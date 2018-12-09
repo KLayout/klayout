@@ -149,13 +149,21 @@ TEST(10_LocalClusterBasic)
   EXPECT_EQ (cluster.id (), size_t (0));
 
   cluster.add (db::PolygonRef (poly, repo), 0);
+  cluster.add_attr (1);
   EXPECT_EQ (cluster.bbox ().to_string (), "(0,0;1000,1000)");
 
   db::local_cluster<db::PolygonRef> cluster2;
-  cluster.add (db::PolygonRef (poly, repo).transformed (db::Trans (db::Vector (10, 20))), 1);
+  cluster2.add (db::PolygonRef (poly, repo).transformed (db::Trans (db::Vector (10, 20))), 1);
+  cluster2.add_attr (2);
 
   cluster.join_with (cluster2);
   EXPECT_EQ (cluster.bbox ().to_string (), "(0,0;1010,1020)");
+
+  EXPECT_EQ (cluster.begin_attr () == cluster.end_attr (), false);
+  db::local_cluster<db::PolygonRef>::attr_iterator a = cluster.begin_attr ();
+  EXPECT_EQ (*a++, 1u);
+  EXPECT_EQ (*a++, 2u);
+  EXPECT_EQ (a == cluster.end_attr (), true);
 }
 
 TEST(11_LocalClusterInteractBasic)
@@ -248,6 +256,9 @@ static std::string local_cluster_to_string (const db::local_cluster<T> &cluster,
       res += "[" + tl::to_string (*l) + "]" + obj2string (*s);
     }
   }
+  for (typename db::local_cluster<T>::attr_iterator a = cluster.begin_attr (); a != cluster.end_attr (); ++a) {
+    res += "%" + tl::to_string (*a);
+  }
   return res;
 }
 
@@ -322,6 +333,67 @@ TEST(20_LocalClustersBasic)
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)\n"
     "#2:[1](0,1100;0,2100;1000,2100;1000,1100)"
+  );
+}
+
+TEST(21_LocalClustersBasicWithAttributes)
+{
+  db::Layout layout;
+  db::Cell &cell = layout.cell (layout.add_cell ("TOP"));
+  db::GenericRepository &repo = layout.shape_repository ();
+
+  db::Connectivity conn;
+  conn.connect (0);
+  conn.connect (1);
+  conn.connect (2);
+  conn.connect (0, 1);
+  conn.connect (0, 2);
+
+  db::Polygon poly;
+  tl::from_string ("(0,0;0,1000;1000,1000;1000,0)", poly);
+
+  cell.shapes (0).insert (db::PolygonRef (poly, repo));
+
+  db::local_clusters<db::PolygonRef> clusters;
+  EXPECT_EQ (local_clusters_to_string (clusters, conn), "");
+
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0)");
+
+  //  one more shape
+  cell.shapes (0).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (10, 20))), repo), 1));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1");
+
+  //  one more shape creating a new cluster
+  cell.shapes (2).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo), 2));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1\n"
+    "#2:[2](0,1100;0,2100;1000,2100;1000,1100)%2"
+  );
+
+  //  one more shape connecting these
+  cell.shapes (2).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1000))), repo), 3));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)%1%2%3"
+  );
+
+  //  one more shape opening a new cluster
+  cell.shapes (1).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo), 4));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)%1%2%3\n"
+    "#2:[1](0,1100;0,2100;1000,2100;1000,1100)%4"
   );
 }
 
@@ -408,28 +480,234 @@ TEST(30_LocalConnectedClusters)
   EXPECT_EQ (x.size (), size_t (0));
 }
 
-static void normalize_layer (db::Layout &layout, unsigned int layer)
+static db::PolygonRef make_box (db::Layout &ly, const db::Box &box)
 {
-  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
-    db::Shapes s (layout.is_editable ());
-    s.swap (c->shapes (layer));
-    for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); !i.at_end (); ++i) {
-      db::Polygon poly;
-      i->polygon (poly);
-      c->shapes (layer).insert (db::PolygonRef (poly, layout.shape_repository ()));
-    }
-  }
+  return db::PolygonRef (db::Polygon (box), ly.shape_repository ());
 }
 
-static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const db::hier_clusters<db::PolygonRef> &hc, db::local_cluster<db::PolygonRef>::id_type cluster_id, const db::ICplxTrans &trans, const db::Connectivity &conn)
+TEST(40_HierClustersBasic)
+{
+  db::hier_clusters<db::PolygonRef> hc;
+
+  db::Layout ly;
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  top.shapes (l1).insert (make_box (ly, db::Box (0, 0, 1000, 1000)));
+
+  db::Cell &c1 = ly.cell (ly.add_cell ("C1"));
+  c1.shapes (l1).insert (make_box (ly, db::Box (0, 0, 2000, 500)));
+  top.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans ()));
+
+  db::Cell &c2 = ly.cell (ly.add_cell ("C2"));
+  c2.shapes (l1).insert (make_box (ly, db::Box (0, 0, 500, 2000)));
+  c2.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans ()));
+  top.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), db::Trans ()));
+
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+
+  hc.build (ly, top, db::ShapeIterator::Polygons, conn);
+
+  int n, nc;
+  const db::connected_clusters<db::PolygonRef> *cluster;
+
+  //  1 cluster in TOP with 2 connections
+  n = 0;
+  cluster = &hc.clusters_per_cell (top.cell_index ());
+  for (db::connected_clusters<db::PolygonRef>::const_iterator i = cluster->begin (); i != cluster->end (); ++i) {
+    ++n;
+  }
+  EXPECT_EQ (n, 1);
+  EXPECT_EQ (cluster->bbox ().to_string (), "(0,0;1000,1000)")
+  nc = 0;
+  for (db::connected_clusters<db::PolygonRef>::connections_iterator i = cluster->begin_connections (); i != cluster->end_connections (); ++i) {
+    nc += i->second.size ();
+  }
+  EXPECT_EQ (nc, 2);
+
+  //  1 cluster in C1 without connection
+  n = 0;
+  cluster = &hc.clusters_per_cell (c1.cell_index ());
+  for (db::connected_clusters<db::PolygonRef>::const_iterator i = cluster->begin (); i != cluster->end (); ++i) {
+    ++n;
+  }
+  EXPECT_EQ (n, 1);
+  EXPECT_EQ (cluster->bbox ().to_string (), "(0,0;2000,500)")
+  nc = 0;
+  for (db::connected_clusters<db::PolygonRef>::connections_iterator i = cluster->begin_connections (); i != cluster->end_connections (); ++i) {
+    nc += i->second.size ();
+  }
+  EXPECT_EQ (nc, 0);
+
+  //  1 cluster in C2 with one connection
+  n = 0;
+  cluster = &hc.clusters_per_cell (c2.cell_index ());
+  for (db::connected_clusters<db::PolygonRef>::const_iterator i = cluster->begin (); i != cluster->end (); ++i) {
+    ++n;
+  }
+  EXPECT_EQ (n, 1);
+  EXPECT_EQ (cluster->bbox ().to_string (), "(0,0;500,2000)")
+  nc = 0;
+  for (db::connected_clusters<db::PolygonRef>::connections_iterator i = cluster->begin_connections (); i != cluster->end_connections (); ++i) {
+    nc += i->second.size ();
+  }
+  EXPECT_EQ (nc, 1);
+}
+
+static std::string path2string (const db::Layout &ly, db::cell_index_type ci, const std::vector<db::ClusterInstance> &path)
+{
+  std::string res = ly.cell_name (ci);
+  for (std::vector<db::ClusterInstance>::const_iterator p = path.begin (); p != path.end (); ++p) {
+    res += "/";
+    res += ly.cell_name (p->inst ().inst_ptr.cell_index ());
+  }
+  return res;
+}
+
+static std::string rcsiter2string (const db::Layout &ly, db::cell_index_type ci, db::recursive_cluster_shape_iterator<db::PolygonRef> si)
+{
+  std::string res;
+  while (! si.at_end ()) {
+    db::Polygon poly = si->obj ();
+    poly.transform (si->trans ());
+    poly.transform (si.trans ());
+    if (! res.empty ()) {
+      res += ";";
+    }
+    res += path2string (ly, ci, si.inst_path ());
+    res += ":";
+    res += poly.to_string ();
+    ++si;
+  }
+  return res;
+}
+
+static std::string rciter2string (const db::Layout &ly, db::cell_index_type ci, db::recursive_cluster_iterator<db::PolygonRef> si)
+{
+  std::string res;
+  while (! si.at_end ()) {
+    if (! res.empty ()) {
+      res += ";";
+    }
+    res += path2string (ly, ci, si.inst_path ());
+    ++si;
+  }
+  return res;
+}
+
+TEST(41_HierClustersRecursiveClusterShapeIterator)
+{
+  db::hier_clusters<db::PolygonRef> hc;
+
+  db::Layout ly;
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  top.shapes (l1).insert (make_box (ly, db::Box (0, 0, 1000, 1000)));
+
+  db::Cell &c1 = ly.cell (ly.add_cell ("C1"));
+  c1.shapes (l1).insert (make_box (ly, db::Box (0, 0, 2000, 500)));
+  top.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (0, 10))));
+
+  db::Cell &c2 = ly.cell (ly.add_cell ("C2"));
+  c2.shapes (l1).insert (make_box (ly, db::Box (0, 0, 500, 2000)));
+  c2.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (0, 20))));
+  top.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), db::Trans (db::Vector (0, 30))));
+
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+
+  hc.build (ly, top, db::ShapeIterator::Polygons, conn);
+
+  std::string res;
+  int n = 0;
+  db::connected_clusters<db::PolygonRef> *cluster = &hc.clusters_per_cell (top.cell_index ());
+  for (db::connected_clusters<db::PolygonRef>::const_iterator i = cluster->begin (); i != cluster->end (); ++i) {
+    res = rcsiter2string (ly, top.cell_index (), db::recursive_cluster_shape_iterator<db::PolygonRef> (hc, l1, top.cell_index (), i->id ()));
+    ++n;
+  }
+  EXPECT_EQ (n, 1);
+  EXPECT_EQ (res, "TOP:(0,0;0,1000;1000,1000;1000,0);TOP/C1:(0,10;0,510;2000,510;2000,10);TOP/C2:(0,30;0,2030;500,2030;500,30);TOP/C2/C1:(0,50;0,550;2000,550;2000,50)");
+}
+
+TEST(41_HierClustersRecursiveClusterIterator)
+{
+  db::hier_clusters<db::PolygonRef> hc;
+
+  db::Layout ly;
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  top.shapes (l1).insert (make_box (ly, db::Box (0, 0, 1000, 1000)));
+
+  db::Cell &c1 = ly.cell (ly.add_cell ("C1"));
+  c1.shapes (l1).insert (make_box (ly, db::Box (0, 0, 2000, 500)));
+  top.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (0, 10))));
+
+  db::Cell &c2 = ly.cell (ly.add_cell ("C2"));
+  c2.shapes (l1).insert (make_box (ly, db::Box (0, 0, 500, 2000)));
+  c2.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (0, 20))));
+  top.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), db::Trans (db::Vector (0, 30))));
+
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+
+  hc.build (ly, top, db::ShapeIterator::Polygons, conn);
+
+  std::string res;
+  int n = 0;
+  db::connected_clusters<db::PolygonRef> *cluster = &hc.clusters_per_cell (top.cell_index ());
+  for (db::connected_clusters<db::PolygonRef>::const_iterator i = cluster->begin (); i != cluster->end (); ++i) {
+    res = rciter2string (ly, top.cell_index (), db::recursive_cluster_iterator<db::PolygonRef> (hc, top.cell_index (), i->id ()));
+    ++n;
+  }
+  EXPECT_EQ (n, 1);
+  EXPECT_EQ (res, "TOP;TOP/C1;TOP/C2;TOP/C2/C1");
+}
+
+static void normalize_layer (db::Layout &layout, std::vector<std::string> &strings, unsigned int &layer)
+{
+  unsigned int new_layer = layout.insert_layer ();
+
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+    const db::Shapes &s = c->shapes (layer);
+    for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::Texts | db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); !i.at_end (); ++i) {
+      if (! i->is_text ()) {
+        db::Polygon poly;
+        i->polygon (poly);
+        c->shapes (new_layer).insert (db::PolygonRef (poly, layout.shape_repository ()));
+      } else {
+        db::Polygon poly (i->bbox ());
+        unsigned int attr_id = (unsigned int) strings.size () + 1;
+        strings.push_back (i->text_string ());
+        c->shapes (new_layer).insert (db::PolygonRefWithProperties (db::PolygonRef (poly, layout.shape_repository ()), attr_id));
+      }
+    }
+  }
+
+  layer = new_layer;
+}
+
+static void copy_cluster_shapes (const std::string *&attrs, db::Shapes &out, db::cell_index_type ci, const db::hier_clusters<db::PolygonRef> &hc, db::local_cluster<db::PolygonRef>::id_type cluster_id, const db::ICplxTrans &trans, const db::Connectivity &conn)
 {
   //  use property #1 to code the cell name
+  //  use property #2 to code the attrs string for the first shape
 
   db::PropertiesRepository &pr = out.layout ()->properties_repository ();
+
+  db::properties_id_type cell_pid = 0, cell_and_attr_pid = 0;
+
   db::property_names_id_type pn_id = pr.prop_name_id (tl::Variant (1));
   db::PropertiesRepository::properties_set pm;
   pm.insert (std::make_pair (pn_id, tl::Variant (out.layout ()->cell_name (ci))));
-  db::properties_id_type cell_pid = pr.properties_id (pm);
+  cell_pid = pr.properties_id (pm);
+
+  if (attrs && ! attrs->empty ()) {
+    db::property_names_id_type pn2_id = pr.prop_name_id (tl::Variant (2));
+    pm.insert (std::make_pair (pn2_id, tl::Variant (*attrs)));
+    cell_and_attr_pid = pr.properties_id (pm);
+  }
 
   const db::connected_clusters<db::PolygonRef> &clusters = hc.clusters_per_cell (ci);
   const db::local_cluster<db::PolygonRef> &lc = clusters.cluster_by_id (cluster_id);
@@ -438,7 +716,9 @@ static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const 
   for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
       db::Polygon poly = s->obj ().transformed (trans * db::ICplxTrans (s->trans ()));
-      out.insert (db::PolygonWithProperties (poly, cell_pid));
+      out.insert (db::PolygonWithProperties (poly, cell_and_attr_pid > 0 ? cell_and_attr_pid : cell_pid));
+      cell_and_attr_pid = 0;
+      attrs = 0; // used
     }
   }
 
@@ -452,7 +732,7 @@ static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const 
     db::ICplxTrans t = trans * i->inst ().complex_trans ();
 
     db::cell_index_type cci = i->inst ().inst_ptr.cell_index ();
-    copy_cluster_shapes (out, cci, hc, i->id (), t, conn);
+    copy_cluster_shapes (attrs, out, cci, hc, i->id (), t, conn);
 
   }
 }
@@ -460,11 +740,16 @@ static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const 
 static void run_hc_test (tl::TestBase *_this, const std::string &file, const std::string &au_file)
 {
   db::Layout ly;
-  unsigned int l1 = 0, l2 = 0, l3 = 0;
+  unsigned int l0 = 0, l1 = 0, l2 = 0, l3 = 0;
 
   {
     db::LayerProperties p;
     db::LayerMap lmap;
+
+    p.layer = 0;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l0 = ly.insert_layer ());
+    ly.set_properties (l0, p);
 
     p.layer = 1;
     p.datatype = 0;
@@ -493,9 +778,10 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
     reader.read (ly, options);
   }
 
-  normalize_layer (ly, l1);
-  normalize_layer (ly, l2);
-  normalize_layer (ly, l3);
+  std::vector<std::string> strings;
+  normalize_layer (ly, strings, l1);
+  normalize_layer (ly, strings, l2);
+  normalize_layer (ly, strings, l3);
 
   //  connect 1 to 1, 1 to 2 and 1 to 3, but *not* 2 to 3
   db::Connectivity conn;
@@ -519,12 +805,25 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
         continue;
       }
 
+      //  collect strings
+      std::string attrs;
+      for (db::recursive_cluster_iterator<db::PolygonRef> rc (hc, *td, *c); ! rc.at_end (); ++rc) {
+        const db::local_cluster<db::PolygonRef> &rcc = hc.clusters_per_cell (rc.cell_index ()).cluster_by_id (rc.cluster_id ());
+        for (db::local_cluster<db::PolygonRef>::attr_iterator a = rcc.begin_attr (); a != rcc.end_attr (); ++a) {
+          if (! attrs.empty ()) {
+            attrs += "/";
+          }
+          attrs += std::string (ly.cell_name (rc.cell_index ())) + ":" + strings[*a - 1];
+        }
+      }
+
       net_layers.push_back (std::make_pair (0, ly.insert_layer ()));
 
       unsigned int lout = net_layers.back ().second;
 
       db::Shapes &out = ly.cell (*td).shapes (lout);
-      copy_cluster_shapes (out, *td, hc, *c, db::ICplxTrans (), conn);
+      const std::string *attrs_str = &attrs;
+      copy_cluster_shapes (attrs_str, out, *td, hc, *c, db::ICplxTrans (), conn);
 
       db::Polygon::area_type area = 0;
       for (db::Shapes::shape_iterator s = out.begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
@@ -586,9 +885,10 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
     reader.read (ly, options);
   }
 
-  normalize_layer (ly, l1);
-  normalize_layer (ly, l2);
-  normalize_layer (ly, l3);
+  std::vector<std::string> strings;
+  normalize_layer (ly, strings, l1);
+  normalize_layer (ly, strings, l2);
+  normalize_layer (ly, strings, l3);
 
   //  connect 1 to 1, 1 to 2 and 1 to 3, but *not* 2 to 3
   db::Connectivity conn;
@@ -611,68 +911,69 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/" + au_file);
 }
 
-TEST(41_HierClusters)
+TEST(101_HierClusters)
 {
   run_hc_test (_this, "hc_test_l1.gds", "hc_test_au1.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l1.gds", "hc_test_au1b.gds");
 }
 
-TEST(42_HierClusters)
+TEST(102_HierClusters)
 {
   run_hc_test (_this, "hc_test_l2.gds", "hc_test_au2.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l2.gds", "hc_test_au2b.gds");
 }
 
-TEST(43_HierClusters)
+TEST(103_HierClusters)
 {
   run_hc_test (_this, "hc_test_l3.gds", "hc_test_au3.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l3.gds", "hc_test_au3b.gds");
 }
 
-TEST(44_HierClusters)
+TEST(104_HierClusters)
 {
   run_hc_test (_this, "hc_test_l4.gds", "hc_test_au4.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l4.gds", "hc_test_au4b.gds");
 }
 
-TEST(45_HierClusters)
+TEST(105_HierClusters)
 {
   run_hc_test (_this, "hc_test_l5.gds", "hc_test_au5.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l5.gds", "hc_test_au5b.gds");
 }
 
-TEST(46_HierClusters)
+TEST(106_HierClusters)
 {
   run_hc_test (_this, "hc_test_l6.gds", "hc_test_au6.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l6.gds", "hc_test_au6b.gds");
 }
 
-TEST(47_HierClusters)
+TEST(107_HierClusters)
 {
   run_hc_test (_this, "hc_test_l7.gds", "hc_test_au7.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l7.gds", "hc_test_au7b.gds");
 }
 
-TEST(48_HierClusters)
+TEST(108_HierClusters)
 {
   run_hc_test (_this, "hc_test_l8.gds", "hc_test_au8.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l8.gds", "hc_test_au8b.gds");
 }
 
-TEST(49_HierClusters)
+TEST(109_HierClusters)
 {
   run_hc_test (_this, "hc_test_l9.gds", "hc_test_au9.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l9.gds", "hc_test_au9b.gds");
 }
 
-TEST(50_HierClusters)
+TEST(110_HierClusters)
 {
   run_hc_test (_this, "hc_test_l10.gds", "hc_test_au10.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l10.gds", "hc_test_au10b.gds");
 }
 
-TEST(51_HierClusters)
+TEST(111_HierClusters)
 {
   run_hc_test (_this, "hc_test_l11.gds", "hc_test_au11.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l4.gds", "hc_test_au4b.gds");
 }
+

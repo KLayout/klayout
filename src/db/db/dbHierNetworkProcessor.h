@@ -123,6 +123,9 @@ public:
   typedef typename T::box_type box_type;
   typedef db::unstable_box_tree<box_type, T, db::box_convert<T> > tree_type;
   typedef typename tree_type::flat_iterator shape_iterator;
+  typedef unsigned int attr_id;
+  typedef std::set<attr_id> attr_set;
+  typedef attr_set::const_iterator attr_iterator;
 
   /**
    *  @brief Creates an empty cluster
@@ -179,6 +182,31 @@ public:
    */
   shape_iterator begin (unsigned int l) const;
 
+  /**
+   *  @brief Adds the given attribute to the attribute set
+   *
+   *  Attributes are arbitary IDs attached to clusters.
+   *  The attribute value 0 is reserved for "no attribute" and is not
+   *  put into the set.
+   */
+  void add_attr (attr_id a);
+
+  /**
+   *  @brief Gets the attribute iterator (begin)
+   */
+  attr_iterator begin_attr () const
+  {
+    return m_attrs.begin ();
+  }
+
+  /**
+   *  @brief Gets the attribute iterator (end)
+   */
+  attr_iterator end_attr () const
+  {
+    return m_attrs.end ();
+  }
+
 private:
   template <typename> friend class local_clusters;
   template <typename> friend class interaction_receiver;
@@ -201,6 +229,7 @@ private:
   bool m_needs_update;
   std::map<unsigned int, tree_type> m_shapes;
   box_type m_bbox;
+  attr_set m_attrs;
 };
 
 /**
@@ -231,6 +260,7 @@ class DB_PUBLIC local_clusters
 public:
   typedef typename local_cluster<T>::id_type id_type;
   typedef typename local_cluster<T>::box_type box_type;
+  typedef typename local_cluster<T>::attr_id attr_id;
   typedef db::box_tree<box_type, local_cluster<T>, local_cluster_box_convert<T> > tree_type;
   typedef typename tree_type::touching_iterator touching_iterator;
   typedef typename tree_type::const_iterator const_iterator;
@@ -670,6 +700,13 @@ public:
   }
 
   /**
+   *  @brief Returns the instantiation path of the current cluster
+   *
+   *  The call path's root is the initial cell
+   */
+  std::vector<ClusterInstance> inst_path () const;
+
+  /**
    *  @brief Returns the transformation applicable for transforming the shape to the root cluster
    */
   const db::ICplxTrans &trans () const
@@ -716,6 +753,73 @@ private:
   void next_conn ();
   void up ();
   void down (db::cell_index_type ci, typename db::local_cluster<T>::id_type id, const db::ICplxTrans &t);
+};
+
+/**
+ *  @brief A recursive cluster iterator for the clusters itself
+ *
+ *  This iterator will deliver the child clusters of a specific cluster.
+ */
+template <class T>
+class DB_PUBLIC recursive_cluster_iterator
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  recursive_cluster_iterator (const hier_clusters<T> &hc, db::cell_index_type ci, typename local_cluster<T>::id_type id);
+
+  /**
+   *  @brief Returns a value indicating whether there are any more shapes
+   */
+  bool at_end () const
+  {
+    return m_cell_index_stack.empty ();
+  }
+
+  /**
+   *  @brief Returns the cell index the shape lives in
+   */
+  db::cell_index_type cell_index () const
+  {
+    return m_cell_index_stack.back ();
+  }
+
+  /**
+   *  @brief Returns the id of the current cluster
+   */
+  typename db::local_cluster<T>::id_type cluster_id () const
+  {
+    if (m_conn_iter_stack.size () <= 1) {
+      return m_id;
+    } else {
+      return m_conn_iter_stack [m_conn_iter_stack.size () - 2].first->id ();
+    }
+  }
+
+  /**
+   *  @brief Returns the instantiation path of the current cluster
+   *
+   *  The call path's root is the initial cell
+   */
+  std::vector<ClusterInstance> inst_path () const;
+
+  /**
+   *  @brief Increment operator
+   */
+  recursive_cluster_iterator &operator++ ();
+
+private:
+  typedef typename db::connected_clusters<T>::connections_type connections_type;
+
+  const hier_clusters<T> *mp_hc;
+  std::vector<db::cell_index_type> m_cell_index_stack;
+  std::vector<std::pair<typename connections_type::const_iterator, typename connections_type::const_iterator> > m_conn_iter_stack;
+  typename db::local_cluster<T>::id_type m_id;
+
+  void next_conn ();
+  void up ();
+  void down (db::cell_index_type ci, typename db::local_cluster<T>::id_type id);
 };
 
 /**

@@ -156,6 +156,16 @@ local_cluster<T>::clear ()
   m_shapes.clear ();
   m_needs_update = false;
   m_bbox = box_type ();
+  m_attrs.clear ();
+}
+
+template <class T>
+void
+local_cluster<T>::add_attr (attr_id a)
+{
+  if (a > 0) {
+    m_attrs.insert (a);
+  }
 }
 
 template <class T>
@@ -174,6 +184,8 @@ local_cluster<T>::join_with (const local_cluster<T> &other)
     tree_type &other_tree = m_shapes[s->first];
     other_tree.insert (s->second.begin (), s->second.end ());
   }
+
+  m_attrs.insert (other.m_attrs.begin (), other.m_attrs.end ());
 
   m_needs_update = true;
 }
@@ -427,7 +439,7 @@ namespace
 
 template <class T, class BoxTree>
 struct cluster_building_receiver
-  : public db::box_scanner_receiver<T, unsigned int>
+  : public db::box_scanner_receiver<T, std::pair<unsigned int, unsigned int> >
 {
   typedef typename local_cluster<T>::id_type id_type;
 
@@ -437,9 +449,9 @@ struct cluster_building_receiver
     //  .. nothing yet..
   }
 
-  void add (const T *s1, unsigned int l1, const T *s2, unsigned int l2)
+  void add (const T *s1, std::pair<unsigned int, unsigned int> p1, const T *s2, std::pair<unsigned int, unsigned int> p2)
   {
-    if (! mp_conn->interacts (*s1, l1, *s2, l2)) {
+    if (! mp_conn->interacts (*s1, p1.first, *s2, p2.first)) {
       return;
     }
 
@@ -451,8 +463,10 @@ struct cluster_building_receiver
       if (id2 == m_shape_to_cluster_id.end ()) {
 
         local_cluster<T> *cluster = mp_clusters->insert ();
-        cluster->add (*s1, l1);
-        cluster->add (*s2, l2);
+        cluster->add (*s1, p1.first);
+        cluster->add (*s2, p2.first);
+        cluster->add_attr (p1.second);
+        cluster->add_attr (p2.second);
 
         m_shape_to_cluster_id.insert (std::make_pair (s1, cluster->id ()));
         m_shape_to_cluster_id.insert (std::make_pair (s2, cluster->id ()));
@@ -460,7 +474,9 @@ struct cluster_building_receiver
       } else {
 
         //  NOTE: const_cast is in order - we know what we're doing.
-        const_cast<local_cluster<T> &> (mp_clusters->cluster_by_id (id2->second)).add (*s1, l1);
+        local_cluster<T> &c2 = const_cast<local_cluster<T> &> (mp_clusters->cluster_by_id (id2->second));
+        c2.add (*s1, p1.first);
+        c2.add_attr (p1.second);
         m_shape_to_cluster_id.insert (std::make_pair (s1, id2->second));
 
       }
@@ -468,7 +484,9 @@ struct cluster_building_receiver
     } else if (id2 == m_shape_to_cluster_id.end ()) {
 
       //  NOTE: const_cast is in order - we know what we're doing.
-      const_cast<local_cluster<T> &> (mp_clusters->cluster_by_id (id1->second)).add (*s2, l2);
+      local_cluster<T> &c1 = const_cast<local_cluster<T> &> (mp_clusters->cluster_by_id (id1->second));
+      c1.add (*s2, p2.first);
+      c1.add_attr (p2.second);
       m_shape_to_cluster_id.insert (std::make_pair (s2, id1->second));
 
     } else if (id1->second != id2->second) {
@@ -481,13 +499,14 @@ struct cluster_building_receiver
     }
   }
 
-  void finish (const T *s, unsigned int l)
+  void finish (const T *s, std::pair<unsigned int, unsigned> p)
   {
     //  if the shape has not been handled yet, insert a single cluster with only this shape
     typename std::map<const T *, id_type>::const_iterator id = m_shape_to_cluster_id.find (s);
     if (id == m_shape_to_cluster_id.end ()) {
       local_cluster<T> *cluster = mp_clusters->insert ();
-      cluster->add (*s, l);
+      cluster->add (*s, p.first);
+      cluster->add_attr (p.second);
     }
   }
 
@@ -503,14 +522,14 @@ template <class T>
 void
 local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
 {
-  db::box_scanner<T, unsigned int> bs;
+  db::box_scanner<T, std::pair<unsigned int, unsigned int> > bs;
   typename T::tag object_tag;
   db::box_convert<T> bc;
 
   for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     const db::Shapes &shapes = cell.shapes (*l);
     for (db::Shapes::shape_iterator s = shapes.begin (shape_flags); ! s.at_end (); ++s) {
-      bs.insert (s->basic_ptr (object_tag), *l);
+      bs.insert (s->basic_ptr (object_tag), std::make_pair (*l, (attr_id) s->prop_id ()));
     }
   }
 
@@ -1362,6 +1381,19 @@ recursive_cluster_shape_iterator<T>::recursive_cluster_shape_iterator (const hie
 }
 
 template <class T>
+std::vector<ClusterInstance> recursive_cluster_shape_iterator<T>::inst_path () const
+{
+  std::vector<db::ClusterInstance> p;
+  if (!m_conn_iter_stack.empty ()) {
+    p.reserve (m_conn_iter_stack.size ());
+    for (size_t i = 0; i < m_conn_iter_stack.size () - 1; ++i) {
+      p.push_back (*m_conn_iter_stack [i].first);
+    }
+  }
+  return p;
+}
+
+template <class T>
 recursive_cluster_shape_iterator<T> &recursive_cluster_shape_iterator<T>::operator++ ()
 {
   ++m_shape_iter;
@@ -1426,6 +1458,78 @@ void recursive_cluster_shape_iterator<T>::down (db::cell_index_type ci, typename
 
 //  explicit instantiations
 template class DB_PUBLIC recursive_cluster_shape_iterator<db::PolygonRef>;
+
+// ------------------------------------------------------------------------------
+//  recursive_cluster_iterator implementation
+
+template <class T>
+recursive_cluster_iterator<T>::recursive_cluster_iterator (const hier_clusters<T> &hc, db::cell_index_type ci, typename local_cluster<T>::id_type id)
+  : mp_hc (&hc), m_id (id)
+{
+  down (ci, id);
+}
+
+template <class T>
+std::vector<ClusterInstance> recursive_cluster_iterator<T>::inst_path () const
+{
+  std::vector<db::ClusterInstance> p;
+  if (!m_conn_iter_stack.empty ()) {
+    p.reserve (m_conn_iter_stack.size ());
+    for (size_t i = 0; i < m_conn_iter_stack.size () - 1; ++i) {
+      p.push_back (*m_conn_iter_stack [i].first);
+    }
+  }
+  return p;
+}
+
+template <class T>
+recursive_cluster_iterator<T> &recursive_cluster_iterator<T>::operator++ ()
+{
+  next_conn ();
+  return *this;
+}
+
+template <class T>
+void recursive_cluster_iterator<T>::next_conn ()
+{
+  while (m_conn_iter_stack.back ().first == m_conn_iter_stack.back ().second) {
+
+    up ();
+    if (m_conn_iter_stack.empty ()) {
+      return;
+    }
+
+    ++m_conn_iter_stack.back ().first;
+
+  }
+
+  if (m_conn_iter_stack.back ().first != m_conn_iter_stack.back ().second) {
+
+    const ClusterInstance &cli = *m_conn_iter_stack.back ().first;
+    down (cli.inst ().inst_ptr.cell_index (), cli.id ());
+
+  }
+}
+
+template <class T>
+void recursive_cluster_iterator<T>::up ()
+{
+  m_conn_iter_stack.pop_back ();
+  m_cell_index_stack.pop_back ();
+}
+
+template <class T>
+void recursive_cluster_iterator<T>::down (db::cell_index_type ci, typename db::local_cluster<T>::id_type id)
+{
+  const connected_clusters<T> &clusters = mp_hc->clusters_per_cell (ci);
+  const typename connected_clusters<T>::connections_type &conn = clusters.connections_for_cluster (id);
+
+  m_cell_index_stack.push_back (ci);
+  m_conn_iter_stack.push_back (std::make_pair (conn.begin (), conn.end ()));
+}
+
+//  explicit instantiations
+template class DB_PUBLIC recursive_cluster_iterator<db::PolygonRef>;
 
 // ------------------------------------------------------------------------------
 //  incoming_cluster_connections implementation

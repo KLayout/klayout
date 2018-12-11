@@ -1,5 +1,8 @@
-0.25.6          (2018-11-23):
+0.25.7          (2018-12-14):
 
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/207
+       Basic.TEXT PCell was rounding bias a spacing values to
+       integer multiples.
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/203
        A segfault was fixed that happend on certain platforms
        when closing the application (e.g. CentOS7).

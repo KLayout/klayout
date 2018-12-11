@@ -154,11 +154,11 @@ BasicText::produce (const db::Layout &layout, const std::vector<unsigned int> &l
   const db::TextGenerator &font = db::TextGenerator::generators ()[f];
 
   double m = parameters [p_magnification].to_double ();
-  db::Coord b = parameters [p_bias].to_double ();
+  double b = parameters [p_bias].to_double ();
   bool inv = parameters [p_inverse].to_bool ();
 
-  db::Coord dx = parameters [p_char_spacing].to_double ();
-  db::Coord dy = parameters [p_line_spacing].to_double ();
+  double dx = parameters [p_char_spacing].to_double ();
+  double dy = parameters [p_line_spacing].to_double ();
 
   std::string t = parameters [p_text].to_string ();
 

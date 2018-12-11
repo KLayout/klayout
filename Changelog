@@ -1,5 +1,11 @@
 0.25.6          (2018-11-23):
 
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/203
+       A segfault was fixed that happend on certain platforms
+       when closing the application (e.g. CentOS7).
+ 
+0.25.6          (2018-11-23):
+
 * Enhancement: https://github.com/klayoutmatthias/klayout/pull/199
        Added an option to export DXF polygons as LINE objects
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/198

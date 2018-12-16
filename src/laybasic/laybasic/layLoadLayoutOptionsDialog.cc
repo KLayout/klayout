@@ -182,7 +182,7 @@ LoadLayoutOptionsDialog::update ()
   }
 
   const lay::Technology *tech = m_tech_array [m_technology_index];
-  options_tab->setEnabled (tech && tech->is_persisted ());
+  options_tab->setEnabled (!tech || tech->is_persisted ());
 
   for (std::vector< std::pair<StreamReaderOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
     if (page->first) {
@@ -235,6 +235,7 @@ LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
 
   tech_cbx->blockSignals (false);
   tech_cbx->show ();
+  tech_frame->show ();
 
   if (get_options_internal ()) {
 
@@ -266,7 +267,7 @@ LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
 bool 
 LoadLayoutOptionsDialog::get_options (db::LoadLayoutOptions &options)
 {
-  tech_cbx->hide ();
+  tech_frame->hide ();
   always_cbx->hide ();
 
   m_opt_array.clear ();

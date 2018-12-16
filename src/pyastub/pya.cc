@@ -22,13 +22,14 @@
 
 
 #include "pya.h"
+#include "tlInternational.h"
 
 namespace pya
 {
 
 static void fail (const char *file, int line)
 {
-  throw tl::ScriptError (tl::to_string (QObject::tr ("Python support not compiled in")).c_str (), file, line, "missing_feature", std::vector<tl::BacktraceElement> ());
+  throw tl::ScriptError (tl::to_string (tr ("Python support not compiled in")).c_str (), file, line, "missing_feature", std::vector<tl::BacktraceElement> ());
 }
 
 static PythonInterpreter *sp_pya_interpreter = 0;

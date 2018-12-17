@@ -301,7 +301,7 @@ private:
   {
     //  NOTE: we shouldn't keep pointers here as the layouts may get deleted and recreated with the same address.
     //  But as we don't access these objects that's fairly safe.
-    DeliveryMappingCacheKey (unsigned int _from_index, db::Layout *_into_layout, db::cell_index_type _into_cell)
+    DeliveryMappingCacheKey (unsigned int _from_index, tl::id_type _into_layout, db::cell_index_type _into_cell)
       : from_index (_from_index), into_layout (_into_layout), into_cell (_into_cell)
     {
       //  .. nothing yet ..
@@ -319,7 +319,7 @@ private:
     }
 
     unsigned int from_index;
-    db::Layout *into_layout;
+    tl::id_type into_layout;
     db::cell_index_type into_cell;
   };
 

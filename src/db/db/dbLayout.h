@@ -40,6 +40,7 @@
 #include "tlString.h"
 #include "tlThreads.h"
 #include "tlObject.h"
+#include "tlUniqueId.h"
 #include "gsi.h"
 
 #include <cstring>
@@ -460,7 +461,8 @@ class DB_PUBLIC Layout
   : public db::Object,
     public db::LayoutStateModel,
     public gsi::ObjectBase,
-    public tl::Object
+    public tl::Object,
+    public tl::UniqueId
 {
 public:
   typedef db::Box box_type;

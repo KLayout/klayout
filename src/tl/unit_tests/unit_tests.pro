@@ -35,6 +35,7 @@ SOURCES = \
   tlHttpStream.cc \
   tlInt128Support.cc \
   tlLongInt.cc \
+    tlUniqueIdTests.cc
 
 !equals(HAVE_QT, "0") {
 

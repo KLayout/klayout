@@ -320,7 +320,7 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
 
   //  derive a cell mapping for source to target. We employ a
 
-  DeliveryMappingCacheKey key (deep_layer.layout_index (), into_layout, into_cell);
+  DeliveryMappingCacheKey key (deep_layer.layout_index (), tl::id_of (into_layout), into_cell);
 
   std::map<DeliveryMappingCacheKey, db::CellMapping>::iterator cm = m_delivery_mapping_cache.find (key);
   if (cm == m_delivery_mapping_cache.end ()) {

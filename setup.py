@@ -59,12 +59,12 @@ from setuptools.extension import Extension, Library
 import glob
 import os
 import platform
-import distutils.sysconfig as sysconfig
 from distutils.errors import CompileError
 import distutils.command.build_ext
 import setuptools.command.build_ext
 import multiprocessing
 N_cores = multiprocessing.cpu_count()
+
 
 # monkey-patch for parallel compilation
 # from https://stackoverflow.com/questions/11013851/speeding-up-build-process-with-distutils
@@ -88,6 +88,7 @@ def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=N
         n_tries = 2
         while n_tries > 0:
             try:
+                print("Building", obj)
                 self._compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
             except CompileError:
                 n_tries -= 1
@@ -95,7 +96,7 @@ def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=N
             else:
                 break
     # convert to list, imap is evaluated on-demand
-    list(multiprocessing.pool.ThreadPool(N).imap(_single_compile, objects))
+    list(multiprocessing.pool.ThreadPool(N).map(_single_compile, objects))
     return objects
 
 
@@ -155,16 +156,17 @@ distutils.ccompiler.CCompiler.library_filename = patched_library_filename
 # for this ... We're patching this back now.
 
 def always_link_shared_object(
-    self, objects, output_libname, output_dir=None, libraries=None,
-    library_dirs=None, runtime_library_dirs=None, export_symbols=None,
-    debug=0, extra_preargs=None, extra_postargs=None, build_temp=None,
-    target_lang=None):
+        self, objects, output_libname, output_dir=None, libraries=None,
+        library_dirs=None, runtime_library_dirs=None, export_symbols=None,
+        debug=0, extra_preargs=None, extra_postargs=None, build_temp=None,
+        target_lang=None):
     self.link(
         self.SHARED_LIBRARY, objects, output_libname,
         output_dir, libraries, library_dirs, runtime_library_dirs,
         export_symbols, debug, extra_preargs, extra_postargs,
         build_temp, target_lang
     )
+
 
 setuptools.command.build_ext.libtype = "shared"
 setuptools.command.build_ext.link_shared_object = always_link_shared_object

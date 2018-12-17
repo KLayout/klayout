@@ -22,6 +22,7 @@
 
 
 #include "tlUnitTest.h"
+#include "tlThreads.h"
 
 #include "dbTilingProcessor.h"
 #include "dbTextWriter.h"
@@ -32,8 +33,6 @@
 #include "dbShapeProcessor.h"
 
 #include <cstdlib>
-#include <QMutex>
-#include <QMutexLocker>
 
 unsigned int get_rand()
 {
@@ -403,8 +402,8 @@ public:
 
   void add (double x) const
   {
-    static QMutex lock;
-    QMutexLocker locker (&lock);
+    static tl::Mutex lock;
+    tl::MutexLocker locker (&lock);
     *mp_sum += x;
     *mp_n += 1;
   }

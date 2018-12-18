@@ -1,5 +1,36 @@
 matrix:
   include:
+    # python manylinux packages
+
+    - name: "manylinux1_x86_64 cp36-cp36m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp36-cp36m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_i686 cp36-cp36m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp36-cp36m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+
     # python 2 osx
     
     - name: "klayout python2 osx10.13"
@@ -288,7 +319,19 @@ before_install:
     fi
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
 
-script: 
+install:
+  - if [ "$DOCKER_BUILD" = true ]; then
+        docker pull $DOCKER_IMAGE;
+    fi
+
+script:
+  - if [ "$DOCKER_BUILD" = true ]; then
+        mkdir -p ccache;
+        mkdir -p wheelhouse;
+        docker run --rm -e DOCKER_IMAGE -e PY_VERSION -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD "/io/ci-scripts/docker/docker_build.sh";
+        mkdir -p deploy/dist-pymod;
+        cp -a wheelhouse/klayout-*manylinux1*.whl deploy/dist-pymod;
+    fi 
   - if [ "$PYTHON_BUILD" = true ]; then
         python setup.py build;
         python setup.py bdist_wheel;

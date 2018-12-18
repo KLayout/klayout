@@ -10,7 +10,6 @@ RUN ln -s /usr/bin/ccache /usr/lib/ccache/gcc
 RUN ln -s /usr/bin/ccache /usr/lib/ccache/g++
 
 # Add ccache to PATH
-ENV PATH="/usr/lib/ccache:${PATH}"
 RUN mkdir -p /persist/.ccache
 ENV CCACHE_DIR="/persist/.ccache"
 

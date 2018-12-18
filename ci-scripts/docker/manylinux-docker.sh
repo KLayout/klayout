@@ -11,7 +11,7 @@ ln -s /usr/bin/ccache /usr/lib64/ccache/c++
 ln -s /usr/bin/ccache /usr/lib64/ccache/cc
 ln -s /usr/bin/ccache /usr/lib64/ccache/gcc
 ln -s /usr/bin/ccache /usr/lib64/ccache/g++
-export PATH=/usr/lib64/ccache:$PATH
+# export PATH=/usr/lib64/ccache:$PATH # unnecessary
 
 # Compile wheels
 for PYBIN in /opt/python/*/bin; do

@@ -35,6 +35,9 @@ cd /io
 # Compile wheel
 "/opt/python/$PY_VERSION/bin/python" setup.py bdist_wheel -d /io/wheelhouse/ || exit 1
 
+# Show ccache stats
+ccache -s
+
 # Bundle external shared libraries into the wheels via auditwheel
 for whl in /io/wheelhouse/*linux_*.whl; do
     auditwheel repair "$whl" -w /io/wheelhouse/ || exit 1

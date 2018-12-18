@@ -2,6 +2,34 @@ matrix:
   include:
     # python manylinux packages
 
+    - name: "manylinux1_x86_64 cp37-cp37m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp37-cp37m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_i686 cp37-cp37m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp37-cp37m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
     - name: "manylinux1_x86_64 cp36-cp36m package"
       os: linux
       sudo: true
@@ -24,6 +52,118 @@ matrix:
       env:
         - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
         - PY_VERSION="cp36-cp36m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_x86_64 cp35-cp35m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp35-cp35m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_i686 cp35-cp35m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp35-cp35m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_x86_64 cp34-cp34m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp34-cp34m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_i686 cp34-cp34m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp34-cp34m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_x86_64 cp27-cp27mu package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp27-cp27mu"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_i686 cp27-cp27mu package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp27-cp27mu"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_x86_64 cp27-cp27m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp27-cp27m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "manylinux1_i686 cp27-cp27m package"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp27-cp27m"
         - DOCKER_BUILD=true
         - MATRIX_EVAL=""
       cache:

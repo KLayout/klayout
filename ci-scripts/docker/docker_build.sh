@@ -14,7 +14,12 @@ fi
 echo PY_VERSION=$PY_VERSION
 echo DOCKER_IMAGE=$DOCKER_IMAGE
 
-yum install -y zlib-devel ccache zip || exit 1  # sometimes the epel server is down.
+# sometimes the epel server is down. retry 5 times
+for i in $(seq 1 5); do 
+    yum install -y zlib-devel ccache zip && s=0 && break || s=$? && sleep 15; 
+done
+
+[ $s -eq 0 ] || exit $s
 
 if [[ $DOCKER_IMAGE == "quay.io/pypa/manylinux1_x86_64" ]]; then
     ln -s /usr/bin/ccache /usr/lib64/ccache/c++

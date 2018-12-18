@@ -469,16 +469,18 @@ script:
         mkdir -p ccache;
         mkdir -p wheelhouse;
         docker run --rm -e DOCKER_IMAGE -e PY_VERSION -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD "/io/ci-scripts/docker/docker_build.sh";
-        mkdir -p deploy/dist-pymod;
-        cp -a wheelhouse/klayout-*manylinux1*.whl deploy/dist-pymod;
+        klayout_version=$(python -c 'import setup; print(setup.Config().version())'); 
+        mkdir -p deploy/dist-pymod/$klayout_version;
+        cp -a wheelhouse/klayout-*manylinux1*.whl deploy/dist-pymod/$klayout_version;
     fi 
   - if [ "$PYTHON_BUILD" = true ]; then
         python setup.py build;
         python setup.py bdist_wheel;
         python setup.py install;
         python -m unittest testdata/pymod/import_db.py  testdata/pymod/import_rdb.py testdata/pymod/import_tl.py;
-        mkdir -p deploy/dist-pymod;
-        cp -a dist/* deploy/dist-pymod/;
+        klayout_version=$(python -c 'import setup; print(setup.Config().version())');
+        mkdir -p deploy/dist-pymod/$klayout_version;
+        cp -a dist/* deploy/dist-pymod/$klayout_version;
         python -c 'import klayout.db as db; print(dir(db))';
         python -c 'import klayout.rdb as rdb; print(dir(rdb))';
         python -c 'import klayout.tl as tl; print(dir(tl))';

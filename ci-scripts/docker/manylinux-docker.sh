@@ -7,10 +7,10 @@ set -e -x
 # Install a system package required by our library
 yum install -y zlib-devel
 yum install -y ccache
-ln -s /usr/bin/ccache /usr/lib64/ccachec++
-ln -s /usr/bin/ccache /usr/lib64/ccachecc
-ln -s /usr/bin/ccache /usr/lib64/ccachegcc
-ln -s /usr/bin/ccache /usr/lib64/ccacheg++
+ln -s /usr/bin/ccache /usr/lib64/ccache/c++
+ln -s /usr/bin/ccache /usr/lib64/ccache/cc
+ln -s /usr/bin/ccache /usr/lib64/ccache/gcc
+ln -s /usr/bin/ccache /usr/lib64/ccache/g++
 export PATH=/usr/lib64/ccache:$PATH
 
 # Compile wheels
@@ -27,5 +27,5 @@ done
 # Install packages and test
 for PYBIN in /opt/python/*/bin/; do
     "${PYBIN}/pip" install klayout --no-index -f /io/wheelhouse
-    "${PYBIN}" -m unittest /io/testdata/pymod/import_db.py  testdata/pymod/import_rdb.py testdata/pymod/import_tl.py
+    "${PYBIN}/python" -m unittest testdata/pymod/import_db.py  testdata/pymod/import_rdb.py testdata/pymod/import_tl.py
 done

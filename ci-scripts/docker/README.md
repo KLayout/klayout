@@ -140,6 +140,10 @@ I tested step 1-5 with both quay.io/pypa/manylinux1_x86_64 and quay.io/pypa/many
 I noticed that the ccache folder ended up with 800MB. I was hoping that the gcc compilation could reuse a lot of previously built objects but that didn't happen. I think that's because each python comes with its own header. So going forward it doesn't make sense to create a docker image for every python version. I will just cache a ccache folder via travis.
 The ccache folder after a single build has 657MB. Go figure.
 
+I discovered that fix_wheel script was actually not properly working. So instead I looked into fixing `auditwheel` directly. Here's the commit that fixes it: https://github.com/thomaslima/auditwheel/tree/87f5306ec02cc68020afaa9933543c898b1d47c1
+
+So now the plan is to change the `docker_build.sh` script so it uses the proper auditwheel, instead of their default.
+
 # Chapter 2. Testing CI flow with docker
 
 # Step 1. Testing commands in own computer

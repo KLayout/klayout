@@ -143,7 +143,8 @@ SOURCES = \
     dbDeepRegion.cc \
     dbHierNetworkProcessor.cc \
     dbNetlistProperty.cc \
-    gsiDeclDbNetlistProperty.cc
+    gsiDeclDbNetlistProperty.cc \
+    dbNetlist.cc
 
 HEADERS = \
   dbArray.h \
@@ -253,7 +254,8 @@ HEADERS = \
     dbHierarchyBuilder.h \
     dbLocalOperation.h \
     dbHierProcessor.h \
-    dbNetlistProperty.h
+    dbNetlistProperty.h \
+    dbNetlist.h
 
 !equals(HAVE_QT, "0") {
 

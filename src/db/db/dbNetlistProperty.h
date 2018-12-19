@@ -20,7 +20,11 @@
 
 */
 
+#ifndef _HDR_dbNetlistProperty
+#define _HDR_dbNetlistProperty
+
 #include "dbCommon.h"
+#include "dbNetlist.h"
 #include "tlVariant.h"
 
 #include <string>
@@ -232,4 +236,51 @@ private:
   std::string m_name;
 };
 
+#if 0 // @@@
+/**
+ *  @brief A reference to an actual port
+ */
+class DB_PUBLIC DevicePortRef
+  : public db::NetlistProperty
+{
+public:
+  DevicePortRef (db::NetPortRef *port);
+
+  //  ...
+
+private:
+  tl::weak_ptr<db::NetPortRef> mp_port;
+};
+
+/**
+ *  @brief An abstrace reference to a port
+ *
+ *  Abstract references are created when turning a string back into a port.
+ *  Abstract references can be turned into actual port references using
+ *  "to_actual_ref".
+ */
+class DB_PUBLIC DevicePortAbstractRef
+  : public db::NetlistProperty
+{
+public:
+  DevicePortAbstractRef (const std::string &device_name, const std::string &port_name);
+
+  //  ...
+
+  /**
+   *  @brief Turns an abstract reference into an actual one
+   *
+   *  The returned object is either 0, if the translation cannot be done or
+   *  and new'd NetPortRef object. It's the responsibility of the caller
+   *  to delete this object when it's no longer used.
+   */
+  NetPortRef *to_actual_ref (const db::Netlist *netlist) const;
+
+private:
+  std::string m_device_name, m_port_name;
+};
+#endif
+
 }
+
+#endif

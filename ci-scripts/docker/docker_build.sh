@@ -26,21 +26,28 @@ if [[ $DOCKER_IMAGE == "quay.io/pypa/manylinux1_x86_64" ]]; then
     ln -s /usr/bin/ccache /usr/lib64/ccache/cc
     ln -s /usr/bin/ccache /usr/lib64/ccache/gcc
     ln -s /usr/bin/ccache /usr/lib64/ccache/g++
+    export PATH="/usr/lib64/ccache/:$PATH"
 elif [[ $DOCKER_IMAGE == "quay.io/pypa/manylinux1_i686" ]]; then
     ln -s /usr/bin/ccache /usr/lib/ccache/c++
     ln -s /usr/bin/ccache /usr/lib/ccache/cc
     ln -s /usr/bin/ccache /usr/lib/ccache/gcc
     ln -s /usr/bin/ccache /usr/lib/ccache/g++
+    export PATH="/usr/lib/ccache/:$PATH"
 fi
 echo $PATH
-# /usr/lib64/ccache:/opt/rh/devtoolset-2/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export CCACHE_DIR="/io/ccache"
+
+# Show ccache stats
+echo "Cache stats:"
+ccache -s
+
 cd /io
 
 # Compile wheel
 "/opt/python/$PY_VERSION/bin/python" setup.py bdist_wheel -d /io/wheelhouse/ || exit 1
 
 # Show ccache stats
+echo "Cache stats:"
 ccache -s
 
 # Bundle external shared libraries into the wheels via auditwheel

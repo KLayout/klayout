@@ -34,8 +34,8 @@ Pin::Pin ()
   //  .. nothing yet ..
 }
 
-Pin::Pin (Circuit *circuit, const std::string &name)
-  : m_circuit (circuit), m_name (name), m_id (0)
+Pin::Pin (const std::string &name)
+  : m_name (name), m_id (0)
 {
   //  .. nothing yet ..
 }
@@ -43,10 +43,15 @@ Pin::Pin (Circuit *circuit, const std::string &name)
 // --------------------------------------------------------------------------------
 //  Device class implementation
 
-Device::Device (DeviceClass *device_class)
-  : m_device_class (device_class)
+Device::Device (DeviceClass *device_class, const std::string &name)
+  : m_device_class (device_class), m_name (name)
 {
   //  .. nothing yet ..
+}
+
+void Device::set_name (const std::string &n)
+{
+  m_name = n;
 }
 
 // --------------------------------------------------------------------------------
@@ -81,8 +86,8 @@ const DevicePortDefinition *
 NetPortRef::port_def () const
 {
   const DeviceClass *dc = device_class ();
-  if (dc && m_port_id < dc->port_definitions ().size ()) {
-    return &dc->port_definitions ()[m_port_id];
+  if (dc) {
+    return dc->port_definition (m_port_id);
   } else {
     return 0;
   }
@@ -115,9 +120,15 @@ NetPinRef::NetPinRef (size_t pin_id, SubCircuit *circuit)
   //  .. nothing yet ..
 }
 
-const Pin *NetPinRef::pin () const
+const Pin *NetPinRef::pin (const db::Circuit *c) const
 {
-  return m_subcircuit->circuit ()->pin_by_id (m_pin_id);
+  if (! m_subcircuit.get ()) {
+    tl_assert (c != 0);
+    return c->pin_by_id (m_pin_id);
+  } else {
+    tl_assert (m_subcircuit->circuit () != 0);
+    return m_subcircuit->circuit ()->pin_by_id (m_pin_id);
+  }
 }
 
 // --------------------------------------------------------------------------------
@@ -177,9 +188,11 @@ void Net::translate_devices (const std::map<const Device *, Device *> &map)
 void Net::translate_subcircuits (const std::map<const SubCircuit *, SubCircuit *> &map)
 {
   for (pin_list::iterator i = m_pins.begin (); i != m_pins.end (); ++i) {
-    std::map<const SubCircuit *, SubCircuit *>::const_iterator m = map.find (i->subcircuit ());
-    tl_assert (m != map.end ());
-    i->set_subcircuit (m->second);
+    if (i->subcircuit ()) {
+      std::map<const SubCircuit *, SubCircuit *>::const_iterator m = map.find (i->subcircuit ());
+      tl_assert (m != map.end ());
+      i->set_subcircuit (m->second);
+    }
   }
 }
 
@@ -321,14 +334,16 @@ DeviceClass::DeviceClass ()
   // .. nothing yet ..
 }
 
-DeviceClass::DeviceClass (const DeviceClass & /*other*/)
+DeviceClass::DeviceClass (const DeviceClass &other)
 {
-  // .. nothing yet ..
+  operator= (other);
 }
 
-DeviceClass &DeviceClass::operator= (const DeviceClass & /*other*/)
+DeviceClass &DeviceClass::operator= (const DeviceClass &other)
 {
-  // .. nothing yet ..
+  if (this != &other) {
+    m_port_definitions = other.m_port_definitions;
+  }
   return *this;
 }
 
@@ -344,10 +359,24 @@ const std::string &DeviceClass::description () const
   return no_description;
 }
 
-const std::vector<DevicePortDefinition> &DeviceClass::port_definitions () const
+void DeviceClass::add_port_definition (const DevicePortDefinition &pd)
 {
-  static std::vector<DevicePortDefinition> no_defs;
-  return no_defs;
+  m_port_definitions.push_back (pd);
+  m_port_definitions.back ().set_id (m_port_definitions.size () - 1);
+}
+
+void DeviceClass::clear_port_definitions ()
+{
+  m_port_definitions.clear ();
+}
+
+const DevicePortDefinition *DeviceClass::port_definition (size_t id) const
+{
+  if (id < m_port_definitions.size ()) {
+    return & m_port_definitions [id];
+  } else {
+    return 0;
+  }
 }
 
 // --------------------------------------------------------------------------------
@@ -366,7 +395,7 @@ GenericDeviceClass::GenericDeviceClass (const GenericDeviceClass &other)
 GenericDeviceClass &GenericDeviceClass::operator= (const GenericDeviceClass &other)
 {
   if (this != &other) {
-    m_port_definitions = other.m_port_definitions;
+    DeviceClass::operator= (other);
     m_name = other.m_name;
     m_description = other.m_description;
   }

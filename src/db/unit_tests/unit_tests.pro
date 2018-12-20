@@ -59,7 +59,8 @@ SOURCES = \
     dbDeepRegionTests.cc \
     dbDeepShapeStoreTests.cc \
     dbHierNetworkProcessorTests.cc \
-    dbNetlistPropertyTests.cc
+    dbNetlistPropertyTests.cc \
+    dbNetlistTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

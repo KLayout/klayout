@@ -55,17 +55,9 @@ public:
   Pin ();
 
   /**
-   *  @brief Creates a port of the given circuit with the given name.
+   *  @brief Creates a pin with the given name.
    */
-  Pin (Circuit *circuit, const std::string &name);
-
-  /**
-   *  @brief Gets the circuit reference
-   */
-  const Circuit *circuit () const
-  {
-    return m_circuit.get ();
-  }
+  Pin (const std::string &name);
 
   /**
    *  @brief Gets the name of the pin
@@ -112,7 +104,7 @@ public:
   /**
    *  @brief The constructor
    */
-  Device (DeviceClass *device_class);
+  Device (DeviceClass *device_class, const std::string &name = std::string ());
 
   /**
    *  @brief Gets the device class
@@ -130,8 +122,22 @@ public:
     m_device_class.reset (cls);
   }
 
+  /**
+   *  @brief Sets the name
+   */
+  void set_name (const std::string &n);
+
+  /**
+   *  @brief Gets the name
+   */
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
 private:
   tl::weak_ptr<DeviceClass> m_device_class;
+  std::string m_name;
 };
 
 /**
@@ -283,8 +289,11 @@ public:
 
   /**
    *  @brief Gets the pin reference from the pin id
+   *
+   *  The circuit is the one where the net is defined. It is used to
+   *  resolve outgoing pints.
    */
-  const Pin *pin () const;
+  const Pin *pin (const Circuit *c) const;
 
   /**
    *  @brief Gets the subcircuit reference
@@ -695,7 +704,7 @@ public:
    *  @brief Creates an empty device port definition
    */
   DevicePortDefinition ()
-    : m_name (), m_description ()
+    : m_name (), m_description (), m_id (0)
   {
     //  .. nothing yet ..
   }
@@ -704,7 +713,7 @@ public:
    *  @brief Creates a device port definition with the given name and description
    */
   DevicePortDefinition (const std::string &name, const std::string &description)
-    : m_name (name), m_description (description)
+    : m_name (name), m_description (description), m_id (0)
   {
     //  .. nothing yet ..
   }
@@ -741,8 +750,24 @@ public:
     m_description = d;
   }
 
+  /**
+   *  @brief Gets the port ID
+   */
+  size_t id () const
+  {
+    return m_id;
+  }
+
 private:
+  friend class DeviceClass;
+
   std::string m_name, m_description;
+  size_t m_id;
+
+  void set_id (size_t id)
+  {
+    m_id = id;
+  }
 };
 
 /**
@@ -807,7 +832,28 @@ public:
    *  The number of ports is constant per class. The index of the port
    *  is used as an ID of the port, hence the order must be static.
    */
-  virtual const std::vector<DevicePortDefinition> &port_definitions () const;
+  virtual const std::vector<DevicePortDefinition> &port_definitions () const
+  {
+    return m_port_definitions;
+  }
+
+  /**
+   *  @brief Adds a port definition
+   */
+  void add_port_definition (const DevicePortDefinition &pd);
+
+  /**
+   *  @brief Clears the port definition
+   */
+  void clear_port_definitions ();
+
+  /**
+   *  @brief Gets the port definition from the ID
+   */
+  const DevicePortDefinition *port_definition (size_t id) const;
+
+private:
+  std::vector<DevicePortDefinition> m_port_definitions;
 };
 
 /**
@@ -881,36 +927,7 @@ public:
     m_description = d;
   }
 
-  /**
-   *  @brief Gets the port definitions
-   *
-   *  The port definitions indicate what ports the device offers.
-   *  The number of ports is constant per class. The index of the port
-   *  is used as an ID of the port, hence the order must be static.
-   */
-  virtual const std::vector<DevicePortDefinition> &port_definitions () const
-  {
-    return m_port_definitions;
-  }
-
-  /**
-   *  @brief Adds a port definition
-   */
-  void add_port_definition (const DevicePortDefinition &pd)
-  {
-    m_port_definitions.push_back (pd);
-  }
-
-  /**
-   *  @brief Clears the port definition
-   */
-  void clear_port_definitions ()
-  {
-    m_port_definitions.clear ();
-  }
-
 private:
-  std::vector<DevicePortDefinition> m_port_definitions;
   std::string m_name, m_description;
 };
 

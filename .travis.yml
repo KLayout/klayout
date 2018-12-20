@@ -5,6 +5,7 @@ matrix:
     - name: "manylinux1_x86_64 cp37-cp37m package"
       os: linux
       sudo: true
+      language: python
       python: '3.7-dev'
       services:
         - docker
@@ -35,6 +36,7 @@ matrix:
     - name: "manylinux1_x86_64 cp36-cp36m package"
       os: linux
       sudo: true
+      language: python
       python: '3.6'
       services:
         - docker
@@ -65,6 +67,7 @@ matrix:
     - name: "manylinux1_x86_64 cp35-cp35m package"
       os: linux
       sudo: true
+      language: python
       python: '3.5'
       services:
         - docker
@@ -95,6 +98,7 @@ matrix:
     - name: "manylinux1_x86_64 cp34-cp34m package"
       os: linux
       sudo: true
+      language: python
       python: '3.4'
       services:
         - docker
@@ -125,6 +129,7 @@ matrix:
     - name: "manylinux1_x86_64 cp27-cp27mu package"
       os: linux
       sudo: true
+      language: python
       python: '2.7'
       services:
         - docker
@@ -155,6 +160,7 @@ matrix:
     - name: "manylinux1_x86_64 cp27-cp27m package"
       os: linux
       sudo: true
+      language: python
       python: '2.7'
       services:
         - docker

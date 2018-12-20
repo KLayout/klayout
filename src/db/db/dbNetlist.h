@@ -26,8 +26,12 @@
 #include "dbCommon.h"
 #include "dbTypes.h"
 #include "tlObjectCollection.h"
+#include "tlVector.h"
 
 #include <list>
+#include <map>
+#include <string>
+
 
 namespace db
 {
@@ -43,7 +47,6 @@ class DevicePortDefinition;
  *  A pin is some place other nets can connect to a circuit.
  */
 class DB_PUBLIC Pin
-  : public tl::Object
 {
 public:
   /**
@@ -72,66 +75,25 @@ public:
     return m_name;
   }
 
+  /**
+   *  @brief Gets the ID of the pin (only pins inside circuits have valid ID's)
+   */
+  size_t id () const
+  {
+    return m_id;
+  }
+
 private:
+  friend class Circuit;
+
   tl::weak_ptr<Circuit> m_circuit;
   std::string m_name;
-};
+  size_t m_id;
 
-/**
- *  @brief The definition of a port of a device
- *
- *  A port is a connection a device can make. This is the port
- *  of an actual device. It corresponds to a device class by
- *  the port ID which is essentially the index of the port
- *  in the device classes' port list.
- */
-class DB_PUBLIC Port
-  : public tl::Object
-{
-public:
-  typedef size_t port_id_type;
-
-  /**
-   *  @brief Default constructor
-   */
-  Port ();
-
-  /**
-   *  @brief Creates a port of the given device and port ID
-   */
-  Port (Device *device, port_id_type port_id);
-
-  /**
-   *  @brief Gets the device reference
-   */
-  const Device *device () const
+  void set_id (size_t id)
   {
-    return m_device.get ();
+    m_id = id;
   }
-
-  /**
-   *  @brief Gets the port id
-   */
-  port_id_type port_id () const
-  {
-    return m_port_id;
-  }
-
-  /**
-   *  @brief Gets the port definition
-   *
-   *  Returns 0 if the port is not a valid port reference.
-   */
-  const DevicePortDefinition *port_def () const;
-
-  /**
-   *  @brief Returns the device class
-   */
-  const DeviceClass *device_class () const;
-
-private:
-  tl::weak_ptr<Device> m_device;
-  port_id_type m_port_id;
 };
 
 /**
@@ -158,6 +120,14 @@ public:
   const DeviceClass *device_class () const
   {
     return m_device_class.get ();
+  }
+
+  /**
+   *  @brief Sets the device class
+   */
+  void set_device_class (DeviceClass *cls)
+  {
+    m_device_class.reset (cls);
   }
 
 private:
@@ -199,6 +169,13 @@ public:
     return m_circuit.get ();
   }
 
+  /**
+   *  @brief Sets the circuit reference
+   */
+  void set_circuit (Circuit *c)
+  {
+    m_circuit.reset (c);
+  }
 
 private:
   tl::weak_ptr<Circuit> m_circuit;
@@ -211,6 +188,7 @@ private:
  */
 class DB_PUBLIC NetPortRef
 {
+public:
   /**
    *  @brief Default constructor
    */
@@ -219,26 +197,55 @@ class DB_PUBLIC NetPortRef
   /**
    *  @brief Creates a pin reference to the given pin of the current circuit
    */
-  NetPortRef (Port *port);
+  NetPortRef (Device *device, size_t port_id);
 
   /**
-   *  @brief Gets the port reference
+   *  @brief Gets the device reference
    */
-  Port *port ()
+  Device *device ()
   {
-    return m_port.get ();
+    return m_device.get ();
   }
 
   /**
-   *  @brief Gets the port reference (const version)
+   *  @brief Gets the device reference (const version)
    */
-  const Port *port () const
+  const Device *device () const
   {
-    return m_port.get ();
+    return m_device.get ();
   }
+
+  /**
+   *  @brief Sets the device reference
+   */
+  void set_device (Device *d)
+  {
+    m_device.reset (d);
+  }
+
+  /**
+   *  @brief Gets the port index
+   */
+  size_t port_id () const
+  {
+    return m_port_id;
+  }
+
+  /**
+   *  @brief Gets the port definition
+   *
+   *  Returns 0 if the port is not a valid port reference.
+   */
+  const DevicePortDefinition *port_def () const;
+
+  /**
+   *  @brief Returns the device class
+   */
+  const DeviceClass *device_class () const;
 
 private:
-  tl::weak_ptr<Port> m_port;
+  tl::weak_ptr<Device> m_device;
+  size_t m_port_id;
 };
 
 /**
@@ -250,6 +257,7 @@ private:
  */
 class DB_PUBLIC NetPinRef
 {
+public:
   /**
    *  @brief Default constructor
    */
@@ -258,28 +266,25 @@ class DB_PUBLIC NetPinRef
   /**
    *  @brief Creates a pin reference to the given pin of the current circuit
    */
-  NetPinRef (Pin *pin);
+  NetPinRef (size_t pin_id);
 
   /**
    *  @brief Creates a pin reference to the given pin of the given subcircuit
    */
-  NetPinRef (Pin *pin, SubCircuit *circuit);
-
-  /**
-   *  @brief Gets the pin reference
-   */
-  Pin *pin ()
-  {
-    return m_pin.get ();
-  }
+  NetPinRef (size_t pin_id, SubCircuit *circuit);
 
   /**
    *  @brief Gets the pin reference (const version)
    */
-  const Pin *pin () const
+  size_t pin_id () const
   {
-    return m_pin.get ();
+    return m_pin_id;
   }
+
+  /**
+   *  @brief Gets the pin reference from the pin id
+   */
+  const Pin *pin () const;
 
   /**
    *  @brief Gets the subcircuit reference
@@ -297,8 +302,16 @@ class DB_PUBLIC NetPinRef
     return m_subcircuit.get ();
   }
 
+  /**
+   *  @brief Sets the subcircuit reference
+   */
+  void set_subcircuit (SubCircuit *s)
+  {
+    m_subcircuit.reset (s);
+  }
+
 private:
-  tl::weak_ptr<Pin> m_pin;
+  size_t m_pin_id;
   tl::weak_ptr<SubCircuit> m_subcircuit;
 };
 
@@ -394,9 +407,14 @@ public:
   }
 
 private:
+  friend class Circuit;
+
   port_list m_ports;
   pin_list m_pins;
   std::string m_name;
+
+  void translate_devices (const std::map<const Device *, Device *> &map);
+  void translate_subcircuits (const std::map<const SubCircuit *, SubCircuit *> &map);
 };
 
 /**
@@ -409,7 +427,7 @@ class DB_PUBLIC Circuit
   : public tl::Object
 {
 public:
-  typedef tl::shared_collection<Pin> pin_list;
+  typedef tl::vector<Pin> pin_list;
   typedef pin_list::const_iterator const_pin_iterator;
   typedef pin_list::iterator pin_iterator;
   typedef tl::shared_collection<Device> device_list;
@@ -477,7 +495,7 @@ public:
    *
    *  The circuit takes over ownership of the object.
    */
-  void add_pin (Pin *pin);
+  void add_pin (const Pin &pin);
 
   /**
    *  @brief Deletes a pin from the circuit
@@ -499,6 +517,11 @@ public:
   {
     return m_pins.end ();
   }
+
+  /**
+   *  @brief Gets the pin by ID (the ID is basically the index)
+   */
+  const Pin *pin_by_id (size_t id) const;
 
   /**
    *  @brief Begin iterator for the pins of the circuit (const version)
@@ -649,12 +672,17 @@ public:
   }
 
 private:
+  friend class Netlist;
+
   std::string m_name;
   db::cell_index_type m_cell_index;
   net_list m_nets;
   pin_list m_pins;
   device_list m_devices;
   sub_circuit_list m_sub_circuits;
+
+  void translate_circuits (const std::map<const Circuit *, Circuit *> &map);
+  void translate_device_classes (const std::map<const db::DeviceClass *, db::DeviceClass *> &map);
 };
 
 /**
@@ -726,6 +754,8 @@ class DB_PUBLIC DeviceClass
   : public tl::Object
 {
 public:
+  typedef size_t port_id_type;
+
   /**
    *  @brief Constructor
    *

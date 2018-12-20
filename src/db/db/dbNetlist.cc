@@ -29,46 +29,15 @@ namespace db
 //  Pin class implementation
 
 Pin::Pin ()
+  : m_id (0)
 {
   //  .. nothing yet ..
 }
 
 Pin::Pin (Circuit *circuit, const std::string &name)
-  : m_circuit (circuit), m_name (name)
+  : m_circuit (circuit), m_name (name), m_id (0)
 {
   //  .. nothing yet ..
-}
-
-// --------------------------------------------------------------------------------
-//  Port class implementation
-
-Port::Port ()
-{
-  //  .. nothing yet ..
-}
-
-Port::Port (Device *device, port_id_type port_id)
-  : m_device (device), m_port_id (port_id)
-{
-  //  .. nothing yet ..
-}
-
-const DevicePortDefinition *
-Port::port_def () const
-{
-  const DeviceClass *dc = device_class ();
-  if (dc && m_port_id < dc->port_definitions ().size ()) {
-    return &dc->port_definitions ()[m_port_id];
-  } else {
-    return 0;
-  }
-}
-
-const DeviceClass *
-Port::device_class () const
-{
-  const Device *device = m_device.get ();
-  return device ? device->device_class () : 0;
 }
 
 // --------------------------------------------------------------------------------
@@ -102,10 +71,28 @@ NetPortRef::NetPortRef ()
   //  .. nothing yet ..
 }
 
-NetPortRef::NetPortRef (Port *port)
-  : m_port (port)
+NetPortRef::NetPortRef (Device *device, size_t port_id)
+  : m_device (device), m_port_id (port_id)
 {
   //  .. nothing yet ..
+}
+
+const DevicePortDefinition *
+NetPortRef::port_def () const
+{
+  const DeviceClass *dc = device_class ();
+  if (dc && m_port_id < dc->port_definitions ().size ()) {
+    return &dc->port_definitions ()[m_port_id];
+  } else {
+    return 0;
+  }
+}
+
+const DeviceClass *
+NetPortRef::device_class () const
+{
+  const Device *device = m_device.get ();
+  return device ? device->device_class () : 0;
 }
 
 // --------------------------------------------------------------------------------
@@ -116,16 +103,21 @@ NetPinRef::NetPinRef ()
   //  .. nothing yet ..
 }
 
-NetPinRef::NetPinRef (Pin *pin)
-  : m_pin (pin)
+NetPinRef::NetPinRef (size_t pin_id)
+  : m_pin_id (pin_id)
 {
   //  .. nothing yet ..
 }
 
-NetPinRef::NetPinRef (Pin *pin, SubCircuit *circuit)
-  : m_pin (pin), m_subcircuit (circuit)
+NetPinRef::NetPinRef (size_t pin_id, SubCircuit *circuit)
+  : m_pin_id (pin_id), m_subcircuit (circuit)
 {
   //  .. nothing yet ..
+}
+
+const Pin *NetPinRef::pin () const
+{
+  return m_subcircuit->circuit ()->pin_by_id (m_pin_id);
 }
 
 // --------------------------------------------------------------------------------
@@ -173,6 +165,24 @@ void Net::add_port (const NetPortRef &port)
   m_ports.push_back (port);
 }
 
+void Net::translate_devices (const std::map<const Device *, Device *> &map)
+{
+  for (port_list::iterator i = m_ports.begin (); i != m_ports.end (); ++i) {
+    std::map<const Device *, Device *>::const_iterator m = map.find (i->device ());
+    tl_assert (m != map.end ());
+    i->set_device (m->second);
+  }
+}
+
+void Net::translate_subcircuits (const std::map<const SubCircuit *, SubCircuit *> &map)
+{
+  for (pin_list::iterator i = m_pins.begin (); i != m_pins.end (); ++i) {
+    std::map<const SubCircuit *, SubCircuit *>::const_iterator m = map.find (i->subcircuit ());
+    tl_assert (m != map.end ());
+    i->set_subcircuit (m->second);
+  }
+}
+
 // --------------------------------------------------------------------------------
 //  Circuit class implementation
 
@@ -189,21 +199,45 @@ Circuit::Circuit (const Circuit &other)
 Circuit &Circuit::operator= (const Circuit &other)
 {
   if (this != &other) {
+
     m_name = other.m_name;
+
     for (const_pin_iterator i = other.begin_pins (); i != other.end_pins (); ++i) {
-      add_pin (new Pin (*i));
+      add_pin (*i);
     }
+
+    std::map<const Device *, Device *> device_table;
     for (const_device_iterator i = other.begin_devices (); i != other.end_devices (); ++i) {
-      add_device (new Device (*i));
+      Device *d = new Device (*i);
+      device_table [i.operator-> ()] = d;
+      add_device (d);
     }
-    for (const_net_iterator i = other.begin_nets (); i != other.end_nets (); ++i) {
-      add_net (new Net (*i));
-    }
+
+    std::map<const SubCircuit *, SubCircuit *> sc_table;
     for (const_sub_circuit_iterator i = other.begin_sub_circuits (); i != other.end_sub_circuits (); ++i) {
-      add_sub_circuit (new SubCircuit (*i));
+      SubCircuit *sc = new SubCircuit (*i);
+      sc_table [i.operator-> ()] = sc;
+      add_sub_circuit (sc);
     }
+
+    for (const_net_iterator i = other.begin_nets (); i != other.end_nets (); ++i) {
+      Net *n = new Net (*i);
+      n->translate_devices (device_table);
+      n->translate_subcircuits (sc_table);
+      add_net (n);
+    }
+
   }
   return *this;
+}
+
+const Pin *Circuit::pin_by_id (size_t id) const
+{
+  if (id >= m_pins.size ()) {
+    return 0;
+  } else {
+    return &m_pins [id];
+  }
 }
 
 void Circuit::clear ()
@@ -225,14 +259,10 @@ void Circuit::set_cell_index (const db::cell_index_type ci)
   m_cell_index = ci;
 }
 
-void Circuit::add_pin (Pin *pin)
+void Circuit::add_pin (const Pin &pin)
 {
   m_pins.push_back (pin);
-}
-
-void Circuit::remove_pin (Pin *pin)
-{
-  m_pins.erase (pin);
+  m_pins.back ().set_id (m_pins.size () - 1);
 }
 
 void Circuit::add_net (Net *net)
@@ -263,6 +293,24 @@ void Circuit::add_sub_circuit (SubCircuit *sub_circuit)
 void Circuit::remove_sub_circuit (SubCircuit *sub_circuit)
 {
   m_sub_circuits.erase (sub_circuit);
+}
+
+void Circuit::translate_circuits (const std::map<const Circuit *, Circuit *> &map)
+{
+  for (sub_circuit_iterator i = m_sub_circuits.begin (); i != m_sub_circuits.end (); ++i) {
+    std::map<const Circuit *, Circuit *>::const_iterator m = map.find (i->circuit ());
+    tl_assert (m != map.end ());
+    i->set_circuit (m->second);
+  }
+}
+
+void Circuit::translate_device_classes (const std::map<const DeviceClass *, DeviceClass *> &map)
+{
+  for (device_iterator i = m_devices.begin (); i != m_devices.end (); ++i) {
+    std::map<const DeviceClass *, DeviceClass *>::const_iterator m = map.find (i->device_class ());
+    tl_assert (m != map.end ());
+    i->set_device_class (m->second);
+  }
 }
 
 // --------------------------------------------------------------------------------
@@ -341,16 +389,28 @@ Netlist::Netlist (const Netlist &other)
 Netlist &Netlist::operator= (const Netlist &other)
 {
   if (this != &other) {
-    for (const_circuit_iterator i = other.begin_circuits (); i != other.end_circuits (); ++i) {
-      add_circuit (new Circuit (*i));
-    }
 
+    std::map<const DeviceClass *, DeviceClass *> dct;
     m_device_classes.clear ();
     for (const_device_class_iterator dc = other.begin_device_classes (); dc != other.end_device_classes (); ++dc) {
-      m_device_classes.push_back (dc->clone ());
+      DeviceClass *dc_new = dc->clone ();
+      dct [dc.operator-> ()] = dc_new;
+      m_device_classes.push_back (dc_new);
     }
-  }
 
+    std::map<const Circuit *, Circuit *> ct;
+    for (const_circuit_iterator i = other.begin_circuits (); i != other.end_circuits (); ++i) {
+      Circuit *ct_new = new Circuit (*i);
+      ct_new->translate_device_classes (dct);
+      ct [i.operator-> ()] = ct_new;
+      add_circuit (ct_new);
+    }
+
+    for (circuit_iterator i = begin_circuits (); i != end_circuits (); ++i) {
+      i->translate_circuits (ct);
+    }
+
+  }
   return *this;
 }
 

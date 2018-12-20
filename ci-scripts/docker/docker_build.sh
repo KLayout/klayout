@@ -69,3 +69,5 @@ TEST_HOME=/io/testdata
 "/opt/python/$PY_VERSION/bin/python" $TEST_HOME/pymod/import_db.py || exit 1
 "/opt/python/$PY_VERSION/bin/python" $TEST_HOME/pymod/import_rdb.py || exit 1
 "/opt/python/$PY_VERSION/bin/python" $TEST_HOME/pymod/import_tl.py || exit 1
+"/opt/python/$PY_VERSION/bin/python" $TEST_HOME/pymod/pya_tests.py || exit 1
+

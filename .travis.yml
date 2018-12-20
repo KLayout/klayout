@@ -5,12 +5,14 @@ matrix:
     - name: "manylinux1_x86_64 cp37-cp37m package"
       os: linux
       sudo: true
+      python: '3.7-dev'
       services:
         - docker
       env:
         - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
         - PY_VERSION="cp37-cp37m"
         - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
         - MATRIX_EVAL=""
       cache:
         directories:
@@ -33,12 +35,14 @@ matrix:
     - name: "manylinux1_x86_64 cp36-cp36m package"
       os: linux
       sudo: true
+      python: '3.6'
       services:
         - docker
       env:
         - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
         - PY_VERSION="cp36-cp36m"
         - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
         - MATRIX_EVAL=""
       cache:
         directories:
@@ -61,12 +65,14 @@ matrix:
     - name: "manylinux1_x86_64 cp35-cp35m package"
       os: linux
       sudo: true
+      python: '3.5'
       services:
         - docker
       env:
         - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
         - PY_VERSION="cp35-cp35m"
         - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
         - MATRIX_EVAL=""
       cache:
         directories:
@@ -89,12 +95,14 @@ matrix:
     - name: "manylinux1_x86_64 cp34-cp34m package"
       os: linux
       sudo: true
+      python: '3.4'
       services:
         - docker
       env:
         - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
         - PY_VERSION="cp34-cp34m"
         - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
         - MATRIX_EVAL=""
       cache:
         directories:
@@ -117,12 +125,14 @@ matrix:
     - name: "manylinux1_x86_64 cp27-cp27mu package"
       os: linux
       sudo: true
+      python: '2.7'
       services:
         - docker
       env:
         - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
         - PY_VERSION="cp27-cp27mu"
         - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
         - MATRIX_EVAL=""
       cache:
         directories:
@@ -145,12 +155,14 @@ matrix:
     - name: "manylinux1_x86_64 cp27-cp27m package"
       os: linux
       sudo: true
+      python: '2.7'
       services:
         - docker
       env:
         - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
         - PY_VERSION="cp27-cp27m"
         - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
         - MATRIX_EVAL=""
       cache:
         directories:
@@ -266,96 +278,96 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python3.7 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.7-dev'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.7 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.7-dev'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
 
-    - name: "klayout python3.6 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.6'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.6 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.6'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python2.7 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '2.7'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python2.7 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '2.7'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python2.6 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '2.6'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="0"  # setuptools installed from last pip has syntax error on py 2.6
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python2.6 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '2.6'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="0"  # setuptools installed from last pip has syntax error on py 2.6
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python3.3 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.3'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.3 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.3'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python3.4 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.4'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.4 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.4'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python3.5 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.5'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.5 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.5'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
 
     # KLayout builds for mac
     # Python 3
@@ -472,12 +484,21 @@ script:
         klayout_version=$(python -c 'import setup; print(setup.Config().version())'); 
         mkdir -p deploy/dist-pymod/$klayout_version;
         cp -a wheelhouse/klayout-*manylinux1*.whl deploy/dist-pymod/$klayout_version;
+        if [ "$TEST_IN_HOST" = true ]; then
+            pip install klayout --no-index -f ./wheelhouse;
+            python testdata/pymod/import_db.py;
+            python testdata/pymod/import_rdb.py;
+            python testdata/pymod/import_tl.py;
+            python testdata/pymod/pya_tests.py;
+        fi
     fi 
   - if [ "$PYTHON_BUILD" = true ]; then
         python setup.py build;
         python setup.py bdist_wheel;
         python setup.py install;
-        python -m unittest testdata/pymod/import_db.py  testdata/pymod/import_rdb.py testdata/pymod/import_tl.py;
+        python testdata/pymod/import_db.py;
+        python testdata/pymod/import_rdb.py;
+        python testdata/pymod/import_tl.py;
         python testdata/pymod/pya_tests.py;
         klayout_version=$(python -c 'import setup; print(setup.Config().version())');
         mkdir -p deploy/dist-pymod/$klayout_version;

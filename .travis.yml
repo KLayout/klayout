@@ -2,7 +2,7 @@ matrix:
   include:
     # python manylinux packages
 
-    - name: "manylinux1_x86_64 cp37-cp37m package"
+    - name: "cp37-cp37m-manylinux1_x86_64.whl"
       os: linux
       sudo: true
       language: python
@@ -19,7 +19,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_i686 cp37-cp37m package"
+    - name: "cp37-cp37m-manylinux1_i686.whl"
       os: linux
       sudo: true
       services:
@@ -33,7 +33,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_x86_64 cp36-cp36m package"
+    - name: "cp36-cp36m-manylinux1_x86_64.whl"
       os: linux
       sudo: true
       language: python
@@ -50,7 +50,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_i686 cp36-cp36m package"
+    - name: "cp36-cp36m-manylinux1_i686.whl"
       os: linux
       sudo: true
       services:
@@ -64,7 +64,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_x86_64 cp35-cp35m package"
+    - name: "cp35-cp35m-manylinux1_x86_64.whl"
       os: linux
       sudo: true
       language: python
@@ -81,7 +81,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_i686 cp35-cp35m package"
+    - name: "cp35-cp35m-manylinux1_i686.whl"
       os: linux
       sudo: true
       services:
@@ -95,7 +95,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_x86_64 cp34-cp34m package"
+    - name: "cp34-cp34m-manylinux1_x86_64.whl"
       os: linux
       sudo: true
       language: python
@@ -112,7 +112,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_i686 cp34-cp34m package"
+    - name: "cp34-cp34m-manylinux1_i686.whl"
       os: linux
       sudo: true
       services:
@@ -126,7 +126,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_x86_64 cp27-cp27mu package"
+    - name: "cp27-cp27mu-manylinux1_x86_64.whl"
       os: linux
       sudo: true
       language: python
@@ -143,7 +143,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_i686 cp27-cp27mu package"
+    - name: "cp27-cp27mu-manylinux1_i686.whl"
       os: linux
       sudo: true
       services:
@@ -157,7 +157,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_x86_64 cp27-cp27m package"
+    - name: "cp27-cp27m-manylinux1_x86_64.whl"
       os: linux
       sudo: true
       language: python
@@ -174,7 +174,7 @@ matrix:
         directories:
         - ccache
 
-    - name: "manylinux1_i686 cp27-cp27m package"
+    - name: "cp27-cp27m-manylinux1_i686.whl"
       os: linux
       sudo: true
       services:
@@ -191,7 +191,8 @@ matrix:
 
     # python 2 osx
     
-    - name: "klayout python2 osx10.13"
+    # - name: "klayout python2 osx10.13"
+    - name: "cp27-cp27m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       cache: ccache
@@ -205,7 +206,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python2 osx10.12"
+    # - name: "klayout python2 osx10.12"
+    - name: "cp27-cp27m-macosx_10_12_x86_64.whl"
       os: osx
       osx_image: xcode8.3  # macOS 10.12
       cache: ccache
@@ -219,7 +221,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python2 osx10.11"
+    # - name: "klayout python2 osx10.11"
+    - name: "cp27-cp27m-macosx_10_11_x86_64.whl"
       os: osx
       osx_image: xcode8  # macOS 10.11
       cache: ccache
@@ -235,7 +238,8 @@ matrix:
 
     # python 3 osx
     
-    - name: "klayout python3 osx10.13"
+    # - name: "klayout python3 osx10.13"
+    - name: "cp37-cp37m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       cache: ccache
@@ -251,7 +255,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
 
-    - name: "klayout python3.6.6 osx10.13"
+    # - name: "klayout python3.6.6 osx10.13"
+    - name: "cp36-cp36m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       cache: ccache
@@ -265,7 +270,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
 
-    - name: "klayout python3.5.6 osx10.13"
+    # - name: "klayout python3.5.6 osx10.13"
+    - name: "cp35-cp35m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       cache: ccache
@@ -279,7 +285,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
 
-    - name: "klayout python3.4.9 osx10.13"
+    # - name: "klayout python3.4.9 osx10.13"
+    - name: "cp34-cp34m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       cache: ccache
@@ -293,7 +300,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python3 osx10.12"
+    # - name: "klayout python3 osx10.12"
+    - name: "cp37-cp37m-macosx_10_12_x86_64.whl"
       os: osx
       osx_image: xcode8.3  # macOS 10.12
       cache: ccache
@@ -309,7 +317,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python3 osx10.11"
+    # - name: "klayout python3 osx10.11"
+    - name: "cp37-cp37m-macosx_10_11_x86_64.whl"
       os: osx
       osx_image: xcode8  # macOS 10.11
       cache: ccache
@@ -562,7 +571,7 @@ script:
         python testdata/pymod/pya_tests.py;
         klayout_version=$(python -c 'import setup; print(setup.Config().version())');
         mkdir -p deploy/dist-pymod/$klayout_version;
-        cp -a dist/* deploy/dist-pymod/$klayout_version;
+        cp -a dist/*.whl deploy/dist-pymod/$klayout_version;
         python -c 'import klayout.db as db; print(dir(db))';
         python -c 'import klayout.rdb as rdb; print(dir(rdb))';
         python -c 'import klayout.tl as tl; print(dir(tl))';

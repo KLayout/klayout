@@ -42,6 +42,7 @@ class Device;
 class DeviceClass;
 class DevicePortDefinition;
 class Netlist;
+class Net;
 /**
  *  @brief The definition of a pin of a circuit
  *
@@ -102,10 +103,27 @@ class DB_PUBLIC Device
   : public tl::Object
 {
 public:
+  typedef tl::vector<const Net *> connected_net_list;
+
+  /**
+   *  @brief Default constructor
+   */
+  Device ();
+
   /**
    *  @brief The constructor
    */
   Device (DeviceClass *device_class, const std::string &name = std::string ());
+
+  /**
+   *  @brief Copy constructor
+   */
+  Device (const Device &other);
+
+  /**
+   *  @brief Assignment
+   */
+  Device &operator= (const Device &other);
 
   /**
    *  @brief Gets the device class
@@ -133,6 +151,12 @@ private:
 
   tl::weak_ptr<DeviceClass> m_device_class;
   std::string m_name;
+  mutable connected_net_list m_nets_per_port;
+
+  void clear_nets_per_port ();
+  void reserve_nets_per_port ();
+  void set_net_for_port (size_t port_id, const Net *net);
+  const Net *net_for_port (size_t port_id) const;
 
   /**
    *  @brief Sets the device class
@@ -152,10 +176,22 @@ class DB_PUBLIC SubCircuit
   : public tl::Object
 {
 public:
+  typedef tl::vector<const Net *> connected_net_list;
+
   /**
    *  @brief Default constructor
    */
   SubCircuit ();
+
+  /**
+   *  @brief Copy constructor
+   */
+  SubCircuit (const SubCircuit &other);
+
+  /**
+   *  @brief Assignment
+   */
+  SubCircuit &operator= (const SubCircuit &other);
 
   /**
    *  @brief Creates a subcircuit reference to the given circuit
@@ -216,6 +252,12 @@ private:
   tl::weak_ptr<Circuit> m_circuit;
   std::string m_name;
   db::DCplxTrans m_trans;
+  mutable connected_net_list m_nets_per_pin;
+
+  void clear_nets_per_pin ();
+  void reserve_nets_per_pin ();
+  void set_net_for_pin (size_t pin_id, const Net *net);
+  const Net *net_for_pin (size_t pin_id) const;
 
   /**
    *  @brief Sets the circuit reference
@@ -524,6 +566,7 @@ public:
   typedef tl::shared_collection<SubCircuit> sub_circuit_list;
   typedef sub_circuit_list::const_iterator const_sub_circuit_iterator;
   typedef sub_circuit_list::iterator sub_circuit_iterator;
+  typedef tl::vector<const Net *> connected_net_list;
 
   /**
    *  @brief Constructor
@@ -601,11 +644,6 @@ public:
   void add_pin (const Pin &pin);
 
   /**
-   *  @brief Deletes a pin from the circuit
-   */
-  void remove_pin (Pin *pin);
-
-  /**
    *  @brief Begin iterator for the pins of the circuit (non-const version)
    */
   pin_iterator begin_pins ()
@@ -619,6 +657,14 @@ public:
   pin_iterator end_pins ()
   {
     return m_pins.end ();
+  }
+
+  /**
+   *  @brief Gets the pin count
+   */
+  size_t pin_count () const
+  {
+    return m_pins.size ();
   }
 
   /**
@@ -774,8 +820,52 @@ public:
     return m_sub_circuits.end ();
   }
 
+  /**
+   *  @brief Gets the connected net for a pin with the given id
+   *
+   *  Returns 0 if the pin is not connected to a net.
+   */
+  const Net *net_for_pin (size_t pin_id) const;
+
+  /**
+   *  @brief Gets the connected net for a pin with the given id (non-const version)
+   *
+   *  Returns 0 if the pin is not connected to a net.
+   */
+  Net *net_for_pin (size_t pin_id)
+  {
+    return const_cast<Net *> (((const Circuit *) this)->net_for_pin (pin_id));
+  }
+
+  /**
+   *  @brief Gets the net for a given pin of a subcircuit
+   */
+  const Net *net_for_pin (const SubCircuit *sub_circuit, size_t pin_id) const;
+
+  /**
+   *  @brief Gets the net for a given pin of a subcircuit (non-const version)
+   */
+  Net *net_for_pin (SubCircuit *sub_circuit, size_t pin_id)
+  {
+    return const_cast<Net *> (((const Circuit *) this)->net_for_pin (sub_circuit, pin_id));
+  }
+
+  /**
+   *  @brief Gets the net for a given port of a device
+   */
+  const Net *net_for_port (const Device *device, size_t port_id) const;
+
+  /**
+   *  @brief Gets the net for a given port of a device (non-const version)
+   */
+  Net *net_for_port (Device *device, size_t port_id)
+  {
+    return const_cast<Net *> (((const Circuit *) this)->net_for_port (device, port_id));
+  }
+
 private:
   friend class Netlist;
+  friend class Net;
 
   std::string m_name;
   db::cell_index_type m_cell_index;
@@ -784,10 +874,14 @@ private:
   device_list m_devices;
   sub_circuit_list m_sub_circuits;
   Netlist *mp_netlist;
+  connected_net_list m_nets_per_pin;
+  bool m_nets_per_pin_valid;
 
   void translate_circuits (const std::map<const Circuit *, Circuit *> &map);
-  void translate_device_classes (const std::map<const db::DeviceClass *, db::DeviceClass *> &map);
+  void translate_device_classes (const std::map<const DeviceClass *, DeviceClass *> &map);
   void set_netlist (Netlist *netlist);
+  void invalidate_nets_per_pin ();
+  void validate_nets_per_pin ();
 };
 
 /**

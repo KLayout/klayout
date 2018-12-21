@@ -164,6 +164,61 @@ static std::string nets2string (const db::Circuit &c)
   return res;
 }
 
+//  dual form of netlist
+static std::string netlist2 (const db::Circuit &c)
+{
+  std::string res;
+
+  std::string pins;
+  for (db::Circuit::const_pin_iterator p = c.begin_pins (); p != c.end_pins (); ++p) {
+    if (! pins.empty ()) {
+      pins += ",";
+    }
+    const db::Net *net = c.net_for_pin (p->id ());
+    pins += p->name ();
+    pins += "=";
+    pins += net ? net->name () : std::string ("(null)");
+  }
+
+  res += c.name () + ":" + pins + "\n";
+
+  for (db::Circuit::const_device_iterator d = c.begin_devices (); d != c.end_devices (); ++d) {
+    if (! d->device_class ()) {
+      continue;
+    }
+    pins.clear ();
+    for (size_t i = 0; i < d->device_class ()->port_definitions ().size (); ++i) {
+      if (! pins.empty ()) {
+        pins += ",";
+      }
+      const db::Net *net = c.net_for_port (d.operator-> (), i);
+      pins += d->device_class ()->port_definitions () [i].name ();
+      pins += "=";
+      pins += net ? net->name () : std::string ("(null)");
+    }
+    res += "  D" + d->name () + ":" + pins + "\n";
+  }
+
+  for (db::Circuit::const_sub_circuit_iterator s = c.begin_sub_circuits (); s != c.end_sub_circuits (); ++s) {
+    if (! s->circuit ()) {
+      continue;
+    }
+    pins.clear ();
+    for (size_t i = 0; i < s->circuit ()->pin_count (); ++i) {
+      if (! pins.empty ()) {
+        pins += ",";
+      }
+      pins += s->circuit ()->pin_by_id (i)->name ();
+      pins += "=";
+      const db::Net *net = c.net_for_pin (s.operator-> (), i);
+      pins += net ? net->name () : std::string ("(null)");
+    }
+    res += "  X" + s->name () + ":" + pins + "\n";
+  }
+
+  return res;
+}
+
 TEST(4_CircuitDevices)
 {
   db::GenericDeviceClass dc1;
@@ -178,6 +233,7 @@ TEST(4_CircuitDevices)
   dc2.add_port_definition (db::DevicePortDefinition ("B", ""));
 
   std::auto_ptr<db::Circuit> c (new db::Circuit ());
+  c->set_name ("c");
   db::Device *d1 = new db::Device (&dc1, "d1");
   db::Device *d2a = new db::Device (&dc2, "d2a");
   db::Device *d2b = new db::Device (&dc2, "d2b");
@@ -186,6 +242,7 @@ TEST(4_CircuitDevices)
   c->add_device (d2b);
 
   db::Net *n1 = new db::Net ();
+  n1->set_name ("n1");
   EXPECT_EQ (n1->circuit (), 0);
   c->add_net (n1);
   n1->add_port (db::NetPortRef (d1, 0));
@@ -193,12 +250,14 @@ TEST(4_CircuitDevices)
   EXPECT_EQ (n1->circuit (), c.get ());
 
   db::Net *n2 = new db::Net ();
+  n2->set_name ("n2");
   c->add_net (n2);
   n2->add_port (db::NetPortRef (d1, 1));
   n2->add_port (db::NetPortRef (d2a, 1));
   n2->add_port (db::NetPortRef (d2b, 0));
 
   db::Net *n3 = new db::Net ();
+  n3->set_name ("n3");
   c->add_net (n3);
   n3->add_port (db::NetPortRef (d1, 2));
   n3->add_port (db::NetPortRef (d2b, 1));
@@ -207,6 +266,13 @@ TEST(4_CircuitDevices)
     "d1:S,d2a:A\n"
     "d1:G,d2a:B,d2b:A\n"
     "d1:D,d2b:B\n"
+  );
+
+  EXPECT_EQ (netlist2 (*c),
+    "c:\n"
+    "  Dd1:S=n1,G=n2,D=n3\n"
+    "  Dd2a:A=n1,B=n2\n"
+    "  Dd2b:A=n2,B=n3\n"
   );
 
   db::Circuit cc = *c;
@@ -218,14 +284,31 @@ TEST(4_CircuitDevices)
     "d1:G,d2a:B,d2b:A\n"
     "d1:D,d2b:B\n"
   );
+
+  EXPECT_EQ (netlist2 (cc),
+    "c:\n"
+    "  Dd1:S=n1,G=n2,D=n3\n"
+    "  Dd2a:A=n1,B=n2\n"
+    "  Dd2b:A=n2,B=n3\n"
+  );
 }
 
-static std::string netlist2string (const db::Netlist &nl)
+static std::string nl2string (const db::Netlist &nl)
 {
   std::string res;
   for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
     res += "[" + c->name () + "]\n";
     res += nets2string (*c);
+  }
+  return res;
+}
+
+//  dual form of netlist
+static std::string netlist2 (const db::Netlist &nl)
+{
+  std::string res;
+  for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
+    res += netlist2 (*c);
   }
   return res;
 }
@@ -258,37 +341,44 @@ TEST(4_NetlistSubcircuits)
   c2->add_device (d);
 
   db::SubCircuit *sc1 = new db::SubCircuit (c2);
+  sc1->set_name ("sc1");
   c1->add_sub_circuit (sc1);
 
   db::SubCircuit *sc2 = new db::SubCircuit (c2);
+  sc2->set_name ("sc2");
   c1->add_sub_circuit (sc2);
 
   db::Net *n2a = new db::Net ();
+  n2a->set_name ("n2a");
   n2a->add_pin (db::NetPinRef (0));
   n2a->add_port (db::NetPortRef (d, 0));
   c2->add_net (n2a);
 
   db::Net *n2b = new db::Net ();
+  n2b->set_name ("n2b");
   n2b->add_port (db::NetPortRef (d, 1));
   n2b->add_pin (db::NetPinRef (1));
   c2->add_net (n2b);
 
   db::Net *n1a = new db::Net ();
+  n1a->set_name ("n1a");
   n1a->add_pin (db::NetPinRef (0));
   n1a->add_pin (db::NetPinRef (0, sc1));
   c1->add_net (n1a);
 
   db::Net *n1b = new db::Net ();
+  n1b->set_name ("n1b");
   n1b->add_pin (db::NetPinRef (1, sc1));
   n1b->add_pin (db::NetPinRef (0, sc2));
   c1->add_net (n1b);
 
   db::Net *n1c = new db::Net ();
+  n1c->set_name ("n1c");
   n1c->add_pin (db::NetPinRef (1, sc2));
   n1c->add_pin (db::NetPinRef (1));
   c1->add_net (n1c);
 
-  EXPECT_EQ (netlist2string (*nl),
+  EXPECT_EQ (nl2string (*nl),
     "[c1]\n"
     "+c1p1,c2:c2p1\n"
     "c2:c2p2,c2:c2p1\n"
@@ -298,12 +388,20 @@ TEST(4_NetlistSubcircuits)
     "D:B,+c2p2\n"
   );
 
+  EXPECT_EQ (netlist2 (*nl),
+    "c1:c1p1=n1a,c1p2=n1c\n"
+    "  Xsc1:c2p1=n1a,c2p2=n1b\n"
+    "  Xsc2:c2p1=n1b,c2p2=n1c\n"
+    "c2:c2p1=n2a,c2p2=n2b\n"
+    "  DD:A=n2a,B=n2b\n"
+  );
+
   db::Netlist nl2 = *nl;
   nl.reset (0);
 
   EXPECT_EQ (nl2.begin_circuits ()->netlist (), &nl2);
 
-  EXPECT_EQ (netlist2string (nl2),
+  EXPECT_EQ (nl2string (nl2),
     "[c1]\n"
     "+c1p1,c2:c2p1\n"
     "c2:c2p2,c2:c2p1\n"
@@ -311,6 +409,14 @@ TEST(4_NetlistSubcircuits)
     "[c2]\n"
     "D:A,+c2p1\n"
     "D:B,+c2p2\n"
+  );
+
+  EXPECT_EQ (netlist2 (nl2),
+    "c1:c1p1=n1a,c1p2=n1c\n"
+    "  Xsc1:c2p1=n1a,c2p2=n1b\n"
+    "  Xsc2:c2p1=n1b,c2p2=n1c\n"
+    "c2:c2p1=n2a,c2p2=n2b\n"
+    "  DD:A=n2a,B=n2b\n"
   );
 }
 

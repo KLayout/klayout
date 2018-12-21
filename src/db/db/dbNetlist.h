@@ -25,6 +25,7 @@
 
 #include "dbCommon.h"
 #include "dbTypes.h"
+#include "dbTrans.h"
 #include "tlObjectCollection.h"
 #include "tlVector.h"
 
@@ -183,8 +184,43 @@ public:
     m_circuit.reset (c);
   }
 
+  /**
+   *  @brief Sets the name of the subcircuit
+   *
+   *  The name is one way to identify the subcircuit. The transformation is
+   *  another one.
+   */
+  void set_name (const std::string &n);
+
+  /**
+   *  @brief Gets the name of the subcircuit
+   */
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  /**
+   *  @brief Sets the transformation describing the subcircuit
+   *
+   *  The transformation is a natural description of a subcircuit
+   *  (in contrast to the name) when deriving it from a layout.
+   */
+  void set_trans (const db::DCplxTrans &trans);
+
+  /**
+   *  @brief Gets the transformation describing the subcircuit
+   */
+  const db::DCplxTrans &trans () const
+  {
+    return m_trans;
+  }
+
+
 private:
   tl::weak_ptr<Circuit> m_circuit;
+  std::string m_name;
+  db::DCplxTrans m_trans;
 };
 
 /**

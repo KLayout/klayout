@@ -68,6 +68,16 @@ SubCircuit::SubCircuit (Circuit *circuit)
   //  .. nothing yet ..
 }
 
+void SubCircuit::set_name (const std::string &n)
+{
+  m_name = n;
+}
+
+void SubCircuit::set_trans (const db::DCplxTrans &t)
+{
+  m_trans = t;
+}
+
 // --------------------------------------------------------------------------------
 //  NetPortRef class implementation
 

@@ -306,3 +306,17 @@ TEST(4_NetlistSubcircuits)
     "D:B,+c2p2\n"
   );
 }
+
+TEST(5_SubCircuit)
+{
+  db::SubCircuit sc, sc2;
+
+  sc.set_name ("sc");
+  EXPECT_EQ (sc.name (), "sc");
+  sc.set_trans (db::DCplxTrans (2.5));
+  EXPECT_EQ (sc.trans ().to_string (), "r0 *2.5 0,0");
+
+  sc2 = sc;
+  EXPECT_EQ (sc2.name (), "sc");
+  EXPECT_EQ (sc2.trans ().to_string (), "r0 *2.5 0,0");
+}

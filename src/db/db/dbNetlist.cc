@@ -62,8 +62,8 @@ SubCircuit::SubCircuit ()
   //  .. nothing yet ..
 }
 
-SubCircuit::SubCircuit (Circuit *circuit)
-  : m_circuit (circuit)
+SubCircuit::SubCircuit (Circuit *circuit, const std::string &name)
+  : m_circuit (circuit), m_name (name)
 {
   //  .. nothing yet ..
 }
@@ -145,13 +145,13 @@ const Pin *NetPinRef::pin (const db::Circuit *c) const
 //  Net class implementation
 
 Net::Net ()
-  : m_cluster_id (0)
+  : m_cluster_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
 
 Net::Net (const Net &other)
-  : m_cluster_id (0)
+  : m_cluster_id (0), mp_circuit (0)
 {
   operator= (other);
 }
@@ -215,15 +215,22 @@ void Net::translate_subcircuits (const std::map<const SubCircuit *, SubCircuit *
   }
 }
 
+void Net::set_circuit (Circuit *circuit)
+{
+  mp_circuit = circuit;
+}
+
 // --------------------------------------------------------------------------------
 //  Circuit class implementation
 
 Circuit::Circuit ()
+  : mp_netlist (0)
 {
   //  .. nothing yet ..
 }
 
 Circuit::Circuit (const Circuit &other)
+  : mp_netlist (0)
 {
   operator= (other);
 }
@@ -263,6 +270,11 @@ Circuit &Circuit::operator= (const Circuit &other)
   return *this;
 }
 
+void Circuit::set_netlist (Netlist *netlist)
+{
+  mp_netlist = netlist;
+}
+
 const Pin *Circuit::pin_by_id (size_t id) const
 {
   if (id >= m_pins.size ()) {
@@ -300,6 +312,7 @@ void Circuit::add_pin (const Pin &pin)
 void Circuit::add_net (Net *net)
 {
   m_nets.push_back (net);
+  net->set_circuit (this);
 }
 
 void Circuit::remove_net (Net *net)
@@ -471,6 +484,7 @@ void Netlist::clear ()
 void Netlist::add_circuit (Circuit *circuit)
 {
   m_circuits.push_back (circuit);
+  circuit->set_netlist (this);
 }
 
 void Netlist::remove_circuit (Circuit *circuit)

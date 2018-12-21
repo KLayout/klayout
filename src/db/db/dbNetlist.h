@@ -41,7 +41,7 @@ class Circuit;
 class Device;
 class DeviceClass;
 class DevicePortDefinition;
-
+class Netlist;
 /**
  *  @brief The definition of a pin of a circuit
  *
@@ -116,14 +116,6 @@ public:
   }
 
   /**
-   *  @brief Sets the device class
-   */
-  void set_device_class (DeviceClass *cls)
-  {
-    m_device_class.reset (cls);
-  }
-
-  /**
    *  @brief Sets the name
    */
   void set_name (const std::string &n);
@@ -137,8 +129,18 @@ public:
   }
 
 private:
+  friend class Circuit;
+
   tl::weak_ptr<DeviceClass> m_device_class;
   std::string m_name;
+
+  /**
+   *  @brief Sets the device class
+   */
+  void set_device_class (DeviceClass *dc)
+  {
+    m_device_class.reset (dc);
+  }
 };
 
 /**
@@ -158,7 +160,7 @@ public:
   /**
    *  @brief Creates a subcircuit reference to the given circuit
    */
-  SubCircuit (Circuit *circuit);
+  SubCircuit (Circuit *circuit, const std::string &name = std::string ());
 
   /**
    *  @brief Gets the circuit the reference points to (const version)
@@ -174,14 +176,6 @@ public:
   Circuit *circuit ()
   {
     return m_circuit.get ();
-  }
-
-  /**
-   *  @brief Sets the circuit reference
-   */
-  void set_circuit (Circuit *c)
-  {
-    m_circuit.reset (c);
   }
 
   /**
@@ -216,11 +210,20 @@ public:
     return m_trans;
   }
 
-
 private:
+  friend class Circuit;
+
   tl::weak_ptr<Circuit> m_circuit;
   std::string m_name;
   db::DCplxTrans m_trans;
+
+  /**
+   *  @brief Sets the circuit reference
+   */
+  void set_circuit (Circuit *c)
+  {
+    m_circuit.reset (c);
+  }
 };
 
 /**
@@ -392,6 +395,24 @@ public:
   Net &operator= (const Net &other);
 
   /**
+   *  @brief Gets the circuit the net lives in
+   *  This pointer is 0 if the net is not part of a circuit.
+   */
+  Circuit *circuit ()
+  {
+    return mp_circuit;
+  }
+
+  /**
+   *  @brief Gets the circuit the net lives in (const version)
+   *  This pointer is 0 if the net is not part of a circuit.
+   */
+  const Circuit *circuit () const
+  {
+    return mp_circuit;
+  }
+
+  /**
    *  @brief Clears the circuit
    */
   void clear ();
@@ -474,9 +495,11 @@ private:
   pin_list m_pins;
   std::string m_name;
   size_t m_cluster_id;
+  Circuit *mp_circuit;
 
   void translate_devices (const std::map<const Device *, Device *> &map);
   void translate_subcircuits (const std::map<const SubCircuit *, SubCircuit *> &map);
+  void set_circuit (Circuit *circuit);
 };
 
 /**
@@ -518,6 +541,24 @@ public:
    *  @brief Assignment
    */
   Circuit &operator= (const Circuit &other);
+
+  /**
+   *  @brief Gets the netlist the circuit lives in
+   *  This pointer is 0 if the circuit is not part of a netlist.
+   */
+  Netlist *netlist ()
+  {
+    return mp_netlist;
+  }
+
+  /**
+   *  @brief Gets the netlist the circuit lives in (const version)
+   *  This pointer is 0 if the circuit is not part of a netlist.
+   */
+  const Netlist *netlist () const
+  {
+    return mp_netlist;
+  }
 
   /**
    *  @brief Clears the circuit
@@ -742,9 +783,11 @@ private:
   pin_list m_pins;
   device_list m_devices;
   sub_circuit_list m_sub_circuits;
+  Netlist *mp_netlist;
 
   void translate_circuits (const std::map<const Circuit *, Circuit *> &map);
   void translate_device_classes (const std::map<const db::DeviceClass *, db::DeviceClass *> &map);
+  void set_netlist (Netlist *netlist);
 };
 
 /**

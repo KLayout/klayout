@@ -186,9 +186,11 @@ TEST(4_CircuitDevices)
   c->add_device (d2b);
 
   db::Net *n1 = new db::Net ();
+  EXPECT_EQ (n1->circuit (), 0);
   c->add_net (n1);
   n1->add_port (db::NetPortRef (d1, 0));
   n1->add_port (db::NetPortRef (d2a, 0));
+  EXPECT_EQ (n1->circuit (), c.get ());
 
   db::Net *n2 = new db::Net ();
   c->add_net (n2);
@@ -209,6 +211,7 @@ TEST(4_CircuitDevices)
 
   db::Circuit cc = *c;
   c.reset (0);
+  EXPECT_EQ (cc.begin_nets ()->circuit (), &cc);
 
   EXPECT_EQ (nets2string (cc),
     "d1:S,d2a:A\n"
@@ -238,10 +241,12 @@ TEST(4_NetlistSubcircuits)
   nl->add_device_class (dc);
 
   db::Circuit *c1 = new db::Circuit ();
+  EXPECT_EQ (c1->netlist (), 0);
   c1->set_name ("c1");
   c1->add_pin (db::Pin ("c1p1"));
   c1->add_pin (db::Pin ("c1p2"));
   nl->add_circuit (c1);
+  EXPECT_EQ (c1->netlist (), nl.get ());
 
   db::Circuit *c2 = new db::Circuit ();
   c2->set_name ("c2");
@@ -295,6 +300,8 @@ TEST(4_NetlistSubcircuits)
 
   db::Netlist nl2 = *nl;
   nl.reset (0);
+
+  EXPECT_EQ (nl2.begin_circuits ()->netlist (), &nl2);
 
   EXPECT_EQ (netlist2string (nl2),
     "[c1]\n"

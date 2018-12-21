@@ -225,10 +225,9 @@ matrix:
         homebrew:
           packages:
             - python3
-            - qt
           update: true
       env:
-        - MATRIX_EVAL=""
+        - MATRIX_EVAL="brew update; brew config; brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/56c500b569c724b049be7ab9e12d9693f85522f9/Formula/qt.rb"  # Qt 5.11.2
         - PYTHON_VERSION=B37
         - MACOS_VERSION=ElCapitan
         - KLAYOUT_BUILD=true
@@ -265,13 +264,8 @@ matrix:
     - name: "KLayout macOS 10.11 with py2.7"
       os: osx
       osx_image: xcode8 # macOS 10.11
-      addons:
-        homebrew:
-          packages:
-            - qt
-          update: true
       env:
-        - MATRIX_EVAL=""
+        - MATRIX_EVAL="brew update; brew config; brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/56c500b569c724b049be7ab9e12d9693f85522f9/Formula/qt.rb"  # Qt 5.11.2
         - PYTHON_VERSION=Sys
         - MACOS_VERSION=ElCapitan
         - KLAYOUT_BUILD=true

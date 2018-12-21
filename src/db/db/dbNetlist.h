@@ -410,6 +410,22 @@ public:
   }
 
   /**
+   *  @brief Sets the cluster ID of this net
+   *
+   *  The cluster ID links the net to a cluster from the
+   *  hierarchical layout netlist extractor.
+   */
+  void set_cluster_id (size_t ci);
+
+  /**
+   *  @brief Gets the cluster ID
+   */
+  size_t cluster_id () const
+  {
+    return m_cluster_id;
+  }
+
+  /**
    *  @brief Adds a pin to this net
    */
   void add_pin (const NetPinRef &pin);
@@ -457,6 +473,7 @@ private:
   port_list m_ports;
   pin_list m_pins;
   std::string m_name;
+  size_t m_cluster_id;
 
   void translate_devices (const std::map<const Device *, Device *> &map);
   void translate_subcircuits (const std::map<const SubCircuit *, SubCircuit *> &map);

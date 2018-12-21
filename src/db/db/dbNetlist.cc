@@ -145,11 +145,13 @@ const Pin *NetPinRef::pin (const db::Circuit *c) const
 //  Net class implementation
 
 Net::Net ()
+  : m_cluster_id (0)
 {
   //  .. nothing yet ..
 }
 
 Net::Net (const Net &other)
+  : m_cluster_id (0)
 {
   operator= (other);
 }
@@ -160,6 +162,7 @@ Net &Net::operator= (const Net &other)
     m_name = other.m_name;
     m_pins = other.m_pins;
     m_ports = other.m_ports;
+    m_cluster_id = other.m_cluster_id;
   }
   return *this;
 }
@@ -169,11 +172,17 @@ void Net::clear ()
   m_name.clear ();
   m_ports.clear ();
   m_pins.clear ();
+  m_cluster_id = 0;
 }
 
 void Net::set_name (const std::string &name)
 {
   m_name = name;
+}
+
+void Net::set_cluster_id (size_t ci)
+{
+  m_cluster_id = ci;
 }
 
 void Net::add_pin (const NetPinRef &pin)

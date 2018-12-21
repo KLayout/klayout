@@ -320,3 +320,21 @@ TEST(5_SubCircuit)
   EXPECT_EQ (sc2.name (), "sc");
   EXPECT_EQ (sc2.trans ().to_string (), "r0 *2.5 0,0");
 }
+
+TEST(6_Net)
+{
+  db::Net n, n2;
+
+  n.set_name ("n");
+  EXPECT_EQ (n.name (), "n");
+  n.set_cluster_id (17);
+  EXPECT_EQ (int (n.cluster_id ()), 17);
+
+  n2 = n;
+  EXPECT_EQ (n2.name (), "n");
+  EXPECT_EQ (int (n2.cluster_id ()), 17);
+
+  n.clear ();
+  EXPECT_EQ (n.name (), "");
+  EXPECT_EQ (int (n.cluster_id ()), 0);
+}

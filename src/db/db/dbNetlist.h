@@ -38,235 +38,13 @@ namespace db
 {
 
 class Circuit;
+class SubCircuit;
+class Pin;
 class Device;
 class DeviceClass;
 class DevicePortDefinition;
 class Netlist;
 class Net;
-/**
- *  @brief The definition of a pin of a circuit
- *
- *  A pin is some place other nets can connect to a circuit.
- */
-class DB_PUBLIC Pin
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  Pin ();
-
-  /**
-   *  @brief Creates a pin with the given name.
-   */
-  Pin (const std::string &name);
-
-  /**
-   *  @brief Gets the name of the pin
-   */
-  const std::string &name () const
-  {
-    return m_name;
-  }
-
-  /**
-   *  @brief Gets the ID of the pin (only pins inside circuits have valid ID's)
-   */
-  size_t id () const
-  {
-    return m_id;
-  }
-
-private:
-  friend class Circuit;
-
-  tl::weak_ptr<Circuit> m_circuit;
-  std::string m_name;
-  size_t m_id;
-
-  void set_id (size_t id)
-  {
-    m_id = id;
-  }
-};
-
-/**
- *  @brief An actual device
- *
- *  This class represents the incarnation of a specific device.
- *  The device has a class which specifies a type. This class
- *  is intended for subclassing.
- *  A specific device subclass is supposed to correspond to
- *  a specific device class.
- */
-class DB_PUBLIC Device
-  : public tl::Object
-{
-public:
-  typedef tl::vector<const Net *> connected_net_list;
-
-  /**
-   *  @brief Default constructor
-   */
-  Device ();
-
-  /**
-   *  @brief The constructor
-   */
-  Device (DeviceClass *device_class, const std::string &name = std::string ());
-
-  /**
-   *  @brief Copy constructor
-   */
-  Device (const Device &other);
-
-  /**
-   *  @brief Assignment
-   */
-  Device &operator= (const Device &other);
-
-  /**
-   *  @brief Gets the device class
-   */
-  const DeviceClass *device_class () const
-  {
-    return m_device_class.get ();
-  }
-
-  /**
-   *  @brief Sets the name
-   */
-  void set_name (const std::string &n);
-
-  /**
-   *  @brief Gets the name
-   */
-  const std::string &name () const
-  {
-    return m_name;
-  }
-
-private:
-  friend class Circuit;
-
-  tl::weak_ptr<DeviceClass> m_device_class;
-  std::string m_name;
-  mutable connected_net_list m_nets_per_port;
-
-  void clear_nets_per_port ();
-  void reserve_nets_per_port ();
-  void set_net_for_port (size_t port_id, const Net *net);
-  const Net *net_for_port (size_t port_id) const;
-
-  /**
-   *  @brief Sets the device class
-   */
-  void set_device_class (DeviceClass *dc)
-  {
-    m_device_class.reset (dc);
-  }
-};
-
-/**
- *  @brief A subcircuit of a circuit
- *
- *  This class essentially is a reference to another circuit
- */
-class DB_PUBLIC SubCircuit
-  : public tl::Object
-{
-public:
-  typedef tl::vector<const Net *> connected_net_list;
-
-  /**
-   *  @brief Default constructor
-   */
-  SubCircuit ();
-
-  /**
-   *  @brief Copy constructor
-   */
-  SubCircuit (const SubCircuit &other);
-
-  /**
-   *  @brief Assignment
-   */
-  SubCircuit &operator= (const SubCircuit &other);
-
-  /**
-   *  @brief Creates a subcircuit reference to the given circuit
-   */
-  SubCircuit (Circuit *circuit, const std::string &name = std::string ());
-
-  /**
-   *  @brief Gets the circuit the reference points to (const version)
-   */
-  const Circuit *circuit () const
-  {
-    return m_circuit.get ();
-  }
-
-  /**
-   *  @brief Gets the circuit the reference points to (non-const version)
-   */
-  Circuit *circuit ()
-  {
-    return m_circuit.get ();
-  }
-
-  /**
-   *  @brief Sets the name of the subcircuit
-   *
-   *  The name is one way to identify the subcircuit. The transformation is
-   *  another one.
-   */
-  void set_name (const std::string &n);
-
-  /**
-   *  @brief Gets the name of the subcircuit
-   */
-  const std::string &name () const
-  {
-    return m_name;
-  }
-
-  /**
-   *  @brief Sets the transformation describing the subcircuit
-   *
-   *  The transformation is a natural description of a subcircuit
-   *  (in contrast to the name) when deriving it from a layout.
-   */
-  void set_trans (const db::DCplxTrans &trans);
-
-  /**
-   *  @brief Gets the transformation describing the subcircuit
-   */
-  const db::DCplxTrans &trans () const
-  {
-    return m_trans;
-  }
-
-private:
-  friend class Circuit;
-
-  tl::weak_ptr<Circuit> m_circuit;
-  std::string m_name;
-  db::DCplxTrans m_trans;
-  mutable connected_net_list m_nets_per_pin;
-
-  void clear_nets_per_pin ();
-  void reserve_nets_per_pin ();
-  void set_net_for_pin (size_t pin_id, const Net *net);
-  const Net *net_for_pin (size_t pin_id) const;
-
-  /**
-   *  @brief Sets the circuit reference
-   */
-  void set_circuit (Circuit *c)
-  {
-    m_circuit.reset (c);
-  }
-};
 
 /**
  *  @brief A reference to a port of a device
@@ -287,11 +65,21 @@ public:
   NetPortRef (Device *device, size_t port_id);
 
   /**
+   *  @brief Copy constructor
+   */
+  NetPortRef (const NetPortRef &other);
+
+  /**
+   *  @brief Assignment
+   */
+  NetPortRef &operator= (const NetPortRef &other);
+
+  /**
    *  @brief Gets the device reference
    */
   Device *device ()
   {
-    return m_device.get ();
+    return mp_device;
   }
 
   /**
@@ -299,15 +87,7 @@ public:
    */
   const Device *device () const
   {
-    return m_device.get ();
-  }
-
-  /**
-   *  @brief Sets the device reference
-   */
-  void set_device (Device *d)
-  {
-    m_device.reset (d);
+    return mp_device;
   }
 
   /**
@@ -330,9 +110,36 @@ public:
    */
   const DeviceClass *device_class () const;
 
+  /**
+   *  @brief Gets the net the port lives in
+   */
+  Net *net ()
+  {
+    return mp_net;
+  }
+
+  /**
+   *  @brief Gets the net the port lives in (const version)
+   */
+  const Net *net () const
+  {
+    return mp_net;
+  }
+
 private:
-  tl::weak_ptr<Device> m_device;
+  friend class Net;
+
   size_t m_port_id;
+  Device *mp_device;
+  Net *mp_net;
+
+  /**
+   *  @brief Sets the net the port lives in
+   */
+  void set_net (Net *net)
+  {
+    mp_net = net;
+  }
 };
 
 /**
@@ -358,7 +165,17 @@ public:
   /**
    *  @brief Creates a pin reference to the given pin of the given subcircuit
    */
-  NetPinRef (size_t pin_id, SubCircuit *circuit);
+  NetPinRef (SubCircuit *circuit, size_t pin_id);
+
+  /**
+   *  @brief Copy constructor
+   */
+  NetPinRef (const NetPinRef &other);
+
+  /**
+   *  @brief Assignment
+   */
+  NetPinRef &operator= (const NetPinRef &other);
 
   /**
    *  @brief Gets the pin reference (const version)
@@ -381,7 +198,7 @@ public:
    */
   SubCircuit *subcircuit ()
   {
-    return m_subcircuit.get ();
+    return mp_subcircuit;
   }
 
   /**
@@ -389,20 +206,39 @@ public:
    */
   const SubCircuit *subcircuit () const
   {
-    return m_subcircuit.get ();
+    return mp_subcircuit;
   }
 
   /**
-   *  @brief Sets the subcircuit reference
+   *  @brief Gets the net the pin lives in
    */
-  void set_subcircuit (SubCircuit *s)
+  Net *net ()
   {
-    m_subcircuit.reset (s);
+    return mp_net;
+  }
+
+  /**
+   *  @brief Gets the net the pin lives in (const version)
+   */
+  const Net *net () const
+  {
+    return mp_net;
   }
 
 private:
+  friend class Net;
+
   size_t m_pin_id;
-  tl::weak_ptr<SubCircuit> m_subcircuit;
+  SubCircuit *mp_subcircuit;
+  Net *mp_net;
+
+  /**
+   *  @brief Sets the net the port lives in
+   */
+  void set_net (Net *net)
+  {
+    mp_net = net;
+  }
 };
 
 /**
@@ -416,12 +252,13 @@ class DB_PUBLIC Net
 public:
   typedef std::list<NetPortRef> port_list;
   typedef port_list::const_iterator const_port_iterator;
+  typedef port_list::iterator port_iterator;
   typedef std::list<NetPinRef> pin_list;
   typedef pin_list::const_iterator const_pin_iterator;
+  typedef pin_list::iterator pin_iterator;
 
   /**
    *  @brief Constructor
-   *
    *  Creates an empty circuit.
    */
   Net ();
@@ -430,6 +267,11 @@ public:
    *  @brief Copy constructor
    */
   Net (const Net &other);
+
+  /**
+   *  @brief Destructor
+   */
+  ~Net ();
 
   /**
    *  @brief Assignment
@@ -494,6 +336,11 @@ public:
   void add_pin (const NetPinRef &pin);
 
   /**
+   *  @brief Erases the given pin from this net
+   */
+  void erase_pin (pin_iterator iter);
+
+  /**
    *  @brief Begin iterator for the pins of the net (const version)
    */
   const_pin_iterator begin_pins () const
@@ -510,9 +357,30 @@ public:
   }
 
   /**
+   *  @brief Begin iterator for the pins of the net (non-const version)
+   */
+  pin_iterator begin_pins ()
+  {
+    return m_pins.begin ();
+  }
+
+  /**
+   *  @brief End iterator for the pins of the net (non-const version)
+   */
+  pin_iterator end_pins ()
+  {
+    return m_pins.end ();
+  }
+
+  /**
    *  @brief Adds a port to this net
    */
   void add_port (const NetPortRef &port);
+
+  /**
+   *  @brief Erases the given port from this net
+   */
+  void erase_port (port_iterator iter);
 
   /**
    *  @brief Begin iterator for the ports of the net (const version)
@@ -530,6 +398,22 @@ public:
     return m_ports.end ();
   }
 
+  /**
+   *  @brief Begin iterator for the ports of the net (non-const version)
+   */
+  port_iterator begin_ports ()
+  {
+    return m_ports.begin ();
+  }
+
+  /**
+   *  @brief End iterator for the ports of the net (non-const version)
+   */
+  port_iterator end_ports ()
+  {
+    return m_ports.end ();
+  }
+
 private:
   friend class Circuit;
 
@@ -539,9 +423,288 @@ private:
   size_t m_cluster_id;
   Circuit *mp_circuit;
 
-  void translate_devices (const std::map<const Device *, Device *> &map);
-  void translate_subcircuits (const std::map<const SubCircuit *, SubCircuit *> &map);
   void set_circuit (Circuit *circuit);
+};
+
+/**
+ *  @brief The definition of a pin of a circuit
+ *
+ *  A pin is some place other nets can connect to a circuit.
+ */
+class DB_PUBLIC Pin
+{
+public:
+  /**
+   *  @brief Default constructor
+   */
+  Pin ();
+
+  /**
+   *  @brief Creates a pin with the given name.
+   */
+  Pin (const std::string &name);
+
+  /**
+   *  @brief Gets the name of the pin
+   */
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  /**
+   *  @brief Gets the ID of the pin (only pins inside circuits have valid ID's)
+   */
+  size_t id () const
+  {
+    return m_id;
+  }
+
+private:
+  friend class Circuit;
+
+  tl::weak_ptr<Circuit> m_circuit;
+  std::string m_name;
+  size_t m_id;
+
+  void set_id (size_t id)
+  {
+    m_id = id;
+  }
+};
+
+/**
+ *  @brief An actual device
+ *
+ *  This class represents the incarnation of a specific device.
+ *  The device has a class which specifies a type. This class
+ *  is intended for subclassing.
+ *  A specific device subclass is supposed to correspond to
+ *  a specific device class.
+ */
+class DB_PUBLIC Device
+  : public tl::Object
+{
+public:
+  /**
+   *  @brief Default constructor
+   */
+  Device ();
+
+  /**
+   *  @brief The constructor
+   */
+  Device (DeviceClass *device_class, const std::string &name = std::string ());
+
+  /**
+   *  @brief Copy constructor
+   */
+  Device (const Device &other);
+
+  /**
+   *  @brief Assignment
+   */
+  Device &operator= (const Device &other);
+
+  /**
+   *  @brief Destructor
+   */
+  ~Device ();
+
+  /**
+   *  @brief Gets the device class
+   */
+  const DeviceClass *device_class () const
+  {
+    return m_device_class.get ();
+  }
+
+  /**
+   *  @brief Sets the name
+   */
+  void set_name (const std::string &n);
+
+  /**
+   *  @brief Gets the name
+   */
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  /**
+   *  @brief Gets the net attached to a specific port
+   *  Returns 0 if no net is attached.
+   */
+  const Net *net_for_port (size_t port_id) const;
+
+  /**
+   *  @brief Gets the net attached to a specific port (non-const version)
+   *  Returns 0 if no net is attached.
+   */
+  Net *net_for_port (size_t port_id)
+  {
+    return const_cast<Net *> (((const Device *) this)->net_for_port (port_id));
+  }
+
+  /**
+   *  @brief Connects the given port to the given net
+   *  If the net is 0 the port is disconnected.
+   *  If non-null, a NetPortRef object will be inserted into the
+   *  net and connected with the given port.
+   */
+  void connect_port (size_t port_id, Net *net);
+
+private:
+  friend class Circuit;
+  friend class Net;
+
+  tl::weak_ptr<DeviceClass> m_device_class;
+  std::string m_name;
+  std::vector<Net::port_iterator> m_port_refs;
+
+  /**
+   *  @brief Sets the port reference for a specific port
+   */
+  void set_port_ref_for_port (size_t port_id, Net::port_iterator iter);
+
+  /**
+   *  @brief Sets the device class
+   */
+  void set_device_class (DeviceClass *dc)
+  {
+    m_device_class.reset (dc);
+  }
+};
+
+/**
+ *  @brief A subcircuit of a circuit
+ *
+ *  This class essentially is a reference to another circuit
+ */
+class DB_PUBLIC SubCircuit
+  : public tl::Object
+{
+public:
+  typedef tl::vector<const Net *> connected_net_list;
+
+  /**
+   *  @brief Default constructor
+   */
+  SubCircuit ();
+
+  /**
+   *  @brief Copy constructor
+   */
+  SubCircuit (const SubCircuit &other);
+
+  /**
+   *  @brief Assignment
+   */
+  SubCircuit &operator= (const SubCircuit &other);
+
+  /**
+   *  @brief Creates a subcircuit reference to the given circuit
+   */
+  SubCircuit (Circuit *circuit, const std::string &name = std::string ());
+
+  /**
+   *  @brief Destructor
+   */
+  ~SubCircuit ();
+
+  /**
+   *  @brief Gets the circuit the reference points to (const version)
+   */
+  const Circuit *circuit () const
+  {
+    return m_circuit.get ();
+  }
+
+  /**
+   *  @brief Gets the circuit the reference points to (non-const version)
+   */
+  Circuit *circuit ()
+  {
+    return m_circuit.get ();
+  }
+
+  /**
+   *  @brief Sets the name of the subcircuit
+   *
+   *  The name is one way to identify the subcircuit. The transformation is
+   *  another one.
+   */
+  void set_name (const std::string &n);
+
+  /**
+   *  @brief Gets the name of the subcircuit
+   */
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  /**
+   *  @brief Sets the transformation describing the subcircuit
+   *
+   *  The transformation is a natural description of a subcircuit
+   *  (in contrast to the name) when deriving it from a layout.
+   */
+  void set_trans (const db::DCplxTrans &trans);
+
+  /**
+   *  @brief Gets the transformation describing the subcircuit
+   */
+  const db::DCplxTrans &trans () const
+  {
+    return m_trans;
+  }
+
+  /**
+   *  @brief Gets the net attached to a specific pin
+   *  Returns 0 if no net is attached.
+   */
+  const Net *net_for_pin (size_t pin_id) const;
+
+  /**
+   *  @brief Gets the net attached to a specific pin (non-const version)
+   *  Returns 0 if no net is attached.
+   */
+  Net *net_for_pin (size_t pin_id)
+  {
+    return const_cast<Net *> (((const SubCircuit *) this)->net_for_pin (pin_id));
+  }
+
+  /**
+   *  @brief Connects the given pin to the given net
+   *  If the net is 0 the pin is disconnected.
+   *  If non-null, a NetPinRef object will be inserted into the
+   *  net and connected with the given pin.
+   */
+  void connect_pin (size_t pin_id, Net *net);
+
+private:
+  friend class Circuit;
+  friend class Net;
+
+  tl::weak_ptr<Circuit> m_circuit;
+  std::string m_name;
+  db::DCplxTrans m_trans;
+  std::vector<Net::pin_iterator> m_pin_refs;
+
+  /**
+   *  @brief Sets the pin reference for a specific pin
+   */
+  void set_pin_ref_for_pin (size_t ppin_id, Net::pin_iterator iter);
+
+  /**
+   *  @brief Sets the circuit reference
+   */
+  void set_circuit (Circuit *c)
+  {
+    m_circuit.reset (c);
+  }
 };
 
 /**
@@ -566,7 +729,6 @@ public:
   typedef tl::shared_collection<SubCircuit> sub_circuit_list;
   typedef sub_circuit_list::const_iterator const_sub_circuit_iterator;
   typedef sub_circuit_list::iterator sub_circuit_iterator;
-  typedef tl::vector<const Net *> connected_net_list;
 
   /**
    *  @brief Constructor
@@ -838,30 +1000,12 @@ public:
   }
 
   /**
-   *  @brief Gets the net for a given pin of a subcircuit
+   *  @brief Connects the given pin to the given net
+   *  If the net is 0 the pin is disconnected.
+   *  If non-null, a NetPinRef object will be inserted into the
+   *  net and connected with the given pin.
    */
-  const Net *net_for_pin (const SubCircuit *sub_circuit, size_t pin_id) const;
-
-  /**
-   *  @brief Gets the net for a given pin of a subcircuit (non-const version)
-   */
-  Net *net_for_pin (SubCircuit *sub_circuit, size_t pin_id)
-  {
-    return const_cast<Net *> (((const Circuit *) this)->net_for_pin (sub_circuit, pin_id));
-  }
-
-  /**
-   *  @brief Gets the net for a given port of a device
-   */
-  const Net *net_for_port (const Device *device, size_t port_id) const;
-
-  /**
-   *  @brief Gets the net for a given port of a device (non-const version)
-   */
-  Net *net_for_port (Device *device, size_t port_id)
-  {
-    return const_cast<Net *> (((const Circuit *) this)->net_for_port (device, port_id));
-  }
+  void connect_pin (size_t pin_id, Net *net);
 
 private:
   friend class Netlist;
@@ -874,14 +1018,16 @@ private:
   device_list m_devices;
   sub_circuit_list m_sub_circuits;
   Netlist *mp_netlist;
-  connected_net_list m_nets_per_pin;
-  bool m_nets_per_pin_valid;
+  std::vector<Net::pin_iterator> m_pin_refs;
+
+  /**
+   *  @brief Sets the pin reference for a specific pin
+   */
+  void set_pin_ref_for_pin (size_t ppin_id, Net::pin_iterator iter);
 
   void translate_circuits (const std::map<const Circuit *, Circuit *> &map);
   void translate_device_classes (const std::map<const DeviceClass *, DeviceClass *> &map);
   void set_netlist (Netlist *netlist);
-  void invalidate_nets_per_pin ();
-  void validate_nets_per_pin ();
 };
 
 /**

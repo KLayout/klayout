@@ -28,6 +28,7 @@
 #include "dbTrans.h"
 #include "tlObjectCollection.h"
 #include "tlVector.h"
+#include "gsiObject.h"
 
 #include <list>
 #include <map>
@@ -714,7 +715,7 @@ private:
  *  devices.
  */
 class DB_PUBLIC Circuit
-  : public tl::Object
+  : public gsi::ObjectBase, public tl::Object
 {
 public:
   typedef tl::vector<Pin> pin_list;
@@ -803,7 +804,7 @@ public:
    *
    *  The circuit takes over ownership of the object.
    */
-  void add_pin (const Pin &pin);
+  const Pin &add_pin(const Pin &pin);
 
   /**
    *  @brief Begin iterator for the pins of the circuit (non-const version)
@@ -1112,7 +1113,7 @@ private:
  *  A device class describes a type of device.
  */
 class DB_PUBLIC DeviceClass
-  : public tl::Object
+  : public gsi::ObjectBase, public tl::Object
 {
 public:
   typedef size_t port_id_type;
@@ -1275,7 +1276,7 @@ private:
  *  The circuits represent cells, the device classes type of devices.
  */
 class DB_PUBLIC Netlist
-  : public tl::Object
+  : public gsi::ObjectBase, public tl::Object
 {
 public:
   typedef tl::shared_collection<Circuit> circuit_list;

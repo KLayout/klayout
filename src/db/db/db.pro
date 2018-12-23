@@ -144,7 +144,8 @@ SOURCES = \
     dbHierNetworkProcessor.cc \
     dbNetlistProperty.cc \
     gsiDeclDbNetlistProperty.cc \
-    dbNetlist.cc
+    dbNetlist.cc \
+    gsiDeclDbNetlist.cc
 
 HEADERS = \
   dbArray.h \

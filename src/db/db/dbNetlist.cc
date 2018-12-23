@@ -518,10 +518,11 @@ void Circuit::set_cell_index (const db::cell_index_type ci)
   m_cell_index = ci;
 }
 
-void Circuit::add_pin (const Pin &pin)
+const Pin &Circuit::add_pin (const Pin &pin)
 {
   m_pins.push_back (pin);
   m_pins.back ().set_id (m_pins.size () - 1);
+  return m_pins.back ();
 }
 
 void Circuit::add_net (Net *net)

@@ -128,7 +128,7 @@ TEST(3_CircuitBasic)
   EXPECT_EQ (c2.pin_by_id (2), 0);
 }
 
-static std::string net2string (const db::Net &n, const db::Circuit *c = 0)
+static std::string net2string (const db::Net &n)
 {
   std::string res;
   for (db::Net::const_port_iterator i = n.begin_ports (); i != n.end_ports (); ++i) {
@@ -149,7 +149,7 @@ static std::string net2string (const db::Net &n, const db::Circuit *c = 0)
     } else {
       res += "+";
     }
-    res += i->pin (c) ? i->pin (c)->name () : "(null)";
+    res += i->pin () ? i->pin ()->name () : "(null)";
   }
   return res;
 }
@@ -158,7 +158,7 @@ static std::string nets2string (const db::Circuit &c)
 {
   std::string res;
   for (db::Circuit::const_net_iterator n = c.begin_nets (); n != c.end_nets (); ++n) {
-    res += net2string (*n, &c);
+    res += net2string (*n);
     res += "\n";
   }
   return res;
@@ -526,8 +526,8 @@ TEST(7_NetPortsEditing)
   EXPECT_EQ (d2->net_for_port (0), n2);
   EXPECT_EQ (d2->net_for_port (1), n1);
 
-  EXPECT_EQ (net2string (*n1, &c), "D1:A,D2:B");
-  EXPECT_EQ (net2string (*n2, &c), "D1:B,D2:A");
+  EXPECT_EQ (net2string (*n1), "D1:A,D2:B");
+  EXPECT_EQ (net2string (*n2), "D1:B,D2:A");
 
   d1->connect_port (0, n2);
   d1->connect_port (1, n1);
@@ -535,14 +535,14 @@ TEST(7_NetPortsEditing)
   EXPECT_EQ (d1->net_for_port (0), n2);
   EXPECT_EQ (d1->net_for_port (1), n1);
 
-  EXPECT_EQ (net2string (*n1, &c), "D2:B,D1:B");
-  EXPECT_EQ (net2string (*n2, &c), "D2:A,D1:A");
+  EXPECT_EQ (net2string (*n1), "D2:B,D1:B");
+  EXPECT_EQ (net2string (*n2), "D2:A,D1:A");
 
   d1->connect_port (0, 0);
   EXPECT_EQ (d1->net_for_port (0), 0);
 
-  EXPECT_EQ (net2string (*n1, &c), "D2:B,D1:B");
-  EXPECT_EQ (net2string (*n2, &c), "D2:A");
+  EXPECT_EQ (net2string (*n1), "D2:B,D1:B");
+  EXPECT_EQ (net2string (*n2), "D2:A");
 
   delete d1;
   d1 = 0;
@@ -550,8 +550,8 @@ TEST(7_NetPortsEditing)
   EXPECT_EQ (c.begin_devices ()->name (), "D2");
   EXPECT_EQ (++c.begin_devices () == c.end_devices (), true);
 
-  EXPECT_EQ (net2string (*n1, &c), "D2:B");
-  EXPECT_EQ (net2string (*n2, &c), "D2:A");
+  EXPECT_EQ (net2string (*n1), "D2:B");
+  EXPECT_EQ (net2string (*n2), "D2:A");
 
   delete n1;
   n1 = 0;
@@ -559,7 +559,7 @@ TEST(7_NetPortsEditing)
   EXPECT_EQ (c.begin_nets ()->name (), "n2");
   EXPECT_EQ (++c.begin_nets () == c.end_nets (), true);
 
-  EXPECT_EQ (net2string (*n2, &c), "D2:A");
+  EXPECT_EQ (net2string (*n2), "D2:A");
 
   EXPECT_EQ (d2->net_for_port (0), n2);
   EXPECT_EQ (d2->net_for_port (1), 0);
@@ -611,14 +611,14 @@ TEST(8_NetSubCircuitsEditing)
   EXPECT_EQ (sc2->net_for_pin (0), n2);
   EXPECT_EQ (sc2->net_for_pin (1), n1);
 
-  EXPECT_EQ (net2string (*n1, &c), "+X,sc1:A,sc2:B");
-  EXPECT_EQ (net2string (*n2, &c), "sc1:B,sc2:A");
+  EXPECT_EQ (net2string (*n1), "+X,sc1:A,sc2:B");
+  EXPECT_EQ (net2string (*n2), "sc1:B,sc2:A");
 
   c.connect_pin (0, 0);
   EXPECT_EQ (c.net_for_pin (0), 0);
 
-  EXPECT_EQ (net2string (*n1, &c), "sc1:A,sc2:B");
-  EXPECT_EQ (net2string (*n2, &c), "sc1:B,sc2:A");
+  EXPECT_EQ (net2string (*n1), "sc1:A,sc2:B");
+  EXPECT_EQ (net2string (*n2), "sc1:B,sc2:A");
 
   sc1->connect_pin (0, n2);
   sc1->connect_pin (1, n1);
@@ -626,14 +626,14 @@ TEST(8_NetSubCircuitsEditing)
   EXPECT_EQ (sc1->net_for_pin (0), n2);
   EXPECT_EQ (sc1->net_for_pin (1), n1);
 
-  EXPECT_EQ (net2string (*n1, &c), "sc2:B,sc1:B");
-  EXPECT_EQ (net2string (*n2, &c), "sc2:A,sc1:A");
+  EXPECT_EQ (net2string (*n1), "sc2:B,sc1:B");
+  EXPECT_EQ (net2string (*n2), "sc2:A,sc1:A");
 
   sc1->connect_pin (0, 0);
   EXPECT_EQ (sc1->net_for_pin (0), 0);
 
-  EXPECT_EQ (net2string (*n1, &c), "sc2:B,sc1:B");
-  EXPECT_EQ (net2string (*n2, &c), "sc2:A");
+  EXPECT_EQ (net2string (*n1), "sc2:B,sc1:B");
+  EXPECT_EQ (net2string (*n2), "sc2:A");
 
   delete sc1;
   sc1 = 0;
@@ -641,11 +641,11 @@ TEST(8_NetSubCircuitsEditing)
   EXPECT_EQ (c.begin_sub_circuits ()->name (), "sc2");
   EXPECT_EQ (++c.begin_sub_circuits () == c.end_sub_circuits (), true);
 
-  EXPECT_EQ (net2string (*n1, &c), "sc2:B");
-  EXPECT_EQ (net2string (*n2, &c), "sc2:A");
+  EXPECT_EQ (net2string (*n1), "sc2:B");
+  EXPECT_EQ (net2string (*n2), "sc2:A");
 
   c.connect_pin (1, n1);
-  EXPECT_EQ (net2string (*n1, &c), "sc2:B,+Y");
+  EXPECT_EQ (net2string (*n1), "sc2:B,+Y");
   EXPECT_EQ (c.net_for_pin (1), n1);
 
   delete n1;
@@ -656,7 +656,7 @@ TEST(8_NetSubCircuitsEditing)
   EXPECT_EQ (c.begin_nets ()->name (), "n2");
   EXPECT_EQ (++c.begin_nets () == c.end_nets (), true);
 
-  EXPECT_EQ (net2string (*n2, &c), "sc2:A");
+  EXPECT_EQ (net2string (*n2), "sc2:A");
 
   EXPECT_EQ (sc2->net_for_pin (0), n2);
   EXPECT_EQ (sc2->net_for_pin (1), 0);

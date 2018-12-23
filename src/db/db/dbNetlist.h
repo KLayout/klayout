@@ -188,11 +188,9 @@ public:
 
   /**
    *  @brief Gets the pin reference from the pin id
-   *
-   *  The circuit is the one where the net is defined. It is used to
-   *  resolve outgoing pints.
+   *  If the pin cannot be resolved, null is returned.
    */
-  const Pin *pin (const Circuit *c) const;
+  const Pin *pin () const;
 
   /**
    *  @brief Gets the subcircuit reference
@@ -1177,7 +1175,7 @@ public:
   /**
    *  @brief Adds a port definition
    */
-  void add_port_definition (const DevicePortDefinition &pd);
+  const DevicePortDefinition &add_port_definition (const DevicePortDefinition &pd);
 
   /**
    *  @brief Clears the port definition

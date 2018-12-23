@@ -289,15 +289,16 @@ NetPinRef &NetPinRef::operator= (const NetPinRef &other)
   return *this;
 }
 
-const Pin *NetPinRef::pin (const db::Circuit *c) const
+const Pin *NetPinRef::pin () const
 {
   if (! mp_subcircuit) {
-    tl_assert (c != 0);
-    return c->pin_by_id (m_pin_id);
-  } else {
-    tl_assert (mp_subcircuit->circuit () != 0);
+    if (mp_net && mp_net->circuit ()) {
+      return mp_net->circuit ()->pin_by_id (m_pin_id);
+    }
+  } else if (mp_subcircuit->circuit ()) {
     return mp_subcircuit->circuit ()->pin_by_id (m_pin_id);
   }
+  return 0;
 }
 
 // --------------------------------------------------------------------------------
@@ -645,10 +646,11 @@ const std::string &DeviceClass::description () const
   return no_description;
 }
 
-void DeviceClass::add_port_definition (const DevicePortDefinition &pd)
+const DevicePortDefinition &DeviceClass::add_port_definition (const DevicePortDefinition &pd)
 {
   m_port_definitions.push_back (pd);
   m_port_definitions.back ().set_id (m_port_definitions.size () - 1);
+  return m_port_definitions.back ();
 }
 
 void DeviceClass::clear_port_definitions ()

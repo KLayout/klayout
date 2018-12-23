@@ -35,7 +35,9 @@ Class<db::Pin> decl_dbPin ("db", "Pin",
   ),
   "@brief A pin of a circuit.\n"
   "Pin objects are used to describe the outgoing pins of "
-  "a circuit. To create a new pin of a circuit, use \\Circuit#create_pin."
+  "a circuit. To create a new pin of a circuit, use \\Circuit#create_pin.\n"
+  "\n"
+  "This class has been added in version 0.26."
 );
 
 static void device_disconnect_port (db::Device *device, size_t port_id)
@@ -76,7 +78,9 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   "obtained from the device class using the \\DeviceClass#port_definitions method.\n"
   "\n"
   "Devices connect to nets through the \\Device#connect_port method. "
-  "Device ports can be disconnected using \\Device#disconnect_port."
+  "Device ports can be disconnected using \\Device#disconnect_port.\n"
+  "\n"
+  "This class has been added in version 0.26."
 );
 
 static void subcircuit_connect_pin1 (db::SubCircuit *subcircuit, const db::Pin *pin, db::Net *net)
@@ -136,7 +140,9 @@ Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
   "are identical to the outgoing pins of the circuit the subcircuit refers to.\n"
   "\n"
   "Subcircuits connect to nets through the \\SubCircuit#connect_pin method. "
-  "SubCircuit pins can be disconnected using \\SubCircuit#disconnect_pin."
+  "SubCircuit pins can be disconnected using \\SubCircuit#disconnect_pin.\n"
+  "\n"
+  "This class has been added in version 0.26."
 );
 
 Class<db::NetPortRef> decl_dbNetPortRef ("db", "NetPortRef",
@@ -157,7 +163,9 @@ Class<db::NetPortRef> decl_dbNetPortRef ("db", "NetPortRef",
     "@brief Gets the port definition of the port that is connected"
   ),
   "@brief A connection to a port of a device.\n"
-  "This object is used inside a net (see \\Net) to describe the connections a net makes."
+  "This object is used inside a net (see \\Net) to describe the connections a net makes.\n"
+  "\n"
+  "This class has been added in version 0.26."
 );
 
 Class<db::NetPinRef> decl_dbNetPinRef ("db", "NetPinRef",
@@ -179,7 +187,9 @@ Class<db::NetPinRef> decl_dbNetPinRef ("db", "NetPinRef",
     "@brief Gets the net this pin reference is attached to"
   ),
   "@brief A connection to a pin of a subcircuit or an outgoing pin of the circuit.\n"
-  "This object is used inside a net (see \\Net) to describe the connections a net makes."
+  "This object is used inside a net (see \\Net) to describe the connections a net makes.\n"
+  "\n"
+  "This class has been added in version 0.26."
 );
 
 Class<db::Net> decl_dbNet ("db", "Net",
@@ -228,7 +238,9 @@ Class<db::Net> decl_dbNet ("db", "Net",
   "To connect a net to a pin of a subcircuit, use \\SubCircuit#connect_pin, to "
   "disconnect a net from a pin of a subcircuit, use \\SubCircuit#disconnect_pin. "
   "To connect a net to a port of a device, use \\Device#connect_port, to "
-  "disconnect a net from a port of a device, use \\Device#disconnect_port. "
+  "disconnect a net from a port of a device, use \\Device#disconnect_port.\n"
+  "\n"
+  "This class has been added in version 0.26."
 );
 
 Class<db::DevicePortDefinition> decl_dbDevicePortDefinition ("db", "DevicePortDefinition",
@@ -250,7 +262,9 @@ Class<db::DevicePortDefinition> decl_dbDevicePortDefinition ("db", "DevicePortDe
     "the \\NetPortRef object)."
   ),
   "@brief A port descriptor\n"
-  "This class is used inside the \\DeviceClass class to describe a port of the device."
+  "This class is used inside the \\DeviceClass class to describe a port of the device.\n"
+  "\n"
+  "This class has been added in version 0.26."
 );
 
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
@@ -270,15 +284,29 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "This method obtains the corresponding definition object."
   ),
   "@brief A class describing a specific type of device.\n"
-  "This is the base class for the device class.\n"
+  "Device class objects live in the context of a \\Netlist object. After a "
+  "device class is created, it must be added to the netlist using \\Netlist#add. "
+  "The netlist will own the device class object. When the netlist is destroyed, the "
+  "device class object will become invalid.\n"
+  "\n"
+  "The \\DeviceClass class is the base class for other device classes.\n"
   "\n"
   "This class has been added in version 0.26."
 );
 
+static void gdc_add_port_definition (db::GenericDeviceClass *cls, db::DevicePortDefinition *port_def)
+{
+  if (port_def) {
+    *port_def = cls->add_port_definition (*port_def);
+  }
+}
+
 Class<db::GenericDeviceClass> decl_dbGenericDeviceClass (decl_dbDeviceClass, "db", "GenericDeviceClass",
-  gsi::method ("add_port", &db::GenericDeviceClass::add_port_definition, gsi::arg ("port_def"),
+  gsi::method_ext ("add_port", &gsi::gdc_add_port_definition, gsi::arg ("port_def"),
     "@brief Adds the given port definition to the device class\n"
-    "This method will define a new port. The new port is added at the end of existing ports."
+    "This method will define a new port. The new port is added at the end of existing ports. "
+    "The port definition object passed as the argument is modified to contain the "
+    "new ID of the port."
   ) +
   gsi::method ("clear_ports", &db::GenericDeviceClass::clear_port_definitions,
     "@brief Clears the list of ports\n"
@@ -294,7 +322,7 @@ Class<db::GenericDeviceClass> decl_dbGenericDeviceClass (decl_dbDeviceClass, "db
   "by adding port definitions. Port definitions should not be added dynamically. To create "
   "your own device, instantiate the \\GenericDeviceClass object, set name and description and "
   "specify the ports. Then add this new device class to the \\Netlist object where it will live "
-  "and be used to define device instances (\\Device objects)."
+  "and be used to define device instances (\\Device objects).\n"
   "\n"
   "This class has been added in version 0.26."
 );
@@ -311,25 +339,11 @@ static db::Net *create_net (db::Circuit *c)
   return n;
 }
 
-static db::Device *create_device (db::Circuit *c)
-{
-  db::Device *d = new db::Device ();
-  c->add_device (d);
-  return d;
-}
-
 static db::Device *create_device1 (db::Circuit *c, db::DeviceClass *dc, const std::string &name)
 {
   db::Device *d = new db::Device (dc, name);
   c->add_device (d);
   return d;
-}
-
-static db::SubCircuit *create_subcircuit (db::Circuit *c)
-{
-  db::SubCircuit *sc = new db::SubCircuit ();
-  c->add_sub_circuit (sc);
-  return sc;
 }
 
 static db::SubCircuit *create_subcircuit1 (db::Circuit *c, db::Circuit *cc, const std::string &name)
@@ -395,13 +409,6 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::iterator ("each_net", (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::begin_nets, (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::end_nets,
     "@brief Iterates over the nets of the circuit"
   ) +
-  gsi::method_ext ("create_device", &gsi::create_device,
-    "@brief Creates a new unbound \\Device object inside the circuit\n"
-    "This object describes a device of the circuit. Unbound devices need to be attached "
-    "to a device class before they can be used.\n"
-    "\n"
-    "For more details see the \\Device class."
-  ) +
   gsi::method_ext ("create_device", &gsi::create_device1, gsi::arg ("device_class"), gsi::arg ("name", std::string ()),
     "@brief Creates a new bound \\Device object inside the circuit\n"
     "This object describes a device of the circuit. The device is already attached "
@@ -415,13 +422,6 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   ) +
   gsi::iterator ("each_device", (db::Circuit::device_iterator (db::Circuit::*) ()) &db::Circuit::begin_devices, (db::Circuit::device_iterator (db::Circuit::*) ()) &db::Circuit::end_devices,
     "@brief Iterates over the devices of the circuit"
-  ) +
-  gsi::method_ext ("create_subcircuit", &gsi::create_subcircuit,
-    "@brief Creates a new unbound \\SubCircuit object inside the circuit\n"
-    "This object describes an instance of another circuit (sub-circuit). Unbound sub-circuits need "
-    "to be attached to a circuit before they can be used.\n"
-    "\n"
-    "For more details see the \\SubCircuit class."
   ) +
   gsi::method_ext ("create_subcircuit", &gsi::create_subcircuit1, gsi::arg ("circuit"), gsi::arg ("name", std::string ()),
     "@brief Creates a new bound \\SubCircuit object inside the circuit\n"
@@ -506,8 +506,8 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   "See there for more about nets.\n"
   "\n"
   "The Circuit object is only valid if the netlist object is alive. "
-  "After the netlist object has been destroyed, the Circuit objects "
-  "must not be accessed anymore. Doing so, may result in a crash.\n"
+  "Circuits must be added to a netlist using \\Netlist#add to become "
+  "part of the netlist.\n"
   "\n"
   "The Circuit class has been introduced in version 0.26."
 );

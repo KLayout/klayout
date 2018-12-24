@@ -58,7 +58,7 @@ Device::~Device ()
 }
 
 Device::Device (DeviceClass *device_class, const std::string &name)
-  : m_device_class (device_class), m_name (name)
+  : mp_device_class (device_class), m_name (name)
 {
   //  .. nothing yet ..
 }
@@ -72,7 +72,7 @@ Device &Device::operator= (const Device &other)
 {
   if (this != &other) {
     m_name = other.m_name;
-    m_device_class = other.m_device_class;
+    mp_device_class = other.mp_device_class;
   }
   return *this;
 }
@@ -118,6 +118,41 @@ void Device::connect_port (size_t port_id, Net *net)
   if (net) {
     net->add_port (NetPortRef (this, port_id));
   }
+}
+
+double Device::parameter_value (size_t param_id) const
+{
+  if (m_parameters.size () > param_id) {
+    return m_parameters [param_id];
+  } else if (mp_device_class) {
+    const db::DeviceParameterDefinition *pd = mp_device_class->parameter_definition (param_id);
+    if (pd) {
+      return pd->default_value ();
+    }
+  }
+  return 0.0;
+}
+
+void Device::set_parameter_value (size_t param_id, double v)
+{
+  if (m_parameters.size () <= param_id) {
+
+    //  resize the parameter vector with default values
+    size_t from_size = m_parameters.size ();
+    m_parameters.resize (param_id + 1, 0.0);
+
+    if (mp_device_class) {
+      for (size_t n = from_size; n < param_id; ++n) {
+        const db::DeviceParameterDefinition *pd = mp_device_class->parameter_definition (n);
+        if (pd) {
+          m_parameters [n] = pd->default_value ();
+        }
+      }
+    }
+
+  }
+
+  m_parameters [param_id] = v;
 }
 
 // --------------------------------------------------------------------------------
@@ -662,6 +697,27 @@ const DevicePortDefinition *DeviceClass::port_definition (size_t id) const
 {
   if (id < m_port_definitions.size ()) {
     return & m_port_definitions [id];
+  } else {
+    return 0;
+  }
+}
+
+const DeviceParameterDefinition &DeviceClass::add_parameter_definition (const DeviceParameterDefinition &pd)
+{
+  m_parameter_definitions.push_back (pd);
+  m_parameter_definitions.back ().set_id (m_parameter_definitions.size () - 1);
+  return m_parameter_definitions.back ();
+}
+
+void DeviceClass::clear_parameter_definitions ()
+{
+  m_parameter_definitions.clear ();
+}
+
+const DeviceParameterDefinition *DeviceClass::parameter_definition (size_t id) const
+{
+  if (id < m_parameter_definitions.size ()) {
+    return & m_parameter_definitions [id];
   } else {
     return 0;
   }

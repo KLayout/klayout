@@ -33,6 +33,11 @@ static std::string pd2string (const db::DevicePortDefinition &pd)
   return pd.name () + "(" + pd.description () + ") #" + tl::to_string (pd.id ());
 }
 
+static std::string pd2string (const db::DeviceParameterDefinition &pd)
+{
+  return pd.name () + "(" + pd.description () + ")=" + tl::to_string (pd.default_value ()) + " #" + tl::to_string (pd.id ());
+}
+
 TEST(1_DevicePortDefinition)
 {
   db::DevicePortDefinition pd;
@@ -54,6 +59,22 @@ TEST(1_DevicePortDefinition)
   dc.add_port_definition (pd2);
   EXPECT_EQ (pd2string (dc.port_definitions ()[0]), "name(nothing yet) #0");
   EXPECT_EQ (pd2string (dc.port_definitions ()[1]), "name2(now it has something) #1");
+
+  dc.clear_port_definitions ();
+  EXPECT_EQ (dc.port_definitions ().empty (), true);
+
+  db::DeviceParameterDefinition ppd ("P1", "Parameter 1", 1.0);
+  dc.add_parameter_definition (ppd);
+
+  db::DeviceParameterDefinition ppd2 ("P2", "Parameter 2");
+  dc.add_parameter_definition (ppd2);
+
+  EXPECT_EQ (pd2string (dc.parameter_definitions ()[0]), "P1(Parameter 1)=1 #0");
+  EXPECT_EQ (pd2string (dc.parameter_definitions ()[1]), "P2(Parameter 2)=0 #1");
+
+  dc.clear_parameter_definitions ();
+  EXPECT_EQ (dc.parameter_definitions ().empty (), true);
+
 }
 
 TEST(2_DeviceClass)
@@ -226,11 +247,15 @@ TEST(4_CircuitDevices)
   dc1.add_port_definition (db::DevicePortDefinition ("S", "Source"));
   dc1.add_port_definition (db::DevicePortDefinition ("G", "Gate"));
   dc1.add_port_definition (db::DevicePortDefinition ("D", "Drain"));
+  dc1.add_parameter_definition (db::DeviceParameterDefinition ("U", "", 1.0));
+  dc1.add_parameter_definition (db::DeviceParameterDefinition ("V", "", 2.0));
 
   db::GenericDeviceClass dc2;
   dc2.set_name ("dc2");
   dc2.add_port_definition (db::DevicePortDefinition ("A", ""));
   dc2.add_port_definition (db::DevicePortDefinition ("B", ""));
+  dc2.add_parameter_definition (db::DeviceParameterDefinition ("U", "", 2.0));
+  dc2.add_parameter_definition (db::DeviceParameterDefinition ("V", "", 1.0));
 
   std::auto_ptr<db::Circuit> c (new db::Circuit ());
   c->set_name ("c");
@@ -245,6 +270,21 @@ TEST(4_CircuitDevices)
   c->add_device (d1);
   c->add_device (d2a);
   c->add_device (d2b);
+
+  EXPECT_EQ (d1->parameter_value (0), 1.0);
+  EXPECT_EQ (d1->parameter_value (1), 2.0);
+  EXPECT_EQ (d2a->parameter_value (0), 2.0);
+  EXPECT_EQ (d2a->parameter_value (1), 1.0);
+  d1->set_parameter_value (1, 1.5);
+  EXPECT_EQ (d1->parameter_value (0), 1.0);
+  EXPECT_EQ (d1->parameter_value (1), 1.5);
+  d1->set_parameter_value (0, 0.5);
+  EXPECT_EQ (d1->parameter_value (0), 0.5);
+  EXPECT_EQ (d1->parameter_value (1), 1.5);
+
+  d2a->set_parameter_value (0, -1.0);
+  EXPECT_EQ (d2a->parameter_value (0), -1.0);
+  EXPECT_EQ (d2a->parameter_value (1), 1.0);
 
   EXPECT_EQ (netlist2 (*c),
     "c:\n"

@@ -553,7 +553,7 @@ public:
    */
   const DeviceClass *device_class () const
   {
-    return m_device_class.get ();
+    return mp_device_class;
   }
 
   /**
@@ -592,13 +592,24 @@ public:
    */
   void connect_port (size_t port_id, Net *net);
 
+  /**
+   *  @brief Gets the value for the parameter with the given ID
+   */
+  double parameter_value (size_t param_id) const;
+
+  /**
+   *  @brief Sets the value for the parameter with the given ID
+   */
+  void set_parameter_value (size_t param_id, double v);
+
 private:
   friend class Circuit;
   friend class Net;
 
-  tl::weak_ptr<DeviceClass> m_device_class;
+  DeviceClass *mp_device_class;
   std::string m_name;
   std::vector<Net::port_iterator> m_port_refs;
+  std::vector<double> m_parameters;
 
   /**
    *  @brief Sets the port reference for a specific port
@@ -610,7 +621,7 @@ private:
    */
   void set_device_class (DeviceClass *dc)
   {
-    m_device_class.reset (dc);
+    mp_device_class = dc;
   }
 };
 
@@ -1144,6 +1155,99 @@ private:
 };
 
 /**
+ *  @brief A device parameter definition
+ */
+class DB_PUBLIC DeviceParameterDefinition
+{
+public:
+  /**
+   *  @brief Creates an empty device parameter definition
+   */
+  DeviceParameterDefinition ()
+    : m_name (), m_description (), m_default_value (0.0), m_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Creates a device parameter definition with the given name and description
+   */
+  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0)
+    : m_name (name), m_description (description), m_default_value (default_value), m_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Gets the parameter name
+   */
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  /**
+   *  @brief Sets the parameter name
+   */
+  void set_name (const std::string &n)
+  {
+    m_name = n;
+  }
+
+  /**
+   *  @brief Gets the parameter description
+   */
+  const std::string &description () const
+  {
+    return m_description;
+  }
+
+  /**
+   *  @brief Sets the parameter description
+   */
+  void set_description (const std::string &d)
+  {
+    m_description = d;
+  }
+
+  /**
+   *  @brief Gets the parameter default value
+   */
+  double default_value () const
+  {
+    return m_default_value;
+  }
+
+  /**
+   *  @brief Sets the parameter description
+   */
+  void set_default_value (double d)
+  {
+    m_default_value = d;
+  }
+
+  /**
+   *  @brief Gets the parameter ID
+   */
+  size_t id () const
+  {
+    return m_id;
+  }
+
+private:
+  friend class DeviceClass;
+
+  std::string m_name, m_description;
+  double m_default_value;
+  size_t m_id;
+
+  void set_id (size_t id)
+  {
+    m_id = id;
+  }
+};
+
+/**
  *  @brief A device class
  *
  *  A device class describes a type of device.
@@ -1205,7 +1309,7 @@ public:
    *  The number of ports is constant per class. The index of the port
    *  is used as an ID of the port, hence the order must be static.
    */
-  virtual const std::vector<DevicePortDefinition> &port_definitions () const
+  const std::vector<DevicePortDefinition> &port_definitions () const
   {
     return m_port_definitions;
   }
@@ -1225,8 +1329,32 @@ public:
    */
   const DevicePortDefinition *port_definition (size_t id) const;
 
+  /**
+   *  @brief Gets the parameter definitions
+   */
+  const std::vector<DeviceParameterDefinition> &parameter_definitions () const
+  {
+    return m_parameter_definitions;
+  }
+
+  /**
+   *  @brief Adds a parameter definition
+   */
+  const DeviceParameterDefinition &add_parameter_definition (const DeviceParameterDefinition &pd);
+
+  /**
+   *  @brief Clears the parameter definition
+   */
+  void clear_parameter_definitions ();
+
+  /**
+   *  @brief Gets the parameter definition from the ID
+   */
+  const DeviceParameterDefinition *parameter_definition (size_t id) const;
+
 private:
   std::vector<DevicePortDefinition> m_port_definitions;
+  std::vector<DeviceParameterDefinition> m_parameter_definitions;
 };
 
 /**

@@ -317,9 +317,7 @@ class DBNetlist_TestClass < TestBase
     dc.description = "A device class"
     assert_equal(dc.description, "A device class")
 
-    pd = RBA::DevicePortDefinition::new
-    pd.name = "A"
-    pd.description = "Port A"
+    pd = RBA::DevicePortDefinition::new("A", "Port A")
     dc.add_port(pd)
 
     assert_equal(pd.id, 0)
@@ -343,6 +341,38 @@ class DBNetlist_TestClass < TestBase
 
     names = []
     dc.port_definitions.each { |pd| names << pd.name }
+    assert_equal(names, [])
+
+    pd = RBA::DeviceParameterDefinition::new("P1", "Parameter 1", 2.0)
+    assert_equal(pd.default_value, 2.0)
+    pd.default_value = 1.0
+    assert_equal(pd.default_value, 1.0)
+
+    dc.add_parameter(pd)
+
+    assert_equal(pd.id, 0)
+    assert_equal(pd.name, "P1")
+    assert_equal(pd.description, "Parameter 1")
+    assert_equal(pd.default_value, 1.0)
+
+    pd = RBA::DeviceParameterDefinition::new("", "")
+    pd.name = "P2"
+    pd.description = "Parameter 2"
+    dc.add_parameter(pd)
+
+    assert_equal(pd.id, 1)
+    assert_equal(pd.name, "P2")
+    assert_equal(pd.description, "Parameter 2")
+    assert_equal(pd.default_value, 0.0)
+
+    names = []
+    dc.parameter_definitions.each { |pd| names << pd.name }
+    assert_equal(names, [ "P1", "P2" ])
+
+    dc.clear_parameters
+
+    names = []
+    dc.parameter_definitions.each { |pd| names << pd.name }
     assert_equal(names, [])
 
   end
@@ -422,6 +452,52 @@ class DBNetlist_TestClass < TestBase
     assert_equal(names, [])
 
     assert_equal(c.pin_count, 0)
+
+  end
+
+  def test_9_DeviceParameters
+
+    nl = RBA::Netlist::new
+
+    dc = RBA::GenericDeviceClass::new
+    dc.name = "DC"
+    nl.add(dc)
+
+    dc.add_parameter(RBA::DeviceParameterDefinition::new("U", "Parameter U", 1.0))
+    dc.add_parameter(RBA::DeviceParameterDefinition::new("V", "Parameter V", 2.0))
+
+    assert_equal(dc.has_parameter("U"), true)
+    assert_equal(dc.has_parameter("V"), true)
+    assert_equal(dc.has_parameter("X"), false)
+    assert_equal(dc.parameter_id("U"), 0)
+    assert_equal(dc.parameter_id("V"), 1)
+    error = false
+    begin
+      dc.parameter_id("X") # raises an exception
+    rescue => ex
+      error = true
+    end
+    assert_equal(error, true)
+
+    c = RBA::Circuit::new
+    c.name = "C"
+    nl.add(c)
+    d1 = c.create_device(dc)
+
+    assert_equal(d1.parameter(0), 1.0)
+    assert_equal(d1.parameter("U"), 1.0)
+    assert_equal(d1.parameter(1), 2.0)
+    assert_equal(d1.parameter("V"), 2.0)
+
+    d1.set_parameter(0, 0.5)
+    assert_equal(d1.parameter(0), 0.5)
+    assert_equal(d1.parameter(1), 2.0)
+    d1.set_parameter("U", -0.5)
+    assert_equal(d1.parameter(0), -0.5)
+    assert_equal(d1.parameter(1), 2.0)
+    d1.set_parameter("V", 42)
+    assert_equal(d1.parameter(0), -0.5)
+    assert_equal(d1.parameter(1), 42)
 
   end
 

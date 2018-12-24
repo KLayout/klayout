@@ -22,6 +22,8 @@
 
 #include "gsiDecl.h"
 #include "dbNetlist.h"
+#include "tlException.h"
+#include "tlInternational.h"
 
 namespace gsi
 {
@@ -45,6 +47,40 @@ static void device_disconnect_port (db::Device *device, size_t port_id)
   device->connect_port (port_id, 0);
 }
 
+static bool device_has_param_with_name (const db::DeviceClass *device_class, const std::string &name)
+{
+  const std::vector<db::DeviceParameterDefinition> &pd = device_class->parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+    if (i->name () == name) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static size_t device_param_id_for_name (const db::DeviceClass *device_class, const std::string &name)
+{
+  if (device_class) {
+    const std::vector<db::DeviceParameterDefinition> &pd = device_class->parameter_definitions ();
+    for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+      if (i->name () == name) {
+        return i->id ();
+      }
+    }
+  }
+  throw tl::Exception (tl::to_string (tr ("Invalid parameter name")) + ": '" + name + "'");
+}
+
+static double device_parameter_value (const db::Device *device, const std::string &name)
+{
+  return device->parameter_value (device_param_id_for_name (device->device_class (), name));
+}
+
+static void device_set_parameter_value (db::Device *device, const std::string &name, double value)
+{
+  return device->set_parameter_value (device_param_id_for_name (device->device_class (), name), value);
+}
+
 Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
@@ -66,6 +102,20 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   ) +
   gsi::method_ext ("disconnect_port", &device_disconnect_port, gsi::arg ("port_id"),
     "@brief Disconnects the given port from any net.\n"
+  ) +
+  gsi::method ("parameter", &db::Device::parameter_value, gsi::arg ("param_id"),
+    "@brief Gets the parameter value for the given parameter ID."
+  ) +
+  gsi::method ("set_parameter", &db::Device::set_parameter_value, gsi::arg ("param_id"), gsi::arg ("value"),
+    "@brief Sets the parameter value for the given parameter ID."
+  ) +
+  gsi::method_ext ("parameter", &gsi::device_parameter_value, gsi::arg ("param_name"),
+    "@brief Gets the parameter value for the given parameter name.\n"
+    "If the parameter name is not valid, an exception is thrown."
+  ) +
+  gsi::method_ext ("set_parameter", &gsi::device_set_parameter_value, gsi::arg ("param_name"), gsi::arg ("value"),
+    "@brief Sets the parameter value for the given parameter name.\n"
+    "If the parameter name is not valid, an exception is thrown."
   ),
   "@brief A device inside a circuit.\n"
   "Device object represent atomic devices such as resistors, diodes or transistors. "
@@ -243,7 +293,15 @@ Class<db::Net> decl_dbNet ("db", "Net",
   "This class has been added in version 0.26."
 );
 
+static db::DevicePortDefinition *new_port_definition (const std::string &name, const std::string &description)
+{
+  return new db::DevicePortDefinition (name, description);
+}
+
 Class<db::DevicePortDefinition> decl_dbDevicePortDefinition ("db", "DevicePortDefinition",
+  gsi::constructor ("new", &gsi::new_port_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()),
+    "@brief Creates a new port definition."
+  ) +
   gsi::method ("name", &db::DevicePortDefinition::name,
     "@brief Gets the name of the port."
   ) +
@@ -267,6 +325,45 @@ Class<db::DevicePortDefinition> decl_dbDevicePortDefinition ("db", "DevicePortDe
   "This class has been added in version 0.26."
 );
 
+static db::DeviceParameterDefinition *new_parameter_definition (const std::string &name, const std::string &description, double default_value)
+{
+  return new db::DeviceParameterDefinition (name, description, default_value);
+}
+
+Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "DeviceParameterDefinition",
+  gsi::constructor ("new", &gsi::new_parameter_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()), gsi::arg ("default_value", 0.0),
+    "@brief Creates a new parameter definition."
+  ) +
+  gsi::method ("name", &db::DeviceParameterDefinition::name,
+    "@brief Gets the name of the parameter."
+  ) +
+  gsi::method ("name=", &db::DeviceParameterDefinition::set_name, gsi::arg ("name"),
+    "@brief Sets the name of the parameter."
+  ) +
+  gsi::method ("description", &db::DeviceParameterDefinition::description,
+    "@brief Gets the description of the parameter."
+  ) +
+  gsi::method ("description=", &db::DeviceParameterDefinition::set_description, gsi::arg ("description"),
+    "@brief Sets the description of the parameter."
+  ) +
+  gsi::method ("default_value", &db::DeviceParameterDefinition::default_value,
+    "@brief Gets the default value of the parameter."
+  ) +
+  gsi::method ("default_value=", &db::DeviceParameterDefinition::set_default_value, gsi::arg ("default_value"),
+    "@brief Sets the default value of the parameter.\n"
+    "The default value is used to initialize parameters of \\Device objects."
+  ) +
+  gsi::method ("id", &db::DeviceParameterDefinition::id,
+    "@brief Gets the ID of the parameter.\n"
+    "The ID of the parameter is used in some places to refer to a specific parameter (e.g. in "
+    "the \\NetParameterRef object)."
+  ),
+  "@brief A parameter descriptor\n"
+  "This class is used inside the \\DeviceClass class to describe a parameter of the device.\n"
+  "\n"
+  "This class has been added in version 0.26."
+);
+
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name", &db::DeviceClass::name,
     "@brief Gets the name of the device class."
@@ -276,12 +373,29 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   ) +
   gsi::method ("port_definitions", &db::DeviceClass::port_definitions,
     "@brief Gets the list of port definitions of the device.\n"
-    "See the \\PortDefinition class description for details."
+    "See the \\DevicePortDefinition class description for details."
   ) +
   gsi::method ("port_definition", &db::DeviceClass::port_definition, gsi::arg ("port_id"),
     "@brief Gets the port definition object for a given ID.\n"
     "Port definition IDs are used in some places to reference a specific port of a device. "
     "This method obtains the corresponding definition object."
+  ) +
+  gsi::method ("parameter_definitions", &db::DeviceClass::parameter_definitions,
+    "@brief Gets the list of parameter definitions of the device.\n"
+    "See the \\DeviceParameterDefinition class description for details."
+  ) +
+  gsi::method ("parameter_definition", &db::DeviceClass::parameter_definition, gsi::arg ("parameter_id"),
+    "@brief Gets the parameter definition object for a given ID.\n"
+    "Parameter definition IDs are used in some places to reference a specific parameter of a device. "
+    "This method obtains the corresponding definition object."
+  ) +
+  gsi::method_ext ("has_parameter", &gsi::device_has_param_with_name, gsi::arg ("name"),
+    "@brief Returns true, if the device class has a parameter with the given name.\n"
+  ) +
+  gsi::method_ext ("parameter_id", &gsi::device_param_id_for_name, gsi::arg ("name"),
+    "@brief Returns the parameter ID of the parameter with the given name.\n"
+    "An exception is thrown if there is no parameter with the given name. Use \\has_parameter to check "
+    "whether the name is a valid parameter name."
   ),
   "@brief A class describing a specific type of device.\n"
   "Device class objects live in the context of a \\Netlist object. After a "
@@ -301,15 +415,37 @@ static void gdc_add_port_definition (db::GenericDeviceClass *cls, db::DevicePort
   }
 }
 
+static void gdc_add_parameter_definition (db::GenericDeviceClass *cls, db::DeviceParameterDefinition *parameter_def)
+{
+  if (parameter_def) {
+    *parameter_def = cls->add_parameter_definition (*parameter_def);
+  }
+}
+
 Class<db::GenericDeviceClass> decl_dbGenericDeviceClass (decl_dbDeviceClass, "db", "GenericDeviceClass",
   gsi::method_ext ("add_port", &gsi::gdc_add_port_definition, gsi::arg ("port_def"),
     "@brief Adds the given port definition to the device class\n"
     "This method will define a new port. The new port is added at the end of existing ports. "
     "The port definition object passed as the argument is modified to contain the "
-    "new ID of the port."
+    "new ID of the port.\n"
+    "\n"
+    "The port is copied into the device class. Modifying the port object later "
+    "does not have the effect of changing the port definition."
   ) +
   gsi::method ("clear_ports", &db::GenericDeviceClass::clear_port_definitions,
     "@brief Clears the list of ports\n"
+  ) +
+  gsi::method_ext ("add_parameter", &gsi::gdc_add_parameter_definition, gsi::arg ("parameter_def"),
+    "@brief Adds the given parameter definition to the device class\n"
+    "This method will define a new parameter. The new parameter is added at the end of existing parameters. "
+    "The parameter definition object passed as the argument is modified to contain the "
+    "new ID of the parameter."
+    "\n"
+    "The parameter is copied into the device class. Modifying the parameter object later "
+    "does not have the effect of changing the parameter definition."
+  ) +
+  gsi::method ("clear_parameters", &db::GenericDeviceClass::clear_parameter_definitions,
+    "@brief Clears the list of parameters\n"
   ) +
   gsi::method ("name=", &db::GenericDeviceClass::set_name, gsi::arg ("name"),
     "@brief Sets the name of the device\n"
@@ -323,6 +459,9 @@ Class<db::GenericDeviceClass> decl_dbGenericDeviceClass (decl_dbDeviceClass, "db
   "your own device, instantiate the \\GenericDeviceClass object, set name and description and "
   "specify the ports. Then add this new device class to the \\Netlist object where it will live "
   "and be used to define device instances (\\Device objects).\n"
+  "\n"
+  "In addition, parameters can be defined which correspond to values stored inside the "
+  "specific device instance (\\Device object)."
   "\n"
   "This class has been added in version 0.26."
 );
@@ -545,7 +684,9 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   ) +
   gsi::method ("remove", &db::Netlist::remove_device_class, gsi::arg ("device_class"),
     "@brief Removes the given device class object from the netlist\n"
-    "After the object has been removed, it becomes invalid and cannot be used further."
+    "After the object has been removed, it becomes invalid and cannot be used further. "
+    "Use this method with care as it may corrupt the internal structure of the netlist. "
+    "Only use this method when device refers to this device class."
   ) +
   gsi::iterator ("each_device_class", (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::begin_device_classes, (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::end_device_classes,
     "@brief Iterates over the device classes of the netlist"

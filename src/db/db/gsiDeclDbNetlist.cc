@@ -671,6 +671,18 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::method ("clear", &db::Circuit::clear,
     "@brief Clears the circuit\n"
     "This method removes all objects and clears the other attributes."
+  ) +
+  gsi::method ("combine_devices", &db::Circuit::combine_devices,
+    "@brief Combines devices where possible\n"
+    "This method will combine devices that can be combined according "
+    "to their device classes 'combine_devices' method.\n"
+    "For example, serial or parallel resistors can be combined into "
+    "a single resistor.\n"
+  ) +
+  gsi::method ("purge_nets", &db::Circuit::purge_nets,
+    "@brief Purges floating nets.\n"
+    "Floating nets can be created as effect of reconnections of devices or pins. "
+    "This method will eliminate all nets that make less than two connections."
   ),
   "@brief Circuits are the basic building blocks of the netlist\n"
   "A circuit has pins by which it can connect to the outside. Pins are "
@@ -737,6 +749,18 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   ) +
   gsi::iterator ("each_device_class", (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::begin_device_classes, (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::end_device_classes,
     "@brief Iterates over the device classes of the netlist"
+  ) +
+  gsi::method ("combine_devices", &db::Netlist::combine_devices,
+    "@brief Combines devices where possible\n"
+    "This method will combine devices that can be combined according "
+    "to their device classes 'combine_devices' method.\n"
+    "For example, serial or parallel resistors can be combined into "
+    "a single resistor.\n"
+  ) +
+  gsi::method ("purge_nets", &db::Netlist::purge_nets,
+    "@brief Purges floating nets.\n"
+    "Floating nets can be created as effect of reconnections of devices or pins. "
+    "This method will eliminate all nets that make less than two connections."
   ),
   "@brief The netlist top-level class\n"
   "A netlist is a hierarchical structure of circuits. At least one circuit is the "

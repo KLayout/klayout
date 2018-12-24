@@ -955,4 +955,18 @@ void Netlist::remove_device_class (DeviceClass *device_class)
   m_device_classes.erase (device_class);
 }
 
+void Netlist::purge_nets ()
+{
+  for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
+    c->purge_nets ();
+  }
+}
+
+void Netlist::combine_devices ()
+{
+  for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
+    c->combine_devices ();
+  }
+}
+
 }

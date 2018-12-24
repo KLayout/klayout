@@ -1573,6 +1573,21 @@ public:
     return m_device_classes.end ();
   }
 
+  /**
+   *  @brief Purge unused nets
+   *
+   *  This method will purge all nets which return "floating".
+   */
+  void purge_nets ();
+
+  /**
+   *  @brief Combine devices
+   *
+   *  This method will combine devices that can be combined according
+   *  to their device classes "combine_devices" method.
+   */
+  void combine_devices ();
+
 private:
   circuit_list m_circuits;
   device_class_list m_device_classes;

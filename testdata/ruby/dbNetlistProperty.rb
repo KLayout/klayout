@@ -31,9 +31,6 @@ class DBNetlistProperty_TestClass < TestBase
     assert_equal(np.is_a?(RBA::NetlistProperty), true)
     assert_equal(np.to_s, "")
 
-    np2 = RBA::NetlistProperty::from_s("")
-    assert_equal(np2.is_a?(RBA::NetlistProperty), true)
-
   end
 
   def test_2_NetName
@@ -47,14 +44,37 @@ class DBNetlistProperty_TestClass < TestBase
     assert_equal(np.to_s, "name:abc")
     assert_equal(np.name, "abc")
 
-    np2 = RBA::NetlistProperty::from_s("name:xyz")
-    assert_equal(np2.is_a?(RBA::NetlistProperty), true)
-    assert_equal(np2.is_a?(RBA::NetNameProperty), true)
-    assert_equal(np2.name, "xyz")
+  end
+
+  def test_3_DevicePort
+
+    np = RBA::DevicePortProperty::new
+    assert_equal(np.is_a?(RBA::DevicePortProperty), true)
+    assert_equal(np.is_a?(RBA::DevicePortProperty), true)
+    assert_equal(np.to_s, "port")
+
+    dc = RBA::GenericDeviceClass::new
+    dp = RBA::DevicePortDefinition::new
+    dp.name = "A"
+    dc.add_port(dp)
+    dp.name = "B"
+    dc.add_port(dp)
+
+    c = RBA::Circuit::new
+    d = c.create_device(dc, "D")
+
+    n = c.create_net("NET")
+    d.connect_port(0, n)
+
+    # there is no other way to produce a NetPortRef object yet
+    n.each_port { |p| np.port_ref = p }
+
+    assert_equal(np.to_s, "port:D:A")
+    assert_equal(np.port_ref.device.name, "D")
 
   end
 
-  def test_3_VariantBinding
+  def test_4_VariantBinding
 
     ly = RBA::Layout::new
     l1 = ly.insert_layer(RBA::LayerInfo::new(1, 0))

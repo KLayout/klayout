@@ -180,8 +180,7 @@ class DBNetlist_TestClass < TestBase
     assert_equal(names, [ "D1", "D2" ])
     assert_equal(dcs, [ "DC", "DC" ])
 
-    net = c.create_net
-    net.name = "NET"
+    net = c.create_net("NET")
 
     d1.connect_port(1, net)
     assert_equal(d1.net_for_port(1).name, "NET")
@@ -257,8 +256,7 @@ class DBNetlist_TestClass < TestBase
     assert_equal(names, [ "SC1", "SC2" ])
     assert_equal(ccn, [ "CC", "CC" ])
 
-    net = c.create_net
-    net.name = "NET"
+    net = c.create_net("NET")
 
     sc1.connect_pin(1, net)
     assert_equal(sc1.net_for_pin(1).name, "NET")
@@ -283,12 +281,12 @@ class DBNetlist_TestClass < TestBase
     net.each_pin { |p| assert_equal(p.net.name, "NET") }
 
     net.clear
-    assert_equal(sc1.net_for_pin(1).inspec, "nil")
+    assert_equal(sc1.net_for_pin(1).inspect, "nil")
     assert_equal(sc1.net_for_pin(0).inspect, "nil")
 
   end
 
-  def test_5_SubCircuit
+  def test_6_SubCircuitBasic
 
     nl = RBA::Netlist::new
 
@@ -308,7 +306,7 @@ class DBNetlist_TestClass < TestBase
 
   end
 
-  def test_6_GenericDeviceClass
+  def test_7_GenericDeviceClass
 
     nl = RBA::Netlist::new
 
@@ -349,7 +347,7 @@ class DBNetlist_TestClass < TestBase
 
   end
 
-  def test_7_Circuit
+  def test_8_Circuit
 
     nl = RBA::Netlist::new
 

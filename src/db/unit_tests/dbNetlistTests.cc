@@ -661,3 +661,31 @@ TEST(8_NetSubCircuitsEditing)
   EXPECT_EQ (sc2->net_for_pin (0), n2);
   EXPECT_EQ (sc2->net_for_pin (1), 0);
 }
+
+TEST(9_NetPortRefBasics)
+{
+  db::Device d1, d2;
+
+  EXPECT_EQ (db::NetPortRef (&d1, 0) == db::NetPortRef (&d1, 0), true);
+  EXPECT_EQ (db::NetPortRef (&d1, 0) == db::NetPortRef (&d1, 1), false);
+  EXPECT_EQ (db::NetPortRef (&d1, 0) == db::NetPortRef (&d2, 0), false);
+
+  EXPECT_EQ (db::NetPortRef (&d1, 0) < db::NetPortRef (&d1, 0), false);
+  EXPECT_EQ (db::NetPortRef (&d1, 0) < db::NetPortRef (&d1, 1), true);
+  EXPECT_EQ (db::NetPortRef (&d1, 1) < db::NetPortRef (&d1, 0), false);
+  EXPECT_NE ((db::NetPortRef (&d1, 0) < db::NetPortRef (&d2, 0)), (db::NetPortRef (&d2, 0) < db::NetPortRef (&d1, 0)));
+}
+
+TEST(10_NetPinRefBasics)
+{
+  db::SubCircuit d1, d2;
+
+  EXPECT_EQ (db::NetPinRef (&d1, 0) == db::NetPinRef (&d1, 0), true);
+  EXPECT_EQ (db::NetPinRef (&d1, 0) == db::NetPinRef (&d1, 1), false);
+  EXPECT_EQ (db::NetPinRef (&d1, 0) == db::NetPinRef (&d2, 0), false);
+
+  EXPECT_EQ (db::NetPinRef (&d1, 0) < db::NetPinRef (&d1, 0), false);
+  EXPECT_EQ (db::NetPinRef (&d1, 0) < db::NetPinRef (&d1, 1), true);
+  EXPECT_EQ (db::NetPinRef (&d1, 1) < db::NetPinRef (&d1, 0), false);
+  EXPECT_NE ((db::NetPinRef (&d1, 0) < db::NetPinRef (&d2, 0)), (db::NetPinRef (&d2, 0) < db::NetPinRef (&d1, 0)));
+}

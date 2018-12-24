@@ -35,36 +35,9 @@ static db::NetlistProperty *new_property ()
   return new db::NetlistProperty ();
 }
 
-static db::NetlistProperty *from_string (const std::string &str)
-{
-  tl::Extractor ex (str.c_str ());
-  if (ex.at_end ()) {
-
-    return new db::NetlistProperty ();
-
-  } else if (ex.test ("name")) {
-
-    ex.test (":");
-    std::auto_ptr<db::NetNameProperty> n (new db::NetNameProperty ());
-    n->read (ex);
-    return n.release ();
-
-  } else {
-
-    return 0;
-
-  }
-}
-
 gsi::Class<db::NetlistProperty> decl_NetlistProperty ("db", "NetlistProperty",
   gsi::constructor ("new", &new_property,
     "@brief Creates a plain netlist property"
-  ) +
-  gsi::constructor ("from_s", &from_string, gsi::arg ("str"),
-    "@brief Creates a netlist property from a string\n"
-    "This method can turn the string returned by \\to_string back into a property object.\n"
-    "@param str The string to read the property from\n"
-    "@return A fresh property object created from the string\n"
   ) +
   gsi::method ("to_s", &db::NetlistProperty::to_string,
     "@brief Convert the property to a string.\n"
@@ -109,6 +82,39 @@ gsi::Class<db::NetNameProperty> decl_NetNameProperty (decl_NetlistProperty, "db"
   "@brief A net name property.\n"
   "\n"
   "The netlist property annotates a shape or other object with a net name."
+  "\n\n"
+  "This class was introduced in version 0.26.\n"
+);
+
+// ---------------------------------------------------------------
+//  db::DevicePortProperty binding
+
+static db::DevicePortProperty *new_devport ()
+{
+  return new db::DevicePortProperty ();
+}
+
+static db::DevicePortProperty *new_devport2 (const db::NetPortRef &n)
+{
+  return new db::DevicePortProperty (n);
+}
+
+gsi::Class<db::DevicePortProperty> decl_DevicePortProperty (decl_NetlistProperty, "db", "DevicePortProperty",
+  gsi::constructor ("new", &new_devport,
+    "@brief Creates a new device port property"
+  ) +
+  gsi::constructor ("new", &new_devport2, gsi::arg ("port_ref"),
+    "@brief Creates a new device port property with the given port reference"
+  ) +
+  gsi::method ("port_ref=", &db::DevicePortProperty::set_port_ref, gsi::arg ("p"),
+    "@brief Sets the port reference\n"
+  ) +
+  gsi::method ("port_ref", &db::DevicePortProperty::port_ref,
+    "@brief Gets the port reference\n"
+  ),
+  "@brief A device port reference property.\n"
+  "\n"
+  "The netlist property annotates a shape or other object with a reference to a device port."
   "\n\n"
   "This class was introduced in version 0.26.\n"
 );

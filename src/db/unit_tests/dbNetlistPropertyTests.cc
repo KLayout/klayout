@@ -28,7 +28,7 @@
 
 #include <memory>
 
-TEST(1_Basic)
+TEST(1_NameBasic)
 {
   db::NetNameProperty name;
   EXPECT_EQ (name.to_string (), "name:''");
@@ -45,13 +45,28 @@ TEST(1_Basic)
 
   n2.set_name ("\"quoted\"");
   EXPECT_EQ (n2.to_string (), "name:'\"quoted\"'");
-
-  tl::Extractor ex ("net42");
-  n2.read (ex);
-  EXPECT_EQ (n2.name (), "net42");
 }
 
-TEST(2_Variants)
+TEST(2_PortRefBasic)
+{
+  db::GenericDeviceClass dc;
+  dc.add_port_definition (db::DevicePortDefinition ("A", "Port A"));
+  dc.add_port_definition (db::DevicePortDefinition ("B", "Port B"));
+
+  db::Device d (&dc, "D");
+
+  db::DevicePortProperty dp (db::NetPortRef (&d, 1));
+  EXPECT_EQ (dp.to_string (), "port:D:B");
+
+  dp.set_port_ref (db::NetPortRef (&d, 0));
+  EXPECT_EQ (dp.to_string (), "port:D:A");
+  EXPECT_EQ (dp.port_ref () == db::NetPortRef (&d, 0), true);
+
+  db::DevicePortProperty dp2 = dp;
+  EXPECT_EQ (dp2.to_string (), "port:D:A");
+}
+
+TEST(3_Variants)
 {
   std::auto_ptr<db::NetNameProperty> nn (new db::NetNameProperty ());
   nn->set_name ("net42");
@@ -67,3 +82,4 @@ TEST(2_Variants)
   EXPECT_EQ (vv.is_user<db::NetlistProperty> (), true);
   EXPECT_EQ (dynamic_cast<db::NetNameProperty &>(vv.to_user<db::NetlistProperty> ()).name (), "net42");
 }
+

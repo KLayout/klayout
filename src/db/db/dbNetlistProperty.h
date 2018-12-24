@@ -149,14 +149,6 @@ public:
   {
     return std::string ();
   }
-
-  /**
-   *  @brief Pulls the object from a string
-   */
-  virtual void read (tl::Extractor &)
-  {
-    //  .. nothing yet ..
-  }
 };
 
 /**
@@ -227,59 +219,86 @@ public:
    */
   virtual std::string to_string () const;
 
-  /**
-   *  @brief Pulls the object from a string
-   */
-  virtual void read (tl::Extractor &);
-
 private:
   std::string m_name;
 };
 
-#if 0 // @@@
 /**
- *  @brief A reference to an actual port
- */
-class DB_PUBLIC DevicePortRef
-  : public db::NetlistProperty
-{
-public:
-  DevicePortRef (db::NetPortRef *port);
-
-  //  ...
-
-private:
-  tl::weak_ptr<db::NetPortRef> mp_port;
-};
-
-/**
- *  @brief An abstrace reference to a port
+ *  @brief A reference to a device port
  *
- *  Abstract references are created when turning a string back into a port.
- *  Abstract references can be turned into actual port references using
- *  "to_actual_ref".
+ *  This property is used to mark a shape as a device port reference.
+ *  Such a port reference points to a port of a specific device.
+ *  Attaching such a property to a shape allows connecting the
+ *  net to the device later.
  */
-class DB_PUBLIC DevicePortAbstractRef
+class DB_PUBLIC DevicePortProperty
   : public db::NetlistProperty
 {
 public:
-  DevicePortAbstractRef (const std::string &device_name, const std::string &port_name);
-
-  //  ...
+  /**
+   *  @brief Creates a netlist name property without a specific name
+   */
+  DevicePortProperty ();
 
   /**
-   *  @brief Turns an abstract reference into an actual one
-   *
-   *  The returned object is either 0, if the translation cannot be done or
-   *  and new'd NetPortRef object. It's the responsibility of the caller
-   *  to delete this object when it's no longer used.
+   *  @brief copy constructor
    */
-  NetPortRef *to_actual_ref (const db::Netlist *netlist) const;
+  DevicePortProperty (const db::DevicePortProperty &other);
+
+  /**
+   *  @brief Creates a netlist name property with the given name
+   */
+  DevicePortProperty (const db::NetPortRef &port_ref);
+
+  /**
+   *  @brief Assignment
+   */
+  DevicePortProperty &operator= (const DevicePortProperty &other);
+
+  /**
+   *  @brief Sets the port reference
+   */
+  void set_port_ref (const db::NetPortRef &port_ref);
+
+  /**
+   *  @brief Gets the port reference
+   */
+  const db::NetPortRef &port_ref () const
+  {
+    return m_port_ref;
+  }
+
+  /**
+   *  @brief Clones the object
+   */
+  virtual DevicePortProperty *clone () const
+  {
+    return new DevicePortProperty (*this);
+  }
+
+  /**
+   *  @brief Compares two objects (equal). Both types are guaranteed to be the same.
+   */
+  virtual bool equals (const NetlistProperty *) const;
+
+  /**
+   *  @brief Compares two objects (less). Both types are guaranteed to be the same.
+   */
+  virtual bool less (const NetlistProperty *) const;
+
+  /**
+   *  @brief Assigned the other object to self. Both types are guaranteed to be identical.
+   */
+  virtual void assign (const NetlistProperty *);
+
+  /**
+   *  @brief Converts to a string
+   */
+  virtual std::string to_string () const;
 
 private:
-  std::string m_device_name, m_port_name;
+  db::NetPortRef m_port_ref;
 };
-#endif
 
 }
 

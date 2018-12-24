@@ -76,6 +76,25 @@ public:
   NetPortRef &operator= (const NetPortRef &other);
 
   /**
+   *  @brief Comparison
+   */
+  bool operator< (const NetPortRef &other) const
+  {
+    if (mp_device != other.mp_device) {
+      return mp_device < other.mp_device;
+    }
+    return m_port_id < other.m_port_id;
+  }
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const NetPortRef &other) const
+  {
+    return (mp_device == other.mp_device && m_port_id == other.m_port_id);
+  }
+
+  /**
    *  @brief Gets the device reference
    */
   Device *device ()
@@ -177,6 +196,25 @@ public:
    *  @brief Assignment
    */
   NetPinRef &operator= (const NetPinRef &other);
+
+  /**
+   *  @brief Comparison
+   */
+  bool operator< (const NetPinRef &other) const
+  {
+    if (mp_subcircuit != other.mp_subcircuit) {
+      return mp_subcircuit < other.mp_subcircuit;
+    }
+    return m_pin_id < other.m_pin_id;
+  }
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const NetPinRef &other) const
+  {
+    return (mp_subcircuit == other.mp_subcircuit && m_pin_id == other.m_pin_id);
+  }
 
   /**
    *  @brief Gets the pin reference (const version)

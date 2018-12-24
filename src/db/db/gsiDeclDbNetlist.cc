@@ -332,10 +332,11 @@ static const db::Pin &create_pin (db::Circuit *c, const std::string &name)
   return c->add_pin (db::Pin (name));
 }
 
-static db::Net *create_net (db::Circuit *c)
+static db::Net *create_net (db::Circuit *c, const std::string &name)
 {
   db::Net *n = new db::Net ();
   c->add_net (n);
+  n->set_name (name);
   return n;
 }
 
@@ -394,7 +395,7 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::method ("pin_count", &db::Circuit::pin_count,
     "@brief Gets the number of pins in the circuit"
   ) +
-  gsi::method_ext ("create_net", &gsi::create_net,
+  gsi::method_ext ("create_net", &gsi::create_net, gsi::arg ("name", std::string ()),
     "@brief Creates a new \\Net object inside the circuit\n"
     "This object will describe a net of the circuit. The nets are basically "
     "connections between the different components of the circuit (subcircuits, "

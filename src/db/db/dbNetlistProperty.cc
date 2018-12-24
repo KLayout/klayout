@@ -65,9 +65,10 @@ std::string VariantUserClass<db::NetlistProperty>::to_string (const void *p) con
   return ((const db::NetlistProperty *) p)->to_string ();
 }
 
-void VariantUserClass<db::NetlistProperty>::read (void *p, tl::Extractor &ex) const
+void VariantUserClass<db::NetlistProperty>::read (void * /*p*/, tl::Extractor & /*ex*/) const
 {
-  ((db::NetlistProperty *) p)->read (ex);
+  //  .. nothing yet ..
+  return;
 }
 
 void VariantUserClass<db::NetlistProperty>::assign (void *self, const void *other) const
@@ -123,7 +124,7 @@ const tl::VariantUserClass<db::NetlistProperty> *NetlistProperty::variant_class 
 }
 
 // --------------------------------------------------------------------------------------------
-//  NetlistName Implementation
+//  NetNameProperty Implementation
 
 NetNameProperty::NetNameProperty ()
   : NetlistProperty ()
@@ -188,9 +189,72 @@ std::string NetNameProperty::to_string () const
   return "name:" + tl::to_word_or_quoted_string (m_name, valid_netname_chars);
 }
 
-void NetNameProperty::read (tl::Extractor &ex)
+// --------------------------------------------------------------------------------------------
+//  DevicePortProperty Implementation
+
+DevicePortProperty::DevicePortProperty ()
+  : NetlistProperty ()
 {
-  ex.read_word_or_quoted (m_name, valid_netname_chars);
+  //  .. nothing yet ..
+}
+
+DevicePortProperty::DevicePortProperty (const DevicePortProperty &other)
+  : NetlistProperty (other), m_port_ref (other.m_port_ref)
+{
+  //  .. nothing yet ..
+}
+
+DevicePortProperty::DevicePortProperty (const db::NetPortRef &p)
+  : NetlistProperty (), m_port_ref (p)
+{
+  //  .. nothing yet ..
+}
+
+DevicePortProperty &DevicePortProperty::operator= (const DevicePortProperty &other)
+{
+  NetlistProperty::operator= (other);
+  if (this != &other) {
+    m_port_ref = other.m_port_ref;
+  }
+  return *this;
+}
+
+void DevicePortProperty::set_port_ref (const db::NetPortRef &p)
+{
+  m_port_ref = p;
+}
+
+bool DevicePortProperty::equals (const NetlistProperty *p) const
+{
+  const DevicePortProperty *pp = static_cast<const DevicePortProperty *> (p);
+  return NetlistProperty::equals (p) && m_port_ref == pp->m_port_ref;
+}
+
+bool DevicePortProperty::less (const NetlistProperty *p) const
+{
+  if (! NetlistProperty::equals (p)) {
+    return NetlistProperty::less (p);
+  } else {
+    const DevicePortProperty *pp = static_cast<const DevicePortProperty *> (p);
+    return m_port_ref < pp->m_port_ref;
+  }
+}
+
+void DevicePortProperty::assign (const NetlistProperty *p)
+{
+  NetlistProperty::assign (p);
+  const DevicePortProperty *pp = static_cast<const DevicePortProperty *> (p);
+  m_port_ref = pp->m_port_ref;
+}
+
+
+std::string DevicePortProperty::to_string () const
+{
+  if (m_port_ref.device () && m_port_ref.port_def ()) {
+    return "port:" + tl::to_word_or_quoted_string (m_port_ref.device ()->name ()) + ":" + tl::to_word_or_quoted_string (m_port_ref.port_def ()->name ());
+  } else {
+    return "port";
+  }
 }
 
 }

@@ -256,7 +256,9 @@ HEADERS = \
     dbLocalOperation.h \
     dbHierProcessor.h \
     dbNetlistProperty.h \
-    dbNetlist.h
+    dbNetlist.h \
+    dbNetlistDeviceClasses.h \
+    dbNetlistDeviceExtractor.h
 
 !equals(HAVE_QT, "0") {
 

@@ -22,6 +22,8 @@
 
 #include "dbNetlist.h"
 
+#include <set>
+
 namespace db
 {
 
@@ -645,6 +647,173 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
 
   if (net) {
     net->add_pin (NetPinRef (pin_id));
+  }
+}
+
+void Circuit::purge_nets ()
+{
+  std::vector<db::Net *> nets_to_be_purged;
+  for (net_iterator n = begin_nets (); n != end_nets (); ++n) {
+    if (n->floating ()) {
+      nets_to_be_purged.push_back (n.operator-> ());
+    }
+  }
+  for (std::vector<db::Net *>::const_iterator n = nets_to_be_purged.begin (); n != nets_to_be_purged.end (); ++n) {
+    delete *n;
+  }
+}
+
+/**
+ *  @brief Sanity check for device to be removed
+ */
+static void check_device_before_remove (db::Circuit *c, const db::Device *d)
+{
+  if (d->device_class () != 0) {
+    throw tl::Exception (tl::to_string (tr ("Internal error: No device class after removing device in device combination")) + ": name=" + d->name () + ", circuit=" + c->name ());
+  }
+  const std::vector<db::DevicePortDefinition> &pd = d->device_class ()->port_definitions ();
+  for (std::vector<db::DevicePortDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+    if (d->net_for_port (p->id ()) != 0) {
+      throw tl::Exception (tl::to_string (tr ("Internal error: Port still connected after removing device in device combination")) + ": name=" + d->name () + ", circuit=" + c->name () + ", port=" + p->name ());
+    }
+  }
+}
+
+void Circuit::combine_parallel_devices (const db::DeviceClass &cls)
+{
+  typedef std::vector<const db::Net *> key_type;
+  std::map<key_type, std::vector<db::Device *> > combination_candidates;
+
+  //  identify the candidates for combination - all devices sharing the same nets
+  //  are candidates for combination in parallel mode
+  for (device_iterator d = begin_devices (); d != end_devices (); ++d) {
+
+    if (tl::id_of (d->device_class ()) != tl::id_of (&cls)) {
+      continue;
+    }
+
+    key_type k;
+    const std::vector<db::DevicePortDefinition> &ports = cls.port_definitions ();
+    for (std::vector<db::DevicePortDefinition>::const_iterator p = ports.begin (); p != ports.end (); ++p) {
+      const db::Net *n = d->net_for_port (p->id ());
+      if (n) {
+        k.push_back (n);
+      }
+    }
+
+    std::sort (k.begin (), k.end ());
+    k.erase (std::unique (k.begin (), k.end ()), k.end ());
+    combination_candidates[k].push_back (d.operator-> ());
+
+  }
+
+  //  actually combine the devices
+  for (std::map<key_type, std::vector<db::Device *> >::iterator cc = combination_candidates.begin (); cc != combination_candidates.end (); ++cc) {
+
+    std::vector<db::Device *> &cl = cc->second;
+    for (size_t i = 0; i != cl.size () - 1; ++i) {
+      for (size_t j = i + 1; j != cl.size (); ) {
+        if (cls.combine_devices (cl [i], cl [j])) {
+          check_device_before_remove (this, cl [j]);  //  sanity check
+          delete cl [j];
+          cl.erase (cl.begin () + j);
+        } else {
+          ++j;
+        }
+      }
+    }
+
+  }
+}
+
+static std::pair<db::Device *, db::Device *> attached_two_devices (db::Net &net, const db::DeviceClass &cls)
+{
+  if (net.begin_pins () != net.end_pins ()) {
+    return std::make_pair ((db::Device *) 0, (db::Device *) 0);
+  }
+
+  db::Device *d1 = 0, *d2 = 0;
+
+  Net::port_iterator p = net.begin_ports ();
+  if (p == net.end_ports () || tl::id_of (p->device_class ()) != tl::id_of (&cls)) {
+    return std::make_pair ((db::Device *) 0, (db::Device *) 0);
+  } else {
+    d1 = p->device ();
+  }
+
+  ++p;
+  if (p == net.end_ports () || tl::id_of (p->device_class ()) != tl::id_of (&cls)) {
+    return std::make_pair ((db::Device *) 0, (db::Device *) 0);
+  } else {
+    d2 = p->device ();
+  }
+
+  ++p;
+  if (p != net.end_ports () || d1 == d2 || !d1 || !d2) {
+    return std::make_pair ((db::Device *) 0, (db::Device *) 0);
+  } else {
+    return std::make_pair (d1, d2);
+  }
+}
+
+template <class T>
+static bool same_or_swapped (const std::pair<T, T> &p1, const std::pair<T, T> &p2)
+{
+  return (p1.first == p2.first && p1.second == p2.second) || (p1.first == p2.second && p1.second == p2.first);
+}
+
+void Circuit::combine_serial_devices (const db::DeviceClass &cls)
+{
+  for (net_iterator n = begin_nets (); n != end_nets (); ++n) {
+
+    std::pair<db::Device *, db::Device *> dd = attached_two_devices (*n, cls);
+    if (! dd.first) {
+      continue;
+    }
+
+    //  The net is an internal node: the devices attached to this internal node are
+    //  combination candidates if the number of nets emerging from the attached device pair (not counting
+    //  the internal node we just found) does not exceed the number of pins available for the
+    //  new device.
+
+    std::vector<const db::Net *> other_nets;
+
+    const std::vector<db::DevicePortDefinition> &ports = cls.port_definitions ();
+    for (std::vector<db::DevicePortDefinition>::const_iterator p = ports.begin (); p != ports.end (); ++p) {
+      db::Net *on;
+      on = dd.first->net_for_port (p->id ());
+      if (on && ! same_or_swapped (dd, attached_two_devices (*on, cls))) {
+        other_nets.push_back (on);
+      }
+      on = dd.second->net_for_port (p->id ());
+      if (on && ! same_or_swapped (dd, attached_two_devices (*on, cls))) {
+        other_nets.push_back (on);
+      }
+    }
+
+    std::sort (other_nets.begin (), other_nets.end ());
+    other_nets.erase (std::unique (other_nets.begin (), other_nets.end ()), other_nets.end ());
+
+    if (other_nets.size () <= cls.port_definitions().size ()) {
+
+      //  found a combination candidate
+      if (cls.combine_devices (dd.first, dd.second)) {
+        check_device_before_remove (this, dd.second);  //  sanity check
+        delete dd.second;
+      }
+
+    }
+
+  }
+}
+
+void Circuit::combine_devices ()
+{
+  tl_assert (netlist () != 0);
+
+  for (Netlist::device_class_iterator dc = netlist ()->begin_device_classes (); dc != netlist ()->end_device_classes (); ++dc) {
+    combine_parallel_devices (*dc);
+    combine_serial_devices (*dc);
   }
 }
 

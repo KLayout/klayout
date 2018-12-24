@@ -452,6 +452,14 @@ public:
     return m_ports.end ();
   }
 
+  /**
+   *  @brief Returns true, if the net is floating (has no or only a single connection)
+   */
+  bool floating () const
+  {
+    return (m_pins.size () + m_ports.size ()) < 2;
+  }
+
 private:
   friend class Circuit;
 
@@ -1056,6 +1064,21 @@ public:
    */
   void connect_pin (size_t pin_id, Net *net);
 
+  /**
+   *  @brief Purge unused nets
+   *
+   *  This method will purge all nets which return "floating".
+   */
+  void purge_nets ();
+
+  /**
+   *  @brief Combine devices
+   *
+   *  This method will combine devices that can be combined according
+   *  to their device classes "combine_devices" method.
+   */
+  void combine_devices ();
+
 private:
   friend class Netlist;
   friend class Net;
@@ -1077,6 +1100,8 @@ private:
   void translate_circuits (const std::map<const Circuit *, Circuit *> &map);
   void translate_device_classes (const std::map<const DeviceClass *, DeviceClass *> &map);
   void set_netlist (Netlist *netlist);
+  void combine_parallel_devices (const db::DeviceClass &cls);
+  void combine_serial_devices (const db::DeviceClass &cls);
 };
 
 /**
@@ -1318,6 +1343,21 @@ public:
    *  identifies the device class.
    */
   virtual const std::string &description () const;
+
+  /**
+   *  @brief Combines two devices
+   *
+   *  This method shall test, whether the two devices can be combined. Both devices
+   *  are guaranteed to share the same device class (this).
+   *  If they cannot be combined, this method shall do nothing and return false.
+   *  If they can be combined, this method shall reconnect the nets of the first
+   *  device and entirely disconnect the nets of the second device.
+   *  The second device will be deleted afterwards.
+   */
+  virtual bool combine_devices (db::Device * /*a*/, db::Device * /*b*/) const
+  {
+    return false;
+  }
 
   /**
    *  @brief Gets the port definitions

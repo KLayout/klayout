@@ -652,11 +652,13 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
 //  DeviceClass class implementation
 
 DeviceClass::DeviceClass ()
+  : mp_netlist (0)
 {
   // .. nothing yet ..
 }
 
 DeviceClass::DeviceClass (const DeviceClass &other)
+  : mp_netlist (0)
 {
   operator= (other);
 }
@@ -801,16 +803,19 @@ void Netlist::add_circuit (Circuit *circuit)
 
 void Netlist::remove_circuit (Circuit *circuit)
 {
+  circuit->set_netlist (0);
   m_circuits.erase (circuit);
 }
 
 void Netlist::add_device_class (DeviceClass *device_class)
 {
   m_device_classes.push_back (device_class);
+  device_class->set_netlist (this);
 }
 
 void Netlist::remove_device_class (DeviceClass *device_class)
 {
+  device_class->set_netlist (0);
   m_device_classes.erase (device_class);
 }
 

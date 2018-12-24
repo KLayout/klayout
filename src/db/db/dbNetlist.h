@@ -28,6 +28,7 @@
 #include "dbTrans.h"
 #include "tlObjectCollection.h"
 #include "tlVector.h"
+#include "tlUniqueId.h"
 #include "gsiObject.h"
 
 #include <list>
@@ -1253,7 +1254,7 @@ private:
  *  A device class describes a type of device.
  */
 class DB_PUBLIC DeviceClass
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase, public tl::Object, public tl::UniqueId
 {
 public:
   typedef size_t port_id_type;
@@ -1285,6 +1286,22 @@ public:
   virtual DeviceClass *clone () const
   {
     return new DeviceClass (*this);
+  }
+
+  /**
+   *  @brief Gets the netlist the device class lives in
+   */
+  db::Netlist *netlist ()
+  {
+    return mp_netlist;
+  }
+
+  /**
+   *  @brief Gets the netlist the device class lives in (const version)
+   */
+  const db::Netlist *netlist () const
+  {
+    return mp_netlist;
   }
 
   /**
@@ -1353,8 +1370,16 @@ public:
   const DeviceParameterDefinition *parameter_definition (size_t id) const;
 
 private:
+  friend class Netlist;
+
   std::vector<DevicePortDefinition> m_port_definitions;
   std::vector<DeviceParameterDefinition> m_parameter_definitions;
+  db::Netlist *mp_netlist;
+
+  void set_netlist (db::Netlist *nl)
+  {
+    mp_netlist = nl;
+  }
 };
 
 /**

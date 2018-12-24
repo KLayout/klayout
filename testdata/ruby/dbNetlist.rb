@@ -137,6 +137,7 @@ class DBNetlist_TestClass < TestBase
 
     dc = RBA::GenericDeviceClass::new
     nl.add(dc)
+    assert_equal(dc.netlist.object_id, nl.object_id)
     dc.name = "DC"
     dc.description = "A device class"
 
@@ -158,6 +159,8 @@ class DBNetlist_TestClass < TestBase
     assert_equal(d1.name, "D1")
 
     d2 = c.create_device(dc)
+    assert_equal(d2.device_class.id, dc.id)
+    assert_equal(d2.device_class.object_id, dc.object_id)   # by virtue of Ruby-to-C++ object mapping
     d2.name = "D2"
 
     names = []

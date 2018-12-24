@@ -364,12 +364,26 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
   "This class has been added in version 0.26."
 );
 
+static tl::id_type id_of_device_class (const db::DeviceClass *cls)
+{
+  return tl::id_of (cls);
+}
+
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name", &db::DeviceClass::name,
     "@brief Gets the name of the device class."
   ) +
   gsi::method ("description", &db::DeviceClass::description,
     "@brief Gets the description text of the device class."
+  ) +
+  gsi::method ("netlist", (db::Netlist *(db::DeviceClass::*) ()) &db::DeviceClass::netlist,
+    "@brief Gets the netlist the device class lives in."
+  ) +
+  gsi::method_ext ("id", &gsi::id_of_device_class,
+    "@brief Gets the unique ID of the device class\n"
+    "The ID is a unique integer that identifies the device class. Use the ID "
+    "to check for object identity - i.e. to determine whether two devices share the "
+    "same device class."
   ) +
   gsi::method ("port_definitions", &db::DeviceClass::port_definitions,
     "@brief Gets the list of port definitions of the device.\n"

@@ -49,7 +49,7 @@ TEST(1_NameBasic)
 
 TEST(2_PortRefBasic)
 {
-  db::GenericDeviceClass dc;
+  db::DeviceClass dc;
   dc.add_port_definition (db::DevicePortDefinition ("A", "Port A"));
   dc.add_port_definition (db::DevicePortDefinition ("B", "Port B"));
 

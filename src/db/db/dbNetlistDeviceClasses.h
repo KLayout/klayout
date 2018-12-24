@@ -36,6 +36,7 @@ public:
 
 
 
+
 };
 
 class DB_PUBLIC DeviceClassCapacitor

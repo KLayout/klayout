@@ -836,20 +836,10 @@ DeviceClass &DeviceClass::operator= (const DeviceClass &other)
 {
   if (this != &other) {
     m_port_definitions = other.m_port_definitions;
+    m_name = other.m_name;
+    m_description = other.m_description;
   }
   return *this;
-}
-
-const std::string &DeviceClass::name () const
-{
-  static std::string no_name;
-  return no_name;
-}
-
-const std::string &DeviceClass::description () const
-{
-  static std::string no_description;
-  return no_description;
 }
 
 const DevicePortDefinition &DeviceClass::add_port_definition (const DevicePortDefinition &pd)
@@ -892,29 +882,6 @@ const DeviceParameterDefinition *DeviceClass::parameter_definition (size_t id) c
   } else {
     return 0;
   }
-}
-
-// --------------------------------------------------------------------------------
-//  GenericDeviceClass class implementation
-
-GenericDeviceClass::GenericDeviceClass ()
-{
-  //  .. nothing yet ..
-}
-
-GenericDeviceClass::GenericDeviceClass (const GenericDeviceClass &other)
-{
-  operator= (other);
-}
-
-GenericDeviceClass &GenericDeviceClass::operator= (const GenericDeviceClass &other)
-{
-  if (this != &other) {
-    DeviceClass::operator= (other);
-    m_name = other.m_name;
-    m_description = other.m_description;
-  }
-  return *this;
 }
 
 // --------------------------------------------------------------------------------

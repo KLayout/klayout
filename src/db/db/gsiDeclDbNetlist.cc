@@ -422,21 +422,54 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   "This class has been added in version 0.26."
 );
 
-static void gdc_add_port_definition (db::GenericDeviceClass *cls, db::DevicePortDefinition *port_def)
+namespace {
+
+/**
+ *  @brief A DeviceClass implementation that allows reimplementation of the virtual methods
+ *
+ *  NOTE: cloning of the generic device class is not supported currently. Hence when the
+ *  netlist is copied, the device class attributes will remain, but the functionality is lost.
+ */
+class GenericDeviceClass
+  : public db::DeviceClass
+{
+public:
+  GenericDeviceClass ()
+    : db::DeviceClass ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual bool combine_devices (db::Device *a, db::Device *b) const
+  {
+    if (cb_combine_devices.can_issue ()) {
+      return cb_combine_devices.issue<const db::DeviceClass, bool, db::Device *, db::Device *> (&db::DeviceClass::combine_devices, a, b);
+    } else {
+      return db::DeviceClass::combine_devices (a, b);
+    }
+  }
+
+private:
+  gsi::Callback cb_combine_devices;
+};
+
+}
+
+static void gdc_add_port_definition (GenericDeviceClass *cls, db::DevicePortDefinition *port_def)
 {
   if (port_def) {
     *port_def = cls->add_port_definition (*port_def);
   }
 }
 
-static void gdc_add_parameter_definition (db::GenericDeviceClass *cls, db::DeviceParameterDefinition *parameter_def)
+static void gdc_add_parameter_definition (GenericDeviceClass *cls, db::DeviceParameterDefinition *parameter_def)
 {
   if (parameter_def) {
     *parameter_def = cls->add_parameter_definition (*parameter_def);
   }
 }
 
-Class<db::GenericDeviceClass> decl_dbGenericDeviceClass (decl_dbDeviceClass, "db", "GenericDeviceClass",
+Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "GenericDeviceClass",
   gsi::method_ext ("add_port", &gsi::gdc_add_port_definition, gsi::arg ("port_def"),
     "@brief Adds the given port definition to the device class\n"
     "This method will define a new port. The new port is added at the end of existing ports. "
@@ -446,7 +479,7 @@ Class<db::GenericDeviceClass> decl_dbGenericDeviceClass (decl_dbDeviceClass, "db
     "The port is copied into the device class. Modifying the port object later "
     "does not have the effect of changing the port definition."
   ) +
-  gsi::method ("clear_ports", &db::GenericDeviceClass::clear_port_definitions,
+  gsi::method ("clear_ports", &GenericDeviceClass::clear_port_definitions,
     "@brief Clears the list of ports\n"
   ) +
   gsi::method_ext ("add_parameter", &gsi::gdc_add_parameter_definition, gsi::arg ("parameter_def"),
@@ -458,13 +491,13 @@ Class<db::GenericDeviceClass> decl_dbGenericDeviceClass (decl_dbDeviceClass, "db
     "The parameter is copied into the device class. Modifying the parameter object later "
     "does not have the effect of changing the parameter definition."
   ) +
-  gsi::method ("clear_parameters", &db::GenericDeviceClass::clear_parameter_definitions,
+  gsi::method ("clear_parameters", &GenericDeviceClass::clear_parameter_definitions,
     "@brief Clears the list of parameters\n"
   ) +
-  gsi::method ("name=", &db::GenericDeviceClass::set_name, gsi::arg ("name"),
+  gsi::method ("name=", &GenericDeviceClass::set_name, gsi::arg ("name"),
     "@brief Sets the name of the device\n"
   ) +
-  gsi::method ("description=", &db::GenericDeviceClass::set_description, gsi::arg ("description"),
+  gsi::method ("description=", &GenericDeviceClass::set_description, gsi::arg ("description"),
     "@brief Sets the description of the device\n"
   ),
   "@brief A generic device class\n"

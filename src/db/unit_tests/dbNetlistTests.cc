@@ -87,7 +87,7 @@ TEST(2_DeviceClass)
   pd2.set_name ("name2");
   pd2.set_description ("now it has something");
 
-  db::GenericDeviceClass dc;
+  db::DeviceClass dc;
   dc.set_name ("devname");
   dc.set_description ("devdesc");
   EXPECT_EQ (dc.name (), "devname");
@@ -102,7 +102,7 @@ TEST(2_DeviceClass)
   EXPECT_EQ (pd2string (*dc.port_definition (dc.port_definitions ()[1].id ())), "name2(now it has something) #1");
   EXPECT_EQ (dc.port_definition (3), 0);
 
-  db::GenericDeviceClass dc2 = dc;
+  db::DeviceClass dc2 = dc;
   EXPECT_EQ (dc2.name (), "devname");
   EXPECT_EQ (dc2.description (), "devdesc");
   EXPECT_EQ (dc2.port_definitions ().size (), size_t (2));
@@ -242,7 +242,7 @@ static std::string netlist2 (const db::Circuit &c)
 
 TEST(4_CircuitDevices)
 {
-  db::GenericDeviceClass dc1;
+  db::DeviceClass dc1;
   dc1.set_name ("dc1");
   dc1.add_port_definition (db::DevicePortDefinition ("S", "Source"));
   dc1.add_port_definition (db::DevicePortDefinition ("G", "Gate"));
@@ -250,7 +250,7 @@ TEST(4_CircuitDevices)
   dc1.add_parameter_definition (db::DeviceParameterDefinition ("U", "", 1.0));
   dc1.add_parameter_definition (db::DeviceParameterDefinition ("V", "", 2.0));
 
-  db::GenericDeviceClass dc2;
+  db::DeviceClass dc2;
   dc2.set_name ("dc2");
   dc2.add_port_definition (db::DevicePortDefinition ("A", ""));
   dc2.add_port_definition (db::DevicePortDefinition ("B", ""));
@@ -376,7 +376,7 @@ TEST(4_NetlistSubcircuits)
 {
   std::auto_ptr<db::Netlist> nl (new db::Netlist ());
 
-  db::GenericDeviceClass *dc = new db::GenericDeviceClass ();
+  db::DeviceClass *dc = new db::DeviceClass ();
   dc->set_name ("dc2");
   dc->add_port_definition (db::DevicePortDefinition ("A", ""));
   dc->add_port_definition (db::DevicePortDefinition ("B", ""));
@@ -538,7 +538,7 @@ TEST(6_Net)
 TEST(7_NetPortsEditing)
 {
   db::Circuit c;
-  db::GenericDeviceClass dc;
+  db::DeviceClass dc;
   dc.add_port_definition (db::DevicePortDefinition ("A", ""));
   dc.add_port_definition (db::DevicePortDefinition ("B", ""));
 

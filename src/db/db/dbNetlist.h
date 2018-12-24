@@ -1306,14 +1306,6 @@ public:
   DeviceClass &operator= (const DeviceClass &other);
 
   /**
-   *  @brief Clears the circuit
-   */
-  virtual DeviceClass *clone () const
-  {
-    return new DeviceClass (*this);
-  }
-
-  /**
    *  @brief Gets the netlist the device class lives in
    */
   db::Netlist *netlist ()
@@ -1334,7 +1326,18 @@ public:
    *
    *  The name is a formal name which identifies the class.
    */
-  virtual const std::string &name () const;
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  /**
+   *  @brief Sets the device name
+   */
+  void set_name (const std::string &n)
+  {
+    m_name = n;
+  }
 
   /**
    *  @brief Gets the description text for the device class
@@ -1342,21 +1345,17 @@ public:
    *  The description text is a human-readable text that
    *  identifies the device class.
    */
-  virtual const std::string &description () const;
+  const std::string &description () const
+  {
+    return m_description;
+  }
 
   /**
-   *  @brief Combines two devices
-   *
-   *  This method shall test, whether the two devices can be combined. Both devices
-   *  are guaranteed to share the same device class (this).
-   *  If they cannot be combined, this method shall do nothing and return false.
-   *  If they can be combined, this method shall reconnect the nets of the first
-   *  device and entirely disconnect the nets of the second device.
-   *  The second device will be deleted afterwards.
+   *  @brief Sets the description text
    */
-  virtual bool combine_devices (db::Device * /*a*/, db::Device * /*b*/) const
+  void set_description (const std::string &d)
   {
-    return false;
+    m_description = d;
   }
 
   /**
@@ -1409,9 +1408,33 @@ public:
    */
   const DeviceParameterDefinition *parameter_definition (size_t id) const;
 
+  /**
+   *  @brief Clears the circuit
+   */
+  virtual DeviceClass *clone () const
+  {
+    return new DeviceClass (*this);
+  }
+
+  /**
+   *  @brief Combines two devices
+   *
+   *  This method shall test, whether the two devices can be combined. Both devices
+   *  are guaranteed to share the same device class (this).
+   *  If they cannot be combined, this method shall do nothing and return false.
+   *  If they can be combined, this method shall reconnect the nets of the first
+   *  device and entirely disconnect the nets of the second device.
+   *  The second device will be deleted afterwards.
+   */
+  virtual bool combine_devices (db::Device * /*a*/, db::Device * /*b*/) const
+  {
+    return false;
+  }
+
 private:
   friend class Netlist;
 
+  std::string m_name, m_description;
   std::vector<DevicePortDefinition> m_port_definitions;
   std::vector<DeviceParameterDefinition> m_parameter_definitions;
   db::Netlist *mp_netlist;
@@ -1420,81 +1443,6 @@ private:
   {
     mp_netlist = nl;
   }
-};
-
-/**
- *  @brief A generic device class
- *
- *  The generic device class is a push version of the DeviceClassBase
- */
-class DB_PUBLIC GenericDeviceClass
-  : public DeviceClass
-{
-public:
-  /**
-   *  @brief Constructor
-   *
-   *  Creates an empty circuit.
-   */
-  GenericDeviceClass ();
-
-  /**
-   *  @brief Copy constructor
-   */
-  GenericDeviceClass (const GenericDeviceClass &other);
-
-  /**
-   *  @brief Assignment
-   */
-  GenericDeviceClass &operator= (const GenericDeviceClass &other);
-
-  /**
-   *  @brief Clears the circuit
-   */
-  virtual DeviceClass *clone () const
-  {
-    return new GenericDeviceClass (*this);
-  }
-
-  /**
-   *  @brief Gets the name of the device class
-   *
-   *  The name is a formal name which identifies the class.
-   */
-  virtual const std::string &name () const
-  {
-    return m_name;
-  }
-
-  /**
-   *  @brief Sets the device name
-   */
-  void set_name (const std::string &n)
-  {
-    m_name = n;
-  }
-
-  /**
-   *  @brief Gets the description text for the device class
-   *
-   *  The description text is a human-readable text that
-   *  identifies the device class.
-   */
-  virtual const std::string &description () const
-  {
-    return m_description;
-  }
-
-  /**
-   *  @brief Sets the description text
-   */
-  void set_description (const std::string &d)
-  {
-    m_description = d;
-  }
-
-private:
-  std::string m_name, m_description;
 };
 
 /**

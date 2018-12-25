@@ -33,6 +33,12 @@
 namespace db
 {
 
+/**
+ *  @brief Implements the device extraction for a specific setup
+ *
+ *  This class can be reimplemented to provide the basic algorithms for
+ *  device extraction. See the virtual methods below.
+ */
 class DB_PUBLIC NetlistDeviceExtractor
   : public gsi::ObjectBase
 {
@@ -58,6 +64,9 @@ public:
   /**
    *  @brief Performs the extraction
    *
+   *  layout and cell specify the layout and the top cell from which to perform the
+   *  extraction.
+   *
    *  The netlist will be filled with circuits (unless not present yet) to represent the
    *  cells from the layout.
    *
@@ -67,15 +76,10 @@ public:
    *  the nets later to associate nets with device ports.
    *
    *  The definition of the input layers is device class specific.
+   *
+   *  NOTE: The extractor expects "PolygonRef" type layers.
    */
-  void extract (db::Layout *layout, const std::vector<unsigned int> &layers);
-
-  /**
-   *  @brief Checks the input layers
-   *  This method shall raise an error, if the input layer are not properly defined (e.g.
-   *  too few etc.)
-   */
-  virtual void check_input_layers (db::Layout *layout, const std::vector<unsigned int> &layers) const;
+  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers);
 
   /**
    *  @brief Creates the device classes
@@ -87,8 +91,10 @@ public:
 
   /**
    *  @brief Gets the connectivity object used to extract the device geometry
+   *  This method shall raise an error, if the input layer are not properly defined (e.g.
+   *  too few etc.)
    */
-  virtual db::Connectivity get_connectivity (const std::vector<unsigned int> &layers) const;
+  virtual db::Connectivity get_connectivity (const db::Layout &layout, const std::vector<unsigned int> &layers) const;
 
   /**
    *  @brief Extracts the devices from the given shape cluster
@@ -143,10 +149,13 @@ protected:
   }
 
 private:
+  tl::weak_ptr<db::Netlist> m_netlist;
   db::Layout *mp_layout;
+  db::properties_id_type m_propname_id;
   db::cell_index_type m_cell_index;
-  db::Netlist *mp_netlist;
   db::Circuit *mp_circuit;
+  std::vector<db::DeviceClass *> m_device_classes;
+  unsigned int m_device_name_index;
 };
 
 }

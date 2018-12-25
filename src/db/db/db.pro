@@ -145,7 +145,9 @@ SOURCES = \
     dbNetlistProperty.cc \
     gsiDeclDbNetlistProperty.cc \
     dbNetlist.cc \
-    gsiDeclDbNetlist.cc
+    gsiDeclDbNetlist.cc \
+    dbNetlistDeviceClasses.cc \
+    dbNetlistDeviceExtractor.cc
 
 HEADERS = \
   dbArray.h \

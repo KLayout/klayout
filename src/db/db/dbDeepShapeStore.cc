@@ -291,7 +291,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   //  Build the working hierarchy from the recursive shape iterator
   try {
 
-    tl::SelfTimer timer (tl::to_string (tr ("Building working hierarchy")));
+    tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Building working hierarchy")));
 
     m_layouts[layout_index]->builder.set_shape_receiver (&clip);
     db::RecursiveShapeIterator (si).push (& m_layouts[layout_index]->builder);
@@ -318,7 +318,8 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
 
   db::HierarchyBuilder &original_builder = m_layouts [deep_layer.layout_index ()]->builder;
 
-  //  derive a cell mapping for source to target. We employ a
+  //  Derive a cell mapping for source to target. We reuse any existing mapping for returning the
+  //  shapes into the original layout.
 
   DeliveryMappingCacheKey key (deep_layer.layout_index (), tl::id_of (into_layout), into_cell);
 

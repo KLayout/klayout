@@ -277,6 +277,20 @@ Class<db::Net> decl_dbNet ("db", "Net",
     "@brief Iterates over all terminals the net connects.\n"
     "Terminals connect devices. Terminal connections are described by \\NetTerminalRef "
     "objects."
+  ) +
+  gsi::method ("is_floating?", &db::Net::is_floating,
+    "@brief Returns true, if the net is floating.\n"
+    "Floating nets are those who don't have any or only a single connection (pin_count + terminal_count < 2)."
+  ) +
+  gsi::method ("is_internal?", &db::Net::is_internal,
+    "@brief Returns true, if the net is an internal net.\n"
+    "Internal nets are those which connect exactly two terminals and nothing else (pin_count = 0 and  terminal_count == 2)."
+  ) +
+  gsi::method ("pin_count", &db::Net::pin_count,
+    "@brief Returns the number of pins connected by this net.\n"
+  ) +
+  gsi::method ("terminal_count", &db::Net::terminal_count,
+    "@brief Returns the number of terminals connected by this net.\n"
   ),
   "@brief A single net.\n"
   "A net connects multiple pins or terminals together. Pins are either "
@@ -435,7 +449,7 @@ class GenericDeviceClass
 {
 public:
   GenericDeviceClass ()
-    : db::DeviceClass ()
+    : db::DeviceClass (), m_supports_parallel_combination (true), m_supports_serial_combination (true)
   {
     //  .. nothing yet ..
   }
@@ -449,8 +463,31 @@ public:
     }
   }
 
-private:
+  virtual bool supports_parallel_combination () const
+  {
+    return m_supports_parallel_combination;
+  }
+
+  virtual bool supports_serial_combination () const
+  {
+    return m_supports_serial_combination;
+  }
+
+  void set_supports_parallel_combination (bool f)
+  {
+    m_supports_parallel_combination = f;
+  }
+
+  void set_supports_serial_combination (bool f)
+  {
+    m_supports_serial_combination = f;
+  }
+
   gsi::Callback cb_combine_devices;
+
+private:
+  bool m_supports_parallel_combination;
+  bool m_supports_serial_combination;
 };
 
 }
@@ -499,6 +536,28 @@ Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "Ge
   ) +
   gsi::method ("description=", &GenericDeviceClass::set_description, gsi::arg ("description"),
     "@brief Sets the description of the device\n"
+  ) +
+  gsi::callback ("combine_devices", &GenericDeviceClass::combine_devices, &GenericDeviceClass::cb_combine_devices, gsi::arg ("a"), gsi::arg ("b"),
+    "@brief Combines two devices.\n"
+    "This method shall test, whether the two devices can be combined. Both devices "
+    "are guaranteed to share the same device class (self). "
+    "If they cannot be combined, this method shall do nothing and return false. "
+    "If they can be combined, this method shall reconnect the nets of the first "
+    "device and entirely disconnect the nets of the second device. "
+    "It shall combine the parameters of both devices into the first. "
+    "The second device will be deleted afterwards.\n"
+  ) +
+  gsi::method ("supports_parallel_combination=", &GenericDeviceClass::set_supports_parallel_combination, gsi::arg ("f"),
+    "@brief Specifies whether the device supports parallel device combination.\n"
+    "Parallel device combination means that all terminals of two combination candidates are connected to the same nets. "
+    "If the device does not support this combination mode, this predicate can be set to false. This will make the device "
+    "extractor skip the combination test in parallel mode and improve performance somewhat."
+  ) +
+  gsi::method ("supports_serial_combination=", &GenericDeviceClass::set_supports_serial_combination, gsi::arg ("f"),
+    "@brief Specifies whether the device supports serial device combination.\n"
+    "Serial device combination means that the devices are connected by internal nodes. "
+    "If the device does not support this combination mode, this predicate can be set to false. This will make the device "
+    "extractor skip the combination test in serial mode and improve performance somewhat."
   ),
   "@brief A generic device class\n"
   "This class allows building generic device classes. Specificially, terminals can be defined "

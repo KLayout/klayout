@@ -455,9 +455,33 @@ public:
   /**
    *  @brief Returns true, if the net is floating (has no or only a single connection)
    */
-  bool floating () const
+  bool is_floating () const
   {
     return (m_pins.size () + m_terminals.size ()) < 2;
+  }
+
+  /**
+   *  @brief Returns true, if the net is an internal node (connects two terminals only)
+   */
+  bool is_internal () const
+  {
+    return m_pins.size () == 0 && m_terminals.size () == 2;
+  }
+
+  /**
+   *  @brief Returns the number of pins connected
+   */
+  size_t pin_count () const
+  {
+    return m_pins.size ();
+  }
+
+  /**
+   *  @brief Returns the number of terminals connected
+   */
+  size_t terminal_count () const
+  {
+    return m_terminals.size ();
   }
 
 private:

@@ -41,13 +41,13 @@ bool DeviceClassTwoTerminalDevice::combine_devices (Device *a, Device *b) const
 
     parallel (a, b);
 
-  } else if (na2 == nb1 || na2 == nb2) {
+  } else if ((na2 == nb1 || na2 == nb2) && na2->is_internal ()) {
 
     //  serial a(B) to b(A or B)
     serial (a, b);
     a->connect_terminal (1, (na2 == nb1 ? nb2 : nb1));
 
-  } else if (na1 == nb1 || na1 == nb2) {
+  } else if ((na1 == nb1 || na1 == nb2) && na1->is_internal ()) {
 
     //  serial a(A) to b(A or B)
     serial (a, b);

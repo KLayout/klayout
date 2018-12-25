@@ -46,6 +46,7 @@ void NetlistDeviceExtractor::initialize (db::Netlist *nl)
   m_device_name_index = 0;
   m_propname_id = 0;
   m_netlist.reset (nl);
+
   create_device_classes ();
 }
 
@@ -60,32 +61,54 @@ void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const 
   db::ShapeIterator::flags_type shape_iter_flags = db::ShapeIterator::Polygons;
 
   mp_layout = &layout;
+
   //  port properties are kept in property index 0
   m_propname_id = mp_layout->properties_repository ().prop_name_id (tl::Variant (int (0)));
 
   tl_assert (m_netlist.get () != 0);
 
+  //  build a cell-id-to-circuit lookup table
+  std::map<db::cell_index_type, db::Circuit *> circuits_by_cell;
+  for (db::Netlist::circuit_iterator c = m_netlist->begin_circuits (); c != m_netlist->end_circuits (); ++c) {
+    circuits_by_cell.insert (std::make_pair (c->cell_index (), c.operator-> ()));
+  }
+
+  //  collect the cells below the top cell
   std::set<db::cell_index_type> called_cells;
   called_cells.insert (cell.cell_index ());
   cell.collect_called_cells (called_cells);
 
+  //  build the device clusters
   db::Connectivity device_conn = get_connectivity (layout, layers);
-
   db::hier_clusters<shape_type> device_clusters;
   device_clusters.build (layout, cell, shape_iter_flags, device_conn);
 
+  //  for each cell investigate the clusters
   for (std::set<db::cell_index_type>::const_iterator ci = called_cells.begin (); ci != called_cells.end (); ++ci) {
 
     m_cell_index = *ci;
 
-    mp_circuit = new db::Circuit ();
-    mp_circuit->set_cell_index (*ci);
-    mp_circuit->set_name (layout.cell_name (*ci));
-    m_netlist->add_circuit (mp_circuit);
+    std::map<db::cell_index_type, db::Circuit *>::const_iterator c2c = circuits_by_cell.find (*ci);
+    if (c2c != circuits_by_cell.end ()) {
 
+      //  reuse existing circuit
+      mp_circuit = c2c->second;
+
+    } else {
+
+      //  create a new circuit for this cell
+      mp_circuit = new db::Circuit ();
+      mp_circuit->set_cell_index (*ci);
+      mp_circuit->set_name (layout.cell_name (*ci));
+      m_netlist->add_circuit (mp_circuit);
+
+    }
+
+    //  investigate each cluster
     db::connected_clusters<shape_type> cc = device_clusters.clusters_per_cell (*ci);
     for (db::connected_clusters<shape_type>::all_iterator c = cc.begin_all (); !c.at_end(); ++c) {
 
+      //  take only root clusters - others have upward connections and are not "whole"
       if (! cc.is_root (*c)) {
         continue;
       }
@@ -102,6 +125,7 @@ void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const 
         }
       }
 
+      //  do the actual device extraction
       extract_devices (layer_geometry);
 
     }

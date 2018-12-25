@@ -534,8 +534,8 @@ TEST(6_Net)
   EXPECT_EQ (n.name (), "");
   EXPECT_EQ (int (n.cluster_id ()), 0);
 
-  EXPECT_EQ (n.pin_count (), 0);
-  EXPECT_EQ (n.terminal_count (), 0);
+  EXPECT_EQ (n.pin_count (), size_t (0));
+  EXPECT_EQ (n.terminal_count (), size_t (0));
   EXPECT_EQ (n.is_floating (), true);
   EXPECT_EQ (n.is_internal (), false);
 }
@@ -563,16 +563,16 @@ TEST(7_NetTerminalsEditing)
   d1->connect_terminal (0, n1);
   d1->connect_terminal (1, n2);
 
-  EXPECT_EQ (n1->terminal_count (), 1);
-  EXPECT_EQ (n1->pin_count (), 0);
+  EXPECT_EQ (n1->terminal_count (), size_t (1));
+  EXPECT_EQ (n1->pin_count (), size_t (0));
   EXPECT_EQ (n1->is_floating (), true);
   EXPECT_EQ (n1->is_internal (), false);
 
   d2->connect_terminal (1, n1);
   d2->connect_terminal (0, n2);
 
-  EXPECT_EQ (n1->terminal_count (), 2);
-  EXPECT_EQ (n1->pin_count (), 0);
+  EXPECT_EQ (n1->terminal_count (), size_t (2));
+  EXPECT_EQ (n1->pin_count (), size_t (0));
   EXPECT_EQ (n1->is_floating (), false);
   EXPECT_EQ (n1->is_internal (), true);
 
@@ -653,8 +653,8 @@ TEST(8_NetSubCircuitsEditing)
 
   c.connect_pin (0, n1);
 
-  EXPECT_EQ (n1->terminal_count (), 0);
-  EXPECT_EQ (n1->pin_count (), 1);
+  EXPECT_EQ (n1->terminal_count (), size_t (0));
+  EXPECT_EQ (n1->pin_count (), size_t (1));
   EXPECT_EQ (n1->is_floating (), true);
   EXPECT_EQ (n1->is_internal (), false);
 
@@ -664,8 +664,8 @@ TEST(8_NetSubCircuitsEditing)
   sc1->connect_pin (0, n1);
   sc1->connect_pin (1, n2);
 
-  EXPECT_EQ (n1->terminal_count (), 0);
-  EXPECT_EQ (n1->pin_count (), 2);
+  EXPECT_EQ (n1->terminal_count (), size_t (0));
+  EXPECT_EQ (n1->pin_count (), size_t (2));
   EXPECT_EQ (n1->is_floating (), false);
   EXPECT_EQ (n1->is_internal (), false);
 

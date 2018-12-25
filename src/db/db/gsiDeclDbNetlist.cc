@@ -47,40 +47,6 @@ static void device_disconnect_terminal (db::Device *device, size_t terminal_id)
   device->connect_terminal (terminal_id, 0);
 }
 
-static bool device_has_param_with_name (const db::DeviceClass *device_class, const std::string &name)
-{
-  const std::vector<db::DeviceParameterDefinition> &pd = device_class->parameter_definitions ();
-  for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-    if (i->name () == name) {
-      return true;
-    }
-  }
-  return false;
-}
-
-static size_t device_param_id_for_name (const db::DeviceClass *device_class, const std::string &name)
-{
-  if (device_class) {
-    const std::vector<db::DeviceParameterDefinition> &pd = device_class->parameter_definitions ();
-    for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-      if (i->name () == name) {
-        return i->id ();
-      }
-    }
-  }
-  throw tl::Exception (tl::to_string (tr ("Invalid parameter name")) + ": '" + name + "'");
-}
-
-static double device_parameter_value (const db::Device *device, const std::string &name)
-{
-  return device->parameter_value (device_param_id_for_name (device->device_class (), name));
-}
-
-static void device_set_parameter_value (db::Device *device, const std::string &name, double value)
-{
-  return device->set_parameter_value (device_param_id_for_name (device->device_class (), name), value);
-}
-
 Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
@@ -103,17 +69,17 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method_ext ("disconnect_terminal", &device_disconnect_terminal, gsi::arg ("terminal_id"),
     "@brief Disconnects the given terminal from any net.\n"
   ) +
-  gsi::method ("parameter", &db::Device::parameter_value, gsi::arg ("param_id"),
+  gsi::method ("parameter", (double (db::Device::*) (size_t) const) &db::Device::parameter_value, gsi::arg ("param_id"),
     "@brief Gets the parameter value for the given parameter ID."
   ) +
-  gsi::method ("set_parameter", &db::Device::set_parameter_value, gsi::arg ("param_id"), gsi::arg ("value"),
+  gsi::method ("set_parameter", (void (db::Device::*) (size_t, double)) &db::Device::set_parameter_value, gsi::arg ("param_id"), gsi::arg ("value"),
     "@brief Sets the parameter value for the given parameter ID."
   ) +
-  gsi::method_ext ("parameter", &gsi::device_parameter_value, gsi::arg ("param_name"),
+  gsi::method ("parameter", (double (db::Device::*) (const std::string &) const) &db::Device::parameter_value, gsi::arg ("param_name"),
     "@brief Gets the parameter value for the given parameter name.\n"
     "If the parameter name is not valid, an exception is thrown."
   ) +
-  gsi::method_ext ("set_parameter", &gsi::device_set_parameter_value, gsi::arg ("param_name"), gsi::arg ("value"),
+  gsi::method ("set_parameter", (void (db::Device::*) (const std::string &, double)) &db::Device::set_parameter_value, gsi::arg ("param_name"), gsi::arg ("value"),
     "@brief Sets the parameter value for the given parameter name.\n"
     "If the parameter name is not valid, an exception is thrown."
   ),
@@ -417,13 +383,21 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "Parameter definition IDs are used in some places to reference a specific parameter of a device. "
     "This method obtains the corresponding definition object."
   ) +
-  gsi::method_ext ("has_parameter", &gsi::device_has_param_with_name, gsi::arg ("name"),
+  gsi::method ("has_parameter", &db::DeviceClass::has_parameter_with_name, gsi::arg ("name"),
     "@brief Returns true, if the device class has a parameter with the given name.\n"
   ) +
-  gsi::method_ext ("parameter_id", &gsi::device_param_id_for_name, gsi::arg ("name"),
+  gsi::method ("parameter_id", &db::DeviceClass::parameter_id_for_name, gsi::arg ("name"),
     "@brief Returns the parameter ID of the parameter with the given name.\n"
     "An exception is thrown if there is no parameter with the given name. Use \\has_parameter to check "
     "whether the name is a valid parameter name."
+  ) +
+  gsi::method ("has_terminal", &db::DeviceClass::has_terminal_with_name, gsi::arg ("name"),
+    "@brief Returns true, if the device class has a terminal with the given name.\n"
+  ) +
+  gsi::method ("terminal_id", &db::DeviceClass::terminal_id_for_name, gsi::arg ("name"),
+    "@brief Returns the terminal ID of the terminal with the given name.\n"
+    "An exception is thrown if there is no terminal with the given name. Use \\has_terminal to check "
+    "whether the name is a valid terminal name."
   ),
   "@brief A class describing a specific type of device.\n"
   "Device class objects live in the context of a \\Netlist object. After a "

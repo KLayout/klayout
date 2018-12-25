@@ -157,6 +157,19 @@ void Device::set_parameter_value (size_t param_id, double v)
   m_parameters [param_id] = v;
 }
 
+double Device::parameter_value (const std::string &name) const
+{
+  return device_class () ? parameter_value (device_class ()->parameter_id_for_name (name)) : 0.0;
+}
+
+void Device::set_parameter_value (const std::string &name, double v)
+{
+  if (device_class ()) {
+    set_parameter_value (device_class ()->parameter_id_for_name (name), v);
+  }
+}
+
+
 // --------------------------------------------------------------------------------
 //  SubCircuit class implementation
 
@@ -886,6 +899,50 @@ const DeviceParameterDefinition *DeviceClass::parameter_definition (size_t id) c
   } else {
     return 0;
   }
+}
+
+bool DeviceClass::has_parameter_with_name (const std::string &name) const
+{
+  const std::vector<db::DeviceParameterDefinition> &pd = parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+    if (i->name () == name) {
+      return true;
+    }
+  }
+  return false;
+}
+
+size_t DeviceClass::parameter_id_for_name (const std::string &name) const
+{
+  const std::vector<db::DeviceParameterDefinition> &pd = parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+    if (i->name () == name) {
+      return i->id ();
+    }
+  }
+  throw tl::Exception (tl::to_string (tr ("Invalid parameter name")) + ": '" + name + "'");
+}
+
+bool DeviceClass::has_terminal_with_name (const std::string &name) const
+{
+  const std::vector<db::DeviceTerminalDefinition> &td = terminal_definitions ();
+  for (std::vector<db::DeviceTerminalDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {
+    if (i->name () == name) {
+      return true;
+    }
+  }
+  return false;
+}
+
+size_t DeviceClass::terminal_id_for_name (const std::string &name) const
+{
+  const std::vector<db::DeviceTerminalDefinition> &td = terminal_definitions ();
+  for (std::vector<db::DeviceTerminalDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {
+    if (i->name () == name) {
+      return i->id ();
+    }
+  }
+  throw tl::Exception (tl::to_string (tr ("Invalid terminal name")) + ": '" + name + "'");
 }
 
 // --------------------------------------------------------------------------------

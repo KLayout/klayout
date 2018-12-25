@@ -635,6 +635,18 @@ public:
    */
   void set_parameter_value (size_t param_id, double v);
 
+  /**
+   *  @brief Gets the value for the parameter with the given name
+   *  If the name is not valid, an exception is thrown.
+   */
+  double parameter_value (const std::string &name) const;
+
+  /**
+   *  @brief Sets the value for the parameter with the given name
+   *  If the name is not valid, an exception is thrown.
+   */
+  void set_parameter_value (const std::string &name, double v);
+
 private:
   friend class Circuit;
   friend class Net;
@@ -1431,6 +1443,28 @@ public:
    *  @brief Gets the parameter definition from the ID
    */
   const DeviceParameterDefinition *parameter_definition (size_t id) const;
+
+  /**
+   *  @brief Returns true, if the device has a parameter with the given name
+   */
+  bool has_parameter_with_name (const std::string &name) const;
+
+  /**
+   *  @brief Returns the parameter ID for the parameter with the given name
+   *  If the name is invalid, an exception is thrown.
+   */
+  size_t parameter_id_for_name (const std::string &name) const;
+
+  /**
+   *  @brief Returns true, if the device has a terminal with the given name
+   */
+  bool has_terminal_with_name (const std::string &name) const;
+
+  /**
+   *  @brief Returns the parameter ID for the terminal with the given name
+   *  If the name is invalid, an exception is thrown.
+   */
+  size_t terminal_id_for_name (const std::string &name) const;
 
   /**
    *  @brief Clears the circuit

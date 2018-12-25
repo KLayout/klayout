@@ -1686,7 +1686,9 @@ public:
   }
 
   /**
-   *  @brief Less operator
+   *  @brief Inserts the region into the given layout, cell and layer
+   *  If the region is a hierarchical region, the hierarchy is copied into the
+   *  layout's hierarchy.
    */
   void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
   {

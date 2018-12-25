@@ -812,8 +812,12 @@ void Circuit::combine_devices ()
   tl_assert (netlist () != 0);
 
   for (Netlist::device_class_iterator dc = netlist ()->begin_device_classes (); dc != netlist ()->end_device_classes (); ++dc) {
-    combine_parallel_devices (*dc);
-    combine_serial_devices (*dc);
+    if (dc->supports_parallel_combination ()) {
+      combine_parallel_devices (*dc);
+    }
+    if (dc->supports_serial_combination ()) {
+      combine_serial_devices (*dc);
+    }
   }
 }
 

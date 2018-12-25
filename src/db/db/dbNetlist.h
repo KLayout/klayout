@@ -1431,6 +1431,22 @@ public:
     return false;
   }
 
+  /**
+   *  @brief Returns true if the device class supports device combination in parallel mode
+   */
+  virtual bool supports_parallel_combination () const
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Returns true if the device class supports device combination in serial mode
+   */
+  virtual bool supports_serial_combination () const
+  {
+    return false;
+  }
+
 private:
   friend class Netlist;
 

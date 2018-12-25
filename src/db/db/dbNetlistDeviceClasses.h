@@ -40,6 +40,8 @@ public:
 
   virtual void parallel (Device *a, Device *b) const = 0;
   virtual void serial (Device *a, Device *b) const = 0;
+  virtual bool supports_parallel_combination () const { return true; }
+  virtual bool supports_serial_combination () const { return true; }
 };
 
 /**
@@ -120,6 +122,7 @@ public:
   }
 
   virtual bool combine_devices (Device *a, Device *b) const;
+  virtual bool supports_parallel_combination () const { return true; }
 };
 
 /**
@@ -140,6 +143,7 @@ public:
   }
 
   virtual bool combine_devices (Device *a, Device *b) const;
+  virtual bool supports_parallel_combination () const { return true; }
 };
 
 /**
@@ -159,6 +163,7 @@ public:
   }
 
   virtual bool combine_devices (Device *a, Device *b) const;
+  virtual bool supports_parallel_combination () const { return true; }
 };
 
 }

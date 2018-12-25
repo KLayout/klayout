@@ -25,8 +25,8 @@
 
 #include "dbCommon.h"
 #include "dbNetlist.h"
-#include "dbHierNetworkProcessor.h"
 #include "dbLayout.h"
+#include "dbHierNetworkProcessor.h"
 
 #include "gsiObject.h"
 
@@ -80,6 +80,19 @@ public:
    *  NOTE: The extractor expects "PolygonRef" type layers.
    */
   void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers);
+
+  /**
+   *  @brief Extracts the devices from a list of regions
+   *
+   *  This method behaves identical to the other "extract" method, but accepts
+   *  regions for input.
+   *
+   *  As a requirement, the layout and initial cell of all of the regions
+   *  has to be identical.
+   *
+   *  Currently, the regions have to be deep regions.
+   */
+  void extract (const std::vector<db::Region *> regions);
 
   /**
    *  @brief Creates the device classes
@@ -146,6 +159,33 @@ protected:
   double dbu () const
   {
     return mp_layout->dbu ();
+  }
+
+  /**
+   *  @brief Gets the layout the shapes are taken from
+   *  NOTE: this method is provided for testing purposes mainly.
+   */
+  db::Layout *layout ()
+  {
+    return mp_layout;
+  }
+
+  /**
+   *  @brief Gets the layout the shapes are taken from (const version)
+   *  NOTE: this method is provided for testing purposes mainly.
+   */
+  const db::Layout *layout () const
+  {
+    return mp_layout;
+  }
+
+  /**
+   *  @brief Gets the cell index of the current cell
+   *  NOTE: this method is provided for testing purposes mainly.
+   */
+  db::cell_index_type cell_index () const
+  {
+    return m_cell_index;
   }
 
 private:

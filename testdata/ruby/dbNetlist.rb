@@ -185,11 +185,33 @@ class DBNetlist_TestClass < TestBase
 
     net = c.create_net("NET")
 
+    assert_equal(net.is_floating?, true)
+    assert_equal(net.is_internal?, false)
+    assert_equal(net.terminal_count, 0)
+    assert_equal(net.pin_count, 0)
+
     d1.connect_terminal(1, net)
+
+    assert_equal(net.is_floating?, true)
+    assert_equal(net.is_internal?, false)
+    assert_equal(net.terminal_count, 1)
+    assert_equal(net.pin_count, 0)
+
+    d1.connect_terminal(0, net)
+
+    assert_equal(net.is_floating?, false) # not really, but this simple approach tells us so ...
+    assert_equal(net.is_internal?, true)
+    assert_equal(net.terminal_count, 2)
+    assert_equal(net.pin_count, 0)
+
+    d1.disconnect_terminal(0)
+    assert_equal(net.terminal_count, 1)
+
     assert_equal(d1.net_for_terminal(1).name, "NET")
     assert_equal(d1.net_for_terminal(0).inspect, "nil")
 
     d2.connect_terminal(0, net)
+    assert_equal(net.terminal_count, 2)
 
     dnames = [] 
     net.each_terminal { |p| dnames << p.device.name + ":" + p.terminal_def.name }
@@ -260,12 +282,24 @@ class DBNetlist_TestClass < TestBase
     assert_equal(ccn, [ "CC", "CC" ])
 
     net = c.create_net("NET")
+    assert_equal(net.pin_count, 0)
+    assert_equal(net.terminal_count, 0)
+    assert_equal(net.is_floating?, true)
+    assert_equal(net.is_internal?, false)
 
     sc1.connect_pin(1, net)
+    assert_equal(net.pin_count, 1)
+    assert_equal(net.terminal_count, 0)
+    assert_equal(net.is_floating?, true)
+    assert_equal(net.is_internal?, false)
     assert_equal(sc1.net_for_pin(1).name, "NET")
     assert_equal(sc1.net_for_pin(0).inspect, "nil")
 
     sc2.connect_pin(0, net)
+    assert_equal(net.pin_count, 2)
+    assert_equal(net.terminal_count, 0)
+    assert_equal(net.is_floating?, false)
+    assert_equal(net.is_internal?, false)
 
     cnames = [] 
     net.each_pin { |p| cnames << p.subcircuit.name + ":" + p.pin.name }

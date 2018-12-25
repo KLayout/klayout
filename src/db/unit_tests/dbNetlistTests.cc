@@ -533,6 +533,11 @@ TEST(6_Net)
   n.clear ();
   EXPECT_EQ (n.name (), "");
   EXPECT_EQ (int (n.cluster_id ()), 0);
+
+  EXPECT_EQ (n.pin_count (), 0);
+  EXPECT_EQ (n.terminal_count (), 0);
+  EXPECT_EQ (n.is_floating (), true);
+  EXPECT_EQ (n.is_internal (), false);
 }
 
 TEST(7_NetTerminalsEditing)
@@ -558,8 +563,18 @@ TEST(7_NetTerminalsEditing)
   d1->connect_terminal (0, n1);
   d1->connect_terminal (1, n2);
 
+  EXPECT_EQ (n1->terminal_count (), 1);
+  EXPECT_EQ (n1->pin_count (), 0);
+  EXPECT_EQ (n1->is_floating (), true);
+  EXPECT_EQ (n1->is_internal (), false);
+
   d2->connect_terminal (1, n1);
   d2->connect_terminal (0, n2);
+
+  EXPECT_EQ (n1->terminal_count (), 2);
+  EXPECT_EQ (n1->pin_count (), 0);
+  EXPECT_EQ (n1->is_floating (), false);
+  EXPECT_EQ (n1->is_internal (), true);
 
   EXPECT_EQ (d1->net_for_terminal (0), n1);
   EXPECT_EQ (d1->net_for_terminal (1), n2);
@@ -637,11 +652,22 @@ TEST(8_NetSubCircuitsEditing)
   c.add_net (n2);
 
   c.connect_pin (0, n1);
+
+  EXPECT_EQ (n1->terminal_count (), 0);
+  EXPECT_EQ (n1->pin_count (), 1);
+  EXPECT_EQ (n1->is_floating (), true);
+  EXPECT_EQ (n1->is_internal (), false);
+
   EXPECT_EQ (c.net_for_pin (0), n1);
   EXPECT_EQ (c.net_for_pin (1), 0);
 
   sc1->connect_pin (0, n1);
   sc1->connect_pin (1, n2);
+
+  EXPECT_EQ (n1->terminal_count (), 0);
+  EXPECT_EQ (n1->pin_count (), 2);
+  EXPECT_EQ (n1->is_floating (), false);
+  EXPECT_EQ (n1->is_internal (), false);
 
   sc2->connect_pin (1, n1);
   sc2->connect_pin (0, n2);

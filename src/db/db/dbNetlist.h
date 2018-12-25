@@ -44,55 +44,55 @@ class SubCircuit;
 class Pin;
 class Device;
 class DeviceClass;
-class DevicePortDefinition;
+class DeviceTerminalDefinition;
 class Netlist;
 class Net;
 
 /**
- *  @brief A reference to a port of a device
+ *  @brief A reference to a terminal of a device
  *
- *  A port must always refer to a device inside the current circuit.
+ *  A terminal must always refer to a device inside the current circuit.
  */
-class DB_PUBLIC NetPortRef
+class DB_PUBLIC NetTerminalRef
 {
 public:
   /**
    *  @brief Default constructor
    */
-  NetPortRef ();
+  NetTerminalRef ();
 
   /**
    *  @brief Creates a pin reference to the given pin of the current circuit
    */
-  NetPortRef (Device *device, size_t port_id);
+  NetTerminalRef (Device *device, size_t terminal_id);
 
   /**
    *  @brief Copy constructor
    */
-  NetPortRef (const NetPortRef &other);
+  NetTerminalRef (const NetTerminalRef &other);
 
   /**
    *  @brief Assignment
    */
-  NetPortRef &operator= (const NetPortRef &other);
+  NetTerminalRef &operator= (const NetTerminalRef &other);
 
   /**
    *  @brief Comparison
    */
-  bool operator< (const NetPortRef &other) const
+  bool operator< (const NetTerminalRef &other) const
   {
     if (mp_device != other.mp_device) {
       return mp_device < other.mp_device;
     }
-    return m_port_id < other.m_port_id;
+    return m_terminal_id < other.m_terminal_id;
   }
 
   /**
    *  @brief Equality
    */
-  bool operator== (const NetPortRef &other) const
+  bool operator== (const NetTerminalRef &other) const
   {
-    return (mp_device == other.mp_device && m_port_id == other.m_port_id);
+    return (mp_device == other.mp_device && m_terminal_id == other.m_terminal_id);
   }
 
   /**
@@ -112,19 +112,19 @@ public:
   }
 
   /**
-   *  @brief Gets the port index
+   *  @brief Gets the terminal index
    */
-  size_t port_id () const
+  size_t terminal_id () const
   {
-    return m_port_id;
+    return m_terminal_id;
   }
 
   /**
-   *  @brief Gets the port definition
+   *  @brief Gets the terminal definition
    *
-   *  Returns 0 if the port is not a valid port reference.
+   *  Returns 0 if the terminal is not a valid terminal reference.
    */
-  const DevicePortDefinition *port_def () const;
+  const DeviceTerminalDefinition *terminal_def () const;
 
   /**
    *  @brief Returns the device class
@@ -132,7 +132,7 @@ public:
   const DeviceClass *device_class () const;
 
   /**
-   *  @brief Gets the net the port lives in
+   *  @brief Gets the net the terminal lives in
    */
   Net *net ()
   {
@@ -140,7 +140,7 @@ public:
   }
 
   /**
-   *  @brief Gets the net the port lives in (const version)
+   *  @brief Gets the net the terminal lives in (const version)
    */
   const Net *net () const
   {
@@ -150,12 +150,12 @@ public:
 private:
   friend class Net;
 
-  size_t m_port_id;
+  size_t m_terminal_id;
   Device *mp_device;
   Net *mp_net;
 
   /**
-   *  @brief Sets the net the port lives in
+   *  @brief Sets the net the terminal lives in
    */
   void set_net (Net *net)
   {
@@ -271,7 +271,7 @@ private:
   Net *mp_net;
 
   /**
-   *  @brief Sets the net the port lives in
+   *  @brief Sets the net the terminal lives in
    */
   void set_net (Net *net)
   {
@@ -282,15 +282,15 @@ private:
 /**
  *  @brief A net
  *
- *  A net connects ports of devices and pins or circuits
+ *  A net connects terminals of devices and pins or circuits
  */
 class DB_PUBLIC Net
   : public tl::Object
 {
 public:
-  typedef std::list<NetPortRef> port_list;
-  typedef port_list::const_iterator const_port_iterator;
-  typedef port_list::iterator port_iterator;
+  typedef std::list<NetTerminalRef> terminal_list;
+  typedef terminal_list::const_iterator const_terminal_iterator;
+  typedef terminal_list::iterator terminal_iterator;
   typedef std::list<NetPinRef> pin_list;
   typedef pin_list::const_iterator const_pin_iterator;
   typedef pin_list::iterator pin_iterator;
@@ -411,45 +411,45 @@ public:
   }
 
   /**
-   *  @brief Adds a port to this net
+   *  @brief Adds a terminal to this net
    */
-  void add_port (const NetPortRef &port);
+  void add_terminal (const NetTerminalRef &terminal);
 
   /**
-   *  @brief Erases the given port from this net
+   *  @brief Erases the given terminal from this net
    */
-  void erase_port (port_iterator iter);
+  void erase_terminal (terminal_iterator iter);
 
   /**
-   *  @brief Begin iterator for the ports of the net (const version)
+   *  @brief Begin iterator for the terminals of the net (const version)
    */
-  const_port_iterator begin_ports () const
+  const_terminal_iterator begin_terminals () const
   {
-    return m_ports.begin ();
+    return m_terminals.begin ();
   }
 
   /**
-   *  @brief End iterator for the ports of the net (const version)
+   *  @brief End iterator for the terminals of the net (const version)
    */
-  const_port_iterator end_ports () const
+  const_terminal_iterator end_terminals () const
   {
-    return m_ports.end ();
+    return m_terminals.end ();
   }
 
   /**
-   *  @brief Begin iterator for the ports of the net (non-const version)
+   *  @brief Begin iterator for the terminals of the net (non-const version)
    */
-  port_iterator begin_ports ()
+  terminal_iterator begin_terminals ()
   {
-    return m_ports.begin ();
+    return m_terminals.begin ();
   }
 
   /**
-   *  @brief End iterator for the ports of the net (non-const version)
+   *  @brief End iterator for the terminals of the net (non-const version)
    */
-  port_iterator end_ports ()
+  terminal_iterator end_terminals ()
   {
-    return m_ports.end ();
+    return m_terminals.end ();
   }
 
   /**
@@ -457,13 +457,13 @@ public:
    */
   bool floating () const
   {
-    return (m_pins.size () + m_ports.size ()) < 2;
+    return (m_pins.size () + m_terminals.size ()) < 2;
   }
 
 private:
   friend class Circuit;
 
-  port_list m_ports;
+  terminal_list m_terminals;
   pin_list m_pins;
   std::string m_name;
   size_t m_cluster_id;
@@ -579,27 +579,27 @@ public:
   }
 
   /**
-   *  @brief Gets the net attached to a specific port
+   *  @brief Gets the net attached to a specific terminal
    *  Returns 0 if no net is attached.
    */
-  const Net *net_for_port (size_t port_id) const;
+  const Net *net_for_terminal (size_t terminal_id) const;
 
   /**
-   *  @brief Gets the net attached to a specific port (non-const version)
+   *  @brief Gets the net attached to a specific terminal (non-const version)
    *  Returns 0 if no net is attached.
    */
-  Net *net_for_port (size_t port_id)
+  Net *net_for_terminal (size_t terminal_id)
   {
-    return const_cast<Net *> (((const Device *) this)->net_for_port (port_id));
+    return const_cast<Net *> (((const Device *) this)->net_for_terminal (terminal_id));
   }
 
   /**
-   *  @brief Connects the given port to the given net
-   *  If the net is 0 the port is disconnected.
-   *  If non-null, a NetPortRef object will be inserted into the
-   *  net and connected with the given port.
+   *  @brief Connects the given terminal to the given net
+   *  If the net is 0 the terminal is disconnected.
+   *  If non-null, a NetTerminalRef object will be inserted into the
+   *  net and connected with the given terminal.
    */
-  void connect_port (size_t port_id, Net *net);
+  void connect_terminal (size_t terminal_id, Net *net);
 
   /**
    *  @brief Gets the value for the parameter with the given ID
@@ -617,13 +617,13 @@ private:
 
   DeviceClass *mp_device_class;
   std::string m_name;
-  std::vector<Net::port_iterator> m_port_refs;
+  std::vector<Net::terminal_iterator> m_terminal_refs;
   std::vector<double> m_parameters;
 
   /**
-   *  @brief Sets the port reference for a specific port
+   *  @brief Sets the terminal reference for a specific terminal
    */
-  void set_port_ref_for_port (size_t port_id, Net::port_iterator iter);
+  void set_terminal_ref_for_terminal (size_t terminal_id, Net::terminal_iterator iter);
 
   /**
    *  @brief Sets the device class
@@ -1105,31 +1105,31 @@ private:
 };
 
 /**
- *  @brief A device port definition
+ *  @brief A device terminal definition
  */
-class DB_PUBLIC DevicePortDefinition
+class DB_PUBLIC DeviceTerminalDefinition
 {
 public:
   /**
-   *  @brief Creates an empty device port definition
+   *  @brief Creates an empty device terminal definition
    */
-  DevicePortDefinition ()
+  DeviceTerminalDefinition ()
     : m_name (), m_description (), m_id (0)
   {
     //  .. nothing yet ..
   }
 
   /**
-   *  @brief Creates a device port definition with the given name and description
+   *  @brief Creates a device terminal definition with the given name and description
    */
-  DevicePortDefinition (const std::string &name, const std::string &description)
+  DeviceTerminalDefinition (const std::string &name, const std::string &description)
     : m_name (name), m_description (description), m_id (0)
   {
     //  .. nothing yet ..
   }
 
   /**
-   *  @brief Gets the port name
+   *  @brief Gets the terminal name
    */
   const std::string &name () const
   {
@@ -1137,7 +1137,7 @@ public:
   }
 
   /**
-   *  @brief Sets the port name
+   *  @brief Sets the terminal name
    */
   void set_name (const std::string &n)
   {
@@ -1145,7 +1145,7 @@ public:
   }
 
   /**
-   *  @brief Gets the port description
+   *  @brief Gets the terminal description
    */
   const std::string &description () const
   {
@@ -1153,7 +1153,7 @@ public:
   }
 
   /**
-   *  @brief Sets the port description
+   *  @brief Sets the terminal description
    */
   void set_description (const std::string &d)
   {
@@ -1161,7 +1161,7 @@ public:
   }
 
   /**
-   *  @brief Gets the port ID
+   *  @brief Gets the terminal ID
    */
   size_t id () const
   {
@@ -1282,7 +1282,7 @@ class DB_PUBLIC DeviceClass
   : public gsi::ObjectBase, public tl::Object, public tl::UniqueId
 {
 public:
-  typedef size_t port_id_type;
+  typedef size_t terminal_id_type;
 
   /**
    *  @brief Constructor
@@ -1359,31 +1359,31 @@ public:
   }
 
   /**
-   *  @brief Gets the port definitions
+   *  @brief Gets the terminal definitions
    *
-   *  The port definitions indicate what ports the device offers.
-   *  The number of ports is constant per class. The index of the port
-   *  is used as an ID of the port, hence the order must be static.
+   *  The terminal definitions indicate what terminals the device offers.
+   *  The number of terminals is constant per class. The index of the terminal
+   *  is used as an ID of the terminal, hence the order must be static.
    */
-  const std::vector<DevicePortDefinition> &port_definitions () const
+  const std::vector<DeviceTerminalDefinition> &terminal_definitions () const
   {
-    return m_port_definitions;
+    return m_terminal_definitions;
   }
 
   /**
-   *  @brief Adds a port definition
+   *  @brief Adds a terminal definition
    */
-  const DevicePortDefinition &add_port_definition (const DevicePortDefinition &pd);
+  const DeviceTerminalDefinition &add_terminal_definition (const DeviceTerminalDefinition &pd);
 
   /**
-   *  @brief Clears the port definition
+   *  @brief Clears the terminal definition
    */
-  void clear_port_definitions ();
+  void clear_terminal_definitions ();
 
   /**
-   *  @brief Gets the port definition from the ID
+   *  @brief Gets the terminal definition from the ID
    */
-  const DevicePortDefinition *port_definition (size_t id) const;
+  const DeviceTerminalDefinition *terminal_definition (size_t id) const;
 
   /**
    *  @brief Gets the parameter definitions
@@ -1451,7 +1451,7 @@ private:
   friend class Netlist;
 
   std::string m_name, m_description;
-  std::vector<DevicePortDefinition> m_port_definitions;
+  std::vector<DeviceTerminalDefinition> m_terminal_definitions;
   std::vector<DeviceParameterDefinition> m_parameter_definitions;
   db::Netlist *mp_netlist;
 

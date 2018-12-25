@@ -71,9 +71,9 @@ public:
    *  cells from the layout.
    *
    *  Devices will be generated inside the netlist's circuits as they are extracted
-   *  from the layout. Inside the layout, device port annotation shapes are created with the
-   *  corresponding DevicePortProperty objects attached. The will be used when extracting
-   *  the nets later to associate nets with device ports.
+   *  from the layout. Inside the layout, device terminal annotation shapes are created with the
+   *  corresponding DeviceTerminalProperty objects attached. The will be used when extracting
+   *  the nets later to associate nets with device terminals.
    *
    *  The definition of the input layers is device class specific.
    *
@@ -104,8 +104,8 @@ public:
    *  so the implementation needs to consider this case. The geometries are already merged.
    *
    *  The implementation of this method shall use "create_device" to create new
-   *  devices based on the geometry found. It shall use "define_port" to define
-   *  ports by which the nets extracted in the network extraction step connect
+   *  devices based on the geometry found. It shall use "define_terminal" to define
+   *  terminals by which the nets extracted in the network extraction step connect
    *  to the new devices.
    */
   virtual void extract_devices (const std::vector<db::Region> &layer_geometry);
@@ -126,19 +126,19 @@ protected:
   Device *create_device (unsigned int device_class_index = 0);
 
   /**
-   *  @brief Defines a device port in the layout (a polygon)
+   *  @brief Defines a device terminal in the layout (a polygon)
    */
-  void define_port (Device *device, size_t port_id, size_t layer_index, const db::Polygon &polygon);
+  void define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Polygon &polygon);
 
   /**
-   *  @brief Defines a device port in the layout (a box)
+   *  @brief Defines a device terminal in the layout (a box)
    */
-  void define_port (Device *device, size_t port_id, size_t layer_index, const db::Box &box);
+  void define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Box &box);
 
   /**
-   *  @brief Defines a point-like device port in the layout
+   *  @brief Defines a point-like device terminal in the layout
    */
-  void define_port (Device *device, size_t port_id, size_t layer_index, const db::Point &point);
+  void define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Point &point);
 
   /**
    *  @brief Gets the database unit

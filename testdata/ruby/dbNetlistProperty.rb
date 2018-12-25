@@ -46,31 +46,31 @@ class DBNetlistProperty_TestClass < TestBase
 
   end
 
-  def test_3_DevicePort
+  def test_3_DeviceTerminal
 
-    np = RBA::DevicePortProperty::new
-    assert_equal(np.is_a?(RBA::DevicePortProperty), true)
-    assert_equal(np.is_a?(RBA::DevicePortProperty), true)
-    assert_equal(np.to_s, "port")
+    np = RBA::DeviceTerminalProperty::new
+    assert_equal(np.is_a?(RBA::DeviceTerminalProperty), true)
+    assert_equal(np.is_a?(RBA::DeviceTerminalProperty), true)
+    assert_equal(np.to_s, "terminal")
 
     dc = RBA::GenericDeviceClass::new
-    dp = RBA::DevicePortDefinition::new
+    dp = RBA::DeviceTerminalDefinition::new
     dp.name = "A"
-    dc.add_port(dp)
+    dc.add_terminal(dp)
     dp.name = "B"
-    dc.add_port(dp)
+    dc.add_terminal(dp)
 
     c = RBA::Circuit::new
     d = c.create_device(dc, "D")
 
     n = c.create_net("NET")
-    d.connect_port(0, n)
+    d.connect_terminal(0, n)
 
-    # there is no other way to produce a NetPortRef object yet
-    n.each_port { |p| np.port_ref = p }
+    # there is no other way to produce a NetTerminalRef object yet
+    n.each_terminal { |p| np.terminal_ref = p }
 
-    assert_equal(np.to_s, "port:D:A")
-    assert_equal(np.port_ref.device.name, "D")
+    assert_equal(np.to_s, "terminal:D:A")
+    assert_equal(np.terminal_ref.device.name, "D")
 
   end
 

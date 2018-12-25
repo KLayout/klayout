@@ -141,15 +141,15 @@ class DBNetlist_TestClass < TestBase
     dc.name = "DC"
     dc.description = "A device class"
 
-    pd = RBA::DevicePortDefinition::new
+    pd = RBA::DeviceTerminalDefinition::new
     pd.name = "A"
-    pd.description = "Port A"
-    dc.add_port(pd)
+    pd.description = "Terminal A"
+    dc.add_terminal(pd)
 
-    pd = RBA::DevicePortDefinition::new
+    pd = RBA::DeviceTerminalDefinition::new
     pd.name = "B"
-    pd.description = "Port B"
-    dc.add_port(pd)
+    pd.description = "Terminal B"
+    dc.add_terminal(pd)
 
     c = RBA::Circuit::new
     nl.add(c)
@@ -185,31 +185,31 @@ class DBNetlist_TestClass < TestBase
 
     net = c.create_net("NET")
 
-    d1.connect_port(1, net)
-    assert_equal(d1.net_for_port(1).name, "NET")
-    assert_equal(d1.net_for_port(0).inspect, "nil")
+    d1.connect_terminal(1, net)
+    assert_equal(d1.net_for_terminal(1).name, "NET")
+    assert_equal(d1.net_for_terminal(0).inspect, "nil")
 
-    d2.connect_port(0, net)
+    d2.connect_terminal(0, net)
 
     dnames = [] 
-    net.each_port { |p| dnames << p.device.name + ":" + p.port_def.name }
+    net.each_terminal { |p| dnames << p.device.name + ":" + p.terminal_def.name }
     assert_equal(dnames, [ "D1:B", "D2:A" ])
     dnames = [] 
-    net.each_port { |p| dnames << p.device_class.name + ":" + p.port_id.to_s }
+    net.each_terminal { |p| dnames << p.device_class.name + ":" + p.terminal_id.to_s }
     assert_equal(dnames, [ "DC:1", "DC:0" ])
-    net.each_port { |p| assert_equal(p.net.name, "NET") }
+    net.each_terminal { |p| assert_equal(p.net.name, "NET") }
 
-    d1.disconnect_port(1)
-    assert_equal(d1.net_for_port(1).inspect, "nil")
+    d1.disconnect_terminal(1)
+    assert_equal(d1.net_for_terminal(1).inspect, "nil")
     
     dnames = [] 
-    net.each_port { |p| dnames << p.device.name + ":" + p.port_def.name }
+    net.each_terminal { |p| dnames << p.device.name + ":" + p.terminal_def.name }
     assert_equal(dnames, [ "D2:A" ])
-    net.each_port { |p| assert_equal(p.net.name, "NET") }
+    net.each_terminal { |p| assert_equal(p.net.name, "NET") }
 
     net.clear
-    assert_equal(d1.net_for_port(1).inspect, "nil")
-    assert_equal(d1.net_for_port(0).inspect, "nil")
+    assert_equal(d1.net_for_terminal(1).inspect, "nil")
+    assert_equal(d1.net_for_terminal(0).inspect, "nil")
 
   end
 
@@ -320,30 +320,30 @@ class DBNetlist_TestClass < TestBase
     dc.description = "A device class"
     assert_equal(dc.description, "A device class")
 
-    pd = RBA::DevicePortDefinition::new("A", "Port A")
-    dc.add_port(pd)
+    pd = RBA::DeviceTerminalDefinition::new("A", "Terminal A")
+    dc.add_terminal(pd)
 
     assert_equal(pd.id, 0)
     assert_equal(pd.name, "A")
-    assert_equal(pd.description, "Port A")
+    assert_equal(pd.description, "Terminal A")
 
-    pd = RBA::DevicePortDefinition::new
+    pd = RBA::DeviceTerminalDefinition::new
     pd.name = "B"
-    pd.description = "Port B"
-    dc.add_port(pd)
+    pd.description = "Terminal B"
+    dc.add_terminal(pd)
 
     assert_equal(pd.id, 1)
     assert_equal(pd.name, "B")
-    assert_equal(pd.description, "Port B")
+    assert_equal(pd.description, "Terminal B")
 
     names = []
-    dc.port_definitions.each { |pd| names << pd.name }
+    dc.terminal_definitions.each { |pd| names << pd.name }
     assert_equal(names, [ "A", "B" ])
 
-    dc.clear_ports
+    dc.clear_terminals
 
     names = []
-    dc.port_definitions.each { |pd| names << pd.name }
+    dc.terminal_definitions.each { |pd| names << pd.name }
     assert_equal(names, [])
 
     pd = RBA::DeviceParameterDefinition::new("P1", "Parameter 1", 2.0)

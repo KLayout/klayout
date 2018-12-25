@@ -28,7 +28,7 @@
 
 #include <memory>
 
-static std::string pd2string (const db::DevicePortDefinition &pd)
+static std::string pd2string (const db::DeviceTerminalDefinition &pd)
 {
   return pd.name () + "(" + pd.description () + ") #" + tl::to_string (pd.id ());
 }
@@ -38,16 +38,16 @@ static std::string pd2string (const db::DeviceParameterDefinition &pd)
   return pd.name () + "(" + pd.description () + ")=" + tl::to_string (pd.default_value ()) + " #" + tl::to_string (pd.id ());
 }
 
-TEST(1_DevicePortDefinition)
+TEST(1_DeviceTerminalDefinition)
 {
-  db::DevicePortDefinition pd;
+  db::DeviceTerminalDefinition pd;
 
   EXPECT_EQ (pd2string (pd), "() #0");
   pd.set_name ("name");
   pd.set_description ("nothing yet");
   EXPECT_EQ (pd2string (pd), "name(nothing yet) #0");
 
-  db::DevicePortDefinition pd2;
+  db::DeviceTerminalDefinition pd2;
   pd2 = pd;
   EXPECT_EQ (pd2string (pd2), "name(nothing yet) #0");
   pd2.set_name ("name2");
@@ -55,13 +55,13 @@ TEST(1_DevicePortDefinition)
   EXPECT_EQ (pd2string (pd2), "name2(now it has something) #0");
 
   db::DeviceClass dc;
-  dc.add_port_definition (pd);
-  dc.add_port_definition (pd2);
-  EXPECT_EQ (pd2string (dc.port_definitions ()[0]), "name(nothing yet) #0");
-  EXPECT_EQ (pd2string (dc.port_definitions ()[1]), "name2(now it has something) #1");
+  dc.add_terminal_definition (pd);
+  dc.add_terminal_definition (pd2);
+  EXPECT_EQ (pd2string (dc.terminal_definitions ()[0]), "name(nothing yet) #0");
+  EXPECT_EQ (pd2string (dc.terminal_definitions ()[1]), "name2(now it has something) #1");
 
-  dc.clear_port_definitions ();
-  EXPECT_EQ (dc.port_definitions ().empty (), true);
+  dc.clear_terminal_definitions ();
+  EXPECT_EQ (dc.terminal_definitions ().empty (), true);
 
   db::DeviceParameterDefinition ppd ("P1", "Parameter 1", 1.0);
   dc.add_parameter_definition (ppd);
@@ -79,11 +79,11 @@ TEST(1_DevicePortDefinition)
 
 TEST(2_DeviceClass)
 {
-  db::DevicePortDefinition pd;
+  db::DeviceTerminalDefinition pd;
   pd.set_name ("name");
   pd.set_description ("nothing yet");
 
-  db::DevicePortDefinition pd2;
+  db::DeviceTerminalDefinition pd2;
   pd2.set_name ("name2");
   pd2.set_description ("now it has something");
 
@@ -92,23 +92,23 @@ TEST(2_DeviceClass)
   dc.set_description ("devdesc");
   EXPECT_EQ (dc.name (), "devname");
   EXPECT_EQ (dc.description (), "devdesc");
-  dc.add_port_definition (pd);
-  dc.add_port_definition (pd2);
-  EXPECT_EQ (dc.port_definitions ().size (), size_t (2));
-  EXPECT_EQ (pd2string (dc.port_definitions ()[0]), "name(nothing yet) #0");
-  EXPECT_EQ (pd2string (dc.port_definitions ()[1]), "name2(now it has something) #1");
+  dc.add_terminal_definition (pd);
+  dc.add_terminal_definition (pd2);
+  EXPECT_EQ (dc.terminal_definitions ().size (), size_t (2));
+  EXPECT_EQ (pd2string (dc.terminal_definitions ()[0]), "name(nothing yet) #0");
+  EXPECT_EQ (pd2string (dc.terminal_definitions ()[1]), "name2(now it has something) #1");
 
-  EXPECT_EQ (pd2string (*dc.port_definition (dc.port_definitions ()[0].id ())), "name(nothing yet) #0");
-  EXPECT_EQ (pd2string (*dc.port_definition (dc.port_definitions ()[1].id ())), "name2(now it has something) #1");
-  EXPECT_EQ (dc.port_definition (3), 0);
+  EXPECT_EQ (pd2string (*dc.terminal_definition (dc.terminal_definitions ()[0].id ())), "name(nothing yet) #0");
+  EXPECT_EQ (pd2string (*dc.terminal_definition (dc.terminal_definitions ()[1].id ())), "name2(now it has something) #1");
+  EXPECT_EQ (dc.terminal_definition (3), 0);
 
   db::DeviceClass dc2 = dc;
   EXPECT_EQ (dc2.name (), "devname");
   EXPECT_EQ (dc2.description (), "devdesc");
-  EXPECT_EQ (dc2.port_definitions ().size (), size_t (2));
-  EXPECT_EQ (pd2string (*dc2.port_definition (dc2.port_definitions ()[0].id ())), "name(nothing yet) #0");
-  EXPECT_EQ (pd2string (*dc2.port_definition (dc2.port_definitions ()[1].id ())), "name2(now it has something) #1");
-  EXPECT_EQ (dc2.port_definition (3), 0);
+  EXPECT_EQ (dc2.terminal_definitions ().size (), size_t (2));
+  EXPECT_EQ (pd2string (*dc2.terminal_definition (dc2.terminal_definitions ()[0].id ())), "name(nothing yet) #0");
+  EXPECT_EQ (pd2string (*dc2.terminal_definition (dc2.terminal_definitions ()[1].id ())), "name2(now it has something) #1");
+  EXPECT_EQ (dc2.terminal_definition (3), 0);
 }
 
 static std::string pins2string (const db::Circuit &c)
@@ -152,13 +152,13 @@ TEST(3_CircuitBasic)
 static std::string net2string (const db::Net &n)
 {
   std::string res;
-  for (db::Net::const_port_iterator i = n.begin_ports (); i != n.end_ports (); ++i) {
+  for (db::Net::const_terminal_iterator i = n.begin_terminals (); i != n.end_terminals (); ++i) {
     if (! res.empty ()) {
       res += ",";
     }
     res += i->device () ? i->device ()->name () : "(null)";
     res += ":";
-    res += i->port_def () ? i->port_def ()->name () : "(null)";
+    res += i->terminal_def () ? i->terminal_def ()->name () : "(null)";
   }
   for (db::Net::const_pin_iterator i = n.begin_pins (); i != n.end_pins (); ++i) {
     if (! res.empty ()) {
@@ -208,12 +208,12 @@ static std::string netlist2 (const db::Circuit &c)
       continue;
     }
     pins.clear ();
-    for (size_t i = 0; i < d->device_class ()->port_definitions ().size (); ++i) {
+    for (size_t i = 0; i < d->device_class ()->terminal_definitions ().size (); ++i) {
       if (! pins.empty ()) {
         pins += ",";
       }
-      const db::Net *net = d->net_for_port (i);
-      pins += d->device_class ()->port_definitions () [i].name ();
+      const db::Net *net = d->net_for_terminal (i);
+      pins += d->device_class ()->terminal_definitions () [i].name ();
       pins += "=";
       pins += net ? net->name () : std::string ("(null)");
     }
@@ -244,16 +244,16 @@ TEST(4_CircuitDevices)
 {
   db::DeviceClass dc1;
   dc1.set_name ("dc1");
-  dc1.add_port_definition (db::DevicePortDefinition ("S", "Source"));
-  dc1.add_port_definition (db::DevicePortDefinition ("G", "Gate"));
-  dc1.add_port_definition (db::DevicePortDefinition ("D", "Drain"));
+  dc1.add_terminal_definition (db::DeviceTerminalDefinition ("S", "Source"));
+  dc1.add_terminal_definition (db::DeviceTerminalDefinition ("G", "Gate"));
+  dc1.add_terminal_definition (db::DeviceTerminalDefinition ("D", "Drain"));
   dc1.add_parameter_definition (db::DeviceParameterDefinition ("U", "", 1.0));
   dc1.add_parameter_definition (db::DeviceParameterDefinition ("V", "", 2.0));
 
   db::DeviceClass dc2;
   dc2.set_name ("dc2");
-  dc2.add_port_definition (db::DevicePortDefinition ("A", ""));
-  dc2.add_port_definition (db::DevicePortDefinition ("B", ""));
+  dc2.add_terminal_definition (db::DeviceTerminalDefinition ("A", ""));
+  dc2.add_terminal_definition (db::DeviceTerminalDefinition ("B", ""));
   dc2.add_parameter_definition (db::DeviceParameterDefinition ("U", "", 2.0));
   dc2.add_parameter_definition (db::DeviceParameterDefinition ("V", "", 1.0));
 
@@ -297,16 +297,16 @@ TEST(4_CircuitDevices)
   n1->set_name ("n1");
   EXPECT_EQ (n1->circuit (), 0);
   c->add_net (n1);
-  n1->add_port (db::NetPortRef (d1, 0));
-  n1->add_port (db::NetPortRef (d2a, 0));
+  n1->add_terminal (db::NetTerminalRef (d1, 0));
+  n1->add_terminal (db::NetTerminalRef (d2a, 0));
   EXPECT_EQ (n1->circuit (), c.get ());
 
   db::Net *n2 = new db::Net ();
   n2->set_name ("n2");
   c->add_net (n2);
-  n2->add_port (db::NetPortRef (d1, 1));
-  n2->add_port (db::NetPortRef (d2a, 1));
-  n2->add_port (db::NetPortRef (d2b, 0));
+  n2->add_terminal (db::NetTerminalRef (d1, 1));
+  n2->add_terminal (db::NetTerminalRef (d2a, 1));
+  n2->add_terminal (db::NetTerminalRef (d2b, 0));
 
   EXPECT_EQ (netlist2 (*c),
     "c:\n"
@@ -318,8 +318,8 @@ TEST(4_CircuitDevices)
   db::Net *n3 = new db::Net ();
   n3->set_name ("n3");
   c->add_net (n3);
-  n3->add_port (db::NetPortRef (d1, 2));
-  n3->add_port (db::NetPortRef (d2b, 1));
+  n3->add_terminal (db::NetTerminalRef (d1, 2));
+  n3->add_terminal (db::NetTerminalRef (d2b, 1));
 
   EXPECT_EQ (nets2string (*c),
     "d1:S,d2a:A\n"
@@ -378,8 +378,8 @@ TEST(4_NetlistSubcircuits)
 
   db::DeviceClass *dc = new db::DeviceClass ();
   dc->set_name ("dc2");
-  dc->add_port_definition (db::DevicePortDefinition ("A", ""));
-  dc->add_port_definition (db::DevicePortDefinition ("B", ""));
+  dc->add_terminal_definition (db::DeviceTerminalDefinition ("A", ""));
+  dc->add_terminal_definition (db::DeviceTerminalDefinition ("B", ""));
   nl->add_device_class (dc);
 
   db::Circuit *c1 = new db::Circuit ();
@@ -411,12 +411,12 @@ TEST(4_NetlistSubcircuits)
   c2->add_net (n2a);
   n2a->set_name ("n2a");
   n2a->add_pin (db::NetPinRef (0));
-  n2a->add_port (db::NetPortRef (d, 0));
+  n2a->add_terminal (db::NetTerminalRef (d, 0));
 
   db::Net *n2b = new db::Net ();
   c2->add_net (n2b);
   n2b->set_name ("n2b");
-  n2b->add_port (db::NetPortRef (d, 1));
+  n2b->add_terminal (db::NetTerminalRef (d, 1));
   n2b->add_pin (db::NetPinRef (1));
 
   db::Net *n1a = new db::Net ();
@@ -458,7 +458,7 @@ TEST(4_NetlistSubcircuits)
   //  check netlist
   for (db::Netlist::circuit_iterator c = nl->begin_circuits (); c != nl->end_circuits (); ++c) {
     for (db::Circuit::net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      for (db::Net::port_iterator i = n->begin_ports (); i != n->end_ports (); ++i) {
+      for (db::Net::terminal_iterator i = n->begin_terminals (); i != n->end_terminals (); ++i) {
         EXPECT_EQ (i->net (), n.operator-> ());
       }
       for (db::Net::pin_iterator i = n->begin_pins (); i != n->end_pins (); ++i) {
@@ -493,7 +493,7 @@ TEST(4_NetlistSubcircuits)
   //  check netlist
   for (db::Netlist::circuit_iterator c = nl2.begin_circuits (); c != nl2.end_circuits (); ++c) {
     for (db::Circuit::net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      for (db::Net::port_iterator i = n->begin_ports (); i != n->end_ports (); ++i) {
+      for (db::Net::terminal_iterator i = n->begin_terminals (); i != n->end_terminals (); ++i) {
         EXPECT_EQ (i->net (), n.operator-> ());
       }
       for (db::Net::pin_iterator i = n->begin_pins (); i != n->end_pins (); ++i) {
@@ -535,12 +535,12 @@ TEST(6_Net)
   EXPECT_EQ (int (n.cluster_id ()), 0);
 }
 
-TEST(7_NetPortsEditing)
+TEST(7_NetTerminalsEditing)
 {
   db::Circuit c;
   db::DeviceClass dc;
-  dc.add_port_definition (db::DevicePortDefinition ("A", ""));
-  dc.add_port_definition (db::DevicePortDefinition ("B", ""));
+  dc.add_terminal_definition (db::DeviceTerminalDefinition ("A", ""));
+  dc.add_terminal_definition (db::DeviceTerminalDefinition ("B", ""));
 
   db::Device *d1 = new db::Device (&dc, "D1");
   c.add_device (d1);
@@ -555,31 +555,31 @@ TEST(7_NetPortsEditing)
   n2->set_name ("n2");
   c.add_net (n2);
 
-  d1->connect_port (0, n1);
-  d1->connect_port (1, n2);
+  d1->connect_terminal (0, n1);
+  d1->connect_terminal (1, n2);
 
-  d2->connect_port (1, n1);
-  d2->connect_port (0, n2);
+  d2->connect_terminal (1, n1);
+  d2->connect_terminal (0, n2);
 
-  EXPECT_EQ (d1->net_for_port (0), n1);
-  EXPECT_EQ (d1->net_for_port (1), n2);
-  EXPECT_EQ (d2->net_for_port (0), n2);
-  EXPECT_EQ (d2->net_for_port (1), n1);
+  EXPECT_EQ (d1->net_for_terminal (0), n1);
+  EXPECT_EQ (d1->net_for_terminal (1), n2);
+  EXPECT_EQ (d2->net_for_terminal (0), n2);
+  EXPECT_EQ (d2->net_for_terminal (1), n1);
 
   EXPECT_EQ (net2string (*n1), "D1:A,D2:B");
   EXPECT_EQ (net2string (*n2), "D1:B,D2:A");
 
-  d1->connect_port (0, n2);
-  d1->connect_port (1, n1);
+  d1->connect_terminal (0, n2);
+  d1->connect_terminal (1, n1);
 
-  EXPECT_EQ (d1->net_for_port (0), n2);
-  EXPECT_EQ (d1->net_for_port (1), n1);
+  EXPECT_EQ (d1->net_for_terminal (0), n2);
+  EXPECT_EQ (d1->net_for_terminal (1), n1);
 
   EXPECT_EQ (net2string (*n1), "D2:B,D1:B");
   EXPECT_EQ (net2string (*n2), "D2:A,D1:A");
 
-  d1->connect_port (0, 0);
-  EXPECT_EQ (d1->net_for_port (0), 0);
+  d1->connect_terminal (0, 0);
+  EXPECT_EQ (d1->net_for_terminal (0), 0);
 
   EXPECT_EQ (net2string (*n1), "D2:B,D1:B");
   EXPECT_EQ (net2string (*n2), "D2:A");
@@ -601,8 +601,8 @@ TEST(7_NetPortsEditing)
 
   EXPECT_EQ (net2string (*n2), "D2:A");
 
-  EXPECT_EQ (d2->net_for_port (0), n2);
-  EXPECT_EQ (d2->net_for_port (1), 0);
+  EXPECT_EQ (d2->net_for_terminal (0), n2);
+  EXPECT_EQ (d2->net_for_terminal (1), 0);
 }
 
 TEST(8_NetSubCircuitsEditing)
@@ -702,18 +702,18 @@ TEST(8_NetSubCircuitsEditing)
   EXPECT_EQ (sc2->net_for_pin (1), 0);
 }
 
-TEST(9_NetPortRefBasics)
+TEST(9_NetTerminalRefBasics)
 {
   db::Device d1, d2;
 
-  EXPECT_EQ (db::NetPortRef (&d1, 0) == db::NetPortRef (&d1, 0), true);
-  EXPECT_EQ (db::NetPortRef (&d1, 0) == db::NetPortRef (&d1, 1), false);
-  EXPECT_EQ (db::NetPortRef (&d1, 0) == db::NetPortRef (&d2, 0), false);
+  EXPECT_EQ (db::NetTerminalRef (&d1, 0) == db::NetTerminalRef (&d1, 0), true);
+  EXPECT_EQ (db::NetTerminalRef (&d1, 0) == db::NetTerminalRef (&d1, 1), false);
+  EXPECT_EQ (db::NetTerminalRef (&d1, 0) == db::NetTerminalRef (&d2, 0), false);
 
-  EXPECT_EQ (db::NetPortRef (&d1, 0) < db::NetPortRef (&d1, 0), false);
-  EXPECT_EQ (db::NetPortRef (&d1, 0) < db::NetPortRef (&d1, 1), true);
-  EXPECT_EQ (db::NetPortRef (&d1, 1) < db::NetPortRef (&d1, 0), false);
-  EXPECT_NE ((db::NetPortRef (&d1, 0) < db::NetPortRef (&d2, 0)), (db::NetPortRef (&d2, 0) < db::NetPortRef (&d1, 0)));
+  EXPECT_EQ (db::NetTerminalRef (&d1, 0) < db::NetTerminalRef (&d1, 0), false);
+  EXPECT_EQ (db::NetTerminalRef (&d1, 0) < db::NetTerminalRef (&d1, 1), true);
+  EXPECT_EQ (db::NetTerminalRef (&d1, 1) < db::NetTerminalRef (&d1, 0), false);
+  EXPECT_NE ((db::NetTerminalRef (&d1, 0) < db::NetTerminalRef (&d2, 0)), (db::NetTerminalRef (&d2, 0) < db::NetTerminalRef (&d1, 0)));
 }
 
 TEST(10_NetPinRefBasics)

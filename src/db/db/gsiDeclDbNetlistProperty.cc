@@ -46,7 +46,7 @@ gsi::Class<db::NetlistProperty> decl_NetlistProperty ("db", "NetlistProperty",
   "@brief A generic base class for netlist properties.\n"
   "\n"
   "Netlist properties are used to annotate shapes or other objects with net properties. "
-  "Netlist properties are net names or device ports. "
+  "Netlist properties are net names or device terminals. "
   "Netlist properties can be stored inside property sets. "
   "This class provides the base class for such netlist properties."
   "\n\n"
@@ -87,34 +87,34 @@ gsi::Class<db::NetNameProperty> decl_NetNameProperty (decl_NetlistProperty, "db"
 );
 
 // ---------------------------------------------------------------
-//  db::DevicePortProperty binding
+//  db::DeviceTerminalProperty binding
 
-static db::DevicePortProperty *new_devport ()
+static db::DeviceTerminalProperty *new_devterminal ()
 {
-  return new db::DevicePortProperty ();
+  return new db::DeviceTerminalProperty ();
 }
 
-static db::DevicePortProperty *new_devport2 (const db::NetPortRef &n)
+static db::DeviceTerminalProperty *new_devterminal2 (const db::NetTerminalRef &n)
 {
-  return new db::DevicePortProperty (n);
+  return new db::DeviceTerminalProperty (n);
 }
 
-gsi::Class<db::DevicePortProperty> decl_DevicePortProperty (decl_NetlistProperty, "db", "DevicePortProperty",
-  gsi::constructor ("new", &new_devport,
-    "@brief Creates a new device port property"
+gsi::Class<db::DeviceTerminalProperty> decl_DeviceTerminalProperty (decl_NetlistProperty, "db", "DeviceTerminalProperty",
+  gsi::constructor ("new", &new_devterminal,
+    "@brief Creates a new device terminal property"
   ) +
-  gsi::constructor ("new", &new_devport2, gsi::arg ("port_ref"),
-    "@brief Creates a new device port property with the given port reference"
+  gsi::constructor ("new", &new_devterminal2, gsi::arg ("terminal_ref"),
+    "@brief Creates a new device terminal property with the given terminal reference"
   ) +
-  gsi::method ("port_ref=", &db::DevicePortProperty::set_port_ref, gsi::arg ("p"),
-    "@brief Sets the port reference\n"
+  gsi::method ("terminal_ref=", &db::DeviceTerminalProperty::set_terminal_ref, gsi::arg ("p"),
+    "@brief Sets the terminal reference\n"
   ) +
-  gsi::method ("port_ref", &db::DevicePortProperty::port_ref,
-    "@brief Gets the port reference\n"
+  gsi::method ("terminal_ref", &db::DeviceTerminalProperty::terminal_ref,
+    "@brief Gets the terminal reference\n"
   ),
-  "@brief A device port reference property.\n"
+  "@brief A device terminal reference property.\n"
   "\n"
-  "The netlist property annotates a shape or other object with a reference to a device port."
+  "The netlist property annotates a shape or other object with a reference to a device terminal."
   "\n\n"
   "This class was introduced in version 0.26.\n"
 );

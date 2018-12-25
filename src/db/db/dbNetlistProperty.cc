@@ -190,70 +190,70 @@ std::string NetNameProperty::to_string () const
 }
 
 // --------------------------------------------------------------------------------------------
-//  DevicePortProperty Implementation
+//  DeviceTerminalProperty Implementation
 
-DevicePortProperty::DevicePortProperty ()
+DeviceTerminalProperty::DeviceTerminalProperty ()
   : NetlistProperty ()
 {
   //  .. nothing yet ..
 }
 
-DevicePortProperty::DevicePortProperty (const DevicePortProperty &other)
-  : NetlistProperty (other), m_port_ref (other.m_port_ref)
+DeviceTerminalProperty::DeviceTerminalProperty (const DeviceTerminalProperty &other)
+  : NetlistProperty (other), m_terminal_ref (other.m_terminal_ref)
 {
   //  .. nothing yet ..
 }
 
-DevicePortProperty::DevicePortProperty (const db::NetPortRef &p)
-  : NetlistProperty (), m_port_ref (p)
+DeviceTerminalProperty::DeviceTerminalProperty (const db::NetTerminalRef &p)
+  : NetlistProperty (), m_terminal_ref (p)
 {
   //  .. nothing yet ..
 }
 
-DevicePortProperty &DevicePortProperty::operator= (const DevicePortProperty &other)
+DeviceTerminalProperty &DeviceTerminalProperty::operator= (const DeviceTerminalProperty &other)
 {
   NetlistProperty::operator= (other);
   if (this != &other) {
-    m_port_ref = other.m_port_ref;
+    m_terminal_ref = other.m_terminal_ref;
   }
   return *this;
 }
 
-void DevicePortProperty::set_port_ref (const db::NetPortRef &p)
+void DeviceTerminalProperty::set_terminal_ref (const db::NetTerminalRef &p)
 {
-  m_port_ref = p;
+  m_terminal_ref = p;
 }
 
-bool DevicePortProperty::equals (const NetlistProperty *p) const
+bool DeviceTerminalProperty::equals (const NetlistProperty *p) const
 {
-  const DevicePortProperty *pp = static_cast<const DevicePortProperty *> (p);
-  return NetlistProperty::equals (p) && m_port_ref == pp->m_port_ref;
+  const DeviceTerminalProperty *pp = static_cast<const DeviceTerminalProperty *> (p);
+  return NetlistProperty::equals (p) && m_terminal_ref == pp->m_terminal_ref;
 }
 
-bool DevicePortProperty::less (const NetlistProperty *p) const
+bool DeviceTerminalProperty::less (const NetlistProperty *p) const
 {
   if (! NetlistProperty::equals (p)) {
     return NetlistProperty::less (p);
   } else {
-    const DevicePortProperty *pp = static_cast<const DevicePortProperty *> (p);
-    return m_port_ref < pp->m_port_ref;
+    const DeviceTerminalProperty *pp = static_cast<const DeviceTerminalProperty *> (p);
+    return m_terminal_ref < pp->m_terminal_ref;
   }
 }
 
-void DevicePortProperty::assign (const NetlistProperty *p)
+void DeviceTerminalProperty::assign (const NetlistProperty *p)
 {
   NetlistProperty::assign (p);
-  const DevicePortProperty *pp = static_cast<const DevicePortProperty *> (p);
-  m_port_ref = pp->m_port_ref;
+  const DeviceTerminalProperty *pp = static_cast<const DeviceTerminalProperty *> (p);
+  m_terminal_ref = pp->m_terminal_ref;
 }
 
 
-std::string DevicePortProperty::to_string () const
+std::string DeviceTerminalProperty::to_string () const
 {
-  if (m_port_ref.device () && m_port_ref.port_def ()) {
-    return "port:" + tl::to_word_or_quoted_string (m_port_ref.device ()->name ()) + ":" + tl::to_word_or_quoted_string (m_port_ref.port_def ()->name ());
+  if (m_terminal_ref.device () && m_terminal_ref.terminal_def ()) {
+    return "terminal:" + tl::to_word_or_quoted_string (m_terminal_ref.device ()->name ()) + ":" + tl::to_word_or_quoted_string (m_terminal_ref.terminal_def ()->name ());
   } else {
-    return "port";
+    return "terminal";
   }
 }
 

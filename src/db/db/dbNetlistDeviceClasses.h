@@ -30,9 +30,9 @@ namespace db
 {
 
 /**
- *  @brief A basic two-port device class
+ *  @brief A basic two-terminal device class
  */
-class DB_PUBLIC DeviceClassTwoPortDevice
+class DB_PUBLIC DeviceClassTwoTerminalDevice
   : public db::DeviceClass
 {
 public:
@@ -47,10 +47,10 @@ public:
 /**
  *  @brief A basic resistor device class
  *  A resistor defines a single parameter, "R", which is the resistance in Ohm.
- *  It defines two ports, "A" and "B" for the two terminals.
+ *  It defines two terminals, "A" and "B" for the two terminals.
  */
 class DB_PUBLIC DeviceClassResistor
-  : public db::DeviceClassTwoPortDevice
+  : public db::DeviceClassTwoTerminalDevice
 {
 public:
   DeviceClassResistor ();
@@ -67,10 +67,10 @@ public:
 /**
  *  @brief A basic capacitor device class
  *  A capacitor defines a single parameter, "C", which is the capacitance in Farad.
- *  It defines two ports, "A" and "B" for the two terminals.
+ *  It defines two terminals, "A" and "B" for the two terminals.
  */
 class DB_PUBLIC DeviceClassCapacitor
-  : public db::DeviceClassTwoPortDevice
+  : public db::DeviceClassTwoTerminalDevice
 {
 public:
   DeviceClassCapacitor ();
@@ -87,10 +87,10 @@ public:
 /**
  *  @brief A basic inductor device class
  *  An inductor defines a single parameter, "L", which is the inductance in Henry.
- *  It defines two ports, "A" and "B" for the two terminals.
+ *  It defines two terminals, "A" and "B" for the two terminals.
  */
 class DB_PUBLIC DeviceClassInductor
-  : public db::DeviceClassTwoPortDevice
+  : public db::DeviceClassTwoTerminalDevice
 {
 public:
   DeviceClassInductor ();
@@ -108,7 +108,7 @@ public:
  *  @brief A basic diode device class
  *  A diode defines a single parameter, "A", which is the area in square micrometers (YES: micrometers, as this is the basic unit of measure
  *  in KLayout).
- *  It defines two ports, "A" and "C" for anode and cathode.
+ *  It defines two terminals, "A" and "C" for anode and cathode.
  */
 class DB_PUBLIC DeviceClassDiode
   : public db::DeviceClass
@@ -129,7 +129,7 @@ public:
  *  @brief A basic MOSFET device class with three terminals
  *  A MOSFET defines four parameters: "W" for the gate width in micrometers, "L" for the gate length in micrometers,
  *  "AS" for the source area and "AD" for the drain area.
- *  The MOSFET device defines three ports, "S", "D" and "G" for source, drain and gate.
+ *  The MOSFET device defines three terminals, "S", "D" and "G" for source, drain and gate.
  */
 class DB_PUBLIC DeviceClassMOS3Transistor
   : public db::DeviceClass
@@ -149,7 +149,7 @@ public:
 /**
  *  @brief A basic MOSFET device class with four terminals
  *  The four-terminal MOSFET behaves identical to the three-terminal one but adds one more
- *  port for the bulk.
+ *  terminal for the bulk.
  */
 class DB_PUBLIC DeviceClassMOS4Transistor
   : public db::DeviceClass

@@ -224,56 +224,56 @@ private:
 };
 
 /**
- *  @brief A reference to a device port
+ *  @brief A reference to a device terminal
  *
- *  This property is used to mark a shape as a device port reference.
- *  Such a port reference points to a port of a specific device.
+ *  This property is used to mark a shape as a device terminal reference.
+ *  Such a terminal reference points to a terminal of a specific device.
  *  Attaching such a property to a shape allows connecting the
  *  net to the device later.
  */
-class DB_PUBLIC DevicePortProperty
+class DB_PUBLIC DeviceTerminalProperty
   : public db::NetlistProperty
 {
 public:
   /**
    *  @brief Creates a netlist name property without a specific name
    */
-  DevicePortProperty ();
+  DeviceTerminalProperty ();
 
   /**
    *  @brief copy constructor
    */
-  DevicePortProperty (const db::DevicePortProperty &other);
+  DeviceTerminalProperty (const db::DeviceTerminalProperty &other);
 
   /**
    *  @brief Creates a netlist name property with the given name
    */
-  DevicePortProperty (const db::NetPortRef &port_ref);
+  DeviceTerminalProperty (const db::NetTerminalRef &terminal_ref);
 
   /**
    *  @brief Assignment
    */
-  DevicePortProperty &operator= (const DevicePortProperty &other);
+  DeviceTerminalProperty &operator= (const DeviceTerminalProperty &other);
 
   /**
-   *  @brief Sets the port reference
+   *  @brief Sets the terminal reference
    */
-  void set_port_ref (const db::NetPortRef &port_ref);
+  void set_terminal_ref (const db::NetTerminalRef &terminal_ref);
 
   /**
-   *  @brief Gets the port reference
+   *  @brief Gets the terminal reference
    */
-  const db::NetPortRef &port_ref () const
+  const db::NetTerminalRef &terminal_ref () const
   {
-    return m_port_ref;
+    return m_terminal_ref;
   }
 
   /**
    *  @brief Clones the object
    */
-  virtual DevicePortProperty *clone () const
+  virtual DeviceTerminalProperty *clone () const
   {
-    return new DevicePortProperty (*this);
+    return new DeviceTerminalProperty (*this);
   }
 
   /**
@@ -297,7 +297,7 @@ public:
   virtual std::string to_string () const;
 
 private:
-  db::NetPortRef m_port_ref;
+  db::NetTerminalRef m_terminal_ref;
 };
 
 }

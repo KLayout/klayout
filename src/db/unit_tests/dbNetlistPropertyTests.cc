@@ -47,23 +47,23 @@ TEST(1_NameBasic)
   EXPECT_EQ (n2.to_string (), "name:'\"quoted\"'");
 }
 
-TEST(2_PortRefBasic)
+TEST(2_TerminalRefBasic)
 {
   db::DeviceClass dc;
-  dc.add_port_definition (db::DevicePortDefinition ("A", "Port A"));
-  dc.add_port_definition (db::DevicePortDefinition ("B", "Port B"));
+  dc.add_terminal_definition (db::DeviceTerminalDefinition ("A", "Terminal A"));
+  dc.add_terminal_definition (db::DeviceTerminalDefinition ("B", "Terminal B"));
 
   db::Device d (&dc, "D");
 
-  db::DevicePortProperty dp (db::NetPortRef (&d, 1));
-  EXPECT_EQ (dp.to_string (), "port:D:B");
+  db::DeviceTerminalProperty dp (db::NetTerminalRef (&d, 1));
+  EXPECT_EQ (dp.to_string (), "terminal:D:B");
 
-  dp.set_port_ref (db::NetPortRef (&d, 0));
-  EXPECT_EQ (dp.to_string (), "port:D:A");
-  EXPECT_EQ (dp.port_ref () == db::NetPortRef (&d, 0), true);
+  dp.set_terminal_ref (db::NetTerminalRef (&d, 0));
+  EXPECT_EQ (dp.to_string (), "terminal:D:A");
+  EXPECT_EQ (dp.terminal_ref () == db::NetTerminalRef (&d, 0), true);
 
-  db::DevicePortProperty dp2 = dp;
-  EXPECT_EQ (dp2.to_string (), "port:D:A");
+  db::DeviceTerminalProperty dp2 = dp;
+  EXPECT_EQ (dp2.to_string (), "terminal:D:A");
 }
 
 TEST(3_Variants)

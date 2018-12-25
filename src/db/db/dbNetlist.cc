@@ -52,9 +52,9 @@ Device::Device ()
 
 Device::~Device ()
 {
-  for (std::vector<Net::port_iterator>::const_iterator p = m_port_refs.begin (); p != m_port_refs.end (); ++p) {
-    if (*p != Net::port_iterator () && (*p)->net ()) {
-      (*p)->net ()->erase_port (*p);
+  for (std::vector<Net::terminal_iterator>::const_iterator t = m_terminal_refs.begin (); t != m_terminal_refs.end (); ++t) {
+    if (*t != Net::terminal_iterator () && (*t)->net ()) {
+      (*t)->net ()->erase_terminal (*t);
     }
   }
 }
@@ -84,41 +84,41 @@ void Device::set_name (const std::string &n)
   m_name = n;
 }
 
-void Device::set_port_ref_for_port (size_t port_id, Net::port_iterator iter)
+void Device::set_terminal_ref_for_terminal (size_t terminal_id, Net::terminal_iterator iter)
 {
-  if (m_port_refs.size () < port_id + 1) {
-    m_port_refs.resize (port_id + 1, Net::port_iterator ());
+  if (m_terminal_refs.size () < terminal_id + 1) {
+    m_terminal_refs.resize (terminal_id + 1, Net::terminal_iterator ());
   }
-  m_port_refs [port_id] = iter;
+  m_terminal_refs [terminal_id] = iter;
 }
 
-const Net *Device::net_for_port (size_t port_id) const
+const Net *Device::net_for_terminal (size_t terminal_id) const
 {
-  if (port_id < m_port_refs.size ()) {
-    Net::port_iterator p = m_port_refs [port_id];
-    if (p != Net::port_iterator ()) {
+  if (terminal_id < m_terminal_refs.size ()) {
+    Net::terminal_iterator p = m_terminal_refs [terminal_id];
+    if (p != Net::terminal_iterator ()) {
       return p->net ();
     }
   }
   return 0;
 }
 
-void Device::connect_port (size_t port_id, Net *net)
+void Device::connect_terminal (size_t terminal_id, Net *net)
 {
-  if (net_for_port (port_id) == net) {
+  if (net_for_terminal (terminal_id) == net) {
     return;
   }
 
-  if (port_id < m_port_refs.size ()) {
-    Net::port_iterator p = m_port_refs [port_id];
-    if (p != Net::port_iterator () && p->net ()) {
-      p->net ()->erase_port (p);
+  if (terminal_id < m_terminal_refs.size ()) {
+    Net::terminal_iterator p = m_terminal_refs [terminal_id];
+    if (p != Net::terminal_iterator () && p->net ()) {
+      p->net ()->erase_terminal (p);
     }
-    m_port_refs [port_id] = Net::port_iterator ();
+    m_terminal_refs [terminal_id] = Net::terminal_iterator ();
   }
 
   if (net) {
-    net->add_port (NetPortRef (this, port_id));
+    net->add_terminal (NetTerminalRef (this, terminal_id));
   }
 }
 
@@ -244,48 +244,48 @@ void SubCircuit::connect_pin (size_t pin_id, Net *net)
 }
 
 // --------------------------------------------------------------------------------
-//  NetPortRef class implementation
+//  NetTerminalRef class implementation
 
-NetPortRef::NetPortRef ()
-  : m_port_id (0), mp_device (0), mp_net (0)
+NetTerminalRef::NetTerminalRef ()
+  : m_terminal_id (0), mp_device (0), mp_net (0)
 {
   //  .. nothing yet ..
 }
 
-NetPortRef::NetPortRef (Device *device, size_t port_id)
-  : m_port_id (port_id), mp_device (device), mp_net (0)
+NetTerminalRef::NetTerminalRef (Device *device, size_t terminal_id)
+  : m_terminal_id (terminal_id), mp_device (device), mp_net (0)
 {
   //  .. nothing yet ..
 }
 
-NetPortRef::NetPortRef (const NetPortRef &other)
-  : m_port_id (other.m_port_id), mp_device (other.mp_device), mp_net (0)
+NetTerminalRef::NetTerminalRef (const NetTerminalRef &other)
+  : m_terminal_id (other.m_terminal_id), mp_device (other.mp_device), mp_net (0)
 {
   //  .. nothing yet ..
 }
 
-NetPortRef &NetPortRef::operator= (const NetPortRef &other)
+NetTerminalRef &NetTerminalRef::operator= (const NetTerminalRef &other)
 {
   if (this != &other) {
-    m_port_id = other.m_port_id;
+    m_terminal_id = other.m_terminal_id;
     mp_device = other.mp_device;
   }
   return *this;
 }
 
-const DevicePortDefinition *
-NetPortRef::port_def () const
+const DeviceTerminalDefinition *
+NetTerminalRef::terminal_def () const
 {
   const DeviceClass *dc = device_class ();
   if (dc) {
-    return dc->port_definition (m_port_id);
+    return dc->terminal_definition (m_terminal_id);
   } else {
     return 0;
   }
 }
 
 const DeviceClass *
-NetPortRef::device_class () const
+NetTerminalRef::device_class () const
 {
   return mp_device ? mp_device->device_class () : 0;
 }
@@ -366,8 +366,8 @@ Net &Net::operator= (const Net &other)
       add_pin (*i);
     }
 
-    for (const_port_iterator i = other.begin_ports (); i != other.end_ports (); ++i) {
-      add_port (*i);
+    for (const_terminal_iterator i = other.begin_terminals (); i != other.end_terminals (); ++i) {
+      add_terminal (*i);
     }
 
   }
@@ -384,8 +384,8 @@ void Net::clear ()
   m_name.clear ();
   m_cluster_id = 0;
 
-  while (! m_ports.empty ()) {
-    erase_port (begin_ports ());
+  while (! m_terminals.empty ()) {
+    erase_terminal (begin_terminals ());
   }
 
   while (! m_pins.empty ()) {
@@ -428,24 +428,24 @@ void Net::erase_pin (pin_iterator iter)
   m_pins.erase (iter);
 }
 
-void Net::add_port (const NetPortRef &port)
+void Net::add_terminal (const NetTerminalRef &terminal)
 {
-  if (! port.device ()) {
+  if (! terminal.device ()) {
     return;
   }
 
-  m_ports.push_back (port);
-  NetPortRef &new_port = m_ports.back ();
-  new_port.set_net (this);
-  new_port.device ()->set_port_ref_for_port (new_port.port_id (), --m_ports.end ());
+  m_terminals.push_back (terminal);
+  NetTerminalRef &new_terminal = m_terminals.back ();
+  new_terminal.set_net (this);
+  new_terminal.device ()->set_terminal_ref_for_terminal (new_terminal.terminal_id (), --m_terminals.end ());
 }
 
-void Net::erase_port (port_iterator iter)
+void Net::erase_terminal (terminal_iterator iter)
 {
   if (iter->device ()) {
-    iter->device ()->set_port_ref_for_port (iter->port_id (), port_iterator ());
+    iter->device ()->set_terminal_ref_for_terminal (iter->terminal_id (), terminal_iterator ());
   }
-  m_ports.erase (iter);
+  m_terminals.erase (iter);
 }
 
 void Net::set_circuit (Circuit *circuit)
@@ -500,10 +500,10 @@ Circuit &Circuit::operator= (const Circuit &other)
       n->set_name (i->name ());
       add_net (n);
 
-      for (Net::const_port_iterator p = i->begin_ports (); p != i->end_ports (); ++p) {
+      for (Net::const_terminal_iterator p = i->begin_terminals (); p != i->end_terminals (); ++p) {
         std::map<const Device *, Device *>::const_iterator m = device_table.find (p->device ());
         tl_assert (m != device_table.end ());
-        n->add_port (NetPortRef (m->second, p->port_id ()));
+        n->add_terminal (NetTerminalRef (m->second, p->terminal_id ()));
       }
 
       for (Net::const_pin_iterator p = i->begin_pins (); p != i->end_pins (); ++p) {
@@ -671,10 +671,10 @@ static void check_device_before_remove (db::Circuit *c, const db::Device *d)
   if (d->device_class () != 0) {
     throw tl::Exception (tl::to_string (tr ("Internal error: No device class after removing device in device combination")) + ": name=" + d->name () + ", circuit=" + c->name ());
   }
-  const std::vector<db::DevicePortDefinition> &pd = d->device_class ()->port_definitions ();
-  for (std::vector<db::DevicePortDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-    if (d->net_for_port (p->id ()) != 0) {
-      throw tl::Exception (tl::to_string (tr ("Internal error: Port still connected after removing device in device combination")) + ": name=" + d->name () + ", circuit=" + c->name () + ", port=" + p->name ());
+  const std::vector<db::DeviceTerminalDefinition> &pd = d->device_class ()->terminal_definitions ();
+  for (std::vector<db::DeviceTerminalDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+    if (d->net_for_terminal (p->id ()) != 0) {
+      throw tl::Exception (tl::to_string (tr ("Internal error: Terminal still connected after removing device in device combination")) + ": name=" + d->name () + ", circuit=" + c->name () + ", terminal=" + p->name ());
     }
   }
 }
@@ -693,9 +693,9 @@ void Circuit::combine_parallel_devices (const db::DeviceClass &cls)
     }
 
     key_type k;
-    const std::vector<db::DevicePortDefinition> &ports = cls.port_definitions ();
-    for (std::vector<db::DevicePortDefinition>::const_iterator p = ports.begin (); p != ports.end (); ++p) {
-      const db::Net *n = d->net_for_port (p->id ());
+    const std::vector<db::DeviceTerminalDefinition> &terminals = cls.terminal_definitions ();
+    for (std::vector<db::DeviceTerminalDefinition>::const_iterator p = terminals.begin (); p != terminals.end (); ++p) {
+      const db::Net *n = d->net_for_terminal (p->id ());
       if (n) {
         k.push_back (n);
       }
@@ -734,22 +734,22 @@ static std::pair<db::Device *, db::Device *> attached_two_devices (db::Net &net,
 
   db::Device *d1 = 0, *d2 = 0;
 
-  Net::port_iterator p = net.begin_ports ();
-  if (p == net.end_ports () || tl::id_of (p->device_class ()) != tl::id_of (&cls)) {
+  Net::terminal_iterator p = net.begin_terminals ();
+  if (p == net.end_terminals () || tl::id_of (p->device_class ()) != tl::id_of (&cls)) {
     return std::make_pair ((db::Device *) 0, (db::Device *) 0);
   } else {
     d1 = p->device ();
   }
 
   ++p;
-  if (p == net.end_ports () || tl::id_of (p->device_class ()) != tl::id_of (&cls)) {
+  if (p == net.end_terminals () || tl::id_of (p->device_class ()) != tl::id_of (&cls)) {
     return std::make_pair ((db::Device *) 0, (db::Device *) 0);
   } else {
     d2 = p->device ();
   }
 
   ++p;
-  if (p != net.end_ports () || d1 == d2 || !d1 || !d2) {
+  if (p != net.end_terminals () || d1 == d2 || !d1 || !d2) {
     return std::make_pair ((db::Device *) 0, (db::Device *) 0);
   } else {
     return std::make_pair (d1, d2);
@@ -778,14 +778,14 @@ void Circuit::combine_serial_devices (const db::DeviceClass &cls)
 
     std::vector<const db::Net *> other_nets;
 
-    const std::vector<db::DevicePortDefinition> &ports = cls.port_definitions ();
-    for (std::vector<db::DevicePortDefinition>::const_iterator p = ports.begin (); p != ports.end (); ++p) {
+    const std::vector<db::DeviceTerminalDefinition> &terminals = cls.terminal_definitions ();
+    for (std::vector<db::DeviceTerminalDefinition>::const_iterator p = terminals.begin (); p != terminals.end (); ++p) {
       db::Net *on;
-      on = dd.first->net_for_port (p->id ());
+      on = dd.first->net_for_terminal (p->id ());
       if (on && ! same_or_swapped (dd, attached_two_devices (*on, cls))) {
         other_nets.push_back (on);
       }
-      on = dd.second->net_for_port (p->id ());
+      on = dd.second->net_for_terminal (p->id ());
       if (on && ! same_or_swapped (dd, attached_two_devices (*on, cls))) {
         other_nets.push_back (on);
       }
@@ -794,7 +794,7 @@ void Circuit::combine_serial_devices (const db::DeviceClass &cls)
     std::sort (other_nets.begin (), other_nets.end ());
     other_nets.erase (std::unique (other_nets.begin (), other_nets.end ()), other_nets.end ());
 
-    if (other_nets.size () <= cls.port_definitions().size ()) {
+    if (other_nets.size () <= cls.terminal_definitions().size ()) {
 
       //  found a combination candidate
       if (cls.combine_devices (dd.first, dd.second)) {
@@ -839,29 +839,29 @@ DeviceClass::DeviceClass (const DeviceClass &other)
 DeviceClass &DeviceClass::operator= (const DeviceClass &other)
 {
   if (this != &other) {
-    m_port_definitions = other.m_port_definitions;
+    m_terminal_definitions = other.m_terminal_definitions;
     m_name = other.m_name;
     m_description = other.m_description;
   }
   return *this;
 }
 
-const DevicePortDefinition &DeviceClass::add_port_definition (const DevicePortDefinition &pd)
+const DeviceTerminalDefinition &DeviceClass::add_terminal_definition (const DeviceTerminalDefinition &pd)
 {
-  m_port_definitions.push_back (pd);
-  m_port_definitions.back ().set_id (m_port_definitions.size () - 1);
-  return m_port_definitions.back ();
+  m_terminal_definitions.push_back (pd);
+  m_terminal_definitions.back ().set_id (m_terminal_definitions.size () - 1);
+  return m_terminal_definitions.back ();
 }
 
-void DeviceClass::clear_port_definitions ()
+void DeviceClass::clear_terminal_definitions ()
 {
-  m_port_definitions.clear ();
+  m_terminal_definitions.clear ();
 }
 
-const DevicePortDefinition *DeviceClass::port_definition (size_t id) const
+const DeviceTerminalDefinition *DeviceClass::terminal_definition (size_t id) const
 {
-  if (id < m_port_definitions.size ()) {
-    return & m_port_definitions [id];
+  if (id < m_terminal_definitions.size ()) {
+    return & m_terminal_definitions [id];
   } else {
     return 0;
   }

@@ -42,9 +42,9 @@ Class<db::Pin> decl_dbPin ("db", "Pin",
   "This class has been added in version 0.26."
 );
 
-static void device_disconnect_port (db::Device *device, size_t port_id)
+static void device_disconnect_terminal (db::Device *device, size_t terminal_id)
 {
-  device->connect_port (port_id, 0);
+  device->connect_terminal (terminal_id, 0);
 }
 
 static bool device_has_param_with_name (const db::DeviceClass *device_class, const std::string &name)
@@ -93,15 +93,15 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("name", &db::Device::name,
     "@brief Gets the name of the device.\n"
   ) +
-  gsi::method ("net_for_port", (db::Net *(db::Device::*) (size_t)) &db::Device::net_for_port, gsi::arg ("port_id"),
-    "@brief Gets the net connected to the specified port.\n"
-    "If the port is not connected, nil is returned for the net."
+  gsi::method ("net_for_terminal", (db::Net *(db::Device::*) (size_t)) &db::Device::net_for_terminal, gsi::arg ("terminal_id"),
+    "@brief Gets the net connected to the specified terminal.\n"
+    "If the terminal is not connected, nil is returned for the net."
   ) +
-  gsi::method ("connect_port", &db::Device::connect_port, gsi::arg ("port_id"), gsi::arg ("net"),
-    "@brief Connects the given port to the specified net.\n"
+  gsi::method ("connect_terminal", &db::Device::connect_terminal, gsi::arg ("terminal_id"), gsi::arg ("net"),
+    "@brief Connects the given terminal to the specified net.\n"
   ) +
-  gsi::method_ext ("disconnect_port", &device_disconnect_port, gsi::arg ("port_id"),
-    "@brief Disconnects the given port from any net.\n"
+  gsi::method_ext ("disconnect_terminal", &device_disconnect_terminal, gsi::arg ("terminal_id"),
+    "@brief Disconnects the given terminal from any net.\n"
   ) +
   gsi::method ("parameter", &db::Device::parameter_value, gsi::arg ("param_id"),
     "@brief Gets the parameter value for the given parameter ID."
@@ -123,12 +123,12 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   "The type of device is represented by a \\DeviceClass object. Device objects "
   "live in \\Circuit objects, the device class objects live in the \\Netlist object.\n"
   "\n"
-  "Devices connect to nets through ports. Ports are described by a port ID which is "
-  "essentially the zero-based index of the port. Port definitions can be "
-  "obtained from the device class using the \\DeviceClass#port_definitions method.\n"
+  "Devices connect to nets through terminals. Terminals are described by a terminal ID which is "
+  "essentially the zero-based index of the terminal. Terminal definitions can be "
+  "obtained from the device class using the \\DeviceClass#terminal_definitions method.\n"
   "\n"
-  "Devices connect to nets through the \\Device#connect_port method. "
-  "Device ports can be disconnected using \\Device#disconnect_port.\n"
+  "Devices connect to nets through the \\Device#connect_terminal method. "
+  "Device terminals can be disconnected using \\Device#disconnect_terminal.\n"
   "\n"
   "This class has been added in version 0.26."
 );
@@ -195,24 +195,24 @@ Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
   "This class has been added in version 0.26."
 );
 
-Class<db::NetPortRef> decl_dbNetPortRef ("db", "NetPortRef",
-  gsi::method ("port_id", &db::NetPortRef::port_id,
-    "@brief Gets the ID of the port of the device the connection is made to."
+Class<db::NetTerminalRef> decl_dbNetTerminalRef ("db", "NetTerminalRef",
+  gsi::method ("terminal_id", &db::NetTerminalRef::terminal_id,
+    "@brief Gets the ID of the terminal of the device the connection is made to."
   ) +
-  gsi::method ("device", (db::Device *(db::NetPortRef::*) ()) &db::NetPortRef::device,
+  gsi::method ("device", (db::Device *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::device,
     "@brief Gets the device reference.\n"
     "Gets the device object that this connection is made to."
   ) +
-  gsi::method ("net", (db::Net *(db::NetPortRef::*) ()) &db::NetPortRef::net,
-    "@brief Gets the net this port reference is attached to"
+  gsi::method ("net", (db::Net *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::net,
+    "@brief Gets the net this terminal reference is attached to"
   ) +
-  gsi::method ("device_class", (db::DeviceClass *(db::NetPortRef::*) ()) &db::NetPortRef::device_class,
+  gsi::method ("device_class", (db::DeviceClass *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::device_class,
     "@brief Gets the class of the device which is addressed."
   ) +
-  gsi::method ("port_def", (db::DevicePortDefinition *(db::NetPortRef::*) ()) &db::NetPortRef::port_def,
-    "@brief Gets the port definition of the port that is connected"
+  gsi::method ("terminal_def", (db::DeviceTerminalDefinition *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::terminal_def,
+    "@brief Gets the terminal definition of the terminal that is connected"
   ),
-  "@brief A connection to a port of a device.\n"
+  "@brief A connection to a terminal of a device.\n"
   "This object is used inside a net (see \\Net) to describe the connections a net makes.\n"
   "\n"
   "This class has been added in version 0.26."
@@ -273,54 +273,54 @@ Class<db::Net> decl_dbNet ("db", "Net",
     "are either connections to subcircuit pins or to outgoing pins of the "
     "circuit the net lives in."
   ) +
-  gsi::iterator ("each_port", (db::Net::port_iterator (db::Net::*) ()) &db::Net::begin_ports, (db::Net::port_iterator (db::Net::*) ()) &db::Net::end_ports,
-    "@brief Iterates over all ports the net connects.\n"
-    "Ports connect devices. Port connections are described by \\NetPortRef "
+  gsi::iterator ("each_terminal", (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::begin_terminals, (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::end_terminals,
+    "@brief Iterates over all terminals the net connects.\n"
+    "Terminals connect devices. Terminal connections are described by \\NetTerminalRef "
     "objects."
   ),
   "@brief A single net.\n"
-  "A net connects multiple pins or ports together. Pins are either "
+  "A net connects multiple pins or terminals together. Pins are either "
   "pin or subcircuits of outgoing pins of the circuit the net lives in. "
-  "Ports are connections made to specific ports of devices.\n"
+  "Terminals are connections made to specific terminals of devices.\n"
   "\n"
   "To connect a net to an outgoing pin of a circuit, use \\Circuit#connect_pin, to "
   "disconnect a net from an outgoing pin use \\Circuit#disconnect_pin. "
   "To connect a net to a pin of a subcircuit, use \\SubCircuit#connect_pin, to "
   "disconnect a net from a pin of a subcircuit, use \\SubCircuit#disconnect_pin. "
-  "To connect a net to a port of a device, use \\Device#connect_port, to "
-  "disconnect a net from a port of a device, use \\Device#disconnect_port.\n"
+  "To connect a net to a terminal of a device, use \\Device#connect_terminal, to "
+  "disconnect a net from a terminal of a device, use \\Device#disconnect_terminal.\n"
   "\n"
   "This class has been added in version 0.26."
 );
 
-static db::DevicePortDefinition *new_port_definition (const std::string &name, const std::string &description)
+static db::DeviceTerminalDefinition *new_terminal_definition (const std::string &name, const std::string &description)
 {
-  return new db::DevicePortDefinition (name, description);
+  return new db::DeviceTerminalDefinition (name, description);
 }
 
-Class<db::DevicePortDefinition> decl_dbDevicePortDefinition ("db", "DevicePortDefinition",
-  gsi::constructor ("new", &gsi::new_port_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()),
-    "@brief Creates a new port definition."
+Class<db::DeviceTerminalDefinition> decl_dbDeviceTerminalDefinition ("db", "DeviceTerminalDefinition",
+  gsi::constructor ("new", &gsi::new_terminal_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()),
+    "@brief Creates a new terminal definition."
   ) +
-  gsi::method ("name", &db::DevicePortDefinition::name,
-    "@brief Gets the name of the port."
+  gsi::method ("name", &db::DeviceTerminalDefinition::name,
+    "@brief Gets the name of the terminal."
   ) +
-  gsi::method ("name=", &db::DevicePortDefinition::set_name, gsi::arg ("name"),
-    "@brief Sets the name of the port."
+  gsi::method ("name=", &db::DeviceTerminalDefinition::set_name, gsi::arg ("name"),
+    "@brief Sets the name of the terminal."
   ) +
-  gsi::method ("description", &db::DevicePortDefinition::description,
-    "@brief Gets the description of the port."
+  gsi::method ("description", &db::DeviceTerminalDefinition::description,
+    "@brief Gets the description of the terminal."
   ) +
-  gsi::method ("description=", &db::DevicePortDefinition::set_description, gsi::arg ("description"),
-    "@brief Sets the description of the port."
+  gsi::method ("description=", &db::DeviceTerminalDefinition::set_description, gsi::arg ("description"),
+    "@brief Sets the description of the terminal."
   ) +
-  gsi::method ("id", &db::DevicePortDefinition::id,
-    "@brief Gets the ID of the port.\n"
-    "The ID of the port is used in some places to refer to a specific port (e.g. in "
-    "the \\NetPortRef object)."
+  gsi::method ("id", &db::DeviceTerminalDefinition::id,
+    "@brief Gets the ID of the terminal.\n"
+    "The ID of the terminal is used in some places to refer to a specific terminal (e.g. in "
+    "the \\NetTerminalRef object)."
   ),
-  "@brief A port descriptor\n"
-  "This class is used inside the \\DeviceClass class to describe a port of the device.\n"
+  "@brief A terminal descriptor\n"
+  "This class is used inside the \\DeviceClass class to describe a terminal of the device.\n"
   "\n"
   "This class has been added in version 0.26."
 );
@@ -385,13 +385,13 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "to check for object identity - i.e. to determine whether two devices share the "
     "same device class."
   ) +
-  gsi::method ("port_definitions", &db::DeviceClass::port_definitions,
-    "@brief Gets the list of port definitions of the device.\n"
-    "See the \\DevicePortDefinition class description for details."
+  gsi::method ("terminal_definitions", &db::DeviceClass::terminal_definitions,
+    "@brief Gets the list of terminal definitions of the device.\n"
+    "See the \\DeviceTerminalDefinition class description for details."
   ) +
-  gsi::method ("port_definition", &db::DeviceClass::port_definition, gsi::arg ("port_id"),
-    "@brief Gets the port definition object for a given ID.\n"
-    "Port definition IDs are used in some places to reference a specific port of a device. "
+  gsi::method ("terminal_definition", &db::DeviceClass::terminal_definition, gsi::arg ("terminal_id"),
+    "@brief Gets the terminal definition object for a given ID.\n"
+    "Terminal definition IDs are used in some places to reference a specific terminal of a device. "
     "This method obtains the corresponding definition object."
   ) +
   gsi::method ("parameter_definitions", &db::DeviceClass::parameter_definitions,
@@ -455,10 +455,10 @@ private:
 
 }
 
-static void gdc_add_port_definition (GenericDeviceClass *cls, db::DevicePortDefinition *port_def)
+static void gdc_add_terminal_definition (GenericDeviceClass *cls, db::DeviceTerminalDefinition *terminal_def)
 {
-  if (port_def) {
-    *port_def = cls->add_port_definition (*port_def);
+  if (terminal_def) {
+    *terminal_def = cls->add_terminal_definition (*terminal_def);
   }
 }
 
@@ -470,17 +470,17 @@ static void gdc_add_parameter_definition (GenericDeviceClass *cls, db::DevicePar
 }
 
 Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "GenericDeviceClass",
-  gsi::method_ext ("add_port", &gsi::gdc_add_port_definition, gsi::arg ("port_def"),
-    "@brief Adds the given port definition to the device class\n"
-    "This method will define a new port. The new port is added at the end of existing ports. "
-    "The port definition object passed as the argument is modified to contain the "
-    "new ID of the port.\n"
+  gsi::method_ext ("add_terminal", &gsi::gdc_add_terminal_definition, gsi::arg ("terminal_def"),
+    "@brief Adds the given terminal definition to the device class\n"
+    "This method will define a new terminal. The new terminal is added at the end of existing terminals. "
+    "The terminal definition object passed as the argument is modified to contain the "
+    "new ID of the terminal.\n"
     "\n"
-    "The port is copied into the device class. Modifying the port object later "
-    "does not have the effect of changing the port definition."
+    "The terminal is copied into the device class. Modifying the terminal object later "
+    "does not have the effect of changing the terminal definition."
   ) +
-  gsi::method ("clear_ports", &GenericDeviceClass::clear_port_definitions,
-    "@brief Clears the list of ports\n"
+  gsi::method ("clear_terminals", &GenericDeviceClass::clear_terminal_definitions,
+    "@brief Clears the list of terminals\n"
   ) +
   gsi::method_ext ("add_parameter", &gsi::gdc_add_parameter_definition, gsi::arg ("parameter_def"),
     "@brief Adds the given parameter definition to the device class\n"
@@ -501,10 +501,10 @@ Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "Ge
     "@brief Sets the description of the device\n"
   ),
   "@brief A generic device class\n"
-  "This class allows building generic device classes. Specificially, ports can be defined "
-  "by adding port definitions. Port definitions should not be added dynamically. To create "
+  "This class allows building generic device classes. Specificially, terminals can be defined "
+  "by adding terminal definitions. Terminal definitions should not be added dynamically. To create "
   "your own device, instantiate the \\GenericDeviceClass object, set name and description and "
-  "specify the ports. Then add this new device class to the \\Netlist object where it will live "
+  "specify the terminals. Then add this new device class to the \\Netlist object where it will live "
   "and be used to define device instances (\\Device objects).\n"
   "\n"
   "In addition, parameters can be defined which correspond to values stored inside the "
@@ -695,11 +695,11 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   "Devices are created using the \\create_device method. Subcircuits are "
   "created using the \\create_subcircuit method.\n"
   "\n"
-  "Devices are connected through 'ports', subcircuits are connected through "
-  "their pins. Ports and pins are described by integer ID's in the context of "
+  "Devices are connected through 'terminals', subcircuits are connected through "
+  "their pins. Terminals and pins are described by integer ID's in the context of "
   "most methods.\n"
   "\n"
-  "Finally, the circuit consists of the nets. Nets connect ports of devices "
+  "Finally, the circuit consists of the nets. Nets connect terminals of devices "
   "and pins of subcircuits or the circuit itself. Nets are created using "
   "\\create_net and are represented by objects of the \\Net class.\n"
   "See there for more about nets.\n"

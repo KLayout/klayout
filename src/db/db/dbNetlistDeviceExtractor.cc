@@ -62,7 +62,7 @@ void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const 
 
   mp_layout = &layout;
 
-  //  port properties are kept in property index 0
+  //  terminal properties are kept in property index 0
   m_propname_id = mp_layout->properties_repository ().prop_name_id (tl::Variant (int (0)));
 
   tl_assert (m_netlist.get () != 0);
@@ -165,30 +165,30 @@ Device *NetlistDeviceExtractor::create_device (unsigned int device_class_index)
   return device;
 }
 
-void NetlistDeviceExtractor::define_port (Device *device, size_t port_id, size_t layer_index, const db::Polygon &polygon)
+void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Polygon &polygon)
 {
   tl_assert (mp_layout != 0);
 
-  //  Build a property set for the DevicePortProperty
+  //  Build a property set for the DeviceTerminalProperty
   db::PropertiesRepository::properties_set ps;
   tl::Variant &v = ps.insert (std::make_pair (m_propname_id, tl::Variant ()))->second;
-  v = tl::Variant (new db::DevicePortProperty (db::NetPortRef (device, port_id)), db::NetlistProperty::variant_class (), true);
+  v = tl::Variant (new db::DeviceTerminalProperty (db::NetTerminalRef (device, terminal_id)), db::NetlistProperty::variant_class (), true);
   db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
 
   db::PolygonRef pr (polygon, mp_layout->shape_repository ());
   mp_layout->cell (m_cell_index).shapes (layer_index).insert (db::PolygonRefWithProperties (pr, pi));
 }
 
-void NetlistDeviceExtractor::define_port (Device *device, size_t port_id, size_t layer_index, const db::Box &box)
+void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Box &box)
 {
-  define_port (device, port_id, layer_index, db::Polygon (box));
+  define_terminal (device, terminal_id, layer_index, db::Polygon (box));
 }
 
-void NetlistDeviceExtractor::define_port (Device *device, size_t port_id, size_t layer_index, const db::Point &point)
+void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Point &point)
 {
   //  NOTE: we add one DBU to the "point" to prevent it from vanishing
   db::Vector dv (1, 1);
-  define_port (device, port_id, layer_index, db::Polygon (db::Box (point - dv, point + dv)));
+  define_terminal (device, terminal_id, layer_index, db::Polygon (db::Box (point - dv, point + dv)));
 }
 
 }

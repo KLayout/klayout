@@ -123,20 +123,39 @@ public:
 };
 
 /**
- *  @brief A basic MOSFET device class
+ *  @brief A basic MOSFET device class with three terminals
  *  A MOSFET defines four parameters: "W" for the gate width in micrometers, "L" for the gate length in micrometers,
  *  "AS" for the source area and "AD" for the drain area.
  *  The MOSFET device defines three ports, "S", "D" and "G" for source, drain and gate.
  */
-class DB_PUBLIC DeviceClassMOSTransistor
+class DB_PUBLIC DeviceClassMOS3Transistor
   : public db::DeviceClass
 {
 public:
-  DeviceClassMOSTransistor ();
+  DeviceClassMOS3Transistor ();
 
   virtual db::DeviceClass *clone () const
   {
-    return new DeviceClassMOSTransistor (*this);
+    return new DeviceClassMOS3Transistor (*this);
+  }
+
+  virtual bool combine_devices (Device *a, Device *b) const;
+};
+
+/**
+ *  @brief A basic MOSFET device class with four terminals
+ *  The four-terminal MOSFET behaves identical to the three-terminal one but adds one more
+ *  port for the bulk.
+ */
+class DB_PUBLIC DeviceClassMOS4Transistor
+  : public db::DeviceClass
+{
+public:
+  DeviceClassMOS4Transistor ();
+
+  virtual db::DeviceClass *clone () const
+  {
+    return new DeviceClassMOS4Transistor (*this);
   }
 
   virtual bool combine_devices (Device *a, Device *b) const;

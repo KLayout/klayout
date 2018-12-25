@@ -158,6 +158,7 @@ bool DeviceClassDiode::combine_devices (Device *a, Device *b) const
   const db::Net *nb1 = b->net_for_port (0);
   const db::Net *nb2 = b->net_for_port (1);
 
+  //  only parallel diodes can be combined and their areas will add
   if ((na1 == nb1 && na2 == nb2) || (na1 == nb2 && na2 == nb1)) {
 
     a->set_parameter_value (0, a->parameter_value (0) + b->parameter_value (0));
@@ -172,9 +173,9 @@ bool DeviceClassDiode::combine_devices (Device *a, Device *b) const
 }
 
 // ------------------------------------------------------------------------------------
-//  DeviceClassInductor implementation
+//  DeviceClassMOS3Transistor implementation
 
-DeviceClassMOSTransistor::DeviceClassMOSTransistor ()
+DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
 {
   add_port_definition (db::DevicePortDefinition ("S", "Source"));
   add_port_definition (db::DevicePortDefinition ("G", "Gate"));
@@ -186,7 +187,7 @@ DeviceClassMOSTransistor::DeviceClassMOSTransistor ()
   add_parameter_definition (db::DeviceParameterDefinition ("AD", "Drain area (square micrometer)", 0.0));
 }
 
-bool DeviceClassMOSTransistor::combine_devices (Device *a, Device *b) const
+bool DeviceClassMOS3Transistor::combine_devices (Device *a, Device *b) const
 {
   const db::Net *nas = a->net_for_port (0);
   const db::Net *nag = a->net_for_port (1);
@@ -207,6 +208,56 @@ bool DeviceClassMOSTransistor::combine_devices (Device *a, Device *b) const
       b->connect_port (0, 0);
       b->connect_port (1, 0);
       b->connect_port (2, 0);
+
+      return true;
+
+    }
+
+  }
+
+  return false;
+}
+
+// ------------------------------------------------------------------------------------
+//  DeviceClassMOS4Transistor implementation
+
+DeviceClassMOS4Transistor::DeviceClassMOS4Transistor ()
+{
+  add_port_definition (db::DevicePortDefinition ("S", "Source"));
+  add_port_definition (db::DevicePortDefinition ("G", "Gate"));
+  add_port_definition (db::DevicePortDefinition ("D", "Drain"));
+  add_port_definition (db::DevicePortDefinition ("B", "Bulk"));
+
+  add_parameter_definition (db::DeviceParameterDefinition ("L", "Gate length (micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("W", "Gate width (micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("AS", "Source area (square micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("AD", "Drain area (square micrometer)", 0.0));
+}
+
+bool DeviceClassMOS4Transistor::combine_devices (Device *a, Device *b) const
+{
+  const db::Net *nas = a->net_for_port (0);
+  const db::Net *nag = a->net_for_port (1);
+  const db::Net *nad = a->net_for_port (2);
+  const db::Net *nab = a->net_for_port (3);
+  const db::Net *nbs = b->net_for_port (0);
+  const db::Net *nbg = b->net_for_port (1);
+  const db::Net *nbd = b->net_for_port (2);
+  const db::Net *nbb = b->net_for_port (3);
+
+  //  parallel transistors can be combined into one
+  if (((nas == nbs && nad == nbd) || (nas == nbd && nad == nbs)) && nag == nbg && nab == nbb) {
+
+    //  for combination the gate length must be identical
+    if (fabs (a->parameter_value (0) - b->parameter_value (0)) < 1e-6) {
+
+      a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
+      a->set_parameter_value (2, a->parameter_value (2) + b->parameter_value (2));
+      a->set_parameter_value (3, a->parameter_value (3) + b->parameter_value (3));
+      b->connect_port (0, 0);
+      b->connect_port (1, 0);
+      b->connect_port (2, 0);
+      b->connect_port (3, 0);
 
       return true;
 

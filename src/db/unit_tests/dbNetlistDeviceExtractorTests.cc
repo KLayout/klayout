@@ -33,6 +33,7 @@
 #include "dbReader.h"
 #include "dbWriter.h"
 #include "dbCommonReader.h"
+#include "dbTestSupport.h"
 
 #include "tlUnitTest.h"
 #include "tlString.h"
@@ -105,7 +106,11 @@ public:
         error (tl::to_string (tr ("Gate shape touches neither ndiff and pdiff - ignored")), *p);
       } else {
 
-        db::Region &diff = (rpdiff_on_gate.empty () ? rndiff_on_gate : rpdiff_on_gate);
+        bool is_pmos = ! rpdiff_on_gate.empty ();
+
+        db::Region &diff = (is_pmos ? rpdiff_on_gate : rndiff_on_gate);
+        unsigned int terminal_layer_index = (is_pmos ? 0 : 1);
+        unsigned int device_class_index = (is_pmos ? 0 /*PMOS*/ : 1 /*NMOS*/);
 
         if (diff.size () != 2) {
           error (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting one gate shape (found %d) - gate shape ignored")), int (diff.size ())), *p);
@@ -122,25 +127,26 @@ public:
           error (tl::to_string (tr ("Gate shape is not a box - width and length may be incorrect")), *p);
         }
 
-        db::Device *device = create_device (! rpdiff_on_gate.empty () ? 0 /*pdiff*/ : 1 /*ndiff*/);
+        db::Device *device = create_device (device_class_index);
 
         device->set_parameter_value ("W", dbu () * edges.length () * 0.5);
         device->set_parameter_value ("L", dbu () * (p->perimeter () - edges.length ()) * 0.5);
 
-        int index = 0;
-        for (db::Region::const_iterator d = diff.begin (); !d.at_end () && index < 2; ++d, ++index) {
+        int diff_index = 0;
+        for (db::Region::const_iterator d = diff.begin (); !d.at_end () && diff_index < 2; ++d, ++diff_index) {
 
           //  count the number of gate shapes attached to this shape and distribute the area of the
-          //  diffusion area to the number of gates
+          //  diffusion region to the number of gates
           int n = rgates.selected_interacting (db::Region (*d)).size ();
           tl_assert (n > 0);
 
-          device->set_parameter_value (index == 0 ? "AS" : "AD", dbu () * dbu () * d->area () / double (n));
+          device->set_parameter_value (diff_index == 0 ? "AS" : "AD", dbu () * dbu () * d->area () / double (n));
+
+          define_terminal (device, device->device_class ()->terminal_id_for_name (diff_index == 0 ? "S" : "D"), terminal_layer_index, *d);
 
         }
 
-        // @@@ create terminals
-
+        //  output the device for debugging
         device_out (device, diff, rgate);
 
       }
@@ -262,30 +268,25 @@ TEST(1_DeviceNetExtraction)
   db::Region rpdiff = rsd & rnwell;
   db::Region rndiff = rsd - rnwell;
 
-  if (write_debug) {
+  //  return the computed layers into the original layout and write it for debugging purposes
 
-    //  return the computed layers into the original layout and write it for debugging purposes
+  unsigned int lgate  = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> Gate
+  unsigned int lsd    = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> Source/Drain
+  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> P Diffusion
+  unsigned int lndiff = ly.insert_layer (db::LayerProperties (13, 0));      // 13/0 -> N Diffusion
 
-    unsigned int lgate  = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> Gate
-    unsigned int lsd    = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> Source/Drain
-    unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> P Diffusion
-    unsigned int lndiff = ly.insert_layer (db::LayerProperties (13, 0));      // 13/0 -> N Diffusion
+  rgate.insert_into (&ly, tc.cell_index (), lgate);
+  rsd.insert_into (&ly, tc.cell_index (), lsd);
+  rpdiff.insert_into (&ly, tc.cell_index (), lpdiff);
+  rndiff.insert_into (&ly, tc.cell_index (), lndiff);
 
-    rgate.insert_into (&ly, tc.cell_index (), lgate);
-    rsd.insert_into (&ly, tc.cell_index (), lsd);
-    rpdiff.insert_into (&ly, tc.cell_index (), lpdiff);
-    rndiff.insert_into (&ly, tc.cell_index (), lndiff);
-
-  }
-
-  db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (rnwell.delegate ());
-  db::DeepLayer dl = dr->deep_layer ();
-  dl.layout ();
-  dl.initial_cell ();
-  dl.layer ();
+  //  perform the extraction
 
   db::Netlist nl;
 
+  //  NOTE: the device extractor will add more debug layers for the transistors:
+  //    20/0 -> Diffusion
+  //    21/0 -> Gate
   MOSFETExtractor ex (write_debug ? &ly : 0);
   ex.initialize (&nl);
 
@@ -293,19 +294,15 @@ TEST(1_DeviceNetExtraction)
   region_ptrs.push_back (&rpdiff);
   region_ptrs.push_back (&rndiff);
   region_ptrs.push_back (&rgate);
+
   ex.extract (region_ptrs);
 
-  if (write_debug) {
+  //  compare the collected test data
 
-    std::string fn (tl::testtmp ());
-    fn = tl::combine_path (fn, "debug-1_DeviceNetExtraction.gds");
+  std::string au = tl::testsrc ();
+  au = tl::combine_path (au, "testdata");
+  au = tl::combine_path (au, "algo");
+  au = tl::combine_path (au, "device_extract_au1.gds");
 
-    tl::OutputStream stream (fn);
-    db::SaveLayoutOptions options;
-    db::Writer writer (options);
-    writer.write (ly, stream);
-
-    tl::log << "Device layer debug file written to: " << tl::absolute_file_path (fn);
-
-  }
+  db::compare_layouts (_this, ly, au);
 }

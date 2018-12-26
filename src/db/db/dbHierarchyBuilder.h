@@ -135,7 +135,7 @@ class DB_PUBLIC PolygonReferenceHierarchyBuilderShapeReceiver
   : public HierarchyBuilderShapeReceiver
 {
 public:
-  PolygonReferenceHierarchyBuilderShapeReceiver (db::Layout *layout);
+  PolygonReferenceHierarchyBuilderShapeReceiver (db::Layout *layout, int text_enlargement = -1, const tl::Variant &text_prop_name = tl::Variant ());
 
   virtual void push (const db::Shape &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
   virtual void push (const db::Box &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
@@ -143,6 +143,9 @@ public:
 
 private:
   db::Layout *mp_layout;
+  int m_text_enlargement;
+  bool m_make_text_prop;
+  db::property_names_id_type m_text_prop_id;
 };
 
 /**

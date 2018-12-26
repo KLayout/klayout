@@ -103,6 +103,7 @@ void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const 
   db::ShapeIterator::flags_type shape_iter_flags = db::ShapeIterator::Polygons;
 
   mp_layout = &layout;
+  m_layers = layers;
 
   //  terminal properties are kept in property index 0
   m_propname_id = mp_layout->properties_repository ().prop_name_id (tl::Variant (int (0)));
@@ -207,9 +208,11 @@ Device *NetlistDeviceExtractor::create_device (unsigned int device_class_index)
   return device;
 }
 
-void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Polygon &polygon)
+void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t geometry_index, const db::Polygon &polygon)
 {
   tl_assert (mp_layout != 0);
+  tl_assert (geometry_index < m_layers.size ());
+  unsigned int layer_index = m_layers [geometry_index];
 
   //  Build a property set for the DeviceTerminalProperty
   db::PropertiesRepository::properties_set ps;

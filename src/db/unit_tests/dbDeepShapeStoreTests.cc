@@ -149,3 +149,38 @@ TEST(2_RefCounting)
   dl2 = db::DeepLayer ();
   EXPECT_EQ (store.is_valid_layout_index (lyi1), false);
 }
+
+TEST(3_TextTreatment)
+{
+  db::DeepShapeStore store;
+  db::Layout layout;
+
+  unsigned int l1 = layout.insert_layer ();
+  db::cell_index_type c1 = layout.add_cell ("C1");
+  layout.cell (c1).shapes (l1).insert (db::Text ("TEXT", db::Trans (db::Vector (1000, 2000))));
+
+  db::DeepLayer dl1 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1));
+  EXPECT_EQ (store.layouts (), (unsigned int) 1);
+
+  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).empty (), true);
+
+  store.set_text_enlargement (1);
+  dl1 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1));
+  EXPECT_EQ (store.layouts (), (unsigned int) 1);
+
+  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).size (), size_t (1));
+  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999)");
+
+  store.set_text_property_name (tl::Variant ("text"));
+  dl1 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1));
+  EXPECT_EQ (store.layouts (), (unsigned int) 1);
+
+  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).size (), size_t (1));
+  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999) prop_id=1");
+
+  const db::Layout *dss_layout = store.const_layout (0);
+  db::PropertiesRepository::properties_set ps = dss_layout->properties_repository ().properties (1);
+  EXPECT_EQ (ps.size (), size_t (1));
+  EXPECT_EQ (dss_layout->properties_repository ().prop_name (ps.begin ()->first).to_string (), "text");
+  EXPECT_EQ (ps.begin ()->second.to_string (), "TEXT");
+}

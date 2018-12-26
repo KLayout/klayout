@@ -123,7 +123,7 @@ public:
   typedef typename T::box_type box_type;
   typedef db::unstable_box_tree<box_type, T, db::box_convert<T> > tree_type;
   typedef typename tree_type::flat_iterator shape_iterator;
-  typedef unsigned int attr_id;
+  typedef size_t attr_id;
   typedef std::set<attr_id> attr_set;
   typedef attr_set::const_iterator attr_iterator;
 
@@ -315,6 +315,14 @@ public:
   const_iterator end () const
   {
     return m_clusters.end ();
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the cluster set is empty
+   */
+  bool empty () const
+  {
+    return m_clusters.empty ();
   }
 
   /**
@@ -552,6 +560,14 @@ public:
   connections_iterator end_connections () const
   {
     return m_connections.end ();
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the cluster set is empty
+   */
+  bool empty () const
+  {
+    return local_clusters<T>::empty () && m_connections.empty ();
   }
 
   /**

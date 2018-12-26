@@ -203,6 +203,15 @@ public:
   void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);
 
   /**
+   *  @brief Gets the cell mapping suitable to returning a layout from the deep shape store into the original layout hierarchy
+   *
+   *  If necessary, this method will modify the original layout and add new cells.
+   *  "layout_index" is the layout to return to it's original. "into_layout" is the original layout, "into_cell"
+   *  the original cell.
+   */
+  const db::CellMapping &cell_mapping_to_original (size_t layout_index, db::Layout *into_layout, db::cell_index_type into_cell);
+
+  /**
    *  @brief For testing
    */
   static size_t instance_count ();
@@ -274,6 +283,42 @@ public:
     return m_max_area_ratio;
   }
 
+  /**
+   *  @brief Sets the text property name
+   *
+   *  If set to a non-null variant, text strings are attached to the generated boxes
+   *  as properties with this particular name. This option has an effect only if the
+   *  text_enlargement property is not negative.
+   *  By default, the name is empty.
+   */
+  void set_text_property_name (const tl::Variant &pn);
+
+  /**
+   *  @brief Gets the text property name
+   */
+  const tl::Variant &text_property_name () const
+  {
+    return m_text_property_name;
+  }
+
+  /**
+   *  @brief Sets the text enlargement value
+   *
+   *  If set to a non-negative value, text objects are converted to boxes with the
+   *  given enlargement (width = 2 * enlargement). The box centers are identical
+   *  to the original location of the text.
+   *  If this value is negative (the default), texts are ignored.
+   */
+  void set_text_enlargement (int enl);
+
+  /**
+   *  @brief Gets the text enlargement value
+   */
+  int text_enlargement () const
+  {
+    return m_text_enlargement;
+  }
+
 private:
   friend class DeepLayer;
 
@@ -295,6 +340,8 @@ private:
   int m_threads;
   double m_max_area_ratio;
   size_t m_max_vertex_count;
+  tl::Variant m_text_property_name;
+  int m_text_enlargement;
   tl::Mutex m_lock;
 
   struct DeliveryMappingCacheKey

@@ -492,18 +492,40 @@ ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, const db
 
 // ---------------------------------------------------------------------------------------------
 
-PolygonReferenceHierarchyBuilderShapeReceiver::PolygonReferenceHierarchyBuilderShapeReceiver (db::Layout *layout)
-  : mp_layout (layout)
+PolygonReferenceHierarchyBuilderShapeReceiver::PolygonReferenceHierarchyBuilderShapeReceiver (db::Layout *layout, int text_enlargement, const tl::Variant &text_prop_name)
+  : mp_layout (layout), m_text_enlargement (text_enlargement), m_make_text_prop (false), m_text_prop_id (0)
 {
-  //  nothing yet ..
+  if (! text_prop_name.is_nil ()) {
+    m_text_prop_id = layout->properties_repository ().prop_name_id (text_prop_name);
+    m_make_text_prop = true;
+  }
 }
 
 void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
   if (shape.is_box () || shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ()) {
+
     db::Polygon poly;
     shape.polygon (poly);
     target->insert (db::PolygonRef (poly, mp_layout->shape_repository ()));
+
+  } else if (shape.is_text () && m_text_enlargement >= 0) {
+
+    db::Polygon poly (shape.text_trans () * db::Box (-m_text_enlargement, -m_text_enlargement, m_text_enlargement, m_text_enlargement));
+    db::PolygonRef pref (poly, mp_layout->shape_repository ());
+
+    if (m_make_text_prop) {
+
+      db::PropertiesRepository::properties_set ps;
+      ps.insert (std::make_pair (m_text_prop_id, tl::Variant (shape.text_string ())));
+      db::properties_id_type pid = mp_layout->properties_repository ().properties_id (ps);
+
+      target->insert (db::PolygonRefWithProperties (pref, pid));
+
+    } else {
+      target->insert (pref);
+    }
+
   }
 }
 

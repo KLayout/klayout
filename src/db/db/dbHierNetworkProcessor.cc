@@ -1016,13 +1016,37 @@ private:
     } else if (x->second != y->second) {
 
       //  join two superclusters
-      x->second->insert (y->second->begin (), y->second->end ());
-      for (typename std::set<id_type>::const_iterator i = y->second->begin (); i != y->second->end (); ++i) {
+      std::set<id_type> &yset = *y->second;
+      x->second->insert (yset.begin (), yset.end ());
+      for (typename std::set<id_type>::const_iterator i = yset.begin (); i != yset.end (); ++i) {
         m_cm2join_map [*i] = x->second;
       }
-      y->second->clear ();
+      yset.clear (); //  TODO: no longer required, but we can't delete it, as we just have a pointer .. replace pointer by iterator!
 
     }
+
+#if defined(DEBUG_HIER_NETWORK_PROCESSOR)
+    //  concistency check for debugging
+    for (typename std::map<id_type, std::set<id_type> *>::const_iterator j = m_cm2join_map.begin (); j != m_cm2join_map.end (); ++j) {
+      tl_assert (j->second->find (j->first) != j->second->end ());
+    }
+
+    for (typename std::list<std::set<id_type> >::const_iterator i = m_cm2join_sets.begin (); i != m_cm2join_sets.end (); ++i) {
+      for (typename std::set<id_type>::const_iterator j = i->begin(); j != i->end(); ++j) {
+        tl_assert(m_cm2join_map.find (*j) != m_cm2join_map.end ());
+        tl_assert(m_cm2join_map[*j] == i.operator->());
+      }
+    }
+
+    //  the sets must be disjunct
+    std::set<id_type> all;
+    for (typename std::list<std::set<id_type> >::const_iterator i = m_cm2join_sets.begin (); i != m_cm2join_sets.end (); ++i) {
+      for (typename std::set<id_type>::const_iterator j = i->begin(); j != i->end(); ++j) {
+        tl_assert(all.find (*j) == all.end());
+        all.insert(*j);
+      }
+    }
+#endif
   }
 
   /**

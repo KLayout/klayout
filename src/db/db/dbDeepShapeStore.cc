@@ -177,7 +177,7 @@ struct DeepShapeStore::LayoutHolder
 static size_t s_instance_count = 0;
 
 DeepShapeStore::DeepShapeStore ()
-  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16)
+  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_text_property_name (), m_text_enlargement (-1)
 {
   ++s_instance_count;
 }
@@ -190,6 +190,16 @@ DeepShapeStore::~DeepShapeStore ()
     delete *h;
   }
   m_layouts.clear ();
+}
+
+void DeepShapeStore::set_text_enlargement (int enl)
+{
+  m_text_enlargement = enl;
+}
+
+void DeepShapeStore::set_text_property_name (const tl::Variant &pn)
+{
+  m_text_property_name = pn;
 }
 
 bool DeepShapeStore::is_valid_layout_index (unsigned int n) const
@@ -280,11 +290,14 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
 
   }
 
-  unsigned int layer_index = m_layouts[layout_index]->layout.insert_layer ();
-  m_layouts[layout_index]->builder.set_target_layer (layer_index);
+  db::Layout &layout = m_layouts[layout_index]->layout;
+  db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
+
+  unsigned int layer_index = layout.insert_layer ();
+  builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (& m_layouts[layout_index]->layout);
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (& layout, m_text_enlargement, m_text_property_name);
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count);
   db::ClippingHierarchyBuilderShapeReceiver clip (&red);
 
@@ -293,35 +306,36 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
 
     tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Building working hierarchy")));
 
-    m_layouts[layout_index]->builder.set_shape_receiver (&clip);
-    db::RecursiveShapeIterator (si).push (& m_layouts[layout_index]->builder);
-    m_layouts[layout_index]->builder.set_shape_receiver (0);
+    builder.set_shape_receiver (&clip);
+    db::RecursiveShapeIterator (si).push (& builder);
+    builder.set_shape_receiver (0);
 
   } catch (...) {
-    m_layouts[layout_index]->builder.set_shape_receiver (0);
+    builder.set_shape_receiver (0);
     throw;
   }
 
   return DeepLayer (this, layout_index, layer_index);
 }
 
-void
-DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer)
+const db::CellMapping &
+DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_layout, db::cell_index_type into_cell)
 {
-  const db::Layout *source_layout = deep_layer.layout ();
+  const db::Layout *source_layout = &m_layouts [layout_index]->layout;
   if (source_layout->begin_top_down () == source_layout->end_top_cells ()) {
     //  empty source - nothing to do.
-    return;
+    static db::CellMapping cm;
+    return cm;
   }
 
   db::cell_index_type source_top = *source_layout->begin_top_down();
 
-  db::HierarchyBuilder &original_builder = m_layouts [deep_layer.layout_index ()]->builder;
+  db::HierarchyBuilder &original_builder = m_layouts [layout_index]->builder;
 
   //  Derive a cell mapping for source to target. We reuse any existing mapping for returning the
   //  shapes into the original layout.
 
-  DeliveryMappingCacheKey key (deep_layer.layout_index (), tl::id_of (into_layout), into_cell);
+  DeliveryMappingCacheKey key (layout_index, tl::id_of (into_layout), into_cell);
 
   std::map<DeliveryMappingCacheKey, db::CellMapping>::iterator cm = m_delivery_mapping_cache.find (key);
   if (cm == m_delivery_mapping_cache.end ()) {
@@ -375,16 +389,34 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
 
   }
 
-  //  Actually copy the shapes
+  return cm->second;
+}
 
+void
+DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer)
+{
+  const db::Layout *source_layout = deep_layer.layout ();
+  if (source_layout->begin_top_down () == source_layout->end_top_cells ()) {
+    //  empty source - nothing to do.
+    return;
+  }
+
+  //  prepare the transformation
   db::ICplxTrans trans (source_layout->dbu () / into_layout->dbu ());
 
+  //  prepare a layer map
   std::map<unsigned int, unsigned int> lm;
   lm.insert (std::make_pair (deep_layer.layer (), into_layer));
 
+  //  prepare a cell mapping
+  const db::CellMapping &cm = cell_mapping_to_original (deep_layer.layout_index (), into_layout, into_cell);
+
+  //  prepare a vector with the source cells
   std::vector <db::cell_index_type> source_cells;
-  source_cells.push_back (source_top);
-  db::copy_shapes (*into_layout, *source_layout, trans, source_cells, cm->second.table (), lm);
+  source_cells.push_back (*source_layout->begin_top_down());
+
+  //  actually copy the shapes
+  db::copy_shapes (*into_layout, *source_layout, trans, source_cells, cm.table (), lm);
 }
 
 }

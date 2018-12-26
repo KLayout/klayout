@@ -195,6 +195,7 @@ private:
   db::cell_index_type m_cell_index;
   db::Circuit *mp_circuit;
   std::vector<db::DeviceClass *> m_device_classes;
+  std::vector<unsigned int> m_layers;
   unsigned int m_device_name_index;
 };
 

@@ -241,65 +241,6 @@ static unsigned int layer_of (const db::Region &region)
 }
 
 //  @@@ TODO: move somewhere else
-static db::Layout &layout_of (const db::Region &region)
-{
-  //  TODO: this is clumsy ...
-  db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (region.delegate ());
-  tl_assert (dr != 0);
-
-  db::DeepLayer dl = dr->deep_layer ();
-  tl_assert (dl.layout () != 0);
-  return *dl.layout ();
-}
-
-//  @@@ TODO: move somewhere else
-static db::Layout &layout_of (const std::vector<db::Region *> &regions)
-{
-  db::Layout *layout = 0;
-  for (std::vector<db::Region *>::const_iterator r = regions.begin (); r != regions.end (); ++r) {
-    db::Layout &l = layout_of (**r);
-    if (! layout) {
-      layout = &l;
-    } else {
-      tl_assert (layout == &l);
-    }
-  }
-
-  tl_assert (layout != 0);
-  return *layout;
-}
-
-//  @@@ TODO: move somewhere else
-static db::Cell &cell_of (const db::Region &region)
-{
-  //  TODO: this is clumsy ...
-  db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (region.delegate ());
-  tl_assert (dr != 0);
-
-  db::DeepLayer dl = dr->deep_layer ();
-  tl_assert (dl.initial_cell () != 0);
-  return *dl.initial_cell ();
-}
-
-//  @@@ TODO: move somewhere else
-static db::Cell &cell_of (const std::vector<db::Region *> &regions)
-{
-  db::Cell *cell = 0;
-
-  for (std::vector<db::Region *>::const_iterator r = regions.begin (); r != regions.end (); ++r) {
-    db::Cell &c = cell_of (**r);
-    if (! cell) {
-      cell = &c;
-    } else {
-      tl_assert (cell == &c);
-    }
-  }
-
-  tl_assert (cell != 0);
-  return *cell;
-}
-
-//  @@@ TODO: move somewhere else
 class NetExtractor
 {
 public:
@@ -377,7 +318,6 @@ public:
 
         db::Net *net = new db::Net ();
         net->set_cluster_id (*c);
-        //  @@@ TODO: set name
         circuit->add_net (net);
 
         if (! clusters.is_root (*c)) {
@@ -757,13 +697,8 @@ TEST(1_DeviceNetExtraction)
   dump_map [layer_of (rvia1)     ] = ly.insert_layer (db::LayerProperties (207, 0));
   dump_map [layer_of (rmetal2)   ] = ly.insert_layer (db::LayerProperties (208, 0));
 
-  //  @@@ we should not have to do this -> can be taken from dss?
-  db::CellMapping cm;
-  const db::Layout &ex_layout = layout_of (rpoly);
-  const db::Cell &ex_cell = cell_of (rpoly);
-  cm.create_from_names_full (ly, tc.cell_index (), ex_layout, ex_cell.cell_index ());
-
   //  write nets to layout
+  db::CellMapping cm = dss.cell_mapping_to_original (0, &ly, tc.cell_index ());
   dump_nets (nl, net_ex.clusters (), ly, dump_map, cm);
 
   //  compare netlist as string

@@ -51,6 +51,12 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
   ) +
+  gsi::method ("id", &db::Device::id,
+    "@brief Gets the device ID.\n"
+    "The ID is a unique integer which identifies the device.\n"
+    "It can be used to retrieve the device from the circuit using \\Circuit#device_by_id.\n"
+    "When assigned, the device ID is not 0.\n"
+  ) +
   gsi::method ("name=", &db::Device::set_name, gsi::arg ("name"),
     "@brief Sets the name of the device.\n"
     "Device names are used to name a device inside a netlist file. "
@@ -606,6 +612,10 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   ) +
   gsi::iterator ("each_pin", (db::Circuit::pin_iterator (db::Circuit::*) ()) &db::Circuit::begin_pins, (db::Circuit::pin_iterator (db::Circuit::*) ()) &db::Circuit::end_pins,
     "@brief Iterates over the pins of the circuit"
+  ) +
+  gsi::method ("device_by_id", (db::Device *(db::Circuit::*) (size_t)) &db::Circuit::device_by_id, gsi::arg ("id"),
+    "@brief Gets the device object for a given ID.\n"
+    "If the ID is not a valid device ID, nil is returned."
   ) +
   gsi::method ("pin_by_id", &db::Circuit::pin_by_id, gsi::arg ("id"),
     "@brief Gets the \\Pin object corresponding to a specific ID\n"

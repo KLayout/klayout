@@ -46,6 +46,7 @@ Pin::Pin (const std::string &name)
 //  Device class implementation
 
 Device::Device ()
+  : mp_device_class (0), m_id (0)
 {
   //  .. nothing yet ..
 }
@@ -60,12 +61,13 @@ Device::~Device ()
 }
 
 Device::Device (DeviceClass *device_class, const std::string &name)
-  : mp_device_class (device_class), m_name (name)
+  : mp_device_class (device_class), m_name (name), m_id (0)
 {
   //  .. nothing yet ..
 }
 
 Device::Device (const Device &other)
+  : mp_device_class (0), m_id (0)
 {
   operator= (other);
 }
@@ -470,13 +472,13 @@ void Net::set_circuit (Circuit *circuit)
 //  Circuit class implementation
 
 Circuit::Circuit ()
-  : mp_netlist (0)
+  : mp_netlist (0), m_valid_device_id_table (false)
 {
   //  .. nothing yet ..
 }
 
 Circuit::Circuit (const Circuit &other)
-  : mp_netlist (0)
+  : mp_netlist (0), m_valid_device_id_table (false)
 {
   operator= (other);
 }
@@ -486,6 +488,7 @@ Circuit &Circuit::operator= (const Circuit &other)
   if (this != &other) {
 
     m_name = other.m_name;
+    invalidate_device_id_table ();
 
     for (const_pin_iterator i = other.begin_pins (); i != other.end_pins (); ++i) {
       add_pin (*i);
@@ -589,12 +592,47 @@ void Circuit::remove_net (Net *net)
 
 void Circuit::add_device (Device *device)
 {
+  size_t id = 0;
+  if (! m_devices.empty ()) {
+    tl_assert (m_devices.back () != 0);
+    id = m_devices.back ()->id ();
+  }
+  device->set_id (id + 1);
+
   m_devices.push_back (device);
+  invalidate_device_id_table ();
 }
 
 void Circuit::remove_device (Device *device)
 {
   m_devices.erase (device);
+  invalidate_device_id_table ();
+}
+
+void Circuit::validate_device_id_table ()
+{
+  m_device_id_table.clear ();
+  for (device_iterator d = begin_devices (); d != end_devices (); ++d) {
+    m_device_id_table.insert (std::make_pair (d->id (), d.operator-> ()));
+  }
+
+  m_valid_device_id_table = true;
+}
+
+void Circuit::invalidate_device_id_table ()
+{
+  m_valid_device_id_table = false;
+  m_device_id_table.clear ();
+}
+
+Device *Circuit::device_by_id (size_t id)
+{
+  if (! m_valid_device_id_table) {
+    validate_device_id_table ();
+  }
+
+  std::map<size_t, Device *>::const_iterator d = m_device_id_table.find (id);
+  return d != m_device_id_table.end () ? d->second : 0;
 }
 
 void Circuit::add_sub_circuit (SubCircuit *sub_circuit)

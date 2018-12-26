@@ -157,6 +157,9 @@ class DBNetlist_TestClass < TestBase
     d1 = c.create_device(dc)
     d1.name = "D1"
     assert_equal(d1.name, "D1")
+    assert_equal(d1.id, 1)
+    assert_equal(c.device_by_id(d1.id).id, 1)
+    assert_equal(c.device_by_id(2).inspect, "nil")
 
     d2 = c.create_device(dc)
     assert_equal(d2.device_class.id, dc.id)

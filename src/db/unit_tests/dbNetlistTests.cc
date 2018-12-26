@@ -264,12 +264,26 @@ TEST(4_CircuitDevices)
     "c:\n"
   );
 
+  db::Device *dd = new db::Device (&dc1, "dd");
   db::Device *d1 = new db::Device (&dc1, "d1");
   db::Device *d2a = new db::Device (&dc2, "d2a");
   db::Device *d2b = new db::Device (&dc2, "d2b");
   c->add_device (d1);
+  EXPECT_EQ (d1->id (), 1);
+  EXPECT_EQ (c->device_by_id (d1->id ()) == d1, true);
+  c->add_device (dd);
+  EXPECT_EQ (dd->id (), 2);
+  EXPECT_EQ (c->device_by_id (dd->id ()) == dd, true);
   c->add_device (d2a);
+  EXPECT_EQ (d2a->id (), 3);
+  EXPECT_EQ (c->device_by_id (d2a->id ()) == d2a, true);
   c->add_device (d2b);
+  EXPECT_EQ (d2b->id (), 4);
+  EXPECT_EQ (c->device_by_id (d2b->id ()) == d2b, true);
+  c->remove_device (dd);
+  dd = 0;
+  EXPECT_EQ (c->device_by_id (d2a->id ()) == d2a, true);
+  EXPECT_EQ (c->device_by_id (2) == 0, true);
 
   EXPECT_EQ (d1->parameter_value (0), 1.0);
   EXPECT_EQ (d1->parameter_value (1), 2.0);

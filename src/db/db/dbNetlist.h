@@ -590,6 +590,17 @@ public:
   }
 
   /**
+   *  @brief Gets the device ID
+   *  The ID is a unique integer which identifies the device.
+   *  It can be used to retrieve the device from the circuit using Circuit::device_by_id.
+   *  When assigned, the device ID is not 0.
+   */
+  size_t id () const
+  {
+    return m_id;
+  }
+
+  /**
    *  @brief Sets the name
    */
   void set_name (const std::string &n);
@@ -655,6 +666,7 @@ private:
   std::string m_name;
   std::vector<Net::terminal_iterator> m_terminal_refs;
   std::vector<double> m_parameters;
+  size_t m_id;
 
   /**
    *  @brief Sets the terminal reference for a specific terminal
@@ -667,6 +679,14 @@ private:
   void set_device_class (DeviceClass *dc)
   {
     mp_device_class = dc;
+  }
+
+  /**
+   *  @brief Sets the device ID
+   */
+  void set_id (size_t id)
+  {
+    m_id = id;
   }
 };
 
@@ -1000,6 +1020,23 @@ public:
   void remove_device (Device *device);
 
   /**
+   *  @brief Gets the device from a given ID (const version)
+   *
+   *  If the ID is not valid, null is returned.
+   */
+  const Device *device_by_id (size_t id) const
+  {
+    return (const_cast<Circuit *> (this)->device_by_id (id));
+  }
+
+  /**
+   *  @brief Gets the device from a given ID (const version)
+   *
+   *  If the ID is not valid, null is returned.
+   */
+  Device *device_by_id (size_t id);
+
+  /**
    *  @brief Begin iterator for the devices of the circuit (non-const version)
    */
   device_iterator begin_devices ()
@@ -1127,6 +1164,8 @@ private:
   sub_circuit_list m_sub_circuits;
   Netlist *mp_netlist;
   std::vector<Net::pin_iterator> m_pin_refs;
+  bool m_valid_device_id_table;
+  std::map<size_t, Device *> m_device_id_table;
 
   /**
    *  @brief Sets the pin reference for a specific pin
@@ -1138,6 +1177,9 @@ private:
   void set_netlist (Netlist *netlist);
   void combine_parallel_devices (const db::DeviceClass &cls);
   void combine_serial_devices (const db::DeviceClass &cls);
+
+  void validate_device_id_table ();
+  void invalidate_device_id_table ();
 };
 
 /**

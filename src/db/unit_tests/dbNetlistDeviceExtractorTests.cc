@@ -526,8 +526,7 @@ static std::string netlist2string (const db::Netlist &nl)
 
     res += std::string ("Circuit ") + c->name () + " (" + ps + "):\n";
 
-// @@@ good for debugging
-#if 0
+#if 0  //  for debugging
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
       res += "  N" + net_name (n.operator-> ()) + " pins=" + tl::to_string (n->pin_count ()) + " terminals=" + tl::to_string (n->terminal_count ()) + "\n";
     }

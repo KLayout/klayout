@@ -763,8 +763,9 @@ private:
   hier_clusters<T> *mp_tree;
   const cell_clusters_box_converter<T> *mp_cbc;
   const db::Connectivity *mp_conn;
-  std::map<id_type, std::set<id_type> *> m_cm2join_map;
-  std::list<std::set<id_type> > m_cm2join_sets;
+  typedef std::list<std::set<id_type> > join_set_list;
+  std::map<id_type, typename join_set_list::iterator> m_cm2join_map;
+  join_set_list m_cm2join_sets;
 
   /**
    *  @brief Handles the cluster interactions between two instances or instance arrays
@@ -987,8 +988,8 @@ private:
    */
   void mark_to_join (id_type a, id_type b)
   {
-    typename std::map<id_type, std::set<id_type> *>::const_iterator x = m_cm2join_map.find (a);
-    typename std::map<id_type, std::set<id_type> *>::const_iterator y = m_cm2join_map.find (b);
+    typename std::map<id_type, typename join_set_list::iterator>::const_iterator x = m_cm2join_map.find (a);
+    typename std::map<id_type, typename join_set_list::iterator>::const_iterator y = m_cm2join_map.find (b);
 
     if (x == m_cm2join_map.end ()) {
 
@@ -998,8 +999,8 @@ private:
         m_cm2join_sets.back ().insert (a);
         m_cm2join_sets.back ().insert (b);
 
-        m_cm2join_map [a] = &m_cm2join_sets.back ();
-        m_cm2join_map [b] = &m_cm2join_sets.back ();
+        m_cm2join_map [a] = --m_cm2join_sets.end ();
+        m_cm2join_map [b] = --m_cm2join_sets.end ();
 
       } else {
 
@@ -1016,25 +1017,25 @@ private:
     } else if (x->second != y->second) {
 
       //  join two superclusters
-      std::set<id_type> &yset = *y->second;
-      x->second->insert (yset.begin (), yset.end ());
-      for (typename std::set<id_type>::const_iterator i = yset.begin (); i != yset.end (); ++i) {
+      typename join_set_list::iterator yset = y->second;
+      x->second->insert (yset->begin (), yset->end ());
+      for (typename std::set<id_type>::const_iterator i = yset->begin (); i != yset->end (); ++i) {
         m_cm2join_map [*i] = x->second;
       }
-      yset.clear (); //  TODO: no longer required, but we can't delete it, as we just have a pointer .. replace pointer by iterator!
+      m_cm2join_sets.erase (yset);
 
     }
 
 #if defined(DEBUG_HIER_NETWORK_PROCESSOR)
     //  concistency check for debugging
-    for (typename std::map<id_type, std::set<id_type> *>::const_iterator j = m_cm2join_map.begin (); j != m_cm2join_map.end (); ++j) {
+    for (typename std::map<id_type, typename join_set_list::iterator>::const_iterator j = m_cm2join_map.begin (); j != m_cm2join_map.end (); ++j) {
       tl_assert (j->second->find (j->first) != j->second->end ());
     }
 
     for (typename std::list<std::set<id_type> >::const_iterator i = m_cm2join_sets.begin (); i != m_cm2join_sets.end (); ++i) {
       for (typename std::set<id_type>::const_iterator j = i->begin(); j != i->end(); ++j) {
         tl_assert(m_cm2join_map.find (*j) != m_cm2join_map.end ());
-        tl_assert(m_cm2join_map[*j] == i.operator->());
+        tl_assert(m_cm2join_map[*j] == i);
       }
     }
 
@@ -1047,6 +1048,7 @@ private:
       }
     }
 #endif
+
   }
 
   /**

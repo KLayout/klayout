@@ -334,7 +334,15 @@ static std::string netlist2string (const db::Netlist &nl)
         }
         ts += t->name () + "=" + net_name (d->net_for_terminal (t->id ()));
       }
-      res += std::string ("  D") + d->device_class ()->name () + " " + device_name (*d) + " (" + ts + ")\n";
+      std::string ps;
+      const std::vector<db::DeviceParameterDefinition> &pd = d->device_class ()->parameter_definitions ();
+      for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+        if (p != pd.begin ()) {
+          ps += ",";
+        }
+        ps += p->name () + "=" + tl::to_string (d->parameter_value (p->id ()));
+      }
+      res += std::string ("  D") + d->device_class ()->name () + " " + device_name (*d) + " (" + ts + ") [" + ps + "]\n";
     }
 
     for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
@@ -507,10 +515,10 @@ TEST(1_DeviceAndNetExtraction)
     "  XINV2 $9 ($1=$I6,$2=$I45,$3=$I7,$4=VSS,$5=VDD)\n"
     "  XINV2 $10 ($1=$I7,$2=$I46,$3=$I8,$4=VSS,$5=VDD)\n"
     "Circuit INV2 ($1=IN,$2=$2,$3=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS 1 (S=$2,G=IN,D=$5)\n"
-    "  DPMOS 2 (S=$5,G=$2,D=OUT)\n"
-    "  DNMOS 3 (S=$2,G=IN,D=$4)\n"
-    "  DNMOS 4 (S=$4,G=$2,D=OUT)\n"
+    "  DPMOS 1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS 2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS 3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS 4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
     "  XTRANS $1 ($1=$2,$2=$4,$3=IN)\n"
     "  XTRANS $2 ($1=$2,$2=$5,$3=IN)\n"
     "  XTRANS $3 ($1=$5,$2=OUT,$3=$2)\n"

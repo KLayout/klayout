@@ -435,14 +435,10 @@ static std::string net_name (const db::Net *net)
   }
 }
 
-//  @@@ TODO: refactor. This is inefficient. Give an ID automatically.
-static std::string device_name (const db::Device &device, const db::Circuit &circuit)
+static std::string device_name (const db::Device &device)
 {
   if (device.name ().empty ()) {
-    int id = 1;
-    for (db::Circuit::const_device_iterator d = circuit.begin_devices (); d != circuit.end_devices () && d.operator-> () != &device; ++d, ++id)
-      ;
-    return "$" + tl::to_string (id);
+    return "$" + tl::to_string (device.id ());
   } else {
     return device.name ();
   }
@@ -461,14 +457,11 @@ static std::string subcircuit_name (const db::SubCircuit &subcircuit, const db::
   }
 }
 
-//  @@@ TODO: refactor. This is inefficient. Give an ID automatically.
-static std::string pin_name (const db::Pin &pin, const db::Circuit &circuit)
+static std::string pin_name (const db::Pin &pin)
 {
   if (pin.name ().empty ()) {
-    int id = 1;
-    for (db::Circuit::const_pin_iterator p = circuit.begin_pins (); p != circuit.end_pins () && p.operator-> () != &pin; ++p, ++id)
-      ;
-    return "$" + tl::to_string (id);
+    //  the pin ID is zero-based and essentially the index, so we add 1 to make it compliant with the other IDs
+    return "$" + tl::to_string (pin.id () + 1);
   } else {
     return pin.name ();
   }
@@ -521,7 +514,7 @@ static std::string netlist2string (const db::Netlist &nl)
       if (! ps.empty ()) {
         ps += ",";
       }
-      ps += pin_name (*p, *c) + "=" + net_name (c->net_for_pin (p->id ()));
+      ps += pin_name (*p) + "=" + net_name (c->net_for_pin (p->id ()));
     }
 
     res += std::string ("Circuit ") + c->name () + " (" + ps + "):\n";
@@ -541,7 +534,7 @@ static std::string netlist2string (const db::Netlist &nl)
         }
         ts += t->name () + "=" + net_name (d->net_for_terminal (t->id ()));
       }
-      res += std::string ("  D") + d->device_class ()->name () + " " + device_name (*d, *c) + " (" + ts + ")\n";
+      res += std::string ("  D") + d->device_class ()->name () + " " + device_name (*d) + " (" + ts + ")\n";
     }
 
     for (db::Circuit::const_sub_circuit_iterator sc = c->begin_sub_circuits (); sc != c->end_sub_circuits (); ++sc) {
@@ -552,7 +545,7 @@ static std::string netlist2string (const db::Netlist &nl)
           ps += ",";
         }
         const db::Pin &pin = *p;
-        ps += pin_name (pin, *subcircuit.circuit ()) + "=" + net_name (subcircuit.net_for_pin (pin.id ()));
+        ps += pin_name (pin) + "=" + net_name (subcircuit.net_for_pin (pin.id ()));
       }
       res += std::string ("  X") + sc->circuit ()->name () + " " + subcircuit_name (*sc, *c) + " (" + ps + ")\n";
     }

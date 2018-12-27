@@ -99,87 +99,109 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
       circuit->add_net (net);
 
       if (! clusters.is_root (*c)) {
-
         //  a non-root cluster makes a pin
-        db::Pin pin (net->name ());
-        size_t pin_id = circuit->add_pin (pin).id ();
-        net->add_pin (db::NetPinRef (pin_id));
+        size_t pin_id = make_pin (circuit, net);
         c2p.insert (std::make_pair (*c, pin_id));
-        circuit->connect_pin (pin_id, net);
-
       }
 
-      const connected_clusters_type::connections_type &connections = clusters.connections_for_cluster (*c);
-      for (connected_clusters_type::connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
-
-        db::SubCircuit *subcircuit = 0;
-        db::cell_index_type ccid = i->inst ().inst_ptr.cell_index ();
-
-        std::map<db::InstElement, db::SubCircuit *>::const_iterator j = subcircuits.find (i->inst ());
-        if (j == subcircuits.end ()) {
-
-          //  make subcircuit if required
-
-          std::map<db::cell_index_type, db::Circuit *>::const_iterator k = circuits.find (ccid);
-          tl_assert (k != circuits.end ());  //  because we walk bottom-up
-
-          subcircuit = new db::SubCircuit (k->second);
-          db::CplxTrans dbu_trans (layout.dbu ());
-          subcircuit->set_trans (dbu_trans * i->inst ().complex_trans () * dbu_trans.inverted ());
-          circuit->add_subcircuit (subcircuit);
-          subcircuits.insert (std::make_pair (i->inst (), subcircuit));
-
-        } else {
-          subcircuit = j->second;
-        }
-
-        //  create the pin connection to the subcircuit
-        std::map<db::cell_index_type, std::map<size_t, size_t> >::const_iterator icc2p = pins_per_cluster.find (ccid);
-        tl_assert (icc2p != pins_per_cluster.end ());
-        std::map<size_t, size_t>::const_iterator ip = icc2p->second.find (i->id ());
-        tl_assert (ip != icc2p->second.end ());
-        subcircuit->connect_pin (ip->second, net);
-
-      }
+      //  make subcircuit connections (also make the subcircuits if required) from the connections of the clusters
+      make_and_connect_subcircuits (circuit, clusters, *c, net, subcircuits, circuits, pins_per_cluster, layout.dbu ());
 
       //  collect the properties - we know that the cluster attributes are property ID's because the
       //  cluster processor converts shape property IDs to attributes
       const local_cluster_type &lc = clusters.cluster_by_id (*c);
       for (local_cluster_type::attr_iterator a = lc.begin_attr (); a != lc.end_attr (); ++a) {
-
         const db::PropertiesRepository::properties_set &ps = layout.properties_repository ().properties (*a);
         for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
-
           if (terminal_annot_name_id.first && j->first == terminal_annot_name_id.second) {
-
-            if (j->second.is_user<db::NetlistProperty> ()) {
-              const db::NetlistProperty *np = &j->second.to_user<db::NetlistProperty> ();
-              const db::DeviceTerminalProperty *tp = dynamic_cast<const db::DeviceTerminalProperty *> (np);
-              if (tp) {
-                db::Device *device = circuit->device_by_id (tp->device_id ());
-                tl_assert (device != 0);
-                device->connect_terminal (tp->terminal_id (), net);
-              }
-            }
-
+            make_device_terminal_from_property (j->second, circuit, net);
           } else if (text_annot_name_id.first && j->first == text_annot_name_id.second) {
-
-            std::string n = j->second.to_string ();
-            if (! n.empty ()) {
-              if (! net->name ().empty ()) {
-                n = net->name () + "," + n;
-              }
-              net->set_name (n);
-            }
-
+            make_net_name_from_property (j->second, net);
           }
-
         }
-
       }
 
     }
 
+  }
+}
+
+void NetlistExtractor::make_and_connect_subcircuits (db::Circuit *circuit,
+                                                     const connected_clusters_type &clusters,
+                                                     size_t cid,
+                                                     db::Net *net,
+                                                     std::map<db::InstElement, db::SubCircuit *> &subcircuits,
+                                                     const std::map<db::cell_index_type, db::Circuit *> &circuits,
+                                                     const std::map<db::cell_index_type, std::map<size_t, size_t> > &pins_per_cluster,
+                                                     double dbu)
+{
+  const connected_clusters_type::connections_type &connections = clusters.connections_for_cluster (cid);
+  for (connected_clusters_type::connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
+
+    db::SubCircuit *subcircuit = 0;
+    db::cell_index_type ccid = i->inst ().inst_ptr.cell_index ();
+
+    std::map<db::InstElement, db::SubCircuit *>::const_iterator j = subcircuits.find (i->inst ());
+    if (j == subcircuits.end ()) {
+
+      //  make subcircuit if required
+
+      std::map<db::cell_index_type, db::Circuit *>::const_iterator k = circuits.find (ccid);
+      tl_assert (k != circuits.end ());  //  because we walk bottom-up
+
+      subcircuit = new db::SubCircuit (k->second);
+      db::CplxTrans dbu_trans (dbu);
+      subcircuit->set_trans (dbu_trans * i->inst ().complex_trans () * dbu_trans.inverted ());
+      circuit->add_subcircuit (subcircuit);
+      subcircuits.insert (std::make_pair (i->inst (), subcircuit));
+
+    } else {
+      subcircuit = j->second;
+    }
+
+    //  create the pin connection to the subcircuit
+    std::map<db::cell_index_type, std::map<size_t, size_t> >::const_iterator icc2p = pins_per_cluster.find (ccid);
+    tl_assert (icc2p != pins_per_cluster.end ());
+    std::map<size_t, size_t>::const_iterator ip = icc2p->second.find (i->id ());
+    tl_assert (ip != icc2p->second.end ());
+    subcircuit->connect_pin (ip->second, net);
+
+  }
+}
+
+size_t NetlistExtractor::make_pin (db::Circuit *circuit, db::Net *net)
+{
+  db::Pin pin (net->name ());
+
+  size_t pin_id = circuit->add_pin (pin).id ();
+  net->add_pin (db::NetPinRef (pin_id));
+
+  circuit->connect_pin (pin_id, net);
+
+  return pin_id;
+}
+
+void NetlistExtractor::make_device_terminal_from_property (const tl::Variant &v, db::Circuit *circuit, db::Net *net)
+{
+  if (v.is_user<db::NetlistProperty> ()) {
+    const db::NetlistProperty *np = &v.to_user<db::NetlistProperty> ();
+    const db::DeviceTerminalProperty *tp = dynamic_cast<const db::DeviceTerminalProperty *> (np);
+    if (tp) {
+      db::Device *device = circuit->device_by_id (tp->device_id ());
+      tl_assert (device != 0);
+      device->connect_terminal (tp->terminal_id (), net);
+    }
+  }
+}
+
+void NetlistExtractor::make_net_name_from_property (const tl::Variant &v, db::Net *net)
+{
+  std::string n = v.to_string ();
+  if (! n.empty ()) {
+    if (! net->name ().empty ()) {
+      n = net->name () + "," + n;
+    }
+    net->set_name (n);
   }
 }
 

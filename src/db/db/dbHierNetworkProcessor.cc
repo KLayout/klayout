@@ -28,6 +28,7 @@
 #include "dbPolygon.h"
 #include "dbPolygonTools.h"
 #include "dbBoxScanner.h"
+#include "dbDeepRegion.h"
 #include "tlProgress.h"
 #include "tlLog.h"
 #include "tlTimer.h"
@@ -62,6 +63,18 @@ Connectivity::connect (unsigned int l)
 {
   m_connected [l].insert (l);
   m_all_layers.insert (l);
+}
+
+void
+Connectivity::connect (const db::DeepLayer &l)
+{
+  connect (l.layer ());
+}
+
+void
+Connectivity::connect (const db::DeepLayer &la, const db::DeepLayer &lb)
+{
+  connect (la.layer (), lb.layer ());
 }
 
 Connectivity::layer_iterator

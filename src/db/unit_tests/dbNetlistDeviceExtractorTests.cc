@@ -48,10 +48,9 @@ class MOSFETExtractor
   : public db::NetlistDeviceExtractor
 {
 public:
-  MOSFETExtractor (db::Netlist &nl, db::Layout *debug_out)
+  MOSFETExtractor (db::Layout *debug_out)
     : db::NetlistDeviceExtractor (), mp_debug_out (debug_out), m_ldiff (0), m_lgate (0)
   {
-    initialize (&nl);
     if (mp_debug_out) {
       m_ldiff = mp_debug_out->insert_layer (db::LayerProperties (100, 0));
       m_lgate = mp_debug_out->insert_layer (db::LayerProperties (101, 0));
@@ -230,14 +229,9 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
   return lid;
 }
 
-//  @@@ TODO: move somewhere else
 static unsigned int layer_of (const db::Region &region)
 {
-  //  TODO: this is clumsy ...
-  db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (region.delegate ());
-  tl_assert (dr != 0);
-
-  return dr->deep_layer ().layer ();
+  return db::DeepLayer (region).layer ();
 }
 
 //  @@@ TODO: move somewhere else
@@ -255,42 +249,37 @@ public:
 
   void extract_nets (const db::DeepShapeStore &dss, const db::Connectivity &conn, db::Netlist *nl)
   {
-    //  only works for singular-layout stores currently. This rules out layers from different sources
-    //  and clipping.
-    tl_assert (dss.layouts () == 1);
-    const db::Layout *layout = dss.const_layout (0);
-
-    tl_assert (layout->cells () != 0);
-    const db::Cell &cell = layout->cell (*layout->begin_top_down ());
+    const db::Layout &layout = dss.const_layout ();
+    const db::Cell &cell = dss.const_initial_cell ();
 
     //  gets the text annotation property ID -
     //  this is how the texts are passed for annotating the net names
     std::pair<bool, db::property_names_id_type> text_annot_name_id (false, 0);
     if (! dss.text_property_name ().is_nil ()) {
-      text_annot_name_id = layout->properties_repository ().get_id_of_name (dss.text_property_name ());
+      text_annot_name_id = layout.properties_repository ().get_id_of_name (dss.text_property_name ());
     }
 
     //  gets the device terminal annotation property ID -
     //  this is how the device extractor conveys terminal shape annotations.
     std::pair<bool, db::property_names_id_type> terminal_annot_name_id;
-    terminal_annot_name_id = layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::terminal_property_name ());
+    terminal_annot_name_id = layout.properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::terminal_property_name ());
 
     //  the big part: actually extract the nets
 
-    m_net_clusters.build (*layout, cell, db::ShapeIterator::Polygons, conn);
+    m_net_clusters.build (layout, cell, db::ShapeIterator::Polygons, conn);
 
     //  reverse lookup for Circuit vs. cell index
     std::map<db::cell_index_type, db::Circuit *> circuits;
 
     //  some circuits may be there because of device extraction
     for (db::Netlist::circuit_iterator c = nl->begin_circuits (); c != nl->end_circuits (); ++c) {
-      tl_assert (layout->is_valid_cell_index (c->cell_index ()));
+      tl_assert (layout.is_valid_cell_index (c->cell_index ()));
       circuits.insert (std::make_pair (c->cell_index (), c.operator-> ()));
     }
 
     std::map<db::cell_index_type, std::map<size_t, size_t> > pins_per_cluster;
 
-    for (db::Layout::bottom_up_const_iterator cid = layout->begin_bottom_up (); cid != layout->end_bottom_up (); ++cid) {
+    for (db::Layout::bottom_up_const_iterator cid = layout.begin_bottom_up (); cid != layout.end_bottom_up (); ++cid) {
 
       const connected_clusters_type &clusters = m_net_clusters.clusters_per_cell (*cid);
       if (clusters.empty ()) {
@@ -305,7 +294,7 @@ public:
       if (k == circuits.end ()) {
         circuit = new db::Circuit ();
         nl->add_circuit (circuit);
-        circuit->set_name (layout->cell_name (*cid));
+        circuit->set_name (layout.cell_name (*cid));
         circuit->set_cell_index (*cid);
         circuits.insert (std::make_pair (*cid, circuit));
       } else {
@@ -348,7 +337,7 @@ public:
             tl_assert (k != circuits.end ());  //  because we walk bottom-up
 
             subcircuit = new db::SubCircuit (k->second);
-            db::CplxTrans dbu_trans (layout->dbu ());
+            db::CplxTrans dbu_trans (layout.dbu ());
             subcircuit->set_trans (dbu_trans * i->inst ().complex_trans () * dbu_trans.inverted ());
             circuit->add_subcircuit (subcircuit);
             subcircuits.insert (std::make_pair (i->inst (), subcircuit));
@@ -371,7 +360,7 @@ public:
         const local_cluster_type &lc = clusters.cluster_by_id (*c);
         for (local_cluster_type::attr_iterator a = lc.begin_attr (); a != lc.end_attr (); ++a) {
 
-          const db::PropertiesRepository::properties_set &ps = layout->properties_repository ().properties (*a);
+          const db::PropertiesRepository::properties_set &ps = layout.properties_repository ().properties (*a);
           for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
 
             if (terminal_annot_name_id.first && j->first == terminal_annot_name_id.second) {
@@ -624,15 +613,15 @@ TEST(1_DeviceNetExtraction)
   //  NOTE: the device extractor will add more debug layers for the transistors:
   //    20/0 -> Diffusion
   //    21/0 -> Gate
-  MOSFETExtractor ex (nl, &ly);
+  MOSFETExtractor ex (&ly);
 
-  std::vector<db::Region *> region_ptrs;
-  region_ptrs.push_back (&rpdiff);
-  region_ptrs.push_back (&rndiff);
-  region_ptrs.push_back (&rgate);
-  region_ptrs.push_back (&rpoly);
+  std::vector<db::DeepLayer> dl;
+  dl.push_back (rpdiff);
+  dl.push_back (rndiff);
+  dl.push_back (rgate);
+  dl.push_back (rpoly);
 
-  ex.extract (region_ptrs);
+  ex.extract (dss, dl, &nl);
 
   //  perform the net extraction
 
@@ -640,25 +629,25 @@ TEST(1_DeviceNetExtraction)
 
   db::Connectivity conn;
   //  Intra-layer
-  conn.connect (layer_of (rpdiff));
-  conn.connect (layer_of (rndiff));
-  conn.connect (layer_of (rpoly));
-  conn.connect (layer_of (rdiff_cont));
-  conn.connect (layer_of (rpoly_cont));
-  conn.connect (layer_of (rmetal1));
-  conn.connect (layer_of (rvia1));
-  conn.connect (layer_of (rmetal2));
+  conn.connect (rpdiff);
+  conn.connect (rndiff);
+  conn.connect (rpoly);
+  conn.connect (rdiff_cont);
+  conn.connect (rpoly_cont);
+  conn.connect (rmetal1);
+  conn.connect (rvia1);
+  conn.connect (rmetal2);
   //  Inter-layer
-  conn.connect (layer_of (rpdiff),     layer_of (rdiff_cont));
-  conn.connect (layer_of (rndiff),     layer_of (rdiff_cont));
-  conn.connect (layer_of (rpoly),      layer_of (rpoly_cont));
-  conn.connect (layer_of (rpoly_cont), layer_of (rmetal1));
-  conn.connect (layer_of (rdiff_cont), layer_of (rmetal1));
-  conn.connect (layer_of (rmetal1),    layer_of (rvia1));
-  conn.connect (layer_of (rvia1),      layer_of (rmetal2));
-  conn.connect (layer_of (rpoly),      layer_of (rpoly_lbl));     //  attaches labels
-  conn.connect (layer_of (rmetal1),    layer_of (rmetal1_lbl));   //  attaches labels
-  conn.connect (layer_of (rmetal2),    layer_of (rmetal2_lbl));   //  attaches labels
+  conn.connect (rpdiff,     rdiff_cont);
+  conn.connect (rndiff,     rdiff_cont);
+  conn.connect (rpoly,      rpoly_cont);
+  conn.connect (rpoly_cont, rmetal1);
+  conn.connect (rdiff_cont, rmetal1);
+  conn.connect (rmetal1,    rvia1);
+  conn.connect (rvia1,      rmetal2);
+  conn.connect (rpoly,      rpoly_lbl);     //  attaches labels
+  conn.connect (rmetal1,    rmetal1_lbl);   //  attaches labels
+  conn.connect (rmetal2,    rmetal2_lbl);   //  attaches labels
 
   //  extract the nets
 

@@ -42,12 +42,12 @@ TEST(1)
 
   EXPECT_EQ (dl1.layer (), l1);
   EXPECT_EQ (dl2.layer (), l2);
-  EXPECT_EQ (dl1.layout (), dl2.layout ());
+  EXPECT_EQ (&dl1.layout (), &dl2.layout ());
   EXPECT_EQ (store.layouts (), (unsigned int) 1);
 
   db::DeepLayer dl3 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c2), l1));
   EXPECT_EQ (dl3.layer (), l1);
-  EXPECT_NE (dl1.layout (), dl3.layout ());
+  EXPECT_NE (&dl1.layout (), &dl3.layout ());
   EXPECT_EQ (store.layouts (), (unsigned int) 2);
 
   db::DeepLayer dl4 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1, db::Box (0, 1, 2, 3)));
@@ -58,13 +58,13 @@ TEST(1)
 
   db::DeepLayer dl6 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1, db::Box (0, 1, 2, 3)));
   EXPECT_EQ (dl6.layer (), l2);  //  a new layer (a copy)
-  EXPECT_EQ (dl6.layout (), dl4.layout ());
+  EXPECT_EQ (&dl6.layout (), &dl4.layout ());
   EXPECT_EQ (store.layouts (), (unsigned int) 4);
 }
 
-static size_t shapes_in_top (const db::Layout *layout, unsigned int layer)
+static size_t shapes_in_top (const db::Layout &layout, unsigned int layer)
 {
-  const db::Cell &top = layout->cell (*layout->begin_top_down ());
+  const db::Cell &top = layout.cell (*layout.begin_top_down ());
   return top.shapes (layer).size ();
 }
 
@@ -162,23 +162,23 @@ TEST(3_TextTreatment)
   db::DeepLayer dl1 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1));
   EXPECT_EQ (store.layouts (), (unsigned int) 1);
 
-  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).empty (), true);
+  EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).empty (), true);
 
   store.set_text_enlargement (1);
   dl1 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1));
   EXPECT_EQ (store.layouts (), (unsigned int) 1);
 
-  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).size (), size_t (1));
-  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999)");
+  EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).size (), size_t (1));
+  EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999)");
 
   store.set_text_property_name (tl::Variant ("text"));
   dl1 = store.create_polygon_layer (db::RecursiveShapeIterator (layout, layout.cell (c1), l1));
   EXPECT_EQ (store.layouts (), (unsigned int) 1);
 
-  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).size (), size_t (1));
-  EXPECT_EQ (dl1.initial_cell ()->shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999) prop_id=1");
+  EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).size (), size_t (1));
+  EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999) prop_id=1");
 
-  const db::Layout *dss_layout = store.const_layout (0);
+  const db::Layout *dss_layout = &store.const_layout (0);
   db::PropertiesRepository::properties_set ps = dss_layout->properties_repository ().properties (1);
   EXPECT_EQ (ps.size (), size_t (1));
   EXPECT_EQ (dss_layout->properties_repository ().prop_name (ps.begin ()->first).to_string (), "text");

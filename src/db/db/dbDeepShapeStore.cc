@@ -24,6 +24,8 @@
 #include "dbDeepShapeStore.h"
 #include "dbCellMapping.h"
 #include "dbLayoutUtils.h"
+#include "dbRegion.h"
+#include "dbDeepRegion.h"
 
 #include "tlTimer.h"
 
@@ -36,6 +38,14 @@ DeepLayer::DeepLayer ()
   : mp_store (), m_layout (0), m_layer (0)
 {
   //  .. nothing yet ..
+}
+
+DeepLayer::DeepLayer (const Region &region)
+  : mp_store (), m_layout (0), m_layer (0)
+{
+  const db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (region.delegate ());
+  tl_assert (dr != 0);
+  *this = dr->deep_layer ();
 }
 
 DeepLayer::DeepLayer (const DeepLayer &x)
@@ -82,7 +92,7 @@ DeepLayer::~DeepLayer ()
 DeepLayer
 DeepLayer::derived () const
 {
-  return DeepLayer (const_cast <db::DeepShapeStore *> (mp_store.get ()), m_layout, const_cast <db::Layout *> (layout ())->insert_layer ());
+  return DeepLayer (const_cast <db::DeepShapeStore *> (mp_store.get ()), m_layout, const_cast <db::Layout &> (layout ()).insert_layer ());
 }
 
 DeepLayer
@@ -91,9 +101,7 @@ DeepLayer::copy () const
   DeepLayer new_layer (derived ());
 
   db::DeepShapeStore *non_const_store = const_cast<db::DeepShapeStore *> (mp_store.get ());
-  if (non_const_store->layout (m_layout)) {
-    non_const_store->layout (m_layout)->copy_layer (m_layer, new_layer.layer ());
-  }
+  non_const_store->layout (m_layout).copy_layer (m_layer, new_layer.layer ());
 
   return new_layer;
 }
@@ -105,34 +113,32 @@ DeepLayer::insert_into (db::Layout *into_layout, db::cell_index_type into_cell, 
   const_cast<db::DeepShapeStore *> (mp_store.get ())->insert (*this, into_layout, into_cell, into_layer);
 }
 
-db::Layout *
+db::Layout &
 DeepLayer::layout ()
 {
   check_dss ();
   return mp_store->layout (m_layout);
 }
 
-const db::Layout *
+const db::Layout &
 DeepLayer::layout () const
 {
   check_dss ();
   return const_cast<db::DeepShapeStore *> (mp_store.get ())->layout (m_layout);
 }
 
-db::Cell *
+db::Cell &
 DeepLayer::initial_cell ()
 {
-  db::Layout *ly = layout ();
-  tl_assert (ly->begin_top_down () != ly->end_top_down ());
-  return &ly->cell (*ly->begin_top_down ());
+  check_dss ();
+  return mp_store->initial_cell (m_layout);
 }
 
-const db::Cell *
+const db::Cell &
 DeepLayer::initial_cell () const
 {
-  const db::Layout *ly = layout ();
-  tl_assert (ly->begin_top_down () != ly->end_top_down ());
-  return &ly->cell (*ly->begin_top_down ());
+  check_dss ();
+  return mp_store->const_initial_cell (m_layout);
 }
 
 void
@@ -192,6 +198,32 @@ DeepShapeStore::~DeepShapeStore ()
   m_layouts.clear ();
 }
 
+bool DeepShapeStore::is_singular () const
+{
+  return m_layouts.size () == 1;
+}
+
+void DeepShapeStore::require_singular () const
+{
+  if (! is_singular ()) {
+    throw tl::Exception (tl::to_string (tr ("Internal error: deep shape store isn't singular. This may happen if you try to mix hierarchical layers from different sources our you use clipping.")));
+  }
+}
+
+Cell &DeepShapeStore::initial_cell(unsigned int n)
+{
+  db::Layout &ly = layout (n);
+  tl_assert (ly.cells () > 0);
+  return ly.cell (*ly.begin_top_down ());
+}
+
+const db::Cell &DeepShapeStore::const_initial_cell (unsigned int n) const
+{
+  const db::Layout &ly = const_layout (n);
+  tl_assert (ly.cells () > 0);
+  return ly.cell (*ly.begin_top_down ());
+}
+
 void DeepShapeStore::set_text_enlargement (int enl)
 {
   m_text_enlargement = enl;
@@ -207,16 +239,16 @@ bool DeepShapeStore::is_valid_layout_index (unsigned int n) const
   return (n < (unsigned int) m_layouts.size () && m_layouts[n] != 0);
 }
 
-const db::Layout *DeepShapeStore::const_layout (unsigned int n) const
+const db::Layout &DeepShapeStore::const_layout (unsigned int n) const
 {
   tl_assert (is_valid_layout_index (n));
-  return &(m_layouts [n]->layout);
+  return m_layouts [n]->layout;
 }
 
-db::Layout *DeepShapeStore::layout (unsigned int n)
+db::Layout &DeepShapeStore::layout (unsigned int n)
 {
   tl_assert (is_valid_layout_index (n));
-  return &(m_layouts [n]->layout);
+  return m_layouts [n]->layout;
 }
 
 size_t DeepShapeStore::instance_count ()
@@ -395,14 +427,14 @@ DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_
 void
 DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer)
 {
-  const db::Layout *source_layout = deep_layer.layout ();
-  if (source_layout->begin_top_down () == source_layout->end_top_cells ()) {
+  const db::Layout &source_layout = deep_layer.layout ();
+  if (source_layout.begin_top_down () == source_layout.end_top_cells ()) {
     //  empty source - nothing to do.
     return;
   }
 
   //  prepare the transformation
-  db::ICplxTrans trans (source_layout->dbu () / into_layout->dbu ());
+  db::ICplxTrans trans (source_layout.dbu () / into_layout->dbu ());
 
   //  prepare a layer map
   std::map<unsigned int, unsigned int> lm;
@@ -413,10 +445,10 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
 
   //  prepare a vector with the source cells
   std::vector <db::cell_index_type> source_cells;
-  source_cells.push_back (*source_layout->begin_top_down());
+  source_cells.push_back (*source_layout.begin_top_down());
 
   //  actually copy the shapes
-  db::copy_shapes (*into_layout, *source_layout, trans, source_cells, cm.table (), lm);
+  db::copy_shapes (*into_layout, source_layout, trans, source_cells, cm.table (), lm);
 }
 
 }

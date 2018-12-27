@@ -62,49 +62,26 @@ static void insert_into_region (const db::PolygonRef &s, const db::ICplxTrans &t
   region.insert (s.obj ().transformed (tr * db::ICplxTrans (s.trans ())));
 }
 
-void NetlistDeviceExtractor::extract (const std::vector<db::Region *> regions)
+void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const std::vector<db::DeepLayer> &deep_layers, db::Netlist *nl)
 {
-  tl_assert (! regions.empty ());
+  db::Layout &layout = dss.layout ();
+  db::Cell &cell = dss.initial_cell ();
 
-  const db::Layout *layout = 0;
-  const db::Cell *cell = 0;
   std::vector<unsigned int> layers;
-  layers.reserve (regions.size ());
+  layers.reserve (deep_layers.size ());
 
-  for (std::vector<db::Region *>::const_iterator r = regions.begin (); r != regions.end (); ++r) {
-
-    //  TODO: this is clumsy ...
-    db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> ((*r)->delegate ());
-    tl_assert (dr != 0);
-
-    db::DeepLayer dl = dr->deep_layer ();
-    tl_assert (dl.layout () != 0);
-    tl_assert (dl.initial_cell () != 0);
-
-    if (! layout) {
-      layout = dl.layout ();
-    } else {
-      tl_assert (layout == dl.layout ());
-    }
-
-    if (! cell) {
-      cell = dl.initial_cell ();
-    } else {
-      tl_assert (cell == dl.initial_cell ());
-    }
-
-    layers.push_back (dl.layer ());
-
+  for (std::vector<db::DeepLayer>::const_iterator dl = deep_layers.begin (); dl != deep_layers.end (); ++dl) {
+    tl_assert (&dl->layout () == &layout);
+    layers.push_back (dl->layer ());
   }
 
-  //  NOTE: the const_cast's are there because the extraction will annotate the layout with port
-  //  shapes. That's not part of the initial design, where the underlying deep shape store is
-  //  immutable from the outside. But we know what we're doing.
-  extract (const_cast<db::Layout &> (*layout), const_cast<db::Cell &> (*cell), layers);
+  extract (layout, cell, layers, nl);
 }
 
-void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers)
+void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl)
 {
+  initialize (nl);
+
   typedef db::PolygonRef shape_type;
   db::ShapeIterator::flags_type shape_iter_flags = db::ShapeIterator::Polygons;
 

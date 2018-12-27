@@ -27,6 +27,7 @@
 #include "dbNetlist.h"
 #include "dbLayout.h"
 #include "dbHierNetworkProcessor.h"
+#include "dbDeepShapeStore.h"
 
 #include "gsiObject.h"
 
@@ -64,12 +65,6 @@ public:
   static const tl::Variant &terminal_property_name ();
 
   /**
-   *  @brief Initializes the extractor
-   *  This method will produce the device classes required for the device extraction.
-   */
-  void initialize (db::Netlist *nl);
-
-  /**
    *  @brief Performs the extraction
    *
    *  layout and cell specify the layout and the top cell from which to perform the
@@ -87,21 +82,17 @@ public:
    *
    *  NOTE: The extractor expects "PolygonRef" type layers.
    */
-  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers);
+  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, Netlist *netlist);
 
   /**
    *  @brief Extracts the devices from a list of regions
    *
    *  This method behaves identical to the other "extract" method, but accepts
-   *  regions for input.
-   *
-   *  As a requirement, the layout and initial cell of all of the regions
-   *  has to be identical.
-   *
-   *  Currently, the regions have to be deep regions.
+   *  DeepShape layers for input. By definition, these already have the "PolygonRef" type.
    */
-  void extract (const std::vector<db::Region *> regions);
+  void extract (DeepShapeStore &dss, const std::vector<DeepLayer> &layers, Netlist *netlist);
 
+protected:
   /**
    *  @brief Creates the device classes
    *  At least one device class needs to be defined. Use "register_device_class" to register
@@ -131,7 +122,6 @@ public:
    */
   virtual void extract_devices (const std::vector<db::Region> &layer_geometry);
 
-protected:
   /**
    *  @brief Registers a device class
    *  The device class object will become owned by the netlist and must not be deleted by
@@ -205,6 +195,12 @@ private:
   std::vector<db::DeviceClass *> m_device_classes;
   std::vector<unsigned int> m_layers;
   unsigned int m_device_name_index;
+
+  /**
+   *  @brief Initializes the extractor
+   *  This method will produce the device classes required for the device extraction.
+   */
+  void initialize (db::Netlist *nl);
 };
 
 }

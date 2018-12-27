@@ -40,6 +40,7 @@
 namespace db {
 
 class DeepShapeStore;
+class Region;
 
 /**
  *  @brief Represents a shape collection from the deep shape store
@@ -61,6 +62,12 @@ public:
   ~DeepLayer ();
 
   /**
+   *  @brief Conversion operator from Region to DeepLayer
+   *  This requires the Region to be a DeepRegion. Otherwise, this constructor will assert
+   */
+  DeepLayer (const Region &region);
+
+  /**
    *  @brief Copy constructor
    */
   DeepLayer (const DeepLayer &other);
@@ -74,23 +81,23 @@ public:
    *  @brief Gets the layout object
    *  The return value is guaranteed to be non-null.
    */
-  db::Layout *layout ();
+  Layout &layout();
 
   /**
    *  @brief Gets the layout object (const version)
    */
-  const db::Layout *layout () const;
+  const db::Layout &layout () const;
 
   /**
    *  @brief Gets the layout object
    *  The return value is guaranteed to be non-null.
    */
-  db::Cell *initial_cell ();
+  Cell &initial_cell();
 
   /**
    *  @brief Gets the initial cell object (const version)
    */
-  const db::Cell *initial_cell () const;
+  const db::Cell &initial_cell () const;
 
   /**
    *  @brief Gets the layer
@@ -186,6 +193,20 @@ public:
   ~DeepShapeStore ();
 
   /**
+   *  @brief Returns true, if the DeepShapeStore is singular
+   *
+   *  A "singular" shape store needs a single layout to keep the information.
+   *  This is the case, if all Regions derived from it share the same origin
+   *  and do not use clipping or region selection. Singular shape stores are
+   *  required for netlist extraction for example.
+   *
+   *  For a singular shape store, "layout()" will return the layout
+   *  object and "initial_cell()" will return the initial cell of the
+   *  only layout.
+   */
+  bool is_singular () const;
+
+  /**
    *  @brief Inserts a polygon layer into the deep shape store
    *
    *  This method will create a new layer inside the deep shape store as a
@@ -219,7 +240,72 @@ public:
   /**
    *  @brief Gets the nth layout (const version)
    */
-  const db::Layout *const_layout (unsigned int n) const;
+  const db::Layout &const_layout (unsigned int n) const;
+
+  /**
+   *  @brief Gets the nth layout (non-const version)
+   *
+   *  Don't try to mess too much with the layout object, you'll screw up the internals.
+   */
+  db::Layout &layout (unsigned int n);
+
+  /**
+   *  @brief Gets the initial cell of the nth layout (const version)
+   */
+  const db::Cell &const_initial_cell (unsigned int n) const;
+
+  /**
+   *  @brief Gets the initial cell of the nth layout (non-const version)
+   *
+   *  Don't try to mess too much with the cell object, you'll screw up the internals.
+   */
+  db::Cell &initial_cell (unsigned int n);
+
+  /**
+   *  @brief Gets the singular layout (const version)
+   *
+   *  This method will throw an exception if the deep shape store is not singular.
+   */
+  const db::Layout &const_layout () const
+  {
+    require_singular ();
+    return const_layout (0);
+  }
+
+  /**
+   *  @brief Gets the singular layout (non-const version)
+   *
+   *  This method will throw an exception if the deep shape store is not singular.
+   *  Don't try to mess too much with the layout object, you'll screw up the internals.
+   */
+  db::Layout &layout ()
+  {
+    require_singular ();
+    return layout (0);
+  }
+
+  /**
+   *  @brief Gets the initial cell of the singular layout (const version)
+   *
+   *  This method will throw an exception if the deep shape store is not singular.
+   */
+  const db::Cell &const_initial_cell () const
+  {
+    require_singular ();
+    return const_initial_cell (0);
+  }
+
+  /**
+   *  @brief Gets the initial cell of the singular layout (non-const version)
+   *
+   *  This method will throw an exception if the deep shape store is not singular.
+   *  Don't try to mess too much with the cell object, you'll screw up the internals.
+   */
+  db::Cell &initial_cell ()
+  {
+    require_singular ();
+    return initial_cell (0);
+  }
 
   /**
    *  @brief Gets the number of layouts
@@ -324,10 +410,10 @@ private:
 
   struct LayoutHolder;
 
-  db::Layout *layout (unsigned int n);
-
   void add_ref (unsigned int layout, unsigned int layer);
   void remove_ref (unsigned int layout, unsigned int layer);
+
+  void require_singular () const;
 
   typedef std::map<db::RecursiveShapeIterator, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
 

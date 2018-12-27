@@ -171,15 +171,15 @@ DeepRegion::begin_merged () const
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
 DeepRegion::begin_iter () const
 {
-  const db::Layout *layout = m_deep_layer.layout ();
-  if (layout->cells () == 0) {
+  const db::Layout &layout = m_deep_layer.layout ();
+  if (layout.cells () == 0) {
 
     return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ());
 
   } else {
 
-    const db::Cell &top_cell = layout->cell (*layout->begin_top_down ());
-    db::RecursiveShapeIterator iter (*m_deep_layer.layout (), top_cell, m_deep_layer.layer ());
+    const db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+    db::RecursiveShapeIterator iter (m_deep_layer.layout (), top_cell, m_deep_layer.layer ());
     return std::make_pair (iter, db::ICplxTrans ());
 
   }
@@ -236,7 +236,7 @@ bool
 DeepRegion::equals (const Region &other) const
 {
   const DeepRegion *other_delegate = dynamic_cast<const DeepRegion *> (other.delegate ());
-  if (other_delegate && other_delegate->m_deep_layer.layout () == m_deep_layer.layout ()
+  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()
       && other_delegate->m_deep_layer.layer () == m_deep_layer.layer ()) {
     return true;
   } else {
@@ -248,7 +248,7 @@ bool
 DeepRegion::less (const Region &other) const
 {
   const DeepRegion *other_delegate = dynamic_cast<const DeepRegion *> (other.delegate ());
-  if (other_delegate && other_delegate->m_deep_layer.layout () == m_deep_layer.layout ()) {
+  if (other_delegate && &other_delegate->m_deep_layer.layout () == &m_deep_layer.layout ()) {
     return other_delegate->m_deep_layer.layer () < m_deep_layer.layer ();
   } else {
     return AsIfFlatRegion::less (other);
@@ -348,7 +348,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
 
   db::BoolAndOrNotLocalOperation op (and_op, m_deep_layer.store ()->max_area_ratio (), m_deep_layer.store ()->max_vertex_count ());
 
-  db::LocalProcessor proc (const_cast <db::Layout *> (m_deep_layer.layout ()), const_cast <db::Cell *> (m_deep_layer.initial_cell ()), other->deep_layer ().layout (), other->deep_layer ().initial_cell ());
+  db::LocalProcessor proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
   proc.set_threads (m_deep_layer.store ()->threads ());
 
   proc.run (&op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
@@ -392,20 +392,20 @@ DeepRegion::xor_with (const Region &other) const
 void
 DeepRegion::add_from (const DeepLayer &dl)
 {
-  if (dl.layout () == deep_layer ().layout ()) {
+  if (&dl.layout () == &deep_layer ().layout ()) {
 
     //  intra-layout merge
 
-    deep_layer ().layout ()->copy_layer (dl.layer (), deep_layer ().layer ());
+    deep_layer ().layout ().copy_layer (dl.layer (), deep_layer ().layer ());
 
   } else {
 
     //  inter-layout merge
 
-    db::cell_index_type into_cell = deep_layer ().initial_cell ()->cell_index ();
-    db::Layout *into_layout = deep_layer ().layout ();
-    db::cell_index_type source_cell = dl.initial_cell ()->cell_index ();
-    const db::Layout *source_layout = dl.layout ();
+    db::cell_index_type into_cell = deep_layer ().initial_cell ().cell_index ();
+    db::Layout *into_layout = &deep_layer ().layout ();
+    db::cell_index_type source_cell = dl.initial_cell ().cell_index ();
+    const db::Layout *source_layout = &dl.layout ();
 
     db::CellMapping cm;
     cm.create_from_geometry_full (*into_layout, into_cell, *source_layout, source_cell);
@@ -439,7 +439,7 @@ DeepRegion::add_in_place (const Region &other)
 
     //  non-deep to deep merge (flat)
 
-    db::Shapes &shapes = deep_layer ().initial_cell ()->shapes (deep_layer ().layer ());
+    db::Shapes &shapes = deep_layer ().initial_cell ().shapes (deep_layer ().layer ());
     for (db::Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
       shapes.insert (*p);
     }

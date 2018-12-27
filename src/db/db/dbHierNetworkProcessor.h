@@ -36,6 +36,8 @@
 
 namespace db {
 
+class DeepLayer;
+
 /**
  *  @brief Defines the connectivity
  *
@@ -60,6 +62,20 @@ public:
    *  @brief Adds inter-layer connectivity
    */
   void connect (unsigned int la, unsigned int lb);
+
+  /**
+   *  @brief Adds intra-layer connectivity for layer l
+   *  This is a convenience method that takes a db::DeepLayer object.
+   *  It is assumed that all those layers originate from the same deep shape store.
+   */
+  void connect (const db::DeepLayer &l);
+
+  /**
+   *  @brief Adds inter-layer connectivity
+   *  This is a convenience method that takes a db::DeepLayer object.
+   *  It is assumed that all those layers originate from the same deep shape store.
+   */
+  void connect (const db::DeepLayer &la, const db::DeepLayer &lb);
 
   /**
    *  @brief Adds intra-layer connectivity for layer l

@@ -124,110 +124,46 @@ const tl::VariantUserClass<db::NetlistProperty> *NetlistProperty::variant_class 
 }
 
 // --------------------------------------------------------------------------------------------
-//  NetNameProperty Implementation
-
-NetNameProperty::NetNameProperty ()
-  : NetlistProperty ()
-{
-  //  .. nothing yet ..
-}
-
-NetNameProperty::NetNameProperty (const NetNameProperty &other)
-  : NetlistProperty (other), m_name (other.m_name)
-{
-  //  .. nothing yet ..
-}
-
-NetNameProperty::NetNameProperty (const std::string &n)
-  : NetlistProperty (), m_name (n)
-{
-  //  .. nothing yet ..
-}
-
-NetNameProperty &NetNameProperty::operator= (const NetNameProperty &other)
-{
-  NetlistProperty::operator= (other);
-  if (this != &other) {
-    m_name = other.m_name;
-  }
-  return *this;
-}
-
-void NetNameProperty::set_name (const std::string &n)
-{
-  m_name = n;
-}
-
-bool NetNameProperty::equals (const NetlistProperty *p) const
-{
-  const NetNameProperty *pp = static_cast<const NetNameProperty *> (p);
-  return NetlistProperty::equals (p) && m_name == pp->m_name;
-}
-
-bool NetNameProperty::less (const NetlistProperty *p) const
-{
-  if (! NetlistProperty::equals (p)) {
-    return NetlistProperty::less (p);
-  } else {
-    const NetNameProperty *pp = static_cast<const NetNameProperty *> (p);
-    return m_name < pp->m_name;
-  }
-}
-
-void NetNameProperty::assign (const NetlistProperty *p)
-{
-  NetlistProperty::assign (p);
-  const NetNameProperty *pp = static_cast<const NetNameProperty *> (p);
-  m_name = pp->m_name;
-}
-
-
-static const char *valid_netname_chars = "_.$[]():-,";
-
-std::string NetNameProperty::to_string () const
-{
-  return "name:" + tl::to_word_or_quoted_string (m_name, valid_netname_chars);
-}
-
-// --------------------------------------------------------------------------------------------
 //  DeviceTerminalProperty Implementation
 
 DeviceTerminalProperty::DeviceTerminalProperty ()
-  : NetlistProperty ()
+  : NetlistProperty (), m_terminal_id (0), m_device_id (0)
 {
   //  .. nothing yet ..
 }
 
 DeviceTerminalProperty::DeviceTerminalProperty (const DeviceTerminalProperty &other)
-  : NetlistProperty (other), m_terminal_ref (other.m_terminal_ref)
+  : NetlistProperty (other), m_terminal_id (other.m_terminal_id), m_device_id (other.m_device_id)
 {
   //  .. nothing yet ..
 }
 
-DeviceTerminalProperty::DeviceTerminalProperty (const db::NetTerminalRef &p)
-  : NetlistProperty (), m_terminal_ref (p)
+DeviceTerminalProperty::DeviceTerminalProperty (size_t device_id, size_t terminal_id)
+  : NetlistProperty (), m_terminal_id (terminal_id), m_device_id (device_id)
 {
   //  .. nothing yet ..
+}
+
+void DeviceTerminalProperty::set_terminal_ref (size_t device_id, size_t terminal_id)
+{
+  m_device_id = device_id;
+  m_terminal_id = terminal_id;
 }
 
 DeviceTerminalProperty &DeviceTerminalProperty::operator= (const DeviceTerminalProperty &other)
 {
   NetlistProperty::operator= (other);
   if (this != &other) {
-    m_terminal_ref = other.m_terminal_ref;
+    m_terminal_id = other.m_terminal_id;
+    m_device_id = other.m_device_id;
   }
   return *this;
-}
-
-void DeviceTerminalProperty::set_terminal_ref (const db::NetTerminalRef &p)
-{
-  m_terminal_ref = p;
 }
 
 bool DeviceTerminalProperty::equals (const NetlistProperty *p) const
 {
   const DeviceTerminalProperty *pp = static_cast<const DeviceTerminalProperty *> (p);
-  return NetlistProperty::equals (p) && m_terminal_ref == pp->m_terminal_ref;
+  return NetlistProperty::equals (p) && m_terminal_id == pp->m_terminal_id && m_device_id == pp->m_device_id;
 }
 
 bool DeviceTerminalProperty::less (const NetlistProperty *p) const
@@ -236,7 +172,11 @@ bool DeviceTerminalProperty::less (const NetlistProperty *p) const
     return NetlistProperty::less (p);
   } else {
     const DeviceTerminalProperty *pp = static_cast<const DeviceTerminalProperty *> (p);
-    return m_terminal_ref < pp->m_terminal_ref;
+    if (m_terminal_id != pp->m_terminal_id) {
+      return m_terminal_id < pp->m_terminal_id;
+    } else {
+      return m_device_id < pp->m_device_id;
+    }
   }
 }
 
@@ -244,17 +184,14 @@ void DeviceTerminalProperty::assign (const NetlistProperty *p)
 {
   NetlistProperty::assign (p);
   const DeviceTerminalProperty *pp = static_cast<const DeviceTerminalProperty *> (p);
-  m_terminal_ref = pp->m_terminal_ref;
+  m_terminal_id = pp->m_terminal_id;
+  m_device_id = pp->m_device_id;
 }
 
 
 std::string DeviceTerminalProperty::to_string () const
 {
-  if (m_terminal_ref.device () && m_terminal_ref.terminal_def ()) {
-    return "terminal:" + tl::to_word_or_quoted_string (m_terminal_ref.device ()->name ()) + ":" + tl::to_word_or_quoted_string (m_terminal_ref.terminal_def ()->name ());
-  } else {
-    return "terminal";
-  }
+  return tl::to_string (m_device_id) + ":" + tl::to_string (m_terminal_id);
 }
 
 }

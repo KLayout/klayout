@@ -152,78 +152,6 @@ public:
 };
 
 /**
- *  @brief A property meaning a net name
- */
-class DB_PUBLIC NetNameProperty
-  : public db::NetlistProperty
-{
-public:
-  /**
-   *  @brief Creates a netlist name property without a specific name
-   */
-  NetNameProperty ();
-
-  /**
-   *  @brief copy constructor
-   */
-  NetNameProperty (const NetNameProperty &other);
-
-  /**
-   *  @brief Creates a netlist name property with the given name
-   */
-  NetNameProperty (const std::string &n);
-
-  /**
-   *  @brief Assignment
-   */
-  NetNameProperty &operator= (const NetNameProperty &other);
-
-  /**
-   *  @brief Sets the name
-   */
-  void set_name (const std::string &n);
-
-  /**
-   *  @brief Gets the name
-   */
-  const std::string &name () const
-  {
-    return m_name;
-  }
-
-  /**
-   *  @brief Clones the object
-   */
-  virtual NetlistProperty *clone () const
-  {
-    return new NetNameProperty (*this);
-  }
-
-  /**
-   *  @brief Compares two objects (equal). Both types are guaranteed to be the same.
-   */
-  virtual bool equals (const NetlistProperty *) const;
-
-  /**
-   *  @brief Compares two objects (less). Both types are guaranteed to be the same.
-   */
-  virtual bool less (const NetlistProperty *) const;
-
-  /**
-   *  @brief Assigned the other object to self. Both types are guaranteed to be identical.
-   */
-  virtual void assign (const NetlistProperty *);
-
-  /**
-   *  @brief Converts to a string
-   */
-  virtual std::string to_string () const;
-
-private:
-  std::string m_name;
-};
-
-/**
  *  @brief A reference to a device terminal
  *
  *  This property is used to mark a shape as a device terminal reference.
@@ -248,7 +176,7 @@ public:
   /**
    *  @brief Creates a netlist name property with the given name
    */
-  DeviceTerminalProperty (const db::NetTerminalRef &terminal_ref);
+  DeviceTerminalProperty (size_t device_id, size_t terminal_id);
 
   /**
    *  @brief Assignment
@@ -258,14 +186,22 @@ public:
   /**
    *  @brief Sets the terminal reference
    */
-  void set_terminal_ref (const db::NetTerminalRef &terminal_ref);
+  void set_terminal_ref (size_t device_id, size_t terminal_id);
 
   /**
-   *  @brief Gets the terminal reference
+   *  @brief Gets the terminal ID
    */
-  const db::NetTerminalRef &terminal_ref () const
+  size_t terminal_id () const
   {
-    return m_terminal_ref;
+    return m_terminal_id;
+  }
+
+  /**
+   *  @brief Gets the device ID
+   */
+  size_t device_id () const
+  {
+    return m_device_id;
   }
 
   /**
@@ -297,7 +233,7 @@ public:
   virtual std::string to_string () const;
 
 private:
-  db::NetTerminalRef m_terminal_ref;
+  size_t m_terminal_id, m_device_id;
 };
 
 }

@@ -143,7 +143,6 @@ SOURCES = \
     dbDeepRegion.cc \
     dbHierNetworkProcessor.cc \
     dbNetlistProperty.cc \
-    gsiDeclDbNetlistProperty.cc \
     dbNetlist.cc \
     gsiDeclDbNetlist.cc \
     dbNetlistDeviceClasses.cc \

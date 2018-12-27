@@ -370,9 +370,6 @@ public:
         const local_cluster_type &lc = clusters.cluster_by_id (*c);
         for (local_cluster_type::attr_iterator a = lc.begin_attr (); a != lc.end_attr (); ++a) {
 
-          //  @@@ TODO: needs refactoring!!!
-          //  -> use two distinct and reserved property name ID's for names (=string) and device terminal refs (=single number) instead
-          //  of the scary DeviceTerminalProperty (pointer!!!)
           const db::PropertiesRepository::properties_set &ps = layout->properties_repository ().properties (*a);
           for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
 
@@ -381,11 +378,10 @@ public:
               if (j->second.is_user<db::NetlistProperty> ()) {
                 const db::NetlistProperty *np = &j->second.to_user<db::NetlistProperty> ();
                 const db::DeviceTerminalProperty *tp = dynamic_cast<const db::DeviceTerminalProperty *> (np);
-                const db::NetNameProperty *nnp = dynamic_cast<const db::NetNameProperty *> (np);
                 if (tp) {
-                  const_cast<db::Device *> (tp->terminal_ref ().device ())->connect_terminal (tp->terminal_ref ().terminal_id (), net);
-                } else if (nnp) {
-                  net->set_name (nnp->name ());
+                  db::Device *device = circuit->device_by_id (tp->device_id ());
+                  tl_assert (device != 0);
+                  device->connect_terminal (tp->terminal_id (), net);
                 }
               }
 

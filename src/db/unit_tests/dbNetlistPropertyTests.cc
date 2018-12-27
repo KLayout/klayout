@@ -28,58 +28,36 @@
 
 #include <memory>
 
-TEST(1_NameBasic)
+TEST(1_TerminalRefBasic)
 {
-  db::NetNameProperty name;
-  EXPECT_EQ (name.to_string (), "name:''");
+  db::DeviceTerminalProperty dp (42, 17);
+  EXPECT_EQ (dp.to_string (), "42:17");
+  EXPECT_EQ (dp.device_id () == 42, true);
+  EXPECT_EQ (dp.terminal_id () == 17, true);
 
-  name.set_name ("abc");
-  EXPECT_EQ (name.to_string (), "name:abc");
-  EXPECT_EQ (name.name (), "abc");
-
-  db::NetNameProperty n2 = name;
-  EXPECT_EQ (n2.name (), "abc");
-
-  n2 = db::NetNameProperty ("xyz");
-  EXPECT_EQ (n2.name (), "xyz");
-
-  n2.set_name ("\"quoted\"");
-  EXPECT_EQ (n2.to_string (), "name:'\"quoted\"'");
-}
-
-TEST(2_TerminalRefBasic)
-{
-  db::DeviceClass dc;
-  dc.add_terminal_definition (db::DeviceTerminalDefinition ("A", "Terminal A"));
-  dc.add_terminal_definition (db::DeviceTerminalDefinition ("B", "Terminal B"));
-
-  db::Device d (&dc, "D");
-
-  db::DeviceTerminalProperty dp (db::NetTerminalRef (&d, 1));
-  EXPECT_EQ (dp.to_string (), "terminal:D:B");
-
-  dp.set_terminal_ref (db::NetTerminalRef (&d, 0));
-  EXPECT_EQ (dp.to_string (), "terminal:D:A");
-  EXPECT_EQ (dp.terminal_ref () == db::NetTerminalRef (&d, 0), true);
+  dp.set_terminal_ref (2, 1);
+  EXPECT_EQ (dp.to_string (), "2:1");
+  EXPECT_EQ (dp.device_id () == 2, true);
+  EXPECT_EQ (dp.terminal_id () == 1, true);
 
   db::DeviceTerminalProperty dp2 = dp;
-  EXPECT_EQ (dp2.to_string (), "terminal:D:A");
+  EXPECT_EQ (dp2.to_string (), "2:1");
 }
 
-TEST(3_Variants)
+TEST(2_Variants)
 {
-  std::auto_ptr<db::NetNameProperty> nn (new db::NetNameProperty ());
-  nn->set_name ("net42");
+  std::auto_ptr<db::DeviceTerminalProperty> dp (new db::DeviceTerminalProperty ());
+  dp->set_terminal_ref (42, 17);
 
-  tl::Variant v (nn.release (), db::NetlistProperty::variant_class (), true);
+  tl::Variant v (dp.release (), db::NetlistProperty::variant_class (), true);
   EXPECT_EQ (v.is_user<db::NetlistProperty> (), true);
-  EXPECT_EQ (dynamic_cast<db::NetNameProperty &>(v.to_user<db::NetlistProperty> ()).name (), "net42");
-  EXPECT_EQ (v.to_string (), "name:net42");
+  EXPECT_EQ (dynamic_cast<db::DeviceTerminalProperty &>(v.to_user<db::NetlistProperty> ()).to_string (), "42:17");
+  EXPECT_EQ (v.to_string (), "42:17");
 
   tl::Variant vv = v;
   v = tl::Variant ();
   EXPECT_EQ (v.is_user<db::NetlistProperty> (), false);
   EXPECT_EQ (vv.is_user<db::NetlistProperty> (), true);
-  EXPECT_EQ (dynamic_cast<db::NetNameProperty &>(vv.to_user<db::NetlistProperty> ()).name (), "net42");
+  EXPECT_EQ (dynamic_cast<db::DeviceTerminalProperty &>(vv.to_user<db::NetlistProperty> ()).to_string (), "42:17");
 }
 

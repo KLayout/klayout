@@ -217,7 +217,7 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
   //  Build a property set for the DeviceTerminalProperty
   db::PropertiesRepository::properties_set ps;
   tl::Variant &v = ps.insert (std::make_pair (m_propname_id, tl::Variant ()))->second;
-  v = tl::Variant (new db::DeviceTerminalProperty (db::NetTerminalRef (device, terminal_id)), db::NetlistProperty::variant_class (), true);
+  v = tl::Variant (new db::DeviceTerminalProperty (device->id (), terminal_id), db::NetlistProperty::variant_class (), true);
   db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
 
   db::PolygonRef pr (polygon, mp_layout->shape_repository ());

@@ -581,7 +581,7 @@ static db::Device *create_device1 (db::Circuit *c, db::DeviceClass *dc, const st
 static db::SubCircuit *create_subcircuit1 (db::Circuit *c, db::Circuit *cc, const std::string &name)
 {
   db::SubCircuit *sc = new db::SubCircuit (cc, name);
-  c->add_sub_circuit (sc);
+  c->add_subcircuit (sc);
   return sc;
 }
 
@@ -671,10 +671,10 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
     "\n"
     "For more details see the \\SubCircuit class."
   ) +
-  gsi::method ("remove_subcircuit", &db::Circuit::remove_sub_circuit, gsi::arg ("subcircuit"),
+  gsi::method ("remove_subcircuit", &db::Circuit::remove_subcircuit, gsi::arg ("subcircuit"),
     "@brief Removes the given subcircuit from the circuit\n"
   ) +
-  gsi::iterator ("each_subcircuit", (db::Circuit::sub_circuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_sub_circuits, (db::Circuit::sub_circuit_iterator (db::Circuit::*) ()) &db::Circuit::end_sub_circuits,
+  gsi::iterator ("each_subcircuit", (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_subcircuits, (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::end_subcircuits,
     "@brief Iterates over the subcircuits of the circuit"
   ) +
   gsi::method ("netlist", (db::Netlist *(db::Circuit::*) ()) &db::Circuit::netlist,

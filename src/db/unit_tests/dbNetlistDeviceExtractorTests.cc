@@ -350,7 +350,7 @@ public:
             subcircuit = new db::SubCircuit (k->second);
             db::CplxTrans dbu_trans (layout->dbu ());
             subcircuit->set_trans (dbu_trans * i->inst ().complex_trans () * dbu_trans.inverted ());
-            circuit->add_sub_circuit (subcircuit);
+            circuit->add_subcircuit (subcircuit);
             subcircuits.insert (std::make_pair (i->inst (), subcircuit));
 
           } else {
@@ -530,7 +530,7 @@ static std::string netlist2string (const db::Netlist &nl)
       res += std::string ("  D") + d->device_class ()->name () + " " + device_name (*d) + " (" + ts + ")\n";
     }
 
-    for (db::Circuit::const_sub_circuit_iterator sc = c->begin_sub_circuits (); sc != c->end_sub_circuits (); ++sc) {
+    for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
       std::string ps;
       const db::SubCircuit &subcircuit = *sc;
       for (db::Circuit::const_pin_iterator p = sc->circuit ()->begin_pins (); p != sc->circuit ()->end_pins (); ++p) {

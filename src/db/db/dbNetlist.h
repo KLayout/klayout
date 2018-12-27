@@ -859,9 +859,9 @@ public:
   typedef tl::shared_collection<Net> net_list;
   typedef net_list::const_iterator const_net_iterator;
   typedef net_list::iterator net_iterator;
-  typedef tl::shared_collection<SubCircuit> sub_circuit_list;
-  typedef sub_circuit_list::const_iterator const_sub_circuit_iterator;
-  typedef sub_circuit_list::iterator sub_circuit_iterator;
+  typedef tl::shared_collection<SubCircuit> subcircuit_list;
+  typedef subcircuit_list::const_iterator const_subcircuit_iterator;
+  typedef subcircuit_list::iterator subcircuit_iterator;
 
   /**
    *  @brief Constructor
@@ -1093,12 +1093,12 @@ public:
    *
    *  The circuit takes over ownership of the object.
    */
-  void add_sub_circuit (SubCircuit *sub_circuit);
+  void add_subcircuit (SubCircuit *subcircuit);
 
   /**
    *  @brief Deletes a subcircuit from the circuit
    */
-  void remove_sub_circuit (SubCircuit *sub_circuit);
+  void remove_subcircuit (SubCircuit *subcircuit);
 
   /**
    *  @brief Gets the subcircuit from a given ID (const version)
@@ -1120,33 +1120,33 @@ public:
   /**
    *  @brief Begin iterator for the subcircuits of the circuit (non-const version)
    */
-  sub_circuit_iterator begin_sub_circuits ()
+  subcircuit_iterator begin_subcircuits ()
   {
-    return m_sub_circuits.begin ();
+    return m_subcircuits.begin ();
   }
 
   /**
    *  @brief End iterator for the subcircuits of the circuit (non-const version)
    */
-  sub_circuit_iterator end_sub_circuits ()
+  subcircuit_iterator end_subcircuits ()
   {
-    return m_sub_circuits.end ();
+    return m_subcircuits.end ();
   }
 
   /**
    *  @brief Begin iterator for the subcircuits of the circuit (const version)
    */
-  const_sub_circuit_iterator begin_sub_circuits () const
+  const_subcircuit_iterator begin_subcircuits () const
   {
-    return m_sub_circuits.begin ();
+    return m_subcircuits.begin ();
   }
 
   /**
    *  @brief End iterator for the subcircuits of the circuit (const version)
    */
-  const_sub_circuit_iterator end_sub_circuits () const
+  const_subcircuit_iterator end_subcircuits () const
   {
-    return m_sub_circuits.end ();
+    return m_subcircuits.end ();
   }
 
   /**
@@ -1198,7 +1198,7 @@ private:
   net_list m_nets;
   pin_list m_pins;
   device_list m_devices;
-  sub_circuit_list m_sub_circuits;
+  subcircuit_list m_subcircuits;
   Netlist *mp_netlist;
   std::vector<Net::pin_iterator> m_pin_refs;
   bool m_valid_device_id_table;

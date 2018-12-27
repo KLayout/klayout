@@ -220,7 +220,7 @@ static std::string netlist2 (const db::Circuit &c)
     res += "  D" + d->name () + ":" + pins + "\n";
   }
 
-  for (db::Circuit::const_sub_circuit_iterator s = c.begin_sub_circuits (); s != c.end_sub_circuits (); ++s) {
+  for (db::Circuit::const_subcircuit_iterator s = c.begin_subcircuits (); s != c.end_subcircuits (); ++s) {
     if (! s->circuit ()) {
       continue;
     }
@@ -415,13 +415,13 @@ TEST(4_NetlistSubcircuits)
 
   db::SubCircuit *sc1 = new db::SubCircuit (c2);
   sc1->set_name ("sc1");
-  c1->add_sub_circuit (sc1);
+  c1->add_subcircuit (sc1);
   EXPECT_EQ (sc1->id (), size_t (1));
   EXPECT_EQ (c1->subcircuit_by_id (sc1->id ()) == sc1, true);
 
   db::SubCircuit *sc2 = new db::SubCircuit (c2);
   sc2->set_name ("sc2");
-  c1->add_sub_circuit (sc2);
+  c1->add_subcircuit (sc2);
   EXPECT_EQ (sc2->id (), size_t (2));
   EXPECT_EQ (c1->subcircuit_by_id (sc2->id ()) == sc2, true);
 
@@ -656,10 +656,10 @@ TEST(8_NetSubCircuitsEditing)
   cc2.add_pin (db::Pin ("B"));
 
   db::SubCircuit *sc1 = new db::SubCircuit (&cc1, "sc1");
-  c.add_sub_circuit (sc1);
+  c.add_subcircuit (sc1);
 
   db::SubCircuit *sc2 = new db::SubCircuit (&cc2, "sc2");
-  c.add_sub_circuit (sc2);
+  c.add_subcircuit (sc2);
 
   db::Net *n1 = new db::Net ();
   n1->set_name ("n1");
@@ -722,8 +722,8 @@ TEST(8_NetSubCircuitsEditing)
   delete sc1;
   sc1 = 0;
 
-  EXPECT_EQ (c.begin_sub_circuits ()->name (), "sc2");
-  EXPECT_EQ (++c.begin_sub_circuits () == c.end_sub_circuits (), true);
+  EXPECT_EQ (c.begin_subcircuits ()->name (), "sc2");
+  EXPECT_EQ (++c.begin_subcircuits () == c.end_subcircuits (), true);
 
   EXPECT_EQ (net2string (*n1), "sc2:B");
   EXPECT_EQ (net2string (*n2), "sc2:A");

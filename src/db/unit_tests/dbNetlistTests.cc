@@ -269,16 +269,16 @@ TEST(4_CircuitDevices)
   db::Device *d2a = new db::Device (&dc2, "d2a");
   db::Device *d2b = new db::Device (&dc2, "d2b");
   c->add_device (d1);
-  EXPECT_EQ (d1->id (), 1);
+  EXPECT_EQ (d1->id (), size_t (1));
   EXPECT_EQ (c->device_by_id (d1->id ()) == d1, true);
   c->add_device (dd);
-  EXPECT_EQ (dd->id (), 2);
+  EXPECT_EQ (dd->id (), size_t (2));
   EXPECT_EQ (c->device_by_id (dd->id ()) == dd, true);
   c->add_device (d2a);
-  EXPECT_EQ (d2a->id (), 3);
+  EXPECT_EQ (d2a->id (), size_t (3));
   EXPECT_EQ (c->device_by_id (d2a->id ()) == d2a, true);
   c->add_device (d2b);
-  EXPECT_EQ (d2b->id (), 4);
+  EXPECT_EQ (d2b->id (), size_t (4));
   EXPECT_EQ (c->device_by_id (d2b->id ()) == d2b, true);
   c->remove_device (dd);
   dd = 0;
@@ -416,10 +416,14 @@ TEST(4_NetlistSubcircuits)
   db::SubCircuit *sc1 = new db::SubCircuit (c2);
   sc1->set_name ("sc1");
   c1->add_sub_circuit (sc1);
+  EXPECT_EQ (sc1->id (), size_t (1));
+  EXPECT_EQ (c1->subcircuit_by_id (sc1->id ()) == sc1, true);
 
   db::SubCircuit *sc2 = new db::SubCircuit (c2);
   sc2->set_name ("sc2");
   c1->add_sub_circuit (sc2);
+  EXPECT_EQ (sc2->id (), size_t (2));
+  EXPECT_EQ (c1->subcircuit_by_id (sc2->id ()) == sc2, true);
 
   db::Net *n2a = new db::Net ();
   c2->add_net (n2a);

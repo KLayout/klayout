@@ -176,6 +176,7 @@ void Device::set_parameter_value (const std::string &name, double v)
 //  SubCircuit class implementation
 
 SubCircuit::SubCircuit ()
+  : m_id (0)
 {
   //  .. nothing yet ..
 }
@@ -190,12 +191,13 @@ SubCircuit::~SubCircuit()
 }
 
 SubCircuit::SubCircuit (Circuit *circuit, const std::string &name)
-  : m_circuit (circuit), m_name (name)
+  : m_circuit (circuit), m_name (name), m_id (0)
 {
   //  .. nothing yet ..
 }
 
 SubCircuit::SubCircuit (const SubCircuit &other)
+  : m_id (0)
 {
   operator= (other);
 }
@@ -472,13 +474,13 @@ void Net::set_circuit (Circuit *circuit)
 //  Circuit class implementation
 
 Circuit::Circuit ()
-  : mp_netlist (0), m_valid_device_id_table (false)
+  : mp_netlist (0), m_valid_device_id_table (false), m_valid_subcircuit_id_table (false)
 {
   //  .. nothing yet ..
 }
 
 Circuit::Circuit (const Circuit &other)
-  : mp_netlist (0), m_valid_device_id_table (false)
+  : mp_netlist (0), m_valid_device_id_table (false), m_valid_subcircuit_id_table (false)
 {
   operator= (other);
 }
@@ -489,6 +491,7 @@ Circuit &Circuit::operator= (const Circuit &other)
 
     m_name = other.m_name;
     invalidate_device_id_table ();
+    invalidate_subcircuit_id_table ();
 
     for (const_pin_iterator i = other.begin_pins (); i != other.end_pins (); ++i) {
       add_pin (*i);
@@ -560,6 +563,10 @@ void Circuit::clear ()
   m_devices.clear ();
   m_nets.clear ();
   m_sub_circuits.clear ();
+  m_device_id_table.clear ();
+  m_subcircuit_id_table.clear ();
+  m_valid_device_id_table = false;
+  m_valid_subcircuit_id_table = false;
 }
 
 void Circuit::set_name (const std::string &name)
@@ -637,12 +644,47 @@ Device *Circuit::device_by_id (size_t id)
 
 void Circuit::add_sub_circuit (SubCircuit *sub_circuit)
 {
+  size_t id = 0;
+  if (! m_sub_circuits.empty ()) {
+    tl_assert (m_sub_circuits.back () != 0);
+    id = m_sub_circuits.back ()->id ();
+  }
+  sub_circuit->set_id (id + 1);
+
   m_sub_circuits.push_back (sub_circuit);
+  invalidate_subcircuit_id_table ();
 }
 
 void Circuit::remove_sub_circuit (SubCircuit *sub_circuit)
 {
   m_sub_circuits.erase (sub_circuit);
+  invalidate_subcircuit_id_table ();
+}
+
+void Circuit::validate_subcircuit_id_table ()
+{
+  m_subcircuit_id_table.clear ();
+  for (sub_circuit_iterator d = begin_sub_circuits (); d != end_sub_circuits (); ++d) {
+    m_subcircuit_id_table.insert (std::make_pair (d->id (), d.operator-> ()));
+  }
+
+  m_valid_subcircuit_id_table = true;
+}
+
+void Circuit::invalidate_subcircuit_id_table ()
+{
+  m_valid_subcircuit_id_table = false;
+  m_subcircuit_id_table.clear ();
+}
+
+SubCircuit *Circuit::subcircuit_by_id (size_t id)
+{
+  if (! m_valid_subcircuit_id_table) {
+    validate_subcircuit_id_table ();
+  }
+
+  std::map<size_t, SubCircuit *>::const_iterator d = m_subcircuit_id_table.find (id);
+  return d != m_subcircuit_id_table.end () ? d->second : 0;
 }
 
 void Circuit::translate_circuits (const std::map<const Circuit *, Circuit *> &map)

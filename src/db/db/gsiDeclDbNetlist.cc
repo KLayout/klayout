@@ -128,6 +128,12 @@ Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
   gsi::method ("circuit", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit,
     "@brief Gets the circuit referenced by the subcircuit.\n"
   ) +
+  gsi::method ("id", &db::SubCircuit::id,
+    "@brief Gets the subcircuit ID.\n"
+    "The ID is a unique integer which identifies the subcircuit.\n"
+    "It can be used to retrieve the subcircuit from the circuit using \\Circuit#subcircuit_by_id.\n"
+    "When assigned, the subcircuit ID is not 0.\n"
+  ) +
   gsi::method ("name=", &db::SubCircuit::set_name, gsi::arg ("name"),
     "@brief Sets the name of the subcircuit.\n"
     "SubCircuit names are used to name a subcircuits inside a netlist file. "
@@ -616,6 +622,10 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::method ("device_by_id", (db::Device *(db::Circuit::*) (size_t)) &db::Circuit::device_by_id, gsi::arg ("id"),
     "@brief Gets the device object for a given ID.\n"
     "If the ID is not a valid device ID, nil is returned."
+  ) +
+  gsi::method ("subcircuit_by_id", (db::SubCircuit *(db::Circuit::*) (size_t)) &db::Circuit::subcircuit_by_id, gsi::arg ("id"),
+    "@brief Gets the subcircuit object for a given ID.\n"
+    "If the ID is not a valid subcircuit ID, nil is returned."
   ) +
   gsi::method ("pin_by_id", &db::Circuit::pin_by_id, gsi::arg ("id"),
     "@brief Gets the \\Pin object corresponding to a specific ID\n"

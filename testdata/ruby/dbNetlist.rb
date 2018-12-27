@@ -260,6 +260,8 @@ class DBNetlist_TestClass < TestBase
     sc1.name = "SC1"
     assert_equal(sc1.name, "SC1")
     assert_equal(sc1.circuit.name, "CC")
+    assert_equal(c.subcircuit_by_id(sc1.id).id, 1)
+    assert_equal(c.subcircuit_by_id(2).inspect, "nil")
 
     sc2 = c.create_subcircuit(cc)
     sc2.name = "SC2"

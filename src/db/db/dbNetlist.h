@@ -727,6 +727,17 @@ public:
   ~SubCircuit ();
 
   /**
+   *  @brief Gets the subcircuit ID
+   *  The ID is a unique integer which identifies the subcircuit.
+   *  It can be used to retrieve the subcircuit from the circuit using Circuit::subcircuit_by_id.
+   *  When assigned, the subcircuit ID is not 0.
+   */
+  size_t id () const
+  {
+    return m_id;
+  }
+
+  /**
    *  @brief Gets the circuit the reference points to (const version)
    */
   const Circuit *circuit () const
@@ -805,6 +816,7 @@ private:
   std::string m_name;
   db::DCplxTrans m_trans;
   std::vector<Net::pin_iterator> m_pin_refs;
+  size_t m_id;
 
   /**
    *  @brief Sets the pin reference for a specific pin
@@ -817,6 +829,14 @@ private:
   void set_circuit (Circuit *c)
   {
     m_circuit.reset (c);
+  }
+
+  /**
+   *  @brief Sets the device ID
+   */
+  void set_id (size_t id)
+  {
+    m_id = id;
   }
 };
 
@@ -1081,6 +1101,23 @@ public:
   void remove_sub_circuit (SubCircuit *sub_circuit);
 
   /**
+   *  @brief Gets the subcircuit from a given ID (const version)
+   *
+   *  If the ID is not valid, null is returned.
+   */
+  const SubCircuit *subcircuit_by_id (size_t id) const
+  {
+    return (const_cast<Circuit *> (this)->subcircuit_by_id (id));
+  }
+
+  /**
+   *  @brief Gets the subcircuit from a given ID (const version)
+   *
+   *  If the ID is not valid, null is returned.
+   */
+  SubCircuit *subcircuit_by_id (size_t id);
+
+  /**
    *  @brief Begin iterator for the subcircuits of the circuit (non-const version)
    */
   sub_circuit_iterator begin_sub_circuits ()
@@ -1166,6 +1203,8 @@ private:
   std::vector<Net::pin_iterator> m_pin_refs;
   bool m_valid_device_id_table;
   std::map<size_t, Device *> m_device_id_table;
+  bool m_valid_subcircuit_id_table;
+  std::map<size_t, SubCircuit *> m_subcircuit_id_table;
 
   /**
    *  @brief Sets the pin reference for a specific pin
@@ -1180,6 +1219,8 @@ private:
 
   void validate_device_id_table ();
   void invalidate_device_id_table ();
+  void validate_subcircuit_id_table ();
+  void invalidate_subcircuit_id_table ();
 };
 
 /**

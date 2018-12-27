@@ -279,10 +279,12 @@ public:
 
     m_net_clusters.build (*layout, cell, db::ShapeIterator::Polygons, conn);
 
+    //  reverse lookup for Circuit vs. cell index
     std::map<db::cell_index_type, db::Circuit *> circuits;
+
     //  some circuits may be there because of device extraction
     for (db::Netlist::circuit_iterator c = nl->begin_circuits (); c != nl->end_circuits (); ++c) {
-      //  @@@ TODO: what if the circuits don't have a cell index?
+      tl_assert (layout->is_valid_cell_index (c->cell_index ()));
       circuits.insert (std::make_pair (c->cell_index (), c.operator-> ()));
     }
 
@@ -345,7 +347,6 @@ public:
             std::map<db::cell_index_type, db::Circuit *>::const_iterator k = circuits.find (ccid);
             tl_assert (k != circuits.end ());  //  because we walk bottom-up
 
-            // @@@ name?
             subcircuit = new db::SubCircuit (k->second);
             db::CplxTrans dbu_trans (layout->dbu ());
             subcircuit->set_trans (dbu_trans * i->inst ().complex_trans () * dbu_trans.inverted ());
@@ -440,14 +441,10 @@ static std::string device_name (const db::Device &device)
   }
 }
 
-//  @@@ TODO: refactor. This is inefficient. Give an ID automatically.
-static std::string subcircuit_name (const db::SubCircuit &subcircuit, const db::Circuit &circuit)
+static std::string subcircuit_name (const db::SubCircuit &subcircuit)
 {
   if (subcircuit.name ().empty ()) {
-    int id = 1;
-    for (db::Circuit::const_sub_circuit_iterator d = circuit.begin_sub_circuits (); d != circuit.end_sub_circuits () && d.operator-> () != &subcircuit; ++d, ++id)
-      ;
-    return "$" + tl::to_string (id);
+    return "$" + tl::to_string (subcircuit.id ());
   } else {
     return subcircuit.name ();
   }
@@ -543,7 +540,7 @@ static std::string netlist2string (const db::Netlist &nl)
         const db::Pin &pin = *p;
         ps += pin_name (pin) + "=" + net_name (subcircuit.net_for_pin (pin.id ()));
       }
-      res += std::string ("  X") + sc->circuit ()->name () + " " + subcircuit_name (*sc, *c) + " (" + ps + ")\n";
+      res += std::string ("  X") + sc->circuit ()->name () + " " + subcircuit_name (*sc) + " (" + ps + ")\n";
     }
 
   }

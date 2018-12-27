@@ -255,7 +255,7 @@ gsi::Class<lay::Technology> technology_decl ("Technology",
   gsi::method ("load", &lay::Technology::load, gsi::arg ("file"),
     "@brief Loads the technology definition from a file\n"
   ) +
-  gsi::method ("load", &lay::Technology::save, gsi::arg ("file"),
+  gsi::method ("save", &lay::Technology::save, gsi::arg ("file"),
     "@brief Saves the technology definition to a file\n"
   ) +
   gsi::method ("technology_names", &technology_names,

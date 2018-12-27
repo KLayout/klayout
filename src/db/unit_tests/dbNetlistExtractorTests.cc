@@ -355,7 +355,7 @@ static std::string netlist2string (const db::Netlist &nl)
   return res;
 }
 
-TEST(1_DeviceNetExtraction)
+TEST(1_DeviceAndNetExtraction)
 {
   db::Layout ly;
   db::LayerMap lmap;

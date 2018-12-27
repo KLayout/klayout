@@ -56,6 +56,14 @@ public:
   //  TODO: Do we need to declare input layers?
 
   /**
+   *  @brief Gets the property name for the device terminal annotation
+   *  Annotation happens through db::DeviceTerminalProperty objects attached to
+   *  the terminal shapes.
+   *  The name used for the property is the one returned by this function.
+   */
+  static const tl::Variant &terminal_property_name ();
+
+  /**
    *  @brief Initializes the extractor
    *  This method will produce the device classes required for the device extraction.
    */

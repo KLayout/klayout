@@ -41,6 +41,12 @@ NetlistDeviceExtractor::~NetlistDeviceExtractor ()
   //  .. nothing yet ..
 }
 
+const tl::Variant &NetlistDeviceExtractor::terminal_property_name ()
+{
+  static tl::Variant name ("TERMINAL");
+  return name;
+}
+
 void NetlistDeviceExtractor::initialize (db::Netlist *nl)
 {
   m_device_classes.clear ();
@@ -105,8 +111,8 @@ void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const 
   mp_layout = &layout;
   m_layers = layers;
 
-  //  terminal properties are kept in property index 0
-  m_propname_id = mp_layout->properties_repository ().prop_name_id (tl::Variant (int (0)));
+  //  terminal properties are kept in a property with the terminal_property_name name
+  m_propname_id = mp_layout->properties_repository ().prop_name_id (terminal_property_name ());
 
   tl_assert (m_netlist.get () != 0);
 

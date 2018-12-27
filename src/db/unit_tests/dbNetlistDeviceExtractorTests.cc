@@ -255,8 +255,6 @@ public:
 
   void extract_nets (const db::DeepShapeStore &dss, const db::Connectivity &conn, db::Netlist *nl)
   {
-    tl::Variant terminal_property_name (0); // @@@ take somewhere else
-
     //  only works for singular-layout stores currently. This rules out layers from different sources
     //  and clipping.
     tl_assert (dss.layouts () == 1);
@@ -265,17 +263,19 @@ public:
     tl_assert (layout->cells () != 0);
     const db::Cell &cell = layout->cell (*layout->begin_top_down ());
 
-    //  gets the text annotation property ID
+    //  gets the text annotation property ID -
+    //  this is how the texts are passed for annotating the net names
     std::pair<bool, db::property_names_id_type> text_annot_name_id (false, 0);
     if (! dss.text_property_name ().is_nil ()) {
       text_annot_name_id = layout->properties_repository ().get_id_of_name (dss.text_property_name ());
     }
 
-    //  gets the device terminal annotation property ID
-    std::pair<bool, db::property_names_id_type> terminal_annot_name_id (false, 0);
-    if (! terminal_property_name.is_nil ()) {
-      terminal_annot_name_id = layout->properties_repository ().get_id_of_name (terminal_property_name);
-    }
+    //  gets the device terminal annotation property ID -
+    //  this is how the device extractor conveys terminal shape annotations.
+    std::pair<bool, db::property_names_id_type> terminal_annot_name_id;
+    terminal_annot_name_id = layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::terminal_property_name ());
+
+    //  the big part: actually extract the nets
 
     m_net_clusters.build (*layout, cell, db::ShapeIterator::Polygons, conn);
 

@@ -405,20 +405,9 @@ private:
   hier_clusters_type m_net_clusters;
 };
 
-//  @@@ TODO: move this somewhere else
 static std::string net_name (const db::Net *net)
 {
-  if (! net) {
-    return "(null)";
-  } else if (net->name ().empty ()) {
-    if (net->cluster_id () > std::numeric_limits<size_t>::max () / 2) {
-      return "$I" + tl::to_string ((std::numeric_limits<size_t>::max () - net->cluster_id ()) + 1);
-    } else {
-      return "$" + tl::to_string (net->cluster_id ());
-    }
-  } else {
-    return net->name ();
-  }
+  return net ? net->expanded_name () : "(null)";
 }
 
 static std::string device_name (const db::Device &device)

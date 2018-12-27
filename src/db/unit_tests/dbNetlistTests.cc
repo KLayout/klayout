@@ -547,6 +547,11 @@ TEST(6_Net)
   n2 = n;
   EXPECT_EQ (n2.name (), "n");
   EXPECT_EQ (int (n2.cluster_id ()), 17);
+  EXPECT_EQ (n2.expanded_name (), "n");
+  n2.set_name ("");
+  EXPECT_EQ (n2.expanded_name (), "$17");
+  n2.set_cluster_id (std::numeric_limits<size_t>::max () - 2);
+  EXPECT_EQ (n2.expanded_name (), "$I3");
 
   n.clear ();
   EXPECT_EQ (n.name (), "");

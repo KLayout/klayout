@@ -353,6 +353,14 @@ public:
   }
 
   /**
+   *  @brief Gets the expanded name
+   *
+   *  The "expanded name" is a non-empty name for the net. It uses the
+   *  cluster ID if no name is set.
+   */
+  std::string expanded_name () const;
+
+  /**
    *  @brief Sets the cluster ID of this net
    *
    *  The cluster ID links the net to a cluster from the

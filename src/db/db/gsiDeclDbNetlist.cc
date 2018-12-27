@@ -236,6 +236,10 @@ Class<db::Net> decl_dbNet ("db", "Net",
     "@brief Gets the name of the net.\n"
     "See \\name= for details about the name."
   ) +
+  gsi::method ("expanded_name", &db::Net::expanded_name,
+    "@brief Gets the expanded name of the net.\n"
+    "The expanded name takes the name of the net. If the name is empty, the cluster ID will be used to build a name. "
+  ) +
   gsi::method ("cluster_id=", &db::Net::set_cluster_id, gsi::arg ("id"),
     "@brief Sets the cluster ID of the net.\n"
     "The cluster ID connects the net with a layout cluster. It is set when "

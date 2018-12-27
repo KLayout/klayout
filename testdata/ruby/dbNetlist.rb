@@ -342,9 +342,14 @@ class DBNetlist_TestClass < TestBase
 
     net.name = "NET"
     assert_equal(net.name, "NET")
+    assert_equal(net.expanded_name, "NET")
     
     net.cluster_id = 42
     assert_equal(net.cluster_id, 42)
+    assert_equal(net.expanded_name, "NET")
+
+    net.name = ""
+    assert_equal(net.expanded_name, "$42")
 
   end
 

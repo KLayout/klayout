@@ -415,6 +415,20 @@ void Net::set_name (const std::string &name)
   m_name = name;
 }
 
+std::string Net::expanded_name () const
+{
+  if (name ().empty ()) {
+    if (cluster_id () > std::numeric_limits<size_t>::max () / 2) {
+      //  avoid printing huge ID numbers for internal cluster IDs
+      return "$I" + tl::to_string ((std::numeric_limits<size_t>::max () - cluster_id ()) + 1);
+    } else {
+      return "$" + tl::to_string (cluster_id ());
+    }
+  } else {
+    return name ();
+  }
+}
+
 void Net::set_cluster_id (size_t ci)
 {
   m_cluster_id = ci;

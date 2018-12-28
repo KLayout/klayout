@@ -609,6 +609,24 @@ public:
   }
 
   /**
+   *  @brief Gets the circuit the device lives in (const version)
+   *  This pointer is 0 if the device isn't added to a circuit
+   */
+  const Circuit *circuit () const
+  {
+    return mp_circuit;
+  }
+
+  /**
+   *  @brief Gets the circuit the device lives in (non-const version)
+   *  This pointer is 0 if the device isn't added to a circuit
+   */
+  Circuit *circuit ()
+  {
+    return mp_circuit;
+  }
+
+  /**
    *  @brief Sets the name
    */
   void set_name (const std::string &n);
@@ -675,6 +693,7 @@ private:
   std::vector<Net::terminal_iterator> m_terminal_refs;
   std::vector<double> m_parameters;
   size_t m_id;
+  Circuit *mp_circuit;
 
   /**
    *  @brief Sets the terminal reference for a specific terminal
@@ -696,6 +715,11 @@ private:
   {
     m_id = id;
   }
+
+  /**
+   *  @brief Sets the circuit
+   */
+  void set_circuit (Circuit *circuit);
 };
 
 /**
@@ -727,7 +751,7 @@ public:
   /**
    *  @brief Creates a subcircuit reference to the given circuit
    */
-  SubCircuit (Circuit *circuit, const std::string &name = std::string ());
+  SubCircuit (Circuit *circuit_ref, const std::string &name = std::string ());
 
   /**
    *  @brief Destructor
@@ -746,19 +770,37 @@ public:
   }
 
   /**
-   *  @brief Gets the circuit the reference points to (const version)
+   *  @brief Gets the circuit the subcircuit lives in (const version)
+   *  This pointer is 0 if the subcircuit isn't added to a circuit
    */
   const Circuit *circuit () const
   {
-    return m_circuit.get ();
+    return mp_circuit;
+  }
+
+  /**
+   *  @brief Gets the circuit the subcircuit lives in (non-const version)
+   *  This pointer is 0 if the subcircuit isn't added to a circuit
+   */
+  Circuit *circuit ()
+  {
+    return mp_circuit;
+  }
+
+  /**
+   *  @brief Gets the circuit the reference points to (const version)
+   */
+  const Circuit *circuit_ref () const
+  {
+    return m_circuit_ref.get ();
   }
 
   /**
    *  @brief Gets the circuit the reference points to (non-const version)
    */
-  Circuit *circuit ()
+  Circuit *circuit_ref ()
   {
-    return m_circuit.get ();
+    return m_circuit_ref.get ();
   }
 
   /**
@@ -820,11 +862,12 @@ private:
   friend class Circuit;
   friend class Net;
 
-  tl::weak_ptr<Circuit> m_circuit;
+  tl::weak_ptr<Circuit> m_circuit_ref;
   std::string m_name;
   db::DCplxTrans m_trans;
   std::vector<Net::pin_iterator> m_pin_refs;
   size_t m_id;
+  Circuit *mp_circuit;
 
   /**
    *  @brief Sets the pin reference for a specific pin
@@ -834,9 +877,14 @@ private:
   /**
    *  @brief Sets the circuit reference
    */
+  void set_circuit_ref (Circuit *c);
+
+  /**
+   *  @brief Sets the circuit the subcircuit belongs to
+   */
   void set_circuit (Circuit *c)
   {
-    m_circuit.reset (c);
+    mp_circuit = c;
   }
 
   /**
@@ -870,6 +918,8 @@ public:
   typedef tl::shared_collection<SubCircuit> subcircuit_list;
   typedef subcircuit_list::const_iterator const_subcircuit_iterator;
   typedef subcircuit_list::iterator subcircuit_iterator;
+  typedef tl::weak_collection<SubCircuit>::const_iterator const_refs_iterator;
+  typedef tl::weak_collection<SubCircuit>::iterator refs_iterator;
 
   /**
    *  @brief Constructor
@@ -940,8 +990,43 @@ public:
   }
 
   /**
+   *  @brief Gets the references to this circuit (begin, non-const version)
+   *  This iterator will deliver all subcircuits referencing this circuit
+   */
+  refs_iterator begin_refs ()
+  {
+    return m_refs.begin ();
+  }
+
+  /**
+   *  @brief Gets the references to this circuit (end, non-const version)
+   *  This iterator will deliver all subcircuits referencing this circuit
+   */
+  refs_iterator end_refs ()
+  {
+    return m_refs.end ();
+  }
+
+  /**
+   *  @brief Gets the references to this circuit (begin, const version)
+   *  This iterator will deliver all subcircuits referencing this circuit
+   */
+  const_refs_iterator begin_refs () const
+  {
+    return m_refs.begin ();
+  }
+
+  /**
+   *  @brief Gets the references to this circuit (end, const version)
+   *  This iterator will deliver all subcircuits referencing this circuit
+   */
+  const_refs_iterator end_refs () const
+  {
+    return m_refs.end ();
+  }
+
+  /**
    *  @brief Adds a pin to this circuit
-   *
    *  The circuit takes over ownership of the object.
    */
   const Pin &add_pin(const Pin &pin);
@@ -1200,6 +1285,7 @@ public:
 private:
   friend class Netlist;
   friend class Net;
+  friend class SubCircuit;
 
   std::string m_name;
   db::cell_index_type m_cell_index;
@@ -1213,11 +1299,15 @@ private:
   std::map<size_t, Device *> m_device_id_table;
   bool m_valid_subcircuit_id_table;
   std::map<size_t, SubCircuit *> m_subcircuit_id_table;
+  tl::weak_collection<SubCircuit> m_refs;
 
   /**
    *  @brief Sets the pin reference for a specific pin
    */
   void set_pin_ref_for_pin (size_t ppin_id, Net::pin_iterator iter);
+
+  void register_ref (SubCircuit *sc);
+  void unregister_ref (SubCircuit *sc);
 
   void translate_circuits (const std::map<const Circuit *, Circuit *> &map);
   void translate_device_classes (const std::map<const DeviceClass *, DeviceClass *> &map);

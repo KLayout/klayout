@@ -196,16 +196,24 @@ public:
   typedef std::map<std::string, db::Region *> input_layers;
 
   /**
-   *  @brief Default constructor
+   *  @brief Constructor
+   *
+   *  The name is the name of the device class of the devices generated.
    */
-  NetlistDeviceExtractor ();
+  NetlistDeviceExtractor (const std::string &name);
 
   /**
    *  @brief Destructor
    */
   ~NetlistDeviceExtractor ();
 
-  //  TODO: Do we need to declare input layers?
+  /**
+   *  @brief Gets the name of the extractor and the device class
+   */
+  const std::string &name ()
+  {
+    return m_name;
+  }
 
   /**
    *  @brief Gets the property name for the device terminal annotation
@@ -292,8 +300,7 @@ protected:
    *  defining the device classes and setting up the device layers.
    *
    *  At least one device class needs to be defined. Use "register_device_class" to register
-   *  the device classes you need. The first device class registered has device class index 0,
-   *  the further ones 1, 2, etc.
+   *  the device class you need.
    *
    *  The device layers need to be defined by calling "define_layer" once or several times.
    */
@@ -323,7 +330,8 @@ protected:
   /**
    *  @brief Registers a device class
    *  The device class object will become owned by the netlist and must not be deleted by
-   *  the caller.
+   *  the caller. The name of the device class will be changed to the name given to
+   *  the device extractor.
    *  This method shall be used inside the implementation of "setup" to register
    *  the device classes.
    */
@@ -343,7 +351,7 @@ protected:
    *  The device object returned can be configured by the caller, e.g. set parameters.
    *  It will be owned by the netlist and must not be deleted by the caller.
    */
-  Device *create_device (unsigned int device_class_index = 0);
+  Device *create_device ();
 
   /**
    *  @brief Defines a device terminal in the layout (a polygon)
@@ -436,11 +444,15 @@ private:
   db::properties_id_type m_propname_id;
   db::cell_index_type m_cell_index;
   db::Circuit *mp_circuit;
-  std::vector<db::DeviceClass *> m_device_classes;
+  db::DeviceClass *mp_device_class;
+  std::string m_name;
   layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;
-  unsigned int m_device_name_index;
   error_list m_errors;
+
+  //  no copying
+  NetlistDeviceExtractor (const NetlistDeviceExtractor &);
+  NetlistDeviceExtractor &operator= (const NetlistDeviceExtractor &);
 
   /**
    *  @brief Initializes the extractor
@@ -448,7 +460,7 @@ private:
    */
   void initialize (db::Netlist *nl);
 
-  void extract_without_initialize (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl);
+  void extract_without_initialize (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers);
 };
 
 }

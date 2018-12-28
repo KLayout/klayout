@@ -44,172 +44,6 @@
 #include <memory>
 #include <limits>
 
-class MOSFETExtractor
-  : public db::NetlistDeviceExtractor
-{
-public:
-  MOSFETExtractor (db::Layout *debug_out)
-    : db::NetlistDeviceExtractor (), mp_debug_out (debug_out), m_ldiff (0), m_lgate (0)
-  {
-    if (mp_debug_out) {
-      m_ldiff = mp_debug_out->insert_layer (db::LayerProperties (100, 0));
-      m_lgate = mp_debug_out->insert_layer (db::LayerProperties (101, 0));
-    }
-  }
-
-  virtual void setup ()
-  {
-    define_layer ("PD", "P diffusion");
-    define_layer ("ND", "N diffusion");
-    define_layer ("G", "Gate");
-    define_layer ("P", "Poly");
-
-    db::DeviceClassMOS3Transistor *pmos_class = new db::DeviceClassMOS3Transistor ();
-    pmos_class->set_name ("PMOS");
-    register_device_class (pmos_class);
-
-    db::DeviceClassMOS3Transistor *nmos_class = new db::DeviceClassMOS3Transistor ();
-    nmos_class->set_name ("NMOS");
-    register_device_class (nmos_class);
-  }
-
-  virtual db::Connectivity get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
-  {
-    tl_assert (layers.size () == 4);
-
-    unsigned int lpdiff = layers [0];
-    unsigned int lndiff = layers [1];
-    unsigned int gate = layers [2];
-    //  not used for device recognition: poly (3), but used for producing the gate terminals
-
-    //  The layer definition is pdiff, ndiff, gate
-    db::Connectivity conn;
-    //  collect all connected pdiff
-    conn.connect (lpdiff, lpdiff);
-    //  collect all connected ndiff
-    conn.connect (lndiff, lndiff);
-    //  collect all connected gate shapes
-    conn.connect (gate, gate);
-    //  connect gate with pdiff
-    conn.connect (lpdiff, gate);
-    //  connect gate with ndiff
-    conn.connect (lndiff, gate);
-    return conn;
-  }
-
-  virtual void extract_devices (const std::vector<db::Region> &layer_geometry)
-  {
-    const db::Region &rpdiff = layer_geometry [0];
-    const db::Region &rndiff = layer_geometry [1];
-    const db::Region &rgates = layer_geometry [2];
-
-    for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
-
-      db::Region rgate (*p);
-      db::Region rpdiff_on_gate = rpdiff.selected_interacting (rgate);
-      db::Region rndiff_on_gate = rndiff.selected_interacting (rgate);
-
-      if (! rpdiff_on_gate.empty () && ! rndiff_on_gate.empty ()) {
-        error (tl::to_string (tr ("Gate shape touches both ndiff and pdiff - ignored")), *p);
-      } else if (rpdiff_on_gate.empty () && rndiff_on_gate.empty ()) {
-        error (tl::to_string (tr ("Gate shape touches neither ndiff and pdiff - ignored")), *p);
-      } else {
-
-        bool is_pmos = ! rpdiff_on_gate.empty ();
-
-        db::Region &diff = (is_pmos ? rpdiff_on_gate : rndiff_on_gate);
-        unsigned int terminal_geometry_index = (is_pmos ? 0 : 1);
-        unsigned int gate_geometry_index = 3;
-        unsigned int device_class_index = (is_pmos ? 0 /*PMOS*/ : 1 /*NMOS*/);
-
-        if (diff.size () != 2) {
-          error (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting one gate shape (found %d) - gate shape ignored")), int (diff.size ())), *p);
-          continue;
-        }
-
-        db::Edges edges (rgate.edges () & diff.edges ());
-        if (edges.size () != 2) {
-          error (tl::sprintf (tl::to_string (tr ("Expected two edges interacting gate/diff (found %d) - width and length may be incorrect")), int (edges.size ())), *p);
-          continue;
-        }
-
-        if (! p->is_box ()) {
-          error (tl::to_string (tr ("Gate shape is not a box - width and length may be incorrect")), *p);
-        }
-
-        db::Device *device = create_device (device_class_index);
-
-        device->set_parameter_value ("W", dbu () * edges.length () * 0.5);
-        device->set_parameter_value ("L", dbu () * (p->perimeter () - edges.length ()) * 0.5);
-
-        int diff_index = 0;
-        for (db::Region::const_iterator d = diff.begin (); !d.at_end () && diff_index < 2; ++d, ++diff_index) {
-
-          //  count the number of gate shapes attached to this shape and distribute the area of the
-          //  diffusion region to the number of gates
-          int n = rgates.selected_interacting (db::Region (*d)).size ();
-          tl_assert (n > 0);
-
-          device->set_parameter_value (diff_index == 0 ? "AS" : "AD", dbu () * dbu () * d->area () / double (n));
-
-          define_terminal (device, device->device_class ()->terminal_id_for_name (diff_index == 0 ? "S" : "D"), terminal_geometry_index, *d);
-
-        }
-
-        define_terminal (device, device->device_class ()->terminal_id_for_name ("G"), gate_geometry_index, *p);
-
-        //  output the device for debugging
-        device_out (device, diff, rgate);
-
-      }
-
-    }
-  }
-
-private:
-  db::Layout *mp_debug_out;
-  unsigned int m_ldiff, m_lgate;
-
-  void device_out (const db::Device *device, const db::Region &diff, const db::Region &gate)
-  {
-    if (! mp_debug_out) {
-      return;
-    }
-
-    std::string cn = layout ()->cell_name (cell_index ());
-    std::pair<bool, db::cell_index_type> target_cp = mp_debug_out->cell_by_name (cn.c_str ());
-    tl_assert (target_cp.first);
-
-    db::cell_index_type dci = mp_debug_out->add_cell ((device->device_class ()->name () + "_" + device->name ()).c_str ());
-    mp_debug_out->cell (target_cp.second).insert (db::CellInstArray (db::CellInst (dci), db::Trans ()));
-
-    db::Cell &device_cell = mp_debug_out->cell (dci);
-    for (db::Region::const_iterator p = diff.begin (); ! p.at_end (); ++p) {
-      device_cell.shapes (m_ldiff).insert (*p);
-    }
-    for (db::Region::const_iterator p = gate.begin (); ! p.at_end (); ++p) {
-      device_cell.shapes (m_lgate).insert (*p);
-    }
-
-    std::string ps;
-    const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
-    for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-      if (! ps.empty ()) {
-        ps += ",";
-      }
-      ps += i->name () + "=" + tl::to_string (device->parameter_value (i->id ()));
-    }
-    device_cell.shapes (m_ldiff).insert (db::Text (ps, db::Trans (diff.bbox ().center () - db::Point ())));
-  }
-};
-
-static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_layer, int gds_datatype = 0)
-{
-  unsigned int lid = ly.insert_layer (db::LayerProperties (gds_layer, gds_datatype));
-  lmap.map (ly.get_properties (lid), lid);
-  return lid;
-}
-
 static unsigned int layer_of (const db::Region &region)
 {
   return db::DeepLayer (region).layer ();
@@ -246,6 +80,153 @@ static std::string pin_name (const db::Pin &pin)
   } else {
     return pin.name ();
   }
+}
+
+
+class MOSFETExtractor
+  : public db::NetlistDeviceExtractor
+{
+public:
+  MOSFETExtractor (const std::string &name, db::Layout *debug_out)
+    : db::NetlistDeviceExtractor (name), mp_debug_out (debug_out), m_ldiff (0), m_lgate (0)
+  {
+    if (mp_debug_out) {
+      m_ldiff = mp_debug_out->insert_layer (db::LayerProperties (100, 0));
+      m_lgate = mp_debug_out->insert_layer (db::LayerProperties (101, 0));
+    }
+  }
+
+  virtual void setup ()
+  {
+    define_layer ("SD", "Source/drain diffusion");
+    define_layer ("G", "Gate");
+    define_layer ("P", "Poly");
+
+    register_device_class (new db::DeviceClassMOS3Transistor ());
+  }
+
+  virtual db::Connectivity get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
+  {
+    tl_assert (layers.size () == 3);
+
+    unsigned int diff = layers [0];
+    unsigned int gate = layers [1];
+    //  not used for device recognition: poly (2), but used for producing the gate terminals
+
+    //  The layer definition is diff, gate
+    db::Connectivity conn;
+    //  collect all connected diffusion shapes
+    conn.connect (diff, diff);
+    //  collect all connected gate shapes
+    conn.connect (gate, gate);
+    //  connect gate with diff to detect gate/diffusion boundary
+    conn.connect (diff, gate);
+    return conn;
+  }
+
+  virtual void extract_devices (const std::vector<db::Region> &layer_geometry)
+  {
+    const db::Region &rdiff = layer_geometry [0];
+    const db::Region &rgates = layer_geometry [1];
+
+    for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
+
+      db::Region rgate (*p);
+      db::Region rdiff2gate = rdiff.selected_interacting (rgate);
+
+      if (rdiff2gate.empty ()) {
+        error (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
+      } else {
+
+        unsigned int terminal_geometry_index = 0;
+        unsigned int gate_geometry_index = 2;
+
+        if (rdiff2gate.size () != 2) {
+          error (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting one gate shape (found %d) - gate shape ignored")), int (rdiff2gate.size ())), *p);
+          continue;
+        }
+
+        db::Edges edges (rgate.edges () & rdiff2gate.edges ());
+        if (edges.size () != 2) {
+          error (tl::sprintf (tl::to_string (tr ("Expected two edges interacting gate/diff (found %d) - width and length may be incorrect")), int (edges.size ())), *p);
+          continue;
+        }
+
+        if (! p->is_box ()) {
+          error (tl::to_string (tr ("Gate shape is not a box - width and length may be incorrect")), *p);
+        }
+
+        db::Device *device = create_device ();
+
+        device->set_parameter_value ("W", dbu () * edges.length () * 0.5);
+        device->set_parameter_value ("L", dbu () * (p->perimeter () - edges.length ()) * 0.5);
+
+        int diff_index = 0;
+        for (db::Region::const_iterator d = rdiff2gate.begin (); !d.at_end () && diff_index < 2; ++d, ++diff_index) {
+
+          //  count the number of gate shapes attached to this shape and distribute the area of the
+          //  diffusion region to the number of gates
+          int n = rgates.selected_interacting (db::Region (*d)).size ();
+          tl_assert (n > 0);
+
+          device->set_parameter_value (diff_index == 0 ? "AS" : "AD", dbu () * dbu () * d->area () / double (n));
+
+          define_terminal (device, device->device_class ()->terminal_id_for_name (diff_index == 0 ? "S" : "D"), terminal_geometry_index, *d);
+
+        }
+
+        define_terminal (device, device->device_class ()->terminal_id_for_name ("G"), gate_geometry_index, *p);
+
+        //  output the device for debugging
+        device_out (device, rdiff2gate, rgate);
+
+      }
+
+    }
+  }
+
+private:
+  db::Layout *mp_debug_out;
+  unsigned int m_ldiff, m_lgate;
+
+  void device_out (const db::Device *device, const db::Region &diff, const db::Region &gate)
+  {
+    if (! mp_debug_out) {
+      return;
+    }
+
+    std::string cn = layout ()->cell_name (cell_index ());
+    std::pair<bool, db::cell_index_type> target_cp = mp_debug_out->cell_by_name (cn.c_str ());
+    tl_assert (target_cp.first);
+
+    db::cell_index_type dci = mp_debug_out->add_cell ((device->device_class ()->name () + "_" + device->circuit ()->name () + "_" + device_name (*device)).c_str ());
+    mp_debug_out->cell (target_cp.second).insert (db::CellInstArray (db::CellInst (dci), db::Trans ()));
+
+    db::Cell &device_cell = mp_debug_out->cell (dci);
+    for (db::Region::const_iterator p = diff.begin (); ! p.at_end (); ++p) {
+      device_cell.shapes (m_ldiff).insert (*p);
+    }
+    for (db::Region::const_iterator p = gate.begin (); ! p.at_end (); ++p) {
+      device_cell.shapes (m_lgate).insert (*p);
+    }
+
+    std::string ps;
+    const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
+    for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+      if (! ps.empty ()) {
+        ps += ",";
+      }
+      ps += i->name () + "=" + tl::to_string (device->parameter_value (i->id ()));
+    }
+    device_cell.shapes (m_ldiff).insert (db::Text (ps, db::Trans (diff.bbox ().center () - db::Point ())));
+  }
+};
+
+static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_layer, int gds_datatype = 0)
+{
+  unsigned int lid = ly.insert_layer (db::LayerProperties (gds_layer, gds_datatype));
+  lmap.map (ly.get_properties (lid), lid);
+  return lid;
 }
 
 //  @@@ TODO: move this somewhere else
@@ -329,14 +310,15 @@ static std::string netlist2string (const db::Netlist &nl)
     for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
       std::string ps;
       const db::SubCircuit &subcircuit = *sc;
-      for (db::Circuit::const_pin_iterator p = sc->circuit ()->begin_pins (); p != sc->circuit ()->end_pins (); ++p) {
-        if (p != sc->circuit ()->begin_pins ()) {
+      const db::Circuit *circuit = sc->circuit_ref ();
+      for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
+        if (p != circuit->begin_pins ()) {
           ps += ",";
         }
         const db::Pin &pin = *p;
         ps += pin_name (pin) + "=" + net_name (subcircuit.net_for_pin (pin.id ()));
       }
-      res += std::string ("  X") + sc->circuit ()->name () + " " + subcircuit_name (*sc) + " (" + ps + ")\n";
+      res += std::string ("  X") + circuit->name () + " " + subcircuit_name (*sc) + " (" + ps + ")\n";
     }
 
   }
@@ -344,7 +326,7 @@ static std::string netlist2string (const db::Netlist &nl)
   return res;
 }
 
-TEST(2_DeviceAndNetExtraction)
+TEST(1_DeviceAndNetExtraction)
 {
   db::Layout ly;
   db::LayerMap lmap;
@@ -396,10 +378,14 @@ TEST(2_DeviceAndNetExtraction)
   db::Region rmetal2_lbl (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss);
 
   //  derived regions
-  db::Region rgate  = ractive & rpoly;
-  db::Region rsd    = ractive - rgate;
-  db::Region rpdiff = rsd & rnwell;
-  db::Region rndiff = rsd - rnwell;
+
+  db::Region rpactive = ractive & rnwell;
+  db::Region rpgate   = rpactive & rpoly;
+  db::Region rpsd     = rpactive - rpgate;
+
+  db::Region rnactive = ractive - rnwell;
+  db::Region rngate   = rnactive & rpoly;
+  db::Region rnsd     = rnactive - rngate;
 
   //  return the computed layers into the original layout and write it for debugging purposes
 
@@ -408,10 +394,12 @@ TEST(2_DeviceAndNetExtraction)
   unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> P Diffusion
   unsigned int lndiff = ly.insert_layer (db::LayerProperties (13, 0));      // 13/0 -> N Diffusion
 
-  rgate.insert_into (&ly, tc.cell_index (), lgate);
-  rsd.insert_into (&ly, tc.cell_index (), lsd);
-  rpdiff.insert_into (&ly, tc.cell_index (), lpdiff);
-  rndiff.insert_into (&ly, tc.cell_index (), lndiff);
+  rpgate.insert_into (&ly, tc.cell_index (), lgate);
+  rngate.insert_into (&ly, tc.cell_index (), lgate);
+  rpsd.insert_into (&ly, tc.cell_index (), lsd);
+  rnsd.insert_into (&ly, tc.cell_index (), lsd);
+  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
+  rnsd.insert_into (&ly, tc.cell_index (), lndiff);
 
   //  perform the extraction
 
@@ -420,15 +408,20 @@ TEST(2_DeviceAndNetExtraction)
   //  NOTE: the device extractor will add more debug layers for the transistors:
   //    20/0 -> Diffusion
   //    21/0 -> Gate
-  MOSFETExtractor ex (&ly);
+  MOSFETExtractor pmos_ex ("PMOS", &ly);
+  MOSFETExtractor nmos_ex ("NMOS", &ly);
 
   db::NetlistDeviceExtractor::input_layers dl;
-  dl["PD"] = &rpdiff;
-  dl["ND"] = &rndiff;
-  dl["G"] = &rgate;
-  dl["P"] = &rpoly;
 
-  ex.extract (dss, dl, &nl);
+  dl["SD"] = &rpsd;
+  dl["G"] = &rpgate;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  pmos_ex.extract (dss, dl, &nl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rngate;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  nmos_ex.extract (dss, dl, &nl);
 
   //  perform the net extraction
 
@@ -436,8 +429,8 @@ TEST(2_DeviceAndNetExtraction)
 
   db::Connectivity conn;
   //  Intra-layer
-  conn.connect (rpdiff);
-  conn.connect (rndiff);
+  conn.connect (rpsd);
+  conn.connect (rnsd);
   conn.connect (rpoly);
   conn.connect (rdiff_cont);
   conn.connect (rpoly_cont);
@@ -445,8 +438,8 @@ TEST(2_DeviceAndNetExtraction)
   conn.connect (rvia1);
   conn.connect (rmetal2);
   //  Inter-layer
-  conn.connect (rpdiff,     rdiff_cont);
-  conn.connect (rndiff,     rdiff_cont);
+  conn.connect (rpsd,       rdiff_cont);
+  conn.connect (rnsd,       rdiff_cont);
   conn.connect (rpoly,      rpoly_cont);
   conn.connect (rpoly_cont, rmetal1);
   conn.connect (rdiff_cont, rmetal1);
@@ -468,9 +461,11 @@ TEST(2_DeviceAndNetExtraction)
   //    206/0 -> Metal1
   //    207/0 -> Via1
   //    208/0 -> Metal2
+  //    210/0 -> N source/drain
+  //    211/0 -> P source/drain
   std::map<unsigned int, unsigned int> dump_map;
-  dump_map [layer_of (rpdiff)    ] = ly.insert_layer (db::LayerProperties (210, 0));
-  dump_map [layer_of (rndiff)    ] = ly.insert_layer (db::LayerProperties (211, 0));
+  dump_map [layer_of (rpsd)      ] = ly.insert_layer (db::LayerProperties (210, 0));
+  dump_map [layer_of (rnsd)      ] = ly.insert_layer (db::LayerProperties (211, 0));
   dump_map [layer_of (rpoly)     ] = ly.insert_layer (db::LayerProperties (203, 0));
   dump_map [layer_of (rdiff_cont)] = ly.insert_layer (db::LayerProperties (204, 0));
   dump_map [layer_of (rpoly_cont)] = ly.insert_layer (db::LayerProperties (205, 0));
@@ -496,10 +491,10 @@ TEST(2_DeviceAndNetExtraction)
     "  XINV2 $9 ($1=$I6,$2=$I45,$3=$I7,$4=VSS,$5=VDD)\n"
     "  XINV2 $10 ($1=$I7,$2=$I46,$3=$I8,$4=VSS,$5=VDD)\n"
     "Circuit INV2 ($1=IN,$2=$2,$3=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS 1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
-    "  DPMOS 2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
-    "  DNMOS 3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
-    "  DNMOS 4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
     "  XTRANS $1 ($1=$2,$2=$4,$3=IN)\n"
     "  XTRANS $2 ($1=$2,$2=$5,$3=IN)\n"
     "  XTRANS $3 ($1=$5,$2=OUT,$3=$2)\n"
@@ -523,19 +518,9 @@ TEST(2_DeviceAndNetExtraction)
 //  An attempt to simplify things.
 
 /*
-- layers: use db::Region, or wrapper?
--> use regions, but test whether they are deep regions (?)
-
 TODO:
 - netlist query functions such as net_by_name, device_by_name, circuit_by_name
 - terminal geometry (Polygon) for device, combined device geometry (all terminals)
-- error interface for device extraction
-  //  gets the device extraction errors
-  //  device_extraction_error_iterator begin_device_extraction_errors () const;
-  //  device_extraction_error_iterator end_device_extraction_errors () const;
-  //  bool has_device_extraction_errors () const;
-
-- device extractor needs to declare the layers to allow passing them by name
 - netlist manipulation methods (i.e. flatten certain cells, purging etc.)
 */
 
@@ -551,23 +536,25 @@ public:
   //  the iterator provides the hierarchical selection (enabling/disabling cells etc.)
   LayoutToNetlist (const db::RecursiveShapeIterator &iter);
 
-  //  --- preparation
+  //  --- Step 0: configuration
 
-  //  returns a new'd region
+  void set_threads (unsigned int n);
+  void set_area_ratio (double ar);
+  void set_max_vertex_count (size_t n);
+
+  //  --- Step 1: preparation
+
+  //  returns new'd regions
   db::Region *make_layer (unsigned int layer_index);
   db::Region *make_text_layer (unsigned int layer_index);
   db::Region *make_polygon_layer (unsigned int layer_index);
 
-  //  gets the internal layout and cell
-  const db::Layout &internal_layout () const;
-  const db::Cell &internal_top_cell () const;
-
-  //  --- device extraction
+  //  --- Step 2: device extraction
 
   //  after this, the device extractor will have errors if some occured.
-  void extract_devices (db::NetlistDeviceExtractor *extractor, const std::map<std::string, const db::Region *> &layers);
+  void extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::Region *> &layers);
 
-  //  --- net extraction
+  //  --- Step 3: net extraction
 
   //  define connectivity for the netlist extraction
   void connect (const db::Region &l);
@@ -576,7 +563,11 @@ public:
   //  runs the netlist extraction
   void extract_netlist ();
 
-  //  --- retrieval
+  //  --- Step 4: retrieval
+
+  //  gets the internal layout and cell (0 if not available)
+  const db::Layout *internal_layout () const;
+  const db::Cell *internal_top_cell () const;
 
   //  gets the internal layer index of the given region
   unsigned int layer_of (const db::Region &region) const;
@@ -600,6 +591,11 @@ public:
   //  copies the shapes of the given net from a given layer
   //  (recursive true: include nets from subcircuits)
   db::Region shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive);
+
+  //  finds the net by probing a specific location on the given layer looking through the
+  //  hierarchy. Returns 0 if no net was found.
+  db::Net *probe_net (const db::Region &of_region, const db::DPoint &point);
+  db::Net *probe_net (const db::Region &of_region, const db::Point &point);
 };
 
 }

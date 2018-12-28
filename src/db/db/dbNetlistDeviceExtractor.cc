@@ -46,10 +46,10 @@ NetlistDeviceExtractorError::NetlistDeviceExtractorError (const std::string &cel
 // ----------------------------------------------------------------------------------------
 //  NetlistDeviceExtractor implementation
 
-NetlistDeviceExtractor::NetlistDeviceExtractor ()
+NetlistDeviceExtractor::NetlistDeviceExtractor (const std::string &name)
   : mp_layout (0), m_cell_index (0), mp_circuit (0)
 {
-  m_device_name_index = 0;
+  m_name = name;
   m_propname_id = 0;
 }
 
@@ -67,8 +67,7 @@ const tl::Variant &NetlistDeviceExtractor::terminal_property_name ()
 void NetlistDeviceExtractor::initialize (db::Netlist *nl)
 {
   m_layer_definitions.clear ();
-  m_device_classes.clear ();
-  m_device_name_index = 0;
+  mp_device_class = 0;
   m_propname_id = 0;
   m_netlist.reset (nl);
 
@@ -108,16 +107,16 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const NetlistDevi
 
   }
 
-  extract_without_initialize (dss.layout (), dss.initial_cell (), layers, nl);
+  extract_without_initialize (dss.layout (), dss.initial_cell (), layers);
 }
 
 void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl)
 {
   initialize (nl);
-  extract_without_initialize (layout, cell, layers, nl);
+  extract_without_initialize (layout, cell, layers);
 }
 
-void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl)
+void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers)
 {
   tl_assert (layers.size () == m_layer_definitions.size ());
 
@@ -216,9 +215,16 @@ void NetlistDeviceExtractor::extract_devices (const std::vector<db::Region> & /*
 
 void NetlistDeviceExtractor::register_device_class (DeviceClass *device_class)
 {
+  if (mp_device_class != 0) {
+    throw tl::Exception (tl::to_string (tr ("Device class already set")));
+  }
+
+  tl_assert (device_class != 0);
+  mp_device_class = device_class;
+  mp_device_class->set_name (m_name);
+
   tl_assert (m_netlist.get () != 0);
   m_netlist->add_device_class (device_class);
-  m_device_classes.push_back (device_class);
 }
 
 void NetlistDeviceExtractor::define_layer (const std::string &name, const std::string &description)
@@ -226,11 +232,14 @@ void NetlistDeviceExtractor::define_layer (const std::string &name, const std::s
   m_layer_definitions.push_back (db::NetlistDeviceExtractorLayerDefinition (name, description, m_layer_definitions.size ()));
 }
 
-Device *NetlistDeviceExtractor::create_device (unsigned int device_class_index)
+Device *NetlistDeviceExtractor::create_device ()
 {
+  if (mp_device_class == 0) {
+    throw tl::Exception (tl::to_string (tr ("No device class registered")));
+  }
+
   tl_assert (mp_circuit != 0);
-  tl_assert (device_class_index < m_device_classes.size ());
-  Device *device = new Device (m_device_classes[device_class_index], tl::to_string (++m_device_name_index));
+  Device *device = new Device (mp_device_class);
   mp_circuit->add_device (device);
   return device;
 }

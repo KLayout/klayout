@@ -51,6 +51,9 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
   ) +
+  gsi::method ("circuit", (db::Circuit *(db::Device::*) ()) &db::Device::circuit,
+    "@brief Gets the circuit the device lives in."
+  ) +
   gsi::method ("id", &db::Device::id,
     "@brief Gets the device ID.\n"
     "The ID is a unique integer which identifies the device.\n"
@@ -125,8 +128,12 @@ static void subcircuit_disconnect_pin1 (db::SubCircuit *subcircuit, const db::Pi
 }
 
 Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
-  gsi::method ("circuit", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit,
+  gsi::method ("circuit_ref", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit_ref,
     "@brief Gets the circuit referenced by the subcircuit.\n"
+  ) +
+  gsi::method ("circuit", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit,
+    "@brief Gets the circuit the subcircuit lives in.\n"
+    "This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \\circuit_ref."
   ) +
   gsi::method ("id", &db::SubCircuit::id,
     "@brief Gets the subcircuit ID.\n"
@@ -619,6 +626,9 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
     "This object will describe a pin of the circuit. A circuit connects "
     "to the outside through such a pin. The pin is added after all existing "
     "pins. For more details see the \\Pin class."
+  ) +
+  gsi::iterator ("each_ref", (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::begin_refs, (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::end_refs,
+    "@brief Iterates over the subcircuit objects referencing this circuit\n"
   ) +
   gsi::iterator ("each_pin", (db::Circuit::pin_iterator (db::Circuit::*) ()) &db::Circuit::begin_pins, (db::Circuit::pin_iterator (db::Circuit::*) ()) &db::Circuit::end_pins,
     "@brief Iterates over the pins of the circuit"

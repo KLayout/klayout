@@ -54,6 +54,7 @@ namespace {
   {
   public:
     DummyDeviceExtractor ()
+      : db::NetlistDeviceExtractor (std::string ("DUMMY"))
     {
       error ("msg1");
       error ("msg2", db::Box (0, 1, 2, 3));

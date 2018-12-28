@@ -258,22 +258,35 @@ class DBNetlist_TestClass < TestBase
 
     sc1 = c.create_subcircuit(cc)
     sc1.name = "SC1"
+    assert_equal(sc1.circuit.object_id, c.object_id)
     assert_equal(sc1.name, "SC1")
-    assert_equal(sc1.circuit.name, "CC")
+    assert_equal(sc1.circuit_ref.name, "CC")
     assert_equal(c.subcircuit_by_id(sc1.id).id, 1)
     assert_equal(c.subcircuit_by_id(2).inspect, "nil")
+
+    refs = []
+    cc.each_ref { |r| refs << r.name }
+    assert_equal(refs.join(","), "SC1")
 
     sc2 = c.create_subcircuit(cc)
     sc2.name = "SC2"
 
+    refs = []
+    cc.each_ref { |r| refs << r.name }
+    assert_equal(refs.join(","), "SC1,SC2")
+
     names = []
     ccn = []
-    c.each_subcircuit { |sc| names << sc.name; ccn << sc.circuit.name }
+    c.each_subcircuit { |sc| names << sc.name; ccn << sc.circuit_ref.name }
     assert_equal(names, [ "SC1", "SC2" ])
     assert_equal(ccn, [ "CC", "CC" ])
 
     c.remove_subcircuit(sc2)
     
+    refs = []
+    cc.each_ref { |r| refs << r.name }
+    assert_equal(refs.join(","), "SC1")
+
     names = []
     c.each_subcircuit { |sc| names << sc.name}
     assert_equal(names, [ "SC1" ])
@@ -282,7 +295,7 @@ class DBNetlist_TestClass < TestBase
 
     names = []
     ccn = []
-    c.each_subcircuit { |sc| names << sc.name; ccn << sc.circuit.name }
+    c.each_subcircuit { |sc| names << sc.name; ccn << sc.circuit_ref.name }
     assert_equal(names, [ "SC1", "SC2" ])
     assert_equal(ccn, [ "CC", "CC" ])
 
@@ -530,6 +543,8 @@ class DBNetlist_TestClass < TestBase
     c.name = "C"
     nl.add(c)
     d1 = c.create_device(dc)
+
+    assert_equal(d1.circuit.object_id, c.object_id)
 
     assert_equal(d1.parameter(0), 1.0)
     assert_equal(d1.parameter("U"), 1.0)

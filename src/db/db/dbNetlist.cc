@@ -46,7 +46,7 @@ Pin::Pin (const std::string &name)
 //  Device class implementation
 
 Device::Device ()
-  : mp_device_class (0), m_id (0)
+  : mp_device_class (0), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
@@ -61,13 +61,13 @@ Device::~Device ()
 }
 
 Device::Device (DeviceClass *device_class, const std::string &name)
-  : mp_device_class (device_class), m_name (name), m_id (0)
+  : mp_device_class (device_class), m_name (name), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
 
 Device::Device (const Device &other)
-  : mp_device_class (0), m_id (0)
+  : mp_device_class (0), m_id (0), mp_circuit (0)
 {
   operator= (other);
 }
@@ -79,6 +79,11 @@ Device &Device::operator= (const Device &other)
     mp_device_class = other.mp_device_class;
   }
   return *this;
+}
+
+void Device::set_circuit (Circuit *circuit)
+{
+  mp_circuit = circuit;
 }
 
 void Device::set_name (const std::string &n)
@@ -176,7 +181,7 @@ void Device::set_parameter_value (const std::string &name, double v)
 //  SubCircuit class implementation
 
 SubCircuit::SubCircuit ()
-  : m_id (0)
+  : m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
@@ -191,13 +196,13 @@ SubCircuit::~SubCircuit()
 }
 
 SubCircuit::SubCircuit (Circuit *circuit, const std::string &name)
-  : m_circuit (circuit), m_name (name), m_id (0)
+  : m_circuit_ref (0), m_name (name), m_id (0), mp_circuit (0)
 {
-  //  .. nothing yet ..
+  set_circuit_ref (circuit);
 }
 
 SubCircuit::SubCircuit (const SubCircuit &other)
-  : m_id (0)
+  : m_id (0), mp_circuit (0)
 {
   operator= (other);
 }
@@ -206,8 +211,8 @@ SubCircuit &SubCircuit::operator= (const SubCircuit &other)
 {
   if (this != &other) {
     m_name = other.m_name;
-    m_circuit = other.m_circuit;
     m_trans = other.m_trans;
+    set_circuit_ref (const_cast<Circuit *> (other.circuit_ref ()));
   }
   return *this;
 }
@@ -228,6 +233,17 @@ void SubCircuit::set_pin_ref_for_pin (size_t pin_id, Net::pin_iterator iter)
     m_pin_refs.resize (pin_id + 1, Net::pin_iterator ());
   }
   m_pin_refs [pin_id] = iter;
+}
+
+void SubCircuit::set_circuit_ref (Circuit *c)
+{
+  if (m_circuit_ref.get ()) {
+    m_circuit_ref->unregister_ref (this);
+  }
+  m_circuit_ref.reset (c);
+  if (m_circuit_ref.get ()) {
+    m_circuit_ref->register_ref (this);
+  }
 }
 
 const Net *SubCircuit::net_for_pin (size_t pin_id) const
@@ -349,8 +365,8 @@ const Pin *NetPinRef::pin () const
     if (mp_net && mp_net->circuit ()) {
       return mp_net->circuit ()->pin_by_id (m_pin_id);
     }
-  } else if (mp_subcircuit->circuit ()) {
-    return mp_subcircuit->circuit ()->pin_by_id (m_pin_id);
+  } else if (mp_subcircuit->circuit_ref ()) {
+    return mp_subcircuit->circuit_ref ()->pin_by_id (m_pin_id);
   }
   return 0;
 }
@@ -613,6 +629,8 @@ void Circuit::remove_net (Net *net)
 
 void Circuit::add_device (Device *device)
 {
+  device->set_circuit (this);
+
   size_t id = 0;
   if (! m_devices.empty ()) {
     tl_assert (m_devices.back () != 0);
@@ -658,6 +676,8 @@ Device *Circuit::device_by_id (size_t id)
 
 void Circuit::add_subcircuit (SubCircuit *subcircuit)
 {
+  subcircuit->set_circuit (this);
+
   size_t id = 0;
   if (! m_subcircuits.empty ()) {
     tl_assert (m_subcircuits.back () != 0);
@@ -701,12 +721,22 @@ SubCircuit *Circuit::subcircuit_by_id (size_t id)
   return d != m_subcircuit_id_table.end () ? d->second : 0;
 }
 
+void Circuit::register_ref (SubCircuit *r)
+{
+  m_refs.push_back (r);
+}
+
+void Circuit::unregister_ref (SubCircuit *r)
+{
+  m_refs.erase (r);
+}
+
 void Circuit::translate_circuits (const std::map<const Circuit *, Circuit *> &map)
 {
   for (subcircuit_iterator i = m_subcircuits.begin (); i != m_subcircuits.end (); ++i) {
-    std::map<const Circuit *, Circuit *>::const_iterator m = map.find (i->circuit ());
+    std::map<const Circuit *, Circuit *>::const_iterator m = map.find (i->circuit_ref ());
     tl_assert (m != map.end ());
-    i->set_circuit (m->second);
+    i->set_circuit_ref (m->second);
   }
 }
 

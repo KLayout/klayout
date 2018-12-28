@@ -834,3 +834,121 @@ TEST(11_NetlistCircuitRefs)
   sc3 = db::SubCircuit ();
   EXPECT_EQ (refs2string (c2), "sc1,sc2");
 }
+
+static std::string children2string (const db::Circuit *c)
+{
+  std::string res;
+  for (db::Circuit::const_child_circuit_iterator r = c->begin_children (); r != c->end_children (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*r)->name ();
+  }
+  return res;
+}
+
+static std::string parents2string (const db::Circuit *c)
+{
+  std::string res;
+  for (db::Circuit::const_parent_circuit_iterator r = c->begin_parents (); r != c->end_parents (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*r)->name ();
+  }
+  return res;
+}
+
+static std::string td2string (const db::Netlist *nl)
+{
+  std::string res;
+  for (db::Netlist::const_top_down_circuit_iterator r = nl->begin_top_down (); r != nl->end_top_down (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*r)->name ();
+  }
+  return res;
+}
+
+static std::string bu2string (const db::Netlist *nl)
+{
+  std::string res;
+  for (db::Netlist::const_bottom_up_circuit_iterator r = nl->begin_bottom_up (); r != nl->end_bottom_up (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*r)->name ();
+  }
+  return res;
+}
+
+TEST(12_NetlistTopology)
+{
+  std::auto_ptr<db::Netlist> nl (new db::Netlist ());
+  EXPECT_EQ (nl->top_circuit_count (), size_t (0));
+
+  db::Circuit *c1 = new db::Circuit ();
+  c1->set_name ("c1");
+  nl->add_circuit (c1);
+  EXPECT_EQ (nl->top_circuit_count (), size_t (1));
+  EXPECT_EQ (td2string (nl.get ()), "c1");
+  EXPECT_EQ (bu2string (nl.get ()), "c1");
+
+  db::Circuit *c2 = new db::Circuit ();
+  c2->set_name ("c2");
+  nl->add_circuit (c2);
+  EXPECT_EQ (nl->top_circuit_count (), size_t (2));
+  EXPECT_EQ (td2string (nl.get ()), "c1,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c1");
+
+  db::Circuit *c3 = new db::Circuit ();
+  c3->set_name ("c3");
+  nl->add_circuit (c3);
+  EXPECT_EQ (nl->top_circuit_count (), size_t (3));
+  EXPECT_EQ (td2string (nl.get ()), "c1,c2,c3");
+  EXPECT_EQ (bu2string (nl.get ()), "c3,c2,c1");
+
+  db::SubCircuit *sc1 = new db::SubCircuit (c2);
+  sc1->set_name ("sc1");
+  c1->add_subcircuit (sc1);
+  EXPECT_EQ (children2string (c1), "c2");
+  EXPECT_EQ (parents2string (c2), "c1");
+  EXPECT_EQ (nl->top_circuit_count (), size_t (2));
+  EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
+
+  db::SubCircuit *sc2 = new db::SubCircuit (c2);
+  sc2->set_name ("sc2");
+  c1->add_subcircuit (sc2);
+  EXPECT_EQ (children2string (c1), "c2");
+  EXPECT_EQ (parents2string (c2), "c1");
+  EXPECT_EQ (nl->top_circuit_count (), size_t (2));
+  EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
+
+  db::SubCircuit *sc3 = new db::SubCircuit (c3);
+  sc3->set_name ("sc3");
+  c1->add_subcircuit (sc3);
+  EXPECT_EQ (children2string (c1), "c2,c3");
+  EXPECT_EQ (children2string (c2), "");
+  EXPECT_EQ (children2string (c3), "");
+  EXPECT_EQ (parents2string (c2), "c1");
+  EXPECT_EQ (parents2string (c3), "c1");
+  EXPECT_EQ (nl->top_circuit_count (), size_t (1));
+  EXPECT_EQ (td2string (nl.get ()), "c1,c2,c3");
+  EXPECT_EQ (bu2string (nl.get ()), "c3,c2,c1");
+
+  db::SubCircuit *sc4 = new db::SubCircuit (*sc2);
+  sc4->set_name ("sc4");
+  c3->add_subcircuit (sc4);
+
+  EXPECT_EQ (children2string (c1), "c2,c3");
+  EXPECT_EQ (children2string (c2), "");
+  EXPECT_EQ (children2string (c3), "c2");
+  EXPECT_EQ (parents2string (c2), "c1,c3");
+  EXPECT_EQ (parents2string (c3), "c1");
+  EXPECT_EQ (nl->top_circuit_count (), size_t (1));
+  EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
+}

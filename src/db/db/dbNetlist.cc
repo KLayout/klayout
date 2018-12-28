@@ -504,13 +504,13 @@ void Net::set_circuit (Circuit *circuit)
 //  Circuit class implementation
 
 Circuit::Circuit ()
-  : mp_netlist (0), m_valid_device_id_table (false), m_valid_subcircuit_id_table (false)
+  : mp_netlist (0), m_valid_device_id_table (false), m_valid_subcircuit_id_table (false), m_index (0)
 {
   //  .. nothing yet ..
 }
 
 Circuit::Circuit (const Circuit &other)
-  : mp_netlist (0), m_valid_device_id_table (false), m_valid_subcircuit_id_table (false)
+  : mp_netlist (0), m_valid_device_id_table (false), m_valid_subcircuit_id_table (false), m_index (0)
 {
   operator= (other);
 }
@@ -609,6 +609,54 @@ void Circuit::set_cell_index (const db::cell_index_type ci)
   m_cell_index = ci;
 }
 
+Circuit::child_circuit_iterator Circuit::begin_children ()
+{
+  tl_assert (mp_netlist != 0);
+  return mp_netlist->child_circuits (this).begin ();
+}
+
+Circuit::child_circuit_iterator Circuit::end_children ()
+{
+  tl_assert (mp_netlist != 0);
+  return mp_netlist->child_circuits (this).end ();
+}
+
+Circuit::const_child_circuit_iterator Circuit::begin_children () const
+{
+  tl_assert (mp_netlist != 0);
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->child_circuits (const_cast <Circuit *> (this))).begin ();
+}
+
+Circuit::const_child_circuit_iterator Circuit::end_children () const
+{
+  tl_assert (mp_netlist != 0);
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->child_circuits (const_cast <Circuit *> (this))).end ();
+}
+
+Circuit::child_circuit_iterator Circuit::begin_parents ()
+{
+  tl_assert (mp_netlist != 0);
+  return mp_netlist->parent_circuits (this).begin ();
+}
+
+Circuit::child_circuit_iterator Circuit::end_parents ()
+{
+  tl_assert (mp_netlist != 0);
+  return mp_netlist->parent_circuits (this).end ();
+}
+
+Circuit::const_child_circuit_iterator Circuit::begin_parents () const
+{
+  tl_assert (mp_netlist != 0);
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->parent_circuits (const_cast <Circuit *> (this))).begin ();
+}
+
+Circuit::const_child_circuit_iterator Circuit::end_parents () const
+{
+  tl_assert (mp_netlist != 0);
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->parent_circuits (const_cast <Circuit *> (this))).end ();
+}
+
 const Pin &Circuit::add_pin (const Pin &pin)
 {
   m_pins.push_back (pin);
@@ -687,12 +735,20 @@ void Circuit::add_subcircuit (SubCircuit *subcircuit)
 
   m_subcircuits.push_back (subcircuit);
   invalidate_subcircuit_id_table ();
+
+  if (mp_netlist) {
+    mp_netlist->invalidate_topology ();
+  }
 }
 
 void Circuit::remove_subcircuit (SubCircuit *subcircuit)
 {
   m_subcircuits.erase (subcircuit);
   invalidate_subcircuit_id_table ();
+
+  if (mp_netlist) {
+    mp_netlist->invalidate_topology ();
+  }
 }
 
 void Circuit::validate_subcircuit_id_table ()
@@ -1073,21 +1129,25 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
 //  Netlist class implementation
 
 Netlist::Netlist ()
+  : m_valid_topology (false)
 {
-  //  .. nothing yet ..
+  m_circuits.changed ().add (this, &Netlist::invalidate_topology);
 }
 
 Netlist::Netlist (const Netlist &other)
+  : m_valid_topology (false)
 {
   operator= (other);
+  m_circuits.changed ().add (this, &Netlist::invalidate_topology);
 }
 
 Netlist &Netlist::operator= (const Netlist &other)
 {
   if (this != &other) {
 
+    clear ();
+
     std::map<const DeviceClass *, DeviceClass *> dct;
-    m_device_classes.clear ();
     for (const_device_class_iterator dc = other.begin_device_classes (); dc != other.end_device_classes (); ++dc) {
       DeviceClass *dc_new = dc->clone ();
       dct [dc.operator-> ()] = dc_new;
@@ -1108,6 +1168,223 @@ Netlist &Netlist::operator= (const Netlist &other)
 
   }
   return *this;
+}
+
+void Netlist::invalidate_topology ()
+{
+  if (m_valid_topology) {
+    m_valid_topology = false;
+    m_top_circuits = 0;
+    m_top_down_circuits.clear ();
+    m_child_circuits.clear ();
+    m_parent_circuits.clear ();
+  }
+}
+
+namespace {
+  struct sort_by_index
+  {
+    bool operator () (const Circuit *a, const Circuit *b) const
+    {
+      return a->index () < b->index ();
+    }
+  };
+}
+
+void Netlist::validate_topology ()
+{
+  if (m_valid_topology) {
+    return;
+  }
+
+  m_child_circuits.clear ();
+  m_parent_circuits.clear ();
+
+  size_t max_index = 0;
+  for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
+    c->set_index (max_index);
+    ++max_index;
+  }
+
+  //  build the child circuit list ... needed for the topology sorting
+
+  m_child_circuits.reserve (max_index);
+  m_parent_circuits.reserve (max_index);
+
+  for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
+
+    std::set<Circuit *> children;
+    for (Circuit::subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
+      if (sc->circuit_ref ()) {
+        children.insert (sc->circuit_ref ());
+      }
+    }
+
+    m_child_circuits.push_back (tl::vector<Circuit *> ());
+    tl::vector<Circuit *> &cc = m_child_circuits.back ();
+    cc.reserve (children.size ());
+    cc.insert (cc.end (), children.begin (), children.end ());
+    //  sort by index for better reproducibility
+    std::sort (cc.begin (), cc.end (), sort_by_index ());
+
+    std::set<Circuit *> parents;
+    for (Circuit::refs_iterator sc = c->begin_refs (); sc != c->end_refs (); ++sc) {
+      if (sc->circuit ()) {
+        parents.insert (sc->circuit ());
+      }
+    }
+
+    m_parent_circuits.push_back (tl::vector<Circuit *> ());
+    tl::vector<Circuit *> &pc = m_parent_circuits.back ();
+    pc.reserve (parents.size ());
+    pc.insert (pc.end (), parents.begin (), parents.end ());
+    //  sort by index for better reproducibility
+    std::sort (pc.begin (), pc.end (), sort_by_index ());
+
+  }
+
+  //  do topology sorting
+
+  m_top_circuits = 0;
+  m_top_down_circuits.clear ();
+  m_top_down_circuits.reserve (max_index);
+
+  std::vector<size_t> num_parents (max_index, 0);
+
+  //  while there are cells to treat ..
+  while (m_top_down_circuits.size () != max_index) {
+
+    size_t n_top_down_circuits = m_top_down_circuits.size ();
+
+    //  Treat all circuits that do not have all parents reported.
+    //  For all such a circuits, disable the parent counting,
+    //  add the circuits's index to the top-down sorted list and
+    //  increment the reported parent count in all the
+    //  child circuits.
+
+    for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
+      if (m_parent_circuits [c->index ()].size () == num_parents [c->index ()]) {
+        m_top_down_circuits.push_back (c.operator-> ());
+        num_parents [c->index ()] = std::numeric_limits<cell_index_type>::max ();
+      }
+    }
+
+    //  For all these a circuits, increment the reported parent instance
+    //  count in all the child circuits.
+    for (tl::vector<Circuit *>::const_iterator ii = m_top_down_circuits.begin () + n_top_down_circuits; ii != m_top_down_circuits.end (); ++ii) {
+      const tl::vector<Circuit *> &cc = m_child_circuits [(*ii)->index ()];
+      for (tl::vector<Circuit *>::const_iterator icc = cc.begin (); icc != cc.end (); ++icc) {
+        tl_assert (num_parents [(*icc)->index ()] != std::numeric_limits<cell_index_type>::max ());
+        num_parents [(*icc)->index ()] += 1;
+      }
+    }
+
+    //  If no new cells have been reported this is basically a
+    //  sign of recursion in the graph.
+    if (n_top_down_circuits == m_top_down_circuits.size ()) {
+      throw tl::Exception (tl::to_string (tr ("Recursive hierarchy detected in netlist")));
+    }
+
+  }
+
+  //  Determine the number of top cells
+  for (tl::vector<Circuit *>::const_iterator e = m_top_down_circuits.begin (); e != m_top_down_circuits.end () && m_parent_circuits [(*e)->index ()].empty (); ++e) {
+    ++m_top_circuits;
+  }
+
+  m_valid_topology = true;
+}
+
+const tl::vector<Circuit *> &Netlist::child_circuits (Circuit *circuit)
+{
+  if (! m_valid_topology) {
+    validate_topology ();
+  }
+
+  tl_assert (circuit->index () < m_child_circuits.size ());
+  return m_child_circuits [circuit->index ()];
+}
+
+const tl::vector<Circuit *> &Netlist::parent_circuits (Circuit *circuit)
+{
+  if (! m_valid_topology) {
+    validate_topology ();
+  }
+
+  tl_assert (circuit->index () < m_parent_circuits.size ());
+  return m_parent_circuits [circuit->index ()];
+}
+
+Netlist::top_down_circuit_iterator Netlist::begin_top_down ()
+{
+  if (! m_valid_topology) {
+    validate_topology ();
+  }
+  return m_top_down_circuits.begin ();
+}
+
+Netlist::top_down_circuit_iterator Netlist::end_top_down ()
+{
+  if (! m_valid_topology) {
+    validate_topology ();
+  }
+  return m_top_down_circuits.end ();
+}
+
+Netlist::const_top_down_circuit_iterator Netlist::begin_top_down () const
+{
+  if (! m_valid_topology) {
+    const_cast<Netlist *> (this)->validate_topology ();
+  }
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (m_top_down_circuits).begin ();
+}
+
+Netlist::const_top_down_circuit_iterator Netlist::end_top_down () const
+{
+  if (! m_valid_topology) {
+    const_cast<Netlist *> (this)->validate_topology ();
+  }
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (m_top_down_circuits).end ();
+}
+
+size_t Netlist::top_circuit_count () const
+{
+  if (! m_valid_topology) {
+    const_cast<Netlist *> (this)->validate_topology ();
+  }
+  return m_top_circuits;
+}
+
+Netlist::bottom_up_circuit_iterator Netlist::begin_bottom_up ()
+{
+  if (! m_valid_topology) {
+    validate_topology ();
+  }
+  return m_top_down_circuits.rbegin ();
+}
+
+Netlist::bottom_up_circuit_iterator Netlist::end_bottom_up ()
+{
+  if (! m_valid_topology) {
+    validate_topology ();
+  }
+  return m_top_down_circuits.rend ();
+}
+
+Netlist::const_bottom_up_circuit_iterator Netlist::begin_bottom_up () const
+{
+  if (! m_valid_topology) {
+    const_cast<Netlist *> (this)->validate_topology ();
+  }
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (m_top_down_circuits).rbegin ();
+}
+
+Netlist::const_bottom_up_circuit_iterator Netlist::end_bottom_up () const
+{
+  if (! m_valid_topology) {
+    const_cast<Netlist *> (this)->validate_topology ();
+  }
+  return reinterpret_cast<const tl::vector<const Circuit *> &> (m_top_down_circuits).rend ();
 }
 
 void Netlist::clear ()

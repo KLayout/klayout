@@ -920,6 +920,10 @@ public:
   typedef subcircuit_list::iterator subcircuit_iterator;
   typedef tl::weak_collection<SubCircuit>::const_iterator const_refs_iterator;
   typedef tl::weak_collection<SubCircuit>::iterator refs_iterator;
+  typedef tl::vector<Circuit *>::const_iterator child_circuit_iterator;
+  typedef tl::vector<const Circuit *>::const_iterator const_child_circuit_iterator;
+  typedef tl::vector<Circuit *>::const_iterator parent_circuit_iterator;
+  typedef tl::vector<const Circuit *>::const_iterator const_parent_circuit_iterator;
 
   /**
    *  @brief Constructor
@@ -975,6 +979,15 @@ public:
   }
 
   /**
+   *  @brief The index of the circuit in the netlist
+   *  CAUTION: this attribute is used for internal purposes and may not be valid always.
+   */
+  size_t index () const
+  {
+    return m_index;
+  }
+
+  /**
    *  @brief Sets the layout cell reference for this circuit
    *
    *  The layout cell reference links a circuit to a layout cell.
@@ -1015,6 +1028,52 @@ public:
   {
     return m_refs.begin ();
   }
+
+  /**
+   *  @brief Gets the child circuits iterator (begin)
+   *  The child circuits are the circuits referenced by all subcircuits
+   *  in the circuit.
+   */
+  child_circuit_iterator begin_children ();
+
+  /**
+   *  @brief Gets the child circuits iterator (end)
+   */
+  child_circuit_iterator end_children ();
+
+  /**
+   *  @brief Gets the child circuits iterator (begin, const version)
+   *  The child circuits are the circuits referenced by all subcircuits
+   *  in the circuit.
+   */
+  const_child_circuit_iterator begin_children () const;
+
+  /**
+   *  @brief Gets the child circuits iterator (end, const version)
+   */
+  const_child_circuit_iterator end_children () const;
+
+  /**
+   *  @brief Gets the parent circuits iterator (begin)
+   *  The parents circuits are the circuits referencing this circuit via subcircuits.
+   */
+  parent_circuit_iterator begin_parents ();
+
+  /**
+   *  @brief Gets the parent circuits iterator (end)
+   */
+  parent_circuit_iterator end_parents ();
+
+  /**
+   *  @brief Gets the parent circuits iterator (begin, const version)
+   *  The parents circuits are the circuits referencing this circuit via subcircuits.
+   */
+  const_parent_circuit_iterator begin_parents () const;
+
+  /**
+   *  @brief Gets the parent circuits iterator (end, const version)
+   */
+  const_parent_circuit_iterator end_parents () const;
 
   /**
    *  @brief Gets the references to this circuit (end, const version)
@@ -1300,10 +1359,13 @@ private:
   bool m_valid_subcircuit_id_table;
   std::map<size_t, SubCircuit *> m_subcircuit_id_table;
   tl::weak_collection<SubCircuit> m_refs;
+  size_t m_index;
 
-  /**
-   *  @brief Sets the pin reference for a specific pin
-   */
+  void set_index (size_t index)
+  {
+    m_index = index;
+  }
+
   void set_pin_ref_for_pin (size_t ppin_id, Net::pin_iterator iter);
 
   void register_ref (SubCircuit *sc);
@@ -1717,6 +1779,10 @@ public:
   typedef tl::shared_collection<DeviceClass> device_class_list;
   typedef device_class_list::const_iterator const_device_class_iterator;
   typedef device_class_list::iterator device_class_iterator;
+  typedef tl::vector<Circuit *>::const_iterator top_down_circuit_iterator;
+  typedef tl::vector<const Circuit *>::const_iterator const_top_down_circuit_iterator;
+  typedef tl::vector<Circuit *>::const_reverse_iterator bottom_up_circuit_iterator;
+  typedef tl::vector<const Circuit *>::const_reverse_iterator const_bottom_up_circuit_iterator;
 
   /**
    *  @brief Constructor
@@ -1785,6 +1851,65 @@ public:
   }
 
   /**
+   *  @brief Gets the top-down circuits iterator (begin)
+   *  This iterator will deliver the circuits in a top-down way - i.e. child circuits
+   *  will always come after parent circuits.
+   *  The first "top_circuit_count" elements will be top circuits (those which are not
+   *  referenced by other circuits).
+   */
+  top_down_circuit_iterator begin_top_down ();
+
+  /**
+   *  @brief Gets the top-down circuits iterator (end)
+   */
+  top_down_circuit_iterator end_top_down ();
+
+  /**
+   *  @brief Gets the top-down circuits iterator (begin, const version)
+   *  This iterator will deliver the circuits in a top-down way - i.e. child circuits
+   *  will always come after parent circuits.
+   *  The first "top_circuit_count" elements will be top circuits (those which are not
+   *  referenced by other circuits).
+   */
+  const_top_down_circuit_iterator begin_top_down () const;
+
+  /**
+   *  @brief Gets the top-down circuits iterator (end, const version)
+   */
+  const_top_down_circuit_iterator end_top_down () const;
+
+  /**
+   *  @brief Gets the number of top circuits
+   *  Top circuits are those which are not referenced by other circuits.
+   *  In a well-formed netlist there is a single top-level circuit.
+   */
+  size_t top_circuit_count () const;
+
+  /**
+   *  @brief Gets the bottom-up circuits iterator (begin)
+   *  This iterator will deliver the circuits in a bottom-up way - i.e. child circuits
+   *  will always come before parent circuits.
+   */
+  bottom_up_circuit_iterator begin_bottom_up ();
+
+  /**
+   *  @brief Gets the bottom-up circuits iterator (end)
+   */
+  bottom_up_circuit_iterator end_bottom_up ();
+
+  /**
+   *  @brief Gets the bottom-up circuits iterator (begin, const version)
+   *  This iterator will deliver the circuits in a bottom-up way - i.e. child circuits
+   *  will always come before parent circuits.
+   */
+  const_bottom_up_circuit_iterator begin_bottom_up () const;
+
+  /**
+   *  @brief Gets the bottom-up circuits iterator (end, const version)
+   */
+  const_bottom_up_circuit_iterator end_bottom_up () const;
+
+  /**
    *  @brief Adds a device class to this netlist
    *
    *  The netlist takes over ownership of the object.
@@ -1844,8 +1969,21 @@ public:
   void combine_devices ();
 
 private:
+  friend class Circuit;
+
   circuit_list m_circuits;
   device_class_list m_device_classes;
+  bool m_valid_topology;
+  tl::vector<Circuit *> m_top_down_circuits;
+  tl::vector<tl::vector<Circuit *> > m_child_circuits;
+  tl::vector<tl::vector<Circuit *> > m_parent_circuits;
+  size_t m_top_circuits;
+
+  void invalidate_topology ();
+  void validate_topology ();
+
+  const tl::vector<Circuit *> &child_circuits (Circuit *circuit);
+  const tl::vector<Circuit *> &parent_circuits (Circuit *circuit);
 };
 
 }

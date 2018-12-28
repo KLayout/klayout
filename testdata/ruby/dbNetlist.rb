@@ -563,6 +563,98 @@ class DBNetlist_TestClass < TestBase
 
   end
 
+  def test_10_NetlistTopology
+
+    nl = RBA::Netlist::new
+    assert_equal(nl.top_circuit_count, 0)
+
+    c1 = RBA::Circuit::new
+    c1.name = "C1"
+    nl.add(c1)
+    assert_equal(nl.top_circuit_count, 1)
+
+    c2 = RBA::Circuit::new
+    c2.name = "C2"
+    nl.add(c2)
+    assert_equal(nl.top_circuit_count, 2)
+
+    c3 = RBA::Circuit::new
+    c3.name = "C3"
+    nl.add(c3)
+    assert_equal(nl.top_circuit_count, 3)
+
+    names = []
+    nl.each_circuit_top_down { |c| names << c.name }
+    assert_equal(names.join(","), "C1,C2,C3")
+
+    names = []
+    nl.each_circuit_bottom_up { |c| names << c.name }
+    assert_equal(names.join(","), "C3,C2,C1")
+
+    names = []
+    c1.each_child { |c| names << c.name }
+    assert_equal(names.join(","), "")
+
+    names = []
+    c2.each_parent { |c| names << c.name }
+    assert_equal(names.join(","), "")
+
+    c1.create_subcircuit(c2)
+    assert_equal(nl.top_circuit_count, 2)
+
+    names = []
+    c1.each_child { |c| names << c.name }
+    assert_equal(names.join(","), "C2")
+
+    names = []
+    c2.each_parent { |c| names << c.name }
+    assert_equal(names.join(","), "C1")
+
+    c1.create_subcircuit(c2)
+    c1.create_subcircuit(c3)
+    assert_equal(nl.top_circuit_count, 1)
+
+    names = []
+    c1.each_child { |c| names << c.name }
+    assert_equal(names.join(","), "C2,C3")
+
+    names = []
+    c2.each_parent { |c| names << c.name }
+    assert_equal(names.join(","), "C1")
+
+    names = []
+    c3.each_parent { |c| names << c.name }
+    assert_equal(names.join(","), "C1")
+
+    names = []
+    nl.each_circuit_top_down { |c| names << c.name }
+    assert_equal(names.join(","), "C1,C2,C3")
+
+    names = []
+    nl.each_circuit_bottom_up { |c| names << c.name }
+    assert_equal(names.join(","), "C3,C2,C1")
+
+    c3.create_subcircuit(c2)
+    assert_equal(nl.top_circuit_count, 1)
+
+    names = []
+    c2.each_parent { |c| names << c.name }
+    assert_equal(names.join(","), "C1,C3")
+
+    names = []
+    c3.each_parent { |c| names << c.name }
+    assert_equal(names.join(","), "C1")
+
+    names = []
+    nl.each_circuit_top_down { |c| names << c.name }
+    assert_equal(names.join(","), "C1,C3,C2")
+
+    names = []
+    nl.each_circuit_bottom_up { |c| names << c.name }
+    assert_equal(names.join(","), "C2,C3,C1")
+
+  end
+
 end
 
 load("test_epilogue.rb")

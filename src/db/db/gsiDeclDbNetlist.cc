@@ -627,6 +627,14 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
     "to the outside through such a pin. The pin is added after all existing "
     "pins. For more details see the \\Pin class."
   ) +
+  gsi::iterator ("each_child", (db::Circuit::child_circuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_children, (db::Circuit::child_circuit_iterator (db::Circuit::*) ()) &db::Circuit::end_children,
+    "@brief Iterates over the child circuits of this circuit\n"
+    "Child circuits are the ones that are referenced from this circuit via subcircuits."
+  ) +
+  gsi::iterator ("each_parent", (db::Circuit::parent_circuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_parents, (db::Circuit::parent_circuit_iterator (db::Circuit::*) ()) &db::Circuit::end_parents,
+    "@brief Iterates over the parent circuits of this circuit\n"
+    "Child circuits are the ones that are referencing this circuit via subcircuits."
+  ) +
   gsi::iterator ("each_ref", (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::begin_refs, (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::end_refs,
     "@brief Iterates over the subcircuit objects referencing this circuit\n"
   ) +
@@ -799,6 +807,21 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("remove", &db::Netlist::remove_circuit, gsi::arg ("circuit"),
     "@brief Removes the given circuit object from the netlist\n"
     "After the object has been removed, it becomes invalid and cannot be used further."
+  ) +
+  gsi::iterator ("each_circuit_top_down", (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_top_down, (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_top_down,
+    "@brief Iterates over the circuits top-down\n"
+    "Iterating top-down means the parent circuits come before the child circuits. "
+    "The first \\top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits."
+  ) +
+  gsi::iterator ("each_circuit_bottom_up", (db::Netlist::bottom_up_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_bottom_up, (db::Netlist::bottom_up_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_bottom_up,
+    "@brief Iterates over the circuits bottom-up\n"
+    "Iterating bottom-up means the parent circuits come after the child circuits. "
+    "This is the basically the reverse order as delivered by \\each_circuit_top_down."
+  ) +
+  gsi::method ("top_circuit_count", &db::Netlist::top_circuit_count,
+    "@brief Gets the number of top circuits.\n"
+    "Top circuits are those which are not referenced by other circuits via subcircuits. "
+    "A well-formed netlist has a single top circuit."
   ) +
   gsi::iterator ("each_circuit", (db::Netlist::circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_circuits, (db::Netlist::circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_circuits,
     "@brief Iterates over the circuits of the netlist"

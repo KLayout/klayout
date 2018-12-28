@@ -57,8 +57,13 @@ public:
     }
   }
 
-  virtual void create_device_classes ()
+  virtual void setup ()
   {
+    define_layer ("PD", "P diffusion");
+    define_layer ("ND", "N diffusion");
+    define_layer ("G", "Gate");
+    define_layer ("P", "Poly");
+
     db::DeviceClassMOS3Transistor *pmos_class = new db::DeviceClassMOS3Transistor ();
     pmos_class->set_name ("PMOS");
     register_device_class (pmos_class);
@@ -417,11 +422,11 @@ TEST(2_DeviceAndNetExtraction)
   //    21/0 -> Gate
   MOSFETExtractor ex (&ly);
 
-  std::vector<db::DeepLayer> dl;
-  dl.push_back (rpdiff);
-  dl.push_back (rndiff);
-  dl.push_back (rgate);
-  dl.push_back (rpoly);
+  db::NetlistDeviceExtractor::input_layers dl;
+  dl["PD"] = &rpdiff;
+  dl["ND"] = &rndiff;
+  dl["G"] = &rgate;
+  dl["P"] = &rpoly;
 
   ex.extract (dss, dl, &nl);
 

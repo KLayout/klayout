@@ -146,6 +146,40 @@ private:
 };
 
 /**
+ *  @brief Specifies a single layer from the device extractor
+ */
+class DB_PUBLIC NetlistDeviceExtractorLayerDefinition
+{
+public:
+  NetlistDeviceExtractorLayerDefinition ()
+    : index (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  NetlistDeviceExtractorLayerDefinition (const std::string &_name, const std::string &_description, size_t _index)
+    : name (_name), description (_description), index (_index)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief The formal name
+   */
+  std::string name;
+
+  /**
+   *  @brief The human-readable description
+   */
+  std::string description;
+
+  /**
+   *  @brief The index of the layer
+   */
+  size_t index;
+};
+
+/**
  *  @brief Implements the device extraction for a specific setup
  *
  *  This class can be reimplemented to provide the basic algorithms for
@@ -157,6 +191,9 @@ class DB_PUBLIC NetlistDeviceExtractor
 public:
   typedef std::list<db::NetlistDeviceExtractorError> error_list;
   typedef error_list::const_iterator error_iterator;
+  typedef std::vector<db::NetlistDeviceExtractorLayerDefinition> layer_definitions;
+  typedef layer_definitions::const_iterator layer_definitions_iterator;
+  typedef std::map<std::string, db::Region *> input_layers;
 
   /**
    *  @brief Default constructor
@@ -202,9 +239,10 @@ public:
    *  @brief Extracts the devices from a list of regions
    *
    *  This method behaves identical to the other "extract" method, but accepts
-   *  DeepShape layers for input. By definition, these already have the "PolygonRef" type.
+   *  named regions for input. These regions need to be of deep region type and
+   *  originate from the same layout than the DeepShapeStore.
    */
-  void extract (DeepShapeStore &dss, const std::vector<DeepLayer> &layers, Netlist *netlist);
+  void extract (DeepShapeStore &dss, const input_layers &layers, Netlist *netlist);
 
   /**
    *  @brief Gets the error iterator, begin
@@ -230,14 +268,36 @@ public:
     return ! m_errors.empty ();
   }
 
+  /**
+   *  @brief Gets the layer definition iterator, begin
+   */
+  layer_definitions_iterator begin_layer_definitions () const
+  {
+    return m_layer_definitions.begin ();
+  }
+
+  /**
+   *  @brief Gets the layer definition iterator, end
+   */
+  layer_definitions_iterator end_layer_definitions () const
+  {
+    return m_layer_definitions.end ();
+  }
+
 protected:
   /**
-   *  @brief Creates the device classes
+   *  @brief Sets up the extractor
+   *
+   *  This method is supposed to set up the device extractor. This involves two basic steps:
+   *  defining the device classes and setting up the device layers.
+   *
    *  At least one device class needs to be defined. Use "register_device_class" to register
    *  the device classes you need. The first device class registered has device class index 0,
    *  the further ones 1, 2, etc.
+   *
+   *  The device layers need to be defined by calling "define_layer" once or several times.
    */
-  virtual void create_device_classes ();
+  virtual void setup ();
 
   /**
    *  @brief Gets the connectivity object used to extract the device geometry
@@ -264,8 +324,19 @@ protected:
    *  @brief Registers a device class
    *  The device class object will become owned by the netlist and must not be deleted by
    *  the caller.
+   *  This method shall be used inside the implementation of "setup" to register
+   *  the device classes.
    */
   void register_device_class (DeviceClass *device_class);
+
+  /**
+   *  @brief Defines a layer
+   *  Each call will define one more layer for the device extraction.
+   *  This method shall be used inside the implementation of "setip" to define
+   *  the device layers. The actual geometries are later available to "extract_devices"
+   *  in the order the layers are defined.
+   */
+  void define_layer (const std::string &name, const std::string &description = std::string ());
 
   /**
    *  @brief Creates a device
@@ -366,6 +437,7 @@ private:
   db::cell_index_type m_cell_index;
   db::Circuit *mp_circuit;
   std::vector<db::DeviceClass *> m_device_classes;
+  layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;
   unsigned int m_device_name_index;
   error_list m_errors;
@@ -375,6 +447,8 @@ private:
    *  This method will produce the device classes required for the device extraction.
    */
   void initialize (db::Netlist *nl);
+
+  void extract_without_initialize (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl);
 };
 
 }

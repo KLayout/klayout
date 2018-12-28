@@ -66,12 +66,13 @@ const tl::Variant &NetlistDeviceExtractor::terminal_property_name ()
 
 void NetlistDeviceExtractor::initialize (db::Netlist *nl)
 {
+  m_layer_definitions.clear ();
   m_device_classes.clear ();
   m_device_name_index = 0;
   m_propname_id = 0;
   m_netlist.reset (nl);
 
-  create_device_classes ();
+  setup ();
 }
 
 static void insert_into_region (const db::PolygonRef &s, const db::ICplxTrans &tr, db::Region &region)
@@ -79,25 +80,46 @@ static void insert_into_region (const db::PolygonRef &s, const db::ICplxTrans &t
   region.insert (s.obj ().transformed (tr * db::ICplxTrans (s.trans ())));
 }
 
-void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const std::vector<db::DeepLayer> &deep_layers, db::Netlist *nl)
+void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const NetlistDeviceExtractor::input_layers &layer_map, db::Netlist *nl)
 {
-  db::Layout &layout = dss.layout ();
-  db::Cell &cell = dss.initial_cell ();
+  initialize (nl);
 
   std::vector<unsigned int> layers;
-  layers.reserve (deep_layers.size ());
+  layers.reserve (m_layer_definitions.size ());
 
-  for (std::vector<db::DeepLayer>::const_iterator dl = deep_layers.begin (); dl != deep_layers.end (); ++dl) {
-    tl_assert (&dl->layout () == &layout);
-    layers.push_back (dl->layer ());
+  for (layer_definitions::const_iterator ld = begin_layer_definitions (); ld != end_layer_definitions (); ++ld) {
+
+    input_layers::const_iterator l = layer_map.find (ld->name);
+    if (l == layer_map.end ()) {
+      throw tl::Exception (tl::to_string (tr ("Missing input layer for device extraction: ")) + ld->name);
+    }
+
+    tl_assert (l->second != 0);
+    db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (l->second->delegate ());
+    if (dr == 0) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid region passed to input layer '%s' for device extraction: must be of deep region kind")), ld->name));
+    }
+
+    if (&dr->deep_layer ().layout () != &dss.layout () || &dr->deep_layer ().initial_cell () != &dss.initial_cell ()) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid region passed to input layer '%s' for device extraction: not originating from the same source")), ld->name));
+    }
+
+    layers.push_back (dr->deep_layer ().layer ());
+
   }
 
-  extract (layout, cell, layers, nl);
+  extract_without_initialize (dss.layout (), dss.initial_cell (), layers, nl);
 }
 
 void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl)
 {
   initialize (nl);
+  extract_without_initialize (layout, cell, layers, nl);
+}
+
+void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl)
+{
+  tl_assert (layers.size () == m_layer_definitions.size ());
 
   typedef db::PolygonRef shape_type;
   db::ShapeIterator::flags_type shape_iter_flags = db::ShapeIterator::Polygons;
@@ -176,7 +198,7 @@ void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const 
   }
 }
 
-void NetlistDeviceExtractor::create_device_classes ()
+void NetlistDeviceExtractor::setup ()
 {
   //  .. the default implementation does nothing ..
 }
@@ -197,6 +219,11 @@ void NetlistDeviceExtractor::register_device_class (DeviceClass *device_class)
   tl_assert (m_netlist.get () != 0);
   m_netlist->add_device_class (device_class);
   m_device_classes.push_back (device_class);
+}
+
+void NetlistDeviceExtractor::define_layer (const std::string &name, const std::string &description)
+{
+  m_layer_definitions.push_back (db::NetlistDeviceExtractorLayerDefinition (name, description, m_layer_definitions.size ()));
 }
 
 Device *NetlistDeviceExtractor::create_device (unsigned int device_class_index)

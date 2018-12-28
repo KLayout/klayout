@@ -29,6 +29,23 @@
 namespace db
 {
 
+// ----------------------------------------------------------------------------------------
+//  NetlistDeviceExtractorError implementation
+
+NetlistDeviceExtractorError::NetlistDeviceExtractorError ()
+{
+  //  .. nothing yet ..
+}
+
+NetlistDeviceExtractorError::NetlistDeviceExtractorError (const std::string &cell_name, const std::string &msg)
+  : m_cell_name (cell_name), m_message (msg)
+{
+  //  .. nothing yet ..
+}
+
+// ----------------------------------------------------------------------------------------
+//  NetlistDeviceExtractor implementation
+
 NetlistDeviceExtractor::NetlistDeviceExtractor ()
   : mp_layout (0), m_cell_index (0), mp_circuit (0)
 {
@@ -217,6 +234,51 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
   //  NOTE: we add one DBU to the "point" to prevent it from vanishing
   db::Vector dv (1, 1);
   define_terminal (device, terminal_id, layer_index, db::Polygon (db::Box (point - dv, point + dv)));
+}
+
+std::string NetlistDeviceExtractor::cell_name () const
+{
+  if (layout ()) {
+    return layout ()->cell_name (cell_index ());
+  } else {
+    return std::string ();
+  }
+}
+
+void NetlistDeviceExtractor::error (const std::string &msg)
+{
+  m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
+}
+
+void NetlistDeviceExtractor::error (const std::string &msg, const db::Polygon &poly)
+{
+  error (msg);
+  m_errors.back ().set_geometry (db::Region (poly));
+}
+
+void NetlistDeviceExtractor::error (const std::string &msg, const db::Region &region)
+{
+  error (msg);
+  m_errors.back ().set_geometry (region);
+}
+
+void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg)
+{
+  error (msg);
+  m_errors.back ().set_category_name (category_name);
+  m_errors.back ().set_category_description (category_description);
+}
+
+void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Polygon &poly)
+{
+  error (category_name, category_description, msg);
+  m_errors.back ().set_geometry (db::Region (poly));
+}
+
+void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Region &region)
+{
+  error (category_name, category_description, msg);
+  m_errors.back ().set_geometry (region);
 }
 
 }

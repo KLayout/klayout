@@ -28,11 +28,122 @@
 #include "dbLayout.h"
 #include "dbHierNetworkProcessor.h"
 #include "dbDeepShapeStore.h"
+#include "dbRegion.h"
 
 #include "gsiObject.h"
 
 namespace db
 {
+
+/**
+ *  @brief An error object for the netlist device extractor
+ *
+ *  The device extractor will keep errors using objects of this kind.
+ */
+class DB_PUBLIC NetlistDeviceExtractorError
+{
+public:
+  /**
+   *  @brief Creates an error
+   */
+  NetlistDeviceExtractorError ();
+
+  /**
+   *  @brief Creates an error with a cell name and a message (the minimum information)
+   */
+  NetlistDeviceExtractorError (const std::string &cell_name, const std::string &msg);
+
+  /**
+   *  @brief The category name of the error
+   *  Specifying the category name is optional. If a category is given, it will be used for
+   *  the report.
+   */
+  const std::string &category_name () const
+  {
+    return m_category_name;
+  }
+
+  /**
+   *  @brief Sets the category name
+   */
+  void set_category_name (const std::string &s)
+  {
+    m_category_name = s;
+  }
+
+  /**
+   *  @brief The category description of the error
+   *  Specifying the category description is optional. If a category is given, this attribute will
+   *  be used for the category description.
+   */
+  const std::string &category_description () const
+  {
+    return m_category_description;
+  }
+
+  /**
+   *  @brief Sets the category description
+   */
+  void set_category_description (const std::string &s)
+  {
+    m_category_description = s;
+  }
+
+  /**
+   *  @brief Gets the geometry for this error
+   *  Not all errors may specify a geometry.
+   */
+  const db::Region &geometry () const
+  {
+    return m_geometry;
+  }
+
+  /**
+   *  @brief Sets the geometry
+   */
+  void set_geometry (const db::Region &g)
+  {
+    m_geometry = g;
+  }
+
+  /**
+   *  @brief Gets the message for this error
+   */
+  const std::string &message () const
+  {
+    return m_message;
+  }
+
+  /**
+   *  @brief Sets the message
+   */
+  void set_message (const std::string &n)
+  {
+    m_message = n;
+  }
+
+  /**
+   *  @brief Gets the cell name the error occured in
+   */
+  const std::string &cell_name () const
+  {
+    return m_cell_name;
+  }
+
+  /**
+   *  @brief Sets the cell name
+   */
+  void set_cell_name (const std::string &n)
+  {
+    m_cell_name = n;
+  }
+
+private:
+  std::string m_cell_name;
+  std::string m_message;
+  db::Region m_geometry;
+  std::string m_category_name, m_category_description;
+};
 
 /**
  *  @brief Implements the device extraction for a specific setup
@@ -44,6 +155,9 @@ class DB_PUBLIC NetlistDeviceExtractor
   : public gsi::ObjectBase
 {
 public:
+  typedef std::list<db::NetlistDeviceExtractorError> error_list;
+  typedef error_list::const_iterator error_iterator;
+
   /**
    *  @brief Default constructor
    */
@@ -91,6 +205,30 @@ public:
    *  DeepShape layers for input. By definition, these already have the "PolygonRef" type.
    */
   void extract (DeepShapeStore &dss, const std::vector<DeepLayer> &layers, Netlist *netlist);
+
+  /**
+   *  @brief Gets the error iterator, begin
+   */
+  error_iterator begin_errors ()
+  {
+    return m_errors.begin ();
+  }
+
+  /**
+   *  @brief Gets the error iterator, end
+   */
+  error_iterator end_errors ()
+  {
+    return m_errors.end ();
+  }
+
+  /**
+   *  @brief Returns true, if there are errors
+   */
+  bool has_errors () const
+  {
+    return ! m_errors.empty ();
+  }
 
 protected:
   /**
@@ -186,6 +324,41 @@ protected:
     return m_cell_index;
   }
 
+  /**
+   *  @brief Issues an error with the given message
+   */
+  void error (const std::string &msg);
+
+  /**
+   *  @brief Issues an error with the given message and error shape
+   */
+  void error (const std::string &msg, const db::Polygon &poly);
+
+  /**
+   *  @brief Issues an error with the given message and error geometry
+   */
+  void error (const std::string &msg, const db::Region &region);
+
+  /**
+   *  @brief Issues an error with the given category name, description and message
+   */
+  void error (const std::string &category_name, const std::string &category_description, const std::string &msg);
+
+  /**
+   *  @brief Issues an error with the given category name, description and message and error shape
+   */
+  void error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Polygon &poly);
+
+  /**
+   *  @brief Issues an error with the given category name, description and message and error geometry
+   */
+  void error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Region &region);
+
+  /**
+   *  @brief Gets the name of the current cell
+   */
+  std::string cell_name () const;
+
 private:
   tl::weak_ptr<db::Netlist> m_netlist;
   db::Layout *mp_layout;
@@ -195,6 +368,7 @@ private:
   std::vector<db::DeviceClass *> m_device_classes;
   std::vector<unsigned int> m_layers;
   unsigned int m_device_name_index;
+  error_list m_errors;
 
   /**
    *  @brief Initializes the extractor

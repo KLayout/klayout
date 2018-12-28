@@ -161,30 +161,6 @@ public:
     }
   }
 
-  void error (const std::string &msg)
-  {
-    // @@@ TODO: move this to device extractor
-    tl::error << tr ("Error in cell '") << cell_name () << "': " << msg;
-  }
-
-  void error (const std::string &msg, const db::Polygon &poly)
-  {
-    // @@@ TODO: move this to device extractor
-    tl::error << tr ("Error in cell '") << cell_name () << "': " << msg << " (" << poly.to_string () << ")";
-  }
-
-  void error (const std::string &msg, const db::Region &region)
-  {
-    // @@@ TODO: move this to device extractor
-    tl::error << tr ("Error in cell '") << cell_name () << "': " << msg << " (" << region.to_string () << ")";
-  }
-
-  std::string cell_name () const
-  {
-    // @@@ TODO: move this to device extractor
-    return layout ()->cell_name (cell_index ());
-  }
-
 private:
   db::Layout *mp_debug_out;
   unsigned int m_ldiff, m_lgate;
@@ -363,7 +339,7 @@ static std::string netlist2string (const db::Netlist &nl)
   return res;
 }
 
-TEST(1_DeviceAndNetExtraction)
+TEST(2_DeviceAndNetExtraction)
 {
   db::Layout ly;
   db::LayerMap lmap;
@@ -535,3 +511,92 @@ TEST(1_DeviceAndNetExtraction)
 
   db::compare_layouts (_this, ly, au);
 }
+
+#if 0
+
+// --------------------------------------------------------------------------------------
+//  An attempt to simplify things.
+
+/*
+- layers: use db::Region, or wrapper?
+-> use regions, but test whether they are deep regions (?)
+
+TODO:
+- netlist query functions such as net_by_name, device_by_name, circuit_by_name
+- terminal geometry (Polygon) for device, combined device geometry (all terminals)
+- error interface for device extraction
+  //  gets the device extraction errors
+  //  device_extraction_error_iterator begin_device_extraction_errors () const;
+  //  device_extraction_error_iterator end_device_extraction_errors () const;
+  //  bool has_device_extraction_errors () const;
+
+- device extractor needs to declare the layers to allow passing them by name
+- netlist manipulation methods (i.e. flatten certain cells, purging etc.)
+*/
+
+#include "tlGlobPattern.h"
+#include "dbHierNetworkProcessor.h"
+
+namespace db
+{
+
+class DB_PUBLIC LayoutToNetlist
+{
+public:
+  //  the iterator provides the hierarchical selection (enabling/disabling cells etc.)
+  LayoutToNetlist (const db::RecursiveShapeIterator &iter);
+
+  //  --- preparation
+
+  //  returns a new'd region
+  db::Region *make_layer (unsigned int layer_index);
+  db::Region *make_text_layer (unsigned int layer_index);
+  db::Region *make_polygon_layer (unsigned int layer_index);
+
+  //  gets the internal layout and cell
+  const db::Layout &internal_layout () const;
+  const db::Cell &internal_top_cell () const;
+
+  //  --- device extraction
+
+  //  after this, the device extractor will have errors if some occured.
+  void extract_devices (db::NetlistDeviceExtractor *extractor, const std::map<std::string, const db::Region *> &layers);
+
+  //  --- net extraction
+
+  //  define connectivity for the netlist extraction
+  void connect (const db::Region &l);
+  void connect (const db::Region &a, const db::Region &b);
+
+  //  runs the netlist extraction
+  void extract_netlist ();
+
+  //  --- retrieval
+
+  //  gets the internal layer index of the given region
+  unsigned int layer_of (const db::Region &region) const;
+
+  //  creates a cell mapping for copying the internal hierarchy to the given layout
+  //  CAUTION: may create new cells in "layout".
+  db::CellMapping cell_mapping_into (db::Layout &layout, db::Cell &cell);
+
+  //  creates a cell mapping for copying the internal hierarchy to the given layout
+  //  This version will not create new cells in the target layout.
+  db::CellMapping const_cell_mapping_into (const db::Layout &layout, const db::Cell &cell);
+
+  //  gets the netlist extracted (0 if no extraction happened yet)
+  db::Netlist *netlist () const;
+
+  //  gets the hierarchical clusters of the nets (CAUTION: the layer indexes therein are
+  //  internal layer indexes), same for cell indexes.
+  //  -> NOT GSI
+  const db::hier_clusters<db::PolygonRef> &net_clusters () const;
+
+  //  copies the shapes of the given net from a given layer
+  //  (recursive true: include nets from subcircuits)
+  db::Region shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive);
+};
+
+}
+
+#endif

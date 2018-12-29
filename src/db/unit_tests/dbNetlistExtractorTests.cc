@@ -480,17 +480,17 @@ TEST(1_DeviceAndNetExtraction)
   //  compare netlist as string
   EXPECT_EQ (netlist2string (nl),
     "Circuit RINGO ():\n"
-    "  XINV2 $1 ($1=$I8,$2=FB,$3=OSC,$4=VSS,$5=VDD)\n"
-    "  XINV2 $2 ($1=FB,$2=$I38,$3=$I19,$4=VSS,$5=VDD)\n"
-    "  XINV2 $3 ($1=$I19,$2=$I39,$3=$I1,$4=VSS,$5=VDD)\n"
-    "  XINV2 $4 ($1=$I1,$2=$I40,$3=$I2,$4=VSS,$5=VDD)\n"
-    "  XINV2 $5 ($1=$I2,$2=$I41,$3=$I3,$4=VSS,$5=VDD)\n"
-    "  XINV2 $6 ($1=$I3,$2=$I42,$3=$I4,$4=VSS,$5=VDD)\n"
-    "  XINV2 $7 ($1=$I4,$2=$I43,$3=$I5,$4=VSS,$5=VDD)\n"
-    "  XINV2 $8 ($1=$I5,$2=$I44,$3=$I6,$4=VSS,$5=VDD)\n"
-    "  XINV2 $9 ($1=$I6,$2=$I45,$3=$I7,$4=VSS,$5=VDD)\n"
-    "  XINV2 $10 ($1=$I7,$2=$I46,$3=$I8,$4=VSS,$5=VDD)\n"
-    "Circuit INV2 ($1=IN,$2=$2,$3=OUT,$4=$4,$5=$5):\n"
+    "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
+    "  XINV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD)\n"
+    "  XINV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD)\n"
+    "  XINV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD)\n"
+    "  XINV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD)\n"
+    "  XINV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD)\n"
+    "  XINV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD)\n"
+    "  XINV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD)\n"
+    "  XINV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD)\n"
+    "  XINV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD)\n"
+    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
     "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
     "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
     "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
@@ -500,6 +500,33 @@ TEST(1_DeviceAndNetExtraction)
     "  XTRANS $3 ($1=$5,$2=OUT,$3=$2)\n"
     "  XTRANS $4 ($1=$4,$2=OUT,$3=$2)\n"
     "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
+  );
+
+  // doesn't do anything here, but we test that this does not destroy anything:
+  nl.combine_devices ();
+
+  //  make pins for named nets of top-level circuits - this way they are not purged
+  nl.make_top_level_pins ();
+  nl.purge ();
+
+  //  compare netlist as string
+  EXPECT_EQ (netlist2string (nl),
+    "Circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD):\n"
+    "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
+    "  XINV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD)\n"
+    "  XINV2 $3 (IN=$I19,$2=(null),OUT=$I1,$4=VSS,$5=VDD)\n"
+    "  XINV2 $4 (IN=$I1,$2=(null),OUT=$I2,$4=VSS,$5=VDD)\n"
+    "  XINV2 $5 (IN=$I2,$2=(null),OUT=$I3,$4=VSS,$5=VDD)\n"
+    "  XINV2 $6 (IN=$I3,$2=(null),OUT=$I4,$4=VSS,$5=VDD)\n"
+    "  XINV2 $7 (IN=$I4,$2=(null),OUT=$I5,$4=VSS,$5=VDD)\n"
+    "  XINV2 $8 (IN=$I5,$2=(null),OUT=$I6,$4=VSS,$5=VDD)\n"
+    "  XINV2 $9 (IN=$I6,$2=(null),OUT=$I7,$4=VSS,$5=VDD)\n"
+    "  XINV2 $10 (IN=$I7,$2=(null),OUT=$I8,$4=VSS,$5=VDD)\n"
+    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
+    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
   );
 
   //  compare the collected test data

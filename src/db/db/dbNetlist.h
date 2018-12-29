@@ -1985,6 +1985,23 @@ public:
   void purge_nets ();
 
   /**
+   *  @brief Creates pins for top-level circuits
+   *
+   *  This method will turn all named nets of top-level circuits (such that are not
+   *  referenced by subcircuits) into pins. This method can be used before purge to
+   *  avoid that purge will remove nets which are directly connecting to subcircuits.
+   */
+  void make_top_level_pins ();
+
+  /**
+   *  @brief Purge unused nets, circuits and subcircuits
+   *
+   *  This method will purge all nets which return "floating". Circuits which don't have any
+   *  nets (or only floating ones) and removed. Their subcircuits are disconnected.
+   */
+  void purge ();
+
+  /**
    *  @brief Combine devices
    *
    *  This method will combine devices that can be combined according

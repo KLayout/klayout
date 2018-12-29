@@ -1446,6 +1446,53 @@ void Netlist::purge_nets ()
   }
 }
 
+void Netlist::make_top_level_pins ()
+{
+  size_t ntop = top_circuit_count ();
+  for (top_down_circuit_iterator c = begin_top_down (); c != end_top_down () && ntop > 0; ++c, --ntop) {
+
+    Circuit *circuit = *c;
+
+    if (circuit->pin_count () == 0) {
+
+      //  create pins for the named nets and connect them
+      for (Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
+        if (! n->name ().empty () && n->terminal_count () + n->pin_count () > 0) {
+          Pin pin (n->name ());
+          pin = circuit->add_pin (pin);
+          circuit->connect_pin (pin.id (), n.operator-> ());
+        }
+      }
+
+    }
+
+  }
+}
+
+void Netlist::purge ()
+{
+  //  This locking is very important as we do not want to recompute the bottom-up list
+  //  while iterating.
+  NetlistLocker locker (this);
+
+  for (bottom_up_circuit_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
+
+    Circuit *circuit = *c;
+
+    circuit->purge_nets ();
+    if (circuit->begin_nets () == circuit->end_nets ()) {
+
+      //  No nets left: delete the subcircuits that refer to us and finally delete the circuit
+      while (circuit->begin_refs () != circuit->end_refs ()) {
+        delete circuit->begin_refs ().operator-> ();
+      }
+      delete circuit;
+
+    }
+
+  }
+}
+
 void Netlist::combine_devices ()
 {
   for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {

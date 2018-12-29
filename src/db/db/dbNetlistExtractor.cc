@@ -98,12 +98,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
       net->set_cluster_id (*c);
       circuit->add_net (net);
 
-      if (! clusters.is_root (*c)) {
-        //  a non-root cluster makes a pin
-        size_t pin_id = make_pin (circuit, net);
-        c2p.insert (std::make_pair (*c, pin_id));
-      }
-
       //  make subcircuit connections (also make the subcircuits if required) from the connections of the clusters
       make_and_connect_subcircuits (circuit, clusters, *c, net, subcircuits, circuits, pins_per_cluster, layout.dbu ());
 
@@ -119,6 +113,12 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
             make_net_name_from_property (j->second, net);
           }
         }
+      }
+
+      if (! clusters.is_root (*c)) {
+        //  a non-root cluster makes a pin
+        size_t pin_id = make_pin (circuit, net);
+        c2p.insert (std::make_pair (*c, pin_id));
       }
 
     }

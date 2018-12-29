@@ -98,6 +98,11 @@ void DeviceClassResistor::serial (Device *a, Device *b) const
 // ------------------------------------------------------------------------------------
 //  DeviceClassCapacitor implementation
 
+DB_PUBLIC size_t DeviceClassCapacitor::param_id_C = 0;
+
+DB_PUBLIC size_t DeviceClassCapacitor::terminal_id_A = 0;
+DB_PUBLIC size_t DeviceClassCapacitor::terminal_id_B = 1;
+
 DeviceClassCapacitor::DeviceClassCapacitor ()
 {
   add_terminal_definition (db::DeviceTerminalDefinition ("A", "Terminal A"));
@@ -122,6 +127,11 @@ void DeviceClassCapacitor::parallel (Device *a, Device *b) const
 
 // ------------------------------------------------------------------------------------
 //  DeviceClassInductor implementation
+
+DB_PUBLIC size_t DeviceClassInductor::param_id_L = 0;
+
+DB_PUBLIC size_t DeviceClassInductor::terminal_id_A = 0;
+DB_PUBLIC size_t DeviceClassInductor::terminal_id_B = 1;
 
 DeviceClassInductor::DeviceClassInductor ()
 {
@@ -148,6 +158,11 @@ void DeviceClassInductor::serial (Device *a, Device *b) const
 // ------------------------------------------------------------------------------------
 //  DeviceClassInductor implementation
 
+DB_PUBLIC size_t DeviceClassDiode::param_id_A = 0;
+
+DB_PUBLIC size_t DeviceClassDiode::terminal_id_A = 0;
+DB_PUBLIC size_t DeviceClassDiode::terminal_id_C = 1;
+
 DeviceClassDiode::DeviceClassDiode ()
 {
   add_terminal_definition (db::DeviceTerminalDefinition ("A", "Anode"));
@@ -164,7 +179,7 @@ bool DeviceClassDiode::combine_devices (Device *a, Device *b) const
   const db::Net *nb2 = b->net_for_terminal (1);
 
   //  only parallel diodes can be combined and their areas will add
-  if ((na1 == nb1 && na2 == nb2) || (na1 == nb2 && na2 == nb1)) {
+  if (na1 == nb1 && na2 == nb2) {
 
     a->set_parameter_value (0, a->parameter_value (0) + b->parameter_value (0));
     b->connect_terminal (0, 0);
@@ -179,6 +194,15 @@ bool DeviceClassDiode::combine_devices (Device *a, Device *b) const
 
 // ------------------------------------------------------------------------------------
 //  DeviceClassMOS3Transistor implementation
+
+DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_L = 0;
+DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_W = 1;
+DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_AS = 2;
+DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_AD = 3;
+
+DB_PUBLIC size_t DeviceClassMOS3Transistor::terminal_id_S = 0;
+DB_PUBLIC size_t DeviceClassMOS3Transistor::terminal_id_G = 1;
+DB_PUBLIC size_t DeviceClassMOS3Transistor::terminal_id_D = 2;
 
 DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
 {
@@ -225,6 +249,16 @@ bool DeviceClassMOS3Transistor::combine_devices (Device *a, Device *b) const
 
 // ------------------------------------------------------------------------------------
 //  DeviceClassMOS4Transistor implementation
+
+DB_PUBLIC size_t DeviceClassMOS4Transistor::param_id_L = 0;
+DB_PUBLIC size_t DeviceClassMOS4Transistor::param_id_W = 1;
+DB_PUBLIC size_t DeviceClassMOS4Transistor::param_id_AS = 2;
+DB_PUBLIC size_t DeviceClassMOS4Transistor::param_id_AD = 3;
+
+DB_PUBLIC size_t DeviceClassMOS4Transistor::terminal_id_S = 0;
+DB_PUBLIC size_t DeviceClassMOS4Transistor::terminal_id_G = 1;
+DB_PUBLIC size_t DeviceClassMOS4Transistor::terminal_id_D = 2;
+DB_PUBLIC size_t DeviceClassMOS4Transistor::terminal_id_B = 3;
 
 DeviceClassMOS4Transistor::DeviceClassMOS4Transistor ()
 {

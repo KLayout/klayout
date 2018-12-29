@@ -133,8 +133,8 @@ public:
 
         db::Device *device = create_device ();
 
-        device->set_parameter_value ("W", dbu () * edges.length () * 0.5);
-        device->set_parameter_value ("L", dbu () * (p->perimeter () - edges.length ()) * 0.5);
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, dbu () * edges.length () * 0.5);
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, dbu () * (p->perimeter () - edges.length ()) * 0.5);
 
         int diff_index = 0;
         for (db::Region::const_iterator d = rdiff2gate.begin (); !d.at_end () && diff_index < 2; ++d, ++diff_index) {
@@ -144,13 +144,13 @@ public:
           int n = rgates.selected_interacting (db::Region (*d)).size ();
           tl_assert (n > 0);
 
-          device->set_parameter_value (diff_index == 0 ? "AS" : "AD", dbu () * dbu () * d->area () / double (n));
+          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, dbu () * dbu () * d->area () / double (n));
 
-          define_terminal (device, device->device_class ()->terminal_id_for_name (diff_index == 0 ? "S" : "D"), terminal_geometry_index, *d);
+          define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, terminal_geometry_index, *d);
 
         }
 
-        define_terminal (device, device->device_class ()->terminal_id_for_name ("G"), gate_geometry_index, *p);
+        define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_geometry_index, *p);
 
         //  output the device for debugging
         device_out (device, rdiff2gate, rgate);

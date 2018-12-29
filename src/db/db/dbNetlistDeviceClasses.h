@@ -85,6 +85,11 @@ public:
     return new DeviceClassCapacitor (*this);
   }
 
+  static size_t param_id_C;
+
+  static size_t terminal_id_A;
+  static size_t terminal_id_B;
+
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
 };
@@ -105,6 +110,11 @@ public:
     return new DeviceClassInductor (*this);
   }
 
+  static size_t param_id_L;
+
+  static size_t terminal_id_A;
+  static size_t terminal_id_B;
+
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
 };
@@ -120,6 +130,11 @@ class DB_PUBLIC DeviceClassDiode
 {
 public:
   DeviceClassDiode ();
+
+  static size_t param_id_A;
+
+  static size_t terminal_id_A;
+  static size_t terminal_id_C;
 
   virtual db::DeviceClass *clone () const
   {
@@ -142,6 +157,15 @@ class DB_PUBLIC DeviceClassMOS3Transistor
 public:
   DeviceClassMOS3Transistor ();
 
+  static size_t param_id_L;
+  static size_t param_id_W;
+  static size_t param_id_AS;
+  static size_t param_id_AD;
+
+  static size_t terminal_id_S;
+  static size_t terminal_id_G;
+  static size_t terminal_id_D;
+
   virtual db::DeviceClass *clone () const
   {
     return new DeviceClassMOS3Transistor (*this);
@@ -161,6 +185,16 @@ class DB_PUBLIC DeviceClassMOS4Transistor
 {
 public:
   DeviceClassMOS4Transistor ();
+
+  static size_t param_id_L;
+  static size_t param_id_W;
+  static size_t param_id_AS;
+  static size_t param_id_AD;
+
+  static size_t terminal_id_S;
+  static size_t terminal_id_G;
+  static size_t terminal_id_D;
+  static size_t terminal_id_B;
 
   virtual db::DeviceClass *clone () const
   {

@@ -902,9 +902,19 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (td2string (nl.get ()), "c1,c2");
   EXPECT_EQ (bu2string (nl.get ()), "c2,c1");
 
+  std::auto_ptr<db::NetlistLocker> locker (new db::NetlistLocker (nl.get ()));
+
   db::Circuit *c3 = new db::Circuit ();
   c3->set_name ("c3");
   nl->add_circuit (c3);
+
+  //  because we locked, it did not get updated:
+  EXPECT_EQ (nl->top_circuit_count (), size_t (2));
+  EXPECT_EQ (td2string (nl.get ()), "c1,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c1");
+  locker.reset (0);
+
+  //  after removing the lock, it's updated
   EXPECT_EQ (nl->top_circuit_count (), size_t (3));
   EXPECT_EQ (td2string (nl.get ()), "c1,c2,c3");
   EXPECT_EQ (bu2string (nl.get ()), "c3,c2,c1");

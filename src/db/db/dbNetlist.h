@@ -1807,6 +1807,30 @@ public:
   void clear ();
 
   /**
+   *  @brief Starts a sequence of operations during which topology updates are not desired
+   *
+   *  If the hierarchy is modified, the topology information (top-down order, children
+   *  and parent information) may be recomputed frequently. This may cause performance issues
+   *  and may not be desired.
+   *
+   *  Calling this method will bring the netlist into a state in which updates on the
+   *  list will not happen. Using "unlock" will end this state.
+   *
+   *  "lock" and "unlock" are incremental and can be nested. Use "NetlistLocker" for safe locking
+   *  and unlocking.
+   *
+   *  Before lock, the state will be validated, so inside the locked operation, the topology
+   *  information will be valid with respect to the initial state.
+   */
+  void lock ();
+
+  /**
+   *  @brief Ends a sequence of operations during which topology updates are not desired
+   *  See "lock" for more details.
+   */
+  void unlock ();
+
+  /**
    *  @brief Adds a circuit to this netlist
    *
    *  The netlist takes over ownership of the object.
@@ -1974,6 +1998,7 @@ private:
   circuit_list m_circuits;
   device_class_list m_device_classes;
   bool m_valid_topology;
+  int m_lock_count;
   tl::vector<Circuit *> m_top_down_circuits;
   tl::vector<tl::vector<Circuit *> > m_child_circuits;
   tl::vector<tl::vector<Circuit *> > m_parent_circuits;
@@ -1984,6 +2009,31 @@ private:
 
   const tl::vector<Circuit *> &child_circuits (Circuit *circuit);
   const tl::vector<Circuit *> &parent_circuits (Circuit *circuit);
+};
+
+/**
+ *  @brief A helper class using RAII for safe locking/unlocking
+ */
+class DB_PUBLIC NetlistLocker
+{
+public:
+  NetlistLocker (Netlist *netlist)
+    : mp_netlist (netlist)
+  {
+    if (mp_netlist.get ()) {
+      mp_netlist->lock ();
+    }
+  }
+
+  ~NetlistLocker ()
+  {
+    if (mp_netlist.get ()) {
+      mp_netlist->unlock ();
+    }
+  }
+
+private:
+  tl::weak_ptr<Netlist> mp_netlist;
 };
 
 }

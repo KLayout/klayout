@@ -1129,13 +1129,13 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
 //  Netlist class implementation
 
 Netlist::Netlist ()
-  : m_valid_topology (false)
+  : m_valid_topology (false), m_lock_count (0)
 {
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
 }
 
 Netlist::Netlist (const Netlist &other)
-  : m_valid_topology (false)
+  : m_valid_topology (false), m_lock_count (0)
 {
   operator= (other);
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
@@ -1173,11 +1173,16 @@ Netlist &Netlist::operator= (const Netlist &other)
 void Netlist::invalidate_topology ()
 {
   if (m_valid_topology) {
+
     m_valid_topology = false;
-    m_top_circuits = 0;
-    m_top_down_circuits.clear ();
-    m_child_circuits.clear ();
-    m_parent_circuits.clear ();
+
+    if (m_lock_count == 0) {
+      m_top_circuits = 0;
+      m_top_down_circuits.clear ();
+      m_child_circuits.clear ();
+      m_parent_circuits.clear ();
+    }
+
   }
 }
 
@@ -1194,6 +1199,8 @@ namespace {
 void Netlist::validate_topology ()
 {
   if (m_valid_topology) {
+    return;
+  } else if (m_lock_count > 0) {
     return;
   }
 
@@ -1293,6 +1300,21 @@ void Netlist::validate_topology ()
   }
 
   m_valid_topology = true;
+}
+
+void Netlist::lock ()
+{
+  if (m_lock_count == 0) {
+    validate_topology ();
+  }
+  ++m_lock_count;
+}
+
+void Netlist::unlock ()
+{
+  if (m_lock_count > 0) {
+    --m_lock_count;
+  }
 }
 
 const tl::vector<Circuit *> &Netlist::child_circuits (Circuit *circuit)

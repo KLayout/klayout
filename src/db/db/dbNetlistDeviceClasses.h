@@ -60,6 +60,11 @@ public:
     return new DeviceClassResistor (*this);
   }
 
+  static size_t param_id_R;
+
+  static size_t terminal_id_A;
+  static size_t terminal_id_B;
+
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
 };

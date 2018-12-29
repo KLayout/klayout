@@ -105,6 +105,8 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   "Devices connect to nets through the \\Device#connect_terminal method. "
   "Device terminals can be disconnected using \\Device#disconnect_terminal.\n"
   "\n"
+  "Device objects are created inside a circuit with \\Circuit#create_device.\n"
+  "\n"
   "This class has been added in version 0.26."
 );
 
@@ -176,6 +178,8 @@ Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
   "\n"
   "Subcircuits connect to nets through the \\SubCircuit#connect_pin method. "
   "SubCircuit pins can be disconnected using \\SubCircuit#disconnect_pin.\n"
+  "\n"
+  "Subcircuit objects are created inside a circuit with \\Circuit#create_subcircuit.\n"
   "\n"
   "This class has been added in version 0.26."
 );
@@ -285,6 +289,8 @@ Class<db::Net> decl_dbNet ("db", "Net",
   "A net connects multiple pins or terminals together. Pins are either "
   "pin or subcircuits of outgoing pins of the circuit the net lives in. "
   "Terminals are connections made to specific terminals of devices.\n"
+  "\n"
+  "Net objects are created inside a circuit with \\Circuit#create_net.\n"
   "\n"
   "To connect a net to an outgoing pin of a circuit, use \\Circuit#connect_pin, to "
   "disconnect a net from an outgoing pin use \\Circuit#disconnect_pin. "
@@ -840,12 +846,27 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::iterator ("each_device_class", (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::begin_device_classes, (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::end_device_classes,
     "@brief Iterates over the device classes of the netlist"
   ) +
+  gsi::method ("to_s", &db::Netlist::to_string,
+    "@brief Converts the netlist to a string representation.\n"
+    "This method is intended for test purposes mainly."
+  ) +
   gsi::method ("combine_devices", &db::Netlist::combine_devices,
     "@brief Combines devices where possible\n"
     "This method will combine devices that can be combined according "
     "to their device classes 'combine_devices' method.\n"
     "For example, serial or parallel resistors can be combined into "
     "a single resistor.\n"
+  ) +
+  gsi::method ("make_top_level_pins", &db::Netlist::make_top_level_pins,
+    "@brief Creates pins for top-level circuits.\n"
+    "This method will turn all named nets of top-level circuits (such that are not "
+    "referenced by subcircuits) into pins. This method can be used before purge to "
+    "avoid that purge will remove nets which are directly connecting to subcircuits."
+  ) +
+  gsi::method ("purge", &db::Netlist::purge,
+    "@brief Purge unused nets, circuits and subcircuits.\n"
+    "This method will purge all nets which return \\floating == true. Circuits which don't have any "
+    "nets (or only floating ones) and removed. Their subcircuits are disconnected."
   ) +
   gsi::method ("purge_nets", &db::Netlist::purge_nets,
     "@brief Purges floating nets.\n"

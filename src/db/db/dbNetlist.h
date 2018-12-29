@@ -302,6 +302,11 @@ public:
   Net ();
 
   /**
+   *  @brief Creates a empty net with the give name
+   */
+  Net (const std::string &name);
+
+  /**
    *  @brief Copy constructor
    */
   Net (const Net &other);
@@ -1374,8 +1379,8 @@ private:
   void translate_circuits (const std::map<const Circuit *, Circuit *> &map);
   void translate_device_classes (const std::map<const DeviceClass *, DeviceClass *> &map);
   void set_netlist (Netlist *netlist);
-  void combine_parallel_devices (const db::DeviceClass &cls);
-  void combine_serial_devices (const db::DeviceClass &cls);
+  bool combine_parallel_devices (const db::DeviceClass &cls);
+  bool combine_serial_devices (const db::DeviceClass &cls);
 
   void validate_device_id_table ();
   void invalidate_device_id_table ();
@@ -1805,6 +1810,13 @@ public:
    *  @brief Clears the netlist
    */
   void clear ();
+
+  /**
+   *  @brief Returns a string representation of the netlist
+   *
+   *  This method is basically intended to testing.
+   */
+  std::string to_string () const;
 
   /**
    *  @brief Starts a sequence of operations during which topology updates are not desired

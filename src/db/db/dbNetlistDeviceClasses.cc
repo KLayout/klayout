@@ -68,6 +68,11 @@ bool DeviceClassTwoTerminalDevice::combine_devices (Device *a, Device *b) const
 // ------------------------------------------------------------------------------------
 //  DeviceClassResistor implementation
 
+DB_PUBLIC size_t DeviceClassResistor::param_id_R = 0;
+
+DB_PUBLIC size_t DeviceClassResistor::terminal_id_A = 0;
+DB_PUBLIC size_t DeviceClassResistor::terminal_id_B = 1;
+
 DeviceClassResistor::DeviceClassResistor ()
 {
   add_terminal_definition (db::DeviceTerminalDefinition ("A", "Terminal A"));

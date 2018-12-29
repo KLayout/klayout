@@ -49,11 +49,6 @@ static unsigned int layer_of (const db::Region &region)
   return db::DeepLayer (region).layer ();
 }
 
-static std::string net_name (const db::Net *net)
-{
-  return net ? net->expanded_name () : "(null)";
-}
-
 static std::string device_name (const db::Device &device)
 {
   if (device.name ().empty ()) {
@@ -62,26 +57,6 @@ static std::string device_name (const db::Device &device)
     return device.name ();
   }
 }
-
-static std::string subcircuit_name (const db::SubCircuit &subcircuit)
-{
-  if (subcircuit.name ().empty ()) {
-    return "$" + tl::to_string (subcircuit.id ());
-  } else {
-    return subcircuit.name ();
-  }
-}
-
-static std::string pin_name (const db::Pin &pin)
-{
-  if (pin.name ().empty ()) {
-    //  the pin ID is zero-based and essentially the index, so we add 1 to make it compliant with the other IDs
-    return "$" + tl::to_string (pin.id () + 1);
-  } else {
-    return pin.name ();
-  }
-}
-
 
 class MOSFETExtractor
   : public db::NetlistDeviceExtractor
@@ -229,9 +204,7 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
   return lid;
 }
 
-//  @@@ TODO: move this somewhere else
-
-static void dump_nets (const db::Netlist &nl, const db::hier_clusters<db::PolygonRef> &clusters, db::Layout &ly, const std::map<unsigned int, unsigned int> &lmap, const db::CellMapping &cmap)
+static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<db::PolygonRef> &clusters, db::Layout &ly, const std::map<unsigned int, unsigned int> &lmap, const db::CellMapping &cmap)
 {
   for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
 
@@ -248,7 +221,7 @@ static void dump_nets (const db::Netlist &nl, const db::hier_clusters<db::Polygo
 
       if (any_shapes) {
 
-        std::string nn = "NET_" + c->name () + "_" + net_name (n.operator-> ());
+        std::string nn = "NET_" + c->name () + "_" + n->expanded_name ();
         db::Cell &net_cell = ly.cell (ly.add_cell (nn.c_str ()));
         cell.insert (db::CellInstArray (db::CellInst (net_cell.cell_index ()), db::Trans ()));
 
@@ -264,66 +237,6 @@ static void dump_nets (const db::Netlist &nl, const db::hier_clusters<db::Polygo
     }
 
   }
-}
-
-static std::string netlist2string (const db::Netlist &nl)
-{
-  std::string res;
-  for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
-
-    std::string ps;
-    for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p) {
-      if (! ps.empty ()) {
-        ps += ",";
-      }
-      ps += pin_name (*p) + "=" + net_name (c->net_for_pin (p->id ()));
-    }
-
-    res += std::string ("Circuit ") + c->name () + " (" + ps + "):\n";
-
-#if 0  //  for debugging
-    for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      res += "  N" + net_name (n.operator-> ()) + " pins=" + tl::to_string (n->pin_count ()) + " terminals=" + tl::to_string (n->terminal_count ()) + "\n";
-    }
-#endif
-
-    for (db::Circuit::const_device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
-      std::string ts;
-      const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
-      for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
-        if (t != td.begin ()) {
-          ts += ",";
-        }
-        ts += t->name () + "=" + net_name (d->net_for_terminal (t->id ()));
-      }
-      std::string ps;
-      const std::vector<db::DeviceParameterDefinition> &pd = d->device_class ()->parameter_definitions ();
-      for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-        if (p != pd.begin ()) {
-          ps += ",";
-        }
-        ps += p->name () + "=" + tl::to_string (d->parameter_value (p->id ()));
-      }
-      res += std::string ("  D") + d->device_class ()->name () + " " + device_name (*d) + " (" + ts + ") [" + ps + "]\n";
-    }
-
-    for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
-      std::string ps;
-      const db::SubCircuit &subcircuit = *sc;
-      const db::Circuit *circuit = sc->circuit_ref ();
-      for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
-        if (p != circuit->begin_pins ()) {
-          ps += ",";
-        }
-        const db::Pin &pin = *p;
-        ps += pin_name (pin) + "=" + net_name (subcircuit.net_for_pin (pin.id ()));
-      }
-      res += std::string ("  X") + circuit->name () + " " + subcircuit_name (*sc) + " (" + ps + ")\n";
-    }
-
-  }
-
-  return res;
 }
 
 TEST(1_DeviceAndNetExtraction)
@@ -475,10 +388,10 @@ TEST(1_DeviceAndNetExtraction)
 
   //  write nets to layout
   db::CellMapping cm = dss.cell_mapping_to_original (0, &ly, tc.cell_index ());
-  dump_nets (nl, net_ex.clusters (), ly, dump_map, cm);
+  dump_nets_to_layout (nl, net_ex.clusters (), ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (netlist2string (nl),
+  EXPECT_EQ (nl.to_string (),
     "Circuit RINGO ():\n"
     "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
     "  XINV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD)\n"
@@ -510,7 +423,7 @@ TEST(1_DeviceAndNetExtraction)
   nl.purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (netlist2string (nl),
+  EXPECT_EQ (nl.to_string (),
     "Circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD):\n"
     "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
     "  XINV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD)\n"

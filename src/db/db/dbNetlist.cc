@@ -380,6 +380,12 @@ Net::Net ()
   //  .. nothing yet ..
 }
 
+Net::Net (const std::string &name)
+  : m_cluster_id (0), mp_circuit (0)
+{
+  m_name = name;
+}
+
 Net::Net (const Net &other)
   : m_cluster_id (0), mp_circuit (0)
 {
@@ -861,7 +867,7 @@ void Circuit::purge_nets ()
  */
 static void check_device_before_remove (db::Circuit *c, const db::Device *d)
 {
-  if (d->device_class () != 0) {
+  if (d->device_class () == 0) {
     throw tl::Exception (tl::to_string (tr ("Internal error: No device class after removing device in device combination")) + ": name=" + d->name () + ", circuit=" + c->name ());
   }
   const std::vector<db::DeviceTerminalDefinition> &pd = d->device_class ()->terminal_definitions ();
@@ -872,10 +878,12 @@ static void check_device_before_remove (db::Circuit *c, const db::Device *d)
   }
 }
 
-void Circuit::combine_parallel_devices (const db::DeviceClass &cls)
+bool Circuit::combine_parallel_devices (const db::DeviceClass &cls)
 {
   typedef std::vector<const db::Net *> key_type;
   std::map<key_type, std::vector<db::Device *> > combination_candidates;
+
+  bool any = false;
 
   //  identify the candidates for combination - all devices sharing the same nets
   //  are candidates for combination in parallel mode
@@ -904,12 +912,13 @@ void Circuit::combine_parallel_devices (const db::DeviceClass &cls)
   for (std::map<key_type, std::vector<db::Device *> >::iterator cc = combination_candidates.begin (); cc != combination_candidates.end (); ++cc) {
 
     std::vector<db::Device *> &cl = cc->second;
-    for (size_t i = 0; i != cl.size () - 1; ++i) {
-      for (size_t j = i + 1; j != cl.size (); ) {
+    for (size_t i = 0; i < cl.size () - 1; ++i) {
+      for (size_t j = i + 1; j < cl.size (); ) {
         if (cls.combine_devices (cl [i], cl [j])) {
           check_device_before_remove (this, cl [j]);  //  sanity check
           delete cl [j];
           cl.erase (cl.begin () + j);
+          any = true;
         } else {
           ++j;
         }
@@ -917,6 +926,8 @@ void Circuit::combine_parallel_devices (const db::DeviceClass &cls)
     }
 
   }
+
+  return any;
 }
 
 static std::pair<db::Device *, db::Device *> attached_two_devices (db::Net &net, const db::DeviceClass &cls)
@@ -955,8 +966,10 @@ static bool same_or_swapped (const std::pair<T, T> &p1, const std::pair<T, T> &p
   return (p1.first == p2.first && p1.second == p2.second) || (p1.first == p2.second && p1.second == p2.first);
 }
 
-void Circuit::combine_serial_devices (const db::DeviceClass &cls)
+bool Circuit::combine_serial_devices(const db::DeviceClass &cls)
 {
+  bool any = false;
+
   for (net_iterator n = begin_nets (); n != end_nets (); ++n) {
 
     std::pair<db::Device *, db::Device *> dd = attached_two_devices (*n, cls);
@@ -993,11 +1006,14 @@ void Circuit::combine_serial_devices (const db::DeviceClass &cls)
       if (cls.combine_devices (dd.first, dd.second)) {
         check_device_before_remove (this, dd.second);  //  sanity check
         delete dd.second;
+        any = true;
       }
 
     }
 
   }
+
+  return any;
 }
 
 void Circuit::combine_devices ()
@@ -1005,12 +1021,27 @@ void Circuit::combine_devices ()
   tl_assert (netlist () != 0);
 
   for (Netlist::device_class_iterator dc = netlist ()->begin_device_classes (); dc != netlist ()->end_device_classes (); ++dc) {
-    if (dc->supports_parallel_combination ()) {
-      combine_parallel_devices (*dc);
+
+    //  repeat the combination step unless no combination happens - this is required to take care of combinations that arise after
+    //  other combinations have been realized.
+    bool any = true;
+    while (any) {
+
+      any = false;
+
+      if (dc->supports_parallel_combination ()) {
+        if (combine_parallel_devices (*dc)) {
+          any = true;
+        }
+      }
+      if (dc->supports_serial_combination ()) {
+        if (combine_serial_devices (*dc)) {
+          any = true;
+        }
+      }
+
     }
-    if (dc->supports_serial_combination ()) {
-      combine_serial_devices (*dc);
-    }
+
   }
 }
 
@@ -1498,6 +1529,99 @@ void Netlist::combine_devices ()
   for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
     c->combine_devices ();
   }
+}
+
+static std::string net2string (const db::Net *net)
+{
+  return net ? tl::to_word_or_quoted_string (net->expanded_name ()) : "(null)";
+}
+
+static std::string device2string (const db::Device &device)
+{
+  if (device.name ().empty ()) {
+    return "$" + tl::to_string (device.id ());
+  } else {
+    return tl::to_word_or_quoted_string (device.name ());
+  }
+}
+
+static std::string subcircuit2string (const db::SubCircuit &subcircuit)
+{
+  if (subcircuit.name ().empty ()) {
+    return "$" + tl::to_string (subcircuit.id ());
+  } else {
+    return tl::to_word_or_quoted_string (subcircuit.name ());
+  }
+}
+
+static std::string pin2string (const db::Pin &pin)
+{
+  if (pin.name ().empty ()) {
+    //  the pin ID is zero-based and essentially the index, so we add 1 to make it compliant with the other IDs
+    return "$" + tl::to_string (pin.id () + 1);
+  } else {
+    return tl::to_word_or_quoted_string (pin.name ());
+  }
+}
+
+std::string Netlist::to_string () const
+{
+  std::string res;
+  for (db::Netlist::const_circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
+
+    std::string ps;
+    for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p) {
+      if (! ps.empty ()) {
+        ps += ",";
+      }
+      ps += pin2string (*p) + "=" + net2string (c->net_for_pin (p->id ()));
+    }
+
+    res += std::string ("Circuit ") + c->name () + " (" + ps + "):\n";
+
+#if 0  //  for debugging
+    for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
+      res += "  N" + net_name (n.operator-> ()) + " pins=" + tl::to_string (n->pin_count ()) + " terminals=" + tl::to_string (n->terminal_count ()) + "\n";
+    }
+#endif
+
+    for (db::Circuit::const_device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
+      std::string ts;
+      const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
+      for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
+        if (t != td.begin ()) {
+          ts += ",";
+        }
+        ts += t->name () + "=" + net2string (d->net_for_terminal (t->id ()));
+      }
+      std::string ps;
+      const std::vector<db::DeviceParameterDefinition> &pd = d->device_class ()->parameter_definitions ();
+      for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+        if (p != pd.begin ()) {
+          ps += ",";
+        }
+        ps += p->name () + "=" + tl::to_string (d->parameter_value (p->id ()));
+      }
+      res += std::string ("  D") + d->device_class ()->name () + " " + device2string (*d) + " (" + ts + ") [" + ps + "]\n";
+    }
+
+    for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
+      std::string ps;
+      const db::SubCircuit &subcircuit = *sc;
+      const db::Circuit *circuit = sc->circuit_ref ();
+      for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
+        if (p != circuit->begin_pins ()) {
+          ps += ",";
+        }
+        const db::Pin &pin = *p;
+        ps += pin2string (pin) + "=" + net2string (subcircuit.net_for_pin (pin.id ()));
+      }
+      res += std::string ("  X") + circuit->name () + " " + subcircuit2string (*sc) + " (" + ps + ")\n";
+    }
+
+  }
+
+  return res;
 }
 
 }

@@ -228,7 +228,7 @@ matrix:
             - qt
           update: true
       env:
-        - MATRIX_EVAL=""
+        - MATRIX_EVAL="brew update; brew install qt"  # homebrew addon fails for xcode8
         - PYTHON_VERSION=B37
         - MACOS_VERSION=ElCapitan
         - KLAYOUT_BUILD=true
@@ -271,7 +271,7 @@ matrix:
             - qt
           update: true
       env:
-        - MATRIX_EVAL=""
+        - MATRIX_EVAL="brew update; brew install qt"  # homebrew addon fails for xcode8
         - PYTHON_VERSION=Sys
         - MACOS_VERSION=ElCapitan
         - KLAYOUT_BUILD=true

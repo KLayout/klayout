@@ -1,28 +1,235 @@
 matrix:
   include:
+    # python manylinux packages
+
+    - name: "cp37-cp37m-manylinux1_x86_64.whl"
+      os: linux
+      sudo: true
+      language: python
+      python: '3.7-dev'
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp37-cp37m"
+        - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp37-cp37m-manylinux1_i686.whl"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp37-cp37m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp36-cp36m-manylinux1_x86_64.whl"
+      os: linux
+      sudo: true
+      language: python
+      python: '3.6'
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp36-cp36m"
+        - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp36-cp36m-manylinux1_i686.whl"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp36-cp36m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp35-cp35m-manylinux1_x86_64.whl"
+      os: linux
+      sudo: true
+      language: python
+      python: '3.5'
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp35-cp35m"
+        - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp35-cp35m-manylinux1_i686.whl"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp35-cp35m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp34-cp34m-manylinux1_x86_64.whl"
+      os: linux
+      sudo: true
+      language: python
+      python: '3.4'
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp34-cp34m"
+        - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp34-cp34m-manylinux1_i686.whl"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp34-cp34m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp27-cp27mu-manylinux1_x86_64.whl"
+      os: linux
+      sudo: true
+      language: python
+      python: '2.7'
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp27-cp27mu"
+        - DOCKER_BUILD=true
+        - TEST_IN_HOST=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp27-cp27mu-manylinux1_i686.whl"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp27-cp27mu"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp27-cp27m-manylinux1_x86_64.whl"
+      os: linux
+      sudo: true
+      language: python
+      python: '2.7'
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_x86_64"
+        - PY_VERSION="cp27-cp27m"
+        - DOCKER_BUILD=true
+        - TEST_IN_HOST=false  # travis's python 2.7 uses ucs4 (mu), so this test fails.
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+    - name: "cp27-cp27m-manylinux1_i686.whl"
+      os: linux
+      sudo: true
+      services:
+        - docker
+      env:
+        - DOCKER_IMAGE="quay.io/pypa/manylinux1_i686"
+        - PY_VERSION="cp27-cp27m"
+        - DOCKER_BUILD=true
+        - MATRIX_EVAL=""
+      cache:
+        directories:
+        - ccache
+
+
     # python 2 osx
     
-    - name: "klayout python2 osx10.13"
+    # - name: "klayout python2 osx10.13"
+    - name: "cp27-cp27m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - ccache
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python2 osx10.12"
+    # - name: "klayout python2 osx10.12"
+    - name: "cp27-cp27m-macosx_10_12_x86_64.whl"
       os: osx
       osx_image: xcode8.3  # macOS 10.12
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - ccache
       env:
         - MATRIX_EVAL="brew install python2 || brew link --overwrite python@2"  # deficient python2 in travis's xcode8.3 (no ssl)
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python2 osx10.11"
+    # - name: "klayout python2 osx10.11"
+    - name: "cp27-cp27m-macosx_10_11_x86_64.whl"
       os: osx
       osx_image: xcode8  # macOS 10.11
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - ccache
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
@@ -31,13 +238,16 @@ matrix:
 
     # python 3 osx
     
-    - name: "klayout python3 osx10.13"
+    # - name: "klayout python3 osx10.13"
+    - name: "cp37-cp37m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
+      cache: ccache
       addons:
         homebrew:
           packages:
             - python3
+            - ccache
           update: true
       env:
         - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
@@ -45,40 +255,61 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
 
-    - name: "klayout python3.6.6 osx10.13"
+    # - name: "klayout python3.6.6 osx10.13"
+    - name: "cp36-cp36m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - ccache
       env:
         - MATRIX_EVAL="brew update; brew install sashkab/python/python36; brew link --force --overwrite python36; shopt -s expand_aliases; alias python='/usr/local/opt/python36/bin/python3.6'; alias pip='/usr/local/opt/python36/bin/pip3.6';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
 
-    - name: "klayout python3.5.6 osx10.13"
+    # - name: "klayout python3.5.6 osx10.13"
+    - name: "cp35-cp35m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - ccache
       env:
         - MATRIX_EVAL="brew update; brew install sashkab/python/python35; brew link --force --overwrite python35; shopt -s expand_aliases; alias python='/usr/local/opt/python35/bin/python3.5'; alias pip='/usr/local/opt/python35/bin/pip3.5';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
 
-    - name: "klayout python3.4.9 osx10.13"
+    # - name: "klayout python3.4.9 osx10.13"
+    - name: "cp34-cp34m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - ccache
       env:
         - MATRIX_EVAL="brew update; brew install sashkab/python/python34; brew link --force --overwrite python34; shopt -s expand_aliases; alias python='/usr/local/opt/python34/bin/python3.4'; alias pip='/usr/local/opt/python34/bin/pip3.4';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python3 osx10.12"
+    # - name: "klayout python3 osx10.12"
+    - name: "cp37-cp37m-macosx_10_12_x86_64.whl"
       os: osx
       osx_image: xcode8.3  # macOS 10.12
+      cache: ccache
       addons:
         homebrew:
           packages:
             - python3
+            - ccache
           update: true
       env:
         - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
@@ -86,116 +317,124 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python3 osx10.11"
+    # - name: "klayout python3 osx10.11"
+    - name: "cp37-cp37m-macosx_10_11_x86_64.whl"
       os: osx
       osx_image: xcode8  # macOS 10.11
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - ccache
       env:
         - MATRIX_EVAL="brew update; brew config; brew upgrade python; brew postinstall python; ls -l /usr/local/opt/python/libexec/bin/; shopt -s expand_aliases; alias python='/usr/local/opt/python/libexec/bin/python'; alias pip='/usr/local/opt/python/libexec/bin/pip';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
     
-    - name: "klayout python3.7 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.7-dev'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.7 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.7-dev'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
 
-    - name: "klayout python3.6 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.6'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.6 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.6'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python2.7 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '2.7'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python2.7 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '2.7'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python2.6 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '2.6'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="0"  # setuptools installed from last pip has syntax error on py 2.6
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python2.6 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '2.6'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="0"  # setuptools installed from last pip has syntax error on py 2.6
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python3.3 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.3'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.3 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.3'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python3.4 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.4'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.4 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.4'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
     
-    - name: "klayout python3.5 package"
-      os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.5'
-      env:
-        - MATRIX_EVAL=""
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - CC=clang
-        - CXX=clang++
+    # - name: "klayout python3.5 package"
+    #   os: linux
+    #   dist: trusty # Ubuntu 14.04
+    #   sudo: false
+    #   language: python
+    #   python: '3.5'
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - CC=clang
+    #     - CXX=clang++
 
     # KLayout builds for mac
     # Python 3
     - name: "KLayout macOS 10.13 with py3.7"
       os: osx
       osx_image: xcode9.4 # macOS 10.13
+      cache: ccache
       addons:
         homebrew:
           packages:
             - python3
             - qt
+            - ccache
           update: true
       env:
         - MATRIX_EVAL=""
@@ -206,11 +445,13 @@ matrix:
     - name: "KLayout macOS 10.12 with py3.7"
       os: osx
       osx_image: xcode8.3 # macOS 10.12
+      cache: ccache
       addons:
         homebrew:
           packages:
             - python3
             - qt
+            - ccache
           update: true
       env:
         - MATRIX_EVAL=""
@@ -221,11 +462,13 @@ matrix:
     - name: "KLayout macOS 10.11 with py3.7"
       os: osx
       osx_image: xcode8 # macOS 10.11
+      cache: ccache
       addons:
         homebrew:
           packages:
             - python3
             - qt
+            - ccache
           update: true
       env:
         - MATRIX_EVAL="brew update; brew install qt"  # homebrew addon fails for xcode8
@@ -237,10 +480,12 @@ matrix:
     - name: "KLayout macOS 10.13 with py2.7"
       os: osx
       osx_image: xcode9.4 # macOS 10.13
+      cache: ccache
       addons:
         homebrew:
           packages:
             - qt
+            - ccache
           update: true
       env:
         - MATRIX_EVAL=""
@@ -251,10 +496,12 @@ matrix:
     - name: "KLayout macOS 10.12 with py2.7"
       os: osx
       osx_image: xcode8.3 # macOS 10.12
+      cache: ccache
       addons:
         homebrew:
           packages:
             - qt
+            - ccache
           update: true
       env:
         - MATRIX_EVAL=""
@@ -265,10 +512,12 @@ matrix:
     - name: "KLayout macOS 10.11 with py2.7"
       os: osx
       osx_image: xcode8 # macOS 10.11
+      cache: ccache
       addons:
         homebrew:
           packages:
             - qt
+            - ccache
           update: true
       env:
         - MATRIX_EVAL="brew update; brew install qt"  # homebrew addon fails for xcode8
@@ -287,15 +536,42 @@ before_install:
         pip install --upgrade setuptools wheel || sudo pip install --upgrade setuptools wheel;
     fi
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+        export PATH="/usr/local/opt/ccache/libexec:$PATH";
+    fi
 
-script: 
+install:
+  - if [ "$DOCKER_BUILD" = true ]; then
+        docker pull $DOCKER_IMAGE;
+    fi
+
+script:
+  - if [ "$DOCKER_BUILD" = true ]; then
+        mkdir -p ccache;
+        mkdir -p wheelhouse;
+        docker run --rm -e DOCKER_IMAGE -e PY_VERSION -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD "/io/ci-scripts/docker/docker_build.sh";
+        klayout_version=$(python -c 'import setup; print(setup.Config().version())'); 
+        mkdir -p deploy/dist-pymod/$klayout_version;
+        cp -a wheelhouse/klayout-*manylinux1*.whl deploy/dist-pymod/$klayout_version;
+        if [ "$TEST_IN_HOST" = true ]; then
+            pip install klayout --no-index -f ./wheelhouse;
+            python testdata/pymod/import_db.py;
+            python testdata/pymod/import_rdb.py;
+            python testdata/pymod/import_tl.py;
+            python testdata/pymod/pya_tests.py;
+        fi
+    fi 
   - if [ "$PYTHON_BUILD" = true ]; then
         python setup.py build;
         python setup.py bdist_wheel;
         python setup.py install;
-        python -m unittest testdata/pymod/import_db.py  testdata/pymod/import_rdb.py testdata/pymod/import_tl.py;
-        mkdir -p deploy/dist-pymod;
-        cp -a dist/* deploy/dist-pymod/;
+        python testdata/pymod/import_db.py;
+        python testdata/pymod/import_rdb.py;
+        python testdata/pymod/import_tl.py;
+        python testdata/pymod/pya_tests.py;
+        klayout_version=$(python -c 'import setup; print(setup.Config().version())');
+        mkdir -p deploy/dist-pymod/$klayout_version;
+        cp -a dist/*.whl deploy/dist-pymod/$klayout_version;
         python -c 'import klayout.db as db; print(dir(db))';
         python -c 'import klayout.rdb as rdb; print(dir(rdb))';
         python -c 'import klayout.tl as tl; print(dir(tl))';

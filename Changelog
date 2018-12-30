@@ -1,11 +1,15 @@
-0.25.7          (2018-12-14):
+0.25.7          (2018-12-31):
 
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/209
+       Reader options were grayed out in stream import feature.
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/207
        Basic.TEXT PCell was rounding bias a spacing values to
        integer multiples.
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/203
        A segfault was fixed that happend on certain platforms
        when closing the application (e.g. CentOS7).
+* Bugfix: (RBA/pya) Technology#load was not working 
+       Instead of load, the technology was saved.
  
 0.25.6          (2018-11-23):
 

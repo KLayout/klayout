@@ -22,6 +22,7 @@
 
 #include "gsiDecl.h"
 #include "dbNetlistDeviceExtractor.h"
+#include "dbNetlistDeviceExtractorClasses.h"
 
 namespace {
 
@@ -212,15 +213,31 @@ Class<db::NetlistDeviceExtractorLayerDefinition> decl_dbNetlistDeviceExtractorLa
   "This class has been introduced in version 0.26."
 );
 
-Class<NetlistDeviceExtractorImpl> decl_dbNetlistDeviceExtractor ("db", "NetlistDeviceExtractorImpl",
-  gsi::method ("name", &NetlistDeviceExtractorImpl::name,
+Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceExtractorBase",
+  gsi::method ("name", &db::NetlistDeviceExtractor::name,
     "@brief Gets the name of the device extractor and the device class."
   ) +
+  gsi::iterator ("each_layer_definition", &db::NetlistDeviceExtractor::begin_layer_definitions, &db::NetlistDeviceExtractor::end_layer_definitions,
+    "@brief Iterates over all layer definitions."
+  ) +
+  gsi::iterator ("each_error", &db::NetlistDeviceExtractor::begin_errors, &db::NetlistDeviceExtractor::end_errors,
+    "@brief Iterates over all errors collected in the device extractor."
+  ),
+  "@brief The base class for all device extractors.\n"
+  "This is an abstract base class for device extractors. See \\NetlistDeviceExtractor for a generic "
+  "class which you can reimplement to supply your own customized device extractor. "
+  "In many cases using one of the preconfigured specific device extractors may be useful already and "
+  "it's not required to implement a custom one. For an example about a preconfigured device extractor see "
+  "\\DeviceExtractorMOS3Transistor.\n"
+  "\n"
+  "This class cannot and should not be instantiated explicitly. Use one of the subclasses instead.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+Class<NetlistDeviceExtractorImpl> decl_NetlistDeviceExtractorImpl (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractor",
   gsi::method ("name=", &NetlistDeviceExtractorImpl::set_name,
     "@brief Sets the name of the device extractor and the device class."
-  ) +
-  gsi::iterator ("each_layer_definition", &NetlistDeviceExtractorImpl::begin_layer_definitions, &NetlistDeviceExtractorImpl::end_layer_definitions,
-    "@brief Iterates over all layer definitions."
   ) +
   gsi::callback ("setup", &NetlistDeviceExtractorImpl::setup, &NetlistDeviceExtractorImpl::cb_setup,
     "@brief Sets up the extractor.\n"
@@ -364,6 +381,36 @@ Class<NetlistDeviceExtractorImpl> decl_dbNetlistDeviceExtractor ("db", "NetlistD
   "\n"
   "If errors occur during device extraction, the \\error method may be used to issue such errors. Errors "
   "reported this way are kept in the error log.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorMOS3Transistor *make_mos3_extractor (const std::string &name)
+{
+  return new db::NetlistDeviceExtractorMOS3Transistor (name);
+}
+
+Class<db::NetlistDeviceExtractorMOS3Transistor> decl_NetlistDeviceExtractorMOS3Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorMOS3Transistor",
+  gsi::constructor ("new", &make_mos3_extractor, gsi::arg ("name"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a three-terminal MOS transistor\n"
+  "\n"
+  "This class supplies the generic extractor for a MOS device.\n"
+  "The device is defined by two basic input layers: the diffusion area\n"
+  "(source and drain) and the gate area. It requires a third layer\n"
+  "(poly) to put the gate terminals on. The separation between poly\n"
+  "and allows separating the device recognition layer (gate) from the\n"
+  "conductive layer.\n"
+  "\n"
+  "The device class produced by this extractor is \\DeviceClassMOS3Transistor.\n"
+  "The extractor extracts the four parameters of this class: L, W, AS and AD.\n"
+  "\n"
+  "The diffusion area is distributed on the number of gates connecting to\n"
+  "the particular source or drain area.\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
   "\n"
   "This class has been introduced in version 0.26."
 );

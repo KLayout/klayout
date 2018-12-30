@@ -150,7 +150,8 @@ SOURCES = \
     dbNetlistExtractor.cc \
     gsiDeclDbNetlistDeviceClasses.cc \
     gsiDeclDbNetlistDeviceExtractor.cc \
-    gsiDeclDbHierNetworkProcessor.cc
+    gsiDeclDbHierNetworkProcessor.cc \
+    dbNetlistDeviceExtractorClasses.cc
 
 HEADERS = \
   dbArray.h \
@@ -264,7 +265,8 @@ HEADERS = \
     dbNetlist.h \
     dbNetlistDeviceClasses.h \
     dbNetlistDeviceExtractor.h \
-    dbNetlistExtractor.h
+    dbNetlistExtractor.h \
+    dbNetlistDeviceExtractorClasses.h
 
 !equals(HAVE_QT, "0") {
 

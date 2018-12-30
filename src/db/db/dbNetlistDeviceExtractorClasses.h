@@ -70,7 +70,7 @@ protected:
 namespace tl
 {
 
-template<> struct tl::type_traits<db::NetlistDeviceExtractorMOS3Transistor> : public tl::type_traits<void>
+template<> struct type_traits<db::NetlistDeviceExtractorMOS3Transistor> : public tl::type_traits<void>
 {
   typedef tl::false_tag has_copy_constructor;
   typedef tl::false_tag has_default_constructor;

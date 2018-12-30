@@ -78,6 +78,16 @@ public:
   DeepLayer &operator= (const DeepLayer &other);
 
   /**
+   *  @brief Less operator
+   */
+  bool operator< (const DeepLayer &other) const;
+
+  /**
+   *  @brief Equality operator
+   */
+  bool operator== (const DeepLayer &other) const;
+
+  /**
    *  @brief Gets the layout object
    *  The return value is guaranteed to be non-null.
    */

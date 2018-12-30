@@ -20,13 +20,8 @@
 
 */
 
-
 #include "dbNetlistDeviceExtractorClasses.h"
-#include "dbNetlistExtractor.h"
-#include "dbNetlistDeviceClasses.h"
-#include "dbLayout.h"
-#include "dbDeepShapeStore.h"
-#include "dbRegion.h"
+#include "dbLayoutToNetlist.h"
 #include "dbStream.h"
 #include "dbDeepRegion.h"
 #include "dbDeepShapeStore.h"
@@ -34,8 +29,6 @@
 #include "dbWriter.h"
 #include "dbCommonReader.h"
 #include "dbTestSupport.h"
-#include "dbNetlistProperty.h"
-#include "dbCellMapping.h"
 
 #include "tlUnitTest.h"
 #include "tlString.h"
@@ -44,12 +37,8 @@
 #include <memory>
 #include <limits>
 
-static unsigned int layer_of (const db::Region &region)
+namespace
 {
-  const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (region.delegate ());
-  tl_assert (dr != 0);
-  return dr->deep_layer ().layer ();
-}
 
 static std::string device_name (const db::Device &device)
 {
@@ -59,9 +48,6 @@ static std::string device_name (const db::Device &device)
     return device.name ();
   }
 }
-
-namespace
-{
 
 class MOSFETExtractor
   : public db::NetlistDeviceExtractorMOS3Transistor
@@ -115,13 +101,6 @@ private:
 
 }
 
-static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_layer, int gds_datatype = 0)
-{
-  unsigned int lid = ly.insert_layer (db::LayerProperties (gds_layer, gds_datatype));
-  lmap.map (ly.get_properties (lid), lid);
-  return lid;
-}
-
 static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<db::PolygonRef> &clusters, db::Layout &ly, const std::map<unsigned int, unsigned int> &lmap, const db::CellMapping &cmap)
 {
   for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
@@ -157,7 +136,14 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
   }
 }
 
-TEST(1_DeviceAndNetExtraction)
+static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_layer, int gds_datatype = 0)
+{
+  unsigned int lid = ly.insert_layer (db::LayerProperties (gds_layer, gds_datatype));
+  lmap.map (ly.get_properties (lid), lid);
+  return lid;
+}
+
+TEST(1_Basic)
 {
   db::Layout ly;
   db::LayerMap lmap;
@@ -190,32 +176,28 @@ TEST(1_DeviceAndNetExtraction)
   }
 
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
+  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  db::DeepShapeStore dss;
-  dss.set_text_enlargement (1);
-  dss.set_text_property_name (tl::Variant ("LABEL"));
-
-  //  original layers
-  db::Region rnwell (db::RecursiveShapeIterator (ly, tc, nwell), dss);
-  db::Region ractive (db::RecursiveShapeIterator (ly, tc, active), dss);
-  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
-  db::Region rpoly_lbl (db::RecursiveShapeIterator (ly, tc, poly_lbl), dss);
-  db::Region rdiff_cont (db::RecursiveShapeIterator (ly, tc, diff_cont), dss);
-  db::Region rpoly_cont (db::RecursiveShapeIterator (ly, tc, poly_cont), dss);
-  db::Region rmetal1 (db::RecursiveShapeIterator (ly, tc, metal1), dss);
-  db::Region rmetal1_lbl (db::RecursiveShapeIterator (ly, tc, metal1_lbl), dss);
-  db::Region rvia1 (db::RecursiveShapeIterator (ly, tc, via1), dss);
-  db::Region rmetal2 (db::RecursiveShapeIterator (ly, tc, metal2), dss);
-  db::Region rmetal2_lbl (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss);
+  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell));
+  std::auto_ptr<db::Region> ractive (l2n.make_layer (active));
+  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly));
+  std::auto_ptr<db::Region> rpoly_lbl (l2n.make_text_layer (poly_lbl));
+  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont));
+  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont));
+  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1));
+  std::auto_ptr<db::Region> rmetal1_lbl (l2n.make_text_layer (metal1_lbl));
+  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1));
+  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2));
+  std::auto_ptr<db::Region> rmetal2_lbl (l2n.make_text_layer (metal2_lbl));
 
   //  derived regions
 
-  db::Region rpactive = ractive & rnwell;
-  db::Region rpgate   = rpactive & rpoly;
+  db::Region rpactive = *ractive & *rnwell;
+  db::Region rpgate   = rpactive & *rpoly;
   db::Region rpsd     = rpactive - rpgate;
 
-  db::Region rnactive = ractive - rnwell;
-  db::Region rngate   = rnactive & rpoly;
+  db::Region rnactive = *ractive - *rnwell;
+  db::Region rngate   = rnactive & *rpoly;
   db::Region rnsd     = rnactive - rngate;
 
   //  return the computed layers into the original layout and write it for debugging purposes
@@ -232,57 +214,55 @@ TEST(1_DeviceAndNetExtraction)
   rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
   rnsd.insert_into (&ly, tc.cell_index (), lndiff);
 
-  //  perform the extraction
-
-  db::Netlist nl;
-
   //  NOTE: the device extractor will add more debug layers for the transistors:
   //    20/0 -> Diffusion
   //    21/0 -> Gate
   MOSFETExtractor pmos_ex ("PMOS", &ly);
   MOSFETExtractor nmos_ex ("NMOS", &ly);
 
+  //  device extraction
+
   db::NetlistDeviceExtractor::input_layers dl;
 
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
-  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, dl, &nl);
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  l2n.extract_devices (pmos_ex, dl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
-  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, dl, &nl);
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  l2n.extract_devices (nmos_ex, dl);
 
-  //  perform the net extraction
+  //  net extraction
 
-  db::NetlistExtractor net_ex;
-
-  db::Connectivity conn;
   //  Intra-layer
-  conn.connect (rpsd);
-  conn.connect (rnsd);
-  conn.connect (rpoly);
-  conn.connect (rdiff_cont);
-  conn.connect (rpoly_cont);
-  conn.connect (rmetal1);
-  conn.connect (rvia1);
-  conn.connect (rmetal2);
+  l2n.connect (rpsd);
+  l2n.connect (rnsd);
+  l2n.connect (*rpoly);
+  l2n.connect (*rdiff_cont);
+  l2n.connect (*rpoly_cont);
+  l2n.connect (*rmetal1);
+  l2n.connect (*rvia1);
+  l2n.connect (*rmetal2);
   //  Inter-layer
-  conn.connect (rpsd,       rdiff_cont);
-  conn.connect (rnsd,       rdiff_cont);
-  conn.connect (rpoly,      rpoly_cont);
-  conn.connect (rpoly_cont, rmetal1);
-  conn.connect (rdiff_cont, rmetal1);
-  conn.connect (rmetal1,    rvia1);
-  conn.connect (rvia1,      rmetal2);
-  conn.connect (rpoly,      rpoly_lbl);     //  attaches labels
-  conn.connect (rmetal1,    rmetal1_lbl);   //  attaches labels
-  conn.connect (rmetal2,    rmetal2_lbl);   //  attaches labels
+  l2n.connect (rpsd,        *rdiff_cont);
+  l2n.connect (rnsd,        *rdiff_cont);
+  l2n.connect (*rpoly,      *rpoly_cont);
+  l2n.connect (*rpoly_cont, *rmetal1);
+  l2n.connect (*rdiff_cont, *rmetal1);
+  l2n.connect (*rmetal1,    *rvia1);
+  l2n.connect (*rvia1,      *rmetal2);
+  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
+  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
+  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
 
-  //  extract the nets
+  //  create some mess - we have to keep references to the layers to make them not disappear
+  rmetal1_lbl.reset (0);
+  rmetal2_lbl.reset (0);
+  rpoly_lbl.reset (0);
 
-  net_ex.extract_nets (dss, conn, &nl);
+  l2n.extract_netlist ();
 
   //  debug layers produced for nets
   //    202/0 -> Active
@@ -295,21 +275,21 @@ TEST(1_DeviceAndNetExtraction)
   //    210/0 -> N source/drain
   //    211/0 -> P source/drain
   std::map<unsigned int, unsigned int> dump_map;
-  dump_map [layer_of (rpsd)      ] = ly.insert_layer (db::LayerProperties (210, 0));
-  dump_map [layer_of (rnsd)      ] = ly.insert_layer (db::LayerProperties (211, 0));
-  dump_map [layer_of (rpoly)     ] = ly.insert_layer (db::LayerProperties (203, 0));
-  dump_map [layer_of (rdiff_cont)] = ly.insert_layer (db::LayerProperties (204, 0));
-  dump_map [layer_of (rpoly_cont)] = ly.insert_layer (db::LayerProperties (205, 0));
-  dump_map [layer_of (rmetal1)   ] = ly.insert_layer (db::LayerProperties (206, 0));
-  dump_map [layer_of (rvia1)     ] = ly.insert_layer (db::LayerProperties (207, 0));
-  dump_map [layer_of (rmetal2)   ] = ly.insert_layer (db::LayerProperties (208, 0));
+  dump_map [l2n.layer_of (rpsd)       ] = ly.insert_layer (db::LayerProperties (210, 0));
+  dump_map [l2n.layer_of (rnsd)       ] = ly.insert_layer (db::LayerProperties (211, 0));
+  dump_map [l2n.layer_of (*rpoly)     ] = ly.insert_layer (db::LayerProperties (203, 0));
+  dump_map [l2n.layer_of (*rdiff_cont)] = ly.insert_layer (db::LayerProperties (204, 0));
+  dump_map [l2n.layer_of (*rpoly_cont)] = ly.insert_layer (db::LayerProperties (205, 0));
+  dump_map [l2n.layer_of (*rmetal1)   ] = ly.insert_layer (db::LayerProperties (206, 0));
+  dump_map [l2n.layer_of (*rvia1)     ] = ly.insert_layer (db::LayerProperties (207, 0));
+  dump_map [l2n.layer_of (*rmetal2)   ] = ly.insert_layer (db::LayerProperties (208, 0));
 
   //  write nets to layout
-  db::CellMapping cm = dss.cell_mapping_to_original (0, &ly, tc.cell_index ());
-  dump_nets_to_layout (nl, net_ex.clusters (), ly, dump_map, cm);
+  db::CellMapping cm = l2n.cell_mapping_into (ly, tc);
+  dump_nets_to_layout (*l2n.netlist (), l2n.net_clusters (), ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_string (),
+  EXPECT_EQ (l2n.netlist ()->to_string (),
     "Circuit RINGO ():\n"
     "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
     "  XINV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD)\n"
@@ -334,14 +314,14 @@ TEST(1_DeviceAndNetExtraction)
   );
 
   // doesn't do anything here, but we test that this does not destroy anything:
-  nl.combine_devices ();
+  l2n.netlist ()->combine_devices ();
 
   //  make pins for named nets of top-level circuits - this way they are not purged
-  nl.make_top_level_pins ();
-  nl.purge ();
+  l2n.netlist ()->make_top_level_pins ();
+  l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_string (),
+  EXPECT_EQ (l2n.netlist ()->to_string (),
     "Circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD):\n"
     "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
     "  XINV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD)\n"

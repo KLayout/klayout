@@ -186,7 +186,7 @@ public:
  *  device extraction. See the virtual methods below.
  */
 class DB_PUBLIC NetlistDeviceExtractor
-  : public gsi::ObjectBase
+  : public gsi::ObjectBase, public tl::Object
 {
 public:
   typedef std::list<db::NetlistDeviceExtractorError> error_list;

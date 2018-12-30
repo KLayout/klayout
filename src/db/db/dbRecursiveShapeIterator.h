@@ -475,6 +475,20 @@ public:
   }
 
   /**
+   *  @brief Changes the layer to be traversed
+   *
+   *  This method must be used before shapes are being retrieved. Using this method may reset the iterator.
+   */
+  void set_layer (unsigned int layer);
+
+  /**
+   *  @brief Changes the layers to be traversed
+   *
+   *  This method must be used before shapes are being retrieved. Using this method may reset the iterator.
+   */
+  void set_layers (const std::vector<unsigned int> &layers);
+
+  /**
    *  @brief Specify the property selector
    *
    *  The selector is the same as being used in db::ShapeIterator.

@@ -113,6 +113,34 @@ DeepLayer::insert_into (db::Layout *into_layout, db::cell_index_type into_cell, 
   const_cast<db::DeepShapeStore *> (mp_store.get ())->insert (*this, into_layout, into_cell, into_layer);
 }
 
+bool DeepLayer::operator< (const DeepLayer &other) const
+{
+  if (mp_store.get () != other.mp_store.get ()) {
+    return mp_store.get () < other.mp_store.get ();
+  }
+  if (m_layout != other.m_layout) {
+    return m_layout < other.m_layout;
+  }
+  if (m_layer != other.m_layer) {
+    return m_layer < other.m_layer;
+  }
+  return false;
+}
+
+bool DeepLayer::operator== (const DeepLayer &other) const
+{
+  if (mp_store.get () != other.mp_store.get ()) {
+    return false;
+  }
+  if (m_layout != other.m_layout) {
+    return false;
+  }
+  if (m_layer != other.m_layer) {
+    return false;
+  }
+  return true;
+}
+
 db::Layout &
 DeepLayer::layout ()
 {

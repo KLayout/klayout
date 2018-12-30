@@ -360,6 +360,28 @@ RecursiveShapeIterator::confine_region (const region_type &region)
   m_needs_reinit = true;
 }
 
+void
+RecursiveShapeIterator::set_layer (unsigned int layer)
+{
+  if (m_has_layers || m_layer != layer) {
+    m_has_layers = false;
+    m_layers.clear ();
+    m_layer = layer;
+    m_needs_reinit = true;
+  }
+}
+
+void
+RecursiveShapeIterator::set_layers (const std::vector<unsigned int> &layers)
+{
+  if (! m_has_layers || m_layers != layers) {
+    m_has_layers = true;
+    m_layers = layers;
+    m_layer = 0;
+    m_needs_reinit = true;
+  }
+}
+
 namespace {
 
 struct BoxTreePusher

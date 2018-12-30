@@ -49,6 +49,100 @@ class Netlist;
 class Net;
 
 /**
+ *  @brief A getter for the ID of an object
+ */
+template <class T>
+struct id_attribute
+{
+  typedef size_t attr_type;
+  size_t operator() (const T *t) const { return t->id (); }
+  bool has (const T * /*t*/) const { return true; }
+};
+
+/**
+ *  @brief A getter for the cluster ID of an object
+ */
+template <class T>
+struct cluster_id_attribute
+{
+  typedef size_t attr_type;
+  attr_type operator() (const T *t) const { return t->cluster_id (); }
+  bool has (const T * /*t*/) const { return true; }
+};
+
+/**
+ *  @brief A getter for the cluster ID of an object
+ */
+template <class T>
+struct cell_index_attribute
+{
+  typedef db::cell_index_type attr_type;
+  attr_type operator() (const T *t) const { return t->cell_index (); }
+  bool has (const T * /*t*/) const { return true; }
+};
+
+/**
+ *  @brief A getter for the name of an object
+ */
+template <class T>
+struct name_attribute
+{
+  typedef std::string attr_type;
+  const attr_type &operator() (const T *t) const { return t->name (); }
+  bool has (const T *t) const { return ! t->name ().empty (); }
+};
+
+/**
+ *  @brief An id-to-object translation table
+ */
+template <class T, class I, class ATTR>
+class object_by_attr
+{
+public:
+  typedef typename ATTR::attr_type attr_type;
+  typedef typename I::value_type value_type;
+
+  object_by_attr (T *self, I (T::*bi) (), I (T::*ei) ()) : mp_self (self), m_bi (bi), m_ei (ei), m_valid (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  void invalidate ()
+  {
+    m_valid = false;
+    m_map.clear ();
+  }
+
+  value_type *object_by (const attr_type &attr) const
+  {
+    if (! m_valid) {
+      validate ();
+    }
+    typename std::map<attr_type, value_type *>::const_iterator m = m_map.find (attr);
+    return m == m_map.end () ? 0 : m->second;
+  }
+
+private:
+  T *mp_self;
+  I (T::*m_bi) ();
+  I (T::*m_ei) ();
+  mutable bool m_valid;
+  mutable std::map<attr_type, value_type *> m_map;
+
+  void validate () const
+  {
+    ATTR attr;
+    m_map.clear ();
+    for (I i = (mp_self->*m_bi) (); i != (mp_self->*m_ei) (); ++i) {
+      if (attr.has (i.operator-> ())) {
+        m_map.insert (std::make_pair (attr (i.operator-> ()), i.operator-> ()));
+      }
+    }
+    m_valid = true;
+  }
+};
+
+/**
  *  @brief A reference to a terminal of a device
  *
  *  A terminal must always refer to a device inside the current circuit.
@@ -1125,6 +1219,14 @@ public:
   const Pin *pin_by_id (size_t id) const;
 
   /**
+   *  @brief Gets the pin by name
+   *
+   *  If there is no pin with that name, null is returned.
+   *  NOTE: this is a linear search, so it's performance may not be good for many pins.
+   */
+  const Pin *pin_by_name (const std::string &name) const;
+
+  /**
    *  @brief Begin iterator for the pins of the circuit (const version)
    */
   const_pin_iterator begin_pins () const
@@ -1185,6 +1287,46 @@ public:
   }
 
   /**
+   *  @brief Gets the net from a given cluster ID (const version)
+   *
+   *  If the cluster ID is not valid, null is returned.
+   */
+  const Net *net_by_cluster_id (size_t cluster_id) const
+  {
+    return (const_cast<Circuit *> (this)->net_by_cluster_id (cluster_id));
+  }
+
+  /**
+   *  @brief Gets the net from a given cluster ID (non-const version)
+   *
+   *  If the cluster ID is not valid, null is returned.
+   */
+  Net *net_by_cluster_id (size_t cluster_id)
+  {
+    return m_net_by_cluster_id.object_by (cluster_id);
+  }
+
+  /**
+   *  @brief Gets the net from a given name (const version)
+   *
+   *  If the name is not valid, null is returned.
+   */
+  const Net *net_by_name (const std::string &name) const
+  {
+    return (const_cast<Circuit *> (this)->net_by_name (name));
+  }
+
+  /**
+   *  @brief Gets the net from a given name (non-const version)
+   *
+   *  If the name is not valid, null is returned.
+   */
+  Net *net_by_name (const std::string &name)
+  {
+    return m_net_by_name.object_by (name);
+  }
+
+  /**
    *  @brief Adds a device to this circuit
    *
    *  The circuit takes over ownership of the object.
@@ -1207,11 +1349,34 @@ public:
   }
 
   /**
-   *  @brief Gets the device from a given ID (const version)
+   *  @brief Gets the device from a given ID (non-const version)
    *
    *  If the ID is not valid, null is returned.
    */
-  Device *device_by_id (size_t id);
+  Device *device_by_id (size_t id)
+  {
+    return m_device_by_id.object_by (id);
+  }
+
+  /**
+   *  @brief Gets the device from a given name (const version)
+   *
+   *  If the name is not valid, null is returned.
+   */
+  const Device *device_by_name (const std::string &name) const
+  {
+    return (const_cast<Circuit *> (this)->device_by_name (name));
+  }
+
+  /**
+   *  @brief Gets the device from a given name (non-const version)
+   *
+   *  If the name is not valid, null is returned.
+   */
+  Device *device_by_name (const std::string &name)
+  {
+    return m_device_by_name.object_by (name);
+  }
 
   /**
    *  @brief Begin iterator for the devices of the circuit (non-const version)
@@ -1268,11 +1433,34 @@ public:
   }
 
   /**
-   *  @brief Gets the subcircuit from a given ID (const version)
+   *  @brief Gets the subcircuit from a given ID (non-const version)
    *
    *  If the ID is not valid, null is returned.
    */
-  SubCircuit *subcircuit_by_id (size_t id);
+  SubCircuit *subcircuit_by_id (size_t id)
+  {
+    return m_subcircuit_by_id.object_by (id);
+  }
+
+  /**
+   *  @brief Gets the subcircuit from a given name (const version)
+   *
+   *  If the name is not valid, null is returned.
+   */
+  const SubCircuit *subcircuit_by_name (const std::string &name) const
+  {
+    return (const_cast<Circuit *> (this)->subcircuit_by_name (name));
+  }
+
+  /**
+   *  @brief Gets the subcircuit from a given name (non-const version)
+   *
+   *  If the name is not valid, null is returned.
+   */
+  SubCircuit *subcircuit_by_name (const std::string &name)
+  {
+    return m_subcircuit_by_name.object_by (name);
+  }
 
   /**
    *  @brief Begin iterator for the subcircuits of the circuit (non-const version)
@@ -1350,6 +1538,7 @@ private:
   friend class Netlist;
   friend class Net;
   friend class SubCircuit;
+  friend class Device;
 
   std::string m_name;
   db::cell_index_type m_cell_index;
@@ -1359,10 +1548,12 @@ private:
   subcircuit_list m_subcircuits;
   Netlist *mp_netlist;
   std::vector<Net::pin_iterator> m_pin_refs;
-  bool m_valid_device_id_table;
-  std::map<size_t, Device *> m_device_id_table;
-  bool m_valid_subcircuit_id_table;
-  std::map<size_t, SubCircuit *> m_subcircuit_id_table;
+  object_by_attr<Circuit, Circuit::device_iterator, id_attribute<Device> > m_device_by_id;
+  object_by_attr<Circuit, Circuit::subcircuit_iterator, id_attribute<SubCircuit> > m_subcircuit_by_id;
+  object_by_attr<Circuit, Circuit::net_iterator, cluster_id_attribute<Net> > m_net_by_cluster_id;
+  object_by_attr<Circuit, Circuit::device_iterator, name_attribute<Device> > m_device_by_name;
+  object_by_attr<Circuit, Circuit::subcircuit_iterator, name_attribute<SubCircuit> > m_subcircuit_by_name;
+  object_by_attr<Circuit, Circuit::net_iterator, name_attribute<Net> > m_net_by_name;
   tl::weak_collection<SubCircuit> m_refs;
   size_t m_index;
 
@@ -1381,11 +1572,6 @@ private:
   void set_netlist (Netlist *netlist);
   bool combine_parallel_devices (const db::DeviceClass &cls);
   bool combine_serial_devices (const db::DeviceClass &cls);
-
-  void validate_device_id_table ();
-  void invalidate_device_id_table ();
-  void validate_subcircuit_id_table ();
-  void invalidate_subcircuit_id_table ();
 };
 
 /**
@@ -1887,6 +2073,46 @@ public:
   }
 
   /**
+   *  @brief Gets the circuit with the given name
+   *
+   *  If no circuit with that name exists, null is returned.
+   */
+  Circuit *circuit_by_name (const std::string &name)
+  {
+    return m_circuit_by_name.object_by (name);
+  }
+
+  /**
+   *  @brief Gets the circuit with the given name (const version)
+   *
+   *  If no circuit with that name exists, null is returned.
+   */
+  const Circuit *circuit_by_name (const std::string &name) const
+  {
+    return m_circuit_by_name.object_by (name);
+  }
+
+  /**
+   *  @brief Gets the circuit with the given cell index
+   *
+   *  If no circuit with that cell index exists, null is returned.
+   */
+  Circuit *circuit_by_cell_index (db::cell_index_type cell_index)
+  {
+    return m_circuit_by_cell_index.object_by (cell_index);
+  }
+
+  /**
+   *  @brief Gets the circuit with the given cell index (const version)
+   *
+   *  If no circuit with that cell index exists, null is returned.
+   */
+  const Circuit *circuit_by_cell_index (db::cell_index_type cell_index) const
+  {
+    return m_circuit_by_cell_index.object_by (cell_index);
+  }
+
+  /**
    *  @brief Gets the top-down circuits iterator (begin)
    *  This iterator will deliver the circuits in a top-down way - i.e. child circuits
    *  will always come after parent circuits.
@@ -2032,6 +2258,8 @@ private:
   tl::vector<tl::vector<Circuit *> > m_child_circuits;
   tl::vector<tl::vector<Circuit *> > m_parent_circuits;
   size_t m_top_circuits;
+  object_by_attr<Netlist, Netlist::circuit_iterator, name_attribute<Circuit> > m_circuit_by_name;
+  object_by_attr<Netlist, Netlist::circuit_iterator, cell_index_attribute<Circuit> > m_circuit_by_cell_index;
 
   void invalidate_topology ();
   void validate_topology ();

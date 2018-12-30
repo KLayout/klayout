@@ -89,6 +89,9 @@ void Device::set_circuit (Circuit *circuit)
 void Device::set_name (const std::string &n)
 {
   m_name = n;
+  if (mp_circuit) {
+    mp_circuit->m_device_by_name.invalidate ();
+  }
 }
 
 void Device::set_terminal_ref_for_terminal (size_t terminal_id, Net::terminal_iterator iter)
@@ -220,6 +223,9 @@ SubCircuit &SubCircuit::operator= (const SubCircuit &other)
 void SubCircuit::set_name (const std::string &n)
 {
   m_name = n;
+  if (mp_circuit) {
+    mp_circuit->m_subcircuit_by_name.invalidate ();
+  }
 }
 
 void SubCircuit::set_trans (const db::DCplxTrans &t)
@@ -435,6 +441,9 @@ void Net::clear ()
 void Net::set_name (const std::string &name)
 {
   m_name = name;
+  if (mp_circuit) {
+    mp_circuit->m_net_by_name.invalidate ();
+  }
 }
 
 std::string Net::expanded_name () const
@@ -454,6 +463,9 @@ std::string Net::expanded_name () const
 void Net::set_cluster_id (size_t ci)
 {
   m_cluster_id = ci;
+  if (mp_circuit) {
+    mp_circuit->m_net_by_cluster_id.invalidate ();
+  }
 }
 
 void Net::add_pin (const NetPinRef &pin)
@@ -510,13 +522,27 @@ void Net::set_circuit (Circuit *circuit)
 //  Circuit class implementation
 
 Circuit::Circuit ()
-  : mp_netlist (0), m_valid_device_id_table (false), m_valid_subcircuit_id_table (false), m_index (0)
+  : mp_netlist (0),
+    m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
+    m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
+    m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
+    m_device_by_name (this, &Circuit::begin_devices, &Circuit::end_devices),
+    m_subcircuit_by_name (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
+    m_net_by_name (this, &Circuit::begin_nets, &Circuit::end_nets),
+    m_index (0)
 {
   //  .. nothing yet ..
 }
 
 Circuit::Circuit (const Circuit &other)
-  : mp_netlist (0), m_valid_device_id_table (false), m_valid_subcircuit_id_table (false), m_index (0)
+  : mp_netlist (0),
+    m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
+    m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
+    m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
+    m_device_by_name (this, &Circuit::begin_devices, &Circuit::end_devices),
+    m_subcircuit_by_name (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
+    m_net_by_name (this, &Circuit::begin_nets, &Circuit::end_nets),
+    m_index (0)
 {
   operator= (other);
 }
@@ -526,8 +552,12 @@ Circuit &Circuit::operator= (const Circuit &other)
   if (this != &other) {
 
     m_name = other.m_name;
-    invalidate_device_id_table ();
-    invalidate_subcircuit_id_table ();
+    m_device_by_id.invalidate ();
+    m_subcircuit_by_id.invalidate ();
+    m_net_by_cluster_id.invalidate ();
+    m_device_by_name.invalidate ();
+    m_subcircuit_by_name.invalidate ();
+    m_net_by_name.invalidate ();
 
     for (const_pin_iterator i = other.begin_pins (); i != other.end_pins (); ++i) {
       add_pin (*i);
@@ -592,6 +622,16 @@ const Pin *Circuit::pin_by_id (size_t id) const
   }
 }
 
+const Pin *Circuit::pin_by_name (const std::string &name) const
+{
+  for (Circuit::const_pin_iterator p = begin_pins (); p != end_pins (); ++p) {
+    if (p->name () == name) {
+      return p.operator-> ();
+    }
+  }
+  return 0;
+}
+
 void Circuit::clear ()
 {
   m_name.clear ();
@@ -599,20 +639,28 @@ void Circuit::clear ()
   m_devices.clear ();
   m_nets.clear ();
   m_subcircuits.clear ();
-  m_device_id_table.clear ();
-  m_subcircuit_id_table.clear ();
-  m_valid_device_id_table = false;
-  m_valid_subcircuit_id_table = false;
+  m_device_by_id.invalidate ();
+  m_subcircuit_by_id.invalidate ();
+  m_net_by_cluster_id.invalidate ();
+  m_device_by_name.invalidate ();
+  m_subcircuit_by_name.invalidate ();
+  m_net_by_name.invalidate ();
 }
 
 void Circuit::set_name (const std::string &name)
 {
   m_name = name;
+  if (mp_netlist) {
+    mp_netlist->m_circuit_by_name.invalidate ();
+  }
 }
 
 void Circuit::set_cell_index (const db::cell_index_type ci)
 {
   m_cell_index = ci;
+  if (mp_netlist) {
+    mp_netlist->m_circuit_by_cell_index.invalidate ();
+  }
 }
 
 Circuit::child_circuit_iterator Circuit::begin_children ()
@@ -674,11 +722,15 @@ void Circuit::add_net (Net *net)
 {
   m_nets.push_back (net);
   net->set_circuit (this);
+  m_net_by_cluster_id.invalidate ();
+  m_net_by_name.invalidate ();
 }
 
 void Circuit::remove_net (Net *net)
 {
   m_nets.erase (net);
+  m_net_by_cluster_id.invalidate ();
+  m_net_by_name.invalidate ();
 }
 
 void Circuit::add_device (Device *device)
@@ -693,39 +745,15 @@ void Circuit::add_device (Device *device)
   device->set_id (id + 1);
 
   m_devices.push_back (device);
-  invalidate_device_id_table ();
+  m_device_by_id.invalidate ();
+  m_device_by_name.invalidate ();
 }
 
 void Circuit::remove_device (Device *device)
 {
   m_devices.erase (device);
-  invalidate_device_id_table ();
-}
-
-void Circuit::validate_device_id_table ()
-{
-  m_device_id_table.clear ();
-  for (device_iterator d = begin_devices (); d != end_devices (); ++d) {
-    m_device_id_table.insert (std::make_pair (d->id (), d.operator-> ()));
-  }
-
-  m_valid_device_id_table = true;
-}
-
-void Circuit::invalidate_device_id_table ()
-{
-  m_valid_device_id_table = false;
-  m_device_id_table.clear ();
-}
-
-Device *Circuit::device_by_id (size_t id)
-{
-  if (! m_valid_device_id_table) {
-    validate_device_id_table ();
-  }
-
-  std::map<size_t, Device *>::const_iterator d = m_device_id_table.find (id);
-  return d != m_device_id_table.end () ? d->second : 0;
+  m_device_by_id.invalidate ();
+  m_device_by_name.invalidate ();
 }
 
 void Circuit::add_subcircuit (SubCircuit *subcircuit)
@@ -740,7 +768,8 @@ void Circuit::add_subcircuit (SubCircuit *subcircuit)
   subcircuit->set_id (id + 1);
 
   m_subcircuits.push_back (subcircuit);
-  invalidate_subcircuit_id_table ();
+  m_subcircuit_by_id.invalidate ();
+  m_subcircuit_by_name.invalidate ();
 
   if (mp_netlist) {
     mp_netlist->invalidate_topology ();
@@ -750,37 +779,12 @@ void Circuit::add_subcircuit (SubCircuit *subcircuit)
 void Circuit::remove_subcircuit (SubCircuit *subcircuit)
 {
   m_subcircuits.erase (subcircuit);
-  invalidate_subcircuit_id_table ();
+  m_subcircuit_by_id.invalidate ();
+  m_subcircuit_by_name.invalidate ();
 
   if (mp_netlist) {
     mp_netlist->invalidate_topology ();
   }
-}
-
-void Circuit::validate_subcircuit_id_table ()
-{
-  m_subcircuit_id_table.clear ();
-  for (subcircuit_iterator d = begin_subcircuits (); d != end_subcircuits (); ++d) {
-    m_subcircuit_id_table.insert (std::make_pair (d->id (), d.operator-> ()));
-  }
-
-  m_valid_subcircuit_id_table = true;
-}
-
-void Circuit::invalidate_subcircuit_id_table ()
-{
-  m_valid_subcircuit_id_table = false;
-  m_subcircuit_id_table.clear ();
-}
-
-SubCircuit *Circuit::subcircuit_by_id (size_t id)
-{
-  if (! m_valid_subcircuit_id_table) {
-    validate_subcircuit_id_table ();
-  }
-
-  std::map<size_t, SubCircuit *>::const_iterator d = m_subcircuit_id_table.find (id);
-  return d != m_subcircuit_id_table.end () ? d->second : 0;
 }
 
 void Circuit::register_ref (SubCircuit *r)
@@ -1160,13 +1164,17 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
 //  Netlist class implementation
 
 Netlist::Netlist ()
-  : m_valid_topology (false), m_lock_count (0)
+  : m_valid_topology (false), m_lock_count (0),
+    m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
+    m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits)
 {
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
 }
 
 Netlist::Netlist (const Netlist &other)
-  : m_valid_topology (false), m_lock_count (0)
+  : m_valid_topology (false), m_lock_count (0),
+    m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
+    m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits)
 {
   operator= (other);
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
@@ -1444,18 +1452,24 @@ void Netlist::clear ()
 {
   m_device_classes.clear ();
   m_circuits.clear ();
+  m_circuit_by_name.invalidate ();
+  m_circuit_by_cell_index.invalidate ();
 }
 
 void Netlist::add_circuit (Circuit *circuit)
 {
   m_circuits.push_back (circuit);
   circuit->set_netlist (this);
+  m_circuit_by_name.invalidate ();
+  m_circuit_by_cell_index.invalidate ();
 }
 
 void Netlist::remove_circuit (Circuit *circuit)
 {
   circuit->set_netlist (0);
   m_circuits.erase (circuit);
+  m_circuit_by_name.invalidate ();
+  m_circuit_by_cell_index.invalidate ();
 }
 
 void Netlist::add_device_class (DeviceClass *device_class)

@@ -651,13 +651,33 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
     "@brief Gets the device object for a given ID.\n"
     "If the ID is not a valid device ID, nil is returned."
   ) +
+  gsi::method ("device_by_name", (db::Device *(db::Circuit::*) (const std::string &)) &db::Circuit::device_by_name, gsi::arg ("name"),
+    "@brief Gets the device object for a given name.\n"
+    "If the ID is not a valid device name, nil is returned."
+  ) +
   gsi::method ("subcircuit_by_id", (db::SubCircuit *(db::Circuit::*) (size_t)) &db::Circuit::subcircuit_by_id, gsi::arg ("id"),
     "@brief Gets the subcircuit object for a given ID.\n"
     "If the ID is not a valid subcircuit ID, nil is returned."
   ) +
+  gsi::method ("subcircuit_by_name", (db::SubCircuit *(db::Circuit::*) (const std::string &)) &db::Circuit::subcircuit_by_name, gsi::arg ("name"),
+    "@brief Gets the subcircuit object for a given name.\n"
+    "If the ID is not a valid subcircuit name, nil is returned."
+  ) +
+  gsi::method ("net_by_cluster_id", (db::Net *(db::Circuit::*) (size_t)) &db::Circuit::net_by_cluster_id, gsi::arg ("cluster_id"),
+    "@brief Gets the net object corresponding to a specific cluster ID\n"
+    "If the ID is not a valid pin cluster ID, nil is returned."
+  ) +
+  gsi::method ("net_by_name", (db::Net *(db::Circuit::*) (const std::string &)) &db::Circuit::net_by_name, gsi::arg ("name"),
+    "@brief Gets the net object for a given name.\n"
+    "If the ID is not a valid net name, nil is returned."
+  ) +
   gsi::method ("pin_by_id", &db::Circuit::pin_by_id, gsi::arg ("id"),
     "@brief Gets the \\Pin object corresponding to a specific ID\n"
     "If the ID is not a valid pin ID, nil is returned."
+  ) +
+  gsi::method ("pin_by_name", &db::Circuit::pin_by_name, gsi::arg ("name"),
+    "@brief Gets the \\Pin object corresponding to a specific name\n"
+    "If the ID is not a valid pin name, nil is returned."
   ) +
   gsi::method ("pin_count", &db::Circuit::pin_count,
     "@brief Gets the number of pins in the circuit"
@@ -813,6 +833,14 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("remove", &db::Netlist::remove_circuit, gsi::arg ("circuit"),
     "@brief Removes the given circuit object from the netlist\n"
     "After the object has been removed, it becomes invalid and cannot be used further."
+  ) +
+  gsi::method ("circuit_by_cell_index", (db::Circuit *(db::Netlist::*) (db::cell_index_type)) &db::Netlist::circuit_by_cell_index, gsi::arg ("cell_index"),
+    "@brief Gets the circuit object for a given cell index.\n"
+    "If the cell index is not valid or no circuit is registered with this index, nil is returned."
+  ) +
+  gsi::method ("circuit_by_name", (db::Circuit *(db::Netlist::*) (const std::string &)) &db::Netlist::circuit_by_name, gsi::arg ("name"),
+    "@brief Gets the circuit object for a given name.\n"
+    "If the ID is not a valid circuit name, nil is returned."
   ) +
   gsi::iterator ("each_circuit_top_down", (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_top_down, (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_top_down,
     "@brief Iterates over the circuits top-down\n"

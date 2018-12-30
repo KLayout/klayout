@@ -37,6 +37,11 @@ class DBNetlist_TestClass < TestBase
     c.cell_index = 42
     assert_equal(c.cell_index, 42)
 
+    assert_equal(nl.circuit_by_cell_index(42).name, "XYZ")
+    assert_equal(nl.circuit_by_name("XYZ").name, "XYZ")
+    assert_equal(nl.circuit_by_cell_index(17).inspect, "nil")
+    assert_equal(nl.circuit_by_name("DOESNOTEXIST").inspect, "nil")
+
     cc = RBA::Circuit::new
     nl.add(cc)
     cc.name = "ABC"
@@ -160,6 +165,9 @@ class DBNetlist_TestClass < TestBase
     assert_equal(d1.id, 1)
     assert_equal(c.device_by_id(d1.id).id, 1)
     assert_equal(c.device_by_id(2).inspect, "nil")
+    assert_equal(c.device_by_name(d1.name).name, "D1")
+    assert_equal(c.device_by_id(2).inspect, "nil")
+    assert_equal(c.device_by_name("doesnt_exist").inspect, "nil")
 
     d2 = c.create_device(dc)
     assert_equal(d2.device_class.id, dc.id)
@@ -263,6 +271,9 @@ class DBNetlist_TestClass < TestBase
     assert_equal(sc1.circuit_ref.name, "CC")
     assert_equal(c.subcircuit_by_id(sc1.id).id, 1)
     assert_equal(c.subcircuit_by_id(2).inspect, "nil")
+    assert_equal(c.subcircuit_by_name(sc1.name).name, "SC1")
+    assert_equal(c.subcircuit_by_id(2).inspect, "nil")
+    assert_equal(c.subcircuit_by_name("doesnt_exist").inspect, "nil")
 
     refs = []
     cc.each_ref { |r| refs << r.name }
@@ -460,14 +471,24 @@ class DBNetlist_TestClass < TestBase
     assert_equal(pinb1.id, 2)
     assert_equal(pinb2.id, 3)
     assert_equal(c.pin_by_id(0).name, "A1")
+    assert_equal(c.pin_by_name("A1").name, "A1")
     assert_equal(c.pin_by_id(3).name, "B2")
+    assert_equal(c.pin_by_name("B2").name, "B2")
+    assert_equal(c.pin_by_id(17).inspect, "nil")
+    assert_equal(c.pin_by_name("DOESNOTEXIST").inspect, "nil")
 
     names = []
     c.each_pin { |p| names << p.name }
     assert_equal(names, [ "A1", "A2", "B1", "B2" ])
 
     net1 = c.create_net
+    net1.cluster_id = 17
     net1.name = "NET1"
+
+    assert_equal(c.net_by_cluster_id(17).name, "NET1")
+    assert_equal(c.net_by_cluster_id(42).inspect, "nil")
+    assert_equal(c.net_by_name("NET1").name, "NET1")
+    assert_equal(c.net_by_name("DOESNOTEXIST").inspect, "nil")
 
     net2 = c.create_net
     net2.name = "NET2"
@@ -575,11 +596,13 @@ END
 
     c1 = RBA::Circuit::new
     c1.name = "C1"
+    c1.cell_index = 17
     nl.add(c1)
     assert_equal(nl.top_circuit_count, 1)
 
     c2 = RBA::Circuit::new
     c2.name = "C2"
+    c1.cell_index = 42
     nl.add(c2)
     assert_equal(nl.top_circuit_count, 2)
 

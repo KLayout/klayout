@@ -139,6 +139,9 @@ TEST(3_CircuitBasic)
   EXPECT_EQ (c.pin_by_id (0)->name (), "p1");
   EXPECT_EQ (c.pin_by_id (1)->name (), "p2");
   EXPECT_EQ (c.pin_by_id (2), 0);
+  EXPECT_EQ (c.pin_by_name ("p1")->name (), "p1");
+  EXPECT_EQ (c.pin_by_name ("doesnt_exist") == 0, true);
+  EXPECT_EQ (c.pin_by_name ("p2")->name (), "p2");
 
   db::Circuit c2 = c;
   EXPECT_EQ (c2.name (), "name");
@@ -267,7 +270,7 @@ TEST(4_CircuitDevices)
   db::Device *dd = new db::Device (&dc1, "dd");
   db::Device *d1 = new db::Device (&dc1, "d1");
   db::Device *d2a = new db::Device (&dc2, "d2a");
-  db::Device *d2b = new db::Device (&dc2, "d2b");
+  db::Device *d2b = new db::Device (&dc2, "d2x");
 
   EXPECT_EQ (d1->circuit () == 0, true);
 
@@ -275,19 +278,34 @@ TEST(4_CircuitDevices)
   EXPECT_EQ (d1->circuit () == c.get (), true);
   EXPECT_EQ (d1->id (), size_t (1));
   EXPECT_EQ (c->device_by_id (d1->id ()) == d1, true);
+  EXPECT_EQ (c->device_by_name (d1->name ()) == d1, true);
+
   c->add_device (dd);
   EXPECT_EQ (dd->id (), size_t (2));
   EXPECT_EQ (c->device_by_id (dd->id ()) == dd, true);
+  EXPECT_EQ (c->device_by_name (dd->name ()) == dd, true);
+
   c->add_device (d2a);
   EXPECT_EQ (d2a->id (), size_t (3));
   EXPECT_EQ (c->device_by_id (d2a->id ()) == d2a, true);
+  EXPECT_EQ (c->device_by_name (d2a->name ()) == d2a, true);
+
   c->add_device (d2b);
   EXPECT_EQ (d2b->id (), size_t (4));
   EXPECT_EQ (c->device_by_id (d2b->id ()) == d2b, true);
+  EXPECT_EQ (c->device_by_name (d2b->name ()) == d2b, true);
+
+  d2b->set_name ("d2b");
+  EXPECT_EQ (c->device_by_id (d2b->id ()) == d2b, true);
+  EXPECT_EQ (c->device_by_name (d2b->name ()) == d2b, true);
+  EXPECT_EQ (c->device_by_name ("d2x") == 0, true);
+
   c->remove_device (dd);
   dd = 0;
   EXPECT_EQ (c->device_by_id (d2a->id ()) == d2a, true);
   EXPECT_EQ (c->device_by_id (2) == 0, true);
+  EXPECT_EQ (c->device_by_name (d2a->name ()) == d2a, true);
+  EXPECT_EQ (c->device_by_name ("doesnt_exist") == 0, true);
 
   EXPECT_EQ (d1->parameter_value (0), 1.0);
   EXPECT_EQ (d1->parameter_value (1), 2.0);
@@ -313,18 +331,33 @@ TEST(4_CircuitDevices)
 
   db::Net *n1 = new db::Net ();
   n1->set_name ("n1");
+  n1->set_cluster_id (41);
   EXPECT_EQ (n1->circuit (), 0);
   c->add_net (n1);
   n1->add_terminal (db::NetTerminalRef (d1, 0));
   n1->add_terminal (db::NetTerminalRef (d2a, 0));
   EXPECT_EQ (n1->circuit (), c.get ());
+  EXPECT_EQ (c->net_by_cluster_id (17) == 0, true);
+  EXPECT_EQ (c->net_by_cluster_id (41) == n1, true);
+  EXPECT_EQ (c->net_by_name ("doesnt_exist") == 0, true);
+  EXPECT_EQ (c->net_by_name ("n1") == n1, true);
 
   db::Net *n2 = new db::Net ();
-  n2->set_name ("n2");
+  n2->set_name ("n2x");
+  n2->set_cluster_id (17);
   c->add_net (n2);
   n2->add_terminal (db::NetTerminalRef (d1, 1));
   n2->add_terminal (db::NetTerminalRef (d2a, 1));
   n2->add_terminal (db::NetTerminalRef (d2b, 0));
+  EXPECT_EQ (c->net_by_cluster_id (17) == n2, true);
+  EXPECT_EQ (c->net_by_name ("n2x") == n2, true);
+
+  n2->set_name ("n2");
+  n2->set_cluster_id (42);
+  EXPECT_EQ (c->net_by_cluster_id (17) == 0, true);
+  EXPECT_EQ (c->net_by_name ("n2x") == 0, true);
+  EXPECT_EQ (c->net_by_cluster_id (42) == n2, true);
+  EXPECT_EQ (c->net_by_name ("n2") == n2, true);
 
   EXPECT_EQ (netlist2 (*c),
     "c:\n"
@@ -413,18 +446,33 @@ TEST(4_NetlistSubcircuits)
   nl->add_device_class (dc);
 
   db::Circuit *c1 = new db::Circuit ();
+  c1->set_cell_index (17);
   EXPECT_EQ (c1->netlist (), 0);
   c1->set_name ("c1");
   c1->add_pin (db::Pin ("c1p1"));
   c1->add_pin (db::Pin ("c1p2"));
   nl->add_circuit (c1);
   EXPECT_EQ (c1->netlist (), nl.get ());
+  EXPECT_EQ (nl->circuit_by_name ("c1") == c1, true);
+  EXPECT_EQ (nl->circuit_by_name ("doesnt_exist") == 0, true);
+  EXPECT_EQ (nl->circuit_by_cell_index (17) == c1, true);
+  EXPECT_EQ (nl->circuit_by_cell_index (42) == 0, true);
 
   db::Circuit *c2 = new db::Circuit ();
-  c2->set_name ("c2");
+  c2->set_name ("c2x");
   c2->add_pin (db::Pin ("c2p1"));
   c2->add_pin (db::Pin ("c2p2"));
+  c2->set_cell_index (41);
   nl->add_circuit (c2);
+  EXPECT_EQ (nl->circuit_by_name ("c2x") == c2, true);
+  EXPECT_EQ (nl->circuit_by_cell_index (41) == c2, true);
+
+  c2->set_name ("c2");
+  EXPECT_EQ (nl->circuit_by_name ("c2x") == 0, true);
+  EXPECT_EQ (nl->circuit_by_name ("c2") == c2, true);
+  c2->set_cell_index (42);
+  EXPECT_EQ (nl->circuit_by_cell_index (41) == 0, true);
+  EXPECT_EQ (nl->circuit_by_cell_index (42) == c2, true);
 
   db::Device *d = new db::Device (dc, "D");
   c2->add_device (d);
@@ -438,13 +486,23 @@ TEST(4_NetlistSubcircuits)
   EXPECT_EQ (sc1->circuit () == c1, true);
   EXPECT_EQ (sc1->id (), size_t (1));
   EXPECT_EQ (c1->subcircuit_by_id (sc1->id ()) == sc1, true);
+  EXPECT_EQ (c1->subcircuit_by_id (2) == 0, true);
+  EXPECT_EQ (c1->subcircuit_by_name (sc1->name ()) == sc1, true);
+  EXPECT_EQ (c1->subcircuit_by_name ("doesnt_exist") == 0, true);
 
   db::SubCircuit *sc2 = new db::SubCircuit (c2);
-  sc2->set_name ("sc2");
-  EXPECT_EQ (refs2string (c2), "sc1,sc2");
+  sc2->set_name ("scx");
+  EXPECT_EQ (refs2string (c2), "sc1,scx");
   c1->add_subcircuit (sc2);
   EXPECT_EQ (sc2->id (), size_t (2));
   EXPECT_EQ (c1->subcircuit_by_id (sc2->id ()) == sc2, true);
+  EXPECT_EQ (c1->subcircuit_by_name (sc2->name ()) == sc2, true);
+
+  sc2->set_name ("sc2");
+  EXPECT_EQ (refs2string (c2), "sc1,sc2");
+  EXPECT_EQ (c1->subcircuit_by_id (sc2->id ()) == sc2, true);
+  EXPECT_EQ (c1->subcircuit_by_name (sc2->name ()) == sc2, true);
+  EXPECT_EQ (c1->subcircuit_by_name ("scx") == 0, true);
 
   db::Net *n2a = new db::Net ();
   c2->add_net (n2a);

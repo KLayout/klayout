@@ -1,10 +1,7 @@
+# import all packages from klayout, such as klayout.db and klayout.tl
+# WARNING: doing it manually until it becomes impractical
+# TODO: We need a specification document explaining what should go into pya
 
-import klayout
-import importlib
-
-__all__ = []
-for m in klayout.__all__:
-  mod = importlib.import_module("klayout." + m)
-  for mm in mod.__all__:
-    globals()[mm] = getattr(mod, mm)
-
+from klayout.db import *  # noqa
+from klayout.tl import *  # noqa
+from klayout.rdb import *  # noqa

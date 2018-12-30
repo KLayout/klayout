@@ -39,7 +39,7 @@ namespace tl
   class Extractor;
 
   //  specialization of tl::VariantUserClass for the purpose of NetlistProperty representation
-  template <> class DB_PUBLIC tl::VariantUserClass<db::NetlistProperty>
+  template <> class DB_PUBLIC VariantUserClass<db::NetlistProperty>
     : public tl::VariantUserClassBase
   {
   public:

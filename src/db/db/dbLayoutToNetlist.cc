@@ -209,7 +209,7 @@ db::Region LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region 
     const db::local_cluster<db::PolygonRef> &lc = m_netex.clusters ().clusters_per_cell (ci).cluster_by_id (net.cluster_id ());
 
     for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (lid); !s.at_end (); ++s) {
-      res.insert (*s);
+      res.insert (s->obj ().transformed (s->trans ()));
     }
 
   } else {
@@ -220,7 +220,7 @@ db::Region LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region 
     db::cell_index_type ci = circuit->cell_index ();
 
     for (db::recursive_cluster_shape_iterator<db::PolygonRef> rci (m_netex.clusters (), lid, ci, net.cluster_id ()); !rci.at_end (); ++rci) {
-      res.insert (rci->obj ().transformed (db::ICplxTrans (rci->trans ()) * rci.trans ()));
+      res.insert (rci->obj ().transformed (rci.trans () * db::ICplxTrans (rci->trans ())));
     }
 
   }

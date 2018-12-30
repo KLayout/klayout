@@ -101,33 +101,73 @@ private:
 
 }
 
-static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<db::PolygonRef> &clusters, db::Layout &ly, const std::map<unsigned int, unsigned int> &lmap, const db::CellMapping &cmap)
+static void dump_nets_to_layout (const db::LayoutToNetlist &l2n, db::Layout &ly, const std::map<const db::Region *, unsigned int> &lmap, const db::CellMapping &cmap)
 {
+  const db::Netlist &nl = *l2n.netlist ();
   for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
 
     db::Cell &cell = ly.cell (cmap.cell_mapping (c->cell_index ()));
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
 
-      const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (c->cell_index ()).cluster_by_id (n->cluster_id ());
+      db::cell_index_type nci = std::numeric_limits<db::cell_index_type>::max ();
 
-      bool any_shapes = false;
-      for (std::map<unsigned int, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end () && !any_shapes; ++m) {
-        any_shapes = ! lc.begin (m->first).at_end ();
+      for (std::map<const db::Region *, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
+
+        db::Region shapes = l2n.shapes_of_net (*n, *m->first, false);
+        if (shapes.empty ()) {
+          continue;
+        }
+
+        if (nci == std::numeric_limits<db::cell_index_type>::max ()) {
+          std::string nn = "NET_" + c->name () + "_" + n->expanded_name ();
+          nci = ly.add_cell (nn.c_str ());
+          cell.insert (db::CellInstArray (db::CellInst (nci), db::Trans ()));
+        }
+
+        shapes.insert_into (&ly, nci, m->second);
+
       }
 
-      if (any_shapes) {
+    }
 
-        std::string nn = "NET_" + c->name () + "_" + n->expanded_name ();
-        db::Cell &net_cell = ly.cell (ly.add_cell (nn.c_str ()));
-        cell.insert (db::CellInstArray (db::CellInst (net_cell.cell_index ()), db::Trans ()));
+  }
+}
 
-        for (std::map<unsigned int, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
-          db::Shapes &target = net_cell.shapes (m->second);
-          for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (m->first); !s.at_end (); ++s) {
-            target.insert (*s);
-          }
+static void dump_recursive_nets_to_layout (const db::LayoutToNetlist &l2n, db::Layout &ly, const std::map<const db::Region *, unsigned int> &lmap, const db::CellMapping &cmap)
+{
+  const db::Netlist &nl = *l2n.netlist ();
+  for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
+
+    db::Cell &cell = ly.cell (cmap.cell_mapping (c->cell_index ()));
+
+    for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
+
+      //  only handle nets without outgoing pins - these are local
+      bool is_local = true;
+      for (db::Net::const_pin_iterator p = n->begin_pins (); p != n->end_pins () && is_local; ++p) {
+        is_local = (p->subcircuit () != 0);
+      }
+      if (! is_local) {
+        continue;
+      }
+
+      db::cell_index_type nci = std::numeric_limits<db::cell_index_type>::max ();
+
+      for (std::map<const db::Region *, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
+
+        db::Region shapes = l2n.shapes_of_net (*n, *m->first, true);
+        if (shapes.empty ()) {
+          continue;
         }
+
+        if (nci == std::numeric_limits<db::cell_index_type>::max ()) {
+          std::string nn = "RNET_" + c->name () + "_" + n->expanded_name ();
+          nci = ly.add_cell (nn.c_str ());
+          cell.insert (db::CellInstArray (db::CellInst (nci), db::Trans ()));
+        }
+
+        shapes.insert_into (&ly, nci, m->second);
 
       }
 
@@ -274,19 +314,31 @@ TEST(1_Basic)
   //    208/0 -> Metal2
   //    210/0 -> N source/drain
   //    211/0 -> P source/drain
-  std::map<unsigned int, unsigned int> dump_map;
-  dump_map [l2n.layer_of (rpsd)       ] = ly.insert_layer (db::LayerProperties (210, 0));
-  dump_map [l2n.layer_of (rnsd)       ] = ly.insert_layer (db::LayerProperties (211, 0));
-  dump_map [l2n.layer_of (*rpoly)     ] = ly.insert_layer (db::LayerProperties (203, 0));
-  dump_map [l2n.layer_of (*rdiff_cont)] = ly.insert_layer (db::LayerProperties (204, 0));
-  dump_map [l2n.layer_of (*rpoly_cont)] = ly.insert_layer (db::LayerProperties (205, 0));
-  dump_map [l2n.layer_of (*rmetal1)   ] = ly.insert_layer (db::LayerProperties (206, 0));
-  dump_map [l2n.layer_of (*rvia1)     ] = ly.insert_layer (db::LayerProperties (207, 0));
-  dump_map [l2n.layer_of (*rmetal2)   ] = ly.insert_layer (db::LayerProperties (208, 0));
+  std::map<const db::Region *, unsigned int> dump_map;
+  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (210, 0));
+  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (211, 0));
+  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (203, 0));
+  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (204, 0));
+  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (205, 0));
+  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (206, 0));
+  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (207, 0));
+  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (208, 0));
 
   //  write nets to layout
   db::CellMapping cm = l2n.cell_mapping_into (ly, tc);
-  dump_nets_to_layout (*l2n.netlist (), l2n.net_clusters (), ly, dump_map, cm);
+  dump_nets_to_layout (l2n, ly, dump_map, cm);
+
+  dump_map.clear ();
+  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (310, 0));
+  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (311, 0));
+  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (303, 0));
+  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (304, 0));
+  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (305, 0));
+  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (306, 0));
+  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (307, 0));
+  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (308, 0));
+
+  dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
 
   //  compare netlist as string
   EXPECT_EQ (l2n.netlist ()->to_string (),
@@ -345,7 +397,7 @@ TEST(1_Basic)
   std::string au = tl::testsrc ();
   au = tl::combine_path (au, "testdata");
   au = tl::combine_path (au, "algo");
-  au = tl::combine_path (au, "device_extract_au1.gds");
+  au = tl::combine_path (au, "device_extract_au1_with_rec_nets.gds");
 
   db::compare_layouts (_this, ly, au);
 }

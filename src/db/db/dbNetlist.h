@@ -1519,6 +1519,13 @@ public:
   void connect_pin (size_t pin_id, Net *net);
 
   /**
+   *  @brief Returns true, if the net is an external net
+   *
+   *  External nets are net which are connected to an outgoing pin.
+   */
+  bool is_external_net (const db::Net *net) const;
+
+  /**
    *  @brief Purge unused nets
    *
    *  This method will purge all nets which return "floating".

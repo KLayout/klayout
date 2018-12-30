@@ -851,6 +851,21 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
   }
 }
 
+bool Circuit::is_external_net (const db::Net *net) const
+{
+  if (!net || net->pin_count () == 0) {
+    return false;
+  }
+
+  for (std::vector<Net::pin_iterator>::const_iterator p = m_pin_refs.begin (); p != m_pin_refs.end (); ++p) {
+    if (*p != Net::pin_iterator () && (*p)->net () == net) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 void Circuit::purge_nets ()
 {
   std::vector<db::Net *> nets_to_be_purged;

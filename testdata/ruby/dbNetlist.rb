@@ -510,7 +510,9 @@ class DBNetlist_TestClass < TestBase
     c.each_net { |n| names << n.name }
     assert_equal(names, [ "NET1", "NET2" ])
 
+    assert_equal(c.is_external_net?(net1), false)
     c.connect_pin(pina1, net1)
+    assert_equal(c.is_external_net?(net1), true)
     c.connect_pin(pinb1.id, net1)
     c.connect_pin(pina2, net2)
     c.connect_pin(pinb2.id, net2)

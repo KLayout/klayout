@@ -144,11 +144,7 @@ static void dump_recursive_nets_to_layout (const db::LayoutToNetlist &l2n, db::L
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
 
       //  only handle nets without outgoing pins - these are local
-      bool is_local = true;
-      for (db::Net::const_pin_iterator p = n->begin_pins (); p != n->end_pins () && is_local; ++p) {
-        is_local = (p->subcircuit () != 0);
-      }
-      if (! is_local) {
+      if (c->is_external_net (n.operator-> ())) {
         continue;
       }
 

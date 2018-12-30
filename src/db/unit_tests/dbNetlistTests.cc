@@ -751,18 +751,21 @@ TEST(8_NetSubCircuitsEditing)
   n2->set_name ("n2");
   c.add_net (n2);
 
+  EXPECT_EQ (c.is_external_net (n1), false);
   c.connect_pin (0, n1);
 
   EXPECT_EQ (n1->terminal_count (), size_t (0));
   EXPECT_EQ (n1->pin_count (), size_t (1));
   EXPECT_EQ (n1->is_floating (), true);
   EXPECT_EQ (n1->is_internal (), false);
+  EXPECT_EQ (c.is_external_net (n1), true);
 
   EXPECT_EQ (c.net_for_pin (0), n1);
   EXPECT_EQ (c.net_for_pin (1), 0);
 
   sc1->connect_pin (0, n1);
   sc1->connect_pin (1, n2);
+  EXPECT_EQ (c.is_external_net (n2), false);
 
   EXPECT_EQ (n1->terminal_count (), size_t (0));
   EXPECT_EQ (n1->pin_count (), size_t (2));

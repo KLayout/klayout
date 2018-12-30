@@ -760,6 +760,10 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
     "@brief Gets the cell index of the circuit\n"
     "See \\cell_index= for details.\n"
   ) +
+  gsi::method ("is_external_net?", &db::Circuit::is_external_net, gsi::arg ("net"),
+    "@brief Returns true, if the given net is an external one.\n"
+    "External nets are nets which are connected to an outgoing pin."
+  ) +
   gsi::method ("net_for_pin", (db::Net *(db::Circuit::*) (size_t)) &db::Circuit::net_for_pin, gsi::arg ("pin_id"),
     "@brief Gets the net object attached to a specific pin.\n"
     "This is the net object inside the circuit which attaches to the given outward-bound pin.\n"

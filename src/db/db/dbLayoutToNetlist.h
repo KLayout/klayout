@@ -86,6 +86,11 @@ public:
   void set_threads (int n);
 
   /**
+   *  @brief Gets the number of threads to use
+   */
+  int threads () const;
+
+  /**
    *  @brief Sets the area_ratio parameter for the hierarchical network processor
    *  This parameter controls splitting of large polygons in order to reduce the
    *  error made by the bounding box approximation.
@@ -93,11 +98,21 @@ public:
   void set_area_ratio (double ar);
 
   /**
+   *  @brief Gets the area ratio
+   */
+  double area_ratio () const;
+
+  /**
    *  @brief Sets the max_vertex_count parameter for the hierarchical network processor
    *  This parameter controls splitting of large polygons in order to enhance performance
    *  for very big polygons.
    */
   void set_max_vertex_count (size_t n);
+
+  /**
+   *  @brief Gets the max vertex count
+   */
+  size_t max_vertex_count () const;
 
   /**
    *  @brief Creates a new region representing an original layer
@@ -240,7 +255,7 @@ private:
   std::set<db::DeepLayer> m_dlrefs;
   bool m_netlist_extracted;
 
-  size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, db::cell_index_type &cell_index_found);
+  size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
 };
 
 }

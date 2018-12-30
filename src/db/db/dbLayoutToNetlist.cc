@@ -53,14 +53,29 @@ void LayoutToNetlist::set_threads (int n)
   m_dss.set_threads (n);
 }
 
+int LayoutToNetlist::threads () const
+{
+  return m_dss.threads ();
+}
+
 void LayoutToNetlist::set_area_ratio (double ar)
 {
   m_dss.set_max_area_ratio (ar);
 }
 
+double LayoutToNetlist::area_ratio () const
+{
+  return m_dss.max_area_ratio ();
+}
+
 void LayoutToNetlist::set_max_vertex_count (size_t n)
 {
   m_dss.set_max_vertex_count (n);
+}
+
+size_t LayoutToNetlist::max_vertex_count () const
+{
+  return m_dss.max_vertex_count ();
 }
 
 db::Region *LayoutToNetlist::make_layer (unsigned int layer_index)
@@ -233,25 +248,32 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::DPoi
   return probe_net (of_region, db::CplxTrans (internal_layout ()->dbu ()).inverted () * point);
 }
 
-size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, db::cell_index_type &cell_index_found)
+size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path)
 {
-  db::Box local_box = trans.inverted () * test_cluster.bbox ();
+  db::Box local_box = trans * test_cluster.bbox ();
 
   const db::local_clusters<db::PolygonRef> &lcc = net_clusters ().clusters_per_cell (cell->cell_index ());
   for (db::local_clusters<db::PolygonRef>::touching_iterator i = lcc.begin_touching (local_box); ! i.at_end (); ++i) {
     const db::local_cluster<db::PolygonRef> &lc = *i;
     if (lc.interacts (test_cluster, trans, m_conn)) {
-      cell_index_found = cell->cell_index ();
       return lc.id ();
     }
   }
 
   for (db::Cell::touching_iterator i = cell->begin_touching (local_box); ! i.at_end (); ++i) {
-    db::ICplxTrans t = trans * i->complex_trans ();
-    size_t cluster_id = search_net (t, &internal_layout ()->cell (i->cell_index ()), test_cluster, cell_index_found);
-    if (cluster_id > 0) {
-      return cluster_id;
+
+    for (db::CellInstArray::iterator ia = i->begin_touching (local_box, internal_layout ()); ! ia.at_end (); ++ia) {
+
+      db::ICplxTrans trans_inst = i->complex_trans (*ia);
+      db::ICplxTrans t = trans_inst.inverted () * trans;
+      size_t cluster_id = search_net (t, &internal_layout ()->cell (i->cell_index ()), test_cluster, rev_inst_path);
+      if (cluster_id > 0) {
+        rev_inst_path.push_back (db::InstElement (*i, ia));
+        return cluster_id;
+      }
+
     }
+
   }
 
   return 0;
@@ -264,6 +286,9 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
   }
   tl_assert (mp_netlist.get ());
 
+  db::CplxTrans dbu_trans (internal_layout ()->dbu ());
+  db::VCplxTrans dbu_trans_inv = dbu_trans.inverted ();
+
   unsigned int layer = layer_of (of_region);
 
   //  Prepare a test cluster
@@ -272,15 +297,69 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
   db::local_cluster<db::PolygonRef> test_cluster;
   test_cluster.add (db::PolygonRef (db::Polygon (box), sr), layer);
 
-  db::cell_index_type ci = 0;
-  size_t cluster_id = search_net (db::ICplxTrans (), internal_top_cell (), test_cluster, ci);
+  std::vector<db::InstElement> inst_path;
+
+  size_t cluster_id = search_net (db::ICplxTrans (), internal_top_cell (), test_cluster, inst_path);
   if (cluster_id > 0) {
 
-    db::Circuit *circuit = mp_netlist->circuit_by_cell_index (ci);
-    tl_assert (circuit != 0);
+    //  search_net delivers the path in reverse order
+    std::reverse (inst_path.begin (), inst_path.end ());
+
+    std::vector<db::cell_index_type> cell_indexes;
+    cell_indexes.reserve (inst_path.size () + 1);
+    cell_indexes.push_back (internal_top_cell ()->cell_index ());
+    for (std::vector<db::InstElement>::const_iterator i = inst_path.begin (); i != inst_path.end (); ++i) {
+      cell_indexes.push_back (i->inst_ptr.cell_index ());
+    }
+
+    db::Circuit *circuit = mp_netlist->circuit_by_cell_index (cell_indexes.back ());
+    if (! circuit) {
+      //  the circuit has probably been optimized away
+      return 0;
+    }
 
     db::Net *net = circuit->net_by_cluster_id (cluster_id);
-    tl_assert (net != 0);
+    if (! net) {
+      //  the net has probably been optimized away
+      return 0;
+    }
+
+    //  follow the path up in the net hierarchy using the transformation and the upper cell index as the
+    //  guide line
+    while (! inst_path.empty () && circuit->is_external_net (net)) {
+
+      cell_indexes.pop_back ();
+
+      db::Pin *pin = 0;
+      for (db::Circuit::pin_iterator p = circuit->begin_pins (); p != circuit->end_pins () && ! pin; ++p) {
+        if (circuit->net_for_pin (p->id ()) == net) {
+          pin = p.operator-> ();
+        }
+      }
+      tl_assert (pin != 0);
+
+      db::DCplxTrans dtrans = dbu_trans * inst_path.back ().complex_trans () * dbu_trans_inv;
+
+      //  try to find a parent circuit which connects to this net
+      db::Circuit *upper_circuit = 0;
+      db::Net *upper_net = 0;
+      for (db::Circuit::refs_iterator r = circuit->begin_refs (); r != circuit->end_refs () && ! upper_net; ++r) {
+        if (r->trans ().equal (dtrans) && r->circuit () && r->circuit ()->cell_index () == cell_indexes.back ()) {
+          upper_net = r->net_for_pin (pin->id ());
+          upper_circuit = r->circuit ();
+        }
+      }
+
+      if (upper_net) {
+        circuit = upper_circuit;
+        net = upper_net;
+        inst_path.pop_back ();
+      } else {
+        break;
+      }
+
+    }
+
     return net;
 
   } else {

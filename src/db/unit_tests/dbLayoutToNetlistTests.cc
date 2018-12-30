@@ -172,6 +172,12 @@ static void dump_recursive_nets_to_layout (const db::LayoutToNetlist &l2n, db::L
   }
 }
 
+//  TODO: may be useful elsewhere?
+static std::string qnet_name (const db::Net *net)
+{
+  return net ? net->qname () : "(null)";
+}
+
 static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_layer, int gds_datatype = 0)
 {
   unsigned int lid = ly.insert_layer (db::LayerProperties (gds_layer, gds_datatype));
@@ -361,6 +367,19 @@ TEST(1_Basic)
     "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
   );
 
+  //  do some probing before purging
+
+  //  top level
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (0.0, 1.8))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::Point (0, 1800))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (-2.0, 1.8))), "(null)");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (-1.5, 1.8))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (24.5, 1.8))), "RINGO:OSC");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:VSS");
+
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I39");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "RINGO:$I2");
+
   // doesn't do anything here, but we test that this does not destroy anything:
   l2n.netlist ()->combine_devices ();
 
@@ -396,4 +415,18 @@ TEST(1_Basic)
   au = tl::combine_path (au, "device_extract_au1_with_rec_nets.gds");
 
   db::compare_layouts (_this, ly, au);
+
+  //  do some probing after purging
+
+  //  top level
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (0.0, 1.8))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::Point (0, 1800))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (-2.0, 1.8))), "(null)");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (-1.5, 1.8))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (24.5, 1.8))), "RINGO:OSC");
+  //  the transistor which supplies this probe target has been optimized away by "purge".
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "(null)");
+
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "INV2:$2");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "RINGO:$I2");
 }

@@ -29,11 +29,11 @@ namespace {
 /**
  *  @brief A NetlistDeviceExtractor implementation that allows reimplementation of the virtual methods
  */
-class NetlistDeviceExtractorImpl
+class GenericDeviceExtractor
   : public db::NetlistDeviceExtractor
 {
 public:
-  NetlistDeviceExtractorImpl ()
+  GenericDeviceExtractor ()
     : db::NetlistDeviceExtractor (std::string ())
   {
     //  .. nothing yet ..
@@ -66,7 +66,7 @@ public:
   virtual void setup ()
   {
     if (cb_setup.can_issue ()) {
-      cb_setup.issue<NetlistDeviceExtractorImpl> (&NetlistDeviceExtractorImpl::setup_fb);
+      cb_setup.issue<GenericDeviceExtractor> (&GenericDeviceExtractor::setup_fb);
     } else {
       db::NetlistDeviceExtractor::setup ();
     }
@@ -80,7 +80,7 @@ public:
   virtual db::Connectivity get_connectivity (const db::Layout &layout, const std::vector<unsigned int> &layers) const
   {
     if (cb_get_connectivity.can_issue ()) {
-      return cb_get_connectivity.issue<const NetlistDeviceExtractorImpl, db::Connectivity, const db::Layout &, const std::vector<unsigned int> &> (&NetlistDeviceExtractorImpl::get_connectivity_fb, layout, layers);
+      return cb_get_connectivity.issue<const GenericDeviceExtractor, db::Connectivity, const db::Layout &, const std::vector<unsigned int> &> (&GenericDeviceExtractor::get_connectivity_fb, layout, layers);
     } else {
       return db::NetlistDeviceExtractor::get_connectivity (layout, layers);
     }
@@ -94,7 +94,7 @@ public:
   virtual void extract_devices (const std::vector<db::Region> &layer_geometry)
   {
     if (cb_extract_devices.can_issue ()) {
-      cb_extract_devices.issue<NetlistDeviceExtractorImpl, const std::vector<db::Region> &> (&NetlistDeviceExtractorImpl::extract_devices_fb, layer_geometry);
+      cb_extract_devices.issue<GenericDeviceExtractor, const std::vector<db::Region> &> (&GenericDeviceExtractor::extract_devices_fb, layer_geometry);
     } else {
       db::NetlistDeviceExtractor::extract_devices (layer_geometry);
     }
@@ -110,7 +110,7 @@ public:
 namespace tl
 {
 
-template<> struct tl::type_traits<NetlistDeviceExtractorImpl> : public tl::type_traits<void>
+template<> struct tl::type_traits<GenericDeviceExtractor> : public tl::type_traits<void>
 {
   //  mark "NetlistDeviceExtractor" as not having a default ctor and no copy ctor
   typedef tl::false_tag has_copy_constructor;
@@ -235,11 +235,11 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
   "This class has been introduced in version 0.26."
 );
 
-Class<NetlistDeviceExtractorImpl> decl_NetlistDeviceExtractorImpl (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractor",
-  gsi::method ("name=", &NetlistDeviceExtractorImpl::set_name,
+Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceExtractor, "db", "GenericDeviceExtractor",
+  gsi::method ("name=", &GenericDeviceExtractor::set_name,
     "@brief Sets the name of the device extractor and the device class."
   ) +
-  gsi::callback ("setup", &NetlistDeviceExtractorImpl::setup, &NetlistDeviceExtractorImpl::cb_setup,
+  gsi::callback ("setup", &GenericDeviceExtractor::setup, &GenericDeviceExtractor::cb_setup,
     "@brief Sets up the extractor.\n"
     "This method is supposed to set up the device extractor. This involves three basic steps:\n"
     "defining the name, the device classe and setting up the device layers.\n"
@@ -248,7 +248,7 @@ Class<NetlistDeviceExtractorImpl> decl_NetlistDeviceExtractorImpl (decl_dbNetlis
     "Use \\register_device_class to register the device class you need.\n"
     "Defined the layers by calling \\define_layer once or several times.\n"
   ) +
-  gsi::callback ("get_connectivity", &NetlistDeviceExtractorImpl::get_connectivity, &NetlistDeviceExtractorImpl::cb_get_connectivity,
+  gsi::callback ("get_connectivity", &GenericDeviceExtractor::get_connectivity, &GenericDeviceExtractor::cb_get_connectivity,
     gsi::arg ("layout"), gsi::arg ("layers"),
     "@brief Gets the connectivity object used to extract the device geometry.\n"
     "This method shall raise an error, if the input layer are not properly defined (e.g.\n"
@@ -258,7 +258,7 @@ Class<NetlistDeviceExtractorImpl> decl_NetlistDeviceExtractorImpl (decl_dbNetlis
     "The list of layers corresponds to the number of layers defined. Use the layer indexes from this list "
     "to build the connectivity with \\Connectivity#connect."
   ) +
-  gsi::callback ("extract_devices", &NetlistDeviceExtractorImpl::extract_devices, &NetlistDeviceExtractorImpl::cb_extract_devices,
+  gsi::callback ("extract_devices", &GenericDeviceExtractor::extract_devices, &GenericDeviceExtractor::cb_extract_devices,
     gsi::arg ("layer_geometry"),
     "@brief Extracts the devices from the given shape cluster.\n"
     "\n"
@@ -271,7 +271,7 @@ Class<NetlistDeviceExtractorImpl> decl_NetlistDeviceExtractorImpl (decl_dbNetlis
     "terminals by which the nets extracted in the network extraction step connect\n"
     "to the new devices.\n"
   ) +
-  gsi::method ("register_device_class", &NetlistDeviceExtractorImpl::register_device_class, gsi::arg ("device_class"),
+  gsi::method ("register_device_class", &GenericDeviceExtractor::register_device_class, gsi::arg ("device_class"),
    "@brief Registers a device class.\n"
    "The device class object will become owned by the netlist and must not be deleted by\n"
    "the caller. The name of the device class will be changed to the name given to\n"
@@ -279,19 +279,19 @@ Class<NetlistDeviceExtractorImpl> decl_NetlistDeviceExtractorImpl (decl_dbNetlis
    "This method shall be used inside the implementation of \\setup to register\n"
    "the device classes.\n"
   ) +
-  gsi::method ("define_layer", &NetlistDeviceExtractorImpl::define_layer, gsi::arg ("name"), gsi::arg ("description"),
+  gsi::method ("define_layer", &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("description"),
    "@brief Defines a layer.\n"
    "Each call will define one more layer for the device extraction.\n"
    "This method shall be used inside the implementation of \\setup to define\n"
    "the device layers. The actual geometries are later available to \\extract_devices\n"
    "in the order the layers are defined.\n"
   ) +
-  gsi::method ("create_device", &NetlistDeviceExtractorImpl::create_device,
+  gsi::method ("create_device", &GenericDeviceExtractor::create_device,
    "@brief Creates a device.\n"
    "The device object returned can be configured by the caller, e.g. set parameters.\n"
    "It will be owned by the netlist and must not be deleted by the caller.\n"
   ) +
-  gsi::method ("define_terminal", (void (NetlistDeviceExtractorImpl::*) (db::Device *, size_t, size_t, const db::Polygon &)) &NetlistDeviceExtractorImpl::define_terminal,
+  gsi::method ("define_terminal", (void (GenericDeviceExtractor::*) (db::Device *, size_t, size_t, const db::Polygon &)) &GenericDeviceExtractor::define_terminal,
     gsi::arg ("device"), gsi::arg ("terminal_id"), gsi::arg ("layer_index"), gsi::arg ("shape"),
    "@brief Defines a device terminal.\n"
    "This method will define a terminal to the given device and the given terminal ID. \n"
@@ -301,7 +301,7 @@ Class<NetlistDeviceExtractorImpl> decl_NetlistDeviceExtractorImpl (decl_dbNetlis
    "This version produces a terminal with a shape given by the polygon. Note that the polygon is\n"
    "specified in database units.\n"
   ) +
-  gsi::method ("define_terminal", (void (NetlistDeviceExtractorImpl::*) (db::Device *, size_t, size_t, const db::Box &)) &NetlistDeviceExtractorImpl::define_terminal,
+  gsi::method ("define_terminal", (void (GenericDeviceExtractor::*) (db::Device *, size_t, size_t, const db::Box &)) &GenericDeviceExtractor::define_terminal,
     gsi::arg ("device"), gsi::arg ("terminal_id"), gsi::arg ("layer_index"), gsi::arg ("shape"),
    "@brief Defines a device terminal.\n"
    "This method will define a terminal to the given device and the given terminal ID. \n"
@@ -311,7 +311,7 @@ Class<NetlistDeviceExtractorImpl> decl_NetlistDeviceExtractorImpl (decl_dbNetlis
    "This version produces a terminal with a shape given by the box. Note that the box is\n"
    "specified in database units.\n"
   ) +
-  gsi::method ("define_terminal", (void (NetlistDeviceExtractorImpl::*) (db::Device *, size_t, size_t, const db::Point &)) &NetlistDeviceExtractorImpl::define_terminal,
+  gsi::method ("define_terminal", (void (GenericDeviceExtractor::*) (db::Device *, size_t, size_t, const db::Point &)) &GenericDeviceExtractor::define_terminal,
     gsi::arg ("device"), gsi::arg ("terminal_id"), gsi::arg ("layer_index"), gsi::arg ("point"),
    "@brief Defines a device terminal.\n"
    "This method will define a terminal to the given device and the given terminal ID. \n"
@@ -321,30 +321,30 @@ Class<NetlistDeviceExtractorImpl> decl_NetlistDeviceExtractorImpl (decl_dbNetlis
    "This version produces a point-like terminal. Note that the point is\n"
    "specified in database units.\n"
   ) +
-  gsi::method ("dbu", &NetlistDeviceExtractorImpl::dbu,
+  gsi::method ("dbu", &GenericDeviceExtractor::dbu,
    "@brief Gets the database unit\n"
   ) +
-  gsi::method ("error", (void (NetlistDeviceExtractorImpl::*) (const std::string &)) &NetlistDeviceExtractorImpl::error,
+  gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &)) &GenericDeviceExtractor::error,
     gsi::arg ("message"),
    "@brief Issues an error with the given message\n"
   ) +
-  gsi::method ("error", (void (NetlistDeviceExtractorImpl::*) (const std::string &, const db::DPolygon &)) &NetlistDeviceExtractorImpl::error,
+  gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const db::DPolygon &)) &GenericDeviceExtractor::error,
     gsi::arg ("message"), gsi::arg ("geometry"),
    "@brief Issues an error with the given message and micrometer-units polygon geometry\n"
   ) +
-  gsi::method ("error", (void (NetlistDeviceExtractorImpl::*) (const std::string &, const db::Polygon &)) &NetlistDeviceExtractorImpl::error,
+  gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const db::Polygon &)) &GenericDeviceExtractor::error,
     gsi::arg ("message"), gsi::arg ("geometry"),
    "@brief Issues an error with the given message and databse-unit polygon geometry\n"
   ) +
-  gsi::method ("error", (void (NetlistDeviceExtractorImpl::*) (const std::string &, const std::string &, const std::string &)) &NetlistDeviceExtractorImpl::error,
+  gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &)) &GenericDeviceExtractor::error,
     gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"),
    "@brief Issues an error with the given category name and description, message\n"
   ) +
-  gsi::method ("error", (void (NetlistDeviceExtractorImpl::*) (const std::string &, const std::string &, const std::string &, const db::DPolygon &)) &NetlistDeviceExtractorImpl::error,
+  gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &, const db::DPolygon &)) &GenericDeviceExtractor::error,
     gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"), gsi::arg ("geometry"),
    "@brief Issues an error with the given category name and description, message and micrometer-units polygon geometry\n"
   ) +
-  gsi::method ("error", (void (NetlistDeviceExtractorImpl::*) (const std::string &, const std::string &, const std::string &, const db::Polygon &)) &NetlistDeviceExtractorImpl::error,
+  gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &, const db::Polygon &)) &GenericDeviceExtractor::error,
     gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"), gsi::arg ("geometry"),
    "@brief Issues an error with the given category name and description, message and databse-unit polygon geometry\n"
   ),

@@ -269,6 +269,11 @@ Class<db::Net> decl_dbNet ("db", "Net",
     "@brief Gets the name of the net.\n"
     "See \\name= for details about the name."
   ) +
+  gsi::method ("qname|to_s", &db::Net::qname,
+    "@brief Gets the qualified name.\n"
+    "The qualified name is like the expanded name, but the circuit's name is preceeded\n"
+    "(i.e. 'CIRCUIT:NET') if available.\n"
+  ) +
   gsi::method ("expanded_name", &db::Net::expanded_name,
     "@brief Gets the expanded name of the net.\n"
     "The expanded name takes the name of the net. If the name is empty, the cluster ID will be used to build a name. "

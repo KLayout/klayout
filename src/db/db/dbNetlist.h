@@ -460,6 +460,14 @@ public:
   std::string expanded_name () const;
 
   /**
+   *  @brief Gets the qualified name
+   *
+   *  The qualified name is like the expanded name, but preceeded with the
+   *  Circuit name if known (e.g. "CIRCUIT:NET")
+   */
+  std::string qname () const;
+
+  /**
    *  @brief Sets the cluster ID of this net
    *
    *  The cluster ID links the net to a cluster from the
@@ -1578,6 +1586,10 @@ private:
   void set_netlist (Netlist *netlist);
   bool combine_parallel_devices (const db::DeviceClass &cls);
   bool combine_serial_devices (const db::DeviceClass &cls);
+
+  void devices_changed ();
+  void subcircuits_changed ();
+  void nets_changed ();
 };
 
 /**
@@ -2269,6 +2281,7 @@ private:
 
   void invalidate_topology ();
   void validate_topology ();
+  void circuits_changed ();
 
   const tl::vector<Circuit *> &child_circuits (Circuit *circuit);
   const tl::vector<Circuit *> &parent_circuits (Circuit *circuit);

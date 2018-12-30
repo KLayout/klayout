@@ -446,6 +446,15 @@ void Net::set_name (const std::string &name)
   }
 }
 
+std::string Net::qname () const
+{
+  if (circuit ()) {
+    return circuit ()->name () + ":" + expanded_name ();
+  } else {
+    return expanded_name ();
+  }
+}
+
 std::string Net::expanded_name () const
 {
   if (name ().empty ()) {
@@ -531,7 +540,9 @@ Circuit::Circuit ()
     m_net_by_name (this, &Circuit::begin_nets, &Circuit::end_nets),
     m_index (0)
 {
-  //  .. nothing yet ..
+  m_devices.changed ().add (this, &Circuit::devices_changed);
+  m_nets.changed ().add (this, &Circuit::nets_changed);
+  m_subcircuits.changed ().add (this, &Circuit::subcircuits_changed);
 }
 
 Circuit::Circuit (const Circuit &other)
@@ -544,6 +555,10 @@ Circuit::Circuit (const Circuit &other)
     m_net_by_name (this, &Circuit::begin_nets, &Circuit::end_nets),
     m_index (0)
 {
+  m_devices.changed ().add (this, &Circuit::devices_changed);
+  m_nets.changed ().add (this, &Circuit::nets_changed);
+  m_subcircuits.changed ().add (this, &Circuit::subcircuits_changed);
+
   operator= (other);
 }
 
@@ -551,14 +566,9 @@ Circuit &Circuit::operator= (const Circuit &other)
 {
   if (this != &other) {
 
-    m_name = other.m_name;
-    m_device_by_id.invalidate ();
-    m_subcircuit_by_id.invalidate ();
-    m_net_by_cluster_id.invalidate ();
-    m_device_by_name.invalidate ();
-    m_subcircuit_by_name.invalidate ();
-    m_net_by_name.invalidate ();
+    clear ();
 
+    m_name = other.m_name;
     m_pins = other.m_pins;
 
     std::map<const Device *, Device *> device_table;
@@ -630,6 +640,28 @@ const Pin *Circuit::pin_by_name (const std::string &name) const
   return 0;
 }
 
+void Circuit::devices_changed ()
+{
+  m_device_by_id.invalidate ();
+  m_device_by_name.invalidate ();
+}
+
+void Circuit::subcircuits_changed ()
+{
+  m_subcircuit_by_id.invalidate ();
+  m_subcircuit_by_name.invalidate ();
+
+  if (mp_netlist) {
+    mp_netlist->invalidate_topology ();
+  }
+}
+
+void Circuit::nets_changed ()
+{
+  m_net_by_cluster_id.invalidate ();
+  m_net_by_name.invalidate ();
+}
+
 void Circuit::clear ()
 {
   m_name.clear ();
@@ -637,12 +669,6 @@ void Circuit::clear ()
   m_devices.clear ();
   m_nets.clear ();
   m_subcircuits.clear ();
-  m_device_by_id.invalidate ();
-  m_subcircuit_by_id.invalidate ();
-  m_net_by_cluster_id.invalidate ();
-  m_device_by_name.invalidate ();
-  m_subcircuit_by_name.invalidate ();
-  m_net_by_name.invalidate ();
 }
 
 void Circuit::set_name (const std::string &name)
@@ -720,15 +746,11 @@ void Circuit::add_net (Net *net)
 {
   m_nets.push_back (net);
   net->set_circuit (this);
-  m_net_by_cluster_id.invalidate ();
-  m_net_by_name.invalidate ();
 }
 
 void Circuit::remove_net (Net *net)
 {
   m_nets.erase (net);
-  m_net_by_cluster_id.invalidate ();
-  m_net_by_name.invalidate ();
 }
 
 void Circuit::add_device (Device *device)
@@ -743,15 +765,11 @@ void Circuit::add_device (Device *device)
   device->set_id (id + 1);
 
   m_devices.push_back (device);
-  m_device_by_id.invalidate ();
-  m_device_by_name.invalidate ();
 }
 
 void Circuit::remove_device (Device *device)
 {
   m_devices.erase (device);
-  m_device_by_id.invalidate ();
-  m_device_by_name.invalidate ();
 }
 
 void Circuit::add_subcircuit (SubCircuit *subcircuit)
@@ -766,23 +784,11 @@ void Circuit::add_subcircuit (SubCircuit *subcircuit)
   subcircuit->set_id (id + 1);
 
   m_subcircuits.push_back (subcircuit);
-  m_subcircuit_by_id.invalidate ();
-  m_subcircuit_by_name.invalidate ();
-
-  if (mp_netlist) {
-    mp_netlist->invalidate_topology ();
-  }
 }
 
 void Circuit::remove_subcircuit (SubCircuit *subcircuit)
 {
   m_subcircuits.erase (subcircuit);
-  m_subcircuit_by_id.invalidate ();
-  m_subcircuit_by_name.invalidate ();
-
-  if (mp_netlist) {
-    mp_netlist->invalidate_topology ();
-  }
 }
 
 void Circuit::register_ref (SubCircuit *r)
@@ -1182,6 +1188,7 @@ Netlist::Netlist ()
     m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits)
 {
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
+  m_circuits.changed ().add (this, &Netlist::circuits_changed);
 }
 
 Netlist::Netlist (const Netlist &other)
@@ -1191,6 +1198,7 @@ Netlist::Netlist (const Netlist &other)
 {
   operator= (other);
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
+  m_circuits.changed ().add (this, &Netlist::circuits_changed);
 }
 
 Netlist &Netlist::operator= (const Netlist &other)
@@ -1220,6 +1228,12 @@ Netlist &Netlist::operator= (const Netlist &other)
 
   }
   return *this;
+}
+
+void Netlist::circuits_changed ()
+{
+  m_circuit_by_cell_index.invalidate ();
+  m_circuit_by_name.invalidate ();
 }
 
 void Netlist::invalidate_topology ()
@@ -1465,24 +1479,18 @@ void Netlist::clear ()
 {
   m_device_classes.clear ();
   m_circuits.clear ();
-  m_circuit_by_name.invalidate ();
-  m_circuit_by_cell_index.invalidate ();
 }
 
 void Netlist::add_circuit (Circuit *circuit)
 {
   m_circuits.push_back (circuit);
   circuit->set_netlist (this);
-  m_circuit_by_name.invalidate ();
-  m_circuit_by_cell_index.invalidate ();
 }
 
 void Netlist::remove_circuit (Circuit *circuit)
 {
   circuit->set_netlist (0);
   m_circuits.erase (circuit);
-  m_circuit_by_name.invalidate ();
-  m_circuit_by_cell_index.invalidate ();
 }
 
 void Netlist::add_device_class (DeviceClass *device_class)

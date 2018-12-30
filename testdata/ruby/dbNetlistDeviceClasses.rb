@@ -23,7 +23,7 @@ end
 
 load("test_prologue.rb")
 
-class DBNetlist_TestClass < TestBase
+class DBNetlistDeviceClasses_TestClass < TestBase
 
   def test_1_Resistors
   

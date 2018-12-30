@@ -26,48 +26,6 @@
 namespace gsi
 {
 
-//  TODO: move this to gsiMethods.h
-
-template <class R>
-class ConstantValueGetter
-  : public StaticMethodBase
-{
-public:
-  ConstantValueGetter (const std::string &name, const R &v, const std::string &doc)
-    : StaticMethodBase (name, doc, true), m_v (v)
-  {
-  }
-
-  void initialize ()
-  {
-    this->clear ();
-    //  Note: a constant must not return a reference to an existing object, hence "set_return_new":
-    this->template set_return_new<R> ();
-  }
-
-  virtual MethodBase *clone () const
-  {
-    return new ConstantValueGetter (*this);
-  }
-
-  virtual void call (void *, SerialArgs &, SerialArgs &ret) const
-  {
-    mark_called ();
-    ret.write<R> (m_v);
-  }
-
-private:
-  R m_v;
-};
-
-template <class R>
-Methods
-constant (const std::string &name, const R &v, const std::string &doc = std::string ())
-{
-  return Methods (new ConstantValueGetter <R> (name, v, doc));
-}
-
-
 extern Class<db::DeviceClass> decl_dbDeviceClass;
 
 Class<db::DeviceClassResistor> decl_dbDeviceClassResistor (decl_dbDeviceClass, "db", "DeviceClassResistor",

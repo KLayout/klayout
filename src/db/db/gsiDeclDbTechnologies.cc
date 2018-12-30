@@ -256,7 +256,7 @@ gsi::Class<db::Technology> technology_decl ("db", "Technology",
   gsi::method ("load", &db::Technology::load, gsi::arg ("file"),
     "@brief Loads the technology definition from a file\n"
   ) +
-  gsi::method ("load", &db::Technology::save, gsi::arg ("file"),
+  gsi::method ("save", &db::Technology::save, gsi::arg ("file"),
     "@brief Saves the technology definition to a file\n"
   ) +
   gsi::method ("technology_names", &technology_names,

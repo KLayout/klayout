@@ -597,11 +597,6 @@ Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "Ge
   "This class has been added in version 0.26."
 );
 
-static const db::Pin &create_pin (db::Circuit *c, const std::string &name)
-{
-  return c->add_pin (db::Pin (name));
-}
-
 static db::Net *create_net (db::Circuit *c, const std::string &name)
 {
   db::Net *n = new db::Net ();
@@ -649,7 +644,7 @@ static void circuit_disconnect_pin1 (db::Circuit *c, const db::Pin *pin)
 }
 
 Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
-  gsi::method_ext ("create_pin", &gsi::create_pin, gsi::arg ("name"),
+  gsi::method ("create_pin", &db::Circuit::add_pin, gsi::arg ("name"),
     "@brief Creates a new \\Pin object inside the circuit\n"
     "This object will describe a pin of the circuit. A circuit connects "
     "to the outside through such a pin. The pin is added after all existing "

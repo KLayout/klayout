@@ -640,7 +640,6 @@ public:
 private:
   friend class Circuit;
 
-  tl::weak_ptr<Circuit> m_circuit;
   std::string m_name;
   size_t m_id;
 
@@ -1187,7 +1186,7 @@ public:
    *  @brief Adds a pin to this circuit
    *  The circuit takes over ownership of the object.
    */
-  const Pin &add_pin(const Pin &pin);
+  const Pin &add_pin(const std::string &name);
 
   /**
    *  @brief Begin iterator for the pins of the circuit (non-const version)

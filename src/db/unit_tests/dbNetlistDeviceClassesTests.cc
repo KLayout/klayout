@@ -43,8 +43,8 @@ TEST(1_SerialResistors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -94,8 +94,8 @@ TEST(2_SerialResistors1Swapped)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -145,8 +145,8 @@ TEST(3_SerialResistors1OtherSwapped)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -196,8 +196,8 @@ TEST(4_SerialResistors2Swapped)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -247,9 +247,9 @@ TEST(5_SerialResistorsNoCombination)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c = circuit->add_pin (db::Pin ("C"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -301,8 +301,8 @@ TEST(6_ParallelResistors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -349,8 +349,8 @@ TEST(7_ParallelResistors1Swapped)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -397,8 +397,8 @@ TEST(8_ParallelResistors1OtherSwapped)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -445,8 +445,8 @@ TEST(9_ParallelResistors2Swapped)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -506,8 +506,8 @@ TEST(10_ComplexRegistorCombination)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (r1);
   circuit->add_device (r2);
@@ -568,8 +568,8 @@ TEST(11_SerialInductors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (l1);
   circuit->add_device (l2);
@@ -619,8 +619,8 @@ TEST(12_ParallelInductors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (l1);
   circuit->add_device (l2);
@@ -667,8 +667,8 @@ TEST(13_SerialCapacitors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (c1);
   circuit->add_device (c2);
@@ -718,8 +718,8 @@ TEST(14_ParallelCapacitors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (c1);
   circuit->add_device (c2);
@@ -766,8 +766,8 @@ TEST(15_SerialDiodes)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -820,8 +820,8 @@ TEST(16_ParallelDiodes)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -868,8 +868,8 @@ TEST(17_AntiParallelDiodes)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -925,9 +925,9 @@ TEST(20_ParallelMOS3Transistors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c = circuit->add_pin (db::Pin ("C"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -986,9 +986,9 @@ TEST(21_AntiParallelMOS3Transistors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c = circuit->add_pin (db::Pin ("C"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -1047,10 +1047,10 @@ TEST(22_ParallelMOS3TransistorsDisconnectedGates)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c1 = circuit->add_pin (db::Pin ("C1"));
-  db::Pin pin_c2 = circuit->add_pin (db::Pin ("C2"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c1 = circuit->add_pin ("C1");
+  db::Pin pin_c2 = circuit->add_pin ("C2");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -1116,9 +1116,9 @@ TEST(23_ParallelMOS3TransistorsDifferentLength)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c = circuit->add_pin (db::Pin ("C"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -1180,10 +1180,10 @@ TEST(30_ParallelMOS4Transistors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c = circuit->add_pin (db::Pin ("C"));
-  db::Pin pin_d = circuit->add_pin (db::Pin ("D"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
+  db::Pin pin_d = circuit->add_pin ("D");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -1248,10 +1248,10 @@ TEST(31_AntiParallelMOS4Transistors)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c = circuit->add_pin (db::Pin ("C"));
-  db::Pin pin_d = circuit->add_pin (db::Pin ("D"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
+  db::Pin pin_d = circuit->add_pin ("D");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -1316,11 +1316,11 @@ TEST(32_ParallelMOS4TransistorsDisconnectedGates)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c1 = circuit->add_pin (db::Pin ("C1"));
-  db::Pin pin_c2 = circuit->add_pin (db::Pin ("C2"));
-  db::Pin pin_d = circuit->add_pin (db::Pin ("D"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c1 = circuit->add_pin ("C1");
+  db::Pin pin_c2 = circuit->add_pin ("C2");
+  db::Pin pin_d = circuit->add_pin ("D");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -1392,11 +1392,11 @@ TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c = circuit->add_pin (db::Pin ("C"));
-  db::Pin pin_d1 = circuit->add_pin (db::Pin ("D1"));
-  db::Pin pin_d2 = circuit->add_pin (db::Pin ("D2"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
+  db::Pin pin_d1 = circuit->add_pin ("D1");
+  db::Pin pin_d2 = circuit->add_pin ("D2");
 
   circuit->add_device (d1);
   circuit->add_device (d2);
@@ -1468,10 +1468,10 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
 
-  db::Pin pin_a = circuit->add_pin (db::Pin ("A"));
-  db::Pin pin_b = circuit->add_pin (db::Pin ("B"));
-  db::Pin pin_c = circuit->add_pin (db::Pin ("C"));
-  db::Pin pin_d = circuit->add_pin (db::Pin ("D"));
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
+  db::Pin pin_d = circuit->add_pin ("D");
 
   circuit->add_device (d1);
   circuit->add_device (d2);

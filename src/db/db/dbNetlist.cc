@@ -559,9 +559,7 @@ Circuit &Circuit::operator= (const Circuit &other)
     m_subcircuit_by_name.invalidate ();
     m_net_by_name.invalidate ();
 
-    for (const_pin_iterator i = other.begin_pins (); i != other.end_pins (); ++i) {
-      add_pin (*i);
-    }
+    m_pins = other.m_pins;
 
     std::map<const Device *, Device *> device_table;
     for (const_device_iterator i = other.begin_devices (); i != other.end_devices (); ++i) {
@@ -711,9 +709,9 @@ Circuit::const_child_circuit_iterator Circuit::end_parents () const
   return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->parent_circuits (const_cast <Circuit *> (this))).end ();
 }
 
-const Pin &Circuit::add_pin (const Pin &pin)
+const Pin &Circuit::add_pin (const std::string &name)
 {
-  m_pins.push_back (pin);
+  m_pins.push_back (Pin (name));
   m_pins.back ().set_id (m_pins.size () - 1);
   return m_pins.back ();
 }
@@ -1503,8 +1501,7 @@ void Netlist::make_top_level_pins ()
       //  create pins for the named nets and connect them
       for (Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
         if (! n->name ().empty () && n->terminal_count () + n->pin_count () > 0) {
-          Pin pin (n->name ());
-          pin = circuit->add_pin (pin);
+          Pin pin = circuit->add_pin (n->name ());
           circuit->connect_pin (pin.id (), n.operator-> ());
         }
       }

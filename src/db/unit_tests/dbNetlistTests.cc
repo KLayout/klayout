@@ -130,10 +130,8 @@ TEST(3_CircuitBasic)
   c.set_name ("name");
   EXPECT_EQ (c.name (), "name");
 
-  db::Pin p1 ("p1");
-  db::Pin p2 ("p2");
-  c.add_pin (p1);
-  c.add_pin (p2);
+  db::Pin p1 = c.add_pin ("p1");
+  db::Pin p2 = c.add_pin ("p2");
   EXPECT_EQ (pins2string (c), "p1#0,p2#1");
 
   EXPECT_EQ (c.pin_by_id (0)->name (), "p1");
@@ -449,8 +447,8 @@ TEST(4_NetlistSubcircuits)
   c1->set_cell_index (17);
   EXPECT_EQ (c1->netlist (), 0);
   c1->set_name ("c1");
-  c1->add_pin (db::Pin ("c1p1"));
-  c1->add_pin (db::Pin ("c1p2"));
+  c1->add_pin ("c1p1");
+  c1->add_pin ("c1p2");
   nl->add_circuit (c1);
   EXPECT_EQ (c1->netlist (), nl.get ());
   EXPECT_EQ (nl->circuit_by_name ("c1") == c1, true);
@@ -460,8 +458,8 @@ TEST(4_NetlistSubcircuits)
 
   db::Circuit *c2 = new db::Circuit ();
   c2->set_name ("c2x");
-  c2->add_pin (db::Pin ("c2p1"));
-  c2->add_pin (db::Pin ("c2p2"));
+  c2->add_pin ("c2p1");
+  c2->add_pin ("c2p2");
   c2->set_cell_index (41);
   nl->add_circuit (c2);
   EXPECT_EQ (nl->circuit_by_name ("c2x") == c2, true);
@@ -726,18 +724,18 @@ TEST(8_NetSubCircuitsEditing)
 {
   db::Circuit c;
   c.set_name ("c");
-  c.add_pin (db::Pin ("X"));
-  c.add_pin (db::Pin ("Y"));
+  c.add_pin ("X");
+  c.add_pin ("Y");
 
   db::Circuit cc1;
   cc1.set_name ("sc1");
-  cc1.add_pin (db::Pin ("A"));
-  cc1.add_pin (db::Pin ("B"));
+  cc1.add_pin ("A");
+  cc1.add_pin ("B");
 
   db::Circuit cc2;
   cc2.set_name ("sc2");
-  cc2.add_pin (db::Pin ("A"));
-  cc2.add_pin (db::Pin ("B"));
+  cc2.add_pin ("A");
+  cc2.add_pin ("B");
 
   db::SubCircuit *sc1 = new db::SubCircuit (&cc1, "sc1");
   c.add_subcircuit (sc1);

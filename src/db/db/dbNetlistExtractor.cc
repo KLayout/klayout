@@ -171,9 +171,7 @@ void NetlistExtractor::make_and_connect_subcircuits (db::Circuit *circuit,
 
 size_t NetlistExtractor::make_pin (db::Circuit *circuit, db::Net *net)
 {
-  db::Pin pin (net->name ());
-
-  size_t pin_id = circuit->add_pin (pin).id ();
+  size_t pin_id = circuit->add_pin (net->name ()).id ();
   net->add_pin (db::NetPinRef (pin_id));
 
   circuit->connect_pin (pin_id, net);

@@ -59,6 +59,11 @@ public:
   Connectivity ();
 
   /**
+   *  @brief Adds intra-layer connectivity for layer l
+   */
+  void connect (unsigned int l);
+
+  /**
    *  @brief Adds inter-layer connectivity
    */
   void connect (unsigned int la, unsigned int lb);
@@ -76,11 +81,6 @@ public:
    *  It is assumed that all those layers originate from the same deep shape store.
    */
   void connect (const db::DeepLayer &la, const db::DeepLayer &lb);
-
-  /**
-   *  @brief Adds intra-layer connectivity for layer l
-   */
-  void connect (unsigned int l);
 
   /**
    *  @brief Begin iterator for the layers involved

@@ -149,7 +149,8 @@ SOURCES = \
     dbNetlistDeviceExtractor.cc \
     dbNetlistExtractor.cc \
     gsiDeclDbNetlistDeviceClasses.cc \
-    gsiDeclDbNetlistDeviceExtractor.cc
+    gsiDeclDbNetlistDeviceExtractor.cc \
+    gsiDeclDbHierNetworkProcessor.cc
 
 HEADERS = \
   dbArray.h \

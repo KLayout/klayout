@@ -91,9 +91,9 @@ public:
 
   /**
    *  @brief Gets the geometry for this error
-   *  Not all errors may specify a geometry.
+   *  Not all errors may specify a geometry. In this case, the polygon is empty.
    */
-  const db::Region &geometry () const
+  const db::DPolygon &geometry () const
   {
     return m_geometry;
   }
@@ -101,7 +101,7 @@ public:
   /**
    *  @brief Sets the geometry
    */
-  void set_geometry (const db::Region &g)
+  void set_geometry (const db::DPolygon &g)
   {
     m_geometry = g;
   }
@@ -141,7 +141,7 @@ public:
 private:
   std::string m_cell_name;
   std::string m_message;
-  db::Region m_geometry;
+  db::DPolygon m_geometry;
   std::string m_category_name, m_category_description;
 };
 
@@ -294,13 +294,20 @@ public:
 
 protected:
   /**
+   *  @brief Sets the name of the device class and the device extractor
+   */
+  void set_name (const std::string &name)
+  {
+    m_name = name;
+  }
+
+  /**
    *  @brief Sets up the extractor
    *
    *  This method is supposed to set up the device extractor. This involves two basic steps:
-   *  defining the device classes and setting up the device layers.
+   *  defining the device classe and setting up the device layers.
    *
-   *  At least one device class needs to be defined. Use "register_device_class" to register
-   *  the device class you need.
+   *  Use "register_device_class" to register the device class you need.
    *
    *  The device layers need to be defined by calling "define_layer" once or several times.
    */
@@ -340,7 +347,7 @@ protected:
   /**
    *  @brief Defines a layer
    *  Each call will define one more layer for the device extraction.
-   *  This method shall be used inside the implementation of "setip" to define
+   *  This method shall be used inside the implementation of "setup" to define
    *  the device layers. The actual geometries are later available to "extract_devices"
    *  in the order the layers are defined.
    */
@@ -411,12 +418,15 @@ protected:
   /**
    *  @brief Issues an error with the given message and error shape
    */
-  void error (const std::string &msg, const db::Polygon &poly);
+  void error (const std::string &msg, const db::DPolygon &poly);
 
   /**
-   *  @brief Issues an error with the given message and error geometry
+   *  @brief Issues an error with the given message and error shape
    */
-  void error (const std::string &msg, const db::Region &region);
+  void error (const std::string &msg, const db::Polygon &poly)
+  {
+    error (msg, poly.transformed (db::CplxTrans (dbu ())));
+  }
 
   /**
    *  @brief Issues an error with the given category name, description and message
@@ -426,12 +436,15 @@ protected:
   /**
    *  @brief Issues an error with the given category name, description and message and error shape
    */
-  void error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Polygon &poly);
+  void error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::DPolygon &poly);
 
   /**
-   *  @brief Issues an error with the given category name, description and message and error geometry
+   *  @brief Issues an error with the given category name, description and message and error shape
    */
-  void error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Region &region);
+  void error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Polygon &poly)
+  {
+    error (category_name, category_description, msg, poly.transformed (db::CplxTrans (dbu ())));
+  }
 
   /**
    *  @brief Gets the name of the current cell
@@ -461,6 +474,18 @@ private:
   void initialize (db::Netlist *nl);
 
   void extract_without_initialize (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers);
+};
+
+}
+
+namespace tl
+{
+
+template<> struct tl::type_traits<db::NetlistDeviceExtractor> : public tl::type_traits<void>
+{
+  //  mark "NetlistDeviceExtractor" as not having a default ctor and no copy ctor
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
 };
 
 }

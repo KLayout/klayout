@@ -218,6 +218,9 @@ void NetlistDeviceExtractor::register_device_class (DeviceClass *device_class)
   if (mp_device_class != 0) {
     throw tl::Exception (tl::to_string (tr ("Device class already set")));
   }
+  if (m_name.empty ()) {
+    throw tl::Exception (tl::to_string (tr ("No device extractor/device class name set")));
+  }
 
   tl_assert (device_class != 0);
   mp_device_class = device_class;
@@ -286,16 +289,10 @@ void NetlistDeviceExtractor::error (const std::string &msg)
   m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
 }
 
-void NetlistDeviceExtractor::error (const std::string &msg, const db::Polygon &poly)
+void NetlistDeviceExtractor::error (const std::string &msg, const db::DPolygon &poly)
 {
   error (msg);
-  m_errors.back ().set_geometry (db::Region (poly));
-}
-
-void NetlistDeviceExtractor::error (const std::string &msg, const db::Region &region)
-{
-  error (msg);
-  m_errors.back ().set_geometry (region);
+  m_errors.back ().set_geometry (poly);
 }
 
 void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg)
@@ -305,16 +302,10 @@ void NetlistDeviceExtractor::error (const std::string &category_name, const std:
   m_errors.back ().set_category_description (category_description);
 }
 
-void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Polygon &poly)
+void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::DPolygon &poly)
 {
   error (category_name, category_description, msg);
-  m_errors.back ().set_geometry (db::Region (poly));
-}
-
-void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Region &region)
-{
-  error (category_name, category_description, msg);
-  m_errors.back ().set_geometry (region);
+  m_errors.back ().set_geometry (poly);
 }
 
 }

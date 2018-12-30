@@ -42,9 +42,23 @@ Class<db::Pin> decl_dbPin ("db", "Pin",
   "This class has been added in version 0.26."
 );
 
+static void device_connect_terminal_by_name (db::Device *device, const std::string &terminal_name, db::Net *net)
+{
+  if (! device->device_class ()) {
+    throw tl::Exception (tl::to_string (tr ("Device does not have a device class")));
+  }
+  size_t terminal_id = device->device_class ()->terminal_id_for_name (terminal_name);
+  device->connect_terminal (terminal_id, net);
+}
+
 static void device_disconnect_terminal (db::Device *device, size_t terminal_id)
 {
   device->connect_terminal (terminal_id, 0);
+}
+
+static void device_disconnect_terminal_by_name (db::Device *device, const std::string &terminal_name)
+{
+  device_connect_terminal_by_name (device, terminal_name, 0);
 }
 
 Class<db::Device> decl_dbDevice ("db", "Device",
@@ -77,6 +91,14 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   ) +
   gsi::method_ext ("disconnect_terminal", &device_disconnect_terminal, gsi::arg ("terminal_id"),
     "@brief Disconnects the given terminal from any net.\n"
+  ) +
+  gsi::method_ext ("connect_terminal", &device_connect_terminal_by_name, gsi::arg ("terminal_name"), gsi::arg ("net"),
+    "@brief Connects the given terminal to the specified net.\n"
+    "This version accepts a terminal name. If the name is not a valid terminal name, an exception is raised."
+  ) +
+  gsi::method_ext ("disconnect_terminal", &device_disconnect_terminal_by_name, gsi::arg ("terminal_name"),
+    "@brief Disconnects the given terminal from any net.\n"
+    "This version accepts a terminal name. If the name is not a valid terminal name, an exception is raised."
   ) +
   gsi::method ("parameter", (double (db::Device::*) (size_t) const) &db::Device::parameter_value, gsi::arg ("param_id"),
     "@brief Gets the parameter value for the given parameter ID."
@@ -412,7 +434,7 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "Parameter definition IDs are used in some places to reference a specific parameter of a device. "
     "This method obtains the corresponding definition object."
   ) +
-  gsi::method ("has_parameter", &db::DeviceClass::has_parameter_with_name, gsi::arg ("name"),
+  gsi::method ("has_parameter?", &db::DeviceClass::has_parameter_with_name, gsi::arg ("name"),
     "@brief Returns true, if the device class has a parameter with the given name.\n"
   ) +
   gsi::method ("parameter_id", &db::DeviceClass::parameter_id_for_name, gsi::arg ("name"),
@@ -420,7 +442,7 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "An exception is thrown if there is no parameter with the given name. Use \\has_parameter to check "
     "whether the name is a valid parameter name."
   ) +
-  gsi::method ("has_terminal", &db::DeviceClass::has_terminal_with_name, gsi::arg ("name"),
+  gsi::method ("has_terminal?", &db::DeviceClass::has_terminal_with_name, gsi::arg ("name"),
     "@brief Returns true, if the device class has a terminal with the given name.\n"
   ) +
   gsi::method ("terminal_id", &db::DeviceClass::terminal_id_for_name, gsi::arg ("name"),

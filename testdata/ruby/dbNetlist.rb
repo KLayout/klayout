@@ -156,6 +156,11 @@ class DBNetlist_TestClass < TestBase
     pd.description = "Terminal B"
     dc.add_terminal(pd)
 
+    assert_equal(dc.has_terminal?("X"), false)
+    assert_equal(dc.has_terminal?("A"), true)
+    assert_equal(dc.terminal_id("A"), 0)
+    assert_equal(dc.terminal_id("B"), 1)
+
     c = RBA::Circuit::new
     nl.add(c)
 
@@ -220,6 +225,14 @@ class DBNetlist_TestClass < TestBase
 
     assert_equal(d1.net_for_terminal(1).name, "NET")
     assert_equal(d1.net_for_terminal(0).inspect, "nil")
+
+    d1.disconnect_terminal("B")
+    assert_equal(net.terminal_count, 0)
+    assert_equal(d1.net_for_terminal(1).inspect, "nil")
+
+    d1.connect_terminal("B", net)
+    assert_equal(net.terminal_count, 1)
+    assert_equal(d1.net_for_terminal(1).name, "NET")
 
     d2.connect_terminal(0, net)
     assert_equal(net.terminal_count, 2)
@@ -547,9 +560,9 @@ class DBNetlist_TestClass < TestBase
     dc.add_parameter(RBA::DeviceParameterDefinition::new("U", "Parameter U", 1.0))
     dc.add_parameter(RBA::DeviceParameterDefinition::new("V", "Parameter V", 2.0))
 
-    assert_equal(dc.has_parameter("U"), true)
-    assert_equal(dc.has_parameter("V"), true)
-    assert_equal(dc.has_parameter("X"), false)
+    assert_equal(dc.has_parameter?("U"), true)
+    assert_equal(dc.has_parameter?("V"), true)
+    assert_equal(dc.has_parameter?("X"), false)
     assert_equal(dc.parameter_id("U"), 0)
     assert_equal(dc.parameter_id("V"), 1)
     error = false

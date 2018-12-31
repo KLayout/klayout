@@ -555,11 +555,23 @@ Circuit::Circuit (const Circuit &other)
     m_net_by_name (this, &Circuit::begin_nets, &Circuit::end_nets),
     m_index (0)
 {
+  operator= (other);
   m_devices.changed ().add (this, &Circuit::devices_changed);
   m_nets.changed ().add (this, &Circuit::nets_changed);
   m_subcircuits.changed ().add (this, &Circuit::subcircuits_changed);
+}
 
-  operator= (other);
+Circuit::~Circuit ()
+{
+  m_devices.changed ().remove (this, &Circuit::devices_changed);
+  m_nets.changed ().remove (this, &Circuit::nets_changed);
+  m_subcircuits.changed ().remove (this, &Circuit::subcircuits_changed);
+
+  //  the default destructor will make the nets access "this" to unregister the
+  //  objects - hence we have to do this explicitly.
+  m_nets.clear ();
+  m_subcircuits.clear ();
+  m_devices.clear ();
 }
 
 Circuit &Circuit::operator= (const Circuit &other)
@@ -1199,6 +1211,12 @@ Netlist::Netlist (const Netlist &other)
   operator= (other);
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
   m_circuits.changed ().add (this, &Netlist::circuits_changed);
+}
+
+Netlist::~Netlist ()
+{
+  m_circuits.changed ().remove (this, &Netlist::invalidate_topology);
+  m_circuits.changed ().remove (this, &Netlist::circuits_changed);
 }
 
 Netlist &Netlist::operator= (const Netlist &other)

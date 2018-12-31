@@ -1044,6 +1044,11 @@ public:
   Circuit (const Circuit &other);
 
   /**
+   *  @brief Destructor
+   */
+  ~Circuit ();
+
+  /**
    *  @brief Assignment
    */
   Circuit &operator= (const Circuit &other);
@@ -2004,6 +2009,11 @@ public:
    *  @brief Copy constructor
    */
   Netlist (const Netlist &other);
+
+  /**
+   *  @brief Destructor
+   */
+  ~Netlist ();
 
   /**
    *  @brief Assignment

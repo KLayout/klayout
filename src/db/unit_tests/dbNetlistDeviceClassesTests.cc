@@ -77,7 +77,7 @@ TEST(1_SerialResistors)
     "Circuit  (A=n1,B=n3):\n"
     "  D r1 (A=n1,B=n3) [R=4]\n"
   );
-};
+}
 
 TEST(2_SerialResistors1Swapped)
 {
@@ -128,7 +128,7 @@ TEST(2_SerialResistors1Swapped)
     "Circuit  (A=n1,B=n3):\n"
     "  D r1 (A=n1,B=n3) [R=4]\n"
   );
-};
+}
 
 TEST(3_SerialResistors1OtherSwapped)
 {
@@ -179,7 +179,7 @@ TEST(3_SerialResistors1OtherSwapped)
     "Circuit  (A=n1,B=n3):\n"
     "  D r1 (A=n3,B=n1) [R=4]\n"
   );
-};
+}
 
 TEST(4_SerialResistors2Swapped)
 {
@@ -230,7 +230,7 @@ TEST(4_SerialResistors2Swapped)
     "Circuit  (A=n1,B=n3):\n"
     "  D r1 (A=n3,B=n1) [R=4]\n"
   );
-};
+}
 
 TEST(5_SerialResistorsNoCombination)
 {
@@ -284,7 +284,7 @@ TEST(5_SerialResistorsNoCombination)
     "  D r1 (A=n1,B=n2) [R=1]\n"
     "  D r2 (A=n2,B=n3) [R=3]\n"
   );
-};
+}
 
 TEST(6_ParallelResistors)
 {
@@ -332,7 +332,7 @@ TEST(6_ParallelResistors)
     "Circuit  (A=n1,B=n2):\n"
     "  D r1 (A=n1,B=n2) [R=1.2]\n"
   );
-};
+}
 
 TEST(7_ParallelResistors1Swapped)
 {
@@ -380,7 +380,7 @@ TEST(7_ParallelResistors1Swapped)
     "Circuit  (A=n1,B=n2):\n"
     "  D r1 (A=n2,B=n1) [R=1.2]\n"
   );
-};
+}
 
 TEST(8_ParallelResistors1OtherSwapped)
 {
@@ -428,7 +428,7 @@ TEST(8_ParallelResistors1OtherSwapped)
     "Circuit  (A=n1,B=n2):\n"
     "  D r1 (A=n1,B=n2) [R=1.2]\n"
   );
-};
+}
 
 TEST(9_ParallelResistors2Swapped)
 {
@@ -476,7 +476,7 @@ TEST(9_ParallelResistors2Swapped)
     "Circuit  (A=n1,B=n2):\n"
     "  D r1 (A=n2,B=n1) [R=1.2]\n"
   );
-};
+}
 
 TEST(10_ComplexRegistorCombination)
 {
@@ -551,7 +551,7 @@ TEST(10_ComplexRegistorCombination)
     "Circuit  (A=n1,B=n4):\n"
     "  D r4 (A=n1,B=n4) [R=2]\n"
   );
-};
+}
 
 TEST(11_SerialInductors)
 {
@@ -602,7 +602,7 @@ TEST(11_SerialInductors)
     "Circuit  (A=n1,B=n3):\n"
     "  D l1 (A=n1,B=n3) [L=4]\n"
   );
-};
+}
 
 TEST(12_ParallelInductors)
 {
@@ -650,7 +650,7 @@ TEST(12_ParallelInductors)
     "Circuit  (A=n1,B=n2):\n"
     "  D l1 (A=n1,B=n2) [L=1.2]\n"
   );
-};
+}
 
 TEST(13_SerialCapacitors)
 {
@@ -701,7 +701,7 @@ TEST(13_SerialCapacitors)
     "Circuit  (A=n1,B=n3):\n"
     "  D c1 (A=n1,B=n3) [C=1.2]\n"
   );
-};
+}
 
 TEST(14_ParallelCapacitors)
 {
@@ -749,7 +749,7 @@ TEST(14_ParallelCapacitors)
     "Circuit  (A=n1,B=n2):\n"
     "  D c1 (A=n1,B=n2) [C=4]\n"
   );
-};
+}
 
 TEST(15_SerialDiodes)
 {
@@ -803,7 +803,7 @@ TEST(15_SerialDiodes)
     "  D d1 (A=n1,C=n2) [A=2]\n"
     "  D d2 (A=n2,C=n3) [A=3]\n"
   );
-};
+}
 
 TEST(16_ParallelDiodes)
 {
@@ -851,7 +851,7 @@ TEST(16_ParallelDiodes)
     "Circuit  (A=n1,B=n2):\n"
     "  D d1 (A=n1,C=n2) [A=4]\n"
   );
-};
+}
 
 TEST(17_AntiParallelDiodes)
 {
@@ -902,7 +902,7 @@ TEST(17_AntiParallelDiodes)
     "  D d1 (A=n1,C=n2) [A=1]\n"
     "  D d2 (A=n2,C=n1) [A=3]\n"
   );
-};
+}
 
 TEST(20_ParallelMOS3Transistors)
 {
@@ -963,7 +963,7 @@ TEST(20_ParallelMOS3Transistors)
     "Circuit  (A=n1,B=n2,C=n3):\n"
     "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=3,AS=5,AD=7]\n"
   );
-};
+}
 
 TEST(21_AntiParallelMOS3Transistors)
 {
@@ -1024,7 +1024,7 @@ TEST(21_AntiParallelMOS3Transistors)
     "Circuit  (A=n1,B=n2,C=n3):\n"
     "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=3,AS=5,AD=7]\n"
   );
-};
+}
 
 TEST(22_ParallelMOS3TransistorsDisconnectedGates)
 {
@@ -1093,7 +1093,7 @@ TEST(22_ParallelMOS3TransistorsDisconnectedGates)
     "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3]\n"
     "  D d2 (S=n1,G=n4,D=n2) [L=0.5,W=2,AS=3,AD=4]\n"
   );
-};
+}
 
 TEST(23_ParallelMOS3TransistorsDifferentLength)
 {
@@ -1157,7 +1157,7 @@ TEST(23_ParallelMOS3TransistorsDifferentLength)
     "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3]\n"
     "  D d2 (S=n1,G=n3,D=n2) [L=0.75,W=2,AS=3,AD=4]\n"
   );
-};
+}
 
 TEST(30_ParallelMOS4Transistors)
 {
@@ -1225,7 +1225,7 @@ TEST(30_ParallelMOS4Transistors)
     "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
     "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=3,AS=5,AD=7]\n"
   );
-};
+}
 
 TEST(31_AntiParallelMOS4Transistors)
 {
@@ -1293,7 +1293,7 @@ TEST(31_AntiParallelMOS4Transistors)
     "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
     "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=3,AS=5,AD=7]\n"
   );
-};
+}
 
 TEST(32_ParallelMOS4TransistorsDisconnectedGates)
 {
@@ -1369,7 +1369,7 @@ TEST(32_ParallelMOS4TransistorsDisconnectedGates)
     "  D d1 (S=n1,G=n3a,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3]\n"
     "  D d2 (S=n1,G=n3b,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4]\n"
   );
-};
+}
 
 TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
 {
@@ -1445,7 +1445,7 @@ TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
     "  D d1 (S=n1,G=n3,D=n2,B=n0a) [L=0.5,W=1,AS=2,AD=3]\n"
     "  D d2 (S=n1,G=n3,D=n2,B=n0b) [L=0.5,W=2,AS=3,AD=4]\n"
   );
-};
+}
 
 TEST(34_ParallelMOS4TransistorsDifferentLength)
 {
@@ -1516,5 +1516,5 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
     "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3]\n"
     "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.75,W=2,AS=3,AD=4]\n"
   );
-};
+}
 

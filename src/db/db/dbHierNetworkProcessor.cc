@@ -535,7 +535,10 @@ template <class T>
 void
 local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
 {
-  db::box_scanner<T, std::pair<unsigned int, unsigned int> > bs;
+  bool report_progress = tl::verbosity () >= 50;
+  static std::string desc = tl::to_string (tr ("Building local clusters"));
+
+  db::box_scanner<T, std::pair<unsigned int, unsigned int> > bs (report_progress, desc);
   typename T::tag object_tag;
   db::box_convert<T> bc;
 
@@ -1306,9 +1309,11 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
   //  handle instance to instance connections
 
   {
-    tl::SelfTimer timer (tl::verbosity () >= 51, tl::to_string (tr ("Instance to instance treatment")));
+    static std::string desc = tl::to_string (tr ("Instance to instance treatment"));
+    tl::SelfTimer timer (tl::verbosity () >= 51, desc);
 
-    db::box_scanner<db::Instance, unsigned int> bs;
+    bool report_progress = tl::verbosity () >= 50;
+    db::box_scanner<db::Instance, unsigned int> bs (report_progress, desc);
 
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
       bs.insert (inst.operator-> (), 0);
@@ -1320,9 +1325,11 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
   //  handle local to instance connections
 
   {
-    tl::SelfTimer timer (tl::verbosity () >= 51, tl::to_string (tr ("Local to instance treatment")));
+    static std::string desc = tl::to_string (tr ("Local to instance treatment"));
+    tl::SelfTimer timer (tl::verbosity () >= 51, desc);
 
-    db::box_scanner2<db::local_cluster<T>, unsigned int, db::Instance, unsigned int> bs2;
+    bool report_progress = tl::verbosity () >= 50;
+    db::box_scanner2<db::local_cluster<T>, unsigned int, db::Instance, unsigned int> bs2 (report_progress, desc);
 
     for (typename connected_clusters<T>::const_iterator c = local.begin (); c != local.end (); ++c) {
       bs2.insert1 (c.operator-> (), 0);

@@ -73,13 +73,25 @@ Progress::Progress (const std::string &desc, size_t yield_interval)
     m_can_cancel (true),
     m_cancelled (false)
 {
+  //  .. nothing yet ..
+}
+
+Progress::~Progress ()
+{
+  //  .. nothing yet ..
+}
+
+void
+Progress::initialize ()
+{
   ProgressAdaptor *a = adaptor ();
   if (a) {
     a->register_object (this);
   }
 }
 
-Progress::~Progress ()
+void
+Progress::shutdown ()
 {
   ProgressAdaptor *a = adaptor ();
   if (a) {
@@ -134,7 +146,6 @@ Progress::set_desc (const std::string &d)
     }
 
   }
-
 }
 
 void
@@ -181,6 +192,14 @@ RelativeProgress::RelativeProgress (const std::string &desc, size_t max_count, s
   m_format = "%.0f%%";
   m_unit = double (max_count) / 100.0;
   m_count = 0;
+  m_last_count = 0;
+
+  initialize ();
+}
+
+RelativeProgress::~RelativeProgress ()
+{
+  shutdown ();
 }
 
 double
@@ -203,7 +222,8 @@ RelativeProgress &
 RelativeProgress::set (size_t count, bool force_yield)
 {
   m_count = count;
-  test (force_yield);
+  test (force_yield || m_count - m_last_count >= m_unit);
+  m_last_count = m_count;
   return *this;
 }
 
@@ -217,6 +237,13 @@ AbsoluteProgress::AbsoluteProgress (const std::string &desc, size_t yield_interv
   m_unit = 1.0;
   m_format_unit = 0.0;
   m_count = 0;
+
+  initialize ();
+}
+
+AbsoluteProgress::~AbsoluteProgress ()
+{
+  shutdown ();
 }
 
 double

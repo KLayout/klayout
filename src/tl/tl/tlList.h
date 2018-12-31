@@ -94,6 +94,7 @@ public:
       tl_assert (mp_next->mp_prev == this);
       mp_next->mp_prev = mp_prev;
     }
+    mp_prev = mp_next = 0;
   }
 
 private:
@@ -127,11 +128,16 @@ public:
   void clear ()
   {
     while (! empty ()) {
-      if (first ()->m_owned) {
-        delete first ();
-      } else {
-        first ()->unlink ();
-      }
+      erase (first ());
+    }
+  }
+
+  void erase (C *c)
+  {
+    if (c->m_owned) {
+      delete c;
+    } else {
+      c->unlink ();
     }
   }
 
@@ -192,22 +198,22 @@ public:
 
   void insert (C *after, C &new_obj)
   {
-    insert_impl (after, new_obj, false);
+    insert_impl (after, &new_obj, false);
   }
 
   void insert_before (C *before, C &new_obj)
   {
-    insert_before_impl (before, new_obj, false);
+    insert_before_impl (before, &new_obj, false);
   }
 
   void push_back (C &new_obj)
   {
-    push_back_impl (new_obj, false);
+    push_back_impl (&new_obj, false);
   }
 
   void push_front (C &new_obj)
   {
-    push_front_impl (new_obj, false);
+    push_front_impl (&new_obj, false);
   }
 
   size_t size () const
@@ -248,10 +254,9 @@ private:
     list_node<C> *after_node = after;
     if (! after) {
       after_node = &m_head;
-    } else {
-      after_node->m_owned = owned;
     }
 
+    new_obj->m_owned = owned;
     new_obj->mp_next = after_node->mp_next;
     after_node->mp_next = new_obj;
     new_obj->mp_prev = after_node;
@@ -263,10 +268,9 @@ private:
     list_node<C> *before_node = before;
     if (! before) {
       before_node = &m_back;
-    } else {
-      before_node->m_owned = owned;
     }
 
+    new_obj->m_owned = owned;
     new_obj->mp_prev = before_node->mp_prev;
     before_node->mp_prev = new_obj;
     new_obj->mp_next = before_node;

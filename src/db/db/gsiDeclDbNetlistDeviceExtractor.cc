@@ -110,7 +110,7 @@ public:
 namespace tl
 {
 
-template<> struct tl::type_traits<GenericDeviceExtractor> : public tl::type_traits<void>
+template<> struct type_traits<GenericDeviceExtractor> : public tl::type_traits<void>
 {
   //  mark "NetlistDeviceExtractor" as not having a default ctor and no copy ctor
   typedef tl::false_tag has_copy_constructor;

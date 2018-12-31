@@ -42,7 +42,8 @@ SOURCES = \
     tlDeferredExecution.cc \
     tlUri.cc \
     tlLongInt.cc \
-    tlUniqueId.cc
+    tlUniqueId.cc \
+    tlList.cc
 
 HEADERS = \
     tlAlgorithm.h \
@@ -94,7 +95,8 @@ HEADERS = \
     tlDeferredExecution.h \
     tlUri.h \
     tlLongInt.h \
-    tlUniqueId.h
+    tlUniqueId.h \
+    tlList.h
 
 equals(HAVE_CURL, "1") {
 

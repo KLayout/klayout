@@ -126,13 +126,13 @@ static std::pair<bool, std::set<db::Box> > compute_clip_variant (const db::Box &
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_initial_pass (true), m_target_layer (target_layer)
+  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (target_layer)
 {
   set_shape_receiver (pipe);
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_initial_pass (true), m_target_layer (0)
+  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (0)
 {
   set_shape_receiver (pipe);
 }
@@ -158,6 +158,7 @@ HierarchyBuilder::reset ()
   m_cells_seen.clear ();
   m_cell_stack.clear ();
   m_cm_entry = cell_map_type::const_iterator ();
+  m_cm_new_entry = false;
 }
 
 void
@@ -174,17 +175,18 @@ HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
 
   std::pair<db::cell_index_type, std::set<db::Box> > key (iter->top_cell ()->cell_index (), std::set<db::Box> ());
   m_cm_entry = m_cell_map.find (key);
-  if (m_cm_entry == m_cell_map.end ()) {
+  m_cm_new_entry = false;
 
+  if (m_cm_entry == m_cell_map.end ()) {
     db::cell_index_type new_top_index = mp_target->add_cell (iter->layout ()->cell_name (key.first));
     m_cm_entry = m_cell_map.insert (std::make_pair (key, new_top_index)).first;
-
+    m_cm_new_entry = true;
   }
 
   db::Cell &new_top = mp_target->cell (m_cm_entry->second);
   m_cells_seen.insert (key);
 
-  m_cell_stack.push_back (&new_top);
+  m_cell_stack.push_back (std::make_pair (m_cm_new_entry, &new_top));
 }
 
 void
@@ -194,9 +196,10 @@ HierarchyBuilder::end (const RecursiveShapeIterator * /*iter*/)
 
   m_initial_pass = false;
   m_cells_seen.clear ();
-  mp_initial_cell = m_cell_stack.front ();
+  mp_initial_cell = m_cell_stack.front ().second;
   m_cell_stack.clear ();
   m_cm_entry = cell_map_type::const_iterator ();
+  m_cm_new_entry = false;
 }
 
 void
@@ -205,7 +208,7 @@ HierarchyBuilder::enter_cell (const RecursiveShapeIterator * /*iter*/, const db:
   tl_assert (m_cm_entry != m_cell_map.end () && m_cm_entry != cell_map_type::const_iterator ());
   m_cells_seen.insert (m_cm_entry->first);
 
-  m_cell_stack.push_back (&mp_target->cell (m_cm_entry->second));
+  m_cell_stack.push_back (std::make_pair (m_cm_new_entry, &mp_target->cell (m_cm_entry->second)));
 }
 
 void
@@ -221,18 +224,19 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
 
     std::pair<db::cell_index_type, std::set<db::Box> > key (inst.object ().cell_index (), std::set<db::Box> ());
     m_cm_entry = m_cell_map.find (key);
+    m_cm_new_entry = false;
 
-    if (m_initial_pass) {
+    if (m_cm_entry == m_cell_map.end ()) {
+      db::cell_index_type new_cell = mp_target->add_cell (iter->layout ()->cell_name (inst.object ().cell_index ()));
+      m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
+      m_cm_new_entry = true;
+    }
 
-      if (m_cm_entry == m_cell_map.end ()) {
-        db::cell_index_type new_cell = mp_target->add_cell (iter->layout ()->cell_name (inst.object ().cell_index ()));
-        m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
-      }
-
+    //  for new cells, create this instance
+    if (m_cell_stack.back ().first) {
       db::CellInstArray new_inst = inst;
       new_inst.object () = db::CellInst (m_cm_entry->second);
-      m_cell_stack.back ()->insert (new_inst);
-
+      m_cell_stack.back ().second->insert (new_inst);
     }
 
     //  To see the cell once, use NI_single. If we did see the cell already, skip the whole instance array.
@@ -263,21 +267,22 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
 
     std::pair<db::cell_index_type, std::set<db::Box> > key (inst.object ().cell_index (), clip_variant.second);
     m_cm_entry = m_cell_map.find (key);
+    m_cm_new_entry = false;
 
-    if (m_initial_pass) {
-
-      if (m_cm_entry == m_cell_map.end ()) {
-        std::string suffix;
-        if (! key.second.empty ()) {
-          suffix = "$CLIP_VAR";
-        }
-        db::cell_index_type new_cell = mp_target->add_cell ((std::string (iter->layout ()->cell_name (inst.object ().cell_index ())) + suffix).c_str ());
-        m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
+    if (m_cm_entry == m_cell_map.end ()) {
+      std::string suffix;
+      if (! key.second.empty ()) {
+        suffix = "$CLIP_VAR";
       }
+      db::cell_index_type new_cell = mp_target->add_cell ((std::string (iter->layout ()->cell_name (inst.object ().cell_index ())) + suffix).c_str ());
+      m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
+      m_cm_new_entry = true;
+    }
 
+    //  for a new cell, create this instance
+    if (m_cell_stack.back ().first) {
       db::CellInstArray new_inst (db::CellInst (m_cm_entry->second), trans);
-      m_cell_stack.back ()->insert (new_inst);
-
+      m_cell_stack.back ().second->insert (new_inst);
     }
 
     return (m_cells_seen.find (key) == m_cells_seen.end ());
@@ -288,7 +293,7 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
 void
 HierarchyBuilder::shape (const RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*trans*/, const db::Box &region, const box_tree_type *complex_region)
 {
-  db::Shapes &shapes = m_cell_stack.back ()->shapes (m_target_layer);
+  db::Shapes &shapes = m_cell_stack.back ().second->shapes (m_target_layer);
   mp_pipe->push (shape, region, complex_region, &shapes);
 }
 

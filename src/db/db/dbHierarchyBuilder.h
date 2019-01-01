@@ -249,8 +249,9 @@ private:
   cell_map_type m_cell_map;
   std::set<cell_map_type::key_type> m_cells_seen;
   cell_map_type::const_iterator m_cm_entry;
+  bool m_cm_new_entry;
   unsigned int m_target_layer;
-  std::vector<db::Cell *> m_cell_stack;
+  std::vector<std::pair<bool, db::Cell *> > m_cell_stack;
   db::Cell *mp_initial_cell;
 };
 

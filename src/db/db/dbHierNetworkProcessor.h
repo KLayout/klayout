@@ -185,6 +185,14 @@ public:
   bool interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn) const;
 
   /**
+   *  @brief Tests whether this cluster interacts with the given cell
+   *
+   *  "trans" is the transformation which is applied to the cell before
+   *  the test.
+   */
+  bool interacts (const db::Cell &cell, const db::ICplxTrans &trans, const Connectivity &conn) const;
+
+  /**
    *  @brief Gets the bounding box of this cluster
    */
   const box_type &bbox () const

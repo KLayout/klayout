@@ -304,6 +304,30 @@ typename local_cluster<T>::shape_iterator local_cluster<T>::begin (unsigned int 
 
 template <class T>
 bool
+local_cluster<T>::interacts (const db::Cell &cell, const db::ICplxTrans &trans, const Connectivity &conn) const
+{
+  db::box_convert<T> bc;
+
+  for (typename std::map<unsigned int, tree_type>::const_iterator s = m_shapes.begin (); s != m_shapes.end (); ++s) {
+
+    db::Box box;
+
+    Connectivity::layer_iterator le = conn.end_connected (s->first);
+    for (Connectivity::layer_iterator l = conn.begin_connected (s->first); l != le; ++l) {
+      box += cell.bbox (*l);
+    }
+
+    if (! box.empty () && ! s->second.begin_touching (box.transformed (trans), bc).at_end ()) {
+      return true;
+    }
+
+  }
+
+  return false;
+}
+
+template <class T>
+bool
 local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn) const
 {
   const_cast<local_cluster<T> *> (this)->ensure_sorted ();
@@ -970,13 +994,22 @@ private:
     box_type b1 = c1.bbox ();
 
     box_type bb2 = (*mp_cbc) (i2.cell_index ());
-    box_type b2 = i2.cell_inst ().bbox (*mp_cbc).transformed (t2);
 
-    if (! b1.touches (b2)) {
+    db::ICplxTrans t2i = t2 * i2.complex_trans ();
+    const db::Cell &cell2 = mp_layout->cell (i2.cell_index ());
+
+    box_type b2 = cell2.bbox ().transformed (t2i);
+
+    if (! b1.touches (b2) || ! c1.interacts (cell2, t2i, *mp_conn)) {
       return;
     }
 
     box_type common = b1 & b2;
+
+    std::vector<db::InstElement> pp2;
+    pp2.reserve (p2.size () + 1);
+    pp2.insert (pp2.end (), p2.begin (), p2.end ());
+    pp2.push_back (db::InstElement ());
 
     for (db::CellInstArray::iterator ii2 = i2.begin_touching (common.transformed (t2.inverted ()), mp_layout); ! ii2.at_end (); ++ii2) {
 
@@ -985,15 +1018,10 @@ private:
 
       if (b1.touches (ib2)) {
 
-        std::vector<db::InstElement> pp2;
-        pp2.reserve (p2.size () + 1);
-        pp2.insert (pp2.end (), p2.begin (), p2.end ());
-        pp2.push_back (db::InstElement (i2, ii2));
-
+        pp2.back () = db::InstElement (i2, ii2);
         add_single_pair (c1, i2.cell_index (), pp2, tt2);
 
         //  dive into cell of ii2
-        const db::Cell &cell2 = mp_layout->cell (i2.cell_index ());
         for (db::Cell::touching_iterator jj2 = cell2.begin_touching (common.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
           add_pair (c1, *jj2, pp2, tt2);
         }
@@ -1402,7 +1430,9 @@ connected_clusters<T> &
 hier_clusters<T>::clusters_per_cell (db::cell_index_type cell_index)
 {
   typename std::map<db::cell_index_type, connected_clusters<T> >::iterator c = m_per_cell_clusters.find (cell_index);
-  tl_assert (c != m_per_cell_clusters.end ());
+  if (c == m_per_cell_clusters.end ()) {
+    c = m_per_cell_clusters.insert (std::make_pair (cell_index, connected_clusters<T> ())).first;
+  }
   return c->second;
 }
 

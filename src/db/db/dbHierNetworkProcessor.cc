@@ -467,11 +467,27 @@ struct cluster_building_receiver
   : public db::box_scanner_receiver<T, std::pair<unsigned int, unsigned int> >
 {
   typedef typename local_cluster<T>::id_type id_type;
+  typedef std::pair<const T *, std::pair<unsigned int, unsigned int> > shape_value;
 
-  cluster_building_receiver (local_clusters<T> &clusters, const db::Connectivity &conn)
-    : mp_clusters (&clusters), mp_conn (&conn)
+  cluster_building_receiver (const db::Connectivity &conn)
+    : mp_conn (&conn)
   {
     //  .. nothing yet..
+  }
+
+  void generate_clusters (local_clusters<T> &clusters)
+  {
+    //  build the resulting clusters
+    for (typename std::list<std::vector<shape_value> >::const_iterator c = m_clusters.begin (); c != m_clusters.end (); ++c) {
+
+      //  TODO: reserve?
+      local_cluster<T> *cluster = clusters.insert ();
+      for (typename std::vector<shape_value>::const_iterator s = c->begin (); s != c->end (); ++s) {
+        cluster->add (*s->first, s->second.first);
+        cluster->add_attr (s->second.second);
+      }
+
+    }
   }
 
   void add (const T *s1, std::pair<unsigned int, unsigned int> p1, const T *s2, std::pair<unsigned int, unsigned int> p2)
@@ -480,46 +496,49 @@ struct cluster_building_receiver
       return;
     }
 
-    typename std::map<const T *, id_type>::const_iterator id1 = m_shape_to_cluster_id.find (s1);
-    typename std::map<const T *, id_type>::const_iterator id2 = m_shape_to_cluster_id.find (s2);
+    typename std::map<const T *, typename std::list<std::vector<shape_value> >::iterator>::iterator ic1 = m_shape_to_clusters.find (s1);
+    typename std::map<const T *, typename std::list<std::vector<shape_value> >::iterator>::iterator ic2 = m_shape_to_clusters.find (s2);
 
-    if (id1 == m_shape_to_cluster_id.end ()) {
+    if (ic1 == m_shape_to_clusters.end ()) {
 
-      if (id2 == m_shape_to_cluster_id.end ()) {
+      if (ic2 == m_shape_to_clusters.end ()) {
 
-        local_cluster<T> *cluster = mp_clusters->insert ();
-        cluster->add (*s1, p1.first);
-        cluster->add (*s2, p2.first);
-        cluster->add_attr (p1.second);
-        cluster->add_attr (p2.second);
+        m_clusters.push_back (std::vector<shape_value> ());
+        typename std::list<std::vector<shape_value> >::iterator c = --m_clusters.end ();
+        c->push_back (std::make_pair (s1, p1));
+        c->push_back (std::make_pair (s2, p2));
 
-        m_shape_to_cluster_id.insert (std::make_pair (s1, cluster->id ()));
-        m_shape_to_cluster_id.insert (std::make_pair (s2, cluster->id ()));
+        m_shape_to_clusters.insert (std::make_pair (s1, c));
+        m_shape_to_clusters.insert (std::make_pair (s2, c));
 
       } else {
 
-        //  NOTE: const_cast is in order - we know what we're doing.
-        local_cluster<T> &c2 = const_cast<local_cluster<T> &> (mp_clusters->cluster_by_id (id2->second));
-        c2.add (*s1, p1.first);
-        c2.add_attr (p1.second);
-        m_shape_to_cluster_id.insert (std::make_pair (s1, id2->second));
+        ic2->second->push_back (std::make_pair (s1, p1));
+        m_shape_to_clusters.insert (std::make_pair (s1, ic2->second));
 
       }
 
-    } else if (id2 == m_shape_to_cluster_id.end ()) {
+    } else if (ic2 == m_shape_to_clusters.end ()) {
 
-      //  NOTE: const_cast is in order - we know what we're doing.
-      local_cluster<T> &c1 = const_cast<local_cluster<T> &> (mp_clusters->cluster_by_id (id1->second));
-      c1.add (*s2, p2.first);
-      c1.add_attr (p2.second);
-      m_shape_to_cluster_id.insert (std::make_pair (s2, id1->second));
+      ic1->second->push_back (std::make_pair (s2, p2));
+      m_shape_to_clusters.insert (std::make_pair (s2, ic1->second));
 
-    } else if (id1->second != id2->second) {
+    } else if (ic1->second != ic2->second) {
 
-      //  this shape connects two clusters: join them
-      //  NOTE: const_cast is in order - we know what we're doing.
-      const_cast<local_cluster<T> &> (mp_clusters->cluster_by_id (id1->second)).join_with (mp_clusters->cluster_by_id (id2->second));
-      mp_clusters->remove_cluster (id2->second);
+      //  join clusters: use the larger one as the target
+
+      if (ic1->second->size () < ic2->second->size ()) {
+        std::swap (ic1, ic2);
+      }
+
+      ic1->second->insert (ic1->second->end (), ic2->second->begin (), ic2->second->end ());
+
+      typename std::list<std::vector<shape_value> >::iterator j = ic2->second;
+      for (typename std::vector<shape_value>::const_iterator i = j->begin (); i != j->end (); ++i) {
+        m_shape_to_clusters [i->first] = ic1->second;
+      }
+
+      m_clusters.erase (j);
 
     }
   }
@@ -527,18 +546,19 @@ struct cluster_building_receiver
   void finish (const T *s, std::pair<unsigned int, unsigned> p)
   {
     //  if the shape has not been handled yet, insert a single cluster with only this shape
-    typename std::map<const T *, id_type>::const_iterator id = m_shape_to_cluster_id.find (s);
-    if (id == m_shape_to_cluster_id.end ()) {
-      local_cluster<T> *cluster = mp_clusters->insert ();
-      cluster->add (*s, p.first);
-      cluster->add_attr (p.second);
+    typename std::map<const T *, typename std::list<std::vector<shape_value> >::iterator>::const_iterator ic = m_shape_to_clusters.find (s);
+    if (ic == m_shape_to_clusters.end ()) {
+      m_clusters.push_back (std::vector<shape_value> ());
+      typename std::list<std::vector<shape_value> >::iterator c = --m_clusters.end ();
+      c->push_back (std::make_pair (s, p));
+      m_shape_to_clusters.insert (std::make_pair (s, c));
     }
   }
 
 private:
-  local_clusters<T> *mp_clusters;
   const db::Connectivity *mp_conn;
-  std::map<const T *, id_type> m_shape_to_cluster_id;
+  std::map<const T *, typename std::list<std::vector<shape_value> >::iterator> m_shape_to_clusters;
+  std::list<std::vector<shape_value> > m_clusters;
 };
 
 }
@@ -561,8 +581,9 @@ local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flag
     }
   }
 
-  cluster_building_receiver<T, box_type> rec (*this, conn);
+  cluster_building_receiver<T, box_type> rec (conn);
   bs.process (rec, 1 /*==touching*/, bc);
+  rec.generate_clusters (*this);
 }
 
 //  explicit instantiations

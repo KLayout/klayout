@@ -157,7 +157,7 @@ template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::Polyg
 
 template <class T>
 local_cluster<T>::local_cluster ()
-  : m_id (0), m_needs_update (false)
+  : m_id (0), m_needs_update (false), m_size (0)
 {
   //  .. nothing yet ..
 }
@@ -168,6 +168,7 @@ local_cluster<T>::clear ()
 {
   m_shapes.clear ();
   m_needs_update = false;
+  m_size = 0;
   m_bbox = box_type ();
   m_attrs.clear ();
 }
@@ -187,6 +188,7 @@ local_cluster<T>::add (const T &s, unsigned int la)
 {
   m_shapes[la].insert (s);
   m_needs_update = true;
+  ++m_size;
 }
 
 template <class T>
@@ -194,11 +196,12 @@ void
 local_cluster<T>::join_with (const local_cluster<T> &other)
 {
   for (typename std::map<unsigned int, tree_type>::const_iterator s = other.m_shapes.begin (); s != other.m_shapes.end (); ++s) {
-    tree_type &other_tree = m_shapes[s->first];
-    other_tree.insert (s->second.begin (), s->second.end ());
+    tree_type &tree = m_shapes[s->first];
+    tree.insert (s->second.begin (), s->second.end ());
   }
 
   m_attrs.insert (other.m_attrs.begin (), other.m_attrs.end ());
+  m_size += other.size ();
 
   m_needs_update = true;
 }
@@ -310,6 +313,8 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
     return false;
   }
 
+  box_type common_for_other = common.transformed (trans.inverted ());
+
   db::box_scanner2<T, unsigned int, T, unsigned int> scanner;
   transformed_box <T, db::ICplxTrans> bc_t (trans);
   db::box_convert<T> bc;
@@ -326,10 +331,17 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
     return false;
   }
 
+  any = false;
+
   for (typename std::map<unsigned int, tree_type>::const_iterator s = other.m_shapes.begin (); s != other.m_shapes.end (); ++s) {
-    for (typename tree_type::touching_iterator i = s->second.begin_touching (common.transformed (trans.inverted ()), bc); ! i.at_end (); ++i) {
+    for (typename tree_type::touching_iterator i = s->second.begin_touching (common_for_other, bc); ! i.at_end (); ++i) {
       scanner.insert2 (i.operator-> (), s->first);
+      any = true;
     }
+  }
+
+  if (! any) {
+    return false;
   }
 
   interaction_receiver<T> rec (conn, trans);
@@ -906,6 +918,12 @@ private:
 
           } else if (x1 != x2) {
 
+            //  for instance-to-instance interactions the number of connections is more important for the
+            //  cost of the join operation: make the one with more connections the target
+            if (mp_cell_clusters->connections_for_cluster (x1).size () < mp_cell_clusters->connections_for_cluster (x2).size ()) {
+              std::swap (x1, x2);
+            }
+
             mp_cell_clusters->join_cluster_with (x1, x2);
             mp_cell_clusters->remove_cluster (x2);
 
@@ -1258,7 +1276,7 @@ hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell 
   if (tl::verbosity () >= 40) {
     tl::log << msg;
   }
-  tl::SelfTimer (tl::verbosity () >= 41, msg);
+  tl::SelfTimer timer (tl::verbosity () >= 41, msg);
 
   connected_clusters<T> &local = m_per_cell_clusters [cell.cell_index ()];
   local.build_clusters (cell, shape_flags, conn);
@@ -1281,7 +1299,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
   if (tl::verbosity () >= 40) {
     tl::log << msg;
   }
-  tl::SelfTimer (tl::verbosity () >= 41, msg);
+  tl::SelfTimer timer (tl::verbosity () >= 41, msg);
 
   connected_clusters<T> &local = m_per_cell_clusters [cell.cell_index ()];
 

@@ -194,6 +194,13 @@ public:
   }
 
   /**
+   *  @brief Gets the total number of shapes in this cluster
+   */ size_t size () const
+  {
+    return m_size;
+  }
+
+  /**
    *  @brief Gets the shape iterator for a given layer
    */
   shape_iterator begin (unsigned int l) const;
@@ -246,6 +253,7 @@ private:
   std::map<unsigned int, tree_type> m_shapes;
   box_type m_bbox;
   attr_set m_attrs;
+  size_t m_size;
 };
 
 /**

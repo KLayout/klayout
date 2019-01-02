@@ -72,5 +72,17 @@ jobs:
       set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-1.0\msvc2017\%PYTHON_ARCHITECTURE%"
       echo KLAYOUT_BITS=%KLAYOUT_BITS%
       python setup.py install
+    displayName: 'Build KLayout'
 
-    displayName: 'Building KLayout'
+  - script: |
+      set PATH=%KLAYOUT_BITS%\curl\bin;%KLAYOUT_BITS%\expat\bin;%KLAYOUT_BITS%\ptw\bin;%KLAYOUT_BITS%\zlib\bin;%PATH%
+      python testdata/pymod/import_db.py
+      python testdata/pymod/import_rdb.py
+      python testdata/pymod/import_tl.py
+      python testdata/pymod/pya_tests.py
+    displayName: 'Test KLayout pymod'
+
+  # - script : |
+  #     python setup.py bdist_wheel
+  #   displayName: 'Building KLayout wheel'
+

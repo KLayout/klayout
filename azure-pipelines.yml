@@ -1,0 +1,47 @@
+# https://aka.ms/yaml
+jobs:
+- job: 'Test'
+  pool:
+    vmImage: 'vs2017-win2016' # other options: 'macOS-10.13', 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python35:
+        python.version: '3.5'
+      Python36:
+        python.version: '3.6'
+    maxParallel: 3
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  # Add additional tasks to run using each Python version in the matrix above
+
+  # PowerShell
+  # Run a PowerShell script on Windows, macOS, or Linux.
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline' # Optional. Options: filePath, inline
+      #filePath: # Required when targetType == FilePath
+      #arguments: # Optional
+      script: | # Required when targetType == Inline
+        pwd
+        dir
+        Invoke-WebRequest -Uri "https://www.dropbox.com/s/ioax2mnic4987kn/klayout-microbits-1.0.zip?dl=1" -MaximumRedirection 2 -OutFile klayout-microbits-1.0.zip
+        Expand-Archive klayout-microbits-1.0.zip -DestinationPath klayout-microbits
+        dir klayout-microbits
+      #errorActionPreference: 'stop' # Optional. Options: stop, continue, silentlyContinue
+      #failOnStderr: false # Optional
+      #ignoreLASTEXITCODE: false # Optional
+      #pwsh: false # Optional
+      #workingDirectory: # Optional
+    displayName: 'Downloading and Extracting KLayout bits'
+
+  - script: |
+      python -V
+      pwd
+    displayName: 'Diagnostic information'

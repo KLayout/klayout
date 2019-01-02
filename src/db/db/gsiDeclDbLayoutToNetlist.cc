@@ -141,7 +141,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("netlist", &db::LayoutToNetlist::netlist,
     "@brief gets the netlist extracted (0 if no extraction happened yet)\n"
   ) +
-  gsi::method ("shapes_of_net", &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive"),
+  gsi::factory ("shapes_of_net", &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive"),
     "@brief Returns all shapes of a specific net and layer.\n"
     "If 'recursive'' is true, the returned region will contain the shapes of\n"
     "all subcircuits too.\n"

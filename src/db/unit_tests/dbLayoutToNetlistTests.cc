@@ -114,8 +114,8 @@ static void dump_nets_to_layout (const db::LayoutToNetlist &l2n, db::Layout &ly,
 
       for (std::map<const db::Region *, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
 
-        db::Region shapes = l2n.shapes_of_net (*n, *m->first, false);
-        if (shapes.empty ()) {
+        std::auto_ptr<db::Region> shapes (l2n.shapes_of_net (*n, *m->first, false));
+        if (shapes->empty ()) {
           continue;
         }
 
@@ -125,7 +125,7 @@ static void dump_nets_to_layout (const db::LayoutToNetlist &l2n, db::Layout &ly,
           cell.insert (db::CellInstArray (db::CellInst (nci), db::Trans ()));
         }
 
-        shapes.insert_into (&ly, nci, m->second);
+        shapes->insert_into (&ly, nci, m->second);
 
       }
 
@@ -152,8 +152,8 @@ static void dump_recursive_nets_to_layout (const db::LayoutToNetlist &l2n, db::L
 
       for (std::map<const db::Region *, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
 
-        db::Region shapes = l2n.shapes_of_net (*n, *m->first, true);
-        if (shapes.empty ()) {
+        std::auto_ptr<db::Region> shapes (l2n.shapes_of_net (*n, *m->first, true));
+        if (shapes->empty ()) {
           continue;
         }
 
@@ -163,7 +163,7 @@ static void dump_recursive_nets_to_layout (const db::LayoutToNetlist &l2n, db::L
           cell.insert (db::CellInstArray (db::CellInst (nci), db::Trans ()));
         }
 
-        shapes.insert_into (&ly, nci, m->second);
+        shapes->insert_into (&ly, nci, m->second);
 
       }
 

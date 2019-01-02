@@ -215,10 +215,14 @@ public:
 
   /**
    *  @brief Returns all shapes of a specific net and layer.
+   *
    *  If "recursive" is true, the returned region will contain the shapes of
    *  all subcircuits too.
+   *
+   *  This methods returns a new'd Region. It's the responsibility of the caller
+   *  to delete this object.
    */
-  db::Region shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive) const;
+  db::Region *shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive) const;
 
   /**
    *  @brief Finds the net by probing a specific location on the given layer

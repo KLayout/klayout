@@ -75,9 +75,9 @@ cp -v $KLAYOUT_BITS/zlib/bin/* .
 #     exit 1
 # fi
 cd $TMP_WHEEL
-touch $TMP_WHEEL/patch_external_libraries_included
+# touch $TMP_WHEEL/patch_external_libraries_included
 echo "Packing $WHL from $TMP_WHEEL"
-# rm -f $WHL
+rm -f $WHL
 wheel pack $TMP_WHEEL -d `dirname $WHL` || exit 1
 echo "Done. $(basename $WHL) is patched."
 # Cleanup (should always execute)

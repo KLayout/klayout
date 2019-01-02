@@ -14,11 +14,11 @@ class Basic_TestClass < TestBase
     GC.start 
     
     # all references of A are released now:
-    ac0 = RBA::A::a0
-    assert_equal( ac0, 0 )
+    ic0 = RBA::A::instance_count
+    assert_equal( ic0, 0 )
 
     a = RBA::A.new_a(100)
-    assert_equal( RBA::A::a0, ac0 + 1 )
+    assert_equal( RBA::A::instance_count, ic0 + 1 )
 
     a = RBA::A.new
     assert_equal(a.a1, 17)
@@ -27,26 +27,26 @@ class Basic_TestClass < TestBase
 
     a = nil
     GC.start
-    assert_equal( RBA::A::a0, ac0 )
+    assert_equal( RBA::A::instance_count, ic0 )
 
     a = RBA::A.new
-    assert_equal( RBA::A::a0, ac0 )  # delayed instantiation of detached objects - A is actually created if it is used first
+    assert_equal( RBA::A::instance_count, ic0 )  # delayed instantiation of detached objects - A is actually created if it is used first
     a.a2   # just check, if it can be called
-    assert_equal( RBA::A::a0, ac0 + 1 )
+    assert_equal( RBA::A::instance_count, ic0 + 1 )
 
     # open question: with ruby 1.8, aa is not deleted if the assert_equal is missing. Why?
     # maybe the GC does not like to be called that frequently?
     aa = a.dup
-    assert_equal( RBA::A::a0, ac0 + 2 )
+    assert_equal( RBA::A::instance_count, ic0 + 2 )
 
     aa = nil
     GC.start 
 
     if RUBY_VERSION >= "1.9.0"
       # GC works differently in >=1.9.x - but no leak (verified with valgrind)
-      ac0 = RBA::A::a0
+      ic0 = RBA::A::instance_count
     else
-      assert_equal( RBA::A::a0, ac0 + 1 )
+      assert_equal( RBA::A::instance_count, ic0 + 1 )
     end
 
     a = nil
@@ -54,15 +54,15 @@ class Basic_TestClass < TestBase
 
     if RUBY_VERSION >= "1.9.0"
       # GC works differently in >=1.9.x - but no leak (verified with valgrind)
-      ac0 = RBA::A::a0
+      ic0 = RBA::A::instance_count
     else
-      assert_equal( RBA::A::a0, ac0 )
+      assert_equal( RBA::A::instance_count, ic0 )
     end
 
     a = RBA::A.new
-    assert_equal( RBA::A::a0, ac0 )  # delayed instantiation of detached objects - A is actually created if it is used first
+    assert_equal( RBA::A::instance_count, ic0 )  # delayed instantiation of detached objects - A is actually created if it is used first
     a.a2   # just check, if it can be called
-    assert_equal( RBA::A::a0, ac0 + 1 )
+    assert_equal( RBA::A::instance_count, ic0 + 1 )
 
     # mix of getters, setters, predicates
     assert_equal( a.af, false )
@@ -116,7 +116,7 @@ class Basic_TestClass < TestBase
     assert_equal(arr, [5, 1, -1.25])
 
     a.destroy
-    assert_equal( RBA::A::a0, ac0 )
+    assert_equal( RBA::A::instance_count, ic0 )
 
     if !$leak_check 
 
@@ -138,13 +138,13 @@ class Basic_TestClass < TestBase
 
     end
 
-    assert_equal( RBA::A::a0, ac0 )
+    assert_equal( RBA::A::instance_count, ic0 )
     a = RBA::A::new_a( 55 )
-    assert_equal( RBA::A::a0, ac0 + 1 )
+    assert_equal( RBA::A::instance_count, ic0 + 1 )
     assert_equal( a.a1, 55 )
     assert_equal( a.a_vp1( a.a_vp2 ), "abc" )
     a.destroy
-    assert_equal( RBA::A::a0, ac0 )
+    assert_equal( RBA::A::instance_count, ic0 )
 
     a = RBA::A::new_a(0)
     assert_equal( a.a9a(5).to_s, "true" )
@@ -506,7 +506,7 @@ class Basic_TestClass < TestBase
 
       err_caught = false
       begin
-        b.b7.a1 # cannot call non-const method on const reference
+        b.amember_cptr.a1 # cannot call non-const method on const reference
       rescue 
         err_caught = true
       end
@@ -514,7 +514,7 @@ class Basic_TestClass < TestBase
 
     end
       
-    b.b7.a2 
+    b.amember_cptr.a2 
 
     assert_equal( b.b1, 5 )
     assert_equal( b.b2, "" )
@@ -857,46 +857,57 @@ class Basic_TestClass < TestBase
     # test copies of objects being returned
 
     b = RBA::B.new
+    b._create
 
-    a = b.b6( 1971 );
-    assert_equal( a.a1, 1971 );
-    assert_equal( b.b9( a ), 1971 );
+    GC.start
+    a_count = RBA::A.instance_count
+    a = b.make_a( 1971 );
+    assert_equal( RBA::A.instance_count, a_count + 1 )
 
-    aa = b.b6( -61 );
-    assert_equal( b.b9cref( aa ), -61 );
     assert_equal( a.a1, 1971 );
-    assert_equal( b.b9( a ), 1971 );
+    assert_equal( b.an( a ), 1971 );
+
+    aa = b.make_a( -61 );
+    assert_equal( RBA::A.instance_count, a_count + 2 )
+    assert_equal( b.an_cref( aa ), -61 );
+    assert_equal( a.a1, 1971 );
+    assert_equal( b.an( a ), 1971 );
     assert_equal( aa.a1, -61 );
-    assert_equal( b.b9( aa ), -61 );
+    assert_equal( b.an( aa ), -61 );
 
     aa.a5 98;
     a.a5 100;
     
     assert_equal( a.a1, 100 );
-    assert_equal( b.b9( a ), 100 );
+    assert_equal( b.an( a ), 100 );
     assert_equal( aa.a1, 98 );
-    assert_equal( b.b9( aa ), 98 );
+    assert_equal( b.an( aa ), 98 );
+
+    a._destroy
+    aa = nil
+    GC.start
+    assert_equal( RBA::A.instance_count, a_count )
 
   end
 
   def test_18
 
-    # Test references to objects (returned by b.b7)
+    # Test references to objects (returned by b.amember_cptr)
 
     b = RBA::B.new
-    b.b8( 77 )
-    assert_equal( b.b7.a1c, 77 );
+    b.set_an( 77 )
+    assert_equal( b.amember_cptr.a1c, 77 );
 
-    b.b8cref( 79 )
-    assert_equal( b.b7.a1c, 79 );
+    b.set_an_cref( 79 )
+    assert_equal( b.amember_cptr.a1c, 79 );
 
-    aref = b.b7
+    aref = b.amember_cptr
     err_caught = false
 
     if !$leak_check 
 
       begin 
-        x = aref.a1 # cannot call non-const method on const reference (as delivered by b7)
+        x = aref.a1 # cannot call non-const method on const reference (as delivered by amember_cptr)
       rescue
         err_caught = true
       end
@@ -905,7 +916,7 @@ class Basic_TestClass < TestBase
 
     end
 
-    b.b8( -1 )
+    b.set_an( -1 )
     assert_equal( aref.a1c, -1 );
 
   end
@@ -973,19 +984,19 @@ class Basic_TestClass < TestBase
 
     b = RBA::B.new
 
-    a1 = b.b14a( true )
-    a2 = b.b14b
+    a1 = b.amember_or_nil( true )
+    a2 = b.amember_ptr
     assert_equal( a1.a1, 17 )
     assert_equal( a2.a1, 17 )
     a1.a5( 761 )
     assert_equal( a1.a1, 761 )
     assert_equal( a2.a1, 761 )
 
-    a1 = b.b14a( false )
+    a1 = b.amember_or_nil( false )
     assert_equal( a1, nil )
     
-    assert_equal( b.b15( b.b14b ), true )
-    assert_equal( b.b15( b.b14a( false ) ), false )
+    assert_equal( b.b15( b.amember_ptr ), true )
+    assert_equal( b.b15( b.amember_or_nil( false ) ), false )
     assert_equal( b.b15( nil ), false )
 
   end
@@ -996,8 +1007,8 @@ class Basic_TestClass < TestBase
     
     b = RBA::B.new
     
-    b.b14b.s( 117 )
-    assert_equal( b.b14b.g, 117 )
+    b.amember_ptr.s( 117 )
+    assert_equal( b.amember_ptr.g, 117 )
 
     n = 0
     b.b10_nc { |a| a.s( n ); n += 1 } 
@@ -1138,10 +1149,10 @@ class Basic_TestClass < TestBase
     assert_equal( b.b32( "b", 25 ), 20.5 )
 
     GC.start
-    na = RBA::A::a0    # instance count
+    na = RBA::A::instance_count    # instance count
     assert_equal( b.bx( a, 15 ), "aref+i" )
     GC.start
-    assert_equal( RBA::A::a0, na )
+    assert_equal( RBA::A::instance_count, na )
     err_caught = false
     begin 
       # cannot cast second argument to int
@@ -1152,7 +1163,7 @@ class Basic_TestClass < TestBase
     assert_equal( err_caught, true )
     # the exception thrown before must not leave an instance on the call stack:
     GC.start
-    assert_equal( RBA::A::a0, na )
+    assert_equal( RBA::A::instance_count, na )
 
     err_caught = false
     begin 
@@ -1254,53 +1265,53 @@ class Basic_TestClass < TestBase
 
     # destruction of an instance via c++
     GC.start
-    ac0 = RBA::A.a0 
+    ic0 = RBA::A.instance_count 
 
     a = RBA::A::new
     a.create
     assert_equal(a.destroyed?, false)
-    assert_equal(RBA::A.a0, ac0 + 1)
+    assert_equal(RBA::A.instance_count, ic0 + 1)
     RBA::A.a20(a)    # install static instance of A
     assert_equal(a.destroyed?, false)
     RBA::A.a20(nil) 
-    assert_equal(RBA::A.a0, ac0)
+    assert_equal(RBA::A.instance_count, ic0)
     assert_equal(a.destroyed?, true)
 
     a = RBA::A::new
     a.create
     assert_equal(a.destroyed?, false)
-    assert_equal(RBA::A.a0, ac0 + 1)
+    assert_equal(RBA::A.instance_count, ic0 + 1)
     RBA::A.a20(a)    # install static instance of A
     assert_equal(a.destroyed?, false)
-    assert_equal(RBA::A.a0, ac0 + 1)
+    assert_equal(RBA::A.instance_count, ic0 + 1)
     RBA::A.a20(a)    # re-install static instance of A
     assert_equal(a.destroyed?, false)
-    assert_equal(RBA::A.a0, ac0 + 1)
+    assert_equal(RBA::A.instance_count, ic0 + 1)
     
     # install another instance
     aa = RBA::A::new
     aa.create
     assert_equal(aa.destroyed?, false)
-    assert_equal(RBA::A.a0, ac0 + 2)
+    assert_equal(RBA::A.instance_count, ic0 + 2)
     RBA::A.a20(aa)    # install static instance of A
 
     # original one is destroyed now, only new instance remains
     assert_equal(a.destroyed?, true)
     assert_equal(aa.destroyed?, false)
-    assert_equal(RBA::A.a0, ac0 + 1)
+    assert_equal(RBA::A.instance_count, ic0 + 1)
     RBA::A.a20(nil)    # discard installed instance
     assert_equal(aa.destroyed, true)
-    assert_equal(RBA::A.a0, ac0)
+    assert_equal(RBA::A.instance_count, ic0)
 
     # the same without create .. should work too, but not create an instance because of late 
     # instantiation in default ctor
     a = RBA::A::new
     assert_equal(a.destroyed?, false)
-    assert_equal(RBA::A.a0, ac0)
+    assert_equal(RBA::A.instance_count, ic0)
     RBA::A.a20(a)    # install static instance of A
     assert_equal(a.destroyed?, false)
     RBA::A.a20(nil) 
-    assert_equal(RBA::A.a0, ac0)
+    assert_equal(RBA::A.instance_count, ic0)
     assert_equal(a.destroyed?, true)
 
   end
@@ -1309,13 +1320,13 @@ class Basic_TestClass < TestBase
 
     # destruction of an instance via c++
     GC.start
-    ac0 = RBA::A.a0 
+    ic0 = RBA::A.instance_count 
 
     1.times do
       a = RBA::A::new
       a._create
       assert_equal(a.destroyed?, false)
-      assert_equal(RBA::A.a0, ac0 + 1)
+      assert_equal(RBA::A.instance_count, ic0 + 1)
       RBA::A.a20(a)    # install static instance of A
       assert_equal(RBA::A.a20_get == nil, false)
     end
@@ -1323,7 +1334,7 @@ class Basic_TestClass < TestBase
     # makes sure the objects inside the block before are deleted
     GC.start
 
-    assert_equal(RBA::A.a0, ac0)
+    assert_equal(RBA::A.instance_count, ic0)
     assert_equal(RBA::A.a20_get == nil, true)
 
     # "unmanage" will freeze the object and not make it destroyed by the GC
@@ -1331,7 +1342,7 @@ class Basic_TestClass < TestBase
       a = RBA::A::new
       a._create
       assert_equal(a.destroyed?, false)
-      assert_equal(RBA::A.a0, ac0 + 1)
+      assert_equal(RBA::A.instance_count, ic0 + 1)
       RBA::A.a20(a)    # install static instance of A
       assert_equal(RBA::A.a20_get == nil, false)
       a._unmanage
@@ -1340,7 +1351,7 @@ class Basic_TestClass < TestBase
     # makes sure the objects inside the block before are deleted
     GC.start
 
-    assert_equal(RBA::A.a0, ac0 + 1)
+    assert_equal(RBA::A.instance_count, ic0 + 1)
     assert_equal(RBA::A.a20_get == nil, false)
 
     # after "manage" the object gets volatile again
@@ -1352,7 +1363,7 @@ class Basic_TestClass < TestBase
     # makes sure the objects inside the block before are deleted
     GC.start
 
-    assert_equal(RBA::A.a0, ac0)
+    assert_equal(RBA::A.instance_count, ic0)
     assert_equal(RBA::A.a20_get == nil, true)
 
   end
@@ -1786,7 +1797,7 @@ class Basic_TestClass < TestBase
     assert_equal(1, yy.size)
     assert_equal("RBA::Y", yy[0].class.to_s)
     assert_equal(true, yy[0] != nil)
-    yy[0].destroy
+    yy[0]._destroy
     assert_equal(true, yy[0].destroyed?)
     assert_equal(yc, y.vx_dyn_count)
 

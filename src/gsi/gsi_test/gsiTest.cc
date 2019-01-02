@@ -83,7 +83,7 @@ A &A::operator= (const A &a)
   return *this;
 }
 
-int A::a0 ()
+int A::instance_count ()
 {
   return a_count;
 }
@@ -780,6 +780,7 @@ static gsi::QFlagsClass<Enum> decl_qflags_enum ("", "Enums");
 
 static gsi::Class<A> decl_a ("", "A",
   gsi::constructor ("new_a|new", &a_ctor) +
+  gsi::method ("instance_count", &A::instance_count) +
   gsi::method ("br", &A::br) +
   gsi::method ("get_e", &A::get_e) +
   gsi::method ("get_eptr", &A::get_eptr) +
@@ -814,7 +815,6 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("af?|af", &A::af1) +
   gsi::method ("aa", &A::a) +
   gsi::method ("aa", &A::a_static) +
-  gsi::method ("a0", &A::a0) +
   gsi::method ("a1", &A::a1) +
   gsi::method ("a1c", &A::a1c) +
   gsi::method ("a2", &A::a2) +
@@ -904,22 +904,22 @@ static gsi::Class<B> decl_b ("", "B",
   gsi::method ("b5", &B::b5) +
   gsi::method ("b5a", &B::b5a) +
   gsi::method ("b5b", &B::b5b) +
-  gsi::method ("b6|make_a", &B::b6) +
-  gsi::method ("b8|set_an", &B::b8) +
-  gsi::method ("b9|an", &B::b9) +
-  gsi::method ("b8cref|set_an_cref", &B::b8) +
-  gsi::method ("b9cref|an_cref", &B::b9) +
+  gsi::method ("make_a", &B::make_a) +
+  gsi::method ("set_an", &B::set_an) +
+  gsi::method ("an", &B::an) +
+  gsi::method ("set_an_cref", &B::set_an_cref) +
+  gsi::method ("an_cref", &B::an_cref) +
   //  implemented by extension below:
   // gsi::iterator_ext ("b10", &b10b_ext, &b10e_ext) +
   gsi::iterator ("b10_nc", &B::b10b_nc, &B::b10e_nc) +
   gsi::iterator ("b11", &B::b11b, &B::b11e) +
   gsi::iterator ("b12", &B::b12b, &B::b12e) +
   gsi::iterator ("b13", &B::b13b, &B::b13e) +
-  gsi::method ("b14a|amember_or_nil", &B::amember_or_nil) +
-  gsi::method ("b14b|amember_ptr", &B::amember_ptr) +
-  gsi::method ("b7|b14c|amember_cptr", &B::amember_cptr) +
-  gsi::method ("b7c|amember_cref", &B::amember_cref) +
-  gsi::method ("b7d|amember_ref", &B::amember_ref) +
+  gsi::method ("amember_or_nil_alt|amember_or_nil", &B::amember_or_nil) +
+  gsi::method ("amember_ptr_alt|amember_ptr", &B::amember_ptr) +
+  gsi::method ("xxx|amember_cptr", &B::amember_cptr) +
+  gsi::method ("yyy|amember_cref", &B::amember_cref) +
+  gsi::method ("zzz|amember_ref", &B::amember_ref) +
   gsi::method ("b15|arg_is_not_nil", &B::b15) +
   gsi::method ("b16a|av", &B::b16a) +
   gsi::method ("b16b|av_cref", &B::b16b) +

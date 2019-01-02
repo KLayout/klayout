@@ -9,17 +9,29 @@ jobs:
       #   python.version: '2.7'
       Python35:
         python.version: '3.5'
+        python.architecture: 'x64'
       Python36:
         python.version: '3.6'
+        python.architecture: 'x64'
       Python37:
         python.version: '3.7'
-    maxParallel: 3
+        python.architecture: 'x64'
+      Python35_x86:
+        python.version: '3.5'
+        python.architecture: 'x86'
+      Python36_x86:
+        python.version: '3.6'
+        python.architecture: 'x86'
+      Python37_x86:
+        python.version: '3.7'
+        python.architecture: 'x86'
+    maxParallel: 6
 
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
-      architecture: 'x64'
+      architecture: '$(python.architecture)'
 
   # Add additional tasks to run using each Python version in the matrix above
 
@@ -52,12 +64,13 @@ jobs:
   #   displayName: 'Installing Microsoft Visual C++ Compiler for Python 2.7'
 
   - script: |
-      pip install --user --upgrade pip setuptools wheel
+      python -m pip install --upgrade pip setuptools wheel
     displayName: 'Updating pip, setuptools and wheel'
 
   - script: |
       python -V
-      set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-1.0\msvc2017\x64"
+      set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-1.0\msvc2017\%PYTHON_ARCHITECTURE%"
+      echo KLAYOUT_BITS=%KLAYOUT_BITS%
       python setup.py install
 
     displayName: 'Building KLayout'

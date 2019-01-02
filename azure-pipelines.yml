@@ -1,28 +1,28 @@
 # https://aka.ms/yaml
 jobs:
-- job: 'Build'
+- job: Build
   pool:
     vmImage: 'vs2017-win2016' # other options: 'macOS-10.13', 'ubuntu-16.04'
   strategy:
     matrix:
       # Python27:
       #   python.version: '2.7'
-      Python35:
+      cp35-cp35m-win_amd64.whl:
         python.version: '3.5'
         python.architecture: 'x64'
-      Python36:
+      cp36-cp36m-win_amd64.whl:
         python.version: '3.6'
         python.architecture: 'x64'
-      Python37:
+      cp37-cp37m-win_amd64.whl:
         python.version: '3.7'
         python.architecture: 'x64'
-      Python35_x86:
+      cp35-cp35m-win32.whl:
         python.version: '3.5'
         python.architecture: 'x86'
-      Python36_x86:
+      cp36-cp36m-win32.whl:
         python.version: '3.6'
         python.architecture: 'x86'
-      Python37_x86:
+      cp37-cp37m-win32.whl:
         python.version: '3.7'
         python.architecture: 'x86'
     maxParallel: 6
@@ -99,3 +99,54 @@ jobs:
     inputs:
       pathtoPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel-$(python.version).$(python.architecture)'
+
+- job: 'Deploy'
+  displayName: 'Combine Windows wheels'
+  dependsOn: Build
+  pool:
+    vmImage: 'vs2017-win2016' # other options: 'macOS-10.13', 'ubuntu-16.04'
+  steps:
+    - checkout: none #skip checking out the default repository resource
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.7.x64'
+      inputs:
+        artifactName: 'wheel-3.7.x64'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.6.x64'
+      inputs:
+        artifactName: 'wheel-3.6.x64'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.5.x64'
+      inputs:
+        artifactName: 'wheel-3.5.x64'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.7.x86'
+      inputs:
+        artifactName: 'wheel-3.7.x86'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.6.x86'
+      inputs:
+        artifactName: 'wheel-3.6.x86'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.5.x86'
+      inputs:
+        artifactName: 'wheel-3.5.x86'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: CopyFiles@2
+      condition: always()
+      inputs:
+        sourceFolder: '$(System.DefaultWorkingDirectory)'
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+        contents: '**/?(*.whl)'
+        flattenFolders: true
+    - task: PublishBuildArtifacts@1
+      condition: always()
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: 'windows_wheels'
+

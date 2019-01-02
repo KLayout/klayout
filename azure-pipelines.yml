@@ -42,6 +42,12 @@ jobs:
     displayName: 'Downloading and Extracting KLayout bits'
 
   - script: |
+      pip install --user --upgrade pip setuptools wheel
+    displayName: 'Updating pip, setuptools and wheel'
+
+  - script: |
       python -V
-      pwd
-    displayName: 'Diagnostic information'
+      set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-1.0\msvc2017\x64"
+      python setup.py install
+
+    displayName: 'Building KLayout'

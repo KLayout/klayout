@@ -98,4 +98,4 @@ jobs:
     condition: always()
     inputs:
       pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: drop
+      artifactName: 'wheel-$(python.version).$(python.architecture)'

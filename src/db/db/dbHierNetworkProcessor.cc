@@ -156,8 +156,8 @@ template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::Polyg
 //  local_cluster implementation
 
 template <class T>
-local_cluster<T>::local_cluster ()
-  : m_id (0), m_needs_update (false), m_size (0)
+local_cluster<T>::local_cluster (size_t id)
+  : m_id (id), m_needs_update (false), m_size (0)
 {
   //  .. nothing yet ..
 }
@@ -372,9 +372,104 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
   return ! scanner.process (rec, 1 /*==touching*/, bc, bc_t);
 }
 
+template <class T>
+double local_cluster<T>::area_ratio () const
+{
+  box_type bx = bbox ();
+  if (bx.empty ()) {
+    return 0.0;
+  }
+
+  db::box_convert<T> bc;
+
+  //  just the sum of the areas of the bounding boxes - this is precise if no overlaps happen and the
+  //  polygons are rather rectangular. This criterion is coarse enough to prevent recursion in the split
+  //  algorithm and still be fine enough - consider that we a planning to use splitted polygons for
+  //  which the bbox is a fairly good approximation.
+  typename box_type::area_type a = 0;
+  for (typename std::map<unsigned int, tree_type>::const_iterator s = m_shapes.begin (); s != m_shapes.end (); ++s) {
+    for (typename tree_type::const_iterator i = s->second.begin (); i != s->second.end (); ++i) {
+      a += bc (*i).area ();
+    }
+  }
+
+  return (a == 0 ? 0.0 : double (bx.area ()) / double (a));
+}
+
+template <class T>
+std::vector<unsigned int>
+local_cluster<T>::layers () const
+{
+  std::vector<unsigned int> l;
+  l.reserve (m_shapes.size ());
+  for (typename std::map<unsigned int, tree_type>::const_iterator s = m_shapes.begin (); s != m_shapes.end (); ++s) {
+    l.push_back (s->first);
+  }
+  return l;
+}
+
+template <class T, class Iter>
+size_t split_cluster (const local_cluster<T> &cl, double max_area_ratio, Iter &output)
+{
+  if (cl.area_ratio () < max_area_ratio) {
+    return 0;  //  no splitting happened
+  }
+
+  db::box_convert<T> bc;
+  typename local_cluster<T>::box_type bx = cl.bbox ();
+
+  int xthr = bx.width () > bx.height () ? bx.center ().x () : bx.left ();
+  int ythr = bx.width () > bx.height () ? bx.bottom () : bx.center ().y ();
+
+  //  split along the longer axis - decide the position according to the bbox center
+
+  local_cluster<T> a (cl.id ()), b (cl.id ());
+
+  std::vector<unsigned int> layers = cl.layers ();
+
+  for (std::vector<unsigned int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+    for (typename local_cluster<T>::shape_iterator s = cl.begin (*l); ! s.at_end (); ++s) {
+      typename local_cluster<T>::box_type::point_type sc = bc (*s).center ();
+      if (sc.x () < xthr || sc.y () < ythr) {
+        a.add (*s, *l);
+      } else {
+        b.add (*s, *l);
+      }
+    }
+  }
+
+  if (a.size () == 0 || b.size () == 0) {
+    //  give up to prevent infinite recursion
+    return 0;
+  }
+
+  //  split further if required
+  size_t na = split_cluster (a, max_area_ratio, output);
+  size_t nb = split_cluster (b, max_area_ratio, output);
+
+  if (na == 0) {
+    *output++ = a;
+    na = 1;
+  }
+
+  if (nb == 0) {
+    *output++ = b;
+    nb = 1;
+  }
+
+  return na + nb;
+}
+
+template <class T>
+template <class Iter>
+size_t local_cluster<T>::split (double max_area_ratio, Iter &output) const
+{
+  return split_cluster (*this, max_area_ratio, output);
+}
+
 //  explicit instantiations
 template class DB_PUBLIC local_cluster<db::PolygonRef>;
-
+template DB_PUBLIC size_t local_cluster<db::PolygonRef>::split<std::back_insert_iterator<std::list<local_cluster<db::PolygonRef> > > > (double, std::back_insert_iterator<std::list<local_cluster<db::PolygonRef> > > &) const;
 
 // ------------------------------------------------------------------------------
 //  local_clusters implementation
@@ -862,23 +957,22 @@ private:
       return;
     }
 
+    db::ICplxTrans t1i = t1.inverted ();
     db::ICplxTrans t2i = t2.inverted ();
-    db::ICplxTrans t12 = t2i * t1;
 
     box_type common = b1 & b2;
 
-    for (db::CellInstArray::iterator ii1 = i1.begin_touching (common, mp_layout); ! ii1.at_end (); ++ii1) {
+    for (db::CellInstArray::iterator ii1 = i1.begin_touching (common.transformed (t1i), mp_layout); ! ii1.at_end (); ++ii1) {
 
       db::ICplxTrans tt1 = t1 * i1.complex_trans (*ii1);
       box_type ib1 = bb1.transformed (tt1);
-      box_type ib12 = ib1.transformed (t12);
 
       std::vector<db::InstElement> pp1;
       pp1.reserve (p1.size () + 1);
       pp1.insert (pp1.end (), p1.begin (), p1.end ());
       pp1.push_back (db::InstElement (i1, ii1));
 
-      for (db::CellInstArray::iterator ii2 = i2.begin_touching (ib12, mp_layout); ! ii2.at_end (); ++ii2) {
+      for (db::CellInstArray::iterator ii2 = i2.begin_touching (ib1.transformed (t2i), mp_layout); ! ii2.at_end (); ++ii2) {
 
         db::ICplxTrans tt2 = t2 * i2.complex_trans (*ii2);
         box_type ib2 = bb2.transformed (tt2);
@@ -1392,6 +1486,9 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
   //  handle local to instance connections
 
   {
+    std::list<local_cluster<db::PolygonRef> > heap;
+    double area_ratio = 10.0;
+
     static std::string desc = tl::to_string (tr ("Local to instance treatment"));
     tl::SelfTimer timer (tl::verbosity () >= 51, desc);
 
@@ -1399,8 +1496,21 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     db::box_scanner2<db::local_cluster<T>, unsigned int, db::Instance, unsigned int> bs2 (report_progress, desc);
 
     for (typename connected_clusters<T>::const_iterator c = local.begin (); c != local.end (); ++c) {
-      bs2.insert1 (c.operator-> (), 0);
+
+      //  we do not actually need the original clusters. For a better performance we optimize the
+      //  area ratio and split, but we keep the ID the same.
+      std::back_insert_iterator<std::list<local_cluster<db::PolygonRef> > > iout = std::back_inserter (heap);
+      size_t n = c->split (area_ratio, iout);
+      if (n == 0) {
+        bs2.insert1 (c.operator-> (), 0);
+      } else {
+        std::list<local_cluster<db::PolygonRef> >::iterator h = heap.end ();
+        while (n-- > 0) {
+          bs2.insert1 ((--h).operator-> (), 0);
+        }
+      }
     }
+
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
       bs2.insert2 (inst.operator-> (), 0);
     }

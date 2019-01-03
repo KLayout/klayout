@@ -146,7 +146,7 @@ public:
   /**
    *  @brief Creates an empty cluster
    */
-  local_cluster ();
+  local_cluster (size_t id = 0);
 
   /**
    *  @brief Clears the cluster
@@ -202,8 +202,28 @@ public:
   }
 
   /**
+   *  @brief Computes the "area ratio" of the cluster - this is a rough approximation of the area covered
+   *  The algorithm used assumes no overlap between the polygons of the cluster.
+   */
+  double area_ratio () const;
+
+  /**
+   *  @brief Splits the cluster into multiple other clusters until the desired area ratio is achieved.
+   *  The result is sent to the output iterator. The return value is the number of clusters produced.
+   *  If the area ratio of the cluster is below the limit, no splitting happens and 0 is returned.
+   */
+  template <class Iter>
+  size_t split (double max_area_ratio, Iter &output) const;
+
+  /**
+   *  @brief Gets a vector of layers inside the cluster
+   */
+  std::vector<unsigned int> layers () const;
+
+  /**
    *  @brief Gets the total number of shapes in this cluster
-   */ size_t size () const
+   */
+  size_t size () const
   {
     return m_size;
   }

@@ -275,6 +275,38 @@ static std::string local_clusters_to_string (const db::local_clusters<T> &cluste
   return s;
 }
 
+TEST(12_LocalClusterSplitByAreaRatio)
+{
+  db::GenericRepository repo;
+  db::Connectivity conn;
+  conn.connect (0);
+  conn.connect (1);
+  conn.connect (2);
+
+  db::local_cluster<db::PolygonRef> cluster (17);
+  cluster.add (db::PolygonRef (db::Polygon (db::Box (0, 0, 20, 20)), repo), 0);
+  cluster.add (db::PolygonRef (db::Polygon (db::Box (0, 0, 1000, 20)), repo), 0);
+  cluster.add (db::PolygonRef (db::Polygon (db::Box (1000, 0, 1020, 1000)), repo), 1);
+  cluster.add (db::PolygonRef (db::Polygon (db::Box (0, 1000, 1000, 1020)), repo), 2);
+
+  std::list<db::local_cluster<db::PolygonRef> > out;
+  std::back_insert_iterator<std::list<db::local_cluster<db::PolygonRef> > > iout = std::back_inserter (out);
+  size_t n = cluster.split (10.0, iout);
+
+  EXPECT_EQ (n, size_t (3));
+  EXPECT_EQ (out.size (), size_t (3));
+
+  std::list<db::local_cluster<db::PolygonRef> >::const_iterator i = out.begin ();
+  EXPECT_EQ (local_cluster_to_string (*i, conn), "[0](0,0;0,20;20,20;20,0);[0](0,0;0,20;1000,20;1000,0)");
+  EXPECT_EQ (i->id (), size_t (17));
+  ++i;
+  EXPECT_EQ (local_cluster_to_string (*i, conn), "[1](1000,0;1000,1000;1020,1000;1020,0)");
+  EXPECT_EQ (i->id (), size_t (17));
+  ++i;
+  EXPECT_EQ (local_cluster_to_string (*i, conn), "[2](0,1000;0,1020;1000,1020;1000,1000)");
+  EXPECT_EQ (i->id (), size_t (17));
+}
+
 TEST(20_LocalClustersBasic)
 {
   db::Layout layout;

@@ -467,3 +467,34 @@ TEST(5_CompareRecursiveShapeIterators)
   }
 }
 
+TEST(6_DisjunctLayersPerHierarchyBranch)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/hierarchy_builder_l4.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::Layout target;
+  db::HierarchyBuilder builder (&target);
+
+  for (db::Layout::layer_iterator li = ly.begin_layers (); li != ly.end_layers (); ++li) {
+
+    unsigned int li1 = (*li).first;
+    unsigned int target_layer = target.insert_layer (*(*li).second);
+    builder.set_target_layer (target_layer);
+
+    db::cell_index_type top_cell_index = *ly.begin_top_down ();
+    db::RecursiveShapeIterator iter (ly, ly.cell (top_cell_index), li1);
+
+    iter.push (&builder);
+
+  }
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au_l4.gds");
+}
+

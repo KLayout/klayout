@@ -248,6 +248,7 @@ private:
   db::RecursiveShapeIterator m_source;
   cell_map_type m_cell_map;
   std::set<cell_map_type::key_type> m_cells_seen;
+  std::set<db::cell_index_type> m_cells_to_be_filled;
   cell_map_type::const_iterator m_cm_entry;
   bool m_cm_new_entry;
   unsigned int m_target_layer;

@@ -154,6 +154,7 @@ HierarchyBuilder::reset ()
   m_initial_pass = true;
   mp_initial_cell = 0;
 
+  m_cells_to_be_filled.clear ();
   m_cell_map.clear ();
   m_cells_seen.clear ();
   m_cell_stack.clear ();
@@ -206,9 +207,15 @@ void
 HierarchyBuilder::enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
 {
   tl_assert (m_cm_entry != m_cell_map.end () && m_cm_entry != cell_map_type::const_iterator ());
+
   m_cells_seen.insert (m_cm_entry->first);
 
-  m_cell_stack.push_back (std::make_pair (m_cm_new_entry, &mp_target->cell (m_cm_entry->second)));
+  bool new_cell = (m_cells_to_be_filled.find (m_cm_entry->second) != m_cells_to_be_filled.end ());
+  if (new_cell) {
+    m_cells_to_be_filled.erase (m_cm_entry->second);
+  }
+
+  m_cell_stack.push_back (std::make_pair (new_cell, &mp_target->cell (m_cm_entry->second)));
 }
 
 void
@@ -230,6 +237,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
       db::cell_index_type new_cell = mp_target->add_cell (iter->layout ()->cell_name (inst.object ().cell_index ()));
       m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
       m_cm_new_entry = true;
+      m_cells_to_be_filled.insert (new_cell);
     }
 
     //  for new cells, create this instance
@@ -277,6 +285,7 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
       db::cell_index_type new_cell = mp_target->add_cell ((std::string (iter->layout ()->cell_name (inst.object ().cell_index ())) + suffix).c_str ());
       m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
       m_cm_new_entry = true;
+      m_cells_to_be_filled.insert (new_cell);
     }
 
     //  for a new cell, create this instance

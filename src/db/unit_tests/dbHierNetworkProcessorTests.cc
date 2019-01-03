@@ -1006,6 +1006,18 @@ TEST(110_HierClusters)
 TEST(111_HierClusters)
 {
   run_hc_test (_this, "hc_test_l11.gds", "hc_test_au11.gds");
-  run_hc_test_with_backannotation (_this, "hc_test_l4.gds", "hc_test_au4b.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l11.gds", "hc_test_au11b.gds");
+}
+
+TEST(112_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l12.gds", "hc_test_au12.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l12.gds", "hc_test_au12b.gds");
+}
+
+TEST(113_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l13.gds", "hc_test_au13.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l13.gds", "hc_test_au13b.gds");
 }
 

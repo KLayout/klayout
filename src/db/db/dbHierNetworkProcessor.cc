@@ -886,6 +886,16 @@ public:
   }
 
   /**
+   *  @brief Single-instance treatment - may be required because of interactions between array members
+   */
+  void finish (const db::Instance *i, unsigned int /*p1*/)
+  {
+    if (i->size () > 1) {
+      add_single_inst (*i);
+    }
+  }
+
+  /**
    *  @brief Receiver main event for local-to-instance interactions
    */
   void add (const local_cluster<T> *c1, unsigned int /*p1*/, const db::Instance *i2, unsigned int /*p2*/)
@@ -1074,6 +1084,69 @@ private:
 
     }
 
+  }
+
+  /**
+   *  @brief Single instance treatment
+   */
+  void add_single_inst (const db::Instance &i)
+  {
+    box_type bb = (*mp_cbc) (i.cell_index ());
+    const db::Cell &cell = mp_layout->cell (i.cell_index ());
+
+    for (db::CellInstArray::iterator ii = i.begin (); ! ii.at_end (); ++ii) {
+
+      db::ICplxTrans tt = i.complex_trans (*ii);
+      box_type ib = bb.transformed (tt);
+
+      std::vector<db::InstElement> pp;
+      pp.push_back (db::InstElement (i, ii));
+
+      bool any = false;
+      bool first = true;
+
+      for (db::CellInstArray::iterator ii2 = i.begin_touching (ib, mp_layout); ! ii2.at_end (); ++ii2) {
+
+        db::ICplxTrans tt2 = i.complex_trans (*ii2);
+        if (tt.equal (tt2)) {
+          //  skip the initial instance
+          continue;
+        }
+
+        box_type ib2 = bb.transformed (tt2);
+
+        if (ib.touches (ib2)) {
+
+          std::vector<db::InstElement> pp2;
+          pp2.push_back (db::InstElement (i, ii2));
+
+          box_type common = (ib & ib2);
+          add_single_pair (common, i.cell_index (), pp, tt, i.cell_index (), pp2, tt2);
+
+          //  dive into cell of ii2 - this is a self-interaction of a cell with parts of itself
+          //  as these self-interactions are expected to be the same always (regular array), we can skip this test the next times.
+          if (first) {
+            for (db::Cell::touching_iterator jj2 = cell.begin_touching (common.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
+              std::vector<db::InstElement> p;
+              db::ICplxTrans t;
+              add_pair (i, p, t, *jj2, pp2, tt2);
+            }
+          }
+
+          any = true;
+
+        }
+
+      }
+
+      first = false;
+
+      //  we don't expect more to happen on the next instance
+      if (! any) {
+        break;
+      }
+
+    }
   }
 
   /**

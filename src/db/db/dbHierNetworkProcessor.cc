@@ -330,6 +330,8 @@ template <class T>
 bool
 local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn) const
 {
+  db::box_convert<T> bc;
+
   const_cast<local_cluster<T> *> (this)->ensure_sorted ();
 
   box_type common = other.bbox ().transformed (trans) & bbox ();
@@ -339,33 +341,57 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
 
   box_type common_for_other = common.transformed (trans.inverted ());
 
-  db::box_scanner2<T, unsigned int, T, unsigned int> scanner;
-  transformed_box <T, db::ICplxTrans> bc_t (trans);
-  db::box_convert<T> bc;
+  //  shortcut evaluation for disjunct layers
 
-  bool any = false;
+  std::set<unsigned int> ll1;
   for (typename std::map<unsigned int, tree_type>::const_iterator s = m_shapes.begin (); s != m_shapes.end (); ++s) {
-    for (typename tree_type::touching_iterator i = s->second.begin_touching (common, bc); ! i.at_end (); ++i) {
-      scanner.insert1 (i.operator-> (), s->first);
-      any = true;
+    if (! s->second.begin_touching (common, bc).at_end ()) {
+      ll1.insert (s->first);
     }
   }
 
+  if (ll1.empty ()) {
+    return false;
+  }
+
+  std::set<unsigned int> ll2;
+  for (typename std::map<unsigned int, tree_type>::const_iterator s = other.m_shapes.begin (); s != other.m_shapes.end (); ++s) {
+    if (! s->second.begin_touching (common_for_other, bc).at_end ()) {
+      ll2.insert (s->first);
+    }
+  }
+
+  if (ll2.empty ()) {
+    return false;
+  }
+
+  bool any = false;
+
+  for (std::set<unsigned int>::const_iterator i = ll1.begin (); i != ll1.end () && !any; ++i) {
+    db::Connectivity::layer_iterator je = conn.end_connected (*i);
+    for (db::Connectivity::layer_iterator j = conn.begin_connected (*i); j != je && !any; ++j) {
+      any = (ll2.find (*j) != ll2.end ());
+    }
+  }
   if (! any) {
     return false;
   }
 
-  any = false;
+  //  detailed analysis
+
+  db::box_scanner2<T, unsigned int, T, unsigned int> scanner;
+  transformed_box <T, db::ICplxTrans> bc_t (trans);
+
+  for (typename std::map<unsigned int, tree_type>::const_iterator s = m_shapes.begin (); s != m_shapes.end (); ++s) {
+    for (typename tree_type::touching_iterator i = s->second.begin_touching (common, bc); ! i.at_end (); ++i) {
+      scanner.insert1 (i.operator-> (), s->first);
+    }
+  }
 
   for (typename std::map<unsigned int, tree_type>::const_iterator s = other.m_shapes.begin (); s != other.m_shapes.end (); ++s) {
     for (typename tree_type::touching_iterator i = s->second.begin_touching (common_for_other, bc); ! i.at_end (); ++i) {
       scanner.insert2 (i.operator-> (), s->first);
-      any = true;
     }
-  }
-
-  if (! any) {
-    return false;
   }
 
   interaction_receiver<T> rec (conn, trans);
@@ -1037,6 +1063,8 @@ private:
                         db::cell_index_type ci1, const std::vector<db::InstElement> &p1, const db::ICplxTrans &t1,
                         db::cell_index_type ci2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
   {
+    const db::Cell &cell2 = mp_layout->cell (ci2);
+
     const db::local_clusters<T> &cl1 = mp_tree->clusters_per_cell (ci1);
     const db::local_clusters<T> &cl2 = mp_tree->clusters_per_cell (ci2);
 
@@ -1045,6 +1073,11 @@ private:
     db::ICplxTrans t21 = t1i * t2;
 
     for (typename db::local_clusters<T>::touching_iterator i = cl1.begin_touching (common.transformed (t1i)); ! i.at_end (); ++i) {
+
+      //  skip the test, if this cluster doesn't interact with the whole cell2
+      if (! i->interacts (cell2, t21, *mp_conn)) {
+        continue;
+      }
 
       box_type bc1 = common & i->bbox ().transformed (t1);
       for (typename db::local_clusters<T>::touching_iterator j = cl2.begin_touching (bc1.transformed (t2i)); ! j.at_end (); ++j) {

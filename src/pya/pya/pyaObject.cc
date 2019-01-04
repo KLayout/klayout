@@ -538,7 +538,7 @@ PYAObjectBase::destroy ()
     return;
   }
 
-  if (!m_can_destroy && m_obj) {
+  if (! (m_owned || m_can_destroy) && m_obj) {
     throw tl::Exception (tl::to_string (tr ("Object cannot be destroyed explicitly")));
   }
 

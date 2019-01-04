@@ -135,10 +135,10 @@ class BasicTest(unittest.TestCase):
   def test_00(self):
 
     # all references of PA are released now:
-    ac0 = pya.A.a0()
+    ic0 = pya.A.instance_count()
 
     a = pya.A.new_a(100)
-    self.assertEqual( pya.A.a0(), ac0 + 1 )
+    self.assertEqual( pya.A.instance_count(), ic0 + 1 )
 
     a = pya.A()
     self.assertEqual(a.a1(), 17)
@@ -146,28 +146,28 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(a.a1(), 110)
 
     a = None
-    self.assertEqual( pya.A.a0(), ac0 )
+    self.assertEqual( pya.A.instance_count(), ic0 )
 
     a = pya.A()
-    self.assertEqual( pya.A.a0(), ac0 )  # delayed instantiation of detached objects - A is actually created if it is used first
+    self.assertEqual( pya.A.instance_count(), ic0 )  # delayed instantiation of detached objects - A is actually created if it is used first
     a.a2()   # just check, if it can be called
-    self.assertEqual( pya.A.a0(), ac0 + 1 )
+    self.assertEqual( pya.A.instance_count(), ic0 + 1 )
 
     # open question: with ruby 1.8, aa is not deleted if the self.assertEqual is missing. Why?
     # maybe the GC does not like to be called that frequently?
     aa = a.dup()
-    self.assertEqual( pya.A.a0(), ac0 + 2 )
+    self.assertEqual( pya.A.instance_count(), ic0 + 2 )
 
     aa = None
-    self.assertEqual( pya.A.a0(), ac0 + 1 )
+    self.assertEqual( pya.A.instance_count(), ic0 + 1 )
 
     a = None
-    self.assertEqual( pya.A.a0(), ac0 )
+    self.assertEqual( pya.A.instance_count(), ic0 )
 
     a = pya.A()
-    self.assertEqual( pya.A.a0(), ac0 )  # delayed instantiation of detached objects - A is actually created if it is used first
+    self.assertEqual( pya.A.instance_count(), ic0 )  # delayed instantiation of detached objects - A is actually created if it is used first
     a.a2()   # just check, if it can be called
-    self.assertEqual( pya.A.a0(), ac0 + 1 )
+    self.assertEqual( pya.A.instance_count(), ic0 + 1 )
 
     # static and non-static methods can be mixed, but they will be made non-ambiguous too
     self.assertEqual( pya.A.aa(), "static_a" )
@@ -219,7 +219,7 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(arr, [5, 1, -1.25])
 
     a.destroy()
-    self.assertEqual( pya.A.a0(), ac0 )
+    self.assertEqual( pya.A.instance_count(), ic0 )
 
     if not leak_check:
 
@@ -237,13 +237,13 @@ class BasicTest(unittest.TestCase):
         error_caught = True
       self.assertEqual( error_caught, True )
 
-    self.assertEqual( pya.A.a0(), ac0 )
+    self.assertEqual( pya.A.instance_count(), ic0 )
     a = pya.A.new_a( 55 )
-    self.assertEqual( pya.A.a0(), ac0 + 1 )
+    self.assertEqual( pya.A.instance_count(), ic0 + 1 )
     self.assertEqual( a.a1(), 55 )
     self.assertEqual( a.a_vp1( a.a_vp2() ), "abc" )
     a.destroy()
-    self.assertEqual( pya.A.a0(), ac0 )
+    self.assertEqual( pya.A.instance_count(), ic0 )
 
     a = pya.A.new_a(0)
     self.assertEqual( str(a.a9a(5)), "True" )
@@ -594,12 +594,12 @@ class BasicTest(unittest.TestCase):
 
       err_caught = False
       try:
-        b.b7().a1() # cannot call non-const method on const reference
+        b.amember_cptr().a1() # cannot call non-const method on const reference
       except: 
         err_caught = True
       self.assertEqual( err_caught, True )
 
-    b.b7().a2()
+    b.amember_cptr().a2()
 
     self.assertEqual( b.b1(), 5 )
     self.assertEqual( b.b2(), "" )
@@ -973,50 +973,58 @@ class BasicTest(unittest.TestCase):
     # test copies of objects being returned
 
     b = pya.B()
+    b._create()  # force constructor of B to allocate some A instances internally
 
-    a = b.b6( 1971 );
+    a_count = pya.A.instance_count()
+    a = b.make_a( 1971 );
+    self.assertEqual( pya.A.instance_count(), a_count + 1 )
     self.assertEqual( a.a1(), 1971 );
-    self.assertEqual( b.b9( a ), 1971 );
+    self.assertEqual( b.an( a ), 1971 );
 
-    aa = b.b6( -61 );
-    self.assertEqual( b.b9cref( aa ), -61 );
+    aa = b.make_a( -61 );
+    self.assertEqual( pya.A.instance_count(), a_count + 2 )
+    self.assertEqual( b.an_cref( aa ), -61 );
     self.assertEqual( a.a1(), 1971 );
-    self.assertEqual( b.b9( a ), 1971 );
+    self.assertEqual( b.an( a ), 1971 );
     self.assertEqual( aa.a1(), -61 );
-    self.assertEqual( b.b9( aa ), -61 );
+    self.assertEqual( b.an( aa ), -61 );
 
     aa.a5(98);
     a.a5(100);
     
     self.assertEqual( a.a1(), 100 );
-    self.assertEqual( b.b9( a ), 100 );
+    self.assertEqual( b.an( a ), 100 );
     self.assertEqual( aa.a1(), 98 );
-    self.assertEqual( b.b9( aa ), 98 );
+    self.assertEqual( b.an( aa ), 98 );
+
+    a._destroy()
+    aa = None
+    self.assertEqual( pya.A.instance_count(), a_count )
 
   def test_18(self):
 
-    # Test references to objects (returned by b.b7)
+    # Test references to objects (returned by b.amember_cptr)
 
     b = pya.B()
-    b.b8( 77 )
-    self.assertEqual( b.b7().a1c(), 77 );
+    b.set_an( 77 )
+    self.assertEqual( b.amember_cptr().a1c(), 77 );
 
-    b.b8cref( 79 )
-    self.assertEqual( b.b7().a1c(), 79 );
+    b.set_an_cref( 79 )
+    self.assertEqual( b.amember_cptr().a1c(), 79 );
 
-    aref = b.b7()
+    aref = b.amember_cptr()
     err_caught = False
 
     if not leak_check:
 
       try:
-        x = aref.a1() # cannot call non-const method on const reference (as delivered by b7)
+        x = aref.a1() # cannot call non-const method on const reference (as delivered by amember_cptr)
       except:
         err_caught = True
       self.assertEqual( err_caught, True )
       self.assertEqual( aref.a1c(), 79 );
 
-    b.b8( -1 )
+    b.set_an( -1 )
     self.assertEqual( aref.a1c(), -1 );
 
   def test_19(self):
@@ -1068,19 +1076,19 @@ class BasicTest(unittest.TestCase):
 
     b = pya.B()
 
-    a1 = b.b14a( True )
-    a2 = b.b14b()
+    a1 = b.amember_or_nil_alt( True )
+    a2 = b.amember_ptr_alt()
     self.assertEqual( a1.a1(), 17 )
     self.assertEqual( a2.a1(), 17 )
     a1.a5( 761 )
     self.assertEqual( a1.a1(), 761 )
     self.assertEqual( a2.a1(), 761 )
 
-    a1 = b.b14a( False )
+    a1 = b.amember_or_nil( False )
     self.assertEqual( a1, None )
     
-    self.assertEqual( b.b15( b.b14b() ), True )
-    self.assertEqual( b.b15( b.b14a( False ) ), False )
+    self.assertEqual( b.b15( b.amember_ptr() ), True )
+    self.assertEqual( b.b15( b.amember_or_nil( False ) ), False )
     self.assertEqual( b.b15( None ), False )
 
   def test_21(self):
@@ -1094,9 +1102,9 @@ class BasicTest(unittest.TestCase):
 
     b = pya.B()
     
-    # b14b() returns a pya.A object, but it cannot be extended dynamically by a method s ...
-    b.b14b().s( 117 )
-    self.assertEqual( b.b14b().g(), 117 )
+    # amember_ptr() returns a pya.A object, but it cannot be extended dynamically by a method s ...
+    b.amember_ptr().s( 117 )
+    self.assertEqual( b.amember_ptr().g(), 117 )
 
     n = 0
 
@@ -1247,9 +1255,9 @@ class BasicTest(unittest.TestCase):
     self.assertEqual( b.bx("a", 15), 20.5 )
     self.assertEqual( b.b32("b", 25), 20.5 )
 
-    na = pya.A.a0()    # instance count
+    na = pya.A.instance_count()    # instance count
     self.assertEqual(b.bx(a, 15), "aref+i")
-    self.assertEqual(pya.A.a0(), na)
+    self.assertEqual(pya.A.instance_count(), na)
     err_caught = False
     try: 
       # cannot cast second argument to int
@@ -1258,7 +1266,7 @@ class BasicTest(unittest.TestCase):
       err_caught = True
     self.assertEqual(err_caught, True)
     # the exception thrown before must not leave an instance on the call stack:
-    self.assertEqual(pya.A.a0(), na)
+    self.assertEqual(pya.A.instance_count(), na)
 
     err_caught = False
     try: 
@@ -1368,52 +1376,52 @@ class BasicTest(unittest.TestCase):
 
     # destruction of an instance via c++
     pya.A.a20(None) 
-    ac0 = pya.A.a0()
+    ic0 = pya.A.instance_count()
     a = pya.A()
     a.create()
     self.assertEqual(a.destroyed(), False)
-    self.assertEqual(pya.A.a0(), ac0 + 1)
+    self.assertEqual(pya.A.instance_count(), ic0 + 1)
     pya.A.a20(a)    # install static instance of A
     self.assertEqual(a.destroyed(), False)
     pya.A.a20(None) 
     self.assertEqual(a.destroyed(), True)
-    self.assertEqual(pya.A.a0(), ac0)
+    self.assertEqual(pya.A.instance_count(), ic0)
 
     a = pya.A()
     a.create()
     self.assertEqual(a.destroyed(), False)
-    self.assertEqual(pya.A.a0(), ac0 + 1)
+    self.assertEqual(pya.A.instance_count(), ic0 + 1)
     pya.A.a20(a)    # install static instance of A
     self.assertEqual(a.destroyed(), False)
-    self.assertEqual(pya.A.a0(), ac0 + 1)
+    self.assertEqual(pya.A.instance_count(), ic0 + 1)
     pya.A.a20(a)    # re-install static instance of A
     self.assertEqual(a.destroyed(), False)
-    self.assertEqual(pya.A.a0(), ac0 + 1)
+    self.assertEqual(pya.A.instance_count(), ic0 + 1)
     
     # install another instance
     aa = pya.A()
     aa.create()
     self.assertEqual(aa.destroyed(), False)
-    self.assertEqual(pya.A.a0(), ac0 + 2)
+    self.assertEqual(pya.A.instance_count(), ic0 + 2)
     pya.A.a20(aa)    # install static instance of A
 
     # original one is destroyed now, only new instance remains
     self.assertEqual(a.destroyed(), True)
     self.assertEqual(aa.destroyed(), False)
-    self.assertEqual(pya.A.a0(), ac0 + 1)
+    self.assertEqual(pya.A.instance_count(), ic0 + 1)
     pya.A.a20(None)    # discard installed instance
     self.assertEqual(aa.destroyed(), True)
-    self.assertEqual(pya.A.a0(), ac0)
+    self.assertEqual(pya.A.instance_count(), ic0)
 
     # the same without create .. should work too, but not create an instance because of late 
     # instantiation in default ctor
     a = pya.A()
     self.assertEqual(a.destroyed(), False)
-    self.assertEqual(pya.A.a0(), ac0)
+    self.assertEqual(pya.A.instance_count(), ic0)
     pya.A.a20(a)    # install static instance of A
     self.assertEqual(a.destroyed(), False)
     pya.A.a20(None) 
-    self.assertEqual(pya.A.a0(), ac0)
+    self.assertEqual(pya.A.instance_count(), ic0)
     self.assertEqual(a.destroyed(), True)
 
   def test_26(self):
@@ -1463,36 +1471,36 @@ class BasicTest(unittest.TestCase):
 
     # destruction of an instance via c++
     pya.A.a20(None)
-    ac0 = pya.A.a0()
+    ic0 = pya.A.instance_count()
 
     a = pya.A()
     a._create()
     self.assertEqual(a._destroyed(), False)
-    self.assertEqual(pya.A.a0(), ac0 + 1)
+    self.assertEqual(pya.A.instance_count(), ic0 + 1)
     pya.A.a20(a)    
     self.assertEqual(pya.A.a20_get() == None, False)
     # release A instance -> will delete it
     a = None
-    self.assertEqual(pya.A.a0(), ac0)
+    self.assertEqual(pya.A.instance_count(), ic0)
     self.assertEqual(pya.A.a20_get() == None, True)
 
     a = pya.A()
     a._create()
     self.assertEqual(a.destroyed(), False)
-    self.assertEqual(pya.A.a0(), ac0 + 1)
+    self.assertEqual(pya.A.instance_count(), ic0 + 1)
     pya.A.a20(a)    # install static instance of A
     self.assertEqual(pya.A.a20_get() == None, False)
     a._unmanage()
     # release A instance -> won't delete it since it is unmanaged
     a = None
-    self.assertEqual(pya.A.a0(), ac0 + 1)
+    self.assertEqual(pya.A.instance_count(), ic0 + 1)
     self.assertEqual(pya.A.a20_get() == None, False)
 
     a = pya.A.a20_get()
     a._manage()
     # release A instance -> will be deleted since now it's managed again
     a = None
-    self.assertEqual(pya.A.a0(), ac0)
+    self.assertEqual(pya.A.instance_count(), ic0)
     self.assertEqual(pya.A.a20_get() == None, True)
 
   def test_28(self):

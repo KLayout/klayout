@@ -148,23 +148,25 @@ static void dump_recursive_nets_to_layout (const db::LayoutToNetlist &l2n, db::L
         continue;
       }
 
+      bool any = false;
+      for (std::map<const db::Region *, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end () && !any; ++m) {
+        any = !db::recursive_cluster_shape_iterator<db::PolygonRef> (l2n.net_clusters (), l2n.layer_of (*m->first), c->cell_index (), n->cluster_id ()).at_end ();
+      }
+
+      if (!any) {
+        continue;
+      }
+
       db::cell_index_type nci = std::numeric_limits<db::cell_index_type>::max ();
 
+      if (nci == std::numeric_limits<db::cell_index_type>::max ()) {
+        std::string nn = "RNET_" + c->name () + "_" + n->expanded_name ();
+        nci = ly.add_cell (nn.c_str ());
+        cell.insert (db::CellInstArray (db::CellInst (nci), db::Trans ()));
+      }
+
       for (std::map<const db::Region *, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
-
-        std::auto_ptr<db::Region> shapes (l2n.shapes_of_net (*n, *m->first, true));
-        if (shapes->empty ()) {
-          continue;
-        }
-
-        if (nci == std::numeric_limits<db::cell_index_type>::max ()) {
-          std::string nn = "RNET_" + c->name () + "_" + n->expanded_name ();
-          nci = ly.add_cell (nn.c_str ());
-          cell.insert (db::CellInstArray (db::CellInst (nci), db::Trans ()));
-        }
-
-        shapes->insert_into (&ly, nci, m->second);
-
+        l2n.shapes_of_net (*n, *m->first, true, ly.cell (nci).shapes (m->second));
       }
 
     }

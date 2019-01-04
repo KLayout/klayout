@@ -219,35 +219,69 @@ static void deliver_shape (const db::PolygonRef &pr, db::Region &region, const T
   }
 }
 
+template <class Tr>
+static void deliver_shape (const db::PolygonRef &pr, db::Shapes &shapes, const Tr &tr)
+{
+  if (pr.obj ().is_box ()) {
+    shapes.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
+  } else {
+    db::Layout *layout = shapes.layout ();
+    if (layout) {
+      shapes.insert (db::PolygonRef (pr.obj ().transformed (pr.trans ()).transformed (tr), layout->shape_repository ()));
+    } else {
+      shapes.insert (pr.obj ().transformed (pr.trans ()).transformed (tr));
+    }
+  }
+}
+
+template <class To>
+static void deliver_shapes_of_net_recursive (const db::NetlistExtractor &netex, const db::Net &net, unsigned int layer_id, To &to)
+{
+  const db::Circuit *circuit = net.circuit ();
+  tl_assert (circuit != 0);
+
+  db::cell_index_type ci = circuit->cell_index ();
+
+  for (db::recursive_cluster_shape_iterator<db::PolygonRef> rci (netex.clusters (), layer_id, ci, net.cluster_id ()); !rci.at_end (); ++rci) {
+    deliver_shape (*rci, to, rci.trans ());
+  }
+}
+
+template <class To>
+static void deliver_shapes_of_net_nonrecursive (const db::NetlistExtractor &netex, const db::Net &net, unsigned int layer_id, To &to)
+{
+  const db::Circuit *circuit = net.circuit ();
+  tl_assert (circuit != 0);
+
+  db::cell_index_type ci = circuit->cell_index ();
+
+  const db::local_cluster<db::PolygonRef> &lc = netex.clusters ().clusters_per_cell (ci).cluster_by_id (net.cluster_id ());
+
+  for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (layer_id); !s.at_end (); ++s) {
+    deliver_shape (*s, to, db::UnitTrans ());
+  }
+}
+
+void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to) const
+{
+  unsigned int lid = layer_of (of_layer);
+
+  if (! recursive) {
+    deliver_shapes_of_net_nonrecursive (m_netex, net, lid, to);
+  } else {
+    deliver_shapes_of_net_recursive (m_netex, net, lid, to);
+  }
+}
+
 db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive) const
 {
   unsigned int lid = layer_of (of_layer);
   std::auto_ptr<db::Region> res (new db::Region ());
 
   if (! recursive) {
-
-    const db::Circuit *circuit = net.circuit ();
-    tl_assert (circuit != 0);
-
-    db::cell_index_type ci = circuit->cell_index ();
-
-    const db::local_cluster<db::PolygonRef> &lc = m_netex.clusters ().clusters_per_cell (ci).cluster_by_id (net.cluster_id ());
-
-    for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (lid); !s.at_end (); ++s) {
-      deliver_shape (*s, *res, db::UnitTrans ());
-    }
-
+    deliver_shapes_of_net_nonrecursive (m_netex, net, lid, *res);
   } else {
-
-    const db::Circuit *circuit = net.circuit ();
-    tl_assert (circuit != 0);
-
-    db::cell_index_type ci = circuit->cell_index ();
-
-    for (db::recursive_cluster_shape_iterator<db::PolygonRef> rci (m_netex.clusters (), lid, ci, net.cluster_id ()); !rci.at_end (); ++rci) {
-      deliver_shape (*rci, *res, rci.trans ());
-    }
-
+    deliver_shapes_of_net_recursive (m_netex, net, lid, *res);
   }
 
   return res.release ();

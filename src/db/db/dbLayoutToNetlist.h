@@ -225,6 +225,17 @@ public:
   db::Region *shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive) const;
 
   /**
+   *  @brief Delivers all shapes of a specific net and layer to the given Shapes container.
+   *
+   *  If "recursive" is true, the returned region will contain the shapes of
+   *  all subcircuits too.
+   *
+   *  This methods returns a new'd Region. It's the responsibility of the caller
+   *  to delete this object.
+   */
+  void shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to) const;
+
+  /**
    *  @brief Finds the net by probing a specific location on the given layer
    *
    *  This method will find a net looking at the given layer at the specific position.

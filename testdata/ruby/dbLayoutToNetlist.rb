@@ -120,6 +120,12 @@ END
 
     assert_equal(l2n.shapes_of_net(n, rmetal1, true).to_s, "(1660,-420;1660,2420;2020,2420;2020,-420);(1840,820;1840,1180;3220,1180;3220,820);(1660,2420;1660,3180;2020,3180;2020,2420);(1660,-380;1660,380;2020,380;2020,-380)")
 
+    shapes = RBA::Shapes::new
+    l2n.shapes_of_net(n, rmetal1, true, shapes)
+    r = RBA::Region::new
+    shapes.each { |s| r.insert(s.polygon) }
+    assert_equal(r.to_s, "(1660,-420;1660,2420;2020,2420;2020,-420);(1840,820;1840,1180;3220,1180;3220,820);(1660,2420;1660,3180;2020,3180;2020,2420);(1660,-380;1660,380;2020,380;2020,-380)")
+
   end
   
   def test_10_LayoutToNetlistExtractionWithoutDevices

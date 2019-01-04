@@ -882,7 +882,7 @@ public:
   {
     std::vector<db::InstElement> p;
     db::ICplxTrans t;
-    add_pair (*i1, p, t, *i2, p, t);
+    add_pair (box_type::world (), *i1, p, t, *i2, p, t);
   }
 
   /**
@@ -955,7 +955,7 @@ private:
    *  @param p2 The instantiation path to the child cell (not including i2)
    *  @param t2 The accumulated transformation of the path, not including i2
    */
-  void add_pair (const db::Instance &i1, const std::vector<db::InstElement> &p1, const db::ICplxTrans &t1, const db::Instance &i2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
+  void add_pair (const box_type &common, const db::Instance &i1, const std::vector<db::InstElement> &p1, const db::ICplxTrans &t1, const db::Instance &i2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
   {
     box_type bb1 = (*mp_cbc) (i1.cell_index ());
     box_type b1 = i1.cell_inst ().bbox (*mp_cbc).transformed (t1);
@@ -963,16 +963,16 @@ private:
     box_type bb2 = (*mp_cbc) (i2.cell_index ());
     box_type b2 = i2.cell_inst ().bbox (*mp_cbc).transformed (t2);
 
-    if (! b1.touches (b2)) {
+    box_type common_all = common & b1 & b2;
+
+    if (common_all.empty ()) {
       return;
     }
 
     db::ICplxTrans t1i = t1.inverted ();
     db::ICplxTrans t2i = t2.inverted ();
 
-    box_type common = b1 & b2;
-
-    for (db::CellInstArray::iterator ii1 = i1.begin_touching (common.transformed (t1i), mp_layout); ! ii1.at_end (); ++ii1) {
+    for (db::CellInstArray::iterator ii1 = i1.begin_touching (common_all.transformed (t1i), mp_layout); ! ii1.at_end (); ++ii1) {
 
       db::ICplxTrans tt1 = t1 * i1.complex_trans (*ii1);
       box_type ib1 = bb1.transformed (tt1);
@@ -987,29 +987,37 @@ private:
         db::ICplxTrans tt2 = t2 * i2.complex_trans (*ii2);
         box_type ib2 = bb2.transformed (tt2);
 
-        if (ib1.touches (ib2)) {
+        box_type common12 = ib1 & ib2 & common;
+
+        if (! common12.empty ()) {
 
           std::vector<db::InstElement> pp2;
           pp2.reserve (p2.size () + 1);
           pp2.insert (pp2.end (), p2.begin (), p2.end ());
           pp2.push_back (db::InstElement (i2, ii2));
 
-          add_single_pair (common, i1.cell_index (), pp1, tt1, i2.cell_index (), pp2, tt2);
+          add_single_pair (common12, i1.cell_index (), pp1, tt1, i2.cell_index (), pp2, tt2);
 
           //  dive into cell of ii2
           const db::Cell &cell2 = mp_layout->cell (i2.cell_index ());
-          for (db::Cell::touching_iterator jj2 = cell2.begin_touching (common.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
-            add_pair (i1, p1, t1, *jj2, pp2, tt2);
+          for (db::Cell::touching_iterator jj2 = cell2.begin_touching (common12.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
+            add_pair (common12, i1, p1, t1, *jj2, pp2, tt2);
           }
 
         }
 
       }
 
-      //  dive into cell of ii1
-      const db::Cell &cell1 = mp_layout->cell (i1.cell_index ());
-      for (db::Cell::touching_iterator jj1 = cell1.begin_touching (common.transformed (tt1.inverted ())); ! jj1.at_end (); ++jj1) {
-        add_pair (*jj1, pp1, tt1, i2, p2, t2);
+      box_type common1 = ib1 & b2 & common;
+
+      if (! common1.empty ()) {
+
+        //  dive into cell of ii1
+        const db::Cell &cell1 = mp_layout->cell (i1.cell_index ());
+        for (db::Cell::touching_iterator jj1 = cell1.begin_touching (common1.transformed (tt1.inverted ())); ! jj1.at_end (); ++jj1) {
+          add_pair (common1, *jj1, pp1, tt1, i2, p2, t2);
+        }
+
       }
 
     }
@@ -1129,7 +1137,7 @@ private:
             for (db::Cell::touching_iterator jj2 = cell.begin_touching (common.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
               std::vector<db::InstElement> p;
               db::ICplxTrans t;
-              add_pair (i, p, t, *jj2, pp2, tt2);
+              add_pair (common, i, p, t, *jj2, pp2, tt2);
             }
           }
 
@@ -1171,14 +1179,12 @@ private:
       return;
     }
 
-    box_type common = b1 & b2;
-
     std::vector<db::InstElement> pp2;
     pp2.reserve (p2.size () + 1);
     pp2.insert (pp2.end (), p2.begin (), p2.end ());
     pp2.push_back (db::InstElement ());
 
-    for (db::CellInstArray::iterator ii2 = i2.begin_touching (common.transformed (t2.inverted ()), mp_layout); ! ii2.at_end (); ++ii2) {
+    for (db::CellInstArray::iterator ii2 = i2.begin_touching ((b1 & b2).transformed (t2.inverted ()), mp_layout); ! ii2.at_end (); ++ii2) {
 
       db::ICplxTrans tt2 = t2 * i2.complex_trans (*ii2);
       box_type ib2 = bb2.transformed (tt2);
@@ -1189,7 +1195,7 @@ private:
         add_single_pair (c1, i2.cell_index (), pp2, tt2);
 
         //  dive into cell of ii2
-        for (db::Cell::touching_iterator jj2 = cell2.begin_touching (common.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
+        for (db::Cell::touching_iterator jj2 = cell2.begin_touching ((b1 & ib2).transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
           add_pair (c1, *jj2, pp2, tt2);
         }
 

@@ -44,7 +44,7 @@ jobs:
       script: | # Required when targetType == Inline
         pwd
         dir
-        Invoke-WebRequest -Uri "https://www.dropbox.com/s/ioax2mnic4987kn/klayout-microbits-1.0.zip?dl=1" -MaximumRedirection 2 -OutFile klayout-microbits-1.0.zip
+        Invoke-WebRequest -Uri "https://dl.bintray.com/lightwave-lab/klayout/klayout-microbits-1.0.beta.zip" -MaximumRedirection 2 -OutFile klayout-microbits-1.0.beta.zip
         Expand-Archive klayout-microbits-1.0.zip -DestinationPath klayout-microbits
         dir klayout-microbits
       #errorActionPreference: 'stop' # Optional. Options: stop, continue, silentlyContinue

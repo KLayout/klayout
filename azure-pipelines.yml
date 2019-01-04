@@ -43,7 +43,7 @@ jobs:
       #arguments: # Optional
       script: | # Required when targetType == Inline
         pwd
-        Invoke-WebRequest -Uri "https://dl.bintray.com/lightwave-lab/klayout/klayout-microbits-1.0.beta.zip" -OutFile klayout-microbits-1.0.beta.zip
+        Invoke-WebRequest -Uri "https://dl.bintray.com/lightwave-lab/klayout/klayout-microbits-1.0.beta.zip" -OutFile klayout-microbits-1.0.zip
         dir
         Expand-Archive klayout-microbits-1.0.zip -DestinationPath klayout-microbits
         dir klayout-microbits

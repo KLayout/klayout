@@ -323,7 +323,7 @@ CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /
 
           db::CellInstArray bci = bi.cell_inst ();
           bci.object ().cell_index (new_cells [i]);
-          bci.transform_into (db::ICplxTrans (mag));
+          bci.transform_into (db::ICplxTrans (mag), &layout_a.array_repository ());
 
           if (bi.has_prop_id ()) {
             pa.insert (db::CellInstArrayWithProperties (bci, pm (bi.prop_id ())));

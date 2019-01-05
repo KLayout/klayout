@@ -498,3 +498,40 @@ TEST(6_DisjunctLayersPerHierarchyBranch)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au_l4.gds");
 }
 
+TEST(7_DetachFromOriginalLayout)
+{
+  //  using OASIS means we create a lot of references to array
+  //  and shape repo - we check here whether these references get
+  //  translated or resolved in the hierarchy builder.
+  std::auto_ptr<db::Layout> ly (new db::Layout (false));
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/hierarchy_builder_l5.oas.gz";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (*ly);
+  }
+
+  db::Layout target;
+  db::HierarchyBuilder builder (&target);
+
+  for (db::Layout::layer_iterator li = ly->begin_layers (); li != ly->end_layers (); ++li) {
+
+    unsigned int li1 = (*li).first;
+    unsigned int target_layer = target.insert_layer (*(*li).second);
+    builder.set_target_layer (target_layer);
+
+    db::cell_index_type top_cell_index = *ly->begin_top_down ();
+    db::RecursiveShapeIterator iter (*ly, ly->cell (top_cell_index), li1);
+
+    iter.push (&builder);
+
+  }
+
+  //  make sure there is no connection to original layout
+  ly.reset (0);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au_l5.gds");
+}
+

@@ -242,7 +242,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
 
     //  for new cells, create this instance
     if (m_cell_stack.back ().first) {
-      db::CellInstArray new_inst = inst;
+      db::CellInstArray new_inst (inst, &mp_target->array_repository ());
       new_inst.object () = db::CellInst (m_cm_entry->second);
       m_cell_stack.back ().second->insert (new_inst);
     }

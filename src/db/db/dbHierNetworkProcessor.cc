@@ -1206,7 +1206,7 @@ private:
     db::ICplxTrans t2i = t2 * i2.complex_trans ();
     const db::Cell &cell2 = mp_layout->cell (i2.cell_index ());
 
-    box_type b2 = cell2.bbox ().transformed (t2i);
+    box_type b2 = i2.cell_inst ().bbox (*mp_cbc).transformed (t2);
 
     if (! b1.touches (b2) || ! c1.interacts (cell2, t2i, *mp_conn)) {
       return;

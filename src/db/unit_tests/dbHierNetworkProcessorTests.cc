@@ -1021,3 +1021,9 @@ TEST(113_HierClusters)
   run_hc_test_with_backannotation (_this, "hc_test_l13.gds", "hc_test_au13b.gds");
 }
 
+TEST(114_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l14.gds", "hc_test_au14.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l14.gds", "hc_test_au14b.gds");
+}
+

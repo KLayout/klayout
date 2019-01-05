@@ -1203,12 +1203,11 @@ private:
 
     box_type bb2 = (*mp_cbc) (i2.cell_index ());
 
-    db::ICplxTrans t2i = t2 * i2.complex_trans ();
     const db::Cell &cell2 = mp_layout->cell (i2.cell_index ());
 
     box_type b2 = i2.cell_inst ().bbox (*mp_cbc).transformed (t2);
 
-    if (! b1.touches (b2) || ! c1.interacts (cell2, t2i, *mp_conn)) {
+    if (! b1.touches (b2)) {
       return;
     }
 
@@ -1222,7 +1221,7 @@ private:
       db::ICplxTrans tt2 = t2 * i2.complex_trans (*ii2);
       box_type ib2 = bb2.transformed (tt2);
 
-      if (b1.touches (ib2)) {
+      if (b1.touches (ib2) && c1.interacts (cell2, tt2, *mp_conn)) {
 
         pp2.back () = db::InstElement (i2, ii2);
         add_single_pair (c1, i2.cell_index (), pp2, tt2);

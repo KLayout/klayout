@@ -338,13 +338,13 @@ NetTracerSymbolInfo::parse (tl::Extractor &ex)
 // -----------------------------------------------------------------------------------
 //  Net implementation
 
-Net::Net ()
+NetTracerNet::NetTracerNet ()
   : m_dbu (0.001), m_incomplete (true), m_trace_path (false)
 {
   //  .. nothing yet ..
 }
 
-Net::Net (const NetTracer &tracer, const db::ICplxTrans &trans, const db::Layout &layout, db::cell_index_type cell_index, const std::string &layout_filename, const std::string &layout_name, const NetTracerData &data)
+NetTracerNet::NetTracerNet (const NetTracer &tracer, const db::ICplxTrans &trans, const db::Layout &layout, db::cell_index_type cell_index, const std::string &layout_filename, const std::string &layout_name, const NetTracerData &data)
   : m_name (tracer.name ()), m_incomplete (tracer.incomplete ()), m_trace_path (false)
 {
   m_dbu = layout.dbu ();
@@ -406,7 +406,7 @@ Net::Net (const NetTracer &tracer, const db::ICplxTrans &trans, const db::Layout
 }
 
 std::vector<unsigned int>
-Net::export_net (db::Layout &layout, db::Cell &export_cell)
+NetTracerNet::export_net (db::Layout &layout, db::Cell &export_cell)
 {
   std::vector<unsigned int> new_layers;
   std::map<unsigned int, unsigned int> layer_map;
@@ -446,7 +446,7 @@ Net::export_net (db::Layout &layout, db::Cell &export_cell)
 }
 
 const std::string &
-Net::cell_name (db::cell_index_type cell_index) const
+NetTracerNet::cell_name (db::cell_index_type cell_index) const
 {
   std::map <unsigned int, std::string>::const_iterator cn = m_cell_names.find (cell_index);
   if (cn != m_cell_names.end ()) {
@@ -458,7 +458,7 @@ Net::cell_name (db::cell_index_type cell_index) const
 }
 
 db::LayerProperties
-Net::representative_layer_for (unsigned int log_layer) const
+NetTracerNet::representative_layer_for (unsigned int log_layer) const
 {
   std::map <unsigned int, std::pair <db::LayerProperties, db::LayerProperties> >::const_iterator l = m_layers.find (log_layer);
   if (l != m_layers.end ()) {
@@ -469,7 +469,7 @@ Net::representative_layer_for (unsigned int log_layer) const
 }
 
 db::LayerProperties
-Net::layer_for (unsigned int log_layer) const
+NetTracerNet::layer_for (unsigned int log_layer) const
 {
   std::map <unsigned int, std::pair <db::LayerProperties, db::LayerProperties> >::const_iterator l = m_layers.find (log_layer);
   if (l != m_layers.end ()) {
@@ -480,7 +480,7 @@ Net::layer_for (unsigned int log_layer) const
 }
 
 void
-Net::define_layer (unsigned int l, const db::LayerProperties &lp, const db::LayerProperties &lp_representative)
+NetTracerNet::define_layer (unsigned int l, const db::LayerProperties &lp, const db::LayerProperties &lp_representative)
 {
   m_layers.insert (std::make_pair (l, std::make_pair (lp, lp_representative)));
 }

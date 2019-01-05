@@ -157,7 +157,7 @@ private:
   std::string m_expression;
 };
 
-class DB_PLUGIN_PUBLIC Net
+class DB_PLUGIN_PUBLIC NetTracerNet
 {
 public:
   typedef std::vector <db::NetTracerShape>::const_iterator iterator;
@@ -165,12 +165,12 @@ public:
   /**
    *  @brief Default constructor
    */
-  Net ();
+  NetTracerNet ();
 
   /**
    *  @brief Constructor
    */
-  Net (const db::NetTracer &tracer, const db::ICplxTrans &trans, const db::Layout &layout, db::cell_index_type cell_index, const std::string &layout_filename, const std::string &layout_name, const db::NetTracerData &data);
+  NetTracerNet (const db::NetTracer &tracer, const db::ICplxTrans &trans, const db::Layout &layout, db::cell_index_type cell_index, const std::string &layout_filename, const std::string &layout_name, const db::NetTracerData &data);
 
   /**
    *  @brief Iterate the shapes (begin)

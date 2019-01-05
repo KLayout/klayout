@@ -76,18 +76,18 @@ static db::NetTracerShape find_shape (const db::Layout &layout, const db::Cell &
 }
 #endif
 
-static db::Net trace (db::NetTracer &tracer, const db::Layout &layout, const db::Cell &cell, const db::NetTracerTechnologyComponent &tc, unsigned int l_start, const db::Point &p_start)
+static db::NetTracerNet trace (db::NetTracer &tracer, const db::Layout &layout, const db::Cell &cell, const db::NetTracerTechnologyComponent &tc, unsigned int l_start, const db::Point &p_start)
 {
   db::NetTracerData tracer_data = tc.get_tracer_data (layout);
   tracer.trace (layout, cell, p_start, l_start, tracer_data);
-  return db::Net (tracer, db::ICplxTrans (), layout, cell.cell_index (), std::string (), std::string (), tracer_data);
+  return db::NetTracerNet (tracer, db::ICplxTrans (), layout, cell.cell_index (), std::string (), std::string (), tracer_data);
 }
 
-static db::Net trace (db::NetTracer &tracer, const db::Layout &layout, const db::Cell &cell, const db::NetTracerTechnologyComponent &tc, unsigned int l_start, const db::Point &p_start, unsigned int l_stop, const db::Point &p_stop)
+static db::NetTracerNet trace (db::NetTracer &tracer, const db::Layout &layout, const db::Cell &cell, const db::NetTracerTechnologyComponent &tc, unsigned int l_start, const db::Point &p_start, unsigned int l_stop, const db::Point &p_stop)
 {
   db::NetTracerData tracer_data = tc.get_tracer_data (layout);
   tracer.trace (layout, cell, p_start, l_start, p_stop, l_stop, tracer_data);
-  return db::Net (tracer, db::ICplxTrans (), layout, cell.cell_index (), std::string (), std::string (), tracer_data);
+  return db::NetTracerNet (tracer, db::ICplxTrans (), layout, cell.cell_index (), std::string (), std::string (), tracer_data);
 }
 
 void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracerTechnologyComponent &tc, const db::LayerProperties &lp_start, const db::Point &p_start, const std::string &file_au, const char *net_name = 0)
@@ -107,7 +107,7 @@ void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracer
   const db::Cell &cell = layout_org.cell (*layout_org.begin_top_down ());
 
   db::NetTracer tracer;
-  db::Net net = trace (tracer, layout_org, cell, tc, layer_for (layout_org, lp_start), p_start);
+  db::NetTracerNet net = trace (tracer, layout_org, cell, tc, layer_for (layout_org, lp_start), p_start);
 
   if (net_name) {
     EXPECT_EQ (net.name (), std::string (net_name));
@@ -141,7 +141,7 @@ void run_test2 (tl::TestBase *_this, const std::string &file, const db::NetTrace
   const db::Cell &cell = layout_org.cell (*layout_org.begin_top_down ());
 
   db::NetTracer tracer;
-  db::Net net = trace (tracer, layout_org, cell, tc, layer_for (layout_org, lp_start), p_start, layer_for (layout_org, lp_stop), p_stop);
+  db::NetTracerNet net = trace (tracer, layout_org, cell, tc, layer_for (layout_org, lp_start), p_start, layer_for (layout_org, lp_stop), p_stop);
 
   if (net_name) {
     EXPECT_EQ (net.name (), std::string (net_name));

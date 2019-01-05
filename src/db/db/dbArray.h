@@ -87,6 +87,17 @@ struct ArrayBase
     //  .. nothing yet ..
   }
 
+  ArrayBase (const ArrayBase &)
+    : in_repository (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  ArrayBase &operator= (const ArrayBase &)
+  {
+    return *this;
+  }
+
   virtual ~ArrayBase ()
   {
     //  .. nothing yet ..

@@ -427,3 +427,29 @@ TEST(5)
   EXPECT_EQ (l2s (hh), "a0top#0:cell_index=4 r90 0,0 array=(0,10,10,0 5x1),cell_index=5 r90 0,0 array=(0,10,10,0 5x2),cell_index=1 r0 10,0,cell_index=6 r90 0,0 array=(0,20,20,0 5x2),cell_index=7 r90 0,0 array=(0,20,20,0 5x2);a1#1:cell_index=2 r0 0,0,cell_index=2 r0 0,20,cell_index=3 r0 0,40;a2#2:cell_index=3 r0 0,0,cell_index=3 r0 0,10;a3#3:cell_index=4 r90 0,0;a4#4:;a5#5:;a4$1#6:;a5$1#7:");
 }
 
+//  Resolution of array references
+TEST(6)
+{
+  std::auto_ptr<db::Layout> g (new db::Layout ());
+  db::Cell &a0 (g->cell (g->add_cell ("a0")));
+  db::Cell *a4p, *a5p;
+  a4p = &(g->cell (g->add_cell ("a4")));
+  a5p = &(g->cell (g->add_cell ("a5")));
+  db::Cell &a4 (*a4p);
+  db::Cell &a5 (*a5p);
+
+  a0.insert (db::CellInstArray (db::CellInst (a4.cell_index ()), db::Trans (1/*r90*/), g->array_repository (), db::Vector(0, 10), db::Vector(10, 0), 5, 2));
+  a0.insert (db::CellInstArray (db::CellInst (a5.cell_index ()), db::Trans (1/*r90*/), g->array_repository (), db::Vector(0, 10), db::Vector(10, 0), 5, 2));
+
+  db::Layout h;
+  db::Cell &b0 (h.cell (h.add_cell ("a0top")));
+
+  db::CellMapping cm;
+  cm.create_single_mapping_full (h, b0.cell_index (), *g, a0.cell_index ());
+  EXPECT_EQ (m2s (cm, *g, h), "a0->a0top;a4->a4;a5->a5");
+
+  g.reset (0);
+
+  EXPECT_EQ (l2s (h), "a0top#0:cell_index=1 r90 0,0 array=(0,10,10,0 5x2),cell_index=2 r90 0,0 array=(0,10,10,0 5x2);a4#1:;a5#2:");
+}
+

@@ -64,7 +64,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
     circuits.insert (std::make_pair (c->cell_index (), c.operator-> ()));
   }
 
-  std::map<db::cell_index_type, std::map<size_t, size_t> > pins_per_cluster;
+  std::map<db::cell_index_type, std::map<size_t, size_t> > pins_per_cluster_per_cell;
+  std::map<db::cell_index_type, std::map<size_t, db::Net *> > global_nets_per_cell;
 
   for (db::Layout::bottom_up_const_iterator cid = layout.begin_bottom_up (); cid != layout.end_bottom_up (); ++cid) {
 
@@ -88,7 +89,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
       circuit = k->second;
     }
 
-    std::map<size_t, size_t> &c2p = pins_per_cluster [*cid];
+    std::map<size_t, db::Net *> &global_nets = global_nets_per_cell [*cid];
+    std::map<size_t, size_t> &c2p = pins_per_cluster_per_cell [*cid];
 
     std::map<db::InstElement, db::SubCircuit *> subcircuits;
 
@@ -98,8 +100,19 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
       net->set_cluster_id (*c);
       circuit->add_net (net);
 
+      //  make global net connections for clusters which connect to such
+      std::set<size_t> global_net_ids;
+      std::vector<unsigned int> layers = clusters.cluster_by_id (*c).layers ();
+      for (std::vector<unsigned int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+        global_net_ids.insert (conn.begin_global_connections (*l), conn.end_global_connections (*l));
+      }
+      for (std::set<size_t>::const_iterator g = global_net_ids.begin (); g != global_net_ids.end (); ++g) {
+        global_nets.insert (std::make_pair (*g, net));
+        assign_net_name (conn.global_net_name (*g), net);
+      }
+
       //  make subcircuit connections (also make the subcircuits if required) from the connections of the clusters
-      make_and_connect_subcircuits (circuit, clusters, *c, net, subcircuits, circuits, pins_per_cluster, layout.dbu ());
+      make_and_connect_subcircuits (circuit, clusters, *c, net, subcircuits, circuits, pins_per_cluster_per_cell, layout.dbu ());
 
       //  collect the properties - we know that the cluster attributes are property ID's because the
       //  cluster processor converts shape property IDs to attributes
@@ -110,7 +123,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
           if (terminal_annot_name_id.first && j->first == terminal_annot_name_id.second) {
             make_device_terminal_from_property (j->second, circuit, net);
           } else if (text_annot_name_id.first && j->first == text_annot_name_id.second) {
-            make_net_name_from_property (j->second, net);
+            assign_net_name (j->second.to_string (), net);
           }
         }
       }
@@ -119,6 +132,49 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
         //  a non-root cluster makes a pin
         size_t pin_id = make_pin (circuit, net);
         c2p.insert (std::make_pair (*c, pin_id));
+      }
+
+    }
+
+    //  make global net connections for devices
+    for (db::Circuit::device_iterator d = circuit->begin_devices (); d != circuit->end_devices (); ++d) {
+
+      for (db::Device::global_connections_iterator g = d->begin_global_connections (); g != d->end_global_connections (); ++g) {
+
+        db::Net *&net = global_nets [g->second];
+        if (! net) {
+          net = new db::Net (conn.global_net_name (g->second));
+          circuit->add_net (net);
+        }
+
+        net->add_terminal (db::NetTerminalRef (d.operator-> (), g->first));
+
+      }
+
+    }
+
+    //  make the global net connections into subcircuits - if necessary by creating pins into the subcircuit
+    for (db::Circuit::subcircuit_iterator sc = circuit->begin_subcircuits (); sc != circuit->end_subcircuits (); ++sc) {
+
+      db::Circuit *subcircuit = sc->circuit_ref ();
+
+      const std::map<size_t, db::Net *> &sc_gn = global_nets_per_cell [subcircuit->cell_index ()];
+      for (std::map<size_t, db::Net *>::const_iterator g = global_nets.begin (); g != global_nets.end (); ++g) {
+
+        std::map<size_t, db::Net *>::const_iterator gg = sc_gn.find (g->first);
+        if (gg != sc_gn.end ()) {
+
+          size_t pin_id = 0;
+          if (gg->second->pin_count () > 0) {
+            pin_id = gg->second->begin_pins ()->pin_id ();
+          } else {
+            pin_id = subcircuit->add_pin (conn.global_net_name (gg->first)).id ();
+            subcircuit->connect_pin (pin_id, gg->second);
+          }
+          g->second->add_subcircuit_pin (db::NetSubcircuitPinRef (sc.operator-> (), pin_id));
+
+        }
+
       }
 
     }
@@ -192,14 +248,14 @@ void NetlistExtractor::make_device_terminal_from_property (const tl::Variant &v,
   }
 }
 
-void NetlistExtractor::make_net_name_from_property (const tl::Variant &v, db::Net *net)
+void NetlistExtractor::assign_net_name (const std::string &n, db::Net *net)
 {
-  std::string n = v.to_string ();
-  if (! n.empty ()) {
+  std::string nn = n;
+  if (! nn.empty ()) {
     if (! net->name ().empty ()) {
-      n = net->name () + "," + n;
+      nn = net->name () + "," + nn;
     }
-    net->set_name (n);
+    net->set_name (nn);
   }
 }
 

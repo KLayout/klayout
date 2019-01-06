@@ -113,8 +113,22 @@ const Net *Device::net_for_terminal (size_t terminal_id) const
   return 0;
 }
 
+void Device::connect_terminal_global (size_t terminal_id, size_t global_net_id)
+{
+  connect_terminal (terminal_id, 0);
+  m_global_connections.push_back (std::make_pair (terminal_id, global_net_id));
+}
+
 void Device::connect_terminal (size_t terminal_id, Net *net)
 {
+  for (size_t i = 0; i < m_global_connections.size (); ) {
+    if (m_global_connections [i].first == terminal_id) {
+      m_global_connections.erase (m_global_connections.begin () + i);
+    } else {
+      ++i;
+    }
+  }
+
   if (net_for_terminal (terminal_id) == net) {
     return;
   }

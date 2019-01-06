@@ -61,6 +61,10 @@ class DBLayoutToNetlist_TestClass < TestBase
       assert_equal(l2n.internal_layout.cell(ci).name, ly2.cell(cm.cell_mapping(ci)).name)
     end
 
+    rmetal1 = l2n.make_polygon_layer( ly.layer(6, 0) )
+    bulk_id = l2n.connect_global(rmetal1, "BULK")
+    assert_equal(l2n.global_net_name(bulk_id), "BULK")
+
   end
 
   def test_2_ShapesFromNet

@@ -95,7 +95,7 @@ private:
   hier_clusters_type m_net_clusters;
 
   void make_device_terminal_from_property (const tl::Variant &v, db::Circuit *circuit, db::Net *net);
-  void make_net_name_from_property (const tl::Variant &v, db::Net *net);
+  void assign_net_name (const std::string &n, db::Net *net);
 
   /**
    *  @brief Make a pin connection from clusters

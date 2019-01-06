@@ -77,6 +77,60 @@ Connectivity::connect (const db::DeepLayer &la, const db::DeepLayer &lb)
   connect (la.layer (), lb.layer ());
 }
 
+Connectivity::global_nets_type s_empty_global_nets;
+
+Connectivity::global_nets_iterator
+Connectivity::begin_global_connections (unsigned int l) const
+{
+  std::map<unsigned int, global_nets_type>::const_iterator g = m_global_connections.find (l);
+  if (g != m_global_connections.end ()) {
+    return g->second.begin ();
+  } else {
+    return s_empty_global_nets.begin ();
+  }
+}
+
+Connectivity::global_nets_iterator
+Connectivity::end_global_connections (unsigned int l) const
+{
+  std::map<unsigned int, global_nets_type>::const_iterator g = m_global_connections.find (l);
+  if (g != m_global_connections.end ()) {
+    return g->second.end ();
+  } else {
+    return s_empty_global_nets.end ();
+  }
+}
+
+size_t
+Connectivity::connect_global (unsigned int l, const std::string &gn)
+{
+  for (std::vector<std::string>::const_iterator i = m_global_net_names.begin (); i != m_global_net_names.end (); ++i) {
+    if (*i == gn) {
+      size_t id = i - m_global_net_names.begin ();
+      m_global_connections [l].insert (id);
+      return id;
+    }
+  }
+
+  size_t id = m_global_net_names.size ();
+  m_global_connections [l].insert (id);
+  m_global_net_names.push_back (gn);
+  return id;
+}
+
+size_t
+Connectivity::connect_global (const db::DeepLayer &l, const std::string &gn)
+{
+  return connect_global (l.layer (), gn);
+}
+
+const std::string &
+Connectivity::global_net_name (size_t id) const
+{
+  tl_assert (id < m_global_net_names.size ());
+  return m_global_net_names [id];
+}
+
 Connectivity::layer_iterator
 Connectivity::begin_layers () const
 {

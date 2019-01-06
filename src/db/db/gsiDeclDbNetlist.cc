@@ -61,6 +61,44 @@ static void device_disconnect_terminal_by_name (db::Device *device, const std::s
   device_connect_terminal_by_name (device, terminal_name, 0);
 }
 
+static tl::Variant device_terminal_for_global_net (const db::Device *device, size_t global_net)
+{
+  for (db::Device::global_connections_iterator g = device->begin_global_connections (); g != device->end_global_connections (); ++g) {
+    if (g->second == global_net) {
+      return tl::Variant (g->first);
+    }
+  }
+  return tl::Variant ();
+}
+
+static tl::Variant device_global_net_for_terminal (const db::Device *device, size_t terminal_id)
+{
+  for (db::Device::global_connections_iterator g = device->begin_global_connections (); g != device->end_global_connections (); ++g) {
+    if (g->first == terminal_id) {
+      return tl::Variant (g->second);
+    }
+  }
+  return tl::Variant ();
+}
+
+static tl::Variant device_global_net_for_terminal_name (const db::Device *device, const std::string &terminal_name)
+{
+  if (! device->device_class ()) {
+    throw tl::Exception (tl::to_string (tr ("Device does not have a device class")));
+  }
+  size_t terminal_id = device->device_class ()->terminal_id_for_name (terminal_name);
+  return device_global_net_for_terminal (device, terminal_id);
+}
+
+static void device_connect_terminal_global_by_name (db::Device *device, const std::string &terminal_name, size_t global_net)
+{
+  if (! device->device_class ()) {
+    throw tl::Exception (tl::to_string (tr ("Device does not have a device class")));
+  }
+  size_t terminal_id = device->device_class ()->terminal_id_for_name (terminal_name);
+  device->connect_terminal_global (terminal_id, global_net);
+}
+
 Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
@@ -91,14 +129,36 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   ) +
   gsi::method_ext ("disconnect_terminal", &device_disconnect_terminal, gsi::arg ("terminal_id"),
     "@brief Disconnects the given terminal from any net.\n"
+    "If the terminal has been connected to a global, this connection will be disconnected too."
   ) +
   gsi::method_ext ("connect_terminal", &device_connect_terminal_by_name, gsi::arg ("terminal_name"), gsi::arg ("net"),
     "@brief Connects the given terminal to the specified net.\n"
-    "This version accepts a terminal name. If the name is not a valid terminal name, an exception is raised."
+    "This version accepts a terminal name. If the name is not a valid terminal name, an exception is raised.\n"
+    "If the terminal has been connected to a global net, it will be disconnected from there."
   ) +
   gsi::method_ext ("disconnect_terminal", &device_disconnect_terminal_by_name, gsi::arg ("terminal_name"),
     "@brief Disconnects the given terminal from any net.\n"
     "This version accepts a terminal name. If the name is not a valid terminal name, an exception is raised."
+  ) +
+  gsi::method ("connect_terminal_global", &db::Device::connect_terminal_global, gsi::arg ("terminal_id"), gsi::arg ("global_net_id"),
+    "@brief Connects the given terminal to the given global net.\n"
+    "The global net ID is taken from \\Connectivity (connect_global, etc.).\n"
+    "If the terminal was already connected to another net, it will be disconnected from there."
+  ) +
+  gsi::method_ext ("connect_terminal_global", &device_connect_terminal_global_by_name, gsi::arg ("terminal_name"), gsi::arg ("global_net_id"),
+    "@brief Connects the given terminal to the given global net.\n"
+    "This version accepts a terminal name. If the name is not a valid terminal name, an exception is raised."
+  ) +
+  gsi::method_ext ("terminal_on_global_net", &device_terminal_for_global_net, gsi::arg ("global_net_id"),
+    "@brief Gets the terminal ID for the given global net or nil if no terminal is not that global net.\n"
+    "The global net ID is managed by the \\Connectivity object."
+  ) +
+  gsi::method_ext ("global_net_on_terminal", &device_global_net_for_terminal, gsi::arg ("terminal_id"),
+    "@brief Gets the global net ID for the given terminal ID or nil if the terminal is not connected to a global net.\n"
+  ) +
+  gsi::method_ext ("global_net_on_terminal", &device_global_net_for_terminal_name, gsi::arg ("terminal_name"),
+    "@brief Gets the global net ID for the given terminal name or nil if the terminal is not connected to a global net.\n"
+    "If the name is not a valid terminal name, an exception is raised."
   ) +
   gsi::method ("parameter", (double (db::Device::*) (size_t) const) &db::Device::parameter_value, gsi::arg ("param_id"),
     "@brief Gets the parameter value for the given parameter ID."

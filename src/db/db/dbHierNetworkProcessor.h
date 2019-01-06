@@ -52,6 +52,8 @@ class DB_PUBLIC Connectivity
 public:
   typedef std::set<unsigned int> layers_type;
   typedef layers_type::const_iterator layer_iterator;
+  typedef std::set<size_t> global_nets_type;
+  typedef global_nets_type::const_iterator global_nets_iterator;
 
   /**
    *  @brief Creates a connectivity object without any connections
@@ -69,6 +71,11 @@ public:
   void connect (unsigned int la, unsigned int lb);
 
   /**
+   *  @brief Adds a connection to a global net
+   */
+  size_t connect_global (unsigned int l, const std::string &gn);
+
+  /**
    *  @brief Adds intra-layer connectivity for layer l
    *  This is a convenience method that takes a db::DeepLayer object.
    *  It is assumed that all those layers originate from the same deep shape store.
@@ -81,6 +88,16 @@ public:
    *  It is assumed that all those layers originate from the same deep shape store.
    */
   void connect (const db::DeepLayer &la, const db::DeepLayer &lb);
+
+  /**
+   *  @brief Adds a connection to a global net
+   */
+  size_t connect_global (const db::DeepLayer &la, const std::string &gn);
+
+  /**
+   *  @brief Gets the global net name per ID
+   */
+  const std::string &global_net_name (size_t id) const;
 
   /**
    *  @brief Begin iterator for the layers involved
@@ -103,6 +120,16 @@ public:
   layer_iterator end_connected (unsigned int layer) const;
 
   /**
+   *  @brief Begin iterator for the global connections for a specific layer
+   */
+  global_nets_iterator begin_global_connections (unsigned int layer) const;
+
+  /**
+   *  @brief End iterator for the layers connected to a specific layer
+   */
+  global_nets_iterator end_global_connections (unsigned int layer) const;
+
+  /**
    *  @brief Returns true, if the given shapes on the given layers interact
    *
    *  This method accepts a transformation. This transformation is applied
@@ -123,6 +150,8 @@ public:
 private:
   layers_type m_all_layers;
   std::map<unsigned int, layers_type> m_connected;
+  std::vector<std::string> m_global_net_names;
+  std::map<unsigned int, global_nets_type> m_global_connections;
 };
 
 /**

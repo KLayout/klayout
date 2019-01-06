@@ -166,6 +166,17 @@ public:
   void connect (const db::Region &a, const db::Region &b);
 
   /**
+   *  @brief Connects the given layer with a global net with the given name
+   *  Returns the global net ID
+   */
+  size_t connect_global (const db::Region &l, const std::string &gn);
+
+  /**
+   *  @brief Gets the global net name for a given global net ID
+   */
+  const std::string &global_net_name (size_t id) const;
+
+  /**
    *  @brief Runs the netlist extraction
    *  See the class description for more details.
    */

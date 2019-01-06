@@ -74,7 +74,6 @@ TEST(1_DeviceTerminalDefinition)
 
   dc.clear_parameter_definitions ();
   EXPECT_EQ (dc.parameter_definitions ().empty (), true);
-
 }
 
 TEST(2_DeviceClass)
@@ -1024,4 +1023,54 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (nl->top_circuit_count (), size_t (1));
   EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
   EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
+}
+
+TEST(13_DeviceGlobalNets)
+{
+  db::DeviceTerminalDefinition pd;
+  pd.set_name ("name");
+  pd.set_description ("nothing yet");
+
+  db::DeviceTerminalDefinition pd2;
+  pd2.set_name ("name2");
+  pd2.set_description ("now it has something");
+
+  db::DeviceClass dc;
+  dc.set_name ("devname");
+  dc.set_description ("devdesc");
+  dc.add_terminal_definition (pd);
+  dc.add_terminal_definition (pd2);
+
+  db::Device d (&dc);
+  db::Net n;
+
+  d.connect_terminal_global (0, 17);
+
+  db::Device::global_connections_iterator g;
+
+  g = d.begin_global_connections ();
+  EXPECT_EQ (g != d.end_global_connections (), true);
+  EXPECT_EQ (g->first, size_t (0));
+  EXPECT_EQ (g->second, size_t (17));
+
+  ++g;
+  EXPECT_EQ (g == d.end_global_connections (), true);
+
+  d.connect_terminal (0, &n);
+  g = d.begin_global_connections ();
+  EXPECT_EQ (g == d.end_global_connections (), true);
+  EXPECT_EQ (d.net_for_terminal (0) == &n, true);
+
+  d.connect_terminal_global (0, 17);
+  EXPECT_EQ (d.net_for_terminal (0) == 0, true);
+
+  g = d.begin_global_connections ();
+  EXPECT_EQ (g != d.end_global_connections (), true);
+  EXPECT_EQ (g->first, size_t (0));
+  EXPECT_EQ (g->second, size_t (17));
+
+  d.connect_terminal (0, 0);
+  g = d.begin_global_connections ();
+  EXPECT_EQ (g == d.end_global_connections (), true);
+  EXPECT_EQ (d.net_for_terminal (0) == 0, true);
 }

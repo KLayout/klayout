@@ -32,6 +32,13 @@ Class<db::Connectivity> decl_dbConnectivity ("db", "Connectivity",
   ) +
   gsi::method ("connect", (void (db::Connectivity::*) (unsigned int, unsigned int)) &db::Connectivity::connect, gsi::arg ("layer_a"), gsi::arg ("layer_b"),
     "@brief Specifies inter-layer connectivity.\n"
+  ) +
+  gsi::method ("connect_global", (size_t (db::Connectivity::*) (unsigned int, const std::string &)) &db::Connectivity::connect_global, gsi::arg ("layer"), gsi::arg ("global_net_name"),
+    "@brief Connects the given layer to the global net given by name.\n"
+    "Returns the ID of the global net."
+  ) +
+  gsi::method ("global", &db::Connectivity::global_net_name, gsi::arg ("global_net_id"),
+    "@brief Gets the name for a given global net ID.\n"
   ),
   "@brief This class specifies connections between different layers."
   "Connections are build using \\connect. There are basically two flavours of connections: intra-layer and inter-layer.\n"
@@ -44,6 +51,11 @@ Class<db::Connectivity> decl_dbConnectivity ("db", "Connectivity",
   "their layers are specified as being connected through inter-layer \\connect.\n"
   "\n"
   "All layers are specified in terms of layer indexes. Layer indexes are layout layer indexes (see \\Layout class).\n"
+  "\n"
+  "The connectivity object also manages the global nets. Global nets are substrate for example "
+  "and they are propagated automatically from subcircuits to circuits. "
+  "Global nets are defined by name and are managed through IDs. To get the name for a given ID, use "
+  "\\global_net_name."
   "\n"
   "This class has been introduced in version 0.26.\n"
 );

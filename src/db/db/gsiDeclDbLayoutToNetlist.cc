@@ -123,6 +123,14 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Defines an inter-layer connection for the given layers.\n"
     "The conditions mentioned with intra-layer \\connect apply for this method too.\n"
   ) +
+  gsi::method ("connect_global", (void (db::LayoutToNetlist::*) (const db::Region &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
+    "@brief Defines a connection of the given layer with a global net.\n"
+    "This method returns the ID of the global net. Use \\global_net_name to get "
+    "the name back from the ID."
+  ) +
+  gsi::method ("global_net_name", &db::LayoutToNetlist::global_net_name, gsi::arg ("global_net_id"),
+    "@brief Gets the global net name for the given global net ID."
+  ) +
   gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist,
     "@brief Runs the netlist extraction\n"
     "See the class description for more details.\n"

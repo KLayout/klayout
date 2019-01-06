@@ -44,6 +44,18 @@ static std::string l2s (db::Connectivity::layer_iterator b, db::Connectivity::la
   return s;
 }
 
+static std::string gn2s (db::Connectivity::global_nets_iterator b, db::Connectivity::global_nets_iterator e)
+{
+  std::string s;
+  for (db::Connectivity::global_nets_iterator i = b; i != e; ++i) {
+    if (! s.empty ()) {
+      s += ",";
+    }
+    s += tl::to_string (*i);
+  }
+  return s;
+}
+
 TEST(1_Connectivity)
 {
   db::Connectivity conn;
@@ -69,6 +81,27 @@ TEST(1_Connectivity)
   EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0,1,2");
   EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0,1");
   EXPECT_EQ (l2s (conn.begin_connected (2), conn.end_connected (2)), "0,2");
+
+  EXPECT_EQ (conn.connect_global (0, "GLOBAL"), size_t (0));
+  EXPECT_EQ (gn2s (conn.begin_global_connections (2), conn.end_global_connections (2)), "");
+  EXPECT_EQ (gn2s (conn.begin_global_connections (0), conn.end_global_connections (0)), "0");
+  EXPECT_EQ (conn.connect_global (2, "GLOBAL2"), size_t (1));
+  EXPECT_EQ (gn2s (conn.begin_global_connections (2), conn.end_global_connections (2)), "1");
+  EXPECT_EQ (conn.connect_global (0, "GLOBAL2"), size_t (1));
+  EXPECT_EQ (gn2s (conn.begin_global_connections (0), conn.end_global_connections (0)), "0,1");
+
+  EXPECT_EQ (conn.global_net_name (0), "GLOBAL");
+  EXPECT_EQ (conn.global_net_name (1), "GLOBAL2");
+
+  db::Connectivity conn2 = conn;
+
+  EXPECT_EQ (l2s (conn2.begin_connected (0), conn2.end_connected (0)), "0,1,2");
+  EXPECT_EQ (l2s (conn2.begin_connected (1), conn2.end_connected (1)), "0,1");
+  EXPECT_EQ (l2s (conn2.begin_connected (2), conn2.end_connected (2)), "0,2");
+
+  EXPECT_EQ (gn2s (conn2.begin_global_connections (0), conn2.end_global_connections (0)), "0,1");
+  EXPECT_EQ (conn2.global_net_name (0), "GLOBAL");
+  EXPECT_EQ (conn2.global_net_name (1), "GLOBAL2");
 }
 
 TEST(2_ShapeInteractions)

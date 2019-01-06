@@ -149,6 +149,27 @@ void LayoutToNetlist::connect (const db::Region &a, const db::Region &b)
   m_conn.connect (dla.layer (), dlb.layer ());
 }
 
+size_t LayoutToNetlist::connect_global (const db::Region &l, const std::string &gn)
+{
+  if (m_netlist_extracted) {
+    throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
+  }
+  if (! is_deep (l)) {
+    throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in intra-layer connectivity for netlist extraction"))));
+  }
+
+  //  we need to keep a reference, so we can safely delete the region
+  db::DeepLayer dl (l);
+  m_dlrefs.insert (dl);
+
+  return m_conn.connect_global (dl.layer (), gn);
+}
+
+const std::string &LayoutToNetlist::global_net_name (size_t id) const
+{
+  return m_conn.global_net_name (id);
+}
+
 void LayoutToNetlist::extract_netlist ()
 {
   if (m_netlist_extracted) {

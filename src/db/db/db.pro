@@ -269,7 +269,8 @@ HEADERS = \
     dbNetlistDeviceExtractor.h \
     dbNetlistExtractor.h \
     dbNetlistDeviceExtractorClasses.h \
-    dbLayoutToNetlist.h
+    dbLayoutToNetlist.h \
+    dbHierNetworkProcessor.h
 
 !equals(HAVE_QT, "0") {
 

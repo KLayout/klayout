@@ -336,7 +336,6 @@ LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &ta
   }
 
   std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> cell_map;
-  cell_map.insert (std::make_pair (std::make_pair (net.circuit ()->cell_index (), net.cluster_id ()), target_cell.cell_index ()));
 
   build_net_rec (net, target, target_cell, lmap, cell_name_prefix, cell_map);
 }
@@ -347,6 +346,8 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
   if (! m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
   }
+
+  std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> cell_map;
 
   const db::Netlist *netlist = mp_netlist.get ();
   for (db::Netlist::const_circuit_iterator c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
@@ -390,7 +391,7 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
 
           }
 
-          build_net (*n, target, target.cell (net_ci), lmap, circuit_cell_name_prefix);
+          build_net_rec (*n, target, target.cell (net_ci), lmap, circuit_cell_name_prefix, cell_map);
 
         }
 

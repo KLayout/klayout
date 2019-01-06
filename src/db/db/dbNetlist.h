@@ -1534,7 +1534,7 @@ public:
   /**
    *  @brief Returns true, if the net is an external net
    *
-   *  External nets are net which are connected to an outgoing pin.
+   *  External nets are nets which are connected to an outgoing pin.
    */
   bool is_external_net (const db::Net *net) const;
 

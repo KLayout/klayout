@@ -236,6 +236,52 @@ public:
   void shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to) const;
 
   /**
+   *  @brief Builds a net representation in the given layout and cell
+   *
+   *  This method has two modes: recursive and top-level mode. In recursive mode,
+   *  it will create a proper hierarchy below the given target cell to hold all subcircuits the
+   *  net connects to. It will copy the net's parts from this subcircuits into these cells.
+   *
+   *  In top-level mode, only the shapes from the net inside it's circuit are copied to
+   *  the given target cell. No other cells are created.
+   *
+   *  Recursive mode is picked when a cell name prefix is given. The new cells will be
+   *  named like cell_name_prefix + circuit name.
+   *
+   *  @param target The target layout
+   *  @param target_cell The target cell
+   *  @param lmap Target layer indexes (keys) and net regions (values)
+   *  @param cell_name_prefix Chooses recursive mode if non-null
+   */
+  void build_net (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix) const;
+
+  /**
+   *  @brief Builds a full hierarchical representation of the nets
+   *
+   *  This method copies all nets into cells corresponding to the circuits. It uses the cmap
+   *  object to determine the target cell (create them with "cell_mapping_into" or "const_cell_mapping_into").
+   *  If no mapping is requested, the specific circuit it skipped.
+   *
+   *  The method has two net annotation modes:
+   *   * No annotation (net_cell_name_prefix == 0): the shapes will be put into the target cell simply
+   *   * Individual subcells per net (net_cell_name_prefix != 0): for each net, a subcell is created
+   *     and the net shapes will be put there (name of the subcell = net_cell_name_prefix + net name).
+   *
+   *  In addition, net hierarchy is covered in two ways:
+   *   * No connection indicated (circuit_cell_name_prefix == 0: the net shapes are simply put into their
+   *     respective circuits. The connections are not indicated.
+   *   * Subnet hierarchy (circuit_cell_name_prefix != 0): for each root net, a full hierarchy is built
+   *     to accomodate the subnets (see build_net in recursive mode).
+   *
+   *  @param cmap The mapping of internal layout to target layout for the circuit mapping
+   *  @param target The target layout
+   *  @param lmap Target layer indexes (keys) and net regions (values)
+   *  @param circuit_cell_name_prefix See method description
+   *  @param net_cell_name_prefix See method description
+   */
+  void build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *circuit_cell_name_prefix) const;
+
+  /**
    *  @brief Finds the net by probing a specific location on the given layer
    *
    *  This method will find a net looking at the given layer at the specific position.
@@ -271,6 +317,7 @@ private:
   bool m_netlist_extracted;
 
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
+  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap) const;
 };
 
 }

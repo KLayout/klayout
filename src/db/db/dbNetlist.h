@@ -260,9 +260,7 @@ private:
 /**
  *  @brief A reference to a pin inside a net
  *
- *  A pin belongs to a subcircuit.
- *  If the subcircuit reference is 0, the pin is a pin of the current circuit
- *  (upward pin).
+ *  This object describes a connection to an outgoing pin.
  */
 class DB_PUBLIC NetPinRef
 {
@@ -276,11 +274,6 @@ public:
    *  @brief Creates a pin reference to the given pin of the current circuit
    */
   NetPinRef (size_t pin_id);
-
-  /**
-   *  @brief Creates a pin reference to the given pin of the given subcircuit
-   */
-  NetPinRef (SubCircuit *circuit, size_t pin_id);
 
   /**
    *  @brief Copy constructor
@@ -297,6 +290,95 @@ public:
    */
   bool operator< (const NetPinRef &other) const
   {
+    return m_pin_id < other.m_pin_id;
+  }
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const NetPinRef &other) const
+  {
+    return (m_pin_id == other.m_pin_id);
+  }
+
+  /**
+   *  @brief Gets the pin reference (const version)
+   */
+  size_t pin_id () const
+  {
+    return m_pin_id;
+  }
+
+  /**
+   *  @brief Gets the pin reference from the pin id
+   *  If the pin cannot be resolved, null is returned.
+   */
+  const Pin *pin () const;
+
+  /**
+   *  @brief Gets the net the pin lives in
+   */
+  Net *net ()
+  {
+    return mp_net;
+  }
+
+  /**
+   *  @brief Gets the net the pin lives in (const version)
+   */
+  const Net *net () const
+  {
+    return mp_net;
+  }
+
+private:
+  friend class Net;
+
+  size_t m_pin_id;
+  Net *mp_net;
+
+  /**
+   *  @brief Sets the net the terminal lives in
+   */
+  void set_net (Net *net)
+  {
+    mp_net = net;
+  }
+};
+
+/**
+ *  @brief A reference to a pin inside a net
+ *
+ *  This object describes a connection to a pin of a subcircuit.
+ */
+class DB_PUBLIC NetSubcircuitPinRef
+{
+public:
+  /**
+   *  @brief Default constructor
+   */
+  NetSubcircuitPinRef ();
+
+  /**
+   *  @brief Creates a pin reference to the given pin of the given subcircuit
+   */
+  NetSubcircuitPinRef (SubCircuit *circuit, size_t pin_id);
+
+  /**
+   *  @brief Copy constructor
+   */
+  NetSubcircuitPinRef (const NetSubcircuitPinRef &other);
+
+  /**
+   *  @brief Assignment
+   */
+  NetSubcircuitPinRef &operator= (const NetSubcircuitPinRef &other);
+
+  /**
+   *  @brief Comparison
+   */
+  bool operator< (const NetSubcircuitPinRef &other) const
+  {
     if (mp_subcircuit != other.mp_subcircuit) {
       return mp_subcircuit < other.mp_subcircuit;
     }
@@ -306,7 +388,7 @@ public:
   /**
    *  @brief Equality
    */
-  bool operator== (const NetPinRef &other) const
+  bool operator== (const NetSubcircuitPinRef &other) const
   {
     return (mp_subcircuit == other.mp_subcircuit && m_pin_id == other.m_pin_id);
   }
@@ -388,6 +470,9 @@ public:
   typedef std::list<NetPinRef> pin_list;
   typedef pin_list::const_iterator const_pin_iterator;
   typedef pin_list::iterator pin_iterator;
+  typedef std::list<NetSubcircuitPinRef> subcircuit_pin_list;
+  typedef subcircuit_pin_list::const_iterator const_subcircuit_pin_iterator;
+  typedef subcircuit_pin_list::iterator subcircuit_pin_iterator;
 
   /**
    *  @brief Constructor
@@ -526,6 +611,48 @@ public:
   }
 
   /**
+   *  @brief Adds a subcircuit pin to this net
+   */
+  void add_subcircuit_pin (const NetSubcircuitPinRef &pin);
+
+  /**
+   *  @brief Erases the given subcircuit pin from this net
+   */
+  void erase_subcircuit_pin (subcircuit_pin_iterator iter);
+
+  /**
+   *  @brief Begin iterator for the pins of the net (const version)
+   */
+  const_subcircuit_pin_iterator begin_subcircuit_pins () const
+  {
+    return m_subcircuit_pins.begin ();
+  }
+
+  /**
+   *  @brief End iterator for the pins of the net (const version)
+   */
+  const_subcircuit_pin_iterator end_subcircuit_pins () const
+  {
+    return m_subcircuit_pins.end ();
+  }
+
+  /**
+   *  @brief Begin iterator for the pins of the net (non-const version)
+   */
+  subcircuit_pin_iterator begin_subcircuit_pins ()
+  {
+    return m_subcircuit_pins.begin ();
+  }
+
+  /**
+   *  @brief End iterator for the pins of the net (non-const version)
+   */
+  subcircuit_pin_iterator end_subcircuit_pins ()
+  {
+    return m_subcircuit_pins.end ();
+  }
+
+  /**
    *  @brief Adds a terminal to this net
    */
   void add_terminal (const NetTerminalRef &terminal);
@@ -572,7 +699,7 @@ public:
    */
   bool is_floating () const
   {
-    return (m_pins.size () + m_terminals.size ()) < 2;
+    return (m_pins.size () + m_subcircuit_pins.size () + m_terminals.size ()) < 2;
   }
 
   /**
@@ -580,15 +707,23 @@ public:
    */
   bool is_internal () const
   {
-    return m_pins.size () == 0 && m_terminals.size () == 2;
+    return m_pins.size () == 0 && m_subcircuit_pins.size () == 0 && m_terminals.size () == 2;
   }
 
   /**
-   *  @brief Returns the number of pins connected
+   *  @brief Returns the number of outgoing pins connected
    */
   size_t pin_count () const
   {
     return m_pins.size ();
+  }
+
+  /**
+   *  @brief Returns the number of subcircuit pins connected
+   */
+  size_t subcircuit_pin_count () const
+  {
+    return m_subcircuit_pins.size ();
   }
 
   /**
@@ -604,6 +739,7 @@ private:
 
   terminal_list m_terminals;
   pin_list m_pins;
+  subcircuit_pin_list m_subcircuit_pins;
   std::string m_name;
   size_t m_cluster_id;
   Circuit *mp_circuit;
@@ -971,14 +1107,14 @@ private:
   tl::weak_ptr<Circuit> m_circuit_ref;
   std::string m_name;
   db::DCplxTrans m_trans;
-  std::vector<Net::pin_iterator> m_pin_refs;
+  std::vector<Net::subcircuit_pin_iterator> m_pin_refs;
   size_t m_id;
   Circuit *mp_circuit;
 
   /**
    *  @brief Sets the pin reference for a specific pin
    */
-  void set_pin_ref_for_pin (size_t ppin_id, Net::pin_iterator iter);
+  void set_pin_ref_for_pin (size_t ppin_id, Net::subcircuit_pin_iterator iter);
 
   /**
    *  @brief Sets the circuit reference
@@ -1530,13 +1666,6 @@ public:
    *  net and connected with the given pin.
    */
   void connect_pin (size_t pin_id, Net *net);
-
-  /**
-   *  @brief Returns true, if the net is an external net
-   *
-   *  External nets are nets which are connected to an outgoing pin.
-   */
-  bool is_external_net (const db::Net *net) const;
 
   /**
    *  @brief Purge unused nets

@@ -356,46 +356,41 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
       continue;
     }
 
-    std::set<const Net *> excluded_nets;
-    if (circuit_cell_name_prefix) {
-      for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p) {
-        excluded_nets.insert (c->net_for_pin (p->id ()));
-      }
-    }
-
     db::cell_index_type target_ci = cmap.cell_mapping (c->cell_index ());
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
 
-      if (excluded_nets.find (n.operator-> ()) == excluded_nets.end ()) {
+      //  exlude local nets in recursive mode
+      if (circuit_cell_name_prefix && n->pin_count () > 0) {
+        continue;
+      }
 
-        const db::connected_clusters<db::PolygonRef> &ccl = m_netex.clusters ().clusters_per_cell (c->cell_index ());
-        const db::local_cluster<db::PolygonRef> &cl = ccl.cluster_by_id (n->cluster_id ());
+      const db::connected_clusters<db::PolygonRef> &ccl = m_netex.clusters ().clusters_per_cell (c->cell_index ());
+      const db::local_cluster<db::PolygonRef> &cl = ccl.cluster_by_id (n->cluster_id ());
 
-        bool any_connections = ! ccl.connections_for_cluster (n->cluster_id ()).empty ();
+      bool any_connections = ! ccl.connections_for_cluster (n->cluster_id ()).empty ();
 
-        bool any_shapes = false;
-        for (std::map<unsigned int, const db::Region *>::const_iterator m = lmap.begin (); m != lmap.end () && !any_shapes; ++m) {
-          any_shapes = ! cl.begin (layer_of (*m->second)).at_end ();
+      bool any_shapes = false;
+      for (std::map<unsigned int, const db::Region *>::const_iterator m = lmap.begin (); m != lmap.end () && !any_shapes; ++m) {
+        any_shapes = ! cl.begin (layer_of (*m->second)).at_end ();
+      }
+
+      if (any_shapes || (circuit_cell_name_prefix && any_connections)) {
+
+        db::cell_index_type net_ci = target_ci;
+
+        if (net_cell_name_prefix) {
+
+          db::Cell &tc = target.cell (target_ci);
+          net_ci = target.add_cell ((std::string (net_cell_name_prefix) + n->expanded_name ()).c_str ());
+          tc.insert (db::CellInstArray (db::CellInst (net_ci), db::Trans ()));
+
         }
 
-        if (any_shapes || (circuit_cell_name_prefix && any_connections)) {
-
-          db::cell_index_type net_ci = target_ci;
-
-          if (net_cell_name_prefix) {
-
-            db::Cell &tc = target.cell (target_ci);
-            net_ci = target.add_cell ((std::string (net_cell_name_prefix) + n->expanded_name ()).c_str ());
-            tc.insert (db::CellInstArray (db::CellInst (net_ci), db::Trans ()));
-
-          }
-
-          build_net_rec (*n, target, target.cell (net_ci), lmap, circuit_cell_name_prefix, cell_map);
-
-        }
+        build_net_rec (*n, target, target.cell (net_ci), lmap, circuit_cell_name_prefix, cell_map);
 
       }
+
     }
 
   }
@@ -484,16 +479,11 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
 
     //  follow the path up in the net hierarchy using the transformation and the upper cell index as the
     //  guide line
-    while (! inst_path.empty () && circuit->is_external_net (net)) {
+    while (! inst_path.empty () && net->pin_count () > 0) {
 
       cell_indexes.pop_back ();
 
-      db::Pin *pin = 0;
-      for (db::Circuit::pin_iterator p = circuit->begin_pins (); p != circuit->end_pins () && ! pin; ++p) {
-        if (circuit->net_for_pin (p->id ()) == net) {
-          pin = p.operator-> ();
-        }
-      }
+      const db::Pin *pin = circuit->pin_by_id (net->begin_pins ()->pin_id ());
       tl_assert (pin != 0);
 
       db::DCplxTrans dtrans = dbu_trans * inst_path.back ().complex_trans () * dbu_trans_inv;

@@ -165,12 +165,15 @@ static std::string net2string (const db::Net &n)
     if (! res.empty ()) {
       res += ",";
     }
-    if (i->subcircuit ()) {
-      res += i->subcircuit ()->circuit_ref () ? i->subcircuit ()->circuit_ref ()->name () : "(null)";
-      res += ":";
-    } else {
-      res += "+";
+    res += "+";
+    res += i->pin () ? i->pin ()->name () : "(null)";
+  }
+  for (db::Net::const_subcircuit_pin_iterator i = n.begin_subcircuit_pins (); i != n.end_subcircuit_pins (); ++i) {
+    if (! res.empty ()) {
+      res += ",";
     }
+    res += i->subcircuit ()->circuit_ref () ? i->subcircuit ()->circuit_ref ()->name () : "(null)";
+    res += ":";
     res += i->pin () ? i->pin ()->name () : "(null)";
   }
   return res;
@@ -518,25 +521,25 @@ TEST(4_NetlistSubcircuits)
   c1->add_net (n1a);
   n1a->set_name ("n1a");
   n1a->add_pin (db::NetPinRef (0));
-  n1a->add_pin (db::NetPinRef (sc1, 0));
+  n1a->add_subcircuit_pin (db::NetSubcircuitPinRef (sc1, 0));
 
   db::Net *n1b = new db::Net ();
   c1->add_net (n1b);
   n1b->set_name ("n1b");
-  n1b->add_pin (db::NetPinRef (sc1, 1));
-  n1b->add_pin (db::NetPinRef (sc2, 0));
+  n1b->add_subcircuit_pin (db::NetSubcircuitPinRef (sc1, 1));
+  n1b->add_subcircuit_pin (db::NetSubcircuitPinRef (sc2, 0));
 
   db::Net *n1c = new db::Net ();
   c1->add_net (n1c);
   n1c->set_name ("n1c");
-  n1c->add_pin (db::NetPinRef (sc2, 1));
+  n1c->add_subcircuit_pin (db::NetSubcircuitPinRef (sc2, 1));
   n1c->add_pin (db::NetPinRef (1));
 
   EXPECT_EQ (nl2string (*nl),
     "[c1]\n"
     "+c1p1,c2:c2p1\n"
     "c2:c2p2,c2:c2p1\n"
-    "c2:c2p2,+c1p2\n"
+    "+c1p2,c2:c2p2\n"
     "[c2]\n"
     "D:A,+c2p1\n"
     "D:B,+c2p2\n"
@@ -571,7 +574,7 @@ TEST(4_NetlistSubcircuits)
     "[c1]\n"
     "+c1p1,c2:c2p1\n"
     "c2:c2p2,c2:c2p1\n"
-    "c2:c2p2,+c1p2\n"
+    "+c1p2,c2:c2p2\n"
     "[c2]\n"
     "D:A,+c2p1\n"
     "D:B,+c2p2\n"
@@ -751,24 +754,25 @@ TEST(8_NetSubCircuitsEditing)
   n2->set_name ("n2");
   c.add_net (n2);
 
-  EXPECT_EQ (c.is_external_net (n1), false);
+  EXPECT_EQ (n1->pin_count (), size_t (0));
   c.connect_pin (0, n1);
 
   EXPECT_EQ (n1->terminal_count (), size_t (0));
   EXPECT_EQ (n1->pin_count (), size_t (1));
   EXPECT_EQ (n1->is_floating (), true);
   EXPECT_EQ (n1->is_internal (), false);
-  EXPECT_EQ (c.is_external_net (n1), true);
+  EXPECT_NE (n1->pin_count (), size_t (0));
 
   EXPECT_EQ (c.net_for_pin (0), n1);
   EXPECT_EQ (c.net_for_pin (1), 0);
 
   sc1->connect_pin (0, n1);
   sc1->connect_pin (1, n2);
-  EXPECT_EQ (c.is_external_net (n2), false);
+  EXPECT_EQ (n2->pin_count (), size_t (0));
 
   EXPECT_EQ (n1->terminal_count (), size_t (0));
-  EXPECT_EQ (n1->pin_count (), size_t (2));
+  EXPECT_EQ (n1->pin_count (), size_t (1));
+  EXPECT_EQ (n1->subcircuit_pin_count (), size_t (1));
   EXPECT_EQ (n1->is_floating (), false);
   EXPECT_EQ (n1->is_internal (), false);
 
@@ -814,7 +818,7 @@ TEST(8_NetSubCircuitsEditing)
   EXPECT_EQ (net2string (*n2), "sc2:A");
 
   c.connect_pin (1, n1);
-  EXPECT_EQ (net2string (*n1), "sc2:B,+Y");
+  EXPECT_EQ (net2string (*n1), "+Y,sc2:B");
   EXPECT_EQ (c.net_for_pin (1), n1);
 
   delete n1;
@@ -849,14 +853,14 @@ TEST(10_NetPinRefBasics)
 {
   db::SubCircuit d1, d2;
 
-  EXPECT_EQ (db::NetPinRef (&d1, 0) == db::NetPinRef (&d1, 0), true);
-  EXPECT_EQ (db::NetPinRef (&d1, 0) == db::NetPinRef (&d1, 1), false);
-  EXPECT_EQ (db::NetPinRef (&d1, 0) == db::NetPinRef (&d2, 0), false);
+  EXPECT_EQ (db::NetSubcircuitPinRef (&d1, 0) == db::NetSubcircuitPinRef (&d1, 0), true);
+  EXPECT_EQ (db::NetSubcircuitPinRef (&d1, 0) == db::NetSubcircuitPinRef (&d1, 1), false);
+  EXPECT_EQ (db::NetSubcircuitPinRef (&d1, 0) == db::NetSubcircuitPinRef (&d2, 0), false);
 
-  EXPECT_EQ (db::NetPinRef (&d1, 0) < db::NetPinRef (&d1, 0), false);
-  EXPECT_EQ (db::NetPinRef (&d1, 0) < db::NetPinRef (&d1, 1), true);
-  EXPECT_EQ (db::NetPinRef (&d1, 1) < db::NetPinRef (&d1, 0), false);
-  EXPECT_NE ((db::NetPinRef (&d1, 0) < db::NetPinRef (&d2, 0)), (db::NetPinRef (&d2, 0) < db::NetPinRef (&d1, 0)));
+  EXPECT_EQ (db::NetSubcircuitPinRef (&d1, 0) < db::NetSubcircuitPinRef (&d1, 0), false);
+  EXPECT_EQ (db::NetSubcircuitPinRef (&d1, 0) < db::NetSubcircuitPinRef (&d1, 1), true);
+  EXPECT_EQ (db::NetSubcircuitPinRef (&d1, 1) < db::NetSubcircuitPinRef (&d1, 0), false);
+  EXPECT_NE ((db::NetSubcircuitPinRef (&d1, 0) < db::NetSubcircuitPinRef (&d2, 0)), (db::NetSubcircuitPinRef (&d2, 0) < db::NetSubcircuitPinRef (&d1, 0)));
 }
 
 TEST(11_NetlistCircuitRefs)

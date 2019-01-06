@@ -191,9 +191,9 @@ SubCircuit::SubCircuit ()
 
 SubCircuit::~SubCircuit()
 {
-  for (std::vector<Net::pin_iterator>::const_iterator p = m_pin_refs.begin (); p != m_pin_refs.end (); ++p) {
-    if (*p != Net::pin_iterator () && (*p)->net ()) {
-      (*p)->net ()->erase_pin (*p);
+  for (std::vector<Net::subcircuit_pin_iterator>::const_iterator p = m_pin_refs.begin (); p != m_pin_refs.end (); ++p) {
+    if (*p != Net::subcircuit_pin_iterator () && (*p)->net ()) {
+      (*p)->net ()->erase_subcircuit_pin (*p);
     }
   }
 }
@@ -233,10 +233,10 @@ void SubCircuit::set_trans (const db::DCplxTrans &t)
   m_trans = t;
 }
 
-void SubCircuit::set_pin_ref_for_pin (size_t pin_id, Net::pin_iterator iter)
+void SubCircuit::set_pin_ref_for_pin (size_t pin_id, Net::subcircuit_pin_iterator iter)
 {
   if (m_pin_refs.size () < pin_id + 1) {
-    m_pin_refs.resize (pin_id + 1, Net::pin_iterator ());
+    m_pin_refs.resize (pin_id + 1, Net::subcircuit_pin_iterator ());
   }
   m_pin_refs [pin_id] = iter;
 }
@@ -255,8 +255,8 @@ void SubCircuit::set_circuit_ref (Circuit *c)
 const Net *SubCircuit::net_for_pin (size_t pin_id) const
 {
   if (pin_id < m_pin_refs.size ()) {
-    Net::pin_iterator p = m_pin_refs [pin_id];
-    if (p != Net::pin_iterator ()) {
+    Net::subcircuit_pin_iterator p = m_pin_refs [pin_id];
+    if (p != Net::subcircuit_pin_iterator ()) {
       return p->net ();
     }
   }
@@ -270,15 +270,15 @@ void SubCircuit::connect_pin (size_t pin_id, Net *net)
   }
 
   if (pin_id < m_pin_refs.size ()) {
-    Net::pin_iterator p = m_pin_refs [pin_id];
-    if (p != Net::pin_iterator () && p->net ()) {
-      p->net ()->erase_pin (p);
+    Net::subcircuit_pin_iterator p = m_pin_refs [pin_id];
+    if (p != Net::subcircuit_pin_iterator () && p->net ()) {
+      p->net ()->erase_subcircuit_pin (p);
     }
-    m_pin_refs [pin_id] = Net::pin_iterator ();
+    m_pin_refs [pin_id] = Net::subcircuit_pin_iterator ();
   }
 
   if (net) {
-    net->add_pin (NetPinRef (this, pin_id));
+    net->add_subcircuit_pin (NetSubcircuitPinRef (this, pin_id));
   }
 }
 
@@ -333,25 +333,19 @@ NetTerminalRef::device_class () const
 //  NetPinRef class implementation
 
 NetPinRef::NetPinRef ()
-  : m_pin_id (0), mp_subcircuit (0), mp_net (0)
+  : m_pin_id (0), mp_net (0)
 {
   //  .. nothing yet ..
 }
 
 NetPinRef::NetPinRef (size_t pin_id)
-  : m_pin_id (pin_id), mp_subcircuit (0), mp_net (0)
-{
-  //  .. nothing yet ..
-}
-
-NetPinRef::NetPinRef (SubCircuit *circuit, size_t pin_id)
-  : m_pin_id (pin_id), mp_subcircuit (circuit), mp_net (0)
+  : m_pin_id (pin_id), mp_net (0)
 {
   //  .. nothing yet ..
 }
 
 NetPinRef::NetPinRef (const NetPinRef &other)
-  : m_pin_id (other.m_pin_id), mp_subcircuit (other.mp_subcircuit), mp_net (0)
+  : m_pin_id (other.m_pin_id), mp_net (0)
 {
   //  .. nothing yet ..
 }
@@ -360,18 +354,51 @@ NetPinRef &NetPinRef::operator= (const NetPinRef &other)
 {
   if (this != &other) {
     m_pin_id = other.m_pin_id;
-    mp_subcircuit = other.mp_subcircuit;
   }
   return *this;
 }
 
 const Pin *NetPinRef::pin () const
 {
-  if (! mp_subcircuit) {
-    if (mp_net && mp_net->circuit ()) {
-      return mp_net->circuit ()->pin_by_id (m_pin_id);
-    }
-  } else if (mp_subcircuit->circuit_ref ()) {
+  if (mp_net && mp_net->circuit ()) {
+    return mp_net->circuit ()->pin_by_id (m_pin_id);
+  }
+  return 0;
+}
+
+// --------------------------------------------------------------------------------
+//  NetSubcircuitPinRef class implementation
+
+NetSubcircuitPinRef::NetSubcircuitPinRef ()
+  : m_pin_id (0), mp_subcircuit (0), mp_net (0)
+{
+  //  .. nothing yet ..
+}
+
+NetSubcircuitPinRef::NetSubcircuitPinRef (SubCircuit *circuit, size_t pin_id)
+  : m_pin_id (pin_id), mp_subcircuit (circuit), mp_net (0)
+{
+  //  .. nothing yet ..
+}
+
+NetSubcircuitPinRef::NetSubcircuitPinRef (const NetSubcircuitPinRef &other)
+  : m_pin_id (other.m_pin_id), mp_subcircuit (other.mp_subcircuit), mp_net (0)
+{
+  //  .. nothing yet ..
+}
+
+NetSubcircuitPinRef &NetSubcircuitPinRef::operator= (const NetSubcircuitPinRef &other)
+{
+  if (this != &other) {
+    m_pin_id = other.m_pin_id;
+    mp_subcircuit = other.mp_subcircuit;
+  }
+  return *this;
+}
+
+const Pin *NetSubcircuitPinRef::pin () const
+{
+  if (mp_subcircuit && mp_subcircuit->circuit_ref ()) {
     return mp_subcircuit->circuit_ref ()->pin_by_id (m_pin_id);
   }
   return 0;
@@ -407,6 +434,10 @@ Net &Net::operator= (const Net &other)
     m_name = other.m_name;
     m_cluster_id = other.m_cluster_id;
 
+    for (const_subcircuit_pin_iterator i = other.begin_subcircuit_pins (); i != other.end_subcircuit_pins (); ++i) {
+      add_subcircuit_pin (*i);
+    }
+
     for (const_pin_iterator i = other.begin_pins (); i != other.end_pins (); ++i) {
       add_pin (*i);
     }
@@ -435,6 +466,10 @@ void Net::clear ()
 
   while (! m_pins.empty ()) {
     erase_pin (begin_pins ());
+  }
+
+  while (! m_subcircuit_pins.empty ()) {
+    erase_subcircuit_pin (begin_subcircuit_pins ());
   }
 }
 
@@ -483,23 +518,35 @@ void Net::add_pin (const NetPinRef &pin)
   NetPinRef &new_pin = m_pins.back ();
   new_pin.set_net (this);
 
-  if (! pin.subcircuit ()) {
-    if (mp_circuit) {
-      mp_circuit->set_pin_ref_for_pin (new_pin.pin_id (), --m_pins.end ());
-    }
-  } else {
-    new_pin.subcircuit ()->set_pin_ref_for_pin (new_pin.pin_id (), --m_pins.end ());
+  if (mp_circuit) {
+    mp_circuit->set_pin_ref_for_pin (new_pin.pin_id (), --m_pins.end ());
   }
+}
+
+void Net::add_subcircuit_pin (const NetSubcircuitPinRef &pin)
+{
+  m_subcircuit_pins.push_back (pin);
+  NetSubcircuitPinRef &new_pin = m_subcircuit_pins.back ();
+  new_pin.set_net (this);
+
+  tl_assert (pin.subcircuit () != 0);
+  new_pin.subcircuit ()->set_pin_ref_for_pin (new_pin.pin_id (), --m_subcircuit_pins.end ());
 }
 
 void Net::erase_pin (pin_iterator iter)
 {
-  if (iter->subcircuit ()) {
-    iter->subcircuit ()->set_pin_ref_for_pin (iter->pin_id (), pin_iterator ());
-  } else if (mp_circuit) {
+  if (mp_circuit) {
     mp_circuit->set_pin_ref_for_pin (iter->pin_id (), pin_iterator ());
   }
   m_pins.erase (iter);
+}
+
+void Net::erase_subcircuit_pin (subcircuit_pin_iterator iter)
+{
+  if (iter->subcircuit ()) {
+    iter->subcircuit ()->set_pin_ref_for_pin (iter->pin_id (), subcircuit_pin_iterator ());
+  }
+  m_subcircuit_pins.erase (iter);
 }
 
 void Net::add_terminal (const NetTerminalRef &terminal)
@@ -612,13 +659,13 @@ Circuit &Circuit::operator= (const Circuit &other)
       }
 
       for (Net::const_pin_iterator p = i->begin_pins (); p != i->end_pins (); ++p) {
-        if (! p->subcircuit ()) {
-          n->add_pin (NetPinRef (p->pin_id ()));
-        } else {
-          std::map<const SubCircuit *, SubCircuit *>::const_iterator m = sc_table.find (p->subcircuit ());
-          tl_assert (m != sc_table.end ());
-          n->add_pin (NetPinRef (m->second, p->pin_id ()));
-        }
+        n->add_pin (NetPinRef (p->pin_id ()));
+      }
+
+      for (Net::const_subcircuit_pin_iterator p = i->begin_subcircuit_pins (); p != i->end_subcircuit_pins (); ++p) {
+        std::map<const SubCircuit *, SubCircuit *>::const_iterator m = sc_table.find (p->subcircuit ());
+        tl_assert (m != sc_table.end ());
+        n->add_subcircuit_pin (NetSubcircuitPinRef (m->second, p->pin_id ()));
       }
 
     }
@@ -867,21 +914,6 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
   if (net) {
     net->add_pin (NetPinRef (pin_id));
   }
-}
-
-bool Circuit::is_external_net (const db::Net *net) const
-{
-  if (!net || net->pin_count () == 0) {
-    return false;
-  }
-
-  for (std::vector<Net::pin_iterator>::const_iterator p = m_pin_refs.begin (); p != m_pin_refs.end (); ++p) {
-    if (*p != Net::pin_iterator () && (*p)->net () == net) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 void Circuit::purge_nets ()
@@ -1541,7 +1573,7 @@ void Netlist::make_top_level_pins ()
 
       //  create pins for the named nets and connect them
       for (Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
-        if (! n->name ().empty () && n->terminal_count () + n->pin_count () > 0) {
+        if (! n->name ().empty () && n->terminal_count () + n->subcircuit_pin_count () > 0) {
           Pin pin = circuit->add_pin (n->name ());
           circuit->connect_pin (pin.id (), n.operator-> ());
         }
@@ -1633,7 +1665,7 @@ std::string Netlist::to_string () const
 
 #if 0  //  for debugging
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      res += "  N" + net_name (n.operator-> ()) + " pins=" + tl::to_string (n->pin_count ()) + " terminals=" + tl::to_string (n->terminal_count ()) + "\n";
+      res += "  N" + net_name (n.operator-> ()) + " pins=" + tl::to_string (n->pin_count ())  + " sc_pins=" + tl::to_string (n->subcircuit_pin_count ()) + " terminals=" + tl::to_string (n->terminal_count ()) + "\n";
     }
 #endif
 

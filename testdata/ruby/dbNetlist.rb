@@ -330,7 +330,8 @@ class DBNetlist_TestClass < TestBase
     assert_equal(net.is_internal?, false)
 
     sc1.connect_pin(1, net)
-    assert_equal(net.pin_count, 1)
+    assert_equal(net.pin_count, 0)
+    assert_equal(net.subcircuit_pin_count, 1)
     assert_equal(net.terminal_count, 0)
     assert_equal(net.is_floating?, true)
     assert_equal(net.is_internal?, false)
@@ -338,16 +339,19 @@ class DBNetlist_TestClass < TestBase
     assert_equal(sc1.net_for_pin(0).inspect, "nil")
 
     sc2.connect_pin(0, net)
-    assert_equal(net.pin_count, 2)
+    assert_equal(net.pin_count, 0)
+    assert_equal(net.subcircuit_pin_count, 2)
     assert_equal(net.terminal_count, 0)
     assert_equal(net.is_floating?, false)
     assert_equal(net.is_internal?, false)
 
     cnames = [] 
-    net.each_pin { |p| cnames << p.subcircuit.name + ":" + p.pin.name }
+    net.each_pin { |p| cnames << "+" + p.pin.name }
+    net.each_subcircuit_pin { |p| cnames << p.subcircuit.name + ":" + p.pin.name }
     assert_equal(cnames, [ "SC1:B", "SC2:A" ])
     cnames = [] 
-    net.each_pin { |p| cnames << p.subcircuit.name + ":" + p.pin_id.to_s }
+    net.each_pin { |p| cnames << "+" + p.pin.name }
+    net.each_subcircuit_pin { |p| cnames << p.subcircuit.name + ":" + p.pin_id.to_s }
     assert_equal(cnames, [ "SC1:1", "SC2:0" ])
     net.each_pin { |p| assert_equal(p.net.name, "NET") }
 
@@ -355,9 +359,10 @@ class DBNetlist_TestClass < TestBase
     assert_equal(sc1.net_for_pin(1).inspect, "nil")
     
     cnames = [] 
-    net.each_pin { |p| cnames << p.subcircuit.name + ":" + p.pin.name }
+    net.each_pin { |p| cnames << "+" + p.pin.name }
+    net.each_subcircuit_pin { |p| cnames << p.subcircuit.name + ":" + p.pin.name }
     assert_equal(cnames, [ "SC2:A" ])
-    net.each_pin { |p| assert_equal(p.net.name, "NET") }
+    net.each_subcircuit_pin { |p| assert_equal(p.net.name, "NET") }
 
     net.clear
     assert_equal(sc1.net_for_pin(1).inspect, "nil")
@@ -510,9 +515,13 @@ class DBNetlist_TestClass < TestBase
     c.each_net { |n| names << n.name }
     assert_equal(names, [ "NET1", "NET2" ])
 
-    assert_equal(c.is_external_net?(net1), false)
+    assert_equal(net1.pin_count, 0)
     c.connect_pin(pina1, net1)
-    assert_equal(c.is_external_net?(net1), true)
+    cnames = []
+    net1.each_pin { |p| cnames << "+" + p.pin.name }
+    net1.each_subcircuit_pin { |p| cnames << p.subcircuit.name + ":" + p.pin.name }
+    assert_equal(cnames, [ "+A1" ])
+    assert_equal(net1.pin_count, 1)
     c.connect_pin(pinb1.id, net1)
     c.connect_pin(pina2, net2)
     c.connect_pin(pinb2.id, net2)

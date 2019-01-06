@@ -236,18 +236,31 @@ Class<db::NetPinRef> decl_dbNetPinRef ("db", "NetPinRef",
   gsi::method ("pin", &db::NetPinRef::pin,
     "@brief Gets the \\Pin object of the pin the connection is made to."
   ) +
-  gsi::method ("subcircuit", (db::SubCircuit *(db::NetPinRef::*) ()) &db::NetPinRef::subcircuit,
-    "@brief Gets the subcircuit reference.\n"
-    "If the pin is a pin of a subcircuit, this attribute "
-    "indicates the subcircuit the net attaches to. The "
-    "subcircuit lives in the same circuit than the net. "
-    "If the pin is a outgoing pin of the circuit, this "
-    "attribute is nil."
-  ) +
   gsi::method ("net", (db::Net *(db::NetPinRef::*) ()) &db::NetPinRef::net,
     "@brief Gets the net this pin reference is attached to"
   ),
-  "@brief A connection to a pin of a subcircuit or an outgoing pin of the circuit.\n"
+  "@brief A connection to an outgoing pin of the circuit.\n"
+  "This object is used inside a net (see \\Net) to describe the connections a net makes.\n"
+  "\n"
+  "This class has been added in version 0.26."
+);
+
+Class<db::NetSubcircuitPinRef> decl_dbNetSubcircuitPinRef ("db", "NetSubcircuitPinRef",
+  gsi::method ("pin_id", &db::NetSubcircuitPinRef::pin_id,
+    "@brief Gets the ID of the pin the connection is made to."
+  ) +
+  gsi::method ("pin", &db::NetSubcircuitPinRef::pin,
+    "@brief Gets the \\Pin object of the pin the connection is made to."
+  ) +
+  gsi::method ("subcircuit", (db::SubCircuit *(db::NetSubcircuitPinRef::*) ()) &db::NetSubcircuitPinRef::subcircuit,
+    "@brief Gets the subcircuit reference.\n"
+    "This attribute indicates the subcircuit the net attaches to. The "
+    "subcircuit lives in the same circuit than the net. "
+  ) +
+  gsi::method ("net", (db::Net *(db::NetSubcircuitPinRef::*) ()) &db::NetSubcircuitPinRef::net,
+    "@brief Gets the net this pin reference is attached to"
+  ),
+  "@brief A connection to a pin of a subcircuit.\n"
   "This object is used inside a net (see \\Net) to describe the connections a net makes.\n"
   "\n"
   "This class has been added in version 0.26."
@@ -288,10 +301,14 @@ Class<db::Net> decl_dbNet ("db", "Net",
     "See \\cluster_id= for details about the cluster ID."
   ) +
   gsi::iterator ("each_pin", (db::Net::pin_iterator (db::Net::*) ()) &db::Net::begin_pins, (db::Net::pin_iterator (db::Net::*) ()) &db::Net::end_pins,
-    "@brief Iterates over all pins the net connects.\n"
+    "@brief Iterates over all outgoing pins the net connects.\n"
     "Pin connections are described by \\NetPinRef objects. Pin connections "
-    "are either connections to subcircuit pins or to outgoing pins of the "
-    "circuit the net lives in."
+    "are connections to outgoing pins of the circuit the net lives in."
+  ) +
+  gsi::iterator ("each_subcircuit_pin", (db::Net::subcircuit_pin_iterator (db::Net::*) ()) &db::Net::begin_subcircuit_pins, (db::Net::subcircuit_pin_iterator (db::Net::*) ()) &db::Net::end_subcircuit_pins,
+    "@brief Iterates over all subcircuit pins the net connects.\n"
+    "Subcircuit pin connections are described by \\NetSubcircuitPinRef objects. These are "
+    "connections to specific pins of subcircuits."
   ) +
   gsi::iterator ("each_terminal", (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::begin_terminals, (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::end_terminals,
     "@brief Iterates over all terminals the net connects.\n"
@@ -307,7 +324,10 @@ Class<db::Net> decl_dbNet ("db", "Net",
     "Internal nets are those which connect exactly two terminals and nothing else (pin_count = 0 and  terminal_count == 2)."
   ) +
   gsi::method ("pin_count", &db::Net::pin_count,
-    "@brief Returns the number of pins connected by this net.\n"
+    "@brief Returns the number of outgoing pins connected by this net.\n"
+  ) +
+  gsi::method ("subcircuit_pin_count", &db::Net::subcircuit_pin_count,
+    "@brief Returns the number of subcircuit pins connected by this net.\n"
   ) +
   gsi::method ("terminal_count", &db::Net::terminal_count,
     "@brief Returns the number of terminals connected by this net.\n"
@@ -764,10 +784,6 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::method ("cell_index", &db::Circuit::cell_index,
     "@brief Gets the cell index of the circuit\n"
     "See \\cell_index= for details.\n"
-  ) +
-  gsi::method ("is_external_net?", &db::Circuit::is_external_net, gsi::arg ("net"),
-    "@brief Returns true, if the given net is an external one.\n"
-    "External nets are nets which are connected to an outgoing pin."
   ) +
   gsi::method ("net_for_pin", (db::Net *(db::Circuit::*) (size_t)) &db::Circuit::net_for_pin, gsi::arg ("pin_id"),
     "@brief Gets the net object attached to a specific pin.\n"

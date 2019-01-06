@@ -43,6 +43,19 @@ static db::Cell *l2n_internal_top_cell (db::LayoutToNetlist *l2n)
   return const_cast<db::Cell *> (l2n->internal_top_cell ());
 }
 
+static void build_net (const db::LayoutToNetlist *l2n, const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &cell_name_prefix)
+{
+  std::string p = cell_name_prefix.to_string ();
+  l2n->build_net (net, target, target_cell, lmap, cell_name_prefix.is_nil () ? 0 : p.c_str ());
+}
+
+static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &net_cell_name_prefix, const tl::Variant &circuit_cell_name_prefix)
+{
+  std::string cp = circuit_cell_name_prefix.to_string ();
+  std::string np = net_cell_name_prefix.to_string ();
+  l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str ());
+}
+
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::constructor ("new", &make_l2n, gsi::arg ("iter"),
     "@brief The constructor\n"
@@ -151,7 +164,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "If 'recursive'' is true, the returned region will contain the shapes of\n"
     "all subcircuits too.\n"
   ) +
-  gsi::method ("build_net", &db::LayoutToNetlist::build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("cell_name"),
+  gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("cell_name"),
     "@brief Builds a net representation in the given layout and cell\n"
     "\n"
     "This method has two modes: recursive and top-level mode. In recursive mode,\n"
@@ -169,7 +182,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@param lmap Target layer indexes (keys) and net regions (values)\n"
     "@param cell_name_prefix Chooses recursive mode if non-nil\n"
   ) +
-  gsi::method ("build_all_nets", &db::LayoutToNetlist::build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix"), gsi::arg ("circuit_cell_name_prefix"),
+  gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix"), gsi::arg ("circuit_cell_name_prefix"),
     "@brief Builds a full hierarchical representation of the nets\n"
     "\n"
     "This method copies all nets into cells corresponding to the circuits. It uses the cmap\n"

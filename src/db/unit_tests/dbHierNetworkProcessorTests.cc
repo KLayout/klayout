@@ -292,6 +292,9 @@ static std::string local_cluster_to_string (const db::local_cluster<T> &cluster,
   for (typename db::local_cluster<T>::attr_iterator a = cluster.begin_attr (); a != cluster.end_attr (); ++a) {
     res += "%" + tl::to_string (*a);
   }
+  for (typename db::local_cluster<T>::global_nets_iterator g = cluster.begin_global_nets (); g != cluster.end_global_nets (); ++g) {
+    res += "+" + conn.global_net_name (*g);
+  }
   return res;
 }
 
@@ -459,6 +462,75 @@ TEST(21_LocalClustersBasicWithAttributes)
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)%1%2%3\n"
     "#2:[1](0,1100;0,2100;1000,2100;1000,1100)%4"
+  );
+}
+
+TEST(22_LocalClustersWithGlobal)
+{
+  db::Layout layout;
+  db::Cell &cell = layout.cell (layout.add_cell ("TOP"));
+  db::GenericRepository &repo = layout.shape_repository ();
+
+  db::Connectivity conn;
+  conn.connect (0);
+  conn.connect (1);
+  conn.connect (2);
+  conn.connect (0, 1);
+  conn.connect (0, 2);
+
+  db::Polygon poly;
+  tl::from_string ("(0,0;0,1000;1000,1000;1000,0)", poly);
+
+  cell.shapes (0).insert (db::PolygonRef (poly, repo));
+
+  db::local_clusters<db::PolygonRef> clusters;
+  EXPECT_EQ (local_clusters_to_string (clusters, conn), "");
+
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0)");
+
+  //  one more shape
+  cell.shapes (0).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (10, 20))), repo), 1));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1");
+
+  //  one more shape creating a new cluster
+  cell.shapes (2).insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo), 2));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1\n"
+    "#2:[2](0,1100;0,2100;1000,2100;1000,1100)%2"
+  );
+
+  conn.connect_global (0, "GLOBAL");
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1+GLOBAL\n"
+    "#2:[2](0,1100;0,2100;1000,2100;1000,1100)%2"
+  );
+
+  conn.connect_global (2, "GLOBAL2");
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)%1+GLOBAL\n"
+    "#2:[2](0,1100;0,2100;1000,2100;1000,1100)%2+GLOBAL2"
+  );
+
+  conn.connect_global (0, "GLOBAL2");
+
+  //  now, GLOBAL2 will connect these clusters
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1100;0,2100;1000,2100;1000,1100)%1%2+GLOBAL+GLOBAL2"
   );
 }
 

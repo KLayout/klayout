@@ -229,6 +229,13 @@ local_cluster<T>::clear ()
 
 template <class T>
 void
+local_cluster<T>::set_global_nets (const global_nets &gn)
+{
+  m_global_nets = gn;
+}
+
+template <class T>
+void
 local_cluster<T>::add_attr (attr_id a)
 {
   if (a > 0) {
@@ -667,6 +674,9 @@ struct cluster_building_receiver
 {
   typedef typename local_cluster<T>::id_type id_type;
   typedef std::pair<const T *, std::pair<unsigned int, unsigned int> > shape_value;
+  typedef std::vector<shape_value> shape_vector;
+  typedef std::set<size_t> global_nets;
+  typedef std::pair<shape_vector, global_nets> cluster_value;
 
   cluster_building_receiver (const db::Connectivity &conn)
     : mp_conn (&conn)
@@ -677,14 +687,16 @@ struct cluster_building_receiver
   void generate_clusters (local_clusters<T> &clusters)
   {
     //  build the resulting clusters
-    for (typename std::list<std::vector<shape_value> >::const_iterator c = m_clusters.begin (); c != m_clusters.end (); ++c) {
+    for (typename std::list<cluster_value>::const_iterator c = m_clusters.begin (); c != m_clusters.end (); ++c) {
 
       //  TODO: reserve?
       local_cluster<T> *cluster = clusters.insert ();
-      for (typename std::vector<shape_value>::const_iterator s = c->begin (); s != c->end (); ++s) {
+      for (typename shape_vector::const_iterator s = c->first.begin (); s != c->first.end (); ++s) {
         cluster->add (*s->first, s->second.first);
         cluster->add_attr (s->second.second);
       }
+
+      cluster->set_global_nets (c->second);
 
     }
   }
@@ -695,49 +707,42 @@ struct cluster_building_receiver
       return;
     }
 
-    typename std::map<const T *, typename std::list<std::vector<shape_value> >::iterator>::iterator ic1 = m_shape_to_clusters.find (s1);
-    typename std::map<const T *, typename std::list<std::vector<shape_value> >::iterator>::iterator ic2 = m_shape_to_clusters.find (s2);
+    typename std::map<const T *, typename std::list<cluster_value>::iterator>::iterator ic1 = m_shape_to_clusters.find (s1);
+    typename std::map<const T *, typename std::list<cluster_value>::iterator>::iterator ic2 = m_shape_to_clusters.find (s2);
 
     if (ic1 == m_shape_to_clusters.end ()) {
 
       if (ic2 == m_shape_to_clusters.end ()) {
 
-        m_clusters.push_back (std::vector<shape_value> ());
-        typename std::list<std::vector<shape_value> >::iterator c = --m_clusters.end ();
-        c->push_back (std::make_pair (s1, p1));
-        c->push_back (std::make_pair (s2, p2));
+        m_clusters.push_back (cluster_value ());
+        typename std::list<cluster_value>::iterator c = --m_clusters.end ();
+        c->first.push_back (std::make_pair (s1, p1));
+        c->first.push_back (std::make_pair (s2, p2));
 
         m_shape_to_clusters.insert (std::make_pair (s1, c));
         m_shape_to_clusters.insert (std::make_pair (s2, c));
 
       } else {
 
-        ic2->second->push_back (std::make_pair (s1, p1));
+        ic2->second->first.push_back (std::make_pair (s1, p1));
         m_shape_to_clusters.insert (std::make_pair (s1, ic2->second));
 
       }
 
     } else if (ic2 == m_shape_to_clusters.end ()) {
 
-      ic1->second->push_back (std::make_pair (s2, p2));
+      ic1->second->first.push_back (std::make_pair (s2, p2));
       m_shape_to_clusters.insert (std::make_pair (s2, ic1->second));
 
     } else if (ic1->second != ic2->second) {
 
       //  join clusters: use the larger one as the target
 
-      if (ic1->second->size () < ic2->second->size ()) {
-        std::swap (ic1, ic2);
+      if (ic1->second->first.size () < ic2->second->first.size ()) {
+        join (ic2->second, ic1->second);
+      } else {
+        join (ic1->second, ic2->second);
       }
-
-      ic1->second->insert (ic1->second->end (), ic2->second->begin (), ic2->second->end ());
-
-      typename std::list<std::vector<shape_value> >::iterator j = ic2->second;
-      for (typename std::vector<shape_value>::const_iterator i = j->begin (); i != j->end (); ++i) {
-        m_shape_to_clusters [i->first] = ic1->second;
-      }
-
-      m_clusters.erase (j);
 
     }
   }
@@ -745,19 +750,63 @@ struct cluster_building_receiver
   void finish (const T *s, std::pair<unsigned int, unsigned> p)
   {
     //  if the shape has not been handled yet, insert a single cluster with only this shape
-    typename std::map<const T *, typename std::list<std::vector<shape_value> >::iterator>::const_iterator ic = m_shape_to_clusters.find (s);
+    typename std::map<const T *, typename std::list<cluster_value>::iterator>::iterator ic = m_shape_to_clusters.find (s);
     if (ic == m_shape_to_clusters.end ()) {
-      m_clusters.push_back (std::vector<shape_value> ());
-      typename std::list<std::vector<shape_value> >::iterator c = --m_clusters.end ();
-      c->push_back (std::make_pair (s, p));
-      m_shape_to_clusters.insert (std::make_pair (s, c));
+
+      m_clusters.push_back (cluster_value ());
+      typename std::list<cluster_value>::iterator c = --m_clusters.end ();
+      c->first.push_back (std::make_pair (s, p));
+
+      ic = m_shape_to_clusters.insert (std::make_pair (s, c)).first;
+
+    }
+
+    //  consider connections to global nets
+
+    db::Connectivity::global_nets_iterator ge = mp_conn->end_global_connections (p.first);
+    for (db::Connectivity::global_nets_iterator g = mp_conn->begin_global_connections (p.first); g != ge; ++g) {
+
+      typename std::map<size_t, typename std::list<cluster_value>::iterator>::iterator icg = m_global_to_clusters.find (*g);
+
+      if (icg == m_global_to_clusters.end ()) {
+
+        ic->second->second.insert (*g);
+        m_global_to_clusters.insert (std::make_pair (*g, ic->second));
+
+      } else if (ic->second != icg->second) {
+
+        //  join clusters
+        if (ic->second->first.size () < icg->second->first.size ()) {
+          join (icg->second, ic->second);
+        } else {
+          join (ic->second, icg->second);
+        }
+
+      }
+
     }
   }
 
 private:
   const db::Connectivity *mp_conn;
-  std::map<const T *, typename std::list<std::vector<shape_value> >::iterator> m_shape_to_clusters;
-  std::list<std::vector<shape_value> > m_clusters;
+  std::map<const T *, typename std::list<cluster_value>::iterator> m_shape_to_clusters;
+  std::map<size_t, typename std::list<cluster_value>::iterator> m_global_to_clusters;
+  std::list<cluster_value> m_clusters;
+
+  void join (typename std::list<cluster_value>::iterator ic1, typename std::list<cluster_value>::iterator ic2)
+  {
+    ic1->first.insert (ic1->first.end (), ic2->first.begin (), ic2->first.end ());
+    ic1->second.insert (ic2->second.begin (), ic2->second.end ());
+
+    for (typename shape_vector::const_iterator i = ic2->first.begin (); i != ic2->first.end (); ++i) {
+      m_shape_to_clusters [i->first] = ic1;
+    }
+    for (typename global_nets::const_iterator i = ic2->second.begin (); i != ic2->second.end (); ++i) {
+      m_global_to_clusters [*i] = ic1;
+    }
+
+    m_clusters.erase (ic2);
+  }
 };
 
 }

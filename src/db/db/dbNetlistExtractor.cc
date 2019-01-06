@@ -100,13 +100,11 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
       net->set_cluster_id (*c);
       circuit->add_net (net);
 
-      //  make global net connections for clusters which connect to such
-      std::set<size_t> global_net_ids;
-      std::vector<unsigned int> layers = clusters.cluster_by_id (*c).layers ();
-      for (std::vector<unsigned int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-        global_net_ids.insert (conn.begin_global_connections (*l), conn.end_global_connections (*l));
-      }
-      for (std::set<size_t>::const_iterator g = global_net_ids.begin (); g != global_net_ids.end (); ++g) {
+      const db::local_cluster<db::PolygonRef> &cluster = clusters.cluster_by_id (*c);
+
+      //  collect global net assignments from clusters
+      for (std::set<size_t>::const_iterator g = cluster.begin_global_nets (); g != cluster.end_global_nets (); ++g) {
+        tl_assert (global_nets.find (*g) == global_nets.end ());
         global_nets.insert (std::make_pair (*g, net));
         assign_net_name (conn.global_net_name (*g), net);
       }
@@ -150,6 +148,30 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
         net->add_terminal (db::NetTerminalRef (d.operator-> (), g->first));
 
       }
+
+    }
+
+    //  if any of the subcircuits has global nets which this circuit doesn't have, propagate them
+
+    std::set<db::Circuit *> seen;
+    std::set<size_t> global_nets_of_subcircuits;
+    for (db::Circuit::subcircuit_iterator sc = circuit->begin_subcircuits (); sc != circuit->end_subcircuits (); ++sc) {
+
+      db::Circuit *subcircuit = sc->circuit_ref ();
+      if (seen.find (subcircuit) == seen.end ()) {
+
+        seen.insert (subcircuit);
+
+        const std::map<size_t, db::Net *> &sc_gn = global_nets_per_cell [subcircuit->cell_index ()];
+        for (std::map<size_t, db::Net *>::const_iterator g = sc_gn.begin (); g != sc_gn.end (); ++g) {
+          global_nets_of_subcircuits.insert (g->first);
+        }
+
+      }
+
+    }
+
+    for (std::set<size_t>::const_iterator g = global_nets_of_subcircuits.begin (); g != global_nets_of_subcircuits.end (); ++g) {
 
     }
 

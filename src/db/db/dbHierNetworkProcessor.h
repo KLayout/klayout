@@ -171,6 +171,9 @@ public:
   typedef size_t attr_id;
   typedef std::set<attr_id> attr_set;
   typedef attr_set::const_iterator attr_iterator;
+  typedef size_t global_net_id;
+  typedef std::set<global_net_id> global_nets;
+  typedef global_nets::const_iterator global_nets_iterator;
 
   /**
    *  @brief Creates an empty cluster
@@ -287,6 +290,27 @@ public:
     return m_attrs.end ();
   }
 
+  /**
+   *  @brief Gets the global net IDs (begin)
+   */
+  global_nets_iterator begin_global_nets () const
+  {
+    return m_global_nets.begin ();
+  }
+
+  /**
+   *  @brief Gets the global net IDs (end)
+   */
+  global_nets_iterator end_global_nets () const
+  {
+    return m_global_nets.end ();
+  }
+
+  /**
+   *  @brief Sets the global nets
+   */
+  void set_global_nets (const global_nets &gn);
+
 private:
   template <typename> friend class local_clusters;
   template <typename> friend class interaction_receiver;
@@ -310,6 +334,7 @@ private:
   std::map<unsigned int, tree_type> m_shapes;
   box_type m_bbox;
   attr_set m_attrs;
+  global_nets m_global_nets;
   size_t m_size;
 };
 

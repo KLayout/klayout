@@ -38,14 +38,14 @@ TEST(1)
   tl::Eval e;
   tl::Variant v;
 
-  v = e.parse ("A.a0").execute ();
+  v = e.parse ("A.instance_count").execute ();
   int base_insts = v.to_int ();
   EXPECT_EQ (base_insts, 0);
 
   v = e.parse ("A.new(35).to_s").execute ();
   EXPECT_EQ (v.to_string (), std::string ("A: 35"));
 
-  EXPECT_EQ (e.parse ("A.a0").execute ().to_int (), 0);
+  EXPECT_EQ (e.parse ("A.instance_count").execute ().to_int (), 0);
 
   // mapping of to_string to to_s method
   v = e.parse ("A.new(35)").execute ();
@@ -97,11 +97,11 @@ TEST(1)
   EXPECT_EQ (v.to_string (), std::string ("0.125"));
   v = e.parse ("a.a4([5, 1, -1.25])").execute ();
   EXPECT_EQ (v.to_string (), std::string ("-1.25"));
-  v = e.parse ("A.a0").execute ();
+  v = e.parse ("A.instance_count").execute ();
   EXPECT_EQ (v.to_int (), base_insts + 1);   //  one instance more
-  v = e.parse ("a=1; A.a0").execute ();
+  v = e.parse ("a=1; A.instance_count").execute ();
   EXPECT_EQ (v.to_int (), base_insts);   //  remaining instances 
-  v = e.parse ("A.a0").execute ();
+  v = e.parse ("A.instance_count").execute ();
   EXPECT_EQ (v.to_int (), base_insts);   //  remaining instances 
 
   v = e.parse ("var a1=A.new; a1.a5(-15); var a2=a1.dup; a2.a5(107); a1.a1").execute ();

@@ -104,7 +104,7 @@ struct A
   void set_af (bool _f) { f = _f; }
   bool af1 (bool /*dummy*/) { return f; }
 
-  static int a0 ();
+  static int instance_count ();
   int a1 () { 
     return n; 
   }
@@ -465,26 +465,26 @@ struct B
     return m.c_str ();
   }
 
-  A b6 (int n) { 
+  A make_a (int n) {
     return A(n);
   }
 
-  void b8 (int n) 
+  void set_an (int n)
   { 
     a.n = n;
   }
 
-  int b9 (A a) 
+  int an (A a)
   { 
     return a.n;
   }
 
-  void b8cref (const int &n) 
+  void set_an_cref (const int &n)
   { 
     a.n = n;
   }
 
-  const int &b9cref (const A &a) 
+  const int &an_cref (const A &a)
   { 
     return a.n;
   }

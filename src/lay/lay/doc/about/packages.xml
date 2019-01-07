@@ -176,7 +176,7 @@
     &lt;version&gt;Version&lt;/version&gt;
     &lt;title&gt;Title of the package&lt;/title&gt;
     &lt;doc&gt;A brief description&lt;/doc&gt;
-    &lt;doc_url&gt;Documentation URL&lt;/doc_url&gt;
+    &lt;doc-url&gt;Documentation URL&lt;/doc-url&gt;
     &lt;url&gt;Download URL&lt;/url&gt;
     &lt;license&gt;License model&lt;/license&gt;
     &lt;icon&gt;Icon image: base64-encoded, 64x64 max, PNG preferred&lt;/icon&gt;

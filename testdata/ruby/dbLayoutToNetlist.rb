@@ -290,6 +290,134 @@ END
 
   end
 
+  def test_12_LayoutToNetlistExtractionWithDevicesAndGlobalNets
+
+    ly = RBA::Layout::new
+    ly.read(File.join($ut_testsrc, "testdata", "algo", "device_extract_l3.gds"))
+
+    l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))
+
+    rbulk       = l2n.make_polygon_layer( ly.layer       )
+    rnwell      = l2n.make_polygon_layer( ly.layer(1, 0) )
+    ractive     = l2n.make_polygon_layer( ly.layer(2, 0) )
+    rpoly       = l2n.make_polygon_layer( ly.layer(3, 0) )
+    rpoly_lbl   = l2n.make_text_layer(    ly.layer(3, 1) )
+    rdiff_cont  = l2n.make_polygon_layer( ly.layer(4, 0) )
+    rpoly_cont  = l2n.make_polygon_layer( ly.layer(5, 0) )
+    rmetal1     = l2n.make_polygon_layer( ly.layer(6, 0) )
+    rmetal1_lbl = l2n.make_text_layer(    ly.layer(6, 1) )
+    rvia1       = l2n.make_polygon_layer( ly.layer(7, 0) )
+    rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0) )
+    rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1) )
+    rpplus      = l2n.make_polygon_layer( ly.layer(10, 0) )
+    rnplus      = l2n.make_polygon_layer( ly.layer(11, 0) )
+
+    ractive_in_nwell = ractive & rnwell
+    rpactive    = ractive_in_nwell & rpplus
+    rntie       = ractive_in_nwell & rnplus
+    rpgate      = rpactive & rpoly
+    rpsd        = rpactive - rpgate
+
+    ractive_outside_nwell = ractive - rnwell
+    rnactive    = ractive_outside_nwell & rnplus
+    rptie       = ractive_outside_nwell & rpplus
+    rngate      = rnactive & rpoly
+    rnsd        = rnactive - rngate
+
+    # PMOS transistor device extraction
+    pmos_ex = RBA::DeviceExtractorMOS4Transistor::new("PMOS")
+    l2n.extract_devices(pmos_ex, { "SD" => rpsd, "G" => rpgate, "P" => rpoly, "W" => rnwell })
+
+    # NMOS transistor device extraction
+    nmos_ex = RBA::DeviceExtractorMOS4Transistor::new("NMOS")
+    l2n.extract_devices(nmos_ex, { "SD" => rnsd, "G" => rngate, "P" => rpoly, "W" => rbulk })
+
+    # Define connectivity for netlist extraction
+
+    # Intra-layer
+    l2n.connect(rpsd)
+    l2n.connect(rnsd)
+    l2n.connect(rnwell)
+    l2n.connect(rpoly)
+    l2n.connect(rdiff_cont)
+    l2n.connect(rpoly_cont)
+    l2n.connect(rmetal1)
+    l2n.connect(rvia1)
+    l2n.connect(rmetal2)
+    l2n.connect(rptie)
+    l2n.connect(rntie)
+
+    # Inter-layer
+    l2n.connect(rpsd,       rdiff_cont)
+    l2n.connect(rnsd,       rdiff_cont)
+    l2n.connect(rpoly,      rpoly_cont)
+    l2n.connect(rpoly_cont, rmetal1)
+    l2n.connect(rdiff_cont, rmetal1)
+    l2n.connect(rdiff_cont, rntie)
+    l2n.connect(rdiff_cont, rptie)
+    l2n.connect(rnwell,     rntie)
+    l2n.connect(rmetal1,    rvia1)
+    l2n.connect(rvia1,      rmetal2)
+    l2n.connect(rpoly,      rpoly_lbl)     #  attaches labels
+    l2n.connect(rmetal1,    rmetal1_lbl)   #  attaches labels
+    l2n.connect(rmetal2,    rmetal2_lbl)   #  attaches labels
+
+    # Global connections
+    l2n.connect_global(rptie, "BULK")
+    l2n.connect_global(rbulk, "BULK")
+    
+    # Perform netlist extraction 
+    l2n.extract_netlist
+
+    assert_equal(l2n.netlist.to_s, <<END)
+Circuit RINGO ():
+  XINV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD)
+  XINV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD)
+  XINV2PAIR $3 (BULK='BULK,VSS',$2=$I23,$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD)
+  XINV2PAIR $4 (BULK='BULK,VSS',$2=$I24,$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD)
+  XINV2PAIR $5 (BULK='BULK,VSS',$2=$I25,$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD)
+Circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1):
+  XINV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)
+  XINV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)
+Circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK):
+  DPMOS $1 (S=$3,G=IN,D=VDD,B=$1) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]
+  DPMOS $2 (S=VDD,G=$3,D=OUT,B=$1) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]
+  DNMOS $3 (S=$3,G=IN,D=VSS,B=BULK) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]
+  DNMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]
+  XTRANS $1 ($1=$3,$2=VSS,$3=IN)
+  XTRANS $2 ($1=$3,$2=VDD,$3=IN)
+  XTRANS $3 ($1=VDD,$2=OUT,$3=$3)
+  XTRANS $4 ($1=VSS,$2=OUT,$3=$3)
+Circuit TRANS ($1=$1,$2=$2,$3=$3):
+END
+
+    l2n.netlist.combine_devices
+    l2n.netlist.make_top_level_pins
+    l2n.netlist.purge
+
+    puts l2n.netlist.to_s
+    assert_equal(l2n.netlist.to_s, <<END)
+Circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS'):
+  XINV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD)
+  XINV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD)
+  XINV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD)
+  XINV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD)
+  XINV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD)
+Circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1):
+  XINV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)
+  XINV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)
+Circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK):
+  DPMOS $1 (S=$3,G=IN,D=VDD,B=$1) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]
+  DPMOS $2 (S=VDD,G=$3,D=OUT,B=$1) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]
+  DNMOS $3 (S=$3,G=IN,D=VSS,B=BULK) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]
+  DNMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) [L=0.25,W=0.95,AS=0.26125,AD=0.49875]
+END
+
+    # cleanup now
+    l2n._destroy
+
+  end
+
 end
 
 load("test_epilogue.rb")

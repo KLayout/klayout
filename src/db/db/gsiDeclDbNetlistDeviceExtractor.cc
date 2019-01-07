@@ -415,4 +415,39 @@ Class<db::NetlistDeviceExtractorMOS3Transistor> decl_NetlistDeviceExtractorMOS3T
   "This class has been introduced in version 0.26."
 );
 
+db::NetlistDeviceExtractorMOS4Transistor *make_mos4_extractor (const std::string &name)
+{
+  return new db::NetlistDeviceExtractorMOS4Transistor (name);
+}
+
+Class<db::NetlistDeviceExtractorMOS4Transistor> decl_NetlistDeviceExtractorMOS4Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorMOS4Transistor",
+  gsi::constructor ("new", &make_mos4_extractor, gsi::arg ("name"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a four-terminal MOS transistor\n"
+  "\n"
+  "This class supplies the generic extractor for a MOS device.\n"
+  "The device is defined by two basic input layers: the diffusion area\n"
+  "(source and drain) and the gate area. It requires a third layer\n"
+  "(poly) to put the gate terminals on and a forth layer to put the bulk\n"
+  "terminal an. The separation between poly\n"
+  "and allows separating the device recognition layer (gate) from the\n"
+  "conductive layer.\n"
+  "\n"
+  "The bulk terminal layer can be an empty layer representing the substrate.\n"
+  "In this use mode the bulk terminal shapes will be produced there. This\n"
+  "layer then needs to be connected to a global net to establish the net.\n"
+  "\n"
+  "The device class produced by this extractor is \\DeviceClassMOS4Transistor.\n"
+  "The extractor extracts the four parameters of this class: L, W, AS and AD.\n"
+  "\n"
+  "The diffusion area is distributed on the number of gates connecting to\n"
+  "the particular source or drain area.\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
 }

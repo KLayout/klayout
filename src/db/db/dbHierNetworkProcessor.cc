@@ -106,6 +106,7 @@ Connectivity::connect_global (unsigned int l, const std::string &gn)
 {
   size_t id = global_net_id (gn);
   m_global_connections [l].insert (id);
+  m_all_layers.insert (l);
   return id;
 }
 

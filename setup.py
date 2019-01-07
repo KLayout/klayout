@@ -498,6 +498,17 @@ if __name__ == '__main__':
           long_description='TODO',
           author='Matthias Koefferlein',
           author_email='matthias@klayout.de',
+          classifiers=[
+              # Recommended classifiers
+              "Programming Language :: Python :: 2",
+              "Programming Language :: Python :: 3",
+              "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+              "Operating System :: MacOS :: MacOS X",
+              "Operating System :: Microsoft :: Windows",
+              "Operating System :: POSIX :: Linux",
+              # Optional classifiers
+              "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+          ],
           url='https://github.com/klayoutmatthias/klayout',
           packages=find_packages('src/pymod/distutils_src'),
           package_dir={'': 'src/pymod/distutils_src'},  # https://github.com/pypa/setuptools/issues/230

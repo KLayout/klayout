@@ -177,6 +177,11 @@ public:
   const std::string &global_net_name (size_t id) const;
 
   /**
+   *  @brief Gets the global net ID for a given name name
+   */
+  size_t global_net_id (const std::string &name);
+
+  /**
    *  @brief Runs the netlist extraction
    *  See the class description for more details.
    */

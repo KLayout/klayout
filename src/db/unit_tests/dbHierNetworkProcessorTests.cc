@@ -877,16 +877,11 @@ static void copy_cluster_shapes (const std::string *&attrs, db::Shapes &out, db:
 static void run_hc_test (tl::TestBase *_this, const std::string &file, const std::string &au_file)
 {
   db::Layout ly;
-  unsigned int l0 = 0, l1 = 0, l2 = 0, l3 = 0;
+  unsigned int l1 = 0, l2 = 0, l3 = 0, l4 = 0;
 
   {
     db::LayerProperties p;
     db::LayerMap lmap;
-
-    p.layer = 0;
-    p.datatype = 0;
-    lmap.map (db::LDPair (p.layer, p.datatype), l0 = ly.insert_layer ());
-    ly.set_properties (l0, p);
 
     p.layer = 1;
     p.datatype = 0;
@@ -902,6 +897,11 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
     p.datatype = 0;
     lmap.map (db::LDPair (p.layer, p.datatype), l3 = ly.insert_layer ());
     ly.set_properties (l3, p);
+
+    p.layer = 4;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l4 = ly.insert_layer ());
+    ly.set_properties (l4, p);
 
     db::LoadLayoutOptions options;
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
@@ -919,6 +919,7 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
   normalize_layer (ly, strings, l1);
   normalize_layer (ly, strings, l2);
   normalize_layer (ly, strings, l3);
+  normalize_layer (ly, strings, l4);
 
   //  connect 1 to 1, 1 to 2 and 1 to 3, but *not* 2 to 3
   db::Connectivity conn;
@@ -927,6 +928,9 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
   conn.connect (l3, l3);
   conn.connect (l1, l2);
   conn.connect (l1, l3);
+  conn.connect (l1, l4);
+
+  conn.connect_global (l4, "BULK");
 
   db::hier_clusters<db::PolygonRef> hc;
   hc.build (ly, ly.cell (*ly.begin_top_down ()), db::ShapeIterator::Polygons, conn);
@@ -989,7 +993,7 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
 static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::string &file, const std::string &au_file)
 {
   db::Layout ly;
-  unsigned int l1 = 0, l2 = 0, l3 = 0;
+  unsigned int l1 = 0, l2 = 0, l3 = 0, l4 = 0;
 
   {
     db::LayerProperties p;
@@ -1010,6 +1014,11 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
     lmap.map (db::LDPair (p.layer, p.datatype), l3 = ly.insert_layer ());
     ly.set_properties (l3, p);
 
+    p.layer = 4;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l4 = ly.insert_layer ());
+    ly.set_properties (l4, p);
+
     db::LoadLayoutOptions options;
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
@@ -1026,6 +1035,7 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
   normalize_layer (ly, strings, l1);
   normalize_layer (ly, strings, l2);
   normalize_layer (ly, strings, l3);
+  normalize_layer (ly, strings, l4);
 
   //  connect 1 to 1, 1 to 2 and 1 to 3, but *not* 2 to 3
   db::Connectivity conn;
@@ -1034,6 +1044,9 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
   conn.connect (l3, l3);
   conn.connect (l1, l2);
   conn.connect (l1, l3);
+  conn.connect (l1, l4);
+
+  conn.connect_global (l4, "BULK");
 
   db::hier_clusters<db::PolygonRef> hc;
   hc.build (ly, ly.cell (*ly.begin_top_down ()), db::ShapeIterator::Polygons, conn);
@@ -1042,6 +1055,7 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
   lm[l1] = ly.insert_layer (db::LayerProperties (101, 0));
   lm[l2] = ly.insert_layer (db::LayerProperties (102, 0));
   lm[l3] = ly.insert_layer (db::LayerProperties (103, 0));
+  lm[l4] = ly.insert_layer (db::LayerProperties (104, 0));
   hc.return_to_hierarchy (ly, lm);
 
   CHECKPOINT();
@@ -1136,5 +1150,11 @@ TEST(115_HierClusters)
 {
   run_hc_test (_this, "hc_test_l15.gds", "hc_test_au15.gds");
   run_hc_test_with_backannotation (_this, "hc_test_l15.gds", "hc_test_au15b.gds");
+}
+
+TEST(116_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l16.gds", "hc_test_au16.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l16.gds", "hc_test_au16b.gds");
 }
 

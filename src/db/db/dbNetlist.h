@@ -885,31 +885,6 @@ public:
   }
 
   /**
-   *  @brief Gets the global connections iterator (begin)
-   *  Global connections are terminals attached to a global net.
-   *  This iterator delivers a pair of terminal ID (first)
-   *  and global net ID (second).
-   *  See Connectivity for the definition of the global net ID.
-   */
-  global_connections_iterator begin_global_connections () const
-  {
-    return m_global_connections.begin ();
-  }
-
-  /**
-   *  @brief Gets the global connections iterator (end)
-   */
-  global_connections_iterator end_global_connections () const
-  {
-    return m_global_connections.end ();
-  }
-
-  /**
-   *  @brief Connects the given terminal to the given global net
-   */
-  void connect_terminal_global (size_t terminal_id, size_t global_net_id);
-
-  /**
    *  @brief Gets the net attached to a specific terminal
    *  Returns 0 if no net is attached.
    */
@@ -966,7 +941,6 @@ private:
   std::vector<double> m_parameters;
   size_t m_id;
   Circuit *mp_circuit;
-  global_connections m_global_connections;
 
   /**
    *  @brief Sets the terminal reference for a specific terminal

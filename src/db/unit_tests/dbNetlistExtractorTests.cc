@@ -63,11 +63,11 @@ static std::string device_name (const db::Device &device)
 namespace
 {
 
-class MOSFETExtractor
+class MOSFET3Extractor
   : public db::NetlistDeviceExtractorMOS3Transistor
 {
 public:
-  MOSFETExtractor (const std::string &name, db::Layout *debug_out)
+  MOSFET3Extractor (const std::string &name, db::Layout *debug_out)
     : db::NetlistDeviceExtractorMOS3Transistor (name), mp_debug_out (debug_out), m_ldiff (0), m_lgate (0)
   {
     if (mp_debug_out) {
@@ -239,8 +239,8 @@ TEST(1_DeviceAndNetExtraction)
   //  NOTE: the device extractor will add more debug layers for the transistors:
   //    20/0 -> Diffusion
   //    21/0 -> Gate
-  MOSFETExtractor pmos_ex ("PMOS", &ly);
-  MOSFETExtractor nmos_ex ("NMOS", &ly);
+  MOSFET3Extractor pmos_ex ("PMOS", &ly);
+  MOSFET3Extractor nmos_ex ("NMOS", &ly);
 
   db::NetlistDeviceExtractor::input_layers dl;
 

@@ -24,11 +24,11 @@
 #include "dbNetlistDeviceExtractorClasses.h"
 #include "dbNetlistDeviceClasses.h"
 
-// ---------------------------------------------------------------------------------
-//  NetlistDeviceExtractorMOS3Transistor implementation
-
 namespace db
 {
+
+// ---------------------------------------------------------------------------------
+//  NetlistDeviceExtractorMOS3Transistor implementation
 
 NetlistDeviceExtractorMOS3Transistor::NetlistDeviceExtractorMOS3Transistor (const std::string &name)
   : db::NetlistDeviceExtractor (name)
@@ -47,7 +47,7 @@ void NetlistDeviceExtractorMOS3Transistor::setup ()
 
 db::Connectivity NetlistDeviceExtractorMOS3Transistor::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
 {
-  tl_assert (layers.size () == 3);
+  tl_assert (layers.size () >= 3);
 
   unsigned int diff = layers [0];
   unsigned int gate = layers [1];
@@ -117,12 +117,40 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 
       define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_geometry_index, *p);
 
+      //  allow derived classes to modify the device
+      modify_device (*p, layer_geometry, device);
+
       //  output the device for debugging
       device_out (device, rdiff2gate, rgate);
 
     }
 
   }
+}
+
+// ---------------------------------------------------------------------------------
+//  NetlistDeviceExtractorMOS4Transistor implementation
+
+NetlistDeviceExtractorMOS4Transistor::NetlistDeviceExtractorMOS4Transistor (const std::string &name)
+  : NetlistDeviceExtractorMOS3Transistor (name)
+{
+  //  .. nothing yet ..
+}
+
+void NetlistDeviceExtractorMOS4Transistor::setup ()
+{
+  define_layer ("SD", "Source/drain diffusion");
+  define_layer ("G", "Gate");
+  define_layer ("P", "Poly");
+  define_layer ("W", "Well");
+
+  register_device_class (new db::DeviceClassMOS4Transistor ());
+}
+
+void NetlistDeviceExtractorMOS4Transistor::modify_device (const db::Polygon &rgate, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device)
+{
+  unsigned int well_geometry_index = 3;
+  define_terminal (device, db::DeviceClassMOS4Transistor::terminal_id_B, well_geometry_index, rgate);
 }
 
 }

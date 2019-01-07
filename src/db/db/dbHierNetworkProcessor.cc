@@ -104,17 +104,8 @@ Connectivity::end_global_connections (unsigned int l) const
 size_t
 Connectivity::connect_global (unsigned int l, const std::string &gn)
 {
-  for (std::vector<std::string>::const_iterator i = m_global_net_names.begin (); i != m_global_net_names.end (); ++i) {
-    if (*i == gn) {
-      size_t id = i - m_global_net_names.begin ();
-      m_global_connections [l].insert (id);
-      return id;
-    }
-  }
-
-  size_t id = m_global_net_names.size ();
+  size_t id = global_net_id (gn);
   m_global_connections [l].insert (id);
-  m_global_net_names.push_back (gn);
   return id;
 }
 
@@ -129,6 +120,21 @@ Connectivity::global_net_name (size_t id) const
 {
   tl_assert (id < m_global_net_names.size ());
   return m_global_net_names [id];
+}
+
+size_t
+Connectivity::global_net_id (const std::string &gn)
+{
+  for (std::vector<std::string>::const_iterator i = m_global_net_names.begin (); i != m_global_net_names.end (); ++i) {
+    if (*i == gn) {
+      size_t id = i - m_global_net_names.begin ();
+      return id;
+    }
+  }
+
+  size_t id = m_global_net_names.size ();
+  m_global_net_names.push_back (gn);
+  return id;
 }
 
 Connectivity::layer_iterator
@@ -225,6 +231,7 @@ local_cluster<T>::clear ()
   m_size = 0;
   m_bbox = box_type ();
   m_attrs.clear ();
+  m_global_nets.clear ();
 }
 
 template <class T>
@@ -262,6 +269,7 @@ local_cluster<T>::join_with (const local_cluster<T> &other)
   }
 
   m_attrs.insert (other.m_attrs.begin (), other.m_attrs.end ());
+  m_global_nets.insert (other.m_global_nets.begin (), other.m_global_nets.end ());
   m_size += other.size ();
 
   m_needs_update = true;
@@ -1450,95 +1458,7 @@ private:
    */
   ClusterInstance make_path (id_type id, const std::vector<db::InstElement> &path) const
   {
-    std::vector<db::InstElement>::const_iterator p = path.end ();
-    tl_assert (p != path.begin ());
-
-    while (true) {
-
-      --p;
-
-      ClusterInstance ci (id, *p);
-      if (p == path.begin ()) {
-
-        //  if we're attaching to a child which is root yet, we need to promote the
-        //  cluster to the parent in all places
-        connected_clusters<T> &child_cc = mp_tree->clusters_per_cell (p->inst_ptr.cell_index ());
-        if (child_cc.is_root (id)) {
-
-          const db::Cell &child_cell = mp_layout->cell (p->inst_ptr.cell_index ());
-          for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
-
-            connected_clusters<T> &parent_cc = mp_tree->clusters_per_cell (pi->parent_cell_index ());
-            for (db::CellInstArray::iterator pii = pi->child_inst ().begin (); ! pii.at_end (); ++pii) {
-
-              ClusterInstance ci2 (id, db::InstElement (pi->child_inst (), pii));
-              if (mp_cell->cell_index () != pi->parent_cell_index () || ci != ci2) {
-
-                id_type id_dummy = parent_cc.insert_dummy ();
-                parent_cc.add_connection (id_dummy, ci2);
-
-              }
-
-            }
-
-          }
-
-          child_cc.reset_root (id);
-
-        }
-
-        return ci;
-
-      }
-
-      db::cell_index_type pci = p [-1].inst_ptr.cell_index ();
-      connected_clusters<T> &target_cc = mp_tree->clusters_per_cell (pci);
-      id_type parent_cluster = target_cc.find_cluster_with_connection (ci);
-
-      if (parent_cluster > 0) {
-
-        //  taken parent
-        id = parent_cluster;
-
-      } else {
-
-        id_type id_new = 0;
-
-        //  if we're attaching to a child which is root yet, we need to promote the
-        //  cluster to the parent in all places
-        connected_clusters<T> &child_cc = mp_tree->clusters_per_cell (p->inst_ptr.cell_index ());
-        if (child_cc.is_root (id)) {
-
-          const db::Cell &child_cell = mp_layout->cell (p->inst_ptr.cell_index ());
-          for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
-
-            connected_clusters<T> &parent_cc = mp_tree->clusters_per_cell (pi->parent_cell_index ());
-            for (db::CellInstArray::iterator pii = pi->child_inst ().begin (); ! pii.at_end (); ++pii) {
-
-              id_type id_dummy = parent_cc.insert_dummy ();
-              ClusterInstance ci2 (id, db::InstElement (pi->child_inst (), pii));
-              parent_cc.add_connection (id_dummy, ci2);
-
-              if (pci == pi->parent_cell_index () && ci == ci2) {
-                id_new = id_dummy;
-              }
-
-            }
-
-          }
-
-          child_cc.reset_root (id);
-
-        }
-
-        //  no parent -> create vertical connector
-        id = id_new;
-        tl_assert (id != 0);
-
-      }
-
-    }
-
+    return mp_tree->make_path (*mp_layout, *mp_cell, id, path);
   }
 };
 
@@ -1563,6 +1483,120 @@ private:
   const cell_clusters_box_converter<T> *mp_cbc;
 };
 
+}
+
+template <class T>
+ClusterInstance
+hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<db::InstElement> &path)
+{
+  std::vector<db::InstElement>::const_iterator p = path.end ();
+  tl_assert (p != path.begin ());
+
+  while (true) {
+
+    --p;
+
+    ClusterInstance ci (id, *p);
+    if (p == path.begin ()) {
+
+      //  if we're attaching to a child which is root yet, we need to promote the
+      //  cluster to the parent in all places
+      connected_clusters<T> &child_cc = clusters_per_cell (p->inst_ptr.cell_index ());
+      if (child_cc.is_root (id)) {
+
+        const db::Cell &child_cell = layout.cell (p->inst_ptr.cell_index ());
+        for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
+
+          connected_clusters<T> &parent_cc = clusters_per_cell (pi->parent_cell_index ());
+          for (db::CellInstArray::iterator pii = pi->child_inst ().begin (); ! pii.at_end (); ++pii) {
+
+            ClusterInstance ci2 (id, db::InstElement (pi->child_inst (), pii));
+            if (cell.cell_index () != pi->parent_cell_index () || ci != ci2) {
+
+              size_t id_dummy;
+
+              const typename db::local_cluster<T>::global_nets &gn = child_cc.cluster_by_id (id).get_global_nets ();
+              if (gn.empty ()) {
+                id_dummy = parent_cc.insert_dummy ();
+              } else {
+                local_cluster<T> *lc = parent_cc.insert ();
+                lc->set_global_nets (gn);
+                id_dummy = lc->id ();
+              }
+
+              parent_cc.add_connection (id_dummy, ci2);
+
+            }
+
+          }
+
+        }
+
+        child_cc.reset_root (id);
+
+      }
+
+      return ci;
+
+    }
+
+    db::cell_index_type pci = p [-1].inst_ptr.cell_index ();
+    connected_clusters<T> &target_cc = clusters_per_cell (pci);
+    size_t parent_cluster = target_cc.find_cluster_with_connection (ci);
+
+    if (parent_cluster > 0) {
+
+      //  taken parent
+      id = parent_cluster;
+
+    } else {
+
+      size_t id_new = 0;
+
+      //  if we're attaching to a child which is root yet, we need to promote the
+      //  cluster to the parent in all places
+      connected_clusters<T> &child_cc = clusters_per_cell (p->inst_ptr.cell_index ());
+      if (child_cc.is_root (id)) {
+
+        const db::Cell &child_cell = layout.cell (p->inst_ptr.cell_index ());
+        for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
+
+          connected_clusters<T> &parent_cc = clusters_per_cell (pi->parent_cell_index ());
+          for (db::CellInstArray::iterator pii = pi->child_inst ().begin (); ! pii.at_end (); ++pii) {
+
+            size_t id_dummy;
+
+            const typename db::local_cluster<T>::global_nets &gn = child_cc.cluster_by_id (id).get_global_nets ();
+            if (gn.empty ()) {
+              id_dummy = parent_cc.insert_dummy ();
+            } else {
+              local_cluster<T> *lc = parent_cc.insert ();
+              lc->set_global_nets (gn);
+              id_dummy = lc->id ();
+            }
+
+            ClusterInstance ci2 (id, db::InstElement (pi->child_inst (), pii));
+            parent_cc.add_connection (id_dummy, ci2);
+
+            if (pci == pi->parent_cell_index () && ci == ci2) {
+              id_new = id_dummy;
+            }
+
+          }
+
+        }
+
+        child_cc.reset_root (id);
+
+      }
+
+      //  no parent -> create vertical connector
+      id = id_new;
+      tl_assert (id != 0);
+
+    }
+
+  }
 }
 
 template <class T>
@@ -1648,6 +1682,83 @@ hier_clusters<T>::build_hier_connections_for_cells (cell_clusters_box_converter<
   }
 }
 
+namespace {
+
+class GlobalNetClusterMaker
+{
+public:
+  typedef std::pair<std::set<size_t>, std::set<ClusterInstance> > entry_type;
+  typedef std::list<entry_type> entry_list;
+  typedef entry_list::const_iterator entry_iterator;
+
+  void
+  add (const std::set<size_t> &global_nets, size_t cluster_id)
+  {
+    add (global_nets, ClusterInstance (cluster_id, db::InstElement ()));
+  }
+
+  void
+  add (const std::set<size_t> &global_nets, const ClusterInstance &inst)
+  {
+    if (global_nets.empty ()) {
+      return;
+    }
+
+    std::set<size_t>::const_iterator g0 = global_nets.begin ();
+
+    std::map<size_t, entry_list::iterator>::iterator k = m_global_net_to_entries.find (*g0);
+    if (k == m_global_net_to_entries.end ()) {
+
+      m_entries.push_back (entry_type ());
+      m_entries.back ().first.insert (*g0);
+
+      k = m_global_net_to_entries.insert (std::make_pair (*g0, --m_entries.end ())).first;
+
+    }
+
+    k->second->second.insert (inst);
+
+    for (std::set<size_t>::const_iterator g = ++g0; g != global_nets.end (); ++g) {
+
+      std::map<size_t, entry_list::iterator>::iterator j = m_global_net_to_entries.find (*g);
+      if (j == m_global_net_to_entries.end ()) {
+
+        k->second->first.insert (*g);
+        k->second->second.insert (inst);
+
+        m_global_net_to_entries.insert (std::make_pair (*g, k->second));
+
+      } else if (k->second != j->second) {
+
+        //  joining required
+        k->second->first.insert (j->second->first.begin (), j->second->first.end ());
+        k->second->second.insert (j->second->second.begin (), j->second->second.end ());
+
+        m_entries.erase (j->second);
+        j->second = k->second;
+
+      }
+
+    }
+  }
+
+  entry_iterator begin () const
+  {
+    return m_entries.begin ();
+  }
+
+  entry_iterator end () const
+  {
+    return m_entries.end ();
+  }
+
+private:
+  entry_list m_entries;
+  std::map<size_t, entry_list::iterator> m_global_net_to_entries;
+};
+
+}
+
 template <class T>
 void
 hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn)
@@ -1662,7 +1773,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
   //  NOTE: this is a receiver for both the child-to-child and
   //  local to child interactions.
-  hc_receiver<T> rec (layout, cell, local, *this, cbc, conn);
+  std::auto_ptr<hc_receiver<T> > rec (new hc_receiver<T> (layout, cell, local, *this, cbc, conn));
   cell_inst_clusters_box_converter<T> cibc (cbc);
 
   //  The box scanner needs pointers so we have to first store the instances
@@ -1694,7 +1805,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
       bs.insert (inst.operator-> (), 0);
     }
 
-    bs.process (rec, 1 /*touching*/, cibc);
+    bs.process (*rec, 1 /*touching*/, cibc);
   }
 
   //  handle local to instance connections
@@ -1729,11 +1840,79 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
       bs2.insert2 (inst.operator-> (), 0);
     }
 
-    bs2.process (rec, 1 /*touching*/, local_cluster_box_convert<T> (), cibc);
+    bs2.process (*rec, 1 /*touching*/, local_cluster_box_convert<T> (), cibc);
   }
 
-  //  finally join local clusters which got connected by child clusters
-  rec.join_superclusters ();
+  //  join local clusters which got connected by child clusters
+  rec->join_superclusters ();
+  rec.reset (0);
+
+  //  finally connect global nets
+  {
+    static std::string desc = tl::to_string (tr ("Global net treatment"));
+    tl::SelfTimer timer (tl::verbosity () >= 51, desc);
+
+    GlobalNetClusterMaker global_net_clusters;
+
+    //  insert the global nets from the subcircuits which need connection
+
+    for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
+
+      const db::connected_clusters<T> &cc = m_per_cell_clusters [inst->cell_index ()];
+      for (typename db::connected_clusters<T>::const_iterator cl = cc.begin (); cl != cc.end (); ++cl) {
+
+        if (! cl->get_global_nets ().empty () && cc.is_root (cl->id ())) {
+          for (db::Instance::cell_inst_array_type::iterator i = inst->begin (); !i.at_end (); ++i) {
+            global_net_clusters.add (cl->get_global_nets (), db::ClusterInstance (cl->id (), db::InstElement (*inst, i)));
+          }
+        }
+
+      }
+    }
+
+    //  insert the global nets from here
+
+    for (typename db::connected_clusters<T>::const_iterator cl = local.begin (); cl != local.end (); ++cl) {
+      if (! cl->get_global_nets ().empty ()) {
+        global_net_clusters.add (cl->get_global_nets (), db::ClusterInstance (cl->id (), db::InstElement ()));
+      }
+    }
+
+    //  now global_net_clusters knows what clusters need to be made for the global nets
+
+    for (GlobalNetClusterMaker::entry_iterator ge = global_net_clusters.begin (); ge != global_net_clusters.end (); ++ge) {
+
+      db::local_cluster<T> *gc = local.insert ();
+      gc->set_global_nets (ge->first);
+
+      for (std::set<ClusterInstance>::const_iterator ci = ge->second.begin (); ci != ge->second.end (); ++ci) {
+
+        if (ci->inst ().array_inst.at_end ()) {
+
+          local.join_cluster_with (gc->id (), ci->id ());
+          local.remove_cluster (ci->id ());
+
+        } else {
+
+          std::vector<db::InstElement> p;
+          p.push_back (ci->inst ());
+          ClusterInstance k = make_path (layout, cell, ci->id (), p);
+
+          size_t other_id = local.find_cluster_with_connection (k);
+          if (other_id) {
+            local.join_cluster_with (gc->id (), other_id);
+            local.remove_cluster (other_id);
+          } else {
+            local.add_connection (gc->id (), k);
+          }
+
+        }
+
+      }
+
+    }
+
+  }
 }
 
 template <class T>

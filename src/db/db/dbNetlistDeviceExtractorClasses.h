@@ -35,7 +35,7 @@ namespace db
  *  The device is defined by two basic input layers: the diffusion area
  *  (source and drain) and the gate area. It requires a third layer
  *  (poly) to put the gate terminals on. The separation between poly
- *  and allows separating the device recognition layer (gate) from the
+ *  and gate allows separating the device recognition layer (gate) from the
  *  conductive layer.
  *
  *  The device class produced by this extractor is DeviceClassMOS3Transistor.
@@ -56,13 +56,43 @@ public:
 
 protected:
   /**
-   *  @brief A cappback when the device is produced
+   *  @brief A callback when the device is produced
    *  This callback is provided as a debugging port
    */
   virtual void device_out (const db::Device * /*device*/, const db::Region & /*diff*/, const db::Region & /*gate*/)
   {
     //  .. no specific implementation ..
   }
+
+  /**
+   *  @brief Allow derived classes to modify the device
+   */
+  virtual void modify_device (const db::Polygon & /*rgate*/, const std::vector<db::Region> & /*layer_geometry*/, db::Device * /*device*/)
+  {
+    //  .. no specific implementation ..
+  }
+
+};
+
+/**
+ *  @brief A device extractor for a four-terminal MOS transistor
+ *
+ *  This class is like the MOS3Transistor extractor, but requires a forth
+ *  input layer (Well). This layer will be used to output the bulk terminal.
+ *
+ *  The device class produced by this extractor is DeviceClassMOS4Transistor.
+ *  The extractor extracts the four parameters of this class: L, W, AS and AD.
+ */
+class DB_PUBLIC NetlistDeviceExtractorMOS4Transistor
+  : public NetlistDeviceExtractorMOS3Transistor
+{
+public:
+  NetlistDeviceExtractorMOS4Transistor (const std::string &name);
+
+  virtual void setup ();
+
+private:
+  virtual void modify_device (const db::Polygon &rgate, const std::vector<db::Region> &layer_geometry, db::Device *device);
 };
 
 }

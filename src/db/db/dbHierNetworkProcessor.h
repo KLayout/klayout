@@ -100,6 +100,11 @@ public:
   const std::string &global_net_name (size_t id) const;
 
   /**
+   *  @brief Gets the global net ID for the given name
+   */
+  size_t global_net_id (const std::string &gn);
+
+  /**
    *  @brief Begin iterator for the layers involved
    */
   layer_iterator begin_layers () const;
@@ -304,6 +309,14 @@ public:
   global_nets_iterator end_global_nets () const
   {
     return m_global_nets.end ();
+  }
+
+  /**
+   *  @brief Gets the global nets set
+   */
+  const global_nets &get_global_nets () const
+  {
+    return m_global_nets;
   }
 
   /**
@@ -766,6 +779,14 @@ public:
    *  @brief Clears this collection
    */
   void clear ();
+
+  /**
+   *  @brief Makes a valid path to a child cluster
+   *
+   *  Cluster connections can only cross one level of hierarchy. This method
+   *  creates necessary dummy entries for the given path.
+   */
+  ClusterInstance make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<db::InstElement> &path);
 
 private:
   void build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);

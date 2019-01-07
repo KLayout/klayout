@@ -65,8 +65,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
   }
 
   std::map<db::cell_index_type, std::map<size_t, size_t> > pins_per_cluster_per_cell;
-  std::map<db::cell_index_type, std::map<size_t, db::Net *> > global_nets_per_cell;
-
   for (db::Layout::bottom_up_const_iterator cid = layout.begin_bottom_up (); cid != layout.end_bottom_up (); ++cid) {
 
     const connected_clusters_type &clusters = m_net_clusters.clusters_per_cell (*cid);
@@ -89,7 +87,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
       circuit = k->second;
     }
 
-    std::map<size_t, db::Net *> &global_nets = global_nets_per_cell [*cid];
     std::map<size_t, size_t> &c2p = pins_per_cluster_per_cell [*cid];
 
     std::map<db::InstElement, db::SubCircuit *> subcircuits;
@@ -100,12 +97,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
       net->set_cluster_id (*c);
       circuit->add_net (net);
 
-      const db::local_cluster<db::PolygonRef> &cluster = clusters.cluster_by_id (*c);
-
-      //  collect global net assignments from clusters
-      for (std::set<size_t>::const_iterator g = cluster.begin_global_nets (); g != cluster.end_global_nets (); ++g) {
-        tl_assert (global_nets.find (*g) == global_nets.end ());
-        global_nets.insert (std::make_pair (*g, net));
+      const db::local_cluster<db::PolygonRef>::global_nets &gn = clusters.cluster_by_id (*c).get_global_nets ();
+      for (db::local_cluster<db::PolygonRef>::global_nets::const_iterator g = gn.begin (); g != gn.end (); ++g) {
         assign_net_name (conn.global_net_name (*g), net);
       }
 
@@ -130,73 +123,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
         //  a non-root cluster makes a pin
         size_t pin_id = make_pin (circuit, net);
         c2p.insert (std::make_pair (*c, pin_id));
-      }
-
-    }
-
-    //  make global net connections for devices
-    for (db::Circuit::device_iterator d = circuit->begin_devices (); d != circuit->end_devices (); ++d) {
-
-      for (db::Device::global_connections_iterator g = d->begin_global_connections (); g != d->end_global_connections (); ++g) {
-
-        db::Net *&net = global_nets [g->second];
-        if (! net) {
-          net = new db::Net (conn.global_net_name (g->second));
-          circuit->add_net (net);
-        }
-
-        net->add_terminal (db::NetTerminalRef (d.operator-> (), g->first));
-
-      }
-
-    }
-
-    //  if any of the subcircuits has global nets which this circuit doesn't have, propagate them
-
-    std::set<db::Circuit *> seen;
-    std::set<size_t> global_nets_of_subcircuits;
-    for (db::Circuit::subcircuit_iterator sc = circuit->begin_subcircuits (); sc != circuit->end_subcircuits (); ++sc) {
-
-      db::Circuit *subcircuit = sc->circuit_ref ();
-      if (seen.find (subcircuit) == seen.end ()) {
-
-        seen.insert (subcircuit);
-
-        const std::map<size_t, db::Net *> &sc_gn = global_nets_per_cell [subcircuit->cell_index ()];
-        for (std::map<size_t, db::Net *>::const_iterator g = sc_gn.begin (); g != sc_gn.end (); ++g) {
-          global_nets_of_subcircuits.insert (g->first);
-        }
-
-      }
-
-    }
-
-    for (std::set<size_t>::const_iterator g = global_nets_of_subcircuits.begin (); g != global_nets_of_subcircuits.end (); ++g) {
-
-    }
-
-    //  make the global net connections into subcircuits - if necessary by creating pins into the subcircuit
-    for (db::Circuit::subcircuit_iterator sc = circuit->begin_subcircuits (); sc != circuit->end_subcircuits (); ++sc) {
-
-      db::Circuit *subcircuit = sc->circuit_ref ();
-
-      const std::map<size_t, db::Net *> &sc_gn = global_nets_per_cell [subcircuit->cell_index ()];
-      for (std::map<size_t, db::Net *>::const_iterator g = global_nets.begin (); g != global_nets.end (); ++g) {
-
-        std::map<size_t, db::Net *>::const_iterator gg = sc_gn.find (g->first);
-        if (gg != sc_gn.end ()) {
-
-          size_t pin_id = 0;
-          if (gg->second->pin_count () > 0) {
-            pin_id = gg->second->begin_pins ()->pin_id ();
-          } else {
-            pin_id = subcircuit->add_pin (conn.global_net_name (gg->first)).id ();
-            subcircuit->connect_pin (pin_id, gg->second);
-          }
-          g->second->add_subcircuit_pin (db::NetSubcircuitPinRef (sc.operator-> (), pin_id));
-
-        }
-
       }
 
     }

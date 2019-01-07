@@ -259,13 +259,6 @@ class DBNetlist_TestClass < TestBase
 
     d2.connect_terminal(0, net)
     assert_equal(net.terminal_count, 1)
-    d2.connect_terminal_global(0, 1)
-    assert_equal(net.terminal_count, 0)
-
-    assert_equal(d2.terminal_on_global_net(1), 0)
-    assert_equal(d2.terminal_on_global_net(17).inspect, "nil")
-    assert_equal(d2.global_net_on_terminal(0), 1)
-    assert_equal(d2.global_net_on_terminal(1).inspect, "nil")
     
   end
 

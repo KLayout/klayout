@@ -181,19 +181,11 @@ public:
  *  terminal for the bulk.
  */
 class DB_PUBLIC DeviceClassMOS4Transistor
-  : public db::DeviceClass
+  : public DeviceClassMOS3Transistor
 {
 public:
   DeviceClassMOS4Transistor ();
 
-  static size_t param_id_L;
-  static size_t param_id_W;
-  static size_t param_id_AS;
-  static size_t param_id_AD;
-
-  static size_t terminal_id_S;
-  static size_t terminal_id_G;
-  static size_t terminal_id_D;
   static size_t terminal_id_B;
 
   virtual db::DeviceClass *clone () const
@@ -202,7 +194,6 @@ public:
   }
 
   virtual bool combine_devices (Device *a, Device *b) const;
-  virtual bool supports_parallel_combination () const { return true; }
 };
 
 }

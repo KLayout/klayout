@@ -250,27 +250,11 @@ bool DeviceClassMOS3Transistor::combine_devices (Device *a, Device *b) const
 // ------------------------------------------------------------------------------------
 //  DeviceClassMOS4Transistor implementation
 
-DB_PUBLIC size_t DeviceClassMOS4Transistor::param_id_L = 0;
-DB_PUBLIC size_t DeviceClassMOS4Transistor::param_id_W = 1;
-DB_PUBLIC size_t DeviceClassMOS4Transistor::param_id_AS = 2;
-DB_PUBLIC size_t DeviceClassMOS4Transistor::param_id_AD = 3;
-
-DB_PUBLIC size_t DeviceClassMOS4Transistor::terminal_id_S = 0;
-DB_PUBLIC size_t DeviceClassMOS4Transistor::terminal_id_G = 1;
-DB_PUBLIC size_t DeviceClassMOS4Transistor::terminal_id_D = 2;
 DB_PUBLIC size_t DeviceClassMOS4Transistor::terminal_id_B = 3;
 
 DeviceClassMOS4Transistor::DeviceClassMOS4Transistor ()
 {
-  add_terminal_definition (db::DeviceTerminalDefinition ("S", "Source"));
-  add_terminal_definition (db::DeviceTerminalDefinition ("G", "Gate"));
-  add_terminal_definition (db::DeviceTerminalDefinition ("D", "Drain"));
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Bulk"));
-
-  add_parameter_definition (db::DeviceParameterDefinition ("L", "Gate length (micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("W", "Gate width (micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("AS", "Source area (square micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("AD", "Drain area (square micrometer)", 0.0));
 }
 
 bool DeviceClassMOS4Transistor::combine_devices (Device *a, Device *b) const

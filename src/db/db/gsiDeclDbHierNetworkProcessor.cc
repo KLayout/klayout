@@ -37,8 +37,11 @@ Class<db::Connectivity> decl_dbConnectivity ("db", "Connectivity",
     "@brief Connects the given layer to the global net given by name.\n"
     "Returns the ID of the global net."
   ) +
-  gsi::method ("global", &db::Connectivity::global_net_name, gsi::arg ("global_net_id"),
+  gsi::method ("global_net_name", &db::Connectivity::global_net_name, gsi::arg ("global_net_id"),
     "@brief Gets the name for a given global net ID.\n"
+  ) +
+  gsi::method ("global_net_id", &db::Connectivity::global_net_id, gsi::arg ("global_net_name"),
+    "@brief Gets the ID for a given global net name.\n"
   ),
   "@brief This class specifies connections between different layers."
   "Connections are build using \\connect. There are basically two flavours of connections: intra-layer and inter-layer.\n"

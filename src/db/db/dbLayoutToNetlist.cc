@@ -170,6 +170,11 @@ const std::string &LayoutToNetlist::global_net_name (size_t id) const
   return m_conn.global_net_name (id);
 }
 
+size_t LayoutToNetlist::global_net_id (const std::string &name)
+{
+  return m_conn.global_net_id (name);
+}
+
 void LayoutToNetlist::extract_netlist ()
 {
   if (m_netlist_extracted) {
@@ -275,7 +280,6 @@ static void deliver_shapes_of_net_nonrecursive (const db::NetlistExtractor &nete
   tl_assert (circuit != 0);
 
   db::cell_index_type ci = circuit->cell_index ();
-
   const db::local_cluster<db::PolygonRef> &lc = netex.clusters ().clusters_per_cell (ci).cluster_by_id (net.cluster_id ());
 
   for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (layer_id); !s.at_end (); ++s) {

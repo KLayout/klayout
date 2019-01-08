@@ -395,7 +395,6 @@ END
     l2n.netlist.make_top_level_pins
     l2n.netlist.purge
 
-    puts l2n.netlist.to_s
     assert_equal(l2n.netlist.to_s, <<END)
 Circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS'):
   XINV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD)

@@ -72,13 +72,25 @@ struct SortedCellIndexIterator
   SortedCellIndexIterator &operator++() 
   {
     ++m_n;
-	return *this;
+    return *this;
   }
 
   SortedCellIndexIterator &operator+=(size_t n) 
   {
     m_n += n;
-	return *this;
+    return *this;
+  }
+
+  SortedCellIndexIterator &operator--()
+  {
+    --m_n;
+    return *this;
+  }
+
+  SortedCellIndexIterator &operator-=(size_t n)
+  {
+    m_n -= n;
+    return *this;
   }
 
   bool operator==(const SortedCellIndexIterator &d) const

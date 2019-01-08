@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # 
-# Copyright (C) 2006-2018 Matthias Koefferlein
+# Copyright (C) 2006-2019 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1421,7 +1421,7 @@ class BindingProducer
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2018 Matthias Koefferlein
+  Copyright (C) 2006-2019 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -2934,7 +2934,7 @@ END
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2018 Matthias Koefferlein
+  Copyright (C) 2006-2019 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -3013,7 +3013,7 @@ END
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2018 Matthias Koefferlein
+  Copyright (C) 2006-2019 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

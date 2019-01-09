@@ -888,6 +888,21 @@ public:
   }
 
   /**
+   *  @brief Returns a value indicating whether the given index is valid
+   */
+  bool is_used (size_type n) const
+  {
+    if (n >= first () && n < last ()) {
+      if (mp_rdata) {
+        return mp_rdata->is_used (n);
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    *  @brief For diagnostics purposes only
    */
   ReuseData *reuse_data () const
@@ -906,18 +921,6 @@ private:
   {
     mp_start = mp_finish = mp_capacity = 0;
     mp_rdata = 0;
-  }
-
-  bool is_used (size_type n) const
-  {
-    if (n >= first () && n < last ()) {
-      if (mp_rdata) {
-        return mp_rdata->is_used (n);
-      } else {
-        return true;
-      }
-    }
-    return false;
   }
 
   size_type first () const

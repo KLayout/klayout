@@ -23,6 +23,8 @@
 
 
 #include "gsiDecl.h"
+
+#include "gsiDeclDbHelpers.h"
 #include "dbLayout.h"
 #include "dbBoxConvert.h"
 #include "dbRegion.h"
@@ -711,70 +713,70 @@ static void dump_mem_statistics (const db::Cell *cell, bool detailed)
   ms.print ();
 }
 
-static db::Shapes::shape_iterator begin_shapes (const db::Cell *s, unsigned int layer_index, unsigned int flags)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_shapes (const db::Cell *s, unsigned int layer_index, unsigned int flags)
 {
-  return s->begin (layer_index, flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin (layer_index, flags));
 }
 
-static db::Shapes::shape_iterator begin_shapes_all (const db::Cell *s, unsigned int layer_index)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_shapes_all (const db::Cell *s, unsigned int layer_index)
 {
-  return s->begin (layer_index, db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin (layer_index, db::ShapeIterator::All));
 }
 
-static db::Shapes::shape_iterator begin_touching_shapes (const db::Cell *s, unsigned int layer_index, const db::Box &box, unsigned int flags)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_touching_shapes (const db::Cell *s, unsigned int layer_index, const db::Box &box, unsigned int flags)
 {
-  return s->begin_touching (layer_index, box, flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (layer_index, box, flags));
 }
 
-static db::Shapes::shape_iterator begin_touching_shapes_all (const db::Cell *s, unsigned int layer_index, const db::Box &box)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_touching_shapes_all (const db::Cell *s, unsigned int layer_index, const db::Box &box)
 {
-  return s->begin_touching (layer_index, box, db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (layer_index, box, db::ShapeIterator::All));
 }
 
-static db::Shapes::shape_iterator begin_overlapping_shapes (const db::Cell *s, unsigned int layer_index, const db::Box &box, unsigned int flags)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_overlapping_shapes (const db::Cell *s, unsigned int layer_index, const db::Box &box, unsigned int flags)
 {
-  return s->begin_overlapping (layer_index, box, flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (layer_index, box, flags));
 }
 
-static db::Shapes::shape_iterator begin_overlapping_shapes_all (const db::Cell *s, unsigned int layer_index, const db::Box &box)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_overlapping_shapes_all (const db::Cell *s, unsigned int layer_index, const db::Box &box)
 {
-  return s->begin_overlapping (layer_index, box, db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (layer_index, box, db::ShapeIterator::All));
 }
 
-static db::Shapes::shape_iterator begin_touching_shapes_um (const db::Cell *s, unsigned int layer_index, const db::DBox &box, unsigned int flags)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_touching_shapes_um (const db::Cell *s, unsigned int layer_index, const db::DBox &box, unsigned int flags)
 {
   const db::Layout *layout = s->layout ();
   if (! layout) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
   }
-  return s->begin_touching (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, flags));
 }
 
-static db::Shapes::shape_iterator begin_touching_shapes_all_um (const db::Cell *s, unsigned int layer_index, const db::DBox &box)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_touching_shapes_all_um (const db::Cell *s, unsigned int layer_index, const db::DBox &box)
 {
   const db::Layout *layout = s->layout ();
   if (! layout) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
   }
-  return s->begin_touching (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, db::ShapeIterator::All));
 }
 
-static db::Shapes::shape_iterator begin_overlapping_shapes_um (const db::Cell *s, unsigned int layer_index, const db::DBox &box, unsigned int flags)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_overlapping_shapes_um (const db::Cell *s, unsigned int layer_index, const db::DBox &box, unsigned int flags)
 {
   const db::Layout *layout = s->layout ();
   if (! layout) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
   }
-  return s->begin_overlapping (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, flags));
 }
 
-static db::Shapes::shape_iterator begin_overlapping_shapes_all_um (const db::Cell *s, unsigned int layer_index, const db::DBox &box)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_overlapping_shapes_all_um (const db::Cell *s, unsigned int layer_index, const db::DBox &box)
 {
   const db::Layout *layout = s->layout ();
   if (! layout) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
   }
-  return s->begin_overlapping (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, db::ShapeIterator::All));
 }
 
 static db::Instance insert_inst_with_props (db::Cell *c, const db::Cell::cell_inst_array_type &inst, db::properties_id_type id)
@@ -1679,18 +1681,12 @@ static db::DBox cell_dbbox_per_layer (const db::Cell *cell, unsigned int layer_i
   return cell->bbox (layer_index) * layout->dbu ();
 }
 
-static db::Cell::overlapping_iterator cell_begin_overlapping_inst_um (const db::Cell *cell, const db::DBox &db)
+gsi::layout_locking_iterator1<db::Cell::overlapping_iterator> begin_overlapping_inst (const db::Cell *cell, const db::Cell::box_type &b)
 {
-  const db::Layout *layout = cell->layout ();
-  if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit search boxes")));
-  }
-
-  db::CplxTrans dbu_trans (layout->dbu ());
-  return cell->begin_overlapping (dbu_trans.inverted () * db);
+  return gsi::layout_locking_iterator1<db::Cell::overlapping_iterator> (cell->layout (), cell->begin_overlapping (b));
 }
 
-static db::Cell::touching_iterator cell_begin_touching_inst_um (const db::Cell *cell, const db::DBox &db)
+gsi::layout_locking_iterator1<db::Cell::overlapping_iterator> begin_overlapping_inst_um (const db::Cell *cell, const db::DBox &dbox)
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
@@ -1698,7 +1694,43 @@ static db::Cell::touching_iterator cell_begin_touching_inst_um (const db::Cell *
   }
 
   db::CplxTrans dbu_trans (layout->dbu ());
-  return cell->begin_touching (dbu_trans.inverted () * db);
+  return gsi::layout_locking_iterator1<db::Cell::overlapping_iterator> (cell->layout (), cell->begin_overlapping (dbu_trans.inverted () * dbox));
+}
+
+gsi::layout_locking_iterator1<db::Cell::touching_iterator> begin_touching_inst (const db::Cell *cell, const db::Cell::box_type &b)
+{
+  return gsi::layout_locking_iterator1<db::Cell::touching_iterator> (cell->layout (), cell->begin_touching (b));
+}
+
+gsi::layout_locking_iterator1<db::Cell::touching_iterator> begin_touching_inst_um (const db::Cell *cell, const db::DBox &dbox)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit search boxes")));
+  }
+
+  db::CplxTrans dbu_trans (layout->dbu ());
+  return gsi::layout_locking_iterator1<db::Cell::touching_iterator> (cell->layout (), cell->begin_touching (dbu_trans.inverted () * dbox));
+}
+
+gsi::layout_locking_iterator1<db::Cell::child_cell_iterator> begin_child_cells (const db::Cell *cell)
+{
+  return gsi::layout_locking_iterator1<db::Cell::child_cell_iterator> (cell->layout (), cell->begin_child_cells ());
+}
+
+gsi::layout_locking_iterator1<db::Cell::parent_inst_iterator> begin_parent_insts (const db::Cell *cell)
+{
+  return gsi::layout_locking_iterator1<db::Cell::parent_inst_iterator> (cell->layout (), cell->begin_parent_insts ());
+}
+
+gsi::layout_locking_iterator2<db::Cell::parent_cell_iterator> begin_parent_cells (const db::Cell *cell)
+{
+  return gsi::layout_locking_iterator2<db::Cell::parent_cell_iterator> (cell->layout (), cell->begin_parent_cells (), cell->end_parent_cells ());
+}
+
+static layout_locking_iterator1<db::Cell::const_iterator> begin_inst (db::Cell *cell)
+{
+  return layout_locking_iterator1<db::Cell::const_iterator> (cell->layout (), cell->begin ());
 }
 
 Class<db::Cell> decl_Cell ("Cell",
@@ -2569,7 +2601,7 @@ Class<db::Cell> decl_Cell ("Cell",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::iterator ("each_overlapping_inst", (db::Cell::overlapping_iterator (db::Cell::*) (const db::Cell::box_type &b) const) &db::Cell::begin_overlapping, gsi::arg ("b"),
+  gsi::iterator_ext ("each_overlapping_inst", &begin_overlapping_inst, gsi::arg ("b"),
     "@brief Gets the instances overlapping the given rectangle\n"
     "\n"
     "This will iterate over all child cell\n"
@@ -2579,7 +2611,7 @@ Class<db::Cell> decl_Cell ("Cell",
     "\n"
     "Starting with version 0.15, this iterator delivers \\Instance objects rather than \\CellInstArray objects."
   ) +
-  gsi::iterator_ext ("each_overlapping_inst", &cell_begin_overlapping_inst_um, gsi::arg ("b"),
+  gsi::iterator_ext ("each_overlapping_inst", &begin_overlapping_inst_um, gsi::arg ("b"),
     "@brief Gets the instances overlapping the given rectangle, with the rectangle in micrometer units\n"
     "\n"
     "This will iterate over all child cell\n"
@@ -2592,7 +2624,7 @@ Class<db::Cell> decl_Cell ("Cell",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::iterator ("each_touching_inst", (db::Cell::touching_iterator (db::Cell::*) (const db::Cell::box_type &b) const) &db::Cell::begin_touching, gsi::arg ("b"),
+  gsi::iterator_ext ("each_touching_inst", &begin_touching_inst, gsi::arg ("b"),
     "@brief Gets the instances touching the given rectangle\n"
     "\n"
     "This will iterate over all child cell\n"
@@ -2602,7 +2634,7 @@ Class<db::Cell> decl_Cell ("Cell",
     "\n"
     "Starting with version 0.15, this iterator delivers \\Instance objects rather than \\CellInstArray objects."
   ) +
-  gsi::iterator_ext ("each_touching_inst", &cell_begin_touching_inst_um, gsi::arg ("b"),
+  gsi::iterator_ext ("each_touching_inst", &begin_touching_inst_um, gsi::arg ("b"),
     "@brief Gets the instances touching the given rectangle, with the rectangle in micrometer units\n"
     "\n"
     "This will iterate over all child cell\n"
@@ -2615,7 +2647,7 @@ Class<db::Cell> decl_Cell ("Cell",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::iterator ("each_child_cell", &db::Cell::begin_child_cells,
+  gsi::iterator_ext ("each_child_cell", &begin_child_cells,
     "@brief Iterates over all child cells\n"
     "\n"
     "This iterator will report the child cell indices, not every instance.\n"
@@ -2626,12 +2658,12 @@ Class<db::Cell> decl_Cell ("Cell",
     "The number of child cells (not child instances!) is returned.\n"
     "CAUTION: this method is SLOW, in particular if many instances are present.\n"
   ) +
-  gsi::iterator ("each_inst", (db::Cell::const_iterator (db::Cell::*) () const) &db::Cell::begin, 
+  gsi::iterator_ext ("each_inst", &begin_inst,
     "@brief Iterates over all child instances (which may actually be instance arrays)\n"
     "\n"
     "Starting with version 0.15, this iterator delivers \\Instance objects rather than \\CellInstArray objects."
   ) +
-  gsi::iterator ("each_parent_inst", &db::Cell::begin_parent_insts,
+  gsi::iterator_ext ("each_parent_inst", &begin_parent_insts,
     "@brief Iterates over the parent instance list (which may actually be instance arrays)\n"
     "\n"
     "The parent instances are basically inversions of the instances. Using parent instances "
@@ -2642,7 +2674,7 @@ Class<db::Cell> decl_Cell ("Cell",
     "\n"
     "The number of parent cells (cells which reference our cell) is reported."
   ) +
-  gsi::iterator ("each_parent_cell", &db::Cell::begin_parent_cells, &db::Cell::end_parent_cells, 
+  gsi::iterator_ext ("each_parent_cell", &begin_parent_cells,
     "@brief Iterates over all parent cells\n"
     "\n"
     "This iterator will iterate over the parent cells, just returning their\n"

@@ -1725,9 +1725,32 @@ public:
     }
   }
 
+  LayoutLocker (const LayoutLocker &other)
+    : mp_layout (other.mp_layout)
+  {
+    if (mp_layout) {
+      mp_layout->start_changes ();
+    }
+  }
+
+  LayoutLocker &operator= (const LayoutLocker &other)
+  {
+    if (this == &other) {
+      return *this;
+    }
+
+    if (mp_layout) {
+      mp_layout->end_changes ();
+    }
+    mp_layout = other.mp_layout;
+    if (mp_layout) {
+      mp_layout->start_changes ();
+    }
+
+    return *this;
+  }
+
 private:
-  LayoutLocker (const LayoutLocker &);
-  LayoutLocker &operator= (const LayoutLocker &);
 
   db::Layout *mp_layout;
 };

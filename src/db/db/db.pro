@@ -233,7 +233,8 @@ HEADERS = \
     dbGlyphs.h \
     dbCommon.h \
     dbVariableWidthPath.h \
-    dbNamedLayerReader.h
+    dbNamedLayerReader.h \
+    gsiDeclDbHelpers.h
 
 RESOURCES = \
   dbResources.qrc

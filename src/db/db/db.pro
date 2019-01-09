@@ -208,7 +208,8 @@ HEADERS = \
   dbForceLink.h \
   dbPlugin.h \
   dbInit.h \
-    dbConverters.h
+    dbConverters.h \
+    gsiDeclDbHelpers.h
 
 !equals(HAVE_QT, "0") {
 

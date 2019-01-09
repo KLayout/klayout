@@ -1994,6 +1994,45 @@ END
 
   end
 
+  # Iterating while flatten
+  def test_issue200
+
+    ly = RBA::Layout.new
+    ly.read(ENV["TESTSRC"] + "/testdata/gds/t200.gds")
+    l1 = ly.layer(1, 0)
+    l2 = ly.layer(2, 0)
+    l3 = ly.layer(3, 0)
+
+    tc_name = ly.top_cell.name
+    r1 = RBA::Region::new(ly.top_cell.begin_shapes_rec(l1))
+    r2 = RBA::Region::new(ly.top_cell.begin_shapes_rec(l2))
+    r3 = RBA::Region::new(ly.top_cell.begin_shapes_rec(l3))
+    assert_equal(r1.size > 0, true)
+    assert_equal(r2.size > 0, true)
+    assert_equal(r3.size == 0, true)
+
+    ly.top_cell.each_inst do |ci|
+      ci.flatten
+    end
+
+    tc = ly.cell(tc_name)
+    assert_equal(ly.top_cells.size, 4)
+    assert_equal(tc.child_cells, 0)
+    assert_equal(tc.parent_cells, 0)
+
+    rr1 = RBA::Region::new(tc.begin_shapes_rec(l1))
+    rr2 = RBA::Region::new(tc.begin_shapes_rec(l2))
+    rr3 = RBA::Region::new(tc.begin_shapes_rec(l3))
+    assert_equal(r1.size, rr1.size)
+    assert_equal(r2.size, rr2.size)
+    assert_equal(r3.size, rr3.size)
+
+    assert_equal((rr1 ^ r1).is_empty?, true)
+    assert_equal((rr2 ^ r2).is_empty?, true)
+    assert_equal((rr3 ^ r3).is_empty?, true)
+
+  end
+
 end
 
 load("test_epilogue.rb")

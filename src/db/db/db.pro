@@ -153,7 +153,13 @@ SOURCES = \
     gsiDeclDbHierNetworkProcessor.cc \
     dbNetlistDeviceExtractorClasses.cc \
     dbLayoutToNetlist.cc \
-    gsiDeclDbLayoutToNetlist.cc
+    gsiDeclDbLayoutToNetlist.cc \
+    dbCircuit.cc \
+    dbDevice.cc \
+    dbDeviceClass.cc \
+    dbNet.cc \
+    dbSubCircuit.cc \
+    dbPin.cc
 
 HEADERS = \
   dbArray.h \
@@ -270,7 +276,14 @@ HEADERS = \
     dbNetlistExtractor.h \
     dbNetlistDeviceExtractorClasses.h \
     dbLayoutToNetlist.h \
-    dbHierNetworkProcessor.h
+    dbHierNetworkProcessor.h \
+    dbNetlistUtils.h \
+    dbNet.h \
+    dbCircuit.h \
+    dbDevice.h \
+    dbDeviceClass.h \
+    dbPin.h \
+    dbSubCircuit.h
 
 !equals(HAVE_QT, "0") {
 

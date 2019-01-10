@@ -28,6 +28,8 @@
 
 #include <memory>
 
+// ----------------------------------------------------------------------------------------
+
 static std::string pd2string (const db::DeviceTerminalDefinition &pd)
 {
   return pd.name () + "(" + pd.description () + ") #" + tl::to_string (pd.id ());
@@ -36,78 +38,6 @@ static std::string pd2string (const db::DeviceTerminalDefinition &pd)
 static std::string pd2string (const db::DeviceParameterDefinition &pd)
 {
   return pd.name () + "(" + pd.description () + ")=" + tl::to_string (pd.default_value ()) + " #" + tl::to_string (pd.id ());
-}
-
-TEST(1_DeviceTerminalDefinition)
-{
-  db::DeviceTerminalDefinition pd;
-
-  EXPECT_EQ (pd2string (pd), "() #0");
-  pd.set_name ("name");
-  pd.set_description ("nothing yet");
-  EXPECT_EQ (pd2string (pd), "name(nothing yet) #0");
-
-  db::DeviceTerminalDefinition pd2;
-  pd2 = pd;
-  EXPECT_EQ (pd2string (pd2), "name(nothing yet) #0");
-  pd2.set_name ("name2");
-  pd2.set_description ("now it has something");
-  EXPECT_EQ (pd2string (pd2), "name2(now it has something) #0");
-
-  db::DeviceClass dc;
-  dc.add_terminal_definition (pd);
-  dc.add_terminal_definition (pd2);
-  EXPECT_EQ (pd2string (dc.terminal_definitions ()[0]), "name(nothing yet) #0");
-  EXPECT_EQ (pd2string (dc.terminal_definitions ()[1]), "name2(now it has something) #1");
-
-  dc.clear_terminal_definitions ();
-  EXPECT_EQ (dc.terminal_definitions ().empty (), true);
-
-  db::DeviceParameterDefinition ppd ("P1", "Parameter 1", 1.0);
-  dc.add_parameter_definition (ppd);
-
-  db::DeviceParameterDefinition ppd2 ("P2", "Parameter 2");
-  dc.add_parameter_definition (ppd2);
-
-  EXPECT_EQ (pd2string (dc.parameter_definitions ()[0]), "P1(Parameter 1)=1 #0");
-  EXPECT_EQ (pd2string (dc.parameter_definitions ()[1]), "P2(Parameter 2)=0 #1");
-
-  dc.clear_parameter_definitions ();
-  EXPECT_EQ (dc.parameter_definitions ().empty (), true);
-}
-
-TEST(2_DeviceClass)
-{
-  db::DeviceTerminalDefinition pd;
-  pd.set_name ("name");
-  pd.set_description ("nothing yet");
-
-  db::DeviceTerminalDefinition pd2;
-  pd2.set_name ("name2");
-  pd2.set_description ("now it has something");
-
-  db::DeviceClass dc;
-  dc.set_name ("devname");
-  dc.set_description ("devdesc");
-  EXPECT_EQ (dc.name (), "devname");
-  EXPECT_EQ (dc.description (), "devdesc");
-  dc.add_terminal_definition (pd);
-  dc.add_terminal_definition (pd2);
-  EXPECT_EQ (dc.terminal_definitions ().size (), size_t (2));
-  EXPECT_EQ (pd2string (dc.terminal_definitions ()[0]), "name(nothing yet) #0");
-  EXPECT_EQ (pd2string (dc.terminal_definitions ()[1]), "name2(now it has something) #1");
-
-  EXPECT_EQ (pd2string (*dc.terminal_definition (dc.terminal_definitions ()[0].id ())), "name(nothing yet) #0");
-  EXPECT_EQ (pd2string (*dc.terminal_definition (dc.terminal_definitions ()[1].id ())), "name2(now it has something) #1");
-  EXPECT_EQ (dc.terminal_definition (3), 0);
-
-  db::DeviceClass dc2 = dc;
-  EXPECT_EQ (dc2.name (), "devname");
-  EXPECT_EQ (dc2.description (), "devdesc");
-  EXPECT_EQ (dc2.terminal_definitions ().size (), size_t (2));
-  EXPECT_EQ (pd2string (*dc2.terminal_definition (dc2.terminal_definitions ()[0].id ())), "name(nothing yet) #0");
-  EXPECT_EQ (pd2string (*dc2.terminal_definition (dc2.terminal_definitions ()[1].id ())), "name2(now it has something) #1");
-  EXPECT_EQ (dc2.terminal_definition (3), 0);
 }
 
 static std::string pins2string (const db::Circuit &c)
@@ -121,32 +51,6 @@ static std::string pins2string (const db::Circuit &c)
     res += "#" + tl::to_string (i->id ());
   }
   return res;
-}
-
-TEST(3_CircuitBasic)
-{
-  db::Circuit c;
-  c.set_name ("name");
-  EXPECT_EQ (c.name (), "name");
-
-  db::Pin p1 = c.add_pin ("p1");
-  db::Pin p2 = c.add_pin ("p2");
-  EXPECT_EQ (pins2string (c), "p1#0,p2#1");
-
-  EXPECT_EQ (c.pin_by_id (0)->name (), "p1");
-  EXPECT_EQ (c.pin_by_id (1)->name (), "p2");
-  EXPECT_EQ (c.pin_by_id (2), 0);
-  EXPECT_EQ (c.pin_by_name ("p1")->name (), "p1");
-  EXPECT_EQ (c.pin_by_name ("doesnt_exist") == 0, true);
-  EXPECT_EQ (c.pin_by_name ("p2")->name (), "p2");
-
-  db::Circuit c2 = c;
-  EXPECT_EQ (c2.name (), "name");
-  EXPECT_EQ (pins2string (c), "p1#0,p2#1");
-
-  EXPECT_EQ (c2.pin_by_id (0)->name (), "p1");
-  EXPECT_EQ (c2.pin_by_id (1)->name (), "p2");
-  EXPECT_EQ (c2.pin_by_id (2), 0);
 }
 
 static std::string net2string (const db::Net &n)
@@ -241,6 +145,186 @@ static std::string netlist2 (const db::Circuit &c)
   }
 
   return res;
+}
+
+static std::string nl2string (const db::Netlist &nl)
+{
+  std::string res;
+  for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
+    res += "[" + c->name () + "]\n";
+    res += nets2string (*c);
+  }
+  return res;
+}
+
+//  dual form of netlist
+static std::string netlist2 (const db::Netlist &nl)
+{
+  std::string res;
+  for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
+    res += netlist2 (*c);
+  }
+  return res;
+}
+
+static std::string refs2string (const db::Circuit *c)
+{
+  std::string res;
+  for (db::Circuit::const_refs_iterator r = c->begin_refs (); r != c->end_refs (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += r->name ();
+  }
+  return res;
+}
+
+static std::string children2string (const db::Circuit *c)
+{
+  std::string res;
+  for (db::Circuit::const_child_circuit_iterator r = c->begin_children (); r != c->end_children (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*r)->name ();
+  }
+  return res;
+}
+
+static std::string parents2string (const db::Circuit *c)
+{
+  std::string res;
+  for (db::Circuit::const_parent_circuit_iterator r = c->begin_parents (); r != c->end_parents (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*r)->name ();
+  }
+  return res;
+}
+
+static std::string td2string (const db::Netlist *nl)
+{
+  std::string res;
+  for (db::Netlist::const_top_down_circuit_iterator r = nl->begin_top_down (); r != nl->end_top_down (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*r)->name ();
+  }
+  return res;
+}
+
+static std::string bu2string (const db::Netlist *nl)
+{
+  std::string res;
+  for (db::Netlist::const_bottom_up_circuit_iterator r = nl->begin_bottom_up (); r != nl->end_bottom_up (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*r)->name ();
+  }
+  return res;
+}
+
+// ----------------------------------------------------------------------------------------
+
+TEST(1_DeviceTerminalDefinition)
+{
+  db::DeviceTerminalDefinition pd;
+
+  EXPECT_EQ (pd2string (pd), "() #0");
+  pd.set_name ("name");
+  pd.set_description ("nothing yet");
+  EXPECT_EQ (pd2string (pd), "name(nothing yet) #0");
+
+  db::DeviceTerminalDefinition pd2;
+  pd2 = pd;
+  EXPECT_EQ (pd2string (pd2), "name(nothing yet) #0");
+  pd2.set_name ("name2");
+  pd2.set_description ("now it has something");
+  EXPECT_EQ (pd2string (pd2), "name2(now it has something) #0");
+
+  db::DeviceClass dc;
+  dc.add_terminal_definition (pd);
+  dc.add_terminal_definition (pd2);
+  EXPECT_EQ (pd2string (dc.terminal_definitions ()[0]), "name(nothing yet) #0");
+  EXPECT_EQ (pd2string (dc.terminal_definitions ()[1]), "name2(now it has something) #1");
+
+  dc.clear_terminal_definitions ();
+  EXPECT_EQ (dc.terminal_definitions ().empty (), true);
+
+  db::DeviceParameterDefinition ppd ("P1", "Parameter 1", 1.0);
+  dc.add_parameter_definition (ppd);
+
+  db::DeviceParameterDefinition ppd2 ("P2", "Parameter 2");
+  dc.add_parameter_definition (ppd2);
+
+  EXPECT_EQ (pd2string (dc.parameter_definitions ()[0]), "P1(Parameter 1)=1 #0");
+  EXPECT_EQ (pd2string (dc.parameter_definitions ()[1]), "P2(Parameter 2)=0 #1");
+
+  dc.clear_parameter_definitions ();
+  EXPECT_EQ (dc.parameter_definitions ().empty (), true);
+}
+
+TEST(2_DeviceClass)
+{
+  db::DeviceTerminalDefinition pd;
+  pd.set_name ("name");
+  pd.set_description ("nothing yet");
+
+  db::DeviceTerminalDefinition pd2;
+  pd2.set_name ("name2");
+  pd2.set_description ("now it has something");
+
+  db::DeviceClass dc;
+  dc.set_name ("devname");
+  dc.set_description ("devdesc");
+  EXPECT_EQ (dc.name (), "devname");
+  EXPECT_EQ (dc.description (), "devdesc");
+  dc.add_terminal_definition (pd);
+  dc.add_terminal_definition (pd2);
+  EXPECT_EQ (dc.terminal_definitions ().size (), size_t (2));
+  EXPECT_EQ (pd2string (dc.terminal_definitions ()[0]), "name(nothing yet) #0");
+  EXPECT_EQ (pd2string (dc.terminal_definitions ()[1]), "name2(now it has something) #1");
+
+  EXPECT_EQ (pd2string (*dc.terminal_definition (dc.terminal_definitions ()[0].id ())), "name(nothing yet) #0");
+  EXPECT_EQ (pd2string (*dc.terminal_definition (dc.terminal_definitions ()[1].id ())), "name2(now it has something) #1");
+  EXPECT_EQ (dc.terminal_definition (3), 0);
+
+  db::DeviceClass dc2 = dc;
+  EXPECT_EQ (dc2.name (), "devname");
+  EXPECT_EQ (dc2.description (), "devdesc");
+  EXPECT_EQ (dc2.terminal_definitions ().size (), size_t (2));
+  EXPECT_EQ (pd2string (*dc2.terminal_definition (dc2.terminal_definitions ()[0].id ())), "name(nothing yet) #0");
+  EXPECT_EQ (pd2string (*dc2.terminal_definition (dc2.terminal_definitions ()[1].id ())), "name2(now it has something) #1");
+  EXPECT_EQ (dc2.terminal_definition (3), 0);
+}
+
+TEST(3_CircuitBasic)
+{
+  db::Circuit c;
+  c.set_name ("name");
+  EXPECT_EQ (c.name (), "name");
+
+  db::Pin p1 = c.add_pin ("p1");
+  db::Pin p2 = c.add_pin ("p2");
+  EXPECT_EQ (pins2string (c), "p1#0,p2#1");
+
+  EXPECT_EQ (c.pin_by_id (0)->name (), "p1");
+  EXPECT_EQ (c.pin_by_id (1)->name (), "p2");
+  EXPECT_EQ (c.pin_by_id (2), 0);
+  EXPECT_EQ (c.pin_by_name ("p1")->name (), "p1");
+  EXPECT_EQ (c.pin_by_name ("doesnt_exist") == 0, true);
+  EXPECT_EQ (c.pin_by_name ("p2")->name (), "p2");
+
+  db::Circuit c2 = c;
+  EXPECT_EQ (c2.name (), "name");
+  EXPECT_EQ (pins2string (c), "p1#0,p2#1");
+
+  EXPECT_EQ (c2.pin_by_id (0)->name (), "p1");
+  EXPECT_EQ (c2.pin_by_id (1)->name (), "p2");
+  EXPECT_EQ (c2.pin_by_id (2), 0);
 }
 
 TEST(4_CircuitDevices)
@@ -401,38 +485,6 @@ TEST(4_CircuitDevices)
     "  Dd2a:A=n1,B=n2\n"
     "  Dd2b:A=n2,B=n3\n"
   );
-}
-
-static std::string nl2string (const db::Netlist &nl)
-{
-  std::string res;
-  for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
-    res += "[" + c->name () + "]\n";
-    res += nets2string (*c);
-  }
-  return res;
-}
-
-//  dual form of netlist
-static std::string netlist2 (const db::Netlist &nl)
-{
-  std::string res;
-  for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
-    res += netlist2 (*c);
-  }
-  return res;
-}
-
-static std::string refs2string (const db::Circuit *c)
-{
-  std::string res;
-  for (db::Circuit::const_refs_iterator r = c->begin_refs (); r != c->end_refs (); ++r) {
-    if (!res.empty ()) {
-      res += ",";
-    }
-    res += r->name ();
-  }
-  return res;
 }
 
 TEST(4_NetlistSubcircuits)
@@ -895,54 +947,6 @@ TEST(11_NetlistCircuitRefs)
 
   sc3 = db::SubCircuit ();
   EXPECT_EQ (refs2string (c2), "sc1,sc2");
-}
-
-static std::string children2string (const db::Circuit *c)
-{
-  std::string res;
-  for (db::Circuit::const_child_circuit_iterator r = c->begin_children (); r != c->end_children (); ++r) {
-    if (!res.empty ()) {
-      res += ",";
-    }
-    res += (*r)->name ();
-  }
-  return res;
-}
-
-static std::string parents2string (const db::Circuit *c)
-{
-  std::string res;
-  for (db::Circuit::const_parent_circuit_iterator r = c->begin_parents (); r != c->end_parents (); ++r) {
-    if (!res.empty ()) {
-      res += ",";
-    }
-    res += (*r)->name ();
-  }
-  return res;
-}
-
-static std::string td2string (const db::Netlist *nl)
-{
-  std::string res;
-  for (db::Netlist::const_top_down_circuit_iterator r = nl->begin_top_down (); r != nl->end_top_down (); ++r) {
-    if (!res.empty ()) {
-      res += ",";
-    }
-    res += (*r)->name ();
-  }
-  return res;
-}
-
-static std::string bu2string (const db::Netlist *nl)
-{
-  std::string res;
-  for (db::Netlist::const_bottom_up_circuit_iterator r = nl->begin_bottom_up (); r != nl->end_bottom_up (); ++r) {
-    if (!res.empty ()) {
-      res += ",";
-    }
-    res += (*r)->name ();
-  }
-  return res;
 }
 
 TEST(12_NetlistTopology)

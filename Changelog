@@ -1,5 +1,9 @@
-0.25.7          (2018-12-31):
+0.25.7          (2019-01-09):
 
+* Bugfix: %GITHUB%/issues/200
+       Safer iteration of cell instances and shapes (with
+       modifications of container during iteration) - in this
+       case while flattening instances
 * Bugfix: %GITHUB%/issues/209
        Reader options were grayed out in stream import feature.
 * Bugfix: %GITHUB%/issues/207

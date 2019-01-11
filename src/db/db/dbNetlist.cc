@@ -40,7 +40,7 @@ Netlist::Netlist ()
 }
 
 Netlist::Netlist (const Netlist &other)
-  : m_valid_topology (false), m_lock_count (0),
+  : gsi::ObjectBase (other), tl::Object (other), m_valid_topology (false), m_lock_count (0),
     m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
     m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits)
 {

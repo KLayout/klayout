@@ -185,6 +185,12 @@ LocalProcessorCellContext::LocalProcessorCellContext ()
   //  .. nothing yet ..
 }
 
+LocalProcessorCellContext::LocalProcessorCellContext (const LocalProcessorCellContext &other)
+  : m_propagated (other.m_propagated), m_drops (other.m_drops)
+{
+  //  .. nothing yet ..
+}
+
 void
 LocalProcessorCellContext::add (db::LocalProcessorCellContext *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst)
 {

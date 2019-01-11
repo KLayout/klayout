@@ -80,7 +80,7 @@ public:
   virtual db::Connectivity get_connectivity (const db::Layout &layout, const std::vector<unsigned int> &layers) const
   {
     if (cb_get_connectivity.can_issue ()) {
-      return cb_get_connectivity.issue<const GenericDeviceExtractor, db::Connectivity, const db::Layout &, const std::vector<unsigned int> &> (&GenericDeviceExtractor::get_connectivity_fb, layout, layers);
+      return cb_get_connectivity.issue<GenericDeviceExtractor, db::Connectivity, const db::Layout &, const std::vector<unsigned int> &> (&GenericDeviceExtractor::get_connectivity_fb, layout, layers);
     } else {
       return db::NetlistDeviceExtractor::get_connectivity (layout, layers);
     }

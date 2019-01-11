@@ -141,6 +141,7 @@ public:
   typedef std::pair<const db::Cell *, db::ICplxTrans> parent_inst_type;
 
   LocalProcessorCellContext ();
+  LocalProcessorCellContext (const LocalProcessorCellContext &other);
 
   void add (db::LocalProcessorCellContext *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst);
   void propagate (const std::unordered_set<db::PolygonRef> &res);
@@ -208,6 +209,12 @@ public:
 
   LocalProcessorContexts ()
     : m_subject_layer (0), m_intruder_layer (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  LocalProcessorContexts (const LocalProcessorContexts &other)
+    : m_contexts_per_cell (other.m_contexts_per_cell), m_subject_layer (other.m_subject_layer), m_intruder_layer (other.m_intruder_layer)
   {
     //  .. nothing yet ..
   }

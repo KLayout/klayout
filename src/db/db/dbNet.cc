@@ -167,7 +167,7 @@ Net::Net (const std::string &name)
 }
 
 Net::Net (const Net &other)
-  : m_cluster_id (0), mp_circuit (0)
+  : tl::Object (other), m_cluster_id (0), mp_circuit (0)
 {
   operator= (other);
 }

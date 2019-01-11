@@ -114,6 +114,10 @@ public:
   virtual RegionDelegate *merged_in_place ();
   virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc);
   virtual RegionDelegate *merged () const;
+  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc) const
+  {
+    return db::AsIfFlatRegion::merged (min_coherence, min_wc);
+  }
 
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter);
 

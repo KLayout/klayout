@@ -51,7 +51,7 @@ SubCircuit::SubCircuit (Circuit *circuit, const std::string &name)
 }
 
 SubCircuit::SubCircuit (const SubCircuit &other)
-  : m_id (0), mp_circuit (0)
+  : tl::Object (other), m_id (0), mp_circuit (0)
 {
   operator= (other);
 }

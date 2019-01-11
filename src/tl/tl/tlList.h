@@ -303,6 +303,7 @@ public:
   list_impl () { }
 
   list_impl (const list_impl &other)
+    : list_impl<C, tl::false_tag> (other)
   {
     operator= (other);
   }
@@ -522,6 +523,6 @@ public:
   }
 };
 
-};
+}
 
 #endif

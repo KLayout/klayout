@@ -45,7 +45,7 @@ Circuit::Circuit ()
 }
 
 Circuit::Circuit (const Circuit &other)
-  : mp_netlist (0),
+  : gsi::ObjectBase (other), tl::Object (other), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),

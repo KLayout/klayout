@@ -35,7 +35,7 @@ DeviceClass::DeviceClass ()
 }
 
 DeviceClass::DeviceClass (const DeviceClass &other)
-  : mp_netlist (0)
+  : gsi::ObjectBase (other), tl::Object (other), tl::UniqueId (other), mp_netlist (0)
 {
   operator= (other);
 }

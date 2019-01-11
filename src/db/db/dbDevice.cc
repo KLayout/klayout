@@ -52,7 +52,7 @@ Device::Device (DeviceClass *device_class, const std::string &name)
 }
 
 Device::Device (const Device &other)
-  : mp_device_class (0), m_id (0), mp_circuit (0)
+  : tl::Object (other), mp_device_class (0), m_id (0), mp_circuit (0)
 {
   operator= (other);
 }

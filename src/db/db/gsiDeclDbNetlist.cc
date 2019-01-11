@@ -509,7 +509,7 @@ public:
   virtual bool combine_devices (db::Device *a, db::Device *b) const
   {
     if (cb_combine_devices.can_issue ()) {
-      return cb_combine_devices.issue<const db::DeviceClass, bool, db::Device *, db::Device *> (&db::DeviceClass::combine_devices, a, b);
+      return cb_combine_devices.issue<db::DeviceClass, bool, db::Device *, db::Device *> (&db::DeviceClass::combine_devices, a, b);
     } else {
       return db::DeviceClass::combine_devices (a, b);
     }

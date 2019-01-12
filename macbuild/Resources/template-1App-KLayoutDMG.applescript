@@ -35,15 +35,15 @@ on run (volumeName) -- most likely, the volume name is "KLayout"
             --     WIN_HEIGHT =  [500] pix
             set posMargin   to 50
             set negMargin   to 10
-            set theTopLeftX to 50
-            set theTopLeftY to 100
-            set theWidth    to 1000
-            set theHeight   to 500
+            set theTopLeftX to ${ORGX}
+            set theTopLeftY to ${ORGY}
+            set theWidth    to ${WIN_WIDTH}
+            set theHeight   to ${WIN_HEIGHT}
             set theBottomRightX to (theTopLeftX + theWidth  + posMargin)
             set theBottomRightY to (theTopLeftY + theHeight + posMargin)
 
             -- [3] Set the full path to .DS_Store file
-            set dotDSStore to "/Volumes/KLayout/.DS_Store"
+            set dotDSStore to "${FULL_PATH_DS_STORE}"
 
             -- [4] Set global view options
             tell container window
@@ -64,14 +64,14 @@ on run (volumeName) -- most likely, the volume name is "KLayout"
             end tell
 
             -- [6] Set the background PNG image (1000 x 500 pix) file name stored
-            set background picture of opts to file ".background:1App-KLayoutDMG-Back.png"
+            set background picture of opts to file ".background:${BACKGROUND_PNG_FILE}"
 
             -- [7] Set positions of each icon
             --     ITEM_1 = klayout.app      {860, 165}
             --     ITEM_2 = klayout.scripts: omit this for 1-Application package
             --     ITEM_3 = Applications     {860, 345}
-            set position of item "klayout.app" to {860, 165}
-            set position of item "Applications" to {860, 345}
+            set position of item "${ITEM_1}" to {${X1}, ${Y1}}
+            set position of item "${ITEM_3}" to {${X3}, ${Y3}}
 
             -- [8] Update the contents of container
             close
@@ -104,7 +104,7 @@ on run (volumeName) -- most likely, the volume name is "KLayout"
         repeat while ejected is false
             delay 1
             set elapsedTime to elapsedTime + 1
-            if (do shell script "[ -f " & dotDSStore & " ]; echo $?") = "0" then set ejected to true
+            if (do shell script "${CHECK_BASH}") = "0" then set ejected to true
         end repeat
         log "### Elapsed <" & elapsedTime & "> [sec] for writing .DS_Store file."
     end tell

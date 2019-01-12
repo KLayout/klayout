@@ -105,6 +105,8 @@ def SetGlobals():
     Platform = "Sierra"
   elif release == 17:
     Platform = "HighSierra"
+  elif release == 18:
+    Platform = "Mojave"
   else:
     Platform = ""
     print("")
@@ -132,6 +134,9 @@ def SetGlobals():
   elif Platform == "HighSierra":
     ModuleRuby   = "RubyHighSierra"
     ModulePython = "PythonHighSierra"
+  elif Platform == "Mojave":
+    ModuleRuby   = "RubyMojave"
+    ModulePython = "PythonMojave"
   else:
     ModuleRuby   = "nil"
     ModulePython = "nil"
@@ -273,6 +278,8 @@ def ParseCommandLineArguments():
           ModuleRuby = 'RubySierra'
         elif Platform == "HighSierra":
           ModuleRuby = 'RubyHighSierra'
+        elif Platform == "Mojave":
+          ModuleRuby = 'RubyMojave'
         else:
           ModuleRuby = ''
         break
@@ -311,6 +318,8 @@ def ParseCommandLineArguments():
           ModulePython = 'PythonSierra'
         elif Platform == "HighSierra":
           ModulePython = 'PythonHighSierra'
+        elif Platform == "Mojave":
+          ModulePython = 'PythonMojave'
         else:
           ModulePython = ''
         break

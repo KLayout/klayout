@@ -159,7 +159,9 @@ SOURCES = \
     dbDeviceClass.cc \
     dbNet.cc \
     dbSubCircuit.cc \
-    dbPin.cc
+    dbPin.cc \
+    dbLayoutToNetlistReader.cc \
+    dbLayoutToNetlistWriter.cc
 
 HEADERS = \
   dbArray.h \
@@ -283,7 +285,9 @@ HEADERS = \
     dbDevice.h \
     dbDeviceClass.h \
     dbPin.h \
-    dbSubCircuit.h
+    dbSubCircuit.h \
+    dbLayoutToNetlistReader.h \
+    dbLayoutToNetlistWriter.h
 
 !equals(HAVE_QT, "0") {
 

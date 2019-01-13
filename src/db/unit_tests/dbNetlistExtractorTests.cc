@@ -51,70 +51,6 @@ static unsigned int layer_of (const db::Region &region)
   return dr->deep_layer ().layer ();
 }
 
-static std::string device_name (const db::Device &device)
-{
-  if (device.name ().empty ()) {
-    return "$" + tl::to_string (device.id ());
-  } else {
-    return device.name ();
-  }
-}
-
-namespace
-{
-
-class MOSFET3Extractor
-  : public db::NetlistDeviceExtractorMOS3Transistor
-{
-public:
-  MOSFET3Extractor (const std::string &name, db::Layout *debug_out)
-    : db::NetlistDeviceExtractorMOS3Transistor (name), mp_debug_out (debug_out), m_ldiff (0), m_lgate (0)
-  {
-    if (mp_debug_out) {
-      m_ldiff = mp_debug_out->insert_layer (db::LayerProperties (100, 0));
-      m_lgate = mp_debug_out->insert_layer (db::LayerProperties (101, 0));
-    }
-  }
-
-private:
-  db::Layout *mp_debug_out;
-  unsigned int m_ldiff, m_lgate;
-
-  void device_out (const db::Device *device, const db::Region &diff, const db::Region &gate)
-  {
-    if (! mp_debug_out) {
-      return;
-    }
-
-    std::string cn = layout ()->cell_name (cell_index ());
-    std::pair<bool, db::cell_index_type> target_cp = mp_debug_out->cell_by_name (cn.c_str ());
-    tl_assert (target_cp.first);
-
-    db::cell_index_type dci = mp_debug_out->add_cell ((device->device_class ()->name () + "_" + device->circuit ()->name () + "_" + device_name (*device)).c_str ());
-    mp_debug_out->cell (target_cp.second).insert (db::CellInstArray (db::CellInst (dci), db::Trans ()));
-
-    db::Cell &device_cell = mp_debug_out->cell (dci);
-    for (db::Region::const_iterator p = diff.begin (); ! p.at_end (); ++p) {
-      device_cell.shapes (m_ldiff).insert (*p);
-    }
-    for (db::Region::const_iterator p = gate.begin (); ! p.at_end (); ++p) {
-      device_cell.shapes (m_lgate).insert (*p);
-    }
-
-    std::string ps;
-    const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
-    for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-      if (! ps.empty ()) {
-        ps += ",";
-      }
-      ps += i->name () + "=" + tl::to_string (device->parameter_value (i->id ()));
-    }
-    device_cell.shapes (m_ldiff).insert (db::Text (ps, db::Trans (diff.bbox ().center () - db::Point ())));
-  }
-};
-
-}
-
 static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_layer, int gds_datatype = 0)
 {
   unsigned int lid = ly.insert_layer (db::LayerProperties (gds_layer, gds_datatype));
@@ -124,6 +60,8 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
 
 static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<db::PolygonRef> &clusters, db::Layout &ly, const std::map<unsigned int, unsigned int> &lmap, const db::CellMapping &cmap)
 {
+  std::set<db::cell_index_type> device_cells_seen;
+
   for (db::Netlist::const_circuit_iterator c = nl.begin_circuits (); c != nl.end_circuits (); ++c) {
 
     db::Cell &cell = ly.cell (cmap.cell_mapping (c->cell_index ()));
@@ -146,6 +84,40 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
         for (std::map<unsigned int, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
           db::Shapes &target = net_cell.shapes (m->second);
           for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (m->first); !s.at_end (); ++s) {
+            target.insert (*s);
+          }
+        }
+
+      }
+
+    }
+
+    for (db::Circuit::const_device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
+
+      if (device_cells_seen.find (d->cell_index ()) != device_cells_seen.end ()) {
+        continue;
+      }
+
+      db::Cell &device_cell = ly.cell (cmap.cell_mapping (d->cell_index ()));
+      device_cells_seen.insert (d->cell_index ());
+
+      std::string ps;
+      const std::vector<db::DeviceParameterDefinition> &pd = d->device_class ()->parameter_definitions ();
+      for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+        if (! ps.empty ()) {
+          ps += ",";
+        }
+        ps += i->name () + "=" + tl::to_string (d->parameter_value (i->id ()));
+      }
+
+      const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
+      for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
+
+        const db::local_cluster<db::PolygonRef> &dc = clusters.clusters_per_cell (d->cell_index ()).cluster_by_id (d->cluster_id_for_terminal (t->id ()));
+
+        for (std::map<unsigned int, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
+          db::Shapes &target = device_cell.shapes (m->second);
+          for (db::local_cluster<db::PolygonRef>::shape_iterator s = dc.begin (m->first); !s.at_end (); ++s) {
             target.insert (*s);
           }
         }
@@ -235,24 +207,22 @@ TEST(1_DeviceAndNetExtraction)
   //  perform the extraction
 
   db::Netlist nl;
+  db::hier_clusters<db::PolygonRef> cl;
 
-  //  NOTE: the device extractor will add more debug layers for the transistors:
-  //    20/0 -> Diffusion
-  //    21/0 -> Gate
-  MOSFET3Extractor pmos_ex ("PMOS", &ly);
-  MOSFET3Extractor nmos_ex ("NMOS", &ly);
+  db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
 
   db::NetlistDeviceExtractor::input_layers dl;
 
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, dl, &nl);
+  pmos_ex.extract (dss, dl, nl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, dl, &nl);
+  nmos_ex.extract (dss, dl, nl, cl);
 
   //  perform the net extraction
 
@@ -282,7 +252,7 @@ TEST(1_DeviceAndNetExtraction)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, conn, &nl);
+  net_ex.extract_nets (dss, conn, nl, cl);
 
   //  debug layers produced for nets
   //    202/0 -> Active
@@ -306,7 +276,7 @@ TEST(1_DeviceAndNetExtraction)
 
   //  write nets to layout
   db::CellMapping cm = dss.cell_mapping_to_original (0, &ly, tc.cell_index ());
-  dump_nets_to_layout (nl, net_ex.clusters (), ly, dump_map, cm);
+  dump_nets_to_layout (nl, cl, ly, dump_map, cm);
 
   //  compare netlist as string
   EXPECT_EQ (nl.to_string (),

@@ -420,6 +420,7 @@ private:
 
   struct LayoutHolder;
 
+  void invalidate_hier ();
   void add_ref (unsigned int layout, unsigned int layer);
   void remove_ref (unsigned int layout, unsigned int layer);
 

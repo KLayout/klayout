@@ -1664,6 +1664,11 @@ template <class T>
 void
 hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
 {
+  if (m_per_cell_clusters.find (cell.cell_index ()) != m_per_cell_clusters.end ()) {
+    //  skip pre-build clusters (from devices)
+    return;
+  }
+
   std::string msg = tl::to_string (tr ("Computing local clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
   if (tl::verbosity () >= 40) {
     tl::log << msg;

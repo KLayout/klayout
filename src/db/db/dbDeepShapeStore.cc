@@ -340,7 +340,10 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
     layout_index = (unsigned int) m_layouts.size ();
 
     m_layouts.push_back (new LayoutHolder ());
-    m_layouts.back ()->layout.dbu (si.layout ()->dbu ());
+
+    db::Layout &layout = m_layouts.back ()->layout;
+    layout.hier_changed_event.add (this, &DeepShapeStore::invalidate_hier);
+    layout.dbu (si.layout ()->dbu ());
 
     m_layout_map[si] = layout_index;
 
@@ -378,6 +381,12 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   return DeepLayer (this, layout_index, layer_index);
 }
 
+void
+DeepShapeStore::invalidate_hier ()
+{
+  m_delivery_mapping_cache.clear ();
+}
+
 const db::CellMapping &
 DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_layout, db::cell_index_type into_cell)
 {
@@ -409,8 +418,6 @@ DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_
       //  create from them. We need to consider however, that the hierarchy builder is allowed to create
       //  variants which we cannot map.
 
-      bool any_skipped = false;
-
       for (HierarchyBuilder::cell_map_type::const_iterator m = original_builder.begin_cell_map (); m != original_builder.end_cell_map (); ++m) {
 
         HierarchyBuilder::cell_map_type::const_iterator mm = m;
@@ -425,16 +432,13 @@ DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_
 
         if (! skip) {
           cm->second.map (m->first.first, m->second);
-        } else {
-          any_skipped = true;
         }
 
       }
 
-      if (any_skipped) {
-        //  Add new cells for the variants
-        cm->second.create_missing_mapping (*into_layout, into_cell, *source_layout, source_top);
-      }
+      //  Add new cells for the variants and (possible) devices which are cells added during the device
+      //  extraction process
+      cm->second.create_missing_mapping (*into_layout, into_cell, *source_layout, source_top);
 
     } else if (into_layout->cells () == 1) {
 

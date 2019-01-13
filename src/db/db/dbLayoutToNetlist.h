@@ -198,6 +198,14 @@ public:
   const db::Cell *internal_top_cell () const;
 
   /**
+   *  @brief Gets the connectivity object
+   */
+  const db::Connectivity &connectivity () const
+  {
+    return m_conn;
+  }
+
+  /**
    *  @brief Gets the internal layer for a given extraction layer
    *  This method is required to derive the internal layer index - for example for
    *  investigating the cluster tree.
@@ -227,7 +235,10 @@ public:
    *  NOTE: the layer and cell indexes used inside this structure refer to the
    *  internal layout.
    */
-  const db::hier_clusters<db::PolygonRef> &net_clusters () const;
+  const db::hier_clusters<db::PolygonRef> &net_clusters () const
+  {
+    return m_net_clusters;
+  }
 
   /**
    *  @brief Returns all shapes of a specific net and layer.
@@ -327,7 +338,7 @@ private:
   db::RecursiveShapeIterator m_iter;
   db::DeepShapeStore m_dss;
   db::Connectivity m_conn;
-  db::NetlistExtractor m_netex;
+  db::hier_clusters<db::PolygonRef> m_net_clusters;
   std::auto_ptr<db::Netlist> mp_netlist;
   std::set<db::DeepLayer> m_dlrefs;
   bool m_netlist_extracted;

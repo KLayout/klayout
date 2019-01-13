@@ -50,7 +50,9 @@ NetlistDeviceExtractor::NetlistDeviceExtractor (const std::string &name)
   : mp_layout (0), m_cell_index (0), mp_circuit (0)
 {
   m_name = name;
-  m_propname_id = 0;
+  m_terminal_id_propname_id = 0;
+  m_device_class_propname_id = 0;
+  m_device_id_propname_id = 0;
 }
 
 NetlistDeviceExtractor::~NetlistDeviceExtractor ()
@@ -58,9 +60,21 @@ NetlistDeviceExtractor::~NetlistDeviceExtractor ()
   //  .. nothing yet ..
 }
 
-const tl::Variant &NetlistDeviceExtractor::terminal_property_name ()
+const tl::Variant &NetlistDeviceExtractor::terminal_id_property_name ()
 {
-  static tl::Variant name ("TERMINAL");
+  static tl::Variant name ("TERMINAL_ID");
+  return name;
+}
+
+const tl::Variant &NetlistDeviceExtractor::device_id_property_name ()
+{
+  static tl::Variant name ("DEVICE_ID");
+  return name;
+}
+
+const tl::Variant &NetlistDeviceExtractor::device_class_property_name ()
+{
+  static tl::Variant name ("DEVICE_CLASS");
   return name;
 }
 
@@ -68,7 +82,9 @@ void NetlistDeviceExtractor::initialize (db::Netlist *nl)
 {
   m_layer_definitions.clear ();
   mp_device_class = 0;
-  m_propname_id = 0;
+  m_terminal_id_propname_id = 0;
+  m_device_id_propname_id = 0;
+  m_device_class_propname_id = 0;
   m_netlist.reset (nl);
 
   setup ();
@@ -79,9 +95,9 @@ static void insert_into_region (const db::PolygonRef &s, const db::ICplxTrans &t
   region.insert (s.obj ().transformed (tr * db::ICplxTrans (s.trans ())));
 }
 
-void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const NetlistDeviceExtractor::input_layers &layer_map, db::Netlist *nl)
+void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const NetlistDeviceExtractor::input_layers &layer_map, db::Netlist &nl, hier_clusters_type &clusters)
 {
-  initialize (nl);
+  initialize (&nl);
 
   std::vector<unsigned int> layers;
   layers.reserve (m_layer_definitions.size ());
@@ -107,16 +123,16 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const NetlistDevi
 
   }
 
-  extract_without_initialize (dss.layout (), dss.initial_cell (), layers);
+  extract_without_initialize (dss.layout (), dss.initial_cell (), clusters, layers);
 }
 
-void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl)
+void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl, hier_clusters_type &clusters)
 {
   initialize (nl);
-  extract_without_initialize (layout, cell, layers);
+  extract_without_initialize (layout, cell, clusters, layers);
 }
 
-void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers)
+void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers)
 {
   tl_assert (layers.size () == m_layer_definitions.size ());
 
@@ -125,9 +141,12 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
 
   mp_layout = &layout;
   m_layers = layers;
+  mp_clusters = &clusters;
 
   //  terminal properties are kept in a property with the terminal_property_name name
-  m_propname_id = mp_layout->properties_repository ().prop_name_id (terminal_property_name ());
+  m_terminal_id_propname_id = mp_layout->properties_repository ().prop_name_id (terminal_id_property_name ());
+  m_device_id_propname_id = mp_layout->properties_repository ().prop_name_id (device_id_property_name ());
+  m_device_class_propname_id = mp_layout->properties_repository ().prop_name_id (device_class_property_name ());
 
   tl_assert (m_netlist.get () != 0);
 
@@ -149,6 +168,11 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
 
   //  for each cell investigate the clusters
   for (std::set<db::cell_index_type>::const_iterator ci = called_cells.begin (); ci != called_cells.end (); ++ci) {
+
+    //  skip device cells from previous extractions
+    if (is_device_cell (*ci)) {
+      continue;
+    }
 
     m_cell_index = *ci;
 
@@ -192,9 +216,114 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
       //  do the actual device extraction
       extract_devices (layer_geometry);
 
+      //  push the new devices to the layout
+      push_new_devices ();
+
     }
 
   }
+}
+
+bool NetlistDeviceExtractor::is_device_cell (db::cell_index_type ci) const
+{
+  db::properties_id_type pi = mp_layout->cell (ci).prop_id ();
+  if (pi == 0) {
+    return false;
+  }
+
+  const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
+  for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+    if (j->first == m_device_class_propname_id) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void NetlistDeviceExtractor::push_new_devices ()
+{
+  db::VCplxTrans dbu_inv = db::CplxTrans (mp_layout->dbu ()).inverted ();
+
+  for (std::map<db::Device *, geometry_per_terminal_type>::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
+
+    db::Vector disp = dbu_inv * d->first->position () - db::Point ();
+
+    DeviceCellKey key;
+
+    for (geometry_per_terminal_type::const_iterator t = d->second.begin (); t != d->second.end (); ++t) {
+      std::map<size_t, std::set<db::PolygonRef> > &gt = key.geometry [t->first];
+      for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
+        std::set<db::PolygonRef> &gl = gt [l->first];
+        for (std::vector<db::PolygonRef>::const_iterator p = l->second.begin (); p != l->second.end (); ++p) {
+          db::PolygonRef pr = *p;
+          pr.transform (db::PolygonRef::trans_type (-disp));
+          gl.insert (pr);
+        }
+      }
+    }
+
+    const std::vector<db::DeviceParameterDefinition> &pd = mp_device_class->parameter_definitions ();
+    for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+      key.parameters.insert (std::make_pair (p->id (), d->first->parameter_value (p->id ())));
+    }
+
+    db::PropertiesRepository::properties_set ps;
+
+    std::map<DeviceCellKey, db::cell_index_type>::iterator c = m_device_cells.find (key);
+    if (c == m_device_cells.end ()) {
+
+      std::string cell_name = "D$" + mp_device_class->name ();
+      db::Cell &device_cell = mp_layout->cell (mp_layout->add_cell (cell_name.c_str ()));
+      c = m_device_cells.insert (std::make_pair (key, device_cell.cell_index ())).first;
+
+      //  attach the device class ID to the cell
+      ps.clear ();
+      ps.insert (std::make_pair (m_device_class_propname_id, tl::Variant (mp_device_class->name ())));
+      device_cell.prop_id (mp_layout->properties_repository ().properties_id (ps));
+
+      db::connected_clusters<db::PolygonRef> &cc = mp_clusters->clusters_per_cell (device_cell.cell_index ());
+
+      for (geometry_per_terminal_type::const_iterator t = d->second.begin (); t != d->second.end (); ++t) {
+
+        //  Build a property set for the device terminal ID
+        ps.clear ();
+        ps.insert (std::make_pair (m_terminal_id_propname_id, tl::Variant (t->first)));
+        db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
+
+        //  initialize the local cluster (will not be extracted)
+        db::local_cluster<db::PolygonRef> *lc = cc.insert ();
+        lc->add_attr (pi);
+
+        //  build the cell shapes and local cluster
+        for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
+          db::Shapes &shapes = device_cell.shapes (l->first);
+          for (std::vector<db::PolygonRef>::const_iterator s = l->second.begin (); s != l->second.end (); ++s) {
+            db::PolygonRef pr = *s;
+            pr.transform (db::PolygonRef::trans_type (-disp));
+            shapes.insert (db::PolygonRefWithProperties (pr, pi));
+            lc->add (*s, l->first);
+          }
+        }
+
+      }
+
+    }
+
+    //  make the cell index known to the device
+    d->first->set_cell_index (c->second);
+
+    //  Build a property set for the device ID
+    ps.clear ();
+    ps.insert (std::make_pair (m_device_id_propname_id, tl::Variant (d->first->id ())));
+    db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
+
+    db::CellInstArrayWithProperties inst (db::CellInstArray (db::CellInst (c->second), db::Trans (disp)), pi);
+    mp_layout->cell (m_cell_index).insert (inst);
+
+  }
+
+  m_new_devices.clear ();
 }
 
 void NetlistDeviceExtractor::setup ()
@@ -253,14 +382,8 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
   tl_assert (geometry_index < m_layers.size ());
   unsigned int layer_index = m_layers [geometry_index];
 
-  //  Build a property set for the DeviceTerminalProperty
-  db::PropertiesRepository::properties_set ps;
-  tl::Variant &v = ps.insert (std::make_pair (m_propname_id, tl::Variant ()))->second;
-  v = tl::Variant (new db::DeviceTerminalProperty (device->id (), terminal_id), db::NetlistProperty::variant_class (), true);
-  db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
-
   db::PolygonRef pr (polygon, mp_layout->shape_repository ());
-  mp_layout->cell (m_cell_index).shapes (layer_index).insert (db::PolygonRefWithProperties (pr, pi));
+  m_new_devices[device][terminal_id][layer_index].push_back (pr);
 }
 
 void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Box &box)

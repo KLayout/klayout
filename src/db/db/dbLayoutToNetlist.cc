@@ -110,7 +110,7 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
   if (! mp_netlist.get ()) {
     mp_netlist.reset (new db::Netlist ());
   }
-  extractor.extract(m_dss, layers, mp_netlist.get ());
+  extractor.extract(m_dss, layers, *mp_netlist, m_net_clusters);
 }
 
 void LayoutToNetlist::connect (const db::Region &l)
@@ -183,7 +183,12 @@ void LayoutToNetlist::extract_netlist ()
   if (! mp_netlist.get ()) {
     mp_netlist.reset (new db::Netlist ());
   }
-  m_netex.extract_nets(m_dss, m_conn, mp_netlist.get ());
+
+  m_net_clusters.clear ();
+
+  db::NetlistExtractor netex;
+  netex.extract_nets(m_dss, m_conn, *mp_netlist, m_net_clusters);
+
   m_netlist_extracted = true;
 }
 
@@ -227,14 +232,6 @@ db::Netlist *LayoutToNetlist::netlist () const
   return mp_netlist.get ();
 }
 
-const db::hier_clusters<db::PolygonRef> &LayoutToNetlist::net_clusters () const
-{
-  if (! m_netlist_extracted) {
-    throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
-  }
-  return m_netex.clusters ();
-}
-
 template <class Tr>
 static void deliver_shape (const db::PolygonRef &pr, db::Region &region, const Tr &tr)
 {
@@ -261,26 +258,26 @@ static void deliver_shape (const db::PolygonRef &pr, db::Shapes &shapes, const T
 }
 
 template <class To>
-static void deliver_shapes_of_net_recursive (const db::NetlistExtractor &netex, const db::Net &net, unsigned int layer_id, To &to)
+static void deliver_shapes_of_net_recursive (const db::hier_clusters<db::PolygonRef> &clusters, const db::Net &net, unsigned int layer_id, To &to)
 {
   const db::Circuit *circuit = net.circuit ();
   tl_assert (circuit != 0);
 
   db::cell_index_type ci = circuit->cell_index ();
 
-  for (db::recursive_cluster_shape_iterator<db::PolygonRef> rci (netex.clusters (), layer_id, ci, net.cluster_id ()); !rci.at_end (); ++rci) {
+  for (db::recursive_cluster_shape_iterator<db::PolygonRef> rci (clusters, layer_id, ci, net.cluster_id ()); !rci.at_end (); ++rci) {
     deliver_shape (*rci, to, rci.trans ());
   }
 }
 
 template <class To>
-static void deliver_shapes_of_net_nonrecursive (const db::NetlistExtractor &netex, const db::Net &net, unsigned int layer_id, To &to)
+static void deliver_shapes_of_net_nonrecursive (const db::hier_clusters<db::PolygonRef> &clusters, const db::Net &net, unsigned int layer_id, To &to)
 {
   const db::Circuit *circuit = net.circuit ();
   tl_assert (circuit != 0);
 
   db::cell_index_type ci = circuit->cell_index ();
-  const db::local_cluster<db::PolygonRef> &lc = netex.clusters ().clusters_per_cell (ci).cluster_by_id (net.cluster_id ());
+  const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (ci).cluster_by_id (net.cluster_id ());
 
   for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (layer_id); !s.at_end (); ++s) {
     deliver_shape (*s, to, db::UnitTrans ());
@@ -292,9 +289,9 @@ void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_la
   unsigned int lid = layer_of (of_layer);
 
   if (! recursive) {
-    deliver_shapes_of_net_nonrecursive (m_netex, net, lid, to);
+    deliver_shapes_of_net_nonrecursive (m_net_clusters, net, lid, to);
   } else {
-    deliver_shapes_of_net_recursive (m_netex, net, lid, to);
+    deliver_shapes_of_net_recursive (m_net_clusters, net, lid, to);
   }
 }
 
@@ -304,9 +301,9 @@ db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region
   std::auto_ptr<db::Region> res (new db::Region ());
 
   if (! recursive) {
-    deliver_shapes_of_net_nonrecursive (m_netex, net, lid, *res);
+    deliver_shapes_of_net_nonrecursive (m_net_clusters, net, lid, *res);
   } else {
-    deliver_shapes_of_net_recursive (m_netex, net, lid, *res);
+    deliver_shapes_of_net_recursive (m_net_clusters, net, lid, *res);
   }
 
   return res.release ();
@@ -326,7 +323,7 @@ LayoutToNetlist::build_net_rec (const db::Net &net, db::Layout &target, db::Cell
   const db::Circuit *circuit = net.circuit ();
   tl_assert (circuit != 0);
 
-  const db::connected_clusters<db::PolygonRef> &clusters = m_netex.clusters ().clusters_per_cell (circuit->cell_index ());
+  const db::connected_clusters<db::PolygonRef> &clusters = m_net_clusters.clusters_per_cell (circuit->cell_index ());
   typedef db::connected_clusters<db::PolygonRef>::connections_type connections_type;
   const connections_type &connections = clusters.connections_for_cluster (net.cluster_id ());
   for (connections_type::const_iterator c = connections.begin (); c != connections.end (); ++c) {
@@ -390,7 +387,7 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
         continue;
       }
 
-      const db::connected_clusters<db::PolygonRef> &ccl = m_netex.clusters ().clusters_per_cell (c->cell_index ());
+      const db::connected_clusters<db::PolygonRef> &ccl = m_net_clusters.clusters_per_cell (c->cell_index ());
       const db::local_cluster<db::PolygonRef> &cl = ccl.cluster_by_id (n->cluster_id ());
 
       bool any_connections = ! ccl.connections_for_cluster (n->cluster_id ()).empty ();

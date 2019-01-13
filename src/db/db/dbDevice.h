@@ -25,6 +25,7 @@
 
 #include "dbCommon.h"
 #include "dbNet.h"
+#include "dbPoint.h"
 
 #include "tlObject.h"
 
@@ -128,6 +129,49 @@ public:
   }
 
   /**
+   *  @brief Sets the device position
+   *  The device position should be the center of the recognition shape or something similar.
+   *  Giving the device a position allows combining multiple devices with the same
+   *  relative geometry into a single cell.
+   *  The position has to be given in micrometer units.
+   */
+  void set_position (const db::DPoint &pos);
+
+  /**
+   *  @brief Gets the device position
+   */
+  const db::DPoint &position () const
+  {
+    return m_position;
+  }
+
+  /**
+   *  @brief Sets the device cell index
+   *  In the layout, a device is represented by a cell. This attribute gives the index of this
+   *  cell.
+   */
+  void set_cell_index (db::cell_index_type ci);
+
+  /**
+   *  @brief Gets the device cell index
+   */
+  db::cell_index_type cell_index () const
+  {
+    return m_cell_index;
+  }
+
+  /**
+   *  @brief Gets the cluster ID for a given terminal
+   *  This attribute connects the device terminal with a terminal cluster
+   */
+  size_t cluster_id_for_terminal (size_t terminal_id) const;
+
+  /**
+   *  @brief Sets the cluster ID for a given terminal
+   */
+  void set_cluster_id_for_terminal (size_t terminal_id, size_t cluster_id);
+
+  /**
    *  @brief Gets the net attached to a specific terminal
    *  Returns 0 if no net is attached.
    */
@@ -180,7 +224,10 @@ private:
 
   DeviceClass *mp_device_class;
   std::string m_name;
+  db::DPoint m_position;
+  db::cell_index_type m_cell_index;
   std::vector<Net::terminal_iterator> m_terminal_refs;
+  std::vector<size_t> m_terminal_cluster_ids;
   std::vector<double> m_parameters;
   size_t m_id;
   Circuit *mp_circuit;

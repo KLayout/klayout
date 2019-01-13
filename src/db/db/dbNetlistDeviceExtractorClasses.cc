@@ -98,6 +98,8 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 
       db::Device *device = create_device ();
 
+      device->set_position (db::CplxTrans (dbu ()) * p->box ().center ());
+
       device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, dbu () * edges.length () * 0.5);
       device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, dbu () * (p->perimeter () - edges.length ()) * 0.5);
 

@@ -31,7 +31,7 @@ namespace db
 //  Device class implementation
 
 Device::Device ()
-  : mp_device_class (0), m_id (0), mp_circuit (0)
+  : mp_device_class (0), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
@@ -46,13 +46,13 @@ Device::~Device ()
 }
 
 Device::Device (DeviceClass *device_class, const std::string &name)
-  : mp_device_class (device_class), m_name (name), m_id (0), mp_circuit (0)
+  : mp_device_class (device_class), m_name (name), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
 
 Device::Device (const Device &other)
-  : tl::Object (other), mp_device_class (0), m_id (0), mp_circuit (0)
+  : tl::Object (other), mp_device_class (0), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), m_id (0), mp_circuit (0)
 {
   operator= (other);
 }
@@ -61,6 +61,10 @@ Device &Device::operator= (const Device &other)
 {
   if (this != &other) {
     m_name = other.m_name;
+    m_position = other.m_position;
+    m_cell_index = other.m_cell_index;
+    m_terminal_cluster_ids = other.m_terminal_cluster_ids;
+    m_parameters = other.m_parameters;
     mp_device_class = other.mp_device_class;
   }
   return *this;
@@ -77,6 +81,29 @@ void Device::set_name (const std::string &n)
   if (mp_circuit) {
     mp_circuit->m_device_by_name.invalidate ();
   }
+}
+
+void Device::set_position (const db::DPoint &pt)
+{
+  m_position = pt;
+}
+
+void Device::set_cell_index (db::cell_index_type ci)
+{
+  m_cell_index = ci;
+}
+
+size_t Device::cluster_id_for_terminal (size_t terminal_id) const
+{
+  return terminal_id < m_terminal_cluster_ids.size () ? m_terminal_cluster_ids [terminal_id] : 0;
+}
+
+void Device::set_cluster_id_for_terminal (size_t terminal_id, size_t cluster_id)
+{
+  if (m_terminal_cluster_ids.size () <= terminal_id) {
+    m_terminal_cluster_ids.resize (terminal_id + 1, 0);
+  }
+  m_terminal_cluster_ids [terminal_id] = cluster_id;
 }
 
 void Device::set_terminal_ref_for_terminal (size_t terminal_id, Net::terminal_iterator iter)

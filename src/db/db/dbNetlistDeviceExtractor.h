@@ -194,6 +194,7 @@ public:
   typedef std::vector<db::NetlistDeviceExtractorLayerDefinition> layer_definitions;
   typedef layer_definitions::const_iterator layer_definitions_iterator;
   typedef std::map<std::string, db::Region *> input_layers;
+  typedef db::hier_clusters<db::PolygonRef> hier_clusters_type;
 
   /**
    *  @brief Constructor
@@ -217,11 +218,21 @@ public:
 
   /**
    *  @brief Gets the property name for the device terminal annotation
-   *  Annotation happens through db::DeviceTerminalProperty objects attached to
-   *  the terminal shapes.
-   *  The name used for the property is the one returned by this function.
+   *  This name is used to attach the terminal ID to terminal shapes.
    */
-  static const tl::Variant &terminal_property_name ();
+  static const tl::Variant &terminal_id_property_name ();
+
+  /**
+   *  @brief Gets the property name for the device id annotation
+   *  This name is used to attach the device ID to instances.
+   */
+  static const tl::Variant &device_id_property_name ();
+
+  /**
+   *  @brief Gets the property name for the device class annotation
+   *  This name is used to attach the device class name to cells.
+   */
+  static const tl::Variant &device_class_property_name ();
 
   /**
    *  @brief Performs the extraction
@@ -241,7 +252,7 @@ public:
    *
    *  NOTE: The extractor expects "PolygonRef" type layers.
    */
-  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, Netlist *netlist);
+  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, Netlist *netlist, hier_clusters_type &clusters);
 
   /**
    *  @brief Extracts the devices from a list of regions
@@ -250,7 +261,7 @@ public:
    *  named regions for input. These regions need to be of deep region type and
    *  originate from the same layout than the DeepShapeStore.
    */
-  void extract (DeepShapeStore &dss, const input_layers &layers, Netlist *netlist);
+  void extract (DeepShapeStore &dss, const input_layers &layers, Netlist &netlist, hier_clusters_type &clusters);
 
   /**
    *  @brief Gets the error iterator, begin
@@ -452,9 +463,43 @@ protected:
   std::string cell_name () const;
 
 private:
+  struct DeviceCellKey
+  {
+    DeviceCellKey () { }
+
+    bool operator== (const DeviceCellKey &other) const
+    {
+      if (geometry != other.geometry) {
+        return false;
+      }
+      if (parameters != other.parameters) {
+        return false;
+      }
+      return true;
+    }
+
+    bool operator< (const DeviceCellKey &other) const
+    {
+      if (geometry != other.geometry) {
+        return geometry < other.geometry;
+      }
+      if (parameters != other.parameters) {
+        return parameters < other.parameters;
+      }
+      return false;
+    }
+
+    std::map<unsigned int, std::map<size_t, std::set<db::PolygonRef> > > geometry;
+    std::map<size_t, double> parameters;
+  };
+
+  typedef std::map<unsigned int, std::vector<db::PolygonRef> > geometry_per_layer_type;
+  typedef std::map<size_t, geometry_per_layer_type> geometry_per_terminal_type;
+
   tl::weak_ptr<db::Netlist> m_netlist;
   db::Layout *mp_layout;
-  db::properties_id_type m_propname_id;
+  db::properties_id_type m_terminal_id_propname_id, m_device_id_propname_id, m_device_class_propname_id;
+  hier_clusters_type *mp_clusters;
   db::cell_index_type m_cell_index;
   db::Circuit *mp_circuit;
   db::DeviceClass *mp_device_class;
@@ -462,6 +507,8 @@ private:
   layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;
   error_list m_errors;
+  std::map<db::Device *, geometry_per_terminal_type> m_new_devices;
+  std::map<DeviceCellKey, db::cell_index_type> m_device_cells;
 
   //  no copying
   NetlistDeviceExtractor (const NetlistDeviceExtractor &);
@@ -473,7 +520,9 @@ private:
    */
   void initialize (db::Netlist *nl);
 
-  void extract_without_initialize (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers);
+  void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers);
+  void push_new_devices ();
+  bool is_device_cell (db::cell_index_type ci) const;
 };
 
 }

@@ -513,7 +513,7 @@ private:
   std::vector<unsigned int> m_layers;
   error_list m_errors;
   std::map<size_t, geometry_per_terminal_type> m_new_devices;
-  std::map<DeviceCellKey, db::cell_index_type> m_device_cells;
+  std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceModel *> > m_device_cells;
 
   //  no copying
   NetlistDeviceExtractor (const NetlistDeviceExtractor &);

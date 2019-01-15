@@ -124,7 +124,11 @@ static std::string netlist2 (const db::Circuit &c)
       pins += "=";
       pins += net ? net->name () : std::string ("(null)");
     }
-    res += "  D" + d->name () + ":" + pins + "\n";
+    res += "  D" + d->name ();
+    if (d->device_model ()) {
+      res += "/" + d->device_model ()->name ();
+    }
+    res += ":" + pins + "\n";
   }
 
   for (db::Circuit::const_subcircuit_iterator s = c.begin_subcircuits (); s != c.end_subcircuits (); ++s) {
@@ -497,6 +501,12 @@ TEST(4_NetlistSubcircuits)
   dc->add_terminal_definition (db::DeviceTerminalDefinition ("B", ""));
   nl->add_device_class (dc);
 
+  db::DeviceModel *dm = new db::DeviceModel ();
+  dm->set_name ("dm2");
+  dm->set_cell_index (42);
+  dm->set_cluster_id_for_terminal (0, 17);
+  nl->add_device_model (dm);
+
   db::Circuit *c1 = new db::Circuit ();
   c1->set_cell_index (17);
   EXPECT_EQ (c1->netlist (), 0);
@@ -526,8 +536,9 @@ TEST(4_NetlistSubcircuits)
   EXPECT_EQ (nl->circuit_by_cell_index (41) == 0, true);
   EXPECT_EQ (nl->circuit_by_cell_index (42) == c2, true);
 
-  db::Device *d = new db::Device (dc, "D");
+  db::Device *d = new db::Device (dc, dm, "D");
   c2->add_device (d);
+  EXPECT_EQ (d->device_model ()->name (), "dm2");
 
   EXPECT_EQ (refs2string (c2), "");
   db::SubCircuit *sc1 = new db::SubCircuit (c2);
@@ -601,7 +612,7 @@ TEST(4_NetlistSubcircuits)
     "  Xsc1:c2p1=n1a,c2p2=n1b\n"
     "  Xsc2:c2p1=n1b,c2p2=n1c\n"
     "c2:c2p1=n2a,c2p2=n2b\n"
-    "  DD:A=n2a,B=n2b\n"
+    "  DD/dm2:A=n2a,B=n2b\n"
   );
 
   //  check netlist
@@ -636,7 +647,7 @@ TEST(4_NetlistSubcircuits)
     "  Xsc1:c2p1=n1a,c2p2=n1b\n"
     "  Xsc2:c2p1=n1b,c2p2=n1c\n"
     "c2:c2p1=n2a,c2p2=n2b\n"
-    "  DD:A=n2a,B=n2b\n"
+    "  DD/dm2:A=n2a,B=n2b\n"
   );
 
   //  check netlist
@@ -1027,4 +1038,31 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (nl->top_circuit_count (), size_t (1));
   EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
   EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
+}
+
+TEST(13_DeviceModel)
+{
+  db::Netlist nl;
+
+  db::DeviceModel *dm = new db::DeviceModel ("name");
+  EXPECT_EQ (dm->name (), "name");
+  dm->set_name ("name2");
+  EXPECT_EQ (dm->name (), "name2");
+
+  dm->set_cluster_id_for_terminal (1, 17);
+  dm->set_cluster_id_for_terminal (0, 42);
+  EXPECT_EQ (dm->cluster_id_for_terminal (0), size_t (42));
+  EXPECT_EQ (dm->cluster_id_for_terminal (1), size_t (17));
+
+  dm->set_cell_index (5);
+  EXPECT_EQ (dm->cell_index (), db::cell_index_type (5));
+
+  nl.add_device_model (dm);
+  EXPECT_EQ (dm->netlist () == &nl, true);
+  EXPECT_EQ (nl.begin_device_models () == nl.end_device_models (), false);
+  EXPECT_EQ (nl.begin_device_models ()->name (), "name2");
+
+  nl.remove_device_model (dm);
+
+  EXPECT_EQ (nl.begin_device_models () == nl.end_device_models (), true);
 }

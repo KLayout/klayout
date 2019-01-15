@@ -208,7 +208,6 @@ void NetlistExtractor::connect_devices (db::Circuit *circuit,
 
           size_t tid = j->second.to<size_t> ();
           device->connect_terminal (tid, net);
-          device->set_cluster_id_for_terminal (tid, i->id ());
 
         }
 

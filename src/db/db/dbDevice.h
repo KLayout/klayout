@@ -36,6 +36,7 @@ namespace db
 
 class Circuit;
 class DeviceClass;
+class DeviceModel;
 
 /**
  *  @brief An actual device
@@ -64,6 +65,11 @@ public:
   Device (DeviceClass *device_class, const std::string &name = std::string ());
 
   /**
+   *  @brief The constructor
+   */
+  Device (DeviceClass *device_class, DeviceModel *device_model, const std::string &name = std::string ());
+
+  /**
    *  @brief Copy constructor
    */
   Device (const Device &other);
@@ -84,6 +90,29 @@ public:
   const DeviceClass *device_class () const
   {
     return mp_device_class;
+  }
+
+  /**
+   *  @brief Sets the device class
+   */
+  void set_device_class (DeviceClass *dc)
+  {
+    mp_device_class = dc;
+  }
+  /**
+   *  @brief Gets the device model
+   */
+  const DeviceModel *device_model () const
+  {
+    return mp_device_model;
+  }
+
+  /**
+   *  @brief Sets the device model
+   */
+  void set_device_model (DeviceModel *dm)
+  {
+    mp_device_model = dm;
   }
 
   /**
@@ -146,32 +175,6 @@ public:
   }
 
   /**
-   *  @brief Sets the device cell index
-   *  In the layout, a device is represented by a cell. This attribute gives the index of this
-   *  cell.
-   */
-  void set_cell_index (db::cell_index_type ci);
-
-  /**
-   *  @brief Gets the device cell index
-   */
-  db::cell_index_type cell_index () const
-  {
-    return m_cell_index;
-  }
-
-  /**
-   *  @brief Gets the cluster ID for a given terminal
-   *  This attribute connects the device terminal with a terminal cluster
-   */
-  size_t cluster_id_for_terminal (size_t terminal_id) const;
-
-  /**
-   *  @brief Sets the cluster ID for a given terminal
-   */
-  void set_cluster_id_for_terminal (size_t terminal_id, size_t cluster_id);
-
-  /**
    *  @brief Gets the net attached to a specific terminal
    *  Returns 0 if no net is attached.
    */
@@ -223,11 +226,10 @@ private:
   friend class Net;
 
   DeviceClass *mp_device_class;
+  DeviceModel *mp_device_model;
   std::string m_name;
   db::DPoint m_position;
-  db::cell_index_type m_cell_index;
   std::vector<Net::terminal_iterator> m_terminal_refs;
-  std::vector<size_t> m_terminal_cluster_ids;
   std::vector<double> m_parameters;
   size_t m_id;
   Circuit *mp_circuit;
@@ -236,14 +238,6 @@ private:
    *  @brief Sets the terminal reference for a specific terminal
    */
   void set_terminal_ref_for_terminal (size_t terminal_id, Net::terminal_iterator iter);
-
-  /**
-   *  @brief Sets the device class
-   */
-  void set_device_class (DeviceClass *dc)
-  {
-    mp_device_class = dc;
-  }
 
   /**
    *  @brief Sets the device ID

@@ -68,10 +68,18 @@ Netlist &Netlist::operator= (const Netlist &other)
       m_device_classes.push_back (dc_new);
     }
 
+    std::map<const DeviceModel *, DeviceModel *> dmt;
+    for (const_device_model_iterator dm = other.begin_device_models (); dm != other.end_device_models (); ++dm) {
+      DeviceModel *dm_new = new DeviceModel (*dm);
+      dmt [dm.operator-> ()] = dm_new;
+      m_device_models.push_back (dm_new);
+    }
+
     std::map<const Circuit *, Circuit *> ct;
     for (const_circuit_iterator i = other.begin_circuits (); i != other.end_circuits (); ++i) {
       Circuit *ct_new = new Circuit (*i);
       ct_new->translate_device_classes (dct);
+      ct_new->translate_device_models (dmt);
       ct [i.operator-> ()] = ct_new;
       add_circuit (ct_new);
     }
@@ -332,6 +340,7 @@ Netlist::const_bottom_up_circuit_iterator Netlist::end_bottom_up () const
 void Netlist::clear ()
 {
   m_device_classes.clear ();
+  m_device_models.clear ();
   m_circuits.clear ();
 }
 
@@ -357,6 +366,18 @@ void Netlist::remove_device_class (DeviceClass *device_class)
 {
   device_class->set_netlist (0);
   m_device_classes.erase (device_class);
+}
+
+void Netlist::add_device_model (DeviceModel *device_model)
+{
+  m_device_models.push_back (device_model);
+  device_model->set_netlist (this);
+}
+
+void Netlist::remove_device_model (DeviceModel *device_model)
+{
+  device_model->set_netlist (0);
+  m_device_models.erase (device_model);
 }
 
 void Netlist::purge_nets ()

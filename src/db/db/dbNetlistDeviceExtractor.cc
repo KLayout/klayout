@@ -281,12 +281,17 @@ void NetlistDeviceExtractor::push_new_devices ()
 
     db::PropertiesRepository::properties_set ps;
 
-    std::map<DeviceCellKey, db::cell_index_type>::iterator c = m_device_cells.find (key);
+    std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceModel *> >::iterator c = m_device_cells.find (key);
     if (c == m_device_cells.end ()) {
 
       std::string cell_name = "D$" + mp_device_class->name ();
       db::Cell &device_cell = mp_layout->cell (mp_layout->add_cell (cell_name.c_str ()));
-      c = m_device_cells.insert (std::make_pair (key, device_cell.cell_index ())).first;
+
+      db::DeviceModel *dm = new db::DeviceModel (mp_layout->cell_name (device_cell.cell_index ()));
+      m_netlist->add_device_model (dm);
+      dm->set_cell_index (device_cell.cell_index ());
+
+      c = m_device_cells.insert (std::make_pair (key, std::make_pair (device_cell.cell_index (), dm))).first;
 
       //  attach the device class ID to the cell
       ps.clear ();
@@ -305,6 +310,7 @@ void NetlistDeviceExtractor::push_new_devices ()
         //  initialize the local cluster (will not be extracted)
         db::local_cluster<db::PolygonRef> *lc = cc.insert ();
         lc->add_attr (pi);
+        dm->set_cluster_id_for_terminal (t->first, lc->id ());
 
         //  build the cell shapes and local cluster
         for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
@@ -322,14 +328,14 @@ void NetlistDeviceExtractor::push_new_devices ()
     }
 
     //  make the cell index known to the device
-    device->set_cell_index (c->second);
+    device->set_device_model (c->second.second);
 
     //  Build a property set for the device ID
     ps.clear ();
     ps.insert (std::make_pair (m_device_id_propname_id, tl::Variant (d->first)));
     db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
 
-    db::CellInstArrayWithProperties inst (db::CellInstArray (db::CellInst (c->second), db::Trans (disp)), pi);
+    db::CellInstArrayWithProperties inst (db::CellInstArray (db::CellInst (c->second.first), db::Trans (disp)), pi);
     mp_layout->cell (m_cell_index).insert (inst);
 
   }

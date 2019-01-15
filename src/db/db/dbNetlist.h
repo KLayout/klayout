@@ -26,6 +26,7 @@
 #include "dbCommon.h"
 #include "dbCircuit.h"
 #include "dbDeviceClass.h"
+#include "dbDeviceModel.h"
 
 #include "tlVector.h"
 
@@ -51,6 +52,9 @@ public:
   typedef tl::shared_collection<DeviceClass> device_class_list;
   typedef device_class_list::const_iterator const_device_class_iterator;
   typedef device_class_list::iterator device_class_iterator;
+  typedef tl::shared_collection<DeviceModel> device_model_list;
+  typedef device_model_list::const_iterator const_device_model_iterator;
+  typedef device_model_list::iterator device_model_iterator;
   typedef tl::vector<Circuit *>::const_iterator top_down_circuit_iterator;
   typedef tl::vector<const Circuit *>::const_iterator const_top_down_circuit_iterator;
   typedef tl::vector<Circuit *>::const_reverse_iterator bottom_up_circuit_iterator;
@@ -302,6 +306,50 @@ public:
   }
 
   /**
+   *  @brief Adds a device model to this netlist
+   *
+   *  The netlist takes over ownership of the object.
+   */
+  void add_device_model (DeviceModel *device_model);
+
+  /**
+   *  @brief Deletes a device model from the netlist
+   */
+  void remove_device_model (DeviceModel *device_model);
+
+  /**
+   *  @brief Begin iterator for the device models of the netlist (non-const version)
+   */
+  device_model_iterator begin_device_models ()
+  {
+    return m_device_models.begin ();
+  }
+
+  /**
+   *  @brief End iterator for the device models of the netlist (non-const version)
+   */
+  device_model_iterator end_device_models ()
+  {
+    return m_device_models.end ();
+  }
+
+  /**
+   *  @brief Begin iterator for the device models of the netlist (const version)
+   */
+  const_device_model_iterator begin_device_models () const
+  {
+    return m_device_models.begin ();
+  }
+
+  /**
+   *  @brief End iterator for the device models of the netlist (const version)
+   */
+  const_device_model_iterator end_device_models () const
+  {
+    return m_device_models.end ();
+  }
+
+  /**
    *  @brief Purge unused nets
    *
    *  This method will purge all nets which return "floating".
@@ -338,6 +386,7 @@ private:
 
   circuit_list m_circuits;
   device_class_list m_device_classes;
+  device_model_list m_device_models;
   bool m_valid_topology;
   int m_lock_count;
   tl::vector<Circuit *> m_top_down_circuits;

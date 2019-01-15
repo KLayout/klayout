@@ -330,6 +330,17 @@ void Circuit::translate_device_classes (const std::map<const DeviceClass *, Devi
   }
 }
 
+void Circuit::translate_device_models (const std::map<const DeviceModel *, DeviceModel *> &map)
+{
+  for (device_iterator i = m_devices.begin (); i != m_devices.end (); ++i) {
+    if (i->device_model ()) {
+      std::map<const DeviceModel *, DeviceModel *>::const_iterator m = map.find (i->device_model ());
+      tl_assert (m != map.end ());
+      i->set_device_model (m->second);
+    }
+  }
+}
+
 void Circuit::set_pin_ref_for_pin (size_t pin_id, Net::pin_iterator iter)
 {
   if (m_pin_refs.size () < pin_id + 1) {

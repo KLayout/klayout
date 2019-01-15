@@ -43,17 +43,19 @@ static db::Cell *l2n_internal_top_cell (db::LayoutToNetlist *l2n)
   return const_cast<db::Cell *> (l2n->internal_top_cell ());
 }
 
-static void build_net (const db::LayoutToNetlist *l2n, const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &cell_name_prefix)
+static void build_net (const db::LayoutToNetlist *l2n, const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
 {
-  std::string p = cell_name_prefix.to_string ();
-  l2n->build_net (net, target, target_cell, lmap, cell_name_prefix.is_nil () ? 0 : p.c_str ());
+  std::string p = circuit_cell_name_prefix.to_string ();
+  std::string dp = device_cell_name_prefix.to_string ();
+  l2n->build_net (net, target, target_cell, lmap, circuit_cell_name_prefix.is_nil () ? 0 : p.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
 }
 
-static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &net_cell_name_prefix, const tl::Variant &circuit_cell_name_prefix)
+static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &net_cell_name_prefix, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
 {
   std::string cp = circuit_cell_name_prefix.to_string ();
   std::string np = net_cell_name_prefix.to_string ();
-  l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str ());
+  std::string dp = device_cell_name_prefix.to_string ();
+  l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
 }
 
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
@@ -150,9 +152,11 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "This method is required to derive the internal layer index - for example for\n"
     "investigating the cluster tree.\n"
   ) +
-  gsi::method ("cell_mapping_into", &db::LayoutToNetlist::cell_mapping_into, gsi::arg ("layout"), gsi::arg ("cell"),
+  gsi::method ("cell_mapping_into", &db::LayoutToNetlist::cell_mapping_into, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("with_device_cells", false),
     "@brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.\n"
-    "CAUTION: may create new cells in 'layout'.\n"
+    "If 'with_device_cells' is true, cells will be produced for devices. These are cells not corresponding to circuits, so they are disabled normally.\n"
+    "Use this option, if you want to access device terminal shapes per device.\n"
+    "CAUTION: this function may create new cells in 'layout'.\n"
   ) +
   gsi::method ("const_cell_mapping_into", &db::LayoutToNetlist::const_cell_mapping_into, gsi::arg ("layout"), gsi::arg ("cell"),
     "@brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.\n"
@@ -172,7 +176,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "If 'recursive'' is true, the returned region will contain the shapes of\n"
     "all subcircuits too.\n"
   ) +
-  gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("cell_name"),
+  gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a net representation in the given layout and cell\n"
     "\n"
     "This method has two modes: recursive and top-level mode. In recursive mode,\n"
@@ -182,15 +186,19 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "In top-level mode, only the shapes from the net inside it's circuit are copied to\n"
     "the given target cell. No other cells are created.\n"
     "\n"
-    "Recursive mode is picked when a cell name prefix is given. The new cells will be\n"
-    "named like cell_name_prefix + circuit name.\n"
+    "Recursive mode is picked when a circuit cell name prefix is given. The new cells will be\n"
+    "named like circuit_cell_name_prefix + circuit name.\n"
+    "\n"
+    "If a device cell name prefix is given, device shapes will be output on device cells named\n"
+    "like device_cell_name_prefix + device name.\n"
     "\n"
     "@param target The target layout\n"
     "@param target_cell The target cell\n"
     "@param lmap Target layer indexes (keys) and net regions (values)\n"
-    "@param cell_name_prefix Chooses recursive mode if non-nil\n"
+    "@param circuit_cell_name_prefix Chooses recursive mode if non-nil\n"
+    "@param device_cell_name_prefix If given, devices will be output as separate cells\n"
   ) +
-  gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix"), gsi::arg ("circuit_cell_name_prefix"),
+  gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a full hierarchical representation of the nets\n"
     "\n"
     "This method copies all nets into cells corresponding to the circuits. It uses the cmap\n"
@@ -214,11 +222,15 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "   to accomodate the subnets (see build_net in recursive mode). @/li\n"
     "@/ul\n"
     "\n"
+    "If a device name prefix is given, device shapes will be output on device cells named\n"
+    "like device_name_prefix + device name.\n"
+    "\n"
     "@param cmap The mapping of internal layout to target layout for the circuit mapping\n"
     "@param target The target layout\n"
     "@param lmap Target layer indexes (keys) and net regions (values)\n"
     "@param circuit_cell_name_prefix See method description\n"
     "@param net_cell_name_prefix See method description\n"
+    "@param device_cell_name_prefix If given, devices will be output as separate cells\n"
   ) +
   gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::DPoint &)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"),
     "@brief Finds the net by probing a specific location on the given layer\n"

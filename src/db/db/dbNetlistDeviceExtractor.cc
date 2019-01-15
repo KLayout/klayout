@@ -21,7 +21,6 @@
 */
 
 #include "dbNetlistDeviceExtractor.h"
-#include "dbNetlistProperty.h"
 #include "dbRegion.h"
 #include "dbHierNetworkProcessor.h"
 #include "dbDeepRegion.h"
@@ -224,16 +223,21 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   }
 }
 
-bool NetlistDeviceExtractor::is_device_cell (db::cell_index_type ci) const
+bool NetlistDeviceExtractor::is_device_cell (const db::Layout &layout, db::cell_index_type ci)
 {
-  db::properties_id_type pi = mp_layout->cell (ci).prop_id ();
+  db::properties_id_type pi = layout.cell (ci).prop_id ();
   if (pi == 0) {
     return false;
   }
 
-  const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
+  std::pair<bool, db::property_names_id_type> pn = layout.properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::device_class_property_name ());
+  if (! pn.first) {
+    return false;
+  }
+
+  const db::PropertiesRepository::properties_set &ps = layout.properties_repository ().properties (pi);
   for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
-    if (j->first == m_device_class_propname_id) {
+    if (j->first == pn.second) {
       return true;
     }
   }
@@ -241,13 +245,20 @@ bool NetlistDeviceExtractor::is_device_cell (db::cell_index_type ci) const
   return false;
 }
 
+bool NetlistDeviceExtractor::is_device_cell (db::cell_index_type ci) const
+{
+  return is_device_cell (*mp_layout, ci);
+}
+
 void NetlistDeviceExtractor::push_new_devices ()
 {
   db::VCplxTrans dbu_inv = db::CplxTrans (mp_layout->dbu ()).inverted ();
 
-  for (std::map<db::Device *, geometry_per_terminal_type>::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
+  for (std::map<size_t, geometry_per_terminal_type>::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
 
-    db::Vector disp = dbu_inv * d->first->position () - db::Point ();
+    db::Device *device = mp_circuit->device_by_id (d->first);
+
+    db::Vector disp = dbu_inv * device->position () - db::Point ();
 
     DeviceCellKey key;
 
@@ -265,7 +276,7 @@ void NetlistDeviceExtractor::push_new_devices ()
 
     const std::vector<db::DeviceParameterDefinition> &pd = mp_device_class->parameter_definitions ();
     for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-      key.parameters.insert (std::make_pair (p->id (), d->first->parameter_value (p->id ())));
+      key.parameters.insert (std::make_pair (p->id (), device->parameter_value (p->id ())));
     }
 
     db::PropertiesRepository::properties_set ps;
@@ -311,11 +322,11 @@ void NetlistDeviceExtractor::push_new_devices ()
     }
 
     //  make the cell index known to the device
-    d->first->set_cell_index (c->second);
+    device->set_cell_index (c->second);
 
     //  Build a property set for the device ID
     ps.clear ();
-    ps.insert (std::make_pair (m_device_id_propname_id, tl::Variant (d->first->id ())));
+    ps.insert (std::make_pair (m_device_id_propname_id, tl::Variant (d->first)));
     db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
 
     db::CellInstArrayWithProperties inst (db::CellInstArray (db::CellInst (c->second), db::Trans (disp)), pi);
@@ -383,7 +394,7 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
   unsigned int layer_index = m_layers [geometry_index];
 
   db::PolygonRef pr (polygon, mp_layout->shape_repository ());
-  m_new_devices[device][terminal_id][layer_index].push_back (pr);
+  m_new_devices[device->id ()][terminal_id][layer_index].push_back (pr);
 }
 
 void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Box &box)

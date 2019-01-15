@@ -59,7 +59,6 @@ SOURCES = \
     dbDeepRegionTests.cc \
     dbDeepShapeStoreTests.cc \
     dbHierNetworkProcessorTests.cc \
-    dbNetlistPropertyTests.cc \
     dbNetlistTests.cc \
     dbNetlistExtractorTests.cc \
     dbNetlistDeviceExtractorTests.cc \

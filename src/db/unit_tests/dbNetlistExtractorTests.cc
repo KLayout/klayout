@@ -34,7 +34,6 @@
 #include "dbWriter.h"
 #include "dbCommonReader.h"
 #include "dbTestSupport.h"
-#include "dbNetlistProperty.h"
 #include "dbCellMapping.h"
 
 #include "tlUnitTest.h"

@@ -30,6 +30,8 @@
 #include "dbTypes.h"
 
 #include <map>
+#include <vector>
+#include <set>
 
 namespace db
 {
@@ -186,9 +188,11 @@ public:
    *  left unmapped. This method allows creating mappings for these missing cells by adding
    *  new cells and the corresponding instances into the target layout_a.
    *
+   *  If given, "exclude_cells" can specify a list of cells not to map.
+   *
    *  The returned vector lists the new cells.
    */
-  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b);
+  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells = 0);
 
 private:
   void extract_unique (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::const_iterator cand, 

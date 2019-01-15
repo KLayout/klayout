@@ -388,7 +388,7 @@ DeepShapeStore::invalidate_hier ()
 }
 
 const db::CellMapping &
-DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_layout, db::cell_index_type into_cell)
+DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells)
 {
   const db::Layout *source_layout = &m_layouts [layout_index]->layout;
   if (source_layout->begin_top_down () == source_layout->end_top_cells ()) {
@@ -436,20 +436,20 @@ DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_
 
       }
 
-      //  Add new cells for the variants and (possible) devices which are cells added during the device
-      //  extraction process
-      cm->second.create_missing_mapping (*into_layout, into_cell, *source_layout, source_top);
-
     } else if (into_layout->cells () == 1) {
 
       //  Another simple case is mapping into an empty (or single-top-cell-only) layout, where we can use "create_from_single_full".
-      cm->second.create_single_mapping_full (*into_layout, into_cell, *source_layout, source_top);
+      cm->second.create_single_mapping (*into_layout, into_cell, *source_layout, source_top);
 
     } else {
 
-      cm->second.create_from_geometry_full (*into_layout, into_cell, *source_layout, source_top);
+      cm->second.create_from_geometry (*into_layout, into_cell, *source_layout, source_top);
 
     }
+
+    //  Add new cells for the variants and (possible) devices which are cells added during the device
+    //  extraction process
+    cm->second.create_missing_mapping (*into_layout, into_cell, *source_layout, source_top, excluded_cells);
 
   }
 

@@ -214,9 +214,11 @@ public:
 
   /**
    *  @brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.
-   *  CAUTION: may create new cells in "layout".
+   *  If 'with_device_cells' is true, cells will be produced for devices. These are cells not corresponding to circuits, so they are disabled normally.
+   *  Use this option, if you want to access device terminal shapes per device.
+   *  CAUTION: This function may create new cells in "layout".
    */
-  db::CellMapping cell_mapping_into (db::Layout &layout, db::Cell &cell);
+  db::CellMapping cell_mapping_into (db::Layout &layout, db::Cell &cell, bool with_device_cells = false);
 
   /**
    *  @brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.
@@ -275,12 +277,16 @@ public:
    *  Recursive mode is picked when a cell name prefix is given. The new cells will be
    *  named like cell_name_prefix + circuit name.
    *
+   *  If a device cell name prefix is given, cells will be produced for each device model
+   *  using a name like device_cell_name_prefix + device name.
+   *
    *  @param target The target layout
    *  @param target_cell The target cell
    *  @param lmap Target layer indexes (keys) and net regions (values)
    *  @param cell_name_prefix Chooses recursive mode if non-null
+   *  @param device_cell_name_prefix See above
    */
-  void build_net (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix) const;
+  void build_net (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, const char *device_cell_name_prefix) const;
 
   /**
    *  @brief Builds a full hierarchical representation of the nets
@@ -300,13 +306,17 @@ public:
    *   * Subnet hierarchy (circuit_cell_name_prefix != 0): for each root net, a full hierarchy is built
    *     to accomodate the subnets (see build_net in recursive mode).
    *
+   *  If a device cell name prefix is given, cells will be produced for each device model
+   *  using a name like device_cell_name_prefix + device name.
+   *
    *  @param cmap The mapping of internal layout to target layout for the circuit mapping
    *  @param target The target layout
    *  @param lmap Target layer indexes (keys) and net regions (values)
    *  @param circuit_cell_name_prefix See method description
    *  @param net_cell_name_prefix See method description
+   *  @param device_cell_name_prefix See above
    */
-  void build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *circuit_cell_name_prefix) const;
+  void build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const;
 
   /**
    *  @brief Finds the net by probing a specific location on the given layer
@@ -344,7 +354,8 @@ private:
   bool m_netlist_extracted;
 
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
-  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap) const;
+  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap) const;
+  void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap) const;
 };
 
 }

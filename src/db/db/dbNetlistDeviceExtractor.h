@@ -235,6 +235,11 @@ public:
   static const tl::Variant &device_class_property_name ();
 
   /**
+   *  @brief Returns true, if the given cell is a device cell
+   */
+  static bool is_device_cell (const db::Layout &layout, db::cell_index_type ci);
+
+  /**
    *  @brief Performs the extraction
    *
    *  layout and cell specify the layout and the top cell from which to perform the
@@ -507,7 +512,7 @@ private:
   layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;
   error_list m_errors;
-  std::map<db::Device *, geometry_per_terminal_type> m_new_devices;
+  std::map<size_t, geometry_per_terminal_type> m_new_devices;
   std::map<DeviceCellKey, db::cell_index_type> m_device_cells;
 
   //  no copying

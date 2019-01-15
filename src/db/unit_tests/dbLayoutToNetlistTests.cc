@@ -37,101 +37,9 @@
 #include <memory>
 #include <limits>
 
-namespace
-{
-
 static std::string qnet_name (const db::Net *net)
 {
   return net ? net->qname () : "(null)";
-}
-
-static std::string device_name (const db::Device &device)
-{
-  if (device.name ().empty ()) {
-    return "$" + tl::to_string (device.id ());
-  } else {
-    return device.name ();
-  }
-}
-
-static void mos2layout (const db::Layout *layout, db::cell_index_type cell_index, db::Layout *debug_out, const db::Device *device, unsigned int ldiff, const db::Region &diff, unsigned int lgate, const db::Region &gate)
-{
-  std::string cn = layout->cell_name (cell_index);
-  std::pair<bool, db::cell_index_type> target_cp = debug_out->cell_by_name (cn.c_str ());
-  tl_assert (target_cp.first);
-
-  db::cell_index_type dci = debug_out->add_cell ((device->device_class ()->name () + "_" + device->circuit ()->name () + "_" + device_name (*device)).c_str ());
-  debug_out->cell (target_cp.second).insert (db::CellInstArray (db::CellInst (dci), db::Trans ()));
-
-  db::Cell &device_cell = debug_out->cell (dci);
-  for (db::Region::const_iterator p = diff.begin (); ! p.at_end (); ++p) {
-    device_cell.shapes (ldiff).insert (*p);
-  }
-  for (db::Region::const_iterator p = gate.begin (); ! p.at_end (); ++p) {
-    device_cell.shapes (lgate).insert (*p);
-  }
-
-  std::string ps;
-  const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
-  for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-    if (! ps.empty ()) {
-      ps += ",";
-    }
-    ps += i->name () + "=" + tl::to_string (device->parameter_value (i->id ()));
-  }
-  device_cell.shapes (ldiff).insert (db::Text (ps, db::Trans (diff.bbox ().center () - db::Point ())));
-}
-
-class MOSFET3Extractor
-  : public db::NetlistDeviceExtractorMOS3Transistor
-{
-public:
-  MOSFET3Extractor (const std::string &name, db::Layout *debug_out)
-    : db::NetlistDeviceExtractorMOS3Transistor (name), mp_debug_out (debug_out), m_ldiff (0), m_lgate (0)
-  {
-    if (mp_debug_out) {
-      m_ldiff = mp_debug_out->insert_layer (db::LayerProperties (100, 0));
-      m_lgate = mp_debug_out->insert_layer (db::LayerProperties (101, 0));
-    }
-  }
-
-private:
-  db::Layout *mp_debug_out;
-  unsigned int m_ldiff, m_lgate;
-
-  void device_out (const db::Device *device, const db::Region &diff, const db::Region &gate)
-  {
-    if (mp_debug_out) {
-      mos2layout (layout (), cell_index (), mp_debug_out, device, m_ldiff, diff, m_lgate, gate);
-    }
-  }
-};
-
-class MOSFET4Extractor
-  : public db::NetlistDeviceExtractorMOS4Transistor
-{
-public:
-  MOSFET4Extractor (const std::string &name, db::Layout *debug_out)
-    : db::NetlistDeviceExtractorMOS4Transistor (name), mp_debug_out (debug_out), m_ldiff (0), m_lgate (0)
-  {
-    if (mp_debug_out) {
-      m_ldiff = mp_debug_out->insert_layer (db::LayerProperties (100, 0));
-      m_lgate = mp_debug_out->insert_layer (db::LayerProperties (101, 0));
-    }
-  }
-
-private:
-  db::Layout *mp_debug_out;
-  unsigned int m_ldiff, m_lgate;
-
-  void device_out (const db::Device *device, const db::Region &diff, const db::Region &gate)
-  {
-    if (mp_debug_out) {
-      mos2layout (layout (), cell_index (), mp_debug_out, device, m_ldiff, diff, m_lgate, gate);
-    }
-  }
-};
-
 }
 
 static void dump_nets_to_layout (const db::LayoutToNetlist &l2n, db::Layout &ly, const std::map<const db::Region *, unsigned int> &lmap, const db::CellMapping &cmap)
@@ -271,25 +179,8 @@ TEST(1_Basic)
   db::Region rngate   = rnactive & *rpoly;
   db::Region rnsd     = rnactive - rngate;
 
-  //  return the computed layers into the original layout and write it for debugging purposes
-
-  unsigned int lgate  = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> Gate
-  unsigned int lsd    = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> Source/Drain
-  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> P Diffusion
-  unsigned int lndiff = ly.insert_layer (db::LayerProperties (13, 0));      // 13/0 -> N Diffusion
-
-  rpgate.insert_into (&ly, tc.cell_index (), lgate);
-  rngate.insert_into (&ly, tc.cell_index (), lgate);
-  rpsd.insert_into (&ly, tc.cell_index (), lsd);
-  rnsd.insert_into (&ly, tc.cell_index (), lsd);
-  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
-  rnsd.insert_into (&ly, tc.cell_index (), lndiff);
-
-  //  NOTE: the device extractor will add more debug layers for the transistors:
-  //    20/0 -> Diffusion
-  //    21/0 -> Gate
-  MOSFET3Extractor pmos_ex ("PMOS", &ly);
-  MOSFET3Extractor nmos_ex ("NMOS", &ly);
+  db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
 
   //  device extraction
 
@@ -304,6 +195,23 @@ TEST(1_Basic)
   dl["G"] = &rngate;
   dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
   l2n.extract_devices (nmos_ex, dl);
+
+  //  return the computed layers into the original layout and write it for debugging purposes
+  //  NOTE: this will include the device layers too
+
+  unsigned int lgate  = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> Gate
+  unsigned int lsd    = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> Source/Drain
+  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> P Diffusion
+  unsigned int lndiff = ly.insert_layer (db::LayerProperties (13, 0));      // 13/0 -> N Diffusion
+  unsigned int lpoly  = ly.insert_layer (db::LayerProperties (14, 0));      // 14/0 -> Poly with gate terminal
+
+  rpgate.insert_into (&ly, tc.cell_index (), lgate);
+  rngate.insert_into (&ly, tc.cell_index (), lgate);
+  rpsd.insert_into (&ly, tc.cell_index (), lsd);
+  rnsd.insert_into (&ly, tc.cell_index (), lsd);
+  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
+  rnsd.insert_into (&ly, tc.cell_index (), lndiff);
+  rpoly->insert_into (&ly, tc.cell_index (), lpoly);
 
   //  net extraction
 
@@ -356,7 +264,7 @@ TEST(1_Basic)
   dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (208, 0));
 
   //  write nets to layout
-  db::CellMapping cm = l2n.cell_mapping_into (ly, tc);
+  db::CellMapping cm = l2n.cell_mapping_into (ly, tc, true /*with device cells*/);
   dump_nets_to_layout (l2n, ly, dump_map, cm);
 
   dump_map.clear ();
@@ -425,7 +333,7 @@ TEST(1_Basic)
     ly2.dbu (ly.dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2);
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
     std::map<unsigned int, const db::Region *> lmap;
     lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
@@ -437,7 +345,7 @@ TEST(1_Basic)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, 0, 0);
+    l2n.build_all_nets (cm, ly2, lmap, 0, 0, 0);
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
@@ -452,7 +360,7 @@ TEST(1_Basic)
     ly2.dbu (ly.dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2);
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
     std::map<unsigned int, const db::Region *> lmap;
     lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
@@ -464,7 +372,7 @@ TEST(1_Basic)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", 0);
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", 0, 0);
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
@@ -479,7 +387,7 @@ TEST(1_Basic)
     ly2.dbu (ly.dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2);
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
     std::map<unsigned int, const db::Region *> lmap;
     lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
@@ -491,7 +399,7 @@ TEST(1_Basic)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, 0, "CIRCUIT_");
+    l2n.build_all_nets (cm, ly2, lmap, 0, "CIRCUIT_", 0);
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
@@ -506,7 +414,7 @@ TEST(1_Basic)
     ly2.dbu (ly.dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2);
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
     std::map<unsigned int, const db::Region *> lmap;
     lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
@@ -518,7 +426,7 @@ TEST(1_Basic)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", "CIRCUIT_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
@@ -641,11 +549,8 @@ TEST(2_Probing)
   rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
   rnsd.insert_into (&ly, tc.cell_index (), lndiff);
 
-  //  NOTE: the device extractor will add more debug layers for the transistors:
-  //    20/0 -> Diffusion
-  //    21/0 -> Gate
-  MOSFET3Extractor pmos_ex ("PMOS", &ly);
-  MOSFET3Extractor nmos_ex ("NMOS", &ly);
+  db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
 
   //  device extraction
 
@@ -895,11 +800,8 @@ TEST(3_GlobalNetConnections)
   rpsd.insert_into (&ly, tc.cell_index (), lptie);
   rnsd.insert_into (&ly, tc.cell_index (), lntie);
 
-  //  NOTE: the device extractor will add more debug layers for the transistors:
-  //    20/0 -> Diffusion
-  //    21/0 -> Gate
-  MOSFET3Extractor pmos_ex ("PMOS", &ly);
-  MOSFET3Extractor nmos_ex ("NMOS", &ly);
+  db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
 
   //  device extraction
 
@@ -1166,11 +1068,8 @@ TEST(4_GlobalNetDeviceExtraction)
   rpsd.insert_into (&ly, tc.cell_index (), lptie);
   rnsd.insert_into (&ly, tc.cell_index (), lntie);
 
-  //  NOTE: the device extractor will add more debug layers for the transistors:
-  //    20/0 -> Diffusion
-  //    21/0 -> Gate
-  MOSFET4Extractor pmos_ex ("PMOS", &ly);
-  MOSFET4Extractor nmos_ex ("NMOS", &ly);
+  db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
 
   //  device extraction
 
@@ -1442,11 +1341,8 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   rpsd.insert_into (&ly, tc.cell_index (), lptie);
   rnsd.insert_into (&ly, tc.cell_index (), lntie);
 
-  //  NOTE: the device extractor will add more debug layers for the transistors:
-  //    20/0 -> Diffusion
-  //    21/0 -> Gate
-  MOSFET4Extractor pmos_ex ("PMOS", &ly);
-  MOSFET4Extractor nmos_ex ("NMOS", &ly);
+  db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
 
   //  device extraction
 

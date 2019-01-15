@@ -239,8 +239,10 @@ public:
    *  If necessary, this method will modify the original layout and add new cells.
    *  "layout_index" is the layout to return to it's original. "into_layout" is the original layout, "into_cell"
    *  the original cell.
+   *
+   *  "excluded_cells" - if not 0 - will exclude the given cells (and flatten them).
    */
-  const db::CellMapping &cell_mapping_to_original (size_t layout_index, db::Layout *into_layout, db::cell_index_type into_cell);
+  const db::CellMapping &cell_mapping_to_original (size_t layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells = 0);
 
   /**
    *  @brief For testing

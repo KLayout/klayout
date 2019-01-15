@@ -142,7 +142,6 @@ SOURCES = \
     dbHierProcessor.cc \
     dbDeepRegion.cc \
     dbHierNetworkProcessor.cc \
-    dbNetlistProperty.cc \
     dbNetlist.cc \
     gsiDeclDbNetlist.cc \
     dbNetlistDeviceClasses.cc \
@@ -271,7 +270,6 @@ HEADERS = \
     dbHierarchyBuilder.h \
     dbLocalOperation.h \
     dbHierProcessor.h \
-    dbNetlistProperty.h \
     dbNetlist.h \
     dbNetlistDeviceClasses.h \
     dbNetlistDeviceExtractor.h \

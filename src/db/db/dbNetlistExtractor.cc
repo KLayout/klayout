@@ -23,7 +23,6 @@
 #include "dbNetlistExtractor.h"
 #include "dbDeepShapeStore.h"
 #include "dbNetlistDeviceExtractor.h"
-#include "dbNetlistProperty.h"
 
 namespace db
 {
@@ -50,7 +49,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
 
   m_terminal_annot_name_id = mp_layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::terminal_id_property_name ());
   m_device_annot_name_id = mp_layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::device_id_property_name ());
-  m_device_class_annot_name_id = mp_layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::device_class_property_name ());
 
   //  the big part: actually extract the nets
 
@@ -68,7 +66,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
   std::map<db::cell_index_type, std::map<size_t, size_t> > pins_per_cluster_per_cell;
   for (db::Layout::bottom_up_const_iterator cid = mp_layout->begin_bottom_up (); cid != mp_layout->end_bottom_up (); ++cid) {
 
-    if (cell_is_device_cell (*cid)) {
+    if (db::NetlistDeviceExtractor::is_device_cell (*mp_layout, *cid)) {
       continue;
     }
 
@@ -147,27 +145,6 @@ void NetlistExtractor::collect_labels (const connected_clusters_type &clusters,
     }
 
   }
-}
-
-bool NetlistExtractor::cell_is_device_cell (db::cell_index_type ci) const
-{
-  if (! m_device_class_annot_name_id.first) {
-    return false;
-  }
-
-  const db::Cell &cell = mp_layout->cell (ci);
-  if (cell.prop_id () == 0) {
-    return false;
-  }
-
-  const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (cell.prop_id ());
-  for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
-    if (j->first == m_device_class_annot_name_id.second) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 bool NetlistExtractor::instance_is_device (db::properties_id_type prop_id) const

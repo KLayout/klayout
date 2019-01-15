@@ -90,11 +90,9 @@ private:
   std::pair<bool, db::property_names_id_type> m_text_annot_name_id;
   std::pair<bool, db::property_names_id_type> m_device_annot_name_id;
   std::pair<bool, db::property_names_id_type> m_terminal_annot_name_id;
-  std::pair<bool, db::property_names_id_type> m_device_class_annot_name_id;
 
   void assign_net_name (const std::string &n, db::Net *net);
   bool instance_is_device (db::properties_id_type prop_id) const;
-  bool cell_is_device_cell (db::cell_index_type ci) const;
   db::Device *device_from_instance (db::properties_id_type prop_id, db::Circuit *circuit) const;
 
   /**

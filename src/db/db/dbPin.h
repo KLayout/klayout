@@ -57,6 +57,12 @@ public:
   }
 
   /**
+   *  @brief Gets a name which always non-empty
+   *  This method will pick a name like "$<id>" if the explicit name is empty.
+   */
+  std::string expanded_name () const;
+
+  /**
    *  @brief Gets the ID of the pin (only pins inside circuits have valid ID's)
    */
   size_t id () const

@@ -47,9 +47,14 @@ class DB_PUBLIC DeviceModel
 {
 public:
   /**
+   *  @brief Default constructor
+   */
+  DeviceModel ();
+
+  /**
    *  @brief The constructor
    */
-  DeviceModel (const std::string &name = std::string ());
+  DeviceModel (db::DeviceClass *device_class, const std::string &name = std::string ());
 
   /**
    *  @brief Copy constructor
@@ -65,6 +70,22 @@ public:
    *  @brief Destructor
    */
   ~DeviceModel ();
+
+  /**
+   *  @brief Gets the device class
+   */
+  const DeviceClass *device_class () const
+  {
+    return mp_device_class;
+  }
+
+  /**
+   *  @brief Sets the device class
+   */
+  void set_device_class (DeviceClass *dc)
+  {
+    mp_device_class = dc;
+  }
 
   /**
    *  @brief Gets the netlist the device lives in (const version)
@@ -127,6 +148,7 @@ private:
   friend class Netlist;
 
   std::string m_name;
+  db::DeviceClass *mp_device_class;
   db::cell_index_type m_cell_index;
   std::vector<size_t> m_terminal_cluster_ids;
   Netlist *mp_netlist;

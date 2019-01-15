@@ -21,6 +21,7 @@
 */
 
 #include "dbPin.h"
+#include "tlString.h"
 
 namespace db
 {
@@ -38,6 +39,15 @@ Pin::Pin (const std::string &name)
   : m_name (name), m_id (0)
 {
   //  .. nothing yet ..
+}
+
+std::string Pin::expanded_name () const
+{
+  if (name ().empty ()) {
+    return "$" + tl::to_string (id ());
+  } else {
+    return name ();
+  }
 }
 
 }

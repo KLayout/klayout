@@ -24,6 +24,7 @@
 #define HDR_dbLayoutToNetlistWriter
 
 #include "dbCommon.h"
+#include "dbPolygon.h"
 #include "tlStream.h"
 
 namespace db
@@ -34,6 +35,7 @@ class Net;
 class Circuit;
 class SubCircuit;
 class Device;
+class DeviceModel;
 
 /**
  *  @brief The base class for a LayoutToNetlist writer
@@ -65,6 +67,8 @@ private:
   void write (const db::LayoutToNetlist *l2n, const db::Net &net);
   void write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit);
   void write (const db::LayoutToNetlist *l2n, const db::Device &device);
+  void write (const db::LayoutToNetlist *l2n, const db::DeviceModel &device_model);
+  void write (const db::PolygonRef *s, const std::string &lname);
 };
 
 }

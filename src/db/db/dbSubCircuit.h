@@ -135,6 +135,12 @@ public:
   }
 
   /**
+   *  @brief Gets a name which always non-empty
+   *  This method will pick a name like "$<id>" if the explicit name is empty.
+   */
+  std::string expanded_name () const;
+
+  /**
    *  @brief Sets the transformation describing the subcircuit
    *
    *  The transformation is a natural description of a subcircuit

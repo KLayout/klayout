@@ -502,6 +502,8 @@ TEST(4_NetlistSubcircuits)
   nl->add_device_class (dc);
 
   db::DeviceModel *dm = new db::DeviceModel ();
+  dm->set_device_class (dc);
+  EXPECT_EQ (dm->device_class () == dc, true);
   dm->set_name ("dm2");
   dm->set_cell_index (42);
   dm->set_cluster_id_for_terminal (0, 17);
@@ -1044,7 +1046,8 @@ TEST(13_DeviceModel)
 {
   db::Netlist nl;
 
-  db::DeviceModel *dm = new db::DeviceModel ("name");
+  db::DeviceModel *dm = new db::DeviceModel (0, "name");
+  EXPECT_EQ (dm->device_class () == 0, true);
   EXPECT_EQ (dm->name (), "name");
   dm->set_name ("name2");
   EXPECT_EQ (dm->name (), "name2");

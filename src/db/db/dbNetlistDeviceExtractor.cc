@@ -287,7 +287,7 @@ void NetlistDeviceExtractor::push_new_devices ()
       std::string cell_name = "D$" + mp_device_class->name ();
       db::Cell &device_cell = mp_layout->cell (mp_layout->add_cell (cell_name.c_str ()));
 
-      db::DeviceModel *dm = new db::DeviceModel (mp_layout->cell_name (device_cell.cell_index ()));
+      db::DeviceModel *dm = new db::DeviceModel (mp_device_class, mp_layout->cell_name (device_cell.cell_index ()));
       m_netlist->add_device_model (dm);
       dm->set_cell_index (device_cell.cell_index ());
 

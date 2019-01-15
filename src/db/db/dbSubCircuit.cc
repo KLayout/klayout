@@ -74,6 +74,15 @@ void SubCircuit::set_name (const std::string &n)
   }
 }
 
+std::string SubCircuit::expanded_name () const
+{
+  if (name ().empty ()) {
+    return "$" + tl::to_string (id ());
+  } else {
+    return name ();
+  }
+}
+
 void SubCircuit::set_trans (const db::DCplxTrans &t)
 {
   m_trans = t;

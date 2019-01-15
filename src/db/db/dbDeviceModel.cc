@@ -29,19 +29,25 @@ namespace db
 // --------------------------------------------------------------------------------
 //  DeviceModel class implementation
 
+DeviceModel::DeviceModel ()
+  : m_name (), mp_device_class (0), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), mp_netlist (0)
+{
+  //  .. nothing yet ..
+}
+
 DeviceModel::~DeviceModel ()
 {
   //  .. nothing yet ..
 }
 
-DeviceModel::DeviceModel (const std::string &name)
-  : m_name (name), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), mp_netlist (0)
+DeviceModel::DeviceModel (db::DeviceClass *device_class, const std::string &name)
+  : m_name (name), mp_device_class (device_class), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), mp_netlist (0)
 {
   //  .. nothing yet ..
 }
 
 DeviceModel::DeviceModel (const DeviceModel &other)
-  : tl::Object (other), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), mp_netlist (0)
+  : tl::Object (other), mp_device_class (0), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), mp_netlist (0)
 {
   operator= (other);
 }
@@ -50,6 +56,7 @@ DeviceModel &DeviceModel::operator= (const DeviceModel &other)
 {
   if (this != &other) {
     m_name = other.m_name;
+    mp_device_class = other.mp_device_class;
     m_cell_index = other.m_cell_index;
     m_terminal_cluster_ids = other.m_terminal_cluster_ids;
   }

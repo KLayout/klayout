@@ -75,6 +75,15 @@ Device &Device::operator= (const Device &other)
   return *this;
 }
 
+std::string Device::expanded_name () const
+{
+  if (name ().empty ()) {
+    return "$" + tl::to_string (id ());
+  } else {
+    return name ();
+  }
+}
+
 void Device::set_circuit (Circuit *circuit)
 {
   mp_circuit = circuit;

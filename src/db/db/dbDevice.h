@@ -99,6 +99,7 @@ public:
   {
     mp_device_class = dc;
   }
+
   /**
    *  @brief Gets the device model
    */
@@ -156,6 +157,12 @@ public:
   {
     return m_name;
   }
+
+  /**
+   *  @brief Gets a name which always non-empty
+   *  This method will pick a name like "$<id>" if the explicit name is empty.
+   */
+  std::string expanded_name () const;
 
   /**
    *  @brief Sets the device position

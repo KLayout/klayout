@@ -22,6 +22,8 @@
 
 #include "gsiDecl.h"
 #include "dbLayoutToNetlist.h"
+#include "dbLayoutToNetlistWriter.h"
+#include "tlStream.h"
 
 namespace gsi
 {
@@ -56,6 +58,13 @@ static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMappin
   std::string np = net_cell_name_prefix.to_string ();
   std::string dp = device_cell_name_prefix.to_string ();
   l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
+}
+
+static void write_l2n (const db::LayoutToNetlist *l2n, const std::string &path)
+{
+  tl::OutputStream stream (path);
+  db::LayoutToNetlistStandardWriter writer (stream);
+  writer.write (l2n);
 }
 
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
@@ -254,6 +263,10 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "See the description of the other \\probe_net variant.\n"
     "This variant accepts a database-unit location. The location is given in the\n"
     "coordinate space of the initial cell.\n"
+  ) +
+  gsi::method_ext ("write", &write_l2n, gsi::arg ("path"),
+    "@brief Writes the extracted netlist to a file.\n"
+    "This method employs the native format of KLayout.\n"
   ),
   "@brief A generic framework for extracting netlists from layouts\n"
   "\n"

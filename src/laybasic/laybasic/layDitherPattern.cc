@@ -726,8 +726,6 @@ DitherPatternInfo::from_strings (const std::vector<std::string> &strv)
     uint_from_string (strv [strv.size () - 1 - i].c_str (), data [i], w);
   }
 
-  std::reverse (&data[0], &data[h]);
-
   set_pattern (data, w, h);
 }
 

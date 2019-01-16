@@ -68,7 +68,7 @@ private:
   void write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit);
   void write (const db::LayoutToNetlist *l2n, const db::Device &device);
   void write (const db::LayoutToNetlist *l2n, const db::DeviceModel &device_model);
-  void write (const db::PolygonRef *s, const std::string &lname);
+  void write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname);
 };
 
 }

@@ -78,28 +78,43 @@ size_t LayoutToNetlist::max_vertex_count () const
   return m_dss.max_vertex_count ();
 }
 
-db::Region *LayoutToNetlist::make_layer (unsigned int layer_index)
+db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::string &n)
 {
   db::RecursiveShapeIterator si (m_iter);
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::All);
-  return new db::Region (si, m_dss);
+
+  db::Region *region = new db::Region (si, m_dss);
+  if (! n.empty ()) {
+    name (*region, n);
+  }
+  return region;
 }
 
-db::Region *LayoutToNetlist::make_text_layer (unsigned int layer_index)
+db::Region *LayoutToNetlist::make_text_layer (unsigned int layer_index, const std::string &n)
 {
   db::RecursiveShapeIterator si (m_iter);
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::Texts);
-  return new db::Region (si, m_dss);
+
+  db::Region *region = new db::Region (si, m_dss);
+  if (! n.empty ()) {
+    name (*region, n);
+  }
+  return region;
 }
 
-db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index)
+db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const std::string &n)
 {
   db::RecursiveShapeIterator si (m_iter);
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::Paths | db::ShapeIterator::Polygons | db::ShapeIterator::Boxes);
-  return new db::Region (si, m_dss);
+
+  db::Region *region = new db::Region (si, m_dss);
+  if (! n.empty ()) {
+    name (*region, n);
+  }
+  return region;
 }
 
 void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::Region *> &layers)
@@ -200,6 +215,15 @@ const db::Layout *LayoutToNetlist::internal_layout () const
 const db::Cell *LayoutToNetlist::internal_top_cell () const
 {
   return &m_dss.const_initial_cell ();
+}
+
+void LayoutToNetlist::name (const db::Region &region, const std::string &name)
+{
+  unsigned int li = layer_of (region);
+  db::Layout &ly = m_dss.layout ();
+  db::LayerProperties lp = ly.get_properties (li);
+  lp.name = name;
+  ly.set_properties (li, lp);
 }
 
 unsigned int LayoutToNetlist::layer_of (const db::Region &region) const

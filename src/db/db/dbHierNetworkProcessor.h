@@ -882,6 +882,11 @@ public:
    */
   recursive_cluster_shape_iterator &operator++ ();
 
+  /**
+   *  @brief Skips the current cell and advances to the next cell and shape
+   */
+  void skip_cell ();
+
 private:
   typedef typename db::connected_clusters<T>::connections_type connections_type;
 

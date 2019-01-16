@@ -95,21 +95,34 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("max_vertex_count", &db::LayoutToNetlist::max_vertex_count,
     "See \\max_vertex_count= for details about this attribute."
   ) +
-  gsi::method ("make_layer", &db::LayoutToNetlist::make_layer, gsi::arg ("layer_index"),
-    "@brief Creates a new region representing an original layer\n"
-    "'layer_index'' is the layer index of the desired layer in the original layout.\n"
-    "The Region object returned is a new object and must be deleted by the caller.\n"
+  gsi::method ("name", &db::LayoutToNetlist::name, gsi::arg ("l"),
+    "@brief Names the given layer\n"
+    "'l' must be a hierarchical region derived with \\make_layer, \\make_text_layer or \\make_polygon_layer or "
+    "a region derived from those by boolean operations or other hierarchical operations.\n"
+    "\n"
+    "Naming a layer allows the system to indicate the layer in various contexts, i.e. "
+    "when writing the data to a file.\n"
+  ) +
+  gsi::method ("make_layer", &db::LayoutToNetlist::make_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
+    "@brief Creates a new hierarchical region representing an original layer\n"
+    "'layer_index' is the layer index of the desired layer in the original layout.\n"
     "This variant produces polygons and takes texts for net name annotation.\n"
     "A variant not taking texts is \\make_polygon_layer. A Variant only taking\n"
-    "texts is \\make_text_layer.\n"""
+    "texts is \\make_text_layer.\n"
+    "\n"
+    "The name is optional. If given, the layer will already be named accordingly (see \\name).\n"
   ) +
-  gsi::method ("make_text_layer", &db::LayoutToNetlist::make_text_layer, gsi::arg ("layer_index"),
+  gsi::method ("make_text_layer", &db::LayoutToNetlist::make_text_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
     "@brief Creates a new region representing an original layer taking texts only\n"
     "See \\make_layer for details.\n"
+    "\n"
+    "The name is optional. If given, the layer will already be named accordingly (see \\name).\n"
   ) +
-  gsi::method ("make_polygon_layer", &db::LayoutToNetlist::make_polygon_layer, gsi::arg ("layer_index"),
+  gsi::method ("make_polygon_layer", &db::LayoutToNetlist::make_polygon_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
     "@brief Creates a new region representing an original layer taking polygons and texts\n"
     "See \\make_layer for details.\n"
+    "\n"
+    "The name is optional. If given, the layer will already be named accordingly (see \\name).\n"
   ) +
   gsi::method ("extract_devices", &db::LayoutToNetlist::extract_devices, gsi::arg ("extractor"), gsi::arg ("layers"),
     "@brief Extracts devices\n"

@@ -2030,6 +2030,27 @@ recursive_cluster_shape_iterator<T> &recursive_cluster_shape_iterator<T>::operat
 }
 
 template <class T>
+void recursive_cluster_shape_iterator<T>::skip_cell ()
+{
+  m_shape_iter = typename db::local_cluster<T>::shape_iterator ();
+
+  do {
+
+    up ();
+    if (m_conn_iter_stack.empty ()) {
+      return;
+    }
+
+    ++m_conn_iter_stack.back ().first;
+
+  } while (m_conn_iter_stack.back ().first == m_conn_iter_stack.back ().second);
+
+  while (m_shape_iter.at_end () && ! m_conn_iter_stack.empty ()) {
+    next_conn ();
+  }
+}
+
+template <class T>
 void recursive_cluster_shape_iterator<T>::next_conn ()
 {
   if (m_conn_iter_stack.back ().first != m_conn_iter_stack.back ().second) {

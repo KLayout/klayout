@@ -702,10 +702,14 @@ static std::string path2string (const db::Layout &ly, db::cell_index_type ci, co
   return res;
 }
 
-static std::string rcsiter2string (const db::Layout &ly, db::cell_index_type ci, db::recursive_cluster_shape_iterator<db::PolygonRef> si)
+static std::string rcsiter2string (const db::Layout &ly, db::cell_index_type ci, db::recursive_cluster_shape_iterator<db::PolygonRef> si, db::cell_index_type ci2skip = std::numeric_limits<db::cell_index_type>::max ())
 {
   std::string res;
   while (! si.at_end ()) {
+    if (si.cell_index () == ci2skip) {
+      si.skip_cell ();
+      continue;
+    }
     db::Polygon poly = si->obj ();
     poly.transform (si->trans ());
     poly.transform (si.trans ());
@@ -766,6 +770,16 @@ TEST(41_HierClustersRecursiveClusterShapeIterator)
   }
   EXPECT_EQ (n, 1);
   EXPECT_EQ (res, "TOP:(0,0;0,1000;1000,1000;1000,0);TOP/C1:(0,10;0,510;2000,510;2000,10);TOP/C2:(0,30;0,2030;500,2030;500,30);TOP/C2/C1:(0,50;0,550;2000,550;2000,50)");
+
+  res.clear ();
+  n = 0;
+  cluster = &hc.clusters_per_cell (top.cell_index ());
+  for (db::connected_clusters<db::PolygonRef>::const_iterator i = cluster->begin (); i != cluster->end (); ++i) {
+    res = rcsiter2string (ly, top.cell_index (), db::recursive_cluster_shape_iterator<db::PolygonRef> (hc, l1, top.cell_index (), i->id ()), c1.cell_index ());
+    ++n;
+  }
+  EXPECT_EQ (n, 1);
+  EXPECT_EQ (res, "TOP:(0,0;0,1000;1000,1000;1000,0);TOP/C2:(0,30;0,2030;500,2030;500,30)");
 }
 
 TEST(41_HierClustersRecursiveClusterIterator)

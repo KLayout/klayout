@@ -115,6 +115,25 @@ public:
   size_t max_vertex_count () const;
 
   /**
+   *  @brief Names a layer
+   *  This is a formal name for the layer. Using a name or layer properties
+   *  (see below) enhances readability of backannotated information
+   *  if layers are involved. Use this method or the other variants to
+   *  attach a name or standard layer properties to a region delivered
+   *  by "make_layer" or derived from other regions through boolean
+   *  operations.
+   */
+  void name (const db::Region &region, const std::string &name);
+
+  /**
+   *  @brief Gets the name of the given layer
+   */
+  std::string name (const db::Region &region) const
+  {
+    return internal_layout ()->get_properties (layer_of (region)).name;
+  }
+
+  /**
    *  @brief Creates a new region representing an original layer
    *  "layer_index" is the layer index of the desired layer in the original layout.
    *  The Region object returned is a new object and must be deleted by the caller.
@@ -122,19 +141,19 @@ public:
    *  A variant not taking texts is "make_polygon_layer". A Variant only taking
    *  texts is "make_text_layer".
    */
-  db::Region *make_layer (unsigned int layer_index);
+  db::Region *make_layer (unsigned int layer_index, const std::string &name = std::string ());
 
   /**
    *  @brief Creates a new region representing an original layer taking texts only
    *  See "make_layer" for details.
    */
-  db::Region *make_text_layer (unsigned int layer_index);
+  db::Region *make_text_layer (unsigned int layer_index, const std::string &name = std::string ());
 
   /**
    *  @brief Creates a new region representing an original layer taking polygons and texts
    *  See "make_layer" for details.
    */
-  db::Region *make_polygon_layer (unsigned int layer_index);
+  db::Region *make_polygon_layer (unsigned int layer_index, const std::string &name = std::string ());
 
   /**
    *  @brief Extracts devices

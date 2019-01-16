@@ -72,27 +72,33 @@ TEST(1_WriterBasic)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly));
-  std::auto_ptr<db::Region> rpoly_lbl (l2n.make_text_layer (poly_lbl));
-  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont));
-  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1));
-  std::auto_ptr<db::Region> rmetal1_lbl (l2n.make_text_layer (metal1_lbl));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2));
-  std::auto_ptr<db::Region> rmetal2_lbl (l2n.make_text_layer (metal2_lbl));
+  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::auto_ptr<db::Region> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::auto_ptr<db::Region> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::auto_ptr<db::Region> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
   db::Region rpactive = *ractive & *rnwell;
   db::Region rpgate   = rpactive & *rpoly;
   db::Region rpsd     = rpactive - rpgate;
+  l2n.name (rpactive, "pactive");
+  l2n.name (rpgate,   "pgate");
+  l2n.name (rpsd,     "psd");
 
   db::Region rnactive = *ractive - *rnwell;
   db::Region rngate   = rnactive & *rpoly;
   db::Region rnsd     = rnactive - rngate;
+  l2n.name (rnactive, "nactive");
+  l2n.name (rngate,   "ngate");
+  l2n.name (rnsd,     "nsd");
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
@@ -157,18 +163,23 @@ TEST(1_WriterBasic)
   rpoly_lbl.reset (0);
 
   l2n.extract_netlist ();
+  l2n.netlist ()->purge ();
 
-  tl::OutputMemoryStream mem;
+  std::string path = tmp_file ("tmp_l2nwriter_1.txt");
   {
-    tl::OutputStream stream (mem);
+    tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream);
     writer.write (&l2n);
   }
 
-//  TODO: too big for inlined text ...
-#if 0
-  EXPECT_EQ (std::string (mem.data (), mem.size ()),
-    ""
-  );
-#endif
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au.txt");
+
+  tl::InputStream is (path);
+  tl::InputStream is_au (au_path);
+
+  if (is.read_all () != is_au.read_all ()) {
+    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
+                               tl::absolute_file_path (path),
+                               tl::absolute_file_path (au_path)));
+  }
 }

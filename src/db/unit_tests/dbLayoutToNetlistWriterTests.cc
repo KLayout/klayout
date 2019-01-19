@@ -168,7 +168,7 @@ TEST(1_WriterBasic)
   std::string path = tmp_file ("tmp_l2nwriter_1.txt");
   {
     tl::OutputStream stream (path);
-    db::LayoutToNetlistStandardWriter writer (stream);
+    db::LayoutToNetlistStandardWriter writer (stream, false);
     writer.write (&l2n);
   }
 

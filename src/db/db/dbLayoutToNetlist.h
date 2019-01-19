@@ -134,6 +134,11 @@ public:
   }
 
   /**
+   *  @brief Creates a new empty region
+   */
+  db::Region *make_layer (const std::string &n);
+
+  /**
    *  @brief Creates a new region representing an original layer
    *  "layer_index" is the layer index of the desired layer in the original layout.
    *  The Region object returned is a new object and must be deleted by the caller.
@@ -217,6 +222,16 @@ public:
   const db::Cell *internal_top_cell () const;
 
   /**
+   *  @brief Gets the internal layout (non-const version)
+   */
+  db::Layout *internal_layout ();
+
+  /**
+   *  @brief Gets the internal top cell (non-const version)
+   */
+  db::Cell *internal_top_cell ();
+
+  /**
    *  @brief Gets the connectivity object
    */
   const db::Connectivity &connectivity () const
@@ -252,11 +267,24 @@ public:
   db::Netlist *netlist () const;
 
   /**
+   *  @brief gets the netlist extracted or make on if none exists yet.
+   */
+  db::Netlist *make_netlist ();
+
+  /**
    *  @brief Gets the hierarchical shape clusters derived in the net extraction.
    *  NOTE: the layer and cell indexes used inside this structure refer to the
    *  internal layout.
    */
   const db::hier_clusters<db::PolygonRef> &net_clusters () const
+  {
+    return m_net_clusters;
+  }
+
+  /**
+   *  @brief Gets the hierarchical shape clusters derived in the net extraction (non-conver version)
+   */
+  db::hier_clusters<db::PolygonRef> &net_clusters ()
   {
     return m_net_clusters;
   }

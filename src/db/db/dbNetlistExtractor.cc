@@ -63,16 +63,42 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
     circuits.insert (std::make_pair (c->cell_index (), c.operator-> ()));
   }
 
+  //  reverse lookup for DeviceModel vs. cell index
+  std::map<db::cell_index_type, db::DeviceModel *> device_models;
+  for (db::Netlist::device_model_iterator dm = nl.begin_device_models (); dm != nl.end_device_models (); ++dm) {
+    device_models.insert (std::make_pair (dm->cell_index (), dm.operator-> ()));
+  }
+
   std::map<db::cell_index_type, std::map<size_t, size_t> > pins_per_cluster_per_cell;
   for (db::Layout::bottom_up_const_iterator cid = mp_layout->begin_bottom_up (); cid != mp_layout->end_bottom_up (); ++cid) {
-
-    if (db::NetlistDeviceExtractor::is_device_cell (*mp_layout, *cid)) {
-      continue;
-    }
 
     const connected_clusters_type &clusters = mp_clusters->clusters_per_cell (*cid);
     if (clusters.empty ()) {
       continue;
+    }
+
+    std::map<db::cell_index_type, db::DeviceModel *>::const_iterator dmc = device_models.find (*cid);
+    if (dmc != device_models.end ()) {
+
+      //  make the terminal to cluster ID connections for the device model from the device cells
+
+      if (m_terminal_annot_name_id.first) {
+
+        for (connected_clusters_type::const_iterator dc = clusters.begin (); dc != clusters.end (); ++dc) {
+          for (local_cluster_type::attr_iterator a = dc->begin_attr (); a != dc->end_attr (); ++a) {
+            const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (*a);
+            for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+              if (j->first == m_terminal_annot_name_id.second) {
+                dmc->second->set_cluster_id_for_terminal (j->second.to<size_t> (), dc->id ());
+              }
+            }
+          }
+        }
+
+      }
+
+      continue;
+
     }
 
     //  a cell makes a new circuit (or uses an existing one)

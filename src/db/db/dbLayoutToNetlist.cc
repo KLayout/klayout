@@ -78,6 +78,18 @@ size_t LayoutToNetlist::max_vertex_count () const
   return m_dss.max_vertex_count ();
 }
 
+db::Region *LayoutToNetlist::make_layer (const std::string &n)
+{
+  db::RecursiveShapeIterator si (m_iter);
+  si.shape_flags (db::ShapeIterator::Nothing);
+
+  db::Region *region = new db::Region (si, m_dss);
+  if (! n.empty ()) {
+    name (*region, n);
+  }
+  return region;
+}
+
 db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::string &n)
 {
   db::RecursiveShapeIterator si (m_iter);
@@ -199,8 +211,6 @@ void LayoutToNetlist::extract_netlist ()
     mp_netlist.reset (new db::Netlist ());
   }
 
-  m_net_clusters.clear ();
-
   db::NetlistExtractor netex;
   netex.extract_nets(m_dss, m_conn, *mp_netlist, m_net_clusters);
 
@@ -215,6 +225,16 @@ const db::Layout *LayoutToNetlist::internal_layout () const
 const db::Cell *LayoutToNetlist::internal_top_cell () const
 {
   return &m_dss.const_initial_cell ();
+}
+
+db::Layout *LayoutToNetlist::internal_layout ()
+{
+  return &m_dss.layout ();
+}
+
+db::Cell *LayoutToNetlist::internal_top_cell ()
+{
+  return &m_dss.initial_cell ();
 }
 
 void LayoutToNetlist::name (const db::Region &region, const std::string &name)
@@ -268,6 +288,15 @@ db::Netlist *LayoutToNetlist::netlist () const
 {
   return mp_netlist.get ();
 }
+
+db::Netlist *LayoutToNetlist::make_netlist ()
+{
+  if (! mp_netlist.get ()) {
+    mp_netlist.reset (new db::Netlist ());
+  }
+  return mp_netlist.get ();
+}
+
 
 template <class Tr>
 static void deliver_shape (const db::PolygonRef &pr, db::Region &region, const Tr &tr)

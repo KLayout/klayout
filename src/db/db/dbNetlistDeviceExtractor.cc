@@ -307,20 +307,16 @@ void NetlistDeviceExtractor::push_new_devices ()
         ps.insert (std::make_pair (m_terminal_id_propname_id, tl::Variant (t->first)));
         db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
 
-        //  initialize the local cluster (will not be extracted)
-        db::local_cluster<db::PolygonRef> *lc = cc.insert ();
-        lc->add_attr (pi);
-        dm->set_cluster_id_for_terminal (t->first, lc->id ());
-
-        //  build the cell shapes and local cluster
+        //  build the cell shapes
         for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
+
           db::Shapes &shapes = device_cell.shapes (l->first);
           for (std::vector<db::PolygonRef>::const_iterator s = l->second.begin (); s != l->second.end (); ++s) {
             db::PolygonRef pr = *s;
             pr.transform (db::PolygonRef::trans_type (-disp));
             shapes.insert (db::PolygonRefWithProperties (pr, pi));
-            lc->add (*s, l->first);
           }
+
         }
 
       }

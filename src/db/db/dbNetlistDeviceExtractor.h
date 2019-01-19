@@ -235,11 +235,6 @@ public:
   static const tl::Variant &device_class_property_name ();
 
   /**
-   *  @brief Returns true, if the given cell is a device cell
-   */
-  static bool is_device_cell (const db::Layout &layout, db::cell_index_type ci);
-
-  /**
    *  @brief Performs the extraction
    *
    *  layout and cell specify the layout and the top cell from which to perform the
@@ -527,7 +522,6 @@ private:
 
   void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers);
   void push_new_devices ();
-  bool is_device_cell (db::cell_index_type ci) const;
 };
 
 }

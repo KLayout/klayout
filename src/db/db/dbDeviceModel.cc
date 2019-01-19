@@ -22,6 +22,7 @@
 
 #include "dbDeviceModel.h"
 #include "dbCircuit.h"
+#include "dbNetlist.h"
 
 namespace db
 {
@@ -71,11 +72,17 @@ void DeviceModel::set_netlist (Netlist *netlist)
 void DeviceModel::set_name (const std::string &n)
 {
   m_name = n;
+  if (mp_netlist) {
+    mp_netlist->m_device_model_by_name.invalidate ();
+  }
 }
 
 void DeviceModel::set_cell_index (db::cell_index_type ci)
 {
   m_cell_index = ci;
+  if (mp_netlist) {
+    mp_netlist->m_device_model_by_cell_index.invalidate ();
+  }
 }
 
 size_t DeviceModel::cluster_id_for_terminal (size_t terminal_id) const

@@ -33,26 +33,33 @@ namespace db
 Netlist::Netlist ()
   : m_valid_topology (false), m_lock_count (0),
     m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
-    m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits)
+    m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits),
+    m_device_model_by_name (this, &Netlist::begin_device_models, &Netlist::end_device_models),
+    m_device_model_by_cell_index (this, &Netlist::begin_device_models, &Netlist::end_device_models)
 {
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
   m_circuits.changed ().add (this, &Netlist::circuits_changed);
+  m_device_models.changed ().add (this, &Netlist::device_models_changed);
 }
 
 Netlist::Netlist (const Netlist &other)
   : gsi::ObjectBase (other), tl::Object (other), m_valid_topology (false), m_lock_count (0),
     m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
-    m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits)
+    m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits),
+    m_device_model_by_name (this, &Netlist::begin_device_models, &Netlist::end_device_models),
+    m_device_model_by_cell_index (this, &Netlist::begin_device_models, &Netlist::end_device_models)
 {
   operator= (other);
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
   m_circuits.changed ().add (this, &Netlist::circuits_changed);
+  m_device_models.changed ().add (this, &Netlist::device_models_changed);
 }
 
 Netlist::~Netlist ()
 {
   m_circuits.changed ().remove (this, &Netlist::invalidate_topology);
   m_circuits.changed ().remove (this, &Netlist::circuits_changed);
+  m_device_models.changed ().remove (this, &Netlist::device_models_changed);
 }
 
 Netlist &Netlist::operator= (const Netlist &other)
@@ -96,6 +103,12 @@ void Netlist::circuits_changed ()
 {
   m_circuit_by_cell_index.invalidate ();
   m_circuit_by_name.invalidate ();
+}
+
+void Netlist::device_models_changed ()
+{
+  m_device_model_by_cell_index.invalidate ();
+  m_device_model_by_name.invalidate ();
 }
 
 void Netlist::invalidate_topology ()

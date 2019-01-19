@@ -1047,10 +1047,19 @@ TEST(13_DeviceModel)
   db::Netlist nl;
 
   db::DeviceModel *dm = new db::DeviceModel (0, "name");
+  nl.add_device_model (dm);
+  EXPECT_EQ (dm->netlist () == &nl, true);
+
   EXPECT_EQ (dm->device_class () == 0, true);
   EXPECT_EQ (dm->name (), "name");
+  EXPECT_EQ (nl.device_model_by_name ("name") == dm, true);
+  EXPECT_EQ (nl.device_model_by_name ("name2") == 0, true);
+  EXPECT_EQ (nl.device_model_by_name ("does_not_exist") == 0, true);
   dm->set_name ("name2");
   EXPECT_EQ (dm->name (), "name2");
+  EXPECT_EQ (nl.device_model_by_name ("name") == 0, true);
+  EXPECT_EQ (nl.device_model_by_name ("name2") == dm, true);
+  EXPECT_EQ (nl.device_model_by_name ("does_not_exist") == 0, true);
 
   dm->set_cluster_id_for_terminal (1, 17);
   dm->set_cluster_id_for_terminal (0, 42);
@@ -1058,10 +1067,10 @@ TEST(13_DeviceModel)
   EXPECT_EQ (dm->cluster_id_for_terminal (1), size_t (17));
 
   dm->set_cell_index (5);
+  EXPECT_EQ (nl.device_model_by_cell_index (5) == dm, true);
+  EXPECT_EQ (nl.device_model_by_cell_index (17) == 0, true);
   EXPECT_EQ (dm->cell_index (), db::cell_index_type (5));
 
-  nl.add_device_model (dm);
-  EXPECT_EQ (dm->netlist () == &nl, true);
   EXPECT_EQ (nl.begin_device_models () == nl.end_device_models (), false);
   EXPECT_EQ (nl.begin_device_models ()->name (), "name2");
 

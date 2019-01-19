@@ -149,7 +149,6 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
   *mp_stream << "# Circuits are the hierarchical building blocks of the netlist." << endl;
   for (db::Netlist::const_bottom_up_circuit_iterator i = nl->begin_bottom_up (); i != nl->end_bottom_up (); ++i) {
     const db::Circuit *x = *i;
-    *mp_stream << endl << "# Circuit " << x->name () << endl;
     *mp_stream << Keys::circuit_key << "(" << tl::to_word_or_quoted_string (x->name ()) << endl;
     write (l2n, *x);
     *mp_stream << ")" << endl;
@@ -233,6 +232,10 @@ void std_writer_impl<Keys>::write (const db::PolygonRef *s, const db::ICplxTrans
 template <class Keys>
 void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net &net)
 {
+  if (! l2n->netlist ()) {
+    throw tl::Exception (tl::to_string (tr ("Can't write annotated netlist before extraction has been done")));
+  }
+
   const db::Layout *ly = l2n->internal_layout ();
   const db::hier_clusters<db::PolygonRef> &clusters = l2n->net_clusters ();
   const db::Circuit *circuit = net.circuit ();
@@ -251,7 +254,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
       //  vanish in "purge" but the clusters will still be there we need to recursive into clusters from
       //  unknown cells.
       db::cell_index_type ci = si.cell_index ();
-      if (ci != prev_ci && ci != cci && l2n->netlist ()->circuit_by_cell_index (ci)) {
+      if (ci != prev_ci && ci != cci && (l2n->netlist ()->circuit_by_cell_index (ci) || l2n->netlist ()->device_model_by_cell_index (ci))) {
 
         si.skip_cell ();
 

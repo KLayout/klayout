@@ -169,7 +169,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   for (std::set<db::cell_index_type>::const_iterator ci = called_cells.begin (); ci != called_cells.end (); ++ci) {
 
     //  skip device cells from previous extractions
-    if (is_device_cell (*ci)) {
+    if (m_netlist->device_model_by_cell_index (*ci)) {
       continue;
     }
 
@@ -223,33 +223,6 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   }
 }
 
-bool NetlistDeviceExtractor::is_device_cell (const db::Layout &layout, db::cell_index_type ci)
-{
-  db::properties_id_type pi = layout.cell (ci).prop_id ();
-  if (pi == 0) {
-    return false;
-  }
-
-  std::pair<bool, db::property_names_id_type> pn = layout.properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::device_class_property_name ());
-  if (! pn.first) {
-    return false;
-  }
-
-  const db::PropertiesRepository::properties_set &ps = layout.properties_repository ().properties (pi);
-  for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
-    if (j->first == pn.second) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-bool NetlistDeviceExtractor::is_device_cell (db::cell_index_type ci) const
-{
-  return is_device_cell (*mp_layout, ci);
-}
-
 void NetlistDeviceExtractor::push_new_devices ()
 {
   db::VCplxTrans dbu_inv = db::CplxTrans (mp_layout->dbu ()).inverted ();
@@ -297,8 +270,6 @@ void NetlistDeviceExtractor::push_new_devices ()
       ps.clear ();
       ps.insert (std::make_pair (m_device_class_propname_id, tl::Variant (mp_device_class->name ())));
       device_cell.prop_id (mp_layout->properties_repository ().properties_id (ps));
-
-      db::connected_clusters<db::PolygonRef> &cc = mp_clusters->clusters_per_cell (device_cell.cell_index ());
 
       for (geometry_per_terminal_type::const_iterator t = d->second.begin (); t != d->second.end (); ++t) {
 

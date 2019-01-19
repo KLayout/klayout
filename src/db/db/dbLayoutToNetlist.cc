@@ -260,13 +260,9 @@ db::CellMapping LayoutToNetlist::cell_mapping_into (db::Layout &layout, db::Cell
   unsigned int layout_index = 0;
 
   std::set<db::cell_index_type> device_cells;
-
-  if (! with_device_cells) {
-    const db::Layout &src_layout = m_dss.layout (layout_index);
-    for (db::Layout::const_iterator c = src_layout.begin (); c != src_layout.end (); ++c) {
-      if (db::NetlistDeviceExtractor::is_device_cell (src_layout, c->cell_index ())) {
-        device_cells.insert (c->cell_index ());
-      }
+  if (! with_device_cells && mp_netlist.get ()) {
+    for (db::Netlist::device_model_iterator i = mp_netlist->begin_device_models (); i != mp_netlist->end_device_models (); ++i) {
+      device_cells.insert (i->cell_index ());
     }
   }
 
@@ -404,7 +400,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
     if (cm == cmap.end ()) {
 
       const char *name_prefix = 0;
-      if (db::NetlistDeviceExtractor::is_device_cell (*internal_layout (), subci)) {
+      if (mp_netlist->device_model_by_cell_index (subci)) {
         name_prefix = device_cell_name_prefix;
       } else {
         name_prefix = cell_name_prefix;

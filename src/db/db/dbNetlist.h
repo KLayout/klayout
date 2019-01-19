@@ -350,6 +350,46 @@ public:
   }
 
   /**
+   *  @brief Gets the device model with the given name
+   *
+   *  If no device model with that name exists, null is returned.
+   */
+  DeviceModel *device_model_by_name (const std::string &name)
+  {
+    return m_device_model_by_name.object_by (name);
+  }
+
+  /**
+   *  @brief Gets the device model with the given name (const version)
+   *
+   *  If no device model with that name exists, null is returned.
+   */
+  const DeviceModel *device_model_by_name (const std::string &name) const
+  {
+    return m_device_model_by_name.object_by (name);
+  }
+
+  /**
+   *  @brief Gets the device model with the given cell index
+   *
+   *  If no device model with that cell index exists, null is returned.
+   */
+  DeviceModel *device_model_by_cell_index (db::cell_index_type cell_index)
+  {
+    return m_device_model_by_cell_index.object_by (cell_index);
+  }
+
+  /**
+   *  @brief Gets the device model with the given cell index (const version)
+   *
+   *  If no device model with that cell index exists, null is returned.
+   */
+  const DeviceModel *device_model_by_cell_index (db::cell_index_type cell_index) const
+  {
+    return m_device_model_by_cell_index.object_by (cell_index);
+  }
+
+  /**
    *  @brief Purge unused nets
    *
    *  This method will purge all nets which return "floating".
@@ -383,6 +423,7 @@ public:
 
 private:
   friend class Circuit;
+  friend class DeviceModel;
 
   circuit_list m_circuits;
   device_class_list m_device_classes;
@@ -395,10 +436,13 @@ private:
   size_t m_top_circuits;
   object_by_attr<Netlist, Netlist::circuit_iterator, name_attribute<Circuit> > m_circuit_by_name;
   object_by_attr<Netlist, Netlist::circuit_iterator, cell_index_attribute<Circuit> > m_circuit_by_cell_index;
+  object_by_attr<Netlist, Netlist::device_model_iterator, name_attribute<DeviceModel> > m_device_model_by_name;
+  object_by_attr<Netlist, Netlist::device_model_iterator, cell_index_attribute<DeviceModel> > m_device_model_by_cell_index;
 
   void invalidate_topology ();
   void validate_topology ();
   void circuits_changed ();
+  void device_models_changed ();
 
   const tl::vector<Circuit *> &child_circuits (Circuit *circuit);
   const tl::vector<Circuit *> &parent_circuits (Circuit *circuit);

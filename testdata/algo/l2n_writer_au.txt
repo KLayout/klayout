@@ -82,8 +82,6 @@ device(D$NMOS$1 NMOS
 
 # Circuit section
 # Circuits are the hierarchical building blocks of the netlist.
-
-# Circuit INV2
 circuit(INV2
 
  # Nets with their geometries
@@ -91,9 +89,7 @@ circuit(INV2
   rect(poly -525 -250 -275 2250)
   rect(poly -1700 1620 -400 1980)
   rect(poly -525 -800 -275 800)
-  rect(poly -525 -475 -275 475)
   rect(poly -525 2000 -275 3600)
-  rect(poly -525 2325 -275 3275)
   rect(poly_lbl -801 1799 -799 1801)
   rect(poly_cont -1630 1690 -1410 1910)
  )
@@ -101,9 +97,7 @@ circuit(INV2
   rect(poly 275 -250 525 2250)
   rect(poly 220 820 580 1180)
   rect(poly 275 2000 525 3600)
-  rect(poly 275 2325 525 3275)
   rect(poly 275 -800 525 800)
-  rect(poly 275 -475 525 475)
   rect(diff_cont -910 2490 -690 2710)
   rect(diff_cont -910 2890 -690 3110)
   rect(diff_cont -910 -310 -690 -90)
@@ -114,8 +108,6 @@ circuit(INV2
   rect(metal1 -980 2420 -620 3180)
   rect(metal1 -980 -380 -620 380)
   rect(psd -1050 2325 -525 3275)
-  rect(psd -1050 2325 -525 3275)
-  rect(nsd -1050 -475 -525 475)
   rect(nsd -1050 -475 -525 475)
  )
  net(OUT
@@ -128,8 +120,6 @@ circuit(INV2
   rect(metal1 620 -380 980 380)
   rect(metal1_lbl 799 1799 801 1801)
   rect(psd 525 2325 1050 3275)
-  rect(psd 525 2325 1050 3275)
-  rect(nsd 525 -475 1050 475)
   rect(nsd 525 -475 1050 475)
  )
  net($4
@@ -143,8 +133,6 @@ circuit(INV2
   rect(via1 -125 75 125 325)
   rect(metal2 -1400 -450 1400 450)
   rect(nsd -275 -475 275 475)
-  rect(nsd -275 -475 275 475)
-  rect(nsd -275 -475 275 475)
  )
  net($5
   rect(diff_cont -110 2490 110 2710)
@@ -156,8 +144,6 @@ circuit(INV2
   rect(via1 -125 2475 125 2725)
   rect(via1 -125 2875 125 3125)
   rect(metal2 -1400 2350 1400 3250)
-  rect(psd -275 2325 275 3275)
-  rect(psd -275 2325 275 3275)
   rect(psd -275 2325 275 3275)
  )
 
@@ -211,8 +197,6 @@ circuit(INV2
  )
 
 )
-
-# Circuit RINGO
 circuit(RINGO
 
  # Nets with their geometries

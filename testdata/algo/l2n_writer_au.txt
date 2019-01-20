@@ -1,5 +1,6 @@
+#%l2n-klayout
+
 # General section
-# Lists general definitions.
 
 top(RINGO)
 unit(0.001)
@@ -211,6 +212,15 @@ circuit(RINGO
   rect(metal2 -1720 1600 23160 2000)
   rect(metal2_lbl -1 1799 1 1801)
  )
+ net(OSC
+  rect(diff_cont 24450 2890 24670 3110)
+  rect(diff_cont 24450 2490 24670 2710)
+  rect(diff_cont 24450 90 24670 310)
+  rect(diff_cont 24450 -310 24670 -90)
+  rect(via1 24435 1675 24685 1925)
+  rect(metal2 24360 1600 24760 2000)
+  rect(metal2_lbl 24559 1799 24561 1801)
+ )
  net(VSS
   rect(diff_cont 2530 -310 2750 -90)
   rect(diff_cont 2530 90 2750 310)
@@ -392,10 +402,17 @@ circuit(RINGO
   rect(diff_cont 3330 -310 3550 -90)
  )
 
+ # Outgoing pins and their connections to nets
+ pin(FB FB)
+ pin(OSC OSC)
+ pin(VSS VSS)
+ pin(VDD VDD)
+
  # Subcircuits and their connections
  circuit($1 INV2 location(23760 0)
   pin(IN $I8)
   pin($1 FB)
+  pin(OUT OSC)
   pin($3 VSS)
   pin($4 VDD)
  )

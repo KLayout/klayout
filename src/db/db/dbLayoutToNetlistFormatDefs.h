@@ -110,6 +110,8 @@ namespace l2n_std_format
                              param_key, location_key, rotation_key,
                              mirror_key, scale_key, pin_key,
                              indent1, indent2;
+
+    inline static bool is_short () { return Short; }
   };
 }
 

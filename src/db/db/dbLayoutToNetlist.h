@@ -141,7 +141,6 @@ public:
   /**
    *  @brief Creates a new region representing an original layer
    *  "layer_index" is the layer index of the desired layer in the original layout.
-   *  The Region object returned is a new object and must be deleted by the caller.
    *  This variant produces polygons and takes texts for net name annotation.
    *  A variant not taking texts is "make_polygon_layer". A Variant only taking
    *  texts is "make_text_layer".
@@ -212,6 +211,13 @@ public:
   void extract_netlist ();
 
   /**
+   *  @brief Marks the netlist as extracted
+   *  NOTE: this method is provided for special cases such as netlist readers. Don't
+   *  use it.
+   */
+  void set_netlist_extracted ();
+
+  /**
    *  @brief Gets the internal layout
    */
   const db::Layout *internal_layout () const;
@@ -268,6 +274,8 @@ public:
 
   /**
    *  @brief gets the netlist extracted or make on if none exists yet.
+   *  NOTE: this method is provided for special cases like readers of persisted
+   *  layout to netlist data.
    */
   db::Netlist *make_netlist ();
 
@@ -401,8 +409,8 @@ private:
   bool m_netlist_extracted;
 
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
-  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap) const;
-  void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap) const;
+  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
+  void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
 };
 
 }

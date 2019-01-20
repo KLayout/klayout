@@ -83,23 +83,33 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
   const db::Layout *ly = l2n->internal_layout ();
   const db::Netlist *nl = l2n->netlist ();
 
-  *mp_stream << "# General section" << endl;
-  *mp_stream << "# Lists general definitions." << endl << endl;
+  *mp_stream << "#%l2n-klayout" << endl;
+
+  if (! Keys::is_short ()) {
+    *mp_stream << endl << "# General section" << endl << endl;
+  }
+
   if (version > 0) {
     *mp_stream << Keys::version_key << "(" << version << ")" << endl;
   }
   *mp_stream << Keys::top_key << "(" << tl::to_word_or_quoted_string (ly->cell_name (l2n->internal_top_cell ()->cell_index ())) << ")" << endl;
   *mp_stream << Keys::unit_key << "(" << ly->dbu () << ")" << endl;
 
-  *mp_stream << endl << "# Layer section" << endl;
-  *mp_stream << "# This section lists the mask layers (drawing or derived) and their connections." << endl;
+  if (! Keys::is_short ()) {
+    *mp_stream << endl << "# Layer section" << endl;
+    *mp_stream << "# This section lists the mask layers (drawing or derived) and their connections." << endl;
+  }
 
-  *mp_stream << endl << "# Mask layers" << endl;
+  if (! Keys::is_short ()) {
+    *mp_stream << endl << "# Mask layers" << endl;
+  }
   for (db::Connectivity::layer_iterator l = l2n->connectivity ().begin_layers (); l != l2n->connectivity ().end_layers (); ++l) {
     *mp_stream << Keys::layer_key << "(" << name_for_layer (ly, *l) << ")" << endl;
   }
 
-  *mp_stream << endl << "# Mask layer connectivity" << endl;
+  if (! Keys::is_short ()) {
+    *mp_stream << endl << "# Mask layer connectivity" << endl;
+  }
   for (db::Connectivity::layer_iterator l = l2n->connectivity ().begin_layers (); l != l2n->connectivity ().end_layers (); ++l) {
 
     db::Connectivity::layer_iterator ce = l2n->connectivity ().end_connected (*l);
@@ -121,7 +131,9 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
     db::Connectivity::global_nets_iterator gb = l2n->connectivity ().begin_global_connections (*l);
     if (gb != ge) {
       if (! any) {
-        *mp_stream << endl << "# Global nets and connectivity" << endl;
+        if (! Keys::is_short ()) {
+          *mp_stream << endl << "# Global nets and connectivity" << endl;
+        }
         any = true;
       }
       *mp_stream << Keys::global_key << "(" << name_for_layer (ly, *l);
@@ -133,7 +145,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
 
   }
 
-  if (nl->begin_device_models () != nl->end_device_models ()) {
+  if (nl->begin_device_models () != nl->end_device_models () && ! Keys::is_short ()) {
     *mp_stream << endl << "# Device abstracts section" << endl;
     *mp_stream << "# Device abstracts list the pin shapes of the devices." << endl;
   }
@@ -145,8 +157,10 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
     }
   }
 
-  *mp_stream << endl << "# Circuit section" << endl;
-  *mp_stream << "# Circuits are the hierarchical building blocks of the netlist." << endl;
+  if (! Keys::is_short ()) {
+    *mp_stream << endl << "# Circuit section" << endl;
+    *mp_stream << "# Circuits are the hierarchical building blocks of the netlist." << endl;
+  }
   for (db::Netlist::const_bottom_up_circuit_iterator i = nl->begin_bottom_up (); i != nl->end_bottom_up (); ++i) {
     const db::Circuit *x = *i;
     *mp_stream << Keys::circuit_key << "(" << tl::to_word_or_quoted_string (x->name ()) << endl;
@@ -159,14 +173,18 @@ template <class Keys>
 void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Circuit &circuit)
 {
   if (circuit.begin_nets () != circuit.end_nets ()) {
-    *mp_stream << endl << indent1 << "# Nets with their geometries" << endl;
+    if (! Keys::is_short ()) {
+      *mp_stream << endl << indent1 << "# Nets with their geometries" << endl;
+    }
     for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
       write (l2n, *n);
     }
   }
 
   if (circuit.begin_pins () != circuit.end_pins ()) {
-    *mp_stream << endl << indent1 << "# Outgoing pins and their connections to nets" << endl;
+    if (! Keys::is_short ()) {
+      *mp_stream << endl << indent1 << "# Outgoing pins and their connections to nets" << endl;
+    }
     for (db::Circuit::const_pin_iterator p = circuit.begin_pins (); p != circuit.end_pins (); ++p) {
       const db::Net *net = circuit.net_for_pin (p->id ());
       if (net) {
@@ -176,20 +194,26 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Cir
   }
 
   if (circuit.begin_devices () != circuit.end_devices ()) {
-    *mp_stream << endl << indent1 << "# Devices and their connections" << endl;
+    if (! Keys::is_short ()) {
+      *mp_stream << endl << indent1 << "# Devices and their connections" << endl;
+    }
     for (db::Circuit::const_device_iterator d = circuit.begin_devices (); d != circuit.end_devices (); ++d) {
       write (l2n, *d);
     }
   }
 
   if (circuit.begin_subcircuits () != circuit.end_subcircuits ()) {
-    *mp_stream << endl << indent1 << "# Subcircuits and their connections" << endl;
+    if (! Keys::is_short ()) {
+      *mp_stream << endl << indent1 << "# Subcircuits and their connections" << endl;
+    }
     for (db::Circuit::const_subcircuit_iterator x = circuit.begin_subcircuits (); x != circuit.end_subcircuits (); ++x) {
       write (l2n, *x);
     }
   }
 
-  *mp_stream << endl;
+  if (! Keys::is_short ()) {
+    *mp_stream << endl;
+  }
 }
 
 template <class T, class Tr>

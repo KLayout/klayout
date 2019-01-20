@@ -217,6 +217,11 @@ void LayoutToNetlist::extract_netlist ()
   m_netlist_extracted = true;
 }
 
+void LayoutToNetlist::set_netlist_extracted ()
+{
+  m_netlist_extracted = true;
+}
+
 const db::Layout *LayoutToNetlist::internal_layout () const
 {
   return &m_dss.const_layout ();
@@ -293,19 +298,30 @@ db::Netlist *LayoutToNetlist::make_netlist ()
   return mp_netlist.get ();
 }
 
+namespace
+{
+  struct StopOnFirst { };
+}
 
 template <class Tr>
-static void deliver_shape (const db::PolygonRef &pr, db::Region &region, const Tr &tr)
+static bool deliver_shape (const db::PolygonRef &, StopOnFirst, const Tr &)
+{
+  return false;
+}
+
+template <class Tr>
+static bool deliver_shape (const db::PolygonRef &pr, db::Region &region, const Tr &tr)
 {
   if (pr.obj ().is_box ()) {
     region.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
   } else {
     region.insert (pr.obj ().transformed (pr.trans ()).transformed (tr));
   }
+  return true;
 }
 
 template <class Tr>
-static void deliver_shape (const db::PolygonRef &pr, db::Shapes &shapes, const Tr &tr)
+static bool deliver_shape (const db::PolygonRef &pr, db::Shapes &shapes, const Tr &tr)
 {
   if (pr.obj ().is_box ()) {
     shapes.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
@@ -317,25 +333,51 @@ static void deliver_shape (const db::PolygonRef &pr, db::Shapes &shapes, const T
       shapes.insert (pr.obj ().transformed (pr.trans ()).transformed (tr));
     }
   }
+  return true;
 }
 
 template <class To>
-static void deliver_shapes_of_net_recursive (const db::hier_clusters<db::PolygonRef> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, To &to)
+static bool deliver_shapes_of_net_recursive (const db::Netlist * /*nl*/, const db::hier_clusters<db::PolygonRef> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, const db::ICplxTrans &tr, To &to)
 {
   //  deliver the net shapes
   for (db::recursive_cluster_shape_iterator<db::PolygonRef> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
-    deliver_shape (*rci, to, rci.trans ());
+    if (! deliver_shape (*rci, to, tr * rci.trans ())) {
+      return false;
+    }
   }
+  return true;
 }
 
 template <class To>
-static void deliver_shapes_of_net_nonrecursive (const db::hier_clusters<db::PolygonRef> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, To &to)
+static bool deliver_shapes_of_net_nonrecursive (const db::Netlist *nl, const db::hier_clusters<db::PolygonRef> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, const db::ICplxTrans &tr, To &to)
 {
-  const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (ci).cluster_by_id (cid);
+  //  NOTE: this scheme will deliver the shapes from the cell, including (!)
+  //  subcells that are purged
 
-  for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (layer_id); !s.at_end (); ++s) {
-    deliver_shape (*s, to, db::UnitTrans ());
+  db::cell_index_type prev_ci = ci;
+
+  //  deliver the net shapes
+  for (db::recursive_cluster_shape_iterator<db::PolygonRef> rci (clusters, layer_id, ci, cid); !rci.at_end (); ) {
+
+    db::cell_index_type cci = rci.cell_index ();
+    if (cci != prev_ci && cci != ci && (! nl || nl->circuit_by_cell_index (cci) || nl->device_model_by_cell_index (cci))) {
+
+      rci.skip_cell ();
+
+    } else {
+
+      if (! deliver_shape (*rci, to, tr * rci.trans ())) {
+        return false;
+      }
+      prev_ci = cci;
+
+      ++rci;
+
+    }
+
   }
+
+  return true;
 }
 
 void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to) const
@@ -345,9 +387,9 @@ void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_la
   tl_assert (circuit != 0);
 
   if (! recursive) {
-    deliver_shapes_of_net_nonrecursive (m_net_clusters, circuit->cell_index (), net.cluster_id (), lid, to);
+    deliver_shapes_of_net_nonrecursive (mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lid, db::ICplxTrans (), to);
   } else {
-    deliver_shapes_of_net_recursive (m_net_clusters, circuit->cell_index (), net.cluster_id (), lid, to);
+    deliver_shapes_of_net_recursive (mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lid, db::ICplxTrans (), to);
   }
 }
 
@@ -360,31 +402,60 @@ db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region
   std::auto_ptr<db::Region> res (new db::Region ());
 
   if (! recursive) {
-    deliver_shapes_of_net_nonrecursive (m_net_clusters, circuit->cell_index (), net.cluster_id (), lid, *res);
+    deliver_shapes_of_net_nonrecursive (mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lid, db::ICplxTrans (), *res);
   } else {
-    deliver_shapes_of_net_recursive (m_net_clusters, circuit->cell_index (), net.cluster_id (), lid, *res);
+    deliver_shapes_of_net_recursive (mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lid, db::ICplxTrans (), *res);
   }
 
   return res.release ();
 }
 
 void
-LayoutToNetlist::build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap) const
+LayoutToNetlist::build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const db::ICplxTrans &tr) const
 {
   const db::Circuit *circuit = net.circuit ();
   tl_assert (circuit != 0);
 
-  build_net_rec (circuit->cell_index (), net.cluster_id (), target, target_cell, lmap, cell_name_prefix, device_cell_name_prefix, cmap);
+  build_net_rec (circuit->cell_index (), net.cluster_id (), target, target_cell, lmap, &net, net_cell_name_prefix, cell_name_prefix, device_cell_name_prefix, cmap, tr);
 }
 
 void
-LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap) const
+LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &tc, const std::map<unsigned int, const db::Region *> &lmap, const db::Net *net, const char *net_cell_name_prefix, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const db::ICplxTrans &tr) const
 {
-  for (std::map<unsigned int, const db::Region *>::const_iterator l = lmap.begin (); l != lmap.end (); ++l) {
-    deliver_shapes_of_net_nonrecursive (m_net_clusters, ci, cid, layer_of (*l->second), target_cell.shapes (l->first));
+  db::Cell *target_cell = &tc;
+
+  if (net_cell_name_prefix) {
+
+    const db::connected_clusters<db::PolygonRef> &ccl = m_net_clusters.clusters_per_cell (ci);
+
+    bool any_connections = circuit_cell_name_prefix && ! ccl.connections_for_cluster (cid).empty ();
+    if (! any_connections) {
+
+      bool consider_cell = any_connections;
+      for (std::map<unsigned int, const db::Region *>::const_iterator l = lmap.begin (); l != lmap.end () && !consider_cell; ++l) {
+        StopOnFirst sof;
+        consider_cell = deliver_shapes_of_net_nonrecursive (mp_netlist.get (), m_net_clusters, ci, cid, layer_of (*l->second), tr, sof);
+      }
+
+      if (! consider_cell) {
+        //  shortcut if cell is empty -> no net cell will be produced
+        return;
+      }
+
+    }
+
+    //  make a specific cell for the net if requested
+
+    target_cell = &target.cell (target.add_cell ((std::string (net_cell_name_prefix) + net->expanded_name ()).c_str ()));
+    tc.insert (db::CellInstArray (db::CellInst (target_cell->cell_index ()), db::Trans ()));
+
   }
 
-  if (! cell_name_prefix && ! device_cell_name_prefix) {
+  for (std::map<unsigned int, const db::Region *>::const_iterator l = lmap.begin (); l != lmap.end (); ++l) {
+    deliver_shapes_of_net_nonrecursive (mp_netlist.get (), m_net_clusters, ci, cid, layer_of (*l->second), tr, target_cell->shapes (l->first));
+  }
+
+  if (! circuit_cell_name_prefix && ! device_cell_name_prefix) {
     return;
   }
 
@@ -403,7 +474,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
       if (mp_netlist->device_model_by_cell_index (subci)) {
         name_prefix = device_cell_name_prefix;
       } else {
-        name_prefix = cell_name_prefix;
+        name_prefix = circuit_cell_name_prefix;
       }
 
       if (name_prefix) {
@@ -413,7 +484,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
         db::cell_index_type target_ci = target.add_cell ((std::string (name_prefix) + cell_name).c_str ());
         cm = cmap.insert (std::make_pair (std::make_pair (subci, subcid), target_ci)).first;
 
-        build_net_rec (subci, subcid, target, target.cell (target_ci), lmap, cell_name_prefix, device_cell_name_prefix, cmap);
+        build_net_rec (subci, subcid, target, target.cell (target_ci), lmap, 0, 0, circuit_cell_name_prefix, device_cell_name_prefix, cmap, db::ICplxTrans ());
 
       } else {
         cm = cmap.insert (std::make_pair (std::make_pair (subci, subcid), std::numeric_limits<db::cell_index_type>::max ())).first;
@@ -422,7 +493,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
     }
 
     if (cm->second != std::numeric_limits<db::cell_index_type>::max ()) {
-      target_cell.insert (db::CellInstArray (db::CellInst (cm->second), c->inst ().complex_trans ()));
+      target_cell->insert (db::CellInstArray (db::CellInst (cm->second), tr * c->inst ().complex_trans ()));
     }
 
   }
@@ -437,7 +508,7 @@ LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &ta
 
   std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> cell_map;
 
-  build_net_rec (net, target, target_cell, lmap, cell_name_prefix, device_cell_name_prefix, cell_map);
+  build_net_rec (net, target, target_cell, lmap, 0, cell_name_prefix, device_cell_name_prefix, cell_map, db::ICplxTrans ());
 }
 
 void
@@ -456,38 +527,54 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
       continue;
     }
 
+    bool is_top_circuit = c->begin_parents () == c->end_parents ();
+
     db::cell_index_type target_ci = cmap.cell_mapping (c->cell_index ());
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
 
       //  exlude local nets in recursive mode
-      if (circuit_cell_name_prefix && n->pin_count () > 0) {
+      if (circuit_cell_name_prefix && ! is_top_circuit && n->pin_count () > 0) {
         continue;
       }
 
-      const db::connected_clusters<db::PolygonRef> &ccl = m_net_clusters.clusters_per_cell (c->cell_index ());
-      const db::local_cluster<db::PolygonRef> &cl = ccl.cluster_by_id (n->cluster_id ());
+      build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, circuit_cell_name_prefix, device_cell_name_prefix, cell_map, db::ICplxTrans ());
 
-      bool any_connections = ! ccl.connections_for_cluster (n->cluster_id ()).empty ();
+    }
 
-      bool any_shapes = false;
-      for (std::map<unsigned int, const db::Region *>::const_iterator m = lmap.begin (); m != lmap.end () && !any_shapes; ++m) {
-        any_shapes = ! cl.begin (layer_of (*m->second)).at_end ();
-      }
+    if (circuit_cell_name_prefix) {
 
-      if (any_shapes || (circuit_cell_name_prefix && any_connections)) {
+      //  with recursive nets we skip nets in subcircuits which are connected upwards. This means, nets will
+      //  get lost if there is no connection to this pin from the outside. Hence we need to deliver nets from
+      //  subcircuits as part of the circuit which calls the subcircuit - but NOT in a subcircuit cell, because
+      //  this will just apply to nets from certain instances. But the net cell name will be formed as "subcircuit:net"
 
-        db::cell_index_type net_ci = target_ci;
+      const db::Circuit &circuit = *c;
+      for (db::Circuit::const_subcircuit_iterator sc = circuit.begin_subcircuits (); sc != circuit.end_subcircuits (); ++sc) {
 
-        if (net_cell_name_prefix) {
+        const db::SubCircuit &subcircuit = *sc;
+        for (db::Circuit::const_pin_iterator p = subcircuit.circuit_ref ()->begin_pins (); p != subcircuit.circuit_ref ()->end_pins (); ++p) {
 
-          db::Cell &tc = target.cell (target_ci);
-          net_ci = target.add_cell ((std::string (net_cell_name_prefix) + n->expanded_name ()).c_str ());
-          tc.insert (db::CellInstArray (db::CellInst (net_ci), db::Trans ()));
+          if (! subcircuit.net_for_pin (p->id ())) {
+
+            const db::Net *n = subcircuit.circuit_ref ()->net_for_pin (p->id ());
+            if (n) {
+
+              double dbu = target.dbu ();
+              db::ICplxTrans tr = db::CplxTrans (dbu).inverted () * subcircuit.trans () * db::CplxTrans (dbu);
+
+              if (net_cell_name_prefix) {
+                std::string ncn = std::string (net_cell_name_prefix) + subcircuit.expanded_name () + ":";
+                build_net_rec (*n, target, target.cell (target_ci), lmap, ncn.c_str (), circuit_cell_name_prefix, device_cell_name_prefix, cell_map, tr);
+              } else {
+                build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, circuit_cell_name_prefix, device_cell_name_prefix, cell_map, tr);
+              }
+
+            }
+
+          }
 
         }
-
-        build_net_rec (*n, target, target.cell (net_ci), lmap, circuit_cell_name_prefix, device_cell_name_prefix, cell_map);
 
       }
 

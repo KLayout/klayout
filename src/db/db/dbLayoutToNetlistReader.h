@@ -40,6 +40,7 @@ class Circuit;
 class Cell;
 class DeviceModel;
 class DeviceClass;
+class Region;
 
 /**
  *  @brief The base class for a LayoutToNetlist writer
@@ -64,6 +65,8 @@ public:
 
   void read (db::LayoutToNetlist *l2n);
 
+  const db::Region *layer_by_name (const std::string &name);
+
 private:
   friend class l2n_std_reader::Brace;
   typedef l2n_std_reader::Brace Brace;
@@ -82,6 +85,7 @@ private:
   std::string m_path;
   std::string m_line;
   tl::Extractor m_ex;
+  std::auto_ptr<Layers> mp_layers;
 
   void do_read (db::LayoutToNetlist *l2n);
 
@@ -94,12 +98,12 @@ private:
   bool at_end ();
   void skip ();
 
-  void read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit, Layers &layers);
+  void read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit);
   void read_pin (db::LayoutToNetlist *l2n, db::Circuit *circuit);
   db::CellInstArray read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs);
   db::CellInstArray read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs);
-  void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceModel *dm, db::DeviceClass *dc, Layers &layers);
-  std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n, Layers &layers);
+  void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceModel *dm, db::DeviceClass *dc);
+  std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n);
 };
 
 }

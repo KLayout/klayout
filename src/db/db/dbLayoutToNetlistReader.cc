@@ -51,6 +51,11 @@ public:
     m_layers.insert (std::make_pair (name, region));
   }
 
+  bool has_layer (const std::string &name) const
+  {
+    return m_layers.find (name) != m_layers.end ();
+  }
+
   db::Region &layer (const std::string &name)
   {
     std::map<std::string, db::Region *>::const_iterator l = m_layers.find (name);
@@ -180,6 +185,11 @@ void LayoutToNetlistStandardReader::read (db::LayoutToNetlist *l2n)
   }
 }
 
+const db::Region *LayoutToNetlistStandardReader::layer_by_name (const std::string &name)
+{
+  return mp_layers->has_layer (name) ? &mp_layers->layer (name) : 0;
+}
+
 void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
 {
   int version = 0;
@@ -191,7 +201,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
 
   l2n->make_netlist ();
 
-  Layers layers;
+  mp_layers.reset (new Layers ());
 
   while (! at_end ()) {
 
@@ -227,7 +237,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       Brace br (this);
       std::string layer;
       read_word_or_quoted (layer);
-      layers.add (layer, l2n->make_layer (layer));
+      mp_layers->add (layer, l2n->make_layer (layer));
       br.done ();
 
     } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
@@ -238,7 +248,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       while (br) {
         std::string l2;
         read_word_or_quoted (l2);
-        l2n->connect (layers.layer (l1), layers.layer (l2));
+        l2n->connect (mp_layers->layer (l1), mp_layers->layer (l2));
       }
       br.done ();
 
@@ -250,7 +260,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       while (br) {
         std::string g;
         read_word_or_quoted (g);
-        l2n->connect_global (layers.layer (l1), g);
+        l2n->connect_global (mp_layers->layer (l1), g);
       }
       br.done ();
 
@@ -265,7 +275,8 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       l2n->netlist ()->add_circuit (circuit);
 
       db::Layout *ly = l2n->internal_layout ();
-      db::cell_index_type ci = ly->add_cell (name.c_str ());
+      std::pair<bool, db::cell_index_type> ci_old = ly->cell_by_name (name.c_str ());
+      db::cell_index_type ci = ci_old.first ? ci_old.second : ly->add_cell (name.c_str ());
       circuit->set_cell_index (ci);
 
       std::map<db::CellInstArray, std::list<Connections> > connections;
@@ -273,7 +284,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       while (br) {
 
         if (test (skeys::net_key) || test (lkeys::net_key)) {
-          read_net (l2n, circuit, layers);
+          read_net (l2n, circuit);
         } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
           read_pin (l2n, circuit);
         } else if (test (skeys::device_key) || test (lkeys::device_key)) {
@@ -340,7 +351,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       while (br) {
 
         if (test (skeys::terminal_key) || test (lkeys::terminal_key)) {
-          read_abstract_terminal (l2n, dm, gen_dc ? dc : 0, layers);
+          read_abstract_terminal (l2n, dm, gen_dc ? dc : 0);
         } else {
           throw tl::Exception (tl::to_string (tr ("Invalid keyword inside device abstract definition (terminal expected)")));
         }
@@ -352,10 +363,12 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
     }
 
   }
+
+  l2n->set_netlist_extracted ();
 }
 
 std::pair<unsigned int, db::PolygonRef>
-LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n, Layers &layers)
+LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
 {
   std::string lname;
 
@@ -364,7 +377,7 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n, Layers &
     Brace br (this);
 
     read_word_or_quoted (lname);
-    unsigned int lid = l2n->layer_of (layers.layer (lname));
+    unsigned int lid = l2n->layer_of (mp_layers->layer (lname));
 
     db::Coord l = read_coord ();
     db::Coord b = read_coord ();
@@ -381,7 +394,7 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n, Layers &
     Brace br (this);
 
     read_word_or_quoted (lname);
-    unsigned int lid = l2n->layer_of (layers.layer (lname));
+    unsigned int lid = l2n->layer_of (mp_layers->layer (lname));
 
     std::vector<db::Point> pt;
 
@@ -403,7 +416,7 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n, Layers &
 }
 
 void
-LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit, Layers &layers)
+LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit)
 {
   Brace br (this);
 
@@ -421,7 +434,7 @@ LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *
   db::Cell &cell = l2n->internal_layout ()->cell (circuit->cell_index ());
 
   while (br) {
-    std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n, layers);
+    std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n);
     lc.add (pr.second, pr.first);
     cell.shapes (pr.first).insert (pr.second);
   }
@@ -675,7 +688,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Ci
 }
 
 void
-LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceModel *dm, db::DeviceClass *dc, Layers &layers)
+LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceModel *dm, db::DeviceClass *dc)
 {
   Brace br (this);
 
@@ -707,7 +720,7 @@ LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n,
   db::Cell &cell = l2n->internal_layout ()->cell (dm->cell_index ());
 
   while (br) {
-    std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n, layers);
+    std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n);
     lc.add (pr.second, pr.first);
     cell.shapes (pr.first).insert (pr.second);
   }

@@ -89,13 +89,13 @@ TEST(1_ReaderBasic)
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
     au = tl::combine_path (au, "algo");
-    au = tl::combine_path (au, "l2n_writer_au.gds");
+    au = tl::combine_path (au, "l2n_reader_au.gds");
 
     db::compare_layouts (_this, ly2, au);
   }
 }
 
-TEST(2_ReaderBasicShort)
+TEST(1b_ReaderBasicShort)
 {
   db::Layout ly;
 
@@ -129,3 +129,71 @@ TEST(2_ReaderBasicShort)
   }
 
 }
+
+TEST(2_ReaderWithGlobalNets)
+{
+  db::Layout ly;
+
+  db::Cell &tc = ly.cell (ly.add_cell ("TOP"));
+  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
+
+  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_2.txt");
+  tl::InputStream is_in (in_path);
+
+  db::LayoutToNetlistStandardReader reader (is_in);
+  reader.read (&l2n);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp_l2nreader_2.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, false);
+    writer.write (&l2n);
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_2.txt");
+
+  tl::InputStream is (path);
+  tl::InputStream is_au (au_path);
+
+  if (is.read_all () != is_au.read_all ()) {
+    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
+                               tl::absolute_file_path (path),
+                               tl::absolute_file_path (au_path)));
+  }
+
+  //  test build_all_nets from read l2n
+
+  {
+    db::Layout ly2;
+    ly2.dbu (ly.dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = reader.layer_by_name ("psd");
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = reader.layer_by_name ("nsd");
+    lmap [ly2.insert_layer (db::LayerProperties (12, 0))] = reader.layer_by_name ("rbulk");
+    lmap [ly2.insert_layer (db::LayerProperties (13, 0))] = reader.layer_by_name ("ptie");
+    lmap [ly2.insert_layer (db::LayerProperties (14, 0))] = reader.layer_by_name ("ntie");
+    lmap [ly2.insert_layer (db::LayerProperties (1, 0)) ] = reader.layer_by_name ("nwell");
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = reader.layer_by_name ("poly");
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = reader.layer_by_name ("diff_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = reader.layer_by_name ("poly_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = reader.layer_by_name ("metal1");
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = reader.layer_by_name ("via1");
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = reader.layer_by_name ("metal2");
+
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", "CIRCUIT_", "DEVICE_");
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "l2n_reader_au_2.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+}
+

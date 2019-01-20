@@ -429,7 +429,7 @@ TEST(2_WriterWithGlobalNets)
     }
   }
 
-  //  test build_all_nets
+  //  test build_all_nets as reference for the reader
 
   {
     db::Layout ly2;

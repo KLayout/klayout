@@ -46,6 +46,7 @@ public:
   DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics = true, double area_ratio = 3.0, size_t max_vertex_count = 16);
 
   DeepRegion (const DeepRegion &other);
+  DeepRegion (const DeepLayer &dl);
 
   virtual ~DeepRegion ();
 
@@ -94,10 +95,9 @@ protected:
 
 private:
   DeepRegion &operator= (const DeepRegion &other);
-  DeepRegion (const DeepLayer &dl);
 
   DeepLayer m_deep_layer;
-  //  @@@ have hierarchical merged polygons later
+  //  TODO: have hierarchical merged polygons later
   mutable db::Shapes m_merged_polygons;
   mutable bool m_merged_polygons_valid;
 

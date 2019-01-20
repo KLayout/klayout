@@ -36,13 +36,22 @@ static HierarchyBuilderShapeInserter def_inserter;
 int
 compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIterator &iter1, const db::RecursiveShapeIterator &iter2)
 {
+  if ((iter1.layout () == 0) != (iter2.layout () == 0)) {
+    return (iter1.layout () == 0) < (iter2.layout () == 0);
+  }
+  if ((iter1.top_cell () == 0) != (iter2.top_cell () == 0)) {
+    return (iter1.top_cell () == 0) < (iter2.top_cell () == 0);
+  }
+
   //  basic source (layout, top_cell) needs to be the same of course
   if (iter1.layout () != iter2.layout ()) {
     //  NOTE: pointer compare :-(
     return iter1.layout () < iter2.layout () ? -1 : 1;
   }
-  if (iter1.top_cell ()->cell_index () != iter2.top_cell ()->cell_index ()) {
-    return iter1.top_cell ()->cell_index () < iter2.top_cell ()->cell_index () ? -1 : 1;
+  if (iter1.top_cell ()) {
+    if (iter1.top_cell ()->cell_index () != iter2.top_cell ()->cell_index ()) {
+      return iter1.top_cell ()->cell_index () < iter2.top_cell ()->cell_index () ? -1 : 1;
+    }
   }
 
   //  max depth controls the main hierarchical appearance
@@ -51,10 +60,11 @@ compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIter
   }
 
   //  if a region is set, the hierarchical appearance is the same only if the layers and
-  //  complex region are indentical
+  //  complex region are identical
   if ((iter1.region () == db::Box::world ()) != (iter2.region () == db::Box::world ())) {
     return (iter1.region () == db::Box::world ()) < (iter2.region () == db::Box::world ()) ? -1 : 1;
   }
+
   if (iter1.region () != db::Box::world ()) {
     if (iter1.has_complex_region () != iter2.has_complex_region ()) {
       return iter1.has_complex_region () < iter2.has_complex_region () ? -1 : 1;
@@ -174,30 +184,36 @@ HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
   m_cell_stack.clear ();
   m_cells_seen.clear ();
 
+  if (! iter->layout () || ! iter->top_cell ()) {
+    return;
+  }
+
   std::pair<db::cell_index_type, std::set<db::Box> > key (iter->top_cell ()->cell_index (), std::set<db::Box> ());
   m_cm_entry = m_cell_map.find (key);
-  m_cm_new_entry = false;
 
   if (m_cm_entry == m_cell_map.end ()) {
     db::cell_index_type new_top_index = mp_target->add_cell (iter->layout ()->cell_name (key.first));
     m_cm_entry = m_cell_map.insert (std::make_pair (key, new_top_index)).first;
-    m_cm_new_entry = true;
   }
 
   db::Cell &new_top = mp_target->cell (m_cm_entry->second);
   m_cells_seen.insert (key);
 
+  //  NOTE: we consider the top cell "new" if it does not have instances.
+  //  We can do so as the recursive shape iterator will always deliver all instances
+  //  and not a partial set of instances.
+  m_cm_new_entry = new_top.begin ().at_end ();
   m_cell_stack.push_back (std::make_pair (m_cm_new_entry, &new_top));
 }
 
 void
-HierarchyBuilder::end (const RecursiveShapeIterator * /*iter*/)
+HierarchyBuilder::end (const RecursiveShapeIterator *iter)
 {
-  tl_assert (m_cell_stack.size () == 1);
+  tl_assert (! iter->layout () || ! iter->top_cell () || m_cell_stack.size () == 1);
 
   m_initial_pass = false;
   m_cells_seen.clear ();
-  mp_initial_cell = m_cell_stack.front ().second;
+  mp_initial_cell = m_cell_stack.empty () ? 0 : m_cell_stack.front ().second;
   m_cell_stack.clear ();
   m_cm_entry = cell_map_type::const_iterator ();
   m_cm_new_entry = false;

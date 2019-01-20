@@ -61,7 +61,7 @@ class DBLayoutToNetlist_TestClass < TestBase
       assert_equal(l2n.internal_layout.cell(ci).name, ly2.cell(cm.cell_mapping(ci)).name)
     end
 
-    rmetal1 = l2n.make_polygon_layer( ly.layer(6, 0) )
+    rmetal1 = l2n.make_polygon_layer( ly.layer(6, 0), "metal1" )
     bulk_id = l2n.connect_global(rmetal1, "BULK")
     assert_equal(l2n.global_net_name(bulk_id), "BULK")
 
@@ -76,11 +76,11 @@ class DBLayoutToNetlist_TestClass < TestBase
 
     # only plain backend connectivity
 
-    rmetal1     = l2n.make_polygon_layer( ly.layer(6, 0) )
-    rmetal1_lbl = l2n.make_text_layer(    ly.layer(6, 1) )
-    rvia1       = l2n.make_polygon_layer( ly.layer(7, 0) )
-    rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0) )
-    rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1) )
+    rmetal1     = l2n.make_polygon_layer( ly.layer(6, 0), "metal1" )
+    rmetal1_lbl = l2n.make_text_layer(    ly.layer(6, 1), "metal1_lbl" )
+    rvia1       = l2n.make_polygon_layer( ly.layer(7, 0), "via1" )
+    rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0), "metal2" )
+    rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1), "metal2_lbl" )
     
     # Intra-layer
     l2n.connect(rmetal1)
@@ -141,18 +141,20 @@ END
 
     # only plain connectivity
 
-    ractive     = l2n.make_layer(         ly.layer(2, 0) )
-    rpoly       = l2n.make_polygon_layer( ly.layer(3, 0) )
-    rpoly_lbl   = l2n.make_text_layer(    ly.layer(3, 1) )
-    rdiff_cont  = l2n.make_polygon_layer( ly.layer(4, 0) )
-    rpoly_cont  = l2n.make_polygon_layer( ly.layer(5, 0) )
-    rmetal1     = l2n.make_polygon_layer( ly.layer(6, 0) )
-    rmetal1_lbl = l2n.make_text_layer(    ly.layer(6, 1) )
-    rvia1       = l2n.make_polygon_layer( ly.layer(7, 0) )
-    rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0) )
-    rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1) )
+    ractive     = l2n.make_layer(         ly.layer(2, 0), "active" )
+    rpoly       = l2n.make_polygon_layer( ly.layer(3, 0), "poly" )
+    rpoly_lbl   = l2n.make_text_layer(    ly.layer(3, 1), "poly_lbl" )
+    rdiff_cont  = l2n.make_polygon_layer( ly.layer(4, 0), "diff_cont" )
+    rpoly_cont  = l2n.make_polygon_layer( ly.layer(5, 0), "poly_cont" )
+    rmetal1     = l2n.make_polygon_layer( ly.layer(6, 0), "metal1" )
+    rmetal1_lbl = l2n.make_text_layer(    ly.layer(6, 1), "metal1_lbl" )
+    rvia1       = l2n.make_polygon_layer( ly.layer(7, 0), "via1" )
+    rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0), "metal2" )
+    rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1), "metal2_lbl" )
     
     rsd         = ractive - rpoly
+
+    l2n.register(rsd, "sd")
 
     # Intra-layer
     l2n.connect(rsd)
@@ -206,17 +208,17 @@ END
 
     l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))
 
-    rnwell      = l2n.make_layer(         ly.layer(1, 0) )
-    ractive     = l2n.make_layer(         ly.layer(2, 0) )
-    rpoly       = l2n.make_polygon_layer( ly.layer(3, 0) )
-    rpoly_lbl   = l2n.make_text_layer(    ly.layer(3, 1) )
-    rdiff_cont  = l2n.make_polygon_layer( ly.layer(4, 0) )
-    rpoly_cont  = l2n.make_polygon_layer( ly.layer(5, 0) )
-    rmetal1     = l2n.make_polygon_layer( ly.layer(6, 0) )
-    rmetal1_lbl = l2n.make_text_layer(    ly.layer(6, 1) )
-    rvia1       = l2n.make_polygon_layer( ly.layer(7, 0) )
-    rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0) )
-    rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1) )
+    rnwell      = l2n.make_layer(         ly.layer(1, 0), "nwell" )
+    ractive     = l2n.make_layer(         ly.layer(2, 0), "active" )
+    rpoly       = l2n.make_polygon_layer( ly.layer(3, 0), "poly" )
+    rpoly_lbl   = l2n.make_text_layer(    ly.layer(3, 1), "poly_lbl" )
+    rdiff_cont  = l2n.make_polygon_layer( ly.layer(4, 0), "diff_cont" )
+    rpoly_cont  = l2n.make_polygon_layer( ly.layer(5, 0), "poly_cont" )
+    rmetal1     = l2n.make_polygon_layer( ly.layer(6, 0), "metal1" )
+    rmetal1_lbl = l2n.make_text_layer(    ly.layer(6, 1), "metal1_lbl" )
+    rvia1       = l2n.make_polygon_layer( ly.layer(7, 0), "via1" )
+    rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0), "metal2" )
+    rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1), "metal2_lbl" )
 
     rpactive    = ractive & rnwell
     rpgate      = rpactive & rpoly
@@ -235,6 +237,9 @@ END
     l2n.extract_devices(nmos_ex, { "SD" => rnsd, "G" => rngate, "P" => rpoly })
 
     # Define connectivity for netlist extraction
+
+    l2n.register(rpsd, "psd")
+    l2n.register(rnsd, "nsd")
 
     # Intra-layer
     l2n.connect(rpsd)
@@ -297,20 +302,20 @@ END
 
     l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))
 
-    rbulk       = l2n.make_polygon_layer( ly.layer       )
-    rnwell      = l2n.make_polygon_layer( ly.layer(1, 0) )
-    ractive     = l2n.make_polygon_layer( ly.layer(2, 0) )
-    rpoly       = l2n.make_polygon_layer( ly.layer(3, 0) )
-    rpoly_lbl   = l2n.make_text_layer(    ly.layer(3, 1) )
-    rdiff_cont  = l2n.make_polygon_layer( ly.layer(4, 0) )
-    rpoly_cont  = l2n.make_polygon_layer( ly.layer(5, 0) )
-    rmetal1     = l2n.make_polygon_layer( ly.layer(6, 0) )
-    rmetal1_lbl = l2n.make_text_layer(    ly.layer(6, 1) )
-    rvia1       = l2n.make_polygon_layer( ly.layer(7, 0) )
-    rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0) )
-    rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1) )
-    rpplus      = l2n.make_polygon_layer( ly.layer(10, 0) )
-    rnplus      = l2n.make_polygon_layer( ly.layer(11, 0) )
+    rbulk       = l2n.make_layer(                           "bulk" )
+    rnwell      = l2n.make_polygon_layer( ly.layer(1, 0)  , "nwell" )
+    ractive     = l2n.make_polygon_layer( ly.layer(2, 0)  , "active" )
+    rpoly       = l2n.make_polygon_layer( ly.layer(3, 0)  , "poly" )
+    rpoly_lbl   = l2n.make_text_layer(    ly.layer(3, 1)  , "poly_lbl" )
+    rdiff_cont  = l2n.make_polygon_layer( ly.layer(4, 0)  , "diff_cont" )
+    rpoly_cont  = l2n.make_polygon_layer( ly.layer(5, 0)  , "poly_cont" )
+    rmetal1     = l2n.make_polygon_layer( ly.layer(6, 0)  , "metal1" )
+    rmetal1_lbl = l2n.make_text_layer(    ly.layer(6, 1)  , "metal1_lbl" )
+    rvia1       = l2n.make_polygon_layer( ly.layer(7, 0)  , "via1" )
+    rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0)  , "metal2" )
+    rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1)  , "metal2_lbl" )
+    rpplus      = l2n.make_polygon_layer( ly.layer(10, 0) , "pplus" )
+    rnplus      = l2n.make_polygon_layer( ly.layer(11, 0) , "nplus" )
 
     ractive_in_nwell = ractive & rnwell
     rpactive    = ractive_in_nwell & rpplus
@@ -333,6 +338,11 @@ END
     l2n.extract_devices(nmos_ex, { "SD" => rnsd, "G" => rngate, "P" => rpoly, "W" => rbulk })
 
     # Define connectivity for netlist extraction
+
+    l2n.register(rpsd, "psd")
+    l2n.register(rnsd, "nsd")
+    l2n.register(rptie, "ptie")
+    l2n.register(rntie, "ntie")
 
     # Intra-layer
     l2n.connect(rpsd)
@@ -414,6 +424,24 @@ END
 
     # cleanup now
     l2n._destroy
+
+  end
+
+  def test_13_ReadAndWrite
+
+    l2n = RBA::LayoutToNetlist::new
+
+    input = File.join($ut_testsrc, "testdata", "algo", "l2n_writer_au.txt")
+    l2n.read(input)
+
+    tmp = File::join($ut_testtmp, "tmp.txt")
+    l2n.write(tmp)
+
+    assert_equal(File.open(tmp, "r").read, File.open(input, "r").read)
+
+    assert_equal(l2n.layer_names.join(","), "poly,poly_lbl,diff_cont,poly_cont,metal1,metal1_lbl,via1,metal2,metal2_lbl,psd,nsd")
+    assert_equal(l2n.name(l2n.layer_by_name("metal1")), "metal1")
+    assert_equal(l2n.name(l2n.layer_by_index(l2n.layer_of(l2n.layer_by_name("metal1")))), "metal1")
 
   end
 

@@ -23,6 +23,7 @@
 #include "gsiDecl.h"
 #include "dbLayoutToNetlist.h"
 #include "dbLayoutToNetlistWriter.h"
+#include "dbLayoutToNetlistReader.h"
 #include "tlStream.h"
 
 namespace gsi
@@ -31,6 +32,11 @@ namespace gsi
 static db::LayoutToNetlist *make_l2n (const db::RecursiveShapeIterator &iter)
 {
   return new db::LayoutToNetlist (iter);
+}
+
+static db::LayoutToNetlist *make_l2n_default ()
+{
+  return new db::LayoutToNetlist ();
 }
 
 static db::Layout *l2n_internal_layout (db::LayoutToNetlist *l2n)
@@ -67,10 +73,31 @@ static void write_l2n (const db::LayoutToNetlist *l2n, const std::string &path, 
   writer.write (l2n);
 }
 
+static void read_l2n (db::LayoutToNetlist *l2n, const std::string &path)
+{
+  tl::InputStream stream (path);
+  db::LayoutToNetlistStandardReader reader (stream);
+  reader.read (l2n);
+}
+
+static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
+{
+  std::vector<std::string> ln;
+  for (db::LayoutToNetlist::layer_iterator l = l2n->begin_layers (); l != l2n->end_layers (); ++l) {
+    ln.push_back (l->second);
+  }
+  return ln;
+}
+
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::constructor ("new", &make_l2n, gsi::arg ("iter"),
-    "@brief The constructor\n"
-    "See the class description for details.\n"
+    "@brief Creates a new extractor connected to an original layout\n"
+    "This constructor will attach the extractor to an original layout through the "
+    "shape iterator.\n"
+  ) +
+  gsi::constructor ("new", &make_l2n_default,
+    "@brief Creates a new and empty extractor object\n"
+    "The main objective for this constructor is to create an object suitable for reading an annotated netlist.\n"
   ) +
   gsi::method ("threads=", &db::LayoutToNetlist::set_threads, gsi::arg ("n"),
     "@brief Sets the number of threads to use for operations which support multiple threads\n"
@@ -95,34 +122,65 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("max_vertex_count", &db::LayoutToNetlist::max_vertex_count,
     "See \\max_vertex_count= for details about this attribute."
   ) +
-  gsi::method ("name", &db::LayoutToNetlist::name, gsi::arg ("l"),
+  gsi::method ("name", (std::string (db::LayoutToNetlist::*) (const db::Region &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
+    "@brief Get the name of the given layer\n"
+  ) +
+  gsi::method ("name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
+    "@brief Get the name of the given layer (by index)\n"
+  ) +
+  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::Region &region, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),
     "@brief Names the given layer\n"
     "'l' must be a hierarchical region derived with \\make_layer, \\make_text_layer or \\make_polygon_layer or "
     "a region derived from those by boolean operations or other hierarchical operations.\n"
     "\n"
     "Naming a layer allows the system to indicate the layer in various contexts, i.e. "
-    "when writing the data to a file.\n"
+    "when writing the data to a file. Named layers are also persisted inside the LayoutToNetlist object. "
+    "They are not discarded when the Region object is destroyed. Only named layers can be put into "
+    "\\connect.\n"
   ) +
-  gsi::method ("make_layer", &db::LayoutToNetlist::make_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
+  gsi::method_ext ("layer_names", &l2n_layer_names,
+    "@brief Returns a list of names of the layer kept inside the LayoutToNetlist object."
+  ) +
+  gsi::factory ("layer_by_name", &db::LayoutToNetlist::layer_by_name, gsi::arg ("name"),
+    "@brief Gets a layer object for the given name.\n"
+    "The returned object is a copy which represents the named layer."
+  ) +
+  gsi::factory ("layer_by_index", &db::LayoutToNetlist::layer_by_index, gsi::arg ("index"),
+    "@brief Gets a layer object for the given index.\n"
+    "Only named layers can be retrieved with this method. "
+    "The returned object is a copy which represents the named layer."
+  ) +
+  gsi::method ("is_persisted?", &db::LayoutToNetlist::is_persisted, gsi::arg ("layer"),
+    "@brief Returns true, if the given layer is a persisted region.\n"
+    "Persisted layers are kept inside the LayoutToNetlist object and are not released "
+    "if their object is destroyed. Named layers are persisted, unnamed layers are not. "
+    "Only persisted, named layers can be put into \\connect."
+  ) +
+  gsi::factory ("make_layer", (db::Region *(db::LayoutToNetlist::*) (const std::string &)) &db::LayoutToNetlist::make_layer, gsi::arg ("name", std::string ()),
+    "@brief Creates a new, empty hierarchical region\n"
+    "\n"
+    "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
+  ) +
+  gsi::factory ("make_layer", (db::Region *(db::LayoutToNetlist::*) (unsigned int, const std::string &)) &db::LayoutToNetlist::make_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
     "@brief Creates a new hierarchical region representing an original layer\n"
     "'layer_index' is the layer index of the desired layer in the original layout.\n"
     "This variant produces polygons and takes texts for net name annotation.\n"
     "A variant not taking texts is \\make_polygon_layer. A Variant only taking\n"
     "texts is \\make_text_layer.\n"
     "\n"
-    "The name is optional. If given, the layer will already be named accordingly (see \\name).\n"
+    "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
   ) +
-  gsi::method ("make_text_layer", &db::LayoutToNetlist::make_text_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
+  gsi::factory ("make_text_layer", &db::LayoutToNetlist::make_text_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
     "@brief Creates a new region representing an original layer taking texts only\n"
     "See \\make_layer for details.\n"
     "\n"
-    "The name is optional. If given, the layer will already be named accordingly (see \\name).\n"
+    "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
   ) +
-  gsi::method ("make_polygon_layer", &db::LayoutToNetlist::make_polygon_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
+  gsi::factory ("make_polygon_layer", &db::LayoutToNetlist::make_polygon_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
     "@brief Creates a new region representing an original layer taking polygons and texts\n"
     "See \\make_layer for details.\n"
     "\n"
-    "The name is optional. If given, the layer will already be named accordingly (see \\name).\n"
+    "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
   ) +
   gsi::method ("extract_devices", &db::LayoutToNetlist::extract_devices, gsi::arg ("extractor"), gsi::arg ("layers"),
     "@brief Extracts devices\n"
@@ -279,6 +337,10 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   ) +
   gsi::method_ext ("write", &write_l2n, gsi::arg ("path"), gsi::arg ("short_format", false),
     "@brief Writes the extracted netlist to a file.\n"
+    "This method employs the native format of KLayout.\n"
+  ) +
+  gsi::method_ext ("read", &read_l2n, gsi::arg ("path"),
+    "@brief Reads the extracted netlist from the file.\n"
     "This method employs the native format of KLayout.\n"
   ),
   "@brief A generic framework for extracting netlists from layouts\n"

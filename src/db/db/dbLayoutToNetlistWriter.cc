@@ -63,14 +63,13 @@ std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream)
   //  .. nothing yet ..
 }
 
-static std::string name_for_layer (const db::Layout *layout, unsigned int l)
+static std::string name_for_layer (const db::LayoutToNetlist *l2n, unsigned int l)
 {
-  const db::LayerProperties &lp = layout->get_properties (l);
-  if (lp.is_named ()) {
-    return tl::to_word_or_quoted_string (lp.name);
-  } else {
-    return "L" + tl::to_string (l);
+  std::string n = l2n->name (l);
+  if (n.empty ()) {
+    n = "L" + tl::to_string (l);
   }
+  return n;
 }
 
 template <class Keys>
@@ -104,7 +103,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
     *mp_stream << endl << "# Mask layers" << endl;
   }
   for (db::Connectivity::layer_iterator l = l2n->connectivity ().begin_layers (); l != l2n->connectivity ().end_layers (); ++l) {
-    *mp_stream << Keys::layer_key << "(" << name_for_layer (ly, *l) << ")" << endl;
+    *mp_stream << Keys::layer_key << "(" << name_for_layer (l2n, *l) << ")" << endl;
   }
 
   if (! Keys::is_short ()) {
@@ -115,9 +114,9 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
     db::Connectivity::layer_iterator ce = l2n->connectivity ().end_connected (*l);
     db::Connectivity::layer_iterator cb = l2n->connectivity ().begin_connected (*l);
     if (cb != ce) {
-      *mp_stream << Keys::connect_key << "(" << name_for_layer (ly, *l);
+      *mp_stream << Keys::connect_key << "(" << name_for_layer (l2n, *l);
       for (db::Connectivity::layer_iterator c = l2n->connectivity ().begin_connected (*l); c != ce; ++c) {
-        *mp_stream << " " << name_for_layer (ly, *c);
+        *mp_stream << " " << name_for_layer (l2n, *c);
       }
       *mp_stream << ")" << endl;
     }
@@ -136,7 +135,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
         }
         any = true;
       }
-      *mp_stream << Keys::global_key << "(" << name_for_layer (ly, *l);
+      *mp_stream << Keys::global_key << "(" << name_for_layer (l2n, *l);
       for (db::Connectivity::global_nets_iterator g = gb; g != ge; ++g) {
         *mp_stream << " " << tl::to_word_or_quoted_string (l2n->connectivity ().global_net_name (*g));
       }
@@ -260,7 +259,6 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
     throw tl::Exception (tl::to_string (tr ("Can't write annotated netlist before extraction has been done")));
   }
 
-  const db::Layout *ly = l2n->internal_layout ();
   const db::hier_clusters<db::PolygonRef> &clusters = l2n->net_clusters ();
   const db::Circuit *circuit = net.circuit ();
   const db::Connectivity &conn = l2n->connectivity ();
@@ -290,7 +288,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
         }
 
         *mp_stream << indent2;
-        write (si.operator-> (), si.trans (), name_for_layer (ly, *l));
+        write (si.operator-> (), si.trans (), name_for_layer (l2n, *l));
         *mp_stream << endl;
 
         prev_ci = ci;
@@ -365,7 +363,6 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
 {
   const std::vector<db::DeviceTerminalDefinition> &td = device_model.device_class ()->terminal_definitions ();
 
-  const db::Layout *ly = l2n->internal_layout ();
   const db::hier_clusters<db::PolygonRef> &clusters = l2n->net_clusters ();
   const db::Connectivity &conn = l2n->connectivity ();
 
@@ -379,7 +376,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
       for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
 
         *mp_stream << indent2;
-        write (s.operator-> (), db::ICplxTrans (), name_for_layer (ly, *l));
+        write (s.operator-> (), db::ICplxTrans (), name_for_layer (l2n, *l));
         *mp_stream << endl;
 
       }

@@ -90,16 +90,16 @@ TEST(1_WriterBasic)
   db::Region rpactive = *ractive & *rnwell;
   db::Region rpgate   = rpactive & *rpoly;
   db::Region rpsd     = rpactive - rpgate;
-  l2n.name (rpactive, "pactive");
-  l2n.name (rpgate,   "pgate");
-  l2n.name (rpsd,     "psd");
+  l2n.register_layer (rpactive, "pactive");
+  l2n.register_layer (rpgate,   "pgate");
+  l2n.register_layer (rpsd,     "psd");
 
   db::Region rnactive = *ractive - *rnwell;
   db::Region rngate   = rnactive & *rpoly;
   db::Region rnsd     = rnactive - rngate;
-  l2n.name (rnactive, "nactive");
-  l2n.name (rngate,   "ngate");
-  l2n.name (rnsd,     "nsd");
+  l2n.register_layer (rnactive, "nactive");
+  l2n.register_layer (rngate,   "ngate");
+  l2n.register_layer (rnsd,     "nsd");
 
   db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
@@ -296,20 +296,20 @@ TEST(2_WriterWithGlobalNets)
   db::Region rntie    = ractive_in_nwell & *rnplus;
   db::Region rpgate   = rpactive & *rpoly;
   db::Region rpsd     = rpactive - rpgate;
-  l2n.name (rpactive, "pactive");
-  l2n.name (rntie,    "ntie");
-  l2n.name (rpgate,   "pgate");
-  l2n.name (rpsd,     "psd");
+  l2n.register_layer (rpactive, "pactive");
+  l2n.register_layer (rntie,    "ntie");
+  l2n.register_layer (rpgate,   "pgate");
+  l2n.register_layer (rpsd,     "psd");
 
   db::Region ractive_outside_nwell = *ractive - *rnwell;
   db::Region rnactive = ractive_outside_nwell & *rnplus;
   db::Region rptie    = ractive_outside_nwell & *rpplus;
   db::Region rngate   = rnactive & *rpoly;
   db::Region rnsd     = rnactive - rngate;
-  l2n.name (rnactive, "nactive");
-  l2n.name (rptie,    "ptie");
-  l2n.name (rngate,   "ngate");
-  l2n.name (rnsd,     "nsd");
+  l2n.register_layer (rnactive, "nactive");
+  l2n.register_layer (rptie,    "ptie");
+  l2n.register_layer (rngate,   "ngate");
+  l2n.register_layer (rnsd,     "nsd");
 
   //  return the computed layers into the original layout and write it for debugging purposes
 

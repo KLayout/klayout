@@ -73,12 +73,19 @@ class DB_PUBLIC LayoutToNetlist
   : public gsi::ObjectBase, public tl::Object
 {
 public:
+  typedef std::map<unsigned int, std::string>::const_iterator layer_iterator;
+
   /**
    *  @brief The constructor
    *
    *  See the class description for details.
    */
   LayoutToNetlist (const db::RecursiveShapeIterator &iter);
+
+  /**
+   *  @brief The default constructor
+   */
+  LayoutToNetlist ();
 
   /**
    *  @brief Sets the number of threads to use for operations which support multiple threads
@@ -115,28 +122,74 @@ public:
   size_t max_vertex_count () const;
 
   /**
-   *  @brief Names a layer
+   *  @brief Register a layer under the given name
    *  This is a formal name for the layer. Using a name or layer properties
    *  (see below) enhances readability of backannotated information
-   *  if layers are involved. Use this method or the other variants to
-   *  attach a name or standard layer properties to a region delivered
-   *  by "make_layer" or derived from other regions through boolean
-   *  operations.
+   *  if layers are involved. Use this method to attach a name to a region
+   *  derived by boolean operations for example.
+   *  Named regions are persisted inside the LayoutToNetlist object. Only
+   *  named regions can be put into "connect".
    */
-  void name (const db::Region &region, const std::string &name);
+  void register_layer (const db::Region &region, const std::string &name);
 
   /**
-   *  @brief Gets the name of the given layer
+   *  @brief Gets the name of the given region
+   *  Returns an empty string if the region does not have a name.
    */
-  std::string name (const db::Region &region) const
+  std::string name (const db::Region &region) const;
+
+  /**
+   *  @brief Gets the name of the given layer by index
+   *  Returns an empty string if the layer does not have a name.
+   */
+  std::string name (unsigned int) const;
+
+  /**
+   *  @brief Returns true, if the region is a persisted region
+   *  Persisted regions have a name and are kept inside the LayoutToNetlist
+   *  object.
+   */
+  bool is_persisted (const db::Region &region) const;
+
+  /**
+   *  @brief Gets the region (layer) with the given name
+   *  If the name is not valid, this method returns 0. Otherwise it
+   *  will return a new'd Region object referencing the layer with
+   *  the given name. It must be deleted by the caller.
+   */
+  db::Region *layer_by_name (const std::string &name);
+
+  /**
+   *  @brief Gets the region (layer) by index
+   *  If the index is not valid, this method returns 0. Otherwise it
+   *  will return a new'd Region object referencing the layer with
+   *  the given name. It must be deleted by the caller.
+   *  Only named layers are managed by LayoutToNetlist and can
+   *  be retrieved with this method.
+   */
+  db::Region *layer_by_index (unsigned int index);
+
+  /**
+   *  @brief Iterates over the layer indexes and names managed by this object (begin)
+   */
+  layer_iterator begin_layers () const
   {
-    return internal_layout ()->get_properties (layer_of (region)).name;
+    return m_name_of_layer.begin ();
+  }
+
+  /**
+   *  @brief Iterates over the layer indexes and names managed by this object (end)
+   */
+  layer_iterator end_layers () const
+  {
+    return m_name_of_layer.end ();
   }
 
   /**
    *  @brief Creates a new empty region
+   *  This method returns a new'd object which must be deleted by the caller.
    */
-  db::Region *make_layer (const std::string &n);
+  db::Region *make_layer (const std::string &name = std::string ());
 
   /**
    *  @brief Creates a new region representing an original layer
@@ -144,6 +197,11 @@ public:
    *  This variant produces polygons and takes texts for net name annotation.
    *  A variant not taking texts is "make_polygon_layer". A Variant only taking
    *  texts is "make_text_layer".
+   *  All variants return a new'd object which must be deleted by the caller.
+   *  Named regions are considered "precious". The LayoutToNetlist object will
+   *  keep a reference on all named layers, so they persist during the lifetime
+   *  of the LayoutToNetlist object.
+   *  Only named layers can be used for connect (see below).
    */
   db::Region *make_layer (unsigned int layer_index, const std::string &name = std::string ());
 
@@ -179,18 +237,21 @@ public:
    *  a derived layer. Certain limitations apply. It's safe to use
    *  boolean operations for deriving layers. Other operations are applicable as long as they are
    *  capable of delivering hierarchical layers.
+   *  Regions put into "connect" need to be named.
    */
   void connect (const db::Region &l);
 
   /**
    *  @brief Defines an inter-layer connection for the given layers.
    *  The conditions mentioned with intra-layer "connect" apply for this method too.
+   *  Regions put into "connect" need to be named.
    */
   void connect (const db::Region &a, const db::Region &b);
 
   /**
    *  @brief Connects the given layer with a global net with the given name
    *  Returns the global net ID
+   *  Regions put into "connect" need to be named.
    */
   size_t connect_global (const db::Region &l, const std::string &gn);
 
@@ -236,6 +297,11 @@ public:
    *  @brief Gets the internal top cell (non-const version)
    */
   db::Cell *internal_top_cell ();
+
+  /**
+   *  @brief Ensures the internal layout is made
+   */
+  void ensure_internal_layout ();
 
   /**
    *  @brief Gets the connectivity object
@@ -406,8 +472,12 @@ private:
   db::hier_clusters<db::PolygonRef> m_net_clusters;
   std::auto_ptr<db::Netlist> mp_netlist;
   std::set<db::DeepLayer> m_dlrefs;
+  std::map<std::string, db::DeepLayer> m_named_regions;
+  std::map<unsigned int, std::string> m_name_of_layer;
   bool m_netlist_extracted;
+  db::DeepLayer m_dummy_layer;
 
+  void init ();
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
   void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
   void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;

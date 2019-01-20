@@ -36,6 +36,7 @@ static bool is_deep (const db::Region &r)
 }
 
 //  the iterator provides the hierarchical selection (enabling/disabling cells etc.)
+
 LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
   : m_iter (iter), m_netlist_extracted (false)
 {
@@ -44,6 +45,17 @@ LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
     throw tl::Exception (tl::to_string (tr ("The netlist extractor cannot work on clipped layouts")));
   }
 
+  init ();
+}
+
+LayoutToNetlist::LayoutToNetlist ()
+  : m_iter (), m_netlist_extracted (false)
+{
+  init ();
+}
+
+void LayoutToNetlist::init ()
+{
   m_dss.set_text_enlargement (1);
   m_dss.set_text_property_name (tl::Variant ("LABEL"));
 }
@@ -83,11 +95,11 @@ db::Region *LayoutToNetlist::make_layer (const std::string &n)
   db::RecursiveShapeIterator si (m_iter);
   si.shape_flags (db::ShapeIterator::Nothing);
 
-  db::Region *region = new db::Region (si, m_dss);
+  std::auto_ptr <db::Region> region (new db::Region (si, m_dss));
   if (! n.empty ()) {
-    name (*region, n);
+    register_layer (*region, n);
   }
-  return region;
+  return region.release ();
 }
 
 db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::string &n)
@@ -96,11 +108,11 @@ db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::st
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::All);
 
-  db::Region *region = new db::Region (si, m_dss);
+  std::auto_ptr <db::Region> region (new db::Region (si, m_dss));
   if (! n.empty ()) {
-    name (*region, n);
+    register_layer (*region, n);
   }
-  return region;
+  return region.release ();
 }
 
 db::Region *LayoutToNetlist::make_text_layer (unsigned int layer_index, const std::string &n)
@@ -109,11 +121,11 @@ db::Region *LayoutToNetlist::make_text_layer (unsigned int layer_index, const st
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::Texts);
 
-  db::Region *region = new db::Region (si, m_dss);
+  std::auto_ptr <db::Region> region (new db::Region (si, m_dss));
   if (! n.empty ()) {
-    name (*region, n);
+    register_layer (*region, n);
   }
-  return region;
+  return region.release ();
 }
 
 db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const std::string &n)
@@ -122,11 +134,11 @@ db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::Paths | db::ShapeIterator::Polygons | db::ShapeIterator::Boxes);
 
-  db::Region *region = new db::Region (si, m_dss);
+  std::auto_ptr <db::Region> region (new db::Region (si, m_dss));
   if (! n.empty ()) {
-    name (*region, n);
+    register_layer (*region, n);
   }
-  return region;
+  return region.release ();
 }
 
 void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::Region *> &layers)
@@ -148,6 +160,9 @@ void LayoutToNetlist::connect (const db::Region &l)
   if (! is_deep (l)) {
     throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in intra-layer connectivity for netlist extraction"))));
   }
+  if (! is_persisted (l)) {
+    throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in intra-layer connectivity for netlist extraction"))));
+  }
 
   //  we need to keep a reference, so we can safely delete the region
   db::DeepLayer dl (l);
@@ -167,6 +182,12 @@ void LayoutToNetlist::connect (const db::Region &a, const db::Region &b)
   if (! is_deep (b)) {
     throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in inter-layer connectivity (second layer) for netlist extraction"))));
   }
+  if (! is_persisted (a)) {
+    throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in inter-layer connectivity (first layer) for netlist extraction"))));
+  }
+  if (! is_persisted (b)) {
+    throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in inter-layer connectivity (second layer) for netlist extraction"))));
+  }
 
   //  we need to keep a reference, so we can safely delete the region
   db::DeepLayer dla (a), dlb (b);
@@ -182,7 +203,10 @@ size_t LayoutToNetlist::connect_global (const db::Region &l, const std::string &
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
   if (! is_deep (l)) {
-    throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in intra-layer connectivity for netlist extraction"))));
+    throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in global connectivity for netlist extraction"))));
+  }
+  if (! is_persisted (l)) {
+    throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in global connectivity for netlist extraction"))));
   }
 
   //  we need to keep a reference, so we can safely delete the region
@@ -232,6 +256,14 @@ const db::Cell *LayoutToNetlist::internal_top_cell () const
   return &m_dss.const_initial_cell ();
 }
 
+void LayoutToNetlist::ensure_internal_layout ()
+{
+  if (m_dss.layouts () == 0) {
+    //  the dummy layer acts as a reference holder for the layout
+    m_dummy_layer = m_dss.create_polygon_layer (db::RecursiveShapeIterator ());
+  }
+}
+
 db::Layout *LayoutToNetlist::internal_layout ()
 {
   return &m_dss.layout ();
@@ -242,13 +274,69 @@ db::Cell *LayoutToNetlist::internal_top_cell ()
   return &m_dss.initial_cell ();
 }
 
-void LayoutToNetlist::name (const db::Region &region, const std::string &name)
+void LayoutToNetlist::register_layer (const db::Region &region, const std::string &n)
 {
-  unsigned int li = layer_of (region);
-  db::Layout &ly = m_dss.layout ();
-  db::LayerProperties lp = ly.get_properties (li);
-  lp.name = name;
-  ly.set_properties (li, lp);
+  if (m_named_regions.find (n) != m_named_regions.end ()) {
+    throw tl::Exception (tl::to_string (tr ("Layer name is already used: ")) + n);
+  }
+
+  db::DeepRegion *delegate = dynamic_cast<db::DeepRegion *> (region.delegate());
+  if (! delegate) {
+    throw tl::Exception (tl::to_string (tr ("Layer is not a deep region")));
+  }
+
+  if (is_persisted (region)) {
+    std::string prev_name = name (region);
+    m_named_regions.erase (prev_name);
+  }
+
+  m_named_regions [n] = delegate->deep_layer ();
+  m_name_of_layer [layer_of (region)] = n;
+}
+
+std::string LayoutToNetlist::name (const db::Region &region) const
+{
+  std::map<unsigned int, std::string>::const_iterator n = m_name_of_layer.find (layer_of (region));
+  if (n != m_name_of_layer.end ()) {
+    return n->second;
+  } else {
+    return std::string ();
+  }
+}
+
+std::string LayoutToNetlist::name (unsigned int l) const
+{
+  std::map<unsigned int, std::string>::const_iterator n = m_name_of_layer.find (l);
+  if (n != m_name_of_layer.end ()) {
+    return n->second;
+  } else {
+    return std::string ();
+  }
+}
+
+bool LayoutToNetlist::is_persisted (const db::Region &region) const
+{
+  return m_name_of_layer.find (layer_of (region)) != m_name_of_layer.end ();
+}
+
+db::Region *LayoutToNetlist::layer_by_name (const std::string &name)
+{
+  std::map<std::string, db::DeepLayer>::const_iterator l = m_named_regions.find (name);
+  if (l == m_named_regions.end ()) {
+    return 0;
+  } else {
+    return new db::Region (new db::DeepRegion (l->second));
+  }
+}
+
+db::Region *LayoutToNetlist::layer_by_index (unsigned int index)
+{
+  std::map<unsigned int, std::string>::const_iterator n = m_name_of_layer.find (index);
+  if (n == m_name_of_layer.end ()) {
+    return 0;
+  } else {
+    return layer_by_name (n->second);
+  }
 }
 
 unsigned int LayoutToNetlist::layer_of (const db::Region &region) const
@@ -433,8 +521,10 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
 
       bool consider_cell = any_connections;
       for (std::map<unsigned int, const db::Region *>::const_iterator l = lmap.begin (); l != lmap.end () && !consider_cell; ++l) {
-        StopOnFirst sof;
-        consider_cell = deliver_shapes_of_net_nonrecursive (mp_netlist.get (), m_net_clusters, ci, cid, layer_of (*l->second), tr, sof);
+        if (l->second) {
+          StopOnFirst sof;
+          consider_cell = !deliver_shapes_of_net_nonrecursive (mp_netlist.get (), m_net_clusters, ci, cid, layer_of (*l->second), tr, sof);
+        }
       }
 
       if (! consider_cell) {
@@ -452,7 +542,9 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
   }
 
   for (std::map<unsigned int, const db::Region *>::const_iterator l = lmap.begin (); l != lmap.end (); ++l) {
-    deliver_shapes_of_net_nonrecursive (mp_netlist.get (), m_net_clusters, ci, cid, layer_of (*l->second), tr, target_cell->shapes (l->first));
+    if (l->second) {
+      deliver_shapes_of_net_nonrecursive (mp_netlist.get (), m_net_clusters, ci, cid, layer_of (*l->second), tr, target_cell->shapes (l->first));
+    }
   }
 
   if (! circuit_cell_name_prefix && ! device_cell_name_prefix) {

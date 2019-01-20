@@ -195,7 +195,7 @@ struct DeepShapeStore::LayoutHolder
   void remove_layer_ref (unsigned int layer)
   {
     if ((layer_refs[layer] -= 1) <= 0) {
-      layout.clear_layer (layer);
+      layout.delete_layer (layer);
       layer_refs.erase (layer);
     }
   }
@@ -343,7 +343,9 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
 
     db::Layout &layout = m_layouts.back ()->layout;
     layout.hier_changed_event.add (this, &DeepShapeStore::invalidate_hier);
-    layout.dbu (si.layout ()->dbu ());
+    if (si.layout ()) {
+      layout.dbu (si.layout ()->dbu ());
+    }
 
     m_layout_map[si] = layout_index;
 

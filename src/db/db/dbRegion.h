@@ -502,12 +502,36 @@ public:
   Region &operator= (const Region &other);
 
   /**
-   *  @brief Constructor from an object
-   *
-   *  Creates a region representing a single instance of that object
+   *  @brief Constructor from a box
    */
-  template <class Sh>
-  Region (const Sh &s)
+  explicit Region (const db::Box &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a polygon
+   */
+  explicit Region (const db::Polygon &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a simple polygon
+   */
+  explicit Region (const db::SimplePolygon &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a path
+   */
+  explicit Region (const db::Path &s)
     : mp_delegate (0)
   {
     insert (s);
@@ -521,7 +545,7 @@ public:
    *  style.
    */
   template <class Iter>
-  Region (const Iter &b, const Iter &e)
+  explicit Region (const Iter &b, const Iter &e)
     : mp_delegate (0)
   {
     reserve (e - b);
@@ -536,7 +560,7 @@ public:
    *  Creates a region from a recursive shape iterator. This allows feeding a region
    *  from a hierarchy of cells.
    */
-  Region (const RecursiveShapeIterator &si);
+  explicit Region (const RecursiveShapeIterator &si);
 
   /**
    *  @brief Constructor from a RecursiveShapeIterator with a transformation
@@ -545,7 +569,7 @@ public:
    *  from a hierarchy of cells. The transformation is useful to scale to a specific
    *  DBU for example.
    */
-  Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics = true);
+  explicit Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics = true);
 
   /**
    *  @brief Constructor from a RecursiveShapeIterator providing a deep representation
@@ -556,12 +580,12 @@ public:
    *  "area_ratio" and "max_vertex_count" are optimization parameters for the
    *  shape splitting algorithm.
    */
-  Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio = 3.0, size_t max_vertex_count = 16);
+  explicit Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio = 3.0, size_t max_vertex_count = 16);
 
   /**
    *  @brief Constructor from a RecursiveShapeIterator providing a deep representation with transformation
    */
-  Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics = true, double area_ratio = 3.0, size_t max_vertex_count = 16);
+  explicit Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics = true, double area_ratio = 3.0, size_t max_vertex_count = 16);
 
   /**
    *  @brief Gets the underlying delegate object

@@ -29,46 +29,6 @@ namespace db
 
 namespace l2n_std_reader {
 
-class Layers
-{
-public:
-  Layers () { }
-
-  ~Layers ()
-  {
-    for (std::map<std::string, db::Region *>::const_iterator i = m_layers.begin (); i != m_layers.end (); ++i) {
-      delete i->second;
-    }
-    m_layers.clear ();
-  }
-
-  void add (const std::string &name, db::Region *region)
-  {
-    if (m_layers.find (name) != m_layers.end ()) {
-      delete region;
-      throw tl::Exception (tl::to_string (tr ("Duplicate layer name: ")) + name);
-    }
-    m_layers.insert (std::make_pair (name, region));
-  }
-
-  bool has_layer (const std::string &name) const
-  {
-    return m_layers.find (name) != m_layers.end ();
-  }
-
-  db::Region &layer (const std::string &name)
-  {
-    std::map<std::string, db::Region *>::const_iterator l = m_layers.find (name);
-    if (l == m_layers.end ()) {
-      throw tl::Exception (tl::to_string (tr ("Not a valid layer name: ")) + name);
-    }
-    return *l->second;
-  }
-
-private:
-  std::map<std::string, db::Region *> m_layers;
-};
-
 class Brace
 {
 public:
@@ -185,9 +145,13 @@ void LayoutToNetlistStandardReader::read (db::LayoutToNetlist *l2n)
   }
 }
 
-const db::Region *LayoutToNetlistStandardReader::layer_by_name (const std::string &name)
+static db::Region &layer_by_name (db::LayoutToNetlist *l2n, const std::string &name)
 {
-  return mp_layers->has_layer (name) ? &mp_layers->layer (name) : 0;
+  db::Region *l = l2n->layer_by_name (name);
+  if (! l) {
+    throw tl::Exception (tl::to_string (tr ("Not a valid layer name: ")) + name);
+  }
+  return *l;
 }
 
 void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
@@ -196,12 +160,16 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
   std::string description;
 
   //  TODO: there probably is a more efficient way to force the layout inside l2n to be made
-  l2n->make_layer (std::string ());
+  l2n->ensure_internal_layout ();
   tl_assert (l2n->internal_layout ());
+  l2n->internal_layout ()->dbu (1.0); //  mainly for testing
+
+  if (l2n->internal_layout ()->cells () == 0) {
+    l2n->internal_layout ()->add_cell ("TOP");
+  }
+  tl_assert (l2n->internal_top_cell () != 0);
 
   l2n->make_netlist ();
-
-  mp_layers.reset (new Layers ());
 
   while (! at_end ()) {
 
@@ -237,7 +205,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       Brace br (this);
       std::string layer;
       read_word_or_quoted (layer);
-      mp_layers->add (layer, l2n->make_layer (layer));
+      delete l2n->make_layer (layer);
       br.done ();
 
     } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
@@ -248,7 +216,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       while (br) {
         std::string l2;
         read_word_or_quoted (l2);
-        l2n->connect (mp_layers->layer (l1), mp_layers->layer (l2));
+        l2n->connect (layer_by_name (l2n, l1), layer_by_name (l2n, l2));
       }
       br.done ();
 
@@ -260,7 +228,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       while (br) {
         std::string g;
         read_word_or_quoted (g);
-        l2n->connect_global (mp_layers->layer (l1), g);
+        l2n->connect_global (layer_by_name (l2n, l1), g);
       }
       br.done ();
 
@@ -377,7 +345,7 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
     Brace br (this);
 
     read_word_or_quoted (lname);
-    unsigned int lid = l2n->layer_of (mp_layers->layer (lname));
+    unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
 
     db::Coord l = read_coord ();
     db::Coord b = read_coord ();
@@ -394,7 +362,7 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
     Brace br (this);
 
     read_word_or_quoted (lname);
-    unsigned int lid = l2n->layer_of (mp_layers->layer (lname));
+    unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
 
     std::vector<db::Point> pt;
 

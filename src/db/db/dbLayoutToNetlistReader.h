@@ -65,8 +65,6 @@ public:
 
   void read (db::LayoutToNetlist *l2n);
 
-  const db::Region *layer_by_name (const std::string &name);
-
 private:
   friend class l2n_std_reader::Brace;
   typedef l2n_std_reader::Brace Brace;
@@ -85,7 +83,6 @@ private:
   std::string m_path;
   std::string m_line;
   tl::Extractor m_ex;
-  std::auto_ptr<Layers> mp_layers;
 
   void do_read (db::LayoutToNetlist *l2n);
 

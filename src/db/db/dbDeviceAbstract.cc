@@ -20,7 +20,7 @@
 
 */
 
-#include "dbDeviceModel.h"
+#include "dbDeviceAbstract.h"
 #include "dbCircuit.h"
 #include "dbNetlist.h"
 
@@ -28,32 +28,32 @@ namespace db
 {
 
 // --------------------------------------------------------------------------------
-//  DeviceModel class implementation
+//  DeviceAbstract class implementation
 
-DeviceModel::DeviceModel ()
+DeviceAbstract::DeviceAbstract ()
   : m_name (), mp_device_class (0), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), mp_netlist (0)
 {
   //  .. nothing yet ..
 }
 
-DeviceModel::~DeviceModel ()
+DeviceAbstract::~DeviceAbstract ()
 {
   //  .. nothing yet ..
 }
 
-DeviceModel::DeviceModel (db::DeviceClass *device_class, const std::string &name)
+DeviceAbstract::DeviceAbstract (db::DeviceClass *device_class, const std::string &name)
   : m_name (name), mp_device_class (device_class), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), mp_netlist (0)
 {
   //  .. nothing yet ..
 }
 
-DeviceModel::DeviceModel (const DeviceModel &other)
+DeviceAbstract::DeviceAbstract (const DeviceAbstract &other)
   : tl::Object (other), mp_device_class (0), m_cell_index (std::numeric_limits<db::cell_index_type>::max ()), mp_netlist (0)
 {
   operator= (other);
 }
 
-DeviceModel &DeviceModel::operator= (const DeviceModel &other)
+DeviceAbstract &DeviceAbstract::operator= (const DeviceAbstract &other)
 {
   if (this != &other) {
     m_name = other.m_name;
@@ -64,33 +64,33 @@ DeviceModel &DeviceModel::operator= (const DeviceModel &other)
   return *this;
 }
 
-void DeviceModel::set_netlist (Netlist *netlist)
+void DeviceAbstract::set_netlist (Netlist *netlist)
 {
   mp_netlist = netlist;
 }
 
-void DeviceModel::set_name (const std::string &n)
+void DeviceAbstract::set_name (const std::string &n)
 {
   m_name = n;
   if (mp_netlist) {
-    mp_netlist->m_device_model_by_name.invalidate ();
+    mp_netlist->m_device_abstract_by_name.invalidate ();
   }
 }
 
-void DeviceModel::set_cell_index (db::cell_index_type ci)
+void DeviceAbstract::set_cell_index (db::cell_index_type ci)
 {
   m_cell_index = ci;
   if (mp_netlist) {
-    mp_netlist->m_device_model_by_cell_index.invalidate ();
+    mp_netlist->m_device_abstract_by_cell_index.invalidate ();
   }
 }
 
-size_t DeviceModel::cluster_id_for_terminal (size_t terminal_id) const
+size_t DeviceAbstract::cluster_id_for_terminal (size_t terminal_id) const
 {
   return terminal_id < m_terminal_cluster_ids.size () ? m_terminal_cluster_ids [terminal_id] : 0;
 }
 
-void DeviceModel::set_cluster_id_for_terminal (size_t terminal_id, size_t cluster_id)
+void DeviceAbstract::set_cluster_id_for_terminal (size_t terminal_id, size_t cluster_id)
 {
   if (m_terminal_cluster_ids.size () <= terminal_id) {
     m_terminal_cluster_ids.resize (terminal_id + 1, 0);

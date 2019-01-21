@@ -136,27 +136,27 @@ Class<db::Device> decl_dbDevice ("db", "Device",
 
 #if 0
 //  TODO: activate once the geometry API is opened (clusters at al.)
-Class<db::DeviceModel> decl_dbDeviceModel ("db", "DeviceModel",
-  gsi::method ("netlist", (db::Netlist *(db::DeviceModel::*) ()) &db::DeviceModel::netlist,
-    "@brief Gets the netlist the device model lives in."
+Class<db::DeviceAbstract> decl_dbDeviceAbstract ("db", "DeviceAbstract",
+  gsi::method ("netlist", (db::Netlist *(db::DeviceAbstract::*) ()) &db::DeviceAbstract::netlist,
+    "@brief Gets the netlist the device abstract lives in."
   ) +
-  gsi::method ("name=", &db::DeviceModel::set_name, gsi::arg ("name"),
-    "@brief Sets the name of the device model.\n"
-    "Device names are used to name a device model inside a netlist file. "
+  gsi::method ("name=", &db::DeviceAbstract::set_name, gsi::arg ("name"),
+    "@brief Sets the name of the device abstract.\n"
+    "Device names are used to name a device abstract inside a netlist file. "
     "Device names should be unique within a netlist."
   ) +
-  gsi::method ("name", &db::DeviceModel::name,
-    "@brief Gets the name of the device model.\n"
+  gsi::method ("name", &db::DeviceAbstract::name,
+    "@brief Gets the name of the device abstract.\n"
   ) +
-  gsi::method ("cell_index", &db::DeviceModel::cell_index,
-    "@brief Gets the cell index of the device model.\n"
+  gsi::method ("cell_index", &db::DeviceAbstract::cell_index,
+    "@brief Gets the cell index of the device abstract.\n"
     "This is the cell that represents the device."
   ) +
-  gsi::method ("cluster_id_for_terminal", &db::DeviceModel::cluster_id_for_terminal, gsi::arg ("terminal_id"),
+  gsi::method ("cluster_id_for_terminal", &db::DeviceAbstract::cluster_id_for_terminal, gsi::arg ("terminal_id"),
     "@brief Gets the cluster ID for the given terminal.\n"
     "The cluster ID links the terminal to geometrical shapes within the clusters of the cell (see \\cell_index)"
   ),
-  "@brief A geometrical device model\n"
+  "@brief A geometrical device abstract\n"
   "This class represents the geometrical model for the device. It links into the extracted layout "
   "to a cell which holds the terminal shapes for the device.\n"
   "\n"

@@ -20,8 +20,8 @@
 
 */
 
-#ifndef _HDR_dbDeviceModel
-#define _HDR_dbDeviceModel
+#ifndef _HDR_dbDeviceAbstract
+#define _HDR_dbDeviceAbstract
 
 #include "dbCommon.h"
 #include "dbNet.h"
@@ -37,39 +37,39 @@ namespace db
 class Netlist;
 
 /**
- *  @brief A device model
+ *  @brief A device abstract
  *
- *  A device model represents the geometrical properties of a device. It basically links
+ *  A device abstract represents the geometrical properties of a device. It basically links
  *  to a cell and clusters for indicating the terminal geometry of the device.
  */
-class DB_PUBLIC DeviceModel
+class DB_PUBLIC DeviceAbstract
   : public tl::Object
 {
 public:
   /**
    *  @brief Default constructor
    */
-  DeviceModel ();
+  DeviceAbstract ();
 
   /**
    *  @brief The constructor
    */
-  DeviceModel (db::DeviceClass *device_class, const std::string &name = std::string ());
+  DeviceAbstract (db::DeviceClass *device_class, const std::string &name = std::string ());
 
   /**
    *  @brief Copy constructor
    */
-  DeviceModel (const DeviceModel &other);
+  DeviceAbstract (const DeviceAbstract &other);
 
   /**
    *  @brief Assignment
    */
-  DeviceModel &operator= (const DeviceModel &other);
+  DeviceAbstract &operator= (const DeviceAbstract &other);
 
   /**
    *  @brief Destructor
    */
-  ~DeviceModel ();
+  ~DeviceAbstract ();
 
   /**
    *  @brief Gets the device class
@@ -89,7 +89,7 @@ public:
 
   /**
    *  @brief Gets the netlist the device lives in (const version)
-   *  This pointer is 0 if the device model isn't added to a netlist
+   *  This pointer is 0 if the device abstract isn't added to a netlist
    */
   const Netlist *netlist () const
   {
@@ -98,7 +98,7 @@ public:
 
   /**
    *  @brief Gets the netlist the device lives in (non-const version)
-   *  This pointer is 0 if the device model isn't added to a netlist
+   *  This pointer is 0 if the device abstract isn't added to a netlist
    */
   Netlist *netlist ()
   {

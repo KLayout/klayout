@@ -26,7 +26,7 @@
 #include "dbCommon.h"
 #include "dbCircuit.h"
 #include "dbDeviceClass.h"
-#include "dbDeviceModel.h"
+#include "dbDeviceAbstract.h"
 
 #include "tlVector.h"
 
@@ -52,9 +52,9 @@ public:
   typedef tl::shared_collection<DeviceClass> device_class_list;
   typedef device_class_list::const_iterator const_device_class_iterator;
   typedef device_class_list::iterator device_class_iterator;
-  typedef tl::shared_collection<DeviceModel> device_model_list;
-  typedef device_model_list::const_iterator const_device_model_iterator;
-  typedef device_model_list::iterator device_model_iterator;
+  typedef tl::shared_collection<DeviceAbstract> device_abstract_list;
+  typedef device_abstract_list::const_iterator const_abstract_model_iterator;
+  typedef device_abstract_list::iterator device_abstract_iterator;
   typedef tl::vector<Circuit *>::const_iterator top_down_circuit_iterator;
   typedef tl::vector<const Circuit *>::const_iterator const_top_down_circuit_iterator;
   typedef tl::vector<Circuit *>::const_reverse_iterator bottom_up_circuit_iterator;
@@ -306,87 +306,87 @@ public:
   }
 
   /**
-   *  @brief Adds a device model to this netlist
+   *  @brief Adds a device abstract to this netlist
    *
    *  The netlist takes over ownership of the object.
    */
-  void add_device_model (DeviceModel *device_model);
+  void add_device_abstract (DeviceAbstract *device_abstract);
 
   /**
-   *  @brief Deletes a device model from the netlist
+   *  @brief Deletes a device abstract from the netlist
    */
-  void remove_device_model (DeviceModel *device_model);
+  void remove_device_abstract (DeviceAbstract *device_abstract);
 
   /**
-   *  @brief Begin iterator for the device models of the netlist (non-const version)
+   *  @brief Begin iterator for the device abstracts of the netlist (non-const version)
    */
-  device_model_iterator begin_device_models ()
+  device_abstract_iterator begin_device_abstracts ()
   {
-    return m_device_models.begin ();
+    return m_device_abstracts.begin ();
   }
 
   /**
-   *  @brief End iterator for the device models of the netlist (non-const version)
+   *  @brief End iterator for the device abstracts of the netlist (non-const version)
    */
-  device_model_iterator end_device_models ()
+  device_abstract_iterator end_device_abstracts ()
   {
-    return m_device_models.end ();
+    return m_device_abstracts.end ();
   }
 
   /**
-   *  @brief Begin iterator for the device models of the netlist (const version)
+   *  @brief Begin iterator for the device abstracts of the netlist (const version)
    */
-  const_device_model_iterator begin_device_models () const
+  const_abstract_model_iterator begin_device_abstracts () const
   {
-    return m_device_models.begin ();
+    return m_device_abstracts.begin ();
   }
 
   /**
-   *  @brief End iterator for the device models of the netlist (const version)
+   *  @brief End iterator for the device abstracts of the netlist (const version)
    */
-  const_device_model_iterator end_device_models () const
+  const_abstract_model_iterator end_device_abstracts () const
   {
-    return m_device_models.end ();
+    return m_device_abstracts.end ();
   }
 
   /**
-   *  @brief Gets the device model with the given name
+   *  @brief Gets the device abstract with the given name
    *
-   *  If no device model with that name exists, null is returned.
+   *  If no device abstract with that name exists, null is returned.
    */
-  DeviceModel *device_model_by_name (const std::string &name)
+  DeviceAbstract *device_abstract_by_name (const std::string &name)
   {
-    return m_device_model_by_name.object_by (name);
+    return m_device_abstract_by_name.object_by (name);
   }
 
   /**
-   *  @brief Gets the device model with the given name (const version)
+   *  @brief Gets the device abstract with the given name (const version)
    *
-   *  If no device model with that name exists, null is returned.
+   *  If no device abstract with that name exists, null is returned.
    */
-  const DeviceModel *device_model_by_name (const std::string &name) const
+  const DeviceAbstract *device_abstract_by_name (const std::string &name) const
   {
-    return m_device_model_by_name.object_by (name);
+    return m_device_abstract_by_name.object_by (name);
   }
 
   /**
-   *  @brief Gets the device model with the given cell index
+   *  @brief Gets the device abstract with the given cell index
    *
-   *  If no device model with that cell index exists, null is returned.
+   *  If no device abstract with that cell index exists, null is returned.
    */
-  DeviceModel *device_model_by_cell_index (db::cell_index_type cell_index)
+  DeviceAbstract *device_abstract_by_cell_index (db::cell_index_type cell_index)
   {
-    return m_device_model_by_cell_index.object_by (cell_index);
+    return m_device_abstract_by_cell_index.object_by (cell_index);
   }
 
   /**
-   *  @brief Gets the device model with the given cell index (const version)
+   *  @brief Gets the device abstract with the given cell index (const version)
    *
-   *  If no device model with that cell index exists, null is returned.
+   *  If no device abstract with that cell index exists, null is returned.
    */
-  const DeviceModel *device_model_by_cell_index (db::cell_index_type cell_index) const
+  const DeviceAbstract *device_abstract_by_cell_index (db::cell_index_type cell_index) const
   {
-    return m_device_model_by_cell_index.object_by (cell_index);
+    return m_device_abstract_by_cell_index.object_by (cell_index);
   }
 
   /**
@@ -423,11 +423,11 @@ public:
 
 private:
   friend class Circuit;
-  friend class DeviceModel;
+  friend class DeviceAbstract;
 
   circuit_list m_circuits;
   device_class_list m_device_classes;
-  device_model_list m_device_models;
+  device_abstract_list m_device_abstracts;
   bool m_valid_topology;
   int m_lock_count;
   tl::vector<Circuit *> m_top_down_circuits;
@@ -436,13 +436,13 @@ private:
   size_t m_top_circuits;
   object_by_attr<Netlist, Netlist::circuit_iterator, name_attribute<Circuit> > m_circuit_by_name;
   object_by_attr<Netlist, Netlist::circuit_iterator, cell_index_attribute<Circuit> > m_circuit_by_cell_index;
-  object_by_attr<Netlist, Netlist::device_model_iterator, name_attribute<DeviceModel> > m_device_model_by_name;
-  object_by_attr<Netlist, Netlist::device_model_iterator, cell_index_attribute<DeviceModel> > m_device_model_by_cell_index;
+  object_by_attr<Netlist, Netlist::device_abstract_iterator, name_attribute<DeviceAbstract> > m_device_abstract_by_name;
+  object_by_attr<Netlist, Netlist::device_abstract_iterator, cell_index_attribute<DeviceAbstract> > m_device_abstract_by_cell_index;
 
   void invalidate_topology ();
   void validate_topology ();
   void circuits_changed ();
-  void device_models_changed ();
+  void device_abstracts_changed ();
 
   const tl::vector<Circuit *> &child_circuits (Circuit *circuit);
   const tl::vector<Circuit *> &parent_circuits (Circuit *circuit);

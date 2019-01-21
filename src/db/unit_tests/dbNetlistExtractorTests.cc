@@ -93,7 +93,7 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
 
     for (db::Circuit::const_device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
 
-      db::cell_index_type dci = d->device_model ()->cell_index ();
+      db::cell_index_type dci = d->device_abstract ()->cell_index ();
 
       if (device_cells_seen.find (dci) != device_cells_seen.end ()) {
         continue;
@@ -114,7 +114,7 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
       const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
       for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
 
-        const db::local_cluster<db::PolygonRef> &dc = clusters.clusters_per_cell (dci).cluster_by_id (d->device_model ()->cluster_id_for_terminal (t->id ()));
+        const db::local_cluster<db::PolygonRef> &dc = clusters.clusters_per_cell (dci).cluster_by_id (d->device_abstract ()->cluster_id_for_terminal (t->id ()));
 
         for (std::map<unsigned int, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
           db::Shapes &target = device_cell.shapes (m->second);

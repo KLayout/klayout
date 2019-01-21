@@ -38,7 +38,7 @@ namespace l2n_std_reader {
 class LayoutToNetlist;
 class Circuit;
 class Cell;
-class DeviceModel;
+class DeviceAbstract;
 class DeviceClass;
 class Region;
 
@@ -99,7 +99,7 @@ private:
   void read_pin (db::LayoutToNetlist *l2n, db::Circuit *circuit);
   db::CellInstArray read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs);
   db::CellInstArray read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs);
-  void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceModel *dm, db::DeviceClass *dc);
+  void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc);
   std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n);
 };
 

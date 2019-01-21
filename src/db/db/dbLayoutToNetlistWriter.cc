@@ -48,7 +48,7 @@ private:
   void write (const db::LayoutToNetlist *l2n, const db::Net &net);
   void write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit);
   void write (const db::LayoutToNetlist *l2n, const db::Device &device);
-  void write (const db::LayoutToNetlist *l2n, const db::DeviceModel &device_model);
+  void write (const db::LayoutToNetlist *l2n, const db::DeviceAbstract &device_abstract);
   void write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname);
 };
 
@@ -144,11 +144,11 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
 
   }
 
-  if (nl->begin_device_models () != nl->end_device_models () && ! Keys::is_short ()) {
+  if (nl->begin_device_abstracts () != nl->end_device_abstracts () && ! Keys::is_short ()) {
     *mp_stream << endl << "# Device abstracts section" << endl;
     *mp_stream << "# Device abstracts list the pin shapes of the devices." << endl;
   }
-  for (db::Netlist::const_device_model_iterator m = nl->begin_device_models (); m != nl->end_device_models (); ++m) {
+  for (db::Netlist::const_abstract_model_iterator m = nl->begin_device_abstracts (); m != nl->end_device_abstracts (); ++m) {
     if (m->device_class ()) {
       *mp_stream << Keys::device_key << "(" << tl::to_word_or_quoted_string (m->name ()) << " " << tl::to_word_or_quoted_string (m->device_class ()->name ()) << endl;
       write (l2n, *m);
@@ -276,7 +276,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
       //  vanish in "purge" but the clusters will still be there we need to recursive into clusters from
       //  unknown cells.
       db::cell_index_type ci = si.cell_index ();
-      if (ci != prev_ci && ci != cci && (l2n->netlist ()->circuit_by_cell_index (ci) || l2n->netlist ()->device_model_by_cell_index (ci))) {
+      if (ci != prev_ci && ci != cci && (l2n->netlist ()->circuit_by_cell_index (ci) || l2n->netlist ()->device_abstract_by_cell_index (ci))) {
 
         si.skip_cell ();
 
@@ -359,9 +359,9 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Sub
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::DeviceModel &device_model)
+void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::DeviceAbstract &device_abstract)
 {
-  const std::vector<db::DeviceTerminalDefinition> &td = device_model.device_class ()->terminal_definitions ();
+  const std::vector<db::DeviceTerminalDefinition> &td = device_abstract.device_class ()->terminal_definitions ();
 
   const db::hier_clusters<db::PolygonRef> &clusters = l2n->net_clusters ();
   const db::Connectivity &conn = l2n->connectivity ();
@@ -372,7 +372,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
 
     for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
 
-      const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (device_model.cell_index ()).cluster_by_id (device_model.cluster_id_for_terminal (t->id ()));
+      const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (device_abstract.cell_index ()).cluster_by_id (device_abstract.cluster_id_for_terminal (t->id ()));
       for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
 
         *mp_stream << indent2;
@@ -396,8 +396,8 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
 
   *mp_stream << indent1 << Keys::device_key << "(" << tl::to_word_or_quoted_string (device.expanded_name ());
 
-  tl_assert (device.device_model () != 0);
-  *mp_stream << " " << tl::to_word_or_quoted_string (device.device_model ()->name ()) << endl;
+  tl_assert (device.device_abstract () != 0);
+  *mp_stream << " " << tl::to_word_or_quoted_string (device.device_abstract ()->name ()) << endl;
 
   *mp_stream << indent2 << Keys::location_key << "(" << device.position ().x () / dbu << " " << device.position ().y () / dbu << ")" << endl;
 

@@ -330,13 +330,13 @@ void Circuit::translate_device_classes (const std::map<const DeviceClass *, Devi
   }
 }
 
-void Circuit::translate_device_models (const std::map<const DeviceModel *, DeviceModel *> &map)
+void Circuit::translate_device_abstracts (const std::map<const DeviceAbstract *, DeviceAbstract *> &map)
 {
   for (device_iterator i = m_devices.begin (); i != m_devices.end (); ++i) {
-    if (i->device_model ()) {
-      std::map<const DeviceModel *, DeviceModel *>::const_iterator m = map.find (i->device_model ());
+    if (i->device_abstract ()) {
+      std::map<const DeviceAbstract *, DeviceAbstract *>::const_iterator m = map.find (i->device_abstract ());
       tl_assert (m != map.end ());
-      i->set_device_model (m->second);
+      i->set_device_abstract (m->second);
     }
   }
 }

@@ -31,7 +31,7 @@ namespace db
 //  Device class implementation
 
 Device::Device ()
-  : mp_device_class (0), mp_device_model (0), m_id (0), mp_circuit (0)
+  : mp_device_class (0), mp_device_abstract (0), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
@@ -46,19 +46,19 @@ Device::~Device ()
 }
 
 Device::Device (DeviceClass *device_class, const std::string &name)
-  : mp_device_class (device_class), mp_device_model (0), m_name (name), m_id (0), mp_circuit (0)
+  : mp_device_class (device_class), mp_device_abstract (0), m_name (name), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
 
-Device::Device (DeviceClass *device_class, DeviceModel *device_model, const std::string &name)
-  : mp_device_class (device_class), mp_device_model (device_model), m_name (name), m_id (0), mp_circuit (0)
+Device::Device (DeviceClass *device_class, DeviceAbstract *device_abstract, const std::string &name)
+  : mp_device_class (device_class), mp_device_abstract (device_abstract), m_name (name), m_id (0), mp_circuit (0)
 {
   //  .. nothing yet ..
 }
 
 Device::Device (const Device &other)
-  : tl::Object (other), mp_device_class (0), mp_device_model (0), m_id (0), mp_circuit (0)
+  : tl::Object (other), mp_device_class (0), mp_device_abstract (0), m_id (0), mp_circuit (0)
 {
   operator= (other);
 }
@@ -70,7 +70,7 @@ Device &Device::operator= (const Device &other)
     m_position = other.m_position;
     m_parameters = other.m_parameters;
     mp_device_class = other.mp_device_class;
-    mp_device_model = other.mp_device_model;
+    mp_device_abstract = other.mp_device_abstract;
   }
   return *this;
 }

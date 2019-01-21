@@ -620,7 +620,7 @@ private:
 
   void translate_circuits (const std::map<const Circuit *, Circuit *> &map);
   void translate_device_classes (const std::map<const DeviceClass *, DeviceClass *> &map);
-  void translate_device_models (const std::map<const DeviceModel *, DeviceModel *> &map);
+  void translate_device_abstracts (const std::map<const DeviceAbstract *, DeviceAbstract *> &map);
   void set_netlist (Netlist *netlist);
   bool combine_parallel_devices (const db::DeviceClass &cls);
   bool combine_serial_devices (const db::DeviceClass &cls);

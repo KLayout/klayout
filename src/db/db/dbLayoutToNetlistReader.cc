@@ -289,9 +289,9 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       std::string name;
       read_word_or_quoted (name);
 
-      db::DeviceModel *dm = new db::DeviceModel ();
+      db::DeviceAbstract *dm = new db::DeviceAbstract ();
       dm->set_name (name);
-      l2n->netlist ()->add_device_model (dm);
+      l2n->netlist ()->add_device_abstract (dm);
 
       db::cell_index_type ci = l2n->internal_layout ()->add_cell (name.c_str ());
       dm->set_cell_index (ci);
@@ -441,20 +441,20 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
   std::string dmname;
   read_word_or_quoted (dmname);
 
-  db::DeviceModel *dm = 0;
-  for (db::Netlist::device_model_iterator i = l2n->netlist ()->begin_device_models (); i != l2n->netlist ()->end_device_models (); ++i) {
+  db::DeviceAbstract *dm = 0;
+  for (db::Netlist::device_abstract_iterator i = l2n->netlist ()->begin_device_abstracts (); i != l2n->netlist ()->end_device_abstracts (); ++i) {
     if (i->name () == dmname) {
       dm = i.operator-> ();
     }
   }
 
   if (! dm) {
-    throw tl::Exception (tl::to_string (tr ("Not a valid device model name: ")) + dmname);
+    throw tl::Exception (tl::to_string (tr ("Not a valid device abstract name: ")) + dmname);
   }
 
   db::Device *device = new db::Device ();
   device->set_device_class (const_cast<db::DeviceClass *> (dm->device_class ()));
-  device->set_device_model (dm);
+  device->set_device_abstract (dm);
   device->set_name (name);
   circuit->add_device (device);
 
@@ -656,7 +656,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Ci
 }
 
 void
-LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceModel *dm, db::DeviceClass *dc)
+LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc)
 {
   Brace br (this);
 

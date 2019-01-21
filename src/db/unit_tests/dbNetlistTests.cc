@@ -125,8 +125,8 @@ static std::string netlist2 (const db::Circuit &c)
       pins += net ? net->name () : std::string ("(null)");
     }
     res += "  D" + d->name ();
-    if (d->device_model ()) {
-      res += "/" + d->device_model ()->name ();
+    if (d->device_abstract ()) {
+      res += "/" + d->device_abstract ()->name ();
     }
     res += ":" + pins + "\n";
   }
@@ -501,13 +501,13 @@ TEST(4_NetlistSubcircuits)
   dc->add_terminal_definition (db::DeviceTerminalDefinition ("B", ""));
   nl->add_device_class (dc);
 
-  db::DeviceModel *dm = new db::DeviceModel ();
+  db::DeviceAbstract *dm = new db::DeviceAbstract ();
   dm->set_device_class (dc);
   EXPECT_EQ (dm->device_class () == dc, true);
   dm->set_name ("dm2");
   dm->set_cell_index (42);
   dm->set_cluster_id_for_terminal (0, 17);
-  nl->add_device_model (dm);
+  nl->add_device_abstract (dm);
 
   db::Circuit *c1 = new db::Circuit ();
   c1->set_cell_index (17);
@@ -540,7 +540,7 @@ TEST(4_NetlistSubcircuits)
 
   db::Device *d = new db::Device (dc, dm, "D");
   c2->add_device (d);
-  EXPECT_EQ (d->device_model ()->name (), "dm2");
+  EXPECT_EQ (d->device_abstract ()->name (), "dm2");
 
   EXPECT_EQ (refs2string (c2), "");
   db::SubCircuit *sc1 = new db::SubCircuit (c2);
@@ -1042,24 +1042,24 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
 }
 
-TEST(13_DeviceModel)
+TEST(13_DeviceAbstract)
 {
   db::Netlist nl;
 
-  db::DeviceModel *dm = new db::DeviceModel (0, "name");
-  nl.add_device_model (dm);
+  db::DeviceAbstract *dm = new db::DeviceAbstract (0, "name");
+  nl.add_device_abstract (dm);
   EXPECT_EQ (dm->netlist () == &nl, true);
 
   EXPECT_EQ (dm->device_class () == 0, true);
   EXPECT_EQ (dm->name (), "name");
-  EXPECT_EQ (nl.device_model_by_name ("name") == dm, true);
-  EXPECT_EQ (nl.device_model_by_name ("name2") == 0, true);
-  EXPECT_EQ (nl.device_model_by_name ("does_not_exist") == 0, true);
+  EXPECT_EQ (nl.device_abstract_by_name ("name") == dm, true);
+  EXPECT_EQ (nl.device_abstract_by_name ("name2") == 0, true);
+  EXPECT_EQ (nl.device_abstract_by_name ("does_not_exist") == 0, true);
   dm->set_name ("name2");
   EXPECT_EQ (dm->name (), "name2");
-  EXPECT_EQ (nl.device_model_by_name ("name") == 0, true);
-  EXPECT_EQ (nl.device_model_by_name ("name2") == dm, true);
-  EXPECT_EQ (nl.device_model_by_name ("does_not_exist") == 0, true);
+  EXPECT_EQ (nl.device_abstract_by_name ("name") == 0, true);
+  EXPECT_EQ (nl.device_abstract_by_name ("name2") == dm, true);
+  EXPECT_EQ (nl.device_abstract_by_name ("does_not_exist") == 0, true);
 
   dm->set_cluster_id_for_terminal (1, 17);
   dm->set_cluster_id_for_terminal (0, 42);
@@ -1067,14 +1067,14 @@ TEST(13_DeviceModel)
   EXPECT_EQ (dm->cluster_id_for_terminal (1), size_t (17));
 
   dm->set_cell_index (5);
-  EXPECT_EQ (nl.device_model_by_cell_index (5) == dm, true);
-  EXPECT_EQ (nl.device_model_by_cell_index (17) == 0, true);
+  EXPECT_EQ (nl.device_abstract_by_cell_index (5) == dm, true);
+  EXPECT_EQ (nl.device_abstract_by_cell_index (17) == 0, true);
   EXPECT_EQ (dm->cell_index (), db::cell_index_type (5));
 
-  EXPECT_EQ (nl.begin_device_models () == nl.end_device_models (), false);
-  EXPECT_EQ (nl.begin_device_models ()->name (), "name2");
+  EXPECT_EQ (nl.begin_device_abstracts () == nl.end_device_abstracts (), false);
+  EXPECT_EQ (nl.begin_device_abstracts ()->name (), "name2");
 
-  nl.remove_device_model (dm);
+  nl.remove_device_abstract (dm);
 
-  EXPECT_EQ (nl.begin_device_models () == nl.end_device_models (), true);
+  EXPECT_EQ (nl.begin_device_abstracts () == nl.end_device_abstracts (), true);
 }

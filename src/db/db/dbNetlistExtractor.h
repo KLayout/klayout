@@ -37,7 +37,7 @@ class Circuit;
 class SubCircuit;
 class Net;
 class Device;
-class DeviceModel;
+class DeviceAbstract;
 
 /**
  *  @brief The Netlist Extractor
@@ -154,9 +154,9 @@ private:
                        db::Net *net);
 
   /**
-   *  @brief Makes the terminal to cluster ID connections of the device model
+   *  @brief Makes the terminal to cluster ID connections of the device abstract
    */
-  void make_device_model_connections (db::DeviceModel *dm, const connected_clusters_type &clusters);
+  void make_device_abstract_connections (db::DeviceAbstract *dm, const connected_clusters_type &clusters);
 
 };
 

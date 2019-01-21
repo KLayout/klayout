@@ -398,7 +398,7 @@ public:
    *  Recursive mode is picked when a cell name prefix is given. The new cells will be
    *  named like cell_name_prefix + circuit name.
    *
-   *  If a device cell name prefix is given, cells will be produced for each device model
+   *  If a device cell name prefix is given, cells will be produced for each device abstract
    *  using a name like device_cell_name_prefix + device name.
    *
    *  @param target The target layout
@@ -427,7 +427,7 @@ public:
    *   * Subnet hierarchy (circuit_cell_name_prefix != 0): for each root net, a full hierarchy is built
    *     to accomodate the subnets (see build_net in recursive mode).
    *
-   *  If a device cell name prefix is given, cells will be produced for each device model
+   *  If a device cell name prefix is given, cells will be produced for each device abstract
    *  using a name like device_cell_name_prefix + device name.
    *
    *  @param cmap The mapping of internal layout to target layout for the circuit mapping

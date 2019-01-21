@@ -34,32 +34,32 @@ Netlist::Netlist ()
   : m_valid_topology (false), m_lock_count (0),
     m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
     m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits),
-    m_device_model_by_name (this, &Netlist::begin_device_models, &Netlist::end_device_models),
-    m_device_model_by_cell_index (this, &Netlist::begin_device_models, &Netlist::end_device_models)
+    m_device_abstract_by_name (this, &Netlist::begin_device_abstracts, &Netlist::end_device_abstracts),
+    m_device_abstract_by_cell_index (this, &Netlist::begin_device_abstracts, &Netlist::end_device_abstracts)
 {
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
   m_circuits.changed ().add (this, &Netlist::circuits_changed);
-  m_device_models.changed ().add (this, &Netlist::device_models_changed);
+  m_device_abstracts.changed ().add (this, &Netlist::device_abstracts_changed);
 }
 
 Netlist::Netlist (const Netlist &other)
   : gsi::ObjectBase (other), tl::Object (other), m_valid_topology (false), m_lock_count (0),
     m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
     m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits),
-    m_device_model_by_name (this, &Netlist::begin_device_models, &Netlist::end_device_models),
-    m_device_model_by_cell_index (this, &Netlist::begin_device_models, &Netlist::end_device_models)
+    m_device_abstract_by_name (this, &Netlist::begin_device_abstracts, &Netlist::end_device_abstracts),
+    m_device_abstract_by_cell_index (this, &Netlist::begin_device_abstracts, &Netlist::end_device_abstracts)
 {
   operator= (other);
   m_circuits.changed ().add (this, &Netlist::invalidate_topology);
   m_circuits.changed ().add (this, &Netlist::circuits_changed);
-  m_device_models.changed ().add (this, &Netlist::device_models_changed);
+  m_device_abstracts.changed ().add (this, &Netlist::device_abstracts_changed);
 }
 
 Netlist::~Netlist ()
 {
   m_circuits.changed ().remove (this, &Netlist::invalidate_topology);
   m_circuits.changed ().remove (this, &Netlist::circuits_changed);
-  m_device_models.changed ().remove (this, &Netlist::device_models_changed);
+  m_device_abstracts.changed ().remove (this, &Netlist::device_abstracts_changed);
 }
 
 Netlist &Netlist::operator= (const Netlist &other)
@@ -75,18 +75,18 @@ Netlist &Netlist::operator= (const Netlist &other)
       m_device_classes.push_back (dc_new);
     }
 
-    std::map<const DeviceModel *, DeviceModel *> dmt;
-    for (const_device_model_iterator dm = other.begin_device_models (); dm != other.end_device_models (); ++dm) {
-      DeviceModel *dm_new = new DeviceModel (*dm);
+    std::map<const DeviceAbstract *, DeviceAbstract *> dmt;
+    for (const_abstract_model_iterator dm = other.begin_device_abstracts (); dm != other.end_device_abstracts (); ++dm) {
+      DeviceAbstract *dm_new = new DeviceAbstract (*dm);
       dmt [dm.operator-> ()] = dm_new;
-      m_device_models.push_back (dm_new);
+      m_device_abstracts.push_back (dm_new);
     }
 
     std::map<const Circuit *, Circuit *> ct;
     for (const_circuit_iterator i = other.begin_circuits (); i != other.end_circuits (); ++i) {
       Circuit *ct_new = new Circuit (*i);
       ct_new->translate_device_classes (dct);
-      ct_new->translate_device_models (dmt);
+      ct_new->translate_device_abstracts (dmt);
       ct [i.operator-> ()] = ct_new;
       add_circuit (ct_new);
     }
@@ -105,10 +105,10 @@ void Netlist::circuits_changed ()
   m_circuit_by_name.invalidate ();
 }
 
-void Netlist::device_models_changed ()
+void Netlist::device_abstracts_changed ()
 {
-  m_device_model_by_cell_index.invalidate ();
-  m_device_model_by_name.invalidate ();
+  m_device_abstract_by_cell_index.invalidate ();
+  m_device_abstract_by_name.invalidate ();
 }
 
 void Netlist::invalidate_topology ()
@@ -353,7 +353,7 @@ Netlist::const_bottom_up_circuit_iterator Netlist::end_bottom_up () const
 void Netlist::clear ()
 {
   m_device_classes.clear ();
-  m_device_models.clear ();
+  m_device_abstracts.clear ();
   m_circuits.clear ();
 }
 
@@ -381,16 +381,16 @@ void Netlist::remove_device_class (DeviceClass *device_class)
   m_device_classes.erase (device_class);
 }
 
-void Netlist::add_device_model (DeviceModel *device_model)
+void Netlist::add_device_abstract (DeviceAbstract *device_abstract)
 {
-  m_device_models.push_back (device_model);
-  device_model->set_netlist (this);
+  m_device_abstracts.push_back (device_abstract);
+  device_abstract->set_netlist (this);
 }
 
-void Netlist::remove_device_model (DeviceModel *device_model)
+void Netlist::remove_device_abstract (DeviceAbstract *device_abstract)
 {
-  device_model->set_netlist (0);
-  m_device_models.erase (device_model);
+  device_abstract->set_netlist (0);
+  m_device_abstracts.erase (device_abstract);
 }
 
 void Netlist::purge_nets ()

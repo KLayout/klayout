@@ -354,7 +354,7 @@ db::CellMapping LayoutToNetlist::cell_mapping_into (db::Layout &layout, db::Cell
 
   std::set<db::cell_index_type> device_cells;
   if (! with_device_cells && mp_netlist.get ()) {
-    for (db::Netlist::device_model_iterator i = mp_netlist->begin_device_models (); i != mp_netlist->end_device_models (); ++i) {
+    for (db::Netlist::device_abstract_iterator i = mp_netlist->begin_device_abstracts (); i != mp_netlist->end_device_abstracts (); ++i) {
       device_cells.insert (i->cell_index ());
     }
   }
@@ -448,7 +448,7 @@ static bool deliver_shapes_of_net_nonrecursive (const db::Netlist *nl, const db:
   for (db::recursive_cluster_shape_iterator<db::PolygonRef> rci (clusters, layer_id, ci, cid); !rci.at_end (); ) {
 
     db::cell_index_type cci = rci.cell_index ();
-    if (cci != prev_ci && cci != ci && (! nl || nl->circuit_by_cell_index (cci) || nl->device_model_by_cell_index (cci))) {
+    if (cci != prev_ci && cci != ci && (! nl || nl->circuit_by_cell_index (cci) || nl->device_abstract_by_cell_index (cci))) {
 
       rci.skip_cell ();
 
@@ -563,7 +563,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
     if (cm == cmap.end ()) {
 
       const char *name_prefix = 0;
-      if (mp_netlist->device_model_by_cell_index (subci)) {
+      if (mp_netlist->device_abstract_by_cell_index (subci)) {
         name_prefix = device_cell_name_prefix;
       } else {
         name_prefix = circuit_cell_name_prefix;

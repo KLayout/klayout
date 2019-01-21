@@ -169,7 +169,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   for (std::set<db::cell_index_type>::const_iterator ci = called_cells.begin (); ci != called_cells.end (); ++ci) {
 
     //  skip device cells from previous extractions
-    if (m_netlist->device_model_by_cell_index (*ci)) {
+    if (m_netlist->device_abstract_by_cell_index (*ci)) {
       continue;
     }
 
@@ -254,14 +254,14 @@ void NetlistDeviceExtractor::push_new_devices ()
 
     db::PropertiesRepository::properties_set ps;
 
-    std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceModel *> >::iterator c = m_device_cells.find (key);
+    std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *> >::iterator c = m_device_cells.find (key);
     if (c == m_device_cells.end ()) {
 
       std::string cell_name = "D$" + mp_device_class->name ();
       db::Cell &device_cell = mp_layout->cell (mp_layout->add_cell (cell_name.c_str ()));
 
-      db::DeviceModel *dm = new db::DeviceModel (mp_device_class, mp_layout->cell_name (device_cell.cell_index ()));
-      m_netlist->add_device_model (dm);
+      db::DeviceAbstract *dm = new db::DeviceAbstract (mp_device_class, mp_layout->cell_name (device_cell.cell_index ()));
+      m_netlist->add_device_abstract (dm);
       dm->set_cell_index (device_cell.cell_index ());
 
       c = m_device_cells.insert (std::make_pair (key, std::make_pair (device_cell.cell_index (), dm))).first;
@@ -295,7 +295,7 @@ void NetlistDeviceExtractor::push_new_devices ()
     }
 
     //  make the cell index known to the device
-    device->set_device_model (c->second.second);
+    device->set_device_abstract (c->second.second);
 
     //  Build a property set for the device ID
     ps.clear ();

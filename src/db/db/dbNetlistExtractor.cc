@@ -71,10 +71,10 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
       continue;
     }
 
-    db::DeviceModel *dm = nl.device_model_by_cell_index (*cid);
+    db::DeviceAbstract *dm = nl.device_abstract_by_cell_index (*cid);
     if (dm) {
-      //  make the terminal to cluster ID connections for the device model from the device cells
-      make_device_model_connections (dm, clusters);
+      //  make the terminal to cluster ID connections for the device abstract from the device cells
+      make_device_abstract_connections (dm, clusters);
       continue;
     }
 
@@ -129,9 +129,9 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
 }
 
 void
-NetlistExtractor::make_device_model_connections (db::DeviceModel *dm, const connected_clusters_type &clusters)
+NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, const connected_clusters_type &clusters)
 {
-  //  make the terminal to cluster ID connections for the device model from the device cells
+  //  make the terminal to cluster ID connections for the device abstract from the device cells
 
   if (m_terminal_annot_name_id.first) {
 

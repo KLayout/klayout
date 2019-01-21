@@ -36,7 +36,7 @@ namespace db
 
 class Circuit;
 class DeviceClass;
-class DeviceModel;
+class DeviceAbstract;
 
 /**
  *  @brief An actual device
@@ -67,7 +67,7 @@ public:
   /**
    *  @brief The constructor
    */
-  Device (DeviceClass *device_class, DeviceModel *device_model, const std::string &name = std::string ());
+  Device (DeviceClass *device_class, DeviceAbstract *device_abstract, const std::string &name = std::string ());
 
   /**
    *  @brief Copy constructor
@@ -101,19 +101,19 @@ public:
   }
 
   /**
-   *  @brief Gets the device model
+   *  @brief Gets the device abstract
    */
-  const DeviceModel *device_model () const
+  const DeviceAbstract *device_abstract () const
   {
-    return mp_device_model;
+    return mp_device_abstract;
   }
 
   /**
-   *  @brief Sets the device model
+   *  @brief Sets the device abstract
    */
-  void set_device_model (DeviceModel *dm)
+  void set_device_abstract (DeviceAbstract *dm)
   {
-    mp_device_model = dm;
+    mp_device_abstract = dm;
   }
 
   /**
@@ -233,7 +233,7 @@ private:
   friend class Net;
 
   DeviceClass *mp_device_class;
-  DeviceModel *mp_device_model;
+  DeviceAbstract *mp_device_abstract;
   std::string m_name;
   db::DPoint m_position;
   std::vector<Net::terminal_iterator> m_terminal_refs;

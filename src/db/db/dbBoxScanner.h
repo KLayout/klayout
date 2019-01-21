@@ -273,6 +273,25 @@ public:
     typedef bs_side_compare_vs_const_func<BoxConvert, Obj, Prop, box_top<Box> > below_func;
     typedef bs_side_compare_vs_const_func<BoxConvert, Obj, Prop, box_right<Box> > left_func;
 
+    //  sort out the entries with an empty bbox (we must not put that into sort)
+
+    typename container_type::iterator wi = m_pp.begin ();
+    for (typename container_type::iterator ri = m_pp.begin (); ri != m_pp.end (); ++ri) {
+      if (! bc (*ri->first).empty ()) {
+        if (wi != ri) {
+          *wi = *ri;
+        }
+        ++wi;
+      } else {
+        //  we call finish on empty elements though
+        rec.finish (ri->first, ri->second);
+      }
+    }
+
+    if (wi != m_pp.end ()) {
+      m_pp.erase (wi, m_pp.end ());
+    }
+
     if (m_pp.size () <= m_scanner_thr) {
 
       //  below m_scanner_thr elements use the brute force approach which is faster in that case
@@ -605,6 +624,42 @@ public:
     typedef bs_side_compare_func<BoxConvert2, Obj2, Prop2, box_left<Box> > left_side_compare_func2;
     typedef bs_side_compare_vs_const_func<BoxConvert2, Obj2, Prop2, box_top<Box> > below_func2;
     typedef bs_side_compare_vs_const_func<BoxConvert2, Obj2, Prop2, box_right<Box> > left_func2;
+
+    //  sort out the entries with an empty bbox (we must not put that into sort)
+
+    typename container_type1::iterator wi1 = m_pp1.begin ();
+    for (typename container_type1::iterator ri1 = m_pp1.begin (); ri1 != m_pp1.end (); ++ri1) {
+      if (! bc1 (*ri1->first).empty ()) {
+        if (wi1 != ri1) {
+          *wi1 = *ri1;
+        }
+        ++wi1;
+      } else {
+        //  we call finish on empty elements though
+        rec.finish1 (ri1->first, ri1->second);
+      }
+    }
+
+    if (wi1 != m_pp1.end ()) {
+      m_pp1.erase (wi1, m_pp1.end ());
+    }
+
+    typename container_type2::iterator wi2 = m_pp2.begin ();
+    for (typename container_type2::iterator ri2 = m_pp2.begin (); ri2 != m_pp2.end (); ++ri2) {
+      if (! bc2 (*ri2->first).empty ()) {
+        if (wi2 != ri2) {
+          *wi2 = *ri2;
+        }
+        ++wi2;
+      } else {
+        //  we call finish on empty elements though
+        rec.finish2 (ri2->first, ri2->second);
+      }
+    }
+
+    if (wi2 != m_pp2.end ()) {
+      m_pp2.erase (wi2, m_pp2.end ());
+    }
 
     if (m_pp1.empty () || m_pp2.empty ()) {
 

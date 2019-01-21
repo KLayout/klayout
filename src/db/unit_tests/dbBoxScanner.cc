@@ -283,6 +283,28 @@ TEST(1f)
   EXPECT_EQ (tr.str, "");
 }
 
+TEST(1g)
+{
+  //  empty elements
+  db::box_scanner<db::Box, size_t> bs;
+
+  std::vector<db::Box> bb;
+  bb.push_back (db::Box (0, 0, 101, 100));
+  bb.push_back (db::Box (200, 0, 300, 100));
+  bb.push_back (db::Box ());
+  bb.push_back (db::Box (100, 0, 200, 100));
+  bb.push_back (db::Box ());
+  for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
+    bs.insert (&*b, b - bb.begin ());
+  }
+
+  BoxScannerTestRecorder tr;
+  bs.set_fill_factor (0.0);
+  db::box_convert<db::Box> bc;
+  bs.process (tr, 0, bc);
+  EXPECT_EQ (tr.str, "<2><4>(0-3)<0><1><3>");
+}
+
 void run_test2 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)
 {
   std::vector<db::Box> bb;
@@ -983,6 +1005,37 @@ TEST(two_1b)
   BoxScannerTestRecorderTwoStopping trstop;
   EXPECT_EQ (bs.process (trstop, 1, bc1, bc2), false);
   EXPECT_EQ (trstop.str, "(1-12)");
+}
+
+TEST(two_1c)
+{
+  //  some empty elements
+  db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
+
+  std::vector<db::Box> bb;
+  bb.push_back (db::Box ());
+  bb.push_back (db::Box (0, 0, 100, 100));
+  bb.push_back (db::Box (100, 10, 200, 110));
+
+  std::vector<db::SimplePolygon> bb2;
+  bb2.push_back (db::SimplePolygon (db::Box ()));
+  bb2.push_back (db::SimplePolygon (db::Box (50, 50, 150, 150)));
+  bb2.push_back (db::SimplePolygon (db::Box (10, 10, 110, 110)));
+
+  for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
+    bs.insert1 (&*b, b - bb.begin ());
+  }
+  for (std::vector<db::SimplePolygon>::const_iterator b = bb2.begin (); b != bb2.end (); ++b) {
+    bs.insert2 (&*b, int (b - bb2.begin ()) + 10);
+  }
+
+  BoxScannerTestRecorderTwo tr;
+  bs.set_fill_factor (0.0);
+  db::box_convert<db::Box> bc1;
+  db::box_convert<db::SimplePolygon> bc2;
+  bs.set_scanner_threshold (0);
+  EXPECT_EQ (bs.process (tr, 1, bc1, bc2), true);
+  EXPECT_EQ (tr.str, "<0><10>(1-12)(2-12)(1-11)(2-11)<1><2><12><11>");
 }
 
 void run_test2_two (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)

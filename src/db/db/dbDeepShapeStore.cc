@@ -433,7 +433,7 @@ DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_
         }
 
         if (! skip) {
-          cm->second.map (m->first.first, m->second);
+          cm->second.map (m->second, m->first.first);
         }
 
       }

@@ -521,7 +521,8 @@ private:
   void initialize (db::Netlist *nl);
 
   void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers);
-  void push_new_devices ();
+  void push_new_devices (const Vector &disp_cache);
+  void push_cached_devices (db::Circuit *circuit, const std::map<size_t, geometry_per_terminal_type> &cached_devices, const db::Vector &disp_cache, const db::Vector &new_disp);
 };
 
 }

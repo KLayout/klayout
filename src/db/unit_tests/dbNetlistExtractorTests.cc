@@ -340,3 +340,210 @@ TEST(1_DeviceAndNetExtraction)
 
   db::compare_layouts (_this, ly, au);
 }
+
+TEST(2_DeviceAndNetExtractionFlat)
+{
+  db::Layout ly (true);
+  db::LayerMap lmap;
+
+  unsigned int nwell      = define_layer (ly, lmap, 1);
+  unsigned int active     = define_layer (ly, lmap, 2);
+  unsigned int poly       = define_layer (ly, lmap, 3);
+  unsigned int poly_lbl   = define_layer (ly, lmap, 3, 1);
+  unsigned int diff_cont  = define_layer (ly, lmap, 4);
+  unsigned int poly_cont  = define_layer (ly, lmap, 5);
+  unsigned int metal1     = define_layer (ly, lmap, 6);
+  unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
+  unsigned int via1       = define_layer (ly, lmap, 7);
+  unsigned int metal2     = define_layer (ly, lmap, 8);
+  unsigned int metal2_lbl = define_layer (ly, lmap, 8, 1);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l1.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+    ly.flatten (ly.cell (*ly.begin_top_down ()), -1, true);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region rnwell (db::RecursiveShapeIterator (ly, tc, nwell), dss);
+  db::Region ractive (db::RecursiveShapeIterator (ly, tc, active), dss);
+  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
+  db::Region rpoly_lbl (db::RecursiveShapeIterator (ly, tc, poly_lbl), dss);
+  db::Region rdiff_cont (db::RecursiveShapeIterator (ly, tc, diff_cont), dss);
+  db::Region rpoly_cont (db::RecursiveShapeIterator (ly, tc, poly_cont), dss);
+  db::Region rmetal1 (db::RecursiveShapeIterator (ly, tc, metal1), dss);
+  db::Region rmetal1_lbl (db::RecursiveShapeIterator (ly, tc, metal1_lbl), dss);
+  db::Region rvia1 (db::RecursiveShapeIterator (ly, tc, via1), dss);
+  db::Region rmetal2 (db::RecursiveShapeIterator (ly, tc, metal2), dss);
+  db::Region rmetal2_lbl (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss);
+
+  //  derived regions
+
+  db::Region rpactive = ractive & rnwell;
+  db::Region rpgate   = rpactive & rpoly;
+  db::Region rpsd     = rpactive - rpgate;
+
+  db::Region rnactive = ractive - rnwell;
+  db::Region rngate   = rnactive & rpoly;
+  db::Region rnsd     = rnactive - rngate;
+
+  //  return the computed layers into the original layout and write it for debugging purposes
+
+  unsigned int lgate  = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> Gate
+  unsigned int lsd    = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> Source/Drain
+  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> P Diffusion
+  unsigned int lndiff = ly.insert_layer (db::LayerProperties (13, 0));      // 13/0 -> N Diffusion
+
+  rpgate.insert_into (&ly, tc.cell_index (), lgate);
+  rngate.insert_into (&ly, tc.cell_index (), lgate);
+  rpsd.insert_into (&ly, tc.cell_index (), lsd);
+  rnsd.insert_into (&ly, tc.cell_index (), lsd);
+  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
+  rnsd.insert_into (&ly, tc.cell_index (), lndiff);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::PolygonRef> cl;
+
+  db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rpgate;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  pmos_ex.extract (dss, dl, nl, cl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rngate;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  nmos_ex.extract (dss, dl, nl, cl);
+
+  //  perform the net extraction
+
+  db::NetlistExtractor net_ex;
+
+  db::Connectivity conn;
+  //  Intra-layer
+  conn.connect (rpsd);
+  conn.connect (rnsd);
+  conn.connect (rpoly);
+  conn.connect (rdiff_cont);
+  conn.connect (rpoly_cont);
+  conn.connect (rmetal1);
+  conn.connect (rvia1);
+  conn.connect (rmetal2);
+  //  Inter-layer
+  conn.connect (rpsd,       rdiff_cont);
+  conn.connect (rnsd,       rdiff_cont);
+  conn.connect (rpoly,      rpoly_cont);
+  conn.connect (rpoly_cont, rmetal1);
+  conn.connect (rdiff_cont, rmetal1);
+  conn.connect (rmetal1,    rvia1);
+  conn.connect (rvia1,      rmetal2);
+  conn.connect (rpoly,      rpoly_lbl);     //  attaches labels
+  conn.connect (rmetal1,    rmetal1_lbl);   //  attaches labels
+  conn.connect (rmetal2,    rmetal2_lbl);   //  attaches labels
+
+  //  extract the nets
+
+  net_ex.extract_nets (dss, conn, nl, cl);
+
+  //  debug layers produced for nets
+  //    202/0 -> Active
+  //    203/0 -> Poly
+  //    204/0 -> Diffusion contacts
+  //    205/0 -> Poly contacts
+  //    206/0 -> Metal1
+  //    207/0 -> Via1
+  //    208/0 -> Metal2
+  //    210/0 -> N source/drain
+  //    211/0 -> P source/drain
+  std::map<unsigned int, unsigned int> dump_map;
+  dump_map [layer_of (rpsd)      ] = ly.insert_layer (db::LayerProperties (210, 0));
+  dump_map [layer_of (rnsd)      ] = ly.insert_layer (db::LayerProperties (211, 0));
+  dump_map [layer_of (rpoly)     ] = ly.insert_layer (db::LayerProperties (203, 0));
+  dump_map [layer_of (rdiff_cont)] = ly.insert_layer (db::LayerProperties (204, 0));
+  dump_map [layer_of (rpoly_cont)] = ly.insert_layer (db::LayerProperties (205, 0));
+  dump_map [layer_of (rmetal1)   ] = ly.insert_layer (db::LayerProperties (206, 0));
+  dump_map [layer_of (rvia1)     ] = ly.insert_layer (db::LayerProperties (207, 0));
+  dump_map [layer_of (rmetal2)   ] = ly.insert_layer (db::LayerProperties (208, 0));
+
+  //  write nets to layout
+  db::CellMapping cm = dss.cell_mapping_to_original (0, &ly, tc.cell_index ());
+  dump_nets_to_layout (nl, cl, ly, dump_map, cm);
+
+  //  compare netlist as string
+  //  NOTE: some of the nets are called IN,OUT but are different ones. They
+  //  happen to be the same because they share the same label.
+  EXPECT_EQ (nl.to_string (),
+    "Circuit RINGO ():\n"
+    "  DPMOS $1 (S='IN,FB',G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $2 (S=VDD,G='IN,FB',D='OUT,OSC') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $3 (S=$18,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $4 (S=VDD,G=$18,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $5 (S=$16,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $6 (S=VDD,G=$16,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $7 (S=$14,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $8 (S=VDD,G=$14,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $9 (S=$12,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $10 (S=VDD,G=$12,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $11 (S=$4,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $12 (S=VDD,G=$4,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $13 (S=$8,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $14 (S=VDD,G=$8,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $15 (S=$6,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $16 (S=VDD,G=$6,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $17 (S=$2,G='IN,FB',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $18 (S=VDD,G=$2,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DPMOS $19 (S=$10,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DPMOS $20 (S=VDD,G=$10,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $21 (S='IN,FB',G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $22 (S=VSS,G='IN,FB',D='OUT,OSC') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $23 (S=$16,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $24 (S=VSS,G=$16,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $25 (S=$14,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $26 (S=VSS,G=$14,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $27 (S=$12,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $28 (S=VSS,G=$12,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $29 (S=$4,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $30 (S=VSS,G=$4,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $31 (S=$18,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $32 (S=VSS,G=$18,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $33 (S=$2,G='IN,FB',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $34 (S=VSS,G=$2,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $35 (S=$10,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $36 (S=VSS,G=$10,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $37 (S=$6,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $38 (S=VSS,G=$6,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+    "  DNMOS $39 (S=$8,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125]\n"
+    "  DNMOS $40 (S=VSS,G=$8,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875]\n"
+  );
+
+  //  compare the collected test data
+
+  std::string au = tl::testsrc ();
+  au = tl::combine_path (au, "testdata");
+  au = tl::combine_path (au, "algo");
+  au = tl::combine_path (au, "device_extract_au1_flat.gds");
+
+  db::compare_layouts (_this, ly, au);
+}

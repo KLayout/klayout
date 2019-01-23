@@ -68,6 +68,8 @@ section
   file *.dll
   file strm*.exe
   file .*-paths.txt
+  file /r db_plugins
+  file /r lay_plugins
   file /r audio
   file /r generic
   file /r iconengines

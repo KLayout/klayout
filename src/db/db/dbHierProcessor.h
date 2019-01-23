@@ -51,12 +51,39 @@ namespace std
     }
   };
 
-  template <class Polygon, class Trans>
-  struct hash<db::polygon_ref<Polygon, Trans> >
+  template <class Shape, class Trans>
+  struct hash<db::shape_ref<Shape, Trans> >
   {
-    size_t operator() (const db::polygon_ref<Polygon, Trans> &o) const
+    size_t operator() (const db::shape_ref<Shape, Trans> &o) const
     {
-      return hfunc (size_t (o.ptr ()), std::hash<Trans> () (o.trans ()));
+      return hfunc (std::hash<Shape> () (*o.ptr ()), std::hash<Trans> () (o.trans ()));
+    }
+  };
+
+  template <class Shape, class Trans>
+  struct hash<db::polygon_ref<Shape, Trans> >
+  {
+    size_t operator() (const db::polygon_ref<Shape, Trans> &o) const
+    {
+      return std::hash<db::shape_ref<Shape, Trans> > () (o);
+    }
+  };
+
+  template <class Shape, class Trans>
+  struct hash<db::path_ref<Shape, Trans> >
+  {
+    size_t operator() (const db::path_ref<Shape, Trans> &o) const
+    {
+      return std::hash<db::shape_ref<Shape, Trans> > () (o);
+    }
+  };
+
+  template <class Shape, class Trans>
+  struct hash<db::text_ref<Shape, Trans> >
+  {
+    size_t operator() (const db::text_ref<Shape, Trans> &o) const
+    {
+      return std::hash<db::shape_ref<Shape, Trans> > () (o);
     }
   };
 

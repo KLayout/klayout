@@ -173,6 +173,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   all_called_cells.clear ();
 
   //  build the device clusters
+
   db::Connectivity device_conn = get_connectivity (layout, layers);
   db::hier_clusters<shape_type> device_clusters;
   device_clusters.build (layout, cell, shape_iter_flags, device_conn);

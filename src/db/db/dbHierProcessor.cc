@@ -892,7 +892,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
       }
     }
 
-//  @@@ can we shortcut this if interactions is empty?
+//  TODO: can we shortcut this if interactions is empty?
     {
       db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
       InteractionRegistrationInst2Inst rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.intruder_layer (), dist, &interactions);
@@ -941,7 +941,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
       scanner.process (rec, dist, inst_bcs, inst_bci);
     }
 
-//  @@@ can we shortcut this if interactions is empty?
+//  TODO: can we shortcut this if interactions is empty?
     {
       db::box_scanner2<db::CellInstArray, int, db::PolygonRef, int> scanner;
       InteractionRegistrationInst2Shape rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
@@ -1143,7 +1143,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
         scanner.insert (ref, id++);
       }
 
-//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
+//  TODO: TODO: can we confine this search to the subject's (sized) bounding box?
       for (std::unordered_set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert (i.operator-> (), interactions.next_id ());
       }
@@ -1161,13 +1161,13 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
         scanner.insert1 (ref, id++);
       }
 
-//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
+//  TODO: can we confine this search to the subject's (sized) bounding box?
       for (std::unordered_set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert2 (i.operator-> (), interactions.next_id ());
       }
 
       if (intruder_shapes) {
-//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
+//  TODO: can we confine this search to the subject's (sized) bounding box?
         for (db::Shapes::shape_iterator i = intruder_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
           scanner.insert2 (i->basic_ptr (db::PolygonRef::tag ()), interactions.next_id ());
         }
@@ -1198,7 +1198,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
       //  interactions low in the hierarchy.
 
     } else if (intruder_cell) {
-//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
+//  TODO: can we confine this search to the subject's (sized) bounding box?
       for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
         if (! inst_bci (i->cell_inst ()).empty ()) {
           scanner.insert2 (&i->cell_inst (), ++inst_id);
@@ -1206,7 +1206,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
       }
     }
 
-//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
+//  TODO: can we confine this search to the subject's (sized) bounding box?
     for (std::unordered_set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
       if (! inst_bci (*i).empty ()) {
         scanner.insert2 (i.operator-> (), ++inst_id);

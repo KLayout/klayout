@@ -194,10 +194,9 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   tl::RelativeProgress progress (tl::to_string (tr ("Extracting devices")), n, 1);
 
   struct ExtractorCacheValueType {
-    ExtractorCacheValueType () : circuit (0) { }
-    db::Circuit *circuit;
+    ExtractorCacheValueType () { }
     db::Vector disp;
-    std::map<size_t, geometry_per_terminal_type> geometry;
+    tl::vector<db::Device *> devices;
   };
 
   typedef std::map<std::vector<db::Region>, ExtractorCacheValueType> extractor_cache_type;
@@ -245,7 +244,6 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
         for (db::recursive_cluster_shape_iterator<shape_type> si (device_clusters, *l, *ci, *c); ! si.at_end(); ++si) {
           insert_into_region (*si, si.trans (), r);
         }
-        // r.merge ()???
       }
 
       db::Box box;
@@ -269,12 +267,16 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
 
         ExtractorCacheValueType &ecv = extractor_cache [layer_geometry];
         ecv.disp = disp;
-        ecv.circuit = mp_circuit;
-        ecv.geometry.swap (m_new_devices);
+
+        for (std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> >::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
+          ecv.devices.push_back (d->second.first);
+        }
+
+        m_new_devices.clear ();
 
       } else {
 
-        push_cached_devices (ec->second.circuit, ec->second.geometry, ec->second.disp, disp);
+        push_cached_devices (ec->second.devices, ec->second.disp, disp);
 
       }
 
@@ -288,16 +290,16 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
   db::CplxTrans dbu = db::CplxTrans (mp_layout->dbu ());
   db::VCplxTrans dbu_inv = dbu.inverted ();
 
-  for (std::map<size_t, geometry_per_terminal_type>::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
+  for (std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> >::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
 
-    db::Device *device = mp_circuit->device_by_id (d->first);
+    db::Device *device = d->second.first;
 
     db::Vector disp = dbu_inv * device->position () - db::Point ();
     device->set_position (device->position () + dbu * disp_cache);
 
     DeviceCellKey key;
 
-    for (geometry_per_terminal_type::const_iterator t = d->second.begin (); t != d->second.end (); ++t) {
+    for (geometry_per_terminal_type::const_iterator t = d->second.second.begin (); t != d->second.second.end (); ++t) {
       std::map<size_t, std::set<db::PolygonRef> > &gt = key.geometry [t->first];
       for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
         std::set<db::PolygonRef> &gl = gt [l->first];
@@ -333,7 +335,7 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
       ps.insert (std::make_pair (m_device_class_propname_id, tl::Variant (mp_device_class->name ())));
       device_cell.prop_id (mp_layout->properties_repository ().properties_id (ps));
 
-      for (geometry_per_terminal_type::const_iterator t = d->second.begin (); t != d->second.end (); ++t) {
+      for (geometry_per_terminal_type::const_iterator t = d->second.second.begin (); t != d->second.second.end (); ++t) {
 
         //  Build a property set for the device terminal ID
         ps.clear ();
@@ -370,15 +372,15 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
   }
 }
 
-void NetlistDeviceExtractor::push_cached_devices (db::Circuit *circuit, const std::map<size_t, geometry_per_terminal_type> &cached_devices, const db::Vector &disp_cache, const db::Vector &new_disp)
+void NetlistDeviceExtractor::push_cached_devices (const tl::vector<db::Device *> &cached_devices, const db::Vector &disp_cache, const db::Vector &new_disp)
 {
   db::CplxTrans dbu = db::CplxTrans (mp_layout->dbu ());
   db::VCplxTrans dbu_inv = dbu.inverted ();
   db::PropertiesRepository::properties_set ps;
 
-  for (std::map<size_t, geometry_per_terminal_type>::const_iterator d = cached_devices.begin (); d != cached_devices.end (); ++d) {
+  for (std::vector<db::Device *>::const_iterator d = cached_devices.begin (); d != cached_devices.end (); ++d) {
 
-    db::Device *cached_device = circuit->device_by_id (d->first);
+    db::Device *cached_device = *d;
     db::Vector disp = dbu_inv * cached_device->position () - disp_cache - db::Point ();
 
     db::Device *device = new db::Device (*cached_device);
@@ -453,7 +455,9 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
   unsigned int layer_index = m_layers [geometry_index];
 
   db::PolygonRef pr (polygon, mp_layout->shape_repository ());
-  m_new_devices[device->id ()][terminal_id][layer_index].push_back (pr);
+  std::pair<db::Device *, geometry_per_terminal_type> &dd = m_new_devices[device->id ()];
+  dd.first = device;
+  dd.second[terminal_id][layer_index].push_back (pr);
 }
 
 void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Box &box)

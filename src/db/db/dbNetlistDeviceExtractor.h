@@ -507,7 +507,7 @@ private:
   layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;
   error_list m_errors;
-  std::map<size_t, geometry_per_terminal_type> m_new_devices;
+  std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> > m_new_devices;
   std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *> > m_device_cells;
 
   //  no copying
@@ -522,7 +522,7 @@ private:
 
   void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers);
   void push_new_devices (const Vector &disp_cache);
-  void push_cached_devices (db::Circuit *circuit, const std::map<size_t, geometry_per_terminal_type> &cached_devices, const db::Vector &disp_cache, const db::Vector &new_disp);
+  void push_cached_devices (const tl::vector<Device *> &cached_devices, const db::Vector &disp_cache, const db::Vector &new_disp);
 };
 
 }

@@ -27,6 +27,7 @@
 #include "dbBoxConvert.h"
 #include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
+#include "dbLocalOperationUtils.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "tlInternational.h"
@@ -253,6 +254,43 @@ LocalProcessorCellContexts::create (const key_type &intruders)
   return &m_contexts[intruders];
 }
 
+static void
+subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout)
+{
+  if (other.empty ()) {
+    return;
+  }
+
+  db::EdgeProcessor ep;
+
+  size_t p1 = 0, p2 = 1;
+
+  for (std::unordered_set<db::PolygonRef>::const_iterator i = res.begin (); i != res.end (); ++i) {
+    const db::PolygonRef &subject = *i;
+    for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+      ep.insert (*e, p1);
+    }
+    p1 += 2;
+  }
+
+  for (std::unordered_set<db::PolygonRef>::const_iterator i = other.begin (); i != other.end (); ++i) {
+    const db::PolygonRef &subject = *i;
+    for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+      ep.insert (*e, p2);
+    }
+    p2 += 2;
+  }
+
+  double m_max_area_ratio = 3.0; // @@@
+  size_t m_max_vertex_count = 16; // @@@
+  res.clear ();
+  db::BooleanOp op (db::BooleanOp::ANotB);
+  db::PolygonRefGenerator pr (layout, res);
+  db::PolygonSplitter splitter (pr, m_max_area_ratio, m_max_vertex_count);
+  db::PolygonGenerator pg (splitter, true, true);
+  ep.process (pg, op);
+}
+
 void
 LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &contexts, db::Cell *cell, const LocalOperation *op, unsigned int output_layer, const LocalProcessor *proc)
 {
@@ -313,16 +351,13 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
         if (! lost.empty ()) {
 
-          std::unordered_set<db::PolygonRef> new_common;
-          for (std::unordered_set<db::PolygonRef>::const_iterator i = common.begin (); i != common.end (); ++i) {
-            if (res.find (*i) != res.end ()) {
-              new_common.insert (*i);
-            }
-          }
-          common.swap (new_common);
+          subtract (lost, res, cell->layout ());
 
-          for (std::unordered_map<key_type, db::LocalProcessorCellContext>::iterator cc = m_contexts.begin (); cc != c; ++cc) {
-            cc->second.propagate (lost);
+          if (! lost.empty ()) {
+            subtract (common, lost, cell->layout ());
+            for (std::unordered_map<key_type, db::LocalProcessorCellContext>::iterator cc = m_contexts.begin (); cc != c; ++cc) {
+              cc->second.propagate (lost);
+            }
           }
 
         }
@@ -334,7 +369,15 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
           }
         }
 
-        c->second.propagate (gained);
+        if (! gained.empty ()) {
+
+          subtract (gained, common, cell->layout ());
+
+          if (! gained.empty ()) {
+            c->second.propagate (gained);
+          }
+
+        }
 
       }
 

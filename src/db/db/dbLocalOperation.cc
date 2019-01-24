@@ -28,6 +28,7 @@
 #include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
 #include "dbPolygonTools.h"
+#include "dbLocalOperationUtils.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "tlInternational.h"
@@ -35,74 +36,8 @@
 namespace db
 {
 
-
 // ---------------------------------------------------------------------------------------------
 //  BoolAndOrNotLocalOperation implementation
-
-namespace {
-
-class PolygonRefGenerator
-  : public PolygonSink
-{
-public:
-  /**
-   *  @brief Constructor specifying an external vector for storing the polygons
-   */
-  PolygonRefGenerator (db::Layout *layout, std::unordered_set<db::PolygonRef> &polyrefs)
-    : PolygonSink (), mp_layout (layout), mp_polyrefs (&polyrefs)
-  { }
-
-  /**
-   *  @brief Implementation of the PolygonSink interface
-   */
-  virtual void put (const db::Polygon &polygon)
-  {
-    tl::MutexLocker locker (&mp_layout->lock ());
-    mp_polyrefs->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
-  }
-
-private:
-  db::Layout *mp_layout;
-  std::unordered_set<db::PolygonRef> *mp_polyrefs;
-};
-
-class PolygonSplitter
-  : public PolygonSink
-{
-public:
-  PolygonSplitter (PolygonSink &sink, double max_area_ratio, size_t max_vertex_count)
-    : mp_sink (&sink), m_max_area_ratio (max_area_ratio), m_max_vertex_count (max_vertex_count)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual void put (const db::Polygon &poly)
-  {
-    if ((m_max_vertex_count > 0 && poly.vertices () > m_max_vertex_count) || (m_max_area_ratio > 0.0 && poly.area_ratio () > m_max_area_ratio)) {
-
-      std::vector <db::Polygon> split_polygons;
-      db::split_polygon (poly, split_polygons);
-      for (std::vector <db::Polygon>::const_iterator sp = split_polygons.begin (); sp != split_polygons.end (); ++sp) {
-        put (*sp);
-      }
-
-    } else {
-      mp_sink->put (poly);
-    }
-  }
-
-  virtual void start () { mp_sink->start (); }
-  virtual void flush () { mp_sink->flush (); }
-
-private:
-  PolygonSink *mp_sink;
-  double m_max_area_ratio;
-  size_t m_max_vertex_count;
-};
-
-}
-
-// ---------------------------------------------------------------------------------------------
 
 BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and, double max_area_ratio, size_t max_vertex_count)
   : m_is_and (is_and), m_max_area_ratio (max_area_ratio), m_max_vertex_count (max_vertex_count)

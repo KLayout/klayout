@@ -1070,3 +1070,24 @@ TEST(TopWithBelow2)
 {
   run_test_bool (_this, "hlp12.oas", TMNotSwapped, 101);
 }
+
+TEST(BasicHierarchyVariantsAnd)
+{
+  run_test_bool (_this, "hlp13.oas", TMAnd, 100);
+}
+
+TEST(BasicHierarchyVariantsNot)
+{
+  run_test_bool (_this, "hlp13.oas", TMNot, 101);
+}
+
+TEST(BasicHierarchyVariantsAnd2)
+{
+  run_test_bool (_this, "hlp14.oas", TMAnd, 100);
+}
+
+TEST(BasicHierarchyVariantsNot2)
+{
+  run_test_bool (_this, "hlp14.oas", TMNot, 101);
+}
+

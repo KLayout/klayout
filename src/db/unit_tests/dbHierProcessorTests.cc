@@ -704,13 +704,13 @@ TEST(TwoInputsNot5)
 TEST(TwoInputsAnd6)
 {
   //  Extreme variants (copy, vanishing), AND
-  run_test_bool2 (_this, "hlp6.oas", TMAnd, 100);
+  run_test_bool2 (_this, "hlp6.oas", TMAnd, 120);
 }
 
 TEST(TwoInputsNot6)
 {
   //  Extreme variants (copy, vanishing), NOT
-  run_test_bool2 (_this, "hlp6.oas", TMNot, 101);
+  run_test_bool2 (_this, "hlp6.oas", TMNot, 121);
 }
 
 TEST(TwoInputsAnd7)
@@ -844,13 +844,13 @@ TEST(TwoInputsNotWithSize5)
 TEST(TwoInputsAndWithSize6)
 {
   //  Extreme variants (copy, vanishing), AND
-  run_test_bool2_with_size (_this, "hlp6.oas", TMAnd, 1500, 102);
+  run_test_bool2_with_size (_this, "hlp6.oas", TMAnd, 1500, 122);
 }
 
 TEST(TwoInputsNotWithSize6)
 {
   //  Extreme variants (copy, vanishing), NOT
-  run_test_bool2_with_size (_this, "hlp6.oas", TMNot, 1500, 103);
+  run_test_bool2_with_size (_this, "hlp6.oas", TMNot, 1500, 123);
 }
 
 TEST(TwoInputsAndWithSize7)

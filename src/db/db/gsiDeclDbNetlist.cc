@@ -65,6 +65,10 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
   ) +
+  gsi::method ("device_abstract", &db::Device::device_abstract,
+    "@brief Gets the device abstract for this device instance.\n"
+    "See \\DeviceAbstract for more details.\n"
+  ) +
   gsi::method ("circuit", (db::Circuit *(db::Device::*) ()) &db::Device::circuit,
     "@brief Gets the circuit the device lives in."
   ) +
@@ -134,11 +138,12 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   "This class has been added in version 0.26."
 );
 
-#if 0
-//  TODO: activate once the geometry API is opened (clusters at al.)
 Class<db::DeviceAbstract> decl_dbDeviceAbstract ("db", "DeviceAbstract",
   gsi::method ("netlist", (db::Netlist *(db::DeviceAbstract::*) ()) &db::DeviceAbstract::netlist,
     "@brief Gets the netlist the device abstract lives in."
+  ) +
+  gsi::method ("device_class", &db::DeviceAbstract::device_class,
+    "@brief Gets the device class of the device."
   ) +
   gsi::method ("name=", &db::DeviceAbstract::set_name, gsi::arg ("name"),
     "@brief Sets the name of the device abstract.\n"
@@ -162,7 +167,6 @@ Class<db::DeviceAbstract> decl_dbDeviceAbstract ("db", "DeviceAbstract",
   "\n"
   "This class has been added in version 0.26."
 );
-#endif
 
 static void subcircuit_connect_pin1 (db::SubCircuit *subcircuit, const db::Pin *pin, db::Net *net)
 {

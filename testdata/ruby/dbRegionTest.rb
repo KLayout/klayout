@@ -778,6 +778,13 @@ class DBRegion_TestClass < TestBase
     dss = RBA::DeepShapeStore::new
     dss._create
     assert_equal(RBA::DeepShapeStore::instance_count, 1)
+    # do a little testing on the DSS:
+    dss.max_vertex_count = 8
+    assert_equal(dss.max_vertex_count, 8)
+    dss.max_area_ratio = 42.0
+    assert_equal(dss.max_area_ratio, 42.0)
+    dss.threads = 3
+    assert_equal(dss.threads, 3)
     dss = nil
     GC.start
     assert_equal(RBA::DeepShapeStore::instance_count, 0)

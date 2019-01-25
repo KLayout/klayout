@@ -263,9 +263,24 @@ TEST(1_Basic)
   EXPECT_EQ (l2sr (l3), "1,17");
   EXPECT_EQ (l3.size (), size_t (2));
 
+  EXPECT_EQ (l2sr (l2), "17");
+  EXPECT_EQ (l2sr (l3), "1,17");
+  l3.swap (l2);
+  EXPECT_EQ (l2sr (l2), "1,17");
+  EXPECT_EQ (l2sr (l3), "17");
+
   l1.clear ();
-  l2.clear ();
+  l2.swap (l1);
+  EXPECT_EQ (l2sr (l1), "1,17");
+  EXPECT_EQ (l2sr (l2), "");
+
+  l1.clear ();
   l3.clear ();
+
+  l2.swap (l1);
+  EXPECT_EQ (l2sr (l1), "");
+  EXPECT_EQ (l2sr (l2), "");
+
   EXPECT_EQ (obj_count, size_t (0));
 }
 
@@ -382,6 +397,12 @@ TEST(2_BasicNoCopy)
     EXPECT_EQ (l2s (l3), "17,1");
     EXPECT_EQ (l2sr (l3), "1,17");
     EXPECT_EQ (l3.size (), size_t (2));
+
+    EXPECT_EQ (l2sr (l2), "17");
+    EXPECT_EQ (l2sr (l3), "1,17");
+    l3.swap (l2);
+    EXPECT_EQ (l2sr (l2), "1,17");
+    EXPECT_EQ (l2sr (l3), "17");
 
     l1.clear ();
     l2.clear ();

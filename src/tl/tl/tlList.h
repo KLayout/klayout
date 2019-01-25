@@ -28,6 +28,7 @@
 #include "tlTypeTraits.h"
 
 #include <iterator>
+#include <algorithm>
 
 namespace tl
 {
@@ -138,6 +139,24 @@ public:
       delete c;
     } else {
       c->unlink ();
+    }
+  }
+
+  void swap (list_impl<C, tl::false_tag> &other)
+  {
+    std::swap (m_head.mp_next, other.m_head.mp_next);
+    if (m_head.mp_next) {
+      m_head.mp_next->mp_prev = &m_head;
+    }
+    if (other.m_head.mp_next) {
+      other.m_head.mp_next->mp_prev = &other.m_head;
+    }
+    std::swap (m_back.mp_prev, other.m_back.mp_prev);
+    if (m_back.mp_prev) {
+      m_back.mp_prev->mp_next = &m_back;
+    }
+    if (other.m_back.mp_prev) {
+      other.m_back.mp_prev->mp_next = &other.m_back;
     }
   }
 
@@ -303,7 +322,7 @@ public:
   list_impl () { }
 
   list_impl (const list_impl &other)
-    : list_impl<C, tl::false_tag> (other)
+    : list_impl<C, tl::false_tag> ()
   {
     operator= (other);
   }

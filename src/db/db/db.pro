@@ -163,7 +163,8 @@ SOURCES = \
     dbLayoutToNetlistWriter.cc \
     dbLayoutToNetlistFormatDefs.cc \
     dbDeviceAbstract.cc \
-    dbLocalOperationUtils.cc
+    dbLocalOperationUtils.cc \
+    gsiDeclDbDeepShapeStore.cc
 
 HEADERS = \
   dbArray.h \

@@ -226,6 +226,8 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
 
     db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
     proc.set_threads (nthreads);
+    proc.set_area_ratio (3.0);
+    proc.set_max_vertex_count (16);
 
     if (! context_doc) {
       proc.run (lop, l1, l2, lout);
@@ -242,6 +244,8 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
 
     db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &layout_org2, &layout_org2.cell (*layout_org2.begin_top_down ()));
     proc.set_threads (nthreads);
+    proc.set_area_ratio (3.0);
+    proc.set_max_vertex_count (16);
 
     if (! context_doc) {
       proc.run (lop, l1, l2, lout);

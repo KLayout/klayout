@@ -719,34 +719,6 @@ static Container *decompose_trapezoids (const db::Region *r, int mode)
 int td_simple ();
 int po_any ();
 
-Class<db::DeepShapeStore> decl_DeepShapeStore ("db", "DeepShapeStore",
-  method ("threads=", &db::DeepShapeStore::set_threads, gsi::arg ("threads"),
-    "@brief Sets the number of threads for use for operations acting on this heap\n"
-  ) +
-  method ("threads", &db::DeepShapeStore::threads,
-    "@brief Gets the number of threads for use for operations acting on this heap\n"
-  ) +
-  method ("instance_count", db::DeepShapeStore::instance_count, "@hide"),
-  "@brief An opaque layout heap for the deep region processor\n"
-  "\n"
-  "This class is used for keeping intermediate, hierarchical data for the "
-  "deep region processor. It is used in conjunction with the region "
-  "constructor to create a deep (hierarchical) region."
-  "\n"
-  "@code\n"
-  "layout = ... # a layout\n"
-  "layer = ...  # a layer\n"
-  "cell = ...   # a cell (initial cell for the deep region)\n"
-  "dss = RBA::DeepShapeStore::new\n"
-  "region = RBA::Region::new(cell.begin(layer), dss)\n"
-  "@/code\n"
-  "\n"
-  "The DeepShapeStore object also supplies some configuration options "
-  "for the operations acting on the deep regions. See for example \\threads=.\n"
-  "\n"
-  "This class has been introduced in version 0.26.\n"
-);
-
 Class<db::Region> decl_Region ("db", "Region",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
@@ -824,7 +796,7 @@ Class<db::Region> decl_Region ("db", "Region",
     "r = RBA::Region::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
     "@/code\n"
   ) +
-  constructor ("new", &new_sid, gsi::arg ("shape_iterator"), gsi::arg ("deep_shape_store"), gsi::arg ("area_ratio", 3.0), gsi::arg ("max_vertex_count", size_t (16)),
+  constructor ("new", &new_sid, gsi::arg ("shape_iterator"), gsi::arg ("deep_shape_store"), gsi::arg ("area_ratio", 0.0), gsi::arg ("max_vertex_count", size_t (0)),
     "@brief Constructor for a deep region from a hierarchical shape set\n"
     "\n"
     "This constructor creates a hierarchical region. Use a \\DeepShapeStore object to "

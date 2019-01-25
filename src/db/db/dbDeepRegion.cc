@@ -346,10 +346,12 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
 {
   DeepLayer dl_out (m_deep_layer.derived ());
 
-  db::BoolAndOrNotLocalOperation op (and_op, m_deep_layer.store ()->max_area_ratio (), m_deep_layer.store ()->max_vertex_count ());
+  db::BoolAndOrNotLocalOperation op (and_op);
 
   db::LocalProcessor proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
   proc.set_threads (m_deep_layer.store ()->threads ());
+  proc.set_area_ratio(m_deep_layer.store ()->max_area_ratio ());
+  proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
 
   proc.run (&op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
 

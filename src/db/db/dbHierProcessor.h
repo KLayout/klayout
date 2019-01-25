@@ -329,6 +329,31 @@ public:
     m_nthreads = nthreads;
   }
 
+  unsigned int threads () const
+  {
+    return m_nthreads;
+  }
+
+  void set_max_vertex_count (size_t max_vertex_count)
+  {
+    m_max_vertex_count = max_vertex_count;
+  }
+
+  size_t max_vertex_count () const
+  {
+    return m_max_vertex_count;
+  }
+
+  void set_area_ratio (double area_ratio)
+  {
+    m_area_ratio = area_ratio;
+  }
+
+  double area_ratio () const
+  {
+    return m_area_ratio;
+  }
+
 private:
   friend class LocalProcessorCellContexts;
   friend class LocalProcessorContextComputationTask;
@@ -339,6 +364,8 @@ private:
   const db::Cell *mp_intruder_top;
   std::string m_description;
   unsigned int m_nthreads;
+  size_t m_max_vertex_count;
+  double m_area_ratio;
   mutable std::auto_ptr<tl::Job<LocalProcessorContextComputationWorker> > mp_cc_job;
 
   std::string description (const LocalOperation *op) const;

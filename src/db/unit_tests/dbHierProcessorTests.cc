@@ -55,7 +55,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const
+  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const
   {
     db::ShapeInteractions sized_interactions = interactions;
     for (db::ShapeInteractions::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
@@ -66,7 +66,7 @@ public:
         sized_interactions.add_shape (*j, db::PolygonRef (poly, layout->shape_repository ()));
       }
     }
-    BoolAndOrNotLocalOperation::compute_local (layout, sized_interactions, result);
+    BoolAndOrNotLocalOperation::compute_local (layout, sized_interactions, result, max_vertex_count, area_ratio);
   }
 
   db::Coord dist () const
@@ -91,7 +91,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const
+  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const
   {
     db::ShapeInteractions sized_interactions = interactions;
     for (db::ShapeInteractions::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
@@ -110,7 +110,7 @@ public:
 
     }
 
-    SelfOverlapMergeLocalOperation::compute_local (layout, sized_interactions, result);
+    SelfOverlapMergeLocalOperation::compute_local (layout, sized_interactions, result, max_vertex_count, area_ratio);
   }
 
   db::Coord dist () const

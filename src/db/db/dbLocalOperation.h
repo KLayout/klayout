@@ -88,7 +88,7 @@ public:
    *  @param interactions The interaction set
    *  @param result The container to which the results are written
    */
-  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const = 0;
+  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const = 0;
 
   /**
    *  @brief Indicates the desired behaviour when a shape does not have an intruder
@@ -114,16 +114,14 @@ class DB_PUBLIC BoolAndOrNotLocalOperation
   : public LocalOperation
 {
 public:
-  BoolAndOrNotLocalOperation (bool is_and, double max_area_ratio = 0.0, size_t max_vertex_count = 0);
+  BoolAndOrNotLocalOperation (bool is_and);
 
-  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const;
+  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
   bool m_is_and;
-  double m_max_area_ratio;
-  size_t m_max_vertex_count;
 };
 
 /**
@@ -137,7 +135,7 @@ class DB_PUBLIC SelfOverlapMergeLocalOperation
 public:
   SelfOverlapMergeLocalOperation (unsigned int wrap_count);
 
-  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const;
+  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const;
   virtual std::string description () const;
 

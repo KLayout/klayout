@@ -255,7 +255,7 @@ LocalProcessorCellContexts::create (const key_type &intruders)
 }
 
 static void
-subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout)
+subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout, size_t max_vertex_count, double area_ratio)
 {
   if (other.empty ()) {
     return;
@@ -281,12 +281,10 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
     p2 += 2;
   }
 
-  double m_max_area_ratio = 3.0; // @@@
-  size_t m_max_vertex_count = 16; // @@@
   res.clear ();
   db::BooleanOp op (db::BooleanOp::ANotB);
   db::PolygonRefGenerator pr (layout, res);
-  db::PolygonSplitter splitter (pr, m_max_area_ratio, m_max_vertex_count);
+  db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
   db::PolygonGenerator pg (splitter, true, true);
   ep.process (pg, op);
 }
@@ -351,10 +349,10 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
         if (! lost.empty ()) {
 
-          subtract (lost, res, cell->layout ());
+          subtract (lost, res, cell->layout (), proc->max_vertex_count (), proc->area_ratio ());
 
           if (! lost.empty ()) {
-            subtract (common, lost, cell->layout ());
+            subtract (common, lost, cell->layout (), proc->max_vertex_count (), proc->area_ratio ());
             for (std::unordered_map<key_type, db::LocalProcessorCellContext>::iterator cc = m_contexts.begin (); cc != c; ++cc) {
               cc->second.propagate (lost);
             }
@@ -371,7 +369,7 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
         if (! gained.empty ()) {
 
-          subtract (gained, common, cell->layout ());
+          subtract (gained, common, cell->layout (), proc->max_vertex_count (), proc->area_ratio ());
 
           if (! gained.empty ()) {
             c->second.propagate (gained);
@@ -782,13 +780,13 @@ LocalProcessorResultComputationTask::perform ()
 //  LocalProcessor implementation
 
 LocalProcessor::LocalProcessor (db::Layout *layout, db::Cell *top)
-  : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0)
+  : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0)
 {
   //  .. nothing yet ..
 }
 
 LocalProcessor::LocalProcessor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top)
-  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0)
+  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0)
 {
   //  .. nothing yet ..
 }
@@ -1260,7 +1258,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
 
   }
 
-  op->compute_local (mp_subject_layout, interactions, result);
+  op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio);
 }
 
 }

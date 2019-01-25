@@ -39,8 +39,8 @@ namespace db
 // ---------------------------------------------------------------------------------------------
 //  BoolAndOrNotLocalOperation implementation
 
-BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and, double max_area_ratio, size_t max_vertex_count)
-  : m_is_and (is_and), m_max_area_ratio (max_area_ratio), m_max_vertex_count (max_vertex_count)
+BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
+  : m_is_and (is_and)
 {
   //  .. nothing yet ..
 }
@@ -58,7 +58,7 @@ BoolAndOrNotLocalOperation::description () const
 }
 
 void
-BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const
+BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const
 {
   db::EdgeProcessor ep;
 
@@ -103,7 +103,7 @@ BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const ShapeIntera
 
     db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
     db::PolygonRefGenerator pr (layout, result);
-    db::PolygonSplitter splitter (pr, m_max_area_ratio, m_max_vertex_count);
+    db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
     db::PolygonGenerator pg (splitter, true, true);
     ep.process (pg, op);
 
@@ -118,7 +118,7 @@ SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wra
   //  .. nothing yet ..
 }
 
-void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const
+void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   if (m_wrap_count == 0) {
     return;

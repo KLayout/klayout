@@ -103,6 +103,7 @@ class DB_PUBLIC LocalProcessorCellContext
 {
 public:
   typedef std::pair<const db::Cell *, db::ICplxTrans> parent_inst_type;
+  typedef std::vector<LocalProcessorCellDrop>::const_iterator drop_iterator;
 
   LocalProcessorCellContext ();
   LocalProcessorCellContext (const LocalProcessorCellContext &other);
@@ -128,6 +129,18 @@ public:
   tl::Mutex &lock ()
   {
     return m_lock;
+  }
+
+  //  used for debugging purposes only
+  drop_iterator begin_drops () const
+  {
+    return m_drops.begin ();
+  }
+
+  //  used for debugging purposes only
+  drop_iterator end_drops () const
+  {
+    return m_drops.end ();
   }
 
 private:

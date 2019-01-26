@@ -109,6 +109,11 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         //  count the number of gate shapes attached to this shape and distribute the area of the
         //  diffusion region to the number of gates
         int n = rgates.selected_interacting (db::Region (*d)).size ();
+        if (n == 0) { // @@@@
+          printf("@@@ p=%s\n", p->box().to_string().c_str());
+          printf("@@@ rdiff=%s\n", rdiff.to_string().c_str());
+          printf("@@@ rgates=%s\n", rgates.to_string().c_str()); fflush(stdout);
+        }
         tl_assert (n > 0);
 
         device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, dbu () * dbu () * d->area () / double (n));

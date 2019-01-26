@@ -292,7 +292,8 @@ HEADERS = \
     dbLayoutToNetlistWriter.h \
     dbLayoutToNetlistFormatDefs.h \
     dbDeviceAbstract.h \
-    dbLocalOperationUtils.h
+    dbLocalOperationUtils.h \
+    dbDeepRegion.h
 
 !equals(HAVE_QT, "0") {
 

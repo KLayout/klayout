@@ -772,6 +772,23 @@ LocalProcessorResultComputationTask::perform ()
   //  erase the contexts we don't need any longer
   {
     tl::MutexLocker locker (& mp_contexts->lock ());
+
+#if defined(ENABLE_DB_HP_SANITY_ASSERTIONS)
+    std::set<const db::LocalProcessorCellContext *> td;
+    for (db::LocalProcessorCellContexts::iterator i = mp_cell_contexts->begin (); i != mp_cell_contexts->end (); ++i) {
+      td.insert (&i->second);
+    }
+    for (db::LocalProcessorContexts::contexts_per_cell_type::iterator pcc = mp_contexts->context_map ().begin (); pcc != mp_contexts->context_map ().end (); ++pcc) {
+      for (db::LocalProcessorCellContexts::iterator i = pcc->second.begin (); i != pcc->second.end (); ++i) {
+        for (db::LocalProcessorCellContext::drop_iterator j = i->second.begin_drops (); j != i->second.end_drops (); ++j) {
+          if (td.find (j->parent_context) != td.end ()) {
+            tl_assert (false);
+          }
+        }
+      }
+    }
+#endif
+
     mp_contexts->context_map ().erase (mp_cell);
   }
 }
@@ -891,6 +908,23 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
     tl::MutexLocker locker (& contexts.lock ());
 
     db::LocalProcessorCellContexts &cell_contexts = contexts.contexts_per_cell (subject_cell, intruder_cell);
+
+#if defined(ENABLE_DB_HP_SANITY_ASSERTIONS)
+    if (subject_parent) {
+      db::LocalProcessorContexts::contexts_per_cell_type::iterator pcc = contexts.context_map ().find (subject_parent);
+      if (pcc == contexts.context_map ().end ()) {
+        tl_assert (false);
+      }
+      tl_assert (pcc->first == subject_parent);
+      bool any = false;
+      for (db::LocalProcessorCellContexts::iterator pcci = pcc->second.begin (); pcci != pcc->second.end () && !any; ++pcci) {
+        any = (&pcci->second == parent_context);
+      }
+      if (!any) {
+        tl_assert (false);
+      }
+    }
+ #endif
 
     cell_context = cell_contexts.find_context (intruders);
     if (cell_context) {
@@ -1087,23 +1121,24 @@ LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOp
       std::vector<db::cell_index_type> next_cells_bu;
       next_cells_bu.reserve (cells_bu.size ());
 
-      std::list<LocalProcessorResultComputationTask *> tasks;
-
       for (std::vector<db::cell_index_type>::const_iterator bu = cells_bu.begin (); bu != cells_bu.end (); ++bu) {
 
-        if (later.find (*bu) == later.end ()) {
+        LocalProcessorContexts::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
+        if (cpc != contexts.context_map ().end ()) {
 
-          LocalProcessorContexts::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
-          if (cpc != contexts.context_map ().end ()) {
+          if (later.find (*bu) == later.end ()) {
+
             rc_job->schedule (new LocalProcessorResultComputationTask (this, contexts, cpc->first, &cpc->second, op, output_layer));
             any = true;
-            for (db::Cell::parent_cell_iterator pc = cpc->first->begin_parent_cells (); pc != cpc->first->end_parent_cells (); ++pc) {
-              later.insert (*pc);
-            }
+
+          } else {
+            next_cells_bu.push_back (*bu);
           }
 
-        } else {
-          next_cells_bu.push_back (*bu);
+          for (db::Cell::parent_cell_iterator pc = cpc->first->begin_parent_cells (); pc != cpc->first->end_parent_cells (); ++pc) {
+            later.insert (*pc);
+          }
+
         }
 
       }

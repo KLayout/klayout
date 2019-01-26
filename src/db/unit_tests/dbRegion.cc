@@ -1329,3 +1329,27 @@ TEST(30c)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
 }
 
+TEST(issue_228)
+{
+  db::Region r;
+  db::Point pts[] = {
+    db::Point (0, 10),
+    db::Point (0, 290),
+    db::Point (280, 290),
+    db::Point (280, 230),
+    db::Point (360, 230),
+    db::Point (360, 70),
+    db::Point (280,70),
+    db::Point (280,10)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts [0]));
+  r.insert (poly);
+
+  db::Region rr;
+  rr.insert (db::Box (360, 70, 480, 230));
+
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), r.to_string ());
+  EXPECT_EQ (rr.selected_interacting (r).to_string (), rr.to_string ());
+}

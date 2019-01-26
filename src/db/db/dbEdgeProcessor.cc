@@ -639,7 +639,8 @@ InteractionDetector::reset ()
 {
   m_wcv_n.clear ();
   m_wcv_s.clear ();
-  m_inside.clear ();
+  m_inside_n.clear ();
+  m_inside_s.clear ();
 }
 
 void 
@@ -649,7 +650,8 @@ InteractionDetector::reserve (size_t n)
   m_wcv_s.clear ();
   m_wcv_n.resize (n, 0);
   m_wcv_s.resize (n, 0);
-  m_inside.clear ();
+  m_inside_n.clear ();
+  m_inside_s.clear ();
 }
 
 int 
@@ -667,9 +669,11 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
   //  we have to catch interactions between objects north and south to the scanline
   if (north || (m_mode == 0 && m_include_touching)) {
 
+    std::set <property_type> *inside = north ? &m_inside_n : &m_inside_s;
+
     if (inside_after < inside_before) {
 
-      m_inside.erase (p);
+      inside->erase (p);
 
       if (m_mode != 0) {
 
@@ -677,7 +681,7 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
         //  (due to prefer_touch == true and the sorting of coincident edges by property id)
         //  hence every remaining parts count as non-interacting (outside)
         if (p == m_container_id) {
-          for (std::set <property_type>::const_iterator i = m_inside.begin (); i != m_inside.end (); ++i) {
+          for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
             if (*i != m_container_id) {
               m_non_interactions.insert (*i);
             }
@@ -695,13 +699,13 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
           //  note that the container parts will be delivered first of all coincident 
           //  edges hence we can check whether the container is present even for coincident
           //  edges
-          if (m_inside.find (m_container_id) != m_inside.end ()) {
+          if (inside->find (m_container_id) != inside->end ()) {
             m_interactions.insert (std::make_pair (m_container_id, p));
           } else {
             m_non_interactions.insert (p);
           }
         } else {
-          for (std::set <property_type>::const_iterator i = m_inside.begin (); i != m_inside.end (); ++i) {
+          for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
             if (*i != m_container_id) {
               m_interactions.insert (std::make_pair (m_container_id, *i));
             }
@@ -710,7 +714,15 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
 
       } else {
 
-        for (std::set <property_type>::const_iterator i = m_inside.begin (); i != m_inside.end (); ++i) {
+        for (std::set <property_type>::const_iterator i = m_inside_n.begin (); i != m_inside_n.end (); ++i) {
+          if (*i < p) {
+            m_interactions.insert (std::make_pair (*i, p));
+          } else if (*i > p) {
+            m_interactions.insert (std::make_pair (p, *i));
+          }
+        }
+
+        for (std::set <property_type>::const_iterator i = m_inside_s.begin (); i != m_inside_s.end (); ++i) {
           if (*i < p) {
             m_interactions.insert (std::make_pair (*i, p));
           } else if (*i > p) {
@@ -720,7 +732,7 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
 
       }
 
-      m_inside.insert (p);
+      inside->insert (p);
 
     }
 

@@ -299,7 +299,7 @@ public:
   virtual void reserve (size_t n);
   virtual int edge (bool north, bool enter, property_type p);
   virtual int compare_ns () const;
-  virtual bool is_reset () const { return m_inside.empty (); }
+  virtual bool is_reset () const { return m_inside_s.empty () && m_inside_n.empty (); }
   virtual bool prefer_touch () const { return m_include_touching; }
 
 private:
@@ -307,7 +307,7 @@ private:
   bool m_include_touching;
   property_type m_container_id;
   std::vector <int> m_wcv_n, m_wcv_s;
-  std::set <property_type> m_inside;
+  std::set <property_type> m_inside_n, m_inside_s;
   std::set<std::pair<property_type, property_type> > m_interactions;
   std::set<property_type> m_non_interactions;
 };

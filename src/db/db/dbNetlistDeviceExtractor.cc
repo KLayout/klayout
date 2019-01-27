@@ -27,6 +27,7 @@
 
 #include "tlProgress.h"
 #include "tlTimer.h"
+#include "tlInternational.h"
 
 namespace db
 {
@@ -43,6 +44,31 @@ NetlistDeviceExtractorError::NetlistDeviceExtractorError (const std::string &cel
   : m_cell_name (cell_name), m_message (msg)
 {
   //  .. nothing yet ..
+}
+
+std::string NetlistDeviceExtractorError::to_string () const
+{
+  std::string res;
+
+  if (! m_category_name.empty ()) {
+    if (m_category_description.empty ()) {
+      res += "[" + m_category_name + "] ";
+    } else {
+      res += "[" + m_category_description + "] ";
+    }
+  }
+
+  res += m_message;
+
+  if (! m_cell_name.empty ()) {
+    res += tl::to_string (tr (", in cell: ")) + m_cell_name;
+  }
+
+  if (! m_geometry.box ().empty ()) {
+    res += tl::to_string (tr (", shape: ")) + m_geometry.to_string ();
+  }
+
+  return res;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -485,25 +511,43 @@ std::string NetlistDeviceExtractor::cell_name () const
 void NetlistDeviceExtractor::error (const std::string &msg)
 {
   m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
+
+  if (tl::verbosity () >= 20) {
+    tl::error << m_errors.back ().to_string ();
+  }
 }
 
 void NetlistDeviceExtractor::error (const std::string &msg, const db::DPolygon &poly)
 {
-  error (msg);
+  m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
   m_errors.back ().set_geometry (poly);
+
+  if (tl::verbosity () >= 20) {
+    tl::error << m_errors.back ().to_string ();
+  }
 }
 
 void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg)
 {
-  error (msg);
+  m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
   m_errors.back ().set_category_name (category_name);
   m_errors.back ().set_category_description (category_description);
+
+  if (tl::verbosity () >= 20) {
+    tl::error << m_errors.back ().to_string ();
+  }
 }
 
 void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::DPolygon &poly)
 {
-  error (category_name, category_description, msg);
+  m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
+  m_errors.back ().set_category_name (category_name);
+  m_errors.back ().set_category_description (category_description);
   m_errors.back ().set_geometry (poly);
+
+  if (tl::verbosity () >= 20) {
+    tl::error << m_errors.back ().to_string ();
+  }
 }
 
 }

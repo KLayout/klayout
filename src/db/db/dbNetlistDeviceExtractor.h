@@ -138,6 +138,11 @@ public:
     m_cell_name = n;
   }
 
+  /**
+   *  @brief Formats this message for printing
+   */
+  std::string to_string () const;
+
 private:
   std::string m_cell_name;
   std::string m_message;

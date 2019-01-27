@@ -1388,6 +1388,11 @@ private:
    */
   void mark_to_join (id_type a, id_type b)
   {
+    if (a == b) {
+      //  shouldn't happen, but duplicate instances may trigger this
+      return;
+    }
+
     typename std::map<id_type, typename join_set_list::iterator>::const_iterator x = m_cm2join_map.find (a);
     typename std::map<id_type, typename join_set_list::iterator>::const_iterator y = m_cm2join_map.find (b);
 
@@ -1885,12 +1890,14 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
       db::local_cluster<T> *gc = local.insert ();
       gc->set_global_nets (ge->first);
+      //  NOTE: don't use the gc pointer - it may become invalid during make_path (will also do a local.insert)
+      size_t gcid = gc->id ();
 
       for (std::set<ClusterInstance>::const_iterator ci = ge->second.begin (); ci != ge->second.end (); ++ci) {
 
         if (ci->inst ().array_inst.at_end ()) {
 
-          local.join_cluster_with (gc->id (), ci->id ());
+          local.join_cluster_with (gcid, ci->id ());
           local.remove_cluster (ci->id ());
 
         } else {
@@ -1900,11 +1907,13 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
           ClusterInstance k = make_path (layout, cell, ci->id (), p);
 
           size_t other_id = local.find_cluster_with_connection (k);
-          if (other_id) {
-            local.join_cluster_with (gc->id (), other_id);
+          if (other_id == gcid) {
+            //  shouldn't happen, but duplicate instances may trigger this
+          } else if (other_id) {
+            local.join_cluster_with (gcid, other_id);
             local.remove_cluster (other_id);
           } else {
-            local.add_connection (gc->id (), k);
+            local.add_connection (gcid, k);
           }
 
         }

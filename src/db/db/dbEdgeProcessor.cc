@@ -975,7 +975,7 @@ BooleanOp2::compare_ns () const
 //  EdgeProcessor implementation
 
 EdgeProcessor::EdgeProcessor (bool report_progress, const std::string &progress_desc)
-  : m_report_progress (report_progress), m_progress_desc (progress_desc)
+  : m_report_progress (report_progress), m_progress_desc (progress_desc), m_base_verbosity (30)
 {
   mp_work_edges = new std::vector <WorkEdge> ();
   mp_cpvector = new std::vector <CutPoints> ();
@@ -1004,6 +1004,12 @@ EdgeProcessor::enable_progress (const std::string &progress_desc)
 {
   m_report_progress = true;
   m_progress_desc = progress_desc;
+}
+
+void
+EdgeProcessor::set_base_verbosity (int bv)
+{
+  m_base_verbosity = bv;
 }
 
 void 
@@ -1534,7 +1540,7 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 void 
 EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 31, "EdgeProcessor: process");
+  tl::SelfTimer timer (tl::verbosity () >= m_base_verbosity, "EdgeProcessor: process");
 
   bool prefer_touch = op.prefer_touch (); 
   bool selects_edges = op.selects_edges (); 
@@ -1749,7 +1755,7 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
 #endif
 
 
-  tl::SelfTimer timer2 (tl::verbosity () >= 41, "EdgeProcessor: production");
+  tl::SelfTimer timer2 (tl::verbosity () >= m_base_verbosity + 10, "EdgeProcessor: production");
 
   //  step 4: compute the result edges 
   

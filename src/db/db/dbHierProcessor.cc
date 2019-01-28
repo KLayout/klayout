@@ -262,6 +262,7 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
   }
 
   db::EdgeProcessor ep;
+  ep.set_base_verbosity (60);
 
   size_t p1 = 0, p2 = 1;
 
@@ -303,7 +304,7 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
     ++index;
 
-    if (tl::verbosity () >= 30) {
+    if (tl::verbosity () >= 50) {
       tl::log << tr ("Computing local results for ") << cell->layout ()->cell_name (cell->cell_index ()) << " (context " << index << "/" << total << ")";
     }
 
@@ -836,7 +837,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const L
 {
   try {
 
-    tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing contexts for ")) + description (op));
+    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Computing contexts for ")) + description (op));
 
     if (m_nthreads > 0) {
       mp_cc_job.reset (new tl::Job<LocalProcessorContextComputationWorker> (m_nthreads));
@@ -891,7 +892,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 {
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts)
 
-  if (tl::verbosity () >= 30) {
+  if (tl::verbosity () >= 50) {
     if (! subject_parent) {
       tl::log << tr ("Computing context for top cell ") << mp_subject_layout->cell_name (subject_cell->cell_index ());
     } else {
@@ -1089,7 +1090,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 void
 LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int output_layer) const
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing results for ")) + description (op));
+  tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Computing results for ")) + description (op));
 
   //  avoids updates while we work on the layout
   mp_subject_layout->update ();
@@ -1113,7 +1114,7 @@ LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOp
     while (true) {
 
       ++iter;
-      tl::SelfTimer timer (tl::verbosity () >= 21, tl::sprintf (tl::to_string (tr ("Computing results iteration #%d")), iter));
+      tl::SelfTimer timer (tl::verbosity () >= 41, tl::sprintf (tl::to_string (tr ("Computing results iteration #%d")), iter));
 
       bool any = false;
       std::unordered_set<db::cell_index_type> later;

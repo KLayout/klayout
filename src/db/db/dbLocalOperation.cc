@@ -105,6 +105,7 @@ BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const ShapeIntera
     db::PolygonRefGenerator pr (layout, result);
     db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
     db::PolygonGenerator pg (splitter, true, true);
+    ep.set_base_verbosity (50);
     ep.process (pg, op);
 
   }
@@ -158,6 +159,7 @@ void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const Sh
   db::MergeOp op (m_wrap_count - 1);
   db::PolygonRefGenerator pr (layout, result);
   db::PolygonGenerator pg (pr, true, true);
+  ep.set_base_verbosity (50);
   ep.process (pg, op);
 }
 

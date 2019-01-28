@@ -1004,6 +1004,17 @@ public:
   typedef typename local_cluster<T>::id_type id_type;
   typedef std::map<ClusterInstance, id_type> connector_map;
 
+  struct ClusterInstanceInteraction
+  {
+    ClusterInstanceInteraction (size_t _cluster_id, size_t _other_cluster_id, const std::vector<db::InstElement> &_other_path)
+      : cluster_id (_cluster_id), other_cluster_id (_other_cluster_id), other_path (_other_path)
+    { }
+
+    size_t cluster_id;
+    size_t other_cluster_id;
+    std::vector<db::InstElement> other_path;
+  };
+
   /**
    *  @brief Constructor
    */
@@ -1054,8 +1065,26 @@ public:
    *  This step is postponed because doing this while the iteration happens would
    *  invalidate the box trees.
    */
-  void join_superclusters ()
+  void finish_cluster_to_instance_interactions ()
   {
+    for (typename std::list<ClusterInstanceInteraction>::const_iterator ii = m_ci_interactions.begin (); ii != m_ci_interactions.end (); ++ii) {
+
+      ClusterInstance other_key = make_path (ii->other_cluster_id, ii->other_path);
+
+      id_type other = mp_cell_clusters->find_cluster_with_connection (other_key);
+      if (other > 0) {
+
+        //  we found a child cluster that connects two clusters on our own level:
+        //  we must join them into one, but not now. We're still iterating and
+        //  would invalidate the box trees. So keep this now and combine the clusters later.
+        mark_to_join (other, ii->cluster_id);
+
+      } else {
+        mp_cell_clusters->add_connection (ii->cluster_id, other_key);
+      }
+
+    }
+
     for (typename std::list<std::set<id_type> >::const_iterator sc = m_cm2join_sets.begin (); sc != m_cm2join_sets.end (); ++sc) {
 
       if (sc->empty ()) {
@@ -1082,6 +1111,7 @@ private:
   typedef std::list<std::set<id_type> > join_set_list;
   std::map<id_type, typename join_set_list::iterator> m_cm2join_map;
   join_set_list m_cm2join_sets;
+  std::list<ClusterInstanceInteraction> m_ci_interactions;
 
   /**
    *  @brief Handles the cluster interactions between two instances or instance arrays
@@ -1184,6 +1214,10 @@ private:
     db::ICplxTrans t2i = t2.inverted ();
     db::ICplxTrans t21 = t1i * t2;
 
+    //  NOTE: make_path may disturb the iteration (because of modification), hence
+    //  we first collect and then process the interactions.
+    std::vector<std::pair<size_t, size_t> > interactions;
+
     for (typename db::local_clusters<T>::touching_iterator i = cl1.begin_touching (common.transformed (t1i)); ! i.at_end (); ++i) {
 
       //  skip the test, if this cluster doesn't interact with the whole cell2
@@ -1195,48 +1229,51 @@ private:
       for (typename db::local_clusters<T>::touching_iterator j = cl2.begin_touching (bc1.transformed (t2i)); ! j.at_end (); ++j) {
 
         if (i->interacts (*j, t21, *mp_conn)) {
-
-          ClusterInstance k1 = make_path (i->id (), p1);
-          ClusterInstance k2 = make_path (j->id (), p2);
-
-          id_type x1 = mp_cell_clusters->find_cluster_with_connection (k1);
-          id_type x2 = mp_cell_clusters->find_cluster_with_connection (k2);
-
-          if (x1 == 0) {
-
-            if (x2 == 0) {
-
-              id_type connector = mp_cell_clusters->insert_dummy ();
-              mp_cell_clusters->add_connection (connector, k1);
-              mp_cell_clusters->add_connection (connector, k2);
-
-            } else {
-              mp_cell_clusters->add_connection (x2, k1);
-            }
-
-          } else if (x2 == 0) {
-
-            mp_cell_clusters->add_connection (x1, k2);
-
-          } else if (x1 != x2) {
-
-            //  for instance-to-instance interactions the number of connections is more important for the
-            //  cost of the join operation: make the one with more connections the target
-            if (mp_cell_clusters->connections_for_cluster (x1).size () < mp_cell_clusters->connections_for_cluster (x2).size ()) {
-              std::swap (x1, x2);
-            }
-
-            mp_cell_clusters->join_cluster_with (x1, x2);
-            mp_cell_clusters->remove_cluster (x2);
-
-          }
-
+          interactions.push_back (std::make_pair (i->id (), j->id ()));
         }
 
       }
 
     }
 
+    for (std::vector<std::pair<size_t, size_t> >::const_iterator ii = interactions.begin (); ii != interactions.end (); ++ii) {
+
+      ClusterInstance k1 = make_path (ii->first, p1);
+      ClusterInstance k2 = make_path (ii->second, p2);
+
+      id_type x1 = mp_cell_clusters->find_cluster_with_connection (k1);
+      id_type x2 = mp_cell_clusters->find_cluster_with_connection (k2);
+
+      if (x1 == 0) {
+
+        if (x2 == 0) {
+
+          id_type connector = mp_cell_clusters->insert_dummy ();
+          mp_cell_clusters->add_connection (connector, k1);
+          mp_cell_clusters->add_connection (connector, k2);
+
+        } else {
+          mp_cell_clusters->add_connection (x2, k1);
+        }
+
+      } else if (x2 == 0) {
+
+        mp_cell_clusters->add_connection (x1, k2);
+
+      } else if (x1 != x2) {
+
+        //  for instance-to-instance interactions the number of connections is more important for the
+        //  cost of the join operation: make the one with more connections the target
+        if (mp_cell_clusters->connections_for_cluster (x1).size () < mp_cell_clusters->connections_for_cluster (x2).size ()) {
+          std::swap (x1, x2);
+        }
+
+        mp_cell_clusters->join_cluster_with (x1, x2);
+        mp_cell_clusters->remove_cluster (x2);
+
+      }
+
+    }
   }
 
   /**
@@ -1358,26 +1395,15 @@ private:
   void add_single_pair (const local_cluster<T> &c1,
                         db::cell_index_type ci2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
   {
+    //  NOTE: make_path may disturb the iteration (because of modification), hence
+    //  we first collect and then process the interactions.
+
     const db::local_clusters<T> &cl2 = mp_tree->clusters_per_cell (ci2);
 
     for (typename db::local_clusters<T>::touching_iterator j = cl2.begin_touching (c1.bbox ().transformed (t2.inverted ())); ! j.at_end (); ++j) {
 
       if (c1.interacts (*j, t2, *mp_conn)) {
-
-        ClusterInstance k2 = make_path (j->id (), p2);
-
-        id_type other = mp_cell_clusters->find_cluster_with_connection (k2);
-        if (other > 0) {
-
-          //  we found a child cluster that connects two clusters on our own level:
-          //  we must join them into one, but not now. We're still iterating and
-          //  would invalidate the box trees. So keep this now and combine the clusters later.
-          mark_to_join (other, c1.id ());
-
-        } else {
-          mp_cell_clusters->add_connection (c1.id (), k2);
-        }
-
+        m_ci_interactions.push_back (ClusterInstanceInteraction (c1.id (), j->id (), p2));
       }
 
     }
@@ -1649,19 +1675,17 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
           todo.push_back (*c);
         } else {
           tl_assert (! todo.empty ());
-          build_hier_connections_for_cells (cbc, layout, todo, conn);
+          build_hier_connections_for_cells (cbc, layout, todo, conn, progress);
           done.insert (todo.begin (), todo.end ());
           todo.clear ();
           todo.push_back (*c);
         }
 
-        ++progress;
-
       }
 
     }
 
-    build_hier_connections_for_cells (cbc, layout, todo, conn);
+    build_hier_connections_for_cells (cbc, layout, todo, conn, progress);
   }
 }
 
@@ -1681,10 +1705,11 @@ hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell 
 
 template <class T>
 void
-hier_clusters<T>::build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn)
+hier_clusters<T>::build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, tl::RelativeProgress &progress)
 {
   for (std::vector<db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
     build_hier_connections (cbc, layout, layout.cell (*c), conn);
+    ++progress;
   }
 }
 
@@ -1850,7 +1875,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
   }
 
   //  join local clusters which got connected by child clusters
-  rec->join_superclusters ();
+  rec->finish_cluster_to_instance_interactions ();
   rec.reset (0);
 
   //  finally connect global nets

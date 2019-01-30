@@ -1057,9 +1057,34 @@ static gsi::ClassExt<B> b_ext (
   gsi::iterator_ext ("b10p", &b10bp_ext, &b10ep_ext) 
 );
 
+CopyDetector *new_cd (int x)
+{
+  return new CopyDetector (x);
+}
+
+static gsi::Class<CopyDetector> decl_copy_detector ("", "CopyDetector",
+  gsi::constructor ("new", &new_cd) +
+  gsi::method ("x", &CopyDetector::x) +
+  gsi::method ("xx", &CopyDetector::xx)
+);
 
 static gsi::Class<C_P> decl_c ("", "C",
   gsi::callback ("f", &C_P::f, &C_P::f_cb) +
+  gsi::callback ("vfunc", &C_P::vfunc, &C_P::vfunc_cb) +
+  gsi::method ("call_vfunc", &C_P::call_vfunc) +
+  gsi::method ("pass_cd_direct", &C_P::pass_cd_direct) +
+  gsi::method ("pass_cd_cref", &C_P::pass_cd_cref) +
+  gsi::method<C_P, const CopyDetector &, const CopyDetector &, gsi::arg_make_copy> ("pass_cd_cref_as_copy", &C_P::pass_cd_cref) +
+  gsi::method<C_P, const CopyDetector &, const CopyDetector &, gsi::arg_make_reference> ("pass_cd_cref_as_ref", &C_P::pass_cd_cref) +
+  gsi::method ("pass_cd_cptr", &C_P::pass_cd_cptr) +
+  gsi::method<C_P, const CopyDetector *, const CopyDetector &, gsi::arg_make_copy> ("pass_cd_cptr_as_copy", &C_P::pass_cd_cptr) +
+  gsi::method<C_P, const CopyDetector *, const CopyDetector &, gsi::arg_make_reference> ("pass_cd_cptr_as_ref", &C_P::pass_cd_cptr) +
+  gsi::method ("pass_cd_ref", &C_P::pass_cd_ref) +
+  gsi::method<C_P, CopyDetector &, const CopyDetector &, gsi::arg_make_copy> ("pass_cd_ref_as_copy", &C_P::pass_cd_ref) +
+  gsi::method<C_P, CopyDetector &, const CopyDetector &, gsi::arg_make_reference> ("pass_cd_ref_as_ref", &C_P::pass_cd_ref) +
+  gsi::method ("pass_cd_ptr", &C_P::pass_cd_ptr) +
+  gsi::method<C_P, CopyDetector *, const CopyDetector &, gsi::arg_make_copy> ("pass_cd_ptr_as_copy", &C_P::pass_cd_ptr) +
+  gsi::method<C_P, CopyDetector *, const CopyDetector &, gsi::arg_make_reference> ("pass_cd_ptr_as_ref", &C_P::pass_cd_ptr) +
   gsi::method ("g", &C_P::g) +
   gsi::method ("s1", &C::s1) +
   gsi::method ("s2", &C::s2) +

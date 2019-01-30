@@ -220,7 +220,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG, class F = gsi::return_by_value>
+template <class X, class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(Method)
   : public MethodSpecificBase <X>
 {
@@ -240,11 +240,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    if (tl::value_from_type (typename F::is_factory ())) {
-      this->template set_return_new<R> ();
-    } else {
-      this->template set_return<R> ();
-    }
+    this->template set_return<R, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -268,7 +264,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG, class F = gsi::return_by_value>
+template <class X, class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ConstMethod)
   : public MethodSpecificBase <X>
 {
@@ -288,11 +284,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    if (tl::value_from_type (typename F::is_factory ())) {
-      this->template set_return_new<R> ();
-    } else {
-      this->template set_return<R> ();
-    }
+    this->template set_return<R, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -316,7 +308,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG, class F = gsi::return_by_value>
+template <class X, class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ExtMethod)
   : public MethodBase
 {
@@ -336,11 +328,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    if (tl::value_from_type (typename F::is_factory ())) {
-      this->template set_return_new<R> ();
-    } else {
-      this->template set_return<R> ();
-    }
+    this->template set_return<R, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -364,7 +352,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class R _COMMA _TMPLARG, class F = gsi::return_by_value>
+template <class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(StaticMethod)
   : public StaticMethodBase
 {
@@ -384,11 +372,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    if (tl::value_from_type (typename F::is_factory ())) {
-      this->template set_return_new<R> ();
-    } else {
-      this->template set_return<R> ();
-    }
+    this->template set_return<R, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -1300,7 +1284,14 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 method (const std::string &name, R (X::*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(Method) <X, R _COMMA _FUNCARGLIST> (name, m, doc));
+  return Methods (new _NAME(Method) <X, R _COMMA _FUNCARGLIST, arg_default_return_value_preference> (name, m, doc));
+}
+
+template <class X, class R _COMMA _TMPLARG, class Transfer>
+Methods
+method (const std::string &name, R (X::*m) (_FUNCARGLIST), const std::string &doc = std::string ())
+{
+  return Methods (new _NAME(Method) <X, R _COMMA _FUNCARGLIST, Transfer> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1308,7 +1299,14 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 method (const std::string &name, R (X::*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(Method) <X, R _COMMA _FUNCARGLIST> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(Method) <X, R _COMMA _FUNCARGLIST, arg_default_return_value_preference> (name, m, doc))->add_args (_ARGSPECARGS));
+}
+
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+method (const std::string &name, R (X::*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(Method) <X, R _COMMA _FUNCARGLIST, Transfer> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1316,7 +1314,7 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 factory (const std::string &name, R *(X::*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(Method) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc));
+  return Methods (new _NAME(Method) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1324,7 +1322,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory (const std::string &name, R *(X::*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(Method) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(Method) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1332,7 +1330,14 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 method_ext (const std::string &name, R (*xm) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(ExtMethod) <X, R _COMMA _FUNCARGLIST> (name, xm, doc));
+  return Methods (new _NAME(ExtMethod) <X, R _COMMA _FUNCARGLIST, arg_default_return_value_preference> (name, xm, doc));
+}
+
+template <class X, class R _COMMA _TMPLARG, class Transfer>
+Methods
+method_ext (const std::string &name, R (*xm) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
+{
+  return Methods (new _NAME(ExtMethod) <X, R _COMMA _FUNCARGLIST, Transfer> (name, xm, doc));
 }
 
 #if _COUNT != 0
@@ -1340,7 +1345,14 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 method_ext (const std::string &name, R (*xm) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(ExtMethod) <X, R _COMMA _FUNCARGLIST> (name, xm, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(ExtMethod) <X, R _COMMA _FUNCARGLIST, arg_default_return_value_preference> (name, xm, doc))->add_args (_ARGSPECARGS));
+}
+
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+method_ext (const std::string &name, R (*xm) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(ExtMethod) <X, R _COMMA _FUNCARGLIST, Transfer> (name, xm, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1348,7 +1360,7 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 factory_ext (const std::string &name, R *(*xm) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, xm, doc));
+  return Methods (new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, xm, doc));
 }
 
 #if _COUNT != 0
@@ -1356,7 +1368,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory_ext (const std::string &name, R *(*xm) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, xm, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, xm, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1364,7 +1376,7 @@ template <class X _COMMA _TMPLARG>
 Methods
 constructor (const std::string &name, X *(*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(StaticMethod) <X * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc));
+  return Methods (new _NAME(StaticMethod) <X * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1372,7 +1384,7 @@ template <class X _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 constructor (const std::string &name, X *(*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(StaticMethod) <X * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(StaticMethod) <X * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1380,7 +1392,14 @@ template <class R _COMMA _TMPLARG>
 Methods
 method (const std::string &name, R (*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(StaticMethod) <R _COMMA _FUNCARGLIST> (name, m, doc));
+  return Methods (new _NAME(StaticMethod) <R _COMMA _FUNCARGLIST, arg_default_return_value_preference> (name, m, doc));
+}
+
+template <class R _COMMA _TMPLARG, class Transfer>
+Methods
+method (const std::string &name, R (*m) (_FUNCARGLIST), const std::string &doc = std::string ())
+{
+  return Methods (new _NAME(StaticMethod) <R _COMMA _FUNCARGLIST, Transfer> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1388,7 +1407,14 @@ template <class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 method (const std::string &name, R (*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(StaticMethod) <R _COMMA _FUNCARGLIST> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(StaticMethod) <R _COMMA _FUNCARGLIST, arg_default_return_value_preference> (name, m, doc))->add_args (_ARGSPECARGS));
+}
+
+template <class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+method (const std::string &name, R (*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(StaticMethod) <R _COMMA _FUNCARGLIST, Transfer> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1396,7 +1422,7 @@ template <class R _COMMA _TMPLARG>
 Methods
 factory (const std::string &name, R *(*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(StaticMethod) <R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc));
+  return Methods (new _NAME(StaticMethod) <R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1404,7 +1430,7 @@ template <class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory (const std::string &name, R *(*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(StaticMethod) <R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(StaticMethod) <R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1428,7 +1454,7 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 factory_callback (const std::string &name, R (X::*m) (_FUNCARGLIST), Callback X::*cb, const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(Method) <X, R _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc, cb));
+  return Methods (new _NAME(Method) <X, R _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc, cb));
 }
 
 #if _COUNT != 0
@@ -1436,7 +1462,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory_callback (const std::string &name, R (X::*m) (_FUNCARGLIST), Callback X::*cb _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(Method) <X, R _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc, cb))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(Method) <X, R _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc, cb))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1444,7 +1470,14 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 method (const std::string &name, R (X::*m) (_FUNCARGLIST) const, const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST> (name, m, doc));
+  return Methods (new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, arg_default_return_value_preference> (name, m, doc));
+}
+
+template <class X, class R _COMMA _TMPLARG, class Transfer>
+Methods
+method (const std::string &name, R (X::*m) (_FUNCARGLIST) const, const std::string &doc = std::string ())
+{
+  return Methods (new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, Transfer> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1452,7 +1485,14 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 method (const std::string &name, R (X::*m) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, arg_default_return_value_preference> (name, m, doc))->add_args (_ARGSPECARGS));
+}
+
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+method (const std::string &name, R (X::*m) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, Transfer> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1460,7 +1500,7 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 factory (const std::string &name, R *(X::*m) (_FUNCARGLIST) const, const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc));
+  return Methods (new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1468,7 +1508,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory (const std::string &name, R *(X::*m) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1492,7 +1532,7 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 factory_callback (const std::string &name, R (X::*m) (_FUNCARGLIST) const, Callback X::*cb, const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc, cb));
+  return Methods (new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc, cb));
 }
 
 #if _COUNT != 0
@@ -1500,7 +1540,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory_callback (const std::string &name, R (X::*m) (_FUNCARGLIST) const, Callback X::*cb _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc, cb))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc, cb))->add_args (_ARGSPECARGS));
 }
 #endif
 

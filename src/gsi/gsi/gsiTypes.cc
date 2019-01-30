@@ -112,7 +112,7 @@ ArgType::to_string () const
 ArgType::ArgType ()
   : m_type (T_void), mp_spec (0), mp_inner (0), mp_inner_k (0),
     m_is_ref (false), m_is_ptr (false), m_is_cref (false), m_is_cptr (false), m_is_iter (false), 
-    m_owns_spec (false), m_pass_obj (false),
+    m_owns_spec (false), m_pass_obj (false), m_prefer_copy (false),
     mp_cls (0), m_size (0)
 { }
 
@@ -132,7 +132,7 @@ ArgType::~ArgType ()
 ArgType::ArgType (const ArgType &other)
   : m_type (T_void), mp_spec (0), mp_inner (0), mp_inner_k (0),
     m_is_ref (false), m_is_ptr (false), m_is_cref (false), m_is_cptr (false), m_is_iter (false), 
-    m_owns_spec (false), m_pass_obj (false),
+    m_owns_spec (false), m_pass_obj (false), m_prefer_copy (false),
     mp_cls (0), m_size (0)
 {
   operator= (other);
@@ -156,6 +156,7 @@ ArgType::operator= (const ArgType &other)
 
     m_type = other.m_type;
     m_pass_obj = other.m_pass_obj;
+    m_prefer_copy = other.m_prefer_copy;
     m_is_ref = other.m_is_ref;
     m_is_cref = other.m_is_cref;
     m_is_ptr = other.m_is_ptr;
@@ -204,7 +205,7 @@ ArgType::operator== (const ArgType &b) const
   }
   return m_type == b.m_type && m_is_iter == b.m_is_iter && 
          m_is_ref == b.m_is_ref && m_is_cref == b.m_is_cref && m_is_ptr == b.m_is_ptr && m_is_cptr == b.m_is_cptr && 
-         mp_cls == b.mp_cls && m_pass_obj == b.m_pass_obj;
+         mp_cls == b.mp_cls && m_pass_obj == b.m_pass_obj && m_prefer_copy == b.m_prefer_copy;
 }
 
 void 

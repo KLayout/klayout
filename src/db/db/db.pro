@@ -164,7 +164,9 @@ SOURCES = \
     dbLayoutToNetlistFormatDefs.cc \
     dbDeviceAbstract.cc \
     dbLocalOperationUtils.cc \
-    gsiDeclDbDeepShapeStore.cc
+    gsiDeclDbDeepShapeStore.cc \
+    dbNetlistSpiceWriter.cc \
+    dbNetlistWriter.cc
 
 HEADERS = \
   dbArray.h \
@@ -293,7 +295,9 @@ HEADERS = \
     dbLayoutToNetlistFormatDefs.h \
     dbDeviceAbstract.h \
     dbLocalOperationUtils.h \
-    dbDeepRegion.h
+    dbDeepRegion.h \
+    dbNetlistSpiceWriter.h \
+    dbNetlistWriter.h
 
 !equals(HAVE_QT, "0") {
 

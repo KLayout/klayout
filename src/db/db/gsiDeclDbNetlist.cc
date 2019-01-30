@@ -22,8 +22,11 @@
 
 #include "gsiDecl.h"
 #include "dbNetlist.h"
+#include "dbNetlistWriter.h"
+#include "dbNetlistSpiceWriter.h"
 #include "tlException.h"
 #include "tlInternational.h"
+#include "tlStream.h"
 
 namespace gsi
 {
@@ -85,6 +88,10 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   ) +
   gsi::method ("name", &db::Device::name,
     "@brief Gets the name of the device.\n"
+  ) +
+  gsi::method ("expanded_name", &db::Device::expanded_name,
+    "@brief Gets the expanded name of the device.\n"
+    "The expanded name takes the name of the device. If the name is empty, the numeric ID will be used to build a name. "
   ) +
   gsi::method ("net_for_terminal", (db::Net *(db::Device::*) (size_t)) &db::Device::net_for_terminal, gsi::arg ("terminal_id"),
     "@brief Gets the net connected to the specified terminal.\n"
@@ -208,6 +215,10 @@ Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
   ) +
   gsi::method ("name", &db::SubCircuit::name,
     "@brief Gets the name of the subcircuit.\n"
+  ) +
+  gsi::method ("expanded_name", &db::SubCircuit::expanded_name,
+    "@brief Gets the expanded name of the subcircuit.\n"
+    "The expanded name takes the name of the subcircuit. If the name is empty, the numeric ID will be used to build a name. "
   ) +
   gsi::method ("net_for_pin", (db::Net *(db::SubCircuit::*) (size_t)) &db::SubCircuit::net_for_pin, gsi::arg ("pin_id"),
     "@brief Gets the net connected to the specified pin of the subcircuit.\n"
@@ -465,8 +476,14 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name", &db::DeviceClass::name,
     "@brief Gets the name of the device class."
   ) +
+  gsi::method ("name=", &db::DeviceClass::set_name, gsi::arg ("name"),
+    "@brief Sets the name of the device class."
+  ) +
   gsi::method ("description", &db::DeviceClass::description,
     "@brief Gets the description text of the device class."
+  ) +
+  gsi::method ("description=", &db::DeviceClass::set_description, gsi::arg ("description"),
+    "@brief Sets the description of the device class."
   ) +
   gsi::method ("netlist", (db::Netlist *(db::DeviceClass::*) ()) &db::DeviceClass::netlist,
     "@brief Gets the netlist the device class lives in."
@@ -616,12 +633,6 @@ Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "Ge
   ) +
   gsi::method ("clear_parameters", &GenericDeviceClass::clear_parameter_definitions,
     "@brief Clears the list of parameters\n"
-  ) +
-  gsi::method ("name=", &GenericDeviceClass::set_name, gsi::arg ("name"),
-    "@brief Sets the name of the device\n"
-  ) +
-  gsi::method ("description=", &GenericDeviceClass::set_description, gsi::arg ("description"),
-    "@brief Sets the description of the device\n"
   ) +
   gsi::callback ("combine_devices", &GenericDeviceClass::combine_devices, &GenericDeviceClass::cb_combine_devices, gsi::arg ("a"), gsi::arg ("b"),
     "@brief Combines two devices.\n"
@@ -892,18 +903,27 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
 
 static void add_circuit (db::Netlist *nl, db::Circuit *c)
 {
+  tl_assert (c != 0);
   c->keep ();
   nl->add_circuit (c);
 }
 
 static void add_device_class (db::Netlist *nl, db::DeviceClass *cl)
 {
+  tl_assert (cl != 0);
   cl->keep ();
   nl->add_device_class (cl);
 }
 
+static void write_netlist (const db::Netlist *nl, const std::string &file, db::NetlistWriter *writer, const std::string &description)
+{
+  tl_assert (writer != 0);
+  tl::OutputStream os (file);
+  writer->write (os, *nl, description);
+}
+
 Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
-  gsi::method_ext ("add", &gsi::add_circuit,
+  gsi::method_ext ("add", &gsi::add_circuit, gsi::arg ("circuit"),
     "@brief Adds the circuit to the netlist\n"
     "This method will add the given circuit object to the netlist. "
     "After the circuit has been added, it will be owned by the netlist."
@@ -938,7 +958,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::iterator ("each_circuit", (db::Netlist::circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_circuits, (db::Netlist::circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_circuits,
     "@brief Iterates over the circuits of the netlist"
   ) +
-  gsi::method_ext ("add", &gsi::add_device_class,
+  gsi::method_ext ("add", &gsi::add_device_class, gsi::arg ("device_class"),
     "@brief Adds the device class to the netlist\n"
     "This method will add the given device class object to the netlist. "
     "After the device class has been added, it will be owned by the netlist."
@@ -978,6 +998,11 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Purges floating nets.\n"
     "Floating nets can be created as effect of reconnections of devices or pins. "
     "This method will eliminate all nets that make less than two connections."
+  ) +
+  gsi::method_ext ("write", &write_netlist, gsi::arg ("file"), gsi::arg ("writer"), gsi::arg ("description", std::string ()),
+    "@brief Writes the netlist to the given file using the given writer object to format the file\n"
+    "See \\NetlistSpiceWriter for an example for a formatter. "
+    "The description is an arbitrary text which will be put into the file somewhere at the beginning."
   ),
   "@brief The netlist top-level class\n"
   "A netlist is a hierarchical structure of circuits. At least one circuit is the "
@@ -989,6 +1014,206 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   "and are created using \\create_device_class.\n"
   "\n"
   "The netlist class has been introduced with version 0.26."
+);
+
+/**
+ *  @brief A SPICE writer delegate base class for reimplementation
+ */
+class NetlistSpiceWriterDelegateImpl
+  : public db::NetlistSpiceWriterDelegate, public gsi::ObjectBase
+{
+public:
+  NetlistSpiceWriterDelegateImpl ()
+    : db::NetlistSpiceWriterDelegate ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void write_header () const
+  {
+    if (cb_write_header.can_issue ()) {
+      cb_write_header.issue<db::NetlistSpiceWriterDelegate> (&db::NetlistSpiceWriterDelegate::write_header);
+    } else {
+      db::NetlistSpiceWriterDelegate::write_header ();
+    }
+  }
+
+  virtual void write_device_intro (const db::DeviceClass &cls) const
+  {
+    if (cb_write_device_intro.can_issue ()) {
+      cb_write_device_intro.issue<db::NetlistSpiceWriterDelegate, const db::DeviceClass &> (&db::NetlistSpiceWriterDelegate::write_device_intro, cls);
+    } else {
+      db::NetlistSpiceWriterDelegate::write_device_intro (cls);
+    }
+  }
+
+  virtual void write_device (const db::Device &dev) const
+  {
+    if (cb_write_device.can_issue ()) {
+      cb_write_device.issue<db::NetlistSpiceWriterDelegate, const db::Device &> (&db::NetlistSpiceWriterDelegate::write_device, dev);
+    } else {
+      org_write_device (dev);
+    }
+  }
+
+  virtual void org_write_device (const db::Device &dev) const
+  {
+    db::NetlistSpiceWriterDelegate::write_device (dev);
+  }
+
+  gsi::Callback cb_write_header;
+  gsi::Callback cb_write_device_intro;
+  gsi::Callback cb_write_device;
+
+  using db::NetlistSpiceWriterDelegate::emit_comment;
+  using db::NetlistSpiceWriterDelegate::emit_line;
+  using db::NetlistSpiceWriterDelegate::net_to_string;
+  using db::NetlistSpiceWriterDelegate::format_name;
+};
+
+Class<NetlistSpiceWriterDelegateImpl> db_NetlistSpiceWriterDelegate ("db", "NetlistSpiceWriterDelegate",
+  gsi::callback ("write_header", &NetlistSpiceWriterDelegateImpl::write_header, &NetlistSpiceWriterDelegateImpl::cb_write_header,
+    "@brief Writes the text at the beginning of the SPICE netlist\n"
+    "Reimplement this method to insert your own text at the beginning of the file"
+  ) +
+  gsi::callback ("write_device_intro", &NetlistSpiceWriterDelegateImpl::write_device_intro, &NetlistSpiceWriterDelegateImpl::cb_write_device_intro, gsi::arg ("device_class"),
+    "@brief Inserts a text for the given device class\n"
+    "Reimplement this method to insert your own text at the beginning of the file for the given device class"
+  ) +
+  gsi::callback ("write_device", &NetlistSpiceWriterDelegateImpl::write_device, &NetlistSpiceWriterDelegateImpl::cb_write_device, gsi::arg ("device"),
+    "@brief Inserts a text for the given device\n"
+    "Reimplement this method to write the given device in the desired way"
+  ) +
+  gsi::method ("write_device", &NetlistSpiceWriterDelegateImpl::org_write_device, gsi::arg ("device"),
+    "@brief Calls the default implementation of the \\write_device method.\n"
+    "The default implementation will utilize the device class information to write native SPICE "
+    "elements for the devices."
+  ) +
+  gsi::method ("emit_comment", &NetlistSpiceWriterDelegateImpl::emit_comment, gsi::arg ("comment"),
+    "@brief Writes the given comment into the file"
+  ) +
+  gsi::method ("emit_line", &NetlistSpiceWriterDelegateImpl::emit_line, gsi::arg ("line"),
+    "@brief Writes the given line into the file"
+  ) +
+  gsi::method ("net_to_string", &NetlistSpiceWriterDelegateImpl::net_to_string, gsi::arg ("net"),
+    "@brief Gets the node ID for the given net\n"
+    "The node ID is a numeric string instead of the full name of the net. Numeric IDs are used within "
+    "SPICE netlist because they are usually shorter.\n"
+  ) +
+  gsi::method ("format_name", &NetlistSpiceWriterDelegateImpl::format_name, gsi::arg ("name"),
+    "@brief Formats the given name in a SPICE-compatible way"
+  ),
+  "@brief Provides a delegate for the SPICE writer for doing special formatting for devices\n"
+  "Supply a customized class to provide a specialized writing scheme for devices. "
+  "You need a customized class if you want to implement special devices or you want to use "
+  "subcircuits rather than the built-in devices.\n"
+  "\n"
+  "See \\NetlistSpiceWriter for more details.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+namespace {
+
+class NetlistSpiceWriterWithOwnership
+  : public db::NetlistSpiceWriter
+{
+public:
+  NetlistSpiceWriterWithOwnership (NetlistSpiceWriterDelegateImpl *delegate)
+    : db::NetlistSpiceWriter (delegate), m_ownership (delegate)
+  {
+    if (delegate) {
+      delegate->keep ();
+    }
+  }
+
+private:
+  tl::shared_ptr<NetlistSpiceWriterDelegateImpl> m_ownership;
+};
+
+}
+
+db::NetlistSpiceWriter *new_spice_writer ()
+{
+  return new db::NetlistSpiceWriter ();
+}
+
+db::NetlistSpiceWriter *new_spice_writer2 (NetlistSpiceWriterDelegateImpl *delegate)
+{
+  return new NetlistSpiceWriterWithOwnership (delegate);
+}
+
+Class<db::NetlistWriter> db_NetlistWriter ("db", "NetlistWriter",
+  gsi::Methods (),
+  "@hide\n"
+);
+
+Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "NetlistSpiceWriter",
+  gsi::constructor ("new", &new_spice_writer,
+    "@brief Creates a new writer without delegate.\n"
+  ) +
+  gsi::constructor ("new", &new_spice_writer2,
+    "@brief Creates a new writer with a delegate.\n"
+  ),
+  "@brief Implements a netlist writer for the SPICE format.\n"
+  "Provide a delegate for customizing the way devices are written.\n"
+  "\n"
+  "Use the SPICE writer like this:\n"
+  "\n"
+  "@code\n"
+  "writer = RBA::NetlistSpiceWriter::new\n"
+  "netlist.write(path, writer)\n"
+  "@endcode\n"
+  "\n"
+  "You can give a custom description for the headline:\n"
+  "\n"
+  "@code\n"
+  "writer = RBA::NetlistSpiceWriter::new\n"
+  "netlist.write(path, writer, \"A custom description\")\n"
+  "@endcode\n"
+  "\n"
+  "To customize the output, you can use a device writer delegate.\n"
+  "The delegate is an object of a class derived from \\NetlistSpiceWriterDelegate which "
+  "reimplements several methods to customize the following parts:\n"
+  "\n"
+  "@ul\n"
+  "@li A global header (\\NetlistSpiceWriterDelegate#write_header): this method is called to print the part right after the headline @/li\n"
+  "@li A per-device class header (\\NetlistSpiceWriterDelegate#write_device_intro): this method is called for every device class and may print device-class specific headers (e.g. model definitions) @/li\n"
+  "@li Per-device output: this method (\\NetlistSpiceWriterDelegate#write_device): this method is called for every device and may print the device statement(s) in a specific way.\n"
+  "@/ul\n"
+  "\n"
+  "The delegate must use \\NetlistSpiceWriterDelegate#emit_line to print a line, \\NetlistSpiceWriterDelegate#emit_comment to print a comment etc.\n"
+  "For more method see \\NetlistSpiceWriterDelegate.\n"
+  "\n"
+  "A sample with a delegate is this:\n"
+  "\n"
+  "@code\n"
+  "class MyDelegate < RBA::NetlistSpiceWriterDelegate\n"
+  "\n"
+  "  def write_header\n"
+  "    emit_line(\"*** My special header\")\n"
+  "  end\n"
+  "\n"
+  "  def write_device_intro(cls)\n"
+  "    emit_comment(\"My intro for class \" + cls.name)\n"
+  "  end\n"
+  "\n"
+  "  def write_device(dev)\n"
+  "    if dev.device_class.name != \"MYDEVICE\"\n"
+  "    emit_comment(\"Terminal #1: \" + net_to_string(dev.net_for_terminal(0)))\n"
+  "    emit_comment(\"Terminal #2: \" + net_to_string(dev.net_for_terminal(1)))\n"
+  "    super(dev)\n"
+  "    emit_comment(\"After device \" + dev.expanded_name)\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "# write the netlist with delegate:\n"
+  "writer = RBA::NetlistSpiceWriter::new(MyDelegate::new)\n"
+  "netlist.write(path, writer)\n"
+  "@endcode\n"
+  "\n"
+  "This class has been introduced in version 0.26."
 );
 
 }

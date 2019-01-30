@@ -1078,3 +1078,4 @@ TEST(13_DeviceAbstract)
 
   EXPECT_EQ (nl.begin_device_abstracts () == nl.end_device_abstracts (), true);
 }
+

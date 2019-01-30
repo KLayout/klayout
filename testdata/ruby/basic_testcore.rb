@@ -936,6 +936,22 @@ class Basic_TestClass < TestBase
   class C_IMP3 < RBA::C 
   end
 
+  class C_IMP4 < RBA::C
+    def initialize
+      @x = @xx = nil
+    end
+    def x
+      @x
+    end
+    def xx
+      @xx
+    end
+    def vfunc(cd)
+      @x = cd.x
+      @xx = cd.xx
+    end
+  end
+
   def test_19
 
     c0 = RBA::C.new
@@ -977,6 +993,11 @@ class Basic_TestClass < TestBase
     arr = []
     C_IMP2.each { |i| arr.push i }
     assert_equal( arr, [ 0, 1, 2, 3, 4, 5, 6, 0, 0, 1 ] )
+
+    c4 = C_IMP4.new
+    c4.call_vfunc(RBA::CopyDetector::new(17))
+    assert_equal(c4.x, 17)
+    assert_equal(c4.xx, 17)
 
   end
 
@@ -1411,6 +1432,69 @@ class Basic_TestClass < TestBase
 
     GC.start
     assert_equal(RBA::B.has_inst, false)
+
+  end
+
+  def test_29
+    
+    # copy/ref semantics on return
+
+    c = RBA::C::new
+    
+    cd = RBA::CopyDetector::new(42)
+
+    cd2 = c.pass_cd_direct(cd)
+    assert_equal(cd2.x, 42)
+    # two copies: one for return statement and then one for the new object
+    assert_equal(cd2.xx, 44)
+    
+    cd2 = c.pass_cd_cref(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 43)
+    
+    cd2 = c.pass_cd_cref_as_copy(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 43)
+    
+    cd2 = c.pass_cd_cref_as_ref(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 42)
+    
+    cd2 = c.pass_cd_cptr(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 42)
+    
+    cd2 = c.pass_cd_cptr_as_copy(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 43)
+    
+    cd2 = c.pass_cd_cptr_as_ref(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 42)
+    
+    cd2 = c.pass_cd_ptr(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 42)
+    
+    cd2 = c.pass_cd_ptr_as_copy(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 43)
+    
+    cd2 = c.pass_cd_ptr_as_ref(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 42)
+    
+    cd2 = c.pass_cd_ref(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 42)
+    
+    cd2 = c.pass_cd_ref_as_copy(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 43)
+    
+    cd2 = c.pass_cd_ref_as_ref(cd)
+    assert_equal(cd2.x, 42)
+    assert_equal(cd2.xx, 42)
 
   end
 

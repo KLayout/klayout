@@ -73,6 +73,14 @@ class C_IMP2(pya.C):
 class C_IMP3(pya.C):
   anything = None
 
+class C_IMP4(pya.C):
+  def __init__(self):
+    self.x = None
+    self.xx = None
+  def vfunc(self, cd):
+    self.x = cd.x()
+    self.xx = cd.xx()
+
 class Z_IMP1(pya.Z):
   def f(self, x):
     return x.cls_name()
@@ -1072,6 +1080,11 @@ class BasicTest(unittest.TestCase):
       arr.append(i)
     self.assertEqual( arr, [ 0, 1, 2, 3, 4, 5, 6, 0, 0, 1 ] )
 
+    c4 = C_IMP4()
+    c4.call_vfunc(pya.CopyDetector(17))
+    self.assertEqual(c4.x, 17)
+    self.assertEqual(c4.xx, 17)
+
   def test_20(self):
 
     b = pya.B()
@@ -1537,6 +1550,67 @@ class BasicTest(unittest.TestCase):
     # new B instance -> will delete the old one (since we made it managed again)
     b = None
     self.assertEqual(pya.B.has_inst(), False)
+
+  def test_29(self):
+    
+    # copy/ref semantics on return
+
+    c = pya.C()
+    
+    cd = pya.CopyDetector(42)
+
+    cd2 = c.pass_cd_direct(cd)
+    self.assertEqual(cd2.x(), 42)
+    # two copies: one for return statement and then one for the new object
+    self.assertEqual(cd2.xx(), 44)
+    
+    cd2 = c.pass_cd_cref(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 43)
+    
+    cd2 = c.pass_cd_cref_as_copy(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 43)
+    
+    cd2 = c.pass_cd_cref_as_ref(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 42)
+    
+    cd2 = c.pass_cd_cptr(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 42)
+    
+    cd2 = c.pass_cd_cptr_as_copy(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 43)
+    
+    cd2 = c.pass_cd_cptr_as_ref(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 42)
+    
+    cd2 = c.pass_cd_ptr(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 42)
+    
+    cd2 = c.pass_cd_ptr_as_copy(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 43)
+    
+    cd2 = c.pass_cd_ptr_as_ref(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 42)
+    
+    cd2 = c.pass_cd_ref(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 42)
+    
+    cd2 = c.pass_cd_ref_as_copy(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 43)
+    
+    cd2 = c.pass_cd_ref_as_ref(cd)
+    self.assertEqual(cd2.x(), 42)
+    self.assertEqual(cd2.xx(), 42)
 
   def test_30(self):
 

@@ -345,7 +345,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype)
   bool is_direct   = !(atype.is_ptr () || atype.is_ref () || atype.is_cptr () || atype.is_cref ());
   bool pass_obj    = atype.pass_obj () || is_direct;
   bool is_const    = atype.is_cptr () || atype.is_cref ();
-  bool prefer_copy = atype.is_cref ();
+  bool prefer_copy = atype.prefer_copy ();
   bool can_destroy = prefer_copy || atype.is_ptr ();
 
   return object_to_python (obj, self, cls, pass_obj, is_const, prefer_copy, can_destroy);

@@ -1386,6 +1386,67 @@ public:
 };
 
 /**
+ *  @brief A tag indicating ownership transfer
+ *  This tag will transfer ownership of an object (either back- or forward).
+ */
+struct arg_pass_ownership { };
+
+/**
+ *  @brief A tag indicating copy preference
+ *  By specifying this tag, making a copy of the object is the preferred transfer method
+ */
+struct arg_make_copy { };
+
+/**
+ *  @brief A tag indicating to take the reference of an object
+ *  By specifying this tag, taking a reference is the preferred transfer method
+ */
+struct arg_make_reference { };
+
+/**
+ *  @brief A tag indicating the default return value preference
+ *  The default return value preference is "copy" for const references and direct values
+ *  and reference otherwise.
+ */
+struct arg_default_return_value_preference { };
+
+/**
+ *  @brief A function computing the "prefer_copy" value
+ */
+template <class Transfer, class X>
+struct compute_prefer_copy
+{
+  static bool value () { return false; }
+};
+
+template <class X>
+struct compute_prefer_copy<arg_default_return_value_preference, X>
+{
+  static bool value () { return type_traits<X>::is_cref (); }
+};
+
+template <class X>
+struct compute_prefer_copy<arg_make_copy, X>
+{
+  static bool value () { return true; }
+};
+
+/**
+ *  @brief A function computing the "pass_obj" value
+ */
+template <class Transfer, class X>
+struct compute_pass_obj
+{
+  static bool value () { return false; }
+};
+
+template <class X>
+struct compute_pass_obj<arg_pass_ownership, X>
+{
+  static bool value () { return true; }
+};
+
+/**
  *  @brief Generic argument type declaration
  *
  *  The type declaration carries the basic type code and flags, if the argument 
@@ -1427,7 +1488,22 @@ public:
   template <class X>
   void init (const ArgSpecBase &spec)
   {
-    init<X> ();
+    init<X, arg_default_return_value_preference> ();
+    mp_spec = &spec;
+    m_owns_spec = false;
+  }
+
+  /**
+   *  @brief Initializes with an external specification
+   *
+   *  This method will initialize the type object referring to an external
+   *  spec object. The spec object will specify name and default
+   *  value for arguments
+   */
+  template <class X, class Transfer>
+  void init (const ArgSpecBase &spec)
+  {
+    init<X, Transfer> ();
     mp_spec = &spec;
     m_owns_spec = false;
   }
@@ -1442,7 +1518,22 @@ public:
   template <class X>
   void init (ArgSpecBase *spec)
   {
-    init<X> ();
+    init<X, arg_default_return_value_preference> ();
+    mp_spec = spec;
+    m_owns_spec = true;
+  }
+
+  /**
+   *  @brief Initializes with a specification
+   *
+   *  This method will initialize the type object with a specification.
+   *  The ownership over the specification object will be transferred to
+   *  the type object.
+   */
+  template <class X, class Transfer>
+  void init (ArgSpecBase *spec)
+  {
+    init<X, Transfer> ();
     mp_spec = spec;
     m_owns_spec = true;
   }
@@ -1454,7 +1545,7 @@ public:
    *  to the case of object pointers mainly.
    */
   template <class X>
-  void init (bool pass_obj = false) 
+  void init ()
   { 
     release_spec ();
 
@@ -1462,7 +1553,8 @@ public:
     m_is_iter     = type_traits<X>::is_iter ();
     mp_cls        = type_traits<X>::cls_decl ();
 
-    m_pass_obj    = pass_obj;
+    m_pass_obj    = compute_pass_obj<arg_default_return_value_preference, X>::value ();
+    m_prefer_copy = compute_prefer_copy<arg_default_return_value_preference, X>::value ();
     m_is_ref      = type_traits<X>::is_ref ();
     m_is_ptr      = type_traits<X>::is_ptr ();
     m_is_cref     = type_traits<X>::is_cref ();
@@ -1481,12 +1573,56 @@ public:
 
     if (type_traits<typename type_traits<X>::inner_type>::code () != T_void) {
       mp_inner = new ArgType;
-      mp_inner->init<typename type_traits<X>::inner_type> ();
+      mp_inner->init<typename type_traits<X>::inner_type, arg_make_reference> ();
     }
 
     if (type_traits<typename type_traits<X>::inner_k_type>::code () != T_void) {
       mp_inner_k = new ArgType;
-      mp_inner_k->init<typename type_traits<X>::inner_k_type> ();
+      mp_inner_k->init<typename type_traits<X>::inner_k_type, arg_make_reference> ();
+    }
+  }
+
+  /**
+   *  @brief Initialize the type from a given type X
+   *  If "pass_obj" is true, the receiver of an object will always
+   *  take over the ownership over the passed object. This applies
+   *  to the case of object pointers mainly.
+   */
+  template <class X, class Transfer>
+  void init ()
+  {
+    release_spec ();
+
+    m_type        = type_traits<X>::code ();
+    m_is_iter     = type_traits<X>::is_iter ();
+    mp_cls        = type_traits<X>::cls_decl ();
+
+    m_pass_obj    = compute_pass_obj<Transfer, X>::value ();
+    m_prefer_copy = compute_prefer_copy<Transfer, X>::value ();
+    m_is_ref      = type_traits<X>::is_ref ();
+    m_is_ptr      = type_traits<X>::is_ptr ();
+    m_is_cref     = type_traits<X>::is_cref ();
+    m_is_cptr     = type_traits<X>::is_cptr ();
+    m_size        = (unsigned int) type_traits<X>::serial_size ();
+
+    if (mp_inner) {
+      delete mp_inner;
+      mp_inner = 0;
+    }
+
+    if (mp_inner_k) {
+      delete mp_inner_k;
+      mp_inner_k = 0;
+    }
+
+    if (type_traits<typename type_traits<X>::inner_type>::code () != T_void) {
+      mp_inner = new ArgType;
+      mp_inner->init<typename type_traits<X>::inner_type, arg_make_reference> ();
+    }
+
+    if (type_traits<typename type_traits<X>::inner_k_type>::code () != T_void) {
+      mp_inner_k = new ArgType;
+      mp_inner_k->init<typename type_traits<X>::inner_k_type, arg_make_reference> ();
     }
   }
 
@@ -1569,6 +1705,22 @@ public:
   void set_pass_obj (bool b) 
   {
     m_pass_obj = b;
+  }
+
+  /**
+   *  @brief Returns a value indicating that the value prefers to be copied
+   */
+  bool prefer_copy () const
+  {
+    return m_prefer_copy;
+  }
+
+  /**
+   *  @brief Sets a value indicating that the value prefers to be copied
+   */
+  void set_prefer_copy (bool b)
+  {
+    m_prefer_copy = b;
   }
 
   /**
@@ -1702,6 +1854,7 @@ private:
   bool m_is_iter : 1;
   bool m_owns_spec : 1;
   bool m_pass_obj : 1;
+  bool m_prefer_copy : 1;
   mutable const ClassBase *mp_cls;
   unsigned int m_size;
 

@@ -846,6 +846,35 @@ struct B
   static B *b_inst;
 };
 
+class CopyDetector
+{
+public:
+  CopyDetector (int x)
+    : m_x (x), m_xx (x)
+  { }
+
+  CopyDetector ()
+    : m_x (0), m_xx (0)
+  { }
+
+  CopyDetector (const CopyDetector &d)
+    : m_x (d.m_x), m_xx (d.m_xx + 1)  //  this detects the copy
+  { }
+
+  CopyDetector &operator= (const CopyDetector &d)
+  {
+    m_x = d.m_x;
+    m_xx = d.m_xx + 1;
+    return *this;
+  }
+
+  int x () const { return m_x; }
+  int xx () const { return m_xx; }
+
+private:
+  int m_x, m_xx;
+};
+
 class C
 {
 public:
@@ -860,6 +889,22 @@ public:
   {
     return f(s);
   }
+
+  virtual void vfunc (const CopyDetector &)
+  {
+    //  .. nothing yet ..
+  }
+
+  void call_vfunc (const CopyDetector &cd)
+  {
+    vfunc (cd);
+  }
+
+  CopyDetector pass_cd_direct (const CopyDetector &cd) { return cd; }
+  const CopyDetector &pass_cd_cref (const CopyDetector &cd) { return cd; }
+  const CopyDetector *pass_cd_cptr (const CopyDetector &cd) { return &cd; }
+  CopyDetector *pass_cd_ptr (const CopyDetector &cd) { return const_cast<CopyDetector *> (&cd); }
+  CopyDetector &pass_cd_ref (const CopyDetector &cd) { return const_cast<CopyDetector &> (cd); }
 
   static int s1 ();
   static std::vector<int>::const_iterator s1a ();
@@ -880,7 +925,13 @@ public:
     return f_cb.can_issue () ? f_cb.issue<C, unsigned int, const std::string &> (&C::f, s) : C::f (s);
   }
 
+  virtual void vfunc (const CopyDetector &cd)
+  {
+    return vfunc_cb.can_issue () ? vfunc_cb.issue<C, const CopyDetector &> (&C::vfunc, cd) : C::vfunc (cd);
+  }
+
   gsi::Callback f_cb;
+  gsi::Callback vfunc_cb;
 };
 
 struct E

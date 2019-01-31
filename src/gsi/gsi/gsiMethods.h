@@ -334,11 +334,23 @@ public:
   /**
    *  @brief Adds an argument to the argument list (of type X)
    */
-  template <class X> 
+  template <class X>
   void add_arg ()
   {
     ArgType a;
-    a.template init<X> ();
+    a.template init<X, arg_make_reference> ();
+    m_arg_types.push_back (a);
+    m_argsize += a.size ();
+  }
+
+  /**
+   *  @brief Adds an argument to the argument list (of type X)
+   */
+  template <class X, class Transfer>
+  void add_arg ()
+  {
+    ArgType a;
+    a.template init<X, Transfer> ();
     m_arg_types.push_back (a);
     m_argsize += a.size ();
   }
@@ -346,11 +358,23 @@ public:
   /**
    *  @brief Adds an argument to the argument list (of type X plus additional specs)
    */
-  template <class X> 
+  template <class X>
   void add_arg (const ArgSpecBase &spec) 
   {
     ArgType a;
-    a.template init<X> (spec);
+    a.template init<X, arg_make_reference> (spec);
+    m_arg_types.push_back (a);
+    m_argsize += a.size ();
+  }
+
+  /**
+   *  @brief Adds an argument to the argument list (of type X plus additional specs)
+   */
+  template <class X, class Transfer>
+  void add_arg (const ArgSpecBase &spec)
+  {
+    ArgType a;
+    a.template init<X, Transfer> (spec);
     m_arg_types.push_back (a);
     m_argsize += a.size ();
   }
@@ -358,11 +382,23 @@ public:
   /**
    *  @brief This version will take the ownership of the ArgSpecBase object
    */
-  template <class X> 
+  template <class X>
   void add_arg (ArgSpecBase *spec) 
   {
     ArgType a;
-    a.template init<X> (spec);
+    a.template init<X, arg_make_reference> (spec);
+    m_arg_types.push_back (a);
+    m_argsize += a.size ();
+  }
+
+  /**
+   *  @brief This version will take the ownership of the ArgSpecBase object
+   */
+  template <class X, class Transfer>
+  void add_arg (ArgSpecBase *spec)
+  {
+    ArgType a;
+    a.template init<X, Transfer> (spec);
     m_arg_types.push_back (a);
     m_argsize += a.size ();
   }
@@ -379,10 +415,19 @@ public:
   /**
    *  @brief Sets the return type to "X"
    */
-  template <class X> 
+  template <class X>
   void set_return () 
   {
-    m_ret_type.template init<X> ();
+    m_ret_type.template init<X, arg_default_return_value_preference> ();
+  }
+
+  /**
+   *  @brief Sets the return type to "X"
+   */
+  template <class X, class Transfer>
+  void set_return ()
+  {
+    m_ret_type.template init<X, Transfer> ();
   }
 
   /**
@@ -391,7 +436,7 @@ public:
   template <class X> 
   void set_return_new () 
   {
-    m_ret_type.template init<X> (true);
+    m_ret_type.template init<X, arg_pass_ownership> ();
   }
 
   /**
@@ -809,16 +854,6 @@ constant (const std::string &name, R (*m) (), const std::string &doc = std::stri
 {
   return Methods (new ConstantGetter <R> (name, m, doc));
 }
-
-struct return_by_value
-{
-  typedef tl::False is_factory;
-};
-
-struct return_new_object
-{
-  typedef tl::True is_factory;
-};
 
 // 0 argument
 

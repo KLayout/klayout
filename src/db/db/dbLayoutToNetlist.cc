@@ -551,6 +551,11 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
     return;
   }
 
+  //  NOTE: we propagate the magnification part of tr down, but keep the rotation/translation part in the instance
+  //  (we want to avoid magnified instances)
+  db::ICplxTrans tr_wo_mag = tr * db::ICplxTrans (1.0 / tr.mag ());
+  db::ICplxTrans tr_mag (tr.mag ());
+
   const db::connected_clusters<db::PolygonRef> &clusters = m_net_clusters.clusters_per_cell (ci);
   typedef db::connected_clusters<db::PolygonRef>::connections_type connections_type;
   const connections_type &connections = clusters.connections_for_cluster (cid);
@@ -576,7 +581,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
         db::cell_index_type target_ci = target.add_cell ((std::string (name_prefix) + cell_name).c_str ());
         cm = cmap.insert (std::make_pair (std::make_pair (subci, subcid), target_ci)).first;
 
-        build_net_rec (subci, subcid, target, target.cell (target_ci), lmap, 0, 0, circuit_cell_name_prefix, device_cell_name_prefix, cmap, db::ICplxTrans ());
+        build_net_rec (subci, subcid, target, target.cell (target_ci), lmap, 0, 0, circuit_cell_name_prefix, device_cell_name_prefix, cmap, tr_mag);
 
       } else {
         cm = cmap.insert (std::make_pair (std::make_pair (subci, subcid), std::numeric_limits<db::cell_index_type>::max ())).first;
@@ -585,7 +590,9 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
     }
 
     if (cm->second != std::numeric_limits<db::cell_index_type>::max ()) {
-      target_cell->insert (db::CellInstArray (db::CellInst (cm->second), tr * c->inst ().complex_trans ()));
+      db::CellInstArray ci (db::CellInst (cm->second), tr_wo_mag * c->inst ().complex_trans ());
+      ci.transform_into (tr_mag);
+      target_cell->insert (ci);
     }
 
   }
@@ -600,7 +607,8 @@ LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &ta
 
   std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> cell_map;
 
-  build_net_rec (net, target, target_cell, lmap, 0, cell_name_prefix, device_cell_name_prefix, cell_map, db::ICplxTrans ());
+  double mag = internal_layout ()->dbu () / target.dbu ();
+  build_net_rec (net, target, target_cell, lmap, 0, cell_name_prefix, device_cell_name_prefix, cell_map, db::ICplxTrans (mag));
 }
 
 void
@@ -611,6 +619,7 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
   }
 
   std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> cell_map;
+  double mag = internal_layout ()->dbu () / target.dbu ();
 
   const db::Netlist *netlist = mp_netlist.get ();
   for (db::Netlist::const_circuit_iterator c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
@@ -630,7 +639,7 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
         continue;
       }
 
-      build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, circuit_cell_name_prefix, device_cell_name_prefix, cell_map, db::ICplxTrans ());
+      build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, circuit_cell_name_prefix, device_cell_name_prefix, cell_map, db::ICplxTrans (mag));
 
     }
 
@@ -653,7 +662,7 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
             if (n) {
 
               double dbu = target.dbu ();
-              db::ICplxTrans tr = db::CplxTrans (dbu).inverted () * subcircuit.trans () * db::CplxTrans (dbu);
+              db::ICplxTrans tr = db::ICplxTrans (mag) * (db::CplxTrans (dbu).inverted () * subcircuit.trans () * db::CplxTrans (dbu));
 
               if (net_cell_name_prefix) {
                 std::string ncn = std::string (net_cell_name_prefix) + subcircuit.expanded_name () + ":";

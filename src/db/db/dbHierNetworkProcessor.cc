@@ -1892,7 +1892,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
       const db::connected_clusters<T> &cc = m_per_cell_clusters [inst->cell_index ()];
       for (typename db::connected_clusters<T>::const_iterator cl = cc.begin (); cl != cc.end (); ++cl) {
 
-        if (! cl->get_global_nets ().empty () && cc.is_root (cl->id ())) {
+        if (! cl->get_global_nets ().empty ()) {
           for (db::Instance::cell_inst_array_type::iterator i = inst->begin (); !i.at_end (); ++i) {
             global_net_clusters.add (cl->get_global_nets (), db::ClusterInstance (cl->id (), db::InstElement (*inst, i)));
           }

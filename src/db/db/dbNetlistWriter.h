@@ -78,7 +78,7 @@ namespace tl
 {
 
 template <>
-struct tl::type_traits<db::NetlistWriter>
+struct type_traits<db::NetlistWriter>
   : public tl::type_traits<void>
 {
   typedef tl::false_tag has_default_constructor;

@@ -1038,25 +1038,44 @@ public:
     }
   }
 
-  virtual void write_device_intro (const db::DeviceClass &cls) const
+  virtual void write_device_intro (const db::DeviceClass &ccls) const
+  {
+    reimpl_write_device_intro (const_cast<db::DeviceClass &> (ccls));
+  }
+
+  //  NOTE: we pass non-const refs to Ruby/Python - everthing else is a bit of a nightmare.
+  //  Still that's not really clean. Just say, the implementation promises not to change the objects.
+  void reimpl_write_device_intro (db::DeviceClass &cls) const
   {
     if (cb_write_device_intro.can_issue ()) {
-      cb_write_device_intro.issue<db::NetlistSpiceWriterDelegate, const db::DeviceClass &> (&db::NetlistSpiceWriterDelegate::write_device_intro, cls);
+      cb_write_device_intro.issue<NetlistSpiceWriterDelegateImpl, db::DeviceClass &> (&NetlistSpiceWriterDelegateImpl::org_write_device_intro, const_cast<db::DeviceClass &> (cls));
     } else {
-      db::NetlistSpiceWriterDelegate::write_device_intro (cls);
+      org_write_device_intro (cls);
     }
   }
 
-  virtual void write_device (const db::Device &dev) const
+  void org_write_device_intro (db::DeviceClass &cls) const
+  {
+    db::NetlistSpiceWriterDelegate::write_device_intro (cls);
+  }
+
+  virtual void write_device (const db::Device &cdev) const
+  {
+    reimpl_write_device (const_cast<db::Device &> (cdev));
+  }
+
+  //  NOTE: we pass non-const refs to Ruby/Python - everthing else is a bit of a nightmare.
+  //  Still that's not really clean. Just say, the implementation promises not to change the objects.
+  void reimpl_write_device (db::Device &dev) const
   {
     if (cb_write_device.can_issue ()) {
-      cb_write_device.issue<db::NetlistSpiceWriterDelegate, const db::Device &> (&db::NetlistSpiceWriterDelegate::write_device, dev);
+      cb_write_device.issue<NetlistSpiceWriterDelegateImpl, db::Device &> (&NetlistSpiceWriterDelegateImpl::org_write_device, dev);
     } else {
       org_write_device (dev);
     }
   }
 
-  virtual void org_write_device (const db::Device &dev) const
+  void org_write_device (db::Device &dev) const
   {
     db::NetlistSpiceWriterDelegate::write_device (dev);
   }
@@ -1076,11 +1095,11 @@ Class<NetlistSpiceWriterDelegateImpl> db_NetlistSpiceWriterDelegate ("db", "Netl
     "@brief Writes the text at the beginning of the SPICE netlist\n"
     "Reimplement this method to insert your own text at the beginning of the file"
   ) +
-  gsi::callback ("write_device_intro", &NetlistSpiceWriterDelegateImpl::write_device_intro, &NetlistSpiceWriterDelegateImpl::cb_write_device_intro, gsi::arg ("device_class"),
+  gsi::callback ("write_device_intro", &NetlistSpiceWriterDelegateImpl::reimpl_write_device_intro, &NetlistSpiceWriterDelegateImpl::cb_write_device_intro, gsi::arg ("device_class"),
     "@brief Inserts a text for the given device class\n"
     "Reimplement this method to insert your own text at the beginning of the file for the given device class"
   ) +
-  gsi::callback ("write_device", &NetlistSpiceWriterDelegateImpl::write_device, &NetlistSpiceWriterDelegateImpl::cb_write_device, gsi::arg ("device"),
+  gsi::callback ("write_device", &NetlistSpiceWriterDelegateImpl::reimpl_write_device, &NetlistSpiceWriterDelegateImpl::cb_write_device, gsi::arg ("device"),
     "@brief Inserts a text for the given device\n"
     "Reimplement this method to write the given device in the desired way"
   ) +

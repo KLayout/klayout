@@ -57,7 +57,6 @@ public:
   virtual void write_device_intro (const db::DeviceClass &cls) const;
   virtual void write_device (const db::Device &dev) const;
 
-protected:
   std::string net_to_string (const db::Net *net) const;
   void emit_line (const std::string &line) const;
   void emit_comment (const std::string &comment) const;

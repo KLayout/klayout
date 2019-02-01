@@ -39,18 +39,6 @@ public:
     //  .. nothing yet ..
   }
 
-  using db::NetlistDeviceExtractor::set_name;
-  using db::NetlistDeviceExtractor::define_layer;
-  using db::NetlistDeviceExtractor::define_terminal;
-  using db::NetlistDeviceExtractor::create_device;
-  using db::NetlistDeviceExtractor::dbu;
-  using db::NetlistDeviceExtractor::layout;
-  using db::NetlistDeviceExtractor::cell_index;
-  using db::NetlistDeviceExtractor::cell_name;
-  using db::NetlistDeviceExtractor::error;
-  using db::NetlistDeviceExtractor::get_connectivity;
-  using db::NetlistDeviceExtractor::extract_devices;
-
   void register_device_class (db::DeviceClass *device_class)
   {
     //  the class is owned by the extractor
@@ -190,7 +178,7 @@ static const std::string &ld_description (const db::NetlistDeviceExtractorLayerD
   return ld->description;
 }
 
-static int ld_index (const db::NetlistDeviceExtractorLayerDefinition *ld)
+static size_t ld_index (const db::NetlistDeviceExtractorLayerDefinition *ld)
 {
   return ld->index;
 }

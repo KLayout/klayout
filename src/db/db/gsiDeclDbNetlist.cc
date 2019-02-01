@@ -1083,11 +1083,6 @@ public:
   gsi::Callback cb_write_header;
   gsi::Callback cb_write_device_intro;
   gsi::Callback cb_write_device;
-
-  using db::NetlistSpiceWriterDelegate::emit_comment;
-  using db::NetlistSpiceWriterDelegate::emit_line;
-  using db::NetlistSpiceWriterDelegate::net_to_string;
-  using db::NetlistSpiceWriterDelegate::format_name;
 };
 
 Class<NetlistSpiceWriterDelegateImpl> db_NetlistSpiceWriterDelegate ("db", "NetlistSpiceWriterDelegate",

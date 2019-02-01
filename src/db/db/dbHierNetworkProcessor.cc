@@ -301,17 +301,14 @@ local_cluster<T>::ensure_sorted ()
   m_needs_update = false;
 }
 
-namespace
-{
-
 template <class T>
-struct interaction_receiver
+struct DB_PUBLIC hnp_interaction_receiver
   : public box_scanner_receiver2<T, unsigned int, T, unsigned int>
 {
 public:
   typedef typename local_cluster<T>::box_type box_type;
 
-  interaction_receiver (const Connectivity &conn, const db::ICplxTrans &trans)
+  hnp_interaction_receiver (const Connectivity &conn, const db::ICplxTrans &trans)
     : mp_conn (&conn), m_any (false), m_trans (trans)
   {
     //  .. nothing yet ..
@@ -356,8 +353,6 @@ private:
   base_bc m_bc;
   Trans m_trans;
 };
-
-}
 
 template <class T>
 typename local_cluster<T>::shape_iterator local_cluster<T>::begin (unsigned int l) const
@@ -464,7 +459,7 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
     }
   }
 
-  interaction_receiver<T> rec (conn, trans);
+  hnp_interaction_receiver<T> rec (conn, trans);
   return ! scanner.process (rec, 1 /*==touching*/, bc, bc_t);
 }
 

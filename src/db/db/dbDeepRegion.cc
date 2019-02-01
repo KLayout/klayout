@@ -52,6 +52,8 @@ namespace
       set ();
     }
 
+    virtual ~DeepRegionIterator () { }
+
     virtual bool at_end () const
     {
       return m_iter.at_end ();

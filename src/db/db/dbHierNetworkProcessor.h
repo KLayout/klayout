@@ -330,7 +330,7 @@ public:
 
 private:
   template <typename> friend class local_clusters;
-  template <typename> friend class interaction_receiver;
+  template <typename> friend class hnp_interaction_receiver;
 
   void set_id (id_type id)
   {

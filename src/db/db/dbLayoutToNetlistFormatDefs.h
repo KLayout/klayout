@@ -103,13 +103,29 @@ namespace l2n_std_format
   template <bool Short>
   struct DB_PUBLIC keys
   {
-    static const std::string version_key, description_key, top_key, unit_key,
-                             layer_key, connect_key, global_key,
-                             circuit_key, net_key, device_key, subcircuit_key,
-                             polygon_key, rect_key, terminal_key, abstract_key,
-                             param_key, location_key, rotation_key,
-                             mirror_key, scale_key, pin_key,
-                             indent1, indent2;
+    static const std::string &version_key,
+                             &description_key,
+                             &top_key,
+                             &unit_key,
+                             &layer_key,
+                             &connect_key,
+                             &global_key,
+                             &circuit_key,
+                             &net_key,
+                             &device_key,
+                             &subcircuit_key,
+                             &polygon_key,
+                             &rect_key,
+                             &terminal_key,
+                             &abstract_key,
+                             &param_key,
+                             &location_key,
+                             &rotation_key,
+                             &mirror_key,
+                             &scale_key,
+                             &pin_key,
+                             &indent1,
+                             &indent2;
 
     inline static bool is_short () { return Short; }
   };

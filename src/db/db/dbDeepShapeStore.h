@@ -242,7 +242,7 @@ public:
    *
    *  "excluded_cells" - if not 0 - will exclude the given cells (and flatten them).
    */
-  const db::CellMapping &cell_mapping_to_original (size_t layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells = 0);
+  const db::CellMapping &cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells = 0);
 
   /**
    *  @brief For testing

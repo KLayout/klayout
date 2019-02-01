@@ -390,7 +390,7 @@ DeepShapeStore::invalidate_hier ()
 }
 
 const db::CellMapping &
-DeepShapeStore::cell_mapping_to_original (size_t layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells)
+DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells)
 {
   const db::Layout *source_layout = &m_layouts [layout_index]->layout;
   if (source_layout->begin_top_down () == source_layout->end_top_cells ()) {

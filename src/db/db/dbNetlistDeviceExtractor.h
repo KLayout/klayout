@@ -308,7 +308,6 @@ public:
     return m_layer_definitions.end ();
   }
 
-protected:
   /**
    *  @brief Sets the name of the device class and the device extractor
    */

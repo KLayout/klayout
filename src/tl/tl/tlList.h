@@ -44,7 +44,7 @@ class list_node
 public:
   list_node () : mp_next (0), mp_prev (0), m_owned (true) { }
   list_node (const list_node &) : mp_next (0), mp_prev (0), m_owned (true) { }
-  list_node &operator= (const list_node &) { }
+  list_node &operator= (const list_node &) { return *this; }
 
   ~list_node ()
   {
@@ -119,7 +119,7 @@ public:
   }
 
   list_impl (const list_impl &) { tl_assert (false); }
-  list_impl &operator= (const list_impl &) { tl_assert (false); }
+  list_impl &operator= (const list_impl &) { tl_assert (false); return *this; }
 
   ~list_impl ()
   {

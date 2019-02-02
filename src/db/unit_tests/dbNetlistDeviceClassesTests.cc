@@ -916,11 +916,15 @@ TEST(20_ParallelMOS3Transistors)
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 2.0);
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 3.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 12.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 13.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 0.5);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 2.0);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 3.0);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 4.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 13.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 14.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -952,8 +956,8 @@ TEST(20_ParallelMOS3Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3,D=n2) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3,D=n2) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 
   nl.combine_devices ();
@@ -961,7 +965,7 @@ TEST(20_ParallelMOS3Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=3,AS=5,AD=7]\n"
+    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=3,AS=5,AD=7,PS=25,PD=27]\n"
   );
 }
 
@@ -977,11 +981,15 @@ TEST(21_AntiParallelMOS3Transistors)
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 2.0);
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 3.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 12.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 13.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 0.5);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 2.0);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 3.0);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 4.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 13.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 14.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1013,8 +1021,8 @@ TEST(21_AntiParallelMOS3Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n2,G=n3,D=n1) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n2,G=n3,D=n1) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 
   nl.combine_devices ();
@@ -1022,7 +1030,7 @@ TEST(21_AntiParallelMOS3Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=3,AS=5,AD=7]\n"
+    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=3,AS=5,AD=7,PS=25,PD=27]\n"
   );
 }
 
@@ -1038,11 +1046,15 @@ TEST(22_ParallelMOS3TransistorsDisconnectedGates)
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 2.0);
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 3.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 12.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 13.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 0.5);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 2.0);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 3.0);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 4.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 13.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 14.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1079,8 +1091,8 @@ TEST(22_ParallelMOS3TransistorsDisconnectedGates)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C1=n3,C2=n4):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n4,D=n2) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n4,D=n2) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 
   nl.combine_devices ();
@@ -1090,8 +1102,8 @@ TEST(22_ParallelMOS3TransistorsDisconnectedGates)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C1=n3,C2=n4):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n4,D=n2) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n4,D=n2) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 }
 
@@ -1107,11 +1119,15 @@ TEST(23_ParallelMOS3TransistorsDifferentLength)
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 2.0);
   d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 3.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 12.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 13.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 0.75);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 2.0);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 3.0);
   d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 4.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 13.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 14.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1143,8 +1159,8 @@ TEST(23_ParallelMOS3TransistorsDifferentLength)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3,D=n2) [L=0.75,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3,D=n2) [L=0.75,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 
   nl.combine_devices ();
@@ -1154,8 +1170,8 @@ TEST(23_ParallelMOS3TransistorsDifferentLength)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3,D=n2) [L=0.75,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3,D=n2) [L=0.75,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 }
 
@@ -1171,11 +1187,15 @@ TEST(30_ParallelMOS4Transistors)
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 1.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 2.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 3.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 12.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 13.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_L, 0.5);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 2.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 3.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 4.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 13.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 14.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1214,8 +1234,8 @@ TEST(30_ParallelMOS4Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 
   nl.combine_devices ();
@@ -1223,7 +1243,7 @@ TEST(30_ParallelMOS4Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=3,AS=5,AD=7]\n"
+    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=3,AS=5,AD=7,PS=25,PD=27]\n"
   );
 }
 
@@ -1239,11 +1259,15 @@ TEST(31_AntiParallelMOS4Transistors)
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 1.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 2.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 3.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 12.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 13.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_L, 0.5);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 2.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 3.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 4.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 13.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 14.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1282,8 +1306,8 @@ TEST(31_AntiParallelMOS4Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n2,G=n3,D=n1,B=n0) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n2,G=n3,D=n1,B=n0) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 
   nl.combine_devices ();
@@ -1291,7 +1315,7 @@ TEST(31_AntiParallelMOS4Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=3,AS=5,AD=7]\n"
+    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=3,AS=5,AD=7,PS=25,PD=27]\n"
   );
 }
 
@@ -1307,11 +1331,15 @@ TEST(32_ParallelMOS4TransistorsDisconnectedGates)
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 1.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 2.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 3.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 12.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 13.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_L, 0.5);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 2.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 3.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 4.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 13.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 14.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1355,8 +1383,8 @@ TEST(32_ParallelMOS4TransistorsDisconnectedGates)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C1=n3a,C2=n3b,D=n0):\n"
-    "  D d1 (S=n1,G=n3a,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3b,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3a,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3b,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 
   nl.combine_devices ();
@@ -1366,8 +1394,8 @@ TEST(32_ParallelMOS4TransistorsDisconnectedGates)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C1=n3a,C2=n3b,D=n0):\n"
-    "  D d1 (S=n1,G=n3a,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3b,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3a,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3b,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 }
 
@@ -1383,11 +1411,15 @@ TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 1.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 2.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 3.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 12.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 13.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_L, 0.5);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 2.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 3.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 4.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 13.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 14.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1431,8 +1463,8 @@ TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3,D1=n0a,D2=n0b):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0a) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0b) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2,B=n0a) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3,D=n2,B=n0b) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 
   //  not combined because bulk is different:
@@ -1442,8 +1474,8 @@ TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3,D1=n0a,D2=n0b):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0a) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0b) [L=0.5,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2,B=n0a) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3,D=n2,B=n0b) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 }
 
@@ -1459,11 +1491,15 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 1.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 2.0);
   d1->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 3.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 12.0);
+  d1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 13.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_L, 0.75);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_W, 2.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AS, 3.0);
   d2->set_parameter_value (db::DeviceClassMOS4Transistor::param_id_AD, 4.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 13.0);
+  d2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 14.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1502,8 +1538,8 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.75,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.75,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 
   nl.combine_devices ();
@@ -1513,8 +1549,8 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
 
   EXPECT_EQ (nl.to_string (),
     "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.75,W=2,AS=3,AD=4]\n"
+    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
+    "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.75,W=2,AS=3,AD=4,PS=13,PD=14]\n"
   );
 }
 

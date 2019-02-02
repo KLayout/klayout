@@ -127,14 +127,20 @@ Class<db::DeviceClassMOS3Transistor> decl_dbDeviceClassMOS3Transistor (decl_dbDe
   ) +
   gsi::constant ("PARAM_AD", db::DeviceClassMOS3Transistor::param_id_AD,
     "@brief A constant giving the parameter ID for parameter AD"
+  ) +
+  gsi::constant ("PARAM_PS", db::DeviceClassMOS3Transistor::param_id_PS,
+    "@brief A constant giving the parameter ID for parameter PS"
+  ) +
+  gsi::constant ("PARAM_PD", db::DeviceClassMOS3Transistor::param_id_PD,
+    "@brief A constant giving the parameter ID for parameter PD"
   ),
   "@brief A device class for a 3-terminal MOS transistor.\n"
   "This class can be used to describe MOS transistors without a bulk terminal. "
   "A device class for a MOS transistor with a bulk terminal is \\DeviceClassMOS4Transistor. "
   "MOS transistors are defined by their combination behavior and the basic parameters.\n"
   "\n"
-  "The parameters are L, W, AS and AD for the gate length and width in micrometers and source and drain area "
-  "in square micrometers.\n"
+  "The parameters are L, W, AS, AD, PS and PD for the gate length and width in micrometers, source and drain area "
+  "in square micrometers and the source and drain perimeter in micrometers.\n"
   "\n"
   "The terminals are S, G and D for source, gate and drain.\n"
   "\n"
@@ -169,14 +175,20 @@ Class<db::DeviceClassMOS4Transistor> decl_dbDeviceClassMOS4Transistor (decl_dbDe
   ) +
   gsi::constant ("PARAM_AD", db::DeviceClassMOS4Transistor::param_id_AD,
     "@brief A constant giving the parameter ID for parameter AD"
+  ) +
+  gsi::constant ("PARAM_PS", db::DeviceClassMOS4Transistor::param_id_PS,
+    "@brief A constant giving the parameter ID for parameter PS"
+  ) +
+  gsi::constant ("PARAM_PD", db::DeviceClassMOS4Transistor::param_id_PD,
+    "@brief A constant giving the parameter ID for parameter PD"
   ),
   "@brief A device class for a 4-terminal MOS transistor.\n"
   "This class can be used to describe MOS transistors with a bulk terminal. "
   "A device class for a MOS transistor without a bulk terminal is \\DeviceClassMOS3Transistor. "
   "MOS transistors are defined by their combination behavior and the basic parameters.\n"
   "\n"
-  "The parameters are L, W, AS and AD for the gate length and width in micrometers and source and drain area "
-  "in square micrometers.\n"
+  "The parameters are L, W, AS, AD, PS and PD for the gate length and width in micrometers, source and drain area "
+  "in square micrometers and the source and drain perimeter in micrometers.\n"
   "\n"
   "The terminals are S, G, D and B for source, gate, drain and bulk.\n"
   "\n"

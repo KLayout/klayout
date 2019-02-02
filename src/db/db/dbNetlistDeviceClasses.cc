@@ -199,6 +199,8 @@ DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_L = 0;
 DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_W = 1;
 DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_AS = 2;
 DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_AD = 3;
+DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_PS = 4;
+DB_PUBLIC size_t DeviceClassMOS3Transistor::param_id_PD = 5;
 
 DB_PUBLIC size_t DeviceClassMOS3Transistor::terminal_id_S = 0;
 DB_PUBLIC size_t DeviceClassMOS3Transistor::terminal_id_G = 1;
@@ -214,6 +216,8 @@ DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
   add_parameter_definition (db::DeviceParameterDefinition ("W", "Gate width (micrometer)", 0.0));
   add_parameter_definition (db::DeviceParameterDefinition ("AS", "Source area (square micrometer)", 0.0));
   add_parameter_definition (db::DeviceParameterDefinition ("AD", "Drain area (square micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("PS", "Source perimeter (micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("PD", "Drain perimeter (micrometer)", 0.0));
 }
 
 bool DeviceClassMOS3Transistor::combine_devices (Device *a, Device *b) const
@@ -231,9 +235,8 @@ bool DeviceClassMOS3Transistor::combine_devices (Device *a, Device *b) const
     //  for combination the gate length must be identical
     if (fabs (a->parameter_value (0) - b->parameter_value (0)) < 1e-6) {
 
-      a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
-      a->set_parameter_value (2, a->parameter_value (2) + b->parameter_value (2));
-      a->set_parameter_value (3, a->parameter_value (3) + b->parameter_value (3));
+      combine_parameters (a, b);
+
       b->connect_terminal (0, 0);
       b->connect_terminal (1, 0);
       b->connect_terminal (2, 0);
@@ -245,6 +248,15 @@ bool DeviceClassMOS3Transistor::combine_devices (Device *a, Device *b) const
   }
 
   return false;
+}
+
+void DeviceClassMOS3Transistor::combine_parameters (Device *a, Device *b) const
+{
+  a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
+  a->set_parameter_value (2, a->parameter_value (2) + b->parameter_value (2));
+  a->set_parameter_value (3, a->parameter_value (3) + b->parameter_value (3));
+  a->set_parameter_value (4, a->parameter_value (4) + b->parameter_value (4));
+  a->set_parameter_value (5, a->parameter_value (5) + b->parameter_value (5));
 }
 
 // ------------------------------------------------------------------------------------
@@ -274,9 +286,8 @@ bool DeviceClassMOS4Transistor::combine_devices (Device *a, Device *b) const
     //  for combination the gate length must be identical
     if (fabs (a->parameter_value (0) - b->parameter_value (0)) < 1e-6) {
 
-      a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
-      a->set_parameter_value (2, a->parameter_value (2) + b->parameter_value (2));
-      a->set_parameter_value (3, a->parameter_value (3) + b->parameter_value (3));
+      combine_parameters (a, b);
+
       b->connect_terminal (0, 0);
       b->connect_terminal (1, 0);
       b->connect_terminal (2, 0);

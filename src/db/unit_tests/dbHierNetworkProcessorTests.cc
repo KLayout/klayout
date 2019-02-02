@@ -659,7 +659,7 @@ TEST(40_HierClustersBasic)
   EXPECT_EQ (cluster->bbox ().to_string (), "(0,0;1000,1000)")
   nc = 0;
   for (db::connected_clusters<db::PolygonRef>::connections_iterator i = cluster->begin_connections (); i != cluster->end_connections (); ++i) {
-    nc += i->second.size ();
+    nc += int (i->second.size ());
   }
   EXPECT_EQ (nc, 2);
 
@@ -673,7 +673,7 @@ TEST(40_HierClustersBasic)
   EXPECT_EQ (cluster->bbox ().to_string (), "(0,0;2000,500)")
   nc = 0;
   for (db::connected_clusters<db::PolygonRef>::connections_iterator i = cluster->begin_connections (); i != cluster->end_connections (); ++i) {
-    nc += i->second.size ();
+    nc += int (i->second.size ());
   }
   EXPECT_EQ (nc, 0);
 
@@ -687,7 +687,7 @@ TEST(40_HierClustersBasic)
   EXPECT_EQ (cluster->bbox ().to_string (), "(0,0;500,2000)")
   nc = 0;
   for (db::connected_clusters<db::PolygonRef>::connections_iterator i = cluster->begin_connections (); i != cluster->end_connections (); ++i) {
-    nc += i->second.size ();
+    nc += int (i->second.size ());
   }
   EXPECT_EQ (nc, 1);
 }

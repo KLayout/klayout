@@ -327,7 +327,7 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
     DeviceCellKey key;
 
     for (geometry_per_terminal_type::const_iterator t = d->second.second.begin (); t != d->second.second.end (); ++t) {
-      std::map<size_t, std::set<db::PolygonRef> > &gt = key.geometry [t->first];
+      std::map<unsigned int, std::set<db::PolygonRef> > &gt = key.geometry [t->first];
       for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
         std::set<db::PolygonRef> &gl = gt [l->first];
         for (std::vector<db::PolygonRef>::const_iterator p = l->second.begin (); p != l->second.end (); ++p) {

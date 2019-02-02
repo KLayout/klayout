@@ -112,6 +112,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         tl_assert (n > 0);
 
         device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, dbu () * dbu () * d->area () / double (n));
+        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, dbu () * d->perimeter () / double (n));
 
         define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, terminal_geometry_index, *d);
 

@@ -147,8 +147,8 @@ public:
 
 /**
  *  @brief A basic MOSFET device class with three terminals
- *  A MOSFET defines four parameters: "W" for the gate width in micrometers, "L" for the gate length in micrometers,
- *  "AS" for the source area and "AD" for the drain area.
+ *  A MOSFET defines six parameters: "W" for the gate width in micrometers, "L" for the gate length in micrometers,
+ *  "AS" for the source area and "AD" for the drain area and "PS" and "PD" for the source and drain perimeter.
  *  The MOSFET device defines three terminals, "S", "D" and "G" for source, drain and gate.
  */
 class DB_PUBLIC DeviceClassMOS3Transistor
@@ -161,6 +161,8 @@ public:
   static size_t param_id_W;
   static size_t param_id_AS;
   static size_t param_id_AD;
+  static size_t param_id_PS;
+  static size_t param_id_PD;
 
   static size_t terminal_id_S;
   static size_t terminal_id_G;
@@ -173,6 +175,9 @@ public:
 
   virtual bool combine_devices (Device *a, Device *b) const;
   virtual bool supports_parallel_combination () const { return true; }
+
+protected:
+  void combine_parameters (Device *a, Device *b) const;
 };
 
 /**

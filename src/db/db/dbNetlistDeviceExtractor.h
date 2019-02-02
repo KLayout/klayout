@@ -493,7 +493,7 @@ private:
       return false;
     }
 
-    std::map<unsigned int, std::map<size_t, std::set<db::PolygonRef> > > geometry;
+    std::map<size_t, std::map<unsigned int, std::set<db::PolygonRef> > > geometry;
     std::map<size_t, double> parameters;
   };
 

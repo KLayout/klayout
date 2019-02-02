@@ -393,11 +393,15 @@ TEST(5_WriterMOS3Devices)
   ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.18);
   ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 1.2);
   ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 0.75);
+  ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 2.2);
+  ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 1.75);
   db::Device *ddev2 = new db::Device (m3cls);
   ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 1.4);
   ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.25);
   ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 1.3);
   ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 0.85);
+  ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 2.3);
+  ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 1.85);
   circuit1->add_device (ddev1);
   circuit1->add_device (ddev2);
 
@@ -488,11 +492,15 @@ TEST(6_WriterMOS4Devices)
   ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.18);
   ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 1.2);
   ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 0.75);
+  ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 2.2);
+  ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 1.75);
   db::Device *ddev2 = new db::Device (m4cls);
   ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 1.4);
   ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.25);
   ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 1.3);
   ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 0.85);
+  ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 2.3);
+  ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 1.85);
   circuit1->add_device (ddev1);
   circuit1->add_device (ddev2);
 
@@ -657,11 +665,15 @@ TEST(8_WriterSubcircuits)
     ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.18);
     ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 1.2);
     ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 0.75);
+    ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 2.2);
+    ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 1.75);
     db::Device *ddev2 = new db::Device (m4cls);
     ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 1.4);
     ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.25);
     ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 1.3);
     ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 0.85);
+    ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 2.3);
+    ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 1.85);
     circuit1->add_device (ddev1);
     circuit1->add_device (ddev2);
 

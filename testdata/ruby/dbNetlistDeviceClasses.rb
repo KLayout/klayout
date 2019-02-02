@@ -222,11 +222,15 @@ END
     d1.set_parameter(RBA::DeviceClassMOS3Transistor::PARAM_W, 2.0)
     d1.set_parameter(RBA::DeviceClassMOS3Transistor::PARAM_AS, 3.0)
     d1.set_parameter(RBA::DeviceClassMOS3Transistor::PARAM_AD, 4.0)
+    d1.set_parameter(RBA::DeviceClassMOS3Transistor::PARAM_PS, 13.0)
+    d1.set_parameter(RBA::DeviceClassMOS3Transistor::PARAM_PD, 14.0)
     d2 = circuit.create_device(cls, "d2")
     d2.set_parameter("L", 1.0)
     d2.set_parameter("W", 3.0)
     d2.set_parameter("AS", 4.0)
     d2.set_parameter("AD", 5.0)
+    d2.set_parameter("PS", 14.0)
+    d2.set_parameter("PD", 15.0)
 
     pin_a = circuit.create_pin ("A")
     pin_b = circuit.create_pin ("B")
@@ -249,8 +253,8 @@ END
 
     assert_equal(nl.to_s, <<END)
 Circuit  (A=n1,B=n2,C=n3):
-  D d1 (S=n1,G=n3,D=n2) [L=1,W=2,AS=3,AD=4]
-  D d2 (S=n1,G=n3,D=n2) [L=1,W=3,AS=4,AD=5]
+  D d1 (S=n1,G=n3,D=n2) [L=1,W=2,AS=3,AD=4,PS=13,PD=14]
+  D d2 (S=n1,G=n3,D=n2) [L=1,W=3,AS=4,AD=5,PS=14,PD=15]
 END
 
     nl.combine_devices
@@ -258,7 +262,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 Circuit  (A=n1,B=n2,C=n3):
-  D d1 (S=n1,G=n3,D=n2) [L=1,W=5,AS=7,AD=9]
+  D d1 (S=n1,G=n3,D=n2) [L=1,W=5,AS=7,AD=9,PS=27,PD=29]
 END
 
   end
@@ -278,11 +282,15 @@ END
     d1.set_parameter(RBA::DeviceClassMOS4Transistor::PARAM_W, 2.0)
     d1.set_parameter(RBA::DeviceClassMOS4Transistor::PARAM_AS, 3.0)
     d1.set_parameter(RBA::DeviceClassMOS4Transistor::PARAM_AD, 4.0)
+    d1.set_parameter(RBA::DeviceClassMOS4Transistor::PARAM_PS, 13.0)
+    d1.set_parameter(RBA::DeviceClassMOS4Transistor::PARAM_PD, 14.0)
     d2 = circuit.create_device(cls, "d2")
     d2.set_parameter("L", 1.0)
     d2.set_parameter("W", 3.0)
     d2.set_parameter("AS", 4.0)
     d2.set_parameter("AD", 5.0)
+    d2.set_parameter("PS", 14.0)
+    d2.set_parameter("PD", 15.0)
 
     pin_a = circuit.create_pin ("A")
     pin_b = circuit.create_pin ("B")
@@ -311,8 +319,8 @@ END
 
     assert_equal(nl.to_s, <<END)
 Circuit  (A=n1,B=n2,C=n3,D=n4):
-  D d1 (S=n1,G=n3,D=n2,B=n4) [L=1,W=2,AS=3,AD=4]
-  D d2 (S=n1,G=n3,D=n2,B=n4) [L=1,W=3,AS=4,AD=5]
+  D d1 (S=n1,G=n3,D=n2,B=n4) [L=1,W=2,AS=3,AD=4,PS=13,PD=14]
+  D d2 (S=n1,G=n3,D=n2,B=n4) [L=1,W=3,AS=4,AD=5,PS=14,PD=15]
 END
 
     nl.combine_devices
@@ -320,7 +328,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 Circuit  (A=n1,B=n2,C=n3,D=n4):
-  D d1 (S=n1,G=n3,D=n2,B=n4) [L=1,W=5,AS=7,AD=9]
+  D d1 (S=n1,G=n3,D=n2,B=n4) [L=1,W=5,AS=7,AD=9,PS=27,PD=29]
 END
 
   end

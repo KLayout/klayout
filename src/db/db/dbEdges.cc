@@ -133,9 +133,9 @@ Edges &Edges::transform (const T &trans)
 }
 
 //  explicit instantiations
-template Edges &Edges::transform (const db::ICplxTrans &);
-template Edges &Edges::transform (const db::Trans &);
-template Edges &Edges::transform (const db::Disp &);
+template DB_PUBLIC Edges &Edges::transform (const db::ICplxTrans &);
+template DB_PUBLIC Edges &Edges::transform (const db::Trans &);
+template DB_PUBLIC Edges &Edges::transform (const db::Disp &);
 
 template <class Sh>
 void Edges::insert (const Sh &shape)
@@ -143,11 +143,11 @@ void Edges::insert (const Sh &shape)
   flat_edges ()->insert (shape);
 }
 
-template void Edges::insert (const db::Box &);
-template void Edges::insert (const db::SimplePolygon &);
-template void Edges::insert (const db::Polygon &);
-template void Edges::insert (const db::Path &);
-template void Edges::insert (const db::Edge &);
+template DB_PUBLIC void Edges::insert (const db::Box &);
+template DB_PUBLIC void Edges::insert (const db::SimplePolygon &);
+template DB_PUBLIC void Edges::insert (const db::Polygon &);
+template DB_PUBLIC void Edges::insert (const db::Path &);
+template DB_PUBLIC void Edges::insert (const db::Edge &);
 
 void Edges::insert (const db::Shape &shape)
 {
@@ -160,9 +160,9 @@ void Edges::insert (const db::Shape &shape, const T &trans)
   flat_edges ()->insert (shape, trans);
 }
 
-template void Edges::insert (const db::Shape &, const db::ICplxTrans &);
-template void Edges::insert (const db::Shape &, const db::Trans &);
-template void Edges::insert (const db::Shape &, const db::Disp &);
+template DB_PUBLIC void Edges::insert (const db::Shape &, const db::ICplxTrans &);
+template DB_PUBLIC void Edges::insert (const db::Shape &, const db::Trans &);
+template DB_PUBLIC void Edges::insert (const db::Shape &, const db::Disp &);
 
 FlatEdges *
 Edges::flat_edges ()

@@ -103,29 +103,29 @@ namespace l2n_std_format
   template <bool Short>
   struct DB_PUBLIC keys
   {
-    static const std::string &version_key,
-                             &description_key,
-                             &top_key,
-                             &unit_key,
-                             &layer_key,
-                             &connect_key,
-                             &global_key,
-                             &circuit_key,
-                             &net_key,
-                             &device_key,
-                             &subcircuit_key,
-                             &polygon_key,
-                             &rect_key,
-                             &terminal_key,
-                             &abstract_key,
-                             &param_key,
-                             &location_key,
-                             &rotation_key,
-                             &mirror_key,
-                             &scale_key,
-                             &pin_key,
-                             &indent1,
-                             &indent2;
+    static const std::string version_key;
+    static const std::string description_key;
+    static const std::string top_key;
+    static const std::string unit_key;
+    static const std::string layer_key;
+    static const std::string connect_key;
+    static const std::string global_key;
+    static const std::string circuit_key;
+    static const std::string net_key;
+    static const std::string device_key;
+    static const std::string subcircuit_key;
+    static const std::string polygon_key;
+    static const std::string rect_key;
+    static const std::string terminal_key;
+    static const std::string abstract_key;
+    static const std::string param_key;
+    static const std::string location_key;
+    static const std::string rotation_key;
+    static const std::string mirror_key;
+    static const std::string scale_key;
+    static const std::string pin_key;
+    static const std::string indent1;
+    static const std::string indent2;
 
     inline static bool is_short () { return Short; }
   };

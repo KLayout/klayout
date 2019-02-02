@@ -34,63 +34,59 @@
 namespace db
 {
 
-namespace
+/**
+ *  @brief An iterator delegate for the deep region
+ *  TODO: this is kind of redundant with OriginalLayerIterator ..
+ */
+class DB_PUBLIC DeepRegionIterator
+  : public RegionIteratorDelegate
 {
-  /**
-   *  @brief An iterator delegate for the deep region
-   *  TODO: this is kind of redundant with OriginalLayerIterator ..
-   */
-  class DB_PUBLIC DeepRegionIterator
-    : public RegionIteratorDelegate
+public:
+  typedef db::Polygon value_type;
+
+  DeepRegionIterator (const db::RecursiveShapeIterator &iter)
+    : m_iter (iter)
   {
-  public:
-    typedef db::Polygon value_type;
+    set ();
+  }
 
-    DeepRegionIterator (const db::RecursiveShapeIterator &iter)
-      : m_iter (iter)
-    {
-      set ();
+  virtual ~DeepRegionIterator () { }
+
+  virtual bool at_end () const
+  {
+    return m_iter.at_end ();
+  }
+
+  virtual void increment ()
+  {
+    ++m_iter;
+    set ();
+  }
+
+  virtual const value_type *get () const
+  {
+    return &m_polygon;
+  }
+
+  virtual RegionIteratorDelegate *clone () const
+  {
+    return new DeepRegionIterator (*this);
+  }
+
+private:
+  friend class Region;
+
+  db::RecursiveShapeIterator m_iter;
+  mutable value_type m_polygon;
+
+  void set () const
+  {
+    if (! m_iter.at_end ()) {
+      m_iter.shape ().polygon (m_polygon);
+      m_polygon.transform (m_iter.trans (), false);
     }
-
-    virtual ~DeepRegionIterator () { }
-
-    virtual bool at_end () const
-    {
-      return m_iter.at_end ();
-    }
-
-    virtual void increment ()
-    {
-      ++m_iter;
-      set ();
-    }
-
-    virtual const value_type *get () const
-    {
-      return &m_polygon;
-    }
-
-    virtual RegionIteratorDelegate *clone () const
-    {
-      return new DeepRegionIterator (*this);
-    }
-
-  private:
-    friend class Region;
-
-    db::RecursiveShapeIterator m_iter;
-    mutable value_type m_polygon;
-
-    void set () const
-    {
-      if (! m_iter.at_end ()) {
-        m_iter.shape ().polygon (m_polygon);
-        m_polygon.transform (m_iter.trans (), false);
-      }
-    }
-  };
-
-}
+  }
+};
 
 // -------------------------------------------------------------------------------------------------------------
 //  DeepRegion implementation

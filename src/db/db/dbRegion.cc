@@ -122,9 +122,9 @@ Region &Region::transform (const T &trans)
 }
 
 //  explicit instantiations
-template Region &Region::transform (const db::ICplxTrans &);
-template Region &Region::transform (const db::Trans &);
-template Region &Region::transform (const db::Disp &);
+template DB_PUBLIC Region &Region::transform (const db::ICplxTrans &);
+template DB_PUBLIC Region &Region::transform (const db::Trans &);
+template DB_PUBLIC Region &Region::transform (const db::Disp &);
 
 template <class Sh>
 void Region::insert (const Sh &shape)
@@ -132,10 +132,10 @@ void Region::insert (const Sh &shape)
   flat_region ()->insert (shape);
 }
 
-template void Region::insert (const db::Box &);
-template void Region::insert (const db::SimplePolygon &);
-template void Region::insert (const db::Polygon &);
-template void Region::insert (const db::Path &);
+template DB_PUBLIC void Region::insert (const db::Box &);
+template DB_PUBLIC void Region::insert (const db::SimplePolygon &);
+template DB_PUBLIC void Region::insert (const db::Polygon &);
+template DB_PUBLIC void Region::insert (const db::Path &);
 
 void Region::insert (const db::Shape &shape)
 {
@@ -148,9 +148,9 @@ void Region::insert (const db::Shape &shape, const T &trans)
   flat_region ()->insert (shape, trans);
 }
 
-template void Region::insert (const db::Shape &, const db::ICplxTrans &);
-template void Region::insert (const db::Shape &, const db::Trans &);
-template void Region::insert (const db::Shape &, const db::Disp &);
+template DB_PUBLIC void Region::insert (const db::Shape &, const db::ICplxTrans &);
+template DB_PUBLIC void Region::insert (const db::Shape &, const db::Trans &);
+template DB_PUBLIC void Region::insert (const db::Shape &, const db::Disp &);
 
 FlatRegion *
 Region::flat_region ()

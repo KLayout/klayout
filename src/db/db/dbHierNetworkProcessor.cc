@@ -302,7 +302,7 @@ local_cluster<T>::ensure_sorted ()
 }
 
 template <class T>
-struct DB_PUBLIC hnp_interaction_receiver
+class DB_PUBLIC hnp_interaction_receiver
   : public box_scanner_receiver2<T, unsigned int, T, unsigned int>
 {
 public:
@@ -829,7 +829,7 @@ local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flag
   for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     const db::Shapes &shapes = cell.shapes (*l);
     for (db::Shapes::shape_iterator s = shapes.begin (shape_flags); ! s.at_end (); ++s) {
-      bs.insert (s->basic_ptr (object_tag), std::make_pair (*l, (attr_id) s->prop_id ()));
+      bs.insert (s->basic_ptr (object_tag), std::make_pair (*l, (unsigned int) s->prop_id ()));
     }
   }
 
@@ -840,6 +840,27 @@ local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flag
 
 //  explicit instantiations
 template class DB_PUBLIC local_clusters<db::PolygonRef>;
+
+// ------------------------------------------------------------------------------
+//  connected_clusters_iterator implementation
+
+template <class T>
+connected_clusters_iterator<T>::connected_clusters_iterator (const connected_clusters<T> &c)
+  : m_lc_iter (c.begin ())
+{
+  size_t max_id = 0;
+  for (typename connected_clusters<T>::const_iterator i = c.begin (); i != c.end (); ++i) {
+    if (i->id () > max_id) {
+      max_id = i->id ();
+    }
+  }
+
+  m_x_iter = c.m_connections.lower_bound (max_id + 1);
+  m_x_iter_end = c.m_connections.end ();
+}
+
+//  explicit instantiations
+template class DB_PUBLIC connected_clusters_iterator<db::PolygonRef>;
 
 // ------------------------------------------------------------------------------
 //  connected_clusters implementation

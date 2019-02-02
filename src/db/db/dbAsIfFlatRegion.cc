@@ -665,19 +665,16 @@ AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
   return new_region.release ();
 }
 
-namespace
+/**
+ *  @brief A helper class to implement the strange polygon detector
+ */
+struct DB_PUBLIC StrangePolygonInsideFunc
 {
-  /**
-   *  @brief A helper class to implement the strange polygon detector
-   */
-  struct DB_PUBLIC StrangePolygonInsideFunc
+  inline bool operator() (int wc) const
   {
-    inline bool operator() (int wc) const
-    {
-      return wc < 0 || wc > 1;
-    }
-  };
-}
+    return wc < 0 || wc > 1;
+  }
+};
 
 RegionDelegate *
 AsIfFlatRegion::strange_polygon_check () const

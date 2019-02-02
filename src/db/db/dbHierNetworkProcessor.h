@@ -718,21 +718,6 @@ private:
   std::set<id_type> m_connected_clusters;
 };
 
-template <class T>
-connected_clusters_iterator<T>::connected_clusters_iterator (const connected_clusters<T> &c)
-  : m_lc_iter (c.begin ())
-{
-  size_t max_id = 0;
-  for (typename connected_clusters<T>::const_iterator i = c.begin (); i != c.end (); ++i) {
-    if (i->id () > max_id) {
-      max_id = i->id ();
-    }
-  }
-
-  m_x_iter = c.m_connections.lower_bound (max_id + 1);
-  m_x_iter_end = c.m_connections.end ();
-}
-
 template <typename> class cell_clusters_box_converter;
 
 /**

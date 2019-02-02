@@ -152,15 +152,15 @@ private:
 class DB_PUBLIC LocalProcessorCellContexts
 {
 public:
-  typedef std::pair<std::unordered_set<CellInstArray>, std::unordered_set<db::PolygonRef> > key_type;
-  typedef std::unordered_map<key_type, db::LocalProcessorCellContext> map_type;
-  typedef map_type::const_iterator iterator;
+  typedef std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > context_key_type;
+  typedef std::unordered_map<context_key_type, db::LocalProcessorCellContext> context_map_type;
+  typedef context_map_type::const_iterator iterator;
 
   LocalProcessorCellContexts ();
   LocalProcessorCellContexts (const db::Cell *intruder_cell);
 
-  db::LocalProcessorCellContext *find_context (const key_type &intruders);
-  db::LocalProcessorCellContext *create (const key_type &intruders);
+  db::LocalProcessorCellContext *find_context (const context_key_type &intruders);
+  db::LocalProcessorCellContext *create (const context_key_type &intruders);
   void compute_results (const LocalProcessorContexts &contexts, db::Cell *cell, const LocalOperation *op, unsigned int output_layer, const LocalProcessor *proc);
 
   iterator begin () const
@@ -175,7 +175,7 @@ public:
 
 private:
   const db::Cell *mp_intruder_cell;
-  std::unordered_map<key_type, db::LocalProcessorCellContext> m_contexts;
+  std::unordered_map<context_key_type, db::LocalProcessorCellContext> m_contexts;
 };
 
 class DB_PUBLIC LocalProcessorContexts
@@ -260,7 +260,7 @@ class DB_PUBLIC LocalProcessorContextComputationTask
   : public tl::Task
 {
 public:
-  LocalProcessorContextComputationTask (const LocalProcessor *proc, LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, std::pair<std::unordered_set<CellInstArray>, std::unordered_set<PolygonRef> > &intruders, db::Coord dist);
+  LocalProcessorContextComputationTask (const LocalProcessor *proc, LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist);
   void perform ();
 
 private:
@@ -271,7 +271,7 @@ private:
   db::Cell *mp_subject_cell;
   db::ICplxTrans m_subject_cell_inst;
   const db::Cell *mp_intruder_cell;
-  std::pair<std::unordered_set<CellInstArray>, std::unordered_set<PolygonRef> > m_intruders;
+  LocalProcessorCellContexts::context_key_type m_intruders;
   db::Coord m_dist;
 };
 
@@ -382,11 +382,11 @@ private:
   mutable std::auto_ptr<tl::Job<LocalProcessorContextComputationWorker> > mp_cc_job;
 
   std::string description (const LocalOperation *op) const;
-  void compute_contexts (db::LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const std::pair<std::unordered_set<CellInstArray>, std::unordered_set<PolygonRef> > &intruders, db::Coord dist) const;
-  void do_compute_contexts (db::LocalProcessorCellContext *cell_context, const db::LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const std::pair<std::unordered_set<CellInstArray>, std::unordered_set<PolygonRef> > &intruders, db::Coord dist) const;
-  void issue_compute_contexts (db::LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, std::pair<std::unordered_set<CellInstArray>, std::unordered_set<PolygonRef> > &intruders, db::Coord dist) const;
+  void compute_contexts (db::LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist) const;
+  void do_compute_contexts (db::LocalProcessorCellContext *cell_context, const db::LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist) const;
+  void issue_compute_contexts (db::LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist) const;
   void push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<db::PolygonRef> &result) const;
-  void compute_local_cell (const db::LocalProcessorContexts &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const LocalOperation *op, const std::pair<std::unordered_set<CellInstArray>, std::unordered_set<db::PolygonRef> > &intruders, std::unordered_set<db::PolygonRef> &result) const;
+  void compute_local_cell (const db::LocalProcessorContexts &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const LocalOperation *op, const LocalProcessorCellContexts::context_key_type &intruders, std::unordered_set<db::PolygonRef> &result) const;
 };
 
 }

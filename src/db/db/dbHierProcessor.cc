@@ -242,14 +242,14 @@ LocalProcessorCellContexts::LocalProcessorCellContexts (const db::Cell *intruder
 }
 
 db::LocalProcessorCellContext *
-LocalProcessorCellContexts::find_context (const key_type &intruders)
+LocalProcessorCellContexts::find_context (const context_key_type &intruders)
 {
-  std::unordered_map<key_type, db::LocalProcessorCellContext>::iterator c = m_contexts.find (intruders);
+  std::unordered_map<context_key_type, db::LocalProcessorCellContext>::iterator c = m_contexts.find (intruders);
   return c != m_contexts.end () ? &c->second : 0;
 }
 
 db::LocalProcessorCellContext *
-LocalProcessorCellContexts::create (const key_type &intruders)
+LocalProcessorCellContexts::create (const context_key_type &intruders)
 {
   return &m_contexts[intruders];
 }
@@ -290,6 +290,18 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
   ep.process (pg, op);
 }
 
+namespace {
+
+struct context_sorter
+{
+  bool operator () (const std::pair<const LocalProcessorCellContexts::context_key_type *, db::LocalProcessorCellContext *> &a, const std::pair<const LocalProcessorCellContexts::context_key_type *, db::LocalProcessorCellContext *> &b)
+  {
+    return *a.first < *b.first;
+  }
+};
+
+}
+
 void
 LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &contexts, db::Cell *cell, const LocalOperation *op, unsigned int output_layer, const LocalProcessor *proc)
 {
@@ -300,7 +312,19 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
   int index = 0;
   int total = int (m_contexts.size ());
-  for (std::unordered_map<key_type, db::LocalProcessorCellContext>::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
+
+  //  NOTE: we use the ordering provided by key_type::operator< rather than the unordered map to achieve
+  //  reproducability across different platforms. unordered_map is faster, but for processing them,
+  //  strict ordering is a more robust choice.
+  std::vector<std::pair<const context_key_type *, db::LocalProcessorCellContext *> > sorted_contexts;
+  sorted_contexts.reserve (m_contexts.size ());
+  for (std::unordered_map<context_key_type, db::LocalProcessorCellContext>::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
+    sorted_contexts.push_back (std::make_pair (&c->first, &c->second));
+  }
+
+  std::sort (sorted_contexts.begin (), sorted_contexts.end (), context_sorter ());
+
+  for (std::vector<std::pair<const context_key_type *, db::LocalProcessorCellContext *> >::const_iterator c = sorted_contexts.begin (); c != sorted_contexts.end (); ++c) {
 
     ++index;
 
@@ -311,31 +335,31 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
     if (first) {
 
       {
-        tl::MutexLocker locker (&c->second.lock ());
-        common = c->second.propagated ();
+        tl::MutexLocker locker (&c->second->lock ());
+        common = c->second->propagated ();
       }
 
       CRONOLOGY_COMPUTE_BRACKET(event_compute_local_cell)
-      proc->compute_local_cell (contexts, cell, mp_intruder_cell, op, c->first, common);
+      proc->compute_local_cell (contexts, cell, mp_intruder_cell, op, *c->first, common);
       first = false;
 
     } else {
 
       std::unordered_set<db::PolygonRef> res;
       {
-        tl::MutexLocker locker (&c->second.lock ());
-        res = c->second.propagated ();
+        tl::MutexLocker locker (&c->second->lock ());
+        res = c->second->propagated ();
       }
 
       {
         CRONOLOGY_COMPUTE_BRACKET(event_compute_local_cell)
-        proc->compute_local_cell (contexts, cell, mp_intruder_cell, op, c->first, res);
+        proc->compute_local_cell (contexts, cell, mp_intruder_cell, op, *c->first, res);
       }
 
       if (common.empty ()) {
 
         CRONOLOGY_COMPUTE_BRACKET(event_propagate)
-        c->second.propagate (res);
+        c->second->propagate (res);
 
       } else if (res != common) {
 
@@ -354,8 +378,8 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
           if (! lost.empty ()) {
             subtract (common, lost, cell->layout (), proc->max_vertex_count (), proc->area_ratio ());
-            for (std::unordered_map<key_type, db::LocalProcessorCellContext>::iterator cc = m_contexts.begin (); cc != c; ++cc) {
-              cc->second.propagate (lost);
+            for (std::vector<std::pair<const context_key_type *, db::LocalProcessorCellContext *> >::const_iterator cc = sorted_contexts.begin (); cc != c; ++cc) {
+              cc->second->propagate (lost);
             }
           }
 
@@ -373,7 +397,7 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
           subtract (gained, common, cell->layout (), proc->max_vertex_count (), proc->area_ratio ());
 
           if (! gained.empty ()) {
-            c->second.propagate (gained);
+            c->second->propagate (gained);
           }
 
         }
@@ -740,7 +764,7 @@ private:
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorContextComputationTask implementation
 
-LocalProcessorContextComputationTask::LocalProcessorContextComputationTask (const LocalProcessor *proc, LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, std::pair<std::unordered_set<CellInstArray>, std::unordered_set<PolygonRef> > &intruders, db::Coord dist)
+LocalProcessorContextComputationTask::LocalProcessorContextComputationTask (const LocalProcessor *proc, LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist)
   : tl::Task (),
     mp_proc (proc), mp_contexts (&contexts), mp_parent_context (parent_context),
     mp_subject_parent (subject_parent), mp_subject_cell (subject_cell), m_subject_cell_inst (subject_cell_inst),
@@ -849,7 +873,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const L
     contexts.set_intruder_layer (intruder_layer);
     contexts.set_subject_layer (subject_layer);
 
-    std::pair<std::unordered_set<db::CellInstArray>, std::unordered_set<db::PolygonRef> > intruders;
+    LocalProcessorCellContexts::context_key_type intruders;
     issue_compute_contexts (contexts, 0, 0, mp_subject_top, db::ICplxTrans (), mp_intruder_top, intruders, op->dist ());
 
     if (mp_cc_job.get ()) {
@@ -869,7 +893,7 @@ void LocalProcessor::issue_compute_contexts (LocalProcessorContexts &contexts,
                                              db::Cell *subject_cell,
                                              const db::ICplxTrans &subject_cell_inst,
                                              const db::Cell *intruder_cell,
-                                             std::pair<std::unordered_set<CellInstArray>, std::unordered_set<PolygonRef> > &intruders,
+                                             LocalProcessorCellContexts::context_key_type &intruders,
                                              db::Coord dist) const
 {
   bool is_small_job = subject_cell->begin ().at_end ();
@@ -887,7 +911,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
                                        db::Cell *subject_cell,
                                        const db::ICplxTrans &subject_cell_inst,
                                        const db::Cell *intruder_cell,
-                                       const std::pair<std::unordered_set<CellInstArray>, std::unordered_set<PolygonRef> > &intruders,
+                                       const LocalProcessorCellContexts::context_key_type &intruders,
                                        db::Coord dist) const
 {
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts)
@@ -1008,7 +1032,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 
       }
 
-      for (std::unordered_set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
+      for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
         if (! inst_bci (*i).empty ()) {
           scanner.insert2 (i.operator-> (), ++id);
         }
@@ -1028,7 +1052,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
         }
       }
 
-      for (std::unordered_set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
+      for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert2 (i.operator-> (), 0);
       }
 
@@ -1053,7 +1077,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 
         if (! nbox.empty ()) {
 
-          std::pair<std::unordered_set<db::CellInstArray>, std::unordered_set<db::PolygonRef> > intruders_below;
+          LocalProcessorCellContexts::context_key_type intruders_below;
 
           db::shape_reference_translator_with_trans<db::PolygonRef, db::ICplxTrans> rt (mp_subject_layout, tni);
 
@@ -1173,7 +1197,7 @@ LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOp
 }
 
 void
-LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const db::LocalOperation *op, const std::pair<std::unordered_set<CellInstArray>, std::unordered_set<db::PolygonRef> > &intruders, std::unordered_set<db::PolygonRef> &result) const
+LocalProcessor::compute_local_cell (const db::LocalProcessorContexts &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const LocalOperation *op, const LocalProcessorCellContexts::context_key_type &intruders, std::unordered_set<db::PolygonRef> &result) const
 {
   const db::Shapes *subject_shapes = &subject_cell->shapes (contexts.subject_layer ());
 
@@ -1221,7 +1245,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
       }
 
 //  TODO: TODO: can we confine this search to the subject's (sized) bounding box?
-      for (std::unordered_set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
+      for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert (i.operator-> (), interactions.next_id ());
       }
 
@@ -1239,7 +1263,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
       }
 
 //  TODO: can we confine this search to the subject's (sized) bounding box?
-      for (std::unordered_set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
+      for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert2 (i.operator-> (), interactions.next_id ());
       }
 
@@ -1284,7 +1308,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
     }
 
 //  TODO: can we confine this search to the subject's (sized) bounding box?
-    for (std::unordered_set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
+    for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
       if (! inst_bci (*i).empty ()) {
         scanner.insert2 (i.operator-> (), ++inst_id);
       }

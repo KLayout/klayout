@@ -404,6 +404,22 @@ namespace std
       return hf;
     }
   };
+
+  /**
+   *  @brief Generic hash for an ordered set
+   */
+  template <class T>
+  struct hash<std::set<T> >
+  {
+    size_t operator() (const std::set<T> &o) const
+    {
+      size_t hf = 0;
+      for (typename std::set<T>::const_iterator i = o.begin (); i != o.end (); ++i) {
+        hf = hfunc (hf, std::hash <T> () (*i));
+      }
+      return hf;
+    }
+  };
 }
 
 #endif

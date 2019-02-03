@@ -33,8 +33,32 @@ NetlistExtractor::NetlistExtractor ()
   //  .. nothing yet ..
 }
 
+static void
+build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type net_name_id, tl::equivalence_clusters<unsigned int> &eq)
+{
+  std::map<std::string, std::set<unsigned int> > prop_by_name;
+
+  for (db::PropertiesRepository::iterator i = layout->properties_repository ().begin (); i != layout->properties_repository ().end (); ++i) {
+    for (db::PropertiesRepository::properties_set::const_iterator p = i->second.begin (); p != i->second.end (); ++p) {
+      if (p->first == net_name_id) {
+        std::string nn = p->second.to_string ();
+        prop_by_name [nn].insert (i->first);
+      }
+    }
+  }
+
+  for (std::map<std::string, std::set<unsigned int> >::const_iterator pn = prop_by_name.begin (); pn != prop_by_name.end (); ++pn) {
+    std::set<unsigned int>::const_iterator p = pn->second.begin ();
+    std::set<unsigned int>::const_iterator p0 = p;
+    while (p != pn->second.end ()) {
+      eq.same (*p0, *p);
+      ++p;
+    }
+  }
+}
+
 void
-NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters)
+NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters, bool join_nets_by_label)
 {
   mp_clusters = &clusters;
   mp_layout = &dss.const_layout ();
@@ -52,7 +76,11 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
 
   //  the big part: actually extract the nets
 
-  mp_clusters->build (*mp_layout, *mp_cell, db::ShapeIterator::Polygons, conn);
+  tl::equivalence_clusters<unsigned int> net_name_equivalence;
+  if (m_text_annot_name_id.first && join_nets_by_label) {
+    build_net_name_equivalence (mp_layout, m_text_annot_name_id.second, net_name_equivalence);
+  }
+  mp_clusters->build (*mp_layout, *mp_cell, db::ShapeIterator::Polygons, conn, &net_name_equivalence);
 
   //  reverse lookup for Circuit vs. cell index
   std::map<db::cell_index_type, db::Circuit *> circuits;

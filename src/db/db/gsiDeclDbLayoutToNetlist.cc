@@ -213,8 +213,10 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("global_net_name", &db::LayoutToNetlist::global_net_name, gsi::arg ("global_net_id"),
     "@brief Gets the global net name for the given global net ID."
   ) +
-  gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist,
+  gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist, gsi::arg ("join_nets_by_label", true),
     "@brief Runs the netlist extraction\n"
+    "If join_nets_by_label is true, nets on the same hierarchy level carrying the same label will be connected "
+    "implicitly even if there is no physical connection.\n"
     "See the class description for more details.\n"
   ) +
   gsi::method_ext ("internal_layout", &l2n_internal_layout,

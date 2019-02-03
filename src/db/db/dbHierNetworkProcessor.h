@@ -30,6 +30,7 @@
 #include "dbBoxTree.h"
 #include "dbCell.h"
 #include "dbInstElement.h"
+#include "tlEquivalenceClusters.h"
 
 #include <map>
 #include <set>
@@ -463,8 +464,13 @@ public:
    *  This method will only build the local clusters. Child cells
    *  are not taken into account. Only the shape types listed in
    *  shape_flags are taken.
+   *
+   *  If attr_equivalence is non-null, all clusters with attributes
+   *  listed as equivalent in this object are joined. Additional
+   *  cluster joining may happen in this case, because multi-attribute
+   *  assignment might create connections too.
    */
-  void build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
+  void build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0);
 
   /**
    *  @brief Creates and inserts a new clusters
@@ -490,6 +496,8 @@ private:
   box_type m_bbox;
   tree_type m_clusters;
   size_t m_next_dummy_id;
+
+  void apply_attr_equivalences (const tl::equivalence_clusters<unsigned int> &attr_equivalence);
 };
 
 /**
@@ -740,7 +748,7 @@ public:
   /**
    *  @brief Builds a hierarchy of clusters from a cell hierarchy and given connectivity
    */
-  void build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
+  void build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0);
 
   /**
    *  @brief Gets the connected clusters for a given cell
@@ -778,10 +786,10 @@ public:
   ClusterInstance make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<db::InstElement> &path);
 
 private:
-  void build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
+  void build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence);
   void build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn);
   void build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, tl::RelativeProgress &progress);
-  void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
+  void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0);
 
   std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
 };

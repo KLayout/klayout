@@ -817,7 +817,7 @@ private:
 
 template <class T>
 void
-local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
+local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
 {
   bool report_progress = tl::verbosity () >= 50;
   static std::string desc = tl::to_string (tr ("Building local clusters"));
@@ -836,6 +836,57 @@ local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flag
   cluster_building_receiver<T, box_type> rec (conn);
   bs.process (rec, 1 /*==touching*/, bc);
   rec.generate_clusters (*this);
+
+  if (attr_equivalence && attr_equivalence->size () > 0) {
+    apply_attr_equivalences (*attr_equivalence);
+  }
+}
+
+template <class T>
+void
+local_clusters<T>::apply_attr_equivalences (const tl::equivalence_clusters<unsigned int> &attr_equivalence)
+{
+  tl::equivalence_clusters<unsigned int> eq;
+
+  //  collect all local attributes (the ones which are present in attr_equivalence) into "eq"
+  //  and form equivalences for multi-attribute clusters.
+  for (const_iterator c = begin (); c != end (); ++c) {
+    typename local_cluster<T>::attr_iterator a0;
+    for (typename local_cluster<T>::attr_iterator a = c->begin_attr (); a != c->end_attr (); ++a) {
+      if (attr_equivalence.has_attribute (*a)) {
+        if (a0 == typename local_cluster<T>::attr_iterator ()) {
+          a0 = a;
+        }
+        eq.same (*a0, *a);
+      }
+    }
+  }
+
+  //  apply the equivalences implied by attr_equivalence
+  eq.apply_equivalences (attr_equivalence);
+
+  //  identify the layout clusters joined into one attribute cluster and join them
+
+  std::map<tl::equivalence_clusters<unsigned int>::cluster_id_type, std::set<size_t> > c2c;
+
+  for (const_iterator c = begin (); c != end (); ++c) {
+    for (typename local_cluster<T>::attr_iterator a = c->begin_attr (); a != c->end_attr (); ++a) {
+      tl::equivalence_clusters<unsigned int>::cluster_id_type cl = attr_equivalence.cluster_id (*a);
+      if (cl > 0) {
+        c2c [cl].insert (c->id ());
+      }
+    }
+  }
+
+  for (std::map<tl::equivalence_clusters<unsigned int>::cluster_id_type, std::set<size_t> >::const_iterator c = c2c.begin (); c != c2c.end (); ++c) {
+    if (c->second.size () > 1) {
+      std::set<size_t>::const_iterator cl0 = c->second.begin ();
+      std::set<size_t>::const_iterator cl = cl0;
+      while (++cl != c->second.end ()) {
+        join_cluster_with (*cl0, *cl);
+      }
+    }
+  }
 }
 
 //  explicit instantiations
@@ -992,11 +1043,11 @@ void hier_clusters<T>::clear ()
 
 template <class T>
 void
-hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
+hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
 {
   clear ();
   cell_clusters_box_converter<T> cbc (layout, *this);
-  do_build (cbc, layout, cell, shape_flags, conn);
+  do_build (cbc, layout, cell, shape_flags, conn, attr_equivalence);
 }
 
 namespace
@@ -1649,7 +1700,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
 
 template <class T>
 void
-hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
+hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing shape clusters")));
 
@@ -1664,7 +1715,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
     tl::RelativeProgress progress (tl::to_string (tr ("Computing local clusters")), called.size (), 1);
 
     for (std::set<db::cell_index_type>::const_iterator c = called.begin (); c != called.end (); ++c) {
-      build_local_cluster (layout, layout.cell (*c), shape_flags, conn);
+      build_local_cluster (layout, layout.cell (*c), shape_flags, conn, attr_equivalence);
       ++progress;
     }
   }
@@ -1707,7 +1758,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
 
 template <class T>
 void
-hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
+hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
 {
   std::string msg = tl::to_string (tr ("Computing local clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
   if (tl::verbosity () >= 40) {
@@ -1716,7 +1767,7 @@ hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell 
   tl::SelfTimer timer (tl::verbosity () >= 41, msg);
 
   connected_clusters<T> &local = m_per_cell_clusters [cell.cell_index ()];
-  local.build_clusters (cell, shape_flags, conn);
+  local.build_clusters (cell, shape_flags, conn, attr_equivalence);
 }
 
 template <class T>

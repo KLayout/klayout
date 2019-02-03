@@ -59,7 +59,7 @@ Edges::~Edges ()
 Edges &Edges::operator= (const Edges &other)
 {
   if (this != &other) {
-    set_delegate (other.mp_delegate->clone ());
+    set_delegate (other.mp_delegate->clone (), false);
   }
   return *this;
 }
@@ -100,9 +100,13 @@ Edges::iter () const
 }
 
 void
-Edges::set_delegate (EdgesDelegate *delegate)
+Edges::set_delegate (EdgesDelegate *delegate, bool keep_attributes)
 {
   if (delegate != mp_delegate) {
+    if (keep_attributes && mp_delegate && delegate) {
+      //  copy attributes (threads, min_coherence etc.) from old to new
+      *delegate = *mp_delegate;
+    }
     delete mp_delegate;
     mp_delegate = delegate;
   }

@@ -30,6 +30,7 @@ namespace db
 
 RegionDelegate::RegionDelegate ()
 {
+  m_base_verbosity = 0;
   m_report_progress = false;
   m_merged_semantics = true;
   m_strict_handling = false;
@@ -45,6 +46,7 @@ RegionDelegate &
 RegionDelegate::operator= (const RegionDelegate &other)
 {
   if (this != &other) {
+    m_base_verbosity = other.m_base_verbosity;
     m_report_progress = other.m_report_progress;
     m_merged_semantics = other.m_merged_semantics;
     m_strict_handling = other.m_strict_handling;
@@ -67,6 +69,11 @@ void RegionDelegate::enable_progress (const std::string &progress_desc)
 void RegionDelegate::disable_progress ()
 {
   m_report_progress = false;
+}
+
+void RegionDelegate::set_base_verbosity (int vb)
+{
+  m_base_verbosity = vb;
 }
 
 void RegionDelegate::set_min_coherence (bool f)

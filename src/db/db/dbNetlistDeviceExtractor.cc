@@ -271,6 +271,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
         for (db::recursive_cluster_shape_iterator<shape_type> si (device_clusters, *l, *ci, *c); ! si.at_end(); ++si) {
           insert_into_region (*si, si.trans (), r);
         }
+        r.set_base_verbosity (50);
       }
 
       db::Box box;

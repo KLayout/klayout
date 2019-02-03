@@ -1268,7 +1268,7 @@ private:
 
   EdgesDelegate *mp_delegate;
 
-  void set_delegate (EdgesDelegate *delegate);
+  void set_delegate (EdgesDelegate *delegate, bool keep_attributes = true);
   FlatEdges *flat_edges ();
 };
 

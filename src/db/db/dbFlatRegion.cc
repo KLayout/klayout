@@ -107,6 +107,9 @@ FlatRegion::ensure_merged_polygons_valid () const
     m_merged_polygons.clear ();
 
     db::EdgeProcessor ep (report_progress (), progress_desc ());
+    if (base_verbosity ()) {
+      ep.set_base_verbosity (base_verbosity ());
+    }
 
     //  count edges and reserve memory
     size_t n = 0;
@@ -243,6 +246,9 @@ RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int mi
     invalidate_cache ();
 
     db::EdgeProcessor ep (report_progress (), progress_desc ());
+    if (base_verbosity ()) {
+      ep.set_base_verbosity (base_verbosity ());
+    }
 
     //  count edges and reserve memory
     size_t n = 0;

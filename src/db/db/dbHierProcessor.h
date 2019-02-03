@@ -337,6 +337,16 @@ public:
     m_description = d;
   }
 
+  void set_base_verbosity (int vb)
+  {
+    m_base_verbosity = vb;
+  }
+
+  int base_verbosity () const
+  {
+    return m_base_verbosity;
+  }
+
   void set_threads (unsigned int nthreads)
   {
     m_nthreads = nthreads;
@@ -379,6 +389,7 @@ private:
   unsigned int m_nthreads;
   size_t m_max_vertex_count;
   double m_area_ratio;
+  int m_base_verbosity;
   mutable std::auto_ptr<tl::Job<LocalProcessorContextComputationWorker> > mp_cc_job;
 
   std::string description (const LocalOperation *op) const;

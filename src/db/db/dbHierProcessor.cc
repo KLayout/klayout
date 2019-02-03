@@ -255,14 +255,17 @@ LocalProcessorCellContexts::create (const context_key_type &intruders)
 }
 
 static void
-subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout, size_t max_vertex_count, double area_ratio)
+subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout, const db::LocalProcessor *proc)
 {
   if (other.empty ()) {
     return;
   }
 
+  size_t max_vertex_count = proc->max_vertex_count ();
+  double area_ratio = proc->area_ratio ();
+
   db::EdgeProcessor ep;
-  ep.set_base_verbosity (60);
+  ep.set_base_verbosity (proc->base_verbosity () + 30);
 
   size_t p1 = 0, p2 = 1;
 
@@ -328,7 +331,7 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
     ++index;
 
-    if (tl::verbosity () >= 50) {
+    if (tl::verbosity () >= proc->base_verbosity () + 20) {
       tl::log << tr ("Computing local results for ") << cell->layout ()->cell_name (cell->cell_index ()) << " (context " << index << "/" << total << ")";
     }
 
@@ -374,10 +377,10 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
         if (! lost.empty ()) {
 
-          subtract (lost, res, cell->layout (), proc->max_vertex_count (), proc->area_ratio ());
+          subtract (lost, res, cell->layout (), proc);
 
           if (! lost.empty ()) {
-            subtract (common, lost, cell->layout (), proc->max_vertex_count (), proc->area_ratio ());
+            subtract (common, lost, cell->layout (), proc);
             for (std::vector<std::pair<const context_key_type *, db::LocalProcessorCellContext *> >::const_iterator cc = sorted_contexts.begin (); cc != c; ++cc) {
               cc->second->propagate (lost);
             }
@@ -394,7 +397,7 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
         if (! gained.empty ()) {
 
-          subtract (gained, common, cell->layout (), proc->max_vertex_count (), proc->area_ratio ());
+          subtract (gained, common, cell->layout (), proc);
 
           if (! gained.empty ()) {
             c->second->propagate (gained);
@@ -822,13 +825,13 @@ LocalProcessorResultComputationTask::perform ()
 //  LocalProcessor implementation
 
 LocalProcessor::LocalProcessor (db::Layout *layout, db::Cell *top)
-  : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0)
+  : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
 {
   //  .. nothing yet ..
 }
 
 LocalProcessor::LocalProcessor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top)
-  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0)
+  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
 {
   //  .. nothing yet ..
 }
@@ -844,6 +847,8 @@ std::string LocalProcessor::description (const LocalOperation *op) const
 
 void LocalProcessor::run (LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
 {
+  tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Executing ")) + description (op));
+
   LocalProcessorContexts contexts;
   compute_contexts (contexts, op, subject_layer, intruder_layer);
   compute_results (contexts, op, output_layer);
@@ -861,7 +866,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const L
 {
   try {
 
-    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Computing contexts for ")) + description (op));
+    tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing contexts for ")) + description (op));
 
     if (m_nthreads > 0) {
       mp_cc_job.reset (new tl::Job<LocalProcessorContextComputationWorker> (m_nthreads));
@@ -916,7 +921,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 {
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts)
 
-  if (tl::verbosity () >= 50) {
+  if (tl::verbosity () >= m_base_verbosity + 20) {
     if (! subject_parent) {
       tl::log << tr ("Computing context for top cell ") << mp_subject_layout->cell_name (subject_cell->cell_index ());
     } else {
@@ -1114,7 +1119,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 void
 LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int output_layer) const
 {
-  tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Computing results for ")) + description (op));
+  tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing results for ")) + description (op));
 
   //  avoids updates while we work on the layout
   mp_subject_layout->update ();
@@ -1138,7 +1143,7 @@ LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOp
     while (true) {
 
       ++iter;
-      tl::SelfTimer timer (tl::verbosity () >= 41, tl::sprintf (tl::to_string (tr ("Computing results iteration #%d")), iter));
+      tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::sprintf (tl::to_string (tr ("Computing results iteration #%d")), iter));
 
       bool any = false;
       std::unordered_set<db::cell_index_type> later;

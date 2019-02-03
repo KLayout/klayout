@@ -86,6 +86,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         continue;
       }
 
+      rgate.set_base_verbosity (50);
       db::Edges edges (rgate.edges () & rdiff2gate.edges ());
       if (edges.size () != 2) {
         error (tl::sprintf (tl::to_string (tr ("Expected two edges interacting gate/diff (found %d) - width and length may be incorrect")), int (edges.size ())), *p);

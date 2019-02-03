@@ -2384,6 +2384,20 @@ Class<db::Region> decl_Region ("db", "Region",
     "@brief Disable progress reporting\n"
     "Calling this method will disable progress reporting. See \\enable_progress.\n"
   ) +
+  method ("base_verbosity=", &db::Region::set_base_verbosity, gsi::arg ("verbosity"),
+    "@brief Sets the minimum verbosity for timing reports\n"
+    "Timing reports will be given only if the verbosity is larger than this value. "
+    "Detailed reports will be given when the verbosity is more than this value plus 10.\n"
+    "In binary operations, the base verbosity of the first argument is considered.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  method ("base_verbosity", &db::Region::base_verbosity,
+    "@brief Gets the minimum verbosity for timing reports\n"
+    "See \\base_verbosity= for details.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
   method ("Euclidian", &euclidian_metrics,
     "@brief Specifies Euclidian metrics for the check functions\n"
     "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "

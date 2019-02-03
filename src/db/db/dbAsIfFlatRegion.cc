@@ -458,6 +458,9 @@ RegionDelegate *
 AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const
 {
   db::EdgeProcessor ep (report_progress (), progress_desc ());
+  if (base_verbosity ()) {
+    ep.set_base_verbosity (base_verbosity ());
+  }
 
   //  shortcut
   if (empty ()) {
@@ -1055,6 +1058,9 @@ AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc) const
   } else {
 
     db::EdgeProcessor ep (report_progress (), progress_desc ());
+    if (base_verbosity ()) {
+      ep.set_base_verbosity (base_verbosity ());
+    }
 
     //  count edges and reserve memory
     size_t n = 0;
@@ -1132,6 +1138,9 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
     //  Generic case - the size operation will merge first
     db::EdgeProcessor ep (report_progress (), progress_desc ());
+    if (base_verbosity ()) {
+      ep.set_base_verbosity (base_verbosity ());
+    }
 
     //  count edges and reserve memory
     size_t n = 0;
@@ -1213,6 +1222,9 @@ AsIfFlatRegion::and_with (const Region &other) const
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
+    if (base_verbosity ()) {
+      ep.set_base_verbosity (base_verbosity ());
+    }
 
     //  count edges and reserve memory
     size_t n = 0;
@@ -1267,6 +1279,9 @@ AsIfFlatRegion::not_with (const Region &other) const
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
+    if (base_verbosity ()) {
+      ep.set_base_verbosity (base_verbosity ());
+    }
 
     //  count edges and reserve memory
     size_t n = 0;
@@ -1319,6 +1334,9 @@ AsIfFlatRegion::xor_with (const Region &other) const
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
+    if (base_verbosity ()) {
+      ep.set_base_verbosity (base_verbosity ());
+    }
 
     //  count edges and reserve memory
     size_t n = 0;
@@ -1372,6 +1390,9 @@ AsIfFlatRegion::or_with (const Region &other) const
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
+    if (base_verbosity ()) {
+      ep.set_base_verbosity (base_verbosity ());
+    }
 
     //  count edges and reserve memory
     size_t n = 0;

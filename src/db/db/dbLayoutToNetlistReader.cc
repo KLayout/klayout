@@ -248,20 +248,21 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       circuit->set_cell_index (ci);
 
       std::map<db::CellInstArray, std::list<Connections> > connections;
+      std::map<unsigned int, Net *> id2net;
 
       while (br) {
 
         if (test (skeys::net_key) || test (lkeys::net_key)) {
-          read_net (l2n, circuit);
+          read_net (l2n, circuit, id2net);
         } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
-          read_pin (l2n, circuit);
+          read_pin (l2n, circuit, id2net);
         } else if (test (skeys::device_key) || test (lkeys::device_key)) {
           std::list<Connections> conn;
-          db::CellInstArray ia = read_device (l2n, circuit, conn);
+          db::CellInstArray ia = read_device (l2n, circuit, conn, id2net);
           connections[ia] = conn;
         } else if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
           std::list<Connections> conn;
-          db::CellInstArray ia = read_subcircuit (l2n, circuit, conn);
+          db::CellInstArray ia = read_subcircuit (l2n, circuit, conn, id2net);
           connections[ia] = conn;
         } else {
           throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (net, pin, device or circuit expected)")));
@@ -366,9 +367,14 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
 
     std::vector<db::Point> pt;
 
+    db::Coord x = 0, y = 0;
     while (br) {
-      db::Coord x = read_coord ();
-      db::Coord y = read_coord ();
+      if (! test ("*")) {
+        x = read_coord ();
+      }
+      if (! test ("*")) {
+        y = read_coord ();
+      }
       pt.push_back (db::Point (x, y));
     }
 
@@ -384,16 +390,20 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
 }
 
 void
-LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit)
+LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
 {
   Brace br (this);
 
   std::string name;
   read_word_or_quoted (name);
 
+  unsigned int id = (unsigned int) read_int ();
+
   db::Net *net = new db::Net ();
   net->set_name (name);
   circuit->add_net (net);
+
+  id2net.insert (std::make_pair (id, net));
 
   db::connected_clusters<db::PolygonRef> &cc = l2n->net_clusters ().clusters_per_cell (circuit->cell_index ());
   db::local_cluster<db::PolygonRef> &lc = *cc.insert ();
@@ -411,27 +421,26 @@ LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *
 }
 
 void
-LayoutToNetlistStandardReader::read_pin (db::LayoutToNetlist * /*l2n*/, db::Circuit *circuit)
+LayoutToNetlistStandardReader::read_pin (db::LayoutToNetlist * /*l2n*/, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
 {
   Brace br (this);
   std::string name;
   read_word_or_quoted (name);
-  std::string netname;
-  read_word_or_quoted (netname);
+  unsigned int netid = (unsigned int) read_int ();
   br.done ();
 
   const db::Pin &pin = circuit->add_pin (name);
 
-  db::Net *net = circuit->net_by_name (netname);
+  db::Net *net = id2net [netid];
   if (!net) {
-    throw tl::Exception (tl::to_string (tr ("Not a valid net name: ")) + netname);
+    throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
   }
 
   circuit->connect_pin (pin.id (), net);
 }
 
 db::CellInstArray
-LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs)
+LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, Net *> &id2net)
 {
   Brace br (this);
 
@@ -474,8 +483,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       Brace br2 (this);
       std::string tname;
       read_word_or_quoted (tname);
-      std::string netname;
-      read_word_or_quoted (netname);
+      unsigned int netid = (unsigned int) read_int ();
       br2.done ();
 
       size_t tid = std::numeric_limits<size_t>::max ();
@@ -491,9 +499,9 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
         throw tl::Exception (tl::to_string (tr ("Not a valid terminal name: ")) + tname + tl::to_string (tr (" for device class: ")) + dm->device_class ()->name ());
       }
 
-      db::Net *net = circuit->net_by_name (netname);
+      db::Net *net = id2net [netid];
       if (!net) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid net name: ")) + netname);
+        throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
       }
 
       device->connect_terminal (tid, net);
@@ -545,7 +553,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 }
 
 db::CellInstArray
-LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs)
+LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, Net *> &id2net)
 {
   Brace br (this);
 
@@ -617,8 +625,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Ci
       Brace br2 (this);
       std::string pname;
       read_word_or_quoted (pname);
-      std::string netname;
-      read_word_or_quoted (netname);
+      unsigned int netid = (unsigned int) read_int ();
       br2.done ();
 
       const db::Pin *sc_pin = circuit_ref->pin_by_name (pname);
@@ -626,9 +633,9 @@ LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Ci
         throw tl::Exception (tl::to_string (tr ("Not a valid pin name: ")) + pname + tl::to_string (tr (" for circuit: ")) + circuit_ref->name ());
       }
 
-      db::Net *net = circuit->net_by_name (netname);
+      db::Net *net = id2net [netid];
       if (!net) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid net name: ")) + netname);
+        throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
       }
 
       subcircuit->connect_pin (sc_pin->id (), net);

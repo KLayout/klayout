@@ -45,9 +45,9 @@ private:
   tl::OutputStream *mp_stream;
 
   void write (const db::LayoutToNetlist *l2n, const db::Circuit &circuit);
-  void write (const db::LayoutToNetlist *l2n, const db::Net &net);
-  void write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit);
-  void write (const db::LayoutToNetlist *l2n, const db::Device &device);
+  void write (const db::LayoutToNetlist *l2n, const db::Net &net, unsigned int id);
+  void write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit, std::map<const Net *, unsigned int> &net2id);
+  void write (const db::LayoutToNetlist *l2n, const db::Device &device, std::map<const Net *, unsigned int> &net2id);
   void write (const db::LayoutToNetlist *l2n, const db::DeviceAbstract &device_abstract);
   void write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname);
 };
@@ -171,12 +171,16 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
 template <class Keys>
 void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Circuit &circuit)
 {
+  std::map<const db::Net *, unsigned int> net2id;
+  unsigned int id = 0;
+
   if (circuit.begin_nets () != circuit.end_nets ()) {
     if (! Keys::is_short ()) {
       *mp_stream << endl << indent1 << "# Nets with their geometries" << endl;
     }
     for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
-      write (l2n, *n);
+      net2id.insert (std::make_pair (n.operator-> (), ++id));
+      write (l2n, *n, id);
     }
   }
 
@@ -187,7 +191,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Cir
     for (db::Circuit::const_pin_iterator p = circuit.begin_pins (); p != circuit.end_pins (); ++p) {
       const db::Net *net = circuit.net_for_pin (p->id ());
       if (net) {
-        *mp_stream << indent1 << Keys::pin_key << "(" << tl::to_word_or_quoted_string (p->expanded_name ()) << " " << tl::to_word_or_quoted_string (net->expanded_name ()) << ")" << endl;
+        *mp_stream << indent1 << Keys::pin_key << "(" << tl::to_word_or_quoted_string (p->expanded_name ()) << " " << net2id [net] << ")" << endl;
       }
     }
   }
@@ -197,7 +201,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Cir
       *mp_stream << endl << indent1 << "# Devices and their connections" << endl;
     }
     for (db::Circuit::const_device_iterator d = circuit.begin_devices (); d != circuit.end_devices (); ++d) {
-      write (l2n, *d);
+      write (l2n, *d, net2id);
     }
   }
 
@@ -206,7 +210,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Cir
       *mp_stream << endl << indent1 << "# Subcircuits and their connections" << endl;
     }
     for (db::Circuit::const_subcircuit_iterator x = circuit.begin_subcircuits (); x != circuit.end_subcircuits (); ++x) {
-      write (l2n, *x);
+      write (l2n, *x, net2id);
     }
   }
 
@@ -218,9 +222,31 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Cir
 template <class T, class Tr>
 void write_points (tl::OutputStream &stream, const T &poly, const Tr &tr)
 {
+  db::Coord x = 0, y = 0;
+  bool first = true;
   for (typename T::polygon_contour_iterator c = poly.begin_hull (); c != poly.end_hull (); ++c) {
+
     typename T::point_type pt = tr * *c;
-    stream << " " << pt.x () << " " << pt.y ();
+
+    stream << " ";
+
+    if (first || pt.x () != x) {
+      stream << pt.x ();
+    } else {
+      stream << "*";
+    }
+
+    stream << " ";
+
+    if (first || pt.y () != y) {
+      stream << pt.y ();
+    } else {
+      stream << "*";
+    }
+
+    first = false;
+    x = pt.x (); y = pt.y ();
+
   }
 }
 
@@ -253,7 +279,7 @@ void std_writer_impl<Keys>::write (const db::PolygonRef *s, const db::ICplxTrans
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net &net)
+void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net &net, unsigned int id)
 {
   if (! l2n->netlist ()) {
     throw tl::Exception (tl::to_string (tr ("Can't write annotated netlist before extraction has been done")));
@@ -283,7 +309,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
       } else {
 
         if (! any) {
-          *mp_stream << indent1 << Keys::net_key << "(" << tl::to_word_or_quoted_string (net.expanded_name ()) << endl;
+          *mp_stream << indent1 << Keys::net_key << "(" << tl::to_word_or_quoted_string (net.expanded_name ()) << " " << id << endl;
           any = true;
         }
 
@@ -304,12 +330,12 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
   if (any) {
     *mp_stream << indent1 << ")" << endl;
   } else {
-    *mp_stream << indent1 << Keys::net_key << "(" << tl::to_word_or_quoted_string (net.expanded_name ()) << ")" << endl;
+    *mp_stream << indent1 << Keys::net_key << "(" << tl::to_word_or_quoted_string (net.expanded_name ()) << " " << id << ")" << endl;
   }
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit)
+void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit, std::map<const Net *, unsigned int> &net2id)
 {
   const db::Layout *ly = l2n->internal_layout ();
   double dbu = ly->dbu ();
@@ -344,7 +370,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Sub
       } else {
         *mp_stream << " ";
       }
-      *mp_stream << Keys::pin_key << "(" << tl::to_word_or_quoted_string (p->expanded_name ()) << " " << tl::to_word_or_quoted_string (net->expanded_name ()) << ")";
+      *mp_stream << Keys::pin_key << "(" << tl::to_word_or_quoted_string (p->expanded_name ()) << " " << net2id [net] << ")";
       if (separate_lines) {
         *mp_stream << endl;
       }
@@ -389,7 +415,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Device &device)
+void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Device &device, std::map<const Net *, unsigned int> &net2id)
 {
   const db::Layout *ly = l2n->internal_layout ();
   double dbu = ly->dbu ();
@@ -410,7 +436,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
   for (std::vector<DeviceTerminalDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {
     const db::Net *net = device.net_for_terminal (i->id ());
     if (net) {
-      *mp_stream << indent2 << Keys::terminal_key << "(" << tl::to_word_or_quoted_string (i->name ()) << " " << tl::to_word_or_quoted_string (net->expanded_name ()) << ")" << endl;
+      *mp_stream << indent2 << Keys::terminal_key << "(" << tl::to_word_or_quoted_string (i->name ()) << " " << net2id [net] << ")" << endl;
     }
   }
 

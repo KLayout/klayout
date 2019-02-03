@@ -54,17 +54,20 @@ namespace db
  *    top(<circuit>)                - specifies the name of the top circuit [short key: W]
  *    layer(<name>)                 - define a layer [short key: L]
  *    connect(<layer1> <name> ...)  - connects layer1 with the following layers [short key: C]
- *    global(<layer> <net> ...)     - connects a layer with the given global nets [short key: G]
+ *    global(<layer> <net-name> ...)
+ *                                  - connects the shapes of the layer with the given global
+ *                                    nets [short key: G]
  *    circuit(<name> [circuit-def]) - circuit (cell) [short key: X]
  *    device(<name> <class> [device-abstract-def])
  *                                  - device abstract [short key: D]
  *
  *  [circuit-def]:
  *
- *    net(<name> [geometry-def])    - net geometry [short key: N]
+ *    net(<name> <id> [geometry-def])
+ *                                  - net geometry [short key: N]
  *                                    A net declaration shall be there also if no geometry
- *                                    is present
- *    pin(<name> <net-name>)        - outgoing pin connection [short key: P]
+ *                                    is present. The ID is a numerical shortcut for the net.
+ *    pin(<name> <net-id>)          - outgoing pin connection [short key: P]
  *    device(<name> <abstract> [device-def])
  *                                  - device with connections [short key: D]
  *    circuit(<name> [circuit-def]) - subcircuit with connections [short key: X]
@@ -72,6 +75,7 @@ namespace db
  *  [geometry-def]:
  *
  *    polygon(<layer> <x> <y> ...)  - defines a polygon [short key: Q]
+ *                                    "*" for <x> or <y> means take previous
  *    rect(<layer> <left> <bottom> <right> <top>)
  *                                  - defines a rectangle [short key: R]
  *
@@ -85,7 +89,7 @@ namespace db
  *    location(<x> <y>)             - location of the device [short key Y]
  *                                    must be before terminal
  *    param(<name> <value>)         - defines a parameter [short key E]
- *    terminal(<terminal-name> <net-name>)
+ *    terminal(<terminal-name> <net-id>)
  *                                  - specifies connection of the terminal with
  *                                    a net (short key: T)
  *
@@ -95,7 +99,7 @@ namespace db
  *    rotation(<angle>)             - rotation angle (in degree, default is 0) [short key O]
  *    mirror                        - if specified, the instance is mirrored before rotation [short key M]
  *    scale(<mag>)                  - magnification (default is 1) [short key S]
- *    pin(<pin-name> <net-name>)    - specifies connection of the pin with a net [short key: P]
+ *    pin(<pin-name> <net-id>)      - specifies connection of the pin with a net [short key: P]
  */
 
 namespace l2n_std_format

@@ -40,6 +40,7 @@ class Circuit;
 class Cell;
 class DeviceAbstract;
 class DeviceClass;
+class Net;
 class Region;
 
 /**
@@ -95,10 +96,10 @@ private:
   bool at_end ();
   void skip ();
 
-  void read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit);
-  void read_pin (db::LayoutToNetlist *l2n, db::Circuit *circuit);
-  db::CellInstArray read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs);
-  db::CellInstArray read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs);
+  void read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, db::Net *> &id2net);
+  void read_pin (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, db::Net *> &id2net);
+  db::CellInstArray read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, db::Net *> &id2net);
+  db::CellInstArray read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, db::Net *> &id2net);
   void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc);
   std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n);
 };

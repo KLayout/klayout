@@ -394,10 +394,14 @@ LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *
 {
   Brace br (this);
 
-  std::string name;
-  read_word_or_quoted (name);
-
   unsigned int id = (unsigned int) read_int ();
+  std::string name;
+
+  if (test (skeys::name_key) || test (lkeys::name_key)) {
+    Brace br_name (this);
+    read_word_or_quoted (name);
+    br_name.done ();
+  }
 
   db::Net *net = new db::Net ();
   net->set_name (name);

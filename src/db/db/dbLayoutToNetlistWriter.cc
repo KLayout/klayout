@@ -309,7 +309,11 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
       } else {
 
         if (! any) {
-          *mp_stream << indent1 << Keys::net_key << "(" << tl::to_word_or_quoted_string (net.expanded_name ()) << " " << id << endl;
+          *mp_stream << indent1 << Keys::net_key << "(" << id;
+          if (! net.name ().empty ()) {
+            *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (net.name ()) << ")";
+          }
+          *mp_stream << endl;
           any = true;
         }
 
@@ -330,7 +334,13 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
   if (any) {
     *mp_stream << indent1 << ")" << endl;
   } else {
-    *mp_stream << indent1 << Keys::net_key << "(" << tl::to_word_or_quoted_string (net.expanded_name ()) << " " << id << ")" << endl;
+
+    *mp_stream << indent1 << Keys::net_key << "(" << id;
+    if (! net.name ().empty ()) {
+      *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (net.name ()) << ")";
+    }
+    *mp_stream << ")" << endl;
+
   }
 }
 

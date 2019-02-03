@@ -72,7 +72,10 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
   for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
 
     db::Region rgate (*p);
+    rgate.set_base_verbosity (rgates.base_verbosity ());
+
     db::Region rdiff2gate = rdiff.selected_interacting (rgate);
+    rdiff2gate.set_base_verbosity (rdiff.base_verbosity ());
 
     if (rdiff2gate.empty ()) {
       error (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
@@ -86,7 +89,6 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         continue;
       }
 
-      rgate.set_base_verbosity (50);
       db::Edges edges (rgate.edges () & rdiff2gate.edges ());
       if (edges.size () != 2) {
         error (tl::sprintf (tl::to_string (tr ("Expected two edges interacting gate/diff (found %d) - width and length may be incorrect")), int (edges.size ())), *p);

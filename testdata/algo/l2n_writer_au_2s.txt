@@ -89,12 +89,12 @@ D(D$NMOS$1 NMOS
  )
 )
 X(INV2
- N($1 1
+ N(1
   R(nwell -1400 1800 1400 4580)
   R(diff_cont -110 3930 110 4150)
   R(ntie -400 3700 400 4380)
  )
- N(IN 2
+ N(2 I(IN)
   R(poly -525 -250 -275 2250)
   R(poly -1700 1620 -400 1980)
   R(poly -525 -800 -275 800)
@@ -102,7 +102,7 @@ X(INV2
   R(poly_lbl -801 1799 -799 1801)
   R(poly_cont -1630 1690 -1410 1910)
  )
- N($3 3
+ N(3
   R(poly 275 -250 525 2250)
   R(poly 220 820 580 1180)
   R(poly 275 2000 525 3600)
@@ -119,7 +119,7 @@ X(INV2
   R(psd -1050 2325 -525 3275)
   R(nsd -1050 -475 -525 475)
  )
- N(OUT 4
+ N(4 I(OUT)
   R(diff_cont 690 2890 910 3110)
   R(diff_cont 690 2490 910 2710)
   R(diff_cont 690 90 910 310)
@@ -131,7 +131,7 @@ X(INV2
   R(psd 525 2325 1050 3275)
   R(nsd 525 -475 1050 475)
  )
- N(VSS 5
+ N(5 I(VSS)
   R(diff_cont -110 -310 110 -90)
   R(diff_cont -110 90 110 310)
   R(diff_cont -110 90 110 310)
@@ -144,7 +144,7 @@ X(INV2
   R(metal2_lbl 1239 -91 1241 -89)
   R(nsd -275 -475 275 475)
  )
- N(VDD 6
+ N(6 I(VDD)
   R(diff_cont -110 2490 110 2710)
   R(diff_cont -110 2890 110 3110)
   R(diff_cont -110 2890 110 3110)
@@ -157,7 +157,7 @@ X(INV2
   R(metal2_lbl 1249 2799 1251 2801)
   R(psd -275 2325 275 3275)
  )
- N(BULK 7
+ N(7 I(BULK)
   R(diff_cont -110 -1360 110 -1140)
   R(ptie -400 -1590 400 -910)
  )
@@ -222,14 +222,14 @@ X(INV2
  )
 )
 X(INV2PAIR
- N(BULK 1)
- N($I8 2
+ N(1 I(BULK))
+ N(2
   R(diff_cont 3430 3290 3650 3510)
   R(diff_cont 3430 3690 3650 3910)
   R(diff_cont 3430 490 3650 710)
   R(diff_cont 3430 890 3650 1110)
  )
- N($I6 3
+ N(3
   R(diff_cont 4230 3290 4450 3510)
   R(diff_cont 4230 3690 4450 3910)
   R(diff_cont 4230 3690 4450 3910)
@@ -243,7 +243,7 @@ X(INV2PAIR
   R(metal1 1520 3220 1880 3980)
   R(metal1 1520 3220 1880 3980)
  )
- N($I5 4
+ N(4
   R(diff_cont 4230 490 4450 710)
   R(diff_cont 4230 890 4450 1110)
   R(diff_cont 4230 890 4450 1110)
@@ -257,20 +257,20 @@ X(INV2PAIR
   R(metal1 1520 420 1880 1180)
   R(metal1 1520 420 1880 1180)
  )
- N($I4 5
+ N(5
   R(diff_cont 2390 3690 2610 3910)
   R(diff_cont 2390 3290 2610 3510)
   R(diff_cont 2390 890 2610 1110)
   R(diff_cont 2390 490 2610 710)
  )
- N($I3 6)
- N($I2 7
+ N(6)
+ N(7
   R(diff_cont 5030 3690 5250 3910)
   R(diff_cont 5030 3290 5250 3510)
   R(diff_cont 5030 890 5250 1110)
   R(diff_cont 5030 490 5250 710)
  )
- N($I1 8)
+ N(8)
  P(BULK 1)
  P($1 2)
  P($2 3)
@@ -297,7 +297,7 @@ X(INV2PAIR
  )
 )
 X(RINGO
- N(FB 1
+ N(1 I(FB)
   R(diff_cont 22850 2490 23070 2710)
   R(diff_cont 22850 2890 23070 3110)
   R(diff_cont 22850 -310 23070 -90)
@@ -308,7 +308,7 @@ X(RINGO
   R(metal2 -1720 1600 23160 2000)
   R(metal2_lbl -1 1799 1 1801)
  )
- N(OSC 2
+ N(2 I(OSC)
   R(diff_cont 24450 2890 24670 3110)
   R(diff_cont 24450 2490 24670 2710)
   R(diff_cont 24450 90 24670 310)
@@ -317,7 +317,7 @@ X(RINGO
   R(metal2 24360 1600 24760 2000)
   R(metal2_lbl 24559 1799 24561 1801)
  )
- N(VDD 3
+ N(3 I(VDD)
   R(diff_cont 7810 2490 8030 2710)
   R(diff_cont 7810 2890 8030 3110)
   R(diff_cont 7810 2890 8030 3110)
@@ -390,7 +390,7 @@ X(RINGO
   R(metal1 20940 2420 21300 3180)
   R(metal2_lbl -1 2799 1 2801)
  )
- N('BULK,VSS' 4
+ N(4 I('BULK,VSS')
   R(diff_cont 7810 -310 8030 -90)
   R(diff_cont 7810 90 8030 310)
   R(diff_cont 7810 90 8030 310)
@@ -463,25 +463,25 @@ X(RINGO
   R(metal1 20940 -380 21300 380)
   R(metal2_lbl -1 -1 1 1)
  )
- N($I13 5
+ N(5
   R(diff_cont 3330 2890 3550 3110)
   R(diff_cont 3330 2490 3550 2710)
   R(diff_cont 3330 90 3550 310)
   R(diff_cont 3330 -310 3550 -90)
  )
- N($I7 6
+ N(6
   R(diff_cont 19170 2890 19390 3110)
   R(diff_cont 19170 2490 19390 2710)
   R(diff_cont 19170 90 19390 310)
   R(diff_cont 19170 -310 19390 -90)
  )
- N($I6 7
+ N(7
   R(diff_cont 13890 2890 14110 3110)
   R(diff_cont 13890 2490 14110 2710)
   R(diff_cont 13890 90 14110 310)
   R(diff_cont 13890 -310 14110 -90)
  )
- N($I5 8
+ N(8
   R(diff_cont 8610 2890 8830 3110)
   R(diff_cont 8610 2490 8830 2710)
   R(diff_cont 8610 90 8830 310)

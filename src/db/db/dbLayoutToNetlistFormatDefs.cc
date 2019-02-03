@@ -36,6 +36,7 @@ namespace l2n_std_format
   template<> DB_PUBLIC const std::string keys<false>::global_key ("global");
   template<> DB_PUBLIC const std::string keys<false>::circuit_key ("circuit");
   template<> DB_PUBLIC const std::string keys<false>::net_key ("net");
+  template<> DB_PUBLIC const std::string keys<false>::name_key ("name");
   template<> DB_PUBLIC const std::string keys<false>::device_key ("device");
   template<> DB_PUBLIC const std::string keys<false>::polygon_key ("polygon");
   template<> DB_PUBLIC const std::string keys<false>::rect_key ("rect");
@@ -57,6 +58,7 @@ namespace l2n_std_format
   template<> DB_PUBLIC const std::string keys<true>::global_key ("G");
   template<> DB_PUBLIC const std::string keys<true>::circuit_key ("X");
   template<> DB_PUBLIC const std::string keys<true>::net_key ("N");
+  template<> DB_PUBLIC const std::string keys<true>::name_key ("I");
   template<> DB_PUBLIC const std::string keys<true>::device_key ("D");
   template<> DB_PUBLIC const std::string keys<true>::polygon_key ("Q");
   template<> DB_PUBLIC const std::string keys<true>::rect_key ("R");

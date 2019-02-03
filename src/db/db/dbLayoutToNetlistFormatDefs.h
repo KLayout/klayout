@@ -63,7 +63,7 @@ namespace db
  *
  *  [circuit-def]:
  *
- *    net(<name> <id> [geometry-def])
+ *    net(<id> [net-name]? [geometry-def]*)
  *                                  - net geometry [short key: N]
  *                                    A net declaration shall be there also if no geometry
  *                                    is present. The ID is a numerical shortcut for the net.
@@ -71,6 +71,9 @@ namespace db
  *    device(<name> <abstract> [device-def])
  *                                  - device with connections [short key: D]
  *    circuit(<name> [circuit-def]) - subcircuit with connections [short key: X]
+ *
+ *  [net-name]:
+ *    name(<net-name>)              - specify net name [short key:
  *
  *  [geometry-def]:
  *
@@ -81,7 +84,7 @@ namespace db
  *
  *  [device-abstract-def]:
  *
- *    terminal(<terminal-name> [geometry-def])
+ *    terminal(<terminal-name> [geometry-def]*)
  *                                  - specifies the terminal geometry [short key: T]
  *
  *  [device-def]:
@@ -116,6 +119,7 @@ namespace l2n_std_format
     static const std::string global_key;
     static const std::string circuit_key;
     static const std::string net_key;
+    static const std::string name_key;
     static const std::string device_key;
     static const std::string subcircuit_key;
     static const std::string polygon_key;

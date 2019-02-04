@@ -50,6 +50,7 @@ public:
   virtual ~PolygonFilterBase () { }
 
   virtual bool selected (const db::Polygon &polgon) const = 0;
+  virtual bool isotropic () const = 0;
 };
 
 /**
@@ -94,6 +95,14 @@ struct DB_PUBLIC RegionPerimeterFilter
     } else {
       return ! (p >= m_pmin && p < m_pmax);
     }
+  }
+
+  /**
+   *  @brief This filter is isotropic
+   */
+  virtual bool isotropic () const
+  {
+    return true;
   }
 
 private:
@@ -141,6 +150,14 @@ struct DB_PUBLIC RegionAreaFilter
     }
   }
 
+  /**
+   *  @brief This filter is isotropic
+   */
+  virtual bool isotropic () const
+  {
+    return true;
+  }
+
 private:
   area_type m_amin, m_amax;
   bool m_inverse;
@@ -173,6 +190,14 @@ struct DB_PUBLIC RectilinearFilter
     return poly.is_rectilinear () != m_inverse;
   }
 
+  /**
+   *  @brief This filter is isotropic
+   */
+  virtual bool isotropic () const
+  {
+    return true;
+  }
+
 private:
   bool m_inverse;
 };
@@ -202,6 +227,14 @@ struct DB_PUBLIC RectangleFilter
   virtual bool selected (const db::Polygon &poly) const
   {
     return poly.is_box () != m_inverse;
+  }
+
+  /**
+   *  @brief This filter is isotropic
+   */
+  virtual bool isotropic () const
+  {
+    return true;
   }
 
 private:
@@ -276,6 +309,14 @@ struct DB_PUBLIC RegionBBoxFilter
     } else {
       return ! (v >= m_vmin && v < m_vmax);
     }
+  }
+
+  /**
+   *  @brief This filter is isotropic unless the parameter is width or height
+   */
+  virtual bool isotropic () const
+  {
+    return m_parameter != BoxWidth && m_parameter != BoxHeight;
   }
 
 private:

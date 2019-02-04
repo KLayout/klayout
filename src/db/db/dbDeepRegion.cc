@@ -30,6 +30,10 @@
 #include "dbHierProcessor.h"
 #include "dbCellMapping.h"
 #include "dbLayoutUtils.h"
+#include "dbHierNetworkProcessor.h"
+#include "dbCellGraphUtils.h"
+#include "dbPolygonTools.h"
+#include "tlTimer.h"
 
 namespace db
 {
@@ -92,13 +96,13 @@ private:
 //  DeepRegion implementation
 
 DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)
-  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count)), m_merged_polygons (false)
+  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count)), m_merged_polygons ()
 {
   init ();
 }
 
 DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics, double area_ratio, size_t max_vertex_count)
-  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count)), m_merged_polygons (false)
+  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count)), m_merged_polygons ()
 {
   init ();
 
@@ -126,16 +130,17 @@ DeepRegion::~DeepRegion ()
 DeepRegion::DeepRegion (const DeepRegion &other)
   : AsIfFlatRegion (other),
     m_deep_layer (other.m_deep_layer.copy ()),
-    m_merged_polygons (other.m_merged_polygons),
     m_merged_polygons_valid (other.m_merged_polygons_valid)
 {
-  //  .. nothing yet ..
+  if (m_merged_polygons_valid) {
+    m_merged_polygons = other.m_merged_polygons;
+  }
 }
 
 void DeepRegion::init ()
 {
   m_merged_polygons_valid = false;
-  m_merged_polygons.clear ();
+  m_merged_polygons = db::DeepLayer ();
 }
 
 RegionDelegate *
@@ -161,8 +166,7 @@ DeepRegion::begin_merged () const
   if (! merged_semantics ()) {
     return begin ();
   } else {
-    ensure_merged_polygons_valid ();
-    return new FlatRegionIterator (m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+    return new DeepRegionIterator (begin_merged_iter ().first);
   }
 }
 
@@ -187,10 +191,26 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
 DeepRegion::begin_merged_iter () const
 {
   if (! merged_semantics ()) {
+
     return begin_iter ();
+
   } else {
+
     ensure_merged_polygons_valid ();
-    return std::make_pair (db::RecursiveShapeIterator (m_merged_polygons), db::ICplxTrans ());
+
+    const db::Layout &layout = m_merged_polygons.layout ();
+    if (layout.cells () == 0) {
+
+      return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ());
+
+    } else {
+
+      const db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+      db::RecursiveShapeIterator iter (m_merged_polygons.layout (), top_cell, m_merged_polygons.layer ());
+      return std::make_pair (iter, db::ICplxTrans ());
+
+    }
+
   }
 }
 
@@ -253,36 +273,126 @@ DeepRegion::less (const Region &other) const
   }
 }
 
+namespace {
+
+class ClusterMerger
+{
+public:
+  ClusterMerger (unsigned int layer, const db::hier_clusters<db::PolygonRef> &hc, bool min_coherence, bool report_progress, const std::string &progress_desc)
+    : m_layer (layer), mp_hc (&hc), m_min_coherence (min_coherence), m_ep (report_progress, progress_desc)
+  {
+    //  .. nothing yet ..
+  }
+
+  void set_base_verbosity (int vb)
+  {
+    m_ep.set_base_verbosity (vb);
+  }
+
+  db::Shapes &merged (size_t cid, db::cell_index_type ci, bool initial = true)
+  {
+    std::map<size_t, db::Shapes>::iterator s = m_merged_cluster.find (cid);
+
+    //  some sanity checks: initial clusters are single-use, are never generated twice and cannot be retrieved again
+    if (initial) {
+      tl_assert (s == m_merged_cluster.end ());
+      m_done.insert (cid);
+    } else {
+      tl_assert (m_done.find (cid) == m_done.end ());
+    }
+
+    if (s != m_merged_cluster.end ()) {
+      return s->second;
+    }
+
+    s = m_merged_cluster.insert (std::make_pair (cid, db::Shapes ())).first;
+
+    const db::connected_clusters<db::PolygonRef> &cc = mp_hc->clusters_per_cell (ci);
+    const db::local_cluster<db::PolygonRef> &c = cc.cluster_by_id (cid);
+
+    std::list<std::pair<const db::Shapes *, db::ICplxTrans> > merged_child_clusters;
+
+    const db::connected_clusters<db::PolygonRef>::connections_type &conn = cc.connections_for_cluster (cid);
+    for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = conn.begin (); i != conn.end (); ++i) {
+      const db::Shapes &cc_shapes = merged (i->id (), i->inst ().inst_ptr.cell_index (), false);
+      merged_child_clusters.push_back (std::make_pair (&cc_shapes, i->inst ().complex_trans ()));
+    }
+
+    m_ep.clear ();
+
+    size_t pi = 0;
+
+    for (std::list<std::pair<const db::Shapes *, db::ICplxTrans> >::const_iterator i = merged_child_clusters.begin (); i != merged_child_clusters.end (); ++i) {
+      for (db::Shapes::shape_iterator s = i->first->begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+        if (s->is_polygon ()) {
+          db::Polygon poly;
+          s->polygon (poly);
+          m_ep.insert (poly.transformed (i->second), pi++);
+        }
+      }
+    }
+
+    for (db::local_cluster<db::PolygonRef>::shape_iterator s = c.begin (m_layer); !s.at_end (); ++s) {
+      db::Polygon poly = s->obj ();
+      poly.transform (s->trans ());
+      m_ep.insert (poly, pi++);
+    }
+
+    //  and run the merge step
+    db::MergeOp op (0);
+    db::ShapeGenerator pc (s->second);
+    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, m_min_coherence);
+    m_ep.process (pg, op);
+
+    return s->second;
+  }
+
+private:
+  std::map<size_t, db::Shapes> m_merged_cluster;
+  std::set<size_t> m_done;
+  unsigned int m_layer;
+  const db::hier_clusters<db::PolygonRef> *mp_hc;
+  bool m_min_coherence;
+  db::EdgeProcessor m_ep;
+};
+
+}
+
 void
 DeepRegion::ensure_merged_polygons_valid () const
 {
   if (! m_merged_polygons_valid) {
 
-    m_merged_polygons.clear ();
+    m_merged_polygons = m_deep_layer.new_layer ();
 
-    db::EdgeProcessor ep (report_progress (), progress_desc ());
+    tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
+
+    db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+
+    db::hier_clusters<db::PolygonRef> hc;
+    db::Connectivity conn;
+    conn.connect (m_deep_layer);
+    //  TODO: this uses the wrong verbosity inside ...
+    hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Polygons, conn);
+
+    //  collect the clusters and merge them into big polygons
+    //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
+    //  hopefully more efficient that collecting everything and will lead to reuse of parts.
+
+    ClusterMerger cm (m_deep_layer.layer (), hc, min_coherence (), report_progress (), progress_desc ());
     if (base_verbosity ()) {
-      ep.set_base_verbosity (base_verbosity ());
+      cm.set_base_verbosity (base_verbosity ());
     }
 
-    //  count edges and reserve memory
-    size_t n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      n += p->vertices ();
+    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+      const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (c->cell_index ());
+      for (db::connected_clusters<db::PolygonRef>::const_iterator cl = cc.begin (); cl != cc.end (); ++cl) {
+        if (cc.is_root (cl->id ())) {
+          db::Shapes &s = cm.merged (cl->id (), c->cell_index ());
+          c->shapes (m_merged_polygons.layer ()).swap (s);
+        }
+      }
     }
-    ep.reserve (n);
-
-    //  insert the polygons into the processor
-    n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
-      ep.insert (*p, n);
-    }
-
-    //  and run the merge step
-    db::MergeOp op (0);
-    db::ShapeGenerator pc (m_merged_polygons);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
-    ep.process (pg, op);
 
     m_merged_polygons_valid = true;
 
@@ -468,6 +578,426 @@ DeepRegion::add (const Region &other) const
     new_region->add_in_place (other);
     return new_region;
   }
+}
+
+static int is_box_from_iter (db::RecursiveShapeIterator i)
+{
+  if (i.at_end ()) {
+    return -1;
+  }
+
+  if (i->is_box ()) {
+    ++i;
+    if (i.at_end ()) {
+      return 1;
+    }
+  } else if (i->is_path () || i->is_polygon ()) {
+    db::Polygon poly;
+    i->polygon (poly);
+    if (poly.is_box ()) {
+      ++i;
+      if (i.at_end ()) {
+        return 1;
+      }
+    }
+  } else {
+    return -1;
+  }
+
+  return 0; // undecided
+}
+
+bool
+DeepRegion::is_box () const
+{
+  int f = is_box_from_iter (begin_iter ().first);
+  if (f != 0) {
+    return f > 0;
+  }
+
+  //  fallback: merge and then look again
+  return is_box_from_iter (begin_merged_iter ().first) > 0;
+}
+
+size_t
+DeepRegion::size () const
+{
+  size_t n = 0;
+
+  const db::Layout &layout = m_deep_layer.layout ();
+  db::CellCounter cc (&layout);
+  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+    n += cc.weight (*c) * layout.cell (*c).shapes (m_deep_layer.layer ()).size ();
+  }
+
+  return n;
+}
+
+DeepRegion::area_type
+DeepRegion::area (const db::Box &box) const
+{
+  if (box.empty ()) {
+
+    ensure_merged_polygons_valid ();
+
+    //  @@@ scaled instances!
+
+    DeepRegion::area_type a = 0;
+
+    const db::Layout &layout = m_merged_polygons.layout ();
+    db::CellCounter cc (&layout);
+    for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+      DeepRegion::area_type ac = 0;
+      for (db::ShapeIterator s = layout.cell (*c).shapes (m_merged_polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+        ac += s->area ();
+      }
+      a += cc.weight (*c) * ac;
+    }
+
+    return a;
+
+  } else {
+    return db::AsIfFlatRegion::area (box);
+  }
+}
+
+DeepRegion::perimeter_type
+DeepRegion::perimeter (const db::Box &box) const
+{
+  if (box.empty ()) {
+
+    ensure_merged_polygons_valid ();
+
+    //  @@@ scaled instances!
+
+    DeepRegion::perimeter_type p = 0;
+
+    const db::Layout &layout = m_merged_polygons.layout ();
+    db::CellCounter cc (&layout);
+    for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+      DeepRegion::perimeter_type pc = 0;
+      for (db::ShapeIterator s = layout.cell (*c).shapes (m_merged_polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+        pc += s->perimeter ();
+      }
+      p += cc.weight (*c) * pc;
+    }
+
+    return p;
+
+  } else {
+    return db::AsIfFlatRegion::perimeter (box);
+  }
+}
+
+Box
+DeepRegion::bbox () const
+{
+  return m_deep_layer.initial_cell ().bbox (m_deep_layer.layer ());
+}
+
+std::string
+DeepRegion::to_string (size_t nmax) const
+{
+  return db::AsIfFlatRegion::to_string (nmax);
+}
+
+EdgePairs
+DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
+{
+  //  NOTE: snap be optimized by forming grid variants etc.
+  return db::AsIfFlatRegion::grid_check (gx, gy);
+}
+
+EdgePairs
+DeepRegion::angle_check (double min, double max, bool inverse) const
+{
+  //  NOTE: snap be optimized by forming rotation variants etc.
+  return db::AsIfFlatRegion::angle_check (min, max, inverse);
+}
+
+RegionDelegate *
+DeepRegion::snapped (db::Coord gx, db::Coord gy)
+{
+  //  NOTE: snap be optimized by forming grid variants etc.
+  return db::AsIfFlatRegion::snapped (gx, gy);
+}
+
+Edges
+DeepRegion::edges (const EdgeFilterBase *filter) const
+{
+  //  NOTE: needs a deep edge set for optimizing for hierarchy.
+  //  At least the length filter is easy to optimize in the hierarchical case.
+  return db::AsIfFlatRegion::edges (filter);
+}
+
+RegionDelegate *
+DeepRegion::filtered (const PolygonFilterBase &filter) const
+{
+  if (filter.isotropic ()) {
+
+    ensure_merged_polygons_valid ();
+
+    //  @@@ scaled instances!
+
+    db::Layout &layout = m_merged_polygons.layout ();
+
+    std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
+    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+      const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+        db::Polygon poly;
+        si->polygon (poly);
+        if (filter.selected (poly)) {
+          st.insert (poly);
+        }
+      }
+
+    }
+
+    return res.release ();
+
+  } else {
+    return db::AsIfFlatRegion::filtered (filter);
+  }
+}
+
+RegionDelegate *
+DeepRegion::merged_in_place ()
+{
+  ensure_merged_polygons_valid ();
+
+  //  NOTE: this makes both layers share the same resource
+  m_deep_layer = m_merged_polygons;
+
+  return this;
+}
+
+RegionDelegate *
+DeepRegion::merged_in_place (bool min_coherence, unsigned int min_wc)
+{
+  //  TODO: can probably be optimized
+  return db::AsIfFlatRegion::merged_in_place (min_coherence, min_wc);
+}
+
+RegionDelegate *
+DeepRegion::merged () const
+{
+  ensure_merged_polygons_valid ();
+
+  db::Layout &layout = const_cast<db::Layout &> (m_merged_polygons.layout ());
+
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+    c->shapes (res->deep_layer ().layer ()) = c->shapes (m_merged_polygons.layer ());
+  }
+
+  res->deep_layer ().layer ();
+
+  return res.release ();
+}
+
+RegionDelegate *
+DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
+{
+  //  TODO: can probably be optimized
+  return db::AsIfFlatRegion::merged (min_coherence, min_wc);
+}
+
+RegionDelegate *
+DeepRegion::strange_polygon_check () const
+{
+  //  TODO: can probably be optimized
+  return db::AsIfFlatRegion::strange_polygon_check ();
+}
+
+RegionDelegate *
+DeepRegion::sized (coord_type d, unsigned int mode) const
+{
+  ensure_merged_polygons_valid ();
+
+  db::Layout &layout = m_merged_polygons.layout ();
+
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+    db::ShapeGenerator pc (st, false /*no clear - already empty*/);
+    db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
+    db::SizingPolygonFilter siz (pg2, d, d, mode);
+
+    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+      db::Polygon poly;
+      si->polygon (poly);
+      siz.put (poly);
+    }
+
+  }
+
+  return res.release ();
+}
+
+RegionDelegate *
+DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
+{
+  if (dx == dy) {
+    return sized (dx, mode);
+  } else {
+    return db::AsIfFlatRegion::sized (dx, dy, mode);
+  }
+}
+
+RegionDelegate *
+DeepRegion::holes () const
+{
+  ensure_merged_polygons_valid ();
+
+  db::Layout &layout = m_merged_polygons.layout ();
+
+  std::vector<db::Point> pts;
+
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+      for (size_t i = 0; i < si->holes (); ++i) {
+        db::Polygon h;
+        pts.clear ();
+        for (db::Shape::point_iterator p = si->begin_hole ((unsigned int) i); p != si->end_hole ((unsigned int) i); ++p) {
+          pts.push_back (*p);
+        }
+        h.assign_hull (pts.begin (), pts.end ());
+        st.insert (h);
+      }
+    }
+
+  }
+
+  return res.release ();
+}
+
+RegionDelegate *
+DeepRegion::hulls () const
+{
+  ensure_merged_polygons_valid ();
+
+  db::Layout &layout = m_merged_polygons.layout ();
+
+  std::vector<db::Point> pts;
+
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+      db::Polygon h;
+      pts.clear ();
+      for (db::Shape::point_iterator p = si->begin_hull (); p != si->end_hull (); ++p) {
+        pts.push_back (*p);
+      }
+      h.assign_hull (pts.begin (), pts.end ());
+      st.insert (h);
+    }
+
+  }
+
+  return res.release ();
+}
+
+RegionDelegate *
+DeepRegion::in (const Region &other, bool invert) const
+{
+  //  TODO: this can be optimized maybe ...
+  return db::AsIfFlatRegion::in (other, invert);
+}
+
+RegionDelegate *
+DeepRegion::rounded_corners (double rinner, double router, unsigned int n) const
+{
+  ensure_merged_polygons_valid ();
+
+  //  @@@ scaled instances
+
+  db::Layout &layout = m_merged_polygons.layout ();
+
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+      db::Polygon poly;
+      si->polygon (poly);
+      st.insert (db::compute_rounded (poly, rinner, router, n));
+    }
+
+  }
+
+  return res.release ();
+}
+
+RegionDelegate *
+DeepRegion::smoothed (coord_type d) const
+{
+  ensure_merged_polygons_valid ();
+
+  //  @@@ scaled instances
+
+  db::Layout &layout = m_merged_polygons.layout ();
+
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+      db::Polygon poly;
+      si->polygon (poly);
+      st.insert (db::smooth (poly, d));
+    }
+
+  }
+
+  return res.release ();
+}
+
+EdgePairs
+DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+{
+  //  TODO: implement hierarchically
+  return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+}
+
+EdgePairs
+DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+{
+  //  TODO: implement hierarchically
+  return db::AsIfFlatRegion::run_single_polygon_check (rel, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+}
+
+RegionDelegate *
+DeepRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const
+{
+  //  TODO: implement hierarchically
+  return db::AsIfFlatRegion::selected_interacting_generic (other, mode, touching, inverse);
+}
+
+RegionDelegate *
+DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) const
+{
+  //  TODO: implement hierarchically
+  return db::AsIfFlatRegion::selected_interacting_generic (other, inverse);
 }
 
 }

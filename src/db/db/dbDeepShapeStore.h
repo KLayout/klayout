@@ -62,6 +62,12 @@ public:
   ~DeepLayer ();
 
   /**
+   *  @brief The constructor from the detailed information
+   *  Use this constructor if you know what you're doing.
+   */
+  DeepLayer (DeepShapeStore *store, unsigned int layout, unsigned int layer);
+
+  /**
    *  @brief Conversion operator from Region to DeepLayer
    *  This requires the Region to be a DeepRegion. Otherwise, this constructor will assert
    */
@@ -86,6 +92,11 @@ public:
    *  @brief Equality operator
    */
   bool operator== (const DeepLayer &other) const;
+
+  /**
+   *  @brief Creates a new empty layer based on this one
+   */
+  DeepLayer new_layer () const;
 
   /**
    *  @brief Gets the layout object
@@ -155,11 +166,6 @@ public:
 
 private:
   friend class DeepShapeStore;
-
-  /**
-   *  @brief The constructor
-   */
-  DeepLayer (DeepShapeStore *store, unsigned int layout, unsigned int layer);
 
   void check_dss () const;
 

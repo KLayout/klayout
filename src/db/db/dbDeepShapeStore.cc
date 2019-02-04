@@ -141,6 +141,13 @@ bool DeepLayer::operator== (const DeepLayer &other) const
   return true;
 }
 
+DeepLayer
+DeepLayer::new_layer() const
+{
+  db::DeepShapeStore *store = const_cast<db::DeepShapeStore *> (mp_store.get ());
+  return DeepLayer (store, m_layout, store->layout (m_layout).insert_layer ());
+}
+
 db::Layout &
 DeepLayer::layout ()
 {

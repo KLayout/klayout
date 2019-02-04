@@ -291,21 +291,21 @@ public:
 
   db::Shapes &merged (size_t cid, db::cell_index_type ci, bool initial = true)
   {
-    std::map<size_t, db::Shapes>::iterator s = m_merged_cluster.find (cid);
+    std::map<std::pair<size_t, db::cell_index_type>, db::Shapes>::iterator s = m_merged_cluster.find (std::make_pair (cid, ci));
 
     //  some sanity checks: initial clusters are single-use, are never generated twice and cannot be retrieved again
     if (initial) {
       tl_assert (s == m_merged_cluster.end ());
-      m_done.insert (cid);
+      m_done.insert (std::make_pair (cid, ci));
     } else {
-      tl_assert (m_done.find (cid) == m_done.end ());
+      tl_assert (m_done.find (std::make_pair (cid, ci)) == m_done.end ());
     }
 
     if (s != m_merged_cluster.end ()) {
       return s->second;
     }
 
-    s = m_merged_cluster.insert (std::make_pair (cid, db::Shapes ())).first;
+    s = m_merged_cluster.insert (std::make_pair (std::make_pair (cid, ci), db::Shapes (false))).first;
 
     const db::connected_clusters<db::PolygonRef> &cc = mp_hc->clusters_per_cell (ci);
     const db::local_cluster<db::PolygonRef> &c = cc.cluster_by_id (cid);
@@ -348,8 +348,8 @@ public:
   }
 
 private:
-  std::map<size_t, db::Shapes> m_merged_cluster;
-  std::set<size_t> m_done;
+  std::map<std::pair<size_t, db::cell_index_type>, db::Shapes> m_merged_cluster;
+  std::set<std::pair<size_t, db::cell_index_type> > m_done;
   unsigned int m_layer;
   const db::hier_clusters<db::PolygonRef> *mp_hc;
   bool m_min_coherence;
@@ -384,11 +384,12 @@ DeepRegion::ensure_merged_polygons_valid () const
       cm.set_base_verbosity (base_verbosity ());
     }
 
+    //  @@@ iterate only over the called cells?
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
       const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (c->cell_index ());
-      for (db::connected_clusters<db::PolygonRef>::const_iterator cl = cc.begin (); cl != cc.end (); ++cl) {
-        if (cc.is_root (cl->id ())) {
-          db::Shapes &s = cm.merged (cl->id (), c->cell_index ());
+      for (db::connected_clusters<db::PolygonRef>::all_iterator cl = cc.begin_all (); ! cl.at_end (); ++cl) {
+        if (cc.is_root (*cl)) {
+          db::Shapes &s = cm.merged (*cl, c->cell_index ());
           c->shapes (m_merged_polygons.layer ()).swap (s);
         }
       }
@@ -583,13 +584,13 @@ DeepRegion::add (const Region &other) const
 static int is_box_from_iter (db::RecursiveShapeIterator i)
 {
   if (i.at_end ()) {
-    return -1;
+    return true;
   }
 
   if (i->is_box ()) {
     ++i;
     if (i.at_end ()) {
-      return 1;
+      return true;
     }
   } else if (i->is_path () || i->is_polygon ()) {
     db::Polygon poly;
@@ -597,26 +598,18 @@ static int is_box_from_iter (db::RecursiveShapeIterator i)
     if (poly.is_box ()) {
       ++i;
       if (i.at_end ()) {
-        return 1;
+        return true;
       }
     }
-  } else {
-    return -1;
   }
 
-  return 0; // undecided
+  return false;
 }
 
 bool
 DeepRegion::is_box () const
 {
-  int f = is_box_from_iter (begin_iter ().first);
-  if (f != 0) {
-    return f > 0;
-  }
-
-  //  fallback: merge and then look again
-  return is_box_from_iter (begin_merged_iter ().first) > 0;
+  return is_box_from_iter (begin_iter ().first);
 }
 
 size_t

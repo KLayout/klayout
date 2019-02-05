@@ -468,6 +468,8 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 void
 DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer)
 {
+  db::LayoutLocker locker (into_layout);
+
   const db::Layout &source_layout = deep_layer.layout ();
   if (source_layout.begin_top_down () == source_layout.end_top_cells ()) {
     //  empty source - nothing to do.

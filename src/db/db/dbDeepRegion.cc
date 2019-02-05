@@ -380,9 +380,7 @@ DeepRegion::ensure_merged_polygons_valid () const
     //  hopefully more efficient that collecting everything and will lead to reuse of parts.
 
     ClusterMerger cm (m_deep_layer.layer (), hc, min_coherence (), report_progress (), progress_desc ());
-    if (base_verbosity ()) {
-      cm.set_base_verbosity (base_verbosity ());
-    }
+    cm.set_base_verbosity (base_verbosity ());
 
     //  @@@ iterate only over the called cells?
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -390,7 +388,8 @@ DeepRegion::ensure_merged_polygons_valid () const
       for (db::connected_clusters<db::PolygonRef>::all_iterator cl = cc.begin_all (); ! cl.at_end (); ++cl) {
         if (cc.is_root (*cl)) {
           db::Shapes &s = cm.merged (*cl, c->cell_index ());
-          c->shapes (m_merged_polygons.layer ()).swap (s);
+          c->shapes (m_merged_polygons.layer ()).insert (s);
+          s.clear (); //  not needed anymore
         }
       }
     }
@@ -461,9 +460,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
   db::BoolAndOrNotLocalOperation op (and_op);
 
   db::LocalProcessor proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
-  if (base_verbosity ()) {
-    proc.set_base_verbosity (base_verbosity ());
-  }
+  proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (m_deep_layer.store ()->threads ());
   proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
   proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());

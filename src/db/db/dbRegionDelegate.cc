@@ -30,7 +30,7 @@ namespace db
 
 RegionDelegate::RegionDelegate ()
 {
-  m_base_verbosity = 0;
+  m_base_verbosity = 30;
   m_report_progress = false;
   m_merged_semantics = true;
   m_strict_handling = false;

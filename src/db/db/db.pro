@@ -166,7 +166,8 @@ SOURCES = \
     dbLocalOperationUtils.cc \
     gsiDeclDbDeepShapeStore.cc \
     dbNetlistSpiceWriter.cc \
-    dbNetlistWriter.cc
+    dbNetlistWriter.cc \
+    dbCellVariants.cc
 
 HEADERS = \
   dbArray.h \
@@ -297,7 +298,8 @@ HEADERS = \
     dbLocalOperationUtils.h \
     dbDeepRegion.h \
     dbNetlistSpiceWriter.h \
-    dbNetlistWriter.h
+    dbNetlistWriter.h \
+    dbCellVariants.h
 
 !equals(HAVE_QT, "0") {
 

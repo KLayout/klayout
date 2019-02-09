@@ -573,6 +573,82 @@ TEST(9_SizingWithBoolean)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au9e.gds");
 }
 
+TEST(10_HullsAndHoles)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+  dss.set_max_vertex_count (4);
+  dss.set_threads (0);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r1_sized = r1.sized (2000);
+  r1_sized -= r1;
+
+  db::Region hulls = r1_sized.hulls ();
+  db::Region holes = r1_sized.holes ();
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1_sized);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), hulls);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), holes);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au10.gds");
+}
+
+TEST(11_RoundAndSmoothed)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+  dss.set_max_vertex_count (4);
+  dss.set_threads (0);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r1_sized = r1.sized (2000);
+  r1_sized -= r1;
+
+  db::Region rounded = r1_sized.rounded_corners (3000, 5000, 100);
+  db::Region smoothed = rounded.smoothed (100);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1_sized);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), rounded);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), smoothed);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au11.gds");
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

@@ -947,6 +947,7 @@ DeepRegion::holes () const
 
     const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
       for (size_t i = 0; i < si->holes (); ++i) {
@@ -956,7 +957,7 @@ DeepRegion::holes () const
           pts.push_back (*p);
         }
         h.assign_hull (pts.begin (), pts.end ());
-        st.insert (h);
+        pr.put (h);
       }
     }
 
@@ -979,6 +980,7 @@ DeepRegion::hulls () const
 
     const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
       db::Polygon h;
@@ -987,7 +989,7 @@ DeepRegion::hulls () const
         pts.push_back (*p);
       }
       h.assign_hull (pts.begin (), pts.end ());
-      st.insert (h);
+      pr.put (h);
     }
 
   }
@@ -1007,20 +1009,32 @@ DeepRegion::rounded_corners (double rinner, double router, unsigned int n) const
 {
   ensure_merged_polygons_valid ();
 
-  //  @@@ scaled instances
+  db::MagnificationReducer red;
+  db::cell_variants_collector<db::MagnificationReducer> vars (red);
+  vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+
+  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+  const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (vars);
 
   db::Layout &layout = m_merged_polygons.layout ();
 
   std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
+    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
+    tl_assert (v.size () == size_t (1));
+    double mag = v.begin ()->first.mag ();
+    db::Coord rinner_with_mag = db::coord_traits<db::Coord>::rounded (rinner / mag);
+    db::Coord router_with_mag = db::coord_traits<db::Coord>::rounded (router / mag);
+
     const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
       db::Polygon poly;
       si->polygon (poly);
-      st.insert (db::compute_rounded (poly, rinner, router, n));
+      pr.put (db::compute_rounded (poly, rinner_with_mag, router_with_mag, n));
     }
 
   }
@@ -1033,20 +1047,31 @@ DeepRegion::smoothed (coord_type d) const
 {
   ensure_merged_polygons_valid ();
 
-  //  @@@ scaled instances
+  db::MagnificationReducer red;
+  db::cell_variants_collector<db::MagnificationReducer> vars (red);
+  vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+
+  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+  const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (vars);
 
   db::Layout &layout = m_merged_polygons.layout ();
 
   std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
+    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
+    tl_assert (v.size () == size_t (1));
+    double mag = v.begin ()->first.mag ();
+    db::Coord d_with_mag = db::coord_traits<db::Coord>::rounded (d / mag);
+
     const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
       db::Polygon poly;
       si->polygon (poly);
-      st.insert (db::smooth (poly, d));
+      pr.put (db::smooth (poly, d_with_mag));
     }
 
   }

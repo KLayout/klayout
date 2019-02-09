@@ -43,6 +43,21 @@ void PolygonRefGenerator::put (const db::Polygon &polygon)
 }
 
 // -----------------------------------------------------------------------------------------------
+//  class PolygonRefGenerator
+
+PolygonRefToShapesGenerator::PolygonRefToShapesGenerator (db::Layout *layout, db::Shapes *shapes)
+  : PolygonSink (), mp_layout (layout), mp_shapes (shapes)
+{
+  //  .. nothing yet ..
+}
+
+void PolygonRefToShapesGenerator::put (const db::Polygon &polygon)
+{
+  tl::MutexLocker locker (&mp_layout->lock ());
+  mp_shapes->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
+}
+
+// -----------------------------------------------------------------------------------------------
 //  class PolygonSplitter
 
 PolygonSplitter::PolygonSplitter (PolygonSink &sink, double max_area_ratio, size_t max_vertex_count)

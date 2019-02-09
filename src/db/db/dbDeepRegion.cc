@@ -34,6 +34,7 @@
 #include "dbCellGraphUtils.h"
 #include "dbPolygonTools.h"
 #include "dbCellVariants.h"
+#include "dbLocalOperationUtils.h"
 #include "tlTimer.h"
 
 namespace db
@@ -279,8 +280,8 @@ namespace {
 class ClusterMerger
 {
 public:
-  ClusterMerger (unsigned int layer, const db::hier_clusters<db::PolygonRef> &hc, bool min_coherence, bool report_progress, const std::string &progress_desc)
-    : m_layer (layer), mp_hc (&hc), m_min_coherence (min_coherence), m_ep (report_progress, progress_desc)
+  ClusterMerger (unsigned int layer, db::Layout &layout, const db::hier_clusters<db::PolygonRef> &hc, bool min_coherence, bool report_progress, const std::string &progress_desc)
+    : m_layer (layer), mp_layout (&layout), mp_hc (&hc), m_min_coherence (min_coherence), m_ep (report_progress, progress_desc)
   {
     //  .. nothing yet ..
   }
@@ -341,8 +342,8 @@ public:
 
     //  and run the merge step
     db::MergeOp op (0);
-    db::ShapeGenerator pc (s->second);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, m_min_coherence);
+    db::PolygonRefToShapesGenerator pr (mp_layout, &s->second);
+    db::PolygonGenerator pg (pr, false /*don't resolve holes*/, m_min_coherence);
     m_ep.process (pg, op);
 
     return s->second;
@@ -352,6 +353,7 @@ private:
   std::map<std::pair<size_t, db::cell_index_type>, db::Shapes> m_merged_cluster;
   std::set<std::pair<size_t, db::cell_index_type> > m_done;
   unsigned int m_layer;
+  db::Layout *mp_layout;
   const db::hier_clusters<db::PolygonRef> *mp_hc;
   bool m_min_coherence;
   db::EdgeProcessor m_ep;
@@ -380,7 +382,7 @@ DeepRegion::ensure_merged_polygons_valid () const
     //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
     //  hopefully more efficient that collecting everything and will lead to reuse of parts.
 
-    ClusterMerger cm (m_deep_layer.layer (), hc, min_coherence (), report_progress (), progress_desc ());
+    ClusterMerger cm (m_deep_layer.layer (), layout, hc, min_coherence (), report_progress (), progress_desc ());
     cm.set_base_verbosity (base_verbosity ());
 
     //  TODO: iterate only over the called cells?
@@ -841,8 +843,8 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
     const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
-    db::ShapeGenerator pc (st, false /*no clear - already empty*/);
-    db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
+    db::PolygonGenerator pg2 (pr, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, d_with_mag, d_with_mag, mode);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -916,8 +918,8 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
-    db::ShapeGenerator pc (st, false /*no clear - already empty*/);
-    db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
+    db::PolygonGenerator pg2 (pr, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, dx_with_mag, dy_with_mag, mode);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {

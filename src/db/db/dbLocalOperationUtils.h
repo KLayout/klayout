@@ -55,6 +55,25 @@ private:
   std::unordered_set<db::PolygonRef> *mp_polyrefs;
 };
 
+class PolygonRefToShapesGenerator
+  : public PolygonSink
+{
+public:
+  /**
+   *  @brief Constructor specifying an external vector for storing the polygons
+   */
+  PolygonRefToShapesGenerator (db::Layout *layout, db::Shapes *shapes);
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::Polygon &polygon);
+
+private:
+  db::Layout *mp_layout;
+  db::Shapes *mp_shapes;
+};
+
 class PolygonSplitter
   : public PolygonSink
 {

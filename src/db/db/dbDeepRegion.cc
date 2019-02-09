@@ -33,6 +33,7 @@
 #include "dbHierNetworkProcessor.h"
 #include "dbCellGraphUtils.h"
 #include "dbPolygonTools.h"
+#include "dbCellVariants.h"
 #include "tlTimer.h"
 
 namespace db
@@ -382,7 +383,7 @@ DeepRegion::ensure_merged_polygons_valid () const
     ClusterMerger cm (m_deep_layer.layer (), hc, min_coherence (), report_progress (), progress_desc ());
     cm.set_base_verbosity (base_verbosity ());
 
-    //  @@@ iterate only over the called cells?
+    //  TODO: iterate only over the called cells?
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
       const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (c->cell_index ());
       for (db::connected_clusters<db::PolygonRef>::all_iterator cl = cc.begin_all (); ! cl.at_end (); ++cl) {
@@ -630,23 +631,29 @@ DeepRegion::area (const db::Box &box) const
 
     ensure_merged_polygons_valid ();
 
-    //  @@@ scaled instances!
+    db::MagnificationReducer red;
+    db::cell_variants_collector<db::MagnificationReducer> vars (red);
+    vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
 
     DeepRegion::area_type a = 0;
 
     const db::Layout &layout = m_merged_polygons.layout ();
-    db::CellCounter cc (&layout);
     for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
       DeepRegion::area_type ac = 0;
       for (db::ShapeIterator s = layout.cell (*c).shapes (m_merged_polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
         ac += s->area ();
       }
-      a += cc.weight (*c) * ac;
+      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+        double mag = v->first.mag ();
+        a += v->second * ac * mag * mag;
+      }
     }
 
     return a;
 
   } else {
+    //  In the clipped case fall back to flat mode
     return db::AsIfFlatRegion::area (box);
   }
 }
@@ -658,23 +665,29 @@ DeepRegion::perimeter (const db::Box &box) const
 
     ensure_merged_polygons_valid ();
 
-    //  @@@ scaled instances!
+    db::MagnificationReducer red;
+    db::cell_variants_collector<db::MagnificationReducer> vars (red);
+    vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
 
     DeepRegion::perimeter_type p = 0;
 
     const db::Layout &layout = m_merged_polygons.layout ();
-    db::CellCounter cc (&layout);
     for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
       DeepRegion::perimeter_type pc = 0;
       for (db::ShapeIterator s = layout.cell (*c).shapes (m_merged_polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
         pc += s->perimeter ();
       }
-      p += cc.weight (*c) * pc;
+      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+        double mag = v->first.mag ();
+        p += v->second * pc * mag;
+      }
     }
 
     return p;
 
   } else {
+    //  In the clipped case fall back to flat mode
     return db::AsIfFlatRegion::perimeter (box);
   }
 }
@@ -810,15 +823,27 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
 
   db::Layout &layout = m_merged_polygons.layout ();
 
+  db::MagnificationReducer red;
+  db::cell_variants_collector<db::MagnificationReducer> vars (red);
+  vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+
+  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+  const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (vars);
+
   std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
+    tl_assert (v.size () == size_t (1));
+    double mag = v.begin ()->first.mag ();
+    db::Coord d_with_mag = db::coord_traits<db::Coord>::rounded (d / mag);
 
     const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
     db::ShapeGenerator pc (st, false /*no clear - already empty*/);
     db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
-    db::SizingPolygonFilter siz (pg2, d, d, mode);
+    db::SizingPolygonFilter siz (pg2, d_with_mag, d_with_mag, mode);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
       db::Polygon poly;
@@ -831,14 +856,79 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
   return res.release ();
 }
 
+namespace
+{
+
+struct DB_PUBLIC XYAnisotropyAndMagnificationReducer
+{
+  typedef tl::true_tag is_translation_invariant;
+
+  db::ICplxTrans operator () (const db::ICplxTrans &trans) const
+  {
+    double a = trans.angle ();
+    if (a > 180.0 - db::epsilon) {
+      a -= 180.0;
+    }
+    return db::ICplxTrans (trans.mag (), a, false, db::Vector ());
+  }
+
+  db::Trans operator () (const db::Trans &trans) const
+  {
+    return db::Trans (trans.angle () % 2, false, db::Vector ());
+  }
+};
+
+}
+
 RegionDelegate *
 DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 {
   if (dx == dy) {
     return sized (dx, mode);
-  } else {
-    return db::AsIfFlatRegion::sized (dx, dy, mode);
   }
+
+  ensure_merged_polygons_valid ();
+
+  db::Layout &layout = m_merged_polygons.layout ();
+
+  db::XYAnisotropyAndMagnificationReducer red;
+  db::cell_variants_collector<db::XYAnisotropyAndMagnificationReducer> vars (red);
+  vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+
+  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+  const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (vars);
+
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.new_layer ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
+    tl_assert (v.size () == size_t (1));
+    double mag = v.begin ()->first.mag ();
+    double angle = v.begin ()->first.angle ();
+
+    db::Coord dx_with_mag = db::coord_traits<db::Coord>::rounded (dx / mag);
+    db::Coord dy_with_mag = db::coord_traits<db::Coord>::rounded (dy / mag);
+    if (fabs (angle - 90.0) < 45.0) {
+      //  TODO: how to handle x/y swapping on arbitrary angles?
+      std::swap (dx_with_mag, dy_with_mag);
+    }
+
+    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+    db::ShapeGenerator pc (st, false /*no clear - already empty*/);
+    db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
+    db::SizingPolygonFilter siz (pg2, dx_with_mag, dy_with_mag, mode);
+
+    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+      db::Polygon poly;
+      si->polygon (poly);
+      siz.put (poly);
+    }
+
+  }
+
+  return res.release ();
 }
 
 RegionDelegate *

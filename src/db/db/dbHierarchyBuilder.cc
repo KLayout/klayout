@@ -173,6 +173,19 @@ HierarchyBuilder::reset ()
 }
 
 void
+HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_type var)
+{
+  //  non_var (despite it's name) may be a variant created previously.
+  variant_to_original_target_map_type::const_iterator v = m_variants_to_original_target_map.find (non_var);
+  if (v != m_variants_to_original_target_map.end ()) {
+    non_var = v->second;
+  }
+
+  m_original_targets_to_variants_map [non_var].push_back (var);
+  m_variants_to_original_target_map.insert (std::make_pair (var, non_var));
+}
+
+void
 HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
 {
   if (m_initial_pass) {
@@ -203,7 +216,8 @@ HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
   //  We can do so as the recursive shape iterator will always deliver all instances
   //  and not a partial set of instances.
   m_cm_new_entry = new_top.begin ().at_end ();
-  m_cell_stack.push_back (std::make_pair (m_cm_new_entry, &new_top));
+  m_cell_stack.push_back (std::make_pair (m_cm_new_entry, std::vector<db::Cell *> ()));
+  m_cell_stack.back ().second.push_back (&new_top);
 }
 
 void
@@ -213,7 +227,7 @@ HierarchyBuilder::end (const RecursiveShapeIterator *iter)
 
   m_initial_pass = false;
   m_cells_seen.clear ();
-  mp_initial_cell = m_cell_stack.empty () ? 0 : m_cell_stack.front ().second;
+  mp_initial_cell = m_cell_stack.empty () ? 0 : m_cell_stack.front ().second.front ();
   m_cell_stack.clear ();
   m_cm_entry = cell_map_type::const_iterator ();
   m_cm_new_entry = false;
@@ -231,7 +245,16 @@ HierarchyBuilder::enter_cell (const RecursiveShapeIterator * /*iter*/, const db:
     m_cells_to_be_filled.erase (m_cm_entry->second);
   }
 
-  m_cell_stack.push_back (std::make_pair (new_cell, &mp_target->cell (m_cm_entry->second)));
+  m_cell_stack.push_back (std::make_pair (new_cell, std::vector<db::Cell *> ()));
+
+  original_target_to_variants_map_type::const_iterator v = m_original_targets_to_variants_map.find (m_cm_entry->second);
+  if (v != m_original_targets_to_variants_map.end ()) {
+    for (std::vector<db::cell_index_type>::const_iterator i = v->second.begin (); i != v->second.end (); ++i) {
+      m_cell_stack.back ().second.push_back (&mp_target->cell (*i));
+    }
+  } else {
+    m_cell_stack.back ().second.push_back (&mp_target->cell (m_cm_entry->second));
+  }
 }
 
 void
@@ -260,7 +283,9 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
     if (m_cell_stack.back ().first) {
       db::CellInstArray new_inst (inst, &mp_target->array_repository ());
       new_inst.object () = db::CellInst (m_cm_entry->second);
-      m_cell_stack.back ().second->insert (new_inst);
+      for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
+        (*c)->insert (new_inst);
+      }
     }
 
     //  To see the cell once, use NI_single. If we did see the cell already, skip the whole instance array.
@@ -307,7 +332,9 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
     //  for a new cell, create this instance
     if (m_cell_stack.back ().first) {
       db::CellInstArray new_inst (db::CellInst (m_cm_entry->second), trans);
-      m_cell_stack.back ().second->insert (new_inst);
+      for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
+        (*c)->insert (new_inst);
+      }
     }
 
     return (m_cells_seen.find (key) == m_cells_seen.end ());
@@ -318,8 +345,10 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
 void
 HierarchyBuilder::shape (const RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*trans*/, const db::Box &region, const box_tree_type *complex_region)
 {
-  db::Shapes &shapes = m_cell_stack.back ().second->shapes (m_target_layer);
-  mp_pipe->push (shape, region, complex_region, &shapes);
+  for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
+    db::Shapes &shapes = (*c)->shapes (m_target_layer);
+    mp_pipe->push (shape, region, complex_region, &shapes);
+  }
 }
 
 // ---------------------------------------------------------------------------------------------

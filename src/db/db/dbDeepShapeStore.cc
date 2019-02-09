@@ -396,6 +396,19 @@ DeepShapeStore::invalidate_hier ()
   m_delivery_mapping_cache.clear ();
 }
 
+void
+DeepShapeStore::issue_variants (unsigned int layout_index, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_map)
+{
+  invalidate_hier ();
+
+  db::HierarchyBuilder &builder = m_layouts [layout_index]->builder;
+  for (std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator i = var_map.begin (); i != var_map.end (); ++i) {
+    for (std::map<db::ICplxTrans, db::cell_index_type>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
+      builder.register_variant (i->first, j->second);
+    }
+  }
+}
+
 const db::CellMapping &
 DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells)
 {
@@ -431,8 +444,8 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
         HierarchyBuilder::cell_map_type::const_iterator mm = m;
         ++mm;
-        bool skip = false;
-        while (mm != original_builder.end_cell_map () && mm->first.first == m->first.first) {
+        bool skip = original_builder.is_variant (m->second);   //  skip variant cells
+        while (mm != original_builder.end_cell_map () && mm->first.first == m->first.first && ! skip) {
           //  we have cell variants and cannot simply map
           ++mm;
           ++m;

@@ -165,7 +165,7 @@ public:
   /**
    *  @brief Collects cell variants for the given layout starting from the top cell
    */
-  void collect (db::Layout &layout, db::Cell &top_cell)
+  void collect (const db::Layout &layout, const db::Cell &top_cell)
   {
     //  The top cell gets a "variant" with unit transformation
     m_variants [top_cell.cell_index ()].insert (std::make_pair (db::ICplxTrans (), 1));

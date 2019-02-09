@@ -381,7 +381,160 @@ TEST(7_Merge)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au7.gds");
 }
 
+TEST(8_AreaAndPerimeter)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
 
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+  dss.set_max_vertex_count (4);
+  dss.set_threads (0);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  EXPECT_EQ (r1.area (), db::coord_traits<db::Coord>::area_type (9722000000));
+  EXPECT_EQ (r1.perimeter (), db::coord_traits<db::Coord>::perimeter_type (1360000));
+
+  EXPECT_EQ (r1.area (r1.bbox ()), db::coord_traits<db::Coord>::area_type (9722000000));
+  EXPECT_EQ (r1.perimeter (r1.bbox ()), db::coord_traits<db::Coord>::perimeter_type (1360000));
+
+  EXPECT_EQ (r1.area (db::Box (40000, -90000, 50000, -80000)), db::coord_traits<db::Coord>::area_type (100000000));
+  EXPECT_EQ (r1.perimeter (db::Box (40000, -90000, 50000, -80000)), db::coord_traits<db::Coord>::perimeter_type (0));
+  EXPECT_EQ (r1.area (db::Box (-40000, -90000, -50000, -80000)), db::coord_traits<db::Coord>::area_type (0));
+}
+
+TEST(9_SizingSimple)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+  dss.set_max_vertex_count (4);
+  dss.set_threads (0);
+
+  unsigned int l6 = ly.get_layer (db::LayerProperties (6, 0));
+
+  db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
+  db::Region r6_sized = r6.sized (-50);
+  db::Region r6_sized_aniso = r6.sized (-20, -100);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r6);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r6_sized);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r6_sized_aniso);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au9a.gds");
+}
+
+TEST(9_SizingWithScaleVariants)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+  dss.set_max_vertex_count (4);
+  dss.set_threads (0);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r1_sized = r1.sized (-2000);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1_sized);
+
+  //  copy another layer - this challenges the ability to map to multiple variants
+
+  unsigned int l1b = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r1b (db::RecursiveShapeIterator (ly, top_cell, l1b), dss);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1b.merged ());
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au9b.gds");
+}
+
+TEST(9_SizingWithScaleAndXYVariants)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+  dss.set_max_vertex_count (4);
+  dss.set_threads (0);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r1_sized = r1.sized (-2000);
+  db::Region r1_sized_aniso = r1.sized (-1000, -2000);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1_sized);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1_sized_aniso);
+
+  //  copy another layer - this challenges the ability to map to multiple variants
+
+  unsigned int l1b = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r1b (db::RecursiveShapeIterator (ly, top_cell, l1b), dss);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1b.merged ());
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au9c.gds");
+
+  //  merge back to original - this challenges the ability to map back the variants
+
+  ly.insert (top_cell_index, ly.get_layer (db::LayerProperties (11, 0)), r1_sized);
+  ly.insert (top_cell_index, ly.get_layer (db::LayerProperties (12, 0)), r1_sized_aniso);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au9d.gds");
+}
 
 TEST(100_Integration)
 {

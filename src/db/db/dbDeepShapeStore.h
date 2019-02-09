@@ -154,6 +154,12 @@ public:
   DeepLayer copy () const;
 
   /**
+   *  @brief Separates cell variants (see DeepShapeStore::separate_variants)
+   */
+  template <class VarCollector>
+  void separate_variants (VarCollector &collector);
+
+  /**
    *  @brief Gets the shape store object
    *  This is a pure const version to prevent manipulation of the store.
    *  This method is intended to fetch configuration options from the store.
@@ -249,6 +255,27 @@ public:
    *  "excluded_cells" - if not 0 - will exclude the given cells (and flatten them).
    */
   const db::CellMapping &cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells = 0);
+
+  /**
+   *  @brief Create cell variants from the given variant collector
+   *
+   *  To use this method, first create a variant collector (db::cell_variant_collector) with the required
+   *  reducer and collect the variants. Then call this method on the desired layout index to create the variants.
+   */
+  template <class VarCollector>
+  void separate_variants (unsigned int layout_index, VarCollector &coll)
+  {
+    tl_assert (is_valid_layout_index (layout_index));
+
+    std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > var_map;
+    coll.separate_variants (layout (layout_index), initial_cell (layout_index), &var_map);
+    if (var_map.empty ()) {
+      //  nothing to do.
+      return;
+    }
+
+    issue_variants (layout_index, var_map);
+  }
 
   /**
    *  @brief For testing
@@ -434,6 +461,8 @@ private:
 
   void require_singular () const;
 
+  void issue_variants (unsigned int layout, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_map);
+
   typedef std::map<db::RecursiveShapeIterator, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
 
   //  no copying
@@ -477,6 +506,13 @@ private:
 
   std::map<DeliveryMappingCacheKey, db::CellMapping> m_delivery_mapping_cache;
 };
+
+template <class VarCollector>
+void DeepLayer::separate_variants (VarCollector &collector)
+{
+  check_dss ();
+  mp_store->separate_variants (m_layout, collector);
+}
 
 }
 

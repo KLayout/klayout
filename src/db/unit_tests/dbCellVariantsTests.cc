@@ -128,8 +128,8 @@ TEST(2_TwoVariants)
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
   vb.separate_variants (ly, a, &vm);
-  EXPECT_EQ (vm2str (ly, vm), "B:B[m0 *1 0,0],B_VAR1[r0 *1 0,0]");
-  EXPECT_EQ (inst2str (ly, a), "B_VAR1:r0 *1 1,10;B:m0 *1 1,100");
+  EXPECT_EQ (vm2str (ly, vm), "B:B[m0 *1 0,0],B$VAR1[r0 *1 0,0]");
+  EXPECT_EQ (inst2str (ly, a), "B$VAR1:r0 *1 1,10;B:m0 *1 1,100");
 }
 
 TEST(3_TwoLevels)
@@ -158,11 +158,11 @@ TEST(3_TwoLevels)
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
   vb.separate_variants (ly, a, &vm);
-  EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 0,0],B_VAR1[r90 *1 0,0];C:C[m0 *1 0,0],C_VAR1[r0 *1 0,0],C_VAR2[m45 *1 0,0],C_VAR3[r90 *1 0,0]");
+  EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 0,0],B$VAR1[r90 *1 0,0];C:C[m0 *1 0,0],C$VAR1[r0 *1 0,0],C$VAR2[m45 *1 0,0],C$VAR3[r90 *1 0,0]");
 
-  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B_VAR1:r90 *1 1,100");
-  EXPECT_EQ (inst2str (ly, b), "C_VAR1:r0 *1 2,10;C:m0 *1 2,100");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B_VAR1").second)), "C_VAR3:r0 *1 2,10;C_VAR2:m0 *1 2,100");
+  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B$VAR1:r90 *1 1,100");
+  EXPECT_EQ (inst2str (ly, b), "C$VAR1:r0 *1 2,10;C:m0 *1 2,100");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR1").second)), "C$VAR3:r0 *1 2,10;C$VAR2:m0 *1 2,100");
 }
 
 TEST(4_ThreeLevels)
@@ -193,15 +193,15 @@ TEST(4_ThreeLevels)
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
   vb.separate_variants (ly, a, &vm);
-  EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 0,0],B_VAR1[r90 *1 0,0];C:C[m0 *1 0,0],C_VAR1[r0 *1 0,0],C_VAR2[m45 *1 0,0],C_VAR3[r90 *1 0,0];D:D[r270 *1 0,0],D_VAR1[m90 *1 0,0],D_VAR2[r0 *1 0,0],D_VAR3[m45 *1 0,0]");
+  EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 0,0],B$VAR1[r90 *1 0,0];C:C[m0 *1 0,0],C$VAR1[r0 *1 0,0],C$VAR2[m45 *1 0,0],C$VAR3[r90 *1 0,0];D:D[r270 *1 0,0],D$VAR1[m90 *1 0,0],D$VAR2[r0 *1 0,0],D$VAR3[m45 *1 0,0]");
 
-  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B_VAR1:r90 *1 1,100");
-  EXPECT_EQ (inst2str (ly, b), "C_VAR1:r0 *1 2,10;C:m0 *1 2,100");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B_VAR1").second)), "C_VAR3:r0 *1 2,10;C_VAR2:m0 *1 2,100");
+  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B$VAR1:r90 *1 1,100");
+  EXPECT_EQ (inst2str (ly, b), "C$VAR1:r0 *1 2,10;C:m0 *1 2,100");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR1").second)), "C$VAR3:r0 *1 2,10;C$VAR2:m0 *1 2,100");
   EXPECT_EQ (inst2str (ly, c), "D:m45 *1 0,0");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("C_VAR1").second)), "D_VAR3:m45 *1 0,0");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("C_VAR2").second)), "D_VAR2:m45 *1 0,0");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("C_VAR3").second)), "D_VAR1:m45 *1 0,0");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("C$VAR1").second)), "D$VAR3:m45 *1 0,0");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("C$VAR2").second)), "D$VAR2:m45 *1 0,0");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("C$VAR3").second)), "D$VAR1:m45 *1 0,0");
 }
 
 TEST(5_ComplexTrans)
@@ -306,13 +306,13 @@ TEST(8_GridVariants)
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
   vb.separate_variants (ly, a, &vm);
-  EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 1,0],B_VAR1[r0 *1 3,0],B_VAR2[r0 *1 1,1],B_VAR3[r0 *1 3,1];C:C[r0 *1 3,3],C_VAR1[r0 *1 5,3],C_VAR2[r0 *1 3,4],C_VAR3[r0 *1 5,4]");
+  EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 1,0],B$VAR1[r0 *1 3,0],B$VAR2[r0 *1 1,1],B$VAR3[r0 *1 3,1];C:C[r0 *1 3,3],C$VAR1[r0 *1 5,3],C$VAR2[r0 *1 3,4],C$VAR3[r0 *1 5,4]");
 
-  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B_VAR2:r0 *1 1,111;B_VAR1:r0 *1 103,10;B_VAR3:r0 *1 103,111");
+  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B$VAR2:r0 *1 1,111;B$VAR1:r0 *1 103,10;B$VAR3:r0 *1 103,111");
   EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,3");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B_VAR1").second)), "C_VAR1:r0 *1 2,3");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B_VAR2").second)), "C_VAR2:r0 *1 2,3");
-  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B_VAR3").second)), "C_VAR3:r0 *1 2,3");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR1").second)), "C$VAR1:r0 *1 2,3");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR2").second)), "C$VAR2:r0 *1 2,3");
+  EXPECT_EQ (inst2str (ly, ly.cell (ly.cell_by_name ("B$VAR3").second)), "C$VAR3:r0 *1 2,3");
   EXPECT_EQ (inst2str (ly, c), "");
 }
 

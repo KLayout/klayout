@@ -252,7 +252,7 @@ public:
           if (v != vv.begin ()) {
 
             std::string var_name = layout.cell_name (*c);
-            var_name += "_VAR" + tl::to_string (index);
+            var_name += "$VAR" + tl::to_string (index);
 
             ci_var = layout.add_cell (var_name.c_str ());
             copy_shapes (layout, ci_var, *c);

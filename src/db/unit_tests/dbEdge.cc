@@ -29,6 +29,7 @@
 TEST(1) 
 {
   db::Edge e (0, 0, 100, 200);
+  db::Edge ee;
   db::Edge empty;
 
   EXPECT_EQ (empty.is_degenerate (), true);
@@ -53,6 +54,12 @@ TEST(1)
   EXPECT_EQ (e.to_string (), "(0,0;100,200)");
   EXPECT_EQ (e.swapped_points ().to_string (), "(100,200;0,0)");
   EXPECT_EQ (e.to_string (), "(0,0;100,200)");
+  EXPECT_EQ (e.transformed (db::Trans (1)).to_string (), "(0,0;-200,100)");
+  EXPECT_EQ (e.transformed (db::Trans (5)).to_string (), "(200,100;0,0)");   //  mirroring transformations swap points
+  ee = e;
+  ee.transform (db::Trans (5));
+  EXPECT_EQ (ee.to_string (), "(200,100;0,0)");
+  EXPECT_EQ (e.swapped_points ().to_string (), "(100,200;0,0)");
   e.swap_points ();
   EXPECT_EQ (e.to_string (), "(100,200;0,0)");
 
@@ -66,7 +73,6 @@ TEST(1)
   EXPECT_EQ (e.shifted (2).to_string (), "(0,4;10,12)");
   EXPECT_EQ (e.shifted (1).to_string (), "(0,3;10,11)");
 
-  db::Edge ee;
   ee = e;
   ee.shift (2);
   EXPECT_EQ (ee.to_string (), "(0,4;10,12)");

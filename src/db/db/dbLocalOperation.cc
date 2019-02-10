@@ -45,7 +45,7 @@ BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
   //  .. nothing yet ..
 }
 
-local_operation<db::PolygonRef>::on_empty_intruder_mode
+local_operation<db::PolygonRef, db::PolygonRef>::on_empty_intruder_mode
 BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
   return m_is_and ? local_operation::Drop : local_operation::Copy;
@@ -58,22 +58,22 @@ BoolAndOrNotLocalOperation::description () const
 }
 
 void
-BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const
+BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t max_vertex_count, double area_ratio) const
 {
   db::EdgeProcessor ep;
 
   size_t p1 = 0, p2 = 1;
 
   std::set<db::PolygonRef> others;
-  for (shape_interactions<db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (shape_interactions<db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      others.insert (interactions.shape (*j));
+  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      others.insert (interactions.intruder_shape (*j));
     }
   }
 
-  for (shape_interactions<db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
-    const db::PolygonRef &subject = interactions.shape (i->first);
+    const db::PolygonRef &subject = interactions.subject_shape (i->first);
     if (others.find (subject) != others.end ()) {
       if (m_is_and) {
         result.insert (subject);
@@ -119,7 +119,7 @@ SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wra
   //  .. nothing yet ..
 }
 
-void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   if (m_wrap_count == 0) {
     return;
@@ -130,23 +130,23 @@ void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const sh
   size_t p1 = 0, p2 = 1;
   std::set<unsigned int> seen;
 
-  for (shape_interactions<db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
     if (seen.find (i->first) == seen.end ()) {
       seen.insert (i->first);
-      const db::PolygonRef &subject = interactions.shape (i->first);
+      const db::PolygonRef &subject = interactions.subject_shape (i->first);
       for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, p1);
       }
       p1 += 2;
     }
 
-    for (db::shape_interactions<db::PolygonRef>::iterator2 o = i->second.begin (); o != i->second.end (); ++o) {
+    for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 o = i->second.begin (); o != i->second.end (); ++o) {
       //  don't take the same (really the same, not an identical one) shape twice - the interaction
       //  set does not take care to list just one copy of the same item on the intruder side.
       if (seen.find (*o) == seen.end ()) {
         seen.insert (*o);
-        const db::PolygonRef &intruder = interactions.shape (*o);
+        const db::PolygonRef &intruder = interactions.intruder_shape (*o);
         for (db::PolygonRef::polygon_edge_iterator e = intruder.begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p2);
         }

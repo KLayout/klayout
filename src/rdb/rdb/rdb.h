@@ -521,6 +521,15 @@ private:
 };
 
 /**
+ *  @brief Type bindings
+ */
+template <class T>
+RDB_PUBLIC ValueBase *make_value (const T &value)
+{
+  return new Value<T> (value);
+}
+
+/**
  *  @brief A class encapsulating ValueBase pointer
  */
 class RDB_PUBLIC ValueWrapper 

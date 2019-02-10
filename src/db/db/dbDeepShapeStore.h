@@ -241,6 +241,15 @@ public:
   DeepLayer create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio = 0.0, size_t max_vertex_count = 0);
 
   /**
+   *  @brief Inserts an edge layer into the deep shape store
+   *
+   *  This method will create a new layer inside the deep shape store as a
+   *  working copy of the original layer. This method creates a layer
+   *  for edges.
+   */
+  DeepLayer create_edge_layer (const db::RecursiveShapeIterator &si);
+
+  /**
    *  @brief Inserts the deep layer's shapes into some target layout
    */
   void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);
@@ -458,6 +467,8 @@ private:
   void invalidate_hier ();
   void add_ref (unsigned int layout, unsigned int layer);
   void remove_ref (unsigned int layout, unsigned int layer);
+
+  unsigned int layout_for_iter (const db::RecursiveShapeIterator &si);
 
   void require_singular () const;
 

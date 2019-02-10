@@ -21,29 +21,61 @@
 */
 
 
-#ifndef HDR_dbAsIfFlatEdges
-#define HDR_dbAsIfFlatEdges
+#ifndef HDR_dbDeepEdges
+#define HDR_dbDeepEdges
 
 #include "dbCommon.h"
 
-#include "dbEdgesDelegate.h"
+#include "dbAsIfFlatEdges.h"
+#include "dbDeepShapeStore.h"
+#include "dbEdgePairs.h"
 
 namespace db {
 
+class Edges;
+
 /**
- *  @brief Provides default flat implementations
+ *  @brief Provides hierarchical edges implementation
  */
-class DB_PUBLIC AsIfFlatEdges
-  : public EdgesDelegate
+class DB_PUBLIC DeepEdges
+  : public db::AsIfFlatEdges
 {
 public:
-  AsIfFlatEdges ();
-  virtual ~AsIfFlatEdges ();
+  DeepEdges ();
+  DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss);
+  DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics = true);
+
+  DeepEdges (const DeepEdges &other);
+  DeepEdges (const DeepLayer &dl);
+
+  virtual ~DeepEdges ();
+
+  EdgesDelegate *clone () const;
+
+  virtual EdgesIteratorDelegate *begin () const;
+  virtual EdgesIteratorDelegate *begin_merged () const;
+
+  virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
+  virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
+
+  virtual bool empty () const;
+  virtual bool is_merged () const;
+
+  virtual const db::Edge *nth (size_t n) const;
+  virtual bool has_valid_edges () const;
+  virtual bool has_valid_merged_edges () const;
+
+  virtual const db::RecursiveShapeIterator *iter () const;
+
+  virtual bool equals (const Edges &other) const;
+  virtual bool less (const Edges &other) const;
 
   virtual size_t size () const;
-  virtual std::string to_string (size_t) const;
-  virtual distance_type length (const db::Box &) const;
   virtual Box bbox () const;
+
+  virtual DeepEdges::length_type length (const db::Box &) const;
+
+  virtual std::string to_string (size_t nmax) const;
 
   virtual EdgePairs width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
   {
@@ -75,69 +107,27 @@ public:
     return run_check (db::InsideRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
   }
 
-  virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter)
-  {
-    return filtered (filter);
-  }
-
+  virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter);
   virtual EdgesDelegate *filtered (const EdgeFilterBase &) const;
 
-  virtual EdgesDelegate *merged_in_place ()
-  {
-    return merged ();
-  }
+  virtual EdgesDelegate *merged_in_place ();
+  virtual EdgesDelegate *merged () const;
 
-  virtual EdgesDelegate *merged () const
-  {
-    return boolean (0, EdgeOr);
-  }
+  virtual EdgesDelegate *and_with (const Edges &other) const;
+  virtual EdgesDelegate *and_with (const Region &other) const;
 
-  virtual EdgesDelegate *and_with (const Edges &other) const
-  {
-    return boolean (&other, EdgeAnd);
-  }
+  virtual EdgesDelegate *not_with (const Edges &other) const;
+  virtual EdgesDelegate *not_with (const Region &other) const;
 
-  virtual EdgesDelegate *and_with (const Region &other) const
-  {
-    return edge_region_op (other, false /*inside*/, true /*include borders*/);
-  }
+  virtual EdgesDelegate *xor_with (const Edges &other) const;
 
-  virtual EdgesDelegate *not_with (const Edges &other) const
-  {
-    return boolean (&other, EdgeNot);
-  }
+  virtual EdgesDelegate *or_with (const Edges &other) const;
 
-  virtual EdgesDelegate *not_with (const Region &other) const
-  {
-    return edge_region_op (other, true /*outside*/, true /*include borders*/);
-  }
-
-  virtual EdgesDelegate *xor_with (const Edges &other) const
-  {
-    return boolean (&other, EdgeXor);
-  }
-
-  virtual EdgesDelegate *or_with (const Edges &other) const
-  {
-    return boolean (&other, EdgeOr);
-  }
-
-  virtual EdgesDelegate *add_in_place (const Edges &other)
-  {
-    return add (other);
-  }
-
+  virtual EdgesDelegate *add_in_place (const Edges &other);
   virtual EdgesDelegate *add (const Edges &other) const;
 
-  virtual EdgesDelegate *inside_part (const Region &other) const
-  {
-    return edge_region_op (other, false /*inside*/, false /*don't include borders*/);
-  }
-
-  virtual EdgesDelegate *outside_part (const Region &other) const
-  {
-    return edge_region_op (other, true /*outside*/, false /*don't include borders*/);
-  }
+  virtual EdgesDelegate *inside_part (const Region &other) const;
+  virtual EdgesDelegate *outside_part (const Region &other) const;
 
   virtual RegionDelegate *extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const;
   virtual EdgesDelegate *start_segments (length_type length, double fraction) const;
@@ -151,23 +141,32 @@ public:
 
   virtual EdgesDelegate *in (const Edges &, bool) const;
 
-  virtual bool equals (const Edges &other) const;
-  virtual bool less (const Edges &other) const;
+  virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+
+  const DeepLayer &deep_layer () const
+  {
+    return m_deep_layer;
+  }
+
+  DeepLayer &deep_layer ()
+  {
+    return m_deep_layer;
+  }
 
 protected:
-  void update_bbox (const db::Box &box);
-  void invalidate_bbox ();
-  EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
+  virtual void merged_semantics_changed ();
 
 private:
-  AsIfFlatEdges &operator= (const AsIfFlatEdges &other);
+  DeepEdges &operator= (const DeepEdges &other);
 
-  mutable bool m_bbox_valid;
-  mutable db::Box m_bbox;
+  DeepLayer m_deep_layer;
+  mutable DeepLayer m_merged_edges;
+  mutable bool m_merged_edges_valid;
 
-  virtual db::Box compute_bbox () const;
-  EdgesDelegate *boolean (const Edges *other, EdgeBoolOp op) const;
-  EdgesDelegate *edge_region_op (const Region &other, bool outside, bool include_borders) const;
+  void init ();
+  void ensure_merged_edges_valid () const;
+  void add_from (const DeepLayer &dl);
+  EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
 };
 
 }

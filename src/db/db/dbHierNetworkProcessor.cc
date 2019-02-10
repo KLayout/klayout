@@ -198,6 +198,20 @@ interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const db::un
   }
 }
 
+template <class Trans>
+static bool
+interaction_test (const db::Edge &a, const db::Edge &b, const Trans &trans)
+{
+  return a.intersect (b.transformed (trans));
+}
+
+template <class C>
+static bool
+interaction_test (const db::Edge &a, const db::Edge &b, const db::unit_trans<C> &)
+{
+  return a.intersect (b);
+}
+
 template <class T, class Trans>
 bool Connectivity::interacts (const T &a, unsigned int la, const T &b, unsigned int lb, const Trans &trans) const
 {
@@ -212,6 +226,8 @@ bool Connectivity::interacts (const T &a, unsigned int la, const T &b, unsigned 
 //  explicit instantiations
 template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::UnitTrans &trans) const;
 template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::ICplxTrans &trans) const;
+template DB_PUBLIC bool Connectivity::interacts<db::Edge> (const db::Edge &a, unsigned int la, const db::Edge &b, unsigned int lb, const db::UnitTrans &trans) const;
+template DB_PUBLIC bool Connectivity::interacts<db::Edge> (const db::Edge &a, unsigned int la, const db::Edge &b, unsigned int lb, const db::ICplxTrans &trans) const;
 
 // ------------------------------------------------------------------------------
 //  local_cluster implementation
@@ -560,7 +576,9 @@ size_t local_cluster<T>::split (double max_area_ratio, Iter &output) const
 
 //  explicit instantiations
 template class DB_PUBLIC local_cluster<db::PolygonRef>;
+template class DB_PUBLIC local_cluster<db::Edge>;
 template DB_PUBLIC size_t local_cluster<db::PolygonRef>::split<std::back_insert_iterator<std::list<local_cluster<db::PolygonRef> > > > (double, std::back_insert_iterator<std::list<local_cluster<db::PolygonRef> > > &) const;
+template DB_PUBLIC size_t local_cluster<db::Edge>::split<std::back_insert_iterator<std::list<local_cluster<db::Edge> > > > (double, std::back_insert_iterator<std::list<local_cluster<db::Edge> > > &) const;
 
 // ------------------------------------------------------------------------------
 //  local_clusters implementation
@@ -891,6 +909,7 @@ local_clusters<T>::apply_attr_equivalences (const tl::equivalence_clusters<unsig
 
 //  explicit instantiations
 template class DB_PUBLIC local_clusters<db::PolygonRef>;
+template class DB_PUBLIC local_clusters<db::Edge>;
 
 // ------------------------------------------------------------------------------
 //  connected_clusters_iterator implementation
@@ -912,6 +931,7 @@ connected_clusters_iterator<T>::connected_clusters_iterator (const connected_clu
 
 //  explicit instantiations
 template class DB_PUBLIC connected_clusters_iterator<db::PolygonRef>;
+template class DB_PUBLIC connected_clusters_iterator<db::Edge>;
 
 // ------------------------------------------------------------------------------
 //  connected_clusters implementation
@@ -975,6 +995,7 @@ connected_clusters<T>::find_cluster_with_connection (const ClusterInstance &inst
 
 //  explicit instantiations
 template class DB_PUBLIC connected_clusters<db::PolygonRef>;
+template class DB_PUBLIC connected_clusters<db::Edge>;
 
 // ------------------------------------------------------------------------------
 //  connected_clusters implementation
@@ -1909,7 +1930,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
   //  handle local to instance connections
 
   {
-    std::list<local_cluster<db::PolygonRef> > heap;
+    std::list<local_cluster<T> > heap;
     double area_ratio = 10.0;
 
     static std::string desc = tl::to_string (tr ("Local to instance treatment"));
@@ -1922,12 +1943,12 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
       //  we do not actually need the original clusters. For a better performance we optimize the
       //  area ratio and split, but we keep the ID the same.
-      std::back_insert_iterator<std::list<local_cluster<db::PolygonRef> > > iout = std::back_inserter (heap);
+      std::back_insert_iterator<std::list<local_cluster<T> > > iout = std::back_inserter (heap);
       size_t n = c->split (area_ratio, iout);
       if (n == 0) {
         bs2.insert1 (c.operator-> (), 0);
       } else {
-        std::list<local_cluster<db::PolygonRef> >::iterator h = heap.end ();
+        typename std::list<local_cluster<T> >::iterator h = heap.end ();
         while (n-- > 0) {
           bs2.insert1 ((--h).operator-> (), 0);
         }
@@ -2053,6 +2074,11 @@ template <class Trans> void insert_transformed (db::Layout &layout, db::Shapes &
   shapes.insert (db::PolygonRef (poly, layout.shape_repository ()));
 }
 
+template <class Trans> void insert_transformed (db::Layout & /*layout*/, db::Shapes &shapes, const db::Edge &s, const Trans &t)
+{
+  shapes.insert (s.transformed (t));
+}
+
 template <class T>
 void
 hier_clusters<T>::return_to_hierarchy (db::Layout &layout, const std::map<unsigned int, unsigned int> &lm) const
@@ -2085,6 +2111,7 @@ hier_clusters<T>::return_to_hierarchy (db::Layout &layout, const std::map<unsign
 
 //  explicit instantiations
 template class DB_PUBLIC hier_clusters<db::PolygonRef>;
+template class DB_PUBLIC hier_clusters<db::Edge>;
 
 // ------------------------------------------------------------------------------
 //  recursive_cluster_shape_iterator implementation
@@ -2199,6 +2226,7 @@ void recursive_cluster_shape_iterator<T>::down (db::cell_index_type ci, typename
 
 //  explicit instantiations
 template class DB_PUBLIC recursive_cluster_shape_iterator<db::PolygonRef>;
+template class DB_PUBLIC recursive_cluster_shape_iterator<db::Edge>;
 
 // ------------------------------------------------------------------------------
 //  recursive_cluster_iterator implementation
@@ -2271,6 +2299,7 @@ void recursive_cluster_iterator<T>::down (db::cell_index_type ci, typename db::l
 
 //  explicit instantiations
 template class DB_PUBLIC recursive_cluster_iterator<db::PolygonRef>;
+template class DB_PUBLIC recursive_cluster_iterator<db::Edge>;
 
 // ------------------------------------------------------------------------------
 //  incoming_cluster_connections implementation
@@ -2351,5 +2380,6 @@ incoming_cluster_connections<T>::ensure_computed_parent (db::cell_index_type ci)
 
 //  explicit instantiations
 template class DB_PUBLIC incoming_cluster_connections<db::PolygonRef>;
+template class DB_PUBLIC incoming_cluster_connections<db::Edge>;
 
 }

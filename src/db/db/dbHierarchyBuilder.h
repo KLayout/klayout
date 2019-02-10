@@ -149,6 +149,18 @@ private:
 };
 
 /**
+ *  @brief An edge-generating shape receiver that feeds a shapes array after turning the shapes into edges
+ */
+class DB_PUBLIC EdgeBuildingHierarchyBuilderShapeReceiver
+  : public HierarchyBuilderShapeReceiver
+{
+public:
+  virtual void push (const db::Shape &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
+  virtual void push (const db::Box &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
+  virtual void push (const db::Polygon &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
+};
+
+/**
  *  @brief A class building a hierarchy from a recursive shape iterator in push mode
  *
  *  This class is a RecursiveShapeReceiver which acts on the hierarchy events and

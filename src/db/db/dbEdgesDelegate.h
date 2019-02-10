@@ -83,6 +83,12 @@ public:
 
   virtual EdgesDelegate *clone () const = 0;
 
+  void set_base_verbosity (int vb);
+  int base_verbosity () const
+  {
+    return m_base_verbosity;
+  }
+
   void enable_progress (const std::string &progress_desc);
   void disable_progress ();
 
@@ -176,6 +182,7 @@ private:
   bool m_strict_handling;
   bool m_report_progress;
   std::string m_progress_desc;
+  int m_base_verbosity;
 };
 
 }

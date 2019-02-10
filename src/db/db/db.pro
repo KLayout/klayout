@@ -167,7 +167,9 @@ SOURCES = \
     gsiDeclDbDeepShapeStore.cc \
     dbNetlistSpiceWriter.cc \
     dbNetlistWriter.cc \
-    dbCellVariants.cc
+    dbCellVariants.cc \
+    dbDeepEdges.cc \
+    dbDeepEdgePairs.cc
 
 HEADERS = \
   dbArray.h \
@@ -299,7 +301,9 @@ HEADERS = \
     dbDeepRegion.h \
     dbNetlistSpiceWriter.h \
     dbNetlistWriter.h \
-    dbCellVariants.h
+    dbCellVariants.h \
+    dbDeepEdges.h \
+    dbDeepEdgePairs.h
 
 !equals(HAVE_QT, "0") {
 

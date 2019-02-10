@@ -330,21 +330,13 @@ void DeepShapeStore::remove_ref (unsigned int layout, unsigned int layer)
   }
 }
 
-DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count)
+unsigned int
+DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si)
 {
-  if (max_area_ratio == 0.0) {
-    max_area_ratio = m_max_area_ratio;
-  }
-  if (max_vertex_count == 0) {
-    max_vertex_count = m_max_vertex_count;
-  }
-
-  unsigned int layout_index = 0;
-
   layout_map_type::iterator l = m_layout_map.find (si);
   if (l == m_layout_map.end ()) {
 
-    layout_index = (unsigned int) m_layouts.size ();
+    unsigned int layout_index = (unsigned int) m_layouts.size ();
 
     m_layouts.push_back (new LayoutHolder ());
 
@@ -355,12 +347,23 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
     }
 
     m_layout_map[si] = layout_index;
+    return layout_index;
 
   } else {
-
-    layout_index = l->second;
-
+    return l->second;
   }
+}
+
+DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count)
+{
+  if (max_area_ratio == 0.0) {
+    max_area_ratio = m_max_area_ratio;
+  }
+  if (max_vertex_count == 0) {
+    max_vertex_count = m_max_vertex_count;
+  }
+
+  unsigned int layout_index = layout_for_iter (si);
 
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
@@ -376,9 +379,39 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   //  Build the working hierarchy from the recursive shape iterator
   try {
 
-    tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Building working hierarchy")));
+    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
 
     builder.set_shape_receiver (&clip);
+    db::RecursiveShapeIterator (si).push (& builder);
+    builder.set_shape_receiver (0);
+
+  } catch (...) {
+    builder.set_shape_receiver (0);
+    throw;
+  }
+
+  return DeepLayer (this, layout_index, layer_index);
+}
+
+DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si)
+{
+  unsigned int layout_index = layout_for_iter (si);
+
+  db::Layout &layout = m_layouts[layout_index]->layout;
+  db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
+
+  unsigned int layer_index = layout.insert_layer ();
+  builder.set_target_layer (layer_index);
+
+  //  The chain of operators for producing clipped and reduced polygon references
+  db::EdgeBuildingHierarchyBuilderShapeReceiver refs;
+
+  //  Build the working hierarchy from the recursive shape iterator
+  try {
+
+    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+
+    builder.set_shape_receiver (&refs);
     db::RecursiveShapeIterator (si).push (& builder);
     builder.set_shape_receiver (0);
 

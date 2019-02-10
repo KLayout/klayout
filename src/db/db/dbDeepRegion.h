@@ -59,7 +59,6 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
 
   virtual bool empty () const;
-
   virtual bool is_merged () const;
 
   virtual const db::Polygon *nth (size_t n) const;
@@ -71,13 +70,6 @@ public:
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
 
-  virtual RegionDelegate *and_with (const Region &other) const;
-  virtual RegionDelegate *not_with (const Region &other) const;
-  virtual RegionDelegate *xor_with (const Region &other) const;
-
-  virtual RegionDelegate *add_in_place (const Region &other);
-  virtual RegionDelegate *add (const Region &other) const;
-
   virtual bool is_box () const;
   virtual size_t size () const;
 
@@ -86,6 +78,13 @@ public:
   virtual Box bbox () const;
 
   virtual std::string to_string (size_t nmax) const;
+
+  virtual RegionDelegate *and_with (const Region &other) const;
+  virtual RegionDelegate *not_with (const Region &other) const;
+  virtual RegionDelegate *xor_with (const Region &other) const;
+
+  virtual RegionDelegate *add_in_place (const Region &other);
+  virtual RegionDelegate *add (const Region &other) const;
 
   EdgePairs width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
   {

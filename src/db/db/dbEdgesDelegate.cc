@@ -30,6 +30,7 @@ namespace db
 
 EdgesDelegate::EdgesDelegate ()
 {
+  m_base_verbosity = 30;
   m_report_progress = false;
   m_merged_semantics = true;
   m_strict_handling = false;
@@ -44,6 +45,7 @@ EdgesDelegate &
 EdgesDelegate::operator= (const EdgesDelegate &other)
 {
   if (this != &other) {
+    m_base_verbosity = other.m_base_verbosity;
     m_report_progress = other.m_report_progress;
     m_merged_semantics = other.m_merged_semantics;
     m_strict_handling = other.m_strict_handling;
@@ -54,6 +56,11 @@ EdgesDelegate::operator= (const EdgesDelegate &other)
 EdgesDelegate::~EdgesDelegate ()
 {
   //  .. nothing yet ..
+}
+
+void EdgesDelegate::set_base_verbosity (int vb)
+{
+  m_base_verbosity = vb;
 }
 
 void EdgesDelegate::enable_progress (const std::string &progress_desc)

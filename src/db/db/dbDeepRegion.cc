@@ -225,6 +225,7 @@ DeepRegion::empty () const
 bool
 DeepRegion::is_merged () const
 {
+  //  TODO: there is no such thing as a "surely merged" state except after merged() maybe
   return false;
 }
 
@@ -539,7 +540,6 @@ DeepRegion::add_from (const DeepLayer &dl)
   }
 }
 
-
 RegionDelegate *
 DeepRegion::add_in_place (const Region &other)
 {
@@ -564,7 +564,6 @@ DeepRegion::add_in_place (const Region &other)
   }
 
   return this;
-
 }
 
 RegionDelegate *

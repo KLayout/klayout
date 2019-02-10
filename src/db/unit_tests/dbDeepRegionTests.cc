@@ -734,3 +734,41 @@ TEST(100_Integration)
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au100.gds");
 }
+
+TEST(101_DeepFlatCollaboration)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r2_flat (db::RecursiveShapeIterator (ly, top_cell, l2));
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r3_flat (db::RecursiveShapeIterator (ly, top_cell, l3));
+
+  db::Region r2fminus3   = r2_flat - r3;
+  db::Region r2minus3f   = r2 - r3_flat;
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r2fminus3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2minus3f);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au101.gds");
+}
+

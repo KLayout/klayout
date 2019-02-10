@@ -103,10 +103,17 @@ public:
 
   virtual void begin (const db::RecursiveShapeIterator *iter)
   {
-    m_cell_stack.clear ();
-
     db::cell_index_type ci = iter->top_cell ()->cell_index ();
     const rdb::Cell *rdb_cell = cell_for_id (iter->layout (), ci);
+
+    if (! m_cell_stack.empty () && rdb_cell != m_cell_stack.front () && (rdb_cell->references ().begin () == rdb_cell->references ().end ())) {
+      //  If the actual top cell is not the one specified, add a dummy reference so we find the real top cell under
+      //  the given one.
+      //  TODO: get rid of the const_cast
+      (const_cast<rdb::Cell *> (rdb_cell))->references ().insert (rdb::Reference (db::DCplxTrans (), m_cell_stack.front ()->id ()));
+    }
+
+    m_cell_stack.clear ();
     m_cell_stack.push_back (rdb_cell);
     m_id_to_cell.insert (std::make_pair (ci, rdb_cell));
   }

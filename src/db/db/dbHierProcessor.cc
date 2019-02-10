@@ -65,6 +65,9 @@ namespace db
 // ---------------------------------------------------------------------------------------------
 //  Shape reference translator
 
+template <class T> class shape_reference_translator;
+template <class Ref, class Trans> class shape_reference_translator_with_trans;
+
 template <class Ref>
 class shape_reference_translator
 {
@@ -131,6 +134,29 @@ private:
   mutable std::unordered_map<shape_type, const shape_type *> m_cache_by_shape;
 };
 
+template <>
+class shape_reference_translator<db::Edge>
+{
+public:
+  typedef typename db::Edge shape_type;
+
+  shape_reference_translator (db::Layout * /*target_layout*/)
+  {
+    //  .. nothing yet ..
+  }
+
+  const shape_type &operator() (const shape_type &s) const
+  {
+    return s;
+  }
+
+  template <class Trans>
+  shape_type operator() (const shape_type &s, const Trans &tr) const
+  {
+    return s.transformed (tr);
+  }
+};
+
 template <class Ref, class Trans>
 class shape_reference_translator_with_trans
 {
@@ -178,43 +204,68 @@ private:
   mutable std::unordered_map<const shape_type *, std::pair<const shape_type *, ref_trans_type> > m_cache;
 };
 
+template <class Trans>
+class shape_reference_translator_with_trans<db::Edge, Trans>
+{
+public:
+  typedef typename db::Edge shape_type;
+
+  shape_reference_translator_with_trans (db::Layout * /*target_layout*/, const Trans &trans)
+    : m_trans (trans)
+  {
+    //  .. nothing yet ..
+  }
+
+  shape_type operator() (const shape_type &s) const
+  {
+    return s.transformed (m_trans);
+  }
+
+private:
+  Trans m_trans;
+};
+
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorCellContext implementation
 
-LocalProcessorCellContext::LocalProcessorCellContext ()
+template <class T>
+local_processor_cell_context<T>::local_processor_cell_context ()
 {
   //  .. nothing yet ..
 }
 
-LocalProcessorCellContext::LocalProcessorCellContext (const LocalProcessorCellContext &other)
+template <class T>
+local_processor_cell_context<T>::local_processor_cell_context (const local_processor_cell_context &other)
   : m_propagated (other.m_propagated), m_drops (other.m_drops)
 {
   //  .. nothing yet ..
 }
 
+template <class T>
 void
-LocalProcessorCellContext::add (db::LocalProcessorCellContext *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst)
+local_processor_cell_context<T>::add (db::local_processor_cell_context<T> *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst)
 {
-  m_drops.push_back (LocalProcessorCellDrop (parent_context, parent, cell_inst));
+  m_drops.push_back (local_processor_cell_drop<T> (parent_context, parent, cell_inst));
 }
 
+template <class T>
 void
-LocalProcessorCellContext::propagate (const std::unordered_set<db::PolygonRef> &res)
+local_processor_cell_context<T>::propagate (const std::unordered_set<T> &res)
 {
   if (res.empty ()) {
     return;
   }
 
-  for (std::vector<LocalProcessorCellDrop>::const_iterator d = m_drops.begin (); d != m_drops.end (); ++d) {
+  for (typename std::vector<local_processor_cell_drop<T> >::const_iterator d = m_drops.begin (); d != m_drops.end (); ++d) {
 
     tl_assert (d->parent_context != 0);
     tl_assert (d->parent != 0);
 
     db::Layout *subject_layout = d->parent->layout ();
-    shape_reference_translator_with_trans<db::PolygonRef, db::ICplxTrans> rt (subject_layout, d->cell_inst);
-    std::vector<db::PolygonRef> new_refs;
+    shape_reference_translator_with_trans<T, db::ICplxTrans> rt (subject_layout, d->cell_inst);
+    std::vector<T> new_refs;
     new_refs.reserve (res.size ());
-    for (std::unordered_set<db::PolygonRef>::const_iterator r = res.begin (); r != res.end (); ++r) {
+    for (typename std::unordered_set<T>::const_iterator r = res.begin (); r != res.end (); ++r) {
       new_refs.push_back (rt (*r));
     }
 
@@ -226,36 +277,43 @@ LocalProcessorCellContext::propagate (const std::unordered_set<db::PolygonRef> &
   }
 }
 
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_context<db::Edge>;
+
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorCellContexts implementation
 
-LocalProcessorCellContexts::LocalProcessorCellContexts ()
+template <class T>
+local_processor_cell_contexts<T>::local_processor_cell_contexts ()
   : mp_intruder_cell (0)
 {
   //  .. nothing yet ..
 }
 
-LocalProcessorCellContexts::LocalProcessorCellContexts (const db::Cell *intruder_cell)
+template <class T>
+local_processor_cell_contexts<T>::local_processor_cell_contexts (const db::Cell *intruder_cell)
   : mp_intruder_cell (intruder_cell)
 {
   //  .. nothing yet ..
 }
 
-db::LocalProcessorCellContext *
-LocalProcessorCellContexts::find_context (const context_key_type &intruders)
+template <class T>
+db::local_processor_cell_context<T> *
+local_processor_cell_contexts<T>::find_context (const context_key_type &intruders)
 {
-  std::unordered_map<context_key_type, db::LocalProcessorCellContext>::iterator c = m_contexts.find (intruders);
+  typename std::unordered_map<context_key_type, db::local_processor_cell_context<T> >::iterator c = m_contexts.find (intruders);
   return c != m_contexts.end () ? &c->second : 0;
 }
 
-db::LocalProcessorCellContext *
-LocalProcessorCellContexts::create (const context_key_type &intruders)
+template <class T>
+db::local_processor_cell_context<T> *
+local_processor_cell_contexts<T>::create (const context_key_type &intruders)
 {
   return &m_contexts[intruders];
 }
 
 static void
-subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout, const db::LocalProcessor *proc)
+subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout, const db::local_processor<db::PolygonRef> *proc)
 {
   if (other.empty ()) {
     return;
@@ -293,11 +351,21 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
   ep.process (pg, op);
 }
 
+static void
+subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> &other, db::Layout * /*layout*/, const db::local_processor<db::Edge> * /*proc*/)
+{
+  //  for edges, we don't use a boolean core but just set intersection
+  for (std::unordered_set<db::Edge>::const_iterator o = other.begin (); o != other.end (); ++o) {
+    res.erase (*o);
+  }
+}
+
 namespace {
 
+template <class T>
 struct context_sorter
 {
-  bool operator () (const std::pair<const LocalProcessorCellContexts::context_key_type *, db::LocalProcessorCellContext *> &a, const std::pair<const LocalProcessorCellContexts::context_key_type *, db::LocalProcessorCellContext *> &b)
+  bool operator () (const std::pair<const typename local_processor_cell_contexts<T>::context_key_type *, db::local_processor_cell_context<T> *> &a, const std::pair<const typename local_processor_cell_contexts<T>::context_key_type *, db::local_processor_cell_context<T> *> &b)
   {
     return *a.first < *b.first;
   }
@@ -305,13 +373,14 @@ struct context_sorter
 
 }
 
+template <class T>
 void
-LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &contexts, db::Cell *cell, const LocalOperation *op, unsigned int output_layer, const LocalProcessor *proc)
+local_processor_cell_contexts<T>::compute_results (const local_processor_contexts<T> &contexts, db::Cell *cell, const local_operation<T> *op, unsigned int output_layer, const local_processor<T> *proc)
 {
   CRONOLOGY_COMPUTE_BRACKET(event_compute_results)
 
   bool first = true;
-  std::unordered_set<db::PolygonRef> common;
+  std::unordered_set<T> common;
 
   int index = 0;
   int total = int (m_contexts.size ());
@@ -319,15 +388,15 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
   //  NOTE: we use the ordering provided by key_type::operator< rather than the unordered map to achieve
   //  reproducability across different platforms. unordered_map is faster, but for processing them,
   //  strict ordering is a more robust choice.
-  std::vector<std::pair<const context_key_type *, db::LocalProcessorCellContext *> > sorted_contexts;
+  std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<T> *> > sorted_contexts;
   sorted_contexts.reserve (m_contexts.size ());
-  for (std::unordered_map<context_key_type, db::LocalProcessorCellContext>::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
+  for (typename std::unordered_map<context_key_type, db::local_processor_cell_context<T> >::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
     sorted_contexts.push_back (std::make_pair (&c->first, &c->second));
   }
 
-  std::sort (sorted_contexts.begin (), sorted_contexts.end (), context_sorter ());
+  std::sort (sorted_contexts.begin (), sorted_contexts.end (), context_sorter<T> ());
 
-  for (std::vector<std::pair<const context_key_type *, db::LocalProcessorCellContext *> >::const_iterator c = sorted_contexts.begin (); c != sorted_contexts.end (); ++c) {
+  for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<T> *> >::const_iterator c = sorted_contexts.begin (); c != sorted_contexts.end (); ++c) {
 
     ++index;
 
@@ -348,7 +417,7 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
     } else {
 
-      std::unordered_set<db::PolygonRef> res;
+      std::unordered_set<T> res;
       {
         tl::MutexLocker locker (&c->second->lock ());
         res = c->second->propagated ();
@@ -368,8 +437,8 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
         CRONOLOGY_COMPUTE_BRACKET(event_propagate)
 
-        std::unordered_set<db::PolygonRef> lost;
-        for (std::unordered_set<db::PolygonRef>::const_iterator i = common.begin (); i != common.end (); ++i) {
+        std::unordered_set<T> lost;
+        for (typename std::unordered_set<T>::const_iterator i = common.begin (); i != common.end (); ++i) {
           if (res.find (*i) == res.end ()) {
             lost.insert (*i);
           }
@@ -381,15 +450,15 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
 
           if (! lost.empty ()) {
             subtract (common, lost, cell->layout (), proc);
-            for (std::vector<std::pair<const context_key_type *, db::LocalProcessorCellContext *> >::const_iterator cc = sorted_contexts.begin (); cc != c; ++cc) {
+            for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<T> *> >::const_iterator cc = sorted_contexts.begin (); cc != c; ++cc) {
               cc->second->propagate (lost);
             }
           }
 
         }
 
-        std::unordered_set<db::PolygonRef> gained;
-        for (std::unordered_set<db::PolygonRef>::const_iterator i = res.begin (); i != res.end (); ++i) {
+        std::unordered_set<T> gained;
+        for (typename std::unordered_set<T>::const_iterator i = res.begin (); i != res.end (); ++i) {
           if (common.find (*i) == common.end ()) {
             gained.insert (*i);
           }
@@ -414,41 +483,50 @@ LocalProcessorCellContexts::compute_results (const LocalProcessorContexts &conte
   proc->push_results (cell, output_layer, common);
 }
 
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Edge>;
+
 // ---------------------------------------------------------------------------------------------
 
-ShapeInteractions::ShapeInteractions ()
+template <class T>
+shape_interactions<T>::shape_interactions ()
   : m_id (0)
 {
   //  .. nothing yet ..
 }
 
+template <class T>
 bool
-ShapeInteractions::has_shape_id (unsigned int id) const
+shape_interactions<T>::has_shape_id (unsigned int id) const
 {
   return m_shapes.find (id) != m_shapes.end ();
 }
 
+template <class T>
 void
-ShapeInteractions::add_shape (unsigned int id, const db::PolygonRef &shape)
+shape_interactions<T>::add_shape (unsigned int id, const T &shape)
 {
   m_shapes [id] = shape;
 }
 
+template <class T>
 void
-ShapeInteractions::add_subject (unsigned int id, const db::PolygonRef &shape)
+shape_interactions<T>::add_subject (unsigned int id, const T &shape)
 {
   add_shape (id, shape);
   m_interactions.insert (std::make_pair (id, container::value_type::second_type ()));
 }
 
+template <class T>
 void
-ShapeInteractions::add_interaction (unsigned int subject_id, unsigned int intruder_id)
+shape_interactions<T>::add_interaction (unsigned int subject_id, unsigned int intruder_id)
 {
   m_interactions [subject_id].push_back (intruder_id);
 }
 
+template <class T>
 const std::vector<unsigned int> &
-ShapeInteractions::intruders_for (unsigned int subject_id) const
+shape_interactions<T>::intruders_for (unsigned int subject_id) const
 {
   iterator i = m_interactions.find (subject_id);
   if (i == m_interactions.end ()) {
@@ -459,17 +537,21 @@ ShapeInteractions::intruders_for (unsigned int subject_id) const
   }
 }
 
-const db::PolygonRef &
-ShapeInteractions::shape (unsigned int id) const
+template <class T>
+const T &
+shape_interactions<T>::shape (unsigned int id) const
 {
-  std::unordered_map<unsigned int, db::PolygonRef>::const_iterator i = m_shapes.find (id);
+  typename std::unordered_map<unsigned int, T>::const_iterator i = m_shapes.find (id);
   if (i == m_shapes.end ()) {
-    static db::PolygonRef s;
+    static T s;
     return s;
   } else {
     return i->second;
   }
 }
+
+template class DB_PUBLIC shape_interactions<db::PolygonRef>;
+template class DB_PUBLIC shape_interactions<db::Edge>;
 
 // ---------------------------------------------------------------------------------------------
 //  Helper classes for the LocalProcessor
@@ -477,22 +559,32 @@ ShapeInteractions::shape (unsigned int id) const
 namespace
 {
 
-inline unsigned int polygon_ref_flags ()
+template <class T> unsigned int shape_flags ();
+
+template <>
+inline unsigned int shape_flags<db::PolygonRef> ()
 {
   return 1 << db::ShapeIterator::PolygonRef;
 }
 
-struct InteractionRegistrationShape2Shape
-  : db::box_scanner_receiver2<db::PolygonRef, unsigned int, db::PolygonRef, unsigned int>
+template <>
+inline unsigned int shape_flags<db::Edge> ()
+{
+  return db::ShapeIterator::Edges;
+}
+
+template <class T>
+struct interaction_registration_shape2shape
+  : db::box_scanner_receiver2<T, unsigned int, T, unsigned int>
 {
 public:
-  InteractionRegistrationShape2Shape (db::Layout *layout, ShapeInteractions *result)
+  interaction_registration_shape2shape (db::Layout *layout, shape_interactions<T> *result)
     : mp_result (result), mp_layout (layout)
   {
     //  nothing yet ..
   }
 
-  void add (const db::PolygonRef *ref1, unsigned int id1, const db::PolygonRef *ref2, unsigned int id2)
+  void add (const T *ref1, unsigned int id1, const T *ref2, unsigned int id2)
   {
     mp_result->add_shape (id1, *ref1);
 
@@ -500,7 +592,7 @@ public:
       //  In order to guarantee the refs come from the subject layout, we'd need to
       //  rewrite them
       if (!mp_result->has_shape_id (id2)) {
-        db::shape_reference_translator<db::PolygonRef> rt (mp_layout);
+        db::shape_reference_translator<T> rt (mp_layout);
         mp_result->add_shape (id2, rt (*ref2));
       }
     } else {
@@ -511,21 +603,22 @@ public:
   }
 
 private:
-  ShapeInteractions *mp_result;
+  shape_interactions<T> *mp_result;
   db::Layout *mp_layout;
 };
 
-struct InteractionRegistrationShape1
-  : db::box_scanner_receiver<db::PolygonRef, unsigned int>
+template <class T>
+struct interaction_registration_shape1
+  : db::box_scanner_receiver<T, unsigned int>
 {
 public:
-  InteractionRegistrationShape1 (ShapeInteractions *result)
+  interaction_registration_shape1 (shape_interactions<T> *result)
     : mp_result (result)
   {
     //  nothing yet ..
   }
 
-  void add (const db::PolygonRef *ref1, unsigned int id1, const db::PolygonRef *ref2, unsigned int id2)
+  void add (const T *ref1, unsigned int id1, const T *ref2, unsigned int id2)
   {
     mp_result->add_shape (id1, *ref1);
     mp_result->add_shape (id2, *ref2);
@@ -533,20 +626,21 @@ public:
   }
 
 private:
-  ShapeInteractions *mp_result;
+  shape_interactions<T> *mp_result;
 };
 
-struct InteractionRegistrationShape2Inst
-  : db::box_scanner_receiver2<db::PolygonRef, unsigned int, db::CellInstArray, unsigned int>
+template <class T>
+struct interaction_registration_shape2inst
+  : db::box_scanner_receiver2<T, unsigned int, db::CellInstArray, unsigned int>
 {
 public:
-  InteractionRegistrationShape2Inst (db::Layout *subject_layout, const db::Layout *intruder_layout, unsigned int intruder_layer, db::Coord dist, ShapeInteractions *result)
+  interaction_registration_shape2inst (db::Layout *subject_layout, const db::Layout *intruder_layout, unsigned int intruder_layer, db::Coord dist, shape_interactions<T> *result)
     : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_intruder_layer (intruder_layer), m_dist (dist), mp_result (result)
   {
     //  nothing yet ..
   }
 
-  void add (const db::PolygonRef *ref, unsigned int id1, const db::CellInstArray *inst, unsigned int inst_id)
+  void add (const T *ref, unsigned int id1, const db::CellInstArray *inst, unsigned int inst_id)
   {
     const db::Cell &intruder_cell = mp_intruder_layout->cell (inst->object ().cell_index ());
     db::box_convert <db::CellInst, true> inst_bc (*mp_intruder_layout, m_intruder_layer);
@@ -554,9 +648,10 @@ public:
 
     //  Find all instance array members that potentially interact with the shape and use
     //  add_shapes_from_intruder_inst on them
-    for (db::CellInstArray::iterator n = inst->begin_touching (ref->box ().enlarged (db::Vector (m_dist - 1, m_dist - 1)), inst_bc); !n.at_end (); ++n) {
+    db::Box ref_box = db::box_convert<T> () (*ref);
+    for (db::CellInstArray::iterator n = inst->begin_touching (ref_box.enlarged (db::Vector (m_dist - 1, m_dist - 1)), inst_bc); !n.at_end (); ++n) {
       db::ICplxTrans tn = inst->complex_trans (*n);
-      db::Box region = ref->box ().transformed (tn.inverted ()).enlarged (db::Vector (m_dist, m_dist)) & intruder_cell.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
+      db::Box region = ref_box.transformed (tn.inverted ()).enlarged (db::Vector (m_dist, m_dist)) & intruder_cell.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
       if (! region.empty ()) {
         add_shapes_from_intruder_inst (id1, intruder_cell, tn, inst_id, region);
       }
@@ -568,27 +663,27 @@ private:
   const db::Layout *mp_intruder_layout;
   unsigned int m_intruder_layer;
   db::Coord m_dist;
-  ShapeInteractions *mp_result;
-  std::unordered_map<db::PolygonRef, unsigned int> m_inst_shape_ids;
+  shape_interactions<T> *mp_result;
+  std::unordered_map<T, unsigned int> m_inst_shape_ids;
 
   void add_shapes_from_intruder_inst (unsigned int id1, const db::Cell &intruder_cell, const db::ICplxTrans &tn, unsigned int /*inst_id*/, const db::Box &region)
   {
-    db::shape_reference_translator<db::PolygonRef> rt (mp_subject_layout);
+    db::shape_reference_translator<T> rt (mp_subject_layout);
 
     //  Look up all shapes from the intruder instance which interact with the subject shape
     //  (given through region)
     //  TODO: should be lighter, cache, handle arrays ..
     db::RecursiveShapeIterator si (*mp_intruder_layout, intruder_cell, m_intruder_layer, region);
-    si.shape_flags (polygon_ref_flags ());
+    si.shape_flags (shape_flags<T> ());
     while (! si.at_end ()) {
 
       //  NOTE: we intentionally rewrite to the *subject* layout - this way polygon refs in the context come from the
       //  subject, not from the intruder.
-      db::PolygonRef ref2 = rt (*si.shape ().basic_ptr (db::PolygonRef::tag ()), tn * si.trans ());
+      T ref2 = rt (*si.shape ().basic_ptr (typename T::tag ()), tn * si.trans ());
 
       //  reuse the same id for shapes from the same instance -> this avoid duplicates with different IDs on
       //  the intruder side.
-      std::unordered_map<db::PolygonRef, unsigned int>::const_iterator k = m_inst_shape_ids.find (ref2);
+      typename std::unordered_map<T, unsigned int>::const_iterator k = m_inst_shape_ids.find (ref2);
       if (k == m_inst_shape_ids.end ()) {
 
         k = m_inst_shape_ids.insert (std::make_pair (ref2, mp_result->next_id ())).first;
@@ -666,13 +761,14 @@ instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, u
   return false;
 }
 
-struct InteractionRegistrationInst2Inst
+template <class T>
+struct interaction_registration_inst2inst
   : db::box_scanner_receiver2<db::CellInstArray, unsigned int, db::CellInstArray, unsigned int>
 {
 public:
-  typedef std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<db::PolygonRef> > interaction_value_type;
+  typedef std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<T> > interaction_value_type;
 
-  InteractionRegistrationInst2Inst (const db::Layout *subject_layout, unsigned int subject_layer, const db::Layout *intruder_layout, unsigned int intruder_layer, db::Coord dist, std::unordered_map<const db::CellInstArray *, interaction_value_type> *result)
+  interaction_registration_inst2inst (const db::Layout *subject_layout, unsigned int subject_layer, const db::Layout *intruder_layout, unsigned int intruder_layer, db::Coord dist, std::unordered_map<const db::CellInstArray *, interaction_value_type> *result)
     : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_subject_layer (subject_layer), m_intruder_layer (intruder_layer), m_dist (dist), mp_result (result)
   {
     //  nothing yet ..
@@ -705,16 +801,17 @@ private:
   const db::Layout *mp_subject_layout, *mp_intruder_layout;
   unsigned int m_subject_layer, m_intruder_layer;
   db::Coord m_dist;
-  std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<db::PolygonRef> > > *mp_result;
+  std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<T> > > *mp_result;
   std::unordered_set<std::pair<unsigned int, unsigned int> > m_interactions;
 };
 
+template <class T>
 static bool
-instance_shape_interacts (const db::Layout *layout, const db::CellInstArray *inst, unsigned int layer, const db::PolygonRef &ref, db::Coord dist)
+instance_shape_interacts (const db::Layout *layout, const db::CellInstArray *inst, unsigned int layer, const T &ref, db::Coord dist)
 {
   const db::Cell &cell = layout->cell (inst->object ().cell_index ());
   db::box_convert <db::CellInst, true> inst_bc (*layout, layer);
-  db::Box rbox = ref.box ();
+  db::Box rbox = db::box_convert<T> () (ref);
 
   for (db::CellInstArray::iterator n = inst->begin_touching (rbox.enlarged (db::Vector (dist - 1, dist - 1)), inst_bc); ! n.at_end (); ++n) {
 
@@ -738,17 +835,18 @@ instance_shape_interacts (const db::Layout *layout, const db::CellInstArray *ins
   return false;
 }
 
-struct InteractionRegistrationInst2Shape
-  : db::box_scanner_receiver2<db::CellInstArray, unsigned int, db::PolygonRef, unsigned int>
+template <class T>
+struct interaction_registration_inst2shape
+  : db::box_scanner_receiver2<db::CellInstArray, unsigned int, T, unsigned int>
 {
 public:
-  InteractionRegistrationInst2Shape (const db::Layout *subject_layout, unsigned int subject_layer, db::Coord dist, std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<db::PolygonRef> > > *result)
+  interaction_registration_inst2shape (const db::Layout *subject_layout, unsigned int subject_layer, db::Coord dist, std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<T> > > *result)
     : mp_subject_layout (subject_layout), m_subject_layer (subject_layer), m_dist (dist), mp_result (result)
   {
     //  nothing yet ..
   }
 
-  void add (const db::CellInstArray *inst, unsigned int, const db::PolygonRef *ref, unsigned int)
+  void add (const db::CellInstArray *inst, unsigned int, const T *ref, unsigned int)
   {
     if (instance_shape_interacts (mp_subject_layout, inst, m_subject_layer, *ref, m_dist)) {
       (*mp_result) [inst].second.insert (*ref);
@@ -759,7 +857,7 @@ private:
   const db::Layout *mp_subject_layout;
   unsigned int m_subject_layer;
   db::Coord m_dist;
-  std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<db::PolygonRef> > > *mp_result;
+  std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<T> > > *mp_result;
 };
 
 }
@@ -767,7 +865,8 @@ private:
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorContextComputationTask implementation
 
-LocalProcessorContextComputationTask::LocalProcessorContextComputationTask (const LocalProcessor *proc, LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist)
+template <class T>
+local_processor_context_computation_task<T>::local_processor_context_computation_task (const local_processor<T> *proc, local_processor_contexts<T> &contexts, db::local_processor_cell_context<T> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<T>::context_key_type &intruders, db::Coord dist)
   : tl::Task (),
     mp_proc (proc), mp_contexts (&contexts), mp_parent_context (parent_context),
     mp_subject_parent (subject_parent), mp_subject_cell (subject_cell), m_subject_cell_inst (subject_cell_inst),
@@ -777,23 +876,29 @@ LocalProcessorContextComputationTask::LocalProcessorContextComputationTask (cons
   m_intruders.swap (intruders);
 }
 
+template <class T>
 void
-LocalProcessorContextComputationTask::perform ()
+local_processor_context_computation_task<T>::perform ()
 {
   mp_proc->compute_contexts (*mp_contexts, mp_parent_context, mp_subject_parent, mp_subject_cell, m_subject_cell_inst, mp_intruder_cell, m_intruders, m_dist);
 }
 
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Edge>;
+
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorResultComputationTask implementation
 
-LocalProcessorResultComputationTask::LocalProcessorResultComputationTask (const LocalProcessor *proc, LocalProcessorContexts &contexts, db::Cell *cell, LocalProcessorCellContexts *cell_contexts, const LocalOperation *op, unsigned int output_layer)
+template <class T>
+local_processor_result_computation_task<T>::local_processor_result_computation_task (const local_processor<T> *proc, local_processor_contexts<T> &contexts, db::Cell *cell, local_processor_cell_contexts<T> *cell_contexts, const local_operation<T> *op, unsigned int output_layer)
   : mp_proc (proc), mp_contexts (&contexts), mp_cell (cell), mp_cell_contexts (cell_contexts), mp_op (op), m_output_layer (output_layer)
 {
   //  .. nothing yet ..
 }
 
+template <class T>
 void
-LocalProcessorResultComputationTask::perform ()
+local_processor_result_computation_task<T>::perform ()
 {
   mp_cell_contexts->compute_results (*mp_contexts, mp_cell, mp_op, m_output_layer, mp_proc);
 
@@ -802,13 +907,13 @@ LocalProcessorResultComputationTask::perform ()
     tl::MutexLocker locker (& mp_contexts->lock ());
 
 #if defined(ENABLE_DB_HP_SANITY_ASSERTIONS)
-    std::set<const db::LocalProcessorCellContext *> td;
-    for (db::LocalProcessorCellContexts::iterator i = mp_cell_contexts->begin (); i != mp_cell_contexts->end (); ++i) {
+    std::set<const db::local_processor_cell_context<T> *> td;
+    for (typename db::local_processor_cell_contexts<T>::iterator i = mp_cell_contexts->begin (); i != mp_cell_contexts->end (); ++i) {
       td.insert (&i->second);
     }
-    for (db::LocalProcessorContexts::contexts_per_cell_type::iterator pcc = mp_contexts->context_map ().begin (); pcc != mp_contexts->context_map ().end (); ++pcc) {
-      for (db::LocalProcessorCellContexts::iterator i = pcc->second.begin (); i != pcc->second.end (); ++i) {
-        for (db::LocalProcessorCellContext::drop_iterator j = i->second.begin_drops (); j != i->second.end_drops (); ++j) {
+    for (typename db::local_processor_cell_contexts<T>::contexts_per_cell_type::iterator pcc = mp_contexts->context_map ().begin (); pcc != mp_contexts->context_map ().end (); ++pcc) {
+      for (typename db::local_processor_cell_contexts<T>::iterator i = pcc->second.begin (); i != pcc->second.end (); ++i) {
+        for (typename db::local_processor_cell_context<T>::drop_iterator j = i->second.begin_drops (); j != i->second.end_drops (); ++j) {
           if (td.find (j->parent_context) != td.end ()) {
             tl_assert (false);
           }
@@ -821,22 +926,28 @@ LocalProcessorResultComputationTask::perform ()
   }
 }
 
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Edge>;
+
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessor implementation
 
-LocalProcessor::LocalProcessor (db::Layout *layout, db::Cell *top)
+template <class T>
+local_processor<T>::local_processor (db::Layout *layout, db::Cell *top)
   : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
 {
   //  .. nothing yet ..
 }
 
-LocalProcessor::LocalProcessor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top)
+template <class T>
+local_processor<T>::local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top)
   : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
 {
   //  .. nothing yet ..
 }
 
-std::string LocalProcessor::description (const LocalOperation *op) const
+template <class T>
+std::string local_processor<T>::description (const local_operation<T> *op) const
 {
   if (op && m_description.empty ()) {
     return op->description ();
@@ -845,16 +956,18 @@ std::string LocalProcessor::description (const LocalOperation *op) const
   }
 }
 
-void LocalProcessor::run (LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
+template <class T>
+void local_processor<T>::run (local_operation<T> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
 {
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Executing ")) + description (op));
 
-  LocalProcessorContexts contexts;
+  local_processor_contexts<T> contexts;
   compute_contexts (contexts, op, subject_layer, intruder_layer);
   compute_results (contexts, op, output_layer);
 }
 
-void LocalProcessor::push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<db::PolygonRef> &result) const
+template <class T>
+void local_processor<T>::push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<T> &result) const
 {
   if (! result.empty ()) {
     tl::MutexLocker locker (&cell->layout ()->lock ());
@@ -862,14 +975,15 @@ void LocalProcessor::push_results (db::Cell *cell, unsigned int output_layer, co
   }
 }
 
-void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer) const
+template <class T>
+void local_processor<T>::compute_contexts (local_processor_contexts<T> &contexts, const local_operation<T> *op, unsigned int subject_layer, unsigned int intruder_layer) const
 {
   try {
 
     tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing contexts for ")) + description (op));
 
     if (m_nthreads > 0) {
-      mp_cc_job.reset (new tl::Job<LocalProcessorContextComputationWorker> (m_nthreads));
+      mp_cc_job.reset (new tl::Job<local_processor_context_computation_worker<T> > (m_nthreads));
     } else {
       mp_cc_job.reset (0);
     }
@@ -878,7 +992,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const L
     contexts.set_intruder_layer (intruder_layer);
     contexts.set_subject_layer (subject_layer);
 
-    LocalProcessorCellContexts::context_key_type intruders;
+    typename local_processor_cell_contexts<T>::context_key_type intruders;
     issue_compute_contexts (contexts, 0, 0, mp_subject_top, db::ICplxTrans (), mp_intruder_top, intruders, op->dist ());
 
     if (mp_cc_job.get ()) {
@@ -892,32 +1006,34 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const L
   }
 }
 
-void LocalProcessor::issue_compute_contexts (LocalProcessorContexts &contexts,
-                                             db::LocalProcessorCellContext *parent_context,
-                                             db::Cell *subject_parent,
-                                             db::Cell *subject_cell,
-                                             const db::ICplxTrans &subject_cell_inst,
-                                             const db::Cell *intruder_cell,
-                                             LocalProcessorCellContexts::context_key_type &intruders,
-                                             db::Coord dist) const
+template <class T>
+void local_processor<T>::issue_compute_contexts (local_processor_contexts<T> &contexts,
+                                                 db::local_processor_cell_context<T> *parent_context,
+                                                 db::Cell *subject_parent,
+                                                 db::Cell *subject_cell,
+                                                 const db::ICplxTrans &subject_cell_inst,
+                                                 const db::Cell *intruder_cell,
+                                                 typename local_processor_cell_contexts<T>::context_key_type &intruders,
+                                                 db::Coord dist) const
 {
   bool is_small_job = subject_cell->begin ().at_end ();
 
   if (! is_small_job && mp_cc_job.get ()) {
-    mp_cc_job->schedule (new LocalProcessorContextComputationTask (this, contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist));
+    mp_cc_job->schedule (new local_processor_context_computation_task<T> (this, contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist));
   } else {
     compute_contexts (contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist);
   }
 }
 
-void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
-                                       db::LocalProcessorCellContext *parent_context,
-                                       db::Cell *subject_parent,
-                                       db::Cell *subject_cell,
-                                       const db::ICplxTrans &subject_cell_inst,
-                                       const db::Cell *intruder_cell,
-                                       const LocalProcessorCellContexts::context_key_type &intruders,
-                                       db::Coord dist) const
+template <class T>
+void local_processor<T>::compute_contexts (local_processor_contexts<T> &contexts,
+                                           db::local_processor_cell_context<T> *parent_context,
+                                           db::Cell *subject_parent,
+                                           db::Cell *subject_cell,
+                                           const db::ICplxTrans &subject_cell_inst,
+                                           const db::Cell *intruder_cell,
+                                           const typename local_processor_cell_contexts<T>::context_key_type &intruders,
+                                           db::Coord dist) const
 {
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts)
 
@@ -929,7 +1045,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
     }
   }
 
-  db::LocalProcessorCellContext *cell_context = 0;
+  db::local_processor_cell_context<T> *cell_context = 0;
 
   //  prepare a new cell context: this has to happen in a thread-safe way as we share the contexts
   //  object between threads
@@ -937,17 +1053,17 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
   {
     tl::MutexLocker locker (& contexts.lock ());
 
-    db::LocalProcessorCellContexts &cell_contexts = contexts.contexts_per_cell (subject_cell, intruder_cell);
+    db::local_processor_cell_contexts<T> &cell_contexts = contexts.contexts_per_cell (subject_cell, intruder_cell);
 
 #if defined(ENABLE_DB_HP_SANITY_ASSERTIONS)
     if (subject_parent) {
-      db::LocalProcessorContexts::contexts_per_cell_type::iterator pcc = contexts.context_map ().find (subject_parent);
+      typename db::local_processor_cell_contexts<T>::contexts_per_cell_type::iterator pcc = contexts.context_map ().find (subject_parent);
       if (pcc == contexts.context_map ().end ()) {
         tl_assert (false);
       }
       tl_assert (pcc->first == subject_parent);
       bool any = false;
-      for (db::LocalProcessorCellContexts::iterator pcci = pcc->second.begin (); pcci != pcc->second.end () && !any; ++pcci) {
+      for (typename db::local_processor_cell_contexts<T>::iterator pcci = pcc->second.begin (); pcci != pcc->second.end () && !any; ++pcci) {
         any = (&pcci->second == parent_context);
       }
       if (!any) {
@@ -984,7 +1100,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 
   if (! subject_cell->begin ().at_end ()) {
 
-    typedef std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<db::PolygonRef> > interaction_value_type;
+    typedef std::pair<std::unordered_set<const db::CellInstArray *>, std::unordered_set<T> > interaction_value_type;
 
     std::unordered_map<const db::CellInstArray *, interaction_value_type> interactions;
 
@@ -1000,7 +1116,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 //  TODO: can we shortcut this if interactions is empty?
     {
       db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
-      InteractionRegistrationInst2Inst rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.intruder_layer (), dist, &interactions);
+      interaction_registration_inst2inst<T> rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.intruder_layer (), dist, &interactions);
 
       unsigned int id = 0;
 
@@ -1048,8 +1164,8 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 
 //  TODO: can we shortcut this if interactions is empty?
     {
-      db::box_scanner2<db::CellInstArray, int, db::PolygonRef, int> scanner;
-      InteractionRegistrationInst2Shape rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
+      db::box_scanner2<db::CellInstArray, int, T, int> scanner;
+      interaction_registration_inst2shape<T> rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
 
       for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
         if (! inst_bcs (i->cell_inst ()).empty ()) {
@@ -1057,20 +1173,20 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
         }
       }
 
-      for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
+      for (typename std::set<T>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert2 (i.operator-> (), 0);
       }
 
       if (intruder_shapes) {
-        for (db::Shapes::shape_iterator i = intruder_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-          scanner.insert2 (i->basic_ptr (db::PolygonRef::tag ()), 0);
+        for (db::Shapes::shape_iterator i = intruder_shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
+          scanner.insert2 (i->basic_ptr (typename T::tag ()), 0);
         }
       }
 
-      scanner.process (rec, dist, inst_bcs, db::box_convert<db::PolygonRef> ());
+      scanner.process (rec, dist, inst_bcs, db::box_convert<T> ());
     }
 
-    for (std::unordered_map<const db::CellInstArray *, interaction_value_type>::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (typename std::unordered_map<const db::CellInstArray *, interaction_value_type>::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
       db::Cell &subject_child_cell = mp_subject_layout->cell (i->first->object ().cell_index ());
 
@@ -1082,12 +1198,12 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 
         if (! nbox.empty ()) {
 
-          LocalProcessorCellContexts::context_key_type intruders_below;
+          typename local_processor_cell_contexts<T>::context_key_type intruders_below;
 
-          db::shape_reference_translator_with_trans<db::PolygonRef, db::ICplxTrans> rt (mp_subject_layout, tni);
+          db::shape_reference_translator_with_trans<T, db::ICplxTrans> rt (mp_subject_layout, tni);
 
-          for (std::unordered_set<db::PolygonRef>::const_iterator p = i->second.second.begin (); p != i->second.second.end (); ++p) {
-            if (nbox.overlaps (p->box ())) {
+          for (typename std::unordered_set<T>::const_iterator p = i->second.second.begin (); p != i->second.second.end (); ++p) {
+            if (nbox.overlaps (db::box_convert<T> () (*p))) {
               intruders_below.second.insert (rt (*p));
             }
           }
@@ -1116,8 +1232,9 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
   }
 }
 
+template <class T>
 void
-LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int output_layer) const
+local_processor<T>::compute_results (local_processor_contexts<T> &contexts, const local_operation<T> *op, unsigned int output_layer) const
 {
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing results for ")) + description (op));
 
@@ -1127,7 +1244,7 @@ LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOp
 
   if (m_nthreads > 0) {
 
-    std::auto_ptr<tl::Job<LocalProcessorResultComputationWorker> > rc_job (new tl::Job<LocalProcessorResultComputationWorker> (m_nthreads));
+    std::auto_ptr<tl::Job<local_processor_result_computation_worker<T> > > rc_job (new tl::Job<local_processor_result_computation_worker<T> > (m_nthreads));
 
     //  schedule computation jobs in "waves": we need to make sure they are executed
     //  bottom-up. So we identify a new bunch of cells each time we pass through the cell set
@@ -1153,12 +1270,12 @@ LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOp
 
       for (std::vector<db::cell_index_type>::const_iterator bu = cells_bu.begin (); bu != cells_bu.end (); ++bu) {
 
-        LocalProcessorContexts::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
+        typename local_processor_contexts<T>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
         if (cpc != contexts.context_map ().end ()) {
 
           if (later.find (*bu) == later.end ()) {
 
-            rc_job->schedule (new LocalProcessorResultComputationTask (this, contexts, cpc->first, &cpc->second, op, output_layer));
+            rc_job->schedule (new local_processor_result_computation_task<T> (this, contexts, cpc->first, &cpc->second, op, output_layer));
             any = true;
 
           } else {
@@ -1190,7 +1307,7 @@ LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOp
 
     for (db::Layout::bottom_up_const_iterator bu = mp_subject_layout->begin_bottom_up (); bu != mp_subject_layout->end_bottom_up (); ++bu) {
 
-      LocalProcessorContexts::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
+      typename local_processor_contexts<T>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
       if (cpc != contexts.context_map ().end ()) {
         cpc->second.compute_results (contexts, cpc->first, op, output_layer, this);
         contexts.context_map ().erase (cpc);
@@ -1201,8 +1318,9 @@ LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOp
   }
 }
 
+template <class T>
 void
-LocalProcessor::compute_local_cell (const db::LocalProcessorContexts &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const LocalOperation *op, const LocalProcessorCellContexts::context_key_type &intruders, std::unordered_set<db::PolygonRef> &result) const
+local_processor<T>::compute_local_cell (const db::local_processor_contexts<T> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<T> *op, const typename local_processor_cell_contexts<T>::context_key_type &intruders, std::unordered_set<T> &result) const
 {
   const db::Shapes *subject_shapes = &subject_cell->shapes (contexts.subject_layer ());
 
@@ -1216,21 +1334,21 @@ LocalProcessor::compute_local_cell (const db::LocalProcessorContexts &contexts, 
 
   //  local shapes vs. child cell
 
-  ShapeInteractions interactions;
-  db::box_convert <db::CellInstArray, true> inst_bci (*mp_intruder_layout, contexts.intruder_layer ());
+  shape_interactions<T> interactions;
+  db::box_convert<db::CellInstArray, true> inst_bci (*mp_intruder_layout, contexts.intruder_layer ());
 
   //  insert dummy interactions to accommodate subject vs. nothing and assign an ID
   //  range for the subject shapes.
   unsigned int subject_id0 = 0;
-  for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
+  for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
 
     unsigned int id = interactions.next_id ();
     if (subject_id0 == 0) {
       subject_id0 = id;
     }
 
-    if (op->on_empty_intruder_hint () != LocalOperation::Drop) {
-      const db::PolygonRef *ref = i->basic_ptr (db::PolygonRef::tag ());
+    if (op->on_empty_intruder_hint () != local_operation<T>::Drop) {
+      const T *ref = i->basic_ptr (typename T::tag ());
       interactions.add_subject (id, *ref);
     }
 
@@ -1240,46 +1358,46 @@ LocalProcessor::compute_local_cell (const db::LocalProcessorContexts &contexts, 
 
     if (subject_cell == intruder_cell && contexts.subject_layer () == contexts.intruder_layer ()) {
 
-      db::box_scanner<db::PolygonRef, int> scanner;
-      InteractionRegistrationShape1 rec (&interactions);
+      db::box_scanner<T, int> scanner;
+      interaction_registration_shape1<T> rec (&interactions);
 
       unsigned int id = subject_id0;
-      for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-        const db::PolygonRef *ref = i->basic_ptr (db::PolygonRef::tag ());
+      for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
+        const T *ref = i->basic_ptr (typename T::tag ());
         scanner.insert (ref, id++);
       }
 
 //  TODO: TODO: can we confine this search to the subject's (sized) bounding box?
-      for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
+      for (typename std::set<T>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert (i.operator-> (), interactions.next_id ());
       }
 
-      scanner.process (rec, op->dist (), db::box_convert<db::PolygonRef> ());
+      scanner.process (rec, op->dist (), db::box_convert<T> ());
 
     } else {
 
-      db::box_scanner2<db::PolygonRef, int, db::PolygonRef, int> scanner;
-      InteractionRegistrationShape2Shape rec (mp_subject_layout == mp_intruder_layout ? 0 : mp_subject_layout, &interactions);
+      db::box_scanner2<T, int, T, int> scanner;
+      interaction_registration_shape2shape<T> rec (mp_subject_layout == mp_intruder_layout ? 0 : mp_subject_layout, &interactions);
 
       unsigned int id = subject_id0;
-      for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-        const db::PolygonRef *ref = i->basic_ptr (db::PolygonRef::tag ());
+      for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
+        const T *ref = i->basic_ptr (typename T::tag ());
         scanner.insert1 (ref, id++);
       }
 
 //  TODO: can we confine this search to the subject's (sized) bounding box?
-      for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
+      for (typename std::set<T>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert2 (i.operator-> (), interactions.next_id ());
       }
 
       if (intruder_shapes) {
 //  TODO: can we confine this search to the subject's (sized) bounding box?
-        for (db::Shapes::shape_iterator i = intruder_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-          scanner.insert2 (i->basic_ptr (db::PolygonRef::tag ()), interactions.next_id ());
+        for (db::Shapes::shape_iterator i = intruder_shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
+          scanner.insert2 (i->basic_ptr (typename T::tag ()), interactions.next_id ());
         }
       }
 
-      scanner.process (rec, op->dist (), db::box_convert<db::PolygonRef> (), db::box_convert<db::PolygonRef> ());
+      scanner.process (rec, op->dist (), db::box_convert<T> (), db::box_convert<T> ());
 
     }
 
@@ -1287,12 +1405,12 @@ LocalProcessor::compute_local_cell (const db::LocalProcessorContexts &contexts, 
 
   if (! subject_shapes->empty () && ! ((! intruder_cell || intruder_cell->begin ().at_end ()) && intruders.first.empty ())) {
 
-    db::box_scanner2<db::PolygonRef, int, db::CellInstArray, int> scanner;
-    InteractionRegistrationShape2Inst rec (mp_subject_layout, mp_intruder_layout, contexts.intruder_layer (), op->dist (), &interactions);
+    db::box_scanner2<T, int, db::CellInstArray, int> scanner;
+    interaction_registration_shape2inst<T> rec (mp_subject_layout, mp_intruder_layout, contexts.intruder_layer (), op->dist (), &interactions);
 
     unsigned int id = subject_id0;
-    for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-      scanner.insert1 (i->basic_ptr (db::PolygonRef::tag ()), id++);
+    for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
+      scanner.insert1 (i->basic_ptr (typename T::tag ()), id++);
     }
 
     unsigned int inst_id = 0;
@@ -1319,12 +1437,15 @@ LocalProcessor::compute_local_cell (const db::LocalProcessorContexts &contexts, 
       }
     }
 
-    scanner.process (rec, op->dist (), db::box_convert<db::PolygonRef> (), inst_bci);
+    scanner.process (rec, op->dist (), db::box_convert<T> (), inst_bci);
 
   }
 
   op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio);
 }
+
+template class DB_PUBLIC local_processor<db::PolygonRef>;
+template class DB_PUBLIC local_processor<db::Edge>;
 
 }
 

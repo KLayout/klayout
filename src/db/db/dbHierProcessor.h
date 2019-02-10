@@ -42,19 +42,20 @@
 namespace db
 {
 
-class LocalProcessor;
-class LocalProcessorCellContext;
-class LocalProcessorContexts;
+template <class T> class local_processor;
+template <class T> class local_processor_cell_context;
+template <class T> class local_processor_contexts;
 
 //  TODO: move this somewhere else?
-class DB_PUBLIC ShapeInteractions
+template <class T>
+class DB_PUBLIC shape_interactions
 {
 public:
   typedef std::unordered_map<unsigned int, std::vector<unsigned int> > container;
   typedef container::const_iterator iterator;
   typedef container::value_type::second_type::const_iterator iterator2;
 
-  ShapeInteractions ();
+  shape_interactions ();
 
   iterator begin () const
   {
@@ -67,11 +68,11 @@ public:
   }
 
   bool has_shape_id (unsigned int id) const;
-  void add_shape (unsigned int id, const db::PolygonRef &shape);
-  void add_subject (unsigned int id, const db::PolygonRef &shape);
+  void add_shape (unsigned int id, const T &shape);
+  void add_subject (unsigned int id, const T &shape);
   void add_interaction (unsigned int subject_id, unsigned int intruder_id);
   const std::vector<unsigned int> &intruders_for (unsigned int subject_id) const;
-  const db::PolygonRef &shape (unsigned int id) const;
+  const T &shape (unsigned int id) const;
 
   unsigned int next_id ()
   {
@@ -80,43 +81,45 @@ public:
 
 private:
   std::unordered_map<unsigned int, std::vector<unsigned int> > m_interactions;
-  std::unordered_map<unsigned int, db::PolygonRef> m_shapes;
+  std::unordered_map<unsigned int, T> m_shapes;
   unsigned int m_id;
 };
 
 //  TODO: should be hidden (private data?)
-struct DB_PUBLIC LocalProcessorCellDrop
+template <class T>
+struct DB_PUBLIC local_processor_cell_drop
 {
-  LocalProcessorCellDrop (db::LocalProcessorCellContext *_parent_context, db::Cell *_parent, const db::ICplxTrans &_cell_inst)
+  local_processor_cell_drop (db::local_processor_cell_context<T> *_parent_context, db::Cell *_parent, const db::ICplxTrans &_cell_inst)
     : parent_context (_parent_context), parent (_parent), cell_inst (_cell_inst)
   {
     //  .. nothing yet ..
   }
 
-  db::LocalProcessorCellContext *parent_context;
+  db::local_processor_cell_context<T> *parent_context;
   db::Cell *parent;
   db::ICplxTrans cell_inst;
 };
 
 //  TODO: should be hidden (private data?)
-class DB_PUBLIC LocalProcessorCellContext
+template <class T>
+class DB_PUBLIC local_processor_cell_context
 {
 public:
   typedef std::pair<const db::Cell *, db::ICplxTrans> parent_inst_type;
-  typedef std::vector<LocalProcessorCellDrop>::const_iterator drop_iterator;
+  typedef typename std::vector<local_processor_cell_drop<T> >::const_iterator drop_iterator;
 
-  LocalProcessorCellContext ();
-  LocalProcessorCellContext (const LocalProcessorCellContext &other);
+  local_processor_cell_context ();
+  local_processor_cell_context (const local_processor_cell_context &other);
 
-  void add (db::LocalProcessorCellContext *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst);
-  void propagate (const std::unordered_set<db::PolygonRef> &res);
+  void add (db::local_processor_cell_context<T> *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst);
+  void propagate (const std::unordered_set<T> &res);
 
-  std::unordered_set<db::PolygonRef> &propagated ()
+  std::unordered_set<T> &propagated ()
   {
     return m_propagated;
   }
 
-  const std::unordered_set<db::PolygonRef> &propagated () const
+  const std::unordered_set<T> &propagated () const
   {
     return m_propagated;
   }
@@ -144,24 +147,25 @@ public:
   }
 
 private:
-  std::unordered_set<db::PolygonRef> m_propagated;
-  std::vector<LocalProcessorCellDrop> m_drops;
+  std::unordered_set<T> m_propagated;
+  std::vector<local_processor_cell_drop<T> > m_drops;
   tl::Mutex m_lock;
 };
 
-class DB_PUBLIC LocalProcessorCellContexts
+template <class T>
+class DB_PUBLIC local_processor_cell_contexts
 {
 public:
-  typedef std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > context_key_type;
-  typedef std::unordered_map<context_key_type, db::LocalProcessorCellContext> context_map_type;
-  typedef context_map_type::const_iterator iterator;
+  typedef std::pair<std::set<CellInstArray>, std::set<T> > context_key_type;
+  typedef std::unordered_map<context_key_type, db::local_processor_cell_context<T> > context_map_type;
+  typedef typename context_map_type::const_iterator iterator;
 
-  LocalProcessorCellContexts ();
-  LocalProcessorCellContexts (const db::Cell *intruder_cell);
+  local_processor_cell_contexts ();
+  local_processor_cell_contexts (const db::Cell *intruder_cell);
 
-  db::LocalProcessorCellContext *find_context (const context_key_type &intruders);
-  db::LocalProcessorCellContext *create (const context_key_type &intruders);
-  void compute_results (const LocalProcessorContexts &contexts, db::Cell *cell, const LocalOperation *op, unsigned int output_layer, const LocalProcessor *proc);
+  db::local_processor_cell_context<T> *find_context (const context_key_type &intruders);
+  db::local_processor_cell_context<T> *create (const context_key_type &intruders);
+  void compute_results (const local_processor_contexts<T> &contexts, db::Cell *cell, const local_operation<T> *op, unsigned int output_layer, const local_processor<T> *proc);
 
   iterator begin () const
   {
@@ -175,22 +179,23 @@ public:
 
 private:
   const db::Cell *mp_intruder_cell;
-  std::unordered_map<context_key_type, db::LocalProcessorCellContext> m_contexts;
+  std::unordered_map<context_key_type, db::local_processor_cell_context<T> > m_contexts;
 };
 
-class DB_PUBLIC LocalProcessorContexts
+template <class T>
+class DB_PUBLIC local_processor_contexts
 {
 public:
-  typedef std::unordered_map<db::Cell *, LocalProcessorCellContexts> contexts_per_cell_type;
-  typedef contexts_per_cell_type::iterator iterator;
+  typedef std::unordered_map<db::Cell *, local_processor_cell_contexts<T> > contexts_per_cell_type;
+  typedef typename contexts_per_cell_type::iterator iterator;
 
-  LocalProcessorContexts ()
+  local_processor_contexts ()
     : m_subject_layer (0), m_intruder_layer (0)
   {
     //  .. nothing yet ..
   }
 
-  LocalProcessorContexts (const LocalProcessorContexts &other)
+  local_processor_contexts (const local_processor_contexts &other)
     : m_contexts_per_cell (other.m_contexts_per_cell), m_subject_layer (other.m_subject_layer), m_intruder_layer (other.m_intruder_layer)
   {
     //  .. nothing yet ..
@@ -201,11 +206,11 @@ public:
     m_contexts_per_cell.clear ();
   }
 
-  LocalProcessorCellContexts &contexts_per_cell (db::Cell *subject_cell, const db::Cell *intruder_cell)
+  local_processor_cell_contexts<T> &contexts_per_cell (db::Cell *subject_cell, const db::Cell *intruder_cell)
   {
-    contexts_per_cell_type::iterator ctx = m_contexts_per_cell.find (subject_cell);
+    typename contexts_per_cell_type::iterator ctx = m_contexts_per_cell.find (subject_cell);
     if (ctx == m_contexts_per_cell.end ()) {
-      ctx = m_contexts_per_cell.insert (std::make_pair (subject_cell, LocalProcessorCellContexts (intruder_cell))).first;
+      ctx = m_contexts_per_cell.insert (std::make_pair (subject_cell, local_processor_cell_contexts<T> (intruder_cell))).first;
     }
     return ctx->second;
   }
@@ -256,30 +261,32 @@ private:
   mutable tl::Mutex m_lock;
 };
 
-class DB_PUBLIC LocalProcessorContextComputationTask
+template <class T>
+class DB_PUBLIC local_processor_context_computation_task
   : public tl::Task
 {
 public:
-  LocalProcessorContextComputationTask (const LocalProcessor *proc, LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist);
+  local_processor_context_computation_task (const local_processor<T> *proc, local_processor_contexts<T> &contexts, db::local_processor_cell_context<T> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<T>::context_key_type &intruders, db::Coord dist);
   void perform ();
 
 private:
-  const LocalProcessor *mp_proc;
-  LocalProcessorContexts *mp_contexts;
-  db::LocalProcessorCellContext *mp_parent_context;
+  const local_processor<T> *mp_proc;
+  local_processor_contexts<T> *mp_contexts;
+  db::local_processor_cell_context<T> *mp_parent_context;
   db::Cell *mp_subject_parent;
   db::Cell *mp_subject_cell;
   db::ICplxTrans m_subject_cell_inst;
   const db::Cell *mp_intruder_cell;
-  LocalProcessorCellContexts::context_key_type m_intruders;
+  typename local_processor_cell_contexts<T>::context_key_type m_intruders;
   db::Coord m_dist;
 };
 
-class DB_PUBLIC LocalProcessorContextComputationWorker
+template <class T>
+class DB_PUBLIC local_processor_context_computation_worker
   : public tl::Worker
 {
 public:
-  LocalProcessorContextComputationWorker ()
+  local_processor_context_computation_worker ()
     : tl::Worker ()
   {
     //  .. nothing yet ..
@@ -287,31 +294,33 @@ public:
 
   void perform_task (tl::Task *task)
   {
-    static_cast<LocalProcessorContextComputationTask *> (task)->perform ();
+    static_cast<local_processor_context_computation_task<T> *> (task)->perform ();
   }
 };
 
-class DB_PUBLIC LocalProcessorResultComputationTask
+template <class T>
+class DB_PUBLIC local_processor_result_computation_task
   : public tl::Task
 {
 public:
-  LocalProcessorResultComputationTask (const LocalProcessor *proc, LocalProcessorContexts &contexts, db::Cell *cell, LocalProcessorCellContexts *cell_contexts, const LocalOperation *op, unsigned int output_layer);
+  local_processor_result_computation_task (const local_processor<T> *proc, local_processor_contexts<T> &contexts, db::Cell *cell, local_processor_cell_contexts<T> *cell_contexts, const local_operation<T> *op, unsigned int output_layer);
   void perform ();
 
 private:
-  const LocalProcessor *mp_proc;
-  LocalProcessorContexts *mp_contexts;
+  const local_processor<T> *mp_proc;
+  local_processor_contexts<T> *mp_contexts;
   db::Cell *mp_cell;
-  LocalProcessorCellContexts *mp_cell_contexts;
-  const LocalOperation *mp_op;
+  local_processor_cell_contexts<T> *mp_cell_contexts;
+  const local_operation<T> *mp_op;
   unsigned int m_output_layer;
 };
 
-class DB_PUBLIC LocalProcessorResultComputationWorker
+template <class T>
+class DB_PUBLIC local_processor_result_computation_worker
   : public tl::Worker
 {
 public:
-  LocalProcessorResultComputationWorker ()
+  local_processor_result_computation_worker ()
     : tl::Worker ()
   {
     //  .. nothing yet ..
@@ -319,18 +328,19 @@ public:
 
   void perform_task (tl::Task *task)
   {
-    static_cast<LocalProcessorResultComputationTask *> (task)->perform ();
+    static_cast<local_processor_result_computation_task<T> *> (task)->perform ();
   }
 };
 
-class DB_PUBLIC LocalProcessor
+template <class T>
+class DB_PUBLIC local_processor
 {
 public:
-  LocalProcessor (db::Layout *layout, db::Cell *top);
-  LocalProcessor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_cell);
-  void run (LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer);
-  void compute_contexts (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer) const;
-  void compute_results (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int output_layer) const;
+  local_processor (db::Layout *layout, db::Cell *top);
+  local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_cell);
+  void run (local_operation<T> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer);
+  void compute_contexts (local_processor_contexts<T> &contexts, const local_operation<T> *op, unsigned int subject_layer, unsigned int intruder_layer) const;
+  void compute_results (local_processor_contexts<T> &contexts, const local_operation<T> *op, unsigned int output_layer) const;
 
   void set_description (const std::string &d)
   {
@@ -378,8 +388,8 @@ public:
   }
 
 private:
-  friend class LocalProcessorCellContexts;
-  friend class LocalProcessorContextComputationTask;
+  template<typename> friend class local_processor_cell_contexts;
+  template<typename> friend class local_processor_context_computation_task;
 
   db::Layout *mp_subject_layout;
   const db::Layout *mp_intruder_layout;
@@ -390,14 +400,14 @@ private:
   size_t m_max_vertex_count;
   double m_area_ratio;
   int m_base_verbosity;
-  mutable std::auto_ptr<tl::Job<LocalProcessorContextComputationWorker> > mp_cc_job;
+  mutable std::auto_ptr<tl::Job<local_processor_context_computation_worker<T> > > mp_cc_job;
 
-  std::string description (const LocalOperation *op) const;
-  void compute_contexts (db::LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist) const;
-  void do_compute_contexts (db::LocalProcessorCellContext *cell_context, const db::LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist) const;
-  void issue_compute_contexts (db::LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, LocalProcessorCellContexts::context_key_type &intruders, db::Coord dist) const;
-  void push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<db::PolygonRef> &result) const;
-  void compute_local_cell (const db::LocalProcessorContexts &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const LocalOperation *op, const LocalProcessorCellContexts::context_key_type &intruders, std::unordered_set<db::PolygonRef> &result) const;
+  std::string description (const local_operation<T> *op) const;
+  void compute_contexts (db::local_processor_contexts<T> &contexts, db::local_processor_cell_context<T> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const typename local_processor_cell_contexts<T>::context_key_type &intruders, db::Coord dist) const;
+  void do_compute_contexts (db::local_processor_cell_context<T> *cell_context, const db::local_processor_contexts<T> &contexts, db::local_processor_cell_context<T> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const typename local_processor_cell_contexts<T>::context_key_type &intruders, db::Coord dist) const;
+  void issue_compute_contexts (db::local_processor_contexts<T> &contexts, db::local_processor_cell_context<T> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<T>::context_key_type &intruders, db::Coord dist) const;
+  void push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<T> &result) const;
+  void compute_local_cell (const db::local_processor_contexts<T> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<T> *op, const typename local_processor_cell_contexts<T>::context_key_type &intruders, std::unordered_set<T> &result) const;
 };
 
 }
@@ -405,8 +415,8 @@ private:
 namespace tl
 {
 
-template <>
-struct type_traits<db::LocalProcessor> : public tl::type_traits<void>
+template <class T>
+struct type_traits<db::local_processor<T> > : public tl::type_traits<void>
 {
   //  mark "LocalProcessor" as not having a default ctor and no copy ctor
   typedef tl::false_tag has_default_constructor;

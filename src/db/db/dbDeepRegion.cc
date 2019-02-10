@@ -463,7 +463,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
 
   db::BoolAndOrNotLocalOperation op (and_op);
 
-  db::LocalProcessor proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
+  db::local_processor<db::PolygonRef> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (m_deep_layer.store ()->threads ());
   proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());

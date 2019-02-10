@@ -36,6 +36,7 @@ namespace db {
 class EdgeFilterBase;
 class FlatEdges;
 class EmptyEdges;
+class DeepShapeStore;
 
 /**
  *  @brief An edge set iterator
@@ -391,7 +392,7 @@ public:
    *  Creates an edge set representing a single instance of that object
    */
   template <class Sh>
-  Edges (const Sh &s)
+  explicit Edges (const Sh &s)
     : mp_delegate (0)
   {
     insert (s);
@@ -405,7 +406,7 @@ public:
    *  style.
    */
   template <class Iter>
-  Edges (const Iter &b, const Iter &e)
+  explicit Edges (const Iter &b, const Iter &e)
     : mp_delegate (0)
   {
     reserve (e - b);
@@ -420,7 +421,7 @@ public:
    *  Creates an edge set from a recursive shape iterator. This allows to feed an edge set
    *  from a hierarchy of cells.
    */
-  Edges (const RecursiveShapeIterator &si, bool as_edges = true);
+  explicit Edges (const RecursiveShapeIterator &si, bool as_edges = true);
 
   /**
    *  @brief Constructor from a RecursiveShapeIterator with a transformation
@@ -429,7 +430,20 @@ public:
    *  from a hierarchy of cells. The transformation is useful to scale to a specific
    *  DBU for example.
    */
-  Edges (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool as_edges = true, bool merged_semantics = true);
+  explicit Edges (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool as_edges = true, bool merged_semantics = true);
+
+  /**
+   *  @brief Constructor from a RecursiveShapeIterator providing a deep representation
+   *
+   *  This version will create a hierarchical edge collection. The DeepShapeStore needs to be provided
+   *  during the lifetime of the collection and acts as a heap for optimized data.
+   */
+  explicit Edges (const RecursiveShapeIterator &si, DeepShapeStore &dss, bool as_edges = true);
+
+  /**
+   *  @brief Constructor from a RecursiveShapeIterator providing a deep representation with transformation
+   */
+  explicit Edges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges = true, bool merged_semantics = true);
 
   /**
    *  @brief Gets the underlying delegate object
@@ -1281,6 +1295,16 @@ public:
   bool operator< (const db::Edges &other) const
   {
     return mp_delegate->less (other);
+  }
+
+  /**
+   *  @brief Inserts the edge collection into the given layout, cell and layer
+   *  If the edge collection is a hierarchical region, the hierarchy is copied into the
+   *  layout's hierarchy.
+   */
+  void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+  {
+    return mp_delegate->insert_into (layout, into_cell, into_layer);
   }
 
 private:

@@ -246,8 +246,12 @@ public:
    *  This method will create a new layer inside the deep shape store as a
    *  working copy of the original layer. This method creates a layer
    *  for edges.
+   *
+   *  If "as_edges" is true, polygons and boxes will be converted into edges. Otherwise
+   *  only edge objects are taken from the shape iterator. Note that the shape iterator
+   *  must be configured to deliver all shape types if "as_edges" is true.
    */
-  DeepLayer create_edge_layer (const db::RecursiveShapeIterator &si);
+  DeepLayer create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges);
 
   /**
    *  @brief Inserts the deep layer's shapes into some target layout

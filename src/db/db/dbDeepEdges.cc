@@ -87,14 +87,14 @@ private:
 // -------------------------------------------------------------------------------------------------------------
 //  DeepEdges implementation
 
-DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss)
-  : AsIfFlatEdges (), m_deep_layer (dss.create_edge_layer (si)), m_merged_edges ()
+DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, bool as_edges)
+  : AsIfFlatEdges (), m_deep_layer (dss.create_edge_layer (si, as_edges)), m_merged_edges ()
 {
   init ();
 }
 
-DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics)
-  : AsIfFlatEdges (), m_deep_layer (dss.create_edge_layer (si)), m_merged_edges ()
+DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges, bool merged_semantics)
+  : AsIfFlatEdges (), m_deep_layer (dss.create_edge_layer (si, as_edges)), m_merged_edges ()
 {
   init ();
 

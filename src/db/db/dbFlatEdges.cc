@@ -88,6 +88,11 @@ void FlatEdges::init ()
   m_merged_edges_valid = false;
 }
 
+void FlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+{
+  layout->cell (into_cell).shapes (into_layer).insert (m_edges);
+}
+
 void FlatEdges::merged_semantics_changed ()
 {
   m_merged_edges.clear ();

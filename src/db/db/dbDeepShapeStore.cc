@@ -393,7 +393,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   return DeepLayer (this, layout_index, layer_index);
 }
 
-DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si)
+DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges)
 {
   unsigned int layout_index = layout_for_iter (si);
 
@@ -404,7 +404,7 @@ DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &s
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing clipped and reduced polygon references
-  db::EdgeBuildingHierarchyBuilderShapeReceiver refs;
+  db::EdgeBuildingHierarchyBuilderShapeReceiver refs (as_edges);
 
   //  Build the working hierarchy from the recursive shape iterator
   try {

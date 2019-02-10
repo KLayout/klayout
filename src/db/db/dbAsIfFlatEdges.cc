@@ -926,5 +926,17 @@ AsIfFlatEdges::less (const Edges &other) const
   return false;
 }
 
+void
+AsIfFlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+{
+  //  improves performance when inserting an original layout into the same layout
+  db::LayoutLocker locker (layout);
+
+  db::Shapes &shapes = layout->cell (into_cell).shapes (into_layer);
+  for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
+    shapes.insert (*e);
+  }
+}
+
 }
 

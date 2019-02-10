@@ -600,13 +600,19 @@ void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Polygon &sha
 
 // ---------------------------------------------------------------------------------------------
 
+EdgeBuildingHierarchyBuilderShapeReceiver::EdgeBuildingHierarchyBuilderShapeReceiver (bool as_edges)
+  : m_as_edges (as_edges)
+{
+  //  .. nothing yet ..
+}
+
 void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
-  if (shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ()) {
+  if (m_as_edges && (shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ())) {
     db::Polygon poly;
     shape.polygon (poly);
     push (poly, region, complex_region, target);
-  } else if (shape.is_box ()) {
+  } else if (m_as_edges && shape.is_box ()) {
     push (shape.box (), region, complex_region, target);
   } else if (shape.is_edge ()) {
     target->insert (shape.edge ());
@@ -615,7 +621,7 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, co
 
 void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Box &box, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
-  if (! box.empty ()) {
+  if (m_as_edges && ! box.empty ()) {
     target->insert (db::Edge (box.p1 (), box.upper_left ()));
     target->insert (db::Edge (box.upper_left (), box.p2 ()));
     target->insert (db::Edge (box.p2 (), box.lower_right ()));
@@ -625,8 +631,10 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Box &box, const 
 
 void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Polygon &poly, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
-  for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-    target->insert (*e);
+  if (m_as_edges) {
+    for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
+      target->insert (*e);
+    }
   }
 }
 

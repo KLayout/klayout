@@ -155,9 +155,14 @@ class DB_PUBLIC EdgeBuildingHierarchyBuilderShapeReceiver
   : public HierarchyBuilderShapeReceiver
 {
 public:
+  EdgeBuildingHierarchyBuilderShapeReceiver (bool as_edges);
+
   virtual void push (const db::Shape &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
   virtual void push (const db::Box &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
   virtual void push (const db::Polygon &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
+
+private:
+  bool m_as_edges;
 };
 
 /**

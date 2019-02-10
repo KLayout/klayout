@@ -109,6 +109,8 @@ public:
   virtual size_t size () const;
   virtual bool is_merged () const;
 
+  virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter);
 
   virtual EdgesDelegate *add_in_place (const Edges &other);

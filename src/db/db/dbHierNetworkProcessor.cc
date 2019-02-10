@@ -202,14 +202,14 @@ template <class Trans>
 static bool
 interaction_test (const db::Edge &a, const db::Edge &b, const Trans &trans)
 {
-  return a.intersect (b.transformed (trans));
+  return a.coincident (b.transformed (trans));
 }
 
 template <class C>
 static bool
 interaction_test (const db::Edge &a, const db::Edge &b, const db::unit_trans<C> &)
 {
-  return a.intersect (b);
+  return a.coincident (b);
 }
 
 template <class T, class Trans>

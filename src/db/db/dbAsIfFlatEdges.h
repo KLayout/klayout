@@ -154,6 +154,8 @@ public:
   virtual bool equals (const Edges &other) const;
   virtual bool less (const Edges &other) const;
 
+  virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+
 protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();

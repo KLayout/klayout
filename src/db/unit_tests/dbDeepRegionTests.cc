@@ -57,6 +57,9 @@ TEST(1)
 
     regions.push_back (db::Region (iter, dss));
 
+    EXPECT_EQ (regions.back ().size (), db::Region (iter).size ());
+    EXPECT_EQ (regions.back ().bbox (), db::Region (iter).bbox ());
+
   }
 
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));

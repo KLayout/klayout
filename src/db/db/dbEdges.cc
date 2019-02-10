@@ -21,6 +21,7 @@
 */
 
 #include "dbEdges.h"
+#include "dbDeepEdges.h"
 #include "dbOriginalLayerEdges.h"
 #include "dbEmptyEdges.h"
 #include "dbFlatEdges.h"
@@ -89,6 +90,16 @@ Edges::Edges (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, boo
       fe->insert (s.shape (), trans * s.trans ());
     }
   }
+}
+
+Edges::Edges (const RecursiveShapeIterator &si, DeepShapeStore &dss, bool as_edges)
+{
+  mp_delegate = new DeepEdges (si, dss, as_edges);
+}
+
+Edges::Edges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges, bool merged_semantics)
+{
+  mp_delegate = new DeepEdges (si, dss, trans, as_edges, merged_semantics);
 }
 
 const db::RecursiveShapeIterator &

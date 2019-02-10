@@ -63,6 +63,7 @@ class LibraryProxy;
 class CellMapping;
 class LayerMapping;
 class Region;
+class Edges;
 
 template <class Coord> class generic_repository;
 typedef generic_repository<db::Coord> GenericRepository;
@@ -1101,6 +1102,15 @@ public:
    *  given cell.
    */
   void insert (db::cell_index_type cell, int layer, const db::Region &region);
+
+  /**
+   *  @brief Inserts a edge collection (potentially hierarchical) into the given cell and layer
+   *
+   *  If the edge collection is flat (conceptionally), it will be put into the cell.
+   *  If the edge collection is hierarchical, a cell hierarchy will be built below the
+   *  given cell.
+   */
+  void insert (db::cell_index_type cell, int layer, const db::Edges &edges);
 
   /**
    *  @brief Delete a cell plus all subcells 

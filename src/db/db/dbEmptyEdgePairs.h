@@ -74,6 +74,8 @@ public:
   virtual bool equals (const EdgePairs &other) const;
   virtual bool less (const EdgePairs &other) const;
 
+  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
+
 private:
   EmptyEdgePairs &operator= (const EmptyEdgePairs &other);
 };

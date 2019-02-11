@@ -254,6 +254,15 @@ public:
   DeepLayer create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges);
 
   /**
+   *  @brief Inserts an edge pair layer into the deep shape store
+   *
+   *  This method will create a new layer inside the deep shape store as a
+   *  working copy of the original layer. This method creates a layer
+   *  for edge pairs.
+   */
+  DeepLayer create_edge_pair_layer (const db::RecursiveShapeIterator &si);
+
+  /**
    *  @brief Inserts the deep layer's shapes into some target layout
    */
   void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);

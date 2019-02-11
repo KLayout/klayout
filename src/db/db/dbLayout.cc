@@ -654,6 +654,12 @@ Layout::insert (db::cell_index_type cell, int layer, const db::Edges &edges)
 }
 
 void
+Layout::insert (db::cell_index_type cell, int layer, const db::EdgePairs &edge_pairs)
+{
+  edge_pairs.insert_into (this, cell, layer);
+}
+
+void
 Layout::flatten (const db::Cell &source_cell, db::Cell &target_cell, const db::ICplxTrans &t, int levels)
 {
   db::ICplxTrans tt = t;

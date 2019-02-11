@@ -35,6 +35,7 @@ class EdgePairs;
 class EdgePairFilterBase;
 class RegionDelegate;
 class EdgesDelegate;
+class Layout;
 
 /**
  *  @brief The edge pair set iterator delegate
@@ -107,6 +108,8 @@ public:
 
   virtual bool equals (const EdgePairs &other) const = 0;
   virtual bool less (const EdgePairs &other) const = 0;
+
+  virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const = 0;
 
 protected:
   const std::string &progress_desc () const

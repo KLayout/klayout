@@ -640,4 +640,16 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Polygon &poly, c
 
 // ---------------------------------------------------------------------------------------------
 
+EdgePairBuildingHierarchyBuilderShapeReceiver::EdgePairBuildingHierarchyBuilderShapeReceiver ()
+{
+  //  .. nothing yet ..
+}
+
+void EdgePairBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box & /*region*/, const db::RecursiveShapeReceiver::box_tree_type * /*complex_region*/, db::Shapes *target)
+{
+  if (shape.is_edge_pair ()) {
+    target->insert (shape.edge_pair ());
+  }
+}
+
 }

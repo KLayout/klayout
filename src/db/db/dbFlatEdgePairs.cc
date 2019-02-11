@@ -181,6 +181,12 @@ const db::RecursiveShapeIterator *FlatEdgePairs::iter () const
 }
 
 void
+FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+{
+  layout->cell (into_cell).shapes (into_layer).insert (m_edge_pairs);
+}
+
+void
 FlatEdgePairs::insert (const db::EdgePair &ep)
 {
   m_edge_pairs.insert (ep);

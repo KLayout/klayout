@@ -26,6 +26,7 @@
 #include "dbEdgePairs.h"
 #include "dbEmptyEdgePairs.h"
 #include "dbFlatEdgePairs.h"
+#include "dbDeepEdgePairs.h"
 #include "dbOriginalLayerEdgePairs.h"
 #include "dbEdges.h"
 #include "dbRegion.h"
@@ -77,6 +78,16 @@ EdgePairs::EdgePairs (const RecursiveShapeIterator &si)
 EdgePairs::EdgePairs (const RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
   mp_delegate = new OriginalLayerEdgePairs (si, trans);
+}
+
+EdgePairs::EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss)
+{
+  mp_delegate = new DeepEdgePairs (si, dss);
+}
+
+EdgePairs::EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans)
+{
+  mp_delegate = new DeepEdgePairs (si, dss, trans);
 }
 
 template <class Sh>

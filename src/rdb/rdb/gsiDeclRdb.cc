@@ -286,7 +286,7 @@ static void scan_edges (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans
 
 static void scan_edge_pairs (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, const db::EdgePairs &edge_pairs, bool flat)
 {
-  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it; /* @@@ = edges.begin_iter (); */
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = edge_pairs.begin_iter ();
   rdb::scan_layer (cat, cell, trans * it.second, it.first, flat);
 }
 

@@ -697,6 +697,7 @@ class RDB_TestClass < TestBase
 
   end
 
+  # scan_... methods
   def test_11
 
     ly = RBA::Layout::new

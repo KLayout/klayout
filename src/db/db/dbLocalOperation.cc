@@ -45,7 +45,7 @@ BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
   //  .. nothing yet ..
 }
 
-local_operation<db::PolygonRef, db::PolygonRef>::on_empty_intruder_mode
+local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>::on_empty_intruder_mode
 BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
   return m_is_and ? local_operation::Drop : local_operation::Copy;

@@ -49,7 +49,7 @@ template <class TS, class TI> class shape_interactions;
  *  This class implements the actual operation. It receives a
  *  cluster of subject shapes vs. corresponding intruder shapes.
  */
-template <class TS, class TI>
+template <class TS, class TI, class TR>
 class DB_PUBLIC local_operation
 {
 public:
@@ -89,7 +89,7 @@ public:
    *  @param interactions The interaction set
    *  @param result The container to which the results are written
    */
-  virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::unordered_set<TS> &result, size_t max_vertex_count, double area_ratio) const = 0;
+  virtual void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::unordered_set<TR> &result, size_t max_vertex_count, double area_ratio) const = 0;
 
   /**
    *  @brief Indicates the desired behaviour when a shape does not have an intruder
@@ -112,7 +112,7 @@ public:
  *  @brief Implements a boolean AND or NOT operation
  */
 class DB_PUBLIC BoolAndOrNotLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef>
+  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
 {
 public:
   BoolAndOrNotLocalOperation (bool is_and);
@@ -131,7 +131,7 @@ private:
  *  the original shapes overlap at least "wrap_count" times.
  */
 class DB_PUBLIC SelfOverlapMergeLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef>
+  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
 {
 public:
   SelfOverlapMergeLocalOperation (unsigned int wrap_count);

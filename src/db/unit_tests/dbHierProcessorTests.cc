@@ -140,15 +140,15 @@ static void normalize_layer (db::Layout &layout, unsigned int layer)
 }
 
 
-static std::string contexts_to_s (db::Layout *layout, db::local_processor_contexts<db::PolygonRef, db::PolygonRef> &contexts)
+static std::string contexts_to_s (db::Layout *layout, db::local_processor_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef> &contexts)
 {
   std::string res;
 
   for (db::Layout::top_down_const_iterator i = layout->begin_top_down (); i != layout->end_top_down(); ++i) {
-    db::local_processor_contexts<db::PolygonRef, db::PolygonRef>::iterator cc = contexts.context_map ().find (&layout->cell (*i));
+    db::local_processor_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>::iterator cc = contexts.context_map ().find (&layout->cell (*i));
     if (cc != contexts.context_map ().end ()) {
       int index = 1;
-      for (db::local_processor_cell_contexts<db::PolygonRef, db::PolygonRef>::iterator j = cc->second.begin (); j != cc->second.end (); ++j) {
+      for (db::local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>::iterator j = cc->second.begin (); j != cc->second.end (); ++j) {
         res += tl::sprintf ("%s[%d] %d insts, %d shapes (%d times)\n", layout->cell_name (*i), index, int (j->first.first.size ()), int (j->first.second.size ()), int (j->second.size ()));
         index += 1;
       }
@@ -203,7 +203,7 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
     normalize_layer (layout_org, l2);
   }
 
-  db::local_operation<db::PolygonRef, db::PolygonRef> *lop = 0;
+  db::local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> *lop = 0;
   db::BoolAndOrNotLocalOperation bool_op (mode == TMAnd || mode == TMAndSwapped);
   db::SelfOverlapMergeLocalOperation self_intersect_op (2);
   BoolAndOrNotWithSizedLocalOperation sized_bool_op (mode == TMAnd || mode == TMAndSwapped, dist);
@@ -224,7 +224,7 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
 
   if (single) {
 
-    db::local_processor<db::PolygonRef, db::PolygonRef> proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
+    db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
     proc.set_threads (nthreads);
     proc.set_area_ratio (3.0);
     proc.set_max_vertex_count (16);
@@ -232,7 +232,7 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
     if (! context_doc) {
       proc.run (lop, l1, l2, lout);
     } else {
-      db::local_processor_contexts<db::PolygonRef, db::PolygonRef> contexts;
+      db::local_processor_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef> contexts;
       proc.compute_contexts (contexts, lop, l1, l2);
       *context_doc = contexts_to_s (&layout_org, contexts);
       proc.compute_results (contexts, lop, lout);
@@ -242,7 +242,7 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
 
     db::Layout layout_org2 = layout_org;
 
-    db::local_processor<db::PolygonRef, db::PolygonRef> proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &layout_org2, &layout_org2.cell (*layout_org2.begin_top_down ()));
+    db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &layout_org2, &layout_org2.cell (*layout_org2.begin_top_down ()));
     proc.set_threads (nthreads);
     proc.set_area_ratio (3.0);
     proc.set_max_vertex_count (16);
@@ -250,7 +250,7 @@ static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode m
     if (! context_doc) {
       proc.run (lop, l1, l2, lout);
     } else {
-      db::local_processor_contexts<db::PolygonRef, db::PolygonRef> contexts;
+      db::local_processor_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef> contexts;
       proc.compute_contexts (contexts, lop, l1, l2);
       *context_doc = contexts_to_s (&layout_org, contexts);
       proc.compute_results (contexts, lop, lout);

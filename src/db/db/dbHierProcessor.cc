@@ -158,13 +158,13 @@ public:
 };
 
 template <class Ref, class Trans>
-class shape_reference_translator_with_trans
+class shape_reference_translator_with_trans_from_shape_ref
 {
 public:
   typedef typename Ref::shape_type shape_type;
   typedef typename Ref::trans_type ref_trans_type;
 
-  shape_reference_translator_with_trans (db::Layout *target_layout, const Trans &trans)
+  shape_reference_translator_with_trans_from_shape_ref (db::Layout *target_layout, const Trans &trans)
     : mp_layout (target_layout), m_trans (trans), m_ref_trans (trans), m_bare_trans (Trans (m_ref_trans.inverted ()) * trans)
   {
     //  .. nothing yet ..
@@ -205,10 +205,22 @@ private:
 };
 
 template <class Trans>
-class shape_reference_translator_with_trans<db::Edge, Trans>
+class shape_reference_translator_with_trans<db::PolygonRef, Trans>
+  : public shape_reference_translator_with_trans_from_shape_ref<db::PolygonRef, Trans>
 {
 public:
-  typedef typename db::Edge shape_type;
+  shape_reference_translator_with_trans (db::Layout *target_layout, const Trans &trans)
+    : shape_reference_translator_with_trans_from_shape_ref<db::PolygonRef, Trans> (target_layout, trans)
+  {
+    //  .. nothing yet ..
+  }
+};
+
+template <class Sh, class Trans>
+class shape_reference_translator_with_trans
+{
+public:
+  typedef Sh shape_type;
 
   shape_reference_translator_with_trans (db::Layout * /*target_layout*/, const Trans &trans)
     : m_trans (trans)
@@ -228,44 +240,44 @@ private:
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorCellContext implementation
 
-template <class TS, class TI>
-local_processor_cell_context<TS, TI>::local_processor_cell_context ()
+template <class TS, class TI, class TR>
+local_processor_cell_context<TS, TI, TR>::local_processor_cell_context ()
 {
   //  .. nothing yet ..
 }
 
-template <class TS, class TI>
-local_processor_cell_context<TS, TI>::local_processor_cell_context (const local_processor_cell_context &other)
+template <class TS, class TI, class TR>
+local_processor_cell_context<TS, TI, TR>::local_processor_cell_context (const local_processor_cell_context &other)
   : m_propagated (other.m_propagated), m_drops (other.m_drops)
 {
   //  .. nothing yet ..
 }
 
-template <class TS, class TI>
+template <class TS, class TI, class TR>
 void
-local_processor_cell_context<TS, TI>::add (db::local_processor_cell_context<TS, TI> *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst)
+local_processor_cell_context<TS, TI, TR>::add (db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst)
 {
-  m_drops.push_back (local_processor_cell_drop<TS, TI> (parent_context, parent, cell_inst));
+  m_drops.push_back (local_processor_cell_drop<TS, TI, TR> (parent_context, parent, cell_inst));
 }
 
-template <class TS, class TI>
+template <class TS, class TI, class TR>
 void
-local_processor_cell_context<TS, TI>::propagate (const std::unordered_set<TS> &res)
+local_processor_cell_context<TS, TI, TR>::propagate (const std::unordered_set<TR> &res)
 {
   if (res.empty ()) {
     return;
   }
 
-  for (typename std::vector<local_processor_cell_drop<TS, TI> >::const_iterator d = m_drops.begin (); d != m_drops.end (); ++d) {
+  for (typename std::vector<local_processor_cell_drop<TS, TI, TR> >::const_iterator d = m_drops.begin (); d != m_drops.end (); ++d) {
 
     tl_assert (d->parent_context != 0);
     tl_assert (d->parent != 0);
 
     db::Layout *subject_layout = d->parent->layout ();
-    shape_reference_translator_with_trans<TS, db::ICplxTrans> rt (subject_layout, d->cell_inst);
-    std::vector<TS> new_refs;
+    shape_reference_translator_with_trans<TR, db::ICplxTrans> rt (subject_layout, d->cell_inst);
+    std::vector<TR> new_refs;
     new_refs.reserve (res.size ());
-    for (typename std::unordered_set<TS>::const_iterator r = res.begin (); r != res.end (); ++r) {
+    for (typename std::unordered_set<TR>::const_iterator r = res.begin (); r != res.end (); ++r) {
       new_refs.push_back (rt (*r));
     }
 
@@ -277,46 +289,48 @@ local_processor_cell_context<TS, TI>::propagate (const std::unordered_set<TS> &r
   }
 }
 
-template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Polygon>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Polygon, db::Edge>;
+template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Polygon, db::EdgePair>;
 
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorCellContexts implementation
 
-template <class TS, class TI>
-local_processor_cell_contexts<TS, TI>::local_processor_cell_contexts ()
+template <class TS, class TI, class TR>
+local_processor_cell_contexts<TS, TI, TR>::local_processor_cell_contexts ()
   : mp_intruder_cell (0)
 {
   //  .. nothing yet ..
 }
 
-template <class TS, class TI>
-local_processor_cell_contexts<TS, TI>::local_processor_cell_contexts (const db::Cell *intruder_cell)
+template <class TS, class TI, class TR>
+local_processor_cell_contexts<TS, TI, TR>::local_processor_cell_contexts (const db::Cell *intruder_cell)
   : mp_intruder_cell (intruder_cell)
 {
   //  .. nothing yet ..
 }
 
-template <class TS, class TI>
-db::local_processor_cell_context<TS, TI> *
-local_processor_cell_contexts<TS, TI>::find_context (const context_key_type &intruders)
+template <class TS, class TI, class TR>
+db::local_processor_cell_context<TS, TI, TR> *
+local_processor_cell_contexts<TS, TI, TR>::find_context (const context_key_type &intruders)
 {
-  typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI> >::iterator c = m_contexts.find (intruders);
+  typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> >::iterator c = m_contexts.find (intruders);
   return c != m_contexts.end () ? &c->second : 0;
 }
 
-template <class TS, class TI>
-db::local_processor_cell_context<TS, TI> *
-local_processor_cell_contexts<TS, TI>::create (const context_key_type &intruders)
+template <class TS, class TI, class TR>
+db::local_processor_cell_context<TS, TI, TR> *
+local_processor_cell_contexts<TS, TI, TR>::create (const context_key_type &intruders)
 {
   return &m_contexts[intruders];
 }
 
-template <class T>
+template <class TS, class TI>
 static void
-subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout, const db::local_processor<db::PolygonRef, T> *proc)
+subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout, const db::local_processor<TS, TI, db::PolygonRef> *proc)
 {
   if (other.empty ()) {
     return;
@@ -354,22 +368,23 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
   ep.process (pg, op);
 }
 
-template <class T>
+template <class TS, class TI, class TR>
 static void
-subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> &other, db::Layout * /*layout*/, const db::local_processor<db::Edge, T> * /*proc*/)
+subtract (std::unordered_set<TR> &res, const std::unordered_set<TR> &other, db::Layout * /*layout*/, const db::local_processor<TS, TI, TR> * /*proc*/)
 {
   //  for edges, we don't use a boolean core but just set intersection
-  for (std::unordered_set<db::Edge>::const_iterator o = other.begin (); o != other.end (); ++o) {
+  for (typename std::unordered_set<TR>::const_iterator o = other.begin (); o != other.end (); ++o) {
     res.erase (*o);
   }
 }
 
 namespace {
 
-template <class TS, class TI>
+template <class TS, class TI, class TR>
 struct context_sorter
 {
-  bool operator () (const std::pair<const typename local_processor_cell_contexts<TS, TI>::context_key_type *, db::local_processor_cell_context<TS, TI> *> &a, const std::pair<const typename local_processor_cell_contexts<TS, TI>::context_key_type *, db::local_processor_cell_context<TS, TI> *> &b)
+  bool operator () (const std::pair<const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> &a,
+                    const std::pair<const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> &b)
   {
     return *a.first < *b.first;
   }
@@ -377,14 +392,14 @@ struct context_sorter
 
 }
 
-template <class TS, class TI>
+template <class TS, class TI, class TR>
 void
-local_processor_cell_contexts<TS, TI>::compute_results (const local_processor_contexts<TS, TI> &contexts, db::Cell *cell, const local_operation<TS, TI> *op, unsigned int output_layer, const local_processor<TS, TI> *proc)
+local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processor_contexts<TS, TI, TR> &contexts, db::Cell *cell, const local_operation<TS, TI, TR> *op, unsigned int output_layer, const local_processor<TS, TI, TR> *proc)
 {
   CRONOLOGY_COMPUTE_BRACKET(event_compute_results)
 
   bool first = true;
-  std::unordered_set<TS> common;
+  std::unordered_set<TR> common;
 
   int index = 0;
   int total = int (m_contexts.size ());
@@ -392,15 +407,15 @@ local_processor_cell_contexts<TS, TI>::compute_results (const local_processor_co
   //  NOTE: we use the ordering provided by key_type::operator< rather than the unordered map to achieve
   //  reproducability across different platforms. unordered_map is faster, but for processing them,
   //  strict ordering is a more robust choice.
-  std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI> *> > sorted_contexts;
+  std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> > sorted_contexts;
   sorted_contexts.reserve (m_contexts.size ());
-  for (typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI> >::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
+  for (typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> >::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
     sorted_contexts.push_back (std::make_pair (&c->first, &c->second));
   }
 
-  std::sort (sorted_contexts.begin (), sorted_contexts.end (), context_sorter<TS, TI> ());
+  std::sort (sorted_contexts.begin (), sorted_contexts.end (), context_sorter<TS, TI, TR> ());
 
-  for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI> *> >::const_iterator c = sorted_contexts.begin (); c != sorted_contexts.end (); ++c) {
+  for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> >::const_iterator c = sorted_contexts.begin (); c != sorted_contexts.end (); ++c) {
 
     ++index;
 
@@ -421,7 +436,7 @@ local_processor_cell_contexts<TS, TI>::compute_results (const local_processor_co
 
     } else {
 
-      std::unordered_set<TS> res;
+      std::unordered_set<TR> res;
       {
         tl::MutexLocker locker (&c->second->lock ());
         res = c->second->propagated ();
@@ -441,8 +456,8 @@ local_processor_cell_contexts<TS, TI>::compute_results (const local_processor_co
 
         CRONOLOGY_COMPUTE_BRACKET(event_propagate)
 
-        std::unordered_set<TS> lost;
-        for (typename std::unordered_set<TS>::const_iterator i = common.begin (); i != common.end (); ++i) {
+        std::unordered_set<TR> lost;
+        for (typename std::unordered_set<TR>::const_iterator i = common.begin (); i != common.end (); ++i) {
           if (res.find (*i) == res.end ()) {
             lost.insert (*i);
           }
@@ -454,15 +469,15 @@ local_processor_cell_contexts<TS, TI>::compute_results (const local_processor_co
 
           if (! lost.empty ()) {
             subtract (common, lost, cell->layout (), proc);
-            for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI> *> >::const_iterator cc = sorted_contexts.begin (); cc != c; ++cc) {
+            for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> >::const_iterator cc = sorted_contexts.begin (); cc != c; ++cc) {
               cc->second->propagate (lost);
             }
           }
 
         }
 
-        std::unordered_set<TS> gained;
-        for (typename std::unordered_set<TS>::const_iterator i = res.begin (); i != res.end (); ++i) {
+        std::unordered_set<TR> gained;
+        for (typename std::unordered_set<TR>::const_iterator i = res.begin (); i != res.end (); ++i) {
           if (common.find (*i) == common.end ()) {
             gained.insert (*i);
           }
@@ -487,10 +502,12 @@ local_processor_cell_contexts<TS, TI>::compute_results (const local_processor_co
   proc->push_results (cell, output_layer, common);
 }
 
-template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::PolygonRef>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Edge, db::EdgePair>;
 
 // ---------------------------------------------------------------------------------------------
 
@@ -922,8 +939,8 @@ private:
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorContextComputationTask implementation
 
-template <class TS, class TI>
-local_processor_context_computation_task<TS, TI>::local_processor_context_computation_task (const local_processor<TS, TI> *proc, local_processor_contexts<TS, TI> &contexts, db::local_processor_cell_context<TS, TI> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<TS, TI>::context_key_type &intruders, db::Coord dist)
+template <class TS, class TI, class TR>
+local_processor_context_computation_task<TS, TI, TR>::local_processor_context_computation_task (const local_processor<TS, TI, TR> *proc, local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist)
   : tl::Task (),
     mp_proc (proc), mp_contexts (&contexts), mp_parent_context (parent_context),
     mp_subject_parent (subject_parent), mp_subject_cell (subject_cell), m_subject_cell_inst (subject_cell_inst),
@@ -933,31 +950,33 @@ local_processor_context_computation_task<TS, TI>::local_processor_context_comput
   m_intruders.swap (intruders);
 }
 
-template <class TS, class TI>
+template <class TS, class TI, class TR>
 void
-local_processor_context_computation_task<TS, TI>::perform ()
+local_processor_context_computation_task<TS, TI, TR>::perform ()
 {
   mp_proc->compute_contexts (*mp_contexts, mp_parent_context, mp_subject_parent, mp_subject_cell, m_subject_cell_inst, mp_intruder_cell, m_intruders, m_dist);
 }
 
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge, db::EdgePair>;
 
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorResultComputationTask implementation
 
-template <class TS, class TI>
-local_processor_result_computation_task<TS, TI>::local_processor_result_computation_task (const local_processor<TS, TI> *proc, local_processor_contexts<TS, TI> &contexts, db::Cell *cell, local_processor_cell_contexts<TS, TI> *cell_contexts, const local_operation<TS, TI> *op, unsigned int output_layer)
+template <class TS, class TI, class TR>
+local_processor_result_computation_task<TS, TI, TR>::local_processor_result_computation_task (const local_processor<TS, TI, TR> *proc, local_processor_contexts<TS, TI, TR> &contexts, db::Cell *cell, local_processor_cell_contexts<TS, TI, TR> *cell_contexts, const local_operation<TS, TI, TR> *op, unsigned int output_layer)
   : mp_proc (proc), mp_contexts (&contexts), mp_cell (cell), mp_cell_contexts (cell_contexts), mp_op (op), m_output_layer (output_layer)
 {
   //  .. nothing yet ..
 }
 
-template <class TS, class TI>
+template <class TS, class TI, class TR>
 void
-local_processor_result_computation_task<TS, TI>::perform ()
+local_processor_result_computation_task<TS, TI, TR>::perform ()
 {
   mp_cell_contexts->compute_results (*mp_contexts, mp_cell, mp_op, m_output_layer, mp_proc);
 
@@ -966,13 +985,13 @@ local_processor_result_computation_task<TS, TI>::perform ()
     tl::MutexLocker locker (& mp_contexts->lock ());
 
 #if defined(ENABLE_DB_HP_SANITY_ASSERTIONS)
-    std::set<const db::local_processor_cell_context<TS, TI> *> td;
-    for (typename db::local_processor_cell_contexts<TS, TI>::iterator i = mp_cell_contexts->begin (); i != mp_cell_contexts->end (); ++i) {
+    std::set<const db::local_processor_cell_context<TS, TI, TR> *> td;
+    for (typename db::local_processor_cell_contexts<TS, TI, TR>::iterator i = mp_cell_contexts->begin (); i != mp_cell_contexts->end (); ++i) {
       td.insert (&i->second);
     }
-    for (typename db::local_processor_cell_contexts<TS, TI>::contexts_per_cell_type::iterator pcc = mp_contexts->context_map ().begin (); pcc != mp_contexts->context_map ().end (); ++pcc) {
-      for (typename db::local_processor_cell_contexts<TS, TI>::iterator i = pcc->second.begin (); i != pcc->second.end (); ++i) {
-        for (typename db::local_processor_cell_context<TS, TI>::drop_iterator j = i->second.begin_drops (); j != i->second.end_drops (); ++j) {
+    for (typename db::local_processor_cell_contexts<TS, TI, TR>::contexts_per_cell_type::iterator pcc = mp_contexts->context_map ().begin (); pcc != mp_contexts->context_map ().end (); ++pcc) {
+      for (typename db::local_processor_cell_contexts<TS, TI, TR>::iterator i = pcc->second.begin (); i != pcc->second.end (); ++i) {
+        for (typename db::local_processor_cell_context<TS, TI, TR>::drop_iterator j = i->second.begin_drops (); j != i->second.end_drops (); ++j) {
           if (td.find (j->parent_context) != td.end ()) {
             tl_assert (false);
           }
@@ -985,30 +1004,32 @@ local_processor_result_computation_task<TS, TI>::perform ()
   }
 }
 
-template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::PolygonRef, db::EdgePair>;
 
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessor implementation
 
-template <class TS, class TI>
-local_processor<TS, TI>::local_processor (db::Layout *layout, db::Cell *top)
+template <class TS, class TI, class TR>
+local_processor<TS, TI, TR>::local_processor (db::Layout *layout, db::Cell *top)
   : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
 {
   //  .. nothing yet ..
 }
 
-template <class TS, class TI>
-local_processor<TS, TI>::local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top)
+template <class TS, class TI, class TR>
+local_processor<TS, TI, TR>::local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top)
   : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
 {
   //  .. nothing yet ..
 }
 
-template <class TS, class TI>
-std::string local_processor<TS, TI>::description (const local_operation<TS, TI> *op) const
+template <class TS, class TI, class TR>
+std::string local_processor<TS, TI, TR>::description (const local_operation<TS, TI, TR> *op) const
 {
   if (op && m_description.empty ()) {
     return op->description ();
@@ -1017,18 +1038,18 @@ std::string local_processor<TS, TI>::description (const local_operation<TS, TI> 
   }
 }
 
-template <class TS, class TI>
-void local_processor<TS, TI>::run (local_operation<TS, TI> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
+template <class TS, class TI, class TR>
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
 {
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Executing ")) + description (op));
 
-  local_processor_contexts<TS, TI> contexts;
+  local_processor_contexts<TS, TI, TR> contexts;
   compute_contexts (contexts, op, subject_layer, intruder_layer);
   compute_results (contexts, op, output_layer);
 }
 
-template <class TS, class TI>
-void local_processor<TS, TI>::push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<TS> &result) const
+template <class TS, class TI, class TR>
+void local_processor<TS, TI, TR>::push_results (db::Cell *cell, unsigned int output_layer, const std::unordered_set<TR> &result) const
 {
   if (! result.empty ()) {
     tl::MutexLocker locker (&cell->layout ()->lock ());
@@ -1036,15 +1057,15 @@ void local_processor<TS, TI>::push_results (db::Cell *cell, unsigned int output_
   }
 }
 
-template <class TS, class TI>
-void local_processor<TS, TI>::compute_contexts (local_processor_contexts<TS, TI> &contexts, const local_operation<TS, TI> *op, unsigned int subject_layer, unsigned int intruder_layer) const
+template <class TS, class TI, class TR>
+void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer) const
 {
   try {
 
     tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing contexts for ")) + description (op));
 
     if (m_nthreads > 0) {
-      mp_cc_job.reset (new tl::Job<local_processor_context_computation_worker<TS, TI> > (m_nthreads));
+      mp_cc_job.reset (new tl::Job<local_processor_context_computation_worker<TS, TI, TR> > (m_nthreads));
     } else {
       mp_cc_job.reset (0);
     }
@@ -1053,7 +1074,7 @@ void local_processor<TS, TI>::compute_contexts (local_processor_contexts<TS, TI>
     contexts.set_intruder_layer (intruder_layer);
     contexts.set_subject_layer (subject_layer);
 
-    typename local_processor_cell_contexts<TS, TI>::context_key_type intruders;
+    typename local_processor_cell_contexts<TS, TI, TR>::context_key_type intruders;
     issue_compute_contexts (contexts, 0, 0, mp_subject_top, db::ICplxTrans (), mp_intruder_top, intruders, op->dist ());
 
     if (mp_cc_job.get ()) {
@@ -1067,34 +1088,34 @@ void local_processor<TS, TI>::compute_contexts (local_processor_contexts<TS, TI>
   }
 }
 
-template <class TS, class TI>
-void local_processor<TS, TI>::issue_compute_contexts (local_processor_contexts<TS, TI> &contexts,
-                                                 db::local_processor_cell_context<TS, TI> *parent_context,
+template <class TS, class TI, class TR>
+void local_processor<TS, TI, TR>::issue_compute_contexts (local_processor_contexts<TS, TI, TR> &contexts,
+                                                 db::local_processor_cell_context<TS, TI, TR> *parent_context,
                                                  db::Cell *subject_parent,
                                                  db::Cell *subject_cell,
                                                  const db::ICplxTrans &subject_cell_inst,
                                                  const db::Cell *intruder_cell,
-                                                 typename local_processor_cell_contexts<TS, TI>::context_key_type &intruders,
+                                                 typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders,
                                                  db::Coord dist) const
 {
   bool is_small_job = subject_cell->begin ().at_end ();
 
   if (! is_small_job && mp_cc_job.get ()) {
-    mp_cc_job->schedule (new local_processor_context_computation_task<TS, TI> (this, contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist));
+    mp_cc_job->schedule (new local_processor_context_computation_task<TS, TI, TR> (this, contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist));
   } else {
     compute_contexts (contexts, parent_context, subject_parent, subject_cell, subject_cell_inst, intruder_cell, intruders, dist);
   }
 }
 
-template <class TS, class TI>
-void local_processor<TS, TI>::compute_contexts (local_processor_contexts<TS, TI> &contexts,
-                                           db::local_processor_cell_context<TS, TI> *parent_context,
-                                           db::Cell *subject_parent,
-                                           db::Cell *subject_cell,
-                                           const db::ICplxTrans &subject_cell_inst,
-                                           const db::Cell *intruder_cell,
-                                           const typename local_processor_cell_contexts<TS, TI>::context_key_type &intruders,
-                                           db::Coord dist) const
+template <class TS, class TI, class TR>
+void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS, TI, TR> &contexts,
+                                                    db::local_processor_cell_context<TS, TI, TR> *parent_context,
+                                                    db::Cell *subject_parent,
+                                                    db::Cell *subject_cell,
+                                                    const db::ICplxTrans &subject_cell_inst,
+                                                    const db::Cell *intruder_cell,
+                                                    const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders,
+                                                    db::Coord dist) const
 {
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts)
 
@@ -1106,7 +1127,7 @@ void local_processor<TS, TI>::compute_contexts (local_processor_contexts<TS, TI>
     }
   }
 
-  db::local_processor_cell_context<TS, TI> *cell_context = 0;
+  db::local_processor_cell_context<TS, TI, TR> *cell_context = 0;
 
   //  prepare a new cell context: this has to happen in a thread-safe way as we share the contexts
   //  object between threads
@@ -1114,17 +1135,17 @@ void local_processor<TS, TI>::compute_contexts (local_processor_contexts<TS, TI>
   {
     tl::MutexLocker locker (& contexts.lock ());
 
-    db::local_processor_cell_contexts<TS, TI> &cell_contexts = contexts.contexts_per_cell (subject_cell, intruder_cell);
+    db::local_processor_cell_contexts<TS, TI, TR> &cell_contexts = contexts.contexts_per_cell (subject_cell, intruder_cell);
 
 #if defined(ENABLE_DB_HP_SANITY_ASSERTIONS)
     if (subject_parent) {
-      typename db::local_processor_cell_contexts<TS, TI>::contexts_per_cell_type::iterator pcc = contexts.context_map ().find (subject_parent);
+      typename db::local_processor_cell_contexts<TS, TI, TR>::contexts_per_cell_type::iterator pcc = contexts.context_map ().find (subject_parent);
       if (pcc == contexts.context_map ().end ()) {
         tl_assert (false);
       }
       tl_assert (pcc->first == subject_parent);
       bool any = false;
-      for (typename db::local_processor_cell_contexts<TS, TI>::iterator pcci = pcc->second.begin (); pcci != pcc->second.end () && !any; ++pcci) {
+      for (typename db::local_processor_cell_contexts<TS, TI, TR>::iterator pcci = pcc->second.begin (); pcci != pcc->second.end () && !any; ++pcci) {
         any = (&pcci->second == parent_context);
       }
       if (!any) {
@@ -1259,7 +1280,7 @@ void local_processor<TS, TI>::compute_contexts (local_processor_contexts<TS, TI>
 
         if (! nbox.empty ()) {
 
-          typename local_processor_cell_contexts<TS, TI>::context_key_type intruders_below;
+          typename local_processor_cell_contexts<TS, TI, TR>::context_key_type intruders_below;
 
           db::shape_reference_translator_with_trans<TI, db::ICplxTrans> rt (mp_subject_layout, tni);
 
@@ -1293,9 +1314,9 @@ void local_processor<TS, TI>::compute_contexts (local_processor_contexts<TS, TI>
   }
 }
 
-template <class TS, class TI>
+template <class TS, class TI, class TR>
 void
-local_processor<TS, TI>::compute_results (local_processor_contexts<TS, TI> &contexts, const local_operation<TS, TI> *op, unsigned int output_layer) const
+local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int output_layer) const
 {
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing results for ")) + description (op));
 
@@ -1305,7 +1326,7 @@ local_processor<TS, TI>::compute_results (local_processor_contexts<TS, TI> &cont
 
   if (m_nthreads > 0) {
 
-    std::auto_ptr<tl::Job<local_processor_result_computation_worker<TS, TI> > > rc_job (new tl::Job<local_processor_result_computation_worker<TS, TI> > (m_nthreads));
+    std::auto_ptr<tl::Job<local_processor_result_computation_worker<TS, TI, TR> > > rc_job (new tl::Job<local_processor_result_computation_worker<TS, TI, TR> > (m_nthreads));
 
     //  schedule computation jobs in "waves": we need to make sure they are executed
     //  bottom-up. So we identify a new bunch of cells each time we pass through the cell set
@@ -1331,12 +1352,12 @@ local_processor<TS, TI>::compute_results (local_processor_contexts<TS, TI> &cont
 
       for (std::vector<db::cell_index_type>::const_iterator bu = cells_bu.begin (); bu != cells_bu.end (); ++bu) {
 
-        typename local_processor_contexts<TS, TI>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
+        typename local_processor_contexts<TS, TI, TR>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
         if (cpc != contexts.context_map ().end ()) {
 
           if (later.find (*bu) == later.end ()) {
 
-            rc_job->schedule (new local_processor_result_computation_task<TS, TI> (this, contexts, cpc->first, &cpc->second, op, output_layer));
+            rc_job->schedule (new local_processor_result_computation_task<TS, TI, TR> (this, contexts, cpc->first, &cpc->second, op, output_layer));
             any = true;
 
           } else {
@@ -1368,7 +1389,7 @@ local_processor<TS, TI>::compute_results (local_processor_contexts<TS, TI> &cont
 
     for (db::Layout::bottom_up_const_iterator bu = mp_subject_layout->begin_bottom_up (); bu != mp_subject_layout->end_bottom_up (); ++bu) {
 
-      typename local_processor_contexts<TS, TI>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
+      typename local_processor_contexts<TS, TI, TR>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
       if (cpc != contexts.context_map ().end ()) {
         cpc->second.compute_results (contexts, cpc->first, op, output_layer, this);
         contexts.context_map ().erase (cpc);
@@ -1458,9 +1479,9 @@ struct scan_shape2shape_different_layers
   }
 };
 
-template <class TS, class TI>
+template <class TS, class TI, class TR>
 void
-local_processor<TS, TI>::compute_local_cell (const db::local_processor_contexts<TS, TI> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI> *op, const typename local_processor_cell_contexts<TS, TI>::context_key_type &intruders, std::unordered_set<TS> &result) const
+local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::unordered_set<TR> &result) const
 {
   const db::Shapes *subject_shapes = &subject_cell->shapes (contexts.subject_layer ());
 
@@ -1487,7 +1508,7 @@ local_processor<TS, TI>::compute_local_cell (const db::local_processor_contexts<
       subject_id0 = id;
     }
 
-    if (op->on_empty_intruder_hint () != local_operation<TS, TI>::Drop) {
+    if (op->on_empty_intruder_hint () != local_operation<TS, TI, TR>::Drop) {
       const TS *ref = i->basic_ptr (typename TS::tag ());
       interactions.add_subject (id, *ref);
     }
@@ -1550,10 +1571,12 @@ local_processor<TS, TI>::compute_local_cell (const db::local_processor_contexts<
   op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio);
 }
 
-template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor<db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::EdgePair>;
 
 }
 

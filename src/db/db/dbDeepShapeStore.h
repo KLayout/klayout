@@ -154,6 +154,11 @@ public:
   DeepLayer copy () const;
 
   /**
+   *  @brief Adds shapes from another deep layer to this one
+   */
+  void add_from (const DeepLayer &dl);
+
+  /**
    *  @brief Separates cell variants (see DeepShapeStore::separate_variants)
    */
   template <class VarCollector>

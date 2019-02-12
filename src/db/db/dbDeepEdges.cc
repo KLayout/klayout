@@ -526,39 +526,6 @@ EdgesDelegate *DeepEdges::or_with (const Edges &other) const
   return AsIfFlatEdges::or_with (other);
 }
 
-void
-DeepEdges::add_from (const DeepLayer &dl)
-{
-  if (&dl.layout () == &deep_layer ().layout ()) {
-
-    //  intra-layout merge
-
-    deep_layer ().layout ().copy_layer (dl.layer (), deep_layer ().layer ());
-
-  } else {
-
-    //  inter-layout merge
-
-    db::cell_index_type into_cell = deep_layer ().initial_cell ().cell_index ();
-    db::Layout *into_layout = &deep_layer ().layout ();
-    db::cell_index_type source_cell = dl.initial_cell ().cell_index ();
-    const db::Layout *source_layout = &dl.layout ();
-
-    db::CellMapping cm;
-    cm.create_from_geometry_full (*into_layout, into_cell, *source_layout, source_cell);
-
-    //  Actually copy the shapes
-
-    std::map<unsigned int, unsigned int> lm;
-    lm.insert (std::make_pair (dl.layer (), deep_layer ().layer ()));
-
-    std::vector <db::cell_index_type> source_cells;
-    source_cells.push_back (source_cell);
-    db::copy_shapes (*into_layout, *source_layout, db::ICplxTrans (), source_cells, cm.table (), lm);
-
-  }
-}
-
 EdgesDelegate *
 DeepEdges::add_in_place (const Edges &other)
 {
@@ -569,7 +536,7 @@ DeepEdges::add_in_place (const Edges &other)
   const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
   if (other_deep) {
 
-    add_from (other_deep->deep_layer ());
+    deep_layer ().add_from (other_deep->deep_layer ());
 
   } else {
 

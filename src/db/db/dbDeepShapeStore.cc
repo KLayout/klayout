@@ -107,6 +107,39 @@ DeepLayer::copy () const
 }
 
 void
+DeepLayer::add_from (const DeepLayer &dl)
+{
+  if (&dl.layout () == &layout ()) {
+
+    //  intra-layout merge
+
+    layout ().copy_layer (dl.layer (), layer ());
+
+  } else {
+
+    //  inter-layout merge
+
+    db::cell_index_type into_cell = initial_cell ().cell_index ();
+    db::Layout *into_layout = &layout ();
+    db::cell_index_type source_cell = dl.initial_cell ().cell_index ();
+    const db::Layout *source_layout = &dl.layout ();
+
+    db::CellMapping cm;
+    cm.create_from_geometry_full (*into_layout, into_cell, *source_layout, source_cell);
+
+    //  Actually copy the shapes
+
+    std::map<unsigned int, unsigned int> lm;
+    lm.insert (std::make_pair (dl.layer (), layer ()));
+
+    std::vector <db::cell_index_type> source_cells;
+    source_cells.push_back (source_cell);
+    db::copy_shapes (*into_layout, *source_layout, db::ICplxTrans (), source_cells, cm.table (), lm);
+
+  }
+}
+
+void
 DeepLayer::insert_into (db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   check_dss ();

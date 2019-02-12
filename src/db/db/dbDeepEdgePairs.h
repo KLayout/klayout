@@ -95,7 +95,6 @@ private:
   DeepLayer m_deep_layer;
 
   void init ();
-  void add_from (const DeepLayer &dl);
   EdgesDelegate *generic_edges (bool first, bool second) const;
 };
 

@@ -165,7 +165,6 @@ private:
 
   void init ();
   void ensure_merged_edges_valid () const;
-  void add_from (const DeepLayer &dl);
   EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
 };
 

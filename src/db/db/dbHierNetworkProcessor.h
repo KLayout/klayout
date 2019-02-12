@@ -61,9 +61,30 @@ public:
   typedef global_nets_type::const_iterator global_nets_iterator;
 
   /**
+   *  @brief Specifies the edge connectivity mode
+   */
+  enum edge_connectivity_type
+  {
+    /**
+     *  @brief Edges connect if they are collinear
+     */
+    EdgesConnectCollinear,
+
+    /**
+     *  @brief Edges connect if the end point of one edge is the start point of the other edge
+     */
+    EdgesConnectByPoints
+  };
+
+  /**
    *  @brief Creates a connectivity object without any connections
    */
   Connectivity ();
+
+  /**
+   *  @brief Creates a connectivity object without connections and the given edge connectivity mode
+   */
+  Connectivity (edge_connectivity_type ec);
 
   /**
    *  @brief Adds intra-layer connectivity for layer l
@@ -162,6 +183,7 @@ private:
   std::map<unsigned int, layers_type> m_connected;
   std::vector<std::string> m_global_net_names;
   std::map<unsigned int, global_nets_type> m_global_connections;
+  edge_connectivity_type m_ec;
 };
 
 /**

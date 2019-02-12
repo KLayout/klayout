@@ -277,6 +277,11 @@ static std::string obj2string (const db::PolygonRef &ref)
   return ref.obj ().transformed (ref.trans ()).to_string ();
 }
 
+static std::string obj2string (const db::Edge &ref)
+{
+  return ref.to_string ();
+}
+
 template <class T>
 static std::string local_cluster_to_string (const db::local_cluster<T> &cluster, const db::Connectivity &conn)
 {
@@ -532,6 +537,57 @@ TEST(22_LocalClustersWithGlobal)
   EXPECT_EQ (local_clusters_to_string (clusters, conn),
     "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1100;0,2100;1000,2100;1000,1100)%1%2+GLOBAL+GLOBAL2"
   );
+}
+
+TEST(23_LocalClustersWithEdges)
+{
+  db::Layout layout;
+  db::Cell &cell = layout.cell (layout.add_cell ("TOP"));
+
+  db::Edge edge;
+
+  tl::from_string ("(0,0;0,500)", edge);
+  cell.shapes (0).insert (edge);
+
+  tl::from_string ("(0,500;0,1000)", edge);
+  cell.shapes (0).insert (edge);
+
+  tl::from_string ("(0,1000;2000,1000)", edge);
+  cell.shapes (0).insert (edge);
+
+  tl::from_string ("(2000,1000;2000,500)", edge);
+  cell.shapes (0).insert (edge);
+
+  tl::from_string ("(2000,500;1000,250)", edge);
+  cell.shapes (0).insert (edge);
+
+  tl::from_string ("(1500,375;0,0)", edge);
+  cell.shapes (0).insert (edge);
+
+  {
+    //  edge clusters are for intra-layer mainly
+    db::Connectivity conn;
+    conn.connect (0);
+
+    db::local_clusters<db::Edge> clusters;
+    clusters.build_clusters (cell, db::ShapeIterator::Edges, conn);
+    EXPECT_EQ (local_clusters_to_string (clusters, conn),
+      "#1:[0](0,0;0,500);[0](0,500;0,1000)\n"
+      "#2:[0](2000,500;1000,250);[0](1500,375;0,0)\n"
+      "#3:[0](0,1000;2000,1000)\n"
+      "#4:[0](2000,1000;2000,500)"
+    );
+  }
+
+  {
+    //  edge clusters are for intra-layer mainly
+    db::Connectivity conn (db::Connectivity::EdgesConnectByPoints);
+    conn.connect (0);
+
+    db::local_clusters<db::Edge> clusters;
+    clusters.build_clusters (cell, db::ShapeIterator::Edges, conn);
+    EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,500);[0](0,500;0,1000);[0](1500,375;0,0);[0](0,1000;2000,1000);[0](2000,1000;2000,500);[0](2000,500;1000,250)");
+  }
 }
 
 TEST(30_LocalConnectedClusters)

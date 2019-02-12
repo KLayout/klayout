@@ -45,6 +45,13 @@ namespace db
 //  Connectivity implementation
 
 Connectivity::Connectivity ()
+  : m_ec (Connectivity::EdgesConnectCollinear)
+{
+  //  .. nothing yet ..
+}
+
+Connectivity::Connectivity (edge_connectivity_type ec)
+  : m_ec (ec)
 {
   //  .. nothing yet ..
 }
@@ -176,7 +183,7 @@ Connectivity::end_connected (unsigned int layer) const
 
 template <class Trans>
 static bool
-interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const Trans &trans)
+interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const Trans &trans, db::Connectivity::edge_connectivity_type)
 {
   //  TODO: this could be part of db::interact (including transformation)
   if (a.obj ().is_box () && b.obj ().is_box ()) {
@@ -188,7 +195,7 @@ interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const Trans 
 
 template <class C>
 static bool
-interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const db::unit_trans<C> &)
+interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const db::unit_trans<C> &, db::Connectivity::edge_connectivity_type)
 {
   //  TODO: this could be part of db::interact (including transformation)
   if (a.obj ().is_box () && b.obj ().is_box ()) {
@@ -200,16 +207,25 @@ interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const db::un
 
 template <class Trans>
 static bool
-interaction_test (const db::Edge &a, const db::Edge &b, const Trans &trans)
+interaction_test (const db::Edge &a, const db::Edge &b, const Trans &trans, db::Connectivity::edge_connectivity_type ec)
 {
-  return a.coincident (b.transformed (trans));
+  db::Edge bt = b.transformed (trans);
+  if (ec == db::Connectivity::EdgesConnectByPoints) {
+    return a.p2 () == bt.p1 () || a.p1 () == bt.p2 ();
+  } else {
+    return a.parallel (bt) && a.intersect (bt);
+  }
 }
 
 template <class C>
 static bool
-interaction_test (const db::Edge &a, const db::Edge &b, const db::unit_trans<C> &)
+interaction_test (const db::Edge &a, const db::Edge &b, const db::unit_trans<C> &, db::Connectivity::edge_connectivity_type ec)
 {
-  return a.coincident (b);
+  if (ec == db::Connectivity::EdgesConnectByPoints) {
+    return a.p2 () == b.p1 () || a.p1 () == b.p2 ();
+  } else {
+    return a.parallel (b) && a.intersect (b);
+  }
 }
 
 template <class T, class Trans>
@@ -219,7 +235,7 @@ bool Connectivity::interacts (const T &a, unsigned int la, const T &b, unsigned 
   if (i == m_connected.end () || i->second.find (lb) == i->second.end ()) {
     return false;
   } else {
-    return interaction_test (a, b, trans);
+    return interaction_test (a, b, trans, m_ec);
   }
 }
 

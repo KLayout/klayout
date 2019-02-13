@@ -1786,7 +1786,7 @@ private:
 
   RegionDelegate *mp_delegate;
 
-  void set_delegate (RegionDelegate *delegate);
+  void set_delegate (RegionDelegate *delegate, bool keep_attributes = true);
   FlatRegion *flat_region ();
 };
 

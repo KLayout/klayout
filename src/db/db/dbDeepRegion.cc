@@ -294,16 +294,31 @@ public:
     m_ep.set_base_verbosity (vb);
   }
 
-  db::Shapes &merged (size_t cid, db::cell_index_type ci, bool initial = true)
+  db::Shapes &merged (size_t cid, db::cell_index_type ci, unsigned int min_wc = 0)
+  {
+    return compute_merged (cid, ci, true, min_wc);
+  }
+
+  void erase (size_t cid, db::cell_index_type ci)
+  {
+    m_merged_cluster.erase (std::make_pair (cid, ci));
+  }
+
+private:
+  std::map<std::pair<size_t, db::cell_index_type>, db::Shapes> m_merged_cluster;
+  unsigned int m_layer;
+  db::Layout *mp_layout;
+  const db::hier_clusters<db::PolygonRef> *mp_hc;
+  bool m_min_coherence;
+  db::EdgeProcessor m_ep;
+
+  db::Shapes &compute_merged (size_t cid, db::cell_index_type ci, bool initial, unsigned int min_wc)
   {
     std::map<std::pair<size_t, db::cell_index_type>, db::Shapes>::iterator s = m_merged_cluster.find (std::make_pair (cid, ci));
 
     //  some sanity checks: initial clusters are single-use, are never generated twice and cannot be retrieved again
     if (initial) {
       tl_assert (s == m_merged_cluster.end ());
-      m_done.insert (std::make_pair (cid, ci));
-    } else {
-      tl_assert (m_done.find (std::make_pair (cid, ci)) == m_done.end ());
     }
 
     if (s != m_merged_cluster.end ()) {
@@ -315,51 +330,60 @@ public:
     const db::connected_clusters<db::PolygonRef> &cc = mp_hc->clusters_per_cell (ci);
     const db::local_cluster<db::PolygonRef> &c = cc.cluster_by_id (cid);
 
-    std::list<std::pair<const db::Shapes *, db::ICplxTrans> > merged_child_clusters;
+    if (min_wc > 0) {
 
-    const db::connected_clusters<db::PolygonRef>::connections_type &conn = cc.connections_for_cluster (cid);
-    for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = conn.begin (); i != conn.end (); ++i) {
-      const db::Shapes &cc_shapes = merged (i->id (), i->inst ().inst_ptr.cell_index (), false);
-      merged_child_clusters.push_back (std::make_pair (&cc_shapes, i->inst ().complex_trans ()));
-    }
+      //  We cannot merge bottom-up in min_wc mode, so we just use the recursive cluster iterator
 
-    m_ep.clear ();
+      m_ep.clear ();
 
-    size_t pi = 0;
+      size_t pi = 0;
 
-    for (std::list<std::pair<const db::Shapes *, db::ICplxTrans> >::const_iterator i = merged_child_clusters.begin (); i != merged_child_clusters.end (); ++i) {
-      for (db::Shapes::shape_iterator s = i->first->begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
-        if (s->is_polygon ()) {
-          db::Polygon poly;
-          s->polygon (poly);
-          m_ep.insert (poly.transformed (i->second), pi++);
+      for (db::recursive_cluster_shape_iterator<db::PolygonRef> s = db::recursive_cluster_shape_iterator<db::PolygonRef> (*mp_hc, m_layer, ci, cid); !s.at_end (); ++s) {
+        db::Polygon poly = s->obj ();
+        poly.transform (s.trans () * db::ICplxTrans (s->trans ()));
+        m_ep.insert (poly, pi++);
+      }
+
+    } else {
+
+      std::list<std::pair<const db::Shapes *, db::ICplxTrans> > merged_child_clusters;
+
+      const db::connected_clusters<db::PolygonRef>::connections_type &conn = cc.connections_for_cluster (cid);
+      for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = conn.begin (); i != conn.end (); ++i) {
+        const db::Shapes &cc_shapes = compute_merged (i->id (), i->inst ().inst_ptr.cell_index (), false, min_wc);
+        merged_child_clusters.push_back (std::make_pair (&cc_shapes, i->inst ().complex_trans ()));
+      }
+
+      m_ep.clear ();
+
+      size_t pi = 0;
+
+      for (std::list<std::pair<const db::Shapes *, db::ICplxTrans> >::const_iterator i = merged_child_clusters.begin (); i != merged_child_clusters.end (); ++i) {
+        for (db::Shapes::shape_iterator s = i->first->begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+          if (s->is_polygon ()) {
+            db::Polygon poly;
+            s->polygon (poly);
+            m_ep.insert (poly.transformed (i->second), pi++);
+          }
         }
       }
-    }
 
-    for (db::local_cluster<db::PolygonRef>::shape_iterator s = c.begin (m_layer); !s.at_end (); ++s) {
-      db::Polygon poly = s->obj ();
-      poly.transform (s->trans ());
-      m_ep.insert (poly, pi++);
+      for (db::local_cluster<db::PolygonRef>::shape_iterator s = c.begin (m_layer); !s.at_end (); ++s) {
+        db::Polygon poly = s->obj ();
+        poly.transform (s->trans ());
+        m_ep.insert (poly, pi++);
+      }
+
     }
 
     //  and run the merge step
-    db::MergeOp op (0);
+    db::MergeOp op (min_wc);
     db::PolygonRefToShapesGenerator pr (mp_layout, &s->second);
     db::PolygonGenerator pg (pr, false /*don't resolve holes*/, m_min_coherence);
     m_ep.process (pg, op);
 
     return s->second;
   }
-
-private:
-  std::map<std::pair<size_t, db::cell_index_type>, db::Shapes> m_merged_cluster;
-  std::set<std::pair<size_t, db::cell_index_type> > m_done;
-  unsigned int m_layer;
-  db::Layout *mp_layout;
-  const db::hier_clusters<db::PolygonRef> *mp_hc;
-  bool m_min_coherence;
-  db::EdgeProcessor m_ep;
 };
 
 }
@@ -402,7 +426,7 @@ DeepRegion::ensure_merged_polygons_valid () const
           if (cc.is_root (*cl)) {
             db::Shapes &s = cm.merged (*cl, c->cell_index ());
             c->shapes (m_merged_polygons.layer ()).insert (s);
-            s.clear (); //  not needed anymore
+            cm.erase (*cl, c->cell_index ()); //  not needed anymore
           }
         }
       }
@@ -873,8 +897,7 @@ DeepRegion::merged_in_place ()
 RegionDelegate *
 DeepRegion::merged_in_place (bool min_coherence, unsigned int min_wc)
 {
-  //  TODO: can probably be optimized
-  return db::AsIfFlatRegion::merged_in_place (min_coherence, min_wc);
+  return merged (min_coherence, min_wc);
 }
 
 RegionDelegate *
@@ -898,8 +921,39 @@ DeepRegion::merged () const
 RegionDelegate *
 DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
 {
-  //  TODO: can probably be optimized
-  return db::AsIfFlatRegion::merged (min_coherence, min_wc);
+  tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
+
+  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+
+  db::hier_clusters<db::PolygonRef> hc;
+  db::Connectivity conn;
+  conn.connect (m_deep_layer);
+  //  TODO: this uses the wrong verbosity inside ...
+  hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Polygons, conn);
+
+  //  collect the clusters and merge them into big polygons
+  //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
+  //  hopefully more efficient that collecting everything and will lead to reuse of parts.
+
+  DeepLayer dl_out (m_deep_layer.derived ());
+
+  ClusterMerger cm (m_deep_layer.layer (), layout, hc, min_coherence, report_progress (), progress_desc ());
+  cm.set_base_verbosity (base_verbosity ());
+
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+    const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (c->cell_index ());
+    for (db::connected_clusters<db::PolygonRef>::all_iterator cl = cc.begin_all (); ! cl.at_end (); ++cl) {
+      if (cc.is_root (*cl)) {
+        db::Shapes &s = cm.merged (*cl, c->cell_index (), min_wc);
+        c->shapes (dl_out.layer ()).insert (s);
+        cm.erase (*cl, c->cell_index ()); //  not needed anymore
+      }
+    }
+  }
+
+  db::DeepRegion *res = new db::DeepRegion (dl_out);
+  res->set_is_merged (true);
+  return res;
 }
 
 RegionDelegate *

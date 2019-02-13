@@ -60,7 +60,7 @@ Region::~Region ()
 Region &Region::operator= (const Region &other)
 {
   if (this != &other) {
-    set_delegate (other.mp_delegate->clone ());
+    set_delegate (other.mp_delegate->clone (), false);
   }
   return *this;
 }
@@ -94,9 +94,13 @@ Region::iter () const
 }
 
 void
-Region::set_delegate (RegionDelegate *delegate)
+Region::set_delegate (RegionDelegate *delegate, bool keep_attributes)
 {
   if (delegate != mp_delegate) {
+    if (keep_attributes && delegate && mp_delegate) {
+      //  copy the basic attributes like #threads etc.
+      delegate->RegionDelegate::operator= (*mp_delegate);
+    }
     delete mp_delegate;
     mp_delegate = delegate;
   }
@@ -159,7 +163,6 @@ Region::flat_region ()
   if (! region) {
     region = new FlatRegion ();
     if (mp_delegate) {
-      region->RegionDelegate::operator= (*mp_delegate);
       region->insert_seq (begin ());
     }
     if (mp_delegate) {

@@ -868,6 +868,46 @@ TEST(15_Filtered)
   }
 }
 
+TEST(16_MergeWithMinWC)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r1_merged_wc0 = r1.merged (true, 0);
+  db::Region r1_merged_wc1 = r1.merged (true, 1);
+  db::Region r1_merged_wc2 = r1.merged (true, 2);
+  EXPECT_EQ (r1_merged_wc0.is_merged (), true);
+  EXPECT_EQ (r1_merged_wc1.is_merged (), true);
+  EXPECT_EQ (r1_merged_wc2.is_merged (), true);
+
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1_merged_wc0);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1_merged_wc1);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1_merged_wc2);
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au16.gds");
+  }
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

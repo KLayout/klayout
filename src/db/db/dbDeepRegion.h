@@ -241,6 +241,11 @@ private:
   EdgePairs run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
   RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
+
+  const DeepLayer &merged_deep_layer () const
+  {
+    return m_merged_polygons;
+  }
 };
 
 }

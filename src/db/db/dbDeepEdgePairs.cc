@@ -243,7 +243,7 @@ EdgePairsDelegate *DeepEdgePairs::filtered (const EdgePairFilterBase &filter) co
 
 RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
 {
-  db::DeepLayer new_layer = m_deep_layer.new_layer ();
+  db::DeepLayer new_layer = m_deep_layer.derived ();
   db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -261,7 +261,7 @@ RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
 
 EdgesDelegate *DeepEdgePairs::generic_edges (bool first, bool second) const
 {
-  db::DeepLayer new_layer = m_deep_layer.new_layer ();
+  db::DeepLayer new_layer = m_deep_layer.derived ();
   db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {

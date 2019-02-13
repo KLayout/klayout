@@ -212,6 +212,9 @@ protected:
   RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
   RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
 
+  static void produce_shape_for_strange_polygon (const db::Polygon &poly, db::Shapes &shapes);
+  static db::Polygon snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vector<db::Point> &heap);
+
 private:
   AsIfFlatRegion &operator= (const AsIfFlatRegion &other);
 

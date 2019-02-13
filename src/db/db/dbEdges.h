@@ -209,6 +209,7 @@ public:
   virtual ~EdgeFilterBase () { }
 
   virtual bool selected (const db::Edge &edge) const = 0;
+  virtual bool isotropic () const = 0;
 };
 
 /**
@@ -251,6 +252,11 @@ struct DB_PUBLIC EdgeLengthFilter
     }
   }
 
+  bool isotropic () const
+  {
+    return true;
+  }
+
 private:
   length_type m_lmin, m_lmax;
   bool m_inverse;
@@ -274,7 +280,7 @@ struct DB_PUBLIC EdgeOrientationFilter
    *
    *  @param amin The minimum angle (measured against the x axis)
    *  @param amax The maximum angle (measured against the x axis)
-   *  @param inverse If set to true, only polygons not matching this criterion will be filtered
+   *  @param inverse If set to true, only edges not matching this criterion will be filtered
    *
    *  This filter will filter out all edges whose angle against x axis 
    *  is larger or equal to amin and less than amax.
@@ -290,7 +296,7 @@ struct DB_PUBLIC EdgeOrientationFilter
    *  @brief Constructor 
    *
    *  @param a The angle (measured against the x axis)
-   *  @param inverse If set to true, only polygons not matching this criterion will be filtered
+   *  @param inverse If set to true, only edges not matching this criterion will be filtered
    *
    *  This filter will filter out all edges whose angle against x axis 
    *  is equal to a.
@@ -321,6 +327,11 @@ struct DB_PUBLIC EdgeOrientationFilter
         return ! ((smin >= 0 && smax < 0) || (smax > 0 && smin <= 0));
       }
     }
+  }
+
+  bool isotropic () const
+  {
+    return false;
   }
 
 private:
@@ -387,12 +398,55 @@ public:
   Edges &operator= (const Edges &other);
 
   /**
-   *  @brief Constructor from an object
+   *  @brief Constructor from a box
    *
-   *  Creates an edge set representing a single instance of that object
+   *  Creates an edge set representing the contour of the box
    */
-  template <class Sh>
-  explicit Edges (const Sh &s)
+  explicit Edges (const db::Box &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a simple polygon
+   *
+   *  Creates an edge set representing the contour of the polygon
+   */
+  explicit Edges (const db::SimplePolygon &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a polygon
+   *
+   *  Creates an edge set representing the contour of the polygon
+   */
+  explicit Edges (const db::Polygon &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a path
+   *
+   *  Creates an edge set representing the contour of the path
+   */
+  explicit Edges (const db::Path &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from an edge
+   *
+   *  Creates an edge set representing the single edge
+   */
+  explicit Edges (const db::Edge &s)
     : mp_delegate (0)
   {
     insert (s);

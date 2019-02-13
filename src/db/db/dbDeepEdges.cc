@@ -354,7 +354,7 @@ DeepEdges::ensure_merged_edges_valid () const
 {
   if (! m_merged_edges_valid) {
 
-    m_merged_edges = m_deep_layer.new_layer ();
+    m_merged_edges = m_deep_layer.derived ();
 
     tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
 
@@ -480,7 +480,7 @@ EdgesDelegate *DeepEdges::merged () const
 
   db::Layout &layout = const_cast<db::Layout &> (m_merged_edges.layout ());
 
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.new_layer ()));
+  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     c->shapes (res->deep_layer ().layer ()) = c->shapes (m_merged_edges.layer ());
   }

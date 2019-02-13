@@ -619,6 +619,40 @@ static inline db::Coord snap_to_grid (db::Coord c, db::Coord g)
   return c;
 }
 
+db::Polygon
+AsIfFlatRegion::snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vector<db::Point> &heap)
+{
+  db::Polygon pnew;
+
+  for (size_t i = 0; i < poly.holes () + 1; ++i) {
+
+    heap.clear ();
+
+    db::Polygon::polygon_contour_iterator b, e;
+
+    if (i == 0) {
+      b = poly.begin_hull ();
+      e = poly.end_hull ();
+    } else {
+      b = poly.begin_hole ((unsigned int)  (i - 1));
+      e = poly.end_hole ((unsigned int)  (i - 1));
+    }
+
+    for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
+      heap.push_back (db::Point (snap_to_grid ((*pt).x (), gx), snap_to_grid ((*pt).y (), gy)));
+    }
+
+    if (i == 0) {
+      pnew.assign_hull (heap.begin (), heap.end ());
+    } else {
+      pnew.insert_hole (heap.begin (), heap.end ());
+    }
+
+  }
+
+  return pnew;
+}
+
 RegionDelegate *
 AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
 {
@@ -627,40 +661,10 @@ AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
   gx = std::max (db::Coord (1), gx);
   gy = std::max (db::Coord (1), gy);
 
-  std::vector<db::Point> pts;
+  std::vector<db::Point> heap;
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-
-    db::Polygon pnew;
-
-    for (size_t i = 0; i < p->holes () + 1; ++i) {
-
-      pts.clear ();
-
-      db::Polygon::polygon_contour_iterator b, e;
-
-      if (i == 0) {
-        b = p->begin_hull ();
-        e = p->end_hull ();
-      } else {
-        b = p->begin_hole ((unsigned int)  (i - 1));
-        e = p->end_hole ((unsigned int)  (i - 1));
-      }
-
-      for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
-        pts.push_back (db::Point (snap_to_grid ((*pt).x (), gx), snap_to_grid ((*pt).y (), gy)));
-      }
-
-      if (i == 0) {
-        pnew.assign_hull (pts.begin (), pts.end ());
-      } else {
-        pnew.insert_hole (pts.begin (), pts.end ());
-      }
-
-    }
-
-    new_region->raw_polygons ().insert (pnew);
-
+    new_region->raw_polygons ().insert (snapped_polygon (*p, gx, gy, heap));
   }
 
   return new_region.release ();
@@ -677,22 +681,25 @@ struct DB_PUBLIC StrangePolygonInsideFunc
   }
 };
 
+void
+AsIfFlatRegion::produce_shape_for_strange_polygon (const db::Polygon &poly, db::Shapes &shapes)
+{
+  EdgeProcessor ep;
+  ep.insert (poly);
+
+  StrangePolygonInsideFunc inside;
+  db::GenericMerge<StrangePolygonInsideFunc> op (inside);
+  db::ShapeGenerator pc (shapes, false);
+  db::PolygonGenerator pg (pc, false, false);
+  ep.process (pg, op);
+}
+
 RegionDelegate *
 AsIfFlatRegion::strange_polygon_check () const
 {
-  EdgeProcessor ep;
   std::auto_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
-
   for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-
-    ep.clear ();
-    ep.insert (*p);
-
-    StrangePolygonInsideFunc inside;
-    db::GenericMerge<StrangePolygonInsideFunc> op (inside);
-    db::ShapeGenerator pc (new_region->raw_polygons (), false);
-    db::PolygonGenerator pg (pc, false, false);
-    ep.process (pg, op);
+    produce_shape_for_strange_polygon (*p, new_region->raw_polygons ());
   }
 
   return new_region.release ();

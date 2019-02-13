@@ -94,11 +94,6 @@ public:
   bool operator== (const DeepLayer &other) const;
 
   /**
-   *  @brief Creates a new empty layer based on this one
-   */
-  DeepLayer new_layer () const;
-
-  /**
    *  @brief Gets the layout object
    *  The return value is guaranteed to be non-null.
    */

@@ -88,6 +88,28 @@ struct DB_PUBLIC MagnificationReducer
 };
 
 /**
+ *  @brief A magnification and orientation reducer
+ *
+ *  This reducer incarnation reduces the transformation to it's rotation/mirror/magnification part (2d matrix)
+ */
+struct DB_PUBLIC MagnificationAndOrientationReducer
+{
+  typedef tl::true_tag is_translation_invariant;
+
+  db::ICplxTrans operator () (const db::ICplxTrans &trans) const
+  {
+    db::ICplxTrans res (trans);
+    res.disp (db::Vector ());
+    return res;
+  }
+
+  db::Trans operator () (const db::Trans &trans) const
+  {
+    return db::Trans (trans.fp_trans ());
+  }
+};
+
+/**
  *  @brief A grid reducer
  *
  *  This reducer incarnation reduces the transformation to it's displacement modulo a grid
@@ -125,11 +147,30 @@ private:
   inline db::Coord mod (db::Coord c) const
   {
     if (c < 0) {
-      return m_grid - (-c) % m_grid;
+      c = m_grid - (-c) % m_grid;
+      if (c == m_grid) {
+        return 0;
+      } else {
+        return c;
+      }
     } else {
       return c % m_grid;
     }
   }
+};
+
+/**
+ *  @brief A base class for the variants collector
+ */
+class DB_PUBLIC VariantsCollectorBase
+{
+public:
+  VariantsCollectorBase () { }
+  virtual ~VariantsCollectorBase () { }
+
+  virtual void collect (const db::Layout &layout, const db::Cell &top_cell) = 0;
+  virtual void separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table = 0) = 0;
+  virtual const std::map<db::ICplxTrans, size_t> &variants (db::cell_index_type ci) const = 0;
 };
 
 /**
@@ -149,9 +190,19 @@ private:
  */
 template <class Reduce>
 class DB_PUBLIC cell_variants_collector
+  : public VariantsCollectorBase
 {
 public:
   typedef cell_variants_reduce_traits<Reduce> compare_traits;
+
+  /**
+   *  @brief Creates a variant extractor
+   */
+  cell_variants_collector ()
+    : m_red ()
+  {
+    //  .. nothing yet ..
+  }
 
   /**
    *  @brief Creates a variant extractor
@@ -165,7 +216,7 @@ public:
   /**
    *  @brief Collects cell variants for the given layout starting from the top cell
    */
-  void collect (const db::Layout &layout, const db::Cell &top_cell)
+  virtual void collect (const db::Layout &layout, const db::Cell &top_cell)
   {
     //  The top cell gets a "variant" with unit transformation
     m_variants [top_cell.cell_index ()].insert (std::make_pair (db::ICplxTrans (), 1));
@@ -207,7 +258,7 @@ public:
    *  If given, *var_table will be filled with a map giving the new cell and variant against
    *  the old cell for all cells with more than one variant.
    */
-  void separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table = 0)
+  virtual void separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table = 0)
   {
     db::LayoutLocker locker (&layout);
 
@@ -309,7 +360,7 @@ public:
    *  The keys of the map are the variants, the values is the instance count of the variant
    *  (as seen from the top cell).
    */
-  const std::map<db::ICplxTrans, size_t> &variants (db::cell_index_type ci) const
+  virtual const std::map<db::ICplxTrans, size_t> &variants (db::cell_index_type ci) const
   {
     std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator v = m_variants.find (ci);
     static std::map<db::ICplxTrans, size_t> empty_set;

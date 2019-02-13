@@ -138,11 +138,7 @@ public:
 
   virtual Edges edges (const EdgeFilterBase *) const;
 
-  virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter)
-  {
-    return filtered (filter);
-  }
-
+  virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter);
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const;
 
   virtual RegionDelegate *merged_in_place ();
@@ -226,6 +222,7 @@ public:
 
 protected:
   virtual void merged_semantics_changed ();
+  void set_is_merged (bool f);
 
 private:
   DeepRegion &operator= (const DeepRegion &other);
@@ -233,6 +230,7 @@ private:
   DeepLayer m_deep_layer;
   mutable DeepLayer m_merged_polygons;
   mutable bool m_merged_polygons_valid;
+  bool m_is_merged;
 
   void init ();
   void ensure_merged_polygons_valid () const;

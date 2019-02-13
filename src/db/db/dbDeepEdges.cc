@@ -122,7 +122,8 @@ DeepEdges::~DeepEdges ()
 DeepEdges::DeepEdges (const DeepEdges &other)
   : AsIfFlatEdges (other),
     m_deep_layer (other.m_deep_layer.copy ()),
-    m_merged_edges_valid (other.m_merged_edges_valid)
+    m_merged_edges_valid (other.m_merged_edges_valid),
+    m_is_merged (other.m_is_merged)
 {
   if (m_merged_edges_valid) {
     m_merged_edges = other.m_merged_edges;
@@ -133,6 +134,7 @@ void DeepEdges::init ()
 {
   m_merged_edges_valid = false;
   m_merged_edges = db::DeepLayer ();
+  m_is_merged = false;
 }
 
 EdgesDelegate *
@@ -215,8 +217,7 @@ DeepEdges::empty () const
 bool
 DeepEdges::is_merged () const
 {
-  //  TODO: there is no such thing as a "surely merged" state except after merged() maybe
-  return false;
+  return m_is_merged;
 }
 
 const db::Edge *
@@ -354,40 +355,56 @@ DeepEdges::ensure_merged_edges_valid () const
 {
   if (! m_merged_edges_valid) {
 
-    m_merged_edges = m_deep_layer.derived ();
+    if (m_is_merged) {
 
-    tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
+      //  NOTE: this will reuse the deep layer reference
+      m_merged_edges = m_deep_layer;
 
-    db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+    } else {
 
-    db::hier_clusters<db::Edge> hc;
-    db::Connectivity conn;
-    conn.connect (m_deep_layer);
-    //  TODO: this uses the wrong verbosity inside ...
-    hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Edges, conn);
+      m_merged_edges = m_deep_layer.derived ();
 
-    //  collect the clusters and merge them into big polygons
-    //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
-    //  hopefully more efficient that collecting everything and will lead to reuse of parts.
+      tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
 
-    ClusterMerger cm (m_deep_layer.layer (), hc, report_progress (), progress_desc ());
-    cm.set_base_verbosity (base_verbosity ());
+      db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
 
-    //  TODO: iterate only over the called cells?
-    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
-      const db::connected_clusters<db::Edge> &cc = hc.clusters_per_cell (c->cell_index ());
-      for (db::connected_clusters<db::Edge>::all_iterator cl = cc.begin_all (); ! cl.at_end (); ++cl) {
-        if (cc.is_root (*cl)) {
-          db::Shapes &s = cm.merged (*cl, c->cell_index ());
-          c->shapes (m_merged_edges.layer ()).insert (s);
-          s.clear (); //  not needed anymore
+      db::hier_clusters<db::Edge> hc;
+      db::Connectivity conn;
+      conn.connect (m_deep_layer);
+      //  TODO: this uses the wrong verbosity inside ...
+      hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Edges, conn);
+
+      //  collect the clusters and merge them into big polygons
+      //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
+      //  hopefully more efficient that collecting everything and will lead to reuse of parts.
+
+      ClusterMerger cm (m_deep_layer.layer (), hc, report_progress (), progress_desc ());
+      cm.set_base_verbosity (base_verbosity ());
+
+      //  TODO: iterate only over the called cells?
+      for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+        const db::connected_clusters<db::Edge> &cc = hc.clusters_per_cell (c->cell_index ());
+        for (db::connected_clusters<db::Edge>::all_iterator cl = cc.begin_all (); ! cl.at_end (); ++cl) {
+          if (cc.is_root (*cl)) {
+            db::Shapes &s = cm.merged (*cl, c->cell_index ());
+            c->shapes (m_merged_edges.layer ()).insert (s);
+            s.clear (); //  not needed anymore
+          }
         }
       }
+
     }
 
     m_merged_edges_valid = true;
 
   }
+}
+
+void
+DeepEdges::set_is_merged (bool f)
+{
+  m_is_merged = f;
+  m_merged_edges_valid = false;
 }
 
 void
@@ -485,8 +502,7 @@ EdgesDelegate *DeepEdges::merged () const
     c->shapes (res->deep_layer ().layer ()) = c->shapes (m_merged_edges.layer ());
   }
 
-  res->deep_layer ().layer ();
-
+  res->set_is_merged (true);
   return res.release ();
 }
 
@@ -549,6 +565,7 @@ DeepEdges::add_in_place (const Edges &other)
 
   }
 
+  set_is_merged (false);
   return this;
 }
 

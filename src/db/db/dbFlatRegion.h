@@ -183,6 +183,7 @@ protected:
 
 private:
   friend class AsIfFlatRegion;
+  friend class Region;
 
   db::Shapes &raw_polygons () { return m_polygons; }
 

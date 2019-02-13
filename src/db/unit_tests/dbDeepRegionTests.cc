@@ -60,6 +60,7 @@ TEST(1)
 
     EXPECT_EQ (regions.back ().size (), db::Region (iter).size ());
     EXPECT_EQ (regions.back ().bbox (), db::Region (iter).bbox ());
+    EXPECT_EQ (regions.back ().is_merged (), false);
 
   }
 
@@ -71,6 +72,26 @@ TEST(1)
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au1.gds");
+
+  //  some operations
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+  db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (top_cell_index), l2), dss);
+  db::Region r3 (db::RecursiveShapeIterator (ly, ly.cell (top_cell_index), l3), dss);
+
+  EXPECT_EQ (r2.is_merged (), false);
+  r2.merge ();
+  EXPECT_EQ (r2.is_merged (), true);
+  r2 += r3;
+  EXPECT_EQ (r2.is_merged (), false);
+  EXPECT_EQ (r2.merged ().is_merged (), true);
+  EXPECT_EQ (r2.is_merged (), false);
+  r2.merge ();
+  EXPECT_EQ (r2.is_merged (), true);
+  r2.flatten ();
+  EXPECT_EQ (r2.is_merged (), true);
+  r2.insert (db::Box (0, 0, 1000, 2000));
+  EXPECT_EQ (r2.is_merged (), false);
 }
 
 TEST(2)
@@ -153,6 +174,8 @@ TEST(3_BoolAndNot)
   db::Region rboxand3 = box & r3;
   db::Region r42and3  = r42 & r3;
   db::Region r42and42 = r42 & r42;
+
+  EXPECT_EQ (r2and3.is_merged (), false);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -277,6 +300,8 @@ TEST(5_BoolXOR)
   db::Region rboxxor3 = box ^ r3;
   db::Region r42xor3  = r42 ^ r3;
   db::Region r42xor42 = r42 ^ r42;
+
+  EXPECT_EQ (r2xor3.is_merged (), false);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -439,7 +464,13 @@ TEST(9_SizingSimple)
 
   db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
   db::Region r6_sized = r6.sized (-50);
+  EXPECT_EQ (r6_sized.is_merged (), true);
   db::Region r6_sized_aniso = r6.sized (-20, -100);
+  EXPECT_EQ (r6_sized_aniso.is_merged (), true);
+  db::Region r6_sized_plus = r6.sized (50);
+  EXPECT_EQ (r6_sized_plus.is_merged (), false);
+  db::Region r6_sized_aniso_plus = r6.sized (20, 100);
+  EXPECT_EQ (r6_sized_aniso_plus.is_merged (), false);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -447,6 +478,8 @@ TEST(9_SizingSimple)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r6);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r6_sized);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r6_sized_aniso);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r6_sized_plus);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r6_sized_aniso_plus);
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au9a.gds");
@@ -565,6 +598,7 @@ TEST(9_SizingWithBoolean)
   r1_sized -= r1;
   db::Region r1_sized_aniso = r1.sized (1000, 2000);
   r1_sized_aniso -= r1;
+  EXPECT_EQ (r1_sized_aniso.is_merged (), false);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -603,6 +637,8 @@ TEST(10_HullsAndHoles)
 
   db::Region hulls = r1_sized.hulls ();
   db::Region holes = r1_sized.holes ();
+  EXPECT_EQ (hulls.is_merged (), true);
+  EXPECT_EQ (holes.is_merged (), true);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -673,6 +709,7 @@ TEST(12_GridSnap)
 
   db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
   db::Region r3snapped = r3.snapped (50, 50);
+  EXPECT_EQ (r3snapped.is_merged (), false);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -704,6 +741,7 @@ TEST(13_Edges)
 
   db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
   db::Edges r3edges = r3.edges ();
+  EXPECT_EQ (r3edges.is_merged (), true);
 
   db::EdgeLengthFilter f (0, 500, true);
   db::Edges r3edges_filtered = r3.edges (f);
@@ -764,6 +802,8 @@ TEST(14_Interacting)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 0)), r6.selected_overlapping (r1));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (27, 0)), r6.selected_not_overlapping (r1));
 
+  EXPECT_EQ (r2.selected_interacting (r1).is_merged (), true);
+
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au14.gds");
 }
@@ -791,6 +831,9 @@ TEST(15_Filtered)
   db::Region af1_filtered = r1.filtered (af1);
   db::RegionAreaFilter af1inv (0, 1000000000, true);
   db::Region af1_else = r1.filtered (af1inv);
+  EXPECT_EQ (af1_filtered.is_merged (), true);
+  EXPECT_EQ (af1_else.is_merged (), true);
+
 
   {
     db::Layout target;

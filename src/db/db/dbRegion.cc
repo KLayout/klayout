@@ -162,6 +162,9 @@ Region::flat_region ()
       region->RegionDelegate::operator= (*mp_delegate);
       region->insert_seq (begin ());
     }
+    if (mp_delegate) {
+      region->set_is_merged (mp_delegate->is_merged ());
+    }
     set_delegate (region);
   }
 

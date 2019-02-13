@@ -155,13 +155,17 @@ public:
 
 protected:
   virtual void merged_semantics_changed ();
+  void set_is_merged (bool f);
 
 private:
+  friend class DeepRegion;
+
   DeepEdges &operator= (const DeepEdges &other);
 
   DeepLayer m_deep_layer;
   mutable DeepLayer m_merged_edges;
   mutable bool m_merged_edges_valid;
+  bool m_is_merged;
 
   void init ();
   void ensure_merged_edges_valid () const;

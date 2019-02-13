@@ -133,7 +133,8 @@ DeepRegion::~DeepRegion ()
 DeepRegion::DeepRegion (const DeepRegion &other)
   : AsIfFlatRegion (other),
     m_deep_layer (other.m_deep_layer.copy ()),
-    m_merged_polygons_valid (other.m_merged_polygons_valid)
+    m_merged_polygons_valid (other.m_merged_polygons_valid),
+    m_is_merged (other.m_is_merged)
 {
   if (m_merged_polygons_valid) {
     m_merged_polygons = other.m_merged_polygons;
@@ -144,6 +145,7 @@ void DeepRegion::init ()
 {
   m_merged_polygons_valid = false;
   m_merged_polygons = db::DeepLayer ();
+  m_is_merged = false;
 }
 
 RegionDelegate *
@@ -226,8 +228,7 @@ DeepRegion::empty () const
 bool
 DeepRegion::is_merged () const
 {
-  //  TODO: there is no such thing as a "surely merged" state except after merged() maybe
-  return false;
+  return m_is_merged;
 }
 
 const db::Polygon *
@@ -368,40 +369,56 @@ DeepRegion::ensure_merged_polygons_valid () const
 {
   if (! m_merged_polygons_valid) {
 
-    m_merged_polygons = m_deep_layer.derived ();
+    if (m_is_merged) {
 
-    tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
+      //  NOTE: this will reuse the deep layer reference
+      m_merged_polygons = m_deep_layer;
 
-    db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+    } else {
 
-    db::hier_clusters<db::PolygonRef> hc;
-    db::Connectivity conn;
-    conn.connect (m_deep_layer);
-    //  TODO: this uses the wrong verbosity inside ...
-    hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Polygons, conn);
+      m_merged_polygons = m_deep_layer.derived ();
 
-    //  collect the clusters and merge them into big polygons
-    //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
-    //  hopefully more efficient that collecting everything and will lead to reuse of parts.
+      tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
 
-    ClusterMerger cm (m_deep_layer.layer (), layout, hc, min_coherence (), report_progress (), progress_desc ());
-    cm.set_base_verbosity (base_verbosity ());
+      db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
 
-    //  TODO: iterate only over the called cells?
-    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
-      const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (c->cell_index ());
-      for (db::connected_clusters<db::PolygonRef>::all_iterator cl = cc.begin_all (); ! cl.at_end (); ++cl) {
-        if (cc.is_root (*cl)) {
-          db::Shapes &s = cm.merged (*cl, c->cell_index ());
-          c->shapes (m_merged_polygons.layer ()).insert (s);
-          s.clear (); //  not needed anymore
+      db::hier_clusters<db::PolygonRef> hc;
+      db::Connectivity conn;
+      conn.connect (m_deep_layer);
+      //  TODO: this uses the wrong verbosity inside ...
+      hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Polygons, conn);
+
+      //  collect the clusters and merge them into big polygons
+      //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
+      //  hopefully more efficient that collecting everything and will lead to reuse of parts.
+
+      ClusterMerger cm (m_deep_layer.layer (), layout, hc, min_coherence (), report_progress (), progress_desc ());
+      cm.set_base_verbosity (base_verbosity ());
+
+      //  TODO: iterate only over the called cells?
+      for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+        const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (c->cell_index ());
+        for (db::connected_clusters<db::PolygonRef>::all_iterator cl = cc.begin_all (); ! cl.at_end (); ++cl) {
+          if (cc.is_root (*cl)) {
+            db::Shapes &s = cm.merged (*cl, c->cell_index ());
+            c->shapes (m_merged_polygons.layer ()).insert (s);
+            s.clear (); //  not needed anymore
+          }
         }
       }
+
     }
 
     m_merged_polygons_valid = true;
 
   }
+}
+
+void
+DeepRegion::set_is_merged (bool f)
+{
+  m_is_merged = f;
+  m_merged_polygons_valid = false;
 }
 
 void
@@ -530,6 +547,7 @@ DeepRegion::add_in_place (const Region &other)
 
   }
 
+  set_is_merged (false);
   return this;
 }
 
@@ -785,7 +803,15 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
   }
 
+  res->set_is_merged (true);
   return db::Edges (res.release ());
+}
+
+RegionDelegate *
+DeepRegion::filter_in_place (const PolygonFilterBase &filter)
+{
+  //  TODO: implement to be really in-place
+  return filtered (filter);
 }
 
 RegionDelegate *
@@ -828,6 +854,7 @@ DeepRegion::filtered (const PolygonFilterBase &filter) const
 
   }
 
+  res->set_is_merged (true);
   return res.release ();
 }
 
@@ -839,6 +866,7 @@ DeepRegion::merged_in_place ()
   //  NOTE: this makes both layers share the same resource
   m_deep_layer = m_merged_polygons;
 
+  set_is_merged (true);
   return this;
 }
 
@@ -863,6 +891,7 @@ DeepRegion::merged () const
 
   res->deep_layer ().layer ();
 
+  res->set_is_merged (true);
   return res.release ();
 }
 
@@ -913,6 +942,12 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
       siz.put (poly);
     }
 
+  }
+
+  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+  //  overlap after size and are not necessarily merged)
+  if (d < 0) {
+    res->set_is_merged (true);
   }
 
   return res.release ();
@@ -989,6 +1024,12 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
   }
 
+  //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+  //  overlap after size and are not necessarily merged)
+  if (dx < 0 && dy < 0) {
+    res->set_is_merged (true);
+  }
+
   return res.release ();
 }
 
@@ -1022,6 +1063,7 @@ DeepRegion::holes () const
 
   }
 
+  res->set_is_merged (true);
   return res.release ();
 }
 
@@ -1053,6 +1095,7 @@ DeepRegion::hulls () const
 
   }
 
+  res->set_is_merged (true);
   return res.release ();
 }
 
@@ -1250,7 +1293,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (m_deep_layer.store ()->threads ());
-#if 0
+#if defined(SPLIT )
   //  with these settings, the resulting polygons are broken again ...
   proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
   proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
@@ -1258,8 +1301,9 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
 
   proc.run (&op, m_merged_polygons.layer (), other_deep->merged_deep_layer ().layer (), dl_out.layer ());
 
-  //  TODO: mark the results as merged (unless we split - see above)
-  return new db::DeepRegion (dl_out);
+  db::DeepRegion *res = new db::DeepRegion (dl_out);
+  res->set_is_merged (true);
+  return res;
 }
 
 RegionDelegate *

@@ -300,117 +300,6 @@ AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
   return new_region.release ();
 }
 
-namespace
-{
-
-/**
- *  @brief A helper class for the region to edge interaction functionality
- *
- *  Note: This special scanner uses pointers to two different objects: edges and polygons.
- *  It uses odd value pointers to indicate pointers to polygons and even value pointers to indicate
- *  pointers to edges.
- *
- *  There is a special box converter which is able to sort that out as well.
- */
-template <class OutputContainer>
-class region_to_edge_interaction_filter
-  : public db::box_scanner_receiver<char, size_t>
-{
-public:
-  region_to_edge_interaction_filter (OutputContainer &output)
-    : mp_output (&output), m_inverse (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  region_to_edge_interaction_filter (OutputContainer &output, const db::RegionIterator &polygons)
-    : mp_output (&output), m_inverse (true)
-  {
-    for (db::RegionIterator p = polygons; ! p.at_end (); ++p) {
-      m_seen.insert (&*p);
-    }
-  }
-
-  void add (const char *o1, size_t p1, const char *o2, size_t p2)
-  {
-    const db::Edge *e = 0;
-    const db::Polygon *p = 0;
-
-    //  Note: edges have property 0 and have even-valued pointers.
-    //  Polygons have property 1 and odd-valued pointers.
-    if (p1 == 0 && p2 == 1) {
-      e = reinterpret_cast<const db::Edge *> (o1);
-      p = reinterpret_cast<const db::Polygon *> (o2 - 1);
-    } else if (p1 == 1 && p2 == 0) {
-      e = reinterpret_cast<const db::Edge *> (o2);
-      p = reinterpret_cast<const db::Polygon *> (o1 - 1);
-    }
-
-    if (e && p && (m_seen.find (p) == m_seen.end ()) != m_inverse) {
-
-      //  A polygon and an edge interact if the edge is either inside completely
-      //  of at least one edge of the polygon intersects with the edge
-      bool interacts = false;
-      if (p->box ().contains (e->p1 ()) && db::inside_poly (p->begin_edge (), e->p1 ()) >= 0) {
-        interacts = true;
-      } else {
-        for (db::Polygon::polygon_edge_iterator pe = p->begin_edge (); ! pe.at_end () && ! interacts; ++pe) {
-          if ((*pe).intersect (*e)) {
-            interacts = true;
-          }
-        }
-      }
-
-      if (interacts) {
-        if (m_inverse) {
-          m_seen.erase (p);
-        } else {
-          m_seen.insert (p);
-          mp_output->insert (*p);
-        }
-      }
-
-    }
-  }
-
-  void fill_output ()
-  {
-    for (std::set<const db::Polygon *>::const_iterator p = m_seen.begin (); p != m_seen.end (); ++p) {
-      mp_output->insert (**p);
-    }
-  }
-
-private:
-  OutputContainer *mp_output;
-  std::set<const db::Polygon *> m_seen;
-  bool m_inverse;
-};
-
-/**
- *  @brief A special box converter that splits the pointers into polygon and edge pointers
- */
-struct EdgeOrRegionBoxConverter
-{
-  typedef db::Box box_type;
-
-  db::Box operator() (const char &c) const
-  {
-    //  Note: edges have property 0 and have even-valued pointers.
-    //  Polygons have property 1 and odd-valued pointers.
-    const char *cp = &c;
-    if ((size_t (cp) & 1) == 1) {
-      //  it's a polygon
-      return (reinterpret_cast<const db::Polygon *> (cp - 1))->box ();
-    } else {
-      //  it's an edge
-      const db::Edge *e = reinterpret_cast<const db::Edge *> (cp);
-      return db::Box (e->p1 (), e->p2 ());
-    }
-  }
-};
-
-}
-
 RegionDelegate *
 AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse) const
 {
@@ -424,30 +313,31 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse) 
     return clone ();
   }
 
-  db::box_scanner<char, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve (size () + other.size ());
+  db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner (report_progress (), progress_desc ());
+  scanner.reserve1 (size ());
+  scanner.reserve2 (other.size ());
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (false));
+  region_to_edge_interaction_filter<Shapes> filter (output->raw_polygons (), inverse);
 
   AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
 
   for ( ; ! p.at_end (); ++p) {
-    scanner.insert ((char *) p.operator-> () + 1, 1);
+    scanner.insert1 (p.operator-> (), 0);
+    if (inverse) {
+      filter.preset (p.operator-> ());
+    }
   }
 
   AddressableEdgeDelivery e (other.addressable_edges ());
 
   for ( ; ! e.at_end (); ++e) {
-    scanner.insert ((char *) e.operator-> (), 0);
+    scanner.insert2 (e.operator-> (), 0);
   }
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (false));
-  EdgeOrRegionBoxConverter bc;
+  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
 
-  if (! inverse) {
-    region_to_edge_interaction_filter<Shapes> filter (output->raw_polygons ());
-    scanner.process (filter, 1, bc);
-  } else {
-    region_to_edge_interaction_filter<Shapes> filter (output->raw_polygons (), RegionIterator (begin_merged ()));
-    scanner.process (filter, 1, bc);
+  if (inverse) {
     filter.fill_output ();
   }
 

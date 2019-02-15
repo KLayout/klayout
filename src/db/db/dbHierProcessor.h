@@ -54,6 +54,8 @@ public:
   typedef std::unordered_map<unsigned int, std::vector<unsigned int> > container;
   typedef container::const_iterator iterator;
   typedef container::value_type::second_type::const_iterator iterator2;
+  typedef typename std::unordered_map<unsigned int, TS>::const_iterator subject_iterator;
+  typedef typename std::unordered_map<unsigned int, TI>::const_iterator intruder_iterator;
 
   shape_interactions ();
 
@@ -65,6 +67,26 @@ public:
   iterator end () const
   {
     return m_interactions.end ();
+  }
+
+  subject_iterator begin_subjects () const
+  {
+    return m_subject_shapes.begin ();
+  }
+
+  subject_iterator end_subjects () const
+  {
+    return m_subject_shapes.end ();
+  }
+
+  intruder_iterator begin_intruders () const
+  {
+    return m_intruder_shapes.begin ();
+  }
+
+  intruder_iterator end_intruders () const
+  {
+    return m_intruder_shapes.end ();
   }
 
   bool has_intruder_shape_id (unsigned int id) const;

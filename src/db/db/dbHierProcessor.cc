@@ -238,6 +238,30 @@ private:
 };
 
 // ---------------------------------------------------------------------------------------------
+
+/**
+ *  @brief Safe enlargement of a box
+ *  Boxes must not vanish when augmented for overlapping queries. Hence we must not make
+ *  the boxes shrinked too much on enlarge.
+ */
+db::Box safe_box_enlarged (const db::Box &box, db::Coord dx, db::Coord dy)
+{
+  if (box.empty ()) {
+    return box;
+  } else {
+    db::Coord w2 = db::Coord (box.width () / 2);
+    db::Coord h2 = db::Coord (box.height () / 2);
+    if (dx + w2 < 0) {
+      dx = -w2;
+    }
+    if (dy + h2 < 0) {
+      dy = -h2;
+    }
+    return box.enlarged (db::Vector (dx, dy));
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
 //  LocalProcessorCellContext implementation
 
 template <class TS, class TI, class TR>
@@ -723,7 +747,7 @@ public:
     //  Find all instance array members that potentially interact with the shape and use
     //  add_shapes_from_intruder_inst on them
     db::Box ref_box = db::box_convert<TS> () (*ref);
-    for (db::CellInstArray::iterator n = inst->begin_touching (ref_box.enlarged (db::Vector (m_dist - 1, m_dist - 1)), inst_bc); !n.at_end (); ++n) {
+    for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (ref_box, m_dist - 1, m_dist - 1), inst_bc); !n.at_end (); ++n) {
       db::ICplxTrans tn = inst->complex_trans (*n);
       db::Box region = ref_box.transformed (tn.inverted ()).enlarged (db::Vector (m_dist, m_dist)) & intruder_cell.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
       if (! region.empty ()) {
@@ -794,7 +818,7 @@ instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, u
 
       //  TODO: in some cases, it may be possible to optimize this for arrays
 
-      for (db::CellInstArray::iterator k = inst2->begin_touching (ibox1.enlarged (db::Vector (-1, -1)), inst2_bc); ! k.at_end (); ++k) {
+      for (db::CellInstArray::iterator k = inst2->begin_touching (safe_box_enlarged (ibox1, -1, -1), inst2_bc); ! k.at_end (); ++k) {
 
         if (inst1 == inst2 && *n == *k) {
           //  skip self-interactions - this is handled inside the cell
@@ -887,7 +911,7 @@ instance_shape_interacts (const db::Layout *layout, const db::CellInstArray *ins
   db::box_convert <db::CellInst, true> inst_bc (*layout, layer);
   db::Box rbox = db::box_convert<T> () (ref);
 
-  for (db::CellInstArray::iterator n = inst->begin_touching (rbox.enlarged (db::Vector (dist - 1, dist - 1)), inst_bc); ! n.at_end (); ++n) {
+  for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (rbox, dist - 1, dist - 1), inst_bc); ! n.at_end (); ++n) {
 
     db::ICplxTrans tn = inst->complex_trans (*n);
     db::Box cbox = (tn * cell.bbox (layer)).enlarged (db::Vector (dist, dist)) & rbox.enlarged (db::Vector (dist, dist));
@@ -1293,7 +1317,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
           //  TODO: in some cases, it may be possible to optimize this for arrays
 
           for (std::unordered_set<const db::CellInstArray *>::const_iterator j = i->second.first.begin (); j != i->second.first.end (); ++j) {
-            for (db::CellInstArray::iterator k = (*j)->begin_touching (nbox.enlarged (db::Vector (-1, -1)), inst_bcii); ! k.at_end (); ++k) {
+            for (db::CellInstArray::iterator k = (*j)->begin_touching (safe_box_enlarged (nbox, -1, -1), inst_bcii); ! k.at_end (); ++k) {
               db::ICplxTrans tk = (*j)->complex_trans (*k);
               //  NOTE: no self-interactions
               if (i->first != *j || tn != tk) {
@@ -1568,7 +1592,20 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
   }
 
-  op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio);
+  if (interactions.begin () != interactions.end ()) {
+
+    if (interactions.begin_intruders () == interactions.end_intruders ()) {
+
+      typename local_operation<TS, TI, TR>::on_empty_intruder_mode eh = op->on_empty_intruder_hint ();
+      if (eh == local_operation<TS, TI, TR>::Drop) {
+        return;
+      }
+
+    }
+
+    op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio);
+
+  }
 }
 
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef>;

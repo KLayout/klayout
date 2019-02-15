@@ -27,8 +27,74 @@
 #include "dbCommon.h"
 
 #include "dbRegionDelegate.h"
+#include "dbPolygon.h"
+#include "dbEdge.h"
+#include "dbBoxScanner.h"
+
+#include <set>
 
 namespace db {
+
+/**
+ *  @brief A helper class for the region to edge interaction functionality
+ */
+template <class OutputContainer>
+class DB_PUBLIC region_to_edge_interaction_filter
+  : public db::box_scanner_receiver2<db::Polygon, size_t, db::Edge, size_t>
+{
+public:
+  region_to_edge_interaction_filter (OutputContainer &output, bool inverse)
+    : mp_output (&output), m_inverse (inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  void preset (const db::Polygon *poly)
+  {
+    m_seen.insert (poly);
+  }
+
+  void add (const db::Polygon *p, size_t, const db::Edge *e, size_t)
+  {
+    if ((m_seen.find (p) == m_seen.end ()) != m_inverse) {
+
+      //  A polygon and an edge interact if the edge is either inside completely
+      //  of at least one edge of the polygon intersects with the edge
+      bool interacts = false;
+      if (p->box ().contains (e->p1 ()) && db::inside_poly (p->begin_edge (), e->p1 ()) >= 0) {
+        interacts = true;
+      } else {
+        for (db::Polygon::polygon_edge_iterator pe = p->begin_edge (); ! pe.at_end () && ! interacts; ++pe) {
+          if ((*pe).intersect (*e)) {
+            interacts = true;
+          }
+        }
+      }
+
+      if (interacts) {
+        if (m_inverse) {
+          m_seen.erase (p);
+        } else {
+          m_seen.insert (p);
+          mp_output->insert (*p);
+        }
+      }
+
+    }
+  }
+
+  void fill_output ()
+  {
+    for (std::set<const db::Polygon *>::const_iterator p = m_seen.begin (); p != m_seen.end (); ++p) {
+      mp_output->insert (**p);
+    }
+  }
+
+private:
+  OutputContainer *mp_output;
+  std::set<const db::Polygon *> m_seen;
+  bool m_inverse;
+};
 
 /**
  *  @brief Provides default flat implementations

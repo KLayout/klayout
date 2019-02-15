@@ -1328,11 +1328,93 @@ private:
   mutable db::EdgeProcessor m_ep;
 };
 
+struct ResultInserter
+{
+  ResultInserter (db::Layout *layout, std::unordered_set<db::PolygonRef> &result)
+    : mp_layout (layout), mp_result (&result)
+  {
+    //  .. nothing yet ..
+  }
+
+  void insert (const db::Polygon &p)
+  {
+    (*mp_result).insert (db::PolygonRef (p, mp_layout->shape_repository ()));
+  }
+
+private:
+  db::Layout *mp_layout;
+  std::unordered_set<db::PolygonRef> *mp_result;
+};
+
+class InteractingWithEdgeLocalOperation
+  : public local_operation<db::PolygonRef, db::Edge, db::PolygonRef>
+{
+public:
+  InteractingWithEdgeLocalOperation (bool inverse)
+    : m_inverse (inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    m_scanner.clear ();
+
+    ResultInserter inserter (layout, result);
+    region_to_edge_interaction_filter<ResultInserter> filter (inserter, m_inverse);
+
+    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        m_scanner.insert2 (& interactions.intruder_shape (*j), 0);
+      }
+    }
+
+    std::list<db::Polygon> heap;
+    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+      const db::PolygonRef &subject = interactions.subject_shape (i->first);
+      heap.push_back (subject.obj ().transformed (subject.trans ()));
+
+      m_scanner.insert1 (&heap.back (), 0);
+      if (m_inverse) {
+        filter.preset (&heap.back ());
+      }
+
+    }
+
+    m_scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
+    if (m_inverse) {
+      filter.fill_output ();
+    }
+  }
+
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  {
+    if (!m_inverse) {
+      return Drop;
+    } else {
+      return Copy;
+    }
+  }
+
+  virtual std::string description () const
+  {
+    return tl::to_string (tr ("Select regions by their geometric relation (interacting, inside, outside ..)"));
+  }
+
+private:
+  bool m_inverse;
+  mutable db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> m_scanner;
+};
+
 }
 
 RegionDelegate *
 DeepRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const
 {
+  //  with these flag set to true, the resulting polygons are broken again.
+  bool split_after = false;
+
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
     return db::AsIfFlatRegion::selected_interacting_generic (other, mode, touching, inverse);
@@ -1347,24 +1429,52 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (m_deep_layer.store ()->threads ());
-#if defined(SPLIT )
-  //  with these settings, the resulting polygons are broken again ...
-  proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
-  proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
-#endif
+  if (split_after) {
+    proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
+    proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
+  }
 
-  proc.run (&op, m_merged_polygons.layer (), other_deep->merged_deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, m_merged_polygons.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
 
   db::DeepRegion *res = new db::DeepRegion (dl_out);
-  res->set_is_merged (true);
+  if (! split_after) {
+    res->set_is_merged (true);
+  }
   return res;
 }
 
 RegionDelegate *
 DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) const
 {
-  //  TODO: implement hierarchically
-  return db::AsIfFlatRegion::selected_interacting_generic (other, inverse);
+  //  with these flag set to true, the resulting polygons are broken again.
+  bool split_after = false;
+
+  const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
+  if (! other_deep) {
+    return db::AsIfFlatRegion::selected_interacting_generic (other, inverse);
+  }
+
+  ensure_merged_polygons_valid ();
+
+  DeepLayer dl_out (m_deep_layer.derived ());
+
+  db::InteractingWithEdgeLocalOperation op (inverse);
+
+  db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (m_deep_layer.store ()->threads ());
+  if (split_after) {
+    proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
+    proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
+  }
+
+  proc.run (&op, m_merged_polygons.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+
+  db::DeepRegion *res = new db::DeepRegion (dl_out);
+  if (! split_after) {
+    res->set_is_merged (true);
+  }
+  return res;
 }
 
 }

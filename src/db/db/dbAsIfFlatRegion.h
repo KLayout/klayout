@@ -30,10 +30,273 @@
 #include "dbPolygon.h"
 #include "dbEdge.h"
 #include "dbBoxScanner.h"
+#include "dbEdgePairRelations.h"
 
 #include <set>
 
 namespace db {
+
+/**
+ *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
+ */
+template <class Output>
+class edge2edge_check
+  : public db::box_scanner_receiver<db::Edge, size_t>
+{
+public:
+  edge2edge_check (const EdgeRelationFilter &check, Output &output, bool different_polygons, bool requires_different_layers)
+    : mp_check (&check), mp_output (&output), m_requires_different_layers (requires_different_layers), m_different_polygons (different_polygons),
+      m_pass (0)
+  {
+    m_distance = check.distance ();
+  }
+
+  bool prepare_next_pass ()
+  {
+    ++m_pass;
+
+    if (m_pass == 1) {
+
+      if (! m_ep.empty ()) {
+        m_ep_discarded.resize (m_ep.size (), false);
+        return true;
+      }
+
+    } else if (m_pass == 2) {
+
+      std::vector<bool>::const_iterator d = m_ep_discarded.begin ();
+      std::vector<db::EdgePair>::const_iterator ep = m_ep.begin ();
+      while (ep != m_ep.end ()) {
+        tl_assert (d != m_ep_discarded.end ());
+        if (! *d) {
+          mp_output->insert (*ep);
+        }
+        ++d;
+        ++ep;
+      }
+
+    }
+
+    return false;
+  }
+
+  void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
+  {
+    if (m_pass == 0) {
+
+      //  Overlap or inside checks require input from different layers
+      if ((! m_different_polygons || p1 != p2) && (! m_requires_different_layers || ((p1 ^ p2) & 1) != 0)) {
+
+        //  ensure that the first check argument is of layer 1 and the second of
+        //  layer 2 (unless both are of the same layer)
+        int l1 = int (p1 & size_t (1));
+        int l2 = int (p2 & size_t (1));
+
+        db::EdgePair ep;
+        if (mp_check->check (l1 <= l2 ? *o1 : *o2, l1 <= l2 ? *o2 : *o1, &ep)) {
+
+          //  found a violation: store inside the local buffer for now. In the second
+          //  pass we will eliminate those which are shielded completely.
+          size_t n = m_ep.size ();
+          m_ep.push_back (ep);
+          m_e2ep.insert (std::make_pair (std::make_pair (*o1, p1), n));
+          m_e2ep.insert (std::make_pair (std::make_pair (*o2, p2), n));
+
+        }
+
+      }
+
+    } else {
+
+      //  a simple (complete) shielding implementation which is based on the
+      //  assumption that shielding is relevant as soon as a foreign edge cuts through
+      //  both of the edge pair's connecting edges.
+
+      //  TODO: this implementation does not take into account the nature of the
+      //  EdgePair - because of "whole_edge" it may not reflect the part actually
+      //  violating the distance.
+
+      std::vector<size_t> n1, n2;
+
+      for (unsigned int p = 0; p < 2; ++p) {
+
+        std::pair<db::Edge, size_t> k (*o1, p1);
+        for (std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i = m_e2ep.find (k); i != m_e2ep.end () && i->first == k; ++i) {
+          n1.push_back (i->second);
+        }
+
+        std::sort (n1.begin (), n1.end ());
+
+        std::swap (o1, o2);
+        std::swap (p1, p2);
+        n1.swap (n2);
+
+      }
+
+      for (unsigned int p = 0; p < 2; ++p) {
+
+        std::vector<size_t> nn;
+        std::set_difference (n1.begin (), n1.end (), n2.begin (), n2.end (), std::back_inserter (nn));
+
+        for (std::vector<size_t>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
+          if (! m_ep_discarded [*i]) {
+            db::EdgePair ep = m_ep [*i].normalized ();
+            if (db::Edge (ep.first ().p1 (), ep.second ().p2 ()).intersect (*o2) &&
+                db::Edge (ep.second ().p1 (), ep.first ().p2 ()).intersect (*o2)) {
+              m_ep_discarded [*i] = true;
+            }
+          }
+        }
+
+        std::swap (o1, o2);
+        std::swap (p1, p2);
+        n1.swap (n2);
+
+      }
+
+    }
+
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the check requires different layers
+   */
+  bool requires_different_layers () const
+  {
+    return m_requires_different_layers;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether the check requires different layers
+   */
+  void set_requires_different_layers (bool f)
+  {
+    m_requires_different_layers = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the check requires different layers
+   */
+  bool different_polygons () const
+  {
+    return m_different_polygons;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether the check requires different layers
+   */
+  void set_different_polygons (bool f)
+  {
+    m_different_polygons = f;
+  }
+
+  /**
+   *  @brief Gets the distance value
+   */
+  EdgeRelationFilter::distance_type distance () const
+  {
+    return m_distance;
+  }
+
+private:
+  const EdgeRelationFilter *mp_check;
+  Output *mp_output;
+  bool m_requires_different_layers;
+  bool m_different_polygons;
+  EdgeRelationFilter::distance_type m_distance;
+  std::vector<db::EdgePair> m_ep;
+  std::multimap<std::pair<db::Edge, size_t>, size_t> m_e2ep;
+  std::vector<bool> m_ep_discarded;
+  unsigned int m_pass;
+};
+
+/**
+ *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
+ */
+template <class Output>
+class poly2poly_check
+  : public db::box_scanner_receiver<db::Polygon, size_t>
+{
+public:
+  poly2poly_check (edge2edge_check<Output> &output)
+    : mp_output (&output)
+  {
+    //  .. nothing yet ..
+  }
+
+  void finish (const db::Polygon *o, size_t p)
+  {
+    enter (*o, p);
+  }
+
+  void enter (const db::Polygon &o, size_t p)
+  {
+    if (! mp_output->requires_different_layers () && ! mp_output->different_polygons ()) {
+
+      //  finally we check the polygons vs. itself for checks involving intra-polygon interactions
+
+      m_scanner.clear ();
+      m_scanner.reserve (o.vertices ());
+
+      m_edges.clear ();
+      m_edges.reserve (o.vertices ());
+
+      for (db::Polygon::polygon_edge_iterator e = o.begin_edge (); ! e.at_end (); ++e) {
+        m_edges.push_back (*e);
+        m_scanner.insert (& m_edges.back (), p);
+      }
+
+      tl_assert (m_edges.size () == o.vertices ());
+
+      m_scanner.process (*mp_output, mp_output->distance (), db::box_convert<db::Edge> ());
+
+    }
+  }
+
+  void add (const db::Polygon *o1, size_t p1, const db::Polygon *o2, size_t p2)
+  {
+    enter (*o1, p1, *o2, p2);
+  }
+
+  void enter (const db::Polygon &o1, size_t p1, const db::Polygon &o2, size_t p2)
+  {
+    if ((! mp_output->different_polygons () || p1 != p2) && (! mp_output->requires_different_layers () || ((p1 ^ p2) & 1) != 0)) {
+
+      m_scanner.clear ();
+      m_scanner.reserve (o1.vertices () + o2.vertices ());
+
+      m_edges.clear ();
+      m_edges.reserve (o1.vertices () + o2.vertices ());
+
+      for (db::Polygon::polygon_edge_iterator e = o1.begin_edge (); ! e.at_end (); ++e) {
+        m_edges.push_back (*e);
+        m_scanner.insert (& m_edges.back (), p1);
+      }
+
+      for (db::Polygon::polygon_edge_iterator e = o2.begin_edge (); ! e.at_end (); ++e) {
+        m_edges.push_back (*e);
+        m_scanner.insert (& m_edges.back (), p2);
+      }
+
+      tl_assert (m_edges.size () == o1.vertices () + o2.vertices ());
+
+      //  temporarily disable intra-polygon check in that step .. we do that later in finish()
+      //  if required (#650).
+      bool no_intra = mp_output->different_polygons ();
+      mp_output->set_different_polygons (true);
+
+      m_scanner.process (*mp_output, mp_output->distance (), db::box_convert<db::Edge> ());
+
+      mp_output->set_different_polygons (no_intra);
+
+    }
+  }
+
+private:
+  db::box_scanner<db::Edge, size_t> m_scanner;
+  edge2edge_check<Output> *mp_output;
+  std::vector<db::Edge> m_edges;
+};
 
 /**
  *  @brief A helper class for the region to edge interaction functionality

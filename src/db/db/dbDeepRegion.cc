@@ -26,6 +26,7 @@
 #include "dbEmptyRegion.h"
 #include "dbRegion.h"
 #include "dbDeepEdges.h"
+#include "dbDeepEdgePairs.h"
 #include "dbShapeProcessor.h"
 #include "dbFlatRegion.h"
 #include "dbHierProcessor.h"
@@ -1233,18 +1234,142 @@ DeepRegion::smoothed (coord_type d) const
   return res.release ();
 }
 
+namespace
+{
+
+class CheckLocalOperation
+  : public local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair>
+{
+public:
+  CheckLocalOperation (const EdgeRelationFilter &check, bool different_polygons)
+    : m_check (check), m_different_polygons (different_polygons)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::EdgePair> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    edge2edge_check<std::unordered_set<db::EdgePair> > edge_check (m_check, result, false, false);
+    poly2poly_check<std::unordered_set<db::EdgePair> > poly_check (edge_check);
+
+    std::set<db::PolygonRef> others;
+    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        others.insert (interactions.intruder_shape (*j));
+      }
+    }
+
+    size_t n = 0;
+    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
+      const db::PolygonRef &subject = interactions.subject_shape (i->first);
+      db::Polygon poly = subject.obj ().transformed (subject.trans ());
+      poly_check.enter (poly, n);
+      n += 2;
+    }
+
+    n = 1;
+    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      db::Polygon poly = o->obj ().transformed (o->trans ());
+      poly_check.enter (poly, n);
+      n += 2;
+    }
+
+    db::box_scanner<db::Polygon, size_t> scanner;
+
+    do {
+      scanner.process (poly_check, m_check.distance (), db::box_convert<db::Polygon> ());
+    } while (edge_check.prepare_next_pass ());
+  }
+
+  virtual db::Coord dist () const
+  {
+    //  TODO: will the distance be sufficient? Or should be take somewhat more?
+    return m_check.distance ();
+  }
+
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  {
+    return m_different_polygons ? Drop : Ignore;
+  }
+
+  virtual std::string description () const
+  {
+    return tl::to_string (tr ("Generic DRC check"));
+  }
+
+private:
+  EdgeRelationFilter m_check;
+  bool m_different_polygons;
+};
+
+}
+
 EdgePairs
 DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
 {
-  //  TODO: implement hierarchically
-  return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other->delegate ());
+  if (! other_deep) {
+    return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+  }
+
+  ensure_merged_polygons_valid ();
+
+  EdgeRelationFilter check (rel, d, metrics);
+  check.set_whole_edges (whole_edges);
+  check.set_ignore_angle (ignore_angle);
+  check.set_min_projection (min_projection);
+  check.set_max_projection (max_projection);
+
+  DeepLayer dl_out (m_deep_layer.derived ());
+  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (m_merged_polygons.derived ()));
+
+  db::CheckLocalOperation op (check, different_polygons);
+
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (m_deep_layer.store ()->threads ());
+
+  proc.run (&op, m_merged_polygons.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+
+  return db::EdgePairs (res.release ());
 }
 
 EdgePairs
 DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
 {
-  //  TODO: implement hierarchically
-  return db::AsIfFlatRegion::run_single_polygon_check (rel, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+  ensure_merged_polygons_valid ();
+
+  EdgeRelationFilter check (rel, d, metrics);
+  check.set_whole_edges (whole_edges);
+  check.set_ignore_angle (ignore_angle);
+  check.set_min_projection (min_projection);
+  check.set_max_projection (max_projection);
+
+  db::Layout &layout = m_merged_polygons.layout ();
+
+  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (m_merged_polygons.derived ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &shapes = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &result = c->shapes (res->deep_layer ().layer ());
+
+    for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::Polygons); ! s.at_end (); ++s) {
+
+      edge2edge_check<db::Shapes> edge_check (check, result, false, false);
+      poly2poly_check<db::Shapes> poly_check (edge_check);
+
+      db::Polygon poly;
+      s->polygon (poly);
+
+      do {
+        poly_check.enter (poly, 0);
+      } while (edge_check.prepare_next_pass ());
+
+    }
+
+  }
+
+  return db::EdgePairs (res.release ());
 }
 
 namespace

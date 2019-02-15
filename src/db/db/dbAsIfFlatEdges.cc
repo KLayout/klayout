@@ -701,11 +701,12 @@ namespace
  *
  *  If will perform a edge by edge check using the provided EdgeRelationFilter
  */
-class Edge2EdgeCheck
+template <class Output>
+class edge2edge_check_for_edges
   : public db::box_scanner_receiver<db::Edge, size_t>
 {
 public:
-  Edge2EdgeCheck (const EdgeRelationFilter &check, EdgePairs &output, bool requires_different_layers)
+  edge2edge_check_for_edges (const EdgeRelationFilter &check, Output &output, bool requires_different_layers)
     : mp_check (&check), mp_output (&output)
   {
     m_requires_different_layers = requires_different_layers;
@@ -731,7 +732,7 @@ public:
 
 private:
   const EdgeRelationFilter *mp_check;
-  EdgePairs *mp_output;
+  Output *mp_output;
   bool m_requires_different_layers;
 };
 
@@ -771,7 +772,7 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
   check.set_min_projection (min_projection);
   check.set_max_projection (max_projection);
 
-  Edge2EdgeCheck edge_check (check, result, other != 0);
+  edge2edge_check_for_edges<db::EdgePairs> edge_check (check, result, other != 0);
   scanner.process (edge_check, d, db::box_convert<db::Edge> ());
 
   return result;

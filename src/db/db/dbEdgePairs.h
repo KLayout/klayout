@@ -274,8 +274,18 @@ public:
    *
    *  Creates an edge pair set representing a single instance of that object
    */
-  template <class Sh>
-  explicit EdgePairs (const Sh &s)
+  explicit EdgePairs (const db::EdgePair &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from an object
+   *
+   *  Creates an edge pair set representing a single instance of that object
+   */
+  explicit EdgePairs (const db::Shape &s)
     : mp_delegate (0)
   {
     insert (s);

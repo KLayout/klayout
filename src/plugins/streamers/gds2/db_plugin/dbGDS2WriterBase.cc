@@ -296,7 +296,7 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
           int layer = l->second.layer;
           int datatype = l->second.datatype;
 
-          db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
+          db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::EdgePairs | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
           while (! shape.at_end ()) {
 
             progress_checkpoint ();
@@ -307,6 +307,9 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
               write_polygon (layer, datatype, sf, *shape, multi_xy, max_vertex_count, layout, shape->prop_id ());
             } else if (shape->is_edge ()) {
               write_edge (layer, datatype, sf, *shape, layout, shape->prop_id ());
+            } else if (shape->is_edge_pair ()) {
+              write_edge (layer, datatype, sf, shape->edge_pair ().first (), layout, shape->prop_id ());
+              write_edge (layer, datatype, sf, shape->edge_pair ().second (), layout, shape->prop_id ());
             } else if (shape->is_path ()) {
               if (no_zero_length_paths && (shape->path_length () - shape->path_extensions ().first - shape->path_extensions ().second) == 0) {
                 //  eliminate the zero-width path
@@ -580,8 +583,12 @@ GDS2WriterBase::write_path (int layer, int datatype, double sf, const db::Shape 
 void
 GDS2WriterBase::write_edge (int layer, int datatype, double sf, const db::Shape &shape, const db::Layout &layout, db::properties_id_type prop_id)
 {
-  db::Edge e (shape.edge ());
+  write_edge (layer, datatype, sf, shape.edge (), layout, prop_id);
+}
 
+void
+GDS2WriterBase::write_edge (int layer, int datatype, double sf, const db::Edge &e, const db::Layout &layout, db::properties_id_type prop_id)
+{
   write_record_size (4);
   write_record (sPATH);
 

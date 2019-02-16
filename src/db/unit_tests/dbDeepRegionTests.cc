@@ -927,6 +927,92 @@ TEST(16_MergeWithMinWC)
   }
 }
 
+TEST(17_SinglePolygonChecks)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+  unsigned int l6 = ly.get_layer (db::LayerProperties (6, 0));
+  unsigned int l4 = ly.get_layer (db::LayerProperties (4, 0));
+
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
+  db::Region r4 (db::RecursiveShapeIterator (ly, top_cell, l4), dss);
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (3, 0)), r3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (4, 0)), r4);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (6, 0)), r6);
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r3.width_check (260, false, db::Euclidian, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3.width_check (260, true, db::Projection, 90, 2000));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r6.notch_check (1300, false, db::Euclidian, 90, 0));
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au17.gds");
+  }
+}
+
+TEST(18_Checks)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+  unsigned int l6 = ly.get_layer (db::LayerProperties (6, 0));
+  unsigned int l4 = ly.get_layer (db::LayerProperties (4, 0));
+
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
+  db::Region r4 (db::RecursiveShapeIterator (ly, top_cell, l4), dss);
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (3, 0)), r3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (4, 0)), r4);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (6, 0)), r6);
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r3.space_check (500, false, db::Projection, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3.space_check (500, true, db::Projection, 90, 300));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r3.separation_check (r4, 200, false, db::Projection, 90, 0));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r6.enclosing_check (r4, 100, true, db::Projection, 90, 0));
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au18.gds");
+  }
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

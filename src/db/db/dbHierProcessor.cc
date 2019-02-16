@@ -315,10 +315,10 @@ local_processor_cell_context<TS, TI, TR>::propagate (const std::unordered_set<TR
 
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::PolygonRef>;
-template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::EdgePair>;
 template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Polygon, db::Edge>;
-template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge, db::EdgePair>;
 
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorCellContexts implementation
@@ -1033,7 +1033,7 @@ template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef,
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Edge, db::EdgePair>;
 
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessor implementation
@@ -1610,10 +1610,10 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::PolygonRef>;
-template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair>;
 template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::EdgePair>;
 
 }
 

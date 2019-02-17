@@ -542,6 +542,10 @@ protected:
   RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
 
   static void produce_shape_for_strange_polygon (const db::Polygon &poly, db::Shapes &shapes);
+  template <class Trans>
+  static void produce_markers_for_grid_check (const db::Polygon &poly, const Trans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes);
+  template <class Trans>
+  static void produce_markers_for_angle_check (const db::Polygon &poly, const Trans &tr, double min, double max, bool inverse, db::Shapes &shapes);
   static db::Polygon snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vector<db::Point> &heap);
 
 private:

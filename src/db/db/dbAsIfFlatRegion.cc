@@ -23,6 +23,7 @@
 
 #include "dbAsIfFlatRegion.h"
 #include "dbFlatRegion.h"
+#include "dbFlatEdgePairs.h"
 #include "dbEmptyRegion.h"
 #include "dbRegion.h"
 #include "dbShapeProcessor.h"
@@ -404,39 +405,48 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   return output.release ();
 }
 
-EdgePairs
-AsIfFlatRegion::grid_check (db::Coord gx, db::Coord gy) const
+template <class Trans>
+void
+AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const Trans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes)
 {
-  EdgePairs out;
-
   gx = std::max (db::Coord (1), gx);
   gy = std::max (db::Coord (1), gy);
 
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+  for (size_t i = 0; i < poly.holes () + 1; ++i) {
 
-    for (size_t i = 0; i < p->holes () + 1; ++i) {
+    db::Polygon::polygon_contour_iterator b, e;
 
-      db::Polygon::polygon_contour_iterator b, e;
+    if (i == 0) {
+      b = poly.begin_hull ();
+      e = poly.end_hull ();
+    } else {
+      b = poly.begin_hole ((unsigned int) (i - 1));
+      e = poly.end_hole ((unsigned int)  (i - 1));
+    }
 
-      if (i == 0) {
-        b = p->begin_hull ();
-        e = p->end_hull ();
-      } else {
-        b = p->begin_hole ((unsigned int) (i - 1));
-        e = p->end_hole ((unsigned int)  (i - 1));
+    for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
+      db::Point p = tr * *pt;
+      if ((p.x () % gx) != 0 || (p.y () % gy) != 0) {
+        shapes.insert (EdgePair (db::Edge (p, p), db::Edge (p, p)));
       }
-
-      for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
-        if (((*pt).x () % gx) != 0 || ((*pt).y () % gy) != 0) {
-          out.insert (EdgePair (db::Edge (*pt, *pt), db::Edge (*pt, *pt)));
-        }
-      }
-
     }
 
   }
+}
 
-  return out;
+template void AsIfFlatRegion::produce_markers_for_grid_check<db::ICplxTrans> (const db::Polygon &poly, const db::ICplxTrans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes);
+template void AsIfFlatRegion::produce_markers_for_grid_check<db::UnitTrans> (const db::Polygon &poly, const db::UnitTrans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes);
+
+EdgePairs
+AsIfFlatRegion::grid_check (db::Coord gx, db::Coord gy) const
+{
+  std::auto_ptr<db::FlatEdgePairs> res (new db::FlatEdgePairs ());
+
+  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+    produce_markers_for_grid_check (*p, db::UnitTrans (), gx, gy, res->raw_edge_pairs ());
+  }
+
+  return EdgePairs (res.release ());
 }
 
 static bool ac_less (double cos_a, bool gt180_a, double cos_b, bool gt180_b)
@@ -452,50 +462,61 @@ static bool ac_less (double cos_a, bool gt180_a, double cos_b, bool gt180_b)
   }
 }
 
-EdgePairs
-AsIfFlatRegion::angle_check (double min, double max, bool inverse) const
+template <class Trans>
+void
+AsIfFlatRegion::produce_markers_for_angle_check (const db::Polygon &poly, const Trans &tr, double min, double max, bool inverse, db::Shapes &shapes)
 {
-  EdgePairs out;
-
   double cos_min = cos (std::max (0.0, std::min (360.0, min)) / 180.0 * M_PI);
   double cos_max = cos (std::max (0.0, std::min (360.0, max)) / 180.0 * M_PI);
   bool gt180_min = min > 180.0;
   bool gt180_max = max > 180.0;
 
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+  for (size_t i = 0; i < poly.holes () + 1; ++i) {
 
-    for (size_t i = 0; i < p->holes () + 1; ++i) {
+    const db::Polygon::contour_type *h = 0;
+    if (i == 0) {
+      h = &poly.hull ();
+    } else {
+      h = &poly.hole ((unsigned int) (i - 1));
+    }
 
-      const db::Polygon::contour_type *h = 0;
-      if (i == 0) {
-        h = &p->hull ();
-      } else {
-        h = &p->hole ((unsigned int) (i - 1));
-      }
+    size_t np = h->size ();
 
-      size_t np = h->size ();
+    for (size_t j = 0; j < np; ++j) {
 
-      for (size_t j = 0; j < np; ++j) {
+      db::Edge e ((*h) [j], (*h) [(j + 1) % np]);
+      e.transform (tr);
+      db::Edge ee (e.p2 (), (*h) [(j + 2) % np]);
+      ee.transform (tr);
 
-        db::Edge e ((*h) [j], (*h) [(j + 1) % np]);
-        db::Edge ee (e.p2 (), (*h) [(j + 2) % np]);
-        double le = e.double_length ();
-        double lee = ee.double_length ();
+      double le = e.double_length ();
+      double lee = ee.double_length ();
 
-        double cos_a = -db::sprod (e, ee) / (le * lee);
-        bool gt180_a = db::vprod_sign (e, ee) > 0;
+      double cos_a = -db::sprod (e, ee) / (le * lee);
+      bool gt180_a = db::vprod_sign (e, ee) > 0;
 
-        if ((ac_less (cos_a, gt180_a, cos_max, gt180_max) && !ac_less (cos_a, gt180_a, cos_min, gt180_min)) == !inverse) {
-          out.insert (EdgePair (e, ee));
-        }
-
+      if ((ac_less (cos_a, gt180_a, cos_max, gt180_max) && !ac_less (cos_a, gt180_a, cos_min, gt180_min)) == !inverse) {
+        shapes.insert (EdgePair (e, ee));
       }
 
     }
 
   }
+}
 
-  return out;
+template void AsIfFlatRegion::produce_markers_for_angle_check<db::ICplxTrans> (const db::Polygon &poly, const db::ICplxTrans &tr, double min, double max, bool inverse, db::Shapes &shapes);
+template void AsIfFlatRegion::produce_markers_for_angle_check<db::UnitTrans> (const db::Polygon &poly, const db::UnitTrans &tr, double min, double max, bool inverse, db::Shapes &shapes);
+
+EdgePairs
+AsIfFlatRegion::angle_check (double min, double max, bool inverse) const
+{
+  std::auto_ptr<db::FlatEdgePairs> res (new db::FlatEdgePairs ());
+
+  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+    produce_markers_for_angle_check (*p, db::UnitTrans (), min, max, inverse, res->raw_edge_pairs ());
+  }
+
+  return EdgePairs (res.release ());
 }
 
 static inline db::Coord snap_to_grid (db::Coord c, db::Coord g)

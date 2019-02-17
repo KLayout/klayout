@@ -150,14 +150,14 @@ public:
     }
   }
 
+  db::Shapes &raw_edge_pairs () { return m_edge_pairs; }
+
 protected:
   virtual Box compute_bbox () const;
   void invalidate_cache ();
 
 private:
   friend class AsIfFlatEdgePairs;
-
-  db::Shapes &raw_edge_pairs () { return m_edge_pairs; }
 
   FlatEdgePairs &operator= (const FlatEdgePairs &other);
 

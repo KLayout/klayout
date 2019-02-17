@@ -1048,6 +1048,39 @@ TEST(19_GridCheck)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au19.gds");
 }
 
+TEST(19_AngleCheck)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/angle_check_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::EdgePairs ep1_ac1 = r1.angle_check (0, 91, true);
+  db::EdgePairs ep1_ac2 = r1.angle_check (0, 45, false);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), ep1_ac1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (3, 0)), ep1_ac2);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au20.gds");
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

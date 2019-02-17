@@ -284,5 +284,17 @@ AsIfFlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, u
   }
 }
 
+void
+AsIfFlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
+{
+  //  improves performance when inserting an original layout into the same layout
+  db::LayoutLocker locker (layout);
+
+  db::Shapes &shapes = layout->cell (into_cell).shapes (into_layer);
+  for (EdgePairsIterator e (begin ()); ! e.at_end (); ++e) {
+    shapes.insert (e->to_simple_polygon (enl));
+  }
+}
+
 }
 

@@ -317,7 +317,7 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
     "\n"
     "This method has been introduced in version 0.23. The flat mode argument has been added in version 0.26.\n"
   ) +
-  gsi::method_ext ("scan_region", &scan_region, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("region"), gsi::arg ("flat", false),
+  gsi::method_ext ("scan_collection", &scan_region, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("region"), gsi::arg ("flat", false),
     "@brief Turns the given region into a hierarchical or flat report database\n"
     "The exact behavior depends on the nature of the region. If the region is a hierarchical (original or deep) region "
     "and the 'flat' argument is false, this method will produce a hierarchical report database in the given category. "
@@ -331,15 +331,15 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
     "\n"
     "This method has been introduced in version 0.26.\n"
   ) +
-  gsi::method_ext ("scan_edges", &scan_edges, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("edges"), gsi::arg ("flat", false),
+  gsi::method_ext ("scan_collection", &scan_edges, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("edges"), gsi::arg ("flat", false),
     "@brief Turns the given edge collection into a hierarchical or flat report database\n"
-    "This method behaves like the \\scan_region method, except that is accepts an edge collection.\n"
+    "This a another flavour of \\scan_collection accepting an edge collection.\n"
     "\n"
     "This method has been introduced in version 0.26.\n"
   ) +
-  gsi::method_ext ("scan_edge_pairs", &scan_edge_pairs, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("edge_pairs"), gsi::arg ("flat", false),
+  gsi::method_ext ("scan_collection", &scan_edge_pairs, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("edge_pairs"), gsi::arg ("flat", false),
     "@brief Turns the given edge pair collection into a hierarchical or flat report database\n"
-    "This method behaves like the \\scan_region method, except that is accepts an edge pair collection.\n"
+    "This a another flavour of \\scan_collection accepting an edge pair collection.\n"
     "\n"
     "This method has been introduced in version 0.26.\n"
   ) +

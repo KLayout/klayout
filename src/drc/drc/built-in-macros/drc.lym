@@ -2281,6 +2281,15 @@ CODE
     end
     
     # %DRC%
+    # @name is_deep?
+    # @brief Returns true, if the layer is a deep (hierarchical) layer
+    # @synopsis layer.is_deep?
+    
+    def is_deep?
+      @data.is_deep?
+    end
+    
+    # %DRC%
     # @name area
     # @brief Returns the total area of the polygons in the region
     # @synopsis layer.area
@@ -2345,6 +2354,20 @@ CODE
     def length
       requires_edges("length")
       @engine._cmd(@data, :length) * @engine.dbu.to_f
+    end
+    
+    # %DRC%
+    # @name flatten
+    # @brief Flattens the layer
+    # @synopsis layer.flatten
+    # 
+    # If the layer already is a flat one, this method does nothing.
+    # If the layer is a hierarchical layer (an original layer or
+    # a derived layer in deep mode), this method will convert it
+    # to a flat collection of polygons, edges or edge pairs.
+    
+    def flatten
+      @engine._cmd(@data, :flatten)
     end
     
     # %DRC%
@@ -3596,13 +3619,15 @@ CODE
       @output_layout = nil
       @output_rdb = nil
       @output_rdb_file = nil
-      @output_rdb_cell_id = nil
+      @output_rdb_cell = nil
       @used_output_layers = {}
       @output_layers = []
       @vnum = 1
       @layout_sources = {}
       @lnum = 1
       @log_file = nil
+      @dss = nil
+      @deep = false
 
       @verbose = false
 
@@ -3821,11 +3846,14 @@ CODE
     #
     # In tiling mode, the memory requirements are usually smaller (depending on the 
     # choice of the tile size) and multi-CPU support is enabled (see \threads).
-    # To disable tiling mode use \flat. 
+    # To disable tiling mode use \flat or \deep. 
+    #
+    # Tiling mode will disable deep mode (see \deep).
     
     def tiles(tx, ty = nil)
       @tx = tx.to_f
       @ty = (ty || tx).to_f
+      @deep = false
     end
     
     # %DRC%
@@ -3835,6 +3863,38 @@ CODE
     
     def is_tiled?
       @tx != nil
+    end
+    
+    # %DRC%
+    # @name deep
+    # @brief Enters deep (hierarchical) mode
+    # @synopsis deep
+    #
+    # In deep mode, the operations will be performed in a hierarchical fashion. 
+    # Sometimes this reduces the time and memory required for an operation, but this
+    # will also add some overhead for the hierarchical analysis.
+    #
+    # "deepness" is a property of layers. Layers created with "input" while in 
+    # deep mode carry hierarchy. Operations involving such layers at the only
+    # or the first argument are carried out in hierarchical mode. 
+    # 
+    # Hierarchical mode has some more implications, like "merged_semantics" being
+    # implied always. Sometimes cell variants will be created.
+    #
+    # Deep mode can be cancelled with \tiles or \flat.
+    
+    def deep
+      @deep = true
+      @tx = @ty = nil
+    end
+    
+    # %DRC%
+    # @name is_deep?
+    # @brief Returns true, if in deep mode
+    # @synopsis is_deep?
+    
+    def is_deep?
+      @deep
     end
     
     # %DRC%
@@ -3878,6 +3938,7 @@ CODE
     
     def flat
       @tx = @ty = nil
+      @deep = false
     end
     
     # %DRC%
@@ -4131,7 +4192,7 @@ CODE
 
       cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter of 'report'")
 
-      @output_rdb_cell_id = @output_rdb.create_cell(cn).rdb_id
+      @output_rdb_cell = @output_rdb.create_cell(cn)
       @output_rdb.generator = $0
       @output_rdb.top_cell_name = cn
       @output_rdb.description = description
@@ -4153,15 +4214,15 @@ CODE
       
       if @output_rdb
       
-        cell_id = nil
+        cell = nil
         @output_rdb.each_cell do |c|
           if c.name == cellname
-            cell_id = c.rdb_id
+            cell = c
           end
         end
         
-        cell_id ||= @output_rdb.create_cell(cellname).rdb_id
-        @output_rdb_cell_id = cell_id
+        cell ||= @output_rdb.create_cell(cellname)
+        @output_rdb_cell = cell
         
       else
       
@@ -4716,7 +4777,13 @@ CODE
         
           sf = layout.dbu / self.dbu
           if (sf - 1.0).abs &gt; 1e-6
+            if @deep
+              raise("DBU scaling (" + ("%.12g" % layout.dbu) + " to " + ("%.12g" % self.dbu) + ") is not supported in deep mode currently")
+            end
             r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))
+          elsif @deep
+            @dss ||= RBA::DeepShapeStore::new
+            r = RBA::Region::new(iter, @dss)
           else
             r = RBA::Region::new(iter)
           end
@@ -4750,9 +4817,9 @@ CODE
         args[1] &amp;&amp; cat.description = args[1]
 
         if data.is_a?(RBA::RecursiveShapeIterator)
-          @output_rdb.create_items(@output_rdb_cell_id, cat.rdb_id, data)
+          cat.scan_shapes(data)
         else
-          @output_rdb.create_items(@output_rdb_cell_id, cat.rdb_id, RBA::CplxTrans::new(self.dbu), data)
+          cat.scan_collection(@output_rdb_cell, RBA::CplxTrans::new(self.dbu), data)
         end
       
       else 
@@ -4793,40 +4860,59 @@ CODE
           li = output.insert_layer(info)
         end
 
-        tmp = li
+        # make sure the output has the right database unit
+        output.dbu = self.dbu
 
-        begin
+        if data.is_deep?
 
+          # mark the layer as used
           if !@used_output_layers[li]
             @output_layers.push(li)
-            # Note: to avoid issues with output onto the input layer, we
-            # output to a temp layer and later swap both. The simple implementation
-            # did a clear here and the effect of that was that the data potentially
-            # got invalidated.
-            tmp = output.insert_layer(RBA::LayerInfo::new)
             @used_output_layers[li] = true
           end
 
-          # make sure the output has the right database unit
-          output.dbu = self.dbu
-
           # insert the data into the output layer
           if data.is_a?(RBA::EdgePairs)
-            output_cell.shapes(tmp).insert_as_polygons(data, 1)
+            data.insert_into_as_polygons(output, output_cell.cell_index, li, 1)
           else
-            output_cell.shapes(tmp).insert(data)
+            data.insert_into(output, output_cell.cell_index, li)
           end
 
-          #  make the temp layer the output layer
-          if tmp != li
-            output.swap_layers(tmp, li)
+        else
+
+          tmp = li
+
+          begin
+
+            if !@used_output_layers[li]
+              @output_layers.push(li)
+              # Note: to avoid issues with output onto the input layer, we
+              # output to a temp layer and later swap both. The simple implementation
+              # did a clear here and the effect of that was that the data potentially
+              # got invalidated.
+              tmp = output.insert_layer(RBA::LayerInfo::new)
+              @used_output_layers[li] = true
+            end
+
+            # insert the data into the output layer
+            if data.is_a?(RBA::EdgePairs)
+              output_cell.shapes(tmp).insert_as_polygons(data, 1)
+            else
+              output_cell.shapes(tmp).insert(data)
+            end
+
+            #  make the temp layer the output layer
+            if tmp != li
+              output.swap_layers(tmp, li)
+            end
+
+          ensure
+            #  clean up the original layer if requested
+            if tmp != li
+              output.delete_layer(tmp)
+            end
           end
 
-        ensure
-          #  clean up the original layer if requested
-          if tmp != li
-            output.delete_layer(tmp)
-          end
         end
 
       end        

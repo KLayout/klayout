@@ -110,6 +110,7 @@ public:
   virtual bool less (const EdgePairs &other) const = 0;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const = 0;
+  virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const = 0;
 
 protected:
   const std::string &progress_desc () const

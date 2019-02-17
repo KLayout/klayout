@@ -114,6 +114,7 @@ public:
   virtual const db::RecursiveShapeIterator *iter () const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+  virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
 
   void insert (const db::EdgePair &edge_pair);
   void insert (const db::Shape &shape);

@@ -181,6 +181,15 @@ const db::RecursiveShapeIterator *FlatEdgePairs::iter () const
 }
 
 void
+FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
+{
+  db::Shapes &out = layout->cell (into_cell).shapes (into_layer);
+  for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
+    out.insert (p->to_simple_polygon (enl));
+  }
+}
+
+void
 FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   layout->cell (into_cell).shapes (into_layer).insert (m_edge_pairs);

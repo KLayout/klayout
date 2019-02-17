@@ -103,6 +103,10 @@ public:
 
   virtual void begin (const db::RecursiveShapeIterator *iter)
   {
+    if (! iter->top_cell () || ! iter->layout ()) {
+      return;
+    }
+
     db::cell_index_type ci = iter->top_cell ()->cell_index ();
     const rdb::Cell *rdb_cell = cell_for_id (iter->layout (), ci);
 

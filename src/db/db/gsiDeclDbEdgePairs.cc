@@ -26,6 +26,7 @@
 #include "dbEdgePairs.h"
 #include "dbEdges.h"
 #include "dbRegion.h"
+#include "dbDeepEdgePairs.h"
 
 namespace gsi
 {
@@ -158,6 +159,11 @@ static void insert_e (db::EdgePairs *e, const db::EdgePairs &a)
   }
 }
 
+static bool is_deep (const db::EdgePairs *ep)
+{
+  return dynamic_cast<const db::DeepEdgePairs *> (ep->delegate ()) != 0;
+}
+
 Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
@@ -225,6 +231,22 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "This constructor has been introduced in version 0.26."
   ) +
+  method ("insert_into", &db::EdgePairs::insert_into, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
+    "@brief Inserts this edge pairs into the given layout, below the given cell and into the given layer.\n"
+    "If the edge pair collection is a hierarchical one, a suitable hierarchy will be built below the top cell or "
+    "and existing hierarchy will be reused.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method ("insert_into_as_polygons", &db::EdgePairs::insert_into_as_polygons, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("e"),
+    "@brief Inserts this edge pairs into the given layout, below the given cell and into the given layer.\n"
+    "If the edge pair collection is a hierarchical one, a suitable hierarchy will be built below the top cell or "
+    "and existing hierarchy will be reused.\n"
+    "\n"
+    "The edge pairs will be converted to polygons with the enlargement value given be 'e'.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
   method ("insert", (void (db::EdgePairs::*) (const db::Edge &, const db::Edge &)) &db::EdgePairs::insert,
     "@brief Inserts an edge pair into the collection\n"
     "@args first, second\n"
@@ -232,6 +254,11 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   method ("insert", (void (db::EdgePairs::*) (const db::EdgePair &)) &db::EdgePairs::insert,
     "@brief Inserts an edge pair into the collection\n"
     "@args edge_pair\n"
+  ) +
+  method_ext ("is_deep?", &is_deep,
+    "@brief Returns true if the edge pair collection is a deep (hierarchical) one\n"
+    "\n"
+    "This method has been added in version 0.26."
   ) +
   method ("+", &db::EdgePairs::operator+,
     "@brief Returns the combined edge pair collection of self and the other one\n"

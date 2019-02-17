@@ -279,6 +279,12 @@ ValueBase::create_from_shape (const db::Shape &shape, const db::CplxTrans &trans
     shape.edge (edge);
     return new rdb::Value <db::DEdge> (edge.transformed (trans));
 
+  } else if (shape.is_edge_pair ()) {
+
+    db::EdgePair edge_pair;
+    shape.edge_pair (edge_pair);
+    return new rdb::Value <db::DEdgePair> (edge_pair.transformed (trans));
+
   } else {
     return 0;
   }

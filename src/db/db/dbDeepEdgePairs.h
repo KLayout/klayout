@@ -78,6 +78,7 @@ public:
   virtual bool less (const EdgePairs &other) const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+  virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
 
   const DeepLayer &deep_layer () const
   {

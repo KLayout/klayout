@@ -23,6 +23,7 @@
 #include "gsiDecl.h"
 
 #include "dbRegion.h"
+#include "dbDeepRegion.h"
 #include "dbPolygonTools.h"
 #include "dbLayoutUtils.h"
 #include "dbShapes.h"
@@ -715,6 +716,11 @@ static Container *decompose_trapezoids (const db::Region *r, int mode)
   return shapes.release ();
 }
 
+static bool is_deep (const db::Region *region)
+{
+  return dynamic_cast<const db::DeepRegion *> (region->delegate ()) != 0;
+}
+
 //  provided by gsiDeclDbPolygon.cc:
 int td_simple ();
 int po_any ();
@@ -831,6 +837,13 @@ Class<db::Region> decl_Region ("db", "Region",
     "@/code\n"
     "\n"
     "This method has been introduced in version 0.25."
+  ) +
+  method ("insert_into", &db::Region::insert_into, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
+    "@brief Inserts this region into the given layout, below the given cell and into the given layer.\n"
+    "If the region is a hierarchical one, a suitable hierarchy will be built below the top cell or "
+    "and existing hierarchy will be reused.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
   ) +
   factory_ext ("texts", &texts<BoxDelivery>, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
     "@hide\n"
@@ -2315,6 +2328,11 @@ Class<db::Region> decl_Region ("db", "Region",
   method ("bbox", &db::Region::bbox,
     "@brief Return the bounding box of the region\n"
     "The bounding box is the box enclosing all points of all polygons.\n"
+  ) +
+  method_ext ("is_deep?", &is_deep,
+    "@brief Returns true if the region is a deep (hierarchical) one\n"
+    "\n"
+    "This method has been added in version 0.26."
   ) +
   method ("is_merged?", &db::Region::is_merged,
     "@brief Returns true if the region is merged\n"

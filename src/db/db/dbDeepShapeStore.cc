@@ -146,6 +146,13 @@ DeepLayer::insert_into (db::Layout *into_layout, db::cell_index_type into_cell, 
   const_cast<db::DeepShapeStore *> (mp_store.get ())->insert (*this, into_layout, into_cell, into_layer);
 }
 
+void
+DeepLayer::insert_into_as_polygons (db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
+{
+  check_dss ();
+  const_cast<db::DeepShapeStore *> (mp_store.get ())->insert_as_polygons (*this, into_layout, into_cell, into_layer, enl);
+}
+
 bool DeepLayer::operator< (const DeepLayer &other) const
 {
   if (mp_store.get () != other.mp_store.get ()) {
@@ -594,6 +601,39 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
 
   //  actually copy the shapes
   db::copy_shapes (*into_layout, source_layout, trans, source_cells, cm.table (), lm);
+}
+
+void
+DeepShapeStore::insert_as_polygons (const DeepLayer &deep_layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl)
+{
+  //  prepare a temporary layer with the polygons
+  DeepLayer tmp = deep_layer.derived ();
+
+  db::Layout &layout = const_cast<db::Layout &> (deep_layer.layout ());
+
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    db::Shapes &out = c->shapes (tmp.layer ());
+    for (db::Shapes::shape_iterator s = c->shapes (deep_layer.layer ()); ! s.at_end (); ++s) {
+
+      if (s->is_edge_pair ()) {
+
+        out.insert (s->edge_pair ().to_simple_polygon (enl));
+
+      } else if (s->is_path () || s->is_polygon () || s->is_box ()) {
+
+        db::Polygon poly;
+        s->polygon (poly);
+        out.insert (poly);
+
+      }
+
+    }
+
+  }
+
+  //  and insert this one
+  insert (tmp, into_layout, into_cell, into_layer);
 }
 
 }

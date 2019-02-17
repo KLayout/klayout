@@ -75,6 +75,7 @@ public:
   virtual bool less (const EdgePairs &other) const;
 
   virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
+  virtual void insert_into_as_polygons (Layout *, db::cell_index_type, unsigned int, db::Coord) const { }
 
 private:
   EmptyEdgePairs &operator= (const EmptyEdgePairs &other);

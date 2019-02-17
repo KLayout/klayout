@@ -327,4 +327,10 @@ void DeepEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, 
   m_deep_layer.insert_into (layout, into_cell, into_layer);
 }
 
+void DeepEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
+{
+  m_deep_layer.insert_into_as_polygons (layout, into_cell, into_layer, enl);
+}
+
+
 }

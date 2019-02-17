@@ -25,6 +25,7 @@
 
 #include "dbDeepShapeStore.h"
 #include "dbEdges.h"
+#include "dbDeepEdges.h"
 #include "dbRegion.h"
 #include "dbLayoutUtils.h"
 
@@ -373,6 +374,11 @@ static void insert_s (db::Edges *e, const db::Shapes &a)
   insert_st (e, a, db::UnitTrans ());
 }
 
+static bool is_deep (const db::Edges *e)
+{
+  return dynamic_cast<const db::DeepEdges *> (e->delegate ()) != 0;
+}
+
 Class<db::Edges> dec_Edges ("db", "Edges",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
@@ -494,6 +500,13 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "dbu    = 0.1 # the target database unit\n"
     "r = RBA::Edges::new(layout.begin_shapes(cell, layer), dss, RBA::ICplxTrans::new(layout.dbu / dbu), false)\n"
     "@/code\n"
+  ) +
+  method ("insert_into", &db::Edges::insert_into, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
+    "@brief Inserts this edge collection into the given layout, below the given cell and into the given layer.\n"
+    "If the edge collection is a hierarchical one, a suitable hierarchy will be built below the top cell or "
+    "and existing hierarchy will be reused.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
   ) +
   method_ext ("with_length", with_length1, gsi::arg ("length"), gsi::arg ("inverse"),
     "@brief Filter the edges by length\n"
@@ -1376,6 +1389,11 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "@brief Returns all edges which are not members of the other edge collection\n"
     "This method returns all edges in self which can not be found in the other edge collection with exactly the same "
     "geometry."
+  ) +
+  method_ext ("is_deep?", &is_deep,
+    "@brief Returns true if the edge collection is a deep (hierarchical) one\n"
+    "\n"
+    "This method has been added in version 0.26."
   ) +
   method ("is_merged?", &db::Edges::is_merged,
     "@brief Returns true if the edge collection is merged\n"

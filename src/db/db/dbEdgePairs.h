@@ -662,6 +662,16 @@ public:
     return mp_delegate->insert_into (layout, into_cell, into_layer);
   }
 
+  /**
+   *  @brief Inserts the edge pair collection into the given layout, cell and layer as polygons with the given enlargement
+   *  If the edge pair collection is a hierarchical region, the hierarchy is copied into the
+   *  layout's hierarchy.
+   */
+  void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
+  {
+    return mp_delegate->insert_into_as_polygons (layout, into_cell, into_layer, enl);
+  }
+
 private:
   EdgePairsDelegate *mp_delegate;
 

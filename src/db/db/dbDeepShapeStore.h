@@ -137,6 +137,12 @@ public:
   void insert_into (Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
   /**
+   *  @brief Inserts the edge pairs layer into the given layout, starting from the given cell and into the given layer
+   *  The edge pairs are converted to polygons with the given enlargement.
+   */
+  void insert_into_as_polygons (db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
+
+  /**
    *  @brief Creates a derived new deep layer
    *  Derived layers use the same layout and context, but are initially
    *  empty layers for use as output layers on the same hierarchy.
@@ -279,6 +285,13 @@ public:
    *  @brief Inserts the deep layer's shapes into some target layout
    */
   void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);
+
+  /**
+   *  @brief Inserts the deep layer's edge pairs into some target layout
+   *
+   *  The edge pairs are converted to polygons with the given enlargement.
+   */
+  void insert_as_polygons (const DeepLayer &deep_layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl);
 
   /**
    *  @brief Gets the cell mapping suitable to returning a layout from the deep shape store into the original layout hierarchy

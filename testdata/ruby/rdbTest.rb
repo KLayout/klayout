@@ -793,7 +793,7 @@ class RDB_TestClass < TestBase
     rdb = RBA::ReportDatabase.new("neu")
     cat = rdb.create_category("l1")
     r = RBA::Region::new(c1.begin_shapes_rec(l1))
-    cat.scan_region(rdb.create_cell("TOP"), RBA::CplxTrans::new(0.001), r)  # hierarchical scan
+    cat.scan_collection(rdb.create_cell("TOP"), RBA::CplxTrans::new(0.001), r)  # hierarchical scan
     assert_equal(cat.num_items, 3)
     cn = []
     rdb.each_cell { |c| cn << c.to_s_test }
@@ -805,7 +805,7 @@ class RDB_TestClass < TestBase
     rdb = RBA::ReportDatabase.new("neu")
     cat = rdb.create_category("l1")
     r = RBA::Region::new(c1.begin_shapes_rec(l1))
-    cat.scan_region(rdb.create_cell("TOP"), RBA::CplxTrans::new(0.001), r, true)  # flat scan
+    cat.scan_collection(rdb.create_cell("TOP"), RBA::CplxTrans::new(0.001), r, true)  # flat scan
     assert_equal(cat.num_items, 3)
     cn = []
     rdb.each_cell { |c| cn << c.to_s_test }
@@ -817,7 +817,7 @@ class RDB_TestClass < TestBase
     rdb = RBA::ReportDatabase.new("neu")
     cat = rdb.create_category("l1")
     r = RBA::Region::new(c1.begin_shapes_rec(l1)).merged
-    cat.scan_region(rdb.create_cell("TOP"), RBA::CplxTrans::new(0.001), r, true)  # flat scan
+    cat.scan_collection(rdb.create_cell("TOP"), RBA::CplxTrans::new(0.001), r, true)  # flat scan
     assert_equal(cat.num_items, 1)
     cn = []
     rdb.each_cell { |c| cn << c.to_s_test }

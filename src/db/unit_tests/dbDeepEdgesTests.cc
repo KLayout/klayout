@@ -193,3 +193,57 @@ TEST(4_Edge2PolygonBooleans)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au4.gds");
 }
 
+TEST(5_Filters)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Edges e2 = r2.edges ();
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+    db::EdgeLengthFilter elf1 (0, 40000, false);
+    db::EdgeLengthFilter elf2 (0, 30000, true);
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.filtered (elf1));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.filtered (elf2));
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au5a.gds");
+  }
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+    db::EdgeOrientationFilter eof1 (0, 1, false);
+    db::EdgeOrientationFilter eof2 (0, 1, true);
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.filtered (eof1));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.filtered (eof2));
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au5b.gds");
+  }
+}
+

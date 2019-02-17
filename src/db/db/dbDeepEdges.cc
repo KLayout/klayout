@@ -476,14 +476,50 @@ std::string DeepEdges::to_string (size_t nmax) const
 
 EdgesDelegate *DeepEdges::filter_in_place (const EdgeFilterBase &filter)
 {
-  //  TODO: implement
-  return AsIfFlatEdges::filter_in_place (filter);
+  //  TODO: implement to be really in-place
+  return filtered (filter);
 }
 
 EdgesDelegate *DeepEdges::filtered (const EdgeFilterBase &filter) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::filtered (filter);
+  ensure_merged_edges_valid ();
+
+  std::auto_ptr<VariantsCollectorBase> vars;
+
+  if (filter.isotropic ()) {
+    vars.reset (new db::cell_variants_collector<db::MagnificationReducer> ());
+  } else {
+    vars.reset (new db::cell_variants_collector<db::MagnificationAndOrientationReducer> ());
+  }
+
+  vars->collect (m_merged_edges.layout (), m_merged_edges.initial_cell ());
+
+  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+  const_cast<db::DeepLayer &> (m_merged_edges).separate_variants (*vars);
+
+  db::Layout &layout = m_merged_edges.layout ();
+
+  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.derived ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
+    tl_assert (v.size () == size_t (1));
+    const db::ICplxTrans &tr = v.begin ()->first;
+
+    const db::Shapes &s = c->shapes (m_merged_edges.layer ());
+    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+      db::Edge edge = si->edge ();
+      if (filter.selected (edge.transformed (tr))) {
+        st.insert (edge);
+      }
+    }
+
+  }
+
+  res->set_is_merged (true);
+  return res.release ();
 }
 
 EdgesDelegate *DeepEdges::merged_in_place ()

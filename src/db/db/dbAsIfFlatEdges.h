@@ -27,6 +27,8 @@
 #include "dbCommon.h"
 #include "dbBoxScanner.h"
 #include "dbEdgesDelegate.h"
+#include "dbBoxScanner.h"
+#include "dbPolygonTools.h"
 
 #include <map>
 #include <vector>
@@ -34,6 +36,74 @@
 namespace db {
 
 class PolygonSink;
+
+/**
+ *  @brief A helper class for the edge interaction functionality which acts as an edge pair receiver
+ */
+template <class OutputContainer>
+class edge_interaction_filter
+  : public db::box_scanner_receiver<db::Edge, size_t>
+{
+public:
+  edge_interaction_filter (OutputContainer &output)
+    : mp_output (&output)
+  {
+    //  .. nothing yet ..
+  }
+
+  void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
+  {
+    //  Select the edges which intersect
+    if (p1 != p2) {
+      const db::Edge *o = p1 > p2 ? o2 : o1;
+      const db::Edge *oo = p1 > p2 ? o1 : o2;
+      if (o->intersect (*oo)) {
+        if (m_seen.insert (o).second) {
+          mp_output->insert (*o);
+        }
+      }
+    }
+  }
+
+private:
+  OutputContainer *mp_output;
+  std::set<const db::Edge *> m_seen;
+};
+
+/**
+ *  @brief A helper class for the edge to region interaction functionality which acts as an edge pair receiver
+ *
+ *  Note: This special scanner uses pointers to two different objects: edges and polygons.
+ *  It uses odd value pointers to indicate pointers to polygons and even value pointers to indicate
+ *  pointers to edges.
+ *
+ *  There is a special box converter which is able to sort that out as well.
+ */
+template <class OutputContainer>
+class edge_to_region_interaction_filter
+  : public db::box_scanner_receiver2<db::Edge, size_t, db::Polygon, size_t>
+{
+public:
+  edge_to_region_interaction_filter (OutputContainer &output)
+    : mp_output (&output)
+  {
+    //  .. nothing yet ..
+  }
+
+  void add (const db::Edge *e, size_t, const db::Polygon *p, size_t)
+  {
+    if (m_seen.find (e) == m_seen.end ()) {
+      if (db::interact (*p, *e)) {
+        m_seen.insert (e);
+        mp_output->insert (*e);
+      }
+    }
+  }
+
+private:
+  OutputContainer *mp_output;
+  std::set<const db::Edge *> m_seen;
+};
 
 /**
  *  @brief A helper class to turn joined edge sequences into polygons
@@ -186,6 +256,8 @@ protected:
   EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   static db::Polygon extended_edge (const db::Edge &edge, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i);
   static db::Edge compute_partial (const db::Edge &edge, int mode, length_type length, double fraction);
+  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool inverse) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Region &region, bool inverse) const;
 
 private:
   AsIfFlatEdges &operator= (const AsIfFlatEdges &other);

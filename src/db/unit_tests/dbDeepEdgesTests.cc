@@ -342,3 +342,47 @@ TEST(7_Partial)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au7.gds");
 }
 
+TEST(8_SelectInteracting)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Edges e2 = r2.edges ();
+  db::Edges e3 = r3.edges ();
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (3, 0)), r3);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.selected_interacting (e3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.selected_not_interacting (e3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), e3.selected_interacting (e2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), e3.selected_not_interacting (e2));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e2.selected_interacting (r3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), e2.selected_not_interacting (r3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), e3.selected_interacting (r2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), e3.selected_not_interacting (r2));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au8.gds");
+}
+

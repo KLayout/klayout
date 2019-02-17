@@ -174,6 +174,8 @@ private:
   DeepLayer edge_region_op (const DeepRegion *other, bool outside, bool include_borders) const;
   EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   EdgesDelegate *segments (int mode, length_type length, double fraction) const;
+  EdgesDelegate *selected_interacting_generic (const Edges &edges, bool invert) const;
+  EdgesDelegate *selected_interacting_generic (const Region &region, bool invert) const;
 };
 
 }

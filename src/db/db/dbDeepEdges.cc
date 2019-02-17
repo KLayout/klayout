@@ -956,33 +956,221 @@ EdgesDelegate *DeepEdges::centers (length_type length, double fraction) const
   return segments (0, length, fraction);
 }
 
+namespace
+{
+
+class Edge2EdgeInteractingLocalOperation
+  : public local_operation<db::Edge, db::Edge, db::Edge>
+{
+public:
+  Edge2EdgeInteractingLocalOperation (bool inverse)
+    : m_inverse (inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    db::box_scanner<db::Edge, size_t> scanner;
+
+    std::set<db::Edge> others;
+    for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        others.insert (interactions.intruder_shape (*j));
+      }
+    }
+
+    for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      const db::Edge &subject = interactions.subject_shape (i->first);
+      scanner.insert (&subject, 0);
+    }
+
+    for (std::set<db::Edge>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      scanner.insert (o.operator-> (), 1);
+    }
+
+    if (m_inverse) {
+
+      std::unordered_set<db::Edge> interacting;
+      edge_interaction_filter<std::unordered_set<db::Edge> > filter (interacting);
+      scanner.process (filter, 1, db::box_convert<db::Edge> ());
+
+      for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+        const db::Edge &subject = interactions.subject_shape (i->first);
+        if (interacting.find (subject) == interacting.end ()) {
+          result.insert (subject);
+        }
+      }
+
+    } else {
+
+      edge_interaction_filter<std::unordered_set<db::Edge> > filter (result);
+      scanner.process (filter, 1, db::box_convert<db::Edge> ());
+
+    }
+
+  }
+
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  {
+    if (m_inverse) {
+      return Copy;
+    } else {
+      return Drop;
+    }
+  }
+
+  virtual std::string description () const
+  {
+    return tl::to_string (tr ("Select interacting edges"));
+  }
+
+private:
+  bool m_inverse;
+};
+
+class Edge2PolygonInteractingLocalOperation
+  : public local_operation<db::Edge, db::PolygonRef, db::Edge>
+{
+public:
+  Edge2PolygonInteractingLocalOperation (bool inverse)
+    : m_inverse (inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner;
+
+    std::set<db::PolygonRef> others;
+    for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::Edge, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        others.insert (interactions.intruder_shape (*j));
+      }
+    }
+
+    for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      const db::Edge &subject = interactions.subject_shape (i->first);
+      scanner.insert1 (&subject, 0);
+    }
+
+    std::list<db::Polygon> heap;
+    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      heap.push_back (o->obj ().transformed (o->trans ()));
+      scanner.insert2 (& heap.back (), 1);
+    }
+
+    if (m_inverse) {
+
+      std::unordered_set<db::Edge> interacting;
+      edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (interacting);
+      scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
+
+      for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+        const db::Edge &subject = interactions.subject_shape (i->first);
+        if (interacting.find (subject) == interacting.end ()) {
+          result.insert (subject);
+        }
+      }
+
+    } else {
+
+      edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (result);
+      scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
+
+    }
+  }
+
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  {
+    if (m_inverse) {
+      return Copy;
+    } else {
+      return Drop;
+    }
+  }
+
+  virtual std::string description () const
+  {
+    return tl::to_string (tr ("Select interacting edges"));
+  }
+
+private:
+  bool m_inverse;
+};
+
+}
+
+EdgesDelegate *
+DeepEdges::selected_interacting_generic (const Region &other, bool inverse) const
+{
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
+  if (! other_deep) {
+    return db::AsIfFlatEdges::selected_interacting_generic (other, inverse);
+  }
+
+  ensure_merged_edges_valid ();
+
+  DeepLayer dl_out (m_deep_layer.derived ());
+
+  db::Edge2PolygonInteractingLocalOperation op (inverse);
+
+  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (m_deep_layer.store ()->threads ());
+
+  proc.run (&op, m_merged_edges.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+
+  return new db::DeepEdges (dl_out);
+}
+
+EdgesDelegate *
+DeepEdges::selected_interacting_generic (const Edges &other, bool inverse) const
+{
+  const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
+  if (! other_deep) {
+    return db::AsIfFlatEdges::selected_interacting_generic (other, inverse);
+  }
+
+  ensure_merged_edges_valid ();
+
+  DeepLayer dl_out (m_deep_layer.derived ());
+
+  db::Edge2EdgeInteractingLocalOperation op (inverse);
+
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (m_deep_layer.store ()->threads ());
+
+  proc.run (&op, m_merged_edges.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+
+  return new db::DeepEdges (dl_out);
+}
+
 EdgesDelegate *DeepEdges::selected_interacting (const Edges &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::selected_interacting (other);
+  return selected_interacting_generic (other, false);
 }
 
 EdgesDelegate *DeepEdges::selected_not_interacting (const Edges &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::selected_not_interacting (other);
+  return selected_interacting_generic (other, true);
 }
 
 EdgesDelegate *DeepEdges::selected_interacting (const Region &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::selected_interacting (other);
+  return selected_interacting_generic (other, false);
 }
 
 EdgesDelegate *DeepEdges::selected_not_interacting (const Region &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::selected_not_interacting (other);
+  return selected_interacting_generic (other, true);
 }
 
 EdgesDelegate *DeepEdges::in (const Edges &other, bool invert) const
 {
-  //  TODO: implement
+  //  TODO: is there a cheaper way?
   return AsIfFlatEdges::in (other, invert);
 }
 

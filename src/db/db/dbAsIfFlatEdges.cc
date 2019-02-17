@@ -195,149 +195,62 @@ AsIfFlatEdges::to_string (size_t nmax) const
   return os.str ();
 }
 
-namespace
-{
-
-/**
- *  @brief A helper class for the edge to region interaction functionality which acts as an edge pair receiver
- *
- *  Note: This special scanner uses pointers to two different objects: edges and polygons. 
- *  It uses odd value pointers to indicate pointers to polygons and even value pointers to indicate 
- *  pointers to edges.
- *
- *  There is a special box converter which is able to sort that out as well.
- */
-template <class OutputContainer>
-class edge_to_region_interaction_filter
-  : public db::box_scanner_receiver<char, size_t>
-{
-public:
-  edge_to_region_interaction_filter (OutputContainer &output)
-    : mp_output (&output)
-  {
-    //  .. nothing yet ..
-  }
-  
-  void add (const char *o1, size_t p1, const char *o2, size_t p2)
-  { 
-    const db::Edge *e = 0;
-    const db::Polygon *p = 0;
-
-    //  Note: edges have property 0 and have even-valued pointers.
-    //  Polygons have property 1 and odd-valued pointers.
-    if (p1 == 0 && p2 == 1) {
-      e = reinterpret_cast<const db::Edge *> (o1);
-      p = reinterpret_cast<const db::Polygon *> (o2 - 1);
-    } else if (p1 == 1 && p2 == 0) {
-      e = reinterpret_cast<const db::Edge *> (o2);
-      p = reinterpret_cast<const db::Polygon *> (o1 - 1);
-    }
-
-    if (e && p && m_seen.find (e) == m_seen.end ()) {
-      if (db::interact (*p, *e)) {
-        m_seen.insert (e);
-        mp_output->insert (*e);
-      }
-    }
-  }
-
-private:
-  OutputContainer *mp_output;
-  std::set<const db::Edge *> m_seen;
-};
-
-/**
- *  @brief A special box converter that splits the pointers into polygon and edge pointers
- */
-struct EdgeOrRegionBoxConverter
-{
-  typedef db::Box box_type;
-
-  db::Box operator() (const char &c) const
-  {
-    //  Note: edges have property 0 and have even-valued pointers.
-    //  Polygons have property 1 and odd-valued pointers.
-    const char *cp = &c;
-    if ((size_t (cp) & 1) == 1) {
-      //  it's a polygon
-      return (reinterpret_cast<const db::Polygon *> (cp - 1))->box ();
-    } else {
-      //  it's an edge
-      const db::Edge *e = reinterpret_cast<const db::Edge *> (cp);
-      return db::Box (e->p1 (), e->p2 ());
-    }
-  }
-};
-
-}
-
 EdgesDelegate *
-AsIfFlatEdges::selected_interacting (const Region &other) const
+AsIfFlatEdges::selected_interacting_generic (const Region &other, bool inverse) const
 {
   //  shortcuts
   if (other.empty () || empty ()) {
     return new EmptyEdges ();
   }
 
-  db::box_scanner<char, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve (size () + other.size ());
+  db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
   AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
 
   for ( ; ! e.at_end (); ++e) {
-    scanner.insert ((char *) e.operator-> (), 0);
+    scanner.insert1 (e.operator-> (), 0);
   }
 
   AddressablePolygonDelivery p = other.addressable_polygons ();
 
   for ( ; ! p.at_end (); ++p) {
-    scanner.insert ((char *) p.operator-> () + 1, 1);
+    scanner.insert2 (p.operator-> (), 1);
   }
 
   std::auto_ptr<FlatEdges> output (new FlatEdges (true));
-  edge_to_region_interaction_filter<FlatEdges> filter (*output);
-  EdgeOrRegionBoxConverter bc;
-  scanner.process (filter, 1, bc);
+
+  if (! inverse) {
+
+    edge_to_region_interaction_filter<FlatEdges> filter (*output);
+    scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
+
+  } else {
+
+    std::set<db::Edge> interacting;
+    edge_to_region_interaction_filter<std::set<db::Edge> > filter (interacting);
+    scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
+
+    for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
+      if (interacting.find (*o) == interacting.end ()) {
+        output->insert (*o);
+      }
+    }
+
+  }
 
   return output.release ();
 }
 
 EdgesDelegate *
+AsIfFlatEdges::selected_interacting (const Region &other) const
+{
+  return selected_interacting_generic (other, false);
+}
+
+EdgesDelegate *
 AsIfFlatEdges::selected_not_interacting (const Region &other) const
 {
-  //  shortcuts
-  if (other.empty () || empty ()) {
-    return clone ();
-  }
-
-  db::box_scanner<char, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve (size () + other.size ());
-
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
-
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert ((char *) e.operator-> (), 0);
-  }
-
-  AddressablePolygonDelivery p = other.addressable_polygons ();
-
-  for ( ; ! p.at_end (); ++p) {
-    scanner.insert ((char *) p.operator-> () + 1, 1);
-  }
-
-  std::set<db::Edge> interacting;
-  edge_to_region_interaction_filter<std::set<db::Edge> > filter (interacting);
-  EdgeOrRegionBoxConverter bc;
-  scanner.process (filter, 1, bc);
-
-  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
-  for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
-    if (interacting.find (*o) == interacting.end ()) {
-      output->insert (*o);
-    }
-  }
-
-  return output.release ();
+  return selected_interacting_generic (other, true);
 }
 
 namespace
@@ -483,99 +396,57 @@ AsIfFlatEdges::centers (length_type length, double fraction) const
   return segments (0, length, fraction);
 }
 
-namespace
+EdgesDelegate *
+AsIfFlatEdges::selected_interacting_generic (const Edges &edges, bool inverse) const
 {
+  db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
 
-/**
- *  @brief A helper class for the edge interaction functionality which acts as an edge pair receiver
- */
-template <class OutputContainer>
-class edge_interaction_filter
-  : public db::box_scanner_receiver<db::Edge, size_t>
-{
-public:
-  edge_interaction_filter (OutputContainer &output)
-    : mp_output (&output)
-  {
-    //  .. nothing yet ..
+  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+
+  for ( ; ! e.at_end (); ++e) {
+    scanner.insert (e.operator-> (), 0);
   }
-  
-  void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
-  { 
-    //  Select the edges which intersect
-    if (p1 != p2) {
-      const db::Edge *o = p1 > p2 ? o2 : o1;
-      const db::Edge *oo = p1 > p2 ? o1 : o2;
-      if (o->intersect (*oo)) {
-        if (m_seen.insert (o).second) {
-          mp_output->insert (*o);
-        }
+
+  AddressableEdgeDelivery ee = edges.addressable_edges ();
+
+  for ( ; ! ee.at_end (); ++ee) {
+    scanner.insert (ee.operator-> (), 1);
+  }
+
+  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
+
+  if (! inverse) {
+
+    edge_interaction_filter<FlatEdges> filter (*output);
+    scanner.process (filter, 1, db::box_convert<db::Edge> ());
+
+  } else {
+
+    std::set<db::Edge> interacting;
+    edge_interaction_filter<std::set<db::Edge> > filter (interacting);
+    scanner.process (filter, 1, db::box_convert<db::Edge> ());
+
+    for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
+      if (interacting.find (*o) == interacting.end ()) {
+        output->insert (*o);
       }
     }
+
   }
 
-private:
-  OutputContainer *mp_output;
-  std::set<const db::Edge *> m_seen;
-};
-
+  return output.release ();
 }
 
 EdgesDelegate *
 AsIfFlatEdges::selected_interacting (const Edges &other) const
 {
-  db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve (size () + other.size ());
-
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
-
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert (e.operator-> (), 0);
-  }
-
-  AddressableEdgeDelivery ee = other.addressable_edges ();
-
-  for ( ; ! ee.at_end (); ++ee) {
-    scanner.insert (ee.operator-> (), 1);
-  }
-
-  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
-  edge_interaction_filter<FlatEdges> filter (*output);
-  scanner.process (filter, 1, db::box_convert<db::Edge> ());
-
-  return output.release ();
+  return selected_interacting_generic (other, false);
 }
 
 EdgesDelegate *
 AsIfFlatEdges::selected_not_interacting (const Edges &other) const
 {
-  db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve (size () + other.size ());
-
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
-
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert (e.operator-> (), 0);
-  }
-
-  AddressableEdgeDelivery ee = other.addressable_edges ();
-
-  for ( ; ! ee.at_end (); ++ee) {
-    scanner.insert (ee.operator-> (), 1);
-  }
-
-  std::set<db::Edge> interacting;
-  edge_interaction_filter<std::set<db::Edge> > filter (interacting);
-  scanner.process (filter, 1, db::box_convert<db::Edge> ());
-
-  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
-  for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
-    if (interacting.find (*o) == interacting.end ()) {
-      output->insert (*o);
-    }
-  }
-
-  return output.release ();
+  return selected_interacting_generic (other, true);
 }
 
 EdgesDelegate *

@@ -21,7 +21,9 @@
 */
 
 #include "dbEdges.h"
+#include "dbRegion.h"
 #include "dbDeepEdges.h"
+#include "dbDeepRegion.h"
 #include "dbHierNetworkProcessor.h"
 #include "dbCellGraphUtils.h"
 #include "dbCellVariants.h"
@@ -527,6 +529,24 @@ DeepEdges::and_or_not_with (const DeepEdges *other, bool and_op) const
   return dl_out;
 }
 
+DeepLayer
+DeepEdges::edge_region_op (const DeepRegion *other, bool outside, bool include_borders) const
+{
+  DeepLayer dl_out (m_deep_layer.derived ());
+
+  db::EdgeToPolygonLocalOperation op (outside, include_borders);
+
+  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (m_deep_layer.store ()->threads ());
+  proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
+  proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
+
+  proc.run (&op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
+
+  return dl_out;
+}
+
 EdgesDelegate *DeepEdges::and_with (const Edges &other) const
 {
   const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
@@ -549,8 +569,27 @@ EdgesDelegate *DeepEdges::and_with (const Edges &other) const
 
 EdgesDelegate *DeepEdges::and_with (const Region &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::and_with (other);
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return new EmptyEdges ();
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return clone ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::not_with (other);
+
+  } else {
+
+    return new DeepEdges (edge_region_op (other_deep, false /*outside*/, true /*include borders*/));
+
+  }
 }
 
 EdgesDelegate *DeepEdges::not_with (const Edges &other) const
@@ -580,8 +619,27 @@ EdgesDelegate *DeepEdges::not_with (const Edges &other) const
 
 EdgesDelegate *DeepEdges::not_with (const Region &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::not_with (other);
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return new EmptyEdges ();
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return clone ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::not_with (other);
+
+  } else {
+
+    return new DeepEdges (edge_region_op (other_deep, true /*outside*/, true /*include borders*/));
+
+  }
 }
 
 EdgesDelegate *DeepEdges::xor_with (const Edges &other) const
@@ -663,14 +721,52 @@ EdgesDelegate *DeepEdges::add (const Edges &other) const
 
 EdgesDelegate *DeepEdges::inside_part (const Region &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::inside_part (other);
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return new EmptyEdges ();
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return clone ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::not_with (other);
+
+  } else {
+
+    return new DeepEdges (edge_region_op (other_deep, false /*outside*/, false /*include borders*/));
+
+  }
 }
 
 EdgesDelegate *DeepEdges::outside_part (const Region &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::outside_part (other);
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return new EmptyEdges ();
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return clone ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::not_with (other);
+
+  } else {
+
+    return new DeepEdges (edge_region_op (other_deep, true /*outside*/, false /*include borders*/));
+
+  }
 }
 
 RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const

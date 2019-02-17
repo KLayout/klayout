@@ -241,5 +241,70 @@ EdgeBoolAndOrNotLocalOperation::compute_local (db::Layout * /*layout*/, const sh
   }
 }
 
+// ---------------------------------------------------------------------------------------------
+//  EdgeToPolygonLocalOperation implementation
+
+EdgeToPolygonLocalOperation::EdgeToPolygonLocalOperation (bool outside, bool include_borders)
+  : m_outside (outside), m_include_borders (include_borders)
+{
+  //  .. nothing yet ..
+}
+
+local_operation<db::Edge, db::PolygonRef, db::Edge>::on_empty_intruder_mode
+EdgeToPolygonLocalOperation::on_empty_intruder_hint () const
+{
+  return m_outside ? local_operation::Copy : local_operation::Drop;
+}
+
+std::string
+EdgeToPolygonLocalOperation::description () const
+{
+  return tl::to_string (m_outside ? tr ("Edge to polygon AND/INSIDE") : tr ("Edge to polygons NOT/OUTSIDE"));
+}
+
+void
+EdgeToPolygonLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+{
+  db::EdgeProcessor ep;
+
+  std::set<db::PolygonRef> others;
+  for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (shape_interactions<db::Edge, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      others.insert (interactions.intruder_shape (*j));
+    }
+  }
+
+  bool any_subject = false;
+
+  for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::Edge &subject = interactions.subject_shape (i->first);
+    if (i->second.empty ()) {
+      //  shortcut (outside: keep, otherwise: drop)
+      if (m_outside) {
+        result.insert (subject);
+      }
+    } else {
+      ep.insert (subject, 1);
+      any_subject = true;
+    }
+
+  }
+
+  if (! others.empty () || any_subject) {
+
+    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end (); ++e) {
+        ep.insert (*e, 0);
+      }
+    }
+
+    db::EdgeToEdgeSetGenerator cc (result);
+    db::EdgePolygonOp op (m_outside, m_include_borders);
+    ep.process (cc, op);
+
+  }
+}
+
 }
 

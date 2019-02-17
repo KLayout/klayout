@@ -41,7 +41,7 @@ class PolygonRefGenerator
 {
 public:
   /**
-   *  @brief Constructor specifying an external vector for storing the polygons
+   *  @brief Constructor
    */
   PolygonRefGenerator (db::Layout *layout, std::unordered_set<db::PolygonRef> &polyrefs);
 
@@ -53,6 +53,24 @@ public:
 private:
   db::Layout *mp_layout;
   std::unordered_set<db::PolygonRef> *mp_polyrefs;
+};
+
+class EdgeToEdgeSetGenerator
+  : public EdgeSink
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  EdgeToEdgeSetGenerator (std::unordered_set<db::Edge> &edges);
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::Edge &edge);
+
+private:
+  std::unordered_set<db::Edge> *mp_edges;
 };
 
 class PolygonRefToShapesGenerator

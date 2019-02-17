@@ -43,6 +43,20 @@ void PolygonRefGenerator::put (const db::Polygon &polygon)
 }
 
 // -----------------------------------------------------------------------------------------------
+//  class EdgeToEdgeSetGenerator
+
+EdgeToEdgeSetGenerator::EdgeToEdgeSetGenerator (std::unordered_set<db::Edge> &edges)
+  : mp_edges (&edges)
+{
+  //  .. nothing yet ..
+}
+
+void EdgeToEdgeSetGenerator::put (const db::Edge &edge)
+{
+  mp_edges->insert (edge);
+}
+
+// -----------------------------------------------------------------------------------------------
 //  class PolygonRefGenerator
 
 PolygonRefToShapesGenerator::PolygonRefToShapesGenerator (db::Layout *layout, db::Shapes *shapes)

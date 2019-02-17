@@ -164,6 +164,30 @@ private:
   bool m_is_and;
 };
 
+/**
+ *  @brief Implements a boolean AND or NOT operation between edges and polygons (polygons as intruders)
+ *
+ *  "AND" is implemented by "outside == false", "NOT" by "outside == true" with "include_borders == true".
+ *  With "include_borders == false" the operations are "INSIDE" and "OUTSIDE".
+ */
+class DB_PUBLIC EdgeToPolygonLocalOperation
+  : public local_operation<db::Edge, db::PolygonRef, db::Edge>
+{
+public:
+  EdgeToPolygonLocalOperation (bool outside, bool include_borders);
+
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::unordered_set<db::Edge> &result, size_t max_vertex_count, double area_ratio) const;
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+  //  edge interaction distance is 1 to force overlap between edges and edge/boxes
+  virtual db::Coord dist () const { return m_include_borders ? 1 : 0; }
+
+private:
+  bool m_outside;
+  bool m_include_borders;
+};
+
 }
 
 #endif

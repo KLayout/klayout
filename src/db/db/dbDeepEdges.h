@@ -173,6 +173,7 @@ private:
   DeepLayer and_or_not_with(const DeepEdges *other, bool and_op) const;
   DeepLayer edge_region_op (const DeepRegion *other, bool outside, bool include_borders) const;
   EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
+  EdgesDelegate *segments (int mode, length_type length, double fraction) const;
 };
 
 }

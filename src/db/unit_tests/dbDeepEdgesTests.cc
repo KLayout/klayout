@@ -294,3 +294,51 @@ TEST(6_Extended)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au6.gds");
 }
 
+TEST(7_Partial)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Edges e2 = r2.edges ();
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  db::EdgeLengthFilter elf1 (0, 40000, false);
+  db::Edges e2f = e2.filtered (elf1);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.start_segments (1000, 0.0));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.start_segments (0, 0.2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), e2f.start_segments (1000, 0.0));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), e2f.start_segments (0, 0.2));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e2.end_segments (1000, 0.0));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), e2.end_segments (0, 0.2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), e2f.end_segments (1000, 0.0));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), e2f.end_segments (0, 0.2));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e2.centers (1000, 0.0));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), e2.centers (0, 0.2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), e2f.centers (1000, 0.0));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), e2f.centers (0, 0.2));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au7.gds");
+}
+

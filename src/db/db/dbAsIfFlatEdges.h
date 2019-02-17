@@ -185,6 +185,7 @@ protected:
   void invalidate_bbox ();
   EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   static db::Polygon extended_edge (const db::Edge &edge, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i);
+  static db::Edge compute_partial (const db::Edge &edge, int mode, length_type length, double fraction);
 
 private:
   AsIfFlatEdges &operator= (const AsIfFlatEdges &other);
@@ -195,6 +196,7 @@ private:
   virtual db::Box compute_bbox () const;
   EdgesDelegate *boolean (const Edges *other, EdgeBoolOp op) const;
   EdgesDelegate *edge_region_op (const Region &other, bool outside, bool include_borders) const;
+  EdgesDelegate *segments (int mode, length_type length, double fraction) const;
 };
 
 }

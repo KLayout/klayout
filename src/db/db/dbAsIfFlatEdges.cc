@@ -424,8 +424,31 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
   }
 }
 
+db::Edge
+AsIfFlatEdges::compute_partial (const db::Edge &edge, int mode, length_type length, double fraction)
+{
+  double l = std::max (edge.double_length () * fraction, double (length));
+
+  if (mode < 0) {
+
+    return db::Edge (edge.p1 (), db::Point (db::DPoint (edge.p1 ()) + db::DVector (edge.d ()) * (l / edge.double_length ())));
+
+  } else if (mode > 0) {
+
+    return db::Edge (db::Point (db::DPoint (edge.p2 ()) - db::DVector (edge.d ()) * (l / edge.double_length ())), edge.p2 ());
+
+  } else {
+
+    db::DVector dl = db::DVector (edge.d ()) * (0.5 * l / edge.double_length ());
+    db::DPoint center = db::DPoint (edge.p1 ()) + db::DVector (edge.p2 () - edge.p1 ()) * 0.5;
+
+    return db::Edge (db::Point (center - dl), db::Point (center + dl));
+
+  }
+}
+
 EdgesDelegate *
-AsIfFlatEdges::start_segments (length_type length, double fraction) const
+AsIfFlatEdges::segments (int mode, length_type length, double fraction) const
 {
   std::auto_ptr<FlatEdges> edges (new FlatEdges ());
   edges->reserve (size ());
@@ -436,51 +459,28 @@ AsIfFlatEdges::start_segments (length_type length, double fraction) const
   }
 
   for (EdgesIterator e (begin_merged ()); ! e.at_end (); ++e) {
-    double l = std::max (e->double_length () * fraction, double (length));
-    edges->insert (db::Edge (e->p1 (), db::Point (db::DPoint (e->p1 ()) + db::DVector (e->d()) * (l / e->double_length ()))));
+    edges->insert (compute_partial (*e, mode, length, fraction));
   }
 
   return edges.release ();
+}
+
+EdgesDelegate *
+AsIfFlatEdges::start_segments (length_type length, double fraction) const
+{
+  return segments (-1, length, fraction);
 }
 
 EdgesDelegate *
 AsIfFlatEdges::end_segments (length_type length, double fraction) const
 {
-  std::auto_ptr<FlatEdges> edges (new FlatEdges ());
-  edges->reserve (size ());
-
-  //  zero-length edges would vanish in merged sematics, so we don't set it now
-  if (length == 0) {
-    edges->set_merged_semantics (false);
-  }
-
-  for (EdgesIterator e (begin_merged ()); ! e.at_end (); ++e) {
-    double l = std::max (e->double_length () * fraction, double (length));
-    edges->insert (db::Edge (db::Point (db::DPoint (e->p2 ()) - db::DVector (e->d()) * (l / e->double_length ())), e->p2 ()));
-  }
-
-  return edges.release ();
+  return segments (1, length, fraction);
 }
 
 EdgesDelegate *
 AsIfFlatEdges::centers (length_type length, double fraction) const
 {
-  std::auto_ptr<FlatEdges> edges (new FlatEdges ());
-  edges->reserve (size ());
-
-  //  zero-length edges would vanish in merged sematics, so we don't set it now
-  if (length == 0) {
-    edges->set_merged_semantics (false);
-  }
-
-  for (EdgesIterator e (begin_merged ()); ! e.at_end (); ++e) {
-    double l = std::max (e->double_length () * fraction, double (length));
-    db::DVector dl = db::DVector (e->d()) * (0.5 * l / e->double_length ());
-    db::DPoint center = db::DPoint (e->p1 ()) + db::DVector (e->p2 () - e->p1 ()) * 0.5;
-    edges->insert (db::Edge (db::Point (center - dl), db::Point (center + dl)));
-  }
-
-  return edges.release ();
+  return segments (0, length, fraction);
 }
 
 namespace

@@ -144,6 +144,26 @@ private:
   unsigned int m_wrap_count;
 };
 
+/**
+ *  @brief Implements a boolean AND or NOT operation between edges
+ */
+class DB_PUBLIC EdgeBoolAndOrNotLocalOperation
+  : public local_operation<db::Edge, db::Edge, db::Edge>
+{
+public:
+  EdgeBoolAndOrNotLocalOperation (bool is_and);
+
+  virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t max_vertex_count, double area_ratio) const;
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+  //  edge interaction distance is 1 to force overlap between edges and edge/boxes
+  virtual db::Coord dist () const { return 1; }
+
+private:
+  bool m_is_and;
+};
+
 }
 
 #endif

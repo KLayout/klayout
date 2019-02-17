@@ -25,6 +25,7 @@
 #include "dbReader.h"
 #include "dbTestSupport.h"
 #include "dbEdges.h"
+#include "dbRegion.h"
 #include "dbDeepShapeStore.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
@@ -104,5 +105,46 @@ TEST(2_MergeEdges)
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au2.gds");
+}
+
+TEST(3_Edge2EdgeBooleans)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r2and3 = r2 & r3;
+
+  db::Edges e3 = r3.edges ();
+  db::Edges e2and3 = r2and3.edges ();
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (3, 0)), r3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2and3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e3 & e2and3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), e3 - e2and3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), e3 ^ e2and3);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au3.gds");
 }
 

@@ -28,6 +28,9 @@
 #include "dbEdgeBoolean.h"
 #include "dbCellMapping.h"
 #include "dbLayoutUtils.h"
+#include "dbLocalOperation.h"
+#include "dbHierProcessor.h"
+#include "dbEmptyEdges.h"
 
 namespace db
 {
@@ -506,10 +509,42 @@ EdgesDelegate *DeepEdges::merged () const
   return res.release ();
 }
 
+DeepLayer
+DeepEdges::and_or_not_with (const DeepEdges *other, bool and_op) const
+{
+  DeepLayer dl_out (m_deep_layer.derived ());
+
+  db::EdgeBoolAndOrNotLocalOperation op (and_op);
+
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (m_deep_layer.store ()->threads ());
+  proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
+  proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
+
+  proc.run (&op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
+
+  return dl_out;
+}
+
 EdgesDelegate *DeepEdges::and_with (const Edges &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::and_with (other);
+  const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
+
+  if (empty () || other.empty ()) {
+
+    //  Nothing to do
+    return new EmptyEdges ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::and_with (other);
+
+  } else {
+
+    return new DeepEdges (and_or_not_with (other_deep, true));
+
+  }
 }
 
 EdgesDelegate *DeepEdges::and_with (const Region &other) const
@@ -520,8 +555,27 @@ EdgesDelegate *DeepEdges::and_with (const Region &other) const
 
 EdgesDelegate *DeepEdges::not_with (const Edges &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::not_with (other);
+  const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return new EmptyEdges ();
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return clone ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::not_with (other);
+
+  } else {
+
+    return new DeepEdges (and_or_not_with (other_deep, false));
+
+  }
 }
 
 EdgesDelegate *DeepEdges::not_with (const Region &other) const
@@ -532,14 +586,39 @@ EdgesDelegate *DeepEdges::not_with (const Region &other) const
 
 EdgesDelegate *DeepEdges::xor_with (const Edges &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::xor_with (other);
+  const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return other.delegate ()->clone ();
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return clone ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::xor_with (other);
+
+  } else {
+
+    //  Implement XOR as (A-B)+(B-A) - only this implementation
+    //  is compatible with the local processor scheme
+    DeepLayer n1 (and_or_not_with (other_deep, false));
+    DeepLayer n2 (other_deep->and_or_not_with (this, false));
+
+    n1.add_from (n2);
+    return new DeepEdges (n1);
+
+  }
 }
 
 EdgesDelegate *DeepEdges::or_with (const Edges &other) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::or_with (other);
+  //  NOTE: in the hierarchical case we don't do a merge on "or": just map to add
+  return add (other);
 }
 
 EdgesDelegate *

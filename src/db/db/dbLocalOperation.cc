@@ -29,6 +29,7 @@
 #include "dbPolygonGenerators.h"
 #include "dbPolygonTools.h"
 #include "dbLocalOperationUtils.h"
+#include "dbEdgeBoolean.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "tlInternational.h"
@@ -171,6 +172,73 @@ SelfOverlapMergeLocalOperation::on_empty_intruder_mode SelfOverlapMergeLocalOper
 std::string SelfOverlapMergeLocalOperation::description () const
 {
   return tl::sprintf (tl::to_string (tr ("Self-overlap (wrap count %d)")), int (m_wrap_count));
+}
+
+// ---------------------------------------------------------------------------------------------
+//  EdgeBoolAndOrNotLocalOperation implementation
+
+EdgeBoolAndOrNotLocalOperation::EdgeBoolAndOrNotLocalOperation (bool is_and)
+  : m_is_and (is_and)
+{
+  //  .. nothing yet ..
+}
+
+local_operation<db::Edge, db::Edge, db::Edge>::on_empty_intruder_mode
+EdgeBoolAndOrNotLocalOperation::on_empty_intruder_hint () const
+{
+  return m_is_and ? local_operation::Drop : local_operation::Copy;
+}
+
+std::string
+EdgeBoolAndOrNotLocalOperation::description () const
+{
+  return m_is_and ? tl::to_string (tr ("Edge AND operation")) : tl::to_string (tr ("Edge NOT operation"));
+}
+
+void
+EdgeBoolAndOrNotLocalOperation::compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+{
+  EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&result, m_is_and ? EdgeAnd : EdgeNot);
+
+  db::box_scanner<db::Edge, size_t> scanner;
+
+  std::set<db::Edge> others;
+  for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      others.insert (interactions.intruder_shape (*j));
+    }
+  }
+
+  bool any_subject = false;
+
+  for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::Edge &subject = interactions.subject_shape (i->first);
+    if (others.find (subject) != others.end ()) {
+      if (m_is_and) {
+        result.insert (subject);
+      }
+    } else if (i->second.empty ()) {
+      //  shortcut (not: keep, and: drop)
+      if (! m_is_and) {
+        result.insert (subject);
+      }
+    } else {
+      scanner.insert (&subject, 0);
+      any_subject = true;
+    }
+
+  }
+
+  if (! others.empty () || any_subject) {
+
+    for (std::set<db::Edge>::const_iterator o = others.begin (); o != others.end (); ++o) {
+      scanner.insert (o.operator-> (), 1);
+    }
+
+    scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+  }
 }
 
 }

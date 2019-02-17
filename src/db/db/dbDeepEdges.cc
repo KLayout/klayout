@@ -24,6 +24,7 @@
 #include "dbRegion.h"
 #include "dbDeepEdges.h"
 #include "dbDeepRegion.h"
+#include "dbDeepEdgePairs.h"
 #include "dbHierNetworkProcessor.h"
 #include "dbCellGraphUtils.h"
 #include "dbCellVariants.h"
@@ -1174,10 +1175,123 @@ EdgesDelegate *DeepEdges::in (const Edges &other, bool invert) const
   return AsIfFlatEdges::in (other, invert);
 }
 
+namespace
+{
+
+class CheckLocalOperation
+  : public local_operation<db::Edge, db::Edge, db::EdgePair>
+{
+public:
+  CheckLocalOperation (const EdgeRelationFilter &check, bool has_other)
+    : m_check (check), m_has_other (has_other)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::EdgePair> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    edge2edge_check_for_edges<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_has_other);
+
+    db::box_scanner<db::Edge, size_t> scanner;
+    std::set<db::Edge> others;
+
+    if (m_has_other) {
+
+      for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+        for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+          others.insert (interactions.intruder_shape (*j));
+        }
+      }
+
+      size_t n = 0;
+      for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+        const db::Edge &subject = interactions.subject_shape (i->first);
+        scanner.insert (& subject, n);
+        n += 2;
+      }
+
+      n = 1;
+      for (std::set<db::Edge>::const_iterator o = others.begin (); o != others.end (); ++o) {
+        scanner.insert (o.operator-> (), n);
+        n += 2;
+      }
+
+    } else {
+
+      for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+        others.insert (interactions.subject_shape (i->first));
+        for (shape_interactions<db::Edge, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+          others.insert (interactions.intruder_shape (*j));
+        }
+      }
+
+      size_t n = 0;
+      for (std::set<db::Edge>::const_iterator o = others.begin (); o != others.end (); ++o) {
+        scanner.insert (o.operator-> (), n);
+        n += 2;
+      }
+
+    }
+
+    scanner.process (edge_check, m_check.distance (), db::box_convert<db::Edge> ());
+  }
+
+  virtual db::Coord dist () const
+  {
+    //  TODO: will the distance be sufficient? Or should we take somewhat more?
+    return m_check.distance ();
+  }
+
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  {
+    return Drop;
+  }
+
+  virtual std::string description () const
+  {
+    return tl::to_string (tr ("Generic DRC check"));
+  }
+
+private:
+  EdgeRelationFilter m_check;
+  bool m_has_other;
+};
+
+}
+
 EdgePairs DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::run_check (rel, other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+  const db::DeepEdges *other_deep = 0;
+  if (other) {
+    other_deep = dynamic_cast<const db::DeepEdges *> (other->delegate ());
+    if (! other_deep) {
+      return db::AsIfFlatEdges::run_check (rel, other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    }
+  }
+
+  ensure_merged_edges_valid ();
+
+  EdgeRelationFilter check (rel, d, metrics);
+  check.set_whole_edges (whole_edges);
+  check.set_ignore_angle (ignore_angle);
+  check.set_min_projection (min_projection);
+  check.set_max_projection (max_projection);
+
+  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (m_merged_edges.derived ()));
+
+  db::CheckLocalOperation op (check, other_deep != 0);
+
+  db::local_processor<db::Edge, db::Edge, db::EdgePair> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()),
+                                                              const_cast<db::Cell *> (&m_deep_layer.initial_cell ()),
+                                                              other_deep ? &other_deep->deep_layer ().layout () : const_cast<db::Layout *> (&m_deep_layer.layout ()),
+                                                              other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&m_deep_layer.initial_cell ()));
+
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (m_deep_layer.store ()->threads ());
+
+  proc.run (&op, m_merged_edges.layer (), other_deep ? other_deep->deep_layer ().layer () : m_merged_edges.layer (), res->deep_layer ().layer ());
+
+  return db::EdgePairs (res.release ());
 }
 
 }

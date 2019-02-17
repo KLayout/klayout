@@ -106,6 +106,46 @@ private:
 };
 
 /**
+ *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
+ *
+ *  If will perform a edge by edge check using the provided EdgeRelationFilter
+ */
+template <class Output>
+class edge2edge_check_for_edges
+  : public db::box_scanner_receiver<db::Edge, size_t>
+{
+public:
+  edge2edge_check_for_edges (const EdgeRelationFilter &check, Output &output, bool requires_different_layers)
+    : mp_check (&check), mp_output (&output)
+  {
+    m_requires_different_layers = requires_different_layers;
+  }
+
+  void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
+  {
+    //  Overlap or inside checks require input from different layers
+    if (! m_requires_different_layers || ((p1 ^ p2) & 1) != 0) {
+
+      //  ensure that the first check argument is of layer 1 and the second of
+      //  layer 2 (unless both are of the same layer)
+      int l1 = int (p1 & size_t (1));
+      int l2 = int (p2 & size_t (1));
+
+      db::EdgePair ep;
+      if (mp_check->check (l1 <= l2 ? *o1 : *o2, l1 <= l2 ? *o2 : *o1, &ep)) {
+        mp_output->insert (ep);
+      }
+
+    }
+  }
+
+private:
+  const EdgeRelationFilter *mp_check;
+  Output *mp_output;
+  bool m_requires_different_layers;
+};
+
+/**
  *  @brief A helper class to turn joined edge sequences into polygons
  *
  *  This object is an edge cluster so it can connect to a cluster collector

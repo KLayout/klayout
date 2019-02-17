@@ -386,3 +386,51 @@ TEST(8_SelectInteracting)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au8.gds");
 }
 
+TEST(9_DRCChecks)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+  unsigned int l6 = ly.get_layer (db::LayerProperties (6, 0));
+  unsigned int l4 = ly.get_layer (db::LayerProperties (4, 0));
+
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
+  db::Region r4 (db::RecursiveShapeIterator (ly, top_cell, l4), dss);
+
+  db::Edges e3 = r3.edges ();
+  db::Edges e4 = r4.edges ();
+  db::Edges e6 = r6.edges ();
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (3, 0)), r3);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (4, 0)), r4);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (6, 0)), r6);
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e3.space_check (500, false, db::Projection, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e3.space_check (500, true, db::Projection, 90, 300));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e3.separation_check (e4, 200, false, db::Projection, 90, 0));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e6.enclosing_check (e4, 100, true, db::Projection, 90, 0));
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au9.gds");
+  }
+}
+

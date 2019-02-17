@@ -84,6 +84,15 @@ static db::Edges *new_path (const db::Path &o)
   return new db::Edges (o);
 }
 
+static db::Edges *new_shapes (const db::Shapes &s, bool as_edges)
+{
+  db::Edges *r = new db::Edges ();
+  for (db::Shapes::shape_iterator i = s.begin (as_edges ? db::ShapeIterator::All : db::ShapeIterator::Edges); !i.at_end (); ++i) {
+    r->insert (*i);
+  }
+  return r;
+}
+
 static db::Edges *new_si (const db::RecursiveShapeIterator &si, bool as_edges)
 {
   return new db::Edges (si, as_edges);
@@ -424,6 +433,14 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This constructor creates an edge collection from a path.\n"
     "The edges form the contour of the path.\n"
+  ) +
+  constructor ("new", &new_shapes, gsi::arg ("shapes"), gsi::arg ("as_edges", true),
+    "@brief Constructor of a flat edge collection from a \\Shapes container\n"
+    "\n"
+    "If 'as_edges' is true, the shapes from the container will be converted to edges (i.e. polygon contours to edges). "
+    "Otherwise, only edges will be taken from the container.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
   ) +
   constructor ("new", &new_si, gsi::arg ("shape_iterator"), gsi::arg ("as_edges", true),
     "@brief Constructor of a flat edge collection from a hierarchical shape set\n"

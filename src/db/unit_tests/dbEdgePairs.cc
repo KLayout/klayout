@@ -126,3 +126,18 @@ TEST(3)
   EXPECT_EQ (ep.to_string (), "");
 }
 
+TEST(4)
+{
+  db::EdgePairs ep;
+  ep.insert (db::EdgePair (db::Edge (db::Point (10, 20), db::Point (50, 50)), db::Edge (db::Point (-10, -20), db::Point (90, 80))));
+  ep.insert (db::EdgePair (db::Edge (db::Point (10, 20), db::Point (110, 120)), db::Edge (db::Point (90, 80), db::Point (-10, -20))));
+
+  db::Layout ly;
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+  db::cell_index_type top_cell = ly.add_cell ("TOP");
+
+  ep.insert_into_as_polygons (&ly, top_cell, l1, 1);
+
+  db::Region r (db::RecursiveShapeIterator (ly, ly.cell (top_cell), l1));
+  EXPECT_EQ (r.to_string (), "(-11,-20;50,51;9,20;90,81);(-10,-21;9,20;110,121;91,80)");
+}

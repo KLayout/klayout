@@ -796,6 +796,7 @@ class DBRegion_TestClass < TestBase
     r = RBA::Region::new(ly.top_cell.begin_shapes_rec(l1), dss)
     rf = RBA::Region::new(ly.top_cell.begin_shapes_rec(l1))
 
+    assert_equal(r.is_deep?, true)
     assert_equal(r.area, 53120000)
     assert_equal(rf.area, 53120000)
 
@@ -814,6 +815,21 @@ class DBRegion_TestClass < TestBase
     end
     assert_equal(s1, {"INV2"=>1, "TOP"=>0, "TRANS"=>0})
     assert_equal(s2, {"INV2"=>0, "TOP"=>10, "TRANS"=>0})
+
+    target = RBA::Layout::new
+    target_top = target.add_cell("TOP")
+    target_li = target.layer
+    r.insert_into(target, target_top, target_li)
+    cells = []
+    target.each_cell { |c| cells << c.name }
+    assert_equal(cells.join(","), "TOP,INV2,TRANS")
+    assert_equal(RBA::Region::new(target.cell("TOP").shapes(target_li)).to_s, "")
+    assert_equal(RBA::Region::new(target.cell("INV2").shapes(target_li)).to_s, "(-1400,1800;-1400,3800;1400,3800;1400,1800)")
+    assert_equal(RBA::Region::new(target.cell("TRANS").shapes(target_li)).to_s, "")
+
+    r.flatten
+    assert_equal(r.is_deep?, false)
+    assert_equal(r.area, 53120000)
 
     # force destroy, so the unit tests pass on the next iteration
     dss._destroy

@@ -65,6 +65,16 @@ static db::EdgePairs *new_si2 (const db::RecursiveShapeIterator &si, const db::I
   return new db::EdgePairs (si, trans);
 }
 
+static db::EdgePairs *new_sid (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss)
+{
+  return new db::EdgePairs (si, dss);
+}
+
+static db::EdgePairs *new_si2d (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const db::ICplxTrans &trans)
+{
+  return new db::EdgePairs (si, dss, trans);
+}
+
 static std::string to_string0 (const db::EdgePairs *r)
 {
   return r->to_string ();
@@ -201,6 +211,8 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "This constructor creates an edge pair collection from the shapes delivered by the given recursive shape iterator.\n"
     "Only edge pairs are taken from the shape set and other shapes are ignored.\n"
     "This method allows feeding the edge pair collection from a hierarchy of cells.\n"
+    "Edge pairs in layout objects are somewhat special as most formats don't support reading "
+    "or writing of edge pairs. Still they are useful objects and can be created and manipulated inside layouts.\n"
     "\n"
     "@code\n"
     "layout = ... # a layout\n"
@@ -220,8 +232,48 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "The given transformation is applied to each edge pair taken.\n"
     "This method allows feeding the edge pair collection from a hierarchy of cells.\n"
     "The transformation is useful to scale to a specific database unit for example.\n"
+    "Edge pairs in layout objects are somewhat special as most formats don't support reading "
+    "or writing of edge pairs. Still they are useful objects and can be created and manipulated inside layouts.\n"
     "\n"
     "@code\n"
+    "layout = ... # a layout\n"
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
+    "dbu    = 0.1 # the target database unit\n"
+    "r = RBA::EdgePairs::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
+    "@/code\n"
+    "\n"
+    "This constructor has been introduced in version 0.26."
+  ) +
+  constructor ("new", &new_sid, gsi::arg ("shape_iterator"), gsi::arg ("dss"),
+    "@brief Creates a hierarchical edge pair collection from an original layer\n"
+    "\n"
+    "This constructor creates an edge pair collection from the shapes delivered by the given recursive shape iterator.\n"
+    "This version will create a hierarchical edge pair collection which supports hierarchical operations.\n"
+    "Edge pairs in layout objects are somewhat special as most formats don't support reading "
+    "or writing of edge pairs. Still they are useful objects and can be created and manipulated inside layouts.\n"
+    "\n"
+    "@code\n"
+    "dss    = RBA::DeepShapeStore::new\n"
+    "layout = ... # a layout\n"
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
+    "r = RBA::EdgePairs::new(layout.begin_shapes(cell, layer))\n"
+    "@/code\n"
+    "\n"
+    "This constructor has been introduced in version 0.26."
+  ) +
+  constructor ("new", &new_si2d, gsi::arg ("shape_iterator"), gsi::arg ("dss"), gsi::arg ("trans"),
+    "@brief Creates a hierarchical edge pair collection from an original layer with a transformation\n"
+    "\n"
+    "This constructor creates an edge pair collection from the shapes delivered by the given recursive shape iterator.\n"
+    "This version will create a hierarchical edge pair collection which supports hierarchical operations.\n"
+    "The transformation is useful to scale to a specific database unit for example.\n"
+    "Edge pairs in layout objects are somewhat special as most formats don't support reading "
+    "or writing of edge pairs. Still they are useful objects and can be created and manipulated inside layouts.\n"
+    "\n"
+    "@code\n"
+    "dss    = RBA::DeepShapeStore::new\n"
     "layout = ... # a layout\n"
     "cell   = ... # the index of the initial cell\n"
     "layer  = ... # the index of the layer from where to take the shapes from\n"

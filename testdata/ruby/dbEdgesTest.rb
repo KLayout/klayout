@@ -559,6 +559,46 @@ class DBEdges_TestClass < TestBase
 
   end
 
+  # deep edges
+  def test_9
+
+    ly = RBA::Layout::new
+    l1 = ly.layer("l1")
+    c1 = ly.create_cell("C1")
+    c2 = ly.create_cell("C2")
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(0, 0)))
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(0, 100)))
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(200, 100)))
+    c2.shapes(l1).insert(RBA::Box::new(-10, -20, 10, 20))
+    
+    dss = RBA::DeepShapeStore::new
+    r = RBA::Edges::new(ly.begin_shapes(c1.cell_index, l1), dss, true)
+    assert_equal(r.to_s(30), "(-10,-20;-10,20);(-10,20;10,20);(10,20;10,-20);(10,-20;-10,-20);(-10,80;-10,120);(-10,120;10,120);(10,120;10,80);(10,80;-10,80);(190,80;190,120);(190,120;210,120);(210,120;210,80);(210,80;190,80)")
+    assert_equal(r.to_s(2), "(-10,-20;-10,20);(-10,20;10,20)...")
+    assert_equal(r.is_empty?, false)
+    assert_equal(r.bbox.to_s, "(-10,-20;210,120)")
+    assert_equal(r.is_deep?, true)
+
+    target = RBA::Layout::new
+    target_top = target.add_cell("TOP")
+    target_li = target.layer
+    r.insert_into(target, target_top, target_li)
+    cells = []
+    target.each_cell { |c| cells << c.name }
+    assert_equal(cells.join(","), "TOP,C2")
+    assert_equal(RBA::Edges::new(target.cell("TOP").shapes(target_li)).to_s, "")
+    assert_equal(RBA::Edges::new(target.cell("C2").shapes(target_li)).to_s, "(-10,-20;-10,20);(-10,20;10,20);(10,20;10,-20);(10,-20;-10,-20)")
+
+    r.flatten
+
+    assert_equal(r.is_deep?, false)
+
+    assert_equal(r.size, 12)
+    assert_equal(r[1].to_s, "(-10,20;10,20)")
+    assert_equal(r[100].to_s, "")
+
+  end
+
 end
 
 load("test_epilogue.rb")

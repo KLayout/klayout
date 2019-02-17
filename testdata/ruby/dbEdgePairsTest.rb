@@ -112,6 +112,7 @@ class DBEdgePairs_TestClass < TestBase
 
     ep1 = RBA::EdgePair::new(RBA::Edge::new(0, 1, 2, 3), RBA::Edge::new(10, 11, 12, 13))
     ep2 = RBA::EdgePair::new(RBA::Edge::new(20, 21, 22, 23), RBA::Edge::new(30, 31, 32, 33))
+    ep3 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 10, 10, 0))
 
     r1 = RBA::EdgePairs::new([ ep1, ep2 ])
     assert_equal(r1.to_s, "(0,1;2,3)/(10,11;12,13);(20,21;22,23)/(30,31;32,33)")
@@ -128,6 +129,7 @@ class DBEdgePairs_TestClass < TestBase
     ly = RBA::Layout::new
     l1 = ly.layer("l1")
     l2 = ly.layer("l2")
+    l3 = ly.layer("l3")
     c1 = ly.create_cell("C1")
     c2 = ly.create_cell("C2")
     c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(0, 0)))
@@ -135,6 +137,7 @@ class DBEdgePairs_TestClass < TestBase
     c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(200, 100)))
     c2.shapes(l1).insert(ep1)
     c2.shapes(l2).insert(ep2)
+    c2.shapes(l3).insert(ep3)
     
     r = RBA::EdgePairs::new(ly.begin_shapes(c1.cell_index, l1))
     assert_equal(r.to_s(30), "(0,1;2,3)/(10,11;12,13);(0,101;2,103)/(10,111;12,113);(200,101;202,103)/(210,111;212,113)")
@@ -145,12 +148,72 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(r.has_valid_edge_pairs?, false)
     assert_equal(r.bbox.to_s, "(0,1;212,113)")
 
+    assert_equal(r.is_deep?, false)
+
     r.flatten
     assert_equal(r.has_valid_edge_pairs?, true)
     assert_equal(r[1].to_s, "(0,101;2,103)/(10,111;12,113)")
     assert_equal(r[100].inspect, "nil")
     assert_equal(r.bbox.to_s, "(0,1;212,113)")
     
+    dss = RBA::DeepShapeStore::new
+    r = RBA::EdgePairs::new(ly.begin_shapes(c1.cell_index, l1), dss)
+    assert_equal(r.to_s(30), "(0,1;2,3)/(10,11;12,13);(0,101;2,103)/(10,111;12,113);(200,101;202,103)/(210,111;212,113)")
+    assert_equal(r.to_s(2), "(0,1;2,3)/(10,11;12,13);(0,101;2,103)/(10,111;12,113)...")
+    assert_equal(r.is_empty?, false)
+    assert_equal(r.size, 3)
+
+    assert_equal(r.has_valid_edge_pairs?, false)
+    assert_equal(r.bbox.to_s, "(0,1;212,113)")
+
+    assert_equal(r.is_deep?, true)
+
+    r.flatten
+    assert_equal(r.has_valid_edge_pairs?, true)
+    assert_equal(r[1].to_s, "(0,101;2,103)/(10,111;12,113)")
+    assert_equal(r[100].inspect, "nil")
+    assert_equal(r.bbox.to_s, "(0,1;212,113)")
+
+    assert_equal(r.is_deep?, false)
+
+  end
+
+  def test_4
+
+    # insert_into and insert_into_as_polygons
+
+    ep1 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 10, 10, 0))
+
+    ly = RBA::Layout::new
+    l1 = ly.layer("l1")
+    c1 = ly.create_cell("C1")
+    c2 = ly.create_cell("C2")
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(0, 0)))
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(0, 100)))
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(200, 100)))
+    c2.shapes(l1).insert(ep1)
+
+    dss = RBA::DeepShapeStore::new
+    r = RBA::EdgePairs::new(ly.begin_shapes(c1.cell_index, l1), dss)
+
+    target = RBA::Layout::new
+    target_top = target.add_cell("TOP")
+    target_li = target.layer
+    r.insert_into(target, target_top, target_li)
+    cells = []
+    target.each_cell { |c| cells << c.name }
+    assert_equal(cells.join(","), "TOP,C2")
+    assert_equal(RBA::EdgePairs::new(target.cell("TOP").shapes(target_li)).to_s, "")
+    assert_equal(RBA::EdgePairs::new(target.cell("C2").shapes(target_li)).to_s, "(0,0;0,10)/(10,10;10,0)")
+
+    target_li = target.layer
+    r.insert_into_as_polygons(target, target_top, target_li, 1)
+    cells = []
+    target.each_cell { |c| cells << c.name }
+    assert_equal(cells.join(","), "TOP,C2")
+    assert_equal(RBA::Region::new(target.cell("TOP").shapes(target_li)).to_s, "")
+    assert_equal(RBA::Region::new(target.cell("C2").shapes(target_li)).to_s, "(-1,-1;-1,11;11,11;11,-1)")
+
   end
 
 end

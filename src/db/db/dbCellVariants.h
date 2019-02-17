@@ -28,6 +28,7 @@
 #include "dbLayout.h"
 #include "dbTrans.h"
 #include "tlTypeTraits.h"
+#include "tlUtils.h"
 
 namespace db
 {
@@ -355,6 +356,123 @@ public:
   }
 
   /**
+   *  @brief Commits the shapes for different variants to the current cell hierarchy
+   *
+   *  This is an alternative approach and will push the variant shapes into the parent hierarchy.
+   *  "to_commit" initially is a set of shapes to commit for the given cell and variant.
+   *  This map is modified during the algorithm and should be discarded later.
+   */
+  virtual void commit_shapes (db::Layout &layout, db::Cell &top_cell, unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit)
+  {
+    if (to_commit.empty ()) {
+      return;
+    }
+
+    //  NOTE: this implementation suffers from accumulation of propagated shapes: we add more levels of propagated
+    //  shapes if required. We don't clean up, because we do not know when a shape collection stops being required.
+
+    db::LayoutLocker locker (&layout);
+
+    std::set<db::cell_index_type> called;
+    top_cell.collect_called_cells (called);
+    called.insert (top_cell.cell_index ());
+
+    for (db::Layout::bottom_up_const_iterator c = layout.begin_bottom_up (); c != layout.end_bottom_up (); ++c) {
+
+      if (called.find (*c) == called.end ()) {
+        continue;
+      }
+
+      db::Cell &cell = layout.cell (*c);
+
+      std::map<db::ICplxTrans, size_t> &vvc = m_variants [*c];
+      if (vvc.size () > 1) {
+
+        for (std::map<db::ICplxTrans, size_t>::const_iterator vc = vvc.begin (); vc != vvc.end (); ++vc) {
+
+          for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
+
+            std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> >::const_iterator tc = to_commit.find (i->cell_index ());
+            if (tc != to_commit.end ()) {
+
+              const std::map<db::ICplxTrans, db::Shapes> &vt = tc->second;
+
+              //  NOTE: this will add one more commit slot for propagation ... but we don't clean up.
+              //  When would a cleanup happen?
+              std::map<db::ICplxTrans, db::Shapes> &propagated = to_commit [*c];
+
+              for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
+
+                db::ICplxTrans t = i->complex_trans (*ia);
+                db::ICplxTrans rt = m_red (vc->first * t);
+                std::map<db::ICplxTrans, db::Shapes>::const_iterator v = vt.find (rt);
+                if (v != vt.end ()) {
+
+                  db::Shapes &ps = propagated [vc->first];
+                  tl::ident_map<db::Layout::properties_id_type> pm;
+
+                  for (db::Shapes::shape_iterator si = v->second.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+                    ps.insert (*si, t, pm);
+                  }
+
+                }
+
+              }
+
+            }
+
+          }
+
+        }
+
+      } else {
+
+        //  single variant -> we can commit any shapes we have kept for this cell directly to the cell
+
+        std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> >::iterator l = to_commit.find (*c);
+        if (l != to_commit.end ()) {
+          tl_assert (l->second.size () == 1);
+          cell.shapes (layer).insert (l->second.begin ()->second);
+          to_commit.erase (l);
+        }
+
+        //  for child cells, pull everything that needs to be committed to the parent
+
+        for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
+
+          std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> >::const_iterator tc = to_commit.find (i->cell_index ());
+          if (tc != to_commit.end ()) {
+
+            const std::map<db::ICplxTrans, db::Shapes> &vt = tc->second;
+
+            for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
+
+              db::ICplxTrans t = i->complex_trans (*ia);
+              db::ICplxTrans rt = m_red (vvc.begin ()->first * t);
+              std::map<db::ICplxTrans, db::Shapes>::const_iterator v = vt.find (rt);
+
+              if (v != vt.end ()) {
+
+                tl::ident_map<db::Layout::properties_id_type> pm;
+
+                for (db::Shapes::shape_iterator si = v->second.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+                  cell.shapes (layer).insert (*si, t, pm);
+                }
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+  }
+
+  /**
    *  @brief Gets the variants for a given cell
    *
    *  The keys of the map are the variants, the values is the instance count of the variant
@@ -369,6 +487,19 @@ public:
     } else {
       return v->second;
     }
+  }
+
+  /**
+   *  @brief Returns true, if variants have been built
+   */
+  bool has_variants () const
+  {
+    for (std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator i = m_variants.begin (); i != m_variants.end (); ++i) {
+      if (i->second.size () > 1) {
+        return true;
+      }
+    }
+    return false;
   }
 
 private:

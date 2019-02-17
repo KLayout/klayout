@@ -713,11 +713,82 @@ DeepRegion::to_string (size_t nmax) const
   return db::AsIfFlatRegion::to_string (nmax);
 }
 
+static void produce_offgrid_markers (db::Shapes &markers, const db::Shapes &shapes, const db::ICplxTrans &tr, db::Coord g)
+{
+  for (db::Shapes::shape_iterator si = shapes.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+
+    db::Polygon poly;
+    si->polygon (poly);
+
+    for (size_t i = 0; i < poly.holes () + 1; ++i) {
+
+      db::Polygon::polygon_contour_iterator b, e;
+
+      if (i == 0) {
+        b = poly.begin_hull ();
+        e = poly.end_hull ();
+      } else {
+        b = poly.begin_hole ((unsigned int) (i - 1));
+        e = poly.end_hole ((unsigned int)  (i - 1));
+      }
+
+      for (db::Polygon::polygon_contour_iterator p = b; p != e; ++p) {
+        db::Point pt = tr * *p;
+        if ((pt.x () % g) != 0 || (pt.y () % g) != 0) {
+          markers.insert (EdgePair (db::Edge (pt, pt), db::Edge (pt, pt)));
+        }
+      }
+
+    }
+
+  }
+
+}
+
 EdgePairs
 DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
 {
-  //  TODO: snap be optimized by forming grid variants etc.
-  return db::AsIfFlatRegion::grid_check (gx, gy);
+  if (gx <= 0 || gy <= 0) {
+    throw tl::Exception (tl::to_string (tr ("Grid check requires a positive grid value")));
+  }
+
+  if (gx != gy) {
+    //  no way doing this hierarchically ?
+    return db::AsIfFlatRegion::grid_check (gx, gy);
+  }
+
+  ensure_merged_polygons_valid ();
+
+  db::Layout &layout = m_merged_polygons.layout ();
+
+  db::cell_variants_collector<db::GridReducer> vars (gx);
+  vars.collect (layout, m_merged_polygons.initial_cell ());
+
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (m_merged_polygons.derived ()));
+
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
+    for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+
+      db::Shapes *markers;
+      if (vv.size () == 1) {
+        markers = & c->shapes (res->deep_layer ().layer ());
+      } else {
+        markers = & to_commit [c->cell_index ()] [v->first];
+      }
+
+      produce_offgrid_markers (*markers, c->shapes (m_merged_polygons.layer ()), v->first, gx);
+
+    }
+
+  }
+
+  //  propagate the markers with a similar algorithm used for producing the variants
+  res->deep_layer ().commit_shapes (vars, to_commit);
+
+  return db::EdgePairs (res.release ());
 }
 
 EdgePairs

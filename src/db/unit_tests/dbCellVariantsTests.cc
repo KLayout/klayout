@@ -392,3 +392,47 @@ TEST(100_OrientationVariantsWithLayout)
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/cell_variants_au1.gds");
 }
+
+TEST(101_Propagation)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/cell_variants_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.insert_layer (db::LayerProperties (2, 0));
+
+  db::cell_variants_collector<db::MagnificationAndOrientationReducer> vb;
+  vb.collect (ly, top_cell);
+
+  for (db::Layout::const_iterator c = ly.begin (); c != ly.end (); ++c) {
+
+    const std::map<db::ICplxTrans, size_t> &vv = vb.variants (c->cell_index ());
+    for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+
+      db::Shapes &out = to_commit [c->cell_index ()][v->first];
+      for (db::Shapes::shape_iterator s = c->shapes (l1).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+        db::Box b = s->bbox ().transformed (v->first);
+        b.enlarge (db::Vector (-100, 0));
+        out.insert (b.transformed (v->first.inverted ()));
+      }
+
+    }
+
+  }
+
+  vb.commit_shapes (ly, top_cell, l2, to_commit);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/cell_variants_au2.gds");
+}

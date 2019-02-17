@@ -969,7 +969,7 @@ TEST(17_SinglePolygonChecks)
   }
 }
 
-TEST(18_Checks)
+TEST(18_MultiPolygonChecks)
 {
   db::Layout ly;
   {
@@ -1011,6 +1011,41 @@ TEST(18_Checks)
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au18.gds");
   }
+}
+
+TEST(19_GridCheck)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r3_gc1;
+  r3.grid_check (25, 25).polygons (r3_gc1, 100);
+  db::Region r3_gc2;
+  r3.grid_check (40, 40).polygons (r3_gc2, 100);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3_gc1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r3_gc2);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au19.gds");
 }
 
 TEST(100_Integration)

@@ -25,10 +25,34 @@
 #define HDR_dbAsIfFlatEdges
 
 #include "dbCommon.h"
-
+#include "dbBoxScanner.h"
 #include "dbEdgesDelegate.h"
 
+#include <map>
+#include <vector>
+
 namespace db {
+
+class PolygonSink;
+
+/**
+ *  @brief A helper class to turn joined edge sequences into polygons
+ *
+ *  This object is an edge cluster so it can connect to a cluster collector
+ *  driven by a box scanner.
+ */
+struct JoinEdgesCluster
+  : public db::cluster<db::Edge, size_t>
+{
+  typedef db::Edge::coord_type coord_type;
+
+  JoinEdgesCluster (db::PolygonSink *output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i);
+  void finish ();
+
+private:
+  db::PolygonSink *mp_output;
+  coord_type m_ext_b, m_ext_e, m_ext_o, m_ext_i;
+};
 
 /**
  *  @brief Provides default flat implementations
@@ -160,6 +184,7 @@ protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
   EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
+  static db::Polygon extended_edge (const db::Edge &edge, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i);
 
 private:
   AsIfFlatEdges &operator= (const AsIfFlatEdges &other);

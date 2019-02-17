@@ -175,6 +175,8 @@ public:
     }
   }
 
+  db::Shapes &raw_polygons () { return m_polygons; }
+
 protected:
   virtual void merged_semantics_changed ();
   virtual Box compute_bbox () const;
@@ -184,8 +186,6 @@ protected:
 private:
   friend class AsIfFlatRegion;
   friend class Region;
-
-  db::Shapes &raw_polygons () { return m_polygons; }
 
   FlatRegion &operator= (const FlatRegion &other);
 

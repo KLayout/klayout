@@ -31,6 +31,7 @@
 #include "dbCellMapping.h"
 #include "dbLayoutUtils.h"
 #include "dbLocalOperation.h"
+#include "dbLocalOperationUtils.h"
 #include "dbHierProcessor.h"
 #include "dbEmptyEdges.h"
 
@@ -807,8 +808,96 @@ EdgesDelegate *DeepEdges::outside_part (const Region &other) const
 
 RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const
 {
-  //  TODO: implement
-  return AsIfFlatEdges::extended (ext_b, ext_e, ext_o, ext_i, join);
+  ensure_merged_edges_valid ();
+
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_edges.derived ()));
+
+  db::Layout &layout = const_cast<db::Layout &> (m_merged_edges.layout ());
+  db::Cell &top_cell = const_cast<db::Cell &> (m_merged_edges.initial_cell ());
+
+  db::MagnificationReducer red;
+  db::cell_variants_collector<db::MagnificationReducer> vars (red);
+  vars.collect (m_merged_edges.layout (), m_merged_edges.initial_cell ());
+
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+
+  if (join) {
+
+    //  In joined mode we need to create a special cluster which connects all joined edges
+    db::DeepLayer joined = m_merged_edges.derived ();
+
+    db::hier_clusters<db::Edge> hc;
+    db::Connectivity conn (db::Connectivity::EdgesConnectByPoints);
+    conn.connect (m_merged_edges);
+    //  TODO: this uses the wrong verbosity inside ...
+    hc.build (layout, m_merged_edges.initial_cell (), db::ShapeIterator::Edges, conn);
+
+    //  TODO: iterate only over the called cells?
+    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+
+        db::Shapes *out;
+        if (vv.size () == 1) {
+          out = & c->shapes (res->deep_layer ().layer ());
+        } else {
+          out = & to_commit [c->cell_index ()][v->first];
+        }
+
+        const db::connected_clusters<db::Edge> &cc = hc.clusters_per_cell (c->cell_index ());
+        for (db::connected_clusters<db::Edge>::all_iterator cl = cc.begin_all (); ! cl.at_end (); ++cl) {
+
+          if (cc.is_root (*cl)) {
+
+            PolygonRefToShapesGenerator prgen (&layout, out);
+            polygon_transformation_filter<db::ICplxTrans> ptrans (&prgen, v->first.inverted ());
+            JoinEdgesCluster jec (&ptrans, ext_b, ext_e, ext_o, ext_i);
+
+            std::list<db::Edge> heap;
+            for (db::recursive_cluster_shape_iterator<db::Edge> rcsi (hc, m_merged_edges.layer (), c->cell_index (), *cl); ! rcsi.at_end (); ++rcsi) {
+              heap.push_back (rcsi->transformed (v->first * rcsi.trans ()));
+              jec.add (&heap.back (), 0);
+            }
+
+            jec.finish ();
+
+          }
+
+        }
+
+      }
+
+    }
+
+  } else {
+
+    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+
+        db::Shapes *out;
+        if (vv.size () == 1) {
+          out = & c->shapes (res->deep_layer ().layer ());
+        } else {
+          out = & to_commit [c->cell_index ()][v->first];
+        }
+
+        for (db::Shapes::shape_iterator si = c->shapes (m_merged_edges.layer ()).begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+          out->insert (extended_edge (si->edge ().transformed (v->first), ext_b, ext_e, ext_o, ext_i).transformed (v->first.inverted ()));
+        }
+
+      }
+
+    }
+
+  }
+
+  //  propagate results from variants
+  vars.commit_shapes (layout, top_cell, res->deep_layer ().layer (), to_commit);
+
+  return res.release ();
 }
 
 EdgesDelegate *DeepEdges::start_segments (length_type length, double fraction) const

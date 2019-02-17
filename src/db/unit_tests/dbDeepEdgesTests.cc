@@ -247,3 +247,50 @@ TEST(5_Filters)
   }
 }
 
+TEST(6_Extended)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Edges e2 = r2.edges ();
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  db::EdgeLengthFilter elf1 (0, 40000, false);
+  db::Edges e2f = e2.filtered (elf1);
+
+  db::Region e2e1;
+  e2.extended (e2e1, 100, 200, 300, 50);
+  db::Region e2e2;
+  e2f.extended (e2e2, 0, 0, 300, 0);
+  db::Region e2e3;
+  e2.extended (e2e3, 100, 200, 300, 50, true);
+  db::Region e2e4;
+  e2f.extended (e2e4, 0, 0, 300, 0, true);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2e1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2e2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), e2e3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), e2e4);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au6.gds");
+}
+

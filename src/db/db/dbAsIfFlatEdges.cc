@@ -27,16 +27,140 @@
 #include "dbEdges.h"
 #include "dbEdgeBoolean.h"
 #include "dbBoxConvert.h"
-#include "dbBoxScanner.h"
 #include "dbRegion.h"
 #include "dbFlatRegion.h"
 #include "dbPolygonTools.h"
 #include "dbShapeProcessor.h"
+#include "dbEdgeProcessor.h"
+#include "dbPolygonGenerators.h"
+#include "dbPolygon.h"
+#include "dbPath.h"
 
 #include <sstream>
 
 namespace db
 {
+
+// -------------------------------------------------------------------------------------------------------------
+//  JoinEdgesCluster implementation
+
+JoinEdgesCluster::JoinEdgesCluster (db::PolygonSink *output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i)
+  : mp_output (output), m_ext_b (ext_b), m_ext_e (ext_e), m_ext_o (ext_o), m_ext_i (ext_i)
+{
+  //  .. nothing yet ..
+}
+
+void
+JoinEdgesCluster::finish ()
+{
+  std::multimap<db::Point, iterator> objects_by_p1;
+  std::multimap<db::Point, iterator> objects_by_p2;
+  for (iterator o = begin (); o != end (); ++o) {
+    if (o->first->p1 () != o->first->p2 ()) {
+      objects_by_p1.insert (std::make_pair (o->first->p1 (), o));
+      objects_by_p2.insert (std::make_pair (o->first->p2 (), o));
+    }
+  }
+
+  while (! objects_by_p2.empty ()) {
+
+    tl_assert (! objects_by_p1.empty ());
+
+    //  Find the beginning of a new sequence
+    std::multimap<db::Point, iterator>::iterator j0 = objects_by_p1.begin ();
+    std::multimap<db::Point, iterator>::iterator j = j0;
+    do {
+      std::multimap<db::Point, iterator>::iterator jj = objects_by_p2.find (j->first);
+      if (jj == objects_by_p2.end ()) {
+        break;
+      } else {
+        j = objects_by_p1.find (jj->second->first->p1 ());
+        tl_assert (j != objects_by_p1.end ());
+      }
+    } while (j != j0);
+
+    iterator i = j->second;
+
+    //  determine a sequence
+    //  TODO: this chooses any solution in case of forks. Choose a specific one?
+    std::vector<db::Point> pts;
+    pts.push_back (i->first->p1 ());
+
+    do {
+
+      //  record the next point
+      pts.push_back (i->first->p2 ());
+
+      //  remove the edge as it's taken
+      std::multimap<db::Point, iterator>::iterator jj;
+      for (jj = objects_by_p2.find (i->first->p2 ()); jj != objects_by_p2.end () && jj->first == i->first->p2 (); ++jj) {
+        if (jj->second == i) {
+          break;
+        }
+      }
+      tl_assert (jj != objects_by_p2.end () && jj->second == i);
+      objects_by_p2.erase (jj);
+      objects_by_p1.erase (j);
+
+      //  process along the edge to the next one
+      //  TODO: this chooses any solution in case of forks. Choose a specific one?
+      j = objects_by_p1.find (i->first->p2 ());
+      if (j != objects_by_p1.end ()) {
+        i = j->second;
+      } else {
+        break;
+      }
+
+    } while (true);
+
+    bool cyclic = (pts.back () == pts.front ());
+
+    if (! cyclic) {
+
+      //  non-cyclic sequence
+      db::Path path (pts.begin (), pts.end (), 0, m_ext_b, m_ext_e, false);
+      std::vector<db::Point> hull;
+      path.hull (hull, m_ext_o, m_ext_i);
+      db::Polygon poly;
+      poly.assign_hull (hull.begin (), hull.end ());
+      mp_output->put (poly);
+
+    } else {
+
+      //  we have a loop: form a contour by using the polygon size functions and a "Not" to form the hole
+      db::Polygon poly;
+      poly.assign_hull (pts.begin (), pts.end ());
+
+      db::EdgeProcessor ep;
+      db::PolygonGenerator pg (*mp_output, false, true);
+
+      int mode_a = -1, mode_b = -1;
+
+      if (m_ext_o == 0) {
+        ep.insert (poly, 0);
+      } else {
+        db::Polygon sized_poly (poly);
+        sized_poly.size (m_ext_o, m_ext_o, 2 /*sizing mode*/);
+        ep.insert (sized_poly, 0);
+        mode_a = 1;
+      }
+
+      if (m_ext_i == 0) {
+        ep.insert (poly, 1);
+      } else {
+        db::Polygon sized_poly (poly);
+        sized_poly.size (-m_ext_i, -m_ext_i, 2 /*sizing mode*/);
+        ep.insert (sized_poly, 1);
+        mode_b = 1;
+      }
+
+      db::BooleanOp2 op (db::BooleanOp::ANotB, mode_a, mode_b);
+      ep.process (pg, op);
+
+    }
+
+  }
+}
 
 // -------------------------------------------------------------------------------------------------------------
 //  AsIfFlagEdges implementation
@@ -219,148 +343,13 @@ AsIfFlatEdges::selected_not_interacting (const Region &other) const
 namespace
 {
 
-template <class OutputContainer>
-struct JoinEdgesCluster
-  : public db::cluster<db::Edge, size_t>,
-    public db::PolygonSink
-{
-  typedef db::Edge::coord_type coord_type;
-
-  JoinEdgesCluster (OutputContainer *output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i)
-    : mp_output (output), m_ext_b (ext_b), m_ext_e (ext_e), m_ext_o (ext_o), m_ext_i (ext_i)
-  {
-    //  .. nothing yet ..
-  }
-
-  void finish ()
-  {
-    std::multimap<db::Point, iterator> objects_by_p1;
-    std::multimap<db::Point, iterator> objects_by_p2;
-    for (iterator o = begin (); o != end (); ++o) {
-      if (o->first->p1 () != o->first->p2 ()) {
-        objects_by_p1.insert (std::make_pair (o->first->p1 (), o));
-        objects_by_p2.insert (std::make_pair (o->first->p2 (), o));
-      }
-    }
-
-    while (! objects_by_p2.empty ()) {
-
-      tl_assert (! objects_by_p1.empty ());
-
-      //  Find the beginning of a new sequence
-      std::multimap<db::Point, iterator>::iterator j0 = objects_by_p1.begin ();
-      std::multimap<db::Point, iterator>::iterator j = j0;
-      do {
-        std::multimap<db::Point, iterator>::iterator jj = objects_by_p2.find (j->first);
-        if (jj == objects_by_p2.end ()) {
-          break;
-        } else {
-          j = objects_by_p1.find (jj->second->first->p1 ());
-          tl_assert (j != objects_by_p1.end ());
-        }
-      } while (j != j0);
-
-      iterator i = j->second;
-
-      //  determine a sequence
-      //  TODO: this chooses any solution in case of forks. Choose a specific one?
-      std::vector<db::Point> pts;
-      pts.push_back (i->first->p1 ());
-
-      do {
-
-        //  record the next point
-        pts.push_back (i->first->p2 ());
-
-        //  remove the edge as it's taken
-        std::multimap<db::Point, iterator>::iterator jj;
-        for (jj = objects_by_p2.find (i->first->p2 ()); jj != objects_by_p2.end () && jj->first == i->first->p2 (); ++jj) {
-          if (jj->second == i) {
-            break;
-          }
-        }
-        tl_assert (jj != objects_by_p2.end () && jj->second == i);
-        objects_by_p2.erase (jj);
-        objects_by_p1.erase (j);
-
-        //  process along the edge to the next one
-        //  TODO: this chooses any solution in case of forks. Choose a specific one?
-        j = objects_by_p1.find (i->first->p2 ());
-        if (j != objects_by_p1.end ()) {
-          i = j->second;
-        } else {
-          break;
-        }
-
-      } while (true);
-
-      bool cyclic = (pts.back () == pts.front ());
-
-      if (! cyclic) {
-
-        //  non-cyclic sequence
-        db::Path path (pts.begin (), pts.end (), 0, m_ext_b, m_ext_e, false);
-        std::vector<db::Point> hull;
-        path.hull (hull, m_ext_o, m_ext_i);
-        db::Polygon poly;
-        poly.assign_hull (hull.begin (), hull.end ());
-        put (poly);
-
-      } else {
-
-        //  we have a loop: form a contour by using the polygon size functions and a "Not" to form the hole
-        db::Polygon poly;
-        poly.assign_hull (pts.begin (), pts.end ());
-
-        db::EdgeProcessor ep;
-        db::PolygonGenerator pg (*this, false, true);
-
-        int mode_a = -1, mode_b = -1;
-
-        if (m_ext_o == 0) {
-          ep.insert (poly, 0);
-        } else {
-          db::Polygon sized_poly (poly);
-          sized_poly.size (m_ext_o, m_ext_o, 2 /*sizing mode*/);
-          ep.insert (sized_poly, 0);
-          mode_a = 1;
-        }
-
-        if (m_ext_i == 0) {
-          ep.insert (poly, 1);
-        } else {
-          db::Polygon sized_poly (poly);
-          sized_poly.size (-m_ext_i, -m_ext_i, 2 /*sizing mode*/);
-          ep.insert (sized_poly, 1);
-          mode_b = 1;
-        }
-
-        db::BooleanOp2 op (db::BooleanOp::ANotB, mode_a, mode_b);
-        ep.process (pg, op);
-
-      }
-
-    }
-  }
-
-  virtual void put (const db::Polygon &polygon)
-  {
-    mp_output->insert (polygon);
-  }
-
-private:
-  OutputContainer *mp_output;
-  coord_type m_ext_b, m_ext_e, m_ext_o, m_ext_i;
-};
-
-template <class OutputContainer>
 struct JoinEdgesClusterCollector
-  : public db::cluster_collector<db::Edge, size_t, JoinEdgesCluster<OutputContainer> >
+  : public db::cluster_collector<db::Edge, size_t, JoinEdgesCluster>
 {
   typedef db::Edge::coord_type coord_type;
 
-  JoinEdgesClusterCollector (OutputContainer *output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i)
-    : db::cluster_collector<db::Edge, size_t, JoinEdgesCluster<OutputContainer> > (JoinEdgesCluster<OutputContainer> (output, ext_b, ext_e, ext_o, ext_i), true)
+  JoinEdgesClusterCollector (db::PolygonSink *output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i)
+    : db::cluster_collector<db::Edge, size_t, JoinEdgesCluster> (JoinEdgesCluster (output, ext_b, ext_e, ext_o, ext_i), true)
   {
     //  .. nothing yet ..
   }
@@ -368,11 +357,35 @@ struct JoinEdgesClusterCollector
   void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
   {
     if (o1->p2 () == o2->p1 () || o1->p1 () == o2->p2 ()) {
-      db::cluster_collector<db::Edge, size_t, JoinEdgesCluster<OutputContainer> >::add (o1, p1, o2, p2);
+      db::cluster_collector<db::Edge, size_t, JoinEdgesCluster>::add (o1, p1, o2, p2);
     }
   }
 };
 
+}
+
+db::Polygon
+AsIfFlatEdges::extended_edge (const db::Edge &edge, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i)
+{
+  db::DVector d;
+  if (edge.is_degenerate ()) {
+    d = db::DVector (1.0, 0.0);
+  } else {
+    d = db::DVector (edge.d ()) * (1.0 / edge.double_length ());
+  }
+
+  db::DVector n (-d.y (), d.x ());
+
+  db::Point pts[4] = {
+    db::Point (db::DPoint (edge.p1 ()) - d * double (ext_b) + n * double (ext_o)),
+    db::Point (db::DPoint (edge.p2 ()) + d * double (ext_e) + n * double (ext_o)),
+    db::Point (db::DPoint (edge.p2 ()) + d * double (ext_e) - n * double (ext_i)),
+    db::Point (db::DPoint (edge.p1 ()) - d * double (ext_b) - n * double (ext_i)),
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (pts + 0, pts + 4);
+  return poly;
 }
 
 RegionDelegate *
@@ -381,7 +394,8 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
   if (join) {
 
     std::auto_ptr<FlatRegion> output (new FlatRegion ());
-    JoinEdgesClusterCollector<FlatRegion> cluster_collector (output.get (), ext_b, ext_e, ext_o, ext_i);
+    db::ShapeGenerator sg (output->raw_polygons (), false);
+    JoinEdgesClusterCollector cluster_collector (&sg, ext_b, ext_e, ext_o, ext_i);
 
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
     scanner.reserve (size ());
@@ -401,29 +415,8 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
   } else {
 
     std::auto_ptr<FlatRegion> output (new FlatRegion ());
-
     for (EdgesIterator e (begin_merged ()); ! e.at_end (); ++e) {
-
-      db::DVector d;
-      if (e->is_degenerate ()) {
-        d = db::DVector (1.0, 0.0);
-      } else {
-        d = db::DVector (e->d ()) * (1.0 / e->double_length ());
-      }
-
-      db::DVector n (-d.y (), d.x ());
-
-      db::Point pts[4] = {
-        db::Point (db::DPoint (e->p1 ()) - d * double (ext_b) + n * double (ext_o)),
-        db::Point (db::DPoint (e->p2 ()) + d * double (ext_e) + n * double (ext_o)),
-        db::Point (db::DPoint (e->p2 ()) + d * double (ext_e) - n * double (ext_i)),
-        db::Point (db::DPoint (e->p1 ()) - d * double (ext_b) - n * double (ext_i)),
-      };
-
-      db::Polygon poly;
-      poly.assign_hull (pts + 0, pts + 4);
-      output->insert (poly);
-
+      output->insert (extended_edge (*e, ext_b, ext_e, ext_o, ext_i));
     }
 
     return output.release ();

@@ -36,6 +36,33 @@
 namespace db
 {
 
+template <class Trans>
+class polygon_transformation_filter
+  : public PolygonSink
+{
+public:
+  /**
+   *  @brief Constructor specifying an external vector for storing the polygons
+   */
+  polygon_transformation_filter (PolygonSink *output, const Trans &tr)
+    : mp_output (output), m_trans (tr)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::Polygon &polygon)
+  {
+    mp_output->put (polygon.transformed (m_trans));
+  }
+
+private:
+  db::PolygonSink *mp_output;
+  const Trans m_trans;
+};
+
 class PolygonRefGenerator
   : public PolygonSink
 {

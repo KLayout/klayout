@@ -38,12 +38,13 @@ l1_flat.and(l2).output(1001, 0)
 l1.and(l2_flat).output(1002, 0)
 l1_flat.and(l2_flat).output(1003, 0)
 
-l1.space(0.2).output(1010, 0)
-l1_flat.space(0.2).output(1011, 0)
-
 l1.separation(l2, 0.3).output(1020, 0)
 l1_flat.separation(l2, 0.3).output(1021, 0)
 l1.separation(l2_flat, 0.3).output(1022, 0)
 l1_flat.separation(l2_flat, 0.3).output(1023, 0)
+
+l1.space(0.2).output(1010, 0)
+l1.flatten
+l1.space(0.2).output(1011, 0)
 
 

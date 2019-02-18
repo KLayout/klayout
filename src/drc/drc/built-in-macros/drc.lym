@@ -4717,8 +4717,12 @@ CODE
       @output_layout_file = nil
       @output_cell = nil
       @output_rdb_file = nil
+      @output_rdb_cell = nil
       @output_rdb = nil
       @output_rdb_index = nil
+
+      # clean up temp data
+      @dss &amp;&amp; @dss._destroy
       
       if final &amp;&amp; @log_file
         @log_file.close

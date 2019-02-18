@@ -2286,7 +2286,7 @@ CODE
     # @synopsis layer.is_deep?
     
     def is_deep?
-      @data.is_deep?
+      @data.respond_to?(:is_deep?) &amp;&amp; @data.is_deep?
     end
     
     # %DRC%
@@ -4863,7 +4863,7 @@ CODE
         # make sure the output has the right database unit
         output.dbu = self.dbu
 
-        if data.is_deep?
+        if data.respond_to?(:is_deep?) &amp;&amp; data.is_deep?
 
           # mark the layer as used
           if !@used_output_layers[li]

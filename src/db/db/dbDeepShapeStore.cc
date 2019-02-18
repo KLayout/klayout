@@ -222,7 +222,7 @@ DeepLayer::check_dss () const
 struct DeepShapeStore::LayoutHolder
 {
   LayoutHolder ()
-    : refs (0), layout (), builder (&layout)
+    : refs (0), layout (false), builder (&layout)
   {
     //  .. nothing yet ..
   }

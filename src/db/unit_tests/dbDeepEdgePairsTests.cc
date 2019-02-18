@@ -95,7 +95,10 @@ TEST(1_Basics)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), edges);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), first_edges);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), second_edges);
-  db::EdgePairs (ep2).insert_into_as_polygons (&target, target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), 1);
+
+  //  NOTE: insert ep2 as layer 14/0 from a copy - this tests the ability to copy-construct an EP
+  db::EdgePairs ep2_copy (ep2);
+  ep2_copy.insert_into_as_polygons (&target, target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), 1);
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edge_pairs_au1.gds");

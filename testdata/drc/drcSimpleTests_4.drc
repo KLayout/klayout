@@ -1,0 +1,49 @@
+
+# Foreign cell test
+
+source($drc_test_source, "TOPTOP_SMALL")
+target($drc_test_target)
+
+cell("TOPTOP_SMALL")
+
+l1_flat = input(1)
+l1_flat.is_deep? && raise("l1_flat should not be deep")
+
+is_deep? && raise("is_deep? is true")
+
+deep
+
+is_deep? || raise("is_deep? is false")
+
+l1 = input(1)
+l1.is_deep? || raise("l1 should be deep")
+l2 = input(2)
+l2.is_deep? || raise("l2 should be deep")
+
+flat
+
+is_deep? && raise("is_deep? is true")
+
+l2_flat = input(2)
+l2_flat.is_deep? && raise("l2_flat should not be deep")
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1_flat.output(11, 0)
+l2_flat.output(12, 0)
+
+l1.and(l2).output(1000, 0)
+l1_flat.and(l2).output(1001, 0)
+l1.and(l2_flat).output(1002, 0)
+l1_flat.and(l2_flat).output(1003, 0)
+
+l1.space(0.2).output(1010, 0)
+l1_flat.space(0.2).output(1011, 0)
+
+l1.separation(l2, 0.3).output(1020, 0)
+l1_flat.separation(l2, 0.3).output(1021, 0)
+l1.separation(l2_flat, 0.3).output(1022, 0)
+l1_flat.separation(l2_flat, 0.3).output(1023, 0)
+
+

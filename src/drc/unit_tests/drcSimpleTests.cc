@@ -102,7 +102,7 @@ TEST(2)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(3)
+TEST(3_Flat)
 {
   std::string rs = tl::testsrc ();
   rs += "/testdata/drc/drcSimpleTests_3.drc";
@@ -112,6 +112,46 @@ TEST(3)
 
   std::string au = tl::testsrc ();
   au += "/testdata/drc/drcSimpleTests_au3.oas";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(4_Hierarchical)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_4.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/drctest.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au4.oas";
 
   std::string output = this->tmp_file ("tmp.gds");
 

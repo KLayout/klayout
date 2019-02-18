@@ -716,13 +716,17 @@ DeepRegion::to_string (size_t nmax) const
 EdgePairs
 DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
 {
-  if (gx <= 0 || gy <= 0) {
+  if (gx < 0 || gy < 0) {
     throw tl::Exception (tl::to_string (tr ("Grid check requires a positive grid value")));
   }
 
   if (gx != gy) {
     //  no way doing this hierarchically ?
     return db::AsIfFlatRegion::grid_check (gx, gy);
+  }
+
+  if (gx == 0) {
+    return EdgePairs ();
   }
 
   ensure_merged_polygons_valid ();
@@ -796,13 +800,17 @@ DeepRegion::angle_check (double min, double max, bool inverse) const
 RegionDelegate *
 DeepRegion::snapped (db::Coord gx, db::Coord gy)
 {
-  if (gx <= 0 || gy <= 0) {
+  if (gx < 0 || gy < 0) {
     throw tl::Exception (tl::to_string (tr ("Snapping requires a positive grid value")));
   }
 
   if (gx != gy) {
     //  no way doing this hierarchically ?
     return db::AsIfFlatRegion::snapped (gx, gy);
+  }
+
+  if (! gx) {
+    return this;
   }
 
   ensure_merged_polygons_valid ();

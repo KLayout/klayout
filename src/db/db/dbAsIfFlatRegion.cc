@@ -440,6 +440,14 @@ template void AsIfFlatRegion::produce_markers_for_grid_check<db::UnitTrans> (con
 EdgePairs
 AsIfFlatRegion::grid_check (db::Coord gx, db::Coord gy) const
 {
+  if (gx < 0 || gy < 0) {
+    throw tl::Exception (tl::to_string (tr ("Grid check requires a positive grid value")));
+  }
+
+  if (gx == 0 && gy == 0) {
+    return EdgePairs ();
+  }
+
   std::auto_ptr<db::FlatEdgePairs> res (new db::FlatEdgePairs ());
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
@@ -567,6 +575,14 @@ AsIfFlatRegion::snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coor
 RegionDelegate *
 AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
 {
+  if (gx < 0 || gy < 0) {
+    throw tl::Exception (tl::to_string (tr ("Grid check requires a positive grid value")));
+  }
+
+  if (gx == 0 && gy == 0) {
+    return this;
+  }
+
   std::auto_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
 
   gx = std::max (db::Coord (1), gx);

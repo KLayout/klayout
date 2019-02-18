@@ -72,25 +72,36 @@ void runtest (tl::TestBase *_this, int mode)
   db::compare_layouts (_this, layout, au, db::WriteOAS);
 }
 
-TEST(1)
+TEST(1_Flat)
 {
   runtest (_this, 1);
 }
 
-TEST(2)
+TEST(2_BigFlat)
 {
   test_is_long_runner ();
   runtest (_this, 2);
 }
 
-TEST(3)
+TEST(3_Tiled)
 {
   test_is_long_runner ();
   runtest (_this, 3);
 }
 
-TEST(4)
+TEST(4_BigTiled)
 {
   test_is_long_runner ();
   runtest (_this, 4);
+}
+
+TEST(5_Hier)
+{
+  runtest (_this, 5);
+}
+
+TEST(6_BigHier)
+{
+  test_is_long_runner ();
+  runtest (_this, 6);
 }

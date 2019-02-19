@@ -579,10 +579,6 @@ AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
     throw tl::Exception (tl::to_string (tr ("Grid check requires a positive grid value")));
   }
 
-  if (gx == 0 && gy == 0) {
-    return this;
-  }
-
   std::auto_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
 
   gx = std::max (db::Coord (1), gx);

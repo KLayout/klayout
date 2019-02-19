@@ -1086,10 +1086,9 @@ namespace
 {
 
 struct DB_PUBLIC XYAnisotropyAndMagnificationReducer
+  : public db::TransformationReducer
 {
-  typedef tl::true_tag is_translation_invariant;
-
-  db::ICplxTrans operator () (const db::ICplxTrans &trans) const
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
   {
     double a = trans.angle ();
     if (a > 180.0 - db::epsilon) {
@@ -1098,7 +1097,7 @@ struct DB_PUBLIC XYAnisotropyAndMagnificationReducer
     return db::ICplxTrans (trans.mag (), a, false, db::Vector ());
   }
 
-  db::Trans operator () (const db::Trans &trans) const
+  db::Trans reduce (const db::Trans &trans) const
   {
     return db::Trans (trans.angle () % 2, false, db::Vector ());
   }

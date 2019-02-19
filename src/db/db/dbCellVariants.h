@@ -25,24 +25,33 @@
 
 #include "dbCommon.h"
 
-#include "dbLayout.h"
 #include "dbTrans.h"
-#include "tlTypeTraits.h"
-#include "tlUtils.h"
+#include "dbLayout.h"
+
+#include <memory>
 
 namespace db
 {
 
 /**
- *  @brief Tells some properties of a reduce function for cell_variants_builder
+ *  @brief The reducer interface
+ *
+ *  The transformation reducer is used by the variant builder to provide a
+ *  reduced version of the transformation. Variants are built based on this
+ *  reduced transformation.
+ *
+ *  Reduction must satisfy the modulo condition:
+ *
+ *   reduce(A*B) = reduce(reduce(A)*reduce(B))
  */
-template <class T>
-struct DB_PUBLIC cell_variants_reduce_traits
+struct DB_PUBLIC TransformationReducer
 {
-  /**
-   *  @brief Indicates whether the result of the compare function does not depend on translation
-   */
-  typedef typename T::is_translation_invariant is_translation_invariant;
+  TransformationReducer () { }
+  virtual ~TransformationReducer () { }
+
+  virtual db::Trans reduce (const db::Trans &trans) const = 0;
+  virtual db::ICplxTrans reduce (const db::ICplxTrans &trans) const = 0;
+  virtual bool is_translation_invariant () const { return true; }
 };
 
 /**
@@ -51,10 +60,9 @@ struct DB_PUBLIC cell_variants_reduce_traits
  *  This reducer incarnation reduces the transformation to it's rotation/mirror part.
  */
 struct DB_PUBLIC OrientationReducer
+  : public TransformationReducer
 {
-  typedef tl::true_tag is_translation_invariant;
-
-  db::ICplxTrans operator () (const db::ICplxTrans &trans) const
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
   {
     db::ICplxTrans res (trans);
     res.disp (db::Vector ());
@@ -62,7 +70,7 @@ struct DB_PUBLIC OrientationReducer
     return res;
   }
 
-  db::Trans operator () (const db::Trans &trans) const
+  db::Trans reduce (const db::Trans &trans) const
   {
     return db::Trans (trans.fp_trans ());
   }
@@ -74,15 +82,14 @@ struct DB_PUBLIC OrientationReducer
  *  This reducer incarnation reduces the transformation to it's scaling part.
  */
 struct DB_PUBLIC MagnificationReducer
+  : public TransformationReducer
 {
-  typedef tl::true_tag is_translation_invariant;
-
-  db::ICplxTrans operator () (const db::ICplxTrans &trans) const
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
   {
     return db::ICplxTrans (trans.mag ());
   }
 
-  db::Trans operator () (const db::Trans &) const
+  db::Trans reduce (const db::Trans &) const
   {
     return db::Trans ();
   }
@@ -94,17 +101,16 @@ struct DB_PUBLIC MagnificationReducer
  *  This reducer incarnation reduces the transformation to it's rotation/mirror/magnification part (2d matrix)
  */
 struct DB_PUBLIC MagnificationAndOrientationReducer
+  : public TransformationReducer
 {
-  typedef tl::true_tag is_translation_invariant;
-
-  db::ICplxTrans operator () (const db::ICplxTrans &trans) const
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
   {
     db::ICplxTrans res (trans);
     res.disp (db::Vector ());
     return res;
   }
 
-  db::Trans operator () (const db::Trans &trans) const
+  db::Trans reduce (const db::Trans &trans) const
   {
     return db::Trans (trans.fp_trans ());
   }
@@ -116,16 +122,15 @@ struct DB_PUBLIC MagnificationAndOrientationReducer
  *  This reducer incarnation reduces the transformation to it's displacement modulo a grid
  */
 struct DB_PUBLIC GridReducer
+  : public TransformationReducer
 {
-  typedef tl::false_tag is_translation_invariant;
-
   GridReducer (db::Coord grid)
     : m_grid (grid)
   {
     //  .. nothing yet ..
   }
 
-  db::ICplxTrans operator () (const db::ICplxTrans &trans) const
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
   {
     //  NOTE: we need to keep magnification, angle and mirror so when combining the
     //  reduced transformations, the result will be equivalent to reducing the combined
@@ -135,12 +140,14 @@ struct DB_PUBLIC GridReducer
     return res;
   }
 
-  db::Trans operator () (const db::Trans &trans) const
+  db::Trans reduce (const db::Trans &trans) const
   {
     db::Trans res (trans);
     res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
     return res;
   }
+
+  bool is_translation_invariant () const { return false; }
 
 private:
   db::Coord m_grid;
@@ -161,94 +168,30 @@ private:
 };
 
 /**
- *  @brief A base class for the variants collector
- */
-class DB_PUBLIC VariantsCollectorBase
-{
-public:
-  VariantsCollectorBase () { }
-  virtual ~VariantsCollectorBase () { }
-
-  virtual void collect (const db::Layout &layout, const db::Cell &top_cell) = 0;
-  virtual void separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table = 0) = 0;
-  virtual const std::map<db::ICplxTrans, size_t> &variants (db::cell_index_type ci) const = 0;
-};
-
-/**
  *  @brief A class computing variants for cells according to a given criterion
  *
  *  The cell variants are build from the cell instances and are accumulated over
  *  the hierarchy path.
- *
- *  The criterion is a reduction function which defines the core information of a
- *  db::ICplxTrans or db::Trans object to be used for the comparison.
- *
- *  In any case, the compare function is expected to be distributive similar to
- *  the modulo function (A, B are transformations)
- *
- *    RED(A*B) = RED(RED(A)*RED(B))
- *
  */
-template <class Reduce>
-class DB_PUBLIC cell_variants_collector
-  : public VariantsCollectorBase
+class DB_PUBLIC VariantsCollectorBase
 {
 public:
-  typedef cell_variants_reduce_traits<Reduce> compare_traits;
+  /**
+   *  @brief Creates a variant collector without a transformation reducer
+   */
+  VariantsCollectorBase ();
 
   /**
-   *  @brief Creates a variant extractor
+   *  @brief Creates a variant collector with the given reducer
+   *
+   *  The collector will take ownership over the reducer
    */
-  cell_variants_collector ()
-    : m_red ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Creates a variant extractor
-   */
-  cell_variants_collector (const Reduce &red)
-    : m_red (red)
-  {
-    //  .. nothing yet ..
-  }
+  VariantsCollectorBase (TransformationReducer *red);
 
   /**
    *  @brief Collects cell variants for the given layout starting from the top cell
    */
-  virtual void collect (const db::Layout &layout, const db::Cell &top_cell)
-  {
-    //  The top cell gets a "variant" with unit transformation
-    m_variants [top_cell.cell_index ()].insert (std::make_pair (db::ICplxTrans (), 1));
-
-    std::set<db::cell_index_type> called;
-    top_cell.collect_called_cells (called);
-
-    for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
-
-      if (called.find (*c) == called.end ()) {
-        continue;
-      }
-
-      //  collect the parent variants per parent cell
-
-      std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > variants_per_parent_cell;
-      for (db::Cell::parent_inst_iterator pi = layout.cell (*c).begin_parent_insts (); ! pi.at_end (); ++pi) {
-        std::map<db::ICplxTrans, size_t> &variants = variants_per_parent_cell [pi->inst ().object ().cell_index ()];
-        add_variant (variants, pi->child_inst ().cell_inst (), typename compare_traits::is_translation_invariant ());
-      }
-
-      //  compute the resulting variants
-
-      std::map<db::ICplxTrans, size_t> &new_variants = m_variants [*c];
-
-      for (std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator pv = variants_per_parent_cell.begin (); pv != variants_per_parent_cell.end (); ++pv) {
-        product (variants (pv->first), pv->second, new_variants);
-      }
-
-    }
-  }
+  void collect (const db::Layout &layout, const db::Cell &top_cell);
 
   /**
    *  @brief Creates cell variants for singularization of the different variants
@@ -259,101 +202,7 @@ public:
    *  If given, *var_table will be filled with a map giving the new cell and variant against
    *  the old cell for all cells with more than one variant.
    */
-  virtual void separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table = 0)
-  {
-    db::LayoutLocker locker (&layout);
-
-    std::set<db::cell_index_type> called;
-    top_cell.collect_called_cells (called);
-    called.insert (top_cell.cell_index ());
-
-    //  create new cells for the variants
-
-    std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > var_table_intern;
-    if (! var_table) {
-      var_table = &var_table_intern;
-    }
-
-    for (db::Layout::bottom_up_const_iterator c = layout.begin_bottom_up (); c != layout.end_bottom_up (); ++c) {
-
-      if (called.find (*c) == called.end ()) {
-        continue;
-      }
-
-      db::Cell &cell = layout.cell (*c);
-
-      std::map<db::ICplxTrans, size_t> &vv = m_variants [*c];
-      if (vv.size () > 1) {
-
-        std::map<db::ICplxTrans, db::cell_index_type> &vt = (*var_table) [*c];
-
-        std::vector<db::CellInstArrayWithProperties> inst;
-        inst.reserve (cell.cell_instances ());
-
-        for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
-          inst.push_back (db::CellInstArrayWithProperties (i->cell_inst (), i->prop_id ()));
-        }
-
-        cell.clear_insts ();
-
-        int index = 0;
-        for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v, ++index) {
-
-          db::cell_index_type ci_var;
-
-          if (v != vv.begin ()) {
-
-            std::string var_name = layout.cell_name (*c);
-            var_name += "$VAR" + tl::to_string (index);
-
-            ci_var = layout.add_cell (var_name.c_str ());
-            copy_shapes (layout, ci_var, *c);
-
-            //  a new entry for the variant
-            m_variants [ci_var].insert (*v);
-
-          } else {
-            ci_var = *c;
-          }
-
-          vt.insert (std::make_pair (v->first, ci_var));
-          create_var_instances (layout.cell (ci_var), inst, v->first, *var_table, typename compare_traits::is_translation_invariant ());
-
-        }
-
-        //  correct the first (remaining) entry
-        std::pair<db::ICplxTrans, size_t> v1 = *vt.begin ();
-        vv.clear ();
-        vv.insert (v1);
-
-      } else {
-
-        //  if the children of this cell are separated, map the instances to the new variants
-        bool needs_update = false;
-        for (db::Cell::child_cell_iterator cc = cell.begin_child_cells (); ! cc.at_end () && ! needs_update; ++cc) {
-          if (var_table->find (*cc) != var_table->end ()) {
-            needs_update = true;
-          }
-        }
-
-        if (needs_update) {
-
-          std::vector<db::CellInstArrayWithProperties> inst;
-          inst.reserve (cell.cell_instances ());
-
-          for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
-            inst.push_back (db::CellInstArrayWithProperties (i->cell_inst (), i->prop_id ()));
-          }
-
-          cell.clear_insts ();
-          create_var_instances (cell, inst, vv.begin ()->first, *var_table, typename compare_traits::is_translation_invariant ());
-
-        }
-
-      }
-
-    }
-  }
+  void separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table = 0);
 
   /**
    *  @brief Commits the shapes for different variants to the current cell hierarchy
@@ -362,115 +211,7 @@ public:
    *  "to_commit" initially is a set of shapes to commit for the given cell and variant.
    *  This map is modified during the algorithm and should be discarded later.
    */
-  virtual void commit_shapes (db::Layout &layout, db::Cell &top_cell, unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit)
-  {
-    if (to_commit.empty ()) {
-      return;
-    }
-
-    //  NOTE: this implementation suffers from accumulation of propagated shapes: we add more levels of propagated
-    //  shapes if required. We don't clean up, because we do not know when a shape collection stops being required.
-
-    db::LayoutLocker locker (&layout);
-
-    std::set<db::cell_index_type> called;
-    top_cell.collect_called_cells (called);
-    called.insert (top_cell.cell_index ());
-
-    for (db::Layout::bottom_up_const_iterator c = layout.begin_bottom_up (); c != layout.end_bottom_up (); ++c) {
-
-      if (called.find (*c) == called.end ()) {
-        continue;
-      }
-
-      db::Cell &cell = layout.cell (*c);
-
-      std::map<db::ICplxTrans, size_t> &vvc = m_variants [*c];
-      if (vvc.size () > 1) {
-
-        for (std::map<db::ICplxTrans, size_t>::const_iterator vc = vvc.begin (); vc != vvc.end (); ++vc) {
-
-          for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
-
-            std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> >::const_iterator tc = to_commit.find (i->cell_index ());
-            if (tc != to_commit.end ()) {
-
-              const std::map<db::ICplxTrans, db::Shapes> &vt = tc->second;
-
-              //  NOTE: this will add one more commit slot for propagation ... but we don't clean up.
-              //  When would a cleanup happen?
-              std::map<db::ICplxTrans, db::Shapes> &propagated = to_commit [*c];
-
-              for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
-
-                db::ICplxTrans t = i->complex_trans (*ia);
-                db::ICplxTrans rt = m_red (vc->first * t);
-                std::map<db::ICplxTrans, db::Shapes>::const_iterator v = vt.find (rt);
-                if (v != vt.end ()) {
-
-                  db::Shapes &ps = propagated [vc->first];
-                  tl::ident_map<db::Layout::properties_id_type> pm;
-
-                  for (db::Shapes::shape_iterator si = v->second.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
-                    ps.insert (*si, t, pm);
-                  }
-
-                }
-
-              }
-
-            }
-
-          }
-
-        }
-
-      } else {
-
-        //  single variant -> we can commit any shapes we have kept for this cell directly to the cell
-
-        std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> >::iterator l = to_commit.find (*c);
-        if (l != to_commit.end ()) {
-          tl_assert (l->second.size () == 1);
-          cell.shapes (layer).insert (l->second.begin ()->second);
-          to_commit.erase (l);
-        }
-
-        //  for child cells, pull everything that needs to be committed to the parent
-
-        for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
-
-          std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> >::const_iterator tc = to_commit.find (i->cell_index ());
-          if (tc != to_commit.end ()) {
-
-            const std::map<db::ICplxTrans, db::Shapes> &vt = tc->second;
-
-            for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
-
-              db::ICplxTrans t = i->complex_trans (*ia);
-              db::ICplxTrans rt = m_red (vvc.begin ()->first * t);
-              std::map<db::ICplxTrans, db::Shapes>::const_iterator v = vt.find (rt);
-
-              if (v != vt.end ()) {
-
-                tl::ident_map<db::Layout::properties_id_type> pm;
-
-                for (db::Shapes::shape_iterator si = v->second.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
-                  cell.shapes (layer).insert (*si, t, pm);
-                }
-
-              }
-
-            }
-
-          }
-
-        }
-
-      }
-
-    }
-  }
+  void commit_shapes (db::Layout &layout, db::Cell &top_cell, unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit);
 
   /**
    *  @brief Gets the variants for a given cell
@@ -478,128 +219,53 @@ public:
    *  The keys of the map are the variants, the values is the instance count of the variant
    *  (as seen from the top cell).
    */
-  virtual const std::map<db::ICplxTrans, size_t> &variants (db::cell_index_type ci) const
-  {
-    std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator v = m_variants.find (ci);
-    static std::map<db::ICplxTrans, size_t> empty_set;
-    if (v == m_variants.end ()) {
-      return empty_set;
-    } else {
-      return v->second;
-    }
-  }
+  const std::map<db::ICplxTrans, size_t> &variants (db::cell_index_type ci) const;
 
   /**
    *  @brief Returns true, if variants have been built
    */
-  bool has_variants () const
-  {
-    for (std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator i = m_variants.begin (); i != m_variants.end (); ++i) {
-      if (i->second.size () > 1) {
-        return true;
-      }
-    }
-    return false;
-  }
+  bool has_variants () const;
 
 private:
   std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > m_variants;
-  Reduce m_red;
+  std::auto_ptr<TransformationReducer> mp_red;
 
-  void add_variant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst, tl::false_tag) const
+  void add_variant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst, bool tl_invariant) const;
+  void add_variant_non_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
+  void add_variant_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
+  void product (const std::map<db::ICplxTrans, size_t> &v1, const std::map<db::ICplxTrans, size_t> &v2, std::map<db::ICplxTrans, size_t> &prod) const;
+  void copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from) const;
+  void create_var_instances (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table, bool tl_invariant) const;
+  void create_var_instances_non_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;
+  void create_var_instances_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;
+};
+
+/**
+ *  @brief A template using a specific transformation reducer
+ */
+template <class RED>
+class DB_PUBLIC cell_variants_collector
+  : public VariantsCollectorBase
+{
+public:
+  /**
+   *  @brief Creates a variant collector without a transformation reducer
+   */
+  cell_variants_collector ()
+    : VariantsCollectorBase (new RED ())
   {
-    if (inst.is_complex ()) {
-      for (db::CellInstArray::iterator i = inst.begin (); ! i.at_end (); ++i) {
-        variants [m_red (inst.complex_trans (*i))] += 1;
-      }
-    } else {
-      for (db::CellInstArray::iterator i = inst.begin (); ! i.at_end (); ++i) {
-        variants [db::ICplxTrans (m_red (*i))] += 1;
-      }
-    }
+    //  .. nothing yet ..
   }
 
-  void add_variant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst, tl::true_tag) const
+  /**
+   *  @brief Creates a variant collector with the given reducer
+   *
+   *  The collector will take ownership over the reducer
+   */
+  cell_variants_collector (const RED &red)
+    : VariantsCollectorBase (new RED (red))
   {
-    if (inst.is_complex ()) {
-      variants [m_red (inst.complex_trans ())] += inst.size ();
-    } else {
-      variants [db::ICplxTrans (m_red (inst.front ()))] += inst.size ();
-    }
-  }
-
-  void product (const std::map<db::ICplxTrans, size_t> &v1, const std::map<db::ICplxTrans, size_t> &v2, std::map<db::ICplxTrans, size_t> &prod) const
-  {
-    for (std::map<db::ICplxTrans, size_t>::const_iterator i = v1.begin (); i != v1.end (); ++i) {
-      for (std::map<db::ICplxTrans, size_t>::const_iterator j = v2.begin (); j != v2.end (); ++j) {
-        prod [m_red (i->first * j->first)] += i->second * j->second;
-      }
-    }
-  }
-
-  void copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from) const
-  {
-    db::Cell &to = layout.cell (ci_to);
-    const db::Cell &from = layout.cell (ci_from);
-    for (db::Layout::layer_iterator li = layout.begin_layers (); li != layout.end_layers (); ++li) {
-      to.shapes ((*li).first) = from.shapes ((*li).first);
-    }
-  }
-
-  void create_var_instances (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table, tl::false_tag) const
-  {
-    for (std::vector<db::CellInstArrayWithProperties>::const_iterator i = inst.begin (); i != inst.end (); ++i) {
-
-      std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator f = var_table.find (i->object ().cell_index ());
-      if (f == var_table.end ()) {
-
-         in_cell.insert (*i);
-
-      } else {
-
-        const std::map<db::ICplxTrans, db::cell_index_type> &vt = f->second;
-
-        for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
-
-          db::ICplxTrans rt = m_red (for_var * i->complex_trans (*ia));
-          std::map<db::ICplxTrans, db::cell_index_type>::const_iterator v = vt.find (rt);
-          tl_assert (v != vt.end ());
-
-          in_cell.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (v->second), i->complex_trans (*ia)), i->properties_id ()));
-
-        }
-
-      }
-
-    }
-  }
-
-  void create_var_instances (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table, tl::true_tag) const
-  {
-    for (std::vector<db::CellInstArrayWithProperties>::const_iterator i = inst.begin (); i != inst.end (); ++i) {
-
-      std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator f = var_table.find (i->object ().cell_index ());
-      if (f == var_table.end ()) {
-
-         in_cell.insert (*i);
-
-      } else {
-
-        const std::map<db::ICplxTrans, db::cell_index_type> &vt = f->second;
-
-        std::map<db::ICplxTrans, db::cell_index_type>::const_iterator v;
-
-        db::ICplxTrans rt = m_red (for_var * i->complex_trans ());
-        v = vt.find (rt);
-        tl_assert (v != vt.end ());
-
-        db::CellInstArrayWithProperties new_inst = *i;
-        new_inst.object ().cell_index (v->second);
-        in_cell.insert (new_inst);
-
-      }
-
-    }
+    //  .. nothing yet ..
   }
 };
 

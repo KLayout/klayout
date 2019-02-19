@@ -485,7 +485,9 @@ EdgesDelegate *DeepEdges::process_in_place (const EdgeProcessorBase &filter)
 
 EdgesDelegate *DeepEdges::processed (const EdgeProcessorBase &filter) const
 {
-  ensure_merged_edges_valid ();
+  if (! filter.requires_raw_input ()) {
+    ensure_merged_edges_valid ();
+  }
 
   std::auto_ptr<VariantsCollectorBase> vars;
 
@@ -493,17 +495,17 @@ EdgesDelegate *DeepEdges::processed (const EdgeProcessorBase &filter) const
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (m_merged_edges.layout (), m_merged_edges.initial_cell ());
+    vars->collect (m_deep_layer.layout (), m_deep_layer.initial_cell ());
 
     //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (m_merged_edges).separate_variants (*vars);
+    const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
 
   }
 
-  db::Layout &layout = m_merged_edges.layout ();
+  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
   std::vector<db::Edge> res_edges;
 
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.derived ()));
+  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_deep_layer.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     if (vars.get ()) {

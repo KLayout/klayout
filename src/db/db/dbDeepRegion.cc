@@ -567,8 +567,9 @@ DeepRegion::add_in_place (const Region &other)
     //  non-deep to deep merge (flat)
 
     db::Shapes &shapes = deep_layer ().initial_cell ().shapes (deep_layer ().layer ());
+    db::PolygonRefToShapesGenerator pr (const_cast<db::Layout *> (& deep_layer ().layout ()), &shapes);
     for (db::Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
-      shapes.insert (*p);
+      pr.put (*p);
     }
 
   }
@@ -836,13 +837,14 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
 
     const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
 
       db::Polygon poly;
       si->polygon (poly);
       poly.transform (tr);
-      st.insert (snapped_polygon (poly, gx, gy, heap).transformed (trinv));
+      pr.put (snapped_polygon (poly, gx, gy, heap).transformed (trinv));
 
     }
 
@@ -913,26 +915,31 @@ DeepRegion::process_in_place (const PolygonProcessorBase &filter)
 RegionDelegate *
 DeepRegion::processed (const PolygonProcessorBase &filter) const
 {
-  ensure_merged_polygons_valid ();
+  if (! filter.requires_raw_input ()) {
+    ensure_merged_polygons_valid ();
+  }
 
   std::auto_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+    vars->collect (m_deep_layer.layout (), m_deep_layer.initial_cell ());
 
-    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (*vars);
+    const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
 
   }
 
-  db::Layout &layout = m_merged_polygons.layout ();
+  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
 
   std::vector<db::Polygon> poly_res;
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_deep_layer.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+    db::PolygonRefToShapesGenerator pr (&layout, &st);
 
     if (vars.get ()) {
 
@@ -941,9 +948,6 @@ DeepRegion::processed (const PolygonProcessorBase &filter) const
       const db::ICplxTrans &tr = v.begin ()->first;
       db::ICplxTrans trinv = tr.inverted ();
 
-      const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_polygons.layer ());
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
-
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
         db::Polygon poly;
         si->polygon (poly);
@@ -951,14 +955,11 @@ DeepRegion::processed (const PolygonProcessorBase &filter) const
         poly_res.clear ();
         filter.process (poly, poly_res);
         for (std::vector<db::Polygon>::const_iterator p = poly_res.begin (); p != poly_res.end (); ++p) {
-          st.insert (p->transformed (trinv));
+          pr.put (p->transformed (trinv));
         }
       }
 
     } else {
-
-      const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_polygons.layer ());
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
         db::Polygon poly;
@@ -966,7 +967,7 @@ DeepRegion::processed (const PolygonProcessorBase &filter) const
         poly_res.clear ();
         filter.process (poly, poly_res);
         for (std::vector<db::Polygon>::const_iterator p = poly_res.begin (); p != poly_res.end (); ++p) {
-          st.insert (*p);
+          pr.put (*p);
         }
       }
 
@@ -1009,20 +1010,20 @@ DeepRegion::filtered (const PolygonFilterBase &filter) const
   std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
+    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
     if (vars.get ()) {
 
       const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
       tl_assert (v.size () == size_t (1));
       const db::ICplxTrans &tr = v.begin ()->first;
 
-      const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
-
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
         db::Polygon poly;
         si->polygon (poly);
         if (filter.selected (poly.transformed (tr))) {
-          st.insert (poly);
+          st.insert (*si);
         }
       }
 
@@ -1035,7 +1036,7 @@ DeepRegion::filtered (const PolygonFilterBase &filter) const
         db::Polygon poly;
         si->polygon (poly);
         if (filter.selected (poly)) {
-          st.insert (poly);
+          st.insert (*si);
         }
       }
 

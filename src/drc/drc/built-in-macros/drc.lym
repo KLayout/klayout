@@ -4867,36 +4867,30 @@ CODE
         # make sure the output has the right database unit
         output.dbu = self.dbu
 
-        if data.respond_to?(:is_deep?) &amp;&amp; data.is_deep?
+        tmp = li
 
-          # mark the layer as used
+        begin
+
           if !@used_output_layers[li]
             @output_layers.push(li)
+            # Note: to avoid issues with output onto the input layer, we
+            # output to a temp layer and later swap both. The simple implementation
+            # did a clear here and the effect of that was that the data potentially
+            # got invalidated.
+            tmp = output.insert_layer(RBA::LayerInfo::new)
             @used_output_layers[li] = true
           end
 
-          # insert the data into the output layer
-          if data.is_a?(RBA::EdgePairs)
-            data.insert_into_as_polygons(output, output_cell.cell_index, li, 1)
-          else
-            data.insert_into(output, output_cell.cell_index, li)
-          end
+          if data.respond_to?(:is_deep?) &amp;&amp; data.is_deep?
 
-        else
-
-          tmp = li
-
-          begin
-
-            if !@used_output_layers[li]
-              @output_layers.push(li)
-              # Note: to avoid issues with output onto the input layer, we
-              # output to a temp layer and later swap both. The simple implementation
-              # did a clear here and the effect of that was that the data potentially
-              # got invalidated.
-              tmp = output.insert_layer(RBA::LayerInfo::new)
-              @used_output_layers[li] = true
+            # insert the data into the output layer
+            if data.is_a?(RBA::EdgePairs)
+              data.insert_into_as_polygons(output, output_cell.cell_index, tmp, 1)
+            else
+              data.insert_into(output, output_cell.cell_index, tmp)
             end
+
+          else
 
             # insert the data into the output layer
             if data.is_a?(RBA::EdgePairs)
@@ -4905,18 +4899,18 @@ CODE
               output_cell.shapes(tmp).insert(data)
             end
 
-            #  make the temp layer the output layer
-            if tmp != li
-              output.swap_layers(tmp, li)
-            end
-
-          ensure
-            #  clean up the original layer if requested
-            if tmp != li
-              output.delete_layer(tmp)
-            end
           end
 
+          #  make the temp layer the output layer
+          if tmp != li
+            output.swap_layers(tmp, li)
+          end
+
+        ensure
+          #  clean up the original layer if requested
+          if tmp != li
+            output.delete_layer(tmp)
+          end
         end
 
       end        

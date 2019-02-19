@@ -30,6 +30,56 @@
 namespace db
 {
 
+namespace
+{
+
+// -------------------------------------------------------------------------------------------------------------
+//  Smoothing processor
+
+class EdgeSegmentSelector
+  : public EdgeProcessorBase
+{
+public:
+  EdgeSegmentSelector (int mode, db::Edges::length_type length, double fraction)
+    : m_mode (mode), m_length (length), m_fraction (fraction)
+  { }
+
+  virtual void process (const db::Edge &edge, std::vector<db::Edge> &res) const
+  {
+    double l = std::max (edge.double_length () * m_fraction, double (m_length));
+
+    if (m_mode < 0) {
+
+      res.push_back (db::Edge (edge.p1 (), db::Point (db::DPoint (edge.p1 ()) + db::DVector (edge.d ()) * (l / edge.double_length ()))));
+
+    } else if (m_mode > 0) {
+
+      res.push_back (db::Edge (db::Point (db::DPoint (edge.p2 ()) - db::DVector (edge.d ()) * (l / edge.double_length ())), edge.p2 ()));
+
+    } else {
+
+      db::DVector dl = db::DVector (edge.d ()) * (0.5 * l / edge.double_length ());
+      db::DPoint center = db::DPoint (edge.p1 ()) + db::DVector (edge.p2 () - edge.p1 ()) * 0.5;
+
+      res.push_back (db::Edge (db::Point (center - dl), db::Point (center + dl)));
+
+    }
+  }
+
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool result_must_not_be_merged () const { return m_length <= 0; }
+
+private:
+  int m_mode;
+  db::Edges::length_type m_length;
+  double m_fraction;
+  db::MagnificationReducer m_vars;
+};
+
+}
+
 // -------------------------------------------------------------------------------------------------------------
 //  Edges implementation
 
@@ -138,6 +188,21 @@ Edges::reserve (size_t n)
 void Edges::extended (Region &output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const
 {
   output.set_delegate (mp_delegate->extended (ext_b, ext_e, ext_o, ext_i, join));
+}
+
+Edges Edges::start_segments (length_type length, double fraction) const
+{
+  return Edges (mp_delegate->processed (EdgeSegmentSelector (-1, length, fraction)));
+}
+
+Edges Edges::end_segments (length_type length, double fraction) const
+{
+  return Edges (mp_delegate->processed (EdgeSegmentSelector (1, length, fraction)));
+}
+
+Edges Edges::centers (length_type length, double fraction) const
+{
+  return Edges (mp_delegate->processed (EdgeSegmentSelector (0, length, fraction)));
 }
 
 template <class T>

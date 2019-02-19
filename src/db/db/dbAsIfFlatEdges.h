@@ -38,133 +38,6 @@ namespace db {
 class PolygonSink;
 
 /**
- *  @brief A helper class for the edge interaction functionality which acts as an edge pair receiver
- */
-template <class OutputContainer>
-class edge_interaction_filter
-  : public db::box_scanner_receiver<db::Edge, size_t>
-{
-public:
-  edge_interaction_filter (OutputContainer &output)
-    : mp_output (&output)
-  {
-    //  .. nothing yet ..
-  }
-
-  void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
-  {
-    //  Select the edges which intersect
-    if (p1 != p2) {
-      const db::Edge *o = p1 > p2 ? o2 : o1;
-      const db::Edge *oo = p1 > p2 ? o1 : o2;
-      if (o->intersect (*oo)) {
-        if (m_seen.insert (o).second) {
-          mp_output->insert (*o);
-        }
-      }
-    }
-  }
-
-private:
-  OutputContainer *mp_output;
-  std::set<const db::Edge *> m_seen;
-};
-
-/**
- *  @brief A helper class for the edge to region interaction functionality which acts as an edge pair receiver
- *
- *  Note: This special scanner uses pointers to two different objects: edges and polygons.
- *  It uses odd value pointers to indicate pointers to polygons and even value pointers to indicate
- *  pointers to edges.
- *
- *  There is a special box converter which is able to sort that out as well.
- */
-template <class OutputContainer>
-class edge_to_region_interaction_filter
-  : public db::box_scanner_receiver2<db::Edge, size_t, db::Polygon, size_t>
-{
-public:
-  edge_to_region_interaction_filter (OutputContainer &output)
-    : mp_output (&output)
-  {
-    //  .. nothing yet ..
-  }
-
-  void add (const db::Edge *e, size_t, const db::Polygon *p, size_t)
-  {
-    if (m_seen.find (e) == m_seen.end ()) {
-      if (db::interact (*p, *e)) {
-        m_seen.insert (e);
-        mp_output->insert (*e);
-      }
-    }
-  }
-
-private:
-  OutputContainer *mp_output;
-  std::set<const db::Edge *> m_seen;
-};
-
-/**
- *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
- *
- *  If will perform a edge by edge check using the provided EdgeRelationFilter
- */
-template <class Output>
-class edge2edge_check_for_edges
-  : public db::box_scanner_receiver<db::Edge, size_t>
-{
-public:
-  edge2edge_check_for_edges (const EdgeRelationFilter &check, Output &output, bool requires_different_layers)
-    : mp_check (&check), mp_output (&output)
-  {
-    m_requires_different_layers = requires_different_layers;
-  }
-
-  void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
-  {
-    //  Overlap or inside checks require input from different layers
-    if (! m_requires_different_layers || ((p1 ^ p2) & 1) != 0) {
-
-      //  ensure that the first check argument is of layer 1 and the second of
-      //  layer 2 (unless both are of the same layer)
-      int l1 = int (p1 & size_t (1));
-      int l2 = int (p2 & size_t (1));
-
-      db::EdgePair ep;
-      if (mp_check->check (l1 <= l2 ? *o1 : *o2, l1 <= l2 ? *o2 : *o1, &ep)) {
-        mp_output->insert (ep);
-      }
-
-    }
-  }
-
-private:
-  const EdgeRelationFilter *mp_check;
-  Output *mp_output;
-  bool m_requires_different_layers;
-};
-
-/**
- *  @brief A helper class to turn joined edge sequences into polygons
- *
- *  This object is an edge cluster so it can connect to a cluster collector
- *  driven by a box scanner.
- */
-struct JoinEdgesCluster
-  : public db::cluster<db::Edge, size_t>
-{
-  typedef db::Edge::coord_type coord_type;
-
-  JoinEdgesCluster (db::PolygonSink *output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i);
-  void finish ();
-
-private:
-  db::PolygonSink *mp_output;
-  coord_type m_ext_b, m_ext_e, m_ext_o, m_ext_i;
-};
-
-/**
  *  @brief Provides default flat implementations
  */
 class DB_PUBLIC AsIfFlatEdges
@@ -208,6 +81,13 @@ public:
   {
     return run_check (db::InsideRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
   }
+
+  virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &filter)
+  {
+    return processed (filter);
+  }
+
+  virtual EdgesDelegate *processed (const EdgeProcessorBase &filter) const;
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter)
   {
@@ -274,9 +154,6 @@ public:
   }
 
   virtual RegionDelegate *extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const;
-  virtual EdgesDelegate *start_segments (length_type length, double fraction) const;
-  virtual EdgesDelegate *end_segments (length_type length, double fraction) const;
-  virtual EdgesDelegate *centers (length_type length, double fraction) const;
 
   virtual EdgesDelegate *selected_interacting (const Edges &) const;
   virtual EdgesDelegate *selected_not_interacting (const Edges &) const;
@@ -294,8 +171,6 @@ protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
   EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  static db::Polygon extended_edge (const db::Edge &edge, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i);
-  static db::Edge compute_partial (const db::Edge &edge, int mode, length_type length, double fraction);
   virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool inverse) const;
   virtual EdgesDelegate *selected_interacting_generic (const Region &region, bool inverse) const;
 
@@ -308,7 +183,6 @@ private:
   virtual db::Box compute_bbox () const;
   EdgesDelegate *boolean (const Edges *other, EdgeBoolOp op) const;
   EdgesDelegate *edge_region_op (const Region &other, bool outside, bool include_borders) const;
-  EdgesDelegate *segments (int mode, length_type length, double fraction) const;
 };
 
 }

@@ -35,6 +35,35 @@
 namespace db {
 
 /**
+ *  @brief A base class for edge filters
+ */
+class DB_PUBLIC EdgeFilterBase
+{
+public:
+  EdgeFilterBase () { }
+  virtual ~EdgeFilterBase () { }
+
+  virtual bool selected (const db::Edge &edge) const = 0;
+  virtual const TransformationReducer *vars () const = 0;
+};
+
+/**
+ *  @brief A base class for polygon processors
+ */
+class DB_PUBLIC EdgeProcessorBase
+{
+public:
+  EdgeProcessorBase () { }
+  virtual ~EdgeProcessorBase () { }
+
+  virtual void process (const db::Edge &polygon, std::vector<db::Edge> &res) const = 0;
+  virtual const TransformationReducer *vars () const = 0;
+  virtual bool result_is_merged () const = 0;
+  virtual bool requires_raw_input () const = 0;
+  virtual bool result_must_not_be_merged () const = 0;
+};
+
+/**
  *  @brief A common definition for the boolean operations available on edges
  */
 enum EdgeBoolOp { EdgeOr, EdgeNot, EdgeXor, EdgeAnd };
@@ -128,6 +157,8 @@ public:
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter) = 0;
   virtual EdgesDelegate *filtered (const EdgeFilterBase &filter) const = 0;
+  virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &filter) = 0;
+  virtual EdgesDelegate *processed (const EdgeProcessorBase &filter) const = 0;
 
   virtual EdgesDelegate *merged_in_place () = 0;
   virtual EdgesDelegate *merged () const = 0;
@@ -142,9 +173,6 @@ public:
   virtual EdgesDelegate *add (const Edges &other) const = 0;
 
   virtual RegionDelegate *extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const = 0;
-  virtual EdgesDelegate *start_segments (length_type length, double fraction) const = 0;
-  virtual EdgesDelegate *end_segments (length_type length, double fraction) const = 0;
-  virtual EdgesDelegate *centers (length_type length, double fraction) const = 0;
 
   virtual EdgesDelegate *inside_part (const Region &other) const = 0;
   virtual EdgesDelegate *outside_part (const Region &other) const = 0;

@@ -21,6 +21,7 @@
 */
 
 #include "dbEdges.h"
+#include "dbEdgesUtils.h"
 #include "dbRegion.h"
 #include "dbDeepEdges.h"
 #include "dbDeepRegion.h"
@@ -476,6 +477,77 @@ std::string DeepEdges::to_string (size_t nmax) const
   return db::AsIfFlatEdges::to_string (nmax);
 }
 
+EdgesDelegate *DeepEdges::process_in_place (const EdgeProcessorBase &filter)
+{
+  //  TODO: implement to be really in-place
+  return processed (filter);
+}
+
+EdgesDelegate *DeepEdges::processed (const EdgeProcessorBase &filter) const
+{
+  ensure_merged_edges_valid ();
+
+  std::auto_ptr<VariantsCollectorBase> vars;
+
+  if (filter.vars ()) {
+
+    vars.reset (new db::VariantsCollectorBase (filter.vars ()));
+
+    vars->collect (m_merged_edges.layout (), m_merged_edges.initial_cell ());
+
+    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+    const_cast<db::DeepLayer &> (m_merged_edges).separate_variants (*vars);
+
+  }
+
+  db::Layout &layout = m_merged_edges.layout ();
+  std::vector<db::Edge> res_edges;
+
+  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.derived ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    if (vars.get ()) {
+
+      const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
+      tl_assert (v.size () == size_t (1));
+      const db::ICplxTrans &tr = v.begin ()->first;
+      db::ICplxTrans trinv = tr.inverted ();
+
+      const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_edges.layer ());
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+        res_edges.clear ();
+        filter.process (si->edge ().transformed (tr), res_edges);
+        for (std::vector<db::Edge>::const_iterator er = res_edges.begin (); er != res_edges.end (); ++er) {
+          st.insert (er->transformed (trinv));
+        }
+      }
+
+    } else {
+
+      const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_edges.layer ());
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+        res_edges.clear ();
+        filter.process (si->edge (), res_edges);
+        for (std::vector<db::Edge>::const_iterator er = res_edges.begin (); er != res_edges.end (); ++er) {
+          st.insert (*er);
+        }
+      }
+
+    }
+
+  }
+
+  if (filter.result_is_merged ()) {
+    res->set_is_merged (true);
+  }
+
+  return res.release ();
+}
+
 EdgesDelegate *DeepEdges::filter_in_place (const EdgeFilterBase &filter)
 {
   //  TODO: implement to be really in-place
@@ -915,62 +987,6 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
   vars.commit_shapes (layout, top_cell, res->deep_layer ().layer (), to_commit);
 
   return res.release ();
-}
-
-EdgesDelegate *DeepEdges::segments (int mode, length_type length, double fraction) const
-{
-  ensure_merged_edges_valid ();
-
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.derived ()));
-
-  db::Layout &layout = const_cast<db::Layout &> (m_merged_edges.layout ());
-  db::Cell &top_cell = const_cast<db::Cell &> (m_merged_edges.initial_cell ());
-
-  db::MagnificationReducer red;
-  db::cell_variants_collector<db::MagnificationReducer> vars (red);
-  vars.collect (m_merged_edges.layout (), m_merged_edges.initial_cell ());
-
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
-
-  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
-
-    const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
-    for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
-
-      db::Shapes *out;
-      if (vv.size () == 1) {
-        out = & c->shapes (res->deep_layer ().layer ());
-      } else {
-        out = & to_commit [c->cell_index ()][v->first];
-      }
-
-      for (db::Shapes::shape_iterator si = c->shapes (m_merged_edges.layer ()).begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-        out->insert (compute_partial (si->edge ().transformed (v->first), mode, length, fraction).transformed (v->first.inverted ()));
-      }
-
-    }
-
-  }
-
-  //  propagate results from variants
-  vars.commit_shapes (layout, top_cell, res->deep_layer ().layer (), to_commit);
-
-  return res.release ();
-}
-
-EdgesDelegate *DeepEdges::start_segments (length_type length, double fraction) const
-{
-  return segments (-1, length, fraction);
-}
-
-EdgesDelegate *DeepEdges::end_segments (length_type length, double fraction) const
-{
-  return segments (1, length, fraction);
-}
-
-EdgesDelegate *DeepEdges::centers (length_type length, double fraction) const
-{
-  return segments (0, length, fraction);
 }
 
 namespace

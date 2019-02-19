@@ -630,7 +630,7 @@ public:
   /**
    *  @brief Processes the (merged) polygons
    *
-   *  This method will keep all polygons for which the processing filter returns true.
+   *  This method will keep all polygons which the processor returns.
    *  The processing filter can apply modifications too. These modifications will be
    *  kept in the output region.
    *
@@ -646,7 +646,7 @@ public:
   /**
    *  @brief Returns the processed polygons
    *
-   *  This method will keep all polygons for which the processing filter returns true.
+   *  This method will keep all polygons which the processor returns.
    *  The processing filter can apply modifications too. These modifications will be
    *  kept in the output region.
    *

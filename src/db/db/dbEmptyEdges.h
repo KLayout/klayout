@@ -65,6 +65,8 @@ public:
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &) { return this; }
   virtual EdgesDelegate *filtered (const EdgeFilterBase &) const { return new EmptyEdges (); }
+  virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &) { return this; }
+  virtual EdgesDelegate *processed (const EdgeProcessorBase &) const { return new EmptyEdges (); }
 
   virtual EdgesDelegate *merged_in_place () { return this; }
   virtual EdgesDelegate *merged () const { return new EmptyEdges (); }
@@ -79,9 +81,6 @@ public:
   virtual EdgesDelegate *add (const Edges &other) const;
 
   virtual RegionDelegate *extended (coord_type, coord_type, coord_type, coord_type, bool) const;
-  virtual EdgesDelegate *start_segments (length_type, double) const { return new EmptyEdges (); }
-  virtual EdgesDelegate *end_segments (length_type, double) const { return new EmptyEdges (); }
-  virtual EdgesDelegate *centers (length_type, double) const { return new EmptyEdges (); }
 
   virtual EdgesDelegate *inside_part (const Region &) const { return new EmptyEdges (); }
   virtual EdgesDelegate *outside_part (const Region &) const { return new EmptyEdges (); }

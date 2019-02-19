@@ -183,6 +183,35 @@ Box FlatEdges::compute_bbox () const
 }
 
 EdgesDelegate *
+FlatEdges::processed_in_place (const EdgeProcessorBase &filter)
+{
+  std::vector<db::Edge> edge_res;
+
+  edge_iterator_type pw = m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin ();
+  for (EdgesIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
+
+    edge_res.clear ();
+    filter.process (*p, edge_res);
+
+    for (std::vector<db::Edge>::const_iterator pr = edge_res.begin (); pr != edge_res.end (); ++pr) {
+      if (pw == m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
+        m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*pr);
+        pw = m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
+      } else {
+        m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *pr);
+      }
+    }
+
+  }
+
+  m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().erase (pw, m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+  m_merged_edges.clear ();
+  m_is_merged = filter.result_is_merged () && merged_semantics ();
+
+  return this;
+}
+
+EdgesDelegate *
 FlatEdges::filter_in_place (const EdgeFilterBase &filter)
 {
   edge_iterator_type pw = m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin ();

@@ -201,19 +201,6 @@ private:
 class Edges;
 
 /**
- *  @brief A base class for edge filters
- */
-class DB_PUBLIC EdgeFilterBase
-{
-public:
-  EdgeFilterBase () { }
-  virtual ~EdgeFilterBase () { }
-
-  virtual bool selected (const db::Edge &edge) const = 0;
-  virtual const TransformationReducer *vars () const = 0;
-};
-
-/**
  *  @brief An edge set
  *
  *  An edge set is basically a collection of edges. They do not necessarily need to form closed contours. 
@@ -604,6 +591,39 @@ public:
   }
 
   /**
+   *  @brief Processes the (merged) edges
+   *
+   *  This method will keep all edges which the processor returns.
+   *  The processing filter can apply modifications too. These modifications will be
+   *  kept in the output edge collection.
+   *
+   *  Merged semantics applies. In merged semantics, the filter will run over
+   *  all merged edges.
+   */
+  Edges &process (const EdgeProcessorBase &filter)
+  {
+    set_delegate (mp_delegate->process_in_place (filter));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns the processed edges
+   *
+   *  This method will keep all edges which the processor returns.
+   *  The processing filter can apply modifications too. These modifications will be
+   *  kept in the output edge collection.
+   *
+   *  Merged semantics applies. In merged semantics, the filter will run over
+   *  all merged edges.
+   *
+   *  This method will return a new edge collection with the modified and filtered edges.
+   */
+  Edges processed (const EdgeProcessorBase &filter) const
+  {
+    return Edges (mp_delegate->processed (filter));
+  }
+
+  /**
    *  @brief Applies a width check and returns EdgePairs which correspond to violation markers
    *
    *  The width check will create a edge pairs if the width of the area between the 
@@ -947,10 +967,7 @@ public:
    *
    *  Merged semantics applies.
    */
-  Edges start_segments (length_type length, double fraction) const
-  {
-    return Edges (mp_delegate->start_segments (length, fraction));
-  }
+  Edges start_segments (length_type length, double fraction) const;
 
   /**
    *  @brief Returns edges (point-like) representing the end part of the edges
@@ -960,10 +977,7 @@ public:
    *
    *  Merged semantics applies.
    */
-  Edges end_segments (length_type length, double fraction) const
-  {
-    return Edges (mp_delegate->end_segments (length, fraction));
-  }
+  Edges end_segments (length_type length, double fraction) const;
 
   /**
    *  @brief Returns edges (point-like) representing the center of the edges
@@ -973,10 +987,7 @@ public:
    *
    *  Merged semantics applies.
    */
-  Edges centers (length_type length, double fraction) const
-  {
-    return Edges (mp_delegate->centers (length, fraction));
-  }
+  Edges centers (length_type length, double fraction) const;
 
   /**
    *  @brief Select the edges inside the given region

@@ -111,6 +111,7 @@ public:
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
+  virtual EdgesDelegate *processed_in_place (const EdgeProcessorBase &filter);
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter);
 
   virtual EdgesDelegate *add_in_place (const Edges &other);

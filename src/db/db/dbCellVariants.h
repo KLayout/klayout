@@ -44,8 +44,9 @@ namespace db
  *
  *   reduce(A*B) = reduce(reduce(A)*reduce(B))
  */
-struct DB_PUBLIC TransformationReducer
+class DB_PUBLIC TransformationReducer
 {
+public:
   TransformationReducer () { }
   virtual ~TransformationReducer () { }
 
@@ -183,10 +184,8 @@ public:
 
   /**
    *  @brief Creates a variant collector with the given reducer
-   *
-   *  The collector will take ownership over the reducer
    */
-  VariantsCollectorBase (TransformationReducer *red);
+  VariantsCollectorBase (const TransformationReducer *red);
 
   /**
    *  @brief Collects cell variants for the given layout starting from the top cell
@@ -228,7 +227,7 @@ public:
 
 private:
   std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > m_variants;
-  std::auto_ptr<TransformationReducer> mp_red;
+  const TransformationReducer *mp_red;
 
   void add_variant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst, bool tl_invariant) const;
   void add_variant_non_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
@@ -252,7 +251,7 @@ public:
    *  @brief Creates a variant collector without a transformation reducer
    */
   cell_variants_collector ()
-    : VariantsCollectorBase (new RED ())
+    : VariantsCollectorBase (&m_red)
   {
     //  .. nothing yet ..
   }
@@ -263,10 +262,13 @@ public:
    *  The collector will take ownership over the reducer
    */
   cell_variants_collector (const RED &red)
-    : VariantsCollectorBase (new RED (red))
+    : VariantsCollectorBase (&m_red), m_red (red)
   {
     //  .. nothing yet ..
   }
+
+private:
+  RED m_red;
 };
 
 }  // namespace db

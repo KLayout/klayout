@@ -26,6 +26,7 @@
 #include "dbTestSupport.h"
 #include "dbEdges.h"
 #include "dbRegion.h"
+#include "dbEdgesUtils.h"
 #include "dbDeepShapeStore.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"

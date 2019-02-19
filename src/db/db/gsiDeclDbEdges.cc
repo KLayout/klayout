@@ -25,6 +25,7 @@
 
 #include "dbDeepShapeStore.h"
 #include "dbEdges.h"
+#include "dbEdgesUtils.h"
 #include "dbDeepEdges.h"
 #include "dbRegion.h"
 #include "dbLayoutUtils.h"

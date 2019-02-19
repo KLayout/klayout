@@ -169,7 +169,9 @@ SOURCES = \
     dbNetlistWriter.cc \
     dbCellVariants.cc \
     dbDeepEdges.cc \
-    dbDeepEdgePairs.cc
+    dbDeepEdgePairs.cc \
+    dbRegionUtils.cc \
+    dbEdgesUtils.cc
 
 HEADERS = \
   dbArray.h \
@@ -303,7 +305,9 @@ HEADERS = \
     dbNetlistWriter.h \
     dbCellVariants.h \
     dbDeepEdges.h \
-    dbDeepEdgePairs.h
+    dbDeepEdgePairs.h \
+    dbRegionUtils.h \
+    dbEdgesUtils.h
 
 !equals(HAVE_QT, "0") {
 

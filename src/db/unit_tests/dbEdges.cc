@@ -24,6 +24,7 @@
 #include "tlUnitTest.h"
 
 #include "dbEdges.h"
+#include "dbEdgesUtils.h"
 #include "dbPolygonTools.h"
 #include "dbRegion.h"
 

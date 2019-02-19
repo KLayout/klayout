@@ -24,6 +24,8 @@
 #include "tlUnitTest.h"
 
 #include "dbRegion.h"
+#include "dbRegionUtils.h"
+#include "dbEdgesUtils.h"
 #include "dbBoxScanner.h"
 
 #include <cstdio>

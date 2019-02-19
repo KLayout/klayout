@@ -857,13 +857,9 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
   std::auto_ptr<VariantsCollectorBase> vars;
 
-  if (filter) {
+  if (filter && filter->vars ()) {
 
-    if (filter->isotropic ()) {
-      vars.reset (new db::cell_variants_collector<db::MagnificationReducer> ());
-    } else {
-      vars.reset (new db::cell_variants_collector<db::MagnificationAndOrientationReducer> ());
-    }
+    vars.reset (new db::VariantsCollectorBase (filter->vars ()));
 
     vars->collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
 
@@ -919,36 +915,52 @@ DeepRegion::filtered (const PolygonFilterBase &filter) const
   ensure_merged_polygons_valid ();
 
   std::auto_ptr<VariantsCollectorBase> vars;
+  if (filter.vars ()) {
 
-  if (filter.isotropic ()) {
-    vars.reset (new db::cell_variants_collector<db::MagnificationReducer> ());
-  } else {
-    vars.reset (new db::cell_variants_collector<db::MagnificationAndOrientationReducer> ());
+    vars.reset (new db::VariantsCollectorBase (filter.vars ()));
+
+    vars->collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+
+    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+    const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (*vars);
+
   }
-
-  vars->collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
-
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (*vars);
 
   db::Layout &layout = m_merged_polygons.layout ();
 
   std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    const db::ICplxTrans &tr = v.begin ()->first;
+    if (vars.get ()) {
 
-    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
-    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+      const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
+      tl_assert (v.size () == size_t (1));
+      const db::ICplxTrans &tr = v.begin ()->first;
 
-    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
-      db::Polygon poly;
-      si->polygon (poly);
-      if (filter.selected (poly.transformed (tr))) {
-        st.insert (poly);
+      const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+        db::Polygon poly;
+        si->polygon (poly);
+        if (filter.selected (poly.transformed (tr))) {
+          st.insert (poly);
+        }
       }
+
+    } else {
+
+      const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+        db::Polygon poly;
+        si->polygon (poly);
+        if (filter.selected (poly)) {
+          st.insert (poly);
+        }
+      }
+
     }
 
   }

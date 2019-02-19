@@ -488,34 +488,50 @@ EdgesDelegate *DeepEdges::filtered (const EdgeFilterBase &filter) const
 
   std::auto_ptr<VariantsCollectorBase> vars;
 
-  if (filter.isotropic ()) {
-    vars.reset (new db::cell_variants_collector<db::MagnificationReducer> ());
-  } else {
-    vars.reset (new db::cell_variants_collector<db::MagnificationAndOrientationReducer> ());
+  if (filter.vars ()) {
+
+    vars.reset (new db::VariantsCollectorBase (filter.vars ()));
+
+    vars->collect (m_merged_edges.layout (), m_merged_edges.initial_cell ());
+
+    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+    const_cast<db::DeepLayer &> (m_merged_edges).separate_variants (*vars);
+
   }
-
-  vars->collect (m_merged_edges.layout (), m_merged_edges.initial_cell ());
-
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (m_merged_edges).separate_variants (*vars);
 
   db::Layout &layout = m_merged_edges.layout ();
 
   std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    const db::ICplxTrans &tr = v.begin ()->first;
+    if (vars.get ()) {
 
-    const db::Shapes &s = c->shapes (m_merged_edges.layer ());
-    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+      const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
+      tl_assert (v.size () == size_t (1));
+      const db::ICplxTrans &tr = v.begin ()->first;
 
-    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-      db::Edge edge = si->edge ();
-      if (filter.selected (edge.transformed (tr))) {
-        st.insert (edge);
+      const db::Shapes &s = c->shapes (m_merged_edges.layer ());
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+        db::Edge edge = si->edge ();
+        if (filter.selected (edge.transformed (tr))) {
+          st.insert (edge);
+        }
       }
+
+    } else {
+
+      const db::Shapes &s = c->shapes (m_merged_edges.layer ());
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+        db::Edge edge = si->edge ();
+        if (filter.selected (edge)) {
+          st.insert (edge);
+        }
+      }
+
     }
 
   }

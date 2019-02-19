@@ -33,7 +33,7 @@ VariantsCollectorBase::VariantsCollectorBase ()
   //  .. nothing yet ..
 }
 
-VariantsCollectorBase::VariantsCollectorBase (TransformationReducer *red)
+VariantsCollectorBase::VariantsCollectorBase (const TransformationReducer *red)
   : mp_red (red)
 {
   //  .. nothing yet ..
@@ -42,7 +42,7 @@ VariantsCollectorBase::VariantsCollectorBase (TransformationReducer *red)
 void
 VariantsCollectorBase::collect (const db::Layout &layout, const db::Cell &top_cell)
 {
-  tl_assert (mp_red.get () != 0);
+  tl_assert (mp_red != 0);
 
   //  The top cell gets a "variant" with unit transformation
   m_variants [top_cell.cell_index ()].insert (std::make_pair (db::ICplxTrans (), 1));
@@ -78,7 +78,7 @@ VariantsCollectorBase::collect (const db::Layout &layout, const db::Cell &top_ce
 void
 VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table)
 {
-  tl_assert (mp_red.get () != 0);
+  tl_assert (mp_red != 0);
 
   db::LayoutLocker locker (&layout);
 
@@ -177,6 +177,8 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
 void
 VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit)
 {
+  tl_assert (mp_red != 0);
+
   if (to_commit.empty ()) {
     return;
   }

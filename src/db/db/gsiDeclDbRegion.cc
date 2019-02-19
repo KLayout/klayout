@@ -23,6 +23,7 @@
 #include "gsiDecl.h"
 
 #include "dbRegion.h"
+#include "dbRegionUtils.h"
 #include "dbDeepRegion.h"
 #include "dbPolygonTools.h"
 #include "dbLayoutUtils.h"

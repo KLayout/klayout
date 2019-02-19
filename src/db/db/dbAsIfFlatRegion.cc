@@ -26,6 +26,7 @@
 #include "dbFlatEdgePairs.h"
 #include "dbEmptyRegion.h"
 #include "dbRegion.h"
+#include "dbRegionUtils.h"
 #include "dbShapeProcessor.h"
 #include "dbBoxConvert.h"
 #include "dbBoxScanner.h"
@@ -90,60 +91,6 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
   }
 
   return edges;
-}
-
-RegionDelegate *
-AsIfFlatRegion::hulls () const
-{
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion (false));
-
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    db::Polygon h;
-    h.assign_hull (p->begin_hull (), p->end_hull ());
-    new_region->insert (h);
-  }
-
-  return new_region.release ();
-}
-
-RegionDelegate *
-AsIfFlatRegion::holes () const
-{
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion (false));
-
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    for (size_t i = 0; i < p->holes (); ++i) {
-      db::Polygon h;
-      h.assign_hull (p->begin_hole ((unsigned int) i), p->end_hole ((unsigned int) i));
-      new_region->insert (h);
-    }
-  }
-
-  return new_region.release ();
-}
-
-RegionDelegate *
-AsIfFlatRegion::rounded_corners (double rinner, double router, unsigned int n) const
-{
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion (false));
-
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    new_region->insert (db::compute_rounded (*p, rinner, router, n));
-  }
-
-  return new_region.release ();
-}
-
-RegionDelegate *
-AsIfFlatRegion::smoothed (coord_type d) const
-{
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion (false));
-
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    new_region->insert (db::smooth (*p, d));
-  }
-
-  return new_region.release ();
 }
 
 RegionDelegate *
@@ -296,6 +243,25 @@ AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
     if (filter.selected (*p)) {
       new_region->insert (*p);
     }
+  }
+
+  return new_region.release ();
+}
+
+RegionDelegate *
+AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
+{
+  std::auto_ptr<FlatRegion> new_region (new FlatRegion ());
+  std::vector<db::Polygon> poly_res;
+
+  for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
+
+    poly_res.clear ();
+    filter.process (*p, poly_res);
+    for (std::vector<db::Polygon>::const_iterator pr = poly_res.begin (); pr != poly_res.end (); ++pr) {
+      new_region->insert (*pr);
+    }
+
   }
 
   return new_region.release ();
@@ -588,41 +554,6 @@ AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     new_region->raw_polygons ().insert (snapped_polygon (*p, gx, gy, heap));
-  }
-
-  return new_region.release ();
-}
-
-/**
- *  @brief A helper class to implement the strange polygon detector
- */
-struct DB_PUBLIC StrangePolygonInsideFunc
-{
-  inline bool operator() (int wc) const
-  {
-    return wc < 0 || wc > 1;
-  }
-};
-
-void
-AsIfFlatRegion::produce_shape_for_strange_polygon (const db::Polygon &poly, db::Shapes &shapes)
-{
-  EdgeProcessor ep;
-  ep.insert (poly);
-
-  StrangePolygonInsideFunc inside;
-  db::GenericMerge<StrangePolygonInsideFunc> op (inside);
-  db::ShapeGenerator pc (shapes, false);
-  db::PolygonGenerator pg (pc, false, false);
-  ep.process (pg, op);
-}
-
-RegionDelegate *
-AsIfFlatRegion::strange_polygon_check () const
-{
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
-  for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-    produce_shape_for_strange_polygon (*p, new_region->raw_polygons ());
   }
 
   return new_region.release ();

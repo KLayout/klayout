@@ -112,6 +112,14 @@ struct EPTestFilter
   {
     return ep.first ().double_length () < 50;
   }
+
+  const db::TransformationReducer *vars () const
+  {
+    return &m_vars;
+  }
+
+private:
+  db::MagnificationReducer m_vars;
 };
 
 TEST(3) 

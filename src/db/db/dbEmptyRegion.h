@@ -73,11 +73,11 @@ public:
   virtual RegionDelegate *snapped_in_place (db::Coord, db::Coord) { return this; }
   virtual RegionDelegate *snapped (db::Coord, db::Coord)  { return new EmptyRegion (); }
 
-  virtual RegionDelegate *strange_polygon_check () const { return new EmptyRegion (); }
-
   virtual Edges edges (const EdgeFilterBase *) const { return db::Edges (); }
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &) { return this; }
   virtual RegionDelegate *filtered (const PolygonFilterBase &) const { return new EmptyRegion (); }
+  virtual RegionDelegate *process_in_place (const PolygonProcessorBase &) { return this; }
+  virtual RegionDelegate *processed (const PolygonProcessorBase &) const { return new EmptyRegion (); }
 
   virtual RegionDelegate *merged_in_place () { return this; }
   virtual RegionDelegate *merged_in_place (bool, unsigned int) { return this; }
@@ -104,12 +104,7 @@ public:
   virtual RegionDelegate *selected_not_interacting (const Edges &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_overlapping (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_overlapping (const Region &) const { return new EmptyRegion (); }
-
-  virtual RegionDelegate *holes () const { return new EmptyRegion (); }
-  virtual RegionDelegate *hulls () const { return new EmptyRegion (); }
   virtual RegionDelegate *in (const Region &, bool) const { return new EmptyRegion (); }
-  virtual RegionDelegate *rounded_corners (double, double, unsigned int) const { return new EmptyRegion (); }
-  virtual RegionDelegate *smoothed (coord_type) const { return new EmptyRegion (); }
 
   virtual bool has_valid_polygons () const { return true; }
   virtual bool has_valid_merged_polygons () const { return true; }

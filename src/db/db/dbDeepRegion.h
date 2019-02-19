@@ -138,6 +138,8 @@ public:
 
   virtual Edges edges (const EdgeFilterBase *) const;
 
+  virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter);
+  virtual RegionDelegate *processed (const PolygonProcessorBase &filter) const;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter);
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const;
 
@@ -146,8 +148,6 @@ public:
 
   virtual RegionDelegate *merged () const;
   virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc) const;
-
-  virtual RegionDelegate *strange_polygon_check () const;
 
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
@@ -202,11 +202,7 @@ public:
     return selected_interacting_generic (other, 0, false, true);
   }
 
-  virtual RegionDelegate *holes () const;
-  virtual RegionDelegate *hulls () const;
   virtual RegionDelegate *in (const Region &other, bool invert) const;
-  virtual RegionDelegate *rounded_corners (double rinner, double router, unsigned int n) const;
-  virtual RegionDelegate *smoothed (coord_type d) const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 

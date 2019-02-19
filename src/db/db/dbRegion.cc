@@ -26,9 +26,143 @@
 #include "dbEmptyRegion.h"
 #include "dbFlatRegion.h"
 #include "dbDeepRegion.h"
+#include "dbPolygonTools.h"
 
 namespace db
 {
+
+namespace
+{
+
+// -------------------------------------------------------------------------------------------------------------
+//  Strange polygon processor
+
+/**
+ *  @brief A helper class to implement the strange polygon detector
+ */
+struct DB_PUBLIC StrangePolygonInsideFunc
+{
+  inline bool operator() (int wc) const
+  {
+    return wc < 0 || wc > 1;
+  }
+};
+
+class StrangePolygonCheckProcessor
+  : public PolygonProcessorBase
+{
+public:
+  StrangePolygonCheckProcessor () { }
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+  {
+    EdgeProcessor ep;
+    ep.insert (poly);
+
+    StrangePolygonInsideFunc inside;
+    db::GenericMerge<StrangePolygonInsideFunc> op (inside);
+    db::PolygonContainer pc (res, false);
+    db::PolygonGenerator pg (pc, false, false);
+    ep.process (pg, op);
+  }
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool requires_raw_input () const { return true; }
+};
+
+// -------------------------------------------------------------------------------------------------------------
+//  Smoothing processor
+
+class SmoothingProcessor
+  : public PolygonProcessorBase
+{
+public:
+  SmoothingProcessor (db::Coord d) : m_d (d) { }
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+  {
+    res.push_back (db::smooth (poly, m_d));
+  }
+
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+
+private:
+  db::Coord m_d;
+  db::MagnificationReducer m_vars;
+};
+
+// -------------------------------------------------------------------------------------------------------------
+//  Rounded corners processor
+
+class RoundedCornersProcessor
+  : public PolygonProcessorBase
+{
+public:
+  RoundedCornersProcessor (double rinner, double router, unsigned int n)
+    : m_rinner (rinner), m_router (router), m_n (n)
+  { }
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+  {
+    res.push_back (db::compute_rounded (poly, m_rinner, m_router, m_n));
+  }
+
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool result_is_merged () const { return true; }   //  we believe so ...
+  virtual bool requires_raw_input () const { return false; }
+
+private:
+  double m_rinner, m_router;
+  unsigned int m_n;
+  db::MagnificationReducer m_vars;
+};
+
+// -------------------------------------------------------------------------------------------------------------
+//  Holes decomposition processor
+
+class HolesExtractionProcessor
+  : public PolygonProcessorBase
+{
+public:
+  HolesExtractionProcessor () { }
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+  {
+    for (size_t i = 0; i < poly.holes (); ++i) {
+      res.push_back (db::Polygon ());
+      res.back ().assign_hull (poly.begin_hole ((unsigned int) i), poly.end_hole ((unsigned int) i));
+    }
+  }
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return true; }   //  we believe so ...
+  virtual bool requires_raw_input () const { return false; }
+};
+
+// -------------------------------------------------------------------------------------------------------------
+//  Hull extraction processor
+
+class HullExtractionProcessor
+  : public PolygonProcessorBase
+{
+public:
+  HullExtractionProcessor () { }
+
+  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
+  {
+    res.push_back (db::Polygon ());
+    res.back ().assign_hull (poly.begin_hull (), poly.end_hull ());
+  }
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return true; }   //  we believe so ...
+  virtual bool requires_raw_input () const { return false; }
+};
+
+}
 
 // -------------------------------------------------------------------------------------------------------------
 //  Region implementation
@@ -172,6 +306,86 @@ Region::flat_region ()
   }
 
   return region;
+}
+
+Region &
+Region::size (coord_type d, unsigned int mode)
+{
+  set_delegate (mp_delegate->sized (d, mode));
+  return *this;
+}
+
+Region &
+Region::size (coord_type dx, coord_type dy, unsigned int mode)
+{
+  set_delegate (mp_delegate->sized (dx, dy, mode));
+  return *this;
+}
+
+Region
+Region::sized (coord_type d, unsigned int mode) const
+{
+  return Region (mp_delegate->sized (d, mode));
+}
+
+Region
+Region::sized (coord_type dx, coord_type dy, unsigned int mode) const
+{
+  return Region (mp_delegate->sized (dx, dy, mode));
+}
+
+void
+Region::round_corners (double rinner, double router, unsigned int n)
+{
+  process (RoundedCornersProcessor (rinner, router, n));
+}
+
+Region
+Region::rounded_corners (double rinner, double router, unsigned int n) const
+{
+  return processed (RoundedCornersProcessor (rinner, router, n));
+}
+
+void
+Region::smooth (coord_type d)
+{
+  process (SmoothingProcessor (d));
+}
+
+Region
+Region::smoothed (coord_type d) const
+{
+  return processed (SmoothingProcessor (d));
+}
+
+void
+Region::snap (db::Coord gx, db::Coord gy)
+{
+  set_delegate (mp_delegate->snapped_in_place (gx, gy));
+}
+
+Region
+Region::snapped (db::Coord gx, db::Coord gy) const
+{
+  return Region (mp_delegate->snapped (gx, gy));
+}
+
+Region
+Region::strange_polygon_check () const
+{
+  return Region (processed (StrangePolygonCheckProcessor ()));
+}
+
+Region
+Region::holes () const
+{
+  return Region (processed (HolesExtractionProcessor ()));
+}
+
+Region
+Region::hulls () const
+{
+  return Region (processed (HullExtractionProcessor ()));
 }
 
 }

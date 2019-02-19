@@ -37,7 +37,34 @@ namespace db {
 
 class RecursiveShapeIterator;
 class EdgeFilterBase;
-class PolygonFilterBase;
+
+/**
+ *  @brief A base class for polygon filters
+ */
+class DB_PUBLIC PolygonFilterBase
+{
+public:
+  PolygonFilterBase () { }
+  virtual ~PolygonFilterBase () { }
+
+  virtual bool selected (const db::Polygon &polygon) const = 0;
+  virtual const TransformationReducer *vars () const = 0;
+};
+
+/**
+ *  @brief A base class for polygon processors
+ */
+class DB_PUBLIC PolygonProcessorBase
+{
+public:
+  PolygonProcessorBase () { }
+  virtual ~PolygonProcessorBase () { }
+
+  virtual void process (const db::Polygon &polygon, std::vector<db::Polygon> &res) const = 0;
+  virtual const TransformationReducer *vars () const = 0;
+  virtual bool result_is_merged () const = 0;
+  virtual bool requires_raw_input () const = 0;
+};
 
 /**
  *  @brief The region iterator delegate
@@ -141,13 +168,13 @@ public:
   virtual Edges edges (const EdgeFilterBase *filter) const = 0;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter) = 0;
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const = 0;
+  virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter) = 0;
+  virtual RegionDelegate *processed (const PolygonProcessorBase &filter) const = 0;
 
   virtual RegionDelegate *merged_in_place () = 0;
   virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc) = 0;
   virtual RegionDelegate *merged () const = 0;
   virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc) const = 0;
-
-  virtual RegionDelegate *strange_polygon_check () const = 0;
 
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const = 0;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const = 0;
@@ -169,12 +196,7 @@ public:
   virtual RegionDelegate *selected_not_interacting (const Edges &other) const = 0;
   virtual RegionDelegate *selected_overlapping (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_overlapping (const Region &other) const = 0;
-
-  virtual RegionDelegate *holes () const = 0;
-  virtual RegionDelegate *hulls () const = 0;
   virtual RegionDelegate *in (const Region &other, bool invert) const = 0;
-  virtual RegionDelegate *rounded_corners (double rinner, double router, unsigned int n) const = 0;
-  virtual RegionDelegate *smoothed (coord_type d) const = 0;
 
   virtual const db::Polygon *nth (size_t n) const = 0;
   virtual bool has_valid_polygons () const = 0;

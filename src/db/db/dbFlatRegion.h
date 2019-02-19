@@ -119,6 +119,7 @@ public:
     return db::AsIfFlatRegion::merged (min_coherence, min_wc);
   }
 
+  virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter);
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter);
 
   virtual RegionDelegate *add_in_place (const Region &other);

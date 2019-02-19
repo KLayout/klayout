@@ -43,19 +43,6 @@ class DeepShapeStore;
 class TransformationReducer;
 
 /**
- *  @brief A base class for polygon filters
- */
-class DB_PUBLIC PolygonFilterBase
-{
-public:
-  PolygonFilterBase () { }
-  virtual ~PolygonFilterBase () { }
-
-  virtual bool selected (const db::Polygon &polygon) const = 0;
-  virtual const TransformationReducer *vars () const = 0;
-};
-
-/**
  *  @brief A region iterator
  *
  *  The iterator delivers the polygons of the region
@@ -641,6 +628,39 @@ public:
   }
 
   /**
+   *  @brief Processes the (merged) polygons
+   *
+   *  This method will keep all polygons for which the processing filter returns true.
+   *  The processing filter can apply modifications too. These modifications will be
+   *  kept in the output region.
+   *
+   *  Merged semantics applies. In merged semantics, the filter will run over
+   *  all merged polygons.
+   */
+  Region &process (const PolygonProcessorBase &filter)
+  {
+    set_delegate (mp_delegate->process_in_place (filter));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns the processed polygons
+   *
+   *  This method will keep all polygons for which the processing filter returns true.
+   *  The processing filter can apply modifications too. These modifications will be
+   *  kept in the output region.
+   *
+   *  Merged semantics applies. In merged semantics, the filter will run over
+   *  all merged polygons.
+   *
+   *  This method will return a new region with the modified and filtered polygons.
+   */
+  Region processed (const PolygonProcessorBase &filter) const
+  {
+    return Region (mp_delegate->processed (filter));
+  }
+
+  /**
    *  @brief Applies a width check and returns EdgePairs which correspond to violation markers
    *
    *  The width check will create a edge pairs if the width of the area between the
@@ -844,18 +864,12 @@ public:
    *  Snaps the vertices of the polygons to the specified grid.
    *  different grids can be specified int x and y direction.
    */
-  void snap (db::Coord gx, db::Coord gy)
-  {
-    set_delegate (mp_delegate->snapped_in_place (gx, gy));
-  }
+  void snap (db::Coord gx, db::Coord gy);
 
   /**
    *  @brief Returns the snapped region
    */
-  Region snapped (db::Coord gx, db::Coord gy) const
-  {
-    return Region (mp_delegate->snapped (gx, gy));
-  }
+  Region snapped (db::Coord gx, db::Coord gy) const;
 
   /**
    *  @brief Performs a check for "strange" polygons
@@ -865,10 +879,7 @@ public:
    *
    *  Naturally this method will ignore the merged_semantics setting.
    */
-  Region strange_polygon_check () const
-  {
-    return Region (mp_delegate->strange_polygon_check ());
-  }
+  Region strange_polygon_check () const;
 
   /**
    *  @brief Swap with the other region
@@ -948,11 +959,7 @@ public:
    *  @param mode The sizing mode (see EdgeProcessor) for a description of the sizing mode which controls the miter distance.
    *  @return A reference to self
    */
-  Region &size (coord_type d, unsigned int mode = 2)
-  {
-    set_delegate (mp_delegate->sized (d, mode));
-    return *this;
-  }
+  Region &size (coord_type d, unsigned int mode = 2);
 
   /**
    *  @brief Anisotropic sizing
@@ -966,11 +973,7 @@ public:
    *  @param dy The vertical sizing
    *  @param mode The sizing mode (see EdgeProcessor) for a description of the sizing mode which controls the miter distance.
    */
-  Region &size (coord_type dx, coord_type dy, unsigned int mode = 2)
-  {
-    set_delegate (mp_delegate->sized (dx, dy, mode));
-    return *this;
-  }
+  Region &size (coord_type dx, coord_type dy, unsigned int mode = 2);
 
   /**
    *  @brief Returns the sized region
@@ -980,10 +983,7 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region sized (coord_type d, unsigned int mode = 2) const
-  {
-    return Region (mp_delegate->sized (d, mode));
-  }
+  Region sized (coord_type d, unsigned int mode = 2) const;
 
   /**
    *  @brief Returns the sized region
@@ -993,10 +993,7 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region sized (coord_type dx, coord_type dy, unsigned int mode = 2) const
-  {
-    return Region (mp_delegate->sized (dx, dy, mode));
-  }
+  Region sized (coord_type dx, coord_type dy, unsigned int mode = 2) const;
 
   /**
    *  @brief Boolean AND operator
@@ -1333,10 +1330,7 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region holes () const
-  {
-    return Region (mp_delegate->holes ());
-  }
+  Region holes () const;
 
   /**
    *  @brief Returns the hulls
@@ -1346,10 +1340,7 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region hulls () const
-  {
-    return Region (mp_delegate->hulls ());
-  }
+  Region hulls () const;
 
   /**
    *  @brief Returns all polygons which are in the other region
@@ -1374,36 +1365,24 @@ public:
    *  @param router The outer radius in DBU units
    *  @param n The number of points to use per circle
    */
-  void round_corners (double rinner, double router, unsigned int n)
-  {
-    set_delegate (mp_delegate->rounded_corners (rinner, router, n));
-  }
+  void round_corners (double rinner, double router, unsigned int n);
 
   /**
    *  @brief Returns a new region with rounded corners (out of place)
    */
-  Region rounded_corners (double rinner, double router, unsigned int n) const
-  {
-    return Region (mp_delegate->rounded_corners (rinner, router, n));
-  }
+  Region rounded_corners (double rinner, double router, unsigned int n) const;
 
   /**
    *  @brief Smoothes the region (in-place)
    */
-  void smooth (coord_type d)
-  {
-    set_delegate (mp_delegate->smoothed (d));
-  }
+  void smooth (coord_type d);
 
   /**
    *  @brief Returns the smoothed region
    *
    *  @param d The smoothing accuracy
    */
-  Region smoothed (coord_type d) const
-  {
-    return Region (mp_delegate->smoothed (d));
-  }
+  Region smoothed (coord_type d) const;
 
   /**
    *  @brief Returns the nth polygon

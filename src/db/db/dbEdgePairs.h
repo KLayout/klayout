@@ -41,6 +41,7 @@ class EmptyEdgePairs;
 class Edges;
 class Region;
 class DeepShapeStore;
+class TransformationReducer;
 
 /**
  *  @brief An edge pair set iterator
@@ -213,6 +214,7 @@ public:
   virtual ~EdgePairFilterBase () { }
 
   virtual bool selected (const db::EdgePair &edge) const = 0;
+  virtual const TransformationReducer *vars () const = 0;
 };
 
 /**

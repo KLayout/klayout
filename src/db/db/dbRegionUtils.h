@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbRegion.h"
 #include "dbCellVariants.h"
+#include "dbBoxScanner.h"
 
 namespace db {
 
@@ -308,6 +309,168 @@ private:
   parameter_type m_parameter;
   db::MagnificationReducer m_isotropic_vars;
   db::MagnificationAndOrientationReducer m_anisotropic_vars;
+};
+
+/**
+ *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
+ */
+class Edge2EdgeCheckBase
+  : public db::box_scanner_receiver<db::Edge, size_t>
+{
+public:
+  Edge2EdgeCheckBase (const EdgeRelationFilter &check, bool different_polygons, bool requires_different_layers);
+
+  /**
+   *  @brief Call this to initiate a new pass until the return value is false
+   */
+  bool prepare_next_pass ();
+
+  /**
+   *  @brief Reimplementation of the box_scanner_receiver interface
+   */
+  void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2);
+
+  /**
+   *  @brief Gets a value indicating whether the check requires different layers
+   */
+  bool requires_different_layers () const;
+
+  /**
+   *  @brief Sets a value indicating whether the check requires different layers
+   */
+  void set_requires_different_layers (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether the check requires different layers
+   */
+  bool different_polygons () const;
+
+  /**
+   *  @brief Sets a value indicating whether the check requires different layers
+   */
+  void set_different_polygons (bool f);
+
+  /**
+   *  @brief Gets the distance value
+   */
+  EdgeRelationFilter::distance_type distance () const;
+
+protected:
+  virtual void put (const db::EdgePair &edge) const = 0;
+
+private:
+  const EdgeRelationFilter *mp_check;
+  bool m_requires_different_layers;
+  bool m_different_polygons;
+  EdgeRelationFilter::distance_type m_distance;
+  std::vector<db::EdgePair> m_ep;
+  std::multimap<std::pair<db::Edge, size_t>, size_t> m_e2ep;
+  std::vector<bool> m_ep_discarded;
+  unsigned int m_pass;
+};
+
+/**
+ *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
+ */
+template <class Output>
+class edge2edge_check
+  : public Edge2EdgeCheckBase
+{
+public:
+  edge2edge_check (const EdgeRelationFilter &check, Output &output, bool different_polygons, bool requires_different_layers)
+    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers), mp_output (&output)
+  {
+    //  .. nothing yet ..
+  }
+
+protected:
+  void put (const db::EdgePair &edge) const
+  {
+    mp_output->insert (edge);
+  }
+
+private:
+  Output *mp_output;
+};
+
+/**
+ *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
+ */
+class Poly2PolyCheckBase
+  : public db::box_scanner_receiver<db::Polygon, size_t>
+{
+public:
+  Poly2PolyCheckBase (Edge2EdgeCheckBase &output);
+
+  void finish (const db::Polygon *o, size_t p);
+  void enter (const db::Polygon &o, size_t p);
+  void add (const db::Polygon *o1, size_t p1, const db::Polygon *o2, size_t p2);
+  void enter (const db::Polygon &o1, size_t p1, const db::Polygon &o2, size_t p2);
+
+private:
+  db::Edge2EdgeCheckBase *mp_output;
+  db::box_scanner<db::Edge, size_t> m_scanner;
+  std::vector<db::Edge> m_edges;
+};
+
+/**
+ *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
+ */
+template <class Output>
+class poly2poly_check
+  : public Poly2PolyCheckBase
+{
+public:
+  poly2poly_check (edge2edge_check<Output> &output)
+    : Poly2PolyCheckBase (output)
+  {
+    //  .. nothing yet ..
+  }
+};
+
+/**
+ *  @brief A helper class for the region to edge interaction functionality
+ */
+class DB_PUBLIC RegionToEdgeInteractionFilterBase
+  : public db::box_scanner_receiver2<db::Polygon, size_t, db::Edge, size_t>
+{
+public:
+  RegionToEdgeInteractionFilterBase (bool inverse);
+
+  void preset (const db::Polygon *poly);
+  void add (const db::Polygon *p, size_t, const db::Edge *e, size_t);
+  void fill_output ();
+
+protected:
+  virtual void put (const db::Polygon &poly) const = 0;
+
+private:
+  std::set<const db::Polygon *> m_seen;
+  bool m_inverse;
+};
+
+/**
+ *  @brief A helper class for the region to edge interaction functionality
+ */
+template <class OutputContainer>
+class DB_PUBLIC region_to_edge_interaction_filter
+  : public RegionToEdgeInteractionFilterBase
+{
+public:
+  region_to_edge_interaction_filter (OutputContainer &output, bool inverse)
+    : RegionToEdgeInteractionFilterBase (inverse), mp_output (&output)
+  {
+    //  .. nothing yet ..
+  }
+
+protected:
+  virtual void put (const db::Polygon &poly) const
+  {
+    mp_output->insert (poly);
+  }
+
+private:
+  OutputContainer *mp_output;
 };
 
 } // namespace db

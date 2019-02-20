@@ -319,7 +319,7 @@ private:
  *  based on a generic operator.
  */
 template <class F>
-class DB_PUBLIC GenericMerge
+class DB_PUBLIC_TEMPLATE GenericMerge
   : public EdgeEvaluatorBase
 {
 public:

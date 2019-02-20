@@ -67,6 +67,8 @@ public:
   virtual EdgesDelegate *filtered (const EdgeFilterBase &) const { return new EmptyEdges (); }
   virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &) { return this; }
   virtual EdgesDelegate *processed (const EdgeProcessorBase &) const { return new EmptyEdges (); }
+  virtual EdgePairsDelegate *processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &) const;
+  virtual RegionDelegate *processed_to_polygons (const EdgeToPolygonProcessorBase &) const;
 
   virtual EdgesDelegate *merged_in_place () { return this; }
   virtual EdgesDelegate *merged () const { return new EmptyEdges (); }

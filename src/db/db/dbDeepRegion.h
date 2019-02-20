@@ -140,6 +140,8 @@ public:
 
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter);
   virtual RegionDelegate *processed (const PolygonProcessorBase &filter) const;
+  virtual EdgesDelegate *processed_to_edges (const PolygonToEdgeProcessorBase &filter) const;
+  virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter);
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const;
 
@@ -221,6 +223,8 @@ protected:
   void set_is_merged (bool f);
 
 private:
+  friend class DeepEdges;
+
   DeepRegion &operator= (const DeepRegion &other);
 
   DeepLayer m_deep_layer;
@@ -240,6 +244,8 @@ private:
   {
     return m_merged_polygons;
   }
+
+  template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;
 };
 
 }

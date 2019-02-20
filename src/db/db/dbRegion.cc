@@ -70,6 +70,7 @@ public:
   virtual bool result_is_merged () const { return false; }
   virtual bool requires_raw_input () const { return true; }
   virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
 };
 
 // -------------------------------------------------------------------------------------------------------------
@@ -90,6 +91,7 @@ public:
   virtual bool result_is_merged () const { return false; }
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
 
 private:
   db::Coord m_d;
@@ -116,6 +118,7 @@ public:
   virtual bool result_is_merged () const { return true; }   //  we believe so ...
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
 
 private:
   double m_rinner, m_router;
@@ -144,6 +147,7 @@ public:
   virtual bool result_is_merged () const { return true; }   //  we believe so ...
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
 };
 
 // -------------------------------------------------------------------------------------------------------------
@@ -165,6 +169,7 @@ public:
   virtual bool result_is_merged () const { return true; }   //  we believe so ...
   virtual bool requires_raw_input () const { return false; }
   virtual bool wants_variants () const { return true; }
+  virtual bool result_must_not_be_merged () const { return false; }
 };
 
 }

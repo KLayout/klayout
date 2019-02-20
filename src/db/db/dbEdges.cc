@@ -70,6 +70,7 @@ public:
   virtual bool result_is_merged () const { return false; }
   virtual bool requires_raw_input () const { return false; }
   virtual bool result_must_not_be_merged () const { return m_length <= 0; }
+  virtual bool wants_variants () const { return true; }
 
 private:
   int m_mode;
@@ -183,6 +184,11 @@ void
 Edges::reserve (size_t n)
 {
   flat_edges ()->reserve (n);
+}
+
+void Edges::processed (Region &output, const EdgeToPolygonProcessorBase &filter) const
+{
+  output.set_delegate (mp_delegate->processed_to_polygons (filter));
 }
 
 void Edges::extended (Region &output, coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const

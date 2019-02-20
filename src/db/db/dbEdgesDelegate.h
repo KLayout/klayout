@@ -40,27 +40,118 @@ namespace db {
 class DB_PUBLIC EdgeFilterBase
 {
 public:
+  /**
+   *  @brief Constructor
+   */
   EdgeFilterBase () { }
+
   virtual ~EdgeFilterBase () { }
 
+  /**
+   *  @brief Filters the edge
+   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   */
   virtual bool selected (const db::Edge &edge) const = 0;
+
+  /**
+   *  @brief Returns the transformation reducer for building cell variants
+   *  This method may return 0. In this case, not cell variants are built.
+   */
   virtual const TransformationReducer *vars () const = 0;
+
+  /**
+   *  @brief Returns true, if the filter wants raw (not merged) input
+   */
+  virtual bool requires_raw_input () const = 0;
+
+  /**
+   *  @brief Returns true, if the filter wants to build variants
+   *  If not true, the filter accepts shape propagation as variant resolution.
+   */
+  virtual bool wants_variants () const = 0;
 };
 
 /**
- *  @brief A base class for polygon processors
+ *  @brief A template base class for edge processors
+ *
+ *  A polygon processor can turn a edge into something else.
  */
-class DB_PUBLIC EdgeProcessorBase
+template <class Result>
+class DB_PUBLIC edge_processor
 {
 public:
-  EdgeProcessorBase () { }
-  virtual ~EdgeProcessorBase () { }
+  /**
+   *  @brief Constructor
+   */
+  edge_processor () { }
 
-  virtual void process (const db::Edge &polygon, std::vector<db::Edge> &res) const = 0;
+  /**
+   *  @brief Destructor
+   */
+  virtual ~edge_processor () { }
+
+  /**
+   *  @brief Performs the actual processing
+   *  This method will take the input edge from "edge" and puts the results into "res".
+   *  "res" can be empty - in this case, the edge will be skipped.
+   */
+  virtual void process (const db::Edge &edge, std::vector<Result> &res) const = 0;
+
+  /**
+   *  @brief Returns the transformation reducer for building cell variants
+   *  This method may return 0. In this case, not cell variants are built.
+   */
   virtual const TransformationReducer *vars () const = 0;
+
+  /**
+   *  @brief Returns true, if the result of this operation can be regarded "merged" always.
+   */
   virtual bool result_is_merged () const = 0;
-  virtual bool requires_raw_input () const = 0;
+
+  /**
+   *  @brief Returns true, if the result of this operation must not be merged.
+   *  This feature can be used, if the result represents "degenerated" objects such
+   *  as point-like edges. These must not be merged. Otherwise they disappear.
+   */
   virtual bool result_must_not_be_merged () const = 0;
+
+  /**
+   *  @brief Returns true, if the processor wants raw (not merged) input
+   */
+  virtual bool requires_raw_input () const = 0;
+
+  /**
+   *  @brief Returns true, if the processor wants to build variants
+   *  If not true, the processor accepts shape propagation as variant resolution.
+   */
+  virtual bool wants_variants () const = 0;
+};
+
+/**
+ *  @brief A edge processor base class
+ */
+class DB_PUBLIC EdgeProcessorBase
+  : public edge_processor<db::Edge>
+{
+  //  .. nothing yet ..
+};
+
+/**
+ *  @brief An edge-to-polygon processor base class
+ */
+class DB_PUBLIC EdgeToPolygonProcessorBase
+  : public edge_processor<db::Polygon>
+{
+  //  .. nothing yet ..
+};
+
+/**
+ *  @brief An edge-to-edge pair processor base class
+ */
+class DB_PUBLIC EdgeToEdgePairProcessorBase
+  : public edge_processor<db::EdgePair>
+{
+  //  .. nothing yet ..
 };
 
 /**
@@ -70,6 +161,7 @@ enum EdgeBoolOp { EdgeOr, EdgeNot, EdgeXor, EdgeAnd };
 
 class RecursiveShapeIterator;
 class EdgeFilterBase;
+class EdgePairsDelegate;
 class RegionDelegate;
 
 /**
@@ -159,6 +251,8 @@ public:
   virtual EdgesDelegate *filtered (const EdgeFilterBase &filter) const = 0;
   virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &filter) = 0;
   virtual EdgesDelegate *processed (const EdgeProcessorBase &filter) const = 0;
+  virtual EdgePairsDelegate *processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filter) const = 0;
+  virtual RegionDelegate *processed_to_polygons (const EdgeToPolygonProcessorBase &filter) const = 0;
 
   virtual EdgesDelegate *merged_in_place () = 0;
   virtual EdgesDelegate *merged () const = 0;

@@ -78,6 +78,12 @@ public:
   void enable_progress (const std::string &progress_desc);
   void disable_progress ();
 
+  //  dummy features to harmonize the interface of region, edges and edge pair delegates
+  void set_merged_semantics (bool) { }
+  bool merged_semantics () const { return false; }
+  void set_is_merged (bool) { }
+  bool is_merged () const { return false; }
+
   virtual std::string to_string (size_t nmax) const = 0;
 
   virtual EdgePairsIteratorDelegate *begin () const = 0;

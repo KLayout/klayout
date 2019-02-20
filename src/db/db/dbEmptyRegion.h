@@ -78,6 +78,8 @@ public:
   virtual RegionDelegate *filtered (const PolygonFilterBase &) const { return new EmptyRegion (); }
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &) { return this; }
   virtual RegionDelegate *processed (const PolygonProcessorBase &) const { return new EmptyRegion (); }
+  virtual EdgesDelegate *processed_to_edges (const PolygonToEdgeProcessorBase &) const;
+  virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &) const;
 
   virtual RegionDelegate *merged_in_place () { return this; }
   virtual RegionDelegate *merged_in_place (bool, unsigned int) { return this; }

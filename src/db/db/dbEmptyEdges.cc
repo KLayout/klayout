@@ -22,6 +22,7 @@
 
 
 #include "dbEmptyEdges.h"
+#include "dbEmptyEdgePairs.h"
 #include "dbEmptyRegion.h"
 #include "dbEdges.h"
 
@@ -55,6 +56,18 @@ EmptyEdges::clone () const
 
 RegionDelegate *
 EmptyEdges::extended (coord_type, coord_type, coord_type, coord_type, bool) const
+{
+  return new EmptyRegion ();
+}
+
+EdgePairsDelegate *
+EmptyEdges::processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &) const
+{
+  return new EmptyEdgePairs ();
+}
+
+RegionDelegate *
+EmptyEdges::processed_to_polygons (const EdgeToPolygonProcessorBase &) const
 {
   return new EmptyRegion ();
 }

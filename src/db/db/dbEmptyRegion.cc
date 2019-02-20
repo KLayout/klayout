@@ -22,6 +22,8 @@
 
 
 #include "dbEmptyRegion.h"
+#include "dbEmptyEdges.h"
+#include "dbEmptyEdgePairs.h"
 #include "dbRegion.h"
 
 namespace db
@@ -80,6 +82,18 @@ EmptyRegion::or_with (const Region &other) const
   } else {
     return other.delegate ()->merged ();
   }
+}
+
+EdgesDelegate *
+EmptyRegion::processed_to_edges (const PolygonToEdgeProcessorBase &) const
+{
+  return new EmptyEdges ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &) const
+{
+  return new EmptyEdgePairs ();
 }
 
 bool

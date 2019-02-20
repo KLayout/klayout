@@ -24,6 +24,7 @@
 #include "dbAsIfFlatRegion.h"
 #include "dbFlatRegion.h"
 #include "dbFlatEdgePairs.h"
+#include "dbFlatEdges.h"
 #include "dbEmptyRegion.h"
 #include "dbRegion.h"
 #include "dbRegionUtils.h"
@@ -252,6 +253,10 @@ RegionDelegate *
 AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
 {
   std::auto_ptr<FlatRegion> new_region (new FlatRegion ());
+  if (filter.result_must_not_be_merged ()) {
+    new_region->set_merged_semantics (false);
+  }
+
   std::vector<db::Polygon> poly_res;
 
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
@@ -265,6 +270,52 @@ AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
   }
 
   return new_region.release ();
+}
+
+EdgesDelegate *
+AsIfFlatRegion::processed_to_edges (const PolygonToEdgeProcessorBase &filter) const
+{
+  std::auto_ptr<FlatEdges> new_edges (new FlatEdges ());
+  if (filter.result_must_not_be_merged ()) {
+    new_edges->set_merged_semantics (false);
+  }
+
+  std::vector<db::Edge> edge_res;
+
+  for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
+
+    edge_res.clear ();
+    filter.process (*p, edge_res);
+    for (std::vector<db::Edge>::const_iterator er = edge_res.begin (); er != edge_res.end (); ++er) {
+      new_edges->insert (*er);
+    }
+
+  }
+
+  return new_edges.release ();
+}
+
+EdgePairsDelegate *
+AsIfFlatRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const
+{
+  std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
+  if (filter.result_must_not_be_merged ()) {
+    new_edge_pairs->set_merged_semantics (false);
+  }
+
+  std::vector<db::EdgePair> edge_pair_res;
+
+  for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
+
+    edge_pair_res.clear ();
+    filter.process (*p, edge_pair_res);
+    for (std::vector<db::EdgePair>::const_iterator epr = edge_pair_res.begin (); epr != edge_pair_res.end (); ++epr) {
+      new_edge_pairs->insert (*epr);
+    }
+
+  }
+
+  return new_edge_pairs.release ();
 }
 
 RegionDelegate *

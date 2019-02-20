@@ -230,6 +230,10 @@ RegionDelegate *FlatRegion::process_in_place (const PolygonProcessorBase &filter
   m_merged_polygons.clear ();
   m_is_merged = filter.result_is_merged () && merged_semantics ();
 
+  if (filter.result_must_not_be_merged ()) {
+    set_merged_semantics (false);
+  }
+
   return this;
 }
 

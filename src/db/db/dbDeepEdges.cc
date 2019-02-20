@@ -483,126 +483,217 @@ EdgesDelegate *DeepEdges::process_in_place (const EdgeProcessorBase &filter)
   return processed (filter);
 }
 
-EdgesDelegate *DeepEdges::processed (const EdgeProcessorBase &filter) const
+EdgesDelegate *
+DeepEdges::processed (const EdgeProcessorBase &filter) const
+{
+  return processed_impl<db::Edge, db::DeepEdges> (filter);
+}
+
+EdgePairsDelegate *
+DeepEdges::processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filter) const
+{
+  return processed_impl<db::EdgePair, db::DeepEdgePairs> (filter);
+}
+
+RegionDelegate *
+DeepEdges::processed_to_polygons (const EdgeToPolygonProcessorBase &filter) const
+{
+  return processed_impl<db::Polygon, db::DeepRegion> (filter);
+}
+
+namespace
+{
+
+template <class Result> struct delivery;
+
+template <>
+struct delivery<db::Polygon>
+{
+  delivery (db::Layout *layout, db::Shapes *shapes)
+    : mp_layout (layout), mp_shapes (shapes)
+  { }
+
+  void put (const db::Polygon &result)
+  {
+    tl::MutexLocker locker (&mp_layout->lock ());
+    mp_shapes->insert (db::PolygonRef (result, mp_layout->shape_repository ()));
+  }
+
+private:
+  db::Layout *mp_layout;
+  db::Shapes *mp_shapes;
+};
+
+template <class Result>
+struct delivery
+{
+  delivery (db::Layout *, db::Shapes *shapes)
+    : mp_shapes (shapes)
+  { }
+
+  void put (const Result &result)
+  {
+    mp_shapes->insert (result);
+  }
+
+private:
+  db::Shapes *mp_shapes;
+};
+
+}
+
+template <class Result, class OutputContainer>
+OutputContainer *
+DeepEdges::processed_impl (const edge_processor<Result> &filter) const
 {
   if (! filter.requires_raw_input ()) {
     ensure_merged_edges_valid ();
   }
 
   std::auto_ptr<VariantsCollectorBase> vars;
-
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
     vars->collect (m_deep_layer.layout (), m_deep_layer.initial_cell ());
 
-    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
+    if (filter.wants_variants ()) {
+      const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
+    }
 
   }
 
   db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
-  std::vector<db::Edge> res_edges;
 
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_deep_layer.derived ()));
+  std::vector<Result> heap;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+
+  std::auto_ptr<OutputContainer> res (new OutputContainer (m_deep_layer.derived ()));
+  if (filter.result_must_not_be_merged ()) {
+    res->set_merged_semantics (false);
+  }
+
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_edges.layer ());
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
-      tl_assert (v.size () == size_t (1));
-      const db::ICplxTrans &tr = v.begin ()->first;
-      db::ICplxTrans trinv = tr.inverted ();
+      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
 
-      const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_edges.layer ());
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
-
-      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-        res_edges.clear ();
-        filter.process (si->edge ().transformed (tr), res_edges);
-        for (std::vector<db::Edge>::const_iterator er = res_edges.begin (); er != res_edges.end (); ++er) {
-          st.insert (er->transformed (trinv));
+        db::Shapes *st;
+        if (vv.size () == 1) {
+          st = & c->shapes (res->deep_layer ().layer ());
+        } else {
+          st = & to_commit [c->cell_index ()] [v->first];
         }
+
+        delivery<Result> delivery (&layout, st);
+
+        const db::ICplxTrans &tr = v->first;
+        db::ICplxTrans trinv = tr.inverted ();
+
+        for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+          heap.clear ();
+          filter.process (si->edge ().transformed (tr), heap);
+          for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
+            delivery.put (i->transformed (trinv));
+          }
+        }
+
       }
 
     } else {
 
-      const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_edges.layer ());
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+      delivery<Result> delivery (&layout, &st);
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-        res_edges.clear ();
-        filter.process (si->edge (), res_edges);
-        for (std::vector<db::Edge>::const_iterator er = res_edges.begin (); er != res_edges.end (); ++er) {
-          st.insert (*er);
+        filter.process (si->edge (), heap);
+        for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
+          delivery.put (*i);
         }
       }
 
     }
 
+  }
+
+  if (! to_commit.empty () && vars.get ()) {
+    res->deep_layer ().commit_shapes (*vars, to_commit);
   }
 
   if (filter.result_is_merged ()) {
     res->set_is_merged (true);
   }
-
   return res.release ();
 }
 
-EdgesDelegate *DeepEdges::filter_in_place (const EdgeFilterBase &filter)
+EdgesDelegate *
+DeepEdges::filter_in_place (const EdgeFilterBase &filter)
 {
   //  TODO: implement to be really in-place
   return filtered (filter);
 }
 
-EdgesDelegate *DeepEdges::filtered (const EdgeFilterBase &filter) const
+EdgesDelegate *
+DeepEdges::filtered (const EdgeFilterBase &filter) const
 {
-  ensure_merged_edges_valid ();
+  if (! filter.requires_raw_input ()) {
+    ensure_merged_edges_valid ();
+  }
 
   std::auto_ptr<VariantsCollectorBase> vars;
-
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (m_merged_edges.layout (), m_merged_edges.initial_cell ());
+    vars->collect (m_deep_layer.layout (), m_deep_layer.initial_cell ());
 
-    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (m_merged_edges).separate_variants (*vars);
+    if (filter.wants_variants ()) {
+      const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
+    }
 
   }
 
-  db::Layout &layout = m_merged_edges.layout ();
+  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.derived ()));
+  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_deep_layer.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_edges.layer ());
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
-      tl_assert (v.size () == size_t (1));
-      const db::ICplxTrans &tr = v.begin ()->first;
+      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
 
-      const db::Shapes &s = c->shapes (m_merged_edges.layer ());
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
-
-      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-        db::Edge edge = si->edge ();
-        if (filter.selected (edge.transformed (tr))) {
-          st.insert (edge);
+        db::Shapes *st;
+        if (vv.size () == 1) {
+          st = & c->shapes (res->deep_layer ().layer ());
+        } else {
+          st = & to_commit [c->cell_index ()] [v->first];
         }
+
+        const db::ICplxTrans &tr = v->first;
+
+        for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+          if (filter.selected (si->edge ().transformed (tr))) {
+            st->insert (*si);
+          }
+        }
+
       }
 
     } else {
 
-      const db::Shapes &s = c->shapes (m_merged_edges.layer ());
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-        db::Edge edge = si->edge ();
-        if (filter.selected (edge)) {
-          st.insert (edge);
+        if (filter.selected (si->edge ())) {
+          st.insert (*si);
         }
       }
 
@@ -610,7 +701,13 @@ EdgesDelegate *DeepEdges::filtered (const EdgeFilterBase &filter) const
 
   }
 
-  res->set_is_merged (true);
+  if (! to_commit.empty () && vars.get ()) {
+    res->deep_layer ().commit_shapes (*vars, to_commit);
+  }
+
+  if (! filter.requires_raw_input ()) {
+    res->set_is_merged (true);
+  }
   return res.release ();
 }
 

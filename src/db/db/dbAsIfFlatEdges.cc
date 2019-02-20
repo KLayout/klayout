@@ -23,6 +23,8 @@
 
 #include "dbAsIfFlatEdges.h"
 #include "dbFlatEdges.h"
+#include "dbFlatEdgePairs.h"
+#include "dbFlatRegion.h"
 #include "dbEmptyEdges.h"
 #include "dbEdges.h"
 #include "dbEdgesUtils.h"
@@ -360,6 +362,50 @@ AsIfFlatEdges::processed (const EdgeProcessorBase &filter) const
   }
 
   return edges.release ();
+}
+
+EdgePairsDelegate *
+AsIfFlatEdges::processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filter) const
+{
+  std::auto_ptr<FlatEdgePairs> edge_pairs (new FlatEdgePairs ());
+
+  if (filter.result_must_not_be_merged ()) {
+    edge_pairs->set_merged_semantics (false);
+  }
+
+  std::vector<db::EdgePair> res_edge_pairs;
+
+  for (EdgesIterator e (filter.requires_raw_input () ? begin () : begin_merged ()); ! e.at_end (); ++e) {
+    res_edge_pairs.clear ();
+    filter.process (*e, res_edge_pairs);
+    for (std::vector<db::EdgePair>::const_iterator epr = res_edge_pairs.begin (); epr != res_edge_pairs.end (); ++epr) {
+      edge_pairs->insert (*epr);
+    }
+  }
+
+  return edge_pairs.release ();
+}
+
+RegionDelegate *
+AsIfFlatEdges::processed_to_polygons (const EdgeToPolygonProcessorBase &filter) const
+{
+  std::auto_ptr<FlatRegion> region (new FlatRegion ());
+
+  if (filter.result_must_not_be_merged ()) {
+    region->set_merged_semantics (false);
+  }
+
+  std::vector<db::Polygon> res_polygons;
+
+  for (EdgesIterator e (filter.requires_raw_input () ? begin () : begin_merged ()); ! e.at_end (); ++e) {
+    res_polygons.clear ();
+    filter.process (*e, res_polygons);
+    for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
+      region->insert (*pr);
+    }
+  }
+
+  return region.release ();
 }
 
 EdgesDelegate *

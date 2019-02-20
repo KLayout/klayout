@@ -37,6 +37,8 @@ namespace db {
 
 class RecursiveShapeIterator;
 class EdgeFilterBase;
+class EdgesDelegate;
+class EdgePairsDelegate;
 
 /**
  *  @brief A base class for polygon filters
@@ -76,24 +78,30 @@ public:
 };
 
 /**
- *  @brief A base class for polygon processors
+ *  @brief A template base class for polygon processors
+ *
+ *  A polygon processor can turn a polygon into something else.
  */
-class DB_PUBLIC PolygonProcessorBase
+template <class Result>
+class DB_PUBLIC polygon_processor
 {
 public:
   /**
    *  @brief Constructor
    */
-  PolygonProcessorBase () { }
+  polygon_processor () { }
 
-  virtual ~PolygonProcessorBase () { }
+  /**
+   *  @brief Destructor
+   */
+  virtual ~polygon_processor () { }
 
   /**
    *  @brief Performs the actual processing
    *  This method will take the input polygon from "polygon" and puts the results into "res".
    *  "res" can be empty - in this case, the polygon will be skipped.
    */
-  virtual void process (const db::Polygon &polygon, std::vector<db::Polygon> &res) const = 0;
+  virtual void process (const db::Polygon &polygon, std::vector<Result> &res) const = 0;
 
   /**
    *  @brief Returns the transformation reducer for building cell variants
@@ -107,6 +115,13 @@ public:
   virtual bool result_is_merged () const = 0;
 
   /**
+   *  @brief Returns true, if the result of this operation must not be merged.
+   *  This feature can be used, if the result represents "degenerated" objects such
+   *  as point-like edges. These must not be merged. Otherwise they disappear.
+   */
+  virtual bool result_must_not_be_merged () const = 0;
+
+  /**
    *  @brief Returns true, if the processor wants raw (not merged) input
    */
   virtual bool requires_raw_input () const = 0;
@@ -116,6 +131,33 @@ public:
    *  If not true, the processor accepts shape propagation as variant resolution.
    */
   virtual bool wants_variants () const = 0;
+};
+
+/**
+ *  @brief A polygon-to-polygon processor base class
+ */
+class DB_PUBLIC PolygonProcessorBase
+  : public polygon_processor<db::Polygon>
+{
+  //  .. nothing yet ..
+};
+
+/**
+ *  @brief A polygon-to-edge processor base class
+ */
+class DB_PUBLIC PolygonToEdgeProcessorBase
+  : public polygon_processor<db::Edge>
+{
+  //  .. nothing yet ..
+};
+
+/**
+ *  @brief A polygon-to-edge pair processor base class
+ */
+class DB_PUBLIC PolygonToEdgePairProcessorBase
+  : public polygon_processor<db::EdgePair>
+{
+  //  .. nothing yet ..
 };
 
 /**
@@ -222,6 +264,8 @@ public:
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const = 0;
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter) = 0;
   virtual RegionDelegate *processed (const PolygonProcessorBase &filter) const = 0;
+  virtual EdgesDelegate *processed_to_edges (const PolygonToEdgeProcessorBase &filter) const = 0;
+  virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const = 0;
 
   virtual RegionDelegate *merged_in_place () = 0;
   virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc) = 0;

@@ -912,8 +912,68 @@ DeepRegion::process_in_place (const PolygonProcessorBase &filter)
   return processed (filter);
 }
 
+EdgesDelegate *
+DeepRegion::processed_to_edges (const PolygonToEdgeProcessorBase &filter) const
+{
+  return processed_impl<db::Edge, db::DeepEdges> (filter);
+}
+
+EdgePairsDelegate *
+DeepRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const
+{
+  return processed_impl<db::EdgePair, db::DeepEdgePairs> (filter);
+}
+
 RegionDelegate *
 DeepRegion::processed (const PolygonProcessorBase &filter) const
+{
+  return processed_impl<db::Polygon, db::DeepRegion> (filter);
+}
+
+namespace
+{
+
+template <class Result> struct delivery;
+
+template <>
+struct delivery<db::Polygon>
+{
+  delivery (db::Layout *layout, db::Shapes *shapes)
+    : mp_layout (layout), mp_shapes (shapes)
+  { }
+
+  void put (const db::Polygon &result)
+  {
+    tl::MutexLocker locker (&mp_layout->lock ());
+    mp_shapes->insert (db::PolygonRef (result, mp_layout->shape_repository ()));
+  }
+
+private:
+  db::Layout *mp_layout;
+  db::Shapes *mp_shapes;
+};
+
+template <class Result>
+struct delivery
+{
+  delivery (db::Layout *, db::Shapes *shapes)
+    : mp_shapes (shapes)
+  { }
+
+  void put (const Result &result)
+  {
+    mp_shapes->insert (result);
+  }
+
+private:
+  db::Shapes *mp_shapes;
+};
+
+}
+
+template <class Result, class OutputContainer>
+OutputContainer *
+DeepRegion::processed_impl (const polygon_processor<Result> &filter) const
 {
   if (! filter.requires_raw_input ()) {
     ensure_merged_polygons_valid ();
@@ -934,10 +994,14 @@ DeepRegion::processed (const PolygonProcessorBase &filter) const
 
   db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
 
-  std::vector<db::Polygon> poly_res;
+  std::vector<Result> heap;
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_deep_layer.derived ()));
+  std::auto_ptr<OutputContainer> res (new OutputContainer (m_deep_layer.derived ()));
+  if (filter.result_must_not_be_merged ()) {
+    res->set_merged_semantics (false);
+  }
+
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_polygons.layer ());
@@ -954,7 +1018,7 @@ DeepRegion::processed (const PolygonProcessorBase &filter) const
           st = & to_commit [c->cell_index ()] [v->first];
         }
 
-        db::PolygonRefToShapesGenerator pr (&layout, st);
+        delivery<Result> delivery (&layout, st);
 
         const db::ICplxTrans &tr = v->first;
         db::ICplxTrans trinv = tr.inverted ();
@@ -963,10 +1027,10 @@ DeepRegion::processed (const PolygonProcessorBase &filter) const
           db::Polygon poly;
           si->polygon (poly);
           poly.transform (tr);
-          poly_res.clear ();
-          filter.process (poly, poly_res);
-          for (std::vector<db::Polygon>::const_iterator p = poly_res.begin (); p != poly_res.end (); ++p) {
-            pr.put (p->transformed (trinv));
+          heap.clear ();
+          filter.process (poly, heap);
+          for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
+            delivery.put (i->transformed (trinv));
           }
         }
 
@@ -975,15 +1039,15 @@ DeepRegion::processed (const PolygonProcessorBase &filter) const
     } else {
 
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
-      db::PolygonRefToShapesGenerator pr (&layout, &st);
+      delivery<Result> delivery (&layout, &st);
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
         db::Polygon poly;
         si->polygon (poly);
-        poly_res.clear ();
-        filter.process (poly, poly_res);
-        for (std::vector<db::Polygon>::const_iterator p = poly_res.begin (); p != poly_res.end (); ++p) {
-          pr.put (*p);
+        heap.clear ();
+        filter.process (poly, heap);
+        for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
+          delivery.put (*i);
         }
       }
 
@@ -1022,7 +1086,6 @@ DeepRegion::filtered (const PolygonFilterBase &filter) const
 
     vars->collect (m_deep_layer.layout (), m_deep_layer.initial_cell ());
 
-    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
     if (filter.wants_variants ()) {
       const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
     }

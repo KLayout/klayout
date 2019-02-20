@@ -80,6 +80,22 @@ struct DB_PUBLIC EdgeLengthFilter
     return &m_vars;
   }
 
+  /**
+   *  @brief Requires merged input
+   */
+  virtual bool requires_raw_input () const
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Wants to build variants
+   */
+  virtual bool wants_variants () const
+  {
+    return true;
+  }
+
 private:
   length_type m_lmin, m_lmax;
   bool m_inverse;
@@ -159,6 +175,22 @@ struct DB_PUBLIC EdgeOrientationFilter
   virtual const TransformationReducer *vars () const
   {
     return &m_vars;
+  }
+
+  /**
+   *  @brief Requires merged input
+   */
+  virtual bool requires_raw_input () const
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Wants to build variants
+   */
+  virtual bool wants_variants () const
+  {
+    return true;
   }
 
 private:

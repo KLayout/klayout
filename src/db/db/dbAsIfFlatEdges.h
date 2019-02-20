@@ -88,6 +88,8 @@ public:
   }
 
   virtual EdgesDelegate *processed (const EdgeProcessorBase &filter) const;
+  virtual EdgePairsDelegate *processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &) const;
+  virtual RegionDelegate *processed_to_polygons (const EdgeToPolygonProcessorBase &) const;
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter)
   {

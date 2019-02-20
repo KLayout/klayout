@@ -113,6 +113,8 @@ public:
   }
 
   virtual RegionDelegate *processed (const PolygonProcessorBase &filter) const;
+  virtual EdgesDelegate *processed_to_edges (const PolygonToEdgeProcessorBase &filter) const;
+  virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const;
 
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter)
   {

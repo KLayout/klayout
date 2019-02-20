@@ -624,6 +624,31 @@ public:
   }
 
   /**
+   *  @brief Processes the edges into polygons
+   *
+   *  This method will run the processor over all edges and return a region
+   *  with the outputs of the processor.
+   *
+   *  Merged semantics applies. In merged semantics, the filter will run over
+   *  all merged edges.
+   */
+  void processed (Region &output, const EdgeToPolygonProcessorBase &filter) const;
+
+  /**
+   *  @brief Processes the edges into edge pairs
+   *
+   *  This method will run the processor over all edges and return an edge pair collection
+   *  with the outputs of the processor.
+   *
+   *  Merged semantics applies. In merged semantics, the filter will run over
+   *  all merged edges.
+   */
+  EdgePairs processed (const EdgeToEdgePairProcessorBase &filter) const
+  {
+    return EdgePairs (mp_delegate->processed_to_edge_pairs (filter));
+  }
+
+  /**
    *  @brief Applies a width check and returns EdgePairs which correspond to violation markers
    *
    *  The width check will create a edge pairs if the width of the area between the 

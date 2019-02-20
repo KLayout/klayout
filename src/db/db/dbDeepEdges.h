@@ -112,6 +112,8 @@ public:
   virtual EdgesDelegate *filtered (const EdgeFilterBase &) const;
   virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &);
   virtual EdgesDelegate *processed (const EdgeProcessorBase &) const;
+  virtual EdgePairsDelegate *processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filter) const;
+  virtual RegionDelegate *processed_to_polygons (const EdgeToPolygonProcessorBase &filter) const;
 
   virtual EdgesDelegate *merged_in_place ();
   virtual EdgesDelegate *merged () const;
@@ -174,6 +176,7 @@ private:
   EdgePairs run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   EdgesDelegate *selected_interacting_generic (const Edges &edges, bool invert) const;
   EdgesDelegate *selected_interacting_generic (const Region &region, bool invert) const;
+  template <class Result, class OutputContainer> OutputContainer *processed_impl (const edge_processor<Result> &filter) const;
 };
 
 }

@@ -492,7 +492,7 @@ public:
    *  cluster joining may happen in this case, because multi-attribute
    *  assignment might create connections too.
    */
-  void build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0);
+  void build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0, bool report_progress = false);
 
   /**
    *  @brief Creates and inserts a new clusters
@@ -768,6 +768,14 @@ public:
   hier_clusters ();
 
   /**
+   *  @brief Sets the base verbosity
+   *
+   *  The default value is 30. Basic timing will be reported for > base_verbosity, detailed timing
+   *  for > base_verbosity + 10.
+   */
+  void set_base_verbosity (int bv);
+
+  /**
    *  @brief Builds a hierarchy of clusters from a cell hierarchy and given connectivity
    */
   void build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0);
@@ -814,6 +822,7 @@ private:
   void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence = 0);
 
   std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
+  int m_base_verbosity;
 };
 
 /**

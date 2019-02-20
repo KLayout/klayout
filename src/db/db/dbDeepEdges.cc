@@ -379,7 +379,7 @@ DeepEdges::ensure_merged_edges_valid () const
       db::hier_clusters<db::Edge> hc;
       db::Connectivity conn;
       conn.connect (m_deep_layer);
-      //  TODO: this uses the wrong verbosity inside ...
+      hc.set_base_verbosity (base_verbosity() + 10);
       hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Edges, conn);
 
       //  collect the clusters and merge them into big polygons
@@ -387,7 +387,7 @@ DeepEdges::ensure_merged_edges_valid () const
       //  hopefully more efficient that collecting everything and will lead to reuse of parts.
 
       ClusterMerger cm (m_deep_layer.layer (), hc, report_progress (), progress_desc ());
-      cm.set_base_verbosity (base_verbosity ());
+      cm.set_base_verbosity (base_verbosity () + 10);
 
       //  TODO: iterate only over the called cells?
       for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -1019,7 +1019,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
     db::hier_clusters<db::Edge> hc;
     db::Connectivity conn (db::Connectivity::EdgesConnectByPoints);
     conn.connect (m_merged_edges);
-    //  TODO: this uses the wrong verbosity inside ...
+    hc.set_base_verbosity (base_verbosity () + 10);
     hc.build (layout, m_merged_edges.initial_cell (), db::ShapeIterator::Edges, conn);
 
     //  TODO: iterate only over the called cells?

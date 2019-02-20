@@ -412,7 +412,7 @@ DeepRegion::ensure_merged_polygons_valid () const
       db::hier_clusters<db::PolygonRef> hc;
       db::Connectivity conn;
       conn.connect (m_deep_layer);
-      //  TODO: this uses the wrong verbosity inside ...
+      hc.set_base_verbosity (base_verbosity () + 10);
       hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Polygons, conn);
 
       //  collect the clusters and merge them into big polygons
@@ -420,7 +420,7 @@ DeepRegion::ensure_merged_polygons_valid () const
       //  hopefully more efficient that collecting everything and will lead to reuse of parts.
 
       ClusterMerger cm (m_deep_layer.layer (), layout, hc, min_coherence (), report_progress (), progress_desc ());
-      cm.set_base_verbosity (base_verbosity ());
+      cm.set_base_verbosity (base_verbosity () + 10);
 
       //  TODO: iterate only over the called cells?
       for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -1197,7 +1197,7 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
   db::hier_clusters<db::PolygonRef> hc;
   db::Connectivity conn;
   conn.connect (m_deep_layer);
-  //  TODO: this uses the wrong verbosity inside ...
+  hc.set_base_verbosity (base_verbosity () + 10);
   hc.build (layout, m_deep_layer.initial_cell (), db::ShapeIterator::Polygons, conn);
 
   //  collect the clusters and merge them into big polygons
@@ -1207,7 +1207,7 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
   DeepLayer dl_out (m_deep_layer.derived ());
 
   ClusterMerger cm (m_deep_layer.layer (), layout, hc, min_coherence, report_progress (), progress_desc ());
-  cm.set_base_verbosity (base_verbosity ());
+  cm.set_base_verbosity (base_verbosity () + 10);
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (c->cell_index ());
@@ -1273,7 +1273,7 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
 namespace
 {
 
-struct DB_PUBLIC XYAnisotropyAndMagnificationReducer
+struct XYAnisotropyAndMagnificationReducer
   : public db::TransformationReducer
 {
   db::ICplxTrans reduce (const db::ICplxTrans &trans) const

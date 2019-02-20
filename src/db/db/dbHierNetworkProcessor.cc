@@ -851,9 +851,8 @@ private:
 
 template <class T>
 void
-local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
+local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence, bool report_progress)
 {
-  bool report_progress = tl::verbosity () >= 50;
   static std::string desc = tl::to_string (tr ("Building local clusters"));
 
   db::box_scanner<T, std::pair<unsigned int, unsigned int> > bs (report_progress, desc);
@@ -1068,8 +1067,15 @@ private:
 
 template <class T>
 hier_clusters<T>::hier_clusters ()
+  : m_base_verbosity (20)
 {
   //  .. nothing yet ..
+}
+
+template <class T>
+void hier_clusters<T>::set_base_verbosity (int bv)
+{
+  m_base_verbosity = bv;
 }
 
 template <class T>
@@ -1739,7 +1745,7 @@ template <class T>
 void
 hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing shape clusters")));
+  tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Computing shape clusters")));
 
   std::set<db::cell_index_type> called;
   cell.collect_called_cells (called);
@@ -1748,7 +1754,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
   //  first build all local clusters
 
   {
-    tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Computing local shape clusters")));
+    tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing local shape clusters")));
     tl::RelativeProgress progress (tl::to_string (tr ("Computing local clusters")), called.size (), 1);
 
     for (std::set<db::cell_index_type>::const_iterator c = called.begin (); c != called.end (); ++c) {
@@ -1760,7 +1766,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
   //  build the hierarchical connections bottom-up and for all cells whose children are computed already
 
   {
-    tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Computing hierarchical shape clusters")));
+    tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing hierarchical shape clusters")));
     tl::RelativeProgress progress (tl::to_string (tr ("Computing hierarchical clusters")), called.size (), 1);
 
     std::set<db::cell_index_type> done;
@@ -1798,13 +1804,13 @@ void
 hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
 {
   std::string msg = tl::to_string (tr ("Computing local clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
-  if (tl::verbosity () >= 40) {
+  if (tl::verbosity () >= m_base_verbosity + 20) {
     tl::log << msg;
   }
-  tl::SelfTimer timer (tl::verbosity () >= 41, msg);
+  tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 20, msg);
 
   connected_clusters<T> &local = m_per_cell_clusters [cell.cell_index ()];
-  local.build_clusters (cell, shape_flags, conn, attr_equivalence);
+  local.build_clusters (cell, shape_flags, conn, attr_equivalence, tl::verbosity () >= m_base_verbosity + 30);
 }
 
 template <class T>
@@ -1899,10 +1905,10 @@ void
 hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn)
 {
   std::string msg = tl::to_string (tr ("Computing hierarchical clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
-  if (tl::verbosity () >= 40) {
+  if (tl::verbosity () >= m_base_verbosity + 20) {
     tl::log << msg;
   }
-  tl::SelfTimer timer (tl::verbosity () >= 41, msg);
+  tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 20, msg);
 
   connected_clusters<T> &local = m_per_cell_clusters [cell.cell_index ()];
 
@@ -1931,9 +1937,9 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
   {
     static std::string desc = tl::to_string (tr ("Instance to instance treatment"));
-    tl::SelfTimer timer (tl::verbosity () >= 51, desc);
+    tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 30, desc);
 
-    bool report_progress = tl::verbosity () >= 50;
+    bool report_progress = tl::verbosity () >= m_base_verbosity + 30;
     db::box_scanner<db::Instance, unsigned int> bs (report_progress, desc);
 
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
@@ -1950,9 +1956,9 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     double area_ratio = 10.0;
 
     static std::string desc = tl::to_string (tr ("Local to instance treatment"));
-    tl::SelfTimer timer (tl::verbosity () >= 51, desc);
+    tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 30, desc);
 
-    bool report_progress = tl::verbosity () >= 50;
+    bool report_progress = tl::verbosity () >= m_base_verbosity + 30;
     db::box_scanner2<db::local_cluster<T>, unsigned int, db::Instance, unsigned int> bs2 (report_progress, desc);
 
     for (typename connected_clusters<T>::const_iterator c = local.begin (); c != local.end (); ++c) {
@@ -1985,7 +1991,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
   //  finally connect global nets
   {
     static std::string desc = tl::to_string (tr ("Global net treatment"));
-    tl::SelfTimer timer (tl::verbosity () >= 51, desc);
+    tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 30, desc);
 
     GlobalNetClusterMaker global_net_clusters;
 

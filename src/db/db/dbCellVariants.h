@@ -243,7 +243,7 @@ private:
  *  @brief A template using a specific transformation reducer
  */
 template <class RED>
-class DB_PUBLIC cell_variants_collector
+class DB_PUBLIC_TEMPLATE cell_variants_collector
   : public VariantsCollectorBase
 {
 public:

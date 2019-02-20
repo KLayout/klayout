@@ -69,6 +69,7 @@ public:
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }
   virtual bool requires_raw_input () const { return true; }
+  virtual bool wants_variants () const { return true; }
 };
 
 // -------------------------------------------------------------------------------------------------------------
@@ -88,6 +89,7 @@ public:
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return false; }
   virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
 
 private:
   db::Coord m_d;
@@ -113,6 +115,7 @@ public:
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return true; }   //  we believe so ...
   virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
 
 private:
   double m_rinner, m_router;
@@ -140,6 +143,7 @@ public:
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return true; }   //  we believe so ...
   virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
 };
 
 // -------------------------------------------------------------------------------------------------------------
@@ -160,6 +164,7 @@ public:
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return true; }   //  we believe so ...
   virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
 };
 
 }

@@ -44,11 +44,35 @@ class EdgeFilterBase;
 class DB_PUBLIC PolygonFilterBase
 {
 public:
+  /**
+   *  @brief Constructor
+   */
   PolygonFilterBase () { }
+
   virtual ~PolygonFilterBase () { }
 
+  /**
+   *  @brief Filters the polygon
+   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   */
   virtual bool selected (const db::Polygon &polygon) const = 0;
+
+  /**
+   *  @brief Returns the transformation reducer for building cell variants
+   *  This method may return 0. In this case, not cell variants are built.
+   */
   virtual const TransformationReducer *vars () const = 0;
+
+  /**
+   *  @brief Returns true, if the filter wants raw (not merged) input
+   */
+  virtual bool requires_raw_input () const = 0;
+
+  /**
+   *  @brief Returns true, if the filter wants to build variants
+   *  If not true, the filter accepts shape propagation as variant resolution.
+   */
+  virtual bool wants_variants () const = 0;
 };
 
 /**
@@ -57,13 +81,41 @@ public:
 class DB_PUBLIC PolygonProcessorBase
 {
 public:
+  /**
+   *  @brief Constructor
+   */
   PolygonProcessorBase () { }
+
   virtual ~PolygonProcessorBase () { }
 
+  /**
+   *  @brief Performs the actual processing
+   *  This method will take the input polygon from "polygon" and puts the results into "res".
+   *  "res" can be empty - in this case, the polygon will be skipped.
+   */
   virtual void process (const db::Polygon &polygon, std::vector<db::Polygon> &res) const = 0;
+
+  /**
+   *  @brief Returns the transformation reducer for building cell variants
+   *  This method may return 0. In this case, not cell variants are built.
+   */
   virtual const TransformationReducer *vars () const = 0;
+
+  /**
+   *  @brief Returns true, if the result of this operation can be regarded "merged" always.
+   */
   virtual bool result_is_merged () const = 0;
+
+  /**
+   *  @brief Returns true, if the processor wants raw (not merged) input
+   */
   virtual bool requires_raw_input () const = 0;
+
+  /**
+   *  @brief Returns true, if the processor wants to build variants
+   *  If not true, the processor accepts shape propagation as variant resolution.
+   */
+  virtual bool wants_variants () const = 0;
 };
 
 /**

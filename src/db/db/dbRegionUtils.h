@@ -83,6 +83,16 @@ struct DB_PUBLIC RegionPerimeterFilter
     return &m_vars;
   }
 
+  /**
+   *  @brief This filter prefers producing variants
+   */
+  virtual bool wants_variants () const { return true; }
+
+  /**
+   *  @brief This filter wants merged input
+   */
+  virtual bool requires_raw_input () const { return false; }
+
 private:
   perimeter_type m_pmin, m_pmax;
   bool m_inverse;
@@ -137,6 +147,16 @@ struct DB_PUBLIC RegionAreaFilter
     return &m_vars;
   }
 
+  /**
+   *  @brief This filter prefers producing variants
+   */
+  virtual bool wants_variants () const { return true; }
+
+  /**
+   *  @brief This filter wants merged input
+   */
+  virtual bool requires_raw_input () const { return false; }
+
 private:
   area_type m_amin, m_amax;
   bool m_inverse;
@@ -178,6 +198,16 @@ struct DB_PUBLIC RectilinearFilter
     return 0;
   }
 
+  /**
+   *  @brief This filter prefers producing variants
+   */
+  virtual bool wants_variants () const { return true; }
+
+  /**
+   *  @brief This filter wants merged input
+   */
+  virtual bool requires_raw_input () const { return false; }
+
 private:
   bool m_inverse;
 };
@@ -216,6 +246,16 @@ struct DB_PUBLIC RectangleFilter
   {
     return 0;
   }
+
+  /**
+   *  @brief This filter prefers producing variants
+   */
+  virtual bool wants_variants () const { return true; }
+
+  /**
+   *  @brief This filter wants merged input
+   */
+  virtual bool requires_raw_input () const { return false; }
 
 private:
   bool m_inverse;
@@ -302,6 +342,16 @@ struct DB_PUBLIC RegionBBoxFilter
       return &m_anisotropic_vars;
     }
   }
+
+  /**
+   *  @brief This filter prefers producing variants
+   */
+  virtual bool wants_variants () const { return true; }
+
+  /**
+   *  @brief This filter wants merged input
+   */
+  virtual bool requires_raw_input () const { return false; }
 
 private:
   value_type m_vmin, m_vmax;

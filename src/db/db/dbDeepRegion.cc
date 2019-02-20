@@ -926,40 +926,56 @@ DeepRegion::processed (const PolygonProcessorBase &filter) const
 
     vars->collect (m_deep_layer.layout (), m_deep_layer.initial_cell ());
 
-    const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
+    if (filter.wants_variants ()) {
+      const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
+    }
 
   }
 
   db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
 
   std::vector<db::Polygon> poly_res;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
   std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_deep_layer.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_polygons.layer ());
-    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
-    db::PolygonRefToShapesGenerator pr (&layout, &st);
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
-      tl_assert (v.size () == size_t (1));
-      const db::ICplxTrans &tr = v.begin ()->first;
-      db::ICplxTrans trinv = tr.inverted ();
+      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
 
-      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
-        db::Polygon poly;
-        si->polygon (poly);
-        poly.transform (tr);
-        poly_res.clear ();
-        filter.process (poly, poly_res);
-        for (std::vector<db::Polygon>::const_iterator p = poly_res.begin (); p != poly_res.end (); ++p) {
-          pr.put (p->transformed (trinv));
+        db::Shapes *st;
+        if (vv.size () == 1) {
+          st = & c->shapes (res->deep_layer ().layer ());
+        } else {
+          st = & to_commit [c->cell_index ()] [v->first];
         }
+
+        db::PolygonRefToShapesGenerator pr (&layout, st);
+
+        const db::ICplxTrans &tr = v->first;
+        db::ICplxTrans trinv = tr.inverted ();
+
+        for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+          db::Polygon poly;
+          si->polygon (poly);
+          poly.transform (tr);
+          poly_res.clear ();
+          filter.process (poly, poly_res);
+          for (std::vector<db::Polygon>::const_iterator p = poly_res.begin (); p != poly_res.end (); ++p) {
+            pr.put (p->transformed (trinv));
+          }
+        }
+
       }
 
     } else {
+
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+      db::PolygonRefToShapesGenerator pr (&layout, &st);
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
         db::Polygon poly;
@@ -973,6 +989,10 @@ DeepRegion::processed (const PolygonProcessorBase &filter) const
 
     }
 
+  }
+
+  if (! to_commit.empty () && vars.get ()) {
+    res->deep_layer ().commit_shapes (*vars, to_commit);
   }
 
   if (filter.result_is_merged ()) {
@@ -991,45 +1011,58 @@ DeepRegion::filter_in_place (const PolygonFilterBase &filter)
 RegionDelegate *
 DeepRegion::filtered (const PolygonFilterBase &filter) const
 {
-  ensure_merged_polygons_valid ();
+  if (! filter.requires_raw_input ()) {
+    ensure_merged_polygons_valid ();
+  }
 
   std::auto_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+    vars->collect (m_deep_layer.layout (), m_deep_layer.initial_cell ());
 
     //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (*vars);
+    if (filter.wants_variants ()) {
+      const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
+    }
 
   }
 
-  db::Layout &layout = m_merged_polygons.layout ();
+  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_deep_layer.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
-    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+    const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_polygons.layer ());
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
-      tl_assert (v.size () == size_t (1));
-      const db::ICplxTrans &tr = v.begin ()->first;
+      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
 
-      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
-        db::Polygon poly;
-        si->polygon (poly);
-        if (filter.selected (poly.transformed (tr))) {
-          st.insert (*si);
+        db::Shapes *st;
+        if (vv.size () == 1) {
+          st = & c->shapes (res->deep_layer ().layer ());
+        } else {
+          st = & to_commit [c->cell_index ()] [v->first];
         }
+
+        const db::ICplxTrans &tr = v->first;
+
+        for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+          db::Polygon poly;
+          si->polygon (poly);
+          if (filter.selected (poly.transformed (tr))) {
+            st->insert (*si);
+          }
+        }
+
       }
 
     } else {
 
-      const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -1044,7 +1077,13 @@ DeepRegion::filtered (const PolygonFilterBase &filter) const
 
   }
 
-  res->set_is_merged (true);
+  if (! to_commit.empty () && vars.get ()) {
+    res->deep_layer ().commit_shapes (*vars, to_commit);
+  }
+
+  if (! filter.requires_raw_input ()) {
+    res->set_is_merged (true);
+  }
   return res.release ();
 }
 

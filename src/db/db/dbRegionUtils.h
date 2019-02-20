@@ -364,7 +364,7 @@ private:
 /**
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
  */
-class Edge2EdgeCheckBase
+class DB_PUBLIC Edge2EdgeCheckBase
   : public db::box_scanner_receiver<db::Edge, size_t>
 {
 public:
@@ -423,7 +423,7 @@ private:
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
  */
 template <class Output>
-class edge2edge_check
+class DB_PUBLIC_TEMPLATE edge2edge_check
   : public Edge2EdgeCheckBase
 {
 public:
@@ -446,7 +446,7 @@ private:
 /**
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
  */
-class Poly2PolyCheckBase
+class DB_PUBLIC Poly2PolyCheckBase
   : public db::box_scanner_receiver<db::Polygon, size_t>
 {
 public:
@@ -467,7 +467,7 @@ private:
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
  */
 template <class Output>
-class poly2poly_check
+class DB_PUBLIC_TEMPLATE poly2poly_check
   : public Poly2PolyCheckBase
 {
 public:
@@ -503,7 +503,7 @@ private:
  *  @brief A helper class for the region to edge interaction functionality
  */
 template <class OutputContainer>
-class DB_PUBLIC region_to_edge_interaction_filter
+class DB_PUBLIC_TEMPLATE region_to_edge_interaction_filter
   : public RegionToEdgeInteractionFilterBase
 {
 public:

@@ -40,7 +40,7 @@ namespace
 /**
  *  @brief A helper class to implement the strange polygon detector
  */
-struct DB_PUBLIC StrangePolygonInsideFunc
+struct StrangePolygonInsideFunc
 {
   inline bool operator() (int wc) const
   {

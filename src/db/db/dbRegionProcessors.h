@@ -303,7 +303,7 @@ private:
  *  The object can be Edge, Polygon, Box and std::vector<Point>
  */
 template <class Object>
-class DB_PUBLIC minkowsky_sum_computation
+class DB_PUBLIC_TEMPLATE minkowsky_sum_computation
   : public db::PolygonProcessorBase
 {
 public:

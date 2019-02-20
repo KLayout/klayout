@@ -1390,7 +1390,8 @@ private:
 
 }
 
-EdgePairs DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+EdgePairsDelegate *
+DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
 {
   const db::DeepEdges *other_deep = 0;
   if (other) {
@@ -1422,7 +1423,7 @@ EdgePairs DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, 
 
   proc.run (&op, m_merged_edges.layer (), other_deep ? other_deep->deep_layer ().layer () : m_merged_edges.layer (), res->deep_layer ().layer ());
 
-  return db::EdgePairs (res.release ());
+  return res.release ();
 }
 
 }

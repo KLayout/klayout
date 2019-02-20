@@ -26,6 +26,7 @@
 #include "dbFlatEdgePairs.h"
 #include "dbFlatEdges.h"
 #include "dbEmptyRegion.h"
+#include "dbEmptyEdgePairs.h"
 #include "dbRegion.h"
 #include "dbRegionUtils.h"
 #include "dbShapeProcessor.h"
@@ -72,26 +73,26 @@ AsIfFlatRegion::to_string (size_t nmax) const
   return os.str ();
 }
 
-Edges
+EdgesDelegate *
 AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
 {
-  Edges edges;
+  std::auto_ptr<FlatEdges> result (new FlatEdges ());
 
   size_t n = 0;
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     n += p->vertices ();
   }
-  edges.reserve (n);
+  result->reserve (n);
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
       if (! filter || filter->selected (*e)) {
-        edges.insert (*e);
+        result->insert (*e);
       }
     }
   }
 
-  return edges;
+  return result.release ();
 }
 
 RegionDelegate *
@@ -454,7 +455,7 @@ AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const T
 template void AsIfFlatRegion::produce_markers_for_grid_check<db::ICplxTrans> (const db::Polygon &poly, const db::ICplxTrans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes);
 template void AsIfFlatRegion::produce_markers_for_grid_check<db::UnitTrans> (const db::Polygon &poly, const db::UnitTrans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes);
 
-EdgePairs
+EdgePairsDelegate *
 AsIfFlatRegion::grid_check (db::Coord gx, db::Coord gy) const
 {
   if (gx < 0 || gy < 0) {
@@ -462,7 +463,7 @@ AsIfFlatRegion::grid_check (db::Coord gx, db::Coord gy) const
   }
 
   if (gx == 0 && gy == 0) {
-    return EdgePairs ();
+    return new EmptyEdgePairs ();
   }
 
   std::auto_ptr<db::FlatEdgePairs> res (new db::FlatEdgePairs ());
@@ -471,7 +472,7 @@ AsIfFlatRegion::grid_check (db::Coord gx, db::Coord gy) const
     produce_markers_for_grid_check (*p, db::UnitTrans (), gx, gy, res->raw_edge_pairs ());
   }
 
-  return EdgePairs (res.release ());
+  return res.release ();
 }
 
 static bool ac_less (double cos_a, bool gt180_a, double cos_b, bool gt180_b)
@@ -532,7 +533,7 @@ AsIfFlatRegion::produce_markers_for_angle_check (const db::Polygon &poly, const 
 template void AsIfFlatRegion::produce_markers_for_angle_check<db::ICplxTrans> (const db::Polygon &poly, const db::ICplxTrans &tr, double min, double max, bool inverse, db::Shapes &shapes);
 template void AsIfFlatRegion::produce_markers_for_angle_check<db::UnitTrans> (const db::Polygon &poly, const db::UnitTrans &tr, double min, double max, bool inverse, db::Shapes &shapes);
 
-EdgePairs
+EdgePairsDelegate *
 AsIfFlatRegion::angle_check (double min, double max, bool inverse) const
 {
   std::auto_ptr<db::FlatEdgePairs> res (new db::FlatEdgePairs ());
@@ -541,7 +542,7 @@ AsIfFlatRegion::angle_check (double min, double max, bool inverse) const
     produce_markers_for_angle_check (*p, db::UnitTrans (), min, max, inverse, res->raw_edge_pairs ());
   }
 
-  return EdgePairs (res.release ());
+  return res.release ();
 }
 
 static inline db::Coord snap_to_grid (db::Coord c, db::Coord g)
@@ -610,10 +611,10 @@ AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
   return new_region.release ();
 }
 
-EdgePairs
+EdgePairsDelegate *
 AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
 {
-  EdgePairs result;
+  std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   db::box_scanner<db::Polygon, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (size () + (other ? other->size () : 0));
@@ -647,20 +648,20 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   check.set_min_projection (min_projection);
   check.set_max_projection (max_projection);
 
-  edge2edge_check<db::EdgePairs> edge_check (check, result, different_polygons, other != 0);
-  poly2poly_check<db::EdgePairs> poly_check (edge_check);
+  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, different_polygons, other != 0);
+  poly2poly_check<db::FlatEdgePairs> poly_check (edge_check);
 
   do {
     scanner.process (poly_check, d, db::box_convert<db::Polygon> ());
   } while (edge_check.prepare_next_pass ());
 
-  return result;
+  return result.release ();
 }
 
-EdgePairs
+EdgePairsDelegate *
 AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
 {
-  EdgePairs result;
+  std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   EdgeRelationFilter check (rel, d, metrics);
   check.set_whole_edges (whole_edges);
@@ -668,8 +669,8 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   check.set_min_projection (min_projection);
   check.set_max_projection (max_projection);
 
-  edge2edge_check<db::EdgePairs> edge_check (check, result, false, false);
-  poly2poly_check<db::EdgePairs> poly_check (edge_check);
+  edge2edge_check<db::FlatEdgePairs> edge_check (check, *result, false, false);
+  poly2poly_check<db::FlatEdgePairs> poly_check (edge_check);
 
   do {
 
@@ -681,7 +682,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
 
   } while (edge_check.prepare_next_pass ());
 
-  return result;
+  return result.release ();
 }
 
 RegionDelegate *

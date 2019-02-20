@@ -72,6 +72,42 @@ EmptyEdges::processed_to_polygons (const EdgeToPolygonProcessorBase &) const
   return new EmptyRegion ();
 }
 
+EdgePairsDelegate *
+EmptyEdges::width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyEdges::space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyEdges::enclosing_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyEdges::overlap_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyEdges::separation_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyEdges::inside_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
 EdgesDelegate *
 EmptyEdges::add_in_place (const Edges &other)
 {

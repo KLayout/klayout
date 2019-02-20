@@ -96,6 +96,72 @@ EmptyRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &) co
   return new EmptyEdgePairs ();
 }
 
+EdgePairsDelegate *
+EmptyRegion::width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::grid_check (db::Coord, db::Coord) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::angle_check (double, double, bool) const
+{
+  return new EmptyEdgePairs ();
+}
+
+EdgesDelegate *
+EmptyRegion::edges (const EdgeFilterBase *) const
+{
+  return new EmptyEdges ();
+}
+
 bool
 EmptyRegion::equals (const Region &other) const
 {

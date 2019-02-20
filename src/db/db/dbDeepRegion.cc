@@ -24,6 +24,7 @@
 #include "dbDeepRegion.h"
 #include "dbDeepShapeStore.h"
 #include "dbEmptyRegion.h"
+#include "dbEmptyEdgePairs.h"
 #include "dbRegion.h"
 #include "dbRegionUtils.h"
 #include "dbDeepEdges.h"
@@ -715,7 +716,7 @@ DeepRegion::to_string (size_t nmax) const
   return db::AsIfFlatRegion::to_string (nmax);
 }
 
-EdgePairs
+EdgePairsDelegate *
 DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
 {
   if (gx < 0 || gy < 0) {
@@ -728,7 +729,7 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
   }
 
   if (gx == 0) {
-    return EdgePairs ();
+    return new EmptyEdgePairs ();
   }
 
   ensure_merged_polygons_valid ();
@@ -771,10 +772,10 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
   //  propagate the markers with a similar algorithm used for producing the variants
   res->deep_layer ().commit_shapes (vars, to_commit);
 
-  return db::EdgePairs (res.release ());
+  return res.release ();
 }
 
-EdgePairs
+EdgePairsDelegate *
 DeepRegion::angle_check (double min, double max, bool inverse) const
 {
   ensure_merged_polygons_valid ();
@@ -796,7 +797,7 @@ DeepRegion::angle_check (double min, double max, bool inverse) const
 
   }
 
-  return db::EdgePairs (res.release ());
+  return res.release ();
 }
 
 RegionDelegate *
@@ -853,7 +854,7 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
   return res.release ();
 }
 
-Edges
+EdgesDelegate *
 DeepRegion::edges (const EdgeFilterBase *filter) const
 {
   ensure_merged_polygons_valid ();
@@ -902,7 +903,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
   }
 
   res->set_is_merged (true);
-  return db::Edges (res.release ());
+  return res.release ();
 }
 
 RegionDelegate *
@@ -1448,7 +1449,7 @@ private:
 
 }
 
-EdgePairs
+EdgePairsDelegate *
 DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
 {
   const db::DeepRegion *other_deep = 0;
@@ -1481,10 +1482,10 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   proc.run (&op, m_merged_polygons.layer (), other_deep ? other_deep->deep_layer ().layer () : m_merged_polygons.layer (), res->deep_layer ().layer ());
 
-  return db::EdgePairs (res.release ());
+  return res.release ();
 }
 
-EdgePairs
+EdgePairsDelegate *
 DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
 {
   ensure_merged_polygons_valid ();
@@ -1519,7 +1520,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, b
 
   }
 
-  return db::EdgePairs (res.release ());
+  return res.release ();
 }
 
 namespace

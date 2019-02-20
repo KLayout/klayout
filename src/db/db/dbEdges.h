@@ -675,7 +675,7 @@ public:
    */
   EdgePairs width_check (db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
   {
-    return mp_delegate->width_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return EdgePairs (mp_delegate->width_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
   }
 
   /**
@@ -690,7 +690,7 @@ public:
    */
   EdgePairs space_check (db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
   {
-    return mp_delegate->space_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return EdgePairs (mp_delegate->space_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
   }
 
   /**
@@ -708,7 +708,7 @@ public:
    */
   EdgePairs enclosing_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
   {
-    return mp_delegate->enclosing_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return EdgePairs (mp_delegate->enclosing_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
   }
 
   /**
@@ -726,7 +726,7 @@ public:
    */
   EdgePairs overlap_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
   {
-    return mp_delegate->overlap_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return EdgePairs (mp_delegate->overlap_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
   }
 
   /**
@@ -744,7 +744,7 @@ public:
    */
   EdgePairs separation_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
   {
-    return mp_delegate->separation_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return EdgePairs (mp_delegate->separation_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
   }
 
   /**
@@ -762,7 +762,7 @@ public:
    */
   EdgePairs inside_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
   {
-    return mp_delegate->inside_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return EdgePairs (mp_delegate->inside_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
   }
 
   /**

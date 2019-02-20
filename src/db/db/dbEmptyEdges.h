@@ -56,12 +56,12 @@ public:
   virtual distance_type length (const db::Box &) const { return 0; }
   virtual Box bbox () const { return db::Box (); }
 
-  virtual EdgePairs width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs enclosing_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs overlap_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs separation_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs inside_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
+  virtual EdgePairsDelegate *width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *enclosing_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *overlap_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *separation_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *inside_check (const Edges &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &) { return this; }
   virtual EdgesDelegate *filtered (const EdgeFilterBase &) const { return new EmptyEdges (); }

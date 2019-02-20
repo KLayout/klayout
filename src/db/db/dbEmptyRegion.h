@@ -59,21 +59,21 @@ public:
 
   virtual Box bbox () const { return Box (); }
 
-  virtual EdgePairs width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs grid_check (db::Coord, db::Coord) const { return EdgePairs (); }
-  virtual EdgePairs angle_check (double, double, bool) const { return EdgePairs (); }
+  virtual EdgePairsDelegate *width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *grid_check (db::Coord, db::Coord) const;
+  virtual EdgePairsDelegate *angle_check (double, double, bool) const;
 
   virtual RegionDelegate *snapped_in_place (db::Coord, db::Coord) { return this; }
   virtual RegionDelegate *snapped (db::Coord, db::Coord)  { return new EmptyRegion (); }
 
-  virtual Edges edges (const EdgeFilterBase *) const { return db::Edges (); }
+  virtual EdgesDelegate *edges (const EdgeFilterBase *) const;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &) { return this; }
   virtual RegionDelegate *filtered (const PolygonFilterBase &) const { return new EmptyRegion (); }
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &) { return this; }

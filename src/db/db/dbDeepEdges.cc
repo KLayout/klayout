@@ -1003,6 +1003,8 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
   db::Layout &layout = const_cast<db::Layout &> (m_merged_edges.layout ());
   db::Cell &top_cell = const_cast<db::Cell &> (m_merged_edges.initial_cell ());
 
+  //  TODO: there is a special case when we'd need a MagnificationAndOrientationReducer:
+  //  dots formally don't have an orientation, hence the interpretation is x and y.
   db::MagnificationReducer red;
   db::cell_variants_collector<db::MagnificationReducer> vars (red);
   vars.collect (m_merged_edges.layout (), m_merged_edges.initial_cell ());

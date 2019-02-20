@@ -27,6 +27,7 @@
 #include "dbRegion.h"
 #include "dbEdges.h"
 #include "dbRegionUtils.h"
+#include "dbRegionProcessors.h"
 #include "dbEdgesUtils.h"
 #include "dbDeepShapeStore.h"
 #include "tlUnitTest.h"
@@ -1050,7 +1051,7 @@ TEST(19_GridCheck)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au19.gds");
 }
 
-TEST(19_AngleCheck)
+TEST(20_AngleCheck)
 {
   db::Layout ly;
   {
@@ -1081,6 +1082,57 @@ TEST(19_AngleCheck)
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au20.gds");
+}
+
+TEST(21_Processors)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.processed (db::CornersAsDots (-180.0, 180.0)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.processed (db::CornersAsDots (0.0, 180.0)));
+  db::Region ext;
+  r1.processed (db::CornersAsDots (0.0, 180.0)).extended (ext, 1000, 1000, 2000, 2000);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), ext);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r1.processed (db::CornersAsRectangles (-180.0, 180.0, 2000)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r1.processed (db::CornersAsRectangles (0.0, 180.0, 2000)));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r1.processed (db::Extents (0, 0)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r1.processed (db::Extents (1000, 2000)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r1.processed (db::RelativeExtents (0, 0, 1.0, 1.0, 0, 0)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), r1.processed (db::RelativeExtents (0.25, 0.4, 0.75, 0.6, 1000, 2000)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), r1.processed (db::RelativeExtentsAsEdges (0, 0, 1.0, 1.0)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), r1.processed (db::RelativeExtentsAsEdges (0.5, 0.5, 0.5, 0.5)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 0)), r1.processed (db::RelativeExtentsAsEdges (0.25, 0.4, 0.75, 0.6)));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r1.processed (db::minkowsky_sum_computation<db::Box> (db::Box (-1000, -2000, 3000, 4000))));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.processed (db::minkowsky_sum_computation<db::Edge> (db::Edge (-1000, 0, 3000, 0))));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r1.processed (db::TrapezoidDecomposition (db::TD_htrapezoids)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.processed (db::ConvexDecomposition (db::PO_vertical)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r1.processed (db::ConvexDecomposition (db::PO_horizontal)));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au21.gds");
 }
 
 TEST(100_Integration)

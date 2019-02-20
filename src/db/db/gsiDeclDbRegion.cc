@@ -30,6 +30,7 @@
 #include "dbShapes.h"
 #include "dbDeepShapeStore.h"
 #include "dbRegion.h"
+#include "dbRegionProcessors.h"
 #include "tlGlobPattern.h"
 
 #include <memory>
@@ -149,67 +150,14 @@ static typename Delivery::container_type *texts (const db::Region *r, const std:
   return new_texts<Delivery> (r->iter (), pat, pattern);
 }
 
-template <class Delivery>
-static typename Delivery::container_type *corners (const db::Region *r, double angle_start, double angle_end)
+static db::Edges corners_to_dots (const db::Region *r, double angle_start, double angle_end)
 {
-  db::CplxTrans t_start (1.0, angle_start, false, db::DVector ());
-  db::CplxTrans t_end (1.0, angle_end, false, db::DVector ());
+  return r->processed (db::CornersAsDots (angle_start, angle_end));
+}
 
-  bool big_angle = (angle_end - angle_start + db::epsilon) > 180.0;
-  bool all = (angle_end - angle_start - db::epsilon) > 360.0;
-
-  Delivery delivery;
-
-  for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end (); ++p) {
-
-    size_t n = p->holes () + 1;
-    for (size_t i = 0; i < n; ++i) {
-
-      const db::Polygon::contour_type &ctr = p->contour (int (i));
-      size_t nn = ctr.size ();
-      if (nn > 2) {
-
-        db::Point pp = ctr [nn - 2];
-        db::Point pt = ctr [nn - 1];
-        for (size_t j = 0; j < nn; ++j) {
-
-          db::Point pn = ctr [j];
-
-          if (all) {
-            delivery.insert (pt);
-          } else {
-
-            db::Vector vin (pt - pp);
-            db::DVector vout (pn - pt);
-
-            db::DVector v1 = t_start * vin;
-            db::DVector v2 = t_end * vin;
-
-            bool vp1 = db::vprod_sign (v1, vout) >= 0;
-            bool vp2 = db::vprod_sign (v2, vout) <= 0;
-
-            if (big_angle && (vp1 || vp2)) {
-              delivery.insert (pt);
-            } else if (! big_angle && vp1 && vp2) {
-              if (db::sprod_sign (v1, vout) > 0 && db::sprod_sign (v2, vout) > 0) {
-                delivery.insert (pt);
-              }
-            }
-
-          }
-
-          pp = pt;
-          pt = pn;
-
-        }
-
-      }
-
-    }
-
-  }
-
-  return delivery.container.release ();
+static db::Region corners_to_boxes (const db::Region *r, double angle_start, double angle_end, db::Coord dim)
+{
+  return r->processed (db::CornersAsRectangles (angle_start, angle_end, dim));
 }
 
 static db::Region *new_si (const db::RecursiveShapeIterator &si)
@@ -304,38 +252,22 @@ static void insert_si2 (db::Region *r, db::RecursiveShapeIterator si, db::ICplxT
 
 static db::Region minkowsky_sum_pe (const db::Region *r, const db::Edge &e)
 {
-  db::Region o;
-  for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end (); ++p) {
-    o.insert (db::minkowsky_sum (*p, e, false));
-  }
-  return o;
+  return r->processed (db::minkowsky_sum_computation<db::Edge> (e));
 }
 
 static db::Region minkowsky_sum_pp (const db::Region *r, const db::Polygon &q)
 {
-  db::Region o;
-  for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end (); ++p) {
-    o.insert (db::minkowsky_sum (*p, q, false));
-  }
-  return o;
+  return r->processed (db::minkowsky_sum_computation<db::Polygon> (q));
 }
 
 static db::Region minkowsky_sum_pb (const db::Region *r, const db::Box &q)
 {
-  db::Region o;
-  for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end (); ++p) {
-    o.insert (db::minkowsky_sum (*p, q, false));
-  }
-  return o;
+  return r->processed (db::minkowsky_sum_computation<db::Box> (q));
 }
 
 static db::Region minkowsky_sum_pc (const db::Region *r, const std::vector<db::Point> &q)
 {
-  db::Region o;
-  for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end (); ++p) {
-    o.insert (db::minkowsky_sum (*p, q, false));
-  }
-  return o;
+  return r->processed (db::minkowsky_sum_computation<std::vector<db::Point> > (q));
 }
 
 static db::Region &move_p (db::Region *r, const db::Vector &p)
@@ -362,12 +294,7 @@ static db::Region moved_xy (const db::Region *r, db::Coord x, db::Coord y)
 
 static db::Region extents2 (const db::Region *r, db::Coord dx, db::Coord dy)
 {
-  db::Region e;
-  e.reserve (r->size ());
-  for (db::Region::const_iterator i = r->begin_merged (); ! i.at_end (); ++i) {
-    e.insert (i->box ().enlarged (db::Vector (dx, dy)));
-  }
-  return e;
+  return r->processed (db::Extents (dx, dy));
 }
 
 static db::Region extents1 (const db::Region *r, db::Coord d)
@@ -382,33 +309,12 @@ static db::Region extents0 (const db::Region *r)
 
 static db::Region extent_refs (const db::Region *r, double fx1, double fy1, double fx2, double fy2, db::Coord dx, db::Coord dy)
 {
-  db::Region e;
-  e.reserve (r->size ());
-  for (db::Region::const_iterator i = r->begin_merged (); ! i.at_end (); ++i) {
-    db::Box b = i->box ();
-    db::Point p1 (b.left () + db::coord_traits<db::Coord>::rounded (fx1 * b.width ()),
-                  b.bottom () + db::coord_traits<db::Coord>::rounded (fy1 * b.height ()));
-    db::Point p2 (b.left () + db::coord_traits<db::Coord>::rounded (fx2 * b.width ()),
-                  b.bottom () + db::coord_traits<db::Coord>::rounded (fy2 * b.height ()));
-    e.insert (db::Box (p1, p2).enlarged (db::Vector (dx, dy)));
-  }
-  return e;
+  return r->processed (db::RelativeExtents (fx1, fy1, fx2, fy2, dx, dy));
 }
 
 static db::Edges extent_refs_edges (const db::Region *r, double fx1, double fy1, double fx2, double fy2)
 {
-  db::Edges e;
-  e.set_merged_semantics (false);
-  e.reserve (r->size ());
-  for (db::Region::const_iterator i = r->begin_merged (); ! i.at_end (); ++i) {
-    db::Box b = i->box ();
-    db::Point p1 (b.left () + db::coord_traits<db::Coord>::rounded (fx1 * b.width ()),
-                  b.bottom () + db::coord_traits<db::Coord>::rounded (fy1 * b.height ()));
-    db::Point p2 (b.left () + db::coord_traits<db::Coord>::rounded (fx2 * b.width ()),
-                  b.bottom () + db::coord_traits<db::Coord>::rounded (fy2 * b.height ()));
-    e.insert (db::Edge (p1, p2));
-  }
-  return e;
+  return r->processed (db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2));
 }
 
 static db::Region with_perimeter1 (const db::Region *r, db::Region::perimeter_type perimeter, bool inverse)
@@ -1196,11 +1102,13 @@ Class<db::Region> decl_Region ("db", "Region",
     "@hide\n"
     "This method is provided for DRC implementation.\n"
   ) +
-  factory_ext ("corners", &corners<BoxDelivery>, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0),
+  method_ext ("corners", &corners_to_boxes, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("dim", 1),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "The angle values specify a range of angles: all corners whose attached edges form an angle "
-    "between angle_start and angle_end will be reported as small (2x2 DBU) boxes. The angle is measured "
+    "between angle_start and angle_end will be reported boxes with 2*dim x 2*dim dimension. The default dimension is 2x2 DBU.\n"
+    "\n"
+    "The angle is measured "
     "between the incoming and the outcoming edge in mathematical sense: a positive value is a turn left "
     "while a negative value is a turn right. Since polygon contours are oriented clockwise, positive "
     "angles will report concave corners while negative ones report convex ones.\n"
@@ -1209,7 +1117,7 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "This function has been introduced in version 0.25.\n"
   ) +
-  method_ext ("corners_dots", &corners<DotDelivery>, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0),
+  method_ext ("corners_dots", &corners_to_dots, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "This method is similar to \\corners, but delivers an \\Edges collection with dot-like edges for each corner.\n"

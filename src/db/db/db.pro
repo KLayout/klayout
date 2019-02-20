@@ -171,7 +171,8 @@ SOURCES = \
     dbDeepEdges.cc \
     dbDeepEdgePairs.cc \
     dbRegionUtils.cc \
-    dbEdgesUtils.cc
+    dbEdgesUtils.cc \
+    dbRegionProcessors.cc
 
 HEADERS = \
   dbArray.h \
@@ -307,7 +308,8 @@ HEADERS = \
     dbDeepEdges.h \
     dbDeepEdgePairs.h \
     dbRegionUtils.h \
-    dbEdgesUtils.h
+    dbEdgesUtils.h \
+    dbRegionProcessors.h
 
 !equals(HAVE_QT, "0") {
 

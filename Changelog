@@ -3,21 +3,21 @@
 * YET TO BE RELEASED
 * Enhancement: Standalone Python modules provided
        For details see: 
-       https://github.com/klayoutmatthias/klayout/wiki/klayout---Standalone-KLayout-Python-Module
+       %GITHUB%/wiki/klayout---Standalone-KLayout-Python-Module
 
 0.25.5          (2018-09-30):
 
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/162
+* Bugfix: %GITHUB%/issues/162
        GDS2 LIBNAME was not maintained on "File/Save".
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/166
+* Bugfix: %GITHUB%/issues/166
        Internal error when writing GDS files (breaking of polygons)
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/172
+* Bugfix: %GITHUB%/issues/172
        DEF reader did not pull vias from LEF
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/174
+* Bugfix: %GITHUB%/issues/174
        Performance issue with many layers with width >1
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/176
+* Bugfix: %GITHUB%/issues/176
        Painting issue with texts
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/185
+* Bugfix: %GITHUB%/issues/185
        Hash values available as __hash__ standard method now
        for Python
 * Bugfix: some potential memory corruption issues fixed
@@ -27,36 +27,36 @@
        These fixes are included in this release.
 
 0.25.4          (2018-08-25):
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/121
+* Bugfix: %GITHUB%/issues/121
        Issue with multiple reads of GDS2 layouts including PCells
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/134
+* Bugfix: %GITHUB%/issues/134
        Error in cell.fill_region caused by big polygon with 
        spikes
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/139
+* Bugfix: %GITHUB%/issues/139
        Libraries have not been reassigned when loading a GDS file
        from command line (does not happen on File/Open)
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/141
+* Bugfix: %GITHUB%/issues/141
        Issue with RBA::QHostAddress (ambiguous overload) on Qt5
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/142
+* Bugfix: %GITHUB%/issues/142
        Issue with RBA::RecursiveShapeIterator#region=
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/144
+* Bugfix: %GITHUB%/issues/144
        The Salt package descriptions are not shown with Motif
        style
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/148
+* Bugfix: %GITHUB%/issues/148
        Wrong font is used
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/152
+* Bugfix: %GITHUB%/issues/152
        Shapes#size reported a wrong shape count in viewer mode
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/153
+* Bugfix: %GITHUB%/issues/153
        Application crash when editing guiding shape properties
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/155
+* Bugfix: %GITHUB%/issues/155
        Program freezes after replacing nothing by something in 
        Macro editor
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/157
+* Bugfix: %GITHUB%/issues/157
        "Replace cell with ..." rejected cell names with a library
        prefix
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/158
+* Bugfix: %GITHUB%/issues/158
        Repaint issue on cell context
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/159
+* Bugfix: %GITHUB%/issues/159
        Tech specific macros and DRC scripts were not shown in tech
        manager
 * Bugfix: 8 bit indexed GIF images can be used for package icons now
@@ -118,41 +118,41 @@
 * Bugfix: XOR progress is more realistic
        The progress is updated after the layer has been computed,
        not before.
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/117
+* Bugfix: %GITHUB%/issues/117
        DTrans#itype was broken.
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/116
+* Bugfix: %GITHUB%/issues/116
        Fixed a polygon decomposition bug when writing GDS files
        with big polygons with many holes. As a side effect, the
        polygons with many holes computed by a NOT operation for
        example are less complex and spikes in the cutlines are
        avoided.
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/115
+* Bugfix: %GITHUB%/issues/115
        Reader options were not persisted.
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/114
+* Bugfix: %GITHUB%/issues/114
        Custom line styles not loaded from tech's layer properties
        file.
-* Enhancement: https://github.com/klayoutmatthias/klayout/issues/113
+* Enhancement: %GITHUB%/issues/113
        The XOR tool has an option now to heal result shapes which
        cross tile boundaries. The result shape count of tiled 
        and non-tiled mode should basically be the same then.
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/112
+* Bugfix: %GITHUB%/issues/112
        Salt package repository relative paths have not been working.
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/109
+* Bugfix: %GITHUB%/issues/109
        Issues with Python 3 and shape properties - property
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/108
+* Bugfix: %GITHUB%/issues/108
        Bugfix on Box#enlarge and Box#moved for empty boxes.
        keys generated with Python 3 could not be written to GDS2.
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/107
+* Bugfix: %GITHUB%/issues/107
        Undo not working with shapes.
-* Enhancement: https://github.com/klayoutmatthias/klayout/issues/106
+* Enhancement: %GITHUB%/issues/106
        Search & replace help page enhancements.
 
 0.25.2          (2018-03-20):
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/90
+* Bugfix: %GITHUB%/issues/90
       DRC: "extended" was not working as expected with "joined = true"
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/89 
+* Bugfix: %GITHUB%/issues/89 
       Display issue on MacOS fixed
-* Enhancement: https://github.com/klayoutmatthias/klayout/issues/85 
+* Enhancement: %GITHUB%/issues/85 
       IDE debugger: files can be excluded from showing exceptions when 
       they are thrown. To exclude a file press the new "Ignore" button 
       when the debugger tells you an exception has been generated.
@@ -160,7 +160,7 @@
       in the IDE settings ("Debugging" tab)
       The macro IDE settings can now be edited in the File/Setup 
       dialog.
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/94
+* Bugfix: %GITHUB%/issues/94
       Retina displays are support to some extend on MacOS. 
       An open topic is the quality of the icons.
 * Enhancement: build system for MacOS
@@ -174,40 +174,40 @@
        - A potential crash ob removing packages was fixed
 * Enhancement: 64 bit coordinate support enabled on Windows builds
 * Further bugfixes: See links
-       - https://github.com/klayoutmatthias/klayout/issues/21 (Autorun(-early) doesn't seem to run when lym files are inside a package)
-       - https://github.com/klayoutmatthias/klayout/issues/24 (Text insert dialog bug - Ok button isn't working)
-       - https://github.com/klayoutmatthias/klayout/issues/26 (Exceptions are reported every time they propagate up in the call chain in the ruby debugger)
-       - https://github.com/klayoutmatthias/klayout/issues/28 (CIF format detection failed)
-       - https://github.com/klayoutmatthias/klayout/issues/30 (Writer options dialog non-functional on a fresh configuration)
-       - https://github.com/klayoutmatthias/klayout/issues/32 (Rounding issue with instance properties)
-       - https://github.com/klayoutmatthias/klayout/issues/33 (Plugin factory not working when using with Python)
-       - https://github.com/klayoutmatthias/klayout/issues/36 (Hardening against destruction of object inside event handler)
-       - https://github.com/klayoutmatthias/klayout/issues/39 (Action cannot be reassigned)
-       - https://github.com/klayoutmatthias/klayout/issues/40 (Crash in Python binding)
-       - https://github.com/klayoutmatthias/klayout/issues/41 (Polygon#touches? issue)
-       - https://github.com/klayoutmatthias/klayout/issues/42 (Headless mode support with Qt5/-zz)
-       - https://github.com/klayoutmatthias/klayout/issues/43 (Crash when using Qt specific command line options)
-       - https://github.com/klayoutmatthias/klayout/issues/44 (Transformation constructor with x,y not working)
-       - https://github.com/klayoutmatthias/klayout/issues/45 (Partial selection does not capture instance)
-       - https://github.com/klayoutmatthias/klayout/issues/48 (Cancel does not reset current tool)
-       - https://github.com/klayoutmatthias/klayout/issues/51 (Segmentation fault on return to main window and other opportunities)
-       - https://github.com/klayoutmatthias/klayout/issues/53 (Unreadable 'about' text)
-       - https://github.com/klayoutmatthias/klayout/issues/62 (QXmlSimpleReader#parse cannot be called)
-       - https://github.com/klayoutmatthias/klayout/issues/63 (Wrong output on DRC non_interacting with empty second input)
-       - https://github.com/klayoutmatthias/klayout/issues/64 (Crash on exit)
-       - https://github.com/klayoutmatthias/klayout/issues/68 (OASIS reader issue with degenerated shapes)
-       - https://github.com/klayoutmatthias/klayout/issues/69 (DRC: 'inside' does not merge shapes of second input)
-       - https://github.com/klayoutmatthias/klayout/issues/71 (Target cell argument is required)
-       - https://github.com/klayoutmatthias/klayout/issues/72 (Edges/Region NOT issue)
-       - https://github.com/klayoutmatthias/klayout/issues/73 (Allow 'change layers' on PCells which support a single layer parameter)
-       - https://github.com/klayoutmatthias/klayout/issues/74 (Small-corner boolean issue)
-       - https://github.com/klayoutmatthias/klayout/issues/75 (Python PCell issue when parameters are called 'layer')
-       - https://github.com/klayoutmatthias/klayout/issues/79 (Replace function enabled also for read-only macros)
+       - %GITHUB%/issues/21 (Autorun(-early) doesn't seem to run when lym files are inside a package)
+       - %GITHUB%/issues/24 (Text insert dialog bug - Ok button isn't working)
+       - %GITHUB%/issues/26 (Exceptions are reported every time they propagate up in the call chain in the ruby debugger)
+       - %GITHUB%/issues/28 (CIF format detection failed)
+       - %GITHUB%/issues/30 (Writer options dialog non-functional on a fresh configuration)
+       - %GITHUB%/issues/32 (Rounding issue with instance properties)
+       - %GITHUB%/issues/33 (Plugin factory not working when using with Python)
+       - %GITHUB%/issues/36 (Hardening against destruction of object inside event handler)
+       - %GITHUB%/issues/39 (Action cannot be reassigned)
+       - %GITHUB%/issues/40 (Crash in Python binding)
+       - %GITHUB%/issues/41 (Polygon#touches? issue)
+       - %GITHUB%/issues/42 (Headless mode support with Qt5/-zz)
+       - %GITHUB%/issues/43 (Crash when using Qt specific command line options)
+       - %GITHUB%/issues/44 (Transformation constructor with x,y not working)
+       - %GITHUB%/issues/45 (Partial selection does not capture instance)
+       - %GITHUB%/issues/48 (Cancel does not reset current tool)
+       - %GITHUB%/issues/51 (Segmentation fault on return to main window and other opportunities)
+       - %GITHUB%/issues/53 (Unreadable 'about' text)
+       - %GITHUB%/issues/62 (QXmlSimpleReader#parse cannot be called)
+       - %GITHUB%/issues/63 (Wrong output on DRC non_interacting with empty second input)
+       - %GITHUB%/issues/64 (Crash on exit)
+       - %GITHUB%/issues/68 (OASIS reader issue with degenerated shapes)
+       - %GITHUB%/issues/69 (DRC: 'inside' does not merge shapes of second input)
+       - %GITHUB%/issues/71 (Target cell argument is required)
+       - %GITHUB%/issues/72 (Edges/Region NOT issue)
+       - %GITHUB%/issues/73 (Allow 'change layers' on PCells which support a single layer parameter)
+       - %GITHUB%/issues/74 (Small-corner boolean issue)
+       - %GITHUB%/issues/75 (Python PCell issue when parameters are called 'layer')
+       - %GITHUB%/issues/79 (Replace function enabled also for read-only macros)
 * Further enhancements: see links
-       - https://github.com/klayoutmatthias/klayout/issues/29 (Permissive mode for OASIS writer on odd-width paths)
-       - https://github.com/klayoutmatthias/klayout/issues/59 (Async download of package index and details)
-       - https://github.com/klayoutmatthias/klayout/issues/66 (Authentication dialog indicates retry)
-       - https://github.com/klayoutmatthias/klayout/issues/77 (Layout#copy_tree now works in non-editable mode too)
+       - %GITHUB%/issues/29 (Permissive mode for OASIS writer on odd-width paths)
+       - %GITHUB%/issues/59 (Async download of package index and details)
+       - %GITHUB%/issues/66 (Authentication dialog indicates retry)
+       - %GITHUB%/issues/77 (Layout#copy_tree now works in non-editable mode too)
 
 0.25            (2017-11-04):
 * Enhancement: Menu customization
@@ -269,7 +269,7 @@
       Packages can be published on GitHub or any server 
       supporting WebDAV. After registering a package, users
       can install or update packages with a few clicks.
-      For more information see https://github.com/klayoutmatthias/klayout/wiki
+      For more information see %GITHUB%/wiki
       or "About Packages" in the "Various Topics" area of the main 
       documentation. The package manager is found in the "Tools"
       menu under "Manage Packages".

@@ -22,6 +22,8 @@
 
 
 #include "gsiDecl.h"
+
+#include "gsiDeclDbHelpers.h"
 #include "dbShapes.h"
 #include "dbShape.h"
 #include "dbLayout.h"
@@ -101,54 +103,54 @@ static db::Shape dinsert_with_properties (db::Shapes *s, const Sh &p, db::proper
   return s->insert (db::object_with_properties<ISh> (db::CplxTrans (shapes_dbu (s)).inverted () * p, id));
 }
 
-static db::Shapes::shape_iterator begin (const db::Shapes *s, unsigned int flags)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin (const db::Shapes *s, unsigned int flags)
 {
-  return s->begin (flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin (flags));
 }
 
-static db::Shapes::shape_iterator begin_all (const db::Shapes *s)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_all (const db::Shapes *s)
 {
-  return s->begin (db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin (db::ShapeIterator::All));
 }
 
-static db::Shapes::shape_iterator begin_overlapping (const db::Shapes *s, unsigned int flags, const db::Box &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_overlapping (const db::Shapes *s, unsigned int flags, const db::Box &region)
 {
-  return s->begin_overlapping (region, flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (region, flags));
 }
 
-static db::Shapes::shape_iterator begin_doverlapping (const db::Shapes *s, unsigned int flags, const db::DBox &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_doverlapping (const db::Shapes *s, unsigned int flags, const db::DBox &region)
 {
-  return s->begin_overlapping (db::CplxTrans (shapes_dbu (s)).inverted () * region, flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (db::CplxTrans (shapes_dbu (s)).inverted () * region, flags));
 }
 
-static db::Shapes::shape_iterator begin_overlapping_all (const db::Shapes *s, const db::Box &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_overlapping_all (const db::Shapes *s, const db::Box &region)
 {
-  return s->begin_overlapping (region, db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (region, db::ShapeIterator::All));
 }
 
-static db::Shapes::shape_iterator begin_doverlapping_all (const db::Shapes *s, const db::DBox &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_doverlapping_all (const db::Shapes *s, const db::DBox &region)
 {
-  return s->begin_overlapping (db::CplxTrans (shapes_dbu (s)).inverted () * region, db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (db::CplxTrans (shapes_dbu (s)).inverted () * region, db::ShapeIterator::All));
 }
 
-static db::Shapes::shape_iterator begin_touching (const db::Shapes *s, unsigned int flags, const db::Box &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_touching (const db::Shapes *s, unsigned int flags, const db::Box &region)
 {
-  return s->begin_touching (region, flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (region, flags));
 }
 
-static db::Shapes::shape_iterator begin_dtouching (const db::Shapes *s, unsigned int flags, const db::DBox &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_dtouching (const db::Shapes *s, unsigned int flags, const db::DBox &region)
 {
-  return s->begin_touching (db::CplxTrans (shapes_dbu (s)).inverted () * region, flags);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (db::CplxTrans (shapes_dbu (s)).inverted () * region, flags));
 }
 
-static db::Shapes::shape_iterator begin_touching_all (const db::Shapes *s, const db::Box &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_touching_all (const db::Shapes *s, const db::Box &region)
 {
-  return s->begin_touching (region, db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (region, db::ShapeIterator::All));
 }
 
-static db::Shapes::shape_iterator begin_dtouching_all (const db::Shapes *s, const db::DBox &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_dtouching_all (const db::Shapes *s, const db::DBox &region)
 {
-  return s->begin_touching (db::CplxTrans (shapes_dbu (s)).inverted () * region, db::ShapeIterator::All);
+  return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (db::CplxTrans (shapes_dbu (s)).inverted () * region, db::ShapeIterator::All));
 }
 
 static void transform_shapes (db::Shapes *s, const db::Trans &trans)

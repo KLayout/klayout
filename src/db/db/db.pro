@@ -309,7 +309,8 @@ HEADERS = \
     dbDeepEdgePairs.h \
     dbRegionUtils.h \
     dbEdgesUtils.h \
-    dbRegionProcessors.h
+    dbRegionProcessors.h \
+    gsiDeclDbHelpers.h
 
 !equals(HAVE_QT, "0") {
 

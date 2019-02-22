@@ -25,6 +25,7 @@
 #include "dbRegion.h"
 #include "dbRegionUtils.h"
 #include "dbDeepRegion.h"
+#include "dbOriginalLayerRegion.h"
 #include "dbPolygonTools.h"
 #include "dbLayoutUtils.h"
 #include "dbShapes.h"
@@ -77,77 +78,43 @@ static db::Region *new_shapes (const db::Shapes &s)
   return r;
 }
 
-struct DotDelivery
+static db::Region *new_texts_as_boxes1 (const db::RecursiveShapeIterator &si, const std::string &pat, bool pattern, db::Coord enl)
 {
-  typedef db::Edges container_type;
-
-  DotDelivery () : container ()
-  {
-    container.reset (new container_type ());
-    container->set_merged_semantics (false);
-  }
-
-  void insert (const db::Point &pt)
-  {
-    container->insert (db::Edge (pt, pt));
-  }
-
-  std::auto_ptr<container_type> container;
-};
-
-struct BoxDelivery
-{
-  typedef db::Region container_type;
-
-  BoxDelivery () : container ()
-  {
-    container.reset (new container_type ());
-  }
-
-  void insert (const db::Point &pt)
-  {
-    container->insert (db::Box (pt - db::Vector (1, 1), pt + db::Vector (1, 1)));
-  }
-
-  std::auto_ptr<container_type> container;
-};
-
-template <class Delivery>
-static typename Delivery::container_type *new_texts (const db::RecursiveShapeIterator &si_in, const std::string &pat, bool pattern)
-{
-  db::RecursiveShapeIterator si (si_in);
-  si.shape_flags (db::ShapeIterator::Texts);
-
-  tl::GlobPattern glob_pat;
-  bool all = false;
-  if (pattern) {
-    if (pat == "*") {
-      all = true;
-    } else {
-      glob_pat = tl::GlobPattern (pat);
-    }
-  }
-
-  Delivery delivery;
-
-  while (! si.at_end ()) {
-    if (si.shape ().is_text () &&
-        (all || (pattern && glob_pat.match (si.shape ().text_string ())) || (!pattern && si.shape ().text_string () == pat))) {
-      db::Text t;
-      si.shape ().text (t);
-      t.transform (si.trans ());
-      delivery.insert (t.box ().center ());
-    }
-    si.next ();
-  }
-
-  return delivery.container.release ();
+  return new db::Region (db::OriginalLayerRegion (si, false).texts_as_boxes (pat, pattern, enl));
 }
 
-template <class Delivery>
-static typename Delivery::container_type *texts (const db::Region *r, const std::string &pat, bool pattern)
+static db::Region *new_texts_as_boxes2 (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const std::string &pat, bool pattern, db::Coord enl)
 {
-  return new_texts<Delivery> (r->iter (), pat, pattern);
+  return new db::Region (db::OriginalLayerRegion (si, false).texts_as_boxes (pat, pattern, enl, dss));
+}
+
+static const db::OriginalLayerRegion *org_layer (const db::Region *r)
+{
+  const db::OriginalLayerRegion *org_layer = dynamic_cast<const db::OriginalLayerRegion *> (r->delegate ());
+  if (! org_layer) {
+    throw tl::Exception (tl::to_string (tr ("Texts can only be identified on an original layer")));
+  }
+  return org_layer;
+}
+
+static db::Edges *texts_as_dots1 (const db::Region *r, const std::string &pat, bool pattern)
+{
+  return new db::Edges (org_layer (r)->texts_as_dots (pat, pattern));
+}
+
+static db::Edges *texts_as_dots2 (const db::Region *r, db::DeepShapeStore &dss, const std::string &pat, bool pattern)
+{
+  return new db::Edges (org_layer (r)->texts_as_dots (pat, pattern, dss));
+}
+
+static db::Region *texts_as_boxes1 (const db::Region *r, const std::string &pat, bool pattern, db::Coord enl)
+{
+  return new db::Region (org_layer (r)->texts_as_boxes (pat, pattern, enl));
+}
+
+static db::Region *texts_as_boxes2 (const db::Region *r, db::DeepShapeStore &dss, const std::string &pat, bool pattern, db::Coord enl)
+{
+  return new db::Region (org_layer (r)->texts_as_boxes (pat, pattern, enl, dss));
 }
 
 static db::Edges corners_to_dots (const db::Region *r, double angle_start, double angle_end)
@@ -730,12 +697,13 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "This method has been introduced in version 0.26.\n"
   ) +
-  constructor ("new", &new_texts<BoxDelivery>, gsi::arg("shape_iterator"), gsi::arg ("expr"), gsi::arg ("as_pattern", true),
+  constructor ("new", &new_texts_as_boxes1, gsi::arg("shape_iterator"), gsi::arg ("expr"), gsi::arg ("as_pattern", true), gsi::arg ("enl", 1),
     "@brief Constructor from a text set\n"
     "\n"
     "@param shape_iterator The iterator from which to derive the texts\n"
     "@param expr The selection string\n"
     "@param as_pattern If true, the selection string is treated as a glob pattern. Otherwise the match is exact.\n"
+    "@param enl The per-side enlargement of the box to mark the text (1 gives a 2x2 DBU box)"
     "\n"
     "This special constructor will create a region from the text objects delivered by the shape iterator. "
     "Each text object will give a small (non-empty) box that represents the text origin.\n"
@@ -748,7 +716,29 @@ Class<db::Region> decl_Region ("db", "Region",
     "region = RBA::Region::new(iter, \"A*\", false)   # all texts exactly matchin 'A*'\n"
     "@/code\n"
     "\n"
-    "This method has been introduced in version 0.25."
+    "This method has been introduced in version 0.25. The enlargement parameter has been added in version 0.26.\n"
+  ) +
+  constructor ("new", &new_texts_as_boxes2, gsi::arg("shape_iterator"), gsi::arg ("dss"), gsi::arg ("expr"), gsi::arg ("as_pattern", true), gsi::arg ("enl", 1),
+    "@brief Constructor from a text set\n"
+    "\n"
+    "@param shape_iterator The iterator from which to derive the texts\n"
+    "@param dss The \\DeepShapeStore object that acts as a heap for hierarchical operations.\n"
+    "@param expr The selection string\n"
+    "@param as_pattern If true, the selection string is treated as a glob pattern. Otherwise the match is exact.\n"
+    "@param enl The per-side enlargement of the box to mark the text (1 gives a 2x2 DBU box)"
+    "\n"
+    "This special constructor will create a deep region from the text objects delivered by the shape iterator. "
+    "Each text object will give a small (non-empty) box that represents the text origin.\n"
+    "Texts can be selected by their strings - either through a glob pattern or by exact comparison with "
+    "the given string. The following options are available:\n"
+    "\n"
+    "@code\n"
+    "region = RBA::Region::new(iter, dss, \"*\")           # all texts\n"
+    "region = RBA::Region::new(iter, dss, \"A*\")          # all texts starting with an 'A'\n"
+    "region = RBA::Region::new(iter, dss, \"A*\", false)   # all texts exactly matchin 'A*'\n"
+    "@/code\n"
+    "\n"
+    "This variant has been introduced in version 0.26.\n"
   ) +
   method ("insert_into", &db::Region::insert_into, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
     "@brief Inserts this region into the given layout, below the given cell and into the given layer.\n"
@@ -757,11 +747,19 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "This method has been introduced in version 0.26."
   ) +
-  factory_ext ("texts", &texts<BoxDelivery>, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
+  factory_ext ("texts", &texts_as_boxes1, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true), gsi::arg ("enl", 1),
     "@hide\n"
     "This method is provided for DRC implementation only."
   ) +
-  factory_ext ("texts_dots", &texts<DotDelivery>, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
+  factory_ext ("texts", &texts_as_boxes2, gsi::arg ("dss"), gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true), gsi::arg ("enl", 1),
+    "@hide\n"
+    "This method is provided for DRC implementation only."
+  ) +
+  factory_ext ("texts_dots", &texts_as_dots1, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
+    "@hide\n"
+    "This method is provided for DRC implementation only."
+  ) +
+  factory_ext ("texts_dots", &texts_as_dots2, gsi::arg ("dss"), gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
     "@hide\n"
     "This method is provided for DRC implementation only."
   ) +

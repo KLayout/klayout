@@ -28,6 +28,7 @@
 #include "dbEdgesUtils.h"
 #include "dbDeepEdges.h"
 #include "dbRegion.h"
+#include "dbOriginalLayerRegion.h"
 #include "dbLayoutUtils.h"
 
 namespace gsi
@@ -389,6 +390,17 @@ static bool is_deep (const db::Edges *e)
   return dynamic_cast<const db::DeepEdges *> (e->delegate ()) != 0;
 }
 
+static db::Edges *new_texts_as_dots1 (const db::RecursiveShapeIterator &si, const std::string &pat, bool pattern)
+{
+  return new db::Edges (db::OriginalLayerRegion (si, false).texts_as_dots (pat, pattern));
+}
+
+static db::Edges *new_texts_as_dots2 (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const std::string &pat, bool pattern)
+{
+  return new db::Edges (db::OriginalLayerRegion (si, false).texts_as_dots (pat, pattern, dss));
+}
+
+
 Class<db::Edges> dec_Edges ("db", "Edges",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
@@ -518,6 +530,47 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "dbu    = 0.1 # the target database unit\n"
     "r = RBA::Edges::new(layout.begin_shapes(cell, layer), dss, RBA::ICplxTrans::new(layout.dbu / dbu), false)\n"
     "@/code\n"
+  ) +
+  constructor ("new", &new_texts_as_dots1, gsi::arg("shape_iterator"), gsi::arg ("expr"), gsi::arg ("as_pattern", true),
+    "@brief Constructor from a text set\n"
+    "\n"
+    "@param shape_iterator The iterator from which to derive the texts\n"
+    "@param expr The selection string\n"
+    "@param as_pattern If true, the selection string is treated as a glob pattern. Otherwise the match is exact.\n"
+    "\n"
+    "This special constructor will create dot-like edges from the text objects delivered by the shape iterator. "
+    "Each text object will give a degenerated edge (a dot) that represents the text origin.\n"
+    "Texts can be selected by their strings - either through a glob pattern or by exact comparison with "
+    "the given string. The following options are available:\n"
+    "\n"
+    "@code\n"
+    "dots = RBA::Edges::new(iter, \"*\")           # all texts\n"
+    "dots = RBA::Edges::new(iter, \"A*\")          # all texts starting with an 'A'\n"
+    "dots = RBA::Edges::new(iter, \"A*\", false)   # all texts exactly matchin 'A*'\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  constructor ("new", &new_texts_as_dots2, gsi::arg("shape_iterator"), gsi::arg ("dss"), gsi::arg ("expr"), gsi::arg ("as_pattern", true),
+    "@brief Constructor from a text set\n"
+    "\n"
+    "@param shape_iterator The iterator from which to derive the texts\n"
+    "@param dss The \\DeepShapeStore object that acts as a heap for hierarchical operations.\n"
+    "@param expr The selection string\n"
+    "@param as_pattern If true, the selection string is treated as a glob pattern. Otherwise the match is exact.\n"
+    "\n"
+    "This special constructor will create a deep edge set from the text objects delivered by the shape iterator. "
+    "Each text object will give a degenerated edge (a dot) that represents the text origin.\n"
+    "Texts can be selected by their strings - either through a glob pattern or by exact comparison with "
+    "the given string. The following options are available:\n"
+    "\n"
+    "@code\n"
+    "region = RBA::Region::new(iter, dss, \"*\")           # all texts\n"
+    "region = RBA::Region::new(iter, dss, \"A*\")          # all texts starting with an 'A'\n"
+    "region = RBA::Region::new(iter, dss, \"A*\", false)   # all texts exactly matchin 'A*'\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
   ) +
   method ("insert_into", &db::Edges::insert_into, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
     "@brief Inserts this edge collection into the given layout, below the given cell and into the given layer.\n"

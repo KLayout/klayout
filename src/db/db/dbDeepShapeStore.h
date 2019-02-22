@@ -286,6 +286,15 @@ public:
   DeepLayer create_edge_pair_layer (const db::RecursiveShapeIterator &si, const ICplxTrans &trans = db::ICplxTrans ());
 
   /**
+   *  @brief Inserts a polygon layer into the deep shape store using a custom preparation pipeline
+   *
+   *  This method will create a new layer inside the deep shapes store and
+   *  feed it through the given pipeline. The pipeline may perform shape translations and
+   *  finally will feed the target hierarchy.
+   */
+  DeepLayer create_custom_layer (const db::RecursiveShapeIterator &si, HierarchyBuilderShapeReceiver *pipe, const ICplxTrans &trans = db::ICplxTrans ());
+
+  /**
    *  @brief Inserts the deep layer's shapes into some target layout
    */
   void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);

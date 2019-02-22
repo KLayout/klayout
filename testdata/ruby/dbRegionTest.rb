@@ -786,6 +786,62 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # texts
+  def test_15
+
+    r = RBA::Region::new
+    ex = nil
+    begin
+      t = r.texts("*", true)
+    rescue => ex
+    end
+    assert_equal(ex.to_s, "Texts can only be identified on an original layer in Region::texts")
+
+    r.insert(RBA::Box::new(1, 2, 3, 4))
+    ex = nil
+    begin
+      t = r.texts("*", true)
+    rescue => ex
+    end
+    assert_equal(ex.to_s, "Texts can only be identified on an original layer in Region::texts")
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    top.shapes(l1).insert(RBA::Text::new("ABC", RBA::Trans::new(RBA::Vector::new(100, 200))))
+
+    r = RBA::Region::new(top.begin_shapes_rec(l1))
+    t = r.texts("*", true)
+    assert_equal(t.to_s, "(99,199;99,201;101,201;101,199)")
+    assert_equal(t.is_deep?, false)
+    t = r.texts("*", true, 10)
+    assert_equal(t.to_s, "(90,190;90,210;110,210;110,190)")
+    t = r.texts("A*", true, 10)
+    assert_equal(t.to_s, "(90,190;90,210;110,210;110,190)")
+    t = r.texts("A*", false, 10)
+    assert_equal(t.to_s, "")
+    t = r.texts("ABC", false, 10)
+    assert_equal(t.to_s, "(90,190;90,210;110,210;110,190)")
+
+    dss = RBA::DeepShapeStore::new
+    r = RBA::Region::new(top.begin_shapes_rec(l1))
+    t = r.texts(dss, "*", true)
+    assert_equal(t.to_s, "(99,199;99,201;101,201;101,199)")
+    assert_equal(t.is_deep?, true)
+
+    r = RBA::Region::new(top.begin_shapes_rec(l1))
+    t = r.texts_dots("*", true)
+    assert_equal(t.to_s, "(100,200;100,200)")
+    assert_equal(t.is_deep?, false)
+
+    dss = RBA::DeepShapeStore::new
+    r = RBA::Region::new(top.begin_shapes_rec(l1))
+    t = r.texts_dots(dss, "A*", true)
+    assert_equal(t.to_s, "(100,200;100,200)")
+    assert_equal(t.is_deep?, true)
+
+  end
+
   # deep region tests
   def test_deep1
 

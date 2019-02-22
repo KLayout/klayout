@@ -426,6 +426,33 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   return DeepLayer (this, layout_index, layer_index);
 }
 
+DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator &si, HierarchyBuilderShapeReceiver *pipe, const db::ICplxTrans &trans)
+{
+  unsigned int layout_index = layout_for_iter (si, trans);
+
+  db::Layout &layout = m_layouts[layout_index]->layout;
+  db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
+
+  unsigned int layer_index = layout.insert_layer ();
+  builder.set_target_layer (layer_index);
+
+  //  Build the working hierarchy from the recursive shape iterator
+  try {
+
+    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+
+    builder.set_shape_receiver (pipe);
+    db::RecursiveShapeIterator (si).push (& builder);
+    builder.set_shape_receiver (0);
+
+  } catch (...) {
+    builder.set_shape_receiver (0);
+    throw;
+  }
+
+  return DeepLayer (this, layout_index, layer_index);
+}
+
 DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges, const db::ICplxTrans &trans)
 {
   unsigned int layout_index = layout_for_iter (si, trans);

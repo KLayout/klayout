@@ -299,6 +299,35 @@ private:
 };
 
 /**
+ *  @brief A polygon breaker processor
+ *  This processor reduces polygons with more than max_vertex_count vertices and
+ *  an bbox-to-polygon area ratio bigger than max_area_ratio.
+ *  A zero value for these parameters means "don't care".
+ */
+class DB_PUBLIC PolygonBreaker
+  : public db::PolygonProcessorBase
+{
+public:
+  PolygonBreaker (size_t max_vertex_count, double max_area_ratio)
+    : m_max_vertex_count (max_vertex_count), m_max_area_ratio (max_area_ratio)
+  {
+    //  .. nothing yet ..
+  }
+
+  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool result_must_not_be_merged () const { return true; }  //  would spoil the decomposition otherwise
+  virtual bool requires_raw_input () const { return true; }  //  acts on original shapes
+  virtual bool wants_variants () const { return false; }
+
+private:
+  size_t m_max_vertex_count;
+  double m_max_area_ratio;
+};
+
+/**
  *  @brief Computes the Minkowsky sum between the polygons and the given object
  *  The object can be Edge, Polygon, Box and std::vector<Point>
  */

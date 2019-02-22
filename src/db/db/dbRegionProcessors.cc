@@ -184,4 +184,23 @@ void TrapezoidDecomposition::process (const db::Polygon &poly, std::vector<db::P
   }
 }
 
+// -----------------------------------------------------------------------------------
+//  PolygonBreaker implementation
+
+void PolygonBreaker::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
+{
+  if ((m_max_vertex_count > 0 && poly.vertices () > m_max_vertex_count) ||
+      (m_max_area_ratio > 0 && poly.area_ratio () > m_max_area_ratio)) {
+
+    std::vector<db::Polygon> split_polygons;
+    db::split_polygon (poly, split_polygons);
+    for (std::vector<db::Polygon>::const_iterator p = split_polygons.begin (); p != split_polygons.end (); ++p) {
+      process (*p, result);
+    }
+
+  } else {
+    result.push_back (poly);
+  }
+}
+
 }

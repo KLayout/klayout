@@ -347,6 +347,23 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.holes.to_s, "(10,20;10,50;30,50;30,20);(40,20;40,50;60,50;60,20)")
     assert_equal(r.hulls.to_s, "(-10,-20;-10,200;100,200;100,-20);(-10,220;-10,400;100,400;100,220)")
 
+    r1 = RBA::Region::new
+    r1.insert(RBA::Box::new(0, 0, 1000, 100))
+    r1.insert(RBA::Box::new(900, 0, 1000, 1000))
+    r1.merge
+    r2 = r1.dup
+    r2.break(0, 0.0)
+    assert_equal(r2.to_s, "(0,0;0,100;900,100;900,1000;1000,1000;1000,0)")
+    r2 = r1.dup
+    r2.break(0, 3.0)
+    assert_equal(r2.to_s, "(0,0;0,100;1000,100;1000,0);(900,100;900,1000;1000,1000;1000,100)")
+    r2 = r1.dup
+    r2.break(4, 0.0)
+    assert_equal(r2.to_s, "(0,0;0,100;1000,100;1000,0);(900,100;900,1000;1000,1000;1000,100)")
+    r2 = r1.dup
+    r2.break(4, 3.0)
+    assert_equal(r2.to_s, "(0,0;0,100;1000,100;1000,0);(900,100;900,1000;1000,1000;1000,100)")
+
   end
 
   # Selection operators

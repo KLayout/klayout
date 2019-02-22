@@ -433,6 +433,11 @@ static db::Region non_rectilinear (const db::Region *r)
   return r->filtered (f);
 }
 
+static void break_polygons (db::Region *r, size_t max_vertex_count, double max_area_ratio)
+{
+  r->process (db::PolygonBreaker (max_vertex_count, max_area_ratio));
+}
+
 static db::Region &size_ext (db::Region *r, db::Coord d)
 {
   r->size (d);
@@ -1689,9 +1694,23 @@ Class<db::Region> decl_Region ("db", "Region",
     "This method returns all polygons in self which are not rectilinear."
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pe,
+  method_ext ("break", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
+    "@brief Breaks the polygons of the region into smaller ones\n"
+    "\n"
+    "There are two criteria for splitting a polygon: a polygon is split into parts with less then "
+    "'max_vertex_count' points and an bounding box-to-polygon area ratio less than 'max_area_ratio'. "
+    "The area ratio is supposed to render polygons whose bounding box is a better approximation. "
+    "This applies for example to 'L' shape polygons.\n"
+    "\n"
+    "Using a value of 0 for either limit means that the respective limit isn't checked. "
+    "Breaking happens by cutting the polygons into parts at 'good' locations. The "
+    "algorithm does not have a specific goal to minimize the number of parts for example. "
+    "The only goal is to achieve parts within the given limits.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method_ext ("minkowsky_sum", &minkowsky_sum_pe, gsi::arg ("e"),
     "@brief Compute the Minkowsky sum of the region and an edge\n"
-    "@args e\n"
     "\n"
     "@param e The edge.\n"
     "\n"
@@ -1704,9 +1723,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pp,
+  method_ext ("minkowsky_sum", &minkowsky_sum_pp, gsi::arg ("p"),
     "@brief Compute the Minkowsky sum of the region and a polygon\n"
-    "@args p\n"
     "\n"
     "@param p The first argument.\n"
     "\n"
@@ -1718,9 +1736,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pb,
+  method_ext ("minkowsky_sum", &minkowsky_sum_pb, gsi::arg ("b"),
     "@brief Compute the Minkowsky sum of the region and a box\n"
-    "@args b\n"
     "\n"
     "@param b The box.\n"
     "\n"
@@ -1732,9 +1749,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pc,
+  method_ext ("minkowsky_sum", &minkowsky_sum_pc, gsi::arg ("b"),
     "@brief Compute the Minkowsky sum of the region and a contour of points (a trace)\n"
-    "@args b\n"
     "\n"
     "@param b The contour (a series of points forming the trace).\n"
     "\n"
@@ -1747,9 +1763,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("move", &move_p,
+  method_ext ("move", &move_p, gsi::arg ("v"),
     "@brief Moves the region\n"
-    "@args v\n"
     "\n"
     "Moves the polygon by the given offset and returns the \n"
     "moved region. The region is overwritten.\n"
@@ -1760,9 +1775,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "@return The moved region (self).\n"
   ) +
-  method_ext ("move", &move_xy,
+  method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
     "@brief Moves the region\n"
-    "@args x,y\n"
     "\n"
     "Moves the region by the given offset and returns the \n"
     "moved region. The region is overwritten.\n"
@@ -1772,9 +1786,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "@return The moved region (self).\n"
   ) +
-  method_ext ("moved", &moved_p,
+  method_ext ("moved", &moved_p, gsi::arg ("v"),
     "@brief Returns the moved region (does not modify self)\n"
-    "@args p\n"
     "\n"
     "Moves the region by the given offset and returns the \n"
     "moved region. The region is not modified.\n"
@@ -1785,9 +1798,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "@return The moved region.\n"
   ) +
-  method_ext ("moved", &moved_xy,
+  method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("y"),
     "@brief Returns the moved region (does not modify self)\n"
-    "@args x,y\n"
     "\n"
     "Moves the region by the given offset and returns the \n"
     "moved region. The region is not modified.\n"
@@ -1797,9 +1809,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "@return The moved region.\n"
   ) +
-  method ("transform", (db::Region &(db::Region::*)(const db::Trans &)) &db::Region::transform,
+  method ("transform", (db::Region &(db::Region::*)(const db::Trans &)) &db::Region::transform, gsi::arg ("t"),
     "@brief Transform the region (modifies self)\n"
-    "@args t\n"
     "\n"
     "Transforms the region with the given transformation.\n"
     "This version modifies the region and returns a reference to self.\n"
@@ -1808,9 +1819,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "@return The transformed region.\n"
   ) +
-  method ("transform|#transform_icplx", (db::Region &(db::Region::*)(const db::ICplxTrans &)) &db::Region::transform,
+  method ("transform|#transform_icplx", (db::Region &(db::Region::*)(const db::ICplxTrans &)) &db::Region::transform, gsi::arg ("t"),
     "@brief Transform the region with a complex transformation (modifies self)\n"
-    "@args t\n"
     "\n"
     "Transforms the region with the given transformation.\n"
     "This version modifies the region and returns a reference to self.\n"
@@ -1819,9 +1829,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "@return The transformed region.\n"
   ) +
-  method ("transformed", (db::Region (db::Region::*)(const db::Trans &) const) &db::Region::transformed,
+  method ("transformed", (db::Region (db::Region::*)(const db::Trans &) const) &db::Region::transformed, gsi::arg ("t"),
     "@brief Transform the region\n"
-    "@args t\n"
     "\n"
     "Transforms the region with the given transformation.\n"
     "Does not modify the region but returns the transformed region.\n"
@@ -1830,9 +1839,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "@return The transformed region.\n"
   ) +
-  method ("transformed|#transformed_icplx", (db::Region (db::Region::*)(const db::ICplxTrans &) const) &db::Region::transformed,
+  method ("transformed|#transformed_icplx", (db::Region (db::Region::*)(const db::ICplxTrans &) const) &db::Region::transformed, gsi::arg ("t"),
     "@brief Transform the region with a complex transformation\n"
-    "@args t\n"
     "\n"
     "Transforms the region with the given complex transformation.\n"
     "Does not modify the region but returns the transformed region.\n"
@@ -1841,9 +1849,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "@return The transformed region.\n"
   ) +
-  method_ext ("width_check", &width1,
+  method_ext ("width_check", &width1, gsi::arg ("d"),
     "@brief Performs a width check\n"
-    "@args d\n"
     "@param d The minimum width for which the polygons are checked\n"
     "Performs a width check against the minimum width \"d\". For locations where a polygon has a "
     "width less than the given value, an error marker is produced. Error markers form a "
@@ -1853,9 +1860,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("width_check", &width2,
+  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs a width check with options\n"
-    "@args d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum width for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
     "@param metrics Specify the metrics type\n"
@@ -1885,9 +1891,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("space_check", &space1,
+  method_ext ("space_check", &space1, gsi::arg ("d"),
     "@brief Performs a space check\n"
-    "@args d\n"
     "@param d The minimum space for which the polygons are checked\n"
     "Performs a space check against the minimum space \"d\". For locations where a polygon has a "
     "space less than the given value to either itself (a notch) or to other polygons, an error marker is produced. Error markers form a "
@@ -1900,9 +1905,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("space_check", &space2,
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs a space check with options\n"
-    "@args d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
     "@param metrics Specify the metrics type\n"
@@ -1932,9 +1936,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("notch_check", &notch1,
+  method_ext ("notch_check", &notch1, gsi::arg ("d"),
     "@brief Performs a space check between edges of the same polygon\n"
-    "@args d\n"
     "@param d The minimum space for which the polygons are checked\n"
     "Performs a space check against the minimum space \"d\". For locations where a polygon has a "
     "space less than the given value to either itself (a notch) or to other polygons, an error marker is produced. Error markers form a "
@@ -1949,9 +1952,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("notch_check", &notch2,
+  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs a space check between edges of the same polygon with options\n"
-    "@args d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
     "@param metrics Specify the metrics type\n"
@@ -1981,9 +1983,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("isolated_check", &isolated1,
+  method_ext ("isolated_check", &isolated1, gsi::arg ("d"),
     "@brief Performs a space check between edges of different polygons\n"
-    "@args d\n"
     "@param d The minimum space for which the polygons are checked\n"
     "Performs a space check against the minimum space \"d\". For locations where a polygon has a "
     "space less than the given value to other polygons (not itself), an error marker is produced. Error markers form a "
@@ -1998,9 +1999,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("isolated_check", &isolated2,
+  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs a space check between edges of different polygons with options\n"
-    "@args d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
     "@param metrics Specify the metrics type\n"
@@ -2030,9 +2030,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("inside_check", &inside1,
+  method_ext ("inside_check", &inside1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs a check whether polygons of this region are inside polygons of the other region by some amount\n"
-    "@args other, d\n"
     "@param d The minimum overlap for which the polygons are checked\n"
     "@param other The other region against which to check\n"
     "Returns edge pairs for all locations where edges of polygons of this region are inside polygons of the other region "
@@ -2042,9 +2041,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("inside_check", &inside2,
+  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs an inside check with options\n"
-    "@args other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2075,9 +2073,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("overlap_check", &overlap1,
+  method_ext ("overlap_check", &overlap1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs a check whether polygons of this region overlap polygons of the other region by some amount\n"
-    "@args other, d\n"
     "@param d The minimum overlap for which the polygons are checked\n"
     "@param other The other region against which to check\n"
     "Returns edge pairs for all locations where edges of polygons of this region overlap polygons of the other region "
@@ -2085,9 +2082,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("overlap_check", &overlap2,
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs an overlap check with options\n"
-    "@args other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum overlap for which the polygons are checked\n"
     "@param other The other region against which to check\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2118,9 +2114,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("enclosing_check", &enclosing1,
+  method_ext ("enclosing_check", &enclosing1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs a check whether polygons of this region enclose polygons of the other region by some amount\n"
-    "@args other, d\n"
     "@param d The minimum overlap for which the polygons are checked\n"
     "@param other The other region against which to check\n"
     "Returns edge pairs for all locations where edges of polygons of this region are enclosing polygons of the other region "
@@ -2128,9 +2123,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("enclosing_check", &enclosing2,
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs an enclosing check with options\n"
-    "@args other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum enclosing distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2161,9 +2155,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("separation_check", &separation1,
+  method_ext ("separation_check", &separation1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs a check whether polygons of this region are separated from polygons of the other region by some amount\n"
-    "@args other, d\n"
     "@param d The minimum separation for which the polygons are checked\n"
     "@param other The other region against which to check\n"
     "Returns edge pairs for all locations where edges of polygons of this region are separated by polygons of the other region "
@@ -2171,9 +2164,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("separation_check", &separation2,
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs a separation check with options\n"
-    "@args other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum separation for which the polygons are checked\n"
     "@param other The other region against which to check\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2210,9 +2202,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "If merged semantics is not enabled, overlapping areas are counted twice.\n"
   ) +
-  method_ext ("area", &area2,
+  method_ext ("area", &area2, gsi::arg ("rect"),
     "@brief The area of the region (restricted to a rectangle)\n"
-    "@args rect\n"
     "This version will compute the area of the shapes, restricting the computation to the given rectangle.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
@@ -2224,9 +2215,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "If merged semantics is not enabled, internal edges are counted as well.\n"
   ) +
-  method_ext ("perimeter", &perimeter2,
+  method_ext ("perimeter", &perimeter2, gsi::arg ("rect"),
     "@brief The total perimeter of the polygons (restricted to a rectangle)\n"
-    "@args rect\n"
     "This version will compute the perimeter of the polygons, restricting the computation to the given rectangle.\n"
     "Edges along the border are handled in a special way: they are counted when they are oriented with their inside "
     "side toward the rectangle (in other words: outside edges must coincide with the rectangle's border in order to be counted).\n"
@@ -2251,10 +2241,11 @@ Class<db::Region> decl_Region ("db", "Region",
   method ("is_empty?", &db::Region::empty,
     "@brief Returns true if the region is empty\n"
   ) +
-  method ("size", (size_t (db::Region::*) () const) &db::Region::size,
+  method ("size|count", (size_t (db::Region::*) () const) &db::Region::size,
     "@brief Returns the number of polygons in the region\n"
     "\n"
     "This returns the number of raw polygons (not merged polygons if merged semantics is enabled).\n"
+    "The 'count' alias has been provided in version 0.26 to avoid ambiguitiy with the 'size' method which applies a geometrical bias."
   ) +
   iterator ("each", &db::Region::begin,
     "@brief Returns each polygon of the region\n"
@@ -2266,9 +2257,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "This returns the raw polygons if merged semantics is disabled or the merged ones if merged semantics is enabled.\n"
   ) +
-  method ("[]", &db::Region::nth,
+  method ("[]", &db::Region::nth, gsi::arg ("n"),
     "@brief Returns the nth polygon of the region\n"
-    "@args n\n"
     "\n"
     "This method returns nil if the index is out of range. It is available for flat regions only - i.e. "
     "those for which \\has_valid_polygons? is true. Use \\flatten to explicitly flatten a region.\n"
@@ -2294,14 +2284,12 @@ Class<db::Region> decl_Region ("db", "Region",
     "The length of the output is limited to 20 polygons to avoid giant strings on large regions. "
     "For full output use \"to_s\" with a maximum count parameter.\n"
   ) +
-  method_ext ("to_s", &to_string1,
+  method_ext ("to_s", &to_string1, gsi::arg ("max_count"),
     "@brief Converts the region to a string\n"
-    "@args max_count\n"
     "This version allows specification of the maximum number of polygons contained in the string."
   ) +
-  method ("enable_progress", &db::Region::enable_progress,
+  method ("enable_progress", &db::Region::enable_progress, gsi::arg ("label"),
     "@brief Enable progress reporting\n"
-    "@args label\n"
     "After calling this method, the region will report the progress through a progress bar while "
     "expensive operations are running.\n"
     "The label is a text which is put in front of the progress bar.\n"

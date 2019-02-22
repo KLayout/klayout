@@ -436,7 +436,7 @@ DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &s
   unsigned int layer_index = layout.insert_layer ();
   builder.set_target_layer (layer_index);
 
-  //  The chain of operators for producing clipped and reduced polygon references
+  //  The chain of operators for producing edges
   db::EdgeBuildingHierarchyBuilderShapeReceiver refs (as_edges);
 
   //  Build the working hierarchy from the recursive shape iterator
@@ -466,7 +466,7 @@ DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterat
   unsigned int layer_index = layout.insert_layer ();
   builder.set_target_layer (layer_index);
 
-  //  The chain of operators for producing clipped and reduced polygon references
+  //  The chain of operators for producing the edge pairs
   db::EdgePairBuildingHierarchyBuilderShapeReceiver refs;
 
   //  Build the working hierarchy from the recursive shape iterator

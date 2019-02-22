@@ -98,9 +98,9 @@ DeepEdgePairs::DeepEdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &
 }
 
 DeepEdgePairs::DeepEdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans)
-  : AsIfFlatEdgePairs (), m_deep_layer (dss.create_edge_pair_layer (si))
+  : AsIfFlatEdgePairs (), m_deep_layer (dss.create_edge_pair_layer (si, trans))
 {
-  tl_assert (trans.is_unity ()); // TODO: implement
+  //  .. nothing yet ..
 }
 
 DeepEdgePairs::DeepEdgePairs (const DeepEdgePairs &other)

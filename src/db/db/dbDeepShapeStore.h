@@ -201,9 +201,13 @@ private:
 
 struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy
 {
-  bool operator () (const db::RecursiveShapeIterator &a, const db::RecursiveShapeIterator &b) const
+  bool operator () (const std::pair<db::RecursiveShapeIterator, db::ICplxTrans> &a, const std::pair<db::RecursiveShapeIterator, db::ICplxTrans> &b) const
   {
-    return db::compare_iterators_with_respect_to_target_hierarchy (a, b) < 0;
+    int cmp_iter = db::compare_iterators_with_respect_to_target_hierarchy (a.first, b.first);
+    if (cmp_iter != 0) {
+      return cmp_iter < 0;
+    }
+    return a.second < b.second;
   }
 };
 
@@ -257,7 +261,7 @@ public:
    *  into parts satisfying the area ratio (bounding box vs. polygon area)
    *  and maximum vertex count constraints.
    */
-  DeepLayer create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio = 0.0, size_t max_vertex_count = 0);
+  DeepLayer create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio = 0.0, size_t max_vertex_count = 0, const ICplxTrans &trans = db::ICplxTrans ());
 
   /**
    *  @brief Inserts an edge layer into the deep shape store
@@ -270,7 +274,7 @@ public:
    *  only edge objects are taken from the shape iterator. Note that the shape iterator
    *  must be configured to deliver all shape types if "as_edges" is true.
    */
-  DeepLayer create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges);
+  DeepLayer create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges, const ICplxTrans &trans = db::ICplxTrans ());
 
   /**
    *  @brief Inserts an edge pair layer into the deep shape store
@@ -279,7 +283,7 @@ public:
    *  working copy of the original layer. This method creates a layer
    *  for edge pairs.
    */
-  DeepLayer create_edge_pair_layer (const db::RecursiveShapeIterator &si);
+  DeepLayer create_edge_pair_layer (const db::RecursiveShapeIterator &si, const ICplxTrans &trans = db::ICplxTrans ());
 
   /**
    *  @brief Inserts the deep layer's shapes into some target layout
@@ -522,13 +526,13 @@ private:
   void add_ref (unsigned int layout, unsigned int layer);
   void remove_ref (unsigned int layout, unsigned int layer);
 
-  unsigned int layout_for_iter (const db::RecursiveShapeIterator &si);
+  unsigned int layout_for_iter (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans);
 
   void require_singular () const;
 
   void issue_variants (unsigned int layout, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_map);
 
-  typedef std::map<db::RecursiveShapeIterator, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
+  typedef std::map<std::pair<db::RecursiveShapeIterator, db::ICplxTrans>, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
 
   //  no copying
   DeepShapeStore (const DeepShapeStore &);

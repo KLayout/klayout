@@ -102,11 +102,9 @@ DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, boo
 }
 
 DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges, bool merged_semantics)
-  : AsIfFlatEdges (), m_deep_layer (dss.create_edge_layer (si, as_edges)), m_merged_edges ()
+  : AsIfFlatEdges (), m_deep_layer (dss.create_edge_layer (si, as_edges, trans)), m_merged_edges ()
 {
   init ();
-
-  tl_assert (trans.is_unity ()); // TODO: implement
   set_merged_semantics (merged_semantics);
 }
 

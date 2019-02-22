@@ -108,11 +108,9 @@ DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, d
 }
 
 DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics, double area_ratio, size_t max_vertex_count)
-  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count)), m_merged_polygons ()
+  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count, trans)), m_merged_polygons ()
 {
   init ();
-
-  tl_assert (trans.is_unity ()); // TODO: implement
   set_merged_semantics (merged_semantics);
 }
 

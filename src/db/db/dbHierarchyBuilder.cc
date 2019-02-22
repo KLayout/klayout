@@ -135,14 +135,14 @@ static std::pair<bool, std::set<db::Box> > compute_clip_variant (const db::Box &
   return std::make_pair (true, clip_variant);
 }
 
-HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (target_layer)
+HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
+  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (target_layer), m_trans (trans)
 {
   set_shape_receiver (pipe);
 }
 
-HierarchyBuilder::HierarchyBuilder (db::Layout *target, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (0)
+HierarchyBuilder::HierarchyBuilder (db::Layout *target, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
+  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (0), m_trans (trans)
 {
   set_shape_receiver (pipe);
 }
@@ -283,6 +283,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
     if (m_cell_stack.back ().first) {
       db::CellInstArray new_inst (inst, &mp_target->array_repository ());
       new_inst.object () = db::CellInst (m_cm_entry->second);
+      new_inst.transform_into (m_trans);
       for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
         (*c)->insert (new_inst);
       }
@@ -332,6 +333,7 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
     //  for a new cell, create this instance
     if (m_cell_stack.back ().first) {
       db::CellInstArray new_inst (db::CellInst (m_cm_entry->second), trans);
+      new_inst.transform_into (m_trans);
       for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
         (*c)->insert (new_inst);
       }
@@ -347,7 +349,7 @@ HierarchyBuilder::shape (const RecursiveShapeIterator * /*iter*/, const db::Shap
 {
   for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
     db::Shapes &shapes = (*c)->shapes (m_target_layer);
-    mp_pipe->push (shape, region, complex_region, &shapes);
+    mp_pipe->push (shape, m_trans, region, complex_region, &shapes);
   }
 }
 
@@ -360,54 +362,54 @@ ClippingHierarchyBuilderShapeReceiver::ClippingHierarchyBuilderShapeReceiver (Hi
 }
 
 void
-ClippingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ClippingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   static db::Box world = db::Box::world ();
 
   if (region == world || is_inside (shape.bbox (), region, complex_region)) {
 
-    mp_pipe->push (shape, world, 0, target);
+    mp_pipe->push (shape, trans, world, 0, target);
 
   } else if (! is_outside (shape.bbox (), region, complex_region)) {
 
     //  clip the shape if required
     if (shape.is_text () || shape.is_edge () || shape.is_edge_pair ()) {
-      mp_pipe->push (shape, world, 0, target);
+      mp_pipe->push (shape, trans, world, 0, target);
     } else if (shape.is_box ()) {
-      insert_clipped (shape.box (), region, complex_region, target);
+      insert_clipped (shape.box (), trans, region, complex_region, target);
     } else if (shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ()) {
       db::Polygon poly;
       shape.polygon (poly);
-      insert_clipped (poly, region, complex_region, target);
+      insert_clipped (poly, trans, region, complex_region, target);
     }
 
   }
 }
 
 void
-ClippingHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ClippingHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   static db::Box world = db::Box::world ();
 
   if (! complex_region) {
     db::Box r = shape & region;
     if (! r.empty()) {
-      mp_pipe->push (r, world, 0, target);
+      mp_pipe->push (r, trans, world, 0, target);
     }
   } else {
-    insert_clipped (shape, region, complex_region, target);
+    insert_clipped (shape, trans, region, complex_region, target);
   }
 }
 
 void
-ClippingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ClippingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   static db::Box world = db::Box::world ();
 
   if (region == world || (shape.box ().inside (region) && ! complex_region)) {
-    mp_pipe->push (shape, world, 0, target);
+    mp_pipe->push (shape, trans, world, 0, target);
   } else {
-    insert_clipped (shape, region, complex_region, target);
+    insert_clipped (shape, trans, region, complex_region, target);
   }
 }
 
@@ -465,22 +467,22 @@ ClippingHierarchyBuilderShapeReceiver::is_outside (const db::Box &box, const db:
 }
 
 void
-ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Box &box, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Box &box, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   db::Box bb = box & region;
   static db::Box world = db::Box::world ();
 
   if (complex_region) {
     for (db::RecursiveShapeReceiver::box_tree_type::overlapping_iterator cr = complex_region->begin_overlapping (bb, db::box_convert<db::Box> ()); ! cr.at_end (); ++cr) {
-      mp_pipe->push (*cr & bb, world, 0, target);
+      mp_pipe->push (*cr & bb, trans, world, 0, target);
     }
   } else {
-    mp_pipe->push (bb, world, 0, target);
+    mp_pipe->push (bb, trans, world, 0, target);
   }
 }
 
 void
-ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Polygon &poly, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Polygon &poly, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   std::vector<db::Polygon> clipped_poly;
   static db::Box world = db::Box::world ();
@@ -495,7 +497,7 @@ ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Polygon &poly, 
   }
 
   for (std::vector<db::Polygon>::const_iterator p = clipped_poly.begin (); p != clipped_poly.end (); ++p) {
-    mp_pipe->push (*p, world, 0, target);
+    mp_pipe->push (*p, trans, world, 0, target);
   }
 }
 
@@ -508,44 +510,44 @@ ReducingHierarchyBuilderShapeReceiver::ReducingHierarchyBuilderShapeReceiver (Hi
 }
 
 void
-ReducingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ReducingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   if (shape.is_text () || shape.is_edge () || shape.is_edge_pair ()) {
-    mp_pipe->push (shape, region, complex_region, target);
+    mp_pipe->push (shape, trans, region, complex_region, target);
   } else if (shape.is_box ()) {
-    mp_pipe->push (shape.box (), region, complex_region, target);
+    mp_pipe->push (shape.box (), trans, region, complex_region, target);
   } else if (shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ()) {
     db::Polygon poly;
     shape.polygon (poly);
-    reduce (poly, region, complex_region, target);
+    reduce (poly, trans, region, complex_region, target);
   }
 }
 
 void
-ReducingHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ReducingHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
-  mp_pipe->push (shape, region, complex_region, target);
+  mp_pipe->push (shape, trans, region, complex_region, target);
 }
 
 void
-ReducingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ReducingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
-  reduce (shape, region, complex_region, target);
+  reduce (shape, trans, region, complex_region, target);
 }
 
 void
-ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   if (poly.vertices () > m_max_vertex_count || poly.area_ratio () > m_area_ratio) {
 
     std::vector <db::Polygon> split_polygons;
     db::split_polygon (poly, split_polygons);
     for (std::vector <db::Polygon>::const_iterator sp = split_polygons.begin (); sp != split_polygons.end (); ++sp) {
-      reduce (*sp, region, complex_region, target);
+      reduce (*sp, trans, region, complex_region, target);
     }
 
   } else {
-    mp_pipe->push (poly, region, complex_region, target);
+    mp_pipe->push (poly, trans, region, complex_region, target);
   }
 }
 
@@ -560,17 +562,23 @@ PolygonReferenceHierarchyBuilderShapeReceiver::PolygonReferenceHierarchyBuilderS
   }
 }
 
-void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
+void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
   if (shape.is_box () || shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ()) {
 
     db::Polygon poly;
     shape.polygon (poly);
+    if (! trans.is_unity ()) {
+      poly.transform (trans);
+    }
     target->insert (db::PolygonRef (poly, mp_layout->shape_repository ()));
 
   } else if (shape.is_text () && m_text_enlargement >= 0) {
 
     db::Polygon poly (shape.text_trans () * db::Box (-m_text_enlargement, -m_text_enlargement, m_text_enlargement, m_text_enlargement));
+    if (! trans.is_unity ()) {
+      poly.transform (trans);
+    }
     db::PolygonRef pref (poly, mp_layout->shape_repository ());
 
     if (m_make_text_prop) {
@@ -588,14 +596,14 @@ void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape
   }
 }
 
-void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
+void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
-  target->insert (db::PolygonRef (db::Polygon (shape), mp_layout->shape_repository ()));
+  target->insert (db::PolygonRef (db::Polygon (shape.transformed (trans)), mp_layout->shape_repository ()));
 }
 
-void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
+void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
-  target->insert (db::PolygonRef (shape, mp_layout->shape_repository ()));
+  target->insert (db::PolygonRef (shape.transformed (trans), mp_layout->shape_repository ()));
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -606,34 +614,34 @@ EdgeBuildingHierarchyBuilderShapeReceiver::EdgeBuildingHierarchyBuilderShapeRece
   //  .. nothing yet ..
 }
 
-void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
   if (m_as_edges && (shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ())) {
     db::Polygon poly;
     shape.polygon (poly);
-    push (poly, region, complex_region, target);
+    push (poly, trans, region, complex_region, target);
   } else if (m_as_edges && shape.is_box ()) {
-    push (shape.box (), region, complex_region, target);
+    push (shape.box (), trans, region, complex_region, target);
   } else if (shape.is_edge ()) {
     target->insert (shape.edge ());
   }
 }
 
-void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Box &box, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
+void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Box &box, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
   if (m_as_edges && ! box.empty ()) {
-    target->insert (db::Edge (box.p1 (), box.upper_left ()));
-    target->insert (db::Edge (box.upper_left (), box.p2 ()));
-    target->insert (db::Edge (box.p2 (), box.lower_right ()));
-    target->insert (db::Edge (box.lower_right (), box.p1 ()));
+    target->insert (db::Edge (box.p1 (), box.upper_left ()).transformed (trans));
+    target->insert (db::Edge (box.upper_left (), box.p2 ()).transformed (trans));
+    target->insert (db::Edge (box.p2 (), box.lower_right ()).transformed (trans));
+    target->insert (db::Edge (box.lower_right (), box.p1 ()).transformed (trans));
   }
 }
 
-void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Polygon &poly, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
+void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Polygon &poly, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
   if (m_as_edges) {
     for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-      target->insert (*e);
+      target->insert ((*e).transformed (trans));
     }
   }
 }
@@ -645,10 +653,10 @@ EdgePairBuildingHierarchyBuilderShapeReceiver::EdgePairBuildingHierarchyBuilderS
   //  .. nothing yet ..
 }
 
-void EdgePairBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box & /*region*/, const db::RecursiveShapeReceiver::box_tree_type * /*complex_region*/, db::Shapes *target)
+void EdgePairBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const db::RecursiveShapeReceiver::box_tree_type * /*complex_region*/, db::Shapes *target)
 {
   if (shape.is_edge_pair ()) {
-    target->insert (shape.edge_pair ());
+    target->insert (shape.edge_pair ().transformed (trans));
   }
 }
 

@@ -221,8 +221,8 @@ DeepLayer::check_dss () const
 
 struct DeepShapeStore::LayoutHolder
 {
-  LayoutHolder ()
-    : refs (0), layout (false), builder (&layout)
+  LayoutHolder (const db::ICplxTrans &trans)
+    : refs (0), layout (false), builder (&layout, trans)
   {
     //  .. nothing yet ..
   }
@@ -364,22 +364,22 @@ void DeepShapeStore::remove_ref (unsigned int layout, unsigned int layer)
 }
 
 unsigned int
-DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si)
+DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  layout_map_type::iterator l = m_layout_map.find (si);
+  layout_map_type::iterator l = m_layout_map.find (std::make_pair (si, trans));
   if (l == m_layout_map.end ()) {
 
     unsigned int layout_index = (unsigned int) m_layouts.size ();
 
-    m_layouts.push_back (new LayoutHolder ());
+    m_layouts.push_back (new LayoutHolder (trans));
 
     db::Layout &layout = m_layouts.back ()->layout;
     layout.hier_changed_event.add (this, &DeepShapeStore::invalidate_hier);
     if (si.layout ()) {
-      layout.dbu (si.layout ()->dbu ());
+      layout.dbu (si.layout ()->dbu () / trans.mag ());
     }
 
-    m_layout_map[si] = layout_index;
+    m_layout_map[std::make_pair (si, trans)] = layout_index;
     return layout_index;
 
   } else {
@@ -387,7 +387,7 @@ DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si)
   }
 }
 
-DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count)
+DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)
 {
   if (max_area_ratio == 0.0) {
     max_area_ratio = m_max_area_ratio;
@@ -396,7 +396,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
     max_vertex_count = m_max_vertex_count;
   }
 
-  unsigned int layout_index = layout_for_iter (si);
+  unsigned int layout_index = layout_for_iter (si, trans);
 
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
@@ -426,9 +426,9 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   return DeepLayer (this, layout_index, layer_index);
 }
 
-DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges)
+DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges, const db::ICplxTrans &trans)
 {
-  unsigned int layout_index = layout_for_iter (si);
+  unsigned int layout_index = layout_for_iter (si, trans);
 
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
@@ -456,9 +456,9 @@ DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &s
   return DeepLayer (this, layout_index, layer_index);
 }
 
-DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterator &si)
+DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  unsigned int layout_index = layout_for_iter (si);
+  unsigned int layout_index = layout_for_iter (si, trans);
 
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;

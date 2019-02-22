@@ -1135,6 +1135,49 @@ TEST(21_Processors)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au21.gds");
 }
 
+TEST(22_TwoLayoutsWithDifferentDBU)
+{
+  db::Layout ly1;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly1);
+  }
+
+  db::cell_index_type top_cell_index1 = *ly1.begin_top_down ();
+  db::Cell &top_cell1 = ly1.cell (top_cell_index1);
+
+  db::Layout ly2;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_area_peri_l1_dbu2.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly2);
+  }
+
+  db::cell_index_type top_cell_index2 = *ly2.begin_top_down ();
+  db::Cell &top_cell2 = ly2.cell (top_cell_index2);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l11 = ly1.get_layer (db::LayerProperties (1, 0));
+  db::Region r11 (db::RecursiveShapeIterator (ly1, top_cell1, l11), dss);
+
+  unsigned int l12 = ly2.get_layer (db::LayerProperties (2, 0));
+  db::Region r12 (db::RecursiveShapeIterator (ly2, top_cell2, l12), dss, db::ICplxTrans (ly2.dbu () / ly1.dbu ()));
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly1.cell_name (top_cell_index1));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r11.sized (1000) ^ r12);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au22.gds");
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

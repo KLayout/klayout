@@ -844,7 +844,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
     do_render_bg (vp, vo_canvas);
 
     //  paint the layout bitmaps
-    rd_canvas.to_image (m_view_ops, dither_pattern (), line_styles (), background, foreground, active, this, vo_canvas.bg_image (), vp.width (), vp.height ());
+    rd_canvas.to_image (view_ops, dither_pattern (), line_styles (), background, foreground, active, this, vo_canvas.bg_image (), vp.width (), vp.height ());
 
     //  subsample current image to provide the background for the foreground objects
     vo_canvas.make_background ();
@@ -860,7 +860,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
 
     //  TODO: Painting of background objects???
     //  paint the layout bitmaps
-    rd_canvas.to_image (m_view_ops, dither_pattern (), line_styles (), background, foreground, active, this, vo_canvas.bg_image (), vp.width (), vp.height ());
+    rd_canvas.to_image (view_ops, dither_pattern (), line_styles (), background, foreground, active, this, vo_canvas.bg_image (), vp.width (), vp.height ());
 
   }
 

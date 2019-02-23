@@ -2066,7 +2066,7 @@ MainWindow::cm_print ()
       text_rect.setBottom (text_rect.bottom () - hh / 2);
       text_rect.setTop (text_rect.top () + hh / 2);
 
-      QImage img = current_view ()->get_image_with_options (page_rect.width (), page_rect.height () - 4 * hh, 2, 1, 1.0 / 3.0, Qt::white, Qt::black, Qt::black, db::DBox (), false);
+      QImage img = current_view ()->get_image_with_options (page_rect.width (), page_rect.height () - 4 * hh, 1, 1, 1.0 / 3.0, Qt::white, Qt::black, Qt::black, db::DBox (), false);
 
       painter.drawImage (QPoint (page_rect.left (), page_rect.top () + hh * 2), img);
       painter.setFont (header_font);

@@ -350,8 +350,8 @@ public:
         continue;
       }
 
-      const uint32_t *dc = ff.data () + size_t (ch - ff.first_char ()) * ff.height ();
-      for (unsigned int i = 0; i < ff.height (); ++i, ++dc) {
+      const uint32_t *dc = ff.data () + size_t (ch - ff.first_char ()) * ff.height () * ff.stride ();
+      for (unsigned int i = 0; i < ff.height (); ++i, dc += ff.stride ()) {
 
         int iy = y - ff.height () + i + 1;
         if (iy >= 0 || iy < mp_img->height ()) {
@@ -359,10 +359,21 @@ public:
           uint32_t *d = (uint32_t *) mp_img->scanLine (y - ff.height () + i);
           uint32_t m = 1; 
           int ix = x;
-          for (unsigned int j = 0; j < ff.width (); ++j, m <<= 1, ++ix) {
-            if (*dc & m && ix >= 0 && ix < mp_img->width ()) {
+          const uint32_t *ds = dc;
+
+          for (unsigned int j = 0; j < ff.width (); ++j, ++ix) {
+
+            if ((*ds & m) && ix >= 0 && ix < mp_img->width ()) {
               d[ix] = c.rgb ();
             }
+
+            m <<= 1;
+            //  word wrap
+            if (m == 0) {
+              ++ds;
+              m = 1;
+            }
+
           }
 
         }

@@ -1,3 +1,14 @@
+0.25.8          (2019-02-23):
+
+* Bugfix: %GITHUB%/issues/234
+       Issues with LayoutView#save_image_with_options
+* Bugfix: %GITHUB%/issues/232
+       Crash on reading .lyp files with big stipple pattern
+* Bugfix: %GITHUB%/issues/228
+       Bug in Region#interact and DRC's "interact" function.
+* Bugfix: %GITHUB%/issues/225
+       Mirrored custom stipple pattern
+ 
 0.25.7          (2019-01-09):
 
 * Bugfix: %GITHUB%/issues/200

@@ -73,84 +73,84 @@ template class RDB_PUBLIC Value<db::DText>;
 
 //  to_string implementations
 
-template <> std::string Value<double>::to_string () const
+template <> RDB_PUBLIC std::string Value<double>::to_string () const
 {
   return "float: " + tl::to_string (m_value);
 }
 
-template <> std::string Value<std::string>::to_string () const
+template <> RDB_PUBLIC std::string Value<std::string>::to_string () const
 {
   return "text: " + tl::to_word_or_quoted_string (m_value);
 }
 
-template <> std::string Value<db::DPolygon>::to_string () const
+template <> RDB_PUBLIC std::string Value<db::DPolygon>::to_string () const
 {
   return "polygon: " + m_value.to_string ();
 }
 
-template <> std::string Value<db::DEdge>::to_string () const
+template <> RDB_PUBLIC std::string Value<db::DEdge>::to_string () const
 {
   return "edge: " + m_value.to_string ();
 }
 
-template <> std::string Value<db::DEdgePair>::to_string () const
+template <> RDB_PUBLIC std::string Value<db::DEdgePair>::to_string () const
 {
   return "edge-pair: " + m_value.to_string ();
 }
 
-template <> std::string Value<db::DBox>::to_string () const
+template <> RDB_PUBLIC std::string Value<db::DBox>::to_string () const
 {
   return "box: " + m_value.to_string ();
 }
 
-template <> std::string Value<db::DPath>::to_string () const
+template <> RDB_PUBLIC std::string Value<db::DPath>::to_string () const
 {
   return "path: " + m_value.to_string ();
 }
 
-template <> std::string Value<db::DText>::to_string () const
+template <> RDB_PUBLIC std::string Value<db::DText>::to_string () const
 {
   return "label: " + m_value.to_string ();
 }
 
 //  to_display_string implementations
 
-template <> std::string Value<double>::to_display_string () const
+template <> RDB_PUBLIC std::string Value<double>::to_display_string () const
 {
   return tl::to_string (m_value);
 }
 
-template <> std::string Value<std::string>::to_display_string () const
+template <> RDB_PUBLIC std::string Value<std::string>::to_display_string () const
 {
   return m_value;
 }
 
-template <> std::string Value<db::DPolygon>::to_display_string () const
+template <> RDB_PUBLIC std::string Value<db::DPolygon>::to_display_string () const
 {
   return to_string ();
 }
 
-template <> std::string Value<db::DEdge>::to_display_string () const
+template <> RDB_PUBLIC std::string Value<db::DEdge>::to_display_string () const
 {
   return to_string ();
 }
 
-template <> std::string Value<db::DEdgePair>::to_display_string () const
+template <> RDB_PUBLIC std::string Value<db::DEdgePair>::to_display_string () const
 {
   return to_string ();
 }
 
-template <> std::string Value<db::DBox>::to_display_string () const
+template <> RDB_PUBLIC std::string Value<db::DBox>::to_display_string () const
 {
   return to_string ();
 }
 
-template <> std::string Value<db::DPath>::to_display_string () const
+template <> RDB_PUBLIC std::string Value<db::DPath>::to_display_string () const
 {
   return to_string ();
 }
 
-template <> std::string Value<db::DText>::to_display_string () const
+template <> RDB_PUBLIC std::string Value<db::DText>::to_display_string () const
 {
   return to_string ();
 }

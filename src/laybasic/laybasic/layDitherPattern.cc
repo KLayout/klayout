@@ -722,8 +722,8 @@ DitherPatternInfo::from_strings (const std::vector<std::string> &strv)
     data[l] = 0;
   }
 
-  for (size_t i = 0; i < strv.size (); ++i) {
-    uint_from_string (strv [strv.size () - 1 - i].c_str (), data [i], w);
+  for (size_t i = 0; i < h; ++i) {
+    uint_from_string (strv [h - 1 - i].c_str (), data [i], w);
   }
 
   set_pattern (data, w, h);

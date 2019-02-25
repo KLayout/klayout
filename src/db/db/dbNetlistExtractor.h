@@ -126,7 +126,7 @@ private:
                                      const connected_clusters_type &clusters,
                                      size_t cid,
                                      db::Net *net,
-                                     std::map<db::InstElement, db::SubCircuit *> &subcircuits,
+                                     std::map<std::pair<cell_index_type, ICplxTrans>, SubCircuit *> &subcircuits,
                                      const std::map<db::cell_index_type, db::Circuit *> &circuits,
                                      const std::map<db::cell_index_type, std::map<size_t, size_t> > &pins_per_cluster);
 

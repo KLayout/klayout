@@ -123,7 +123,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connect
 
     std::map<size_t, size_t> &c2p = pins_per_cluster_per_cell [*cid];
 
-    std::map<db::InstElement, db::SubCircuit *> subcircuits;
+    std::map<std::pair<db::cell_index_type, db::ICplxTrans>, db::SubCircuit *> subcircuits;
 
     for (connected_clusters_type::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
 
@@ -243,15 +243,16 @@ void NetlistExtractor::connect_devices (db::Circuit *circuit,
   const connected_clusters_type::connections_type &connections = clusters.connections_for_cluster (cid);
   for (connected_clusters_type::connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
 
-    const db::Instance &inst = i->inst ().inst_ptr;
+    db::cell_index_type inst_cell_index = i->inst_cell_index ();
+    db::properties_id_type inst_prop_id = i->inst_prop_id ();
 
     //  only consider devices in this pass
-    db::Device *device = device_from_instance (inst.prop_id (), circuit);
+    db::Device *device = device_from_instance (inst_prop_id, circuit);
     if (! device) {
       continue;
     }
 
-    const db::local_cluster<db::PolygonRef> &dc = mp_clusters->clusters_per_cell (inst.cell_index ()).cluster_by_id (i->id ());
+    const db::local_cluster<db::PolygonRef> &dc = mp_clusters->clusters_per_cell (inst_cell_index).cluster_by_id (i->id ());
 
     //  connect the net to the terminal of the device: take the terminal ID from the properties on the
     //  device cluster
@@ -278,41 +279,46 @@ void NetlistExtractor::make_and_connect_subcircuits (db::Circuit *circuit,
                                                      const connected_clusters_type &clusters,
                                                      size_t cid,
                                                      db::Net *net,
-                                                     std::map<db::InstElement, db::SubCircuit *> &subcircuits,
+                                                     std::map<std::pair<db::cell_index_type, db::ICplxTrans>, db::SubCircuit *> &subcircuits,
                                                      const std::map<db::cell_index_type, db::Circuit *> &circuits,
                                                      const std::map<db::cell_index_type, std::map<size_t, size_t> > &pins_per_cluster)
 {
   const connected_clusters_type::connections_type &connections = clusters.connections_for_cluster (cid);
   for (connected_clusters_type::connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
 
+    db::cell_index_type inst_cell_index = i->inst_cell_index ();
+    db::properties_id_type inst_prop_id = i->inst_prop_id ();
+    const db::ICplxTrans &inst_trans = i->inst_trans ();
+
     //  skip devices in this pass
-    if (instance_is_device (i->inst ().inst_ptr.prop_id ())) {
+    if (instance_is_device (inst_prop_id)) {
       continue;
     }
 
     db::SubCircuit *subcircuit = 0;
-    db::cell_index_type ccid = i->inst ().inst_ptr.cell_index ();
 
-    std::map<db::InstElement, db::SubCircuit *>::const_iterator j = subcircuits.find (i->inst ());
+    std::pair<db::cell_index_type, db::ICplxTrans> subcircuit_key (inst_cell_index, inst_trans);
+
+    std::map<std::pair<db::cell_index_type, db::ICplxTrans>, db::SubCircuit *>::const_iterator j = subcircuits.find (subcircuit_key);
     if (j == subcircuits.end ()) {
 
       //  make subcircuit if required
 
-      std::map<db::cell_index_type, db::Circuit *>::const_iterator k = circuits.find (ccid);
+      std::map<db::cell_index_type, db::Circuit *>::const_iterator k = circuits.find (inst_cell_index);
       tl_assert (k != circuits.end ());  //  because we walk bottom-up
 
       subcircuit = new db::SubCircuit (k->second);
       db::CplxTrans dbu_trans (mp_layout->dbu ());
-      subcircuit->set_trans (dbu_trans * i->inst ().complex_trans () * dbu_trans.inverted ());
+      subcircuit->set_trans (dbu_trans * inst_trans * dbu_trans.inverted ());
       circuit->add_subcircuit (subcircuit);
-      subcircuits.insert (std::make_pair (i->inst (), subcircuit));
+      subcircuits.insert (std::make_pair (subcircuit_key, subcircuit));
 
     } else {
       subcircuit = j->second;
     }
 
     //  create the pin connection to the subcircuit
-    std::map<db::cell_index_type, std::map<size_t, size_t> >::const_iterator icc2p = pins_per_cluster.find (ccid);
+    std::map<db::cell_index_type, std::map<size_t, size_t> >::const_iterator icc2p = pins_per_cluster.find (inst_cell_index);
     tl_assert (icc2p != pins_per_cluster.end ());
     std::map<size_t, size_t>::const_iterator ip = icc2p->second.find (i->id ());
     tl_assert (ip != icc2p->second.end ());

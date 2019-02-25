@@ -634,13 +634,13 @@ TEST(30_LocalConnectedClusters)
   EXPECT_EQ (x.size (), size_t (3));
   ix = x.begin ();
   EXPECT_EQ (ix->id (), size_t (1));
-  EXPECT_EQ (ix->inst () == db::InstElement (i1), true);
+  EXPECT_EQ (*ix == db::ClusterInstance (ix->id (), i1.cell_index (), i1.complex_trans (), i1.prop_id ()), true);
   ++ix;
   EXPECT_EQ (ix->id (), size_t (2));
-  EXPECT_EQ (ix->inst () == db::InstElement (i2), true);
+  EXPECT_EQ (*ix == db::ClusterInstance (ix->id (), i2.cell_index (), i2.complex_trans (), i2.prop_id ()), true);
   ++ix;
   EXPECT_EQ (ix->id (), size_t (1));
-  EXPECT_EQ (ix->inst () == db::InstElement (i2), true);
+  EXPECT_EQ (*ix == db::ClusterInstance (ix->id (), i2.cell_index (), i2.complex_trans (), i2.prop_id ()), true);
 
   x = cc.connections_for_cluster (2);
   EXPECT_EQ (x.size (), size_t (0));
@@ -753,7 +753,7 @@ static std::string path2string (const db::Layout &ly, db::cell_index_type ci, co
   std::string res = ly.cell_name (ci);
   for (std::vector<db::ClusterInstance>::const_iterator p = path.begin (); p != path.end (); ++p) {
     res += "/";
-    res += ly.cell_name (p->inst ().inst_ptr.cell_index ());
+    res += ly.cell_name (p->inst_cell_index ());
   }
   return res;
 }
@@ -936,9 +936,9 @@ static void copy_cluster_shapes (const std::string *&attrs, db::Shapes &out, db:
   const connections_type &connections = clusters.connections_for_cluster (cluster_id);
   for (connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
 
-    db::ICplxTrans t = trans * i->inst ().complex_trans ();
+    db::ICplxTrans t = trans * i->inst_trans ();
 
-    db::cell_index_type cci = i->inst ().inst_ptr.cell_index ();
+    db::cell_index_type cci = i->inst_cell_index ();
     copy_cluster_shapes (attrs, out, cci, hc, i->id (), t, conn);
 
   }

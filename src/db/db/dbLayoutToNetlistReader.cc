@@ -279,7 +279,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
         std::map<db::CellInstArray, std::list<Connections> >::const_iterator c = connections.find (i->cell_inst ());
         if (c != connections.end ()) {
           for (std::list<Connections>::const_iterator j = c->second.begin (); j != c->second.end (); ++j) {
-            l2n->net_clusters ().clusters_per_cell (ci).add_connection (j->from_cluster, db::ClusterInstance (j->to_cluster, *i));
+            l2n->net_clusters ().clusters_per_cell (ci).add_connection (j->from_cluster, db::ClusterInstance (j->to_cluster, i->cell_index (), i->complex_trans (), i->prop_id ()));
           }
         }
       }

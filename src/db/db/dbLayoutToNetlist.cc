@@ -561,7 +561,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
   const connections_type &connections = clusters.connections_for_cluster (cid);
   for (connections_type::const_iterator c = connections.begin (); c != connections.end (); ++c) {
 
-    db::cell_index_type subci = c->inst ().inst_ptr.cell_index ();
+    db::cell_index_type subci = c->inst_cell_index ();
     size_t subcid = c->id ();
 
     std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type>::const_iterator cm = cmap.find (std::make_pair (subci, subcid));
@@ -590,7 +590,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
     }
 
     if (cm->second != std::numeric_limits<db::cell_index_type>::max ()) {
-      db::CellInstArray ci (db::CellInst (cm->second), tr_wo_mag * c->inst ().complex_trans ());
+      db::CellInstArray ci (db::CellInst (cm->second), tr_wo_mag * c->inst_trans ());
       ci.transform_into (tr_mag);
       target_cell->insert (ci);
     }

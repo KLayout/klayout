@@ -34,6 +34,7 @@
 
 #include <map>
 #include <set>
+#include <limits>
 
 namespace tl {
   class RelativeProgress;
@@ -523,19 +524,135 @@ private:
 };
 
 /**
+ *  @brief The instance information for a cluster
+ */
+class DB_PUBLIC ClusterInstElement
+{
+public:
+  ClusterInstElement (const db::InstElement &ie)
+  {
+    if (ie.array_inst.at_end ()) {
+
+      m_inst_cell_index = std::numeric_limits<db::cell_index_type>::max ();
+      m_inst_trans = db::ICplxTrans ();
+      m_inst_prop_id = 0;
+
+    } else {
+
+      m_inst_cell_index = ie.inst_ptr.cell_index ();
+      m_inst_trans = ie.complex_trans ();
+      m_inst_prop_id = ie.inst_ptr.prop_id ();
+
+    }
+  }
+
+  ClusterInstElement (db::cell_index_type inst_cell_index, const db::ICplxTrans &inst_trans, db::properties_id_type inst_prop_id)
+    : m_inst_cell_index (inst_cell_index), m_inst_trans (inst_trans), m_inst_prop_id (inst_prop_id)
+  {
+    //  .. nothing yet ..
+  }
+
+  ClusterInstElement ()
+    : m_inst_cell_index (std::numeric_limits<db::cell_index_type>::max ()), m_inst_trans (), m_inst_prop_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Returns true, if the cluster does not have an instance
+   */
+  bool has_instance () const
+  {
+    return m_inst_cell_index != std::numeric_limits<db::cell_index_type>::max ();
+  }
+
+  /**
+   *  @brief Gets the cell index of the cell which is instantiated
+   */
+  db::cell_index_type inst_cell_index () const
+  {
+    return m_inst_cell_index;
+  }
+
+  /**
+   *  @brief Gets the instance transformation
+   */
+  const db::ICplxTrans &inst_trans () const
+  {
+    return m_inst_trans;
+  }
+
+  /**
+   *  @brief Gets the instance properties id
+   */
+  db::properties_id_type inst_prop_id () const
+  {
+    return m_inst_prop_id;
+  }
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const ClusterInstElement &other) const
+  {
+    return m_inst_cell_index == other.m_inst_cell_index && m_inst_trans == other.m_inst_trans && m_inst_prop_id == other.m_inst_prop_id;
+  }
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const ClusterInstElement &other) const
+  {
+    return ! operator== (other);
+  }
+
+  /**
+   *  @brief Less operator
+   */
+  bool operator< (const ClusterInstElement &other) const
+  {
+    if (m_inst_cell_index != other.m_inst_cell_index) {
+      return m_inst_cell_index < other.m_inst_cell_index;
+    }
+    if (m_inst_trans != other.m_inst_trans) {
+      return m_inst_trans < other.m_inst_trans;
+    }
+    return m_inst_prop_id < other.m_inst_prop_id;
+  }
+
+private:
+  db::cell_index_type m_inst_cell_index;
+  db::ICplxTrans m_inst_trans;
+  db::properties_id_type m_inst_prop_id;
+};
+
+/**
  *  @brief A connection to a cluster in a child instance
  */
 class DB_PUBLIC ClusterInstance
+  : public ClusterInstElement
 {
 public:
-  ClusterInstance (size_t id, const db::InstElement &inst)
-    : m_id (id), m_inst (inst)
+  ClusterInstance (size_t id, db::cell_index_type inst_cell_index, const db::ICplxTrans &inst_trans, db::properties_id_type inst_prop_id)
+    : ClusterInstElement (inst_cell_index, inst_trans, inst_prop_id), m_id (id)
+  {
+    //  .. nothing yet ..
+  }
+
+  ClusterInstance (size_t id, const db::InstElement &inst_element)
+    : ClusterInstElement (inst_element), m_id (id)
+  {
+    //  .. nothing yet ..
+  }
+
+  ClusterInstance (size_t id)
+    : ClusterInstElement (), m_id (id)
   {
     //  .. nothing yet ..
   }
 
   ClusterInstance ()
-    : m_id (0), m_inst ()
+    : ClusterInstElement (), m_id (0)
   {
     //  .. nothing yet ..
   }
@@ -549,19 +666,11 @@ public:
   }
 
   /**
-   *  @brief Gets the instance path
-   */
-  const db::InstElement &inst () const
-  {
-    return m_inst;
-  }
-
-  /**
    *  @brief Equality
    */
   bool operator== (const ClusterInstance &other) const
   {
-    return m_id == other.m_id && m_inst == other.m_inst;
+    return m_id == other.m_id && ClusterInstElement::operator== (other);
   }
 
   /**
@@ -580,12 +689,11 @@ public:
     if (m_id != other.m_id) {
       return m_id < other.m_id;
     }
-    return m_inst < other.m_inst;
+    return ClusterInstElement::operator< (other);
   }
 
 private:
   size_t m_id;
-  db::InstElement m_inst;
 };
 
 template <class T> class hier_clusters;
@@ -813,7 +921,7 @@ public:
    *  Cluster connections can only cross one level of hierarchy. This method
    *  creates necessary dummy entries for the given path.
    */
-  ClusterInstance make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<db::InstElement> &path);
+  ClusterInstance make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<ClusterInstElement> &path);
 
 private:
   void build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence);
@@ -1004,7 +1112,7 @@ private:
 class DB_PUBLIC IncomingClusterInstance
 {
 public:
-  IncomingClusterInstance (db::cell_index_type pc, size_t parent_cluster_id, const db::InstElement &inst)
+  IncomingClusterInstance (db::cell_index_type pc, size_t parent_cluster_id, const ClusterInstance &inst)
     : m_parent_cell (pc), m_parent_cluster_id (parent_cluster_id), m_inst (inst)
   {
     //  .. nothing yet ..
@@ -1036,7 +1144,7 @@ public:
   /**
    *  @brief Gets the instance path
    */
-  const db::InstElement &inst () const
+  const ClusterInstance &inst () const
   {
     return m_inst;
   }
@@ -1066,7 +1174,7 @@ public:
 private:
   db::cell_index_type m_parent_cell;
   size_t m_parent_cluster_id;
-  db::InstElement m_inst;
+  ClusterInstance m_inst;
 };
 
 /**

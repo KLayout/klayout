@@ -351,8 +351,8 @@ private:
 
       const db::connected_clusters<db::PolygonRef>::connections_type &conn = cc.connections_for_cluster (cid);
       for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = conn.begin (); i != conn.end (); ++i) {
-        const db::Shapes &cc_shapes = compute_merged (i->id (), i->inst ().inst_ptr.cell_index (), false, min_wc);
-        merged_child_clusters.push_back (std::make_pair (&cc_shapes, i->inst ().complex_trans ()));
+        const db::Shapes &cc_shapes = compute_merged (i->id (), i->inst_cell_index (), false, min_wc);
+        merged_child_clusters.push_back (std::make_pair (&cc_shapes, i->inst_trans ()));
       }
 
       m_ep.clear ();

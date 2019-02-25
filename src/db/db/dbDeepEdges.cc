@@ -314,8 +314,8 @@ public:
 
     const db::connected_clusters<db::Edge>::connections_type &conn = cc.connections_for_cluster (cid);
     for (db::connected_clusters<db::Edge>::connections_type::const_iterator i = conn.begin (); i != conn.end (); ++i) {
-      const db::Shapes &cc_shapes = merged (i->id (), i->inst ().inst_ptr.cell_index (), false);
-      merged_child_clusters.push_back (std::make_pair (&cc_shapes, i->inst ().complex_trans ()));
+      const db::Shapes &cc_shapes = merged (i->id (), i->inst_cell_index (), false);
+      merged_child_clusters.push_back (std::make_pair (&cc_shapes, i->inst_trans ()));
     }
 
     //  collect the edges to merge ..

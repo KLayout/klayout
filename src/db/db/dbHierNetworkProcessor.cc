@@ -1116,13 +1116,13 @@ public:
 
   struct ClusterInstanceInteraction
   {
-    ClusterInstanceInteraction (size_t _cluster_id, size_t _other_cluster_id, const std::vector<db::InstElement> &_other_path)
+    ClusterInstanceInteraction (size_t _cluster_id, size_t _other_cluster_id, const std::vector<ClusterInstElement> &_other_path)
       : cluster_id (_cluster_id), other_cluster_id (_other_cluster_id), other_path (_other_path)
     { }
 
     size_t cluster_id;
     size_t other_cluster_id;
-    std::vector<db::InstElement> other_path;
+    std::vector<ClusterInstElement> other_path;
   };
 
   /**
@@ -1139,7 +1139,7 @@ public:
    */
   void add (const db::Instance *i1, unsigned int /*p1*/, const db::Instance *i2, unsigned int /*p2*/)
   {
-    std::vector<db::InstElement> p;
+    std::vector<ClusterInstElement> p;
     db::ICplxTrans t;
     add_pair (box_type::world (), *i1, p, t, *i2, p, t);
   }
@@ -1159,7 +1159,7 @@ public:
    */
   void add (const local_cluster<T> *c1, unsigned int /*p1*/, const db::Instance *i2, unsigned int /*p2*/)
   {
-    std::vector<db::InstElement> p;
+    std::vector<ClusterInstElement> p;
     db::ICplxTrans t;
     add_pair (*c1, *i2, p, t);
   }
@@ -1233,7 +1233,7 @@ private:
    *  @param p2 The instantiation path to the child cell (not including i2)
    *  @param t2 The accumulated transformation of the path, not including i2
    */
-  void add_pair (const box_type &common, const db::Instance &i1, const std::vector<db::InstElement> &p1, const db::ICplxTrans &t1, const db::Instance &i2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
+  void add_pair (const box_type &common, const db::Instance &i1, const std::vector<ClusterInstElement> &p1, const db::ICplxTrans &t1, const db::Instance &i2, const std::vector<ClusterInstElement> &p2, const db::ICplxTrans &t2)
   {
     box_type bb1 = (*mp_cbc) (i1.cell_index ());
     box_type b1 = i1.cell_inst ().bbox (*mp_cbc).transformed (t1);
@@ -1255,10 +1255,10 @@ private:
       db::ICplxTrans tt1 = t1 * i1.complex_trans (*ii1);
       box_type ib1 = bb1.transformed (tt1);
 
-      std::vector<db::InstElement> pp1;
+      std::vector<ClusterInstElement> pp1;
       pp1.reserve (p1.size () + 1);
       pp1.insert (pp1.end (), p1.begin (), p1.end ());
-      pp1.push_back (db::InstElement (i1, ii1));
+      pp1.push_back (ClusterInstElement (i1.cell_index (), i1.complex_trans (*ii1), i1.prop_id ()));
 
       for (db::CellInstArray::iterator ii2 = i2.begin_touching (ib1.transformed (t2i), mp_layout); ! ii2.at_end (); ++ii2) {
 
@@ -1269,10 +1269,10 @@ private:
 
         if (! common12.empty ()) {
 
-          std::vector<db::InstElement> pp2;
+          std::vector<ClusterInstElement> pp2;
           pp2.reserve (p2.size () + 1);
           pp2.insert (pp2.end (), p2.begin (), p2.end ());
-          pp2.push_back (db::InstElement (i2, ii2));
+          pp2.push_back (ClusterInstElement (i2.cell_index (), i2.complex_trans (*ii2), i2.prop_id ()));
 
           add_single_pair (common12, i1.cell_index (), pp1, tt1, i2.cell_index (), pp2, tt2);
 
@@ -1312,8 +1312,8 @@ private:
    *  @param t2 The accumulated transformation of the path p2
    */
   void add_single_pair (const box_type &common,
-                        db::cell_index_type ci1, const std::vector<db::InstElement> &p1, const db::ICplxTrans &t1,
-                        db::cell_index_type ci2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
+                        db::cell_index_type ci1, const std::vector<ClusterInstElement> &p1, const db::ICplxTrans &t1,
+                        db::cell_index_type ci2, const std::vector<ClusterInstElement> &p2, const db::ICplxTrans &t2)
   {
     const db::Cell &cell2 = mp_layout->cell (ci2);
 
@@ -1399,8 +1399,8 @@ private:
       db::ICplxTrans tt = i.complex_trans (*ii);
       box_type ib = bb.transformed (tt);
 
-      std::vector<db::InstElement> pp;
-      pp.push_back (db::InstElement (i, ii));
+      std::vector<ClusterInstElement> pp;
+      pp.push_back (ClusterInstElement (i.cell_index (), i.complex_trans (*ii), i.prop_id ()));
 
       bool any = false;
       bool first = true;
@@ -1417,8 +1417,8 @@ private:
 
         if (ib.touches (ib2)) {
 
-          std::vector<db::InstElement> pp2;
-          pp2.push_back (db::InstElement (i, ii2));
+          std::vector<ClusterInstElement> pp2;
+          pp2.push_back (ClusterInstElement (i.cell_index (), i.complex_trans (*ii2), i.prop_id ()));
 
           box_type common = (ib & ib2);
           add_single_pair (common, i.cell_index (), pp, tt, i.cell_index (), pp2, tt2);
@@ -1427,7 +1427,7 @@ private:
           //  as these self-interactions are expected to be the same always (regular array), we can skip this test the next times.
           if (first) {
             for (db::Cell::touching_iterator jj2 = cell.begin_touching (common.transformed (tt2.inverted ())); ! jj2.at_end (); ++jj2) {
-              std::vector<db::InstElement> p;
+              std::vector<ClusterInstElement> p;
               db::ICplxTrans t;
               add_pair (common, i, p, t, *jj2, pp2, tt2);
             }
@@ -1456,7 +1456,7 @@ private:
    *  @param p2 The instantiation path to the child cell (not including i2)
    *  @param t2 The accumulated transformation of the path, not including i2
    */
-  void add_pair (const local_cluster<T> &c1, const db::Instance &i2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
+  void add_pair (const local_cluster<T> &c1, const db::Instance &i2, const std::vector<ClusterInstElement> &p2, const db::ICplxTrans &t2)
   {
     box_type b1 = c1.bbox ();
 
@@ -1470,10 +1470,10 @@ private:
       return;
     }
 
-    std::vector<db::InstElement> pp2;
+    std::vector<ClusterInstElement> pp2;
     pp2.reserve (p2.size () + 1);
     pp2.insert (pp2.end (), p2.begin (), p2.end ());
-    pp2.push_back (db::InstElement ());
+    pp2.push_back (ClusterInstElement ());
 
     for (db::CellInstArray::iterator ii2 = i2.begin_touching ((b1 & b2).transformed (t2.inverted ()), mp_layout); ! ii2.at_end (); ++ii2) {
 
@@ -1482,7 +1482,7 @@ private:
 
       if (b1.touches (ib2) && c1.interacts (cell2, tt2, *mp_conn)) {
 
-        pp2.back () = db::InstElement (i2, ii2);
+        pp2.back () = ClusterInstElement (i2.cell_index (), i2.complex_trans (*ii2), i2.prop_id ());
         add_single_pair (c1, i2.cell_index (), pp2, tt2);
 
         //  dive into cell of ii2
@@ -1503,7 +1503,7 @@ private:
    *  @param t2 The accumulated transformation of the path
    */
   void add_single_pair (const local_cluster<T> &c1,
-                        db::cell_index_type ci2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
+                        db::cell_index_type ci2, const std::vector<ClusterInstElement> &p2, const db::ICplxTrans &t2)
   {
     //  NOTE: make_path may disturb the iteration (because of modification), hence
     //  we first collect and then process the interactions.
@@ -1598,7 +1598,7 @@ private:
    *  Cluster connections can only cross one level of hierarchy. This method
    *  creates necessary dummy entries for the given path.
    */
-  ClusterInstance make_path (id_type id, const std::vector<db::InstElement> &path) const
+  ClusterInstance make_path (id_type id, const std::vector<ClusterInstElement> &path) const
   {
     return mp_tree->make_path (*mp_layout, *mp_cell, id, path);
   }
@@ -1629,30 +1629,32 @@ private:
 
 template <class T>
 ClusterInstance
-hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<db::InstElement> &path)
+hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, size_t id, const std::vector<ClusterInstElement> &path)
 {
-  std::vector<db::InstElement>::const_iterator p = path.end ();
+  std::vector<ClusterInstElement>::const_iterator p = path.end ();
   tl_assert (p != path.begin ());
 
   while (true) {
 
     --p;
 
-    ClusterInstance ci (id, *p);
+    ClusterInstance ci (id, p->inst_cell_index (), p->inst_trans (), p->inst_prop_id ());
     if (p == path.begin ()) {
 
       //  if we're attaching to a child which is root yet, we need to promote the
       //  cluster to the parent in all places
-      connected_clusters<T> &child_cc = clusters_per_cell (p->inst_ptr.cell_index ());
+      connected_clusters<T> &child_cc = clusters_per_cell (p->inst_cell_index ());
       if (child_cc.is_root (id)) {
 
-        const db::Cell &child_cell = layout.cell (p->inst_ptr.cell_index ());
+        const db::Cell &child_cell = layout.cell (p->inst_cell_index ());
         for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
 
-          connected_clusters<T> &parent_cc = clusters_per_cell (pi->parent_cell_index ());
-          for (db::CellInstArray::iterator pii = pi->child_inst ().begin (); ! pii.at_end (); ++pii) {
+          db::Instance child_inst = pi->child_inst ();
 
-            ClusterInstance ci2 (id, db::InstElement (pi->child_inst (), pii));
+          connected_clusters<T> &parent_cc = clusters_per_cell (pi->parent_cell_index ());
+          for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
+
+            ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
             if (cell.cell_index () != pi->parent_cell_index () || ci != ci2) {
 
               size_t id_dummy;
@@ -1682,7 +1684,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
 
     }
 
-    db::cell_index_type pci = p [-1].inst_ptr.cell_index ();
+    db::cell_index_type pci = p [-1].inst_cell_index ();
     connected_clusters<T> &target_cc = clusters_per_cell (pci);
     size_t parent_cluster = target_cc.find_cluster_with_connection (ci);
 
@@ -1697,14 +1699,16 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
 
       //  if we're attaching to a child which is root yet, we need to promote the
       //  cluster to the parent in all places
-      connected_clusters<T> &child_cc = clusters_per_cell (p->inst_ptr.cell_index ());
+      connected_clusters<T> &child_cc = clusters_per_cell (p->inst_cell_index ());
       if (child_cc.is_root (id)) {
 
-        const db::Cell &child_cell = layout.cell (p->inst_ptr.cell_index ());
+        const db::Cell &child_cell = layout.cell (p->inst_cell_index ());
         for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
 
+          db::Instance child_inst = pi->child_inst ();
+
           connected_clusters<T> &parent_cc = clusters_per_cell (pi->parent_cell_index ());
-          for (db::CellInstArray::iterator pii = pi->child_inst ().begin (); ! pii.at_end (); ++pii) {
+          for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
 
             size_t id_dummy;
 
@@ -1717,7 +1721,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
               id_dummy = lc->id ();
             }
 
-            ClusterInstance ci2 (id, db::InstElement (pi->child_inst (), pii));
+            ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
             parent_cc.add_connection (id_dummy, ci2);
 
             if (pci == pi->parent_cell_index () && ci == ci2) {
@@ -1835,7 +1839,7 @@ public:
   void
   add (const std::set<size_t> &global_nets, size_t cluster_id)
   {
-    add (global_nets, ClusterInstance (cluster_id, db::InstElement ()));
+    add (global_nets, ClusterInstance (cluster_id));
   }
 
   void
@@ -2004,7 +2008,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
         if (! cl->get_global_nets ().empty ()) {
           for (db::Instance::cell_inst_array_type::iterator i = inst->begin (); !i.at_end (); ++i) {
-            global_net_clusters.add (cl->get_global_nets (), db::ClusterInstance (cl->id (), db::InstElement (*inst, i)));
+            global_net_clusters.add (cl->get_global_nets (), db::ClusterInstance (cl->id (), inst->cell_index (), inst->complex_trans (*i), inst->prop_id ()));
           }
         }
 
@@ -2015,7 +2019,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
     for (typename db::connected_clusters<T>::const_iterator cl = local.begin (); cl != local.end (); ++cl) {
       if (! cl->get_global_nets ().empty ()) {
-        global_net_clusters.add (cl->get_global_nets (), db::ClusterInstance (cl->id (), db::InstElement ()));
+        global_net_clusters.add (cl->get_global_nets (), db::ClusterInstance (cl->id ()));
       }
     }
 
@@ -2030,15 +2034,15 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
       for (std::set<ClusterInstance>::const_iterator ci = ge->second.begin (); ci != ge->second.end (); ++ci) {
 
-        if (ci->inst ().array_inst.at_end ()) {
+        if (! ci->has_instance ()) {
 
           local.join_cluster_with (gcid, ci->id ());
           local.remove_cluster (ci->id ());
 
         } else {
 
-          std::vector<db::InstElement> p;
-          p.push_back (ci->inst ());
+          std::vector<ClusterInstElement> p;
+          p.push_back (*ci);
           ClusterInstance k = make_path (layout, cell, ci->id (), p);
 
           size_t other_id = local.find_cluster_with_connection (k);
@@ -2201,7 +2205,7 @@ void recursive_cluster_shape_iterator<T>::next_conn ()
   if (m_conn_iter_stack.back ().first != m_conn_iter_stack.back ().second) {
 
     const ClusterInstance &cli = *m_conn_iter_stack.back ().first;
-    down (cli.inst ().inst_ptr.cell_index (), cli.id (), cli.inst ().complex_trans ());
+    down (cli.inst_cell_index (), cli.id (), cli.inst_trans ());
 
   } else {
 
@@ -2297,7 +2301,7 @@ void recursive_cluster_iterator<T>::next_conn ()
   if (m_conn_iter_stack.back ().first != m_conn_iter_stack.back ().second) {
 
     const ClusterInstance &cli = *m_conn_iter_stack.back ().first;
-    down (cli.inst ().inst_ptr.cell_index (), cli.id ());
+    down (cli.inst_cell_index (), cli.id ());
 
   }
 }
@@ -2395,7 +2399,7 @@ incoming_cluster_connections<T>::ensure_computed_parent (db::cell_index_type ci)
   const connected_clusters<T> &cc = ((const hier_clusters<T> *) mp_hc.get ())->clusters_per_cell (ci);
   for (typename connected_clusters<T>::connections_iterator x = cc.begin_connections (); x != cc.end_connections (); ++x) {
     for (typename connected_clusters<T>::connections_type::const_iterator xx = x->second.begin (); xx != x->second.end (); ++xx) {
-      m_incoming [xx->inst ().inst_ptr.cell_index ()][xx->id ()].push_back (IncomingClusterInstance (ci, x->first, xx->inst ()));
+      m_incoming [xx->inst_cell_index ()][xx->id ()].push_back (IncomingClusterInstance (ci, x->first, *xx));
     }
   }
 }

@@ -1733,18 +1733,12 @@ TEST(6_MoreDeviceTypes)
 
   //  compare netlist as string
   EXPECT_EQ (l2n.netlist ()->to_string (),
-    "...\n"
-  );
-
-  // doesn't do anything here, but we test that this does not destroy anything:
-  l2n.netlist ()->combine_devices ();
-
-  //  make pins for named nets of top-level circuits - this way they are not purged
-  l2n.netlist ()->make_top_level_pins ();
-  l2n.netlist ()->purge ();
-
-  //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "...\n"
+    "Circuit TOP ():\n"
+    "  DHVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) [L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4]\n"
+    "  DHVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) [L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8]\n"
+    "  DLVPMOS $3 (S=$10,G=A,D=$6,B=$9) [L=1.5,W=2.475,AS=1.11375,AD=3.155625,PS=5.85,PD=7.5]\n"
+    "  DHVNMOS $4 (S=Z,G=$6,D=VSS,B=BULK) [L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6]\n"
+    "  DHVNMOS $5 (S=VSS,G=A,D=$5,B=BULK) [L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2]\n"
+    "  DLVNMOS $6 (S=VSS,G=A,D=$6,B=BULK) [L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89]\n"
   );
 }

@@ -1587,3 +1587,164 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   //  the transistor which supplies this probe target has been optimized away by "purge".
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "(null)");
 }
+
+TEST(6_MoreDeviceTypes)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int nwell      = define_layer (ly, lmap, 1);
+  unsigned int active     = define_layer (ly, lmap, 2);
+  unsigned int thickgox   = define_layer (ly, lmap, 3);
+  unsigned int pplus      = define_layer (ly, lmap, 4);
+  unsigned int nplus      = define_layer (ly, lmap, 5);
+  unsigned int poly       = define_layer (ly, lmap, 6);
+  unsigned int poly_lbl   = define_layer (ly, lmap, 7);
+  unsigned int cont       = define_layer (ly, lmap, 8);
+  unsigned int metal1     = define_layer (ly, lmap, 9);
+  unsigned int metal1_lbl = define_layer (ly, lmap, 10);
+  unsigned int via1       = define_layer (ly, lmap, 11);
+  unsigned int metal2     = define_layer (ly, lmap, 12);
+  unsigned int metal2_lbl = define_layer (ly, lmap, 13);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l6.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
+
+  std::auto_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
+  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::auto_ptr<db::Region> rthickgox (l2n.make_layer (thickgox, "thickgox"));
+  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::auto_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
+  std::auto_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
+  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::auto_ptr<db::Region> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::auto_ptr<db::Region> rcont (l2n.make_polygon_layer (cont, "cont"));
+  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::auto_ptr<db::Region> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::auto_ptr<db::Region> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+
+  //  derived regions
+
+  db::Region ractive_in_nwell = *ractive & *rnwell;
+  db::Region rpactive    = ractive_in_nwell - *rnplus;
+  db::Region rntie       = ractive_in_nwell & *rnplus;
+  db::Region rpgate      = rpactive & *rpoly;
+  db::Region rpsd        = rpactive - rpgate;
+  db::Region rhv_pgate   = rpgate & *rthickgox;
+  db::Region rlv_pgate   = rpgate - rhv_pgate;
+  db::Region rhv_psd     = rpsd & *rthickgox;
+  db::Region rlv_psd     = rpsd - *rthickgox;
+
+  l2n.register_layer(rntie, "ntie");
+  l2n.register_layer(rpsd,  "psd");
+
+  db::Region ractive_outside_nwell = *ractive - *rnwell;
+  db::Region rnactive    = ractive_outside_nwell - *rpplus;
+  db::Region rptie       = ractive_outside_nwell & *rpplus;
+  db::Region rngate      = rnactive & *rpoly;
+  db::Region rnsd        = rnactive - rngate;
+  db::Region rhv_ngate   = rngate & *rthickgox;
+  db::Region rlv_ngate   = rngate - rhv_ngate;
+  db::Region rhv_nsd     = rnsd & *rthickgox;
+  db::Region rlv_nsd     = rnsd - *rthickgox;
+
+  l2n.register_layer(rptie, "ptie");
+  l2n.register_layer(rnsd,  "nsd");
+
+  db::NetlistDeviceExtractorMOS4Transistor hvpmos_ex ("HVPMOS");
+  db::NetlistDeviceExtractorMOS4Transistor hvnmos_ex ("HVNMOS");
+  db::NetlistDeviceExtractorMOS4Transistor lvpmos_ex ("LVPMOS");
+  db::NetlistDeviceExtractorMOS4Transistor lvnmos_ex ("LVNMOS");
+
+  //  device extraction
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rhv_pgate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rnwell.get ();
+  l2n.extract_devices (hvpmos_ex, dl);
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rlv_pgate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rnwell.get ();
+  l2n.extract_devices (lvpmos_ex, dl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rhv_ngate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rbulk.get ();
+  l2n.extract_devices (hvnmos_ex, dl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rlv_ngate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rbulk.get ();
+  l2n.extract_devices (lvnmos_ex, dl);
+
+  //  Intra-layer
+  l2n.connect (rpsd);
+  l2n.connect (rnsd);
+  l2n.connect (*rnwell);
+  l2n.connect (*rpoly);
+  l2n.connect (*rcont);
+  l2n.connect (*rmetal1);
+  l2n.connect (*rvia1);
+  l2n.connect (*rmetal2);
+  l2n.connect (rptie);
+  l2n.connect (rntie);
+  //  Inter-layer
+  l2n.connect (*rcont,      rntie);
+  l2n.connect (*rcont,      rptie);
+  l2n.connect (*rnwell,     rntie);
+  l2n.connect (rpsd,        *rcont);
+  l2n.connect (rnsd,        *rcont);
+  l2n.connect (*rpoly,      *rcont);
+  l2n.connect (*rcont,      *rmetal1);
+  l2n.connect (*rmetal1,    *rvia1);
+  l2n.connect (*rvia1,      *rmetal2);
+  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
+  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
+  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
+  //  Global
+  l2n.connect_global (rptie, "BULK");
+  l2n.connect_global (*rbulk, "BULK");
+
+  l2n.extract_netlist ();
+
+  //  compare netlist as string
+  EXPECT_EQ (l2n.netlist ()->to_string (),
+    "...\n"
+  );
+
+  // doesn't do anything here, but we test that this does not destroy anything:
+  l2n.netlist ()->combine_devices ();
+
+  //  make pins for named nets of top-level circuits - this way they are not purged
+  l2n.netlist ()->make_top_level_pins ();
+  l2n.netlist ()->purge ();
+
+  //  compare netlist as string
+  EXPECT_EQ (l2n.netlist ()->to_string (),
+    "...\n"
+  );
+}

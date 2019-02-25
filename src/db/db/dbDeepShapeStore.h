@@ -295,6 +295,19 @@ public:
   DeepLayer create_custom_layer (const db::RecursiveShapeIterator &si, HierarchyBuilderShapeReceiver *pipe, const ICplxTrans &trans = db::ICplxTrans ());
 
   /**
+   *  @brief Gets the empty working layer
+   *
+   *  This method will deliver an empty layer for the given layout index. CAUTION: don't modify this layer as it may
+   *  be reused.
+   */
+  DeepLayer empty_layer (unsigned int layout_index);
+
+  /**
+   *  @brief Gets the empty working layer for the singular layout
+   */
+  DeepLayer empty_layer ();
+
+  /**
    *  @brief Inserts the deep layer's shapes into some target layout
    */
   void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);

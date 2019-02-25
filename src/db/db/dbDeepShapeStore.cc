@@ -222,14 +222,23 @@ DeepLayer::check_dss () const
 struct DeepShapeStore::LayoutHolder
 {
   LayoutHolder (const db::ICplxTrans &trans)
-    : refs (0), layout (false), builder (&layout, trans)
+    : refs (0), layout (false), builder (&layout, trans), m_empty_layer (std::numeric_limits<unsigned int>::max ())
   {
     //  .. nothing yet ..
   }
 
+  unsigned int make_empty_layer ()
+  {
+    if (m_empty_layer == std::numeric_limits<unsigned int>::max ()) {
+      m_empty_layer = layout.insert_layer ();
+      layer_refs [m_empty_layer] += 1;  //  the empty layer is not deleted
+    }
+    return m_empty_layer;
+  }
+
   void add_layer_ref (unsigned int layer)
   {
-    layer_refs[layer] += 1;
+    layer_refs [layer] += 1;
   }
 
   void remove_layer_ref (unsigned int layer)
@@ -244,6 +253,9 @@ struct DeepShapeStore::LayoutHolder
   db::Layout layout;
   db::HierarchyBuilder builder;
   std::map<unsigned int, int> layer_refs;
+
+private:
+  unsigned int m_empty_layer;
 };
 
 // ----------------------------------------------------------------------------------
@@ -424,6 +436,17 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   }
 
   return DeepLayer (this, layout_index, layer_index);
+}
+
+DeepLayer DeepShapeStore::empty_layer (unsigned int layout_index)
+{
+  return DeepLayer (this, layout_index, m_layouts[layout_index]->make_empty_layer ());
+}
+
+DeepLayer DeepShapeStore::empty_layer ()
+{
+  require_singular ();
+  return empty_layer (0);
 }
 
 DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator &si, HierarchyBuilderShapeReceiver *pipe, const db::ICplxTrans &trans)

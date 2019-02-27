@@ -83,6 +83,28 @@ public:
   LayoutToNetlist (const db::RecursiveShapeIterator &iter);
 
   /**
+   *  @brief Alternative constructor using an external deep shape storage
+   *
+   *  This constructor allows using an external DSS. It's intended to be used
+   *  with existing DSS instances. Existing layers can be registered with
+   *  "register_layer". The LayoutToNetlist object will hold a weak reference
+   *  to the DSS but not own the DSS.
+   *
+   *  NOTE: if using make_layer, these new layers will be created in the DSS
+   *  given in this constructor.
+   */
+  LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index);
+
+  /**
+   *  @brief Alternative constructor for flat mode
+   *
+   *  In flat mode, the internal DSS will be initialized to a top-level only
+   *  layout. All layers entered through "register_layer" or created with
+   *  "make_layer" will become flat ones.
+   */
+  LayoutToNetlist (const std::string &topcell_name, double dbu);
+
+  /**
    *  @brief The default constructor
    */
   LayoutToNetlist ();
@@ -467,7 +489,8 @@ private:
   LayoutToNetlist &operator= (const db::LayoutToNetlist &other);
 
   db::RecursiveShapeIterator m_iter;
-  db::DeepShapeStore m_dss;
+  std::auto_ptr<db::DeepShapeStore> mp_internal_dss;
+  tl::weak_ptr<db::DeepShapeStore> mp_dss;
   db::Connectivity m_conn;
   db::hier_clusters<db::PolygonRef> m_net_clusters;
   std::auto_ptr<db::Netlist> mp_netlist;
@@ -475,7 +498,20 @@ private:
   std::map<std::string, db::DeepLayer> m_named_regions;
   std::map<unsigned int, std::string> m_name_of_layer;
   bool m_netlist_extracted;
+  bool m_is_flat;
   db::DeepLayer m_dummy_layer;
+
+  db::DeepShapeStore &dss ()
+  {
+    tl_assert (mp_dss.get () != 0);
+    return *mp_dss;
+  }
+
+  const db::DeepShapeStore &dss () const
+  {
+    tl_assert (mp_dss.get () != 0);
+    return *mp_dss;
+  }
 
   void init ();
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);

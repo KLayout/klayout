@@ -30,6 +30,13 @@ Class<db::DeepShapeStore> decl_dbDeepShapeStore ("db", "DeepShapeStore",
   gsi::method ("instance_count", &db::DeepShapeStore::instance_count,
     "@hide\n"
   ) +
+  gsi::method ("is_singular?", &db::DeepShapeStore::is_singular,
+    "@brief Gets a value indicating whether there is a single layout variant\n"
+    "\n"
+    "Specifically for network extraction, singular DSS objects are required. "
+    "Multiple layouts may be present if different sources of layouts have "
+    "been used. Such DSS objects are not usable for network extraction."
+  ) +
   gsi::method ("threads=", &db::DeepShapeStore::set_threads, gsi::arg ("n"),
     "@brief Sets the number of threads to allocate for the hierarchical processor\n"
   ) +

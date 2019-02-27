@@ -600,6 +600,11 @@ static bool is_deep (const db::Region *region)
   return dynamic_cast<const db::DeepRegion *> (region->delegate ()) != 0;
 }
 
+static size_t id (const db::Region *r)
+{
+  return tl::id_of (r->delegate ());
+}
+
 //  provided by gsiDeclDbPolygon.cc:
 int td_simple ();
 int po_any ();
@@ -2228,6 +2233,11 @@ Class<db::Region> decl_Region ("db", "Region",
   ) +
   method_ext ("is_deep?", &is_deep,
     "@brief Returns true if the region is a deep (hierarchical) one\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  method_ext ("data_id", &id,
+    "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
     "\n"
     "This method has been added in version 0.26."
   ) +

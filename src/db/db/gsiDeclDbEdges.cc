@@ -400,6 +400,10 @@ static db::Edges *new_texts_as_dots2 (const db::RecursiveShapeIterator &si, db::
   return new db::Edges (db::OriginalLayerRegion (si, false).texts_as_dots (pat, pattern, dss));
 }
 
+static size_t id (const db::Edges *e)
+{
+  return tl::id_of (e->delegate ());
+}
 
 Class<db::Edges> dec_Edges ("db", "Edges",
   constructor ("new", &new_v, 
@@ -1463,6 +1467,11 @@ Class<db::Edges> dec_Edges ("db", "Edges",
   ) +
   method_ext ("is_deep?", &is_deep,
     "@brief Returns true if the edge collection is a deep (hierarchical) one\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  method_ext ("data_id", &id,
+    "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
     "\n"
     "This method has been added in version 0.26."
   ) +

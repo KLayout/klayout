@@ -174,6 +174,11 @@ static bool is_deep (const db::EdgePairs *ep)
   return dynamic_cast<const db::DeepEdgePairs *> (ep->delegate ()) != 0;
 }
 
+static size_t id (const db::EdgePairs *ep)
+{
+  return tl::id_of (ep->delegate ());
+}
+
 Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
@@ -309,6 +314,11 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   ) +
   method_ext ("is_deep?", &is_deep,
     "@brief Returns true if the edge pair collection is a deep (hierarchical) one\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  method_ext ("data_id", &id,
+    "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
     "\n"
     "This method has been added in version 0.26."
   ) +

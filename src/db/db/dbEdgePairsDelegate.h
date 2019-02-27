@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 
 #include "dbEdgePair.h"
+#include "tlUniqueId.h"
 
 namespace db {
 
@@ -58,6 +59,7 @@ public:
  *  @brief The delegate for the actual edge set implementation
  */
 class DB_PUBLIC EdgePairsDelegate
+  : public tl::UniqueId
 {
 public:
   typedef db::Coord coord_type;

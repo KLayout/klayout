@@ -233,6 +233,14 @@ public:
   DeepShapeStore ();
 
   /**
+   *  @brief The constructor for a singular DSS
+   *
+   *  This DSS will be initialized with one layout and the given database unit
+   *  and top level cell name.
+   */
+  DeepShapeStore (const std::string &topcell_name, double dbu);
+
+  /**
    *  @brief The destructor
    */
   ~DeepShapeStore ();
@@ -250,6 +258,14 @@ public:
    *  only layout.
    */
   bool is_singular () const;
+
+  /**
+   *  @brief Creates a new layer from a flat region (or the region is made flat)
+   *
+   *  This method is intended for use with singular-created DSS objects (see
+   *  singular constructor).
+   */
+  DeepLayer create_from_flat (const db::Region &region, double max_area_ratio = 0.0, size_t max_vertex_count = 0, const db::ICplxTrans &trans = db::ICplxTrans ());
 
   /**
    *  @brief Inserts a polygon layer into the deep shape store

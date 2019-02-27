@@ -35,8 +35,10 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.bbox.to_s, "()")
     assert_equal(r.is_merged?, true)
     assert_equal(r.is_box?, false)
+    data_id = r.data_id
     
     r.assign(RBA::Region::new(RBA::Box::new(10, 20, 100, 200)))
+    assert_equal(data_id != r.data_id, true)
     assert_equal(r.to_s, "(10,20;10,200;100,200;100,20)")
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 1)
@@ -48,6 +50,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.moved(RBA::Point::new(10, 20)).bbox.to_s, "(20,40;110,220)")
     assert_equal(r.moved(10, 20).bbox.to_s, "(20,40;110,220)")
     rr = r.dup
+    assert_equal(rr.data_id != r.data_id, true)
     rr.move(RBA::Point::new(10, 20))
     assert_equal(rr.bbox.to_s, "(20,40;110,220)")
     rr = r.dup

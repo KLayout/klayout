@@ -39,6 +39,16 @@ static db::LayoutToNetlist *make_l2n_default ()
   return new db::LayoutToNetlist ();
 }
 
+static db::LayoutToNetlist *make_l2n_from_existing_dss (db::DeepShapeStore *dss, unsigned int layout_index)
+{
+  return new db::LayoutToNetlist (dss, layout_index);
+}
+
+static db::LayoutToNetlist *make_l2n_flat (const std::string &topcell_name, double dbu)
+{
+  return new db::LayoutToNetlist (topcell_name, dbu);
+}
+
 static db::Layout *l2n_internal_layout (db::LayoutToNetlist *l2n)
 {
   //  although this isn't very clean, we dare to do so as const references are pretty useless in script languages.
@@ -98,6 +108,24 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::constructor ("new", &make_l2n_default,
     "@brief Creates a new and empty extractor object\n"
     "The main objective for this constructor is to create an object suitable for reading an annotated netlist.\n"
+  ) +
+  gsi::constructor ("new", &make_l2n_from_existing_dss, gsi::arg ("dss"), gsi::arg ("layout_index", 0),
+    "@brief Creates a new extractor object reusing an existing \\DeepShapeStore object\n"
+    "This constrcutor can be used if there is a DSS object already from which the "
+    "shapes can be taken. NOTE: in this case, the make_... functions will create "
+    "new layers inside this DSS. To register existing layers (regions) use \\register.\n"
+  ) +
+  gsi::constructor ("new", &make_l2n_flat, gsi::arg ("topcell_name"), gsi::arg ("dbu"),
+    "@brief Creates a new extractor object with a flat DSS\n"
+    "@param topcell_name The name of the top cell of the internal flat layout\n"
+    "@param dbu The database unit to use for the internal flat layout\n"
+    "\n"
+    "This constructor will create an extractor for flat extraction. Layers registered "
+    "with \\register will be flattened. New layers created with make_... will be flat "
+    "layers.\n"
+    "\n"
+    "The database unit is mandatory because the physical parameter extraction "
+    "for devices requires this unit for translation of layout to physical dimensions.\n"
   ) +
   gsi::method ("threads=", &db::LayoutToNetlist::set_threads, gsi::arg ("n"),
     "@brief Sets the number of threads to use for operations which support multiple threads\n"
@@ -381,6 +409,10 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   "    specific net are available with \\shapes_of_net. \\probe_net allows\n"
   "    finding a net by probing a specific location.\n"
   "@li\n"
+  "\n"
+  "Another use model is using the extractor with an existing \\DeepShapeStore object "
+  "or even flat data. In this case, the preparation step is importing by "
+  "taking existing region data using the \\register method.\n"
   "\n"
   "This class has been introduced in version 0.26."
 );

@@ -268,6 +268,16 @@ DeepShapeStore::DeepShapeStore ()
   ++s_instance_count;
 }
 
+DeepShapeStore::DeepShapeStore (const std::string &topcell_name, double dbu)
+  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_text_property_name (), m_text_enlargement (-1)
+{
+  ++s_instance_count;
+
+  m_layouts.push_back (new LayoutHolder (db::ICplxTrans ()));
+  m_layouts.back ()->layout.dbu (dbu);
+  m_layouts.back ()->layout.add_cell (topcell_name.c_str ());
+}
+
 DeepShapeStore::~DeepShapeStore ()
 {
   --s_instance_count;
@@ -276,6 +286,33 @@ DeepShapeStore::~DeepShapeStore ()
     delete *h;
   }
   m_layouts.clear ();
+}
+
+DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)
+{
+  require_singular ();
+
+  unsigned int layer = layout ().insert_layer ();
+
+  if (max_area_ratio == 0.0) {
+    max_area_ratio = m_max_area_ratio;
+  }
+  if (max_vertex_count == 0) {
+    max_vertex_count = m_max_vertex_count;
+  }
+
+  db::Shapes *shapes = &initial_cell ().shapes (layer);
+  db::Box world = db::Box::world ();
+
+  //  The chain of operators for producing clipped and reduced polygon references
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), m_text_enlargement, m_text_property_name);
+  db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count);
+
+  for (db::Region::const_iterator p = region.begin (); ! p.at_end (); ++p) {
+    red.push (*p, trans, world, 0, shapes);
+  }
+
+  return DeepLayer (this, 0 /*singular layout index*/, layer);
 }
 
 bool DeepShapeStore::is_singular () const

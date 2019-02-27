@@ -33,8 +33,10 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(r.is_empty?, true)
     assert_equal(r.size, 0)
     assert_equal(r.bbox.to_s, "()")
+    data_id = r.data_id
 
     r.insert(RBA::Edge::new(0, 0, 0, 100), RBA::Edge::new(-10, 0, -20, 50))
+    assert_equal(data_id != r.data_id, true)
     assert_equal(r.to_s, "(0,0;0,100)/(-10,0;-20,50)")
     r.clear
 
@@ -55,6 +57,7 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(r.moved(-10, 10).to_s, "(-10,10;-10,110)/(-20,10;-30,60)")
     assert_equal(r.moved(RBA::Point::new(-10, 10)).to_s, "(-10,10;-10,110)/(-20,10;-30,60)")
     rr = r.dup
+    assert_equal(rr.data_id != r.data_id, true)
     rr.move(-10, 10)
     assert_equal(rr.to_s, "(-10,10;-10,110)/(-20,10;-30,60)")
     rr = r.dup

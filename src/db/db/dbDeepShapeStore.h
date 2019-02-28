@@ -593,7 +593,8 @@ private:
   DeepShapeStore &operator= (const DeepShapeStore &);
 
   std::vector<LayoutHolder *> m_layouts;
-  std::map<size_t, DeepLayer> m_layers_for_flat;
+  std::map<size_t, std::pair<unsigned int, unsigned int> > m_layers_for_flat;
+  std::map<std::pair<unsigned int, unsigned int>, size_t> m_flat_region_id;
   layout_map_type m_layout_map;
   int m_threads;
   double m_max_area_ratio;

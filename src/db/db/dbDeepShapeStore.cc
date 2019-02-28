@@ -240,11 +240,14 @@ struct DeepShapeStore::LayoutHolder
     layer_refs [layer] += 1;
   }
 
-  void remove_layer_ref (unsigned int layer)
+  bool remove_layer_ref (unsigned int layer)
   {
     if ((layer_refs[layer] -= 1) <= 0) {
       layout.delete_layer (layer);
       layer_refs.erase (layer);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -287,9 +290,6 @@ DeepShapeStore::~DeepShapeStore ()
 {
   --s_instance_count;
 
-  //  because of unregistration we must not do this in the destructor:
-  m_layers_for_flat.clear ();
-
   for (std::vector<LayoutHolder *>::iterator h = m_layouts.begin (); h != m_layouts.end (); ++h) {
     delete *h;
   }
@@ -331,7 +331,8 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, double max
   }
 
   DeepLayer dl (this, 0 /*singular layout index*/, layer);
-  m_layers_for_flat [tl::id_of (region.delegate ())] = dl;
+  m_layers_for_flat [tl::id_of (region.delegate ())] = std::make_pair (dl.layout_index (), dl.layer ());
+  m_flat_region_id [std::make_pair (dl.layout_index (), dl.layer ())] = tl::id_of (region.delegate ());
   return dl;
 }
 
@@ -342,11 +343,11 @@ std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (const db::Region &reg
 
 std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (size_t region_id) const
 {
-  std::map<size_t, DeepLayer>::const_iterator lff = m_layers_for_flat.find (region_id);
+  std::map<size_t, std::pair<unsigned int, unsigned int> >::const_iterator lff = m_layers_for_flat.find (region_id);
   if (lff == m_layers_for_flat.end ()) {
     return std::make_pair (false, DeepLayer ());
   } else {
-    return std::make_pair (true, lff->second);
+    return std::make_pair (true, DeepLayer (const_cast<DeepShapeStore *> (this), lff->second.first, lff->second.second));
   }
 }
 
@@ -439,7 +440,16 @@ void DeepShapeStore::remove_ref (unsigned int layout, unsigned int layer)
 
   tl_assert (layout < (unsigned int) m_layouts.size () && m_layouts[layout] != 0);
 
-  m_layouts[layout]->remove_layer_ref (layer);
+  if (m_layouts[layout]->remove_layer_ref (layer)) {
+
+    //  remove from flat region cross ref if required
+    std::map<std::pair<unsigned int, unsigned int>, size_t>::iterator fri = m_flat_region_id.find (std::make_pair (layout, layer));
+    if (fri != m_flat_region_id.end ()) {
+      m_layers_for_flat.erase (fri->second);
+      m_flat_region_id.erase (fri);
+    }
+
+  }
 
   if ((m_layouts[layout]->refs -= 1) <= 0) {
     delete m_layouts[layout];

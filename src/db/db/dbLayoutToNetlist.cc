@@ -30,10 +30,7 @@
 namespace db
 {
 
-static bool is_deep (const db::Region &r)
-{
-  return dynamic_cast<const db::DeepRegion *> (r.delegate ()) != 0;
-}
+static const unsigned int singular_layout_index = 0;
 
 //  the iterator provides the hierarchical selection (enabling/disabling cells etc.)
 
@@ -414,8 +411,6 @@ unsigned int LayoutToNetlist::layer_of (const db::Region &region) const
 
 db::CellMapping LayoutToNetlist::cell_mapping_into (db::Layout &layout, db::Cell &cell, bool with_device_cells)
 {
-  unsigned int layout_index = 0;
-
   std::set<db::cell_index_type> device_cells;
   if (! with_device_cells && mp_netlist.get ()) {
     for (db::Netlist::device_abstract_iterator i = mp_netlist->begin_device_abstracts (); i != mp_netlist->end_device_abstracts (); ++i) {
@@ -423,7 +418,7 @@ db::CellMapping LayoutToNetlist::cell_mapping_into (db::Layout &layout, db::Cell
     }
   }
 
-  return dss ().cell_mapping_to_original (layout_index, &layout, cell.cell_index (), &device_cells);
+  return dss ().cell_mapping_to_original (singular_layout_index, &layout, cell.cell_index (), &device_cells);
 }
 
 db::CellMapping LayoutToNetlist::const_cell_mapping_into (const db::Layout &layout, const db::Cell &cell)
@@ -865,6 +860,68 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
   } else {
     return 0;
   }
+}
+
+db::Region LayoutToNetlist::antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<db::Region *, double> > &diodes)
+{
+  //  TODO: that's basically too much .. we only need the clusters
+  if (! m_netlist_extracted) {
+    throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
+  }
+
+  db::Layout &ly = dss ().layout ();
+  double dbu = ly.dbu ();
+
+  db::DeepLayer dl (&dss (), singular_layout_index, ly.insert_layer ());
+
+  for (db::Layout::bottom_up_const_iterator cid = ly.begin_bottom_up (); cid != ly.end_bottom_up (); ++cid) {
+
+    const connected_clusters<db::PolygonRef> &clusters = m_net_clusters.clusters_per_cell (*cid);
+    if (clusters.empty ()) {
+      continue;
+    }
+
+    for (connected_clusters<db::PolygonRef>::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
+
+      if (! clusters.is_root (*c)) {
+        continue;
+      }
+
+      db::Region rgate, rmetal;
+
+      deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (gate), db::ICplxTrans (), rgate);
+      deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (metal), db::ICplxTrans (), rmetal);
+
+      double agate = rgate.area () * dbu * dbu;
+      double ametal = rmetal.area () * dbu * dbu;
+
+      double r = ratio;
+
+      for (std::vector<std::pair<db::Region *, double> >::const_iterator d = diodes.begin (); d != diodes.end (); ++d) {
+
+        db::Region rdiode;
+        deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (*d->first), db::ICplxTrans (), rdiode);
+
+        r += rdiode.area () * dbu * dbu / d->second;
+
+      }
+
+      if (tl::verbosity () >= 0 /*50*/) {
+        tl::info << "cell [" << ly.cell_name (*cid) << "]: agate=" << tl::to_string (agate) << ", ametal=" << tl::to_string (ametal) << ", r=" << tl::sprintf ("%.12g", r);
+      }
+
+      if (agate > dbu * dbu && ametal / agate > r + db::epsilon) {
+        db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
+        for (db::Region::const_iterator r = rmetal.begin_merged (); ! r.at_end (); ++r) {
+          shapes.insert (*r);
+        }
+      }
+
+    }
+
+  }
+
+  return db::Region (new db::DeepRegion (dl));
 }
 
 }

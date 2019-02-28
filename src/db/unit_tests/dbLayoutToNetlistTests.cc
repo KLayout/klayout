@@ -2253,3 +2253,125 @@ TEST(9_FlatExtractionWithExternalDSS)
   );
 }
 
+TEST(10_Antenna)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int poly       = define_layer (ly, lmap, 6);
+  unsigned int cont       = define_layer (ly, lmap, 8);
+  unsigned int metal1     = define_layer (ly, lmap, 9);
+  unsigned int via1       = define_layer (ly, lmap, 11);
+  unsigned int metal2     = define_layer (ly, lmap, 12);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "antenna_l1.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+
+  std::auto_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly), dss));
+  std::auto_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont), dss));
+  std::auto_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1), dss));
+  std::auto_ptr<db::Region> rvia1 (new db::Region (db::RecursiveShapeIterator (ly, tc, via1), dss));
+  std::auto_ptr<db::Region> rmetal2 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2), dss));
+
+  db::Layout ly2;
+  ly2.dbu (ly.dbu ());
+  db::Cell &top2 = ly2.cell (ly2.add_cell ("TOPTOP"));
+
+  rpoly->insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (6, 0)));
+  rcont->insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (8, 0)));
+  rmetal1->insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (9, 0)));
+  rvia1->insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (11, 0)));
+  rmetal2->insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (12, 0)));
+
+  {
+    db::LayoutToNetlist l2n (&dss);
+
+    l2n.register_layer (*rpoly, "poly");
+    l2n.register_layer (*rcont, "cont");
+    l2n.register_layer (*rmetal1, "metal1");
+    l2n.register_layer (*rvia1, "via1");
+    l2n.register_layer (*rmetal2, "metal2");
+
+    //  Intra-layer
+    l2n.connect (*rpoly);
+    l2n.connect (*rcont);
+    l2n.connect (*rmetal1);
+    /*  not yet:
+    l2n.connect (*rvia1);
+    l2n.connect (*rmetal2);
+    */
+    //  Inter-layer
+    l2n.connect (*rpoly,      *rcont);
+    l2n.connect (*rcont,      *rmetal1);
+    /*  not yet:
+    l2n.connect (*rmetal1,    *rvia1);
+    l2n.connect (*rvia1,      *rmetal2);
+    */
+
+    l2n.extract_netlist ();
+
+    db::Region a1_3 = l2n.antenna_check (*rpoly, *rmetal1, 3);
+    db::Region a1_10 = l2n.antenna_check (*rpoly, *rmetal1, 10);
+    db::Region a1_30 = l2n.antenna_check (*rpoly, *rmetal1, 30);
+
+    a1_3.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (100, 0)));
+    a1_10.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (101, 0)));
+    a1_30.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (102, 0)));
+  }
+
+  {
+    db::LayoutToNetlist l2n (&dss);
+
+    l2n.register_layer (*rpoly, "poly");
+    l2n.register_layer (*rcont, "cont");
+    l2n.register_layer (*rmetal1, "metal1");
+    l2n.register_layer (*rvia1, "via1");
+    l2n.register_layer (*rmetal2, "metal2");
+
+    //  Intra-layer
+    l2n.connect (*rpoly);
+    l2n.connect (*rcont);
+    l2n.connect (*rmetal1);
+    l2n.connect (*rvia1);
+    l2n.connect (*rmetal2);
+    //  Inter-layer
+    l2n.connect (*rpoly,      *rcont);
+    l2n.connect (*rcont,      *rmetal1);
+    l2n.connect (*rmetal1,    *rvia1);
+    l2n.connect (*rvia1,      *rmetal2);
+
+    l2n.extract_netlist ();
+
+    db::Region a2_5 = l2n.antenna_check (*rpoly, *rmetal2, 5);
+    db::Region a2_10 = l2n.antenna_check (*rpoly, *rmetal2, 10);
+    db::Region a2_17 = l2n.antenna_check (*rpoly, *rmetal2, 17);
+
+    a2_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (200, 0)));
+    a2_10.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (201, 0)));
+    a2_17.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (202, 0)));
+  }
+
+  std::string au = tl::testsrc ();
+  au = tl::combine_path (au, "testdata");
+  au = tl::combine_path (au, "algo");
+  au = tl::combine_path (au, "antenna_au1.gds");
+
+  db::compare_layouts (_this, ly2, au);
+}
+

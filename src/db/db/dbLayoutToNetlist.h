@@ -501,6 +501,25 @@ public:
    */
   db::Net *probe_net (const db::Region &of_region, const db::Point &point);
 
+  /**
+   *  @brief Runs an antenna check on the extracted clusters
+   *
+   *  The antenna check will traverse all clusters and run an antenna check
+   *  for all root clusters. The antenna ratio is defined by the total
+   *  area of all "metal" shapes divided by the total area of all "gate" shapes
+   *  on the cluster. Of all clusters where the antenna ratio is larger than
+   *  the limit ratio all metal shapes are copied to the output region as
+   *  error markers.
+   *
+   *  The limit ratio can be modified by the presence of connections to
+   *  other layers (specifically designating diodes for charge removal).
+   *  Each of these layers will modify the ratio by adding a value of
+   *  A(diode) / Ared[um^2] to the ratio. A(diode) is the area of the
+   *  diode layer per cluster. Both the diode layer and the Ared value
+   *  are specified as pairs in "diodes".
+   */
+  db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<db::Region *, double> > &diodes = std::vector<std::pair<db::Region *, double> > ());
+
 private:
   //  no copying
   LayoutToNetlist (const db::LayoutToNetlist &other);

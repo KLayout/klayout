@@ -1897,3 +1897,359 @@ TEST(7_MoreByEmptyDeviceTypes)
     "  DLVNMOS $6 (S=VSS,G=A,D=$5,B=BULK) [L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2]\n"
   );
 }
+
+TEST(8_FlatExtraction)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int nwell      = define_layer (ly, lmap, 1);
+  unsigned int active     = define_layer (ly, lmap, 2);
+  unsigned int thickgox   = define_layer (ly, lmap, 3);
+  unsigned int pplus      = define_layer (ly, lmap, 4);
+  unsigned int nplus      = define_layer (ly, lmap, 5);
+  unsigned int poly       = define_layer (ly, lmap, 6);
+  unsigned int poly_lbl   = define_layer (ly, lmap, 7);
+  unsigned int cont       = define_layer (ly, lmap, 8);
+  unsigned int metal1     = define_layer (ly, lmap, 9);
+  unsigned int metal1_lbl = define_layer (ly, lmap, 10);
+  unsigned int via1       = define_layer (ly, lmap, 11);
+  unsigned int metal2     = define_layer (ly, lmap, 12);
+  unsigned int metal2_lbl = define_layer (ly, lmap, 13);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l6.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::LayoutToNetlist l2n (ly.cell_name (tc.cell_index ()), ly.dbu ());
+
+  std::auto_ptr<db::Region> rbulk (new db::Region ());
+  std::auto_ptr<db::Region> rnwell (new db::Region (db::RecursiveShapeIterator (ly, tc, nwell)));
+  std::auto_ptr<db::Region> rthickgox (new db::Region (db::RecursiveShapeIterator (ly, tc, thickgox)));
+  std::auto_ptr<db::Region> ractive (new db::Region (db::RecursiveShapeIterator (ly, tc, active)));
+  std::auto_ptr<db::Region> rpplus (new db::Region (db::RecursiveShapeIterator (ly, tc, pplus)));
+  std::auto_ptr<db::Region> rnplus (new db::Region (db::RecursiveShapeIterator (ly, tc, nplus)));
+  std::auto_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly)));
+  std::auto_ptr<db::Region> rpoly_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, poly_lbl)));
+  std::auto_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont)));
+  std::auto_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1)));
+  std::auto_ptr<db::Region> rmetal1_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1_lbl)));
+  std::auto_ptr<db::Region> rvia1 (new db::Region (db::RecursiveShapeIterator (ly, tc, via1)));
+  std::auto_ptr<db::Region> rmetal2 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2)));
+  std::auto_ptr<db::Region> rmetal2_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2_lbl)));
+
+  l2n.register_layer (*rbulk, "bulk");
+  l2n.register_layer (*rnwell, "nwell");
+  l2n.register_layer (*rthickgox, "thickgox");
+  l2n.register_layer (*ractive, "active");
+  l2n.register_layer (*rpplus, "pplus");
+  l2n.register_layer (*rnplus, "nplus");
+  l2n.register_layer (*rpoly, "poly");
+  l2n.register_layer (*rpoly_lbl, "poly_lbl");
+  l2n.register_layer (*rcont, "cont");
+  l2n.register_layer (*rmetal1, "metal1");
+  l2n.register_layer (*rmetal1_lbl, "metal1_lbl");
+  l2n.register_layer (*rvia1, "via1");
+  l2n.register_layer (*rmetal2, "metal2");
+  l2n.register_layer (*rmetal2_lbl, "metal2_lbl");
+
+  //  derived regions
+
+  db::Region ractive_in_nwell = *ractive & *rnwell;
+  db::Region rpactive    = ractive_in_nwell - *rnplus;
+  db::Region rntie       = ractive_in_nwell & *rnplus;
+  db::Region rpgate      = rpactive & *rpoly;
+  db::Region rpsd        = rpactive - rpgate;
+  db::Region rhv_pgate   = rpgate & *rthickgox;
+  db::Region rlv_pgate   = rpgate - rhv_pgate;
+  db::Region rhv_psd     = rpsd & *rthickgox;
+  db::Region rlv_psd     = rpsd - *rthickgox;
+
+  l2n.register_layer (rntie, "ntie");
+  l2n.register_layer (rpsd,  "psd");
+  //  required to provide deep layers for flat ones for the extractor:
+  l2n.register_layer (rhv_pgate,  "hv_pgate");
+  l2n.register_layer (rlv_pgate,  "lv_pgate");
+
+  db::Region ractive_outside_nwell = *ractive - *rnwell;
+  db::Region rnactive    = ractive_outside_nwell - *rpplus;
+  db::Region rptie       = ractive_outside_nwell & *rpplus;
+  db::Region rngate      = rnactive & *rpoly;
+  db::Region rnsd        = rnactive - rngate;
+  db::Region rhv_ngate   = rngate & *rthickgox;
+  db::Region rlv_ngate   = rngate - rhv_ngate;
+  db::Region rhv_nsd     = rnsd & *rthickgox;
+  db::Region rlv_nsd     = rnsd - *rthickgox;
+
+  l2n.register_layer (rptie, "ptie");
+  l2n.register_layer (rnsd,  "nsd");
+  //  required to provide deep layers for flat ones for the extractor:
+  l2n.register_layer (rhv_ngate,  "hv_ngate");
+  l2n.register_layer (rlv_ngate,  "lv_ngate");
+
+  db::NetlistDeviceExtractorMOS4Transistor hvpmos_ex ("HVPMOS");
+  db::NetlistDeviceExtractorMOS4Transistor hvnmos_ex ("HVNMOS");
+  db::NetlistDeviceExtractorMOS4Transistor lvpmos_ex ("LVPMOS");
+  db::NetlistDeviceExtractorMOS4Transistor lvnmos_ex ("LVNMOS");
+
+  //  device extraction
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rhv_pgate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rnwell.get ();
+  l2n.extract_devices (hvpmos_ex, dl);
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rlv_pgate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rnwell.get ();
+  l2n.extract_devices (lvpmos_ex, dl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rhv_ngate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rbulk.get ();
+  l2n.extract_devices (hvnmos_ex, dl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rlv_ngate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rbulk.get ();
+  l2n.extract_devices (lvnmos_ex, dl);
+
+  //  Intra-layer
+  l2n.connect (rpsd);
+  l2n.connect (rnsd);
+  l2n.connect (*rnwell);
+  l2n.connect (*rpoly);
+  l2n.connect (*rcont);
+  l2n.connect (*rmetal1);
+  l2n.connect (*rvia1);
+  l2n.connect (*rmetal2);
+  l2n.connect (rptie);
+  l2n.connect (rntie);
+  //  Inter-layer
+  l2n.connect (*rcont,      rntie);
+  l2n.connect (*rcont,      rptie);
+  l2n.connect (*rnwell,     rntie);
+  l2n.connect (rpsd,        *rcont);
+  l2n.connect (rnsd,        *rcont);
+  l2n.connect (*rpoly,      *rcont);
+  l2n.connect (*rcont,      *rmetal1);
+  l2n.connect (*rmetal1,    *rvia1);
+  l2n.connect (*rvia1,      *rmetal2);
+  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
+  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
+  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
+  //  Global
+  l2n.connect_global (rptie, "BULK");
+  l2n.connect_global (*rbulk, "BULK");
+
+  l2n.extract_netlist ();
+
+  //  compare netlist as string
+  EXPECT_EQ (l2n.netlist ()->to_string (),
+    "Circuit TOP ():\n"
+    "  DHVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) [L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4]\n"
+    "  DHVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) [L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8]\n"
+    "  DLVPMOS $3 (S=$10,G=A,D=$6,B=$9) [L=1.5,W=2.475,AS=1.11375,AD=3.155625,PS=5.85,PD=7.5]\n"
+    "  DHVNMOS $4 (S=Z,G=$6,D=VSS,B=BULK) [L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6]\n"
+    "  DHVNMOS $5 (S=VSS,G=A,D=$5,B=BULK) [L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2]\n"
+    "  DLVNMOS $6 (S=VSS,G=A,D=$6,B=BULK) [L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89]\n"
+  );
+}
+
+TEST(9_FlatExtractionWithExternalDSS)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int nwell      = define_layer (ly, lmap, 1);
+  unsigned int active     = define_layer (ly, lmap, 2);
+  unsigned int thickgox   = define_layer (ly, lmap, 103);  //  does not exist
+  unsigned int pplus      = define_layer (ly, lmap, 4);
+  unsigned int nplus      = define_layer (ly, lmap, 5);
+  unsigned int poly       = define_layer (ly, lmap, 6);
+  unsigned int poly_lbl   = define_layer (ly, lmap, 7);
+  unsigned int cont       = define_layer (ly, lmap, 8);
+  unsigned int metal1     = define_layer (ly, lmap, 9);
+  unsigned int metal1_lbl = define_layer (ly, lmap, 10);
+  unsigned int via1       = define_layer (ly, lmap, 11);
+  unsigned int metal2     = define_layer (ly, lmap, 12);
+  unsigned int metal2_lbl = define_layer (ly, lmap, 13);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l6.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  db::LayoutToNetlist l2n (&dss);
+
+  std::auto_ptr<db::Region> rbulk (new db::Region ());
+  std::auto_ptr<db::Region> rnwell (new db::Region (db::RecursiveShapeIterator (ly, tc, nwell), dss));
+  std::auto_ptr<db::Region> rthickgox (new db::Region (db::RecursiveShapeIterator (ly, tc, thickgox), dss));
+  std::auto_ptr<db::Region> ractive (new db::Region (db::RecursiveShapeIterator (ly, tc, active), dss));
+  std::auto_ptr<db::Region> rpplus (new db::Region (db::RecursiveShapeIterator (ly, tc, pplus), dss));
+  std::auto_ptr<db::Region> rnplus (new db::Region (db::RecursiveShapeIterator (ly, tc, nplus), dss));
+  std::auto_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly), dss));
+  std::auto_ptr<db::Region> rpoly_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, poly_lbl), dss));
+  std::auto_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont), dss));
+  std::auto_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1), dss));
+  std::auto_ptr<db::Region> rmetal1_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1_lbl), dss));
+  std::auto_ptr<db::Region> rvia1 (new db::Region (db::RecursiveShapeIterator (ly, tc, via1), dss));
+  std::auto_ptr<db::Region> rmetal2 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2), dss));
+  std::auto_ptr<db::Region> rmetal2_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss));
+
+  l2n.register_layer (*rbulk, "bulk");
+  l2n.register_layer (*rnwell, "nwell");
+  l2n.register_layer (*rthickgox, "thickgox");
+  l2n.register_layer (*ractive, "active");
+  l2n.register_layer (*rpplus, "pplus");
+  l2n.register_layer (*rnplus, "nplus");
+  l2n.register_layer (*rpoly, "poly");
+  l2n.register_layer (*rpoly_lbl, "poly_lbl");
+  l2n.register_layer (*rcont, "cont");
+  l2n.register_layer (*rmetal1, "metal1");
+  l2n.register_layer (*rmetal1_lbl, "metal1_lbl");
+  l2n.register_layer (*rvia1, "via1");
+  l2n.register_layer (*rmetal2, "metal2");
+  l2n.register_layer (*rmetal2_lbl, "metal2_lbl");
+
+  //  derived regions
+
+  db::Region ractive_in_nwell = *ractive & *rnwell;
+  db::Region rpactive    = ractive_in_nwell - *rnplus;
+  db::Region rntie       = ractive_in_nwell & *rnplus;
+  db::Region rpgate      = rpactive & *rpoly;
+  db::Region rpsd        = rpactive - rpgate;
+  db::Region rhv_pgate   = rpgate & *rthickgox;
+  db::Region rlv_pgate   = rpgate - rhv_pgate;
+  db::Region rhv_psd     = rpsd & *rthickgox;
+  db::Region rlv_psd     = rpsd - *rthickgox;
+
+  l2n.register_layer (rntie, "ntie");
+  l2n.register_layer (rpsd,  "psd");
+  //  required to provide deep layers for flat ones for the extractor:
+  l2n.register_layer (rhv_pgate,  "hv_pgate");
+  l2n.register_layer (rlv_pgate,  "lv_pgate");
+
+  db::Region ractive_outside_nwell = *ractive - *rnwell;
+  db::Region rnactive    = ractive_outside_nwell - *rpplus;
+  db::Region rptie       = ractive_outside_nwell & *rpplus;
+  db::Region rngate      = rnactive & *rpoly;
+  db::Region rnsd        = rnactive - rngate;
+  db::Region rhv_ngate   = rngate & *rthickgox;
+  db::Region rlv_ngate   = rngate - rhv_ngate;
+  db::Region rhv_nsd     = rnsd & *rthickgox;
+  db::Region rlv_nsd     = rnsd - *rthickgox;
+
+  l2n.register_layer (rptie, "ptie");
+  l2n.register_layer (rnsd,  "nsd");
+  //  required to provide deep layers for flat ones for the extractor:
+  l2n.register_layer (rhv_ngate,  "hv_ngate");
+  l2n.register_layer (rlv_ngate,  "lv_ngate");
+
+  db::NetlistDeviceExtractorMOS4Transistor hvpmos_ex ("HVPMOS");
+  db::NetlistDeviceExtractorMOS4Transistor hvnmos_ex ("HVNMOS");
+  db::NetlistDeviceExtractorMOS4Transistor lvpmos_ex ("LVPMOS");
+  db::NetlistDeviceExtractorMOS4Transistor lvnmos_ex ("LVNMOS");
+
+  //  device extraction
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rhv_pgate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rnwell.get ();
+  l2n.extract_devices (hvpmos_ex, dl);
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rlv_pgate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rnwell.get ();
+  l2n.extract_devices (lvpmos_ex, dl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rhv_ngate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rbulk.get ();
+  l2n.extract_devices (hvnmos_ex, dl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rlv_ngate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  dl["W"] = rbulk.get ();
+  l2n.extract_devices (lvnmos_ex, dl);
+
+  //  Intra-layer
+  l2n.connect (rpsd);
+  l2n.connect (rnsd);
+  l2n.connect (*rnwell);
+  l2n.connect (*rpoly);
+  l2n.connect (*rcont);
+  l2n.connect (*rmetal1);
+  l2n.connect (*rvia1);
+  l2n.connect (*rmetal2);
+  l2n.connect (rptie);
+  l2n.connect (rntie);
+  //  Inter-layer
+  l2n.connect (*rcont,      rntie);
+  l2n.connect (*rcont,      rptie);
+  l2n.connect (*rnwell,     rntie);
+  l2n.connect (rpsd,        *rcont);
+  l2n.connect (rnsd,        *rcont);
+  l2n.connect (*rpoly,      *rcont);
+  l2n.connect (*rcont,      *rmetal1);
+  l2n.connect (*rmetal1,    *rvia1);
+  l2n.connect (*rvia1,      *rmetal2);
+  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
+  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
+  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
+  //  Global
+  l2n.connect_global (rptie, "BULK");
+  l2n.connect_global (*rbulk, "BULK");
+
+  l2n.extract_netlist ();
+
+  //  compare netlist as string
+  EXPECT_EQ (l2n.netlist ()->to_string (),
+    "Circuit TOP ():\n"
+    "  DLVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) [L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4]\n"
+    "  DLVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) [L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8]\n"
+    "  DLVPMOS $3 (S=$10,G=A,D=$6,B=$9) [L=1.5,W=2.475,AS=1.11375,AD=3.155625,PS=5.85,PD=7.5]\n"
+    "  DLVNMOS $4 (S=VSS,G=A,D=$6,B=BULK) [L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89]\n"
+    "  DLVNMOS $5 (S=Z,G=$6,D=VSS,B=BULK) [L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6]\n"
+    "  DLVNMOS $6 (S=VSS,G=A,D=$5,B=BULK) [L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2]\n"
+  );
+}
+

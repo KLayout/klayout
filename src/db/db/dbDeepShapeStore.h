@@ -264,8 +264,24 @@ public:
    *
    *  This method is intended for use with singular-created DSS objects (see
    *  singular constructor).
+   *
+   *  After a flat layer has been created for a region, it can be retrieved
+   *  from the region later with layer_for_flat (region).
    */
   DeepLayer create_from_flat (const db::Region &region, double max_area_ratio = 0.0, size_t max_vertex_count = 0, const db::ICplxTrans &trans = db::ICplxTrans ());
+
+  /**
+   *  @brief Gets the layer for a given flat region.
+   *
+   *  If a layer has been created for a flat region with create_from_flat, it can be retrieved with this method.
+   *  The first return value is true in this case.
+   */
+  std::pair<bool, DeepLayer> layer_for_flat (const db::Region &region) const;
+
+  /**
+   *  @brief Same as layer_for_flat, but takes a region Id
+   */
+  std::pair<bool, DeepLayer> layer_for_flat (size_t region_id) const;
 
   /**
    *  @brief Inserts a polygon layer into the deep shape store
@@ -316,12 +332,12 @@ public:
    *  This method will deliver an empty layer for the given layout index. CAUTION: don't modify this layer as it may
    *  be reused.
    */
-  DeepLayer empty_layer (unsigned int layout_index);
+  DeepLayer empty_layer (unsigned int layout_index) const;
 
   /**
    *  @brief Gets the empty working layer for the singular layout
    */
-  DeepLayer empty_layer ();
+  DeepLayer empty_layer () const;
 
   /**
    *  @brief Inserts the deep layer's shapes into some target layout
@@ -577,6 +593,7 @@ private:
   DeepShapeStore &operator= (const DeepShapeStore &);
 
   std::vector<LayoutHolder *> m_layouts;
+  std::map<size_t, DeepLayer> m_layers_for_flat;
   layout_map_type m_layout_map;
   int m_threads;
   double m_max_area_ratio;

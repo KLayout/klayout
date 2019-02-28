@@ -56,6 +56,12 @@ LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_i
   init ();
 }
 
+LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss)
+  : mp_dss (dss), m_netlist_extracted (false), m_is_flat (false)
+{
+  init ();
+}
+
 LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
   : m_iter (), m_netlist_extracted (false), m_is_flat (true)
 {
@@ -66,9 +72,19 @@ LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
 }
 
 LayoutToNetlist::LayoutToNetlist ()
-  : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_netlist_extracted (false), m_is_flat (true)
+  : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_netlist_extracted (false), m_is_flat (false)
 {
   init ();
+}
+
+LayoutToNetlist::~LayoutToNetlist ()
+{
+  //  NOTE: do this in this order because of unregistration of the layers
+  m_named_regions.clear ();
+  m_dlrefs.clear ();
+  mp_internal_dss.reset (0);
+  mp_netlist.reset (0);
+  m_net_clusters.clear ();
 }
 
 void LayoutToNetlist::init ()
@@ -179,15 +195,13 @@ void LayoutToNetlist::connect (const db::Region &l)
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
-  if (! is_deep (l)) {
-    throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in intra-layer connectivity for netlist extraction"))));
-  }
+
   if (! is_persisted (l)) {
     throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in intra-layer connectivity for netlist extraction"))));
   }
 
   //  we need to keep a reference, so we can safely delete the region
-  db::DeepLayer dl (l);
+  db::DeepLayer dl = deep_layer_of (l);
   m_dlrefs.insert (dl);
 
   m_conn.connect (dl.layer ());
@@ -198,12 +212,6 @@ void LayoutToNetlist::connect (const db::Region &a, const db::Region &b)
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
-  if (! is_deep (a)) {
-    throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in inter-layer connectivity (first layer) for netlist extraction"))));
-  }
-  if (! is_deep (b)) {
-    throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in inter-layer connectivity (second layer) for netlist extraction"))));
-  }
   if (! is_persisted (a)) {
     throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in inter-layer connectivity (first layer) for netlist extraction"))));
   }
@@ -212,7 +220,8 @@ void LayoutToNetlist::connect (const db::Region &a, const db::Region &b)
   }
 
   //  we need to keep a reference, so we can safely delete the region
-  db::DeepLayer dla (a), dlb (b);
+  db::DeepLayer dla = deep_layer_of (a);
+  db::DeepLayer dlb = deep_layer_of (b);
   m_dlrefs.insert (dla);
   m_dlrefs.insert (dlb);
 
@@ -224,15 +233,12 @@ size_t LayoutToNetlist::connect_global (const db::Region &l, const std::string &
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
-  if (! is_deep (l)) {
-    throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in global connectivity for netlist extraction"))));
-  }
   if (! is_persisted (l)) {
     throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in global connectivity for netlist extraction"))));
   }
 
   //  we need to keep a reference, so we can safely delete the region
-  db::DeepLayer dl (l);
+  db::DeepLayer dl = deep_layer_of (l);
   m_dlrefs.insert (dl);
 
   return m_conn.connect_global (dl.layer (), gn);
@@ -316,7 +322,7 @@ void LayoutToNetlist::register_layer (const db::Region &region, const std::strin
       if (region.empty ()) {
         dl = dss ().empty_layer ();
       } else {
-        throw tl::Exception (tl::to_string (tr ("Layer is not a deep region")));
+        throw tl::Exception (tl::to_string (tr ("Layer is not a deep region and cannot be registered with name: ")) + n);
       }
 
     } else {
@@ -381,13 +387,29 @@ db::Region *LayoutToNetlist::layer_by_index (unsigned int index)
   }
 }
 
-unsigned int LayoutToNetlist::layer_of (const db::Region &region) const
+db::DeepLayer LayoutToNetlist::deep_layer_of (const db::Region &region) const
 {
   const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (region.delegate ());
   if (! dr) {
-    throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in netlist extraction"))));
+
+    std::pair<bool, db::DeepLayer> lff = dss ().layer_for_flat (region);
+    if (lff.first) {
+      return lff.second;
+    } else if (region.empty ()) {
+      //  provide a substitute empty layer for empty
+      return dss ().empty_layer ();
+    } else {
+      throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in netlist extraction"))));
+    }
+
+  } else {
+    return dr->deep_layer ();
   }
-  return dr->deep_layer ().layer ();
+}
+
+unsigned int LayoutToNetlist::layer_of (const db::Region &region) const
+{
+  return deep_layer_of (region).layer ();
 }
 
 db::CellMapping LayoutToNetlist::cell_mapping_into (db::Layout &layout, db::Cell &cell, bool with_device_cells)

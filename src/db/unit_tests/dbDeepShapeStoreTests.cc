@@ -22,6 +22,8 @@
 
 
 #include "dbDeepShapeStore.h"
+#include "dbRegion.h"
+#include "dbDeepRegion.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -184,3 +186,25 @@ TEST(3_TextTreatment)
   EXPECT_EQ (dss_layout->properties_repository ().prop_name (ps.begin ()->first).to_string (), "text");
   EXPECT_EQ (ps.begin ()->second.to_string (), "TEXT");
 }
+
+TEST(4_FlatAndEmptyInput)
+{
+  db::DeepShapeStore dss ("TOP", 0.01);
+  EXPECT_EQ (dss.layout ().dbu (), 0.01);
+
+  db::Region r1;
+  r1.insert (db::Box (0, 0, 1000, 1000));
+
+  db::Region r2;
+  r2.insert (db::Box (100, 100, 900, 900));
+
+  db::Region r3;
+
+  db::Region dr1 (new db::DeepRegion (dss.create_from_flat (r1)));
+  db::Region dr2 (new db::DeepRegion (dss.create_from_flat (r2)));
+  db::Region dr3 (new db::DeepRegion (dss.create_from_flat (r3)));
+
+  EXPECT_EQ ((dr1 - dr2).to_string (), "(0,0;0,900;100,900;100,100;900,100;900,900;0,900;0,1000;1000,1000;1000,0)");
+  EXPECT_EQ ((dr1 - dr3).to_string (), "(0,0;0,1000;1000,1000;1000,0)");
+}
+

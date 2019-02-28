@@ -96,6 +96,19 @@ public:
   LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index);
 
   /**
+   *  @brief Alternative constructor using an external deep shape storage
+   *
+   *  This constructor allows using an external DSS. It's intended to be used
+   *  with existing DSS instances. Existing layers can be registered with
+   *  "register_layer". The LayoutToNetlist object will hold a weak reference
+   *  to the DSS but not own the DSS.
+   *
+   *  NOTE: this version cannot create layers but just register layers
+   *  which are present inside the DSS given as the argument.
+   */
+  LayoutToNetlist (db::DeepShapeStore *dss);
+
+  /**
    *  @brief Alternative constructor for flat mode
    *
    *  In flat mode, the internal DSS will be initialized to a top-level only
@@ -108,6 +121,11 @@ public:
    *  @brief The default constructor
    */
   LayoutToNetlist ();
+
+  /**
+   *  @brief The destructor
+   */
+  ~LayoutToNetlist ();
 
   /**
    *  @brief Sets the number of threads to use for operations which support multiple threads
@@ -517,6 +535,7 @@ private:
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
   void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
   void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
+  db::DeepLayer deep_layer_of (const db::Region &region) const;
 };
 
 }

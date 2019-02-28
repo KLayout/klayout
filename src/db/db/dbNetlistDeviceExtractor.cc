@@ -141,7 +141,11 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const NetlistDevi
     db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (l->second->delegate ());
     if (dr == 0) {
 
-      if (l->second->empty ()) {
+      std::pair<bool, db::DeepLayer> alias = dss.layer_for_flat (tl::id_of (l->second->delegate ()));
+      if (alias.first) {
+        //  use deep layer alias for a given flat one (if found)
+        layers.push_back (alias.second.layer ());
+      } else if (l->second->empty ()) {
         //  provide a substitute empty layer
         layers.push_back (dss.empty_layer ().layer ());
       } else {

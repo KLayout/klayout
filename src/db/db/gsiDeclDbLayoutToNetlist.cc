@@ -39,9 +39,14 @@ static db::LayoutToNetlist *make_l2n_default ()
   return new db::LayoutToNetlist ();
 }
 
-static db::LayoutToNetlist *make_l2n_from_existing_dss (db::DeepShapeStore *dss, unsigned int layout_index)
+static db::LayoutToNetlist *make_l2n_from_existing_dss_with_layout (db::DeepShapeStore *dss, unsigned int layout_index)
 {
   return new db::LayoutToNetlist (dss, layout_index);
+}
+
+static db::LayoutToNetlist *make_l2n_from_existing_dss (db::DeepShapeStore *dss)
+{
+  return new db::LayoutToNetlist (dss);
 }
 
 static db::LayoutToNetlist *make_l2n_flat (const std::string &topcell_name, double dbu)
@@ -109,9 +114,18 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Creates a new and empty extractor object\n"
     "The main objective for this constructor is to create an object suitable for reading an annotated netlist.\n"
   ) +
-  gsi::constructor ("new", &make_l2n_from_existing_dss, gsi::arg ("dss"), gsi::arg ("layout_index", 0),
+  gsi::constructor ("new", &make_l2n_from_existing_dss, gsi::arg ("dss"),
     "@brief Creates a new extractor object reusing an existing \\DeepShapeStore object\n"
-    "This constrcutor can be used if there is a DSS object already from which the "
+    "This constructor can be used if there is a DSS object already from which the "
+    "shapes can be taken. This version can only be used with \\register to "
+    "add layers (regions) inside the 'dss' object.\n"
+    "\n"
+    "The make_... methods will not create new layers as there is no particular place "
+    "defined where to create the layers."
+  ) +
+  gsi::constructor ("new", &make_l2n_from_existing_dss_with_layout, gsi::arg ("dss"), gsi::arg ("layout_index"),
+    "@brief Creates a new extractor object reusing an existing \\DeepShapeStore object\n"
+    "This constructor can be used if there is a DSS object already from which the "
     "shapes can be taken. NOTE: in this case, the make_... functions will create "
     "new layers inside this DSS. To register existing layers (regions) use \\register.\n"
   ) +

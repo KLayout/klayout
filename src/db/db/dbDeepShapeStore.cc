@@ -227,11 +227,10 @@ struct DeepShapeStore::LayoutHolder
     //  .. nothing yet ..
   }
 
-  unsigned int make_empty_layer ()
+  unsigned int empty_layer () const
   {
     if (m_empty_layer == std::numeric_limits<unsigned int>::max ()) {
-      m_empty_layer = layout.insert_layer ();
-      layer_refs [m_empty_layer] += 1;  //  the empty layer is not deleted
+      const_cast<LayoutHolder *> (this)->make_empty_layer ();
     }
     return m_empty_layer;
   }
@@ -256,6 +255,12 @@ struct DeepShapeStore::LayoutHolder
 
 private:
   unsigned int m_empty_layer;
+
+  void make_empty_layer ()
+  {
+    m_empty_layer = layout.insert_layer ();
+    layer_refs [m_empty_layer] += 1;  //  the empty layer is not deleted
+  }
 };
 
 // ----------------------------------------------------------------------------------
@@ -282,6 +287,9 @@ DeepShapeStore::~DeepShapeStore ()
 {
   --s_instance_count;
 
+  //  because of unregistration we must not do this in the destructor:
+  m_layers_for_flat.clear ();
+
   for (std::vector<LayoutHolder *>::iterator h = m_layouts.begin (); h != m_layouts.end (); ++h) {
     delete *h;
   }
@@ -290,6 +298,12 @@ DeepShapeStore::~DeepShapeStore ()
 
 DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)
 {
+  //  reuse existing layer
+  std::pair<bool, DeepLayer> lff = layer_for_flat (region);
+  if (lff.first) {
+    return lff.second;
+  }
+
   require_singular ();
 
   unsigned int layer = layout ().insert_layer ();
@@ -308,11 +322,32 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, double max
   db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), m_text_enlargement, m_text_property_name);
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count);
 
-  for (db::Region::const_iterator p = region.begin (); ! p.at_end (); ++p) {
-    red.push (*p, trans, world, 0, shapes);
+  //  try to maintain the texts - go through shape iterator
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = region.begin_iter ();
+  db::ICplxTrans ttop = trans * ii.second;
+  while (! ii.first.at_end ()) {
+    red.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+    ++ii.first;
   }
 
-  return DeepLayer (this, 0 /*singular layout index*/, layer);
+  DeepLayer dl (this, 0 /*singular layout index*/, layer);
+  m_layers_for_flat [tl::id_of (region.delegate ())] = dl;
+  return dl;
+}
+
+std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (const db::Region &region) const
+{
+  return layer_for_flat (tl::id_of (region.delegate ()));
+}
+
+std::pair<bool, DeepLayer> DeepShapeStore::layer_for_flat (size_t region_id) const
+{
+  std::map<size_t, DeepLayer>::const_iterator lff = m_layers_for_flat.find (region_id);
+  if (lff == m_layers_for_flat.end ()) {
+    return std::make_pair (false, DeepLayer ());
+  } else {
+    return std::make_pair (true, lff->second);
+  }
 }
 
 bool DeepShapeStore::is_singular () const
@@ -475,12 +510,12 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   return DeepLayer (this, layout_index, layer_index);
 }
 
-DeepLayer DeepShapeStore::empty_layer (unsigned int layout_index)
+DeepLayer DeepShapeStore::empty_layer (unsigned int layout_index) const
 {
-  return DeepLayer (this, layout_index, m_layouts[layout_index]->make_empty_layer ());
+  return DeepLayer (const_cast<DeepShapeStore *> (this), layout_index, m_layouts[layout_index]->empty_layer ());
 }
 
-DeepLayer DeepShapeStore::empty_layer ()
+DeepLayer DeepShapeStore::empty_layer () const
 {
   require_singular ();
   return empty_layer (0);

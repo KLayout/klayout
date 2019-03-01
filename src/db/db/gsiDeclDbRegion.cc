@@ -2280,6 +2280,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "If the region is already flat (i.e. \\has_valid_polygons? returns true), this method will "
     "not change it.\n"
     "\n"
+    "Returns 'self', so this method can be used in a dot concatenation.\n"
+    "\n"
     "This method has been introduced in version 0.26."
   ) +
   method ("has_valid_polygons?", &db::Region::has_valid_polygons,

@@ -445,6 +445,201 @@ END
 
   end
 
+  def test_20_Antenna
+
+    # --- simple antenna check
+
+    input = File.join($ut_testsrc, "testdata", "algo", "antenna_l1.gds")
+    ly = RBA::Layout::new
+    ly.read(input)
+
+    au = File.join($ut_testsrc, "testdata", "algo", "antenna_au1.gds")
+    ly_au = RBA::Layout::new
+    ly_au.read(au)
+
+    dss = RBA::DeepShapeStore::new
+    assert_equal(dss.is_singular?, false)
+
+    rdiode = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(1, 0)), dss)
+    rpoly = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(6, 0)), dss)
+    rcont = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(8, 0)), dss)
+    rmetal1 = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(9, 0)), dss)
+    rvia1 = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(11, 0)), dss)
+    rmetal2 = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(12, 0)), dss)
+    assert_equal(dss.is_singular?, true)
+
+    l2n = RBA::LayoutToNetlist::new(dss)
+
+    l2n.register(rdiode, "diode")
+    l2n.register(rpoly, "poly")
+    l2n.register(rcont, "cont")
+    l2n.register(rmetal1, "metal1")
+    l2n.register(rvia1, "via1")
+    l2n.register(rmetal2, "metal2")
+
+    l2n.connect(rpoly)
+    l2n.connect(rcont)
+    l2n.connect(rmetal1)
+    l2n.connect(rpoly, rcont)
+    l2n.connect(rcont, rmetal1)
+
+    l2n.extract_netlist
+
+    a1_3 = l2n.antenna_check(rpoly, rmetal1, 3)
+    a1_10 = l2n.antenna_check(rpoly, rmetal1, 10)
+    a1_30 = l2n.antenna_check(rpoly, rmetal1, 30)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((a1_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(100, 0)))).to_s, "")
+    assert_equal((a1_10.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(101, 0)))).to_s, "")
+    assert_equal((a1_30.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(102, 0)))).to_s, "")
+
+    # --- same with flat
+
+    l2n._destroy
+
+    input = File.join($ut_testsrc, "testdata", "algo", "antenna_l1.gds")
+    ly = RBA::Layout::new
+    ly.read(input)
+
+    au = File.join($ut_testsrc, "testdata", "algo", "antenna_au1.gds")
+    ly_au = RBA::Layout::new
+    ly_au.read(au)
+
+    rfdiode = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(1, 0)))
+    rfpoly = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(6, 0)))
+    rfcont = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(8, 0)))
+    rfmetal1 = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(9, 0)))
+    rfvia1 = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(11, 0)))
+    rfmetal2 = RBA::Region::new(ly.top_cell.begin_shapes_rec(ly.layer(12, 0)))
+    assert_equal(rfdiode.is_deep?, false)
+    assert_equal(rfpoly.is_deep?, false)
+    assert_equal(rfmetal1.is_deep?, false)
+    assert_equal(rfvia1.is_deep?, false)
+    assert_equal(rfmetal2.is_deep?, false)
+
+    l2n = RBA::LayoutToNetlist::new(ly.top_cell.name, ly.dbu)
+
+    l2n.register(rfdiode, "diode")
+    l2n.register(rfpoly, "poly")
+    l2n.register(rfcont, "cont")
+    l2n.register(rfmetal1, "metal1")
+    l2n.register(rfvia1, "via1")
+    l2n.register(rfmetal2, "metal2")
+
+    l2n.connect(rfpoly)
+    l2n.connect(rfcont)
+    l2n.connect(rfmetal1)
+    l2n.connect(rfpoly, rfcont)
+    l2n.connect(rfcont, rfmetal1)
+
+    l2n.extract_netlist
+
+    a1_3 = l2n.antenna_check(rfpoly, rfmetal1, 3)
+    a1_10 = l2n.antenna_check(rfpoly, rfmetal1, 10)
+    a1_30 = l2n.antenna_check(rfpoly, rfmetal1, 30)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((a1_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(100, 0)))).to_s, "")
+    assert_equal((a1_10.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(101, 0)))).to_s, "")
+    assert_equal((a1_30.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(102, 0)))).to_s, "")
+
+    # --- simple antenna check with metal2
+
+    l2n._destroy
+    l2n = RBA::LayoutToNetlist::new(dss)
+
+    l2n.register(rdiode, "diode")
+    l2n.register(rpoly, "poly")
+    l2n.register(rcont, "cont")
+    l2n.register(rmetal1, "metal1")
+    l2n.register(rvia1, "via1")
+    l2n.register(rmetal2, "metal2")
+
+    l2n.connect(rpoly)
+    l2n.connect(rcont)
+    l2n.connect(rmetal1)
+    l2n.connect(rmetal2)
+    l2n.connect(rpoly, rcont)
+    l2n.connect(rcont, rmetal1)
+    l2n.connect(rmetal1, rvia1)
+    l2n.connect(rvia1, rmetal2)
+
+    l2n.extract_netlist
+
+    a2_5 = l2n.antenna_check(rpoly, rmetal2, 5)
+    a2_10 = l2n.antenna_check(rpoly, rmetal2, 10)
+    a2_17 = l2n.antenna_check(rpoly, rmetal2, 17)
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((a2_5.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(200, 0)))).to_s, "")
+    assert_equal((a2_10.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(201, 0)))).to_s, "")
+    assert_equal((a2_17.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(202, 0)))).to_s, "")
+
+    # --- antenna check with diodes and antenna effect reduction
+
+    l2n._destroy
+    l2n = RBA::LayoutToNetlist::new(dss)
+
+    l2n.register(rdiode, "diode")
+    l2n.register(rpoly, "poly")
+    l2n.register(rcont, "cont")
+    l2n.register(rmetal1, "metal1")
+    l2n.register(rvia1, "via1")
+    l2n.register(rmetal2, "metal2")
+
+    l2n.connect(rdiode)
+    l2n.connect(rpoly)
+    l2n.connect(rcont)
+    l2n.connect(rmetal1)
+    l2n.connect(rdiode, rcont)
+    l2n.connect(rpoly, rcont)
+    l2n.connect(rcont, rmetal1)
+
+    l2n.extract_netlist
+
+    a3_3 = l2n.antenna_check(rpoly, rmetal1, 3, [ [ rdiode, 8.0 ] ] )
+    a3_10 = l2n.antenna_check(rpoly, rmetal1, 10, [ [ rdiode, 8.0 ] ])
+    a3_30 = l2n.antenna_check(rpoly, rmetal1, 30, [ [ rdiode, 8.0 ] ])
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((a3_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(300, 0)))).to_s, "")
+    assert_equal((a3_10.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(301, 0)))).to_s, "")
+    assert_equal((a3_30.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(302, 0)))).to_s, "")
+
+    # --- antenna check with diodes
+
+    l2n._destroy
+    l2n = RBA::LayoutToNetlist::new(dss)
+
+    l2n.register(rdiode, "diode")
+    l2n.register(rpoly, "poly")
+    l2n.register(rcont, "cont")
+    l2n.register(rmetal1, "metal1")
+    l2n.register(rvia1, "via1")
+    l2n.register(rmetal2, "metal2")
+
+    l2n.connect(rdiode)
+    l2n.connect(rpoly)
+    l2n.connect(rcont)
+    l2n.connect(rmetal1)
+    l2n.connect(rdiode, rcont)
+    l2n.connect(rpoly, rcont)
+    l2n.connect(rcont, rmetal1)
+
+    l2n.extract_netlist
+
+    a4_3 = l2n.antenna_check(rpoly, rmetal1, 3, [ rdiode ] )
+    a4_10 = l2n.antenna_check(rpoly, rmetal1, 10, [ rdiode ])
+    a4_30 = l2n.antenna_check(rpoly, rmetal1, 30, [ rdiode ])
+
+    # Note: flatten.merged performs some normalization
+    assert_equal((a4_3.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(400, 0)))).to_s, "")
+    assert_equal((a4_10.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(401, 0)))).to_s, "")
+    assert_equal((a4_30.flatten ^ RBA::Region::new(ly_au.top_cell.begin_shapes_rec(ly_au.layer(402, 0)))).to_s, "")
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -523,7 +523,7 @@ public:
    *  regardless of the diode's area.
    *  In other words: any diode will make the net safe against antenna discharge.
    */
-  db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<db::Region *, double> > &diodes = std::vector<std::pair<db::Region *, double> > ());
+  db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ());
 
 private:
   //  no copying

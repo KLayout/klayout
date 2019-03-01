@@ -862,7 +862,7 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
   }
 }
 
-db::Region LayoutToNetlist::antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<db::Region *, double> > &diodes)
+db::Region LayoutToNetlist::antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes)
 {
   //  TODO: that's basically too much .. we only need the clusters
   if (! m_netlist_extracted) {
@@ -898,7 +898,7 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, const db::Reg
       double r = ratio;
       bool skip = false;
 
-      for (std::vector<std::pair<db::Region *, double> >::const_iterator d = diodes.begin (); d != diodes.end () && ! skip; ++d) {
+      for (std::vector<std::pair<const db::Region *, double> >::const_iterator d = diodes.begin (); d != diodes.end () && ! skip; ++d) {
 
         db::Region rdiode;
         deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (*d->first), db::ICplxTrans (), rdiode);

@@ -25,6 +25,7 @@
 #include "dbLayoutToNetlistWriter.h"
 #include "dbLayoutToNetlistReader.h"
 #include "tlStream.h"
+#include "tlVariant.h"
 
 namespace gsi
 {
@@ -102,6 +103,38 @@ static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
     ln.push_back (l->second);
   }
   return ln;
+}
+
+static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes)
+{
+  std::vector<std::pair<const db::Region *, double> > diode_pairs;
+
+  for (std::vector<tl::Variant>::const_iterator d = diodes.begin (); d != diodes.end (); ++d) {
+
+    if (d->is_user<db::Region> ()) {
+
+      diode_pairs.push_back (std::make_pair (& d->to_user<db::Region> (), 0.0));
+
+    } else if (d->is_list ()) {
+
+      const std::vector<tl::Variant> &list = d->get_list ();
+      if (list.size () != 2) {
+        throw tl::Exception (tl::to_string (tr ("Diode layer specifications of 'antenna' method require list of diode layer/ratio pairs (e.g. '[ [ diode_layer, 10.0 ], ... ]')")));
+      }
+      if (! list [0].is_user<db::Region> ()) {
+        throw tl::Exception (tl::to_string (tr ("Diode layer specifications of 'antenna' method require list of diode layer/ratio pairs (e.g. '[ [ diode_layer, 10.0 ], ... ]') - first element isn't a Region object")));
+      }
+      if (! list [1].can_convert_to_double ()) {
+        throw tl::Exception (tl::to_string (tr ("Diode layer specifications of 'antenna' method require list of diode layer/ratio pairs (e.g. '[ [ diode_layer, 10.0 ], ... ]') - second element isn't a number")));
+      }
+
+      diode_pairs.push_back (std::make_pair (& list [0].to_user<db::Region> (), list [1].to_double ()));
+
+    }
+
+  }
+
+  return l2n->antenna_check (poly, metal, ratio, diode_pairs);
 }
 
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
@@ -386,6 +419,47 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method_ext ("read", &read_l2n, gsi::arg ("path"),
     "@brief Reads the extracted netlist from the file.\n"
     "This method employs the native format of KLayout.\n"
+  ) +
+  gsi::method_ext ("antenna_check", &antenna_check, gsi::arg ("gate"), gsi::arg ("metal"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> ()),
+   "@brief Runs an antenna check on the extracted clusters\n"
+   "\n"
+   "The antenna check will traverse all clusters and run an antenna check\n"
+   "for all root clusters. The antenna ratio is defined by the total\n"
+   "area of all \"metal\" shapes divided by the total area of all \"gate\" shapes\n"
+   "on the cluster. Of all clusters where the antenna ratio is larger than\n"
+   "the limit ratio all metal shapes are copied to the output region as\n"
+   "error markers.\n"
+   "\n"
+   "The simple call is:\n"
+   "\n"
+   "@code\n"
+   "l2n = ... # a LayoutToNetlist object\n"
+   "l2n.extract_netlist\n"
+   "# check for antenna ratio 10.0 of metal vs. poly:\n"
+   "errors = l2n.antenna(poly, metal, 10.0)\n"
+   "@endcode\n"
+   "\n"
+   "You can include diodes which rectify the antenna effect. "
+   "Provide recognition layers for theses diodes and include them "
+   "in the connections. Then specify the diode layers in the antenna call:\n"
+   "\n"
+   "@code\n"
+   "...\n"
+   "# include diode_layer1:\n"
+   "errors = l2n.antenna(poly, metal, 10.0, [ diode_layer1 ])\n"
+   "# include diode_layer1 and diode_layer2:"
+   "errors = l2n.antenna(poly, metal, 10.0, [ diode_layer1, diode_layer2 ])\n"
+   "@endcode\n"
+   "\n"
+   "Diodes can be configured to partially reduce the antenna effect depending "
+   "on their area. This will make the diode_layer1 increase the ratio by 50.0 "
+   "per square micrometer area of the diode:\n"
+   "\n"
+   "@code\n"
+   "...\n"
+   "# diode_layer1 increases the ratio by 50 per sqaure micrometer area:\n"
+   "errors = l2n.antenna(poly, metal, 10.0 [ [ diode_layer, 50.0 ] ])\n"
+   "@endcode\n"
   ),
   "@brief A generic framework for extracting netlists from layouts\n"
   "\n"

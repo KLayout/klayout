@@ -2390,7 +2390,7 @@ TEST(10_Antenna)
 
     l2n.extract_netlist ();
 
-    std::vector<std::pair<db::Region *, double> > diodes;
+    std::vector<std::pair<const db::Region *, double> > diodes;
     //  8.0 means: increase r by 8.0 for each um^2 of diode attached to a net
     diodes.push_back (std::make_pair (rdiode.get (), 8.0));
 
@@ -2423,7 +2423,7 @@ TEST(10_Antenna)
 
     l2n.extract_netlist ();
 
-    std::vector<std::pair<db::Region *, double> > diodes;
+    std::vector<std::pair<const db::Region *, double> > diodes;
     //  0.0 means: skip all nets where there is a rdiode attached
     diodes.push_back (std::make_pair (rdiode.get (), 0.0));
 

@@ -1426,9 +1426,10 @@ public:
    *
    *  This method will turn any region into a flat shape collection.
    */
-  void flatten ()
+  db::Region &flatten ()
   {
     flat_region ();
+    return *this;
   }
 
   /**

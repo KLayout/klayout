@@ -2263,6 +2263,7 @@ TEST(10_Antenna)
   unsigned int metal1     = define_layer (ly, lmap, 9);
   unsigned int via1       = define_layer (ly, lmap, 11);
   unsigned int metal2     = define_layer (ly, lmap, 12);
+  unsigned int diode      = define_layer (ly, lmap, 1);
 
   {
     db::LoadLayoutOptions options;
@@ -2283,6 +2284,7 @@ TEST(10_Antenna)
 
   db::DeepShapeStore dss;
 
+  std::auto_ptr<db::Region> rdiode (new db::Region (db::RecursiveShapeIterator (ly, tc, diode), dss));
   std::auto_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly), dss));
   std::auto_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont), dss));
   std::auto_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1), dss));
@@ -2293,6 +2295,7 @@ TEST(10_Antenna)
   ly2.dbu (ly.dbu ());
   db::Cell &top2 = ly2.cell (ly2.add_cell ("TOPTOP"));
 
+  rdiode->insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (1, 0)));
   rpoly->insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (6, 0)));
   rcont->insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (8, 0)));
   rmetal1->insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (9, 0)));
@@ -2365,6 +2368,72 @@ TEST(10_Antenna)
     a2_5.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (200, 0)));
     a2_10.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (201, 0)));
     a2_17.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (202, 0)));
+  }
+
+  {
+    db::LayoutToNetlist l2n (&dss);
+
+    l2n.register_layer (*rdiode, "diode");
+    l2n.register_layer (*rpoly, "poly");
+    l2n.register_layer (*rcont, "cont");
+    l2n.register_layer (*rmetal1, "metal1");
+
+    //  Intra-layer
+    l2n.connect (*rdiode);
+    l2n.connect (*rpoly);
+    l2n.connect (*rcont);
+    l2n.connect (*rmetal1);
+    //  Inter-layer
+    l2n.connect (*rdiode,     *rcont);
+    l2n.connect (*rpoly,      *rcont);
+    l2n.connect (*rcont,      *rmetal1);
+
+    l2n.extract_netlist ();
+
+    std::vector<std::pair<db::Region *, double> > diodes;
+    //  8.0 means: increase r by 8.0 for each um^2 of diode attached to a net
+    diodes.push_back (std::make_pair (rdiode.get (), 8.0));
+
+    db::Region a3_3 = l2n.antenna_check (*rpoly, *rmetal1, 3, diodes);
+    db::Region a3_10 = l2n.antenna_check (*rpoly, *rmetal1, 10, diodes);
+    db::Region a3_30 = l2n.antenna_check (*rpoly, *rmetal1, 30, diodes);
+
+    a3_3.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (300, 0)));
+    a3_10.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (301, 0)));
+    a3_30.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (302, 0)));
+  }
+
+  {
+    db::LayoutToNetlist l2n (&dss);
+
+    l2n.register_layer (*rdiode, "diode");
+    l2n.register_layer (*rpoly, "poly");
+    l2n.register_layer (*rcont, "cont");
+    l2n.register_layer (*rmetal1, "metal1");
+
+    //  Intra-layer
+    l2n.connect (*rdiode);
+    l2n.connect (*rpoly);
+    l2n.connect (*rcont);
+    l2n.connect (*rmetal1);
+    //  Inter-layer
+    l2n.connect (*rdiode,     *rcont);
+    l2n.connect (*rpoly,      *rcont);
+    l2n.connect (*rcont,      *rmetal1);
+
+    l2n.extract_netlist ();
+
+    std::vector<std::pair<db::Region *, double> > diodes;
+    //  0.0 means: skip all nets where there is a rdiode attached
+    diodes.push_back (std::make_pair (rdiode.get (), 0.0));
+
+    db::Region a4_3 = l2n.antenna_check (*rpoly, *rmetal1, 3, diodes);
+    db::Region a4_10 = l2n.antenna_check (*rpoly, *rmetal1, 10, diodes);
+    db::Region a4_30 = l2n.antenna_check (*rpoly, *rmetal1, 30, diodes);
+
+    a4_3.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (400, 0)));
+    a4_10.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (401, 0)));
+    a4_30.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (402, 0)));
   }
 
   std::string au = tl::testsrc ();

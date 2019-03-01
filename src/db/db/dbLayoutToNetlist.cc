@@ -896,25 +896,36 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, const db::Reg
       double ametal = rmetal.area () * dbu * dbu;
 
       double r = ratio;
+      bool skip = false;
 
-      for (std::vector<std::pair<db::Region *, double> >::const_iterator d = diodes.begin (); d != diodes.end (); ++d) {
+      for (std::vector<std::pair<db::Region *, double> >::const_iterator d = diodes.begin (); d != diodes.end () && ! skip; ++d) {
 
         db::Region rdiode;
         deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (*d->first), db::ICplxTrans (), rdiode);
 
-        r += rdiode.area () * dbu * dbu / d->second;
-
-      }
-
-      if (tl::verbosity () >= 0 /*50*/) {
-        tl::info << "cell [" << ly.cell_name (*cid) << "]: agate=" << tl::to_string (agate) << ", ametal=" << tl::to_string (ametal) << ", r=" << tl::sprintf ("%.12g", r);
-      }
-
-      if (agate > dbu * dbu && ametal / agate > r + db::epsilon) {
-        db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
-        for (db::Region::const_iterator r = rmetal.begin_merged (); ! r.at_end (); ++r) {
-          shapes.insert (*r);
+        if (fabs (d->second) < db::epsilon) {
+          if (rdiode.area () > 0) {
+            skip = true;
+          }
+        } else {
+          r += rdiode.area () * dbu * dbu * d->second;
         }
+
+      }
+
+      if (! skip) {
+
+        if (tl::verbosity () >= 50) {
+          tl::info << "cell [" << ly.cell_name (*cid) << "]: agate=" << tl::to_string (agate) << ", ametal=" << tl::to_string (ametal) << ", r=" << tl::sprintf ("%.12g", r);
+        }
+
+        if (agate > dbu * dbu && ametal / agate > r + db::epsilon) {
+          db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
+          for (db::Region::const_iterator r = rmetal.begin_merged (); ! r.at_end (); ++r) {
+            shapes.insert (*r);
+          }
+        }
+
       }
 
     }

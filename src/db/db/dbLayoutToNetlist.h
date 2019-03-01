@@ -517,6 +517,11 @@ public:
    *  A(diode) / Ared[um^2] to the ratio. A(diode) is the area of the
    *  diode layer per cluster. Both the diode layer and the Ared value
    *  are specified as pairs in "diodes".
+   *
+   *  A special case is Ared = 0: in this case, the presence of any shapes
+   *  on the diode layer will entirely disable the check on a cluster,
+   *  regardless of the diode's area.
+   *  In other words: any diode will make the net safe against antenna discharge.
    */
   db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<db::Region *, double> > &diodes = std::vector<std::pair<db::Region *, double> > ());
 

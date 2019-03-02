@@ -348,7 +348,6 @@ public:
   /**
    *  @brief Initialize the Variant with an explicit vector or variants
    */
-  template
   Variant (const std::vector<tl::Variant> &list)
     : m_type (t_list), m_string (0)
   {

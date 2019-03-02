@@ -346,6 +346,16 @@ public:
   }
 
   /**
+   *  @brief Initialize the Variant with an explicit vector or variants
+   */
+  template
+  Variant (const std::vector<tl::Variant> &list)
+    : m_type (t_list), m_string (0)
+  {
+    m_var.m_list = new std::vector<tl::Variant> (list);
+  }
+
+  /**
    *  @brief Initialize the Variant with a list
    */
   template <class Iter>

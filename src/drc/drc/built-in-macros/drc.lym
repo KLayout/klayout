@@ -3800,6 +3800,12 @@ CODE
 
     end
     
+    def _finish
+      clear_connections
+      # cleans up the L2N object
+      modified
+    end
+
   private
 
     def modified
@@ -4996,6 +5002,7 @@ CODE
 
       # clean up temp data
       @dss &amp;&amp; @dss._destroy
+      @netter &amp;&amp; @netter._finish
       
       if final &amp;&amp; @log_file
         @log_file.close

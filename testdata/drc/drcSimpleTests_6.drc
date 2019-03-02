@@ -1,0 +1,28 @@
+
+# Hierarchical antenna check
+
+source($drc_test_source, "RINGO")
+target($drc_test_target)
+
+deep
+
+diff = input(2, 0)
+poly = input(3, 0)
+contact = input(4, 0)
+poly_cont = input(5, 0)
+metal1 = input(6, 0)
+via1 = input(7, 0)
+metal2 = input(8, 0)
+
+gate = diff & poly
+
+connect(gate, poly)
+connect(poly, poly_cont)
+connect(poly_cont, metal1)
+connect(metal1, via1)
+connect(via1, metal2)
+
+antenna_check(gate, metal2, 1.0).output(101)
+antenna_check(gate, metal2, 5.0).output(105)
+antenna_check(gate, metal2, 10.0).output(110)
+antenna_check(gate, metal2, 50.0).output(150)

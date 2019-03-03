@@ -3596,7 +3596,6 @@ CODE
   # The netter object
 
   # %DRC%
-
   # @scope 
   # @name Netter 
   # @brief DRC Reference: Netter object
@@ -3608,7 +3607,7 @@ CODE
   #
   # An individual netter object can be created, if the netter results
   # need to be kept for multiple extractions. If you really need
-  # a Netter object, use the global \\netter function:
+  # a Netter object, use the global \netter function:
   #
   # @code
   # # create a new Netter object:
@@ -3649,7 +3648,12 @@ CODE
   # 
   # # this will remove all connections made
   # clear_connections
+  # ...
   # @/code
+  #
+  # Further functionality of the Netter object:
+  #
+  # More methods will be added in the future to support network-related features.
 
   class DRCNetter
 

@@ -58,11 +58,11 @@ build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type
 }
 
 void
-NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters, bool join_nets_by_label)
+NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layout_index, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters, bool join_nets_by_label)
 {
   mp_clusters = &clusters;
-  mp_layout = &dss.const_layout ();
-  mp_cell = &dss.const_initial_cell ();
+  mp_layout = &dss.const_layout (layout_index);
+  mp_cell = &dss.const_initial_cell (layout_index);
 
   //  gets the text annotation property ID -
   //  this is how the texts are passed for annotating the net names

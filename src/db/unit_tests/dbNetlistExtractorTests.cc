@@ -218,12 +218,12 @@ TEST(1_DeviceAndNetExtraction)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, dl, nl, cl);
+  pmos_ex.extract (dss, 0, dl, nl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, dl, nl, cl);
+  nmos_ex.extract (dss, 0, dl, nl, cl);
 
   //  perform the net extraction
 
@@ -253,7 +253,7 @@ TEST(1_DeviceAndNetExtraction)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, conn, nl, cl);
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   //  debug layers produced for nets
   //    202/0 -> Active
@@ -430,12 +430,12 @@ TEST(2_DeviceAndNetExtractionFlat)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, dl, nl, cl);
+  pmos_ex.extract (dss, 0, dl, nl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, dl, nl, cl);
+  nmos_ex.extract (dss, 0, dl, nl, cl);
 
   //  perform the net extraction
 
@@ -466,7 +466,7 @@ TEST(2_DeviceAndNetExtractionFlat)
   //  extract the nets
 
   //  don't use "join_nets_by_label" because the flattened texts will spoil everything
-  net_ex.extract_nets (dss, conn, nl, cl, false);
+  net_ex.extract_nets (dss, 0, conn, nl, cl, false);
 
   //  debug layers produced for nets
   //    202/0 -> Active
@@ -664,12 +664,12 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
   dl["SD"] = &rpsd;
   dl["G"] = &rpgate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  pmos_ex.extract (dss, dl, nl, cl);
+  pmos_ex.extract (dss, 0, dl, nl, cl);
 
   dl["SD"] = &rnsd;
   dl["G"] = &rngate;
   dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
-  nmos_ex.extract (dss, dl, nl, cl);
+  nmos_ex.extract (dss, 0, dl, nl, cl);
 
   //  perform the net extraction
 
@@ -699,7 +699,7 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, conn, nl, cl);
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   EXPECT_EQ (all_net_names_unique (nl), true);
 

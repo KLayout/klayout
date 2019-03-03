@@ -159,8 +159,6 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
   int version = 0;
   std::string description;
 
-  //  TODO: there probably is a more efficient way to force the layout inside l2n to be made
-  l2n->ensure_internal_layout ();
   tl_assert (l2n->internal_layout ());
   l2n->internal_layout ()->dbu (1.0); //  mainly for testing
 

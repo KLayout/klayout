@@ -123,7 +123,7 @@ static void insert_into_region (const db::PolygonRef &s, const db::ICplxTrans &t
   region.insert (s.obj ().transformed (tr * db::ICplxTrans (s.trans ())));
 }
 
-void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const NetlistDeviceExtractor::input_layers &layer_map, db::Netlist &nl, hier_clusters_type &clusters)
+void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layout_index, const NetlistDeviceExtractor::input_layers &layer_map, db::Netlist &nl, hier_clusters_type &clusters)
 {
   initialize (&nl);
 
@@ -147,14 +147,14 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const NetlistDevi
         layers.push_back (alias.second.layer ());
       } else if (l->second->empty ()) {
         //  provide a substitute empty layer
-        layers.push_back (dss.empty_layer ().layer ());
+        layers.push_back (dss.empty_layer (layout_index).layer ());
       } else {
         throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid region passed to input layer '%s' for device extraction: must be of deep region kind")), ld->name));
       }
 
     } else {
 
-      if (&dr->deep_layer ().layout () != &dss.layout () || &dr->deep_layer ().initial_cell () != &dss.initial_cell ()) {
+      if (&dr->deep_layer ().layout () != &dss.layout (layout_index) || &dr->deep_layer ().initial_cell () != &dss.initial_cell (layout_index)) {
         throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid region passed to input layer '%s' for device extraction: not originating from the same source")), ld->name));
       }
 
@@ -164,7 +164,7 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, const NetlistDevi
 
   }
 
-  extract_without_initialize (dss.layout (), dss.initial_cell (), clusters, layers);
+  extract_without_initialize (dss.layout (layout_index), dss.initial_cell (layout_index), clusters, layers);
 }
 
 void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl, hier_clusters_type &clusters)

@@ -30,32 +30,35 @@
 namespace db
 {
 
-static const unsigned int singular_layout_index = 0;
-
 //  the iterator provides the hierarchical selection (enabling/disabling cells etc.)
 
 LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
-  : m_iter (iter), m_netlist_extracted (false), m_is_flat (false)
+  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false)
 {
   //  check the iterator
   if (iter.has_complex_region () || iter.region () != db::Box::world ()) {
     throw tl::Exception (tl::to_string (tr ("The netlist extractor cannot work on clipped layouts")));
   }
 
+  mp_internal_dss.reset (new db::DeepShapeStore ());
+  mp_dss.reset (mp_internal_dss.get ());
+
+  //  the dummy layer acts as a reference holder for the layout
+  //  NOTE: this probably can be done better
+  db::RecursiveShapeIterator empty_iter = iter;
+  empty_iter.set_layers (std::vector<unsigned int> ());
+  m_dummy_layer = dss ().create_polygon_layer (empty_iter);
+
   init ();
 }
 
 LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index)
-  : mp_dss (dss), m_netlist_extracted (false), m_is_flat (false)
+  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false)
 {
-  m_iter = db::RecursiveShapeIterator (dss->layout (layout_index), dss->initial_cell (layout_index), std::set<unsigned int> ());
+  if (dss->is_valid_layout_index (m_layout_index)) {
+    m_iter = db::RecursiveShapeIterator (dss->layout (m_layout_index), dss->initial_cell (m_layout_index), std::set<unsigned int> ());
+  }
 
-  init ();
-}
-
-LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss)
-  : mp_dss (dss), m_netlist_extracted (false), m_is_flat (false)
-{
   init ();
 }
 
@@ -64,12 +67,14 @@ LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
 {
   mp_internal_dss.reset (new db::DeepShapeStore (topcell_name, dbu));
   mp_dss.reset (mp_internal_dss.get ());
+  m_layout_index = 0 ;
 
   init ();
 }
 
 LayoutToNetlist::LayoutToNetlist ()
-  : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_netlist_extracted (false), m_is_flat (false)
+  : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_layout_index (0),
+    m_netlist_extracted (false), m_is_flat (false)
 {
   init ();
 }
@@ -86,11 +91,6 @@ LayoutToNetlist::~LayoutToNetlist ()
 
 void LayoutToNetlist::init ()
 {
-  if (! mp_dss.get ()) {
-    mp_internal_dss.reset (new db::DeepShapeStore ());
-    mp_dss.reset (mp_internal_dss.get ());
-  }
-
   dss ().set_text_enlargement (1);
   dss ().set_text_property_name (tl::Variant ("LABEL"));
 }
@@ -184,7 +184,7 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
   if (! mp_netlist.get ()) {
     mp_netlist.reset (new db::Netlist ());
   }
-  extractor.extract(dss (), layers, *mp_netlist, m_net_clusters);
+  extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters);
 }
 
 void LayoutToNetlist::connect (const db::Region &l)
@@ -261,7 +261,7 @@ void LayoutToNetlist::extract_netlist (bool join_nets_by_label)
   }
 
   db::NetlistExtractor netex;
-  netex.extract_nets(dss (), m_conn, *mp_netlist, m_net_clusters, join_nets_by_label);
+  netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters, join_nets_by_label);
 
   m_netlist_extracted = true;
 }
@@ -273,30 +273,40 @@ void LayoutToNetlist::set_netlist_extracted ()
 
 const db::Layout *LayoutToNetlist::internal_layout () const
 {
-  return &dss ().const_layout ();
+  ensure_layout ();
+  return &dss ().const_layout (m_layout_index);
 }
 
 const db::Cell *LayoutToNetlist::internal_top_cell () const
 {
-  return &dss ().const_initial_cell ();
-}
-
-void LayoutToNetlist::ensure_internal_layout ()
-{
-  if (dss ().layouts () == 0) {
-    //  the dummy layer acts as a reference holder for the layout
-    m_dummy_layer = dss ().create_polygon_layer (db::RecursiveShapeIterator ());
-  }
+  ensure_layout ();
+  return &dss ().const_initial_cell (m_layout_index);
 }
 
 db::Layout *LayoutToNetlist::internal_layout ()
 {
-  return &dss ().layout ();
+  ensure_layout ();
+  return &dss ().layout (m_layout_index);
 }
 
 db::Cell *LayoutToNetlist::internal_top_cell ()
 {
-  return &dss ().initial_cell ();
+  ensure_layout ();
+  return &dss ().initial_cell (m_layout_index);
+}
+
+void LayoutToNetlist::ensure_layout () const
+{
+  if (! dss ().is_valid_layout_index (m_layout_index)) {
+
+    LayoutToNetlist *non_const_this = const_cast<LayoutToNetlist *> (this);
+    non_const_this->dss ().make_layout (m_layout_index, db::RecursiveShapeIterator ());
+
+    //  the dummy layer acts as a reference holder for the layout
+    unsigned int dummy_layer_index = non_const_this->dss ().layout (m_layout_index).insert_layer ();
+    non_const_this->m_dummy_layer = db::DeepLayer (& non_const_this->dss (), m_layout_index, dummy_layer_index);
+
+  }
 }
 
 void LayoutToNetlist::register_layer (const db::Region &region, const std::string &n)
@@ -317,7 +327,7 @@ void LayoutToNetlist::register_layer (const db::Region &region, const std::strin
     if (! delegate) {
 
       if (region.empty ()) {
-        dl = dss ().empty_layer ();
+        dl = dss ().empty_layer (m_layout_index);
       } else {
         throw tl::Exception (tl::to_string (tr ("Layer is not a deep region and cannot be registered with name: ")) + n);
       }
@@ -394,7 +404,7 @@ db::DeepLayer LayoutToNetlist::deep_layer_of (const db::Region &region) const
       return lff.second;
     } else if (region.empty ()) {
       //  provide a substitute empty layer for empty
-      return dss ().empty_layer ();
+      return dss ().empty_layer (m_layout_index);
     } else {
       throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in netlist extraction"))));
     }
@@ -418,7 +428,7 @@ db::CellMapping LayoutToNetlist::cell_mapping_into (db::Layout &layout, db::Cell
     }
   }
 
-  return dss ().cell_mapping_to_original (singular_layout_index, &layout, cell.cell_index (), &device_cells);
+  return dss ().cell_mapping_to_original (m_layout_index, &layout, cell.cell_index (), &device_cells);
 }
 
 db::CellMapping LayoutToNetlist::const_cell_mapping_into (const db::Layout &layout, const db::Cell &cell)
@@ -869,10 +879,10 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, const db::Reg
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
   }
 
-  db::Layout &ly = dss ().layout ();
+  db::Layout &ly = dss ().layout (m_layout_index);
   double dbu = ly.dbu ();
 
-  db::DeepLayer dl (&dss (), singular_layout_index, ly.insert_layer ());
+  db::DeepLayer dl (&dss (), m_layout_index, ly.insert_layer ());
 
   for (db::Layout::bottom_up_const_iterator cid = ly.begin_bottom_up (); cid != ly.end_bottom_up (); ++cid) {
 

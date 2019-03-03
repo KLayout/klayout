@@ -284,6 +284,14 @@ public:
   std::pair<bool, DeepLayer> layer_for_flat (size_t region_id) const;
 
   /**
+   *  @brief Creates a layout with the given iterator and transformation for the given index
+   *
+   *  This method is intended for classes that need more control over the layouts per index
+   *  (LayoutToNetlist).
+   */
+  void make_layout (unsigned int layout_index, const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans = db::ICplxTrans ());
+
+  /**
    *  @brief Inserts a polygon layer into the deep shape store
    *
    *  This method will create a new layer inside the deep shape store as a

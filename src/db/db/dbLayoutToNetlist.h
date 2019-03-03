@@ -93,20 +93,7 @@ public:
    *  NOTE: if using make_layer, these new layers will be created in the DSS
    *  given in this constructor.
    */
-  LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index);
-
-  /**
-   *  @brief Alternative constructor using an external deep shape storage
-   *
-   *  This constructor allows using an external DSS. It's intended to be used
-   *  with existing DSS instances. Existing layers can be registered with
-   *  "register_layer". The LayoutToNetlist object will hold a weak reference
-   *  to the DSS but not own the DSS.
-   *
-   *  NOTE: this version cannot create layers but just register layers
-   *  which are present inside the DSS given as the argument.
-   */
-  LayoutToNetlist (db::DeepShapeStore *dss);
+  LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index = 0);
 
   /**
    *  @brief Alternative constructor for flat mode
@@ -339,11 +326,6 @@ public:
   db::Cell *internal_top_cell ();
 
   /**
-   *  @brief Ensures the internal layout is made
-   */
-  void ensure_internal_layout ();
-
-  /**
    *  @brief Gets the connectivity object
    */
   const db::Connectivity &connectivity () const
@@ -533,6 +515,7 @@ private:
   db::RecursiveShapeIterator m_iter;
   std::auto_ptr<db::DeepShapeStore> mp_internal_dss;
   tl::weak_ptr<db::DeepShapeStore> mp_dss;
+  unsigned int m_layout_index;
   db::Connectivity m_conn;
   db::hier_clusters<db::PolygonRef> m_net_clusters;
   std::auto_ptr<db::Netlist> mp_netlist;
@@ -560,6 +543,7 @@ private:
   void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
   void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
   db::DeepLayer deep_layer_of (const db::Region &region) const;
+  void ensure_layout () const;
 };
 
 }

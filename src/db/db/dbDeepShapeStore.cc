@@ -481,6 +481,25 @@ DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si, const db:
   }
 }
 
+void DeepShapeStore::make_layout (unsigned int layout_index, const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
+{
+  tl_assert (m_layout_map.find (std::make_pair (si, trans)) == m_layout_map.end ());
+
+  while (m_layouts.size () <= layout_index) {
+    m_layouts.push_back (0);
+  }
+
+  m_layouts[layout_index] = new LayoutHolder (trans);
+
+  db::Layout &layout = m_layouts[layout_index]->layout;
+  layout.hier_changed_event.add (this, &DeepShapeStore::invalidate_hier);
+  if (si.layout ()) {
+    layout.dbu (si.layout ()->dbu () / trans.mag ());
+  }
+
+  m_layout_map[std::make_pair (si, trans)] = layout_index;
+}
+
 DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)
 {
   if (max_area_ratio == 0.0) {

@@ -266,7 +266,7 @@ public:
    *  named regions for input. These regions need to be of deep region type and
    *  originate from the same layout than the DeepShapeStore.
    */
-  void extract (DeepShapeStore &dss, const input_layers &layers, Netlist &netlist, hier_clusters_type &clusters);
+  void extract (DeepShapeStore &dss, unsigned int layout_index, const input_layers &layers, Netlist &netlist, hier_clusters_type &clusters);
 
   /**
    *  @brief Gets the error iterator, begin

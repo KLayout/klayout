@@ -3772,7 +3772,7 @@ CODE
     # Multiple diode specifications are allowed. Just add them 
     # to the antenna_check call.
     #
-    # The error shapes produced by the antenna check are a copy
+    # The error shapes produced by the antenna check are copies
     # of the metal shapes on the metal layers of each network 
     # violating the antenna rule.
 

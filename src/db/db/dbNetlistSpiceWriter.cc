@@ -135,7 +135,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     os << format_name (dev.expanded_name ());
     os << format_terminals (dev);
 
-    if (mos3) {
+    if (! mos4) {
       //  we assume for the MOS3 type the bulk is connected to Source
       os << " ";
       os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_S));

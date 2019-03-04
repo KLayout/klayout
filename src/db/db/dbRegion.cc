@@ -190,7 +190,7 @@ Region::Region (RegionDelegate *delegate)
 }
 
 Region::Region (const Region &other)
-  : mp_delegate (other.mp_delegate->clone ())
+  : gsi::ObjectBase (), mp_delegate (other.mp_delegate->clone ())
 {
   //  .. nothing yet ..
 }

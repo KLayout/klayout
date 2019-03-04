@@ -57,7 +57,7 @@ EdgePairs::EdgePairs (EdgePairsDelegate *delegate)
 }
 
 EdgePairs::EdgePairs (const EdgePairs &other)
-  : mp_delegate (other.mp_delegate->clone ())
+  : gsi::ObjectBase (), mp_delegate (other.mp_delegate->clone ())
 {
   //  .. nothing yet ..
 }

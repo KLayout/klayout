@@ -97,7 +97,7 @@ Edges::Edges (EdgesDelegate *delegate)
 }
 
 Edges::Edges (const Edges &other)
-  : mp_delegate (other.mp_delegate->clone ())
+  : gsi::ObjectBase (), mp_delegate (other.mp_delegate->clone ())
 {
   //  .. nothing yet ..
 }

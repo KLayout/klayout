@@ -335,6 +335,11 @@ public:
   DeepLayer create_custom_layer (const db::RecursiveShapeIterator &si, HierarchyBuilderShapeReceiver *pipe, const ICplxTrans &trans = db::ICplxTrans ());
 
   /**
+   *  @brief Creates a deep layer as a copy from an existing one
+   */
+  DeepLayer create_copy (const DeepLayer &source, HierarchyBuilderShapeReceiver *pipe);
+
+  /**
    *  @brief Gets the empty working layer
    *
    *  This method will deliver an empty layer for the given layout index. CAUTION: don't modify this layer as it may

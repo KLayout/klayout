@@ -68,10 +68,7 @@ public:
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
 
-  db::EdgesDelegate *texts_as_dots (const std::string &pat, bool pattern) const;
-  db::EdgesDelegate *texts_as_dots (const std::string &pat, bool pattern, db::DeepShapeStore &store) const;
-  db::RegionDelegate *texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl) const;
-  db::RegionDelegate *texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl, db::DeepShapeStore &store) const;
+  virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
 protected:
   virtual void merged_semantics_changed ();

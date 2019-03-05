@@ -259,7 +259,8 @@ copy_or_propagate_shapes (db::Layout &target,
                           db::cell_index_type source_parent_cell_index,
                           unsigned int target_layer, unsigned int source_layer,
                           const std::set<db::cell_index_type> &all_cells_to_copy,
-                          const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping)
+                          const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
+                          const ShapesTransformer *transformer)
 {
   const db::Cell &source_cell = source.cell (source_cell_index);
   const db::Cell &source_parent_cell = source.cell (source_parent_cell_index);
@@ -273,7 +274,7 @@ copy_or_propagate_shapes (db::Layout &target,
         const db::CellInstArray &cell_inst = p->child_inst ().cell_inst ();
         for (db::CellInstArray::iterator a = cell_inst.begin (); ! a.at_end (); ++a) {
           db::ICplxTrans t = db::ICplxTrans (cell_inst.complex_trans (*a)) * propagate_trans;
-          copy_or_propagate_shapes (target, source, trans, t, pm, source_cell_index, p->parent_cell_index (), target_layer, source_layer, all_cells_to_copy, cell_mapping);
+          copy_or_propagate_shapes (target, source, trans, t, pm, source_cell_index, p->parent_cell_index (), target_layer, source_layer, all_cells_to_copy, cell_mapping, transformer);
         }
       }
 
@@ -282,8 +283,7 @@ copy_or_propagate_shapes (db::Layout &target,
   } else if (cm->second != DropCell) {
 
     db::Cell &target_cell = target.cell (cm->second);
-    target_cell.shapes (target_layer).insert_transformed (source_cell.shapes (source_layer), trans * propagate_trans, pm);
-
+    transformer->insert_transformed (target_cell.shapes (target_layer), source_cell.shapes (source_layer), trans * propagate_trans, pm);
   }
 }
 
@@ -294,7 +294,9 @@ copy_or_move_shapes (db::Layout &target,
                      const std::vector<db::cell_index_type> &source_cells,
                      const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
                      const std::map<unsigned int, unsigned int> &layer_mapping,
-                     bool move)
+                     const ShapesTransformer *transformer,
+                     bool move
+                    )
 {
   //  collect all called cells and all top level cells
   std::set<db::cell_index_type> all_top_level_cells;
@@ -311,12 +313,25 @@ copy_or_move_shapes (db::Layout &target,
   for (std::set<db::cell_index_type>::const_iterator c = all_cells_to_copy.begin (); c != all_cells_to_copy.end (); ++c) {
     for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
       ++progress;
-      copy_or_propagate_shapes (target, source, trans, db::ICplxTrans (), pm, *c, *c, lm->second, lm->first, all_cells_to_copy, cell_mapping);
+      copy_or_propagate_shapes (target, source, trans, db::ICplxTrans (), pm, *c, *c, lm->second, lm->first, all_cells_to_copy, cell_mapping, transformer);
       if (move) {
         source.cell (*c).shapes (lm->first).clear ();
       }
     }
   }
+}
+
+namespace
+{
+  class StandardShapesTransformer
+    : public ShapesTransformer
+  {
+  public:
+    void insert_transformed (Shapes &into, const Shapes &from, const ICplxTrans &trans, PropertyMapper &pm) const
+    {
+      into.insert_transformed (from, trans, pm);
+    }
+  };
 }
 
 void
@@ -325,9 +340,14 @@ copy_shapes (db::Layout &target,
              const db::ICplxTrans &trans,
              const std::vector<db::cell_index_type> &source_cells, 
              const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
-             const std::map<unsigned int, unsigned int> &layer_mapping)
+             const std::map<unsigned int, unsigned int> &layer_mapping,
+             const ShapesTransformer *transformer)
 {
-  copy_or_move_shapes (target, const_cast<db::Layout &> (source), trans, source_cells, cell_mapping, layer_mapping, false);
+  StandardShapesTransformer st;
+  if (! transformer) {
+    transformer = &st;
+  }
+  copy_or_move_shapes (target, const_cast<db::Layout &> (source), trans, source_cells, cell_mapping, layer_mapping, transformer, false);
 }
 
 void 
@@ -336,9 +356,14 @@ move_shapes (db::Layout &target,
              const db::ICplxTrans &trans,
              const std::vector<db::cell_index_type> &source_cells, 
              const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
-             const std::map<unsigned int, unsigned int> &layer_mapping)
+             const std::map<unsigned int, unsigned int> &layer_mapping,
+             const ShapesTransformer *transformer)
 {
-  copy_or_move_shapes (target, source, trans, source_cells, cell_mapping, layer_mapping, true);
+  StandardShapesTransformer st;
+  if (! transformer) {
+    transformer = &st;
+  }
+  copy_or_move_shapes (target, source, trans, source_cells, cell_mapping, layer_mapping, transformer, true);
 }
 
 // ------------------------------------------------------------

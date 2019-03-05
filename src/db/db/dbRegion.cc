@@ -26,7 +26,10 @@
 #include "dbEmptyRegion.h"
 #include "dbFlatRegion.h"
 #include "dbDeepRegion.h"
+#include "dbDeepEdges.h"
+#include "dbFlatEdges.h"
 #include "dbPolygonTools.h"
+#include "tlGlobPattern.h"
 
 namespace db
 {
@@ -396,6 +399,291 @@ Region
 Region::hulls () const
 {
   return Region (processed (HullExtractionProcessor ()));
+}
+
+namespace
+{
+
+template <class Container>
+struct dot_delivery
+{
+  typedef Container container_type;
+
+  dot_delivery ()
+  {
+    //  .. nothing yet ..
+  }
+
+  void insert (const db::Point &pt, Container *container) const
+  {
+    container->insert (db::Edge (pt, pt));
+  }
+};
+
+template <class Container>
+struct box_delivery
+{
+  typedef Container container_type;
+
+  box_delivery (db::Coord enl)
+    : m_d (enl, enl)
+  {
+    //  .. nothing yet ..
+  }
+
+  void insert (const db::Point &pt, Container *container) const
+  {
+    container->insert (db::Box (pt - m_d, pt + m_d));
+  }
+
+private:
+  db::Vector m_d;
+};
+
+template <class Iter, class Delivery>
+static void fill_texts (const Iter &iter, const std::string &pat, bool pattern, const Delivery &delivery, typename Delivery::container_type *container, const db::ICplxTrans &trans, const db::DeepRegion *org_deep)
+{
+  std::pair<bool, db::property_names_id_type> text_annot_name_id;
+  const db::Layout *layout = 0;
+
+  if (org_deep) {
+    layout = &org_deep->deep_layer ().layout ();
+    const db::DeepShapeStore *store = org_deep->deep_layer ().store ();
+    if (! store->text_property_name ().is_nil ()) {
+      text_annot_name_id = layout->properties_repository ().get_id_of_name (store->text_property_name ());
+    }
+  }
+
+  tl::GlobPattern glob_pat;
+  bool all = false;
+  if (pattern) {
+    if (pat == "*") {
+      all = true;
+    } else {
+      glob_pat = tl::GlobPattern (pat);
+    }
+  }
+
+  for (Iter si = iter; ! si.at_end (); ++si) {
+
+    bool is_text = false;
+    std::string text_string;
+
+    if (si->is_text ()) {
+
+      //  a raw text
+      is_text = true;
+      text_string = si->text_string ();
+
+    } else if (layout && text_annot_name_id.first && si->prop_id () > 0) {
+
+      //  a text marker
+      const db::PropertiesRepository::properties_set &ps = layout->properties_repository ().properties (si->prop_id ());
+
+      for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end () && ! is_text; ++j) {
+        if (j->first == text_annot_name_id.second) {
+          text_string = j->second.to_string ();
+          is_text = true;
+        }
+      }
+
+    }
+
+    if (is_text &&
+        (all || (pattern && glob_pat.match (text_string)) || (!pattern && text_string == pat))) {
+      delivery.insert (si.trans () * (trans * si->bbox ().center ()), container);
+    }
+
+  }
+}
+
+template <class Delivery>
+class text_shape_receiver
+  : public db::HierarchyBuilderShapeReceiver
+{
+public:
+  text_shape_receiver (const Delivery &delivery, const std::string &pat, bool pattern, const db::DeepRegion *org_deep)
+    : m_delivery (delivery), m_glob_pat (), m_all (false), m_pattern (pattern), m_pat (pat), m_text_annot_name_id (false, 0), mp_layout (0)
+  {
+    if (org_deep) {
+      mp_layout = & org_deep->deep_layer ().layout ();
+      const db::DeepShapeStore *store = org_deep->deep_layer ().store ();
+      if (! store->text_property_name ().is_nil ()) {
+        m_text_annot_name_id = mp_layout->properties_repository ().get_id_of_name (store->text_property_name ());
+      }
+    }
+
+    if (pattern) {
+      if (m_pat == "*") {
+        m_all = true;
+      } else {
+        m_glob_pat = tl::GlobPattern (pat);
+      }
+    }
+  }
+
+  virtual void push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+  {
+    bool is_text = false;
+    std::string text_string;
+
+    if (shape.is_text ()) {
+
+      //  a raw text
+      is_text = true;
+      text_string = shape.text_string ();
+
+    } else if (mp_layout && m_text_annot_name_id.first && shape.prop_id () > 0) {
+
+      //  a text marker
+      const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (shape.prop_id ());
+
+      for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end () && ! is_text; ++j) {
+        if (j->first == m_text_annot_name_id.second) {
+          text_string = j->second.to_string ();
+          is_text = true;
+        }
+      }
+
+    }
+
+    if (is_text &&
+        (m_all || (m_pattern && m_glob_pat.match (text_string)) || (!m_pattern && text_string == m_pat))) {
+
+      db::Point pt = shape.bbox ().center ();
+
+      if (! complex_region) {
+        if (region.contains (pt)) {
+          m_delivery.insert (pt.transformed (trans), target);
+        }
+      } else {
+        if (! complex_region->begin_overlapping (db::Box (pt, pt), db::box_convert<db::Box> ()).at_end ()) {
+          m_delivery.insert (pt.transformed (trans), target);
+        }
+      }
+
+    }
+  }
+
+  virtual void push (const db::Box &, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+  virtual void push (const db::Polygon &, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+
+private:
+  Delivery m_delivery;
+  tl::GlobPattern m_glob_pat;
+  bool m_all;
+  bool m_pattern;
+  std::string m_pat;
+  std::pair<bool, db::property_names_id_type> m_text_annot_name_id;
+  const db::Layout *mp_layout;
+};
+
+}
+
+Edges
+Region::texts_as_dots (const std::string &pat, bool pattern) const
+{
+  const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (delegate ());
+  if (dr) {
+    return texts_as_dots (pat, pattern, const_cast<db::DeepShapeStore &> (*dr->deep_layer ().store ()));
+  }
+
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> si = begin_iter ();
+  if (! dr) {
+    //  some optimization
+    si.first.shape_flags (db::ShapeIterator::Texts);
+  }
+
+  std::auto_ptr<db::FlatEdges> res (new db::FlatEdges ());
+  res->set_merged_semantics (false);
+
+  fill_texts (si.first, pat, pattern, dot_delivery<db::FlatEdges> (), res.get (), si.second, dr);
+
+  return Edges (res.release ());
+}
+
+Edges
+Region::texts_as_dots (const std::string &pat, bool pattern, db::DeepShapeStore &store) const
+{
+  const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (delegate ());
+
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> si = begin_iter ();
+  if (! dr) {
+    //  some optimization
+    si.first.shape_flags (db::ShapeIterator::Texts);
+  }
+
+  if (! si.first.layout ()) {
+
+    //  flat fallback if the source isn't a deep or original layer
+    std::auto_ptr<db::FlatEdges> res (new db::FlatEdges ());
+    res->set_merged_semantics (false);
+
+    fill_texts (si.first, pat, pattern, dot_delivery<db::FlatEdges> (), res.get (), si.second, dr);
+
+    return Edges (res.release ());
+
+  }
+
+  text_shape_receiver<dot_delivery<db::Shapes> > pipe = text_shape_receiver<dot_delivery<db::Shapes> > (dot_delivery<db::Shapes> (), pat, pattern, dr);
+  if (dr && dr->deep_layer ().store () == &store) {
+    return Edges (new db::DeepEdges (store.create_copy (dr->deep_layer (), &pipe)));
+  } else {
+    return Edges (new db::DeepEdges (store.create_custom_layer (si.first, &pipe, si.second)));
+  }
+}
+
+Region
+Region::texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl) const
+{
+  const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (delegate ());
+  if (dr) {
+    return texts_as_boxes (pat, pattern, enl, const_cast<db::DeepShapeStore &> (*dr->deep_layer ().store ()));
+  }
+
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> si = begin_iter ();
+  if (! dr) {
+    //  some optimization
+    si.first.shape_flags (db::ShapeIterator::Texts);
+  }
+
+  std::auto_ptr<db::FlatRegion> res (new db::FlatRegion ());
+  res->set_merged_semantics (false);
+
+  fill_texts (si.first, pat, pattern, box_delivery<db::FlatRegion> (enl), res.get (), si.second, dr);
+
+  return Region (res.release ());
+}
+
+Region
+Region::texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl, db::DeepShapeStore &store) const
+{
+  const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (delegate ());
+
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> si = begin_iter ();
+  if (! dr) {
+    //  some optimization
+    si.first.shape_flags (db::ShapeIterator::Texts);
+  }
+
+  if (! si.first.layout ()) {
+
+    //  flat fallback if the source isn't a deep or original layer
+    std::auto_ptr<db::FlatRegion> res (new db::FlatRegion ());
+    res->set_merged_semantics (false);
+
+    fill_texts (si.first, pat, pattern, box_delivery<db::FlatRegion> (enl), res.get (), si.second, dr);
+
+    return Region (res.release ());
+
+  }
+
+  text_shape_receiver<box_delivery<db::Shapes> > pipe = text_shape_receiver<box_delivery<db::Shapes> > (box_delivery<db::Shapes> (enl), pat, pattern, dr);
+  if (dr && dr->deep_layer ().store () == &store) {
+    return Region (new db::DeepRegion (store.create_copy (dr->deep_layer (), &pipe)));
+  } else {
+    return Region (new db::DeepRegion (store.create_custom_layer (si.first, &pipe, si.second)));
+  }
 }
 
 }

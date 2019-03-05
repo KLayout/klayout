@@ -58,8 +58,6 @@ LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_i
   if (dss->is_valid_layout_index (m_layout_index)) {
     m_iter = db::RecursiveShapeIterator (dss->layout (m_layout_index), dss->initial_cell (m_layout_index), std::set<unsigned int> ());
   }
-
-  init ();
 }
 
 LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
@@ -131,9 +129,7 @@ db::Region *LayoutToNetlist::make_layer (const std::string &n)
   si.shape_flags (db::ShapeIterator::Nothing);
 
   std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
-  if (! n.empty ()) {
-    register_layer (*region, n);
-  }
+  register_layer (*region, n);
   return region.release ();
 }
 
@@ -144,9 +140,7 @@ db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::st
   si.shape_flags (db::ShapeIterator::All);
 
   std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
-  if (! n.empty ()) {
-    register_layer (*region, n);
-  }
+  register_layer (*region, n);
   return region.release ();
 }
 
@@ -157,9 +151,7 @@ db::Region *LayoutToNetlist::make_text_layer (unsigned int layer_index, const st
   si.shape_flags (db::ShapeIterator::Texts);
 
   std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
-  if (! n.empty ()) {
-    register_layer (*region, n);
-  }
+  register_layer (*region, n);
   return region.release ();
 }
 
@@ -170,9 +162,7 @@ db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const
   si.shape_flags (db::ShapeIterator::Paths | db::ShapeIterator::Polygons | db::ShapeIterator::Boxes);
 
   std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
-  if (! n.empty ()) {
-    register_layer (*region, n);
-  }
+  register_layer (*region, n);
   return region.release ();
 }
 

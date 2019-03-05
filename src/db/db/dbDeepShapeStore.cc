@@ -461,13 +461,20 @@ unsigned int
 DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
   layout_map_type::iterator l = m_layout_map.find (std::make_pair (si, trans));
-  if (l == m_layout_map.end ()) {
+  if (l == m_layout_map.end () || m_layouts[l->second] == 0) {
 
-    unsigned int layout_index = (unsigned int) m_layouts.size ();
+    unsigned int layout_index;
 
-    m_layouts.push_back (new LayoutHolder (trans));
+    if (l != m_layout_map.end ()) {
+      //  reuse discarded entry
+      layout_index = l->second;
+      m_layouts[layout_index] = new LayoutHolder (trans);
+    } else {
+      layout_index = (unsigned int) m_layouts.size ();
+      m_layouts.push_back (new LayoutHolder (trans));
+    }
 
-    db::Layout &layout = m_layouts.back ()->layout;
+    db::Layout &layout = m_layouts[layout_index]->layout;
     layout.hier_changed_event.add (this, &DeepShapeStore::invalidate_hier);
     if (si.layout ()) {
       layout.dbu (si.layout ()->dbu () / trans.mag ());
@@ -575,6 +582,32 @@ DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator 
   }
 
   return DeepLayer (this, layout_index, layer_index);
+}
+
+DeepLayer DeepShapeStore::create_copy (const DeepLayer &source, HierarchyBuilderShapeReceiver *pipe)
+{
+  tl_assert (source.store () == this);
+
+  unsigned int from_layer_index = source.layer ();
+  db::Layout &ly = layout ();
+
+  unsigned int layer_index = ly.insert_layer ();
+
+  //  Build the working hierarchy from the recursive shape iterator
+  tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+
+  db::Box region = db::Box::world ();
+  db::ICplxTrans trans;
+
+  for (db::Layout::iterator c = ly.begin (); c != ly.end (); ++c) {
+    db::Shapes &into = c->shapes (layer_index);
+    const db::Shapes &from = c->shapes (from_layer_index);
+    for (db::Shapes::shape_iterator s = from.begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+      pipe->push (*s, trans, region, 0, &into);
+    }
+  }
+
+  return DeepLayer (this, source.layout_index (), layer_index);
 }
 
 DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges, const db::ICplxTrans &trans)
@@ -725,6 +758,74 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
   return cm->second;
 }
 
+namespace
+{
+  class DeepShapeStoreToShapeTransformer
+    : public ShapesTransformer
+  {
+  public:
+    DeepShapeStoreToShapeTransformer (const DeepShapeStore &dss, const db::Layout &layout)
+      : mp_layout (& layout)
+    {
+      //  gets the text annotation property ID -
+      //  this is how the texts are passed for annotating the net names
+      m_text_annot_name_id = std::pair<bool, db::property_names_id_type> (false, 0);
+      if (! dss.text_property_name ().is_nil ()) {
+        m_text_annot_name_id = mp_layout->properties_repository ().get_id_of_name (dss.text_property_name ());
+      }
+    }
+
+    void insert_transformed (Shapes &into, const Shapes &from, const ICplxTrans &trans, PropertyMapper &pm) const
+    {
+      if (! m_text_annot_name_id.first) {
+
+        //  fast shortcut
+        into.insert_transformed (from, trans, pm);
+
+      } else {
+
+        for (db::Shapes::shape_iterator i = from.begin (db::ShapeIterator::All); ! i.at_end (); ++i) {
+
+          bool is_text = false;
+
+          if (i->prop_id () > 0) {
+
+            const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (i->prop_id ());
+
+            for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end () && ! is_text; ++j) {
+              if (j->first == m_text_annot_name_id.second) {
+
+                db::Text text (j->second.to_string (), db::Trans (i->bbox ().center () - db::Point ()));
+                text.transform (trans);
+                if (into.layout ()) {
+                  into.insert (db::TextRef (text, into.layout ()->shape_repository ()));
+                } else {
+                  into.insert (text);
+                }
+
+                is_text = true;
+
+              }
+            }
+
+          }
+
+          if (! is_text) {
+            into.insert (*i, trans, pm);
+          }
+
+        }
+
+      }
+
+    }
+
+  private:
+    std::pair<bool, db::property_names_id_type> m_text_annot_name_id;
+    const db::Layout *mp_layout;
+  };
+}
+
 void
 DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer)
 {
@@ -750,8 +851,11 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
   std::vector <db::cell_index_type> source_cells;
   source_cells.push_back (*source_layout.begin_top_down());
 
+  //  prepare a transformer to convert text-annotated markers back to texts (without transformation however)
+  DeepShapeStoreToShapeTransformer dsst (*this, source_layout);
+
   //  actually copy the shapes
-  db::copy_shapes (*into_layout, source_layout, trans, source_cells, cm.table (), lm);
+  db::copy_shapes (*into_layout, source_layout, trans, source_cells, cm.table (), lm, &dsst);
 }
 
 void

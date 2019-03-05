@@ -1516,6 +1516,40 @@ public:
     return mp_delegate->insert_into (layout, into_cell, into_layer);
   }
 
+  /**
+   *  @brief Delivers texts as dots (degenerated edges)
+   *
+   *  "pat" is a text selector. If "as_pattern" is true, this pattern will be
+   *  treated as a glob pattern. Otherwise, the text is taken if "pat" is equal to the text..
+   */
+  db::Edges texts_as_dots (const std::string &pat, bool as_pattern) const;
+
+  /**
+   *  @brief Delivers texts as dots (degenerated edges) in a deep edge collection
+   *
+   *  "pat" is a text selector. If "as_pattern" is true, this pattern will be
+   *  treated as a glob pattern. Otherwise, the text is taken if "pat" is equal to the text..
+   */
+  db::Edges texts_as_dots (const std::string &pat, bool as_pattern, db::DeepShapeStore &store) const;
+
+  /**
+   *  @brief Delivers texts as boxes
+   *
+   *  "pat" is a text selector. If "as_pattern" is true, this pattern will be
+   *  treated as a glob pattern. Otherwise, the text is taken if "pat" is equal to the text.
+   *  "enl" is the half size of the box (the box is 2*enl wide and 2*enl high).
+   */
+  db::Region texts_as_boxes (const std::string &pat, bool as_pattern, db::Coord enl) const;
+
+  /**
+   *  @brief Delivers texts as boxes in a deep region
+   *
+   *  "pat" is a text selector. If "as_pattern" is true, this pattern will be
+   *  treated as a glob pattern. Otherwise, the text is taken if "pat" is equal to the text.
+   *  "enl" is the half size of the box (the box is 2*enl wide and 2*enl high).
+   */
+  db::Region texts_as_boxes (const std::string &pat, bool as_pattern, db::Coord enl, db::DeepShapeStore &store) const;
+
 private:
   friend class Edges;
   friend class EdgePairs;

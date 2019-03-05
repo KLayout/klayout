@@ -3488,10 +3488,21 @@ CODE
     # @li @tt METAL (17/0) @/tt: A layer named "METAL" or layer 17, datatype 0 (for GDS, which does
     #           not have names)@/li
     # @/ul
+    #
+    # Layers created with "input" contain both texts and polygons. There is a subtle
+    # difference between flat and deep mode: in flat mode, texts are not visible in polygon
+    # operations. In deep mode, texts appear as small 2x2 DBU rectangles. In flat mode, 
+    # some operations such as clipping are not fully supported for texts. Also, texts will
+    # vanish in most polygon operations such as booleans etc.
+    #
+    # Texts can alway be selected by using the \texts method.
+    #
+    # If you don't want to see texts, use \polygons to create an input layer with polygon data
+    # only. If you only want to see texts, use \labels to create an input layer with texts only.
     
     def input(*args)
       layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, false))
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll))
     end
 
     # %DRC%
@@ -3501,26 +3512,45 @@ CODE
     # @synopsis source.labels(layer, datatype)
     # @synopsis source.labels(layer_into)
     # @synopsis source.labels(filter, ...)
-    # Creates a layer with the labels from the given layer of the source.
-    # The layer can be specified by layer and optionally datatype, by a RBA::LayerInfo
-    # object or by a sequence of filters. 
-    # Filters are expressions describing ranges
-    # of layers and/or datatype numbers or layer names. Multiple filters
-    # can be given and all layers matching at least one of these filter
-    # expressions are joined to render the label collection. See "input" for
-    # more details about the input layer specification.
-    #  
-    # Label layers currently can only be passed to an output layer. 
-    # Processing of labels is not supported. See "texts" for a way to filter
-    # texts and use the text locations in geometrical operations.
     #
-    # @code
-    # labels(1, 0).output(100, 0)
-    # @/code
+    # Creates a layer with the labels from the given layer of the source.
+    # 
+    # This method is identical to \input, but takes only texts from the given input
+    # layer.
     
     def labels(*args)
       layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, true))
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts))
+    end
+
+    # %DRC%
+    # @name polygons
+    # @brief Gets the polygon shapes (or shapes that can be converted polygons) from an input layer
+    # @synopsis source.polygons(layer)
+    # @synopsis source.polygons(layer, datatype)
+    # @synopsis source.polygons(layer_into)
+    # @synopsis source.polygons(filter, ...)
+    #
+    # Creates a layer with the polygon shapes from the given layer of the source.
+    # With "polygon shapes" we mean all kind of shapes that can be converted to polygons.
+    # Those are boxes, paths and real polygons.
+    # 
+    # This method is identical to \input with respect to the options supported.
+    
+    def polygons(*args)
+      layers = parse_input_layers(*args)
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons))
+    end
+
+    # %DRC%
+    # @name make_layer
+    # @brief Creates an empty polygon layer based on the hierarchy of the layout
+    # @synopsis make_layer
+    # This method delivers a new empty original layer.
+
+    def make_layer
+      layers = []
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll))
     end
 
     # %DRC%
@@ -3689,6 +3719,73 @@ CODE
       @connections &lt;&lt; [ a, b ].collect { |l| l.data.data_id }
       modified
     end
+
+    # %DRC%
+    # @name connect_global
+    # @brief Connects a layer with a global net
+    # @synopsis connect_global(l, name)
+    # Connects the shapes from the given layer l to a global net with the given name.
+    # Global nets are common to all cells. Global nets automatically connect to parent
+    # cells throughs implied pins. An example is the substrate (bulk) net which connects
+    # to shapes belonging to tie-down diodes.
+    
+    def connect_global(l, name)
+      l.is_a?(DRC::DRCLayer) || raise("Layer argument of Netter#connect_global must be a layer")
+      l.requires_region("Netter#connect_global (layer argument)")
+      @layers[l.data.data_id] = l.data
+      @global_connections &lt;&lt; [ l.data.data_id, name.to_s ]
+    end
+    
+    # %DRC%
+    # @name extract_devices
+    # @brief Extracts devices based on the given extractor class, name and device layer selection
+    # @synopsis extract_devices(extractor, layer_hash)
+    # Runs the device extraction for given device extractor class.
+    # 
+    # The device extractor is either an instance of one of the predefined extractor
+    # classes (e.g. RBA::DeviceExtractorMOS4Transistor) or a custom class. It provides the
+    # algorithms for deriving the device parameters from the device geometry. It needs 
+    # several device recognition layers which are passed in the layer hash.
+    #
+    # Each device class (e.g. n-MOS/p-MOS or high Vt/low Vt) needs it's own instance
+    # of device extractor. The device extractor beside the algorithm and specific 
+    # extraction settings defines the name of the device to be built.
+    #
+    # The layer hash is a map of device type specific functional names (key) and
+    # polygon layers (value). Here is an example:
+    #
+    # @code
+    # deep
+    # 
+    # nwell   = input(1, 0)
+    # active  = input(2, 0)
+    # poly    = input(3, 0)
+    # bulk    = make_layer   # renders an empty layer used for putting the terminals on
+    #
+    # nactive = active - nwell      # active area of NMOS
+    # nsd     = nactive - poly      # source/drain area
+    # gate    = nactive &amp; poly  # gate area
+    #
+    # mos4_ex = RBA::DeviceExtractorMOS4Transistor::new("NMOS4")
+    # extract_devices(mos4_ex, { :SD => nsd, :G => gate, :P => poly, :W => bulk })
+    # @/code
+    
+    def extract_devices(devex, layer_selection)
+
+      devex.is_a?(RBA::DeviceExtractorBase) || raise("First argument of Netter#extract_devices must be a device extractor instance")
+      layer_selection.is_a?(Hash) || raise("Second argument of Netter#extract_devices must be a hash")
+
+      ls = {}
+      layer_selection.each do |n,l|
+        l.requires_region("Netter#extract_devices (#{n} layer)")
+        @layers[l.data.data_id] = l.data
+        ls[n.to_s] = l.data
+      end
+
+      @devices_to_extract &lt;&lt; [ devex, ls ]
+      modified
+
+    end
     
     # %DRC%
     # @name clear_connections
@@ -3697,7 +3794,9 @@ CODE
     # See \connect for more details.
 
     def clear_connections
+      @devices_to_extract = []
       @connections = []
+      @global_connections = []
       @layers = {}
       modified
     end
@@ -3803,6 +3902,18 @@ CODE
       DRC::DRCLayer::new(@engine, @engine._cmd(@l2n, :antenna_check, gate.data, metal.data, ratio, dl))
 
     end
+
+    # %DRC%
+    # @name l2n_data
+    # @brief Gets the internal RBA::LayoutToNetlist object
+    # @synopsis l2n_data
+    # The RBA::LayoutToNetlist object provides access to the internal details of
+    # the netter object.
+
+    def l2n_data
+      @l2n || make_l2n
+      @l2n
+    end
     
     def _finish
       clear_connections
@@ -3830,8 +3941,14 @@ CODE
       end
 
       @layers.each { |id,l| @l2n.register(l, "l" + id.to_s) }
+
+      @devices_to_extract.each do |devex,ls| 
+        @engine._cmd(@l2n, :extract_devices, devex, ls) 
+      end
+
       @layers.each { |id,l| @l2n.connect(l) }
       @connections.each { |a,b| @l2n.connect(@layers[a], @layers[b]) }
+      @global_connections.each { |l,n| @l2n.connect_global(@layers[l], n) }
 
       # run extraction in a timed environment
       @engine._cmd(@l2n, :extract_netlist)
@@ -4201,11 +4318,32 @@ CODE
     end
     
     # %DRC%
+    # @name make_layer
+    # @brief Creates an empty polygon layer based on the hierarchical scheme selected
+    # @synopsis make_layer
+    # The intention of this method is to provide an empty polygon layer based on the
+    # hierarchical scheme selected. This will create a new layer with the hierarchy
+    # of the current layout in deep mode and a flat layer in flat mode.
+    # This method is similar to \polygon_layer, but the latter does not create
+    # a hierarchical layer. Hence the layer created by \make_layer is suitable
+    # for use in device extraction for example, while the one
+    # delivered by \polygon_layer is not.
+    #
+    # On the other hand, a layer created by the \make_layer method is not intended to be
+    # filled with \Layer#insert.
+    
+    def make_layer
+      layout.make_layer
+    end
+      
+    # %DRC%
     # @name polygon_layer
     # @brief Creates an empty polygon layer
     # @synopsis polygon_layer
     # The intention of that method is to create an empty layer which can be 
     # filled with polygon-like objects using \Layer#insert.
+    # A similar method which creates a hierarchical layer in deep mode is 
+    # \make_layer. This other layer is better suited for use with device extraction.
     
     def polygon_layer
       DRCLayer::new(self, RBA::Region::new)
@@ -4621,10 +4759,22 @@ CODE
     # @name input 
     # @brief Fetches the shapes from the specified input from the default source
     # @synopsis input(args)
-    # See \Source#input for a description of that function.
+    # See \Source#input for a description of that function. This method will fetch
+    # polygons and labels. See \polygons and \labels for more specific versions of
+    # this method.
  
     def input(*args)
       layout.input(*args)
+    end
+    
+    # %DRC%
+    # @name polygons 
+    # @brief Fetches the polygons (or shapes that can be converted to polygons) from the specified input from the default source
+    # @synopsis polygons(args)
+    # See \Source#polygons for a description of that function.
+ 
+    def polygons(*args)
+      layout.polygons(*args)
     end
     
     # %DRC%
@@ -4755,6 +4905,12 @@ CODE
     # See \Netter#connect for a description of that function.
  
     # %DRC%
+    # @name connect_global
+    # @brief Specifies a connection to a global net
+    # @synopsis connect_global(l, name)
+    # See \Netter#connect_global for a description of that function.
+ 
+    # %DRC%
     # @name clear_connections
     # @brief Clears all connections stored so far
     # @synopsis clear_connections
@@ -4766,7 +4922,19 @@ CODE
     # @synopsis antenna_check(gate, metal, ratio, [ diode_specs ... ])
     # See \Netter#antenna_check for a description of that function
  
-    %w(connect clear_connections antenna_check).each do |f|
+    # %DRC%
+    # @name l2n_data
+    # @brief Gets the internal RBA::LayoutToNetlist object for the default \Netter
+    # @synopsis l2n_data
+    # See \Netter#l2n_data for a description of that function
+ 
+    # %DRC%
+    # @name extract_devices
+    # @brief Extracts devices for a given device extractor and device layer selection
+    # @synopsis extract_devices(extractor, layer_hash)
+    # See \Netter#extract_devices for a description of that function
+ 
+    %w(connect connect_global clear_connections antenna_check l2n_data extract_devices).each do |f|
       eval &lt;&lt;"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)
@@ -5033,10 +5201,12 @@ CODE
       end
     end
 
-    def _input(layout, cell_index, layers, sel, box, clip, overlapping, labels_only)
+    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags)
     
-      if layers.empty?
+      if layers.empty? &amp;&amp; ! @deep
+
         r = RBA::Region::new
+       
       else
     
         if box
@@ -5044,9 +5214,7 @@ CODE
         else
           iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers)
         end
-        if labels_only
-          iter.shape_flags = RBA::Shapes::STexts
-        end
+        iter.shape_flags = shape_flags
         
         sel.each do |s|
           if s == "-"
@@ -5064,31 +5232,17 @@ CODE
           end
         end
 
-        if labels_only
-
-          # for labels layers, the iterator is the data (no region)
-          r = iter
-
+        sf = layout.dbu / self.dbu
+        if @deep
+          @dss ||= RBA::DeepShapeStore::new
+          r = RBA::Region::new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
         else
+          r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))
+        end
         
-          sf = layout.dbu / self.dbu
-          if (sf - 1.0).abs &gt; 1e-6
-            if @deep
-              raise("DBU scaling (" + ("%.12g" % layout.dbu) + " to " + ("%.12g" % self.dbu) + ") is not supported in deep mode currently")
-            end
-            r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))
-          elsif @deep
-            @dss ||= RBA::DeepShapeStore::new
-            r = RBA::Region::new(iter, @dss)
-          else
-            r = RBA::Region::new(iter)
-          end
-          
-          # clip if a box is specified
-          if box &amp;&amp; clip
-            r &amp;= RBA::Region::new(box)
-          end
-
+        # clip if a box is specified
+        if box &amp;&amp; clip
+          r &amp;= RBA::Region::new(box)
         end
       
       end
@@ -5112,11 +5266,7 @@ CODE
         cat = @output_rdb.create_category(args[0].to_s)
         args[1] &amp;&amp; cat.description = args[1]
 
-        if data.is_a?(RBA::RecursiveShapeIterator)
-          cat.scan_shapes(data)
-        else
-          cat.scan_collection(@output_rdb_cell, RBA::CplxTrans::new(self.dbu), data)
-        end
+        cat.scan_collection(@output_rdb_cell, RBA::CplxTrans::new(self.dbu), data)
       
       else 
 
@@ -5173,24 +5323,11 @@ CODE
             @used_output_layers[li] = true
           end
 
-          if data.respond_to?(:is_deep?) &amp;&amp; data.is_deep?
-
-            # insert the data into the output layer
-            if data.is_a?(RBA::EdgePairs)
-              data.insert_into_as_polygons(output, output_cell.cell_index, tmp, 1)
-            else
-              data.insert_into(output, output_cell.cell_index, tmp)
-            end
-
+          # insert the data into the output layer
+          if data.is_a?(RBA::EdgePairs)
+            data.insert_into_as_polygons(output, output_cell.cell_index, tmp, 1)
           else
-
-            # insert the data into the output layer
-            if data.is_a?(RBA::EdgePairs)
-              output_cell.shapes(tmp).insert_as_polygons(data, 1)
-            else
-              output_cell.shapes(tmp).insert(data)
-            end
-
+            data.insert_into(output, output_cell.cell_index, tmp)
           end
 
           #  make the temp layer the output layer

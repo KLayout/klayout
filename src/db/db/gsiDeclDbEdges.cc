@@ -392,12 +392,12 @@ static bool is_deep (const db::Edges *e)
 
 static db::Edges *new_texts_as_dots1 (const db::RecursiveShapeIterator &si, const std::string &pat, bool pattern)
 {
-  return new db::Edges (db::OriginalLayerRegion (si, false).texts_as_dots (pat, pattern));
+  return new db::Edges (db::Region (si).texts_as_dots (pat, pattern));
 }
 
 static db::Edges *new_texts_as_dots2 (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const std::string &pat, bool pattern)
 {
-  return new db::Edges (db::OriginalLayerRegion (si, false).texts_as_dots (pat, pattern, dss));
+  return new db::Edges (db::Region (si).texts_as_dots (pat, pattern, dss));
 }
 
 static size_t id (const db::Edges *e)

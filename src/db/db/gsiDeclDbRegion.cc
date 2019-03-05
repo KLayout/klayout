@@ -80,41 +80,32 @@ static db::Region *new_shapes (const db::Shapes &s)
 
 static db::Region *new_texts_as_boxes1 (const db::RecursiveShapeIterator &si, const std::string &pat, bool pattern, db::Coord enl)
 {
-  return new db::Region (db::OriginalLayerRegion (si, false).texts_as_boxes (pat, pattern, enl));
+  return new db::Region (db::Region (si).texts_as_boxes (pat, pattern, enl));
 }
 
 static db::Region *new_texts_as_boxes2 (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const std::string &pat, bool pattern, db::Coord enl)
 {
-  return new db::Region (db::OriginalLayerRegion (si, false).texts_as_boxes (pat, pattern, enl, dss));
-}
-
-static const db::OriginalLayerRegion *org_layer (const db::Region *r)
-{
-  const db::OriginalLayerRegion *org_layer = dynamic_cast<const db::OriginalLayerRegion *> (r->delegate ());
-  if (! org_layer) {
-    throw tl::Exception (tl::to_string (tr ("Texts can only be identified on an original layer")));
-  }
-  return org_layer;
+  return new db::Region (db::Region (si).texts_as_boxes (pat, pattern, enl, dss));
 }
 
 static db::Edges *texts_as_dots1 (const db::Region *r, const std::string &pat, bool pattern)
 {
-  return new db::Edges (org_layer (r)->texts_as_dots (pat, pattern));
+  return new db::Edges (r->texts_as_dots (pat, pattern));
 }
 
 static db::Edges *texts_as_dots2 (const db::Region *r, db::DeepShapeStore &dss, const std::string &pat, bool pattern)
 {
-  return new db::Edges (org_layer (r)->texts_as_dots (pat, pattern, dss));
+  return new db::Edges (r->texts_as_dots (pat, pattern, dss));
 }
 
 static db::Region *texts_as_boxes1 (const db::Region *r, const std::string &pat, bool pattern, db::Coord enl)
 {
-  return new db::Region (org_layer (r)->texts_as_boxes (pat, pattern, enl));
+  return new db::Region (r->texts_as_boxes (pat, pattern, enl));
 }
 
 static db::Region *texts_as_boxes2 (const db::Region *r, db::DeepShapeStore &dss, const std::string &pat, bool pattern, db::Coord enl)
 {
-  return new db::Region (org_layer (r)->texts_as_boxes (pat, pattern, enl, dss));
+  return new db::Region (r->texts_as_boxes (pat, pattern, enl, dss));
 }
 
 static db::Edges corners_to_dots (const db::Region *r, double angle_start, double angle_end)
@@ -140,6 +131,11 @@ static db::Region *new_sid (const db::RecursiveShapeIterator &si, db::DeepShapeS
 static db::Region *new_si2 (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
   return new db::Region (si, trans);
+}
+
+static db::Region *new_sid2 (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const db::ICplxTrans &trans, double area_ratio, size_t max_vertex_count)
+{
+  return new db::Region (si, dss, trans, area_ratio, max_vertex_count);
 }
 
 static std::string to_string0 (const db::Region *r)
@@ -653,9 +649,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "This constructor has been introduced in version 0.25."
   ) +
-  constructor ("new", &new_si,
+  constructor ("new", &new_si, gsi::arg ("shape_iterator"),
     "@brief Constructor from a hierarchical shape set\n"
-    "@args shape_iterator\n"
     "\n"
     "This constructor creates a region from the shapes delivered by the given recursive shape iterator.\n"
     "Text objects and edges are not inserted, because they cannot be converted to polygons.\n"
@@ -668,9 +663,8 @@ Class<db::Region> decl_Region ("db", "Region",
     "r = RBA::Region::new(layout.begin_shapes(cell, layer))\n"
     "@/code\n"
   ) +
-  constructor ("new", &new_si2, 
+  constructor ("new", &new_si2, gsi::arg ("shape_iterator"), gsi::arg ("trans"),
     "@brief Constructor from a hierarchical shape set with a transformation\n"
-    "@args shape_iterator, trans\n"
     "\n"
     "This constructor creates a region from the shapes delivered by the given recursive shape iterator.\n"
     "Text objects and edges are not inserted, because they cannot be converted to polygons.\n"
@@ -698,7 +692,24 @@ Class<db::Region> decl_Region ("db", "Region",
     "@param shape_iterator The recursive shape iterator which delivers the hierarchy to take\n"
     "@param deep_shape_store The hierarchical heap (see there)\n"
     "@param area_ratio The maximum ratio of bounding box to polygon area before polygons are split\n"
-    "@param"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  constructor ("new", &new_sid2, gsi::arg ("shape_iterator"), gsi::arg ("deep_shape_store"), gsi::arg ("trans"), gsi::arg ("area_ratio", 0.0), gsi::arg ("max_vertex_count", size_t (0)),
+    "@brief Constructor for a deep region from a hierarchical shape set\n"
+    "\n"
+    "This constructor creates a hierarchical region. Use a \\DeepShapeStore object to "
+    "supply the hierarchical heap. See \\DeepShapeStore for more details.\n"
+    "\n"
+    "'area_ratio' and 'max_vertex' supply two optimization parameters which control how "
+    "big polygons are split to reduce the region's polygon complexity.\n"
+    "\n"
+    "The transformation is useful to scale to a specific database unit for example.\n"
+    "\n"
+    "@param shape_iterator The recursive shape iterator which delivers the hierarchy to take\n"
+    "@param deep_shape_store The hierarchical heap (see there)\n"
+    "@param area_ratio The maximum ratio of bounding box to polygon area before polygons are split\n"
+    "@param trans The transformation to apply when storing the layout data\n"
     "\n"
     "This method has been introduced in version 0.26.\n"
   ) +

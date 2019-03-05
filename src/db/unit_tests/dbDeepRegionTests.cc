@@ -1198,19 +1198,19 @@ TEST(23_Texts)
   unsigned int l6 = ly.get_layer (db::LayerProperties (6, 1));
   unsigned int l8 = ly.get_layer (db::LayerProperties (8, 1));
 
-  db::Region r6boxes (db::OriginalLayerRegion (db::RecursiveShapeIterator (ly, top_cell, l6)).texts_as_boxes ("*", true, 100, dss));
+  db::Region r6boxes (db::Region (db::RecursiveShapeIterator (ly, top_cell, l6)).texts_as_boxes ("*", true, 100, dss));
   db::Region r6dots;
-  db::Edges (db::OriginalLayerRegion (db::RecursiveShapeIterator (ly, top_cell, l6)).texts_as_dots ("*", true, dss)).extended (r6dots, 20, 20, 20, 20);
-  db::Region r8boxes (db::OriginalLayerRegion (db::RecursiveShapeIterator (ly, top_cell, l8)).texts_as_boxes ("VDD", false, 100, dss));
+  db::Edges (db::Region (db::RecursiveShapeIterator (ly, top_cell, l6)).texts_as_dots ("*", true, dss)).extended (r6dots, 20, 20, 20, 20);
+  db::Region r8boxes (db::Region (db::RecursiveShapeIterator (ly, top_cell, l8)).texts_as_boxes ("VDD", false, 100, dss));
   db::Region r8dots;
-  db::Edges (db::OriginalLayerRegion (db::RecursiveShapeIterator (ly, top_cell, l8)).texts_as_dots ("V*", true, dss)).extended (r8dots, 20, 20, 20, 20);
+  db::Edges (db::Region (db::RecursiveShapeIterator (ly, top_cell, l8)).texts_as_dots ("V*", true, dss)).extended (r8dots, 20, 20, 20, 20);
 
-  db::Region rf6boxes (db::OriginalLayerRegion (db::RecursiveShapeIterator (ly, top_cell, l6)).texts_as_boxes ("*", true, 100));
+  db::Region rf6boxes (db::Region (db::RecursiveShapeIterator (ly, top_cell, l6)).texts_as_boxes ("*", true, 100));
   db::Region rf6dots;
-  db::Edges (db::OriginalLayerRegion (db::RecursiveShapeIterator (ly, top_cell, l6)).texts_as_dots ("*", true)).extended (rf6dots, 20, 20, 20, 20);
-  db::Region rf8boxes (db::OriginalLayerRegion (db::RecursiveShapeIterator (ly, top_cell, l8)).texts_as_boxes ("VDD", false, 100));
+  db::Edges (db::Region (db::RecursiveShapeIterator (ly, top_cell, l6)).texts_as_dots ("*", true)).extended (rf6dots, 20, 20, 20, 20);
+  db::Region rf8boxes (db::Region (db::RecursiveShapeIterator (ly, top_cell, l8)).texts_as_boxes ("VDD", false, 100));
   db::Region rf8dots;
-  db::Edges (db::OriginalLayerRegion (db::RecursiveShapeIterator (ly, top_cell, l8)).texts_as_dots ("V*", true)).extended (rf8dots, 20, 20, 20, 20);
+  db::Edges (db::Region (db::RecursiveShapeIterator (ly, top_cell, l8)).texts_as_dots ("V*", true)).extended (rf8dots, 20, 20, 20, 20);
 
   {
     db::Layout target;
@@ -1227,6 +1227,59 @@ TEST(23_Texts)
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au23.gds");
+  }
+}
+
+TEST(24_TextsFromDeep)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("textstring"));
+
+  unsigned int l6 = ly.get_layer (db::LayerProperties (6, 1));
+  unsigned int l8 = ly.get_layer (db::LayerProperties (8, 1));
+
+  db::Region r6boxes (db::Region (db::RecursiveShapeIterator (ly, top_cell, l6), dss).texts_as_boxes ("*", true, 100, dss));
+  db::Region r6dots;
+  db::Edges (db::Region (db::RecursiveShapeIterator (ly, top_cell, l6), dss).texts_as_dots ("*", true, dss)).extended (r6dots, 20, 20, 20, 20);
+  db::Region r8boxes (db::Region (db::RecursiveShapeIterator (ly, top_cell, l8), dss).texts_as_boxes ("VDD", false, 100, dss));
+  db::Region r8dots;
+  db::Edges (db::Region (db::RecursiveShapeIterator (ly, top_cell, l8), dss).texts_as_dots ("V*", true, dss)).extended (r8dots, 20, 20, 20, 20);
+
+  db::Region rf6boxes (db::Region (db::RecursiveShapeIterator (ly, top_cell, l6), dss).texts_as_boxes ("*", true, 100));
+  db::Region rf6dots;
+  db::Edges (db::Region (db::RecursiveShapeIterator (ly, top_cell, l6), dss).texts_as_dots ("*", true)).extended (rf6dots, 20, 20, 20, 20);
+  db::Region rf8boxes (db::Region (db::RecursiveShapeIterator (ly, top_cell, l8), dss).texts_as_boxes ("VDD", false, 100));
+  db::Region rf8dots;
+  db::Edges (db::Region (db::RecursiveShapeIterator (ly, top_cell, l8), dss).texts_as_dots ("V*", true)).extended (rf8dots, 20, 20, 20, 20);
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r6boxes);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r6dots);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), rf6boxes);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), rf6dots);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r8boxes);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r8dots);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), rf8boxes);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), rf8dots);
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au24.gds");
   }
 }
 

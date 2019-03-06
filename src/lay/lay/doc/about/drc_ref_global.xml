@@ -87,6 +87,15 @@ l1 = input(1, 0)
 <p>
 See <a href="/about/drc_ref_netter.xml#connect">Netter#connect</a> for a description of that function.
 </p>
+<h2>"connect_global" - Specifies a connection to a global net</h2>
+<keyword name="connect_global"/>
+<a name="connect_global"/><p>Usage:</p>
+<ul>
+<li><tt>connect_global(l, name)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#connect_global">Netter#connect_global</a> for a description of that function.
+</p>
 <h2>"dbu" - Gets or sets the database unit to use</h2>
 <keyword name="dbu"/>
 <a name="dbu"/><p>Usage:</p>
@@ -164,6 +173,15 @@ Similar to <a href="#log">log</a>, but the message is printed formatted as an er
 <p>
 See <a href="/about/drc_ref_source.xml#extent">Source#extent</a> for a description of that function.
 </p>
+<h2>"extract_devices" - Extracts devices for a given device extractor and device layer selection</h2>
+<keyword name="extract_devices"/>
+<a name="extract_devices"/><p>Usage:</p>
+<ul>
+<li><tt>extract_devices(extractor, layer_hash)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#extract_devices">Netter#extract_devices</a> for a description of that function
+</p>
 <h2>"flat" - Disables tiling mode</h2>
 <keyword name="flat"/>
 <a name="flat"/><p>Usage:</p>
@@ -191,7 +209,9 @@ In non-verbose more, nothing is printed.
 <li><tt>input(args)</tt></li>
 </ul>
 <p>
-See <a href="/about/drc_ref_source.xml#input">Source#input</a> for a description of that function.
+See <a href="/about/drc_ref_source.xml#input">Source#input</a> for a description of that function. This method will fetch
+polygons and labels. See <a href="#polygons">polygons</a> and <a href="#labels">labels</a> for more specific versions of
+this method.
 </p>
 <h2>"is_deep?" - Returns true, if in deep mode</h2>
 <keyword name="is_deep?"/>
@@ -205,6 +225,15 @@ See <a href="/about/drc_ref_source.xml#input">Source#input</a> for a description
 <ul>
 <li><tt>is_tiled?</tt></li>
 </ul>
+<h2>"l2n_data" - Gets the internal <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object for the default <a href="#Netter">Netter</a></h2>
+<keyword name="l2n_data"/>
+<a name="l2n_data"/><p>Usage:</p>
+<ul>
+<li><tt>l2n_data</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#l2n_data">Netter#l2n_data</a> for a description of that function
+</p>
 <h2>"labels" - Gets the labels (text) from an original layer</h2>
 <keyword name="labels"/>
 <a name="labels"/><p>Usage:</p>
@@ -280,6 +309,24 @@ verbose mode is enabled.
 <p>
 After using that method, the log output is sent to the 
 given file instead of the logger window or the terminal.
+</p>
+<h2>"make_layer" - Creates an empty polygon layer based on the hierarchical scheme selected</h2>
+<keyword name="make_layer"/>
+<a name="make_layer"/><p>Usage:</p>
+<ul>
+<li><tt>make_layer</tt></li>
+</ul>
+<p>
+The intention of this method is to provide an empty polygon layer based on the
+hierarchical scheme selected. This will create a new layer with the hierarchy
+of the current layout in deep mode and a flat layer in flat mode.
+This method is similar to <a href="#polygon_layer">polygon_layer</a>, but the latter does not create
+a hierarchical layer. Hence the layer created by <a href="#make_layer">make_layer</a> is suitable
+for use in device extraction for example, while the one
+delivered by <a href="#polygon_layer">polygon_layer</a> is not.
+</p><p>
+On the other hand, a layer created by the <a href="#make_layer">make_layer</a> method is not intended to be
+filled with <a href="/about/drc_ref_layer.xml#insert">Layer#insert</a>.
 </p>
 <h2>"netter" - Creates a new netter object</h2>
 <keyword name="netter"/>
@@ -363,6 +410,17 @@ This function creates a polygon object. The arguments are the same than for the
 <p>
 The intention of that method is to create an empty layer which can be 
 filled with polygon-like objects using <a href="/about/drc_ref_layer.xml#insert">Layer#insert</a>.
+A similar method which creates a hierarchical layer in deep mode is 
+<a href="#make_layer">make_layer</a>. This other layer is better suited for use with device extraction.
+</p>
+<h2>"polygons" - Fetches the polygons (or shapes that can be converted to polygons) from the specified input from the default source</h2>
+<keyword name="polygons"/>
+<a name="polygons"/><p>Usage:</p>
+<ul>
+<li><tt>polygons(args)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_source.xml#polygons">Source#polygons</a> for a description of that function.
 </p>
 <h2>"report" - Specifies a report database for output</h2>
 <keyword name="report"/>

@@ -3495,10 +3495,12 @@ CODE
     # some operations such as clipping are not fully supported for texts. Also, texts will
     # vanish in most polygon operations such as booleans etc.
     #
-    # Texts can alway be selected by using the \texts method.
+    # Texts can later be selected on the layer returned by "input" with the \Layer#texts method.
     #
     # If you don't want to see texts, use \polygons to create an input layer with polygon data
     # only. If you only want to see texts, use \labels to create an input layer with texts only.
+    #
+    # Use the global version of "input" without a source object to address the default source.
     
     def input(*args)
       layers = parse_input_layers(*args)
@@ -3517,6 +3519,8 @@ CODE
     # 
     # This method is identical to \input, but takes only texts from the given input
     # layer.
+    #
+    # Use the global version of "labels" without a source object to address the default source.
     
     def labels(*args)
       layers = parse_input_layers(*args)
@@ -3536,6 +3540,8 @@ CODE
     # Those are boxes, paths and real polygons.
     # 
     # This method is identical to \input with respect to the options supported.
+    #
+    # Use the global version of "polygons" without a source object to address the default source.
     
     def polygons(*args)
       layers = parse_input_layers(*args)

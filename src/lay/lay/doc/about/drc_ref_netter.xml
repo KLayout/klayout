@@ -137,7 +137,7 @@ errors = antenna_check(gate, metal1, 50.0, [ diode, 10.0 ])
 Multiple diode specifications are allowed. Just add them 
 to the antenna_check call.
 </p><p>
-The error shapes produced by the antenna check are a copy
+The error shapes produced by the antenna check are copies
 of the metal shapes on the metal layers of each network 
 violating the antenna rule.
 </p>
@@ -170,5 +170,64 @@ joins.
 </p><p>
 Connections are accumulated. The connections defined so far
 can be cleared with <a href="#clear_connections">clear_connections</a>.
+</p>
+<h2>"connect_global" - Connects a layer with a global net</h2>
+<keyword name="connect_global"/>
+<a name="connect_global"/><p>Usage:</p>
+<ul>
+<li><tt>connect_global(l, name)</tt></li>
+</ul>
+<p>
+Connects the shapes from the given layer l to a global net with the given name.
+Global nets are common to all cells. Global nets automatically connect to parent
+cells throughs implied pins. An example is the substrate (bulk) net which connects
+to shapes belonging to tie-down diodes.
+</p>
+<h2>"extract_devices" - Extracts devices based on the given extractor class, name and device layer selection</h2>
+<keyword name="extract_devices"/>
+<a name="extract_devices"/><p>Usage:</p>
+<ul>
+<li><tt>extract_devices(extractor, layer_hash)</tt></li>
+</ul>
+<p>
+Runs the device extraction for given device extractor class.
+</p><p>
+The device extractor is either an instance of one of the predefined extractor
+classes (e.g. <class_doc href="DeviceExtractorMOS4Transistor">DeviceExtractorMOS4Transistor</class_doc>) or a custom class. It provides the
+algorithms for deriving the device parameters from the device geometry. It needs 
+several device recognition layers which are passed in the layer hash.
+</p><p>
+Each device class (e.g. n-MOS/p-MOS or high Vt/low Vt) needs it's own instance
+of device extractor. The device extractor beside the algorithm and specific 
+extraction settings defines the name of the device to be built.
+</p><p>
+The layer hash is a map of device type specific functional names (key) and
+polygon layers (value). Here is an example:
+</p><p>
+<pre>
+deep
+
+nwell   = input(1, 0)
+active  = input(2, 0)
+poly    = input(3, 0)
+bulk    = make_layer   # renders an empty layer used for putting the terminals on
+
+nactive = active - nwell      # active area of NMOS
+nsd     = nactive - poly      # source/drain area
+gate    = nactive &amp; poly  # gate area
+
+mos4_ex = <class_doc href="DeviceExtractorMOS4Transistor">DeviceExtractorMOS4Transistor</class_doc>::new("NMOS4")
+extract_devices(mos4_ex, { :SD =&gt; nsd, :G =&gt; gate, :P =&gt; poly, :W =&gt; bulk })
+</pre>
+</p>
+<h2>"l2n_data" - Gets the internal <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object</h2>
+<keyword name="l2n_data"/>
+<a name="l2n_data"/><p>Usage:</p>
+<ul>
+<li><tt>l2n_data</tt></li>
+</ul>
+<p>
+The <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object provides access to the internal details of
+the netter object.
 </p>
 </doc>

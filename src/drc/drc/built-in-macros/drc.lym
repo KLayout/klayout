@@ -3539,7 +3539,7 @@ CODE
     
     def polygons(*args)
       layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons))
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs))
     end
 
     # %DRC%
@@ -5235,6 +5235,10 @@ CODE
         sf = layout.dbu / self.dbu
         if @deep
           @dss ||= RBA::DeepShapeStore::new
+          # TODO: align with LayoutToNetlist by using a "master" L2N
+          # object which keeps the DSS.
+          @dss.text_property_name = "LABEL"
+          @dss.text_enlargement = 1
           r = RBA::Region::new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
         else
           r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))

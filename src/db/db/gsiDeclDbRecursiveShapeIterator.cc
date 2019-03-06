@@ -409,7 +409,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("shape_flags=", &db::RecursiveShapeIterator::shape_flags, 
+  gsi::method ("shape_flags=", (void (db::RecursiveShapeIterator::*)(unsigned int)) &db::RecursiveShapeIterator::shape_flags,
     "@brief Specifies the shape selection flags\n"
     "@args flags\n"
     "\n"

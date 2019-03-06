@@ -591,7 +591,7 @@ Region::texts_as_dots (const std::string &pat, bool pattern) const
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> si = begin_iter ();
   if (! dr) {
     //  some optimization
-    si.first.shape_flags (db::ShapeIterator::Texts);
+    si.first.shape_flags (si.first.shape_flags () & db::ShapeIterator::Texts);
   }
 
   std::auto_ptr<db::FlatEdges> res (new db::FlatEdges ());
@@ -610,7 +610,7 @@ Region::texts_as_dots (const std::string &pat, bool pattern, db::DeepShapeStore 
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> si = begin_iter ();
   if (! dr) {
     //  some optimization
-    si.first.shape_flags (db::ShapeIterator::Texts);
+    si.first.shape_flags (si.first.shape_flags () & db::ShapeIterator::Texts);
   }
 
   if (! si.first.layout ()) {
@@ -644,7 +644,7 @@ Region::texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl) con
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> si = begin_iter ();
   if (! dr) {
     //  some optimization
-    si.first.shape_flags (db::ShapeIterator::Texts);
+    si.first.shape_flags (si.first.shape_flags () & db::ShapeIterator::Texts);
   }
 
   std::auto_ptr<db::FlatRegion> res (new db::FlatRegion ());
@@ -663,7 +663,7 @@ Region::texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl, db:
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> si = begin_iter ();
   if (! dr) {
     //  some optimization
-    si.first.shape_flags (db::ShapeIterator::Texts);
+    si.first.shape_flags (si.first.shape_flags () & db::ShapeIterator::Texts);
   }
 
   if (! si.first.layout ()) {

@@ -302,7 +302,7 @@ TEST(7_AntennaWithDiodes)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-TEST(8_FlatTextsAndPolygons)
+TEST(8_TextsAndPolygons)
 {
   std::string rs = tl::testsrc ();
   rs += "/testdata/drc/drcSimpleTests_8.drc";

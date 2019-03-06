@@ -475,6 +475,14 @@ public:
   }
 
   /**
+   *  @brief Gets the shape selection flags
+   */
+  unsigned int shape_flags () const
+  {
+    return m_shape_flags;
+  }
+
+  /**
    *  @brief Changes the layer to be traversed
    *
    *  This method must be used before shapes are being retrieved. Using this method may reset the iterator.

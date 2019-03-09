@@ -385,8 +385,8 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@param cmap The mapping of internal layout to target layout for the circuit mapping\n"
     "@param target The target layout\n"
     "@param lmap Target layer indexes (keys) and net regions (values)\n"
-    "@param circuit_cell_name_prefix See method description\n"
     "@param net_cell_name_prefix See method description\n"
+    "@param circuit_cell_name_prefix See method description\n"
     "@param device_cell_name_prefix If given, devices will be output as separate cells\n"
   ) +
   gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::DPoint &)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"),

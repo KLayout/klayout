@@ -135,7 +135,7 @@ static db::Region *new_si2 (const db::RecursiveShapeIterator &si, const db::ICpl
 
 static db::Region *new_sid2 (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const db::ICplxTrans &trans, double area_ratio, size_t max_vertex_count)
 {
-  return new db::Region (si, dss, trans, area_ratio, max_vertex_count);
+  return new db::Region (si, dss, trans, true, area_ratio, max_vertex_count);
 }
 
 static std::string to_string0 (const db::Region *r)

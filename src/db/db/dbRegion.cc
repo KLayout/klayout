@@ -310,9 +310,8 @@ Region::flat_region ()
   if (! region) {
     region = new FlatRegion ();
     if (mp_delegate) {
+      region->RegionDelegate::operator= (*mp_delegate);   //  copy basic flags
       region->insert_seq (begin ());
-    }
-    if (mp_delegate) {
       region->set_is_merged (mp_delegate->is_merged ());
     }
     set_delegate (region);

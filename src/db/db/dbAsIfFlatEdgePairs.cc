@@ -292,7 +292,7 @@ AsIfFlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type 
 
   db::Shapes &shapes = layout->cell (into_cell).shapes (into_layer);
   for (EdgePairsIterator e (begin ()); ! e.at_end (); ++e) {
-    shapes.insert (e->to_simple_polygon (enl));
+    shapes.insert (e->normalized ().to_simple_polygon (enl));
   }
 }
 

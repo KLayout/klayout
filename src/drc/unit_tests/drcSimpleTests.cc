@@ -31,7 +31,7 @@ TEST(1)
   rs += "/testdata/drc/drcSimpleTests_1.drc";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au1.oas";
+  au += "/testdata/drc/drcSimpleTests_au1.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -71,7 +71,7 @@ TEST(2)
   input += "/testdata/drc/drctest.gds";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au2.oas";
+  au += "/testdata/drc/drcSimpleTests_au2.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -111,7 +111,7 @@ TEST(3_Flat)
   input += "/testdata/drc/drctest.gds";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au3.oas";
+  au += "/testdata/drc/drcSimpleTests_au3.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -151,7 +151,7 @@ TEST(4_Hierarchical)
   input += "/testdata/drc/drctest.gds";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au4.oas";
+  au += "/testdata/drc/drcSimpleTests_au4.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -191,7 +191,7 @@ TEST(5_FlatAntenna)
   input += "/testdata/drc/antenna_l1.gds";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au5.oas";
+  au += "/testdata/drc/drcSimpleTests_au5.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -231,7 +231,7 @@ TEST(6_HierarchicalAntenna)
   input += "/testdata/drc/antenna_l1.gds";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au6.oas";
+  au += "/testdata/drc/drcSimpleTests_au6.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -271,7 +271,7 @@ TEST(7_AntennaWithDiodes)
   input += "/testdata/drc/antenna_l1.gds";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au7.oas";
+  au += "/testdata/drc/drcSimpleTests_au7.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -311,7 +311,7 @@ TEST(8_TextsAndPolygons)
   input += "/testdata/drc/texts.gds";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au8.oas";
+  au += "/testdata/drc/drcSimpleTests_au8.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 

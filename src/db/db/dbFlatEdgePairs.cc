@@ -185,7 +185,7 @@ FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into
 {
   db::Shapes &out = layout->cell (into_cell).shapes (into_layer);
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
-    out.insert (p->to_simple_polygon (enl));
+    out.insert (p->normalized ().to_simple_polygon (enl));
   }
 }
 

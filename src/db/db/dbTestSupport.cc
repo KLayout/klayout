@@ -59,9 +59,13 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
   if (norm == WriteGDS2) {
     tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x.gds", hash));
     options.set_format ("GDS2");
-  } else {
+  } else if (norm == WriteOAS) {
     tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x.oas", hash));
     options.set_format ("OASIS");
+  } else {
+    //  write the temp file in the same format than the au file
+    tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x." + tl::extension (au_file), hash));
+    options.set_format_from_filename (tmp_file);
   }
 
   {

@@ -306,6 +306,30 @@ public:
   void set_netlist_extracted ();
 
   /**
+   *  @brief Gets the internal DeepShapeStore object
+   *
+   *  This method is intended for special cases, i.e. for the master
+   *  LayoutToNetlist object in the DRC environment. The DSS provided
+   *  for DRC needs to be initialized properly for text representation.
+   */
+  db::DeepShapeStore &dss ()
+  {
+    tl_assert (mp_dss.get () != 0);
+    return *mp_dss;
+  }
+
+  /**
+   *  @brief Gets the internal DeepShapeStore object (const version)
+   *
+   *  See the non-const version for details.
+   */
+  const db::DeepShapeStore &dss () const
+  {
+    tl_assert (mp_dss.get () != 0);
+    return *mp_dss;
+  }
+
+  /**
    *  @brief Gets the internal layout
    */
   const db::Layout *internal_layout () const;
@@ -525,18 +549,6 @@ private:
   bool m_netlist_extracted;
   bool m_is_flat;
   db::DeepLayer m_dummy_layer;
-
-  db::DeepShapeStore &dss ()
-  {
-    tl_assert (mp_dss.get () != 0);
-    return *mp_dss;
-  }
-
-  const db::DeepShapeStore &dss () const
-  {
-    tl_assert (mp_dss.get () != 0);
-    return *mp_dss;
-  }
 
   void init ();
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);

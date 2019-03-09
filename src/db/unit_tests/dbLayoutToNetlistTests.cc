@@ -2111,7 +2111,11 @@ TEST(9_FlatExtractionWithExternalDSS)
 
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
 
-  db::DeepShapeStore dss;
+  //  NOTE: we use a DSS from a LayoutToNetlist object - this one is initialized properly
+  //  with the text representation settings.
+  db::LayoutToNetlist l2n_master;
+  db::DeepShapeStore &dss = l2n_master.dss ();
+
   db::LayoutToNetlist l2n (&dss);
 
   std::auto_ptr<db::Region> rbulk (new db::Region ());

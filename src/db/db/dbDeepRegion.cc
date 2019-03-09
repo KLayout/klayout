@@ -247,7 +247,7 @@ DeepRegion::has_valid_polygons () const
 bool
 DeepRegion::has_valid_merged_polygons () const
 {
-  return merged_semantics ();
+  return false;
 }
 
 const db::RecursiveShapeIterator *

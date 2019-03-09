@@ -16,6 +16,6 @@ x.is_box? == false || raise("unexpected value")
 x.output(10, 0)
 
 y = polygon_layer
-y.insert(polygon([ p(0, 0), p(0, 1.0), p(2.0, 1.0), p(2.0, 2.0), p(1.0, 2.0), p(1.0, 0) ]))
+y.insert(polygon([ p(0, 0), p(0, 1.0), p(2.0, 1.0), p(2.0, 2.0), p(3.0, 2.0), p(3.0, 0) ]))
 y.output(11, 0)
 

@@ -873,7 +873,7 @@ DeepShapeStore::insert_as_polygons (const DeepLayer &deep_layer, db::Layout *int
 
       if (s->is_edge_pair ()) {
 
-        out.insert (s->edge_pair ().to_simple_polygon (enl));
+        out.insert (s->edge_pair ().normalized ().to_simple_polygon (enl));
 
       } else if (s->is_path () || s->is_polygon () || s->is_box ()) {
 

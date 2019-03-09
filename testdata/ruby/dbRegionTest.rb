@@ -793,20 +793,12 @@ class DBRegion_TestClass < TestBase
   def test_15
 
     r = RBA::Region::new
-    ex = nil
-    begin
-      t = r.texts("*", true)
-    rescue => ex
-    end
-    assert_equal(ex.to_s, "Texts can only be identified on an original layer in Region::texts")
+    t = r.texts("*", true)
+    assert_equal(t.to_s, "")
 
     r.insert(RBA::Box::new(1, 2, 3, 4))
-    ex = nil
-    begin
-      t = r.texts("*", true)
-    rescue => ex
-    end
-    assert_equal(ex.to_s, "Texts can only be identified on an original layer in Region::texts")
+    t = r.texts("*", true)
+    assert_equal(t.to_s, "")
 
     ly = RBA::Layout::new
     top = ly.create_cell("TOP")

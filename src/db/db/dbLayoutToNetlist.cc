@@ -129,7 +129,9 @@ db::Region *LayoutToNetlist::make_layer (const std::string &n)
   si.shape_flags (db::ShapeIterator::Nothing);
 
   std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
-  register_layer (*region, n);
+  if (! n.empty ()) {
+    register_layer (*region, n);
+  }
   return region.release ();
 }
 
@@ -140,7 +142,9 @@ db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::st
   si.shape_flags (db::ShapeIterator::All);
 
   std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
-  register_layer (*region, n);
+  if (! n.empty ()) {
+    register_layer (*region, n);
+  }
   return region.release ();
 }
 

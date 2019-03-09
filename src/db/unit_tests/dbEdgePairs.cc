@@ -147,5 +147,5 @@ TEST(4)
   ep.insert_into_as_polygons (&ly, top_cell, l1, 1);
 
   db::Region r (db::RecursiveShapeIterator (ly, ly.cell (top_cell), l1));
-  EXPECT_EQ (r.to_string (), "(-11,-20;50,51;9,20;90,81);(-10,-21;9,20;110,121;91,80)");
+  EXPECT_EQ (r.to_string (), "(-10,-21;9,20;50,51;91,80);(-10,-21;9,20;110,121;91,80)");
 }

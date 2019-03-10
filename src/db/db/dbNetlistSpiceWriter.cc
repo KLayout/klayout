@@ -147,8 +147,8 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
 
     os << " L=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_L));
     os << " W=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_W));
-    os << " AS=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_AS));
-    os << " AD=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_AD));
+    os << " AS=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_AS));
+    os << " AD=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_AD));
     os << " PS=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_PS));
     os << " PD=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_PD));
 

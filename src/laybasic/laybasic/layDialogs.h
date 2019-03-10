@@ -370,9 +370,10 @@ public:
 
   bool exec_dialog (int &mode_x, int &mode_y, bool &visible_only, bool &adjust_calls);
 
-private:
+private slots:
   void button_clicked ();
 
+private:
   Ui::AlignCellOptionsDialog *mp_ui;
 };
 

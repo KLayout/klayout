@@ -100,9 +100,9 @@ namespace tl
 
 template<> struct type_traits<GenericDeviceExtractor> : public tl::type_traits<void>
 {
-  //  mark "NetlistDeviceExtractor" as not having a default ctor and no copy ctor
+  //  mark "NetlistDeviceExtractor" as having a default ctor and no copy ctor
   typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
+  typedef tl::true_tag has_default_constructor;
 };
 
 }
@@ -212,7 +212,7 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
     "@brief Iterates over all errors collected in the device extractor."
   ),
   "@brief The base class for all device extractors.\n"
-  "This is an abstract base class for device extractors. See \\NetlistDeviceExtractor for a generic "
+  "This is an abstract base class for device extractors. See \\GenericDeviceExtractor for a generic "
   "class which you can reimplement to supply your own customized device extractor. "
   "In many cases using one of the preconfigured specific device extractors may be useful already and "
   "it's not required to implement a custom one. For an example about a preconfigured device extractor see "

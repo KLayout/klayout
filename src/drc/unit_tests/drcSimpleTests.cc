@@ -462,3 +462,63 @@ TEST(10_NetlistExtractionFlat)
     }
   }
 }
+
+TEST(11_CustomDevices)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_11.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/vdiv.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au11a.cir";
+
+  std::string au_simplified = tl::testsrc ();
+  au_simplified += "/testdata/drc/drcSimpleTests_au11b.cir";
+
+  std::string output = this->tmp_file ("tmp.cir");
+  std::string output_simplified = this->tmp_file ("tmp_simplified.cir");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+        "$drc_test_target_simplified = '%s'\n"
+      , input, output, output_simplified)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+
+  //  verify
+
+  {
+    tl::InputStream is (output);
+    tl::InputStream is_au (au);
+
+    if (is.read_all () != is_au.read_all ()) {
+      _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
+                                 tl::absolute_file_path (output),
+                                 tl::absolute_file_path (au)));
+    }
+  }
+
+  {
+    tl::InputStream is (output_simplified);
+    tl::InputStream is_au (au_simplified);
+
+    if (is.read_all () != is_au.read_all ()) {
+      _this->raise (tl::sprintf ("Compare failed (simplified netlist) - see\n  actual: %s\n  golden: %s",
+                                 tl::absolute_file_path (output_simplified),
+                                 tl::absolute_file_path (au_simplified)));
+    }
+  }
+}

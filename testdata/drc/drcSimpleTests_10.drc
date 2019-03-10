@@ -1,4 +1,4 @@
-# Hierarchical extraction
+# Flat extraction
 
 source($drc_test_source)
 

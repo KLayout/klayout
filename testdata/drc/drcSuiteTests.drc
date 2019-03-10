@@ -4,33 +4,37 @@ def message(m)
   $stdout.flush
 end
 
-def run_testsuite(dm, ic, tiled = false)
+def expect_eq(a, b)
+  a == b || raise("unexpected value #{a.to_s}, should be #{b.to_s}")
+end
+
+def run_testsuite(dm, ic, tiled = false, hier = false)
 
   has_float_range = ((0..0.5).max != 0)
 
   lb = 100
-  
-  a = input(RBA::LayerInfo::new(1, 0))
-  b = input(2)
-  c = input(3)
-  x = input(10)
-  y = input(11)
-  empty = input(1000)
+
+  a = polygons(RBA::LayerInfo::new(1, 0))
+  b = polygons(2)
+  c = polygons(3)
+  x = polygons(10)
+  y = polygons(11)
+  empty = polygons(1000)
 
   h = {}
   layers.each { |l| h[l] = true }
   h[RBA::LayerInfo::new(1, 0)] || raise("missing layer 1/0 in layers list")
   
-  c.is_merged? == false || raise("unexpected value")
+  expect_eq(c.is_merged?, false)
   
   message "--- general #{lb}"
   
   l1 = a&b
   l1.output(lb, dm)
-  l1.is_empty? && raise("must not be empty")
+  expect_eq(l1.is_empty?, false)
   
   a.and(b).xor(l1).is_empty? || raise("xor not empty")
-  tiled || (a.and(b).is_merged? == true || raise("unexpected value"))
+  tiled || hier || expect_eq(a.and(b).is_merged?, true)
   
   a.xor(b).output(RBA::LayerInfo::new(lb + 1, dm))
   a.xor(b).xor(a ^ b).is_empty? || raise("xor not empty")
@@ -43,28 +47,36 @@ def run_testsuite(dm, ic, tiled = false)
   a.join(b).xor(a + b).is_empty? || raise("xor not empty")
 
   if !tiled
-    a.join(b).data.size == 16 * ic || raise("unexpected shape count")
+    expect_eq(a.join(b).data.size, 16 * ic)
   end
   
-  c.raw.is_clean? == false || raise("unexpected value")
-  # c.raw switched the semantics
-  c.is_clean? == false || raise("unexpected value")
-  (c.area / ic).to_s == "10.0" || raise("unexpected value")
-  (c.edges.length / ic).to_s == "18.0" || raise("unexpected value")
-  (c.perimeter / ic).to_s == "18.0" || raise("unexpected value")
-  c.clean
-  c.is_clean? == true || raise("unexpected value")
-  (c.area / ic).to_s == "9.0" || raise("unexpected value")
-  (c.edges.length / ic).to_s == "14.0" || raise("unexpected value")
-  (c.perimeter / ic).to_s == "14.0" || raise("unexpected value")
-  (c.dup.area / ic).to_s == "9.0" || raise("unexpected value")
-  (c.raw.clean.area / ic).to_s == "9.0" || raise("unexpected value")
-  (c.area / ic).to_s == "9.0" || raise("unexpected value")
-  (c.raw.area / ic).to_s == "10.0" || raise("unexpected value")
-  c.clean
+  # NOTE: there is no clean/raw semantics in deep mode
+  if ! hier
+    expect_eq(c.raw.is_clean?, false)
+    # c.raw switched the semantics
+    expect_eq(c.is_clean?, false)
+    expect_eq((c.area / ic).to_s, "10.0")
+    expect_eq((c.edges.length / ic).to_s, "18.0")
+    expect_eq((c.perimeter / ic).to_s, "18.0")
+    c.clean
+    expect_eq(c.is_clean?, true)
+  end
+
+  expect_eq((c.area / ic).to_s, "9.0")
+  expect_eq((c.edges.length / ic).to_s, "14.0")
+  expect_eq((c.perimeter / ic).to_s, "14.0")
+  expect_eq((c.dup.area / ic).to_s, "9.0")
+
+  # NOTE: there is no clean/raw semantics in deep mode
+  if ! hier
+    expect_eq((c.raw.clean.area / ic).to_s, "9.0")
+    expect_eq((c.area / ic).to_s, "9.0")
+    expect_eq((c.raw.area / ic).to_s, "10.0")
+    c.clean
+  end
 
   if ic == 1    
-    c.bbox.to_s == "(-4,-5;0,-2)" || raise("unexpected value")
+    expect_eq(c.bbox.to_s, "(-4,-5;0,-2)")
   end
   
   lb += 10 #110
@@ -80,15 +92,15 @@ def run_testsuite(dm, ic, tiled = false)
   a.edges.end_segments(0, 0.5).extended_out(0.01).output(lb + 7, dm)
   a.edges.end_segments(0.5, 0.5).extended_out(0.01).output(lb + 8, dm)
   
-  a.polygons? == true || raise("unexpected value")
-  a.edges? == false || raise("unexpected value")
-  a.edge_pairs? == false || raise("unexpected value")
-  a.edges.edge_pairs? == false || raise("unexpected value")
-  a.edges.polygons? == false || raise("unexpected value")
-  a.edges.edges? == true || raise("unexpected value")
-  a.space(0.5).edge_pairs? == true || raise("unexpected value")
-  a.space(0.5).polygons? == false || raise("unexpected value")
-  a.space(0.5).edges? == false || raise("unexpected value")
+  expect_eq(a.polygons?, true)
+  expect_eq(a.edges?, false)
+  expect_eq(a.edge_pairs?, false)
+  expect_eq(a.edges.edge_pairs?, false)
+  expect_eq(a.edges.polygons?, false)
+  expect_eq(a.edges.edges?, true)
+  expect_eq(a.space(0.5).edge_pairs?, true)
+  expect_eq(a.space(0.5).polygons?, false)
+  expect_eq(a.space(0.5).edges?, false)
   
   lb += 10 #120
   message "--- extended #{lb}"
@@ -132,7 +144,7 @@ def run_testsuite(dm, ic, tiled = false)
   b.interacting(a).in(b).output(lb + 1, dm)
   (b|a).not_in(b).output(lb + 2, dm)
   x.in(b).output(lb + 3, dm)
-  b.sized(0.1).in(b).is_empty? == true || raise("unexpected value")
+  expect_eq(b.sized(0.1).in(b).is_empty?, true)
   
   lb += 10 #170
   message "--- inside, outside, overlapping, interacting #{lb}"
@@ -209,14 +221,18 @@ def run_testsuite(dm, ic, tiled = false)
   lb += 10 #180
   message "--- merge #{lb}"
   
-  c.raw
+  if !hier
+    c.raw
+  end
   if !tiled
-    c.merged.is_merged? == true || raise("unexpected value")
+    expect_eq(c.merged.is_merged?, true)
   end
   c.merged.output(lb, dm)
   c.merged(2).output(lb + 1, dm)
   c.merged(3).output(lb + 2, dm)
-  c.clean
+  if !hier
+    c.clean
+  end
   cdup = c.dup
   cdup.merge.xor(c.merged).output(lb + 3, dm)
   cdup.xor(c.merged).output(lb + 4, dm)
@@ -252,9 +268,11 @@ def run_testsuite(dm, ic, tiled = false)
   a.non_rectangles.output(lb + 1, dm)
   a.rectilinear.output(lb + 2, dm)
   a.non_rectilinear.output(lb + 3, dm)
-  c.raw
-  c.non_rectangles.output(lb + 4, dm)
-  c.clean
+  if !hier
+    c.raw
+    c.non_rectangles.output(lb + 4, dm)
+    c.clean
+  end
   c.rectangles.output(lb + 5, dm)
   
   lb += 10 #210
@@ -561,12 +579,18 @@ if $drc_test_mode == 1
 
   source($drc_test_source, "TOP")
   target($drc_test_target, "TOP")
+
+  flat
+
   run_testsuite(0, 1)
 
 elsif $drc_test_mode == 2
 
   target($drc_test_target, "TOPTOP")
   source($drc_test_source, "TOPTOP")
+
+  flat
+
   run_testsuite(0, 900)
 
 elsif $drc_test_mode == 3
@@ -591,6 +615,24 @@ elsif $drc_test_mode == 4
   threads(4)
 
   run_testsuite(0, 900, true)
+
+elsif $drc_test_mode == 5
+
+  source($drc_test_source, "TOP")
+  target($drc_test_target, "TOP")
+
+  deep
+
+  run_testsuite(0, 1, false, true)
+
+elsif $drc_test_mode == 6
+
+  target($drc_test_target, "TOPTOP")
+  source($drc_test_source, "TOPTOP")
+
+  deep
+
+  run_testsuite(0, 900, false, true)
 
 end
 

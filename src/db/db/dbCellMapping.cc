@@ -295,7 +295,7 @@ CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type 
 }
 
 std::vector<db::cell_index_type> 
-CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /*cell_index_a*/, const db::Layout &layout_b, db::cell_index_type cell_index_b)
+CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /*cell_index_a*/, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells)
 {
   std::vector<db::cell_index_type> new_cells;
   std::vector<db::cell_index_type> new_cells_b;
@@ -305,7 +305,7 @@ CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /
   called_b.insert (cell_index_b);
 
   for (std::set<db::cell_index_type>::const_iterator b = called_b.begin (); b != called_b.end (); ++b) {
-    if (m_b2a_mapping.find (*b) == m_b2a_mapping.end ()) {
+    if (m_b2a_mapping.find (*b) == m_b2a_mapping.end () && (! exclude_cells || exclude_cells->find (*b) == exclude_cells->end ())) {
       db::cell_index_type new_cell = layout_a.add_cell (layout_b.cell_name (*b));
       new_cells.push_back (new_cell);
       new_cells_b.push_back (*b);
@@ -335,7 +335,7 @@ CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /
 
           db::CellInstArray bci = bi.cell_inst ();
           bci.object ().cell_index (new_cells [i]);
-          bci.transform_into (db::ICplxTrans (mag));
+          bci.transform_into (db::ICplxTrans (mag), &layout_a.array_repository ());
 
           if (bi.has_prop_id ()) {
             pa.insert (db::CellInstArrayWithProperties (bci, pm (bi.prop_id ())));

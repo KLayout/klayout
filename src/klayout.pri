@@ -97,6 +97,12 @@ equals(HAVE_RUBY, "1") {
   }
 }
 
+equals(HAVE_CRONOLOGY, "1") {
+  DEFINES += HAVE_CRONOLOGY
+  LIBS += $$CRONOLOGY_LIB
+  INCLUDEPATH += $$CRONOLOGY_INCLUDE
+}
+
 msvc {
 
   QMAKE_CXXFLAGS += \
@@ -110,6 +116,11 @@ msvc {
   QMAKE_CXXFLAGS_WARN_ON += \
 
 } else {
+
+  CONFIG(gcov) {
+    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+    QMAKE_LFLAGS += --coverage
+  }
 
   QMAKE_CXXFLAGS_WARN_ON += \
       -pedantic \

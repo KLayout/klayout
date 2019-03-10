@@ -379,24 +379,10 @@ TextProgressDelegate::TextProgressDelegate (MainWindow *mw, int verbosity)
   //  .. nothing yet ..
 }
 
-void TextProgressDelegate::set_progress_can_cancel (bool f)
+void TextProgressDelegate::update_progress (tl::Progress *progress)
 {
-  if (!mp_mw->set_progress_can_cancel (f)) {
-    lay::TextProgress::set_progress_can_cancel (f);
-  }
-}
-
-void TextProgressDelegate::set_progress_text (const std::string &text)
-{
-  if (!mp_mw->set_progress_text (text)) {
-    lay::TextProgress::set_progress_text (text);
-  }
-}
-
-void TextProgressDelegate::set_progress_value (double v, const std::string &value)
-{
-  if (!mp_mw->set_progress_value (v, value)) {
-    lay::TextProgress::set_progress_value (v, value);
+  if (!mp_mw->update_progress (progress)) {
+    lay::TextProgress::update_progress (progress);
   }
 }
 
@@ -4642,42 +4628,27 @@ MainWindow::progress_get_widget () const
 }
 
 bool
-MainWindow::set_progress_can_cancel (bool f)
+MainWindow::update_progress (tl::Progress *progress)
 {
-  if (mp_progress_dialog) {
-    mp_progress_dialog->set_can_cancel (f);
-    return true;
-  } else if (isVisible () && mp_progress_widget) {
-    mp_progress_widget->set_can_cancel (f);
-    return true;
-  } else {
-    return false;
-  }
-}
+  bool can_cancel = progress->can_cancel ();
+  std::string text = progress->desc ();
+  std::string value = progress->formatted_value ();
+  double v = progress->value ();
 
-bool
-MainWindow::set_progress_text (const std::string &text)
-{
   if (mp_progress_dialog) {
+
+    mp_progress_dialog->set_can_cancel (can_cancel);
     mp_progress_dialog->set_text (text);
-    return true;
-  } else if (isVisible () && mp_progress_widget) {
-    mp_progress_widget->set_text (text);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-bool
-MainWindow::set_progress_value (double v, const std::string &value)
-{
-  if (mp_progress_dialog) {
     mp_progress_dialog->set_value (v, value);
     return true;
+
   } else if (isVisible () && mp_progress_widget) {
+
+    mp_progress_widget->set_can_cancel (can_cancel);
+    mp_progress_widget->set_text (text);
     mp_progress_widget->set_value (v, value);
     return true;
+
   } else {
     return false;
   }

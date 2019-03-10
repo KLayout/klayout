@@ -24,6 +24,10 @@
 #include "dbCommon.h"
 
 #include "dbEdgePairs.h"
+#include "dbEmptyEdgePairs.h"
+#include "dbFlatEdgePairs.h"
+#include "dbDeepEdgePairs.h"
+#include "dbOriginalLayerEdgePairs.h"
 #include "dbEdges.h"
 #include "dbRegion.h"
 
@@ -34,164 +38,152 @@
 namespace db
 {
 
-void 
-EdgePairs::insert (const db::Edge &e1, const db::Edge &e2)
+EdgePairs::EdgePairs ()
+  : mp_delegate (new EmptyEdgePairs ())
 {
-  m_edge_pairs.push_back (db::EdgePair (e1, e2));
-  m_bbox_valid = false;
+  //  .. nothing yet ..
 }
 
-void 
-EdgePairs::insert (const edge_pair_type &ep)
+EdgePairs::~EdgePairs ()
 {
-  m_edge_pairs.push_back (ep);
-  m_bbox_valid = false;
+  delete mp_delegate;
+  mp_delegate = 0;
 }
 
-bool  
-EdgePairs::operator== (const db::EdgePairs &other) const
+EdgePairs::EdgePairs (EdgePairsDelegate *delegate)
+  : mp_delegate (delegate)
 {
-  if (empty () != other.empty ()) {
-    return false;
-  }
-  if (size () != other.size ()) {
-    return false;
-  }
-  db::EdgePairs::const_iterator o1 = begin ();
-  db::EdgePairs::const_iterator o2 = other.begin ();
-  while (o1 != end () && o2 != other.end ()) {
-    if (*o1 != *o2) {
-      return false;
-    }
-    ++o1;
-    ++o2;
-  }
-  return true;
+  //  .. nothing yet ..
 }
 
-bool  
-EdgePairs::operator< (const db::EdgePairs &other) const
+EdgePairs::EdgePairs (const EdgePairs &other)
+  : gsi::ObjectBase (), mp_delegate (other.mp_delegate->clone ())
 {
-  if (empty () != other.empty ()) {
-    return empty () < other.empty ();
-  }
-  if (size () != other.size ()) {
-    return (size () < other.size ());
-  }
-  db::EdgePairs::const_iterator o1 = begin ();
-  db::EdgePairs::const_iterator o2 = other.begin ();
-  while (o1 != end () && o2 != other.end ()) {
-    if (*o1 != *o2) {
-      return *o1 < *o2;
-    }
-    ++o1;
-    ++o2;
-  }
-  return false;
+  //  .. nothing yet ..
 }
 
-db::EdgePairs &
-EdgePairs::operator+= (const db::EdgePairs &other)
+EdgePairs &EdgePairs::operator= (const EdgePairs &other)
 {
-  if (! other.empty ()) {
-    m_edge_pairs.insert (m_edge_pairs.end (), other.begin (), other.end ());
-    m_bbox_valid = false;
+  if (this != &other) {
+    set_delegate (other.mp_delegate->clone ());
   }
   return *this;
 }
 
-std::string 
-EdgePairs::to_string (size_t nmax) const
+EdgePairs::EdgePairs (const RecursiveShapeIterator &si)
 {
-  std::ostringstream os;
-  const_iterator ep;
-  for (ep = begin (); ep != end () && nmax != 0; ++ep, --nmax) {
-    if (ep != begin ()) {
-      os << ";";
+  mp_delegate = new OriginalLayerEdgePairs (si);
+}
+
+EdgePairs::EdgePairs (const RecursiveShapeIterator &si, const db::ICplxTrans &trans)
+{
+  mp_delegate = new OriginalLayerEdgePairs (si, trans);
+}
+
+EdgePairs::EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss)
+{
+  mp_delegate = new DeepEdgePairs (si, dss);
+}
+
+EdgePairs::EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans)
+{
+  mp_delegate = new DeepEdgePairs (si, dss, trans);
+}
+
+template <class Sh>
+void EdgePairs::insert (const Sh &shape)
+{
+  flat_edge_pairs ()->insert (shape);
+}
+
+template DB_PUBLIC void EdgePairs::insert (const db::EdgePair &);
+
+void EdgePairs::insert (const db::Shape &shape)
+{
+  flat_edge_pairs ()->insert (shape);
+}
+
+template <class T>
+void EdgePairs::insert (const db::Shape &shape, const T &trans)
+{
+  flat_edge_pairs ()->insert (shape, trans);
+}
+
+template DB_PUBLIC void EdgePairs::insert (const db::Shape &, const db::ICplxTrans &);
+template DB_PUBLIC void EdgePairs::insert (const db::Shape &, const db::Trans &);
+template DB_PUBLIC void EdgePairs::insert (const db::Shape &, const db::Disp &);
+
+void EdgePairs::clear ()
+{
+  set_delegate (new EmptyEdgePairs ());
+}
+
+void EdgePairs::reserve (size_t n)
+{
+  flat_edge_pairs ()->reserve (n);
+}
+
+template <class T>
+EdgePairs &EdgePairs::transform (const T &trans)
+{
+  flat_edge_pairs ()->transform (trans);
+  return *this;
+}
+
+//  explicit instantiations
+template DB_PUBLIC EdgePairs &EdgePairs::transform (const db::ICplxTrans &);
+template DB_PUBLIC EdgePairs &EdgePairs::transform (const db::Trans &);
+template DB_PUBLIC EdgePairs &EdgePairs::transform (const db::Disp &);
+
+const db::RecursiveShapeIterator &
+EdgePairs::iter () const
+{
+  static db::RecursiveShapeIterator def_iter;
+  const db::RecursiveShapeIterator *i = mp_delegate->iter ();
+  return *(i ? i : &def_iter);
+}
+
+void EdgePairs::polygons (Region &output, db::Coord e) const
+{
+  output.set_delegate (mp_delegate->polygons (e));
+}
+
+void EdgePairs::edges (Edges &output) const
+{
+  output.set_delegate (mp_delegate->edges ());
+}
+
+void EdgePairs::first_edges (Edges &output) const
+{
+  output.set_delegate (mp_delegate->first_edges ());
+}
+
+void EdgePairs::second_edges (Edges &output) const
+{
+  output.set_delegate (mp_delegate->second_edges ());
+}
+
+void EdgePairs::set_delegate (EdgePairsDelegate *delegate)
+{
+  if (delegate != mp_delegate) {
+    delete mp_delegate;
+    mp_delegate = delegate;
+  }
+}
+
+FlatEdgePairs *EdgePairs::flat_edge_pairs ()
+{
+  FlatEdgePairs *edge_pairs = dynamic_cast<FlatEdgePairs *> (mp_delegate);
+  if (! edge_pairs) {
+    edge_pairs = new FlatEdgePairs ();
+    if (mp_delegate) {
+      edge_pairs->EdgePairsDelegate::operator= (*mp_delegate);
+      edge_pairs->insert_seq (begin ());
     }
-    os << ep->to_string ();
+    set_delegate (edge_pairs);
   }
-  if (ep != end ()) {
-    os << "...";
-  }
-  return os.str ();
-}
 
-void 
-EdgePairs::clear ()
-{
-  m_edge_pairs.clear ();
-  m_bbox = db::Box ();
-  m_bbox_valid = true;
-}
-
-void 
-EdgePairs::polygons (Region &output, db::Coord e) const
-{
-  for (const_iterator ep = begin (); ep != end (); ++ep) {
-    db::Polygon poly = ep->normalized ().to_polygon (e);
-    if (poly.vertices () >= 3) {
-      output.insert (poly);
-    }
-  }
-}
-
-void 
-EdgePairs::edges (Edges &output) const
-{
-  for (const_iterator ep = begin (); ep != end (); ++ep) {
-    output.insert (ep->first ());
-    output.insert (ep->second ());
-  }
-}
-
-void 
-EdgePairs::first_edges (Edges &output) const
-{
-  for (const_iterator ep = begin (); ep != end (); ++ep) {
-    output.insert (ep->first ());
-  }
-}
-
-void 
-EdgePairs::second_edges (Edges &output) const
-{
-  for (const_iterator ep = begin (); ep != end (); ++ep) {
-    output.insert (ep->second ());
-  }
-}
-
-void 
-EdgePairs::init ()
-{
-  m_bbox_valid = false;
-  m_report_progress = false;
-}
-
-void 
-EdgePairs::ensure_bbox_valid () const
-{
-  if (! m_bbox_valid) {
-    m_bbox = db::Box ();
-    for (const_iterator ep = begin (); ep != end (); ++ep) {
-      m_bbox += db::Box (ep->first ().p1 (), ep->first ().p2 ());
-      m_bbox += db::Box (ep->second ().p1 (), ep->second ().p2 ());
-    }
-    m_bbox_valid = true;
-  }
-}
-
-void 
-EdgePairs::disable_progress ()
-{
-  m_report_progress = false;
-}
-
-void 
-EdgePairs::enable_progress (const std::string &progress_desc)
-{
-  m_report_progress = true;
-  m_progress_desc = progress_desc;
+  return edge_pairs;
 }
 
 }

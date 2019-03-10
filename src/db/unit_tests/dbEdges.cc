@@ -24,6 +24,7 @@
 #include "tlUnitTest.h"
 
 #include "dbEdges.h"
+#include "dbEdgesUtils.h"
 #include "dbPolygonTools.h"
 #include "dbRegion.h"
 
@@ -53,7 +54,7 @@ TEST(1)
   EXPECT_EQ (r.bbox ().to_string (), "(0,0;100,200)");
   EXPECT_EQ (r.transformed (db::Trans (db::Vector (1, 2))).bbox ().to_string (), "(1,2;101,202)");
   EXPECT_EQ (r.empty (), false);
-  EXPECT_EQ (r.is_merged (), false);
+  EXPECT_EQ (r.is_merged (), true);
   EXPECT_EQ (r.begin ().at_end (), false);
 
   db::Edges r1 = r;
@@ -638,7 +639,7 @@ TEST(20)
     EXPECT_EQ (r1.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20);(160,80;160,140);(220,80;160,80)");
     EXPECT_EQ (r1.has_valid_edges (), false);
     EXPECT_EQ (r1.length (), db::Edges::length_type (200));
-    EXPECT_EQ (r1.has_valid_edges (), true); // length, since merging, will implicitly convert to valid edges
+    EXPECT_EQ (r1.has_valid_edges (), false);
     EXPECT_EQ (r1.bbox ().to_string (), "(120,20;220,140)");
     EXPECT_EQ (r1.size (), size_t (6));
     EXPECT_EQ (r1.empty (), false);
@@ -649,7 +650,7 @@ TEST(20)
     EXPECT_EQ (rr.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20)");
 
     db::Edges r2 = r1;
-    EXPECT_EQ (r2.has_valid_edges (), true);
+    EXPECT_EQ (r2.has_valid_edges (), false);
     EXPECT_EQ (r2.length (), db::Edges::length_type (200));
     EXPECT_EQ (r2.bbox ().to_string (), "(120,20;220,140)");
     EXPECT_EQ (r2.size (), size_t (6));

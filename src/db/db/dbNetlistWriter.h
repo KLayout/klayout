@@ -1,0 +1,90 @@
+
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2019 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2019 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+#ifndef HDR_dbNetlistWriter
+#define HDR_dbNetlistWriter
+
+#include "dbCommon.h"
+#include "tlTypeTraits.h"
+
+#include <string>
+
+namespace tl
+{
+  class OutputStream;
+}
+
+namespace db
+{
+
+class Netlist;
+
+/**
+ *  @brief A common base class for netlist writers
+ */
+class DB_PUBLIC NetlistWriter
+{
+public:
+  NetlistWriter () { }
+  virtual ~NetlistWriter () { }
+
+  virtual void write (tl::OutputStream &stream, const db::Netlist &netlist, const std::string &description = std::string ()) = 0;
+};
+
+}
+
+namespace tl
+{
+
+template <>
+struct type_traits<db::NetlistWriter>
+  : public tl::type_traits<void>
+{
+  typedef tl::false_tag has_default_constructor;
+  typedef tl::false_tag has_copy_constructor;
+};
+
+}
+
+#endif

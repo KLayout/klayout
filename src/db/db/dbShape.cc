@@ -52,6 +52,8 @@ db::properties_id_type Shape::prop_id () const
         return (**((psimple_polygon_ptr_array_iter_type *) m_generic.iter)).properties_id ();
       case Edge:
         return (**((pedge_iter_type *) m_generic.iter)).properties_id ();
+      case EdgePair:
+        return (**((pedge_pair_iter_type *) m_generic.iter)).properties_id ();
       case Path:
         return (**((ppath_iter_type *) m_generic.iter)).properties_id ();
       case PathRef:
@@ -99,6 +101,8 @@ db::properties_id_type Shape::prop_id () const
         return m_generic.psimple_polygon_aref->properties_id ();
       case Edge:
         return m_generic.pedge->properties_id ();
+      case EdgePair:
+        return m_generic.pedge_pair->properties_id ();
       case Path:
         return m_generic.ppath->properties_id ();
       case PathRef:
@@ -701,6 +705,8 @@ Shape::box_type Shape::bbox () const
     return basic_ptr (text_ptr_array_type::tag ())->bbox (db::box_convert<text_ptr_type> ());
   case Edge:
     return box_type (edge ().p1 (), edge ().p2 ());
+  case EdgePair:
+    return edge_pair ().bbox ();
   case Path:
     return path ().box ();
   case PathRef:
@@ -772,6 +778,9 @@ Shape::to_string () const
   case Edge:
     r = "edge " + edge ().to_string ();
     break;
+  case EdgePair:
+    r = "edge_pair " + edge_pair ().to_string ();
+    break;
   case Path:
   case PathRef:
   case PathPtrArrayMember:
@@ -810,6 +819,4 @@ Shape::to_string () const
   return r;
 }
 
-
 }
-

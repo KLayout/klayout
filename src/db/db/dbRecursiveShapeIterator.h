@@ -38,6 +38,7 @@ namespace db
 {
 
 class Region;
+class RecursiveShapeReceiver;
 
 /**
  *  @brief An iterator delivering shapes that touch or overlap the given region recursively
@@ -266,6 +267,29 @@ public:
   }
 
   /**
+   *  @brief Specify the minimum hierarchy depth to look into
+   *
+   *  A depth of 0 instructs the iterator to deliver shapes from the top level.
+   *  1 instructs to deliver shapes from the first child level.
+   *  The minimum depth must be specified before the shapes are being retrieved.
+   */
+  void min_depth (int depth)
+  {
+    if (m_min_depth != depth) {
+      m_min_depth = depth;
+      m_needs_reinit = true;
+    }
+  }
+
+  /**
+   *  @brief Gets the minimum hierarchy depth to search for
+   */
+  int min_depth () const
+  {
+    return m_min_depth;
+  }
+
+  /**
    *  @brief Gets the iterated shapes
    *
    *  Alternatively to layout/cell, the shape iterator can iterate shapes which will 
@@ -417,18 +441,23 @@ public:
   void reset_selection ();
 
   /**
-   *  @brief Specify the minimum hierarchy depth to look into
+   *  @brief Returns the cells in the "enable" selection
    *
-   *  A depth of 0 instructs the iterator to deliver shapes from the top level.
-   *  1 instructs to deliver shapes from the first child level.
-   *  The minimum depth must be specified before the shapes are being retrieved.
+   *  Cells in this set make the iterator become active, while cells in the
+   *  disable selection make the iterator inactive. Only when active, the
+   *  iterator will deliver shapes.
    */
-  void min_depth (int depth) 
-  { 
-    if (m_min_depth != depth) {
-      m_min_depth = depth; 
-      m_needs_reinit = true;
-    }
+  const std::set<db::cell_index_type> &enables () const
+  {
+    return m_start;
+  }
+
+  /**
+   *  @brief Returns the cells in the "disable" selection
+   */
+  const std::set<db::cell_index_type> &disables () const
+  {
+    return m_stop;
   }
 
   /**
@@ -444,6 +473,28 @@ public:
       m_needs_reinit = true;
     }
   }
+
+  /**
+   *  @brief Gets the shape selection flags
+   */
+  unsigned int shape_flags () const
+  {
+    return m_shape_flags;
+  }
+
+  /**
+   *  @brief Changes the layer to be traversed
+   *
+   *  This method must be used before shapes are being retrieved. Using this method may reset the iterator.
+   */
+  void set_layer (unsigned int layer);
+
+  /**
+   *  @brief Changes the layers to be traversed
+   *
+   *  This method must be used before shapes are being retrieved. Using this method may reset the iterator.
+   */
+  void set_layers (const std::vector<unsigned int> &layers);
 
   /**
    *  @brief Specify the property selector
@@ -479,7 +530,7 @@ public:
    */
   unsigned int layer () const
   {
-    validate ();
+    validate (0);
     return m_layer;
   }
 
@@ -514,30 +565,30 @@ public:
    */
   const cplx_trans_type &trans () const
   {
-    validate ();
+    validate (0);
     return m_trans;
   }
 
   /**
-   *  @brief Get the current depth
+   *  @brief Gets the current depth
    *
    *  Returns the number of hierarchy levels we are below top level currently.
    */
   unsigned int depth () const
   {
-    validate ();
+    validate (0);
     return (unsigned int) m_trans_stack.size ();
   }
 
   /**
-   *  @brief Get the current shape
+   *  @brief Gets the current shape
    *
    *  Returns the shape currently referred to by the recursive iterator. 
    *  This shape is not transformed yet and is located in the current cell.
    */
   shape_type shape () const
   {
-    validate ();
+    validate (0);
     return *m_shape;
   }
 
@@ -548,7 +599,7 @@ public:
    */
   shape_type operator* () const
   {
-    validate ();
+    validate (0);
     return *m_shape;
   }
 
@@ -559,7 +610,7 @@ public:
    */
   const shape_type *operator-> () const
   {
-    validate ();
+    validate (0);
     return m_shape.operator-> ();
   }
 
@@ -571,38 +622,39 @@ public:
   bool at_end () const;
 
   /**
-   *  @brief Get the current cell's index 
+   *  @brief Gets the current cell's index
    */
   db::cell_index_type cell_index () const
   {
-    validate ();
-    size_t c = reinterpret_cast<size_t> (mp_cell);
-    return reinterpret_cast<const cell_type *> (c - (c & size_t (1)))->cell_index ();
+    return cell ()->cell_index ();
   }
 
   /**
-   *  @brief Get the current cell's reference 
+   *  @brief Gets the current cell's reference
    */
   const cell_type *cell () const
   {
-    validate ();
+    validate (0);
     size_t c = reinterpret_cast<size_t> (mp_cell);
-    return reinterpret_cast<const cell_type *> (c - (c & size_t (1)));
+    return reinterpret_cast<const cell_type *> (c - (c & size_t (3)));
   }
 
   /**
-   *  @brief Increment the iterator (operator version)
+   *  @brief Increments the iterator (operator version)
    */
   RecursiveShapeIterator &operator++() 
   {
-    next ();
+    next (0);
     return *this;
   }
 
   /**
-   *  @brief Increment the iterator
+   *  @brief Increments the iterator
    */
-  void next ();
+  void next ()
+  {
+    next (0);
+  }
 
   /**
    *  @brief Comparison of iterators - equality
@@ -637,6 +689,20 @@ public:
    *  @brief The instance path
    */
   std::vector<db::InstElement> path () const;
+
+  /**
+   *  @brief Push-mode delivery
+   *
+   *  This method will deliver all shapes to the given receiver.
+   *  In contrast to pull mode, this method allows tailoring the
+   *  traversal of the hierarchy tree during iteration.
+   *  For this purpose, the receiver has methods that receive
+   *  events and to some extend may modify the traversal (e.g.
+   *  return value of enter_cell).
+   *
+   *  See RecursiveShapeReceiver class for more details.
+   */
+  void push (RecursiveShapeReceiver *receiver);
 
 private:
   std::vector<unsigned int> m_layers;
@@ -681,14 +747,16 @@ private:
   void init_region (const box_type &region);
   void skip_shape_iter_for_complex_region () const;
   void skip_inst_iter_for_complex_region () const;
-  void validate () const;
+  void validate (RecursiveShapeReceiver *receiver) const;
   void start_shapes () const;
-  void next_shape () const;
-  void new_inst () const;
-  void new_cell () const;
+  void next (RecursiveShapeReceiver *receiver);
+  void next_shape (RecursiveShapeReceiver *receiver) const;
+  void new_inst (RecursiveShapeReceiver *receiver) const;
+  void new_inst_member (RecursiveShapeReceiver *receiver) const;
+  void new_cell (RecursiveShapeReceiver *receiver) const;
   void new_layer () const;
-  void up () const;
-  void down () const;
+  void up (RecursiveShapeReceiver *receiver) const;
+  void down (RecursiveShapeReceiver *receiver) const;
 
   bool is_outside_complex_region (const db::Box &box) const;
 
@@ -701,12 +769,133 @@ private:
   {
     size_t c = reinterpret_cast<size_t> (mp_cell);
     c -= (c & size_t (1));
-    mp_cell = reinterpret_cast<const db::Cell *> (c + a);
+    mp_cell = reinterpret_cast<const db::Cell *> (c + (a ? 1 : 0));
   }
+
+  bool is_all_of_instance () const
+  {
+    return (reinterpret_cast<size_t> (mp_cell) & size_t (2)) != 0;
+  }
+
+  void set_all_of_instance (bool a) const
+  {
+    size_t c = reinterpret_cast<size_t> (mp_cell);
+    c -= (c & size_t (2));
+    mp_cell = reinterpret_cast<const db::Cell *> (c + (a ? 2 : 0));
+  }
+};
+
+/**
+ *  @brief A receiver interface for "push" mode
+ *
+ *  In push mode, the iterator will deliver the shapes and hierarchy transitions
+ *  to this interface. See "RecursiveShapeIterator::push" for details about this
+ *  mode.
+ *
+ *  The receiver receives events for the start of the delivery, on each cell
+ *  entry and on each instance (followed by a cell entry). It also receives
+ *  the shapes.
+ */
+class DB_PUBLIC RecursiveShapeReceiver
+{
+public:
+  typedef RecursiveShapeIterator::box_tree_type box_tree_type;
+
+  /**
+   *  @brief See new_inst for details.
+   */
+  enum  new_inst_mode { NI_all = 0, NI_single = 1, NI_skip = 2 };
+
+  /**
+   *  @brief Constructor
+   */
+  RecursiveShapeReceiver () { }
+
+  /**
+   *  @brief Destructor
+   */
+  virtual ~RecursiveShapeReceiver () { }
+
+  /**
+   *  @brief Called once when the iterator begins pushing
+   */
+  virtual void begin (const RecursiveShapeIterator * /*iter*/) { }
+
+  /**
+   *  @brief Called once after the iterator pushed everything
+   */
+  virtual void end (const RecursiveShapeIterator * /*iter*/) { }
+
+  /**
+   *  @brief Enters a cell
+   *
+   *  This method is called when the recursive shape iterator
+   *  enters a new cell. It is not called for the top cell. When it is called, "iter->trans()"
+   *  will already be updated.
+   *
+   *  @param iter The iterator
+   *  @param cell The cell which is entered
+   *  @param region The clip box as seen from "cell" or db::Box::world if there is no clip box
+   *  @param complex_region A complex clip region if one is supplied together with "region"
+   */
+  virtual void enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
+
+  /**
+   *  @brief Leaves the current cell
+   *
+   *  This method is the counterpart for "enter_cell". It is called when traversal of "cell" ended.
+   */
+  virtual void leave_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/) { }
+
+  /**
+   *  @brief Enters a new instance
+   *
+   *  This method is called before "enter_cell" and "new_inst_member" is called and will indicate the instance to follow.
+   *  The sequence of events is
+   *
+   *    new_inst(A)
+   *    new_inst_member(A[0,0])
+   *    enter_cell(A)
+   *    ...
+   *    leave_cell(A)
+   *    new_inst_member(A[1,0])
+   *    enter_cell(A)
+   *    ...
+   *    leave_cell(A)
+   *    ...
+   *    new_inst(B)
+   *    ...
+   *
+   *  The "all" parameter is true, if all instances of the array will be addressed.
+   *
+   *  This method can return the following values:
+   *   - NI_all: iterate all members through "new_inst_member"
+   *   - NI_single: iterate a single member (the first one)
+   *   - NI_skip: skips the whole array (not a single instance is iterated)
+   */
+  virtual new_inst_mode new_inst (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return NI_all; }
+
+  /**
+   *  @brief Enters a new array member of the instance
+   *
+   *  See "new_inst" for a description. This method adds the "trans" parameter
+   *  which holds the complex transformation for this particular instance of
+   *  the array.
+   *
+   *  "all" is true, if an instance array is iterated in "all" mode (see new_inst).
+   *
+   *  If this method returns false, this array instance (but not the whole array) is skipped and the cell is not entered.
+   */
+  virtual bool new_inst_member (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return true; }
+
+  /**
+   *  @brief Delivers a shape
+   *
+   *  @param trans The transformation which maps the shape to the top cell.
+   */
+  virtual void shape (const RecursiveShapeIterator * /*iter*/, const db::Shape & /*shape*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
 };
 
 }  // namespace db
 
 #endif
-
-

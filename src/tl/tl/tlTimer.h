@@ -118,6 +118,7 @@ public:
   {
     m_enabled = true;
     start ();
+    start_report ();
   }
 
   /**
@@ -131,6 +132,7 @@ public:
     m_enabled = enabled;
     if (enabled) {
       start ();
+      start_report ();
     }
   }
 
@@ -144,6 +146,7 @@ public:
 
 private:
   void report () const;
+  void start_report () const;
 
   std::string m_desc;
   bool m_enabled;

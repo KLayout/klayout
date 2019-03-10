@@ -122,13 +122,21 @@ struct box_scanner_receiver
    */
   void finish (const Obj * /*obj*/, const Prop & /*prop*/) { }
 
-  /*
+  /**
    *  @brief Callback for an interaction of o1 with o2.
    *
    *  This method is called when the object o1 interacts with o2 within the current 
    *  definition.
    */
   void add (const Obj * /*o1*/, const Prop & /*p1*/, const Obj * /*o2*/, const Prop & /*p2*/) { }
+
+  /**
+   *  @brief Indicates whether the scanner may stop
+   *
+   *  The scanner will stop if this method returns true. This feature can be used to
+   *  terminate the scan process early if the outcome is known.
+   */
+  bool stop () const { return false; }
 };
 
 /**
@@ -250,9 +258,13 @@ public:
    *
    *  The box converter must be capable of converting the Obj object into a box. 
    *  It must provide a box_type typedef.
+   *
+   *  The scanner process can be terminated early by making the receiver's
+   *  stop() method return true. In this case, this method will return false.
+   *  Otherwise it will return true.
    */
   template <class Rec, class BoxConvert>
-  void process (Rec &rec, typename BoxConvert::box_type::coord_type enl, const BoxConvert &bc = BoxConvert ())
+  bool process (Rec &rec, typename BoxConvert::box_type::coord_type enl, const BoxConvert &bc = BoxConvert ())
   {
     typedef typename BoxConvert::box_type box_type;
     typedef typename box_type::coord_type coord_type;
@@ -261,14 +273,37 @@ public:
     typedef bs_side_compare_vs_const_func<BoxConvert, Obj, Prop, box_top<Box> > below_func;
     typedef bs_side_compare_vs_const_func<BoxConvert, Obj, Prop, box_right<Box> > left_func;
 
+    //  sort out the entries with an empty bbox (we must not put that into sort)
+
+    typename container_type::iterator wi = m_pp.begin ();
+    for (typename container_type::iterator ri = m_pp.begin (); ri != m_pp.end (); ++ri) {
+      if (! bc (*ri->first).empty ()) {
+        if (wi != ri) {
+          *wi = *ri;
+        }
+        ++wi;
+      } else {
+        //  we call finish on empty elements though
+        rec.finish (ri->first, ri->second);
+      }
+    }
+
+    if (wi != m_pp.end ()) {
+      m_pp.erase (wi, m_pp.end ());
+    }
+
     if (m_pp.size () <= m_scanner_thr) {
 
       //  below m_scanner_thr elements use the brute force approach which is faster in that case
 
       for (iterator_type i = m_pp.begin (); i != m_pp.end (); ++i) {
+        box_type b1 = bc (*i->first);
         for (iterator_type j = i + 1; j != m_pp.end (); ++j) {
-          if (bs_boxes_overlap (bc (*i->first), bc (*j->first), enl)) {
+          if (bs_boxes_overlap (b1, bc (*j->first), enl)) {
             rec.add (i->first, i->second, j->first, j->second);
+            if (rec.stop ()) {
+              return false;
+            }
           }
         }
       }
@@ -355,6 +390,9 @@ public:
                 if (seen.insert (std::make_pair (i->first, j->first)).second) {
                   seen.insert (std::make_pair (j->first, i->first));
                   rec.add (i->first, i->second, j->first, j->second);
+                  if (rec.stop ()) {
+                    return false;
+                  }
                 }
               }
             }
@@ -379,10 +417,438 @@ public:
 
     }
 
+    return true;
+
   }
 
 private:
   container_type m_pp;
+  double m_fill_factor;
+  size_t m_scanner_thr;
+  bool m_report_progress;
+  std::string m_progress_desc;
+};
+
+/**
+ *  @brief A template for the twofold box scanner output receiver
+ *
+ *  This template specifies the methods or provides a default implementation for them
+ *  for use as the output receiver of the twofold box scanner.
+ */
+template <class Obj1, class Prop1, class Obj2, class Prop2>
+struct box_scanner_receiver2
+{
+  /**
+   *  @brief Indicates that the given object of first type is no longer used
+   *
+   *  The finish1 method is called when an object of the first type is no longer in the queue and can be
+   *  discarded.
+   */
+  void finish1 (const Obj1 * /*obj*/, const Prop1 & /*prop*/) { }
+
+  /**
+   *  @brief Indicates that the given object of second type is no longer used
+   *
+   *  The finish method is called when an object of the second type is no longer in the queue and can be
+   *  discarded.
+   */
+  void finish2 (const Obj2 * /*obj*/, const Prop2 & /*prop*/) { }
+
+  /**
+   *  @brief Callback for an interaction of o1 with o2.
+   *
+   *  This method is called when the object o1 interacts with o2 within the current
+   *  definition.
+   */
+  void add (const Obj1 * /*o1*/, const Prop1 & /*p1*/, const Obj2 * /*o2*/, const Prop2 & /*p2*/) { }
+
+  /**
+   *  @brief Indicates whether the scanner may stop
+   *
+   *  The scanner will stop if this method returns true. This feature can be used to
+   *  terminate the scan process early if the outcome is known.
+   */
+  bool stop () const { return false; }
+};
+
+/**
+ *  @brief A box scanner framework (twofold version)
+ *
+ *  This implementation provides a box scanner for two different types. Apart from
+ *  that it is similar to the uniform-type box scanner.
+ *
+ *  It will not report interactions within the Obj1 or Obj2 group, but only
+ *  interactions between Obj1 and Obj2 objects.
+ */
+template <class Obj1, class Prop1, class Obj2, class Prop2>
+class box_scanner2
+{
+public:
+  typedef Obj1 object_type1;
+  typedef Obj2 object_type2;
+  typedef std::vector<std::pair<const Obj1 *, Prop1> > container_type1;
+  typedef std::vector<std::pair<const Obj2 *, Prop2> > container_type2;
+  typedef typename container_type1::iterator iterator_type1;
+  typedef typename container_type2::iterator iterator_type2;
+
+  /**
+   *  @brief Default ctor
+   */
+  box_scanner2 (bool report_progress = false, const std::string &progress_desc = std::string ())
+    : m_fill_factor (2), m_scanner_thr (100),
+      m_report_progress (report_progress), m_progress_desc (progress_desc)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Sets the scanner threshold
+   *
+   *  This value determines for how many elements the implementation switches to the scanner
+   *  implementation instead of the plain element-by-element interaction test.
+   *  The default value is 100.
+   */
+  void set_scanner_threshold (size_t n)
+  {
+    m_scanner_thr = n;
+  }
+
+  /**
+   *  @brief Gets the scanner threshold
+   */
+  size_t scanner_threshold () const
+  {
+    return m_scanner_thr;
+  }
+
+  /**
+   *  @brief Sets the fill factor
+   *
+   *  The fill factor determines how many new entries will be collected for a band.
+   *  A fill factor of 2 means that the number of elements in the band will be
+   *  doubled after elements outside of the band have been removed.
+   *  The default fill factor is 2.
+   */
+  void set_fill_factor (double ff)
+  {
+    m_fill_factor = ff;
+  }
+
+  /**
+   *  @brief Gets the fill factor
+   */
+  double fill_factor () const
+  {
+    return m_fill_factor;
+  }
+
+  /**
+   *  @brief Reserve for n elements of Obj1 type
+   */
+  void reserve1 (size_t n)
+  {
+    m_pp1.reserve (n);
+  }
+
+  /**
+   *  @brief Reserve for n elements of Obj2 type
+   */
+  void reserve2 (size_t n)
+  {
+    m_pp2.reserve (n);
+  }
+
+  /**
+   *  @brief Clears the container
+   */
+  void clear ()
+  {
+    m_pp1.clear ();
+    m_pp2.clear ();
+  }
+
+  /**
+   *  @brief Inserts a new object of type Obj1 into the scanner
+   *
+   *  The object's pointer is stored, so the object must remain valid until the
+   *  scanner does not need it any longer. An additional property can be attached to
+   *  the object which will be stored along with the object.
+   */
+  void insert1 (const Obj1 *obj, const Prop1 &prop)
+  {
+    m_pp1.push_back (std::make_pair (obj, prop));
+  }
+
+  /**
+   *  @brief Inserts a new object of type Obj2 into the scanner
+   *
+   *  The object's pointer is stored, so the object must remain valid until the
+   *  scanner does not need it any longer. An additional property can be attached to
+   *  the object which will be stored along with the object.
+   */
+  void insert2 (const Obj2 *obj, const Prop2 &prop)
+  {
+    m_pp2.push_back (std::make_pair (obj, prop));
+  }
+
+  /**
+   *  @brief Get the interactions between the stored objects
+   *
+   *  Two objects interact if the boxes of the objects enlarged by the given value overlap.
+   *  The enlargement is specified in units of width and height, i.e. half of the enlargement
+   *  is applied to one side before the overlap check.
+   *
+   *  An enlargement of 1 means that boxes have to touch only in order to get an interaction.
+   *
+   *  The box scanner will report all interactions of type Obj1 and Obj2 objects to the receiver object.
+   *  See box_scanner_receiver2 for details about the methods that this object must provide.
+   *
+   *  The box converter 1 must be capable of converting the Obj1 object into a box.
+   *  It must provide a box_type typedef. The box converter 2 must be able to convert Obj2 to
+   *  a box. The box type of both box converters must be identical.
+   *
+   *  The scanner process can be terminated early by making the receiver's
+   *  stop() method return true. In this case, this method will return false.
+   *  Otherwise it will return true.
+   */
+  template <class Rec, class BoxConvert1, class BoxConvert2>
+  bool process (Rec &rec, typename BoxConvert1::box_type::coord_type enl, const BoxConvert1 &bc1 = BoxConvert1 (), const BoxConvert2 &bc2 = BoxConvert2 ())
+  {
+    typedef typename BoxConvert1::box_type box_type; //  must be same as BoxConvert2::box_type
+    typedef typename box_type::coord_type coord_type;
+    typedef bs_side_compare_func<BoxConvert1, Obj1, Prop1, box_bottom<Box> > bottom_side_compare_func1;
+    typedef bs_side_compare_func<BoxConvert1, Obj1, Prop1, box_left<Box> > left_side_compare_func1;
+    typedef bs_side_compare_vs_const_func<BoxConvert1, Obj1, Prop1, box_top<Box> > below_func1;
+    typedef bs_side_compare_vs_const_func<BoxConvert1, Obj1, Prop1, box_right<Box> > left_func1;
+    typedef bs_side_compare_func<BoxConvert2, Obj2, Prop2, box_bottom<Box> > bottom_side_compare_func2;
+    typedef bs_side_compare_func<BoxConvert2, Obj2, Prop2, box_left<Box> > left_side_compare_func2;
+    typedef bs_side_compare_vs_const_func<BoxConvert2, Obj2, Prop2, box_top<Box> > below_func2;
+    typedef bs_side_compare_vs_const_func<BoxConvert2, Obj2, Prop2, box_right<Box> > left_func2;
+
+    //  sort out the entries with an empty bbox (we must not put that into sort)
+
+    typename container_type1::iterator wi1 = m_pp1.begin ();
+    for (typename container_type1::iterator ri1 = m_pp1.begin (); ri1 != m_pp1.end (); ++ri1) {
+      if (! bc1 (*ri1->first).empty ()) {
+        if (wi1 != ri1) {
+          *wi1 = *ri1;
+        }
+        ++wi1;
+      } else {
+        //  we call finish on empty elements though
+        rec.finish1 (ri1->first, ri1->second);
+      }
+    }
+
+    if (wi1 != m_pp1.end ()) {
+      m_pp1.erase (wi1, m_pp1.end ());
+    }
+
+    typename container_type2::iterator wi2 = m_pp2.begin ();
+    for (typename container_type2::iterator ri2 = m_pp2.begin (); ri2 != m_pp2.end (); ++ri2) {
+      if (! bc2 (*ri2->first).empty ()) {
+        if (wi2 != ri2) {
+          *wi2 = *ri2;
+        }
+        ++wi2;
+      } else {
+        //  we call finish on empty elements though
+        rec.finish2 (ri2->first, ri2->second);
+      }
+    }
+
+    if (wi2 != m_pp2.end ()) {
+      m_pp2.erase (wi2, m_pp2.end ());
+    }
+
+    if (m_pp1.empty () || m_pp2.empty ()) {
+
+      //  trivial case
+
+      for (iterator_type1 i = m_pp1.begin (); i != m_pp1.end (); ++i) {
+        rec.finish1 (i->first, i->second);
+      }
+      for (iterator_type2 i = m_pp2.begin (); i != m_pp2.end (); ++i) {
+        rec.finish2 (i->first, i->second);
+      }
+
+    } else if (m_pp1.size () + m_pp2.size () <= m_scanner_thr) {
+
+      //  below m_scanner_thr elements use the brute force approach which is faster in that case
+
+      for (iterator_type1 i = m_pp1.begin (); i != m_pp1.end (); ++i) {
+        box_type b1 = bc1 (*i->first);
+        for (iterator_type2 j = m_pp2.begin (); j != m_pp2.end (); ++j) {
+          if (bs_boxes_overlap (b1, bc2 (*j->first), enl)) {
+            rec.add (i->first, i->second, j->first, j->second);
+            if (rec.stop ()) {
+              return false;
+            }
+          }
+        }
+      }
+
+      for (iterator_type1 i = m_pp1.begin (); i != m_pp1.end (); ++i) {
+        rec.finish1 (i->first, i->second);
+      }
+      for (iterator_type2 i = m_pp2.begin (); i != m_pp2.end (); ++i) {
+        rec.finish2 (i->first, i->second);
+      }
+
+    } else {
+
+      std::set<std::pair<const Obj1 *, const Obj2 *> > seen1;
+      std::set<std::pair<const Obj2 *, const Obj1 *> > seen2;
+
+      std::sort (m_pp1.begin (), m_pp1.end (), bottom_side_compare_func1 (bc1));
+      std::sort (m_pp2.begin (), m_pp2.end (), bottom_side_compare_func2 (bc2));
+
+      coord_type y = std::min (bc1 (*m_pp1.front ().first).bottom (), bc2 (*m_pp2.front ().first).bottom ());
+
+      iterator_type1 current1 = m_pp1.begin ();
+      iterator_type1 future1 = m_pp1.begin ();
+      iterator_type2 current2 = m_pp2.begin ();
+      iterator_type2 future2 = m_pp2.begin ();
+
+      std::auto_ptr<tl::RelativeProgress> progress (0);
+      if (m_report_progress) {
+        if (m_progress_desc.empty ()) {
+          progress.reset (new tl::RelativeProgress (tl::to_string (tr ("Processing")), m_pp1.size () + m_pp2.size (), 1000));
+        } else {
+          progress.reset (new tl::RelativeProgress (m_progress_desc, m_pp1.size () + m_pp2.size (), 1000));
+        }
+      }
+
+      while (future1 != m_pp1.end () || future2 != m_pp2.end ()) {
+
+        iterator_type1 cc1 = current1;
+        iterator_type2 cc2 = current2;
+        current1 = std::partition (current1, future1, below_func1 (bc1, y + 1 - enl));
+        current2 = std::partition (current2, future2, below_func2 (bc2, y + 1 - enl));
+
+        while (cc1 != current1) {
+          rec.finish1 (cc1->first, cc1->second);
+          typename std::set<std::pair<const Obj1 *, const Obj2 *> >::iterator s;
+          s = seen1.lower_bound (std::make_pair (cc1->first, (const Obj2 *)0));
+          while (s != seen1.end () && s->first == cc1->first) {
+            seen1.erase (s++);
+          }
+          ++cc1;
+        }
+
+        while (cc2 != current2) {
+          rec.finish2 (cc2->first, cc2->second);
+          typename std::set<std::pair<const Obj2 *, const Obj1 *> >::iterator s;
+          s = seen2.lower_bound (std::make_pair (cc2->first, (const Obj1 *)0));
+          while (s != seen2.end () && s->first == cc2->first) {
+            seen2.erase (s++);
+          }
+          ++cc2;
+        }
+
+        //  add at least the required items per band
+        size_t min_band_size = size_t ((future1 - current1) * m_fill_factor) + size_t ((future2 - current2) * m_fill_factor);
+        coord_type yy = y;
+        do {
+          if (future1 != m_pp1.end () && future2 != m_pp2.end ()) {
+            yy = std::min (bc1 (*future1->first).bottom (), bc2 (*future2->first).bottom ());
+          } else if (future1 != m_pp1.end ()) {
+            yy = bc1 (*future1->first).bottom ();
+          } else {
+            yy = bc2 (*future2->first).bottom ();
+          }
+          while (future1 != m_pp1.end () && bc1 (*future1->first).bottom () == yy) {
+            ++future1;
+          }
+          while (future2 != m_pp2.end () && bc2 (*future2->first).bottom () == yy) {
+            ++future2;
+          }
+        } while ((future1 != m_pp1.end () || future2 != m_pp2.end ()) && size_t (future1 - current1) + size_t (future2 - current2) < min_band_size);
+
+        if (current1 != future1 && current2 != future2) {
+
+          std::sort (current1, future1, left_side_compare_func1 (bc1));
+          std::sort (current2, future2, left_side_compare_func2 (bc2));
+
+          iterator_type1 c1 = current1;
+          iterator_type1 f1 = current1;
+          iterator_type2 c2 = current2;
+          iterator_type2 f2 = current2;
+
+          coord_type x = std::min (bc1 (*c1->first).left (), bc2 (*c2->first).left ());
+
+          while (f1 != future1 || f2 != future2) {
+
+            c1 = std::partition (c1, f1, left_func1 (bc1, x + 1 - enl));
+            c2 = std::partition (c2, f2, left_func2 (bc2, x + 1 - enl));
+
+            //  add at least the required items per band
+            size_t min_box_size = size_t ((f1 - c1) * m_fill_factor) + size_t ((f2 - c2) * m_fill_factor);
+            coord_type xx = x;
+            do {
+              if (f1 != future1 && f2 != future2) {
+                xx = std::min (bc1 (*f1->first).left (), bc2 (*f2->first).left ());
+              } else if (f1 != future1) {
+                xx = bc1 (*f1->first).left ();
+              } else if (f2 != future2) {
+                xx = bc2 (*f2->first).left ();
+              }
+              while (f1 != future1 && bc1 (*f1->first).left () == xx) {
+                ++f1;
+              }
+              while (f2 != future2 && bc2 (*f2->first).left () == xx) {
+                ++f2;
+              }
+            } while ((f1 != future1 || f2 != future2) && size_t (f1 - c1) + size_t (f2 - c2) < min_box_size);
+
+            if (c1 != f1 && c2 != f2) {
+              for (iterator_type1 i = c1; i != f1; ++i) {
+                for (iterator_type2 j = c2; j < f2; ++j) {
+                  if (bs_boxes_overlap (bc1 (*i->first), bc2 (*j->first), enl)) {
+                    if (seen1.insert (std::make_pair (i->first, j->first)).second) {
+                      seen2.insert (std::make_pair (j->first, i->first));
+                      rec.add (i->first, i->second, j->first, j->second);
+                      if (rec.stop ()) {
+                        return false;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            x = xx;
+
+            if (m_report_progress) {
+              progress->set (std::min (f1 - m_pp1.begin (), f2 - m_pp2.begin ()));
+            }
+
+          }
+
+        }
+
+        y = yy;
+
+      }
+
+      while (current1 != m_pp1.end ()) {
+        rec.finish1 (current1->first, current1->second);
+        ++current1;
+      }
+      while (current2 != m_pp2.end ()) {
+        rec.finish2 (current2->first, current2->second);
+        ++current2;
+      }
+
+    }
+
+    return true;
+
+  }
+
+private:
+  container_type1 m_pp1;
+  container_type2 m_pp2;
   double m_fill_factor;
   size_t m_scanner_thr;
   bool m_report_progress;

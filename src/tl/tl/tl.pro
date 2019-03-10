@@ -41,7 +41,10 @@ SOURCES = \
     tlThreads.cc \
     tlDeferredExecution.cc \
     tlUri.cc \
-    tlLongInt.cc
+    tlLongInt.cc \
+    tlUniqueId.cc \
+    tlList.cc \
+    tlEquivalenceClusters.cc
 
 HEADERS = \
     tlAlgorithm.h \
@@ -92,7 +95,10 @@ HEADERS = \
     tlThreads.h \
     tlDeferredExecution.h \
     tlUri.h \
-    tlLongInt.h
+    tlLongInt.h \
+    tlUniqueId.h \
+    tlList.h \
+    tlEquivalenceClusters.h
 
 equals(HAVE_CURL, "1") {
 

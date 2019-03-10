@@ -130,12 +130,12 @@ bool Object::has_strong_references () const
   return false;
 }
 
-void Object::keep ()
+void Object::keep_object ()
 {
   mp_ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) | size_t (1));
 }
 
-void Object::release ()
+void Object::release_object ()
 {
   mp_ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) & ~size_t (1));
 

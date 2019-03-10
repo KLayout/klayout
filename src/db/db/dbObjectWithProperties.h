@@ -29,6 +29,7 @@
 #include "dbPolygon.h"
 #include "dbPath.h"
 #include "dbEdge.h"
+#include "dbEdgePair.h"
 #include "dbText.h"
 #include "dbBox.h"
 #include "dbArray.h"
@@ -195,6 +196,9 @@ typedef object_with_properties<DPathRef> DPathRefWithProperties;
 
 typedef object_with_properties<Edge> EdgeWithProperties;
 typedef object_with_properties<DEdge> DEdgeWithProperties;
+
+typedef object_with_properties<EdgePair> EdgePairWithProperties;
+typedef object_with_properties<DEdgePair> DEdgePairWithProperties;
 
 typedef object_with_properties<Text> TextWithProperties;
 typedef object_with_properties<DText> DTextWithProperties;

@@ -135,6 +135,11 @@ protected:
   void write_edge (int layer, int datatype, double sf, const db::Shape &shape, const db::Layout &layout, db::properties_id_type prop_id);
 
   /**
+   *  @brief Writes an edge
+   */
+  void write_edge (int layer, int datatype, double sf, const db::Edge &edge, const db::Layout &layout, db::properties_id_type prop_id);
+
+  /**
    *  @brief Write a shape as path
    */
   void write_path (int layer, int datatype, double sf, const db::Shape &shape, bool multi_xy, const db::Layout &layout, db::properties_id_type prop_id);

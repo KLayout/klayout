@@ -119,7 +119,60 @@ SOURCES = \
   gsiDeclDbVector.cc \
   gsiDeclDbLayoutDiff.cc \
   gsiDeclDbGlyphs.cc \
-    dbConverters.cc
+    dbConverters.cc \
+    dbAsIfFlatRegion.cc \
+    dbEmptyRegion.cc \
+    dbFlatRegion.cc \
+    dbOriginalLayerRegion.cc \
+    dbRegionDelegate.cc \
+    dbEdgesDelegate.cc \
+    dbEmptyEdges.cc \
+    dbAsIfFlatEdges.cc \
+    dbFlatEdges.cc \
+    dbEdgeBoolean.cc \
+    dbOriginalLayerEdges.cc \
+    dbAsIfFlatEdgePairs.cc \
+    dbEmptyEdgePairs.cc \
+    dbFlatEdgePairs.cc \
+    dbOriginalLayerEdgePairs.cc \
+    dbEdgePairsDelegate.cc \
+    dbDeepShapeStore.cc \
+    dbHierarchyBuilder.cc \
+    dbLocalOperation.cc \
+    dbHierProcessor.cc \
+    dbDeepRegion.cc \
+    dbHierNetworkProcessor.cc \
+    dbNetlist.cc \
+    gsiDeclDbNetlist.cc \
+    dbNetlistDeviceClasses.cc \
+    dbNetlistDeviceExtractor.cc \
+    dbNetlistExtractor.cc \
+    gsiDeclDbNetlistDeviceClasses.cc \
+    gsiDeclDbNetlistDeviceExtractor.cc \
+    gsiDeclDbHierNetworkProcessor.cc \
+    dbNetlistDeviceExtractorClasses.cc \
+    dbLayoutToNetlist.cc \
+    gsiDeclDbLayoutToNetlist.cc \
+    dbCircuit.cc \
+    dbDevice.cc \
+    dbDeviceClass.cc \
+    dbNet.cc \
+    dbSubCircuit.cc \
+    dbPin.cc \
+    dbLayoutToNetlistReader.cc \
+    dbLayoutToNetlistWriter.cc \
+    dbLayoutToNetlistFormatDefs.cc \
+    dbDeviceAbstract.cc \
+    dbLocalOperationUtils.cc \
+    gsiDeclDbDeepShapeStore.cc \
+    dbNetlistSpiceWriter.cc \
+    dbNetlistWriter.cc \
+    dbCellVariants.cc \
+    dbDeepEdges.cc \
+    dbDeepEdgePairs.cc \
+    dbRegionUtils.cc \
+    dbEdgesUtils.cc \
+    dbRegionProcessors.cc
 
 HEADERS = \
   dbArray.h \
@@ -209,6 +262,54 @@ HEADERS = \
   dbPlugin.h \
   dbInit.h \
     dbConverters.h \
+    dbAsIfFlatRegion.h \
+    dbEmptyRegion.h \
+    dbFlatRegion.h \
+    dbOriginalLayerRegion.h \
+    dbRegionDelegate.h \
+    dbEdgesDelegate.h \
+    dbEmptyEdges.h \
+    dbAsIfFlatEdges.h \
+    dbFlatEdges.h \
+    dbEdgeBoolean.h \
+    dbOriginalLayerEdges.h \
+    dbAsIfFlatEdgePairs.h \
+    dbEmptyEdgePairs.h \
+    dbFlatEdgePairs.h \
+    dbOriginalLayerEdgePairs.h \
+    dbEdgePairsDelegate.h \
+    dbDeepShapeStore.h \
+    dbHierarchyBuilder.h \
+    dbLocalOperation.h \
+    dbHierProcessor.h \
+    dbNetlist.h \
+    dbNetlistDeviceClasses.h \
+    dbNetlistDeviceExtractor.h \
+    dbNetlistExtractor.h \
+    dbNetlistDeviceExtractorClasses.h \
+    dbLayoutToNetlist.h \
+    dbHierNetworkProcessor.h \
+    dbNetlistUtils.h \
+    dbNet.h \
+    dbCircuit.h \
+    dbDevice.h \
+    dbDeviceClass.h \
+    dbPin.h \
+    dbSubCircuit.h \
+    dbLayoutToNetlistReader.h \
+    dbLayoutToNetlistWriter.h \
+    dbLayoutToNetlistFormatDefs.h \
+    dbDeviceAbstract.h \
+    dbLocalOperationUtils.h \
+    dbDeepRegion.h \
+    dbNetlistSpiceWriter.h \
+    dbNetlistWriter.h \
+    dbCellVariants.h \
+    dbDeepEdges.h \
+    dbDeepEdgePairs.h \
+    dbRegionUtils.h \
+    dbEdgesUtils.h \
+    dbRegionProcessors.h \
     gsiDeclDbHelpers.h
 
 !equals(HAVE_QT, "0") {

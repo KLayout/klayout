@@ -235,7 +235,7 @@ TEST(2)
   v = e.parse ("var b=B.new; b.bx(-1)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("xz"));
   /*
-  @@@ No detailed type analysis for ambiguity resolution so far: 
+  TODO: No detailed type analysis for ambiguity resolution so far:
   v = e.parse ("var b=B.new; b.bx('hello', 1)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("20.5"));
   */
@@ -297,10 +297,8 @@ TEST(2)
   v = e.parse ("b.amember_ref.a5(177)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
 
-  // @@@
   v = e.parse ("b.amember_or_nil(true)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("A: 177"));
-  // @@@
 
   bool error = false;
   try {

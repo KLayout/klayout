@@ -1,0 +1,77 @@
+
+# Foreign cell test
+
+source($drc_test_source, "TOPTOP_SMALL")
+target($drc_test_target)
+
+cell("TOPTOP_SMALL")
+
+l1_flat = input(1)
+l1_flat.is_deep? && raise("l1_flat should not be deep")
+
+is_deep? && raise("is_deep? is true")
+
+deep
+
+is_deep? || raise("is_deep? is false")
+
+l1 = input(1)
+l1.is_deep? || raise("l1 should be deep")
+l2 = input(2)
+l2.is_deep? || raise("l2 should be deep")
+
+flat
+
+is_deep? && raise("is_deep? is true")
+
+l2_flat = input(2)
+l2_flat.is_deep? && raise("l2_flat should not be deep")
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1_flat.output(11, 0)
+l2_flat.output(12, 0)
+
+r = l1.and(l2)
+r.output(1000, 0)
+r.extents.output(1100, 0)
+
+r = l1_flat.and(l2)
+r.output(1001, 0)
+r.extents.output(1101, 0)
+
+r = l1.and(l2_flat)
+r.output(1002, 0)
+r.extents.output(1102, 0)
+
+r = l1_flat.and(l2_flat)
+r.output(1003, 0)
+r.extents.output(1103, 0)
+
+r = l1.separation(l2, 0.3)
+r.output(1020, 0)
+r.extents.output(1120, 0)
+
+r = l1_flat.separation(l2, 0.3)
+r.output(1021, 0)
+r.extents.output(1121, 0)
+
+r = l1.separation(l2_flat, 0.3)
+r.output(1022, 0)
+r.extents.output(1122, 0)
+
+r = l1_flat.separation(l2_flat, 0.3)
+r.output(1023, 0)
+r.extents.output(1123, 0)
+
+r = l1.space(0.5)
+r.output(1010, 0)
+r.extents.output(1110, 0)
+
+l1.flatten
+r = l1.space(0.5)
+r.output(1011, 0)
+r.extents.output(1111, 0)
+
+

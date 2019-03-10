@@ -319,7 +319,7 @@ private:
  *  based on a generic operator.
  */
 template <class F>
-class DB_PUBLIC GenericMerge
+class DB_PUBLIC_TEMPLATE GenericMerge
   : public EdgeEvaluatorBase
 {
 public:
@@ -605,6 +605,14 @@ public:
    *  @brief Disable progress reporting
    */
   void disable_progress ();
+
+  /**
+   *  @brief Base verbosity for timer reporting
+   *
+   *  The default value is 30. Basic timing will be reported for > base_verbosity, detailed timing
+   *  for > base_verbosity + 10.
+   */
+  void set_base_verbosity (int bv);
 
   /**
    *  @brief Reserve space for at least n edges
@@ -943,6 +951,7 @@ private:
   std::vector <CutPoints> *mp_cpvector;
   bool m_report_progress;
   std::string m_progress_desc;
+  int m_base_verbosity;
 
   static size_t count_edges (const db::Polygon &q) 
   {

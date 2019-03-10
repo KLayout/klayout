@@ -105,9 +105,7 @@ class TextProgressDelegate
 public:
   TextProgressDelegate (MainWindow *mw, int verbosity);
 
-  virtual void set_progress_can_cancel (bool f);
-  virtual void set_progress_text (const std::string &text);
-  virtual void set_progress_value (double v, const std::string &value);
+  virtual void update_progress (tl::Progress *progress);
   virtual void show_progress_bar (bool show);
   virtual bool progress_wants_widget () const;
   virtual void progress_add_widget (QWidget *widget);
@@ -381,17 +379,7 @@ public:
   /**
    *  @brief Implementation of the lay::ProgressBar interface: set the flag indicating whether we can cancel the operation
    */
-  bool set_progress_can_cancel(bool f);
-
-  /**
-   *  @brief Implementation of the lay::ProgressBar interface: set the text to display
-   */
-  bool set_progress_text (const std::string &text);
-
-  /**
-   *  @brief Implementation of the lay::ProgressBar interface: set the value to display
-   */
-  bool set_progress_value (double v, const std::string &value);
+  bool update_progress (tl::Progress *progress);
 
   /**
    *  @brief Implementation of the lay::ProgressBar interface: Returns a value indicating whether a progress widget is wanted

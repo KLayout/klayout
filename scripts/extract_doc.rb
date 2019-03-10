@@ -72,6 +72,8 @@ class DocItem
       end
     end
 
+    self.name || raise("Doc block without name")
+
     para && @paragraphs.push(para)
 
   end
@@ -247,16 +249,25 @@ collector = Collector::new
 File.open($infile, "r") do |file|
 
   block = nil
+  line = 0
 
   file.each_line do |l|
-    l = unescape(l)
-    if l =~ /^\s*#\s*#{$key}/
-      block = []
-    elsif l =~ /^\s*#\s*(.*)\s*$/
-      block && block.push($1)
-    elsif l =~ /^\s*$/
-      block && collector.add_block(block)
-      block = nil
+
+    line += 1
+
+    begin
+      l = unescape(l)
+      if l =~ /^\s*#\s*#{$key}/
+        block = []
+      elsif l =~ /^\s*#\s*(.*)\s*$/
+        block && block.push($1)
+      elsif l =~ /^\s*$/
+        block && collector.add_block(block)
+        block = nil
+      end
+    rescue => ex
+      puts "ERROR in line #{line}:\n" + ex.to_s
+      exit 1
     end
 
   end

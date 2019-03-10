@@ -152,7 +152,7 @@ namespace gsi
 
 static std::string timer_to_s (const tl::Timer *timer)
 {
-  return tl::sprintf ("%.12gs (user), %.12gs (kernel)", timer->sec_user (), timer->sec_sys ());
+  return tl::sprintf ("%.12gs (sys), %.12gs (user), %.12gs (wall)", timer->sec_sys (), timer->sec_user (), timer->sec_wall ());
 }
 
 Class<tl::Timer> decl_Timer ("tl", "Timer",
@@ -162,7 +162,11 @@ Class<tl::Timer> decl_Timer ("tl", "Timer",
   gsi::method ("sys", &tl::Timer::sec_sys, 
     "@brief Returns the elapsed CPU time in kernel mode from start to stop in seconds\n"
   ) +
-  gsi::method_ext ("to_s", &timer_to_s, 
+  gsi::method ("wall", &tl::Timer::sec_wall,
+    "@brief Returns the elapsed real time from start to stop in seconds\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  gsi::method_ext ("to_s", &timer_to_s,
     "@brief Produces a string with the currently elapsed times\n"
   ) +
   gsi::method ("start", &tl::Timer::start, 

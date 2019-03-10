@@ -341,7 +341,7 @@ void insert (X &inserter, const db::Edges &data, const db::Box &tile, bool clip)
 template <class X>
 void insert (X &inserter, const db::EdgePairs &data, const db::Box &tile, bool clip)
 {
-  for (db::EdgePairs::const_iterator o = data.begin (); o != data.end (); ++o) {
+  for (db::EdgePairs::const_iterator o = data.begin (); ! o.at_end (); ++o) {
     insert (inserter, *o, tile, clip);
   }
 }

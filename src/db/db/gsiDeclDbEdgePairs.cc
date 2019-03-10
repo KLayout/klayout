@@ -26,6 +26,7 @@
 #include "dbEdgePairs.h"
 #include "dbEdges.h"
 #include "dbRegion.h"
+#include "dbDeepEdgePairs.h"
 
 namespace gsi
 {
@@ -33,6 +34,45 @@ namespace gsi
 static db::EdgePairs *new_v () 
 {
   return new db::EdgePairs ();
+}
+
+static db::EdgePairs *new_a (const std::vector<db::EdgePair> &pairs)
+{
+  return new db::EdgePairs (pairs.begin (), pairs.end ());
+}
+
+static db::EdgePairs *new_ep (const db::EdgePair &pair)
+{
+  return new db::EdgePairs (pair);
+}
+
+static db::EdgePairs *new_shapes (const db::Shapes &s)
+{
+  db::EdgePairs *r = new db::EdgePairs ();
+  for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::EdgePairs); !i.at_end (); ++i) {
+    r->insert (*i);
+  }
+  return r;
+}
+
+static db::EdgePairs *new_si (const db::RecursiveShapeIterator &si)
+{
+  return new db::EdgePairs (si);
+}
+
+static db::EdgePairs *new_si2 (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
+{
+  return new db::EdgePairs (si, trans);
+}
+
+static db::EdgePairs *new_sid (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss)
+{
+  return new db::EdgePairs (si, dss);
+}
+
+static db::EdgePairs *new_si2d (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const db::ICplxTrans &trans)
+{
+  return new db::EdgePairs (si, dss, trans);
 }
 
 static std::string to_string0 (const db::EdgePairs *r)
@@ -43,15 +83,6 @@ static std::string to_string0 (const db::EdgePairs *r)
 static std::string to_string1 (const db::EdgePairs *r, size_t n)
 {
   return r->to_string (n);
-}
-
-static const db::EdgePair *nth (const db::EdgePairs *r, size_t n)
-{
-  if (n >= r->size ()) {
-    return 0;
-  } else {
-    return &r->begin ()[n];
-  }
 }
 
 static db::EdgePairs &move_p (db::EdgePairs *r, const db::Vector &p)
@@ -94,7 +125,7 @@ static db::Region extents2 (const db::EdgePairs *r, db::Coord dx, db::Coord dy)
 {
   db::Region e;
   e.reserve (r->size ());
-  for (db::EdgePairs::const_iterator i = r->begin (); i != r->end (); ++i) {
+  for (db::EdgePairs::const_iterator i = r->begin (); ! i.at_end (); ++i) {
     e.insert (i->bbox ().enlarged (db::Vector (dx, dy)));
   }
   return e;
@@ -133,9 +164,19 @@ static db::Edges second_edges (const db::EdgePairs *ep)
 
 static void insert_e (db::EdgePairs *e, const db::EdgePairs &a)
 {
-  for (db::EdgePairs::const_iterator p = a.begin (); p != a.end (); ++p) {
+  for (db::EdgePairs::const_iterator p = a.begin (); ! p.at_end (); ++p) {
     e->insert (*p);
   }
+}
+
+static bool is_deep (const db::EdgePairs *ep)
+{
+  return dynamic_cast<const db::DeepEdgePairs *> (ep->delegate ()) != 0;
+}
+
+static size_t id (const db::EdgePairs *ep)
+{
+  return tl::id_of (ep->delegate ());
 }
 
 Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
@@ -144,6 +185,125 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "\n"
     "This constructor creates an empty edge pair collection.\n"
   ) + 
+  constructor ("new", &new_a,
+    "@brief Constructor from an edge pair array\n"
+    "@args array\n"
+    "\n"
+    "This constructor creates an edge pair collection from an array of \\EdgePair objects.\n"
+    "\n"
+    "This constructor has been introduced in version 0.26."
+  ) +
+  constructor ("new", &new_ep,
+    "@brief Constructor from a single edge pair object\n"
+    "@args edge_pair\n"
+    "\n"
+    "This constructor creates an edge pair collection with a single edge pair.\n"
+    "\n"
+    "This constructor has been introduced in version 0.26."
+  ) +
+  constructor ("new", &new_shapes,
+    "@brief Shapes constructor\n"
+    "@args shapes\n"
+    "\n"
+    "This constructor creates an edge pair collection from a \\Shapes collection.\n"
+    "\n"
+    "This constructor has been introduced in version 0.26."
+  ) +
+  constructor ("new", &new_si,
+    "@brief Constructor from a hierarchical shape set\n"
+    "@args shape_iterator\n"
+    "\n"
+    "This constructor creates an edge pair collection from the shapes delivered by the given recursive shape iterator.\n"
+    "Only edge pairs are taken from the shape set and other shapes are ignored.\n"
+    "This method allows feeding the edge pair collection from a hierarchy of cells.\n"
+    "Edge pairs in layout objects are somewhat special as most formats don't support reading "
+    "or writing of edge pairs. Still they are useful objects and can be created and manipulated inside layouts.\n"
+    "\n"
+    "@code\n"
+    "layout = ... # a layout\n"
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
+    "r = RBA::EdgePairs::new(layout.begin_shapes(cell, layer))\n"
+    "@/code\n"
+    "\n"
+    "This constructor has been introduced in version 0.26."
+  ) +
+  constructor ("new", &new_si2,
+    "@brief Constructor from a hierarchical shape set with a transformation\n"
+    "@args shape_iterator, trans\n"
+    "\n"
+    "This constructor creates an edge pair collection from the shapes delivered by the given recursive shape iterator.\n"
+    "Only edge pairs are taken from the shape set and other shapes are ignored.\n"
+    "The given transformation is applied to each edge pair taken.\n"
+    "This method allows feeding the edge pair collection from a hierarchy of cells.\n"
+    "The transformation is useful to scale to a specific database unit for example.\n"
+    "Edge pairs in layout objects are somewhat special as most formats don't support reading "
+    "or writing of edge pairs. Still they are useful objects and can be created and manipulated inside layouts.\n"
+    "\n"
+    "@code\n"
+    "layout = ... # a layout\n"
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
+    "dbu    = 0.1 # the target database unit\n"
+    "r = RBA::EdgePairs::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
+    "@/code\n"
+    "\n"
+    "This constructor has been introduced in version 0.26."
+  ) +
+  constructor ("new", &new_sid, gsi::arg ("shape_iterator"), gsi::arg ("dss"),
+    "@brief Creates a hierarchical edge pair collection from an original layer\n"
+    "\n"
+    "This constructor creates an edge pair collection from the shapes delivered by the given recursive shape iterator.\n"
+    "This version will create a hierarchical edge pair collection which supports hierarchical operations.\n"
+    "Edge pairs in layout objects are somewhat special as most formats don't support reading "
+    "or writing of edge pairs. Still they are useful objects and can be created and manipulated inside layouts.\n"
+    "\n"
+    "@code\n"
+    "dss    = RBA::DeepShapeStore::new\n"
+    "layout = ... # a layout\n"
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
+    "r = RBA::EdgePairs::new(layout.begin_shapes(cell, layer))\n"
+    "@/code\n"
+    "\n"
+    "This constructor has been introduced in version 0.26."
+  ) +
+  constructor ("new", &new_si2d, gsi::arg ("shape_iterator"), gsi::arg ("dss"), gsi::arg ("trans"),
+    "@brief Creates a hierarchical edge pair collection from an original layer with a transformation\n"
+    "\n"
+    "This constructor creates an edge pair collection from the shapes delivered by the given recursive shape iterator.\n"
+    "This version will create a hierarchical edge pair collection which supports hierarchical operations.\n"
+    "The transformation is useful to scale to a specific database unit for example.\n"
+    "Edge pairs in layout objects are somewhat special as most formats don't support reading "
+    "or writing of edge pairs. Still they are useful objects and can be created and manipulated inside layouts.\n"
+    "\n"
+    "@code\n"
+    "dss    = RBA::DeepShapeStore::new\n"
+    "layout = ... # a layout\n"
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
+    "dbu    = 0.1 # the target database unit\n"
+    "r = RBA::EdgePairs::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
+    "@/code\n"
+    "\n"
+    "This constructor has been introduced in version 0.26."
+  ) +
+  method ("insert_into", &db::EdgePairs::insert_into, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
+    "@brief Inserts this edge pairs into the given layout, below the given cell and into the given layer.\n"
+    "If the edge pair collection is a hierarchical one, a suitable hierarchy will be built below the top cell or "
+    "and existing hierarchy will be reused.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method ("insert_into_as_polygons", &db::EdgePairs::insert_into_as_polygons, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("e"),
+    "@brief Inserts this edge pairs into the given layout, below the given cell and into the given layer.\n"
+    "If the edge pair collection is a hierarchical one, a suitable hierarchy will be built below the top cell or "
+    "and existing hierarchy will be reused.\n"
+    "\n"
+    "The edge pairs will be converted to polygons with the enlargement value given be 'e'.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
   method ("insert", (void (db::EdgePairs::*) (const db::Edge &, const db::Edge &)) &db::EdgePairs::insert,
     "@brief Inserts an edge pair into the collection\n"
     "@args first, second\n"
@@ -151,6 +311,16 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   method ("insert", (void (db::EdgePairs::*) (const db::EdgePair &)) &db::EdgePairs::insert,
     "@brief Inserts an edge pair into the collection\n"
     "@args edge_pair\n"
+  ) +
+  method_ext ("is_deep?", &is_deep,
+    "@brief Returns true if the edge pair collection is a deep (hierarchical) one\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  method_ext ("data_id", &id,
+    "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
+    "\n"
+    "This method has been added in version 0.26."
   ) +
   method ("+", &db::EdgePairs::operator+,
     "@brief Returns the combined edge pair collection of self and the other one\n"
@@ -339,14 +509,30 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   method ("size", &db::EdgePairs::size,
     "@brief Returns the number of edge pairs in this collection\n"
   ) +
-  gsi::iterator ("each", &db::EdgePairs::begin, &db::EdgePairs::end,
+  gsi::iterator ("each", &db::EdgePairs::begin,
     "@brief Returns each edge pair of the edge pair collection\n"
   ) +
-  method_ext ("[]", &nth,
+  method ("[]", &db::EdgePairs::nth,
     "@brief Returns the nth edge pair\n"
     "@args n\n"
     "\n"
-    "This method returns nil if the index is out of range.\n"
+    "This method returns nil if the index is out of range. It is available for flat edge pairs only - i.e. "
+    "those for which \\has_valid_edge_pairs? is true. Use \\flatten to explicitly flatten an edge pair collection.\n"
+    "\n"
+    "The \\each iterator is the more general approach to access the edge pairs."
+  ) +
+  method ("flatten", &db::EdgePairs::flatten,
+    "@brief Explicitly flattens an edge pair collection\n"
+    "\n"
+    "If the collection is already flat (i.e. \\has_valid_edge_pairs? returns true), this method will "
+    "not change the collection.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method ("has_valid_edge_pairs?", &db::EdgePairs::has_valid_edge_pairs,
+    "@brief Returns true if the edge pair collection is flat and individual edge pairs can be accessed randomly\n"
+    "\n"
+    "This method has been introduced in version 0.26."
   ) +
   method ("enable_progress", &db::EdgePairs::enable_progress,
     "@brief Enable progress reporting\n"

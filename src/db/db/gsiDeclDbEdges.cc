@@ -23,8 +23,12 @@
 
 #include "gsiDecl.h"
 
+#include "dbDeepShapeStore.h"
 #include "dbEdges.h"
+#include "dbEdgesUtils.h"
+#include "dbDeepEdges.h"
 #include "dbRegion.h"
+#include "dbOriginalLayerRegion.h"
 #include "dbLayoutUtils.h"
 
 namespace gsi
@@ -82,6 +86,15 @@ static db::Edges *new_path (const db::Path &o)
   return new db::Edges (o);
 }
 
+static db::Edges *new_shapes (const db::Shapes &s, bool as_edges)
+{
+  db::Edges *r = new db::Edges ();
+  for (db::Shapes::shape_iterator i = s.begin (as_edges ? db::ShapeIterator::All : db::ShapeIterator::Edges); !i.at_end (); ++i) {
+    r->insert (*i);
+  }
+  return r;
+}
+
 static db::Edges *new_si (const db::RecursiveShapeIterator &si, bool as_edges)
 {
   return new db::Edges (si, as_edges);
@@ -90,6 +103,16 @@ static db::Edges *new_si (const db::RecursiveShapeIterator &si, bool as_edges)
 static db::Edges *new_si2 (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool as_edges)
 {
   return new db::Edges (si, trans, as_edges);
+}
+
+static db::Edges *new_sid (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, bool as_edges)
+{
+  return new db::Edges (si, dss, as_edges);
+}
+
+static db::Edges *new_si2d (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges)
+{
+  return new db::Edges (si, dss, trans, as_edges);
 }
 
 static db::Edges::distance_type length1 (const db::Edges *edges)
@@ -362,65 +385,85 @@ static void insert_s (db::Edges *e, const db::Shapes &a)
   insert_st (e, a, db::UnitTrans ());
 }
 
+static bool is_deep (const db::Edges *e)
+{
+  return dynamic_cast<const db::DeepEdges *> (e->delegate ()) != 0;
+}
+
+static db::Edges *new_texts_as_dots1 (const db::RecursiveShapeIterator &si, const std::string &pat, bool pattern)
+{
+  return new db::Edges (db::Region (si).texts_as_dots (pat, pattern));
+}
+
+static db::Edges *new_texts_as_dots2 (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const std::string &pat, bool pattern)
+{
+  return new db::Edges (db::Region (si).texts_as_dots (pat, pattern, dss));
+}
+
+static size_t id (const db::Edges *e)
+{
+  return tl::id_of (e->delegate ());
+}
+
 Class<db::Edges> dec_Edges ("db", "Edges",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"
     "This constructor creates an empty edge collection.\n"
   ) +
-  constructor ("new", &new_e, 
+  constructor ("new", &new_e, gsi::arg ("edge"),
     "@brief Constructor from a single edge\n"
-    "@args edge\n"
     "\n"
     "This constructor creates an edge collection with a single edge.\n"
   ) +
-  constructor ("new", &new_a1, 
+  constructor ("new", &new_a1, gsi::arg ("array"),
     "@brief Constructor from a polygon array\n"
-    "@args array\n"
     "\n"
     "This constructor creates a region from an array of polygons.\n"
     "The edges form the contours of the polygons.\n"
   ) +
-  constructor ("new", &new_a2, 
+  constructor ("new", &new_a2, gsi::arg ("array"),
     "@brief Constructor from an egde array\n"
-    "@args array\n"
     "\n"
     "This constructor creates a region from an array of edges.\n"
   ) +
-  constructor ("new", &new_b, 
+  constructor ("new", &new_b, gsi::arg ("box"),
     "@brief Box constructor\n"
-    "@args box\n"
     "\n"
     "This constructor creates an edge collection from a box.\n"
     "The edges form the contour of the box.\n"
   ) +
-  constructor ("new", &new_p, 
+  constructor ("new", &new_p, gsi::arg ("polygon"),
     "@brief Polygon constructor\n"
-    "@args polygon\n"
     "\n"
     "This constructor creates an edge collection from a polygon.\n"
     "The edges form the contour of the polygon.\n"
   ) +
-  constructor ("new", &new_ps, 
+  constructor ("new", &new_ps, gsi::arg ("polygon"),
     "@brief Simple polygon constructor\n"
-    "@args polygon\n"
     "\n"
     "This constructor creates an edge collection from a simple polygon.\n"
     "The edges form the contour of the polygon.\n"
   ) +
-  constructor ("new", &new_path, 
+  constructor ("new", &new_path, gsi::arg ("path"),
     "@brief Path constructor\n"
-    "@args path\n"
     "\n"
     "This constructor creates an edge collection from a path.\n"
     "The edges form the contour of the path.\n"
   ) +
-  constructor ("new", &new_si, 
-    "@brief Constructor from a hierarchical shape set\n"
-    "@args shape_iterator, as_edges\n"
+  constructor ("new", &new_shapes, gsi::arg ("shapes"), gsi::arg ("as_edges", true),
+    "@brief Constructor of a flat edge collection from a \\Shapes container\n"
+    "\n"
+    "If 'as_edges' is true, the shapes from the container will be converted to edges (i.e. polygon contours to edges). "
+    "Otherwise, only edges will be taken from the container.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  constructor ("new", &new_si, gsi::arg ("shape_iterator"), gsi::arg ("as_edges", true),
+    "@brief Constructor of a flat edge collection from a hierarchical shape set\n"
     "\n"
     "This constructor creates an edge collection from the shapes delivered by the given recursive shape iterator.\n"
-    "It feeds the shapes from a hierarchy of cells into the edge set.\n"
+    "It feeds the shapes from a hierarchy of cells into a flat edge set.\n"
     "\n"
     "Text objects are not inserted, because they cannot be converted to edges.\n"
     "Edge objects are inserted as such. If \"as_edges\" is true, \"solid\" objects (boxes, polygons, paths) are converted to edges which "
@@ -433,12 +476,11 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "r = RBA::Edges::new(layout.begin_shapes(cell, layer), false)\n"
     "@/code\n"
   ) +
-  constructor ("new", &new_si2, 
-    "@brief Constructor from a hierarchical shape set with a transformation\n"
-    "@args shape_iterator, trans, as_edges\n"
+  constructor ("new", &new_si2, gsi::arg ("shape_iterator"), gsi::arg ("trans"), gsi::arg ("as_edges", true),
+    "@brief Constructor of a flat edge collection from a hierarchical shape set with a transformation\n"
     "\n"
     "This constructor creates an edge collection from the shapes delivered by the given recursive shape iterator.\n"
-    "It feeds the shapes from a hierarchy of cells into the edge set.\n"
+    "It feeds the shapes from a hierarchy of cells into a flat edge set.\n"
     "The transformation is useful to scale to a specific database unit for example.\n"
     "\n"
     "Text objects are not inserted, because they cannot be converted to edges.\n"
@@ -453,16 +495,102 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "r = RBA::Edges::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
     "@/code\n"
   ) +
-  method_ext ("with_length", with_length1, 
+  constructor ("new", &new_sid, gsi::arg ("shape_iterator"), gsi::arg ("dss"), gsi::arg ("as_edges", true),
+    "@brief Constructor of a hierarchical edge collection\n"
+    "\n"
+    "This constructor creates an edge collection from the shapes delivered by the given recursive shape iterator.\n"
+    "It feeds the shapes from a hierarchy of cells into the hierarchical edge set.\n"
+    "The edges remain within their original hierachy unless other operations require the edges to be moved in the hierarchy.\n"
+    "\n"
+    "Text objects are not inserted, because they cannot be converted to edges.\n"
+    "Edge objects are inserted as such. If \"as_edges\" is true, \"solid\" objects (boxes, polygons, paths) are converted to edges which "
+    "form the hull of these objects. If \"as_edges\" is false, solid objects are ignored.\n"
+    "\n"
+    "@code\n"
+    "dss    = RBA::DeepShapeStore::new\n"
+    "layout = ... # a layout\n"
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
+    "r = RBA::Edges::new(layout.begin_shapes(cell, layer), dss, false)\n"
+    "@/code\n"
+  ) +
+  constructor ("new", &new_si2d, gsi::arg ("shape_iterator"), gsi::arg ("dss"), gsi::arg ("trans"), gsi::arg ("as_edges", true),
+    "@brief Constructor of a hierarchical edge collection with a transformation\n"
+    "\n"
+    "This constructor creates an edge collection from the shapes delivered by the given recursive shape iterator.\n"
+    "It feeds the shapes from a hierarchy of cells into the hierarchical edge set.\n"
+    "The edges remain within their original hierachy unless other operations require the edges to be moved in the hierarchy.\n"
+    "The transformation is useful to scale to a specific database unit for example.\n"
+    "\n"
+    "Text objects are not inserted, because they cannot be converted to edges.\n"
+    "Edge objects are inserted as such. If \"as_edges\" is true, \"solid\" objects (boxes, polygons, paths) are converted to edges which "
+    "form the hull of these objects. If \"as_edges\" is false, solid objects are ignored.\n"
+    "\n"
+    "@code\n"
+    "dss    = RBA::DeepShapeStore::new\n"
+    "layout = ... # a layout\n"
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
+    "dbu    = 0.1 # the target database unit\n"
+    "r = RBA::Edges::new(layout.begin_shapes(cell, layer), dss, RBA::ICplxTrans::new(layout.dbu / dbu), false)\n"
+    "@/code\n"
+  ) +
+  constructor ("new", &new_texts_as_dots1, gsi::arg("shape_iterator"), gsi::arg ("expr"), gsi::arg ("as_pattern", true),
+    "@brief Constructor from a text set\n"
+    "\n"
+    "@param shape_iterator The iterator from which to derive the texts\n"
+    "@param expr The selection string\n"
+    "@param as_pattern If true, the selection string is treated as a glob pattern. Otherwise the match is exact.\n"
+    "\n"
+    "This special constructor will create dot-like edges from the text objects delivered by the shape iterator. "
+    "Each text object will give a degenerated edge (a dot) that represents the text origin.\n"
+    "Texts can be selected by their strings - either through a glob pattern or by exact comparison with "
+    "the given string. The following options are available:\n"
+    "\n"
+    "@code\n"
+    "dots = RBA::Edges::new(iter, \"*\")           # all texts\n"
+    "dots = RBA::Edges::new(iter, \"A*\")          # all texts starting with an 'A'\n"
+    "dots = RBA::Edges::new(iter, \"A*\", false)   # all texts exactly matchin 'A*'\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  constructor ("new", &new_texts_as_dots2, gsi::arg("shape_iterator"), gsi::arg ("dss"), gsi::arg ("expr"), gsi::arg ("as_pattern", true),
+    "@brief Constructor from a text set\n"
+    "\n"
+    "@param shape_iterator The iterator from which to derive the texts\n"
+    "@param dss The \\DeepShapeStore object that acts as a heap for hierarchical operations.\n"
+    "@param expr The selection string\n"
+    "@param as_pattern If true, the selection string is treated as a glob pattern. Otherwise the match is exact.\n"
+    "\n"
+    "This special constructor will create a deep edge set from the text objects delivered by the shape iterator. "
+    "Each text object will give a degenerated edge (a dot) that represents the text origin.\n"
+    "Texts can be selected by their strings - either through a glob pattern or by exact comparison with "
+    "the given string. The following options are available:\n"
+    "\n"
+    "@code\n"
+    "region = RBA::Region::new(iter, dss, \"*\")           # all texts\n"
+    "region = RBA::Region::new(iter, dss, \"A*\")          # all texts starting with an 'A'\n"
+    "region = RBA::Region::new(iter, dss, \"A*\", false)   # all texts exactly matchin 'A*'\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  method ("insert_into", &db::Edges::insert_into, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
+    "@brief Inserts this edge collection into the given layout, below the given cell and into the given layer.\n"
+    "If the edge collection is a hierarchical one, a suitable hierarchy will be built below the top cell or "
+    "and existing hierarchy will be reused.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method_ext ("with_length", with_length1, gsi::arg ("length"), gsi::arg ("inverse"),
     "@brief Filter the edges by length\n"
-    "@args length, inverse\n"
     "Filters the edges in the edge collection by length. If \"inverse\" is false, only "
     "edges which have the given length are returned. If \"inverse\" is true, "
     "edges not having the given length are returned.\n"
   ) +
-  method_ext ("with_length", with_length2, 
+  method_ext ("with_length", with_length2, gsi::arg ("min_length"), gsi::arg ("max_length"), gsi::arg ("inverse"),
     "@brief Filter the edges by length\n"
-    "@args min_length, max_length, inverse\n"
     "Filters the edges in the edge collection by length. If \"inverse\" is false, only "
     "edges which have a length larger or equal to \"min_length\" and less than \"max_length\" are "
     "returned. If \"inverse\" is true, "
@@ -471,9 +599,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
   ) +
-  method_ext ("with_angle", with_angle1, 
+  method_ext ("with_angle", with_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
     "@brief Filter the edges by orientation\n"
-    "@args length, inverse\n"
     "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
     "edges which have the given angle to the x-axis are returned. If \"inverse\" is true, "
     "edges not having the given angle are returned.\n"
@@ -484,92 +611,79 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "horizontal = edges.with_orientation(0, true)\n"
     "@/code\n"
   ) +
-  method_ext ("with_angle", with_angle2, 
+  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"),
     "@brief Filter the edges by orientation\n"
-    "@args min_angle, max_angle, inverse\n"
     "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
     "edges which have an angle to the x-axis larger or equal to \"min_angle\" and less than \"max_angle\" are "
     "returned. If \"inverse\" is true, "
     "edges which do not conform to this criterion are returned."
   ) +
-  method ("insert", (void (db::Edges::*)(const db::Edge &)) &db::Edges::insert, 
+  method ("insert", (void (db::Edges::*)(const db::Edge &)) &db::Edges::insert, gsi::arg ("edge"),
     "@brief Inserts an edge\n"
-    "@args edge\n"
     "\n"
     "Inserts the edge into the edge collection.\n"
   ) +
-  method ("insert", (void (db::Edges::*)(const db::Box &)) &db::Edges::insert, 
+  method ("insert", (void (db::Edges::*)(const db::Box &)) &db::Edges::insert, gsi::arg ("box"),
     "@brief Inserts a box\n"
-    "@args box\n"
     "\n"
     "Inserts the edges that form the contour of the box into the edge collection.\n"
   ) +
-  method ("insert", (void (db::Edges::*)(const db::Polygon &)) &db::Edges::insert, 
+  method ("insert", (void (db::Edges::*)(const db::Polygon &)) &db::Edges::insert, gsi::arg ("polygon"),
     "@brief Inserts a polygon\n"
-    "@args polygon\n"
     "\n"
     "Inserts the edges that form the contour of the polygon into the edge collection.\n"
   ) +
-  method ("insert", (void (db::Edges::*)(const db::SimplePolygon &)) &db::Edges::insert, 
+  method ("insert", (void (db::Edges::*)(const db::SimplePolygon &)) &db::Edges::insert, gsi::arg ("polygon"),
     "@brief Inserts a simple polygon\n"
-    "@args polygon\n"
     "\n"
     "Inserts the edges that form the contour of the simple polygon into the edge collection.\n"
   ) +
-  method ("insert", (void (db::Edges::*)(const db::Path &)) &db::Edges::insert, 
+  method ("insert", (void (db::Edges::*)(const db::Path &)) &db::Edges::insert, gsi::arg ("path"),
     "@brief Inserts a path\n"
-    "@args path\n"
     "\n"
     "Inserts the edges that form the contour of the path into the edge collection.\n"
   ) +
-  method_ext ("insert", &insert_e,
+  method_ext ("insert", &insert_e, gsi::arg ("edges"),
     "@brief Inserts all edges from the other edge collection into this one\n"
-    "@args edges\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("insert", &insert_r,
+  method_ext ("insert", &insert_r, gsi::arg ("region"),
     "@brief Inserts a region\n"
-    "@args region\n"
     "Inserts the edges that form the contours of the polygons from the region into the edge collection.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("insert", &insert_s,
+  method_ext ("insert", &insert_s, gsi::arg ("shapes"),
     "@brief Inserts all edges from the shape collection into this edge collection\n"
-    "@args shapes\n"
     "This method takes each edge from the shape collection and "
     "insertes it into the region. \"Polygon-like\" objects are inserted as edges forming the contours of the polygons.\n"
     "Text objects are ignored.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("insert", &insert_st<db::Trans>,
+  method_ext ("insert", &insert_st<db::Trans>, gsi::arg ("shapes"), gsi::arg ("trans"),
     "@brief Inserts all edges from the shape collection into this edge collection (with transformation)\n"
-    "@args shapes\n"
     "This method acts as the version without transformation, but will apply the given "
     "transformation before inserting the edges.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("insert", &insert_st<db::ICplxTrans>,
+  method_ext ("insert", &insert_st<db::ICplxTrans>, gsi::arg ("shapes"), gsi::arg ("trans"),
     "@brief Inserts all edges from the shape collection into this edge collection with complex transformation\n"
-    "@args shapes\n"
     "This method acts as the version without transformation, but will apply the given "
     "complex transformation before inserting the edges.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("insert", &insert_si,
+  method_ext ("insert", &insert_si, gsi::arg ("shape_iterator"),
     "@brief Inserts all shapes delivered by the recursive shape iterator into this edge collection\n"
-    "@args shape_iterator\n"
     "\n"
     "For \"solid\" shapes (boxes, polygons, paths), this method inserts the edges that form the contour of the shape into the edge collection.\n"
     "Edge shapes are inserted as such.\n"
     "Text objects are not inserted, because they cannot be converted to polygons.\n"
   ) +
-  method_ext ("insert", &insert_si2, 
+  method_ext ("insert", &insert_si2, gsi::arg ("shape_iterator"), gsi::arg ("trans"),
     "@brief Inserts all shapes delivered by the recursive shape iterator into this edge collection with a transformation\n"
-    "@args shape_iterator, trans\n"
     "\n"
     "For \"solid\" shapes (boxes, polygons, paths), this method inserts the edges that form the contour of the shape into the edge collection.\n"
     "Edge shapes are inserted as such.\n"
@@ -577,13 +691,11 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "This variant will apply the given transformation to the shapes. This is useful to scale the "
     "shapes to a specific database unit for example.\n"
   ) +
-  method_ext ("insert", &insert_a1, 
+  method_ext ("insert", &insert_a1, gsi::arg ("polygons"),
     "@brief Inserts all polygons from the array into this edge collection\n"
-    "@args array\n"
   ) +
-  method_ext ("insert", &insert_a2, 
+  method_ext ("insert", &insert_a2, gsi::arg ("edges"),
     "@brief Inserts all edges from the array into this edge collection\n"
-    "@args array\n"
   ) +
   method ("merge", (db::Edges &(db::Edges::*) ()) &db::Edges::merge,
     "@brief Merge the edges\n"
@@ -603,30 +715,27 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "Crossing edges are not merged.\n"
     "In contrast to \\merge, this method does not modify the edge collection but returns a merged copy.\n"
   ) +
-  method ("&", (db::Edges (db::Edges::*)(const db::Edges &) const) &db::Edges::operator&,
+  method ("&", (db::Edges (db::Edges::*)(const db::Edges &) const) &db::Edges::operator&, gsi::arg ("other"),
     "@brief Returns the boolean AND between self and the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return The result of the boolean AND operation\n"
     "\n"
     "The boolean AND operation will return all parts of the edges in this collection which "
     "are coincident with parts of the edges in the other collection."
     "The result will be a merged edge collection.\n"
   ) + 
-  method ("&=", (db::Edges &(db::Edges::*)(const db::Edges &)) &db::Edges::operator&=,
+  method ("&=", (db::Edges &(db::Edges::*)(const db::Edges &)) &db::Edges::operator&=, gsi::arg ("other"),
     "@brief Performs the boolean AND between self and the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "The boolean AND operation will return all parts of the edges in this collection which "
     "are coincident with parts of the edges in the other collection."
     "The result will be a merged edge collection.\n"
   ) + 
-  method ("&", (db::Edges (db::Edges::*)(const db::Region &) const) &db::Edges::operator&,
+  method ("&", (db::Edges (db::Edges::*)(const db::Region &) const) &db::Edges::operator&, gsi::arg ("other"),
     "@brief Returns the parts of the edges inside the given region\n"
     "\n"
-    "@args other\n"
     "@return The edges inside the given region\n"
     "\n"
     "This operation returns the parts of the edges which are inside the given region.\n"
@@ -636,10 +745,9 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  method ("&=", (db::Edges &(db::Edges::*)(const db::Region &)) &db::Edges::operator&=,
+  method ("&=", (db::Edges &(db::Edges::*)(const db::Region &)) &db::Edges::operator&=, gsi::arg ("other"),
     "@brief Selects the parts of the edges inside the given region\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "This operation selects the parts of the edges which are inside the given region.\n"
@@ -649,30 +757,27 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  method ("-", (db::Edges (db::Edges::*)(const db::Edges &) const) &db::Edges::operator-,
+  method ("-", (db::Edges (db::Edges::*)(const db::Edges &) const) &db::Edges::operator-, gsi::arg ("other"),
     "@brief Returns the boolean NOT between self and the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return The result of the boolean NOT operation\n"
     "\n"
     "The boolean NOT operation will return all parts of the edges in this collection which "
     "are not coincident with parts of the edges in the other collection."
     "The result will be a merged edge collection.\n"
   ) + 
-  method ("-=", (db::Edges &(db::Edges::*)(const db::Edges &)) &db::Edges::operator-=,
+  method ("-=", (db::Edges &(db::Edges::*)(const db::Edges &)) &db::Edges::operator-=, gsi::arg ("other"),
     "@brief Performs the boolean NOT between self and the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "The boolean NOT operation will return all parts of the edges in this collection which "
     "are not coincident with parts of the edges in the other collection."
     "The result will be a merged edge collection.\n"
   ) + 
-  method ("-", (db::Edges (db::Edges::*)(const db::Region &) const) &db::Edges::operator-,
+  method ("-", (db::Edges (db::Edges::*)(const db::Region &) const) &db::Edges::operator-, gsi::arg ("other"),
     "@brief Returns the parts of the edges outside the given region\n"
     "\n"
-    "@args other\n"
     "@return The edges outside the given region\n"
     "\n"
     "This operation returns the parts of the edges which are outside the given region.\n"
@@ -682,10 +787,9 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  method ("-=", (db::Edges &(db::Edges::*)(const db::Region &)) &db::Edges::operator-=,
+  method ("-=", (db::Edges &(db::Edges::*)(const db::Region &)) &db::Edges::operator-=, gsi::arg ("other"),
     "@brief Selects the parts of the edges outside the given region\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "This operation selects the parts of the edges which are outside the given region.\n"
@@ -695,138 +799,123 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  method ("^", &db::Edges::operator^,
+  method ("^", &db::Edges::operator^, gsi::arg ("other"),
     "@brief Returns the boolean XOR between self and the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return The result of the boolean XOR operation\n"
     "\n"
     "The boolean XOR operation will return all parts of the edges in this and the other collection except "
     "the parts where both are coincident.\n"
     "The result will be a merged edge collection.\n"
   ) + 
-  method ("^=", &db::Edges::operator^=,
+  method ("^=", &db::Edges::operator^=, gsi::arg ("other"),
     "@brief Performs the boolean XOR between self and the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "The boolean XOR operation will return all parts of the edges in this and the other collection except "
     "the parts where both are coincident.\n"
     "The result will be a merged edge collection.\n"
   ) + 
-  method ("\\|", &db::Edges::operator|,
+  method ("\\|", &db::Edges::operator|, gsi::arg ("other"),
     "@brief Returns the boolean OR between self and the other edge set\n"
     "\n"
-    "@args other\n"
     "@return The resulting edge collection\n"
     "\n"
     "The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections "
     "without merging, the + operator is more efficient."
   ) + 
-  method ("\\|=", &db::Edges::operator|=,
+  method ("\\|=", &db::Edges::operator|=, gsi::arg ("other"),
     "@brief Performs the boolean OR between self and the other redge set\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections "
     "without merging, the + operator is more efficient."
   ) + 
-  method ("+", &db::Edges::operator+,
+  method ("+", &db::Edges::operator+, gsi::arg ("other"),
     "@brief Returns the combined edge set of self and the other one\n"
     "\n"
-    "@args other\n"
     "@return The resulting edge set\n"
     "\n"
     "This operator adds the edges of the other edge set to self and returns a new combined edge set. "
     "This usually creates unmerged edge sets and edges may overlap. Use \\merge if you want to ensure the result edge set is merged.\n"
   ) + 
-  method ("+=", &db::Edges::operator+=,
+  method ("+=", &db::Edges::operator+=, gsi::arg ("other"),
     "@brief Adds the edges of the other edge collection to self\n"
     "\n"
-    "@args other\n"
     "@return The edge set after modification (self)\n"
     "\n"
     "This operator adds the edges of the other edge set to self. "
     "This usually creates unmerged edge sets and edges may overlap. Use \\merge if you want to ensure the result edge set is merged.\n"
   ) + 
-  method ("interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_interacting,
+  method ("interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
     "@brief Returns the edges of this edge collection which overlap or touch edges from the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return A new edge collection containing the edges overlapping or touching edges from the other region\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
-  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_not_interacting,
+  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
     "@brief Returns the edges of this edge collection which do not overlap or touch edges from the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return A new edge collection containing the edges not overlapping or touching edges from the other region\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
-  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_interacting,
+  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_interacting, gsi::arg ("other"),
     "@brief Selects the edges from this edge collection which overlap or touch edges from the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
-  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_not_interacting,
+  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_not_interacting, gsi::arg ("other"),
     "@brief Selects the edges from this edge collection which do not overlap or touch edges from the other edge collection\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
-  method ("interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_interacting,
+  method ("interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
     "@brief Returns the edges from this region which overlap or touch polygons from the region\n"
     "\n"
-    "@args other\n"
     "@return A new edge collection containing the edges overlapping or touching polygons from the region\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
-  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_not_interacting,
+  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
     "@brief Returns the edges from this region which do not overlap or touch polygons from the region\n"
     "\n"
-    "@args other\n"
     "@return A new edge collection containing the edges not overlapping or touching polygons from the region\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
-  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_interacting,
+  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_interacting, gsi::arg ("other"),
     "@brief Selects the edges from this region which overlap or touch polygons from the region\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
-  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_interacting,
+  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_interacting, gsi::arg ("other"),
     "@brief Selects the edges from this region which do not overlap or touch polygons from the region\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This method does not merge the edges before they are selected. If you want to select coherent "
     "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
-  method ("inside_part", &db::Edges::inside_part,
+  method ("inside_part", &db::Edges::inside_part, gsi::arg ("other"),
     "@brief Returns the parts of the edges of this edge collection which are inside the polygons of the region\n"
     "\n"
-    "@args other\n"
     "@return A new edge collection containing the edge parts inside the region\n"
     "\n"
     "This operation returns the parts of the edges which are inside the given region.\n"
@@ -836,10 +925,9 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  method ("outside_part", &db::Edges::outside_part,
+  method ("outside_part", &db::Edges::outside_part, gsi::arg ("other"),
     "@brief Returns the parts of the edges of this edge collection which are outside the polygons of the region\n"
     "\n"
-    "@args other\n"
     "@return A new edge collection containing the edge parts outside the region\n"
     "\n"
     "This operation returns the parts of the edges which are not inside the given region.\n"
@@ -849,10 +937,9 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  method ("select_inside_part", &db::Edges::select_inside_part,
+  method ("select_inside_part", &db::Edges::select_inside_part, gsi::arg ("other"),
     "@brief Selects the parts of the edges from this edge collection which are inside the polygons of the given region\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This operation selects the parts of the edges which are inside the given region.\n"
@@ -862,10 +949,9 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  method ("select_outside_part", &db::Edges::select_outside_part,
+  method ("select_outside_part", &db::Edges::select_outside_part, gsi::arg ("other"),
     "@brief Selects the parts of the edges from this edge collection which are outside the polygons of the given region\n"
     "\n"
-    "@args other\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This operation selects the parts of the edges which are not inside the given region.\n"
@@ -878,15 +964,13 @@ Class<db::Edges> dec_Edges ("db", "Edges",
   method ("clear", &db::Edges::clear,
     "@brief Clears the edge collection\n"
   ) +
-  method ("swap", &db::Edges::swap,
+  method ("swap", &db::Edges::swap, gsi::arg ("other"),
     "@brief Swap the contents of this edge collection with the contents of another one\n"
-    "@args other\n"
     "This method is useful to avoid excessive memory allocation in some cases. "
     "For managed memory languages such as Ruby, those cases will be rare. " 
   ) +
-  method_ext ("move", &move_p,
+  method_ext ("move", &move_p, gsi::arg ("v"),
     "@brief Moves the edge collection\n"
-    "@args v\n"
     "\n"
     "Moves the polygon by the given offset and returns the \n"
     "moved edge collection. The edge collection is overwritten.\n"
@@ -897,9 +981,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "Starting with version 0.25 the displacement type is a vector."
   ) +
-  method_ext ("move", &move_xy,
+  method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
     "@brief Moves the edge collection\n"
-    "@args x,y\n"
     "\n"
     "Moves the edge collection by the given offset and returns the \n"
     "moved edge collection. The edge collection is overwritten.\n"
@@ -909,9 +992,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "@return The moved edge collection (self).\n"
   ) +
-  method_ext ("moved", &moved_p,
+  method_ext ("moved", &moved_p, gsi::arg ("v"),
     "@brief Returns the moved edge collection (does not modify self)\n"
-    "@args v\n"
     "\n"
     "Moves the edge collection by the given offset and returns the \n"
     "moved edge collection. The edge collection is not modified.\n"
@@ -922,9 +1004,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "Starting with version 0.25 the displacement type is a vector."
   ) +
-  method_ext ("moved", &moved_xy,
+  method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("v"),
     "@brief Returns the moved edge collection (does not modify self)\n"
-    "@args x,y\n"
     "\n"
     "Moves the edge collection by the given offset and returns the \n"
     "moved edge collection. The edge collection is not modified.\n"
@@ -934,9 +1015,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "@return The moved edge collection.\n"
   ) +
-  method ("transformed", (db::Edges (db::Edges::*)(const db::Trans &) const) &db::Edges::transformed,
+  method ("transformed", (db::Edges (db::Edges::*)(const db::Trans &) const) &db::Edges::transformed, gsi::arg ("t"),
     "@brief Transform the edge collection\n"
-    "@args t\n"
     "\n"
     "Transforms the edge collection with the given transformation.\n"
     "Does not modify the edge collection but returns the transformed edge collection.\n"
@@ -945,9 +1025,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "@return The transformed edge collection.\n"
   ) +
-  method ("transformed|#transformed_icplx", (db::Edges (db::Edges::*)(const db::ICplxTrans &) const) &db::Edges::transformed,
+  method ("transformed|#transformed_icplx", (db::Edges (db::Edges::*)(const db::ICplxTrans &) const) &db::Edges::transformed, gsi::arg ("t"),
     "@brief Transform the edge collection with a complex transformation\n"
-    "@args t\n"
     "\n"
     "Transforms the edge collection with the given complex transformation.\n"
     "Does not modify the edge collection but returns the transformed edge collection.\n"
@@ -956,9 +1035,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "@return The transformed edge collection.\n"
   ) +
-  method ("transform", (db::Edges &(db::Edges::*)(const db::Trans &)) &db::Edges::transform,
+  method ("transform", (db::Edges &(db::Edges::*)(const db::Trans &)) &db::Edges::transform, gsi::arg ("t"),
     "@brief Transform the edge collection (modifies self)\n"
-    "@args t\n"
     "\n"
     "Transforms the edge collection with the given transformation.\n"
     "This version modifies the edge collection and returns a reference to self.\n"
@@ -967,9 +1045,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "@return The transformed edge collection.\n"
   ) +
-  method ("transform|#transform_icplx", (db::Edges &(db::Edges::*)(const db::ICplxTrans &)) &db::Edges::transform,
+  method ("transform|#transform_icplx", (db::Edges &(db::Edges::*)(const db::ICplxTrans &)) &db::Edges::transform, gsi::arg ("t"),
     "@brief Transform the edge collection with a complex transformation (modifies self)\n"
-    "@args t\n"
     "\n"
     "Transforms the edge collection with the given transformation.\n"
     "This version modifies the edge collection and returns a reference to self.\n"
@@ -978,9 +1055,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "@return The transformed edge collection.\n"
   ) +
-  method_ext ("width_check", &width1,
+  method_ext ("width_check", &width1, gsi::arg ("d"),
     "@brief Performs a width check between edges\n"
-    "@args other, d\n"
     "@param d The minimum width for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
     "To understand the overlap check for edges, one has to be familiar with the concept of the inside and outside "
@@ -996,9 +1072,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "A version of this method is available with more options (i.e. the option the deliver whole edges). "
     "Other checks with different edge relations are \\space_check, \\inside_check, \\overlap_check, \\separation_check and \\enclosing_check.\n"
   ) +
-  method_ext ("width_check", &width2,
+  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs a width check with options\n"
-    "@args d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum width for which the edges are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
     "@param metrics Specify the metrics type\n"
@@ -1026,9 +1101,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("space_check", &space1,
+  method_ext ("space_check", &space1, gsi::arg ("d"),
     "@brief Performs a space check between edges\n"
-    "@args d\n"
     "@param d The minimum distance for which the edges are checked\n"
     "To understand the space check for edges, one has to be familiar with the concept of the inside and outside "
     "interpretation of an edge. An edge is considered a boundary between \"inside\" and \"outside\" where \"inside\" "
@@ -1043,9 +1117,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "A version of this method is available with more options (i.e. the option the deliver whole edges). "
     "Other checks with different edge relations are \\width_check, \\inside_check, \\overlap_check, \\separation_check and \\enclosing_check.\n"
   ) +
-  method_ext ("space_check", &space2,
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs a space check with options\n"
-    "@args d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
     "@param metrics Specify the metrics type\n"
@@ -1073,9 +1146,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("inside_check", &inside1,
+  method_ext ("inside_check", &inside1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs an inside check between edges\n"
-    "@args other, d\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
     "To understand the inside check for edges, one has to be familiar with the concept of the inside and outside "
@@ -1091,9 +1163,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "A version of this method is available with more options (i.e. the option the deliver whole edges). "
     "Other checks with different edge relations are \\width_check, \\space_check, \\overlap_check, \\separation_check and \\enclosing_check.\n"
   ) +
-  method_ext ("inside_check", &inside2,
+  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs an inside check with options\n"
-    "@args other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1122,9 +1193,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("enclosing_check", &enclosing1,
+  method_ext ("enclosing_check", &enclosing1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs an enclosing check between edges\n"
-    "@args other, d\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
     "To understand the enclosing check for edges, one has to be familiar with the concept of the inside and outside "
@@ -1140,9 +1210,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "A version of this method is available with more options (i.e. the option the deliver whole edges). "
     "Other checks with different edge relations are \\width_check, \\space_check, \\overlap_check, \\separation_check and \\inside_check.\n"
   ) +
-  method_ext ("enclosing_check", &enclosing2,
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs an enclosing check with options\n"
-    "@args other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1171,9 +1240,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("overlap_check", &overlap1,
+  method_ext ("overlap_check", &overlap1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs an overlap check between edges\n"
-    "@args other, d\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
     "Technically, the overlap check is a width check between edges from different collections. "
@@ -1187,9 +1255,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "A version of this method is available with more options (i.e. the option the deliver whole edges). "
     "Other checks with different edge relations are \\width_check, \\space_check, \\enclosing_check, \\separation_check and \\inside_check.\n"
   ) +
-  method_ext ("overlap_check", &overlap2,
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs an overlap check with options\n"
-    "@args other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1218,9 +1285,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("separation_check", &separation1,
+  method_ext ("separation_check", &separation1, gsi::arg ("other"), gsi::arg ("d"),
     "@brief Performs an separation check between edges\n"
-    "@args other, d\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
     "Technically, the separation check is a space check between edges from different collections. "
@@ -1234,9 +1300,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "A version of this method is available with more options (i.e. the option the deliver whole edges). "
     "Other checks with different edge relations are \\width_check, \\space_check, \\enclosing_check, \\overlap_check and \\inside_check.\n"
   ) +
-  method_ext ("separation_check", &separation2,
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
     "@brief Performs an overlap check with options\n"
-    "@args other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1271,25 +1336,22 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
-  method_ext ("extents", &extents1,
+  method_ext ("extents", &extents1, gsi::arg ("d"),
     "@brief Returns a region with the enlarged bounding boxes of the edges\n"
-    "@args d\n"
     "This method will return a region consisting of the bounding boxes of the edges enlarged by the given distance d.\n"
     "The enlargement is specified per edge, i.e the width and height will be increased by 2*d.\n"
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
-  method_ext ("extents", &extents2,
+  method_ext ("extents", &extents2, gsi::arg ("dx"), gsi::arg ("dy"),
     "@brief Returns a region with the enlarged bounding boxes of the edges\n"
-    "@args dx, dy\n"
     "This method will return a region consisting of the bounding boxes of the edges enlarged by the given distance dx in x direction and dy in y direction.\n"
     "The enlargement is specified per edge, i.e the width will be increased by 2*dx.\n"
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
-  method_ext ("extended_in", &extended_in,
+  method_ext ("extended_in", &extended_in, gsi::arg ("e"),
     "@brief Returns a region with shapes representing the edges with the given width\n"
-    "@args e\n"
     "@param e The extension width\n"
     "@return A region containing the polygons representing these extended edges\n"
     "The edges are extended to the \"inside\" by the given distance \"e\". The distance will be applied to the right side "
@@ -1298,9 +1360,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "Other versions of this feature are \\extended_out and \\extended.\n"
   ) +
-  method_ext ("extended_out", &extended_out,
+  method_ext ("extended_out", &extended_out, gsi::arg ("e"),
     "@brief Returns a region with shapes representing the edges with the given width\n"
-    "@args e\n"
     "@param e The extension width\n"
     "@return A region containing the polygons representing these extended edges\n"
     "The edges are extended to the \"outside\" by the given distance \"e\". The distance will be applied to the left side "
@@ -1309,9 +1370,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "Other versions of this feature are \\extended_in and \\extended.\n"
   ) +
-  method_ext ("extended", &extended,
+  method_ext ("extended", &extended, gsi::arg ("b"), gsi::arg ("e"), gsi::arg ("o"), gsi::arg ("i"), gsi::arg ("join"),
     "@brief Returns a region with shapes representing the edges with the specified extensions\n"
-    "@args b, e, o, i, join\n"
     "@param b the parallel extension at the start point of the edge\n"
     "@param e the parallel extension at the end point of the edge\n"
     "@param o the perpendicular extension to the \"outside\" (left side as seen in the direction of the edge)\n"
@@ -1327,9 +1387,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "If join is true and edges form a closed loop, the b and e parameters are ignored and a rim polygon is created "
     "that forms the loop with the outside and inside extension given by o and i.\n"
   ) +
-  method ("start_segments", &db::Edges::start_segments,
+  method ("start_segments", &db::Edges::start_segments, gsi::arg ("length"), gsi::arg ("fraction"),
     "@brief Returns edges representing a part of the edge after the start point\n"
-    "@args length, fraction\n"
     "@return A new collection of edges representing the start part\n"
     "This method allows to specify the length of these segments in a twofold way: either as a fixed length or "
     "by specifying a fraction of the original length:\n"
@@ -1345,9 +1404,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "It is possible to specify 0 for both values. In this case, degenerated edges (points) are delivered which specify the "
     "start positions of the edges but can't participate in some functions.\n"
   ) +
-  method ("end_segments", &db::Edges::end_segments,
+  method ("end_segments", &db::Edges::end_segments, gsi::arg ("length"), gsi::arg ("fraction"),
     "@brief Returns edges representing a part of the edge before the end point\n"
-    "@args length, fraction\n"
     "@return A new collection of edges representing the end part\n"
     "This method allows to specify the length of these segments in a twofold way: either as a fixed length or "
     "by specifying a fraction of the original length:\n"
@@ -1363,9 +1421,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "It is possible to specify 0 for both values. In this case, degenerated edges (points) are delivered which specify the "
     "end positions of the edges but can't participate in some functions.\n"
   ) +
-  method ("centers", &db::Edges::centers,
+  method ("centers", &db::Edges::centers, gsi::arg ("length"), gsi::arg ("fraction"),
     "@brief Returns edges representing the center part of the edges\n"
-    "@args length, fraction\n"
     "@return A new collection of edges representing the part around the center\n"
     "This method allows to specify the length of these segments in a twofold way: either as a fixed length or "
     "by specifying a fraction of the original length:\n"
@@ -1390,26 +1447,33 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("length", &length2,
+  method_ext ("length", &length2, gsi::arg ("rect"),
     "@brief Returns the total length of all edges in the edge collection (restricted to a rectangle)\n"
-    "@args rect\n"
     "This version will compute the total length of all edges in the collection, restricting the computation to the given rectangle.\n"
     "Edges along the border are handled in a special way: they are counted when they are oriented with their inside "
     "side toward the rectangle (in other words: outside edges must coincide with the rectangle's border in order to be counted).\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("members_of|#in", &in,
+  method_ext ("members_of|#in", &in, gsi::arg ("other"),
     "@brief Returns all edges which are members of the other edge collection\n"
-    "@args other\n"
     "This method returns all edges in self which can be found in the other edge collection as well with exactly the same "
     "geometry."
   ) +
-  method_ext ("not_members_of|#not_in", &not_in,
+  method_ext ("not_members_of|#not_in", &not_in, gsi::arg ("other"),
     "@brief Returns all edges which are not members of the other edge collection\n"
-    "@args other\n"
     "This method returns all edges in self which can not be found in the other edge collection with exactly the same "
     "geometry."
+  ) +
+  method_ext ("is_deep?", &is_deep,
+    "@brief Returns true if the edge collection is a deep (hierarchical) one\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  method_ext ("data_id", &id,
+    "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
+    "\n"
+    "This method has been added in version 0.26."
   ) +
   method ("is_merged?", &db::Edges::is_merged,
     "@brief Returns true if the edge collection is merged\n"
@@ -1432,25 +1496,39 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("[]", &db::Edges::nth,
-    "@brief Returns the nth edge of the edge collection\n"
-    "@args n\n"
+  method ("[]", &db::Edges::nth, gsi::arg ("n"),
+    "@brief Returns the nth edge of the collection\n"
     "\n"
-    "This method returns nil if the index is out of range.\n"
+    "This method returns nil if the index is out of range. It is available for flat edge collections only - i.e. "
+    "those for which \\has_valid_edges? is true. Use \\flatten to explicitly flatten an edge collection.\n"
+    "This method returns the raw edge (not merged edges, even if merged semantics is enabled).\n"
+    "\n"
+    "The \\each iterator is the more general approach to access the edges."
+  ) +
+  method ("flatten", &db::Edges::flatten,
+    "@brief Explicitly flattens an edge collection\n"
+    "\n"
+    "If the collection is already flat (i.e. \\has_valid_edges? returns true), this method will "
+    "not change it.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method ("has_valid_edges?", &db::Edges::has_valid_edges,
+    "@brief Returns true if the edge collection is flat and individual edges can be accessed randomly\n"
+    "\n"
+    "This method has been introduced in version 0.26."
   ) +
   method_ext ("to_s", &to_string0,
     "@brief Converts the edge collection to a string\n"
     "The length of the output is limited to 20 edges to avoid giant strings on large regions. "
     "For full output use \"to_s\" with a maximum count parameter.\n"
   ) +
-  method_ext ("to_s", &to_string1,
+  method_ext ("to_s", &to_string1, gsi::arg ("max_count"),
     "@brief Converts the edge collection to a string\n"
-    "@args max_count\n"
     "This version allows specification of the maximum number of edges contained in the string."
   ) +
-  method ("merged_semantics=", &db::Edges::set_merged_semantics,
+  method ("merged_semantics=", &db::Edges::set_merged_semantics, gsi::arg ("f"),
     "@brief Enable or disable merged semantics\n"
-    "@args f\n"
     "If merged semantics is enabled (the default), colinear, connected or overlapping edges will be considered\n"
     "as single edges.\n"
   ) + 
@@ -1458,9 +1536,8 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "@brief Gets a flag indicating whether merged semantics is enabled\n"
     "See \\merged_semantics= for a description of this attribute.\n"
   ) + 
-  method ("enable_progress", &db::Edges::enable_progress,
+  method ("enable_progress", &db::Edges::enable_progress, gsi::arg ("label"),
     "@brief Enable progress reporting\n"
-    "@args label\n"
     "After calling this method, the edge collection will report the progress through a progress bar while "
     "expensive operations are running.\n"
     "The label is a text which is put in front of the progress bar.\n"

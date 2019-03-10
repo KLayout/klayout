@@ -103,7 +103,7 @@ NetTracerDialog::~NetTracerDialog ()
 void
 NetTracerDialog::clear_nets ()
 {
-  for (std::vector <db::Net *>::iterator n = mp_nets.begin (); n != mp_nets.end (); ++n) {
+  for (std::vector <db::NetTracerNet *>::iterator n = mp_nets.begin (); n != mp_nets.end (); ++n) {
     delete *n;
   }
   mp_nets.clear ();
@@ -178,7 +178,7 @@ NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, b
         stop_search_box = db::DBox (m_mouse_first_point, m_mouse_first_point).enlarged (db::DVector (l, l));
       }
 
-      db::Net *net = do_trace (start_search_box, stop_search_box, trace_path);
+      db::NetTracerNet *net = do_trace (start_search_box, stop_search_box, trace_path);
       if (net) {
 
         //  create a new net taking the shapes from the tracer
@@ -220,7 +220,7 @@ NetTracerDialog::redo_trace_clicked ()
 {
 BEGIN_PROTECTED
 
-  std::set <db::Net *> selected_nets;
+  std::set <db::NetTracerNet *> selected_nets;
 
   QList<QListWidgetItem *> selected_items = net_list->selectedItems ();
   for (QList<QListWidgetItem *>::const_iterator item = selected_items.begin (); item != selected_items.end (); ++item) {
@@ -230,18 +230,18 @@ BEGIN_PROTECTED
     }
   }
 
-  std::vector <db::Net *> nets;
+  std::vector <db::NetTracerNet *> nets;
   nets.swap (mp_nets);
 
   m_net_index = 1;
 
   std::vector <size_t> new_selection;
 
-  for (std::vector <db::Net *>::const_iterator n = nets.begin (); n != nets.end (); ++n) {
+  for (std::vector <db::NetTracerNet *>::const_iterator n = nets.begin (); n != nets.end (); ++n) {
 
     try {
 
-      db::Net *net = do_trace ((*n)->start_search_box (), (*n)->stop_search_box (), (*n)->trace_path_flag ());
+      db::NetTracerNet *net = do_trace ((*n)->start_search_box (), (*n)->stop_search_box (), (*n)->trace_path_flag ());
       if (net) {
 
         //  create a new net taking the shapes from the tracer
@@ -281,7 +281,7 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
-db::Net *
+db::NetTracerNet *
 NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &stop_search_box, bool trace_path)
 {
   unsigned int start_layer = 0;
@@ -401,7 +401,7 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
   } else {
 
     //  create a new net taking the shapes from the tracer
-    db::Net *net = new db::Net (net_tracer, db::ICplxTrans (cv.context_trans ()), cv->layout (), cv.cell_index (), cv->filename (), cv->name (), tracer_data);
+    db::NetTracerNet *net = new db::NetTracerNet (net_tracer, db::ICplxTrans (cv.context_trans ()), cv->layout (), cv.cell_index (), cv->filename (), cv->name (), tracer_data);
     net->set_start_search_box (start_search_box);
     net->set_stop_search_box (stop_search_box);
     net->set_trace_path_flag (trace_path);
@@ -712,7 +712,7 @@ NetTracerDialog::update_info ()
           std::map<unsigned int, db::coord_traits<db::Coord>::perimeter_type> statinfo_perimeter;
 
           size_t tot_shapes = 0;
-          for (db::Net::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end (); ++net_shape) {
+          for (db::NetTracerNet::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end (); ++net_shape) {
 
             if (tot_shapes++ >= max_shapes) {
               incomplete = true;
@@ -917,7 +917,7 @@ NetTracerDialog::update_info ()
           bool incomplete = false;
           std::set<std::string> labels;
 
-          for (db::Net::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end (); ++net_shape) {
+          for (db::NetTracerNet::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end (); ++net_shape) {
 
             if (net_shape->shape ().is_text ()) {
 
@@ -962,7 +962,7 @@ NetTracerDialog::update_info ()
           incomplete = false;
           std::set<std::string> cells;
 
-          for (db::Net::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end (); ++net_shape) {
+          for (db::NetTracerNet::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end (); ++net_shape) {
 
             if (cells.size () >= max_cells) {
               incomplete = true;
@@ -1238,7 +1238,7 @@ BEGIN_PROTECTED
 
           w.start_element ("net");
 
-          const db::Net *net = mp_nets[item_index];
+          const db::NetTracerNet *net = mp_nets[item_index];
 
           w.start_element ("name");
           w.cdata (net->name ());
@@ -1262,7 +1262,7 @@ BEGIN_PROTECTED
 
           w.start_element ("shapes");
 
-          for (db::Net::iterator net_shape = net->begin (); net_shape != net->end (); ++net_shape) {
+          for (db::NetTracerNet::iterator net_shape = net->begin (); net_shape != net->end (); ++net_shape) {
 
             w.start_element ("element");
 
@@ -1443,7 +1443,7 @@ NetTracerDialog::adjust_view ()
       db::DBox cv_bbox;
 
       //  Create markers for the shapes 
-      for (db::Net::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end (); ++net_shape) {
+      for (db::NetTracerNet::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end (); ++net_shape) {
 
         //  Find the actual layer by looking up the layer properties ..
         std::map <unsigned int, unsigned int>::const_iterator ll = llmap.find (net_shape->layer ());
@@ -1534,7 +1534,7 @@ NetTracerDialog::update_highlights ()
       QColor net_color = mp_nets [item_index]->color ();
 
       //  Create markers for the shapes 
-      for (db::Net::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end () && n_marker < m_max_marker_count; ++net_shape) {
+      for (db::NetTracerNet::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end () && n_marker < m_max_marker_count; ++net_shape) {
 
         //  Find the actual layer by looking up the layer properties ..
         std::map <unsigned int, unsigned int>::const_iterator ll = llmap.find (net_shape->layer ());

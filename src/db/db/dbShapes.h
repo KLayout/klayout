@@ -83,6 +83,7 @@ public:
   typedef db::array<path_ptr_type, disp_type> path_ptr_array_type;
   typedef path_ptr_array_type::iterator path_ptr_array_iterator_type;
   typedef db::edge<coord_type> edge_type;
+  typedef db::edge_pair<coord_type> edge_pair_type;
   typedef db::text<coord_type> text_type;
   typedef db::text_ref<text_type, disp_type> text_ref_type;
   typedef db::text_ref<text_type, unit_trans_type> text_ptr_type;
@@ -126,18 +127,19 @@ public:
     SimplePolygonRef       = 4,
     SimplePolygonPtrArray  = 5,
     Edge                   = 6,
-    Path                   = 7,
-    PathRef                = 8,
-    PathPtrArray           = 9,
-    Box                    = 10,
-    BoxArray               = 11,
-    ShortBox               = 12,
-    ShortBoxArray          = 13,
-    Text                   = 14,
-    TextRef                = 15,
-    TextPtrArray           = 16,
-    UserObject             = 17,
-    Null                   = 18 //  must be last!
+    EdgePair               = 7,
+    Path                   = 8,
+    PathRef                = 9,
+    PathPtrArray           = 10,
+    Box                    = 11,
+    BoxArray               = 12,
+    ShortBox               = 13,
+    ShortBoxArray          = 14,
+    Text                   = 15,
+    TextRef                = 16,
+    TextPtrArray           = 17,
+    UserObject             = 18,
+    Null                   = 19 //  must be last!
   };
 
   enum flags_type 
@@ -151,7 +153,8 @@ public:
                       | (1 << SimplePolygonRef) 
                       | (1 << SimplePolygonPtrArray),
     Edges             = (1 << Edge),
-    Paths             = (1 << Path) 
+    EdgePairs         = (1 << EdgePair),
+    Paths             = (1 << Path)
                       | (1 << PathRef) 
                       | (1 << PathPtrArray),
     Boxes             = (1 << Box)
@@ -352,14 +355,15 @@ private:
     char sz8  [sizeof (per_shape_iter_size <path_ref_type>)];
     char sz9  [sizeof (per_shape_iter_size <path_ptr_array_type>)];
     char sz10 [sizeof (per_shape_iter_size <edge_type>)];
-    char sz11 [sizeof (per_shape_iter_size <box_type>)];
-    char sz12 [sizeof (per_shape_iter_size <box_array_type>)];
-    char sz13 [sizeof (per_shape_iter_size <short_box_type>)];
-    char sz14 [sizeof (per_shape_iter_size <short_box_array_type>)];
-    char sz15 [sizeof (per_shape_iter_size <text_type>)];
-    char sz16 [sizeof (per_shape_iter_size <text_ref_type>)];
-    char sz17 [sizeof (per_shape_iter_size <text_ptr_array_type>)];
-    char sz18 [sizeof (per_shape_iter_size <user_object_type>)];
+    char sz11 [sizeof (per_shape_iter_size <edge_pair_type>)];
+    char sz12 [sizeof (per_shape_iter_size <box_type>)];
+    char sz13 [sizeof (per_shape_iter_size <box_array_type>)];
+    char sz14 [sizeof (per_shape_iter_size <short_box_type>)];
+    char sz15 [sizeof (per_shape_iter_size <short_box_array_type>)];
+    char sz16 [sizeof (per_shape_iter_size <text_type>)];
+    char sz17 [sizeof (per_shape_iter_size <text_ref_type>)];
+    char sz18 [sizeof (per_shape_iter_size <text_ptr_array_type>)];
+    char sz19 [sizeof (per_shape_iter_size <user_object_type>)];
   };
 
   //  this union is simply there to determine the maximum size required for all

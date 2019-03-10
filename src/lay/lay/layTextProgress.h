@@ -46,9 +46,7 @@ public:
    */
   TextProgress (int verbosity);
 
-  virtual void set_progress_can_cancel (bool f);
-  virtual void set_progress_text (const std::string &text);
-  virtual void set_progress_value (double v, const std::string &value);
+  virtual void update_progress (tl::Progress *progress);
   virtual void show_progress_bar (bool show);
 
 private:

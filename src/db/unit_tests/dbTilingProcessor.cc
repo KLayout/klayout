@@ -22,6 +22,7 @@
 
 
 #include "tlUnitTest.h"
+#include "tlThreads.h"
 
 #include "dbTilingProcessor.h"
 #include "dbTextWriter.h"
@@ -29,10 +30,9 @@
 #include "gsiDecl.h"
 #include "dbWriter.h"
 #include "dbSaveLayoutOptions.h"
+#include "dbShapeProcessor.h"
 
 #include <cstdlib>
-#include <QMutex>
-#include <QMutexLocker>
 
 unsigned int get_rand()
 {
@@ -237,7 +237,7 @@ TEST(3)
   tp.input ("i2", ir2.begin_iter ().first, ir2.begin_iter ().second);
   EXPECT_EQ (ir2.has_valid_polygons (), false);
   db::Region ir3 (db::RecursiveShapeIterator (ly, ly.cell (top), l3));
-  ir3.ensure_valid_polygons ();
+  ir3.flatten ();
   tp.input ("i3", ir3.begin_iter ().first, ir3.begin_iter ().second);
   EXPECT_EQ (ir3.has_valid_polygons (), true);
   tp.output ("o1", ly, top, o1);
@@ -402,8 +402,8 @@ public:
 
   void add (double x) const
   {
-    static QMutex lock;
-    QMutexLocker locker (&lock);
+    static tl::Mutex lock;
+    tl::MutexLocker locker (&lock);
     *mp_sum += x;
     *mp_n += 1;
   }

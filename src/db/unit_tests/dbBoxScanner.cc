@@ -35,6 +35,8 @@ struct BoxScannerTestRecorder
     str += "<" + tl::to_string (p) + ">";
   }
 
+  bool stop () const { return false; }
+
   void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
   {
     str += "(" + tl::to_string (p1) + "-" + tl::to_string (p2) + ")";
@@ -43,9 +45,31 @@ struct BoxScannerTestRecorder
   std::string str;
 };
 
+struct BoxScannerTestRecorderStopping
+{
+  BoxScannerTestRecorderStopping () : do_stop (false) { }
+
+  void finish (const db::Box * /*box*/, size_t p) {
+    str += "<" + tl::to_string (p) + ">";
+  }
+
+  bool stop () const { return do_stop; }
+
+  void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
+  {
+    str += "(" + tl::to_string (p1) + "-" + tl::to_string (p2) + ")";
+    do_stop = true;
+  }
+
+  std::string str;
+  bool do_stop;
+};
+
 struct BoxScannerTestRecorder2
 {
   void finish (const db::Box *, size_t) { }
+
+  bool stop () const { return false; }
 
   void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
   {
@@ -54,6 +78,65 @@ struct BoxScannerTestRecorder2
   }
 
   std::set<std::pair<size_t, size_t> > interactions;
+};
+
+struct BoxScannerTestRecorderTwo
+{
+  void finish1 (const db::Box * /*box*/, size_t p) {
+    str += "<" + tl::to_string (p) + ">";
+  }
+
+  void finish2 (const db::SimplePolygon * /*poly*/, int p) {
+    str += "<" + tl::to_string (p) + ">";
+  }
+
+  bool stop () const { return false; }
+
+  void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
+  {
+    str += "(" + tl::to_string (p1) + "-" + tl::to_string (p2) + ")";
+  }
+
+  std::string str;
+};
+
+struct BoxScannerTestRecorderTwoStopping
+{
+  BoxScannerTestRecorderTwoStopping () : do_stop (false) { }
+
+  void finish1 (const db::Box * /*box*/, size_t p) {
+    str += "<" + tl::to_string (p) + ">";
+  }
+
+  void finish2 (const db::SimplePolygon * /*poly*/, int p) {
+    str += "<" + tl::to_string (p) + ">";
+  }
+
+  bool stop () const { return do_stop; }
+
+  void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
+  {
+    str += "(" + tl::to_string (p1) + "-" + tl::to_string (p2) + ")";
+    do_stop = true;
+  }
+
+  std::string str;
+  bool do_stop;
+};
+
+struct BoxScannerTestRecorder2Two
+{
+  void finish1 (const db::Box *, size_t) { }
+  void finish2 (const db::SimplePolygon *, int) { }
+
+  bool stop () const { return false; }
+
+  void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
+  {
+    interactions.insert (std::make_pair (p1, p2));
+  }
+
+  std::set<std::pair<size_t, int> > interactions;
 };
 
 TEST(1)
@@ -75,8 +158,12 @@ TEST(1)
   bs.set_fill_factor (0.0);
   db::box_convert<db::Box> bc;
   bs.set_scanner_threshold (0);
-  bs.process (tr, 1, bc);
+  EXPECT_EQ (bs.process (tr, 1, bc), true);
   EXPECT_EQ (tr.str, "(4-2)(5-2)(5-4)(3-2)(3-4)(5-3)<2><5><4><3>(1-0)<0><1>");
+
+  BoxScannerTestRecorderStopping trstop;
+  EXPECT_EQ (bs.process (trstop, 1, bc), false);
+  EXPECT_EQ (trstop.str, "(4-2)");
 }
 
 TEST(1a)
@@ -194,6 +281,28 @@ TEST(1f)
   db::box_convert<db::Box> bc;
   bs.process (tr, 0, bc);
   EXPECT_EQ (tr.str, "");
+}
+
+TEST(1g)
+{
+  //  empty elements
+  db::box_scanner<db::Box, size_t> bs;
+
+  std::vector<db::Box> bb;
+  bb.push_back (db::Box (0, 0, 101, 100));
+  bb.push_back (db::Box (200, 0, 300, 100));
+  bb.push_back (db::Box ());
+  bb.push_back (db::Box (100, 0, 200, 100));
+  bb.push_back (db::Box ());
+  for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
+    bs.insert (&*b, b - bb.begin ());
+  }
+
+  BoxScannerTestRecorder tr;
+  bs.set_fill_factor (0.0);
+  db::box_convert<db::Box> bc;
+  bs.process (tr, 0, bc);
+  EXPECT_EQ (tr.str, "<2><4>(0-3)<0><1><3>");
 }
 
 void run_test2 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)
@@ -787,3 +896,255 @@ TEST(100)
 
 }
 
+
+TEST(two_1)
+{
+  db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
+
+  std::vector<db::Box> bb;
+  std::vector<db::SimplePolygon> bb2;
+  bb.push_back (db::Box (0, 210, 200, 310));
+  bb.push_back (db::Box (10, 220, 210, 320));
+  bb.push_back (db::Box (0, 0, 100, 100));
+  bb.push_back (db::Box (50, 50, 150, 150));
+  bb.push_back (db::Box (10, 10, 110, 110));
+  bb.push_back (db::Box (100, 10, 200, 110));
+
+  for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
+    bb2.push_back (db::SimplePolygon (*b));
+  }
+
+  for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
+    bs.insert1 (&*b, b - bb.begin ());
+  }
+  for (std::vector<db::SimplePolygon>::const_iterator b = bb2.begin (); b != bb2.end (); ++b) {
+    bs.insert2 (&*b, int (b - bb2.begin ()) + 10);
+  }
+
+  BoxScannerTestRecorderTwo tr;
+  bs.set_fill_factor (0.0);
+  db::box_convert<db::Box> bc1;
+  db::box_convert<db::SimplePolygon> bc2;
+  bs.set_scanner_threshold (0);
+  bs.process (tr, 1, bc1, bc2);
+  EXPECT_EQ (tr.str, "(2-12)(2-14)(4-12)(4-14)(2-15)(4-15)(5-12)(5-14)(5-15)(2-13)(4-13)(3-12)(3-14)(3-13)(3-15)(5-13)(0-10)<2><5><4><3><12><15><14><13>(0-11)(1-10)(1-11)<0><1><10><11>");
+}
+
+TEST(two_1a)
+{
+  db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
+
+  std::vector<db::Box> bb;
+  bb.push_back (db::Box (0, 210, 200, 310));
+  //bb.push_back (db::Box (10, 220, 210, 320));
+  //bb.push_back (db::Box (0, 0, 100, 100));
+  bb.push_back (db::Box (50, 50, 150, 150));
+  bb.push_back (db::Box (10, 10, 110, 110));
+  //bb.push_back (db::Box (100, 10, 200, 110));
+
+  std::vector<db::SimplePolygon> bb2;
+  //bb2.push_back (db::SimplePolygon (db::Box (0, 210, 200, 310)));
+  bb2.push_back (db::SimplePolygon (db::Box (10, 220, 210, 320)));
+  bb2.push_back (db::SimplePolygon (db::Box (0, 0, 100, 100)));
+  //bb2.push_back (db::SimplePolygon (db::Box (50, 50, 150, 150)));
+  //bb2.push_back (db::SimplePolygon (db::Box (10, 10, 110, 110)));
+  bb2.push_back (db::SimplePolygon (db::Box (100, 10, 200, 110)));
+
+  for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
+    bs.insert1 (&*b, b - bb.begin ());
+  }
+  for (std::vector<db::SimplePolygon>::const_iterator b = bb2.begin (); b != bb2.end (); ++b) {
+    bs.insert2 (&*b, int (b - bb2.begin ()) + 10);
+  }
+
+  BoxScannerTestRecorderTwo tr;
+  bs.set_fill_factor (0.0);
+  db::box_convert<db::Box> bc1;
+  db::box_convert<db::SimplePolygon> bc2;
+  bs.set_scanner_threshold (0);
+  bs.process (tr, 1, bc1, bc2);
+  EXPECT_EQ (tr.str, "(2-11)(2-12)(1-11)(1-12)<1><2><11><12>(0-10)<0><10>");
+}
+
+TEST(two_1b)
+{
+  db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
+
+  std::vector<db::Box> bb;
+  //bb.push_back (db::Box (0, 210, 200, 310));
+  bb.push_back (db::Box (10, 220, 210, 320));
+  bb.push_back (db::Box (0, 0, 100, 100));
+  //bb.push_back (db::Box (50, 50, 150, 150));
+  //bb.push_back (db::Box (10, 10, 110, 110));
+  bb.push_back (db::Box (100, 10, 200, 110));
+
+  std::vector<db::SimplePolygon> bb2;
+  bb2.push_back (db::SimplePolygon (db::Box (0, 210, 200, 310)));
+  //bb2.push_back (db::SimplePolygon (db::Box (10, 220, 210, 320)));
+  //bb2.push_back (db::SimplePolygon (db::Box (0, 0, 100, 100)));
+  bb2.push_back (db::SimplePolygon (db::Box (50, 50, 150, 150)));
+  bb2.push_back (db::SimplePolygon (db::Box (10, 10, 110, 110)));
+  //bb2.push_back (db::SimplePolygon (db::Box (100, 10, 200, 110)));
+
+  for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
+    bs.insert1 (&*b, b - bb.begin ());
+  }
+  for (std::vector<db::SimplePolygon>::const_iterator b = bb2.begin (); b != bb2.end (); ++b) {
+    bs.insert2 (&*b, int (b - bb2.begin ()) + 10);
+  }
+
+  BoxScannerTestRecorderTwo tr;
+  bs.set_fill_factor (0.0);
+  db::box_convert<db::Box> bc1;
+  db::box_convert<db::SimplePolygon> bc2;
+  bs.set_scanner_threshold (0);
+  EXPECT_EQ (bs.process (tr, 1, bc1, bc2), true);
+  EXPECT_EQ (tr.str, "(1-12)(2-12)(1-11)(2-11)<1><2><11><12>(0-10)<0><10>");
+
+
+  BoxScannerTestRecorderTwoStopping trstop;
+  EXPECT_EQ (bs.process (trstop, 1, bc1, bc2), false);
+  EXPECT_EQ (trstop.str, "(1-12)");
+}
+
+TEST(two_1c)
+{
+  //  some empty elements
+  db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
+
+  std::vector<db::Box> bb;
+  bb.push_back (db::Box ());
+  bb.push_back (db::Box (0, 0, 100, 100));
+  bb.push_back (db::Box (100, 10, 200, 110));
+
+  std::vector<db::SimplePolygon> bb2;
+  bb2.push_back (db::SimplePolygon (db::Box ()));
+  bb2.push_back (db::SimplePolygon (db::Box (50, 50, 150, 150)));
+  bb2.push_back (db::SimplePolygon (db::Box (10, 10, 110, 110)));
+
+  for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
+    bs.insert1 (&*b, b - bb.begin ());
+  }
+  for (std::vector<db::SimplePolygon>::const_iterator b = bb2.begin (); b != bb2.end (); ++b) {
+    bs.insert2 (&*b, int (b - bb2.begin ()) + 10);
+  }
+
+  BoxScannerTestRecorderTwo tr;
+  bs.set_fill_factor (0.0);
+  db::box_convert<db::Box> bc1;
+  db::box_convert<db::SimplePolygon> bc2;
+  bs.set_scanner_threshold (0);
+  EXPECT_EQ (bs.process (tr, 1, bc1, bc2), true);
+  EXPECT_EQ (tr.str, "<0><10>(1-12)(2-12)(1-11)(2-11)<1><2><12><11>");
+}
+
+void run_test2_two (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)
+{
+  std::vector<db::Box> bb;
+  for (size_t i = 0; i < n; ++i) {
+    db::Coord x = rand () % spread;
+    db::Coord y = rand () % spread;
+    bb.push_back (db::Box (x, y, x + 100, y + 100));
+    // std::cout << "Box 1" << bb.back ().to_string () << std::endl;
+  }
+
+  std::vector<db::SimplePolygon> bb2;
+  for (size_t i = 0; i < n; ++i) {
+    db::Coord x = rand () % spread;
+    db::Coord y = rand () % spread;
+    bb2.push_back (db::SimplePolygon (db::Box (x, y, x + 100, y + 100)));
+    // std::cout << "Polygon 2" << bb2.back ().to_string () << std::endl;
+  }
+
+  db::box_scanner2<db::Box, size_t, db::SimplePolygon, int> bs;
+  for (std::vector<db::Box>::const_iterator b = bb.begin (); b != bb.end (); ++b) {
+    bs.insert1 (&*b, b - bb.begin ());
+  }
+  for (std::vector<db::SimplePolygon>::const_iterator b2 = bb2.begin (); b2 != bb2.end (); ++b2) {
+    bs.insert2 (&*b2, int (b2 - bb2.begin ()));
+  }
+
+  BoxScannerTestRecorder2Two tr;
+  bs.set_fill_factor (ff);
+  db::box_convert<db::Box> bc1;
+  db::box_convert<db::SimplePolygon> bc2;
+  {
+    tl::SelfTimer timer ("box-scanner");
+    bs.set_scanner_threshold (0);
+    bs.process (tr, touch ? 1 : 0, bc1, bc2);
+  }
+
+  std::set<std::pair<size_t, int> > interactions;
+  {
+    tl::SelfTimer timer ("brute-force");
+    for (size_t i = 0; i < bb.size (); ++i) {
+      for (size_t j = 0; j < bb2.size (); ++j) {
+        if ((touch && bb[i].touches (bb2[j].box ())) || (!touch && bb[i].overlaps (bb2[j].box ()))) {
+          interactions.insert (std::make_pair (i, int (j)));
+        }
+      }
+    }
+  }
+
+  if (interactions != tr.interactions) {
+    tl::info << "Interactions 1-2 in 'brute force' but not in 'box-scanner':";
+    for (std::set<std::pair<size_t, int> >::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      if (tr.interactions.find (*i) == tr.interactions.end ()) {
+        tl::info << "   " << i->first << "-" << i->second;
+      }
+    }
+    tl::info << "Interactions 1-2 in 'box-scanner' but not in 'brute force':";
+    for (std::set<std::pair<size_t, int> >::const_iterator i = tr.interactions.begin (); i != tr.interactions.end (); ++i) {
+      if (interactions.find (*i) == interactions.end ()) {
+        tl::info << "   " << i->first << "-" << i->second;
+      }
+    }
+  }
+  EXPECT_EQ (interactions == tr.interactions, true);
+
+}
+
+TEST(two_2a)
+{
+  run_test2_two(_this, 10, 0.0, 1000);
+}
+
+TEST(two_2b)
+{
+  run_test2_two(_this, 10, 0.0, 100);
+}
+
+TEST(two_2c)
+{
+  run_test2_two(_this, 10, 0.0, 10);
+}
+
+TEST(two_2d)
+{
+  run_test2_two(_this, 1000, 0.0, 1000);
+}
+
+TEST(two_2e)
+{
+  run_test2_two(_this, 1000, 2, 1000);
+}
+
+TEST(two_2f)
+{
+  run_test2_two(_this, 1000, 2, 1000, false);
+}
+
+TEST(two_2g)
+{
+  run_test2_two(_this, 1000, 2, 500);
+}
+
+TEST(two_2h)
+{
+  run_test2_two(_this, 1000, 2, 100);
+}
+
+TEST(two_2i)
+{
+  run_test2_two(_this, 10000, 2, 10000);
+}

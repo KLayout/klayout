@@ -134,6 +134,7 @@
         <file alias="drc_ref_layer.xml">doc/about/drc_ref_layer.xml</file>
         <file alias="drc_ref_source.xml">doc/about/drc_ref_source.xml</file>
         <file alias="drc_ref_global.xml">doc/about/drc_ref_global.xml</file>
+        <file alias="drc_ref_netter.xml">doc/about/drc_ref_netter.xml</file>
         <file alias="packages.xml">doc/about/packages.xml</file>
     </qresource>
     <qresource prefix="/help/manual">

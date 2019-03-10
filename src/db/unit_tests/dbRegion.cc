@@ -24,6 +24,9 @@
 #include "tlUnitTest.h"
 
 #include "dbRegion.h"
+#include "dbRegionUtils.h"
+#include "dbRegionProcessors.h"
+#include "dbEdgesUtils.h"
 #include "dbBoxScanner.h"
 
 #include <cstdio>
@@ -52,9 +55,18 @@ TEST(1)
   EXPECT_EQ (r.transformed (db::Trans (db::Vector (1, 2))).to_string (), "(1,2;1,202;101,202;101,2)");
   EXPECT_EQ (r.bbox ().to_string (), "(0,0;100,200)");
   EXPECT_EQ (r.empty (), false);
-  EXPECT_EQ (r.is_merged (), false);
+  EXPECT_EQ (r.is_merged (), true);
   EXPECT_EQ (r.is_box (), true);
   EXPECT_EQ (r.begin ().at_end (), false);
+
+  db::Region rr = r;
+  rr.insert (db::Box (db::Point (10, 10), db::Point (110, 30)));
+  EXPECT_EQ (rr.bbox ().to_string (), "(0,0;110,200)");
+  EXPECT_EQ (rr.to_string (), "(0,0;0,200;100,200;100,0);(10,10;10,30;110,30;110,10)");
+  EXPECT_EQ (rr.empty (), false);
+  EXPECT_EQ (rr.is_merged (), false);
+  EXPECT_EQ (rr.is_box (), false);
+  EXPECT_EQ (rr.begin ().at_end (), false);
 
   db::Region r1 = r;
   db::Region r2;
@@ -1327,6 +1339,38 @@ TEST(30c)
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
   r.select_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (-10, -10))));
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+}
+
+TEST(100_Processors)
+{
+  db::Region r;
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  r.insert (db::Box (db::Point (0, 300), db::Point (200, 400)));
+  r.insert (db::Box (db::Point (0, 300), db::Point (200, 400)));
+  r.insert (db::Box (db::Point (100, 300), db::Point (200, 500)));
+
+  EXPECT_EQ (r.processed (db::CornersAsDots (-180.0, 180.0)).to_string (), "(100,0;100,0);(0,0;0,0);(0,200;0,200);(100,200;100,200);(200,300;200,300);(0,300;0,300);(0,400;0,400);(100,400;100,400);(100,500;100,500);(200,500;200,500)");
+  EXPECT_EQ (r.processed (db::CornersAsDots (0.0, 180.0)).to_string (), "(100,400;100,400)");
+  db::Region ext;
+  r.processed (db::CornersAsDots (0.0, 180.0)).extended (ext, 10, 10, 20, 20);
+  EXPECT_EQ (ext.to_string (), "(90,380;90,420;110,420;110,380)");
+  EXPECT_EQ (r.processed (db::CornersAsRectangles (-180.0, 180.0, 2)).to_string (), "(98,-2;98,2;102,2;102,-2);(-2,-2;-2,2;2,2;2,-2);(-2,198;-2,202;2,202;2,198);(98,198;98,202;102,202;102,198);(198,298;198,302;202,302;202,298);(-2,298;-2,302;2,302;2,298);(-2,398;-2,402;2,402;2,398);(98,398;98,402;102,402;102,398);(98,498;98,502;102,502;102,498);(198,498;198,502;202,502;202,498)");
+  EXPECT_EQ (r.processed (db::CornersAsRectangles (0.0, 180.0, 2)).to_string (), "(98,398;98,402;102,402;102,398)");
+
+  EXPECT_EQ (r.processed (db::Extents (0, 0)).to_string (), "(0,0;0,200;100,200;100,0);(0,300;0,500;200,500;200,300)");
+  EXPECT_EQ (r.processed (db::Extents (10, 20)).to_string (), "(-10,-20;-10,220;110,220;110,-20);(-10,280;-10,520;210,520;210,280)");
+  EXPECT_EQ (r.processed (db::RelativeExtents (0, 0, 1.0, 1.0, 0, 0)).to_string (), "(0,0;0,200;100,200;100,0);(0,300;0,500;200,500;200,300)");
+  EXPECT_EQ (r.processed (db::RelativeExtents (0.25, 0.4, 0.75, 0.6, 10, 20)).to_string (), "(15,60;15,140;85,140;85,60);(40,360;40,440;160,440;160,360)");
+  EXPECT_EQ (r.processed (db::RelativeExtentsAsEdges (0, 0, 1.0, 1.0)).to_string (), "(0,0;100,200);(0,300;200,500)");
+  EXPECT_EQ (r.processed (db::RelativeExtentsAsEdges (0.5, 0.5, 0.5, 0.5)).to_string (), "(50,100;50,100);(100,400;100,400)");
+  EXPECT_EQ (r.processed (db::RelativeExtentsAsEdges (0.25, 0.4, 0.75, 0.6)).to_string (), "(25,80;75,120);(50,380;150,420)");
+
+  EXPECT_EQ (r.processed (db::minkowsky_sum_computation<db::Box> (db::Box (-10, -20, 30, 40))).to_string (), "(-10,-20;-10,240;130,240;130,-20);(-10,280;-10,440;90,440;90,540;230,540;230,280)");
+  EXPECT_EQ (r.processed (db::minkowsky_sum_computation<db::Edge> (db::Edge (-10, 0, 30, 0))).to_string (), "(-10,0;-10,200;130,200;130,0);(-10,300;-10,400;90,400;90,500;230,500;230,300)");
+
+  EXPECT_EQ (r.processed (db::TrapezoidDecomposition (db::TD_htrapezoids)).to_string (), "(0,0;0,200;100,200;100,0);(100,300;100,500;200,500;200,300);(0,300;0,400;100,400;100,300)");
+  EXPECT_EQ (r.processed (db::ConvexDecomposition (db::PO_vertical)).to_string (),       "(0,0;0,200;100,200;100,0);(100,300;100,500;200,500;200,300);(0,300;0,400;100,400;100,300)");
+  EXPECT_EQ (r.processed (db::ConvexDecomposition (db::PO_horizontal)).to_string (),     "(0,0;0,200;100,200;100,0);(100,400;100,500;200,500;200,400);(0,300;0,400;200,400;200,300)");
 }
 
 TEST(issue_228)

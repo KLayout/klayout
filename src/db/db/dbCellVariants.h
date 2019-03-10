@@ -1,0 +1,277 @@
+
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2019 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+#ifndef HDR_dbCellVariants
+#define HDR_dbCellVariants
+
+#include "dbCommon.h"
+
+#include "dbTrans.h"
+#include "dbLayout.h"
+
+#include <memory>
+
+namespace db
+{
+
+/**
+ *  @brief The reducer interface
+ *
+ *  The transformation reducer is used by the variant builder to provide a
+ *  reduced version of the transformation. Variants are built based on this
+ *  reduced transformation.
+ *
+ *  Reduction must satisfy the modulo condition:
+ *
+ *   reduce(A*B) = reduce(reduce(A)*reduce(B))
+ */
+class DB_PUBLIC TransformationReducer
+{
+public:
+  TransformationReducer () { }
+  virtual ~TransformationReducer () { }
+
+  virtual db::Trans reduce (const db::Trans &trans) const = 0;
+  virtual db::ICplxTrans reduce (const db::ICplxTrans &trans) const = 0;
+  virtual bool is_translation_invariant () const { return true; }
+};
+
+/**
+ *  @brief An orientation reducer
+ *
+ *  This reducer incarnation reduces the transformation to it's rotation/mirror part.
+ */
+struct DB_PUBLIC OrientationReducer
+  : public TransformationReducer
+{
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
+  {
+    db::ICplxTrans res (trans);
+    res.disp (db::Vector ());
+    res.mag (1.0);
+    return res;
+  }
+
+  db::Trans reduce (const db::Trans &trans) const
+  {
+    return db::Trans (trans.fp_trans ());
+  }
+};
+
+/**
+ *  @brief A magnification reducer
+ *
+ *  This reducer incarnation reduces the transformation to it's scaling part.
+ */
+struct DB_PUBLIC MagnificationReducer
+  : public TransformationReducer
+{
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
+  {
+    return db::ICplxTrans (trans.mag ());
+  }
+
+  db::Trans reduce (const db::Trans &) const
+  {
+    return db::Trans ();
+  }
+};
+
+/**
+ *  @brief A magnification and orientation reducer
+ *
+ *  This reducer incarnation reduces the transformation to it's rotation/mirror/magnification part (2d matrix)
+ */
+struct DB_PUBLIC MagnificationAndOrientationReducer
+  : public TransformationReducer
+{
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
+  {
+    db::ICplxTrans res (trans);
+    res.disp (db::Vector ());
+    return res;
+  }
+
+  db::Trans reduce (const db::Trans &trans) const
+  {
+    return db::Trans (trans.fp_trans ());
+  }
+};
+
+/**
+ *  @brief A grid reducer
+ *
+ *  This reducer incarnation reduces the transformation to it's displacement modulo a grid
+ */
+struct DB_PUBLIC GridReducer
+  : public TransformationReducer
+{
+  GridReducer (db::Coord grid)
+    : m_grid (grid)
+  {
+    //  .. nothing yet ..
+  }
+
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const
+  {
+    //  NOTE: we need to keep magnification, angle and mirror so when combining the
+    //  reduced transformations, the result will be equivalent to reducing the combined
+    //  transformation.
+    db::ICplxTrans res (trans);
+    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
+    return res;
+  }
+
+  db::Trans reduce (const db::Trans &trans) const
+  {
+    db::Trans res (trans);
+    res.disp (db::Vector (mod (trans.disp ().x ()), mod (trans.disp ().y ())));
+    return res;
+  }
+
+  bool is_translation_invariant () const { return false; }
+
+private:
+  db::Coord m_grid;
+
+  inline db::Coord mod (db::Coord c) const
+  {
+    if (c < 0) {
+      c = m_grid - (-c) % m_grid;
+      if (c == m_grid) {
+        return 0;
+      } else {
+        return c;
+      }
+    } else {
+      return c % m_grid;
+    }
+  }
+};
+
+/**
+ *  @brief A class computing variants for cells according to a given criterion
+ *
+ *  The cell variants are build from the cell instances and are accumulated over
+ *  the hierarchy path.
+ */
+class DB_PUBLIC VariantsCollectorBase
+{
+public:
+  /**
+   *  @brief Creates a variant collector without a transformation reducer
+   */
+  VariantsCollectorBase ();
+
+  /**
+   *  @brief Creates a variant collector with the given reducer
+   */
+  VariantsCollectorBase (const TransformationReducer *red);
+
+  /**
+   *  @brief Collects cell variants for the given layout starting from the top cell
+   */
+  void collect (const db::Layout &layout, const db::Cell &top_cell);
+
+  /**
+   *  @brief Creates cell variants for singularization of the different variants
+   *
+   *  After this method can been used, all cells with more than one variant are separated and
+   *  the corresponding instances are updated.
+   *
+   *  If given, *var_table will be filled with a map giving the new cell and variant against
+   *  the old cell for all cells with more than one variant.
+   */
+  void separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table = 0);
+
+  /**
+   *  @brief Commits the shapes for different variants to the current cell hierarchy
+   *
+   *  This is an alternative approach and will push the variant shapes into the parent hierarchy.
+   *  "to_commit" initially is a set of shapes to commit for the given cell and variant.
+   *  This map is modified during the algorithm and should be discarded later.
+   */
+  void commit_shapes (db::Layout &layout, db::Cell &top_cell, unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit);
+
+  /**
+   *  @brief Gets the variants for a given cell
+   *
+   *  The keys of the map are the variants, the values is the instance count of the variant
+   *  (as seen from the top cell).
+   */
+  const std::map<db::ICplxTrans, size_t> &variants (db::cell_index_type ci) const;
+
+  /**
+   *  @brief Returns true, if variants have been built
+   */
+  bool has_variants () const;
+
+private:
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > m_variants;
+  const TransformationReducer *mp_red;
+
+  void add_variant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst, bool tl_invariant) const;
+  void add_variant_non_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
+  void add_variant_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
+  void product (const std::map<db::ICplxTrans, size_t> &v1, const std::map<db::ICplxTrans, size_t> &v2, std::map<db::ICplxTrans, size_t> &prod) const;
+  void copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from) const;
+  void create_var_instances (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table, bool tl_invariant) const;
+  void create_var_instances_non_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;
+  void create_var_instances_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;
+};
+
+/**
+ *  @brief A template using a specific transformation reducer
+ */
+template <class RED>
+class DB_PUBLIC_TEMPLATE cell_variants_collector
+  : public VariantsCollectorBase
+{
+public:
+  /**
+   *  @brief Creates a variant collector without a transformation reducer
+   */
+  cell_variants_collector ()
+    : VariantsCollectorBase (&m_red)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Creates a variant collector with the given reducer
+   *
+   *  The collector will take ownership over the reducer
+   */
+  cell_variants_collector (const RED &red)
+    : VariantsCollectorBase (&m_red), m_red (red)
+  {
+    //  .. nothing yet ..
+  }
+
+private:
+  RED m_red;
+};
+
+}  // namespace db
+
+#endif
+

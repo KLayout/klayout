@@ -1358,7 +1358,6 @@ static std::vector<db::cell_index_type> copy_tree (db::Cell *cell, const db::Cel
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
-  db::PropertyMapper pm (*target_layout, *source_layout);
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   db::CellMapping cm;
@@ -1389,7 +1388,6 @@ static void copy_tree_shapes2 (db::Cell *cell, const db::Cell &source_cell, cons
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
-  db::PropertyMapper pm (*target_layout, *source_layout);
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   db::LayerMapping lm;
@@ -1415,7 +1413,6 @@ static void copy_tree_shapes3 (db::Cell *cell, const db::Cell &source_cell, cons
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
-  db::PropertyMapper pm (*target_layout, *source_layout);
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   std::vector <db::cell_index_type> source_cells;

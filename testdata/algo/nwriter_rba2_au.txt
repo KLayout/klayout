@@ -1,0 +1,29 @@
+* A comment
+*** My special header
+* My intro for class RCLS
+* My intro for class LCLS
+* My intro for class CCLS
+* My intro for class DCLS
+* My intro for class M3CLS
+* My intro for class M4CLS
+
+* cell C1
+* pin p1
+* pin p2
+.SUBCKT C1 1 2
+* net 1 n1
+* net 2 n2
+* net 3 n3
+* device instance $1 0,0 RCLS
+* Before device $1
+* Terminal #1: 1
+* Terminal #2: 3
+R$1 1 3 1.7
+* After device $1
+* device instance $2 0,0 RCLS
+* Before device $2
+* Terminal #1: 3
+* Terminal #2: 2
+R$2 3 2 4.2e-05
+* After device $2
+.ENDS C1

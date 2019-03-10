@@ -674,6 +674,12 @@ inline unsigned int iterator_type_mask (ShapeIterator::edge_type::tag)
 }
 
 /// @brief Internal: ShapeIterator masks per shape type
+inline unsigned int iterator_type_mask (ShapeIterator::edge_pair_type::tag)
+{
+  return 1 << ShapeIterator::EdgePair;
+}
+
+/// @brief Internal: ShapeIterator masks per shape type
 inline unsigned int iterator_type_mask (ShapeIterator::path_type::tag)
 {
   return 1 << ShapeIterator::Path;
@@ -917,6 +923,8 @@ template class layer_class<db::Shape::path_ptr_array_type, db::stable_layer_tag>
 template class layer_class<db::object_with_properties<db::Shape::path_ptr_array_type>, db::stable_layer_tag>;
 template class layer_class<db::Shape::edge_type, db::stable_layer_tag>;
 template class layer_class<db::object_with_properties<db::Shape::edge_type>, db::stable_layer_tag>;
+template class layer_class<db::Shape::edge_pair_type, db::stable_layer_tag>;
+template class layer_class<db::object_with_properties<db::Shape::edge_pair_type>, db::stable_layer_tag>;
 template class layer_class<db::Shape::text_type, db::stable_layer_tag>;
 template class layer_class<db::object_with_properties<db::Shape::text_type>, db::stable_layer_tag>;
 template class layer_class<db::Shape::text_ref_type, db::stable_layer_tag>;
@@ -953,6 +961,8 @@ template class layer_class<db::Shape::path_ptr_array_type, db::unstable_layer_ta
 template class layer_class<db::object_with_properties<db::Shape::path_ptr_array_type>, db::unstable_layer_tag>;
 template class layer_class<db::Shape::edge_type, db::unstable_layer_tag>;
 template class layer_class<db::object_with_properties<db::Shape::edge_type>, db::unstable_layer_tag>;
+template class layer_class<db::Shape::edge_pair_type, db::unstable_layer_tag>;
+template class layer_class<db::object_with_properties<db::Shape::edge_pair_type>, db::unstable_layer_tag>;
 template class layer_class<db::Shape::text_type, db::unstable_layer_tag>;
 template class layer_class<db::object_with_properties<db::Shape::text_type>, db::unstable_layer_tag>;
 template class layer_class<db::Shape::text_ref_type, db::unstable_layer_tag>;

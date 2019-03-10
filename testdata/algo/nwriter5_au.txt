@@ -1,0 +1,16 @@
+* written by unit test
+
+* cell C1
+* pin p1
+* pin p2
+* pin p3
+.SUBCKT C1 1 2 4
+* net 1 n1
+* net 2 n2
+* net 3 n3
+* net 4 n4
+* device instance $1 0,0 M3CLS
+M$1 1 4 3 1 MM3CLS L=0.25U W=0.18U AS=1.2P AD=0.75P PS=2.2U PD=1.75U
+* device instance $2 0,0 M3CLS
+M$2 3 4 2 3 MM3CLS L=1.4U W=0.25U AS=1.3P AD=0.85P PS=2.3U PD=1.85U
+.ENDS C1

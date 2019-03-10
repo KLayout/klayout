@@ -466,7 +466,7 @@ int type_index_of ();
  *  Using this class, any value can be stored inside the collection of Values.
  */
 template <class C>
-class RDB_PUBLIC Value 
+class RDB_PUBLIC_TEMPLATE Value
   : public ValueBase
 {
 public:
@@ -519,6 +519,15 @@ public:
 private:
   C m_value;
 };
+
+/**
+ *  @brief Type bindings
+ */
+template <class T>
+RDB_PUBLIC_TEMPLATE ValueBase *make_value (const T &value)
+{
+  return new Value<T> (value);
+}
 
 /**
  *  @brief A class encapsulating ValueBase pointer

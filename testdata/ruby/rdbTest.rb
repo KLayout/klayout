@@ -697,6 +697,7 @@ class RDB_TestClass < TestBase
 
   end
 
+  # scan_... methods
   def test_11
 
     ly = RBA::Layout::new
@@ -769,7 +770,18 @@ class RDB_TestClass < TestBase
 
     rdb = RBA::ReportDatabase.new("neu")
     cat = rdb.create_category("l1")
-    cat.scan_shapes(c1.begin_shapes_rec(l1))
+    cat.scan_shapes(c1.begin_shapes_rec(l1))  # hierarchical scan
+    assert_equal(cat.num_items, 3)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_test }
+    assert_equal(cn.join(";"), "c1[];c2[c1->r0 *1 0.01,0.02];c3[c1->r0 *1 0.021,0.041]")
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[polygon: (0,0.001;0,0.03;0.02,0.03;0.02,0.001)];c2[polygon: (0,0.001;0,0.031;0.021,0.031;0.021,0.001)];c3[polygon: (0,0.001;0,0.032;0.022,0.032;0.022,0.001)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat = rdb.create_category("l1")
+    cat.scan_shapes(c1.begin_shapes_rec(l1), true)  # flat scan
     assert_equal(cat.num_items, 3)
     cn = []
     rdb.each_cell { |c| cn << c.to_s_test }
@@ -780,14 +792,39 @@ class RDB_TestClass < TestBase
 
     rdb = RBA::ReportDatabase.new("neu")
     cat = rdb.create_category("l1")
-    cat.scan_shapes(c1.begin_shapes_rec(l1))
+    r = RBA::Region::new(c1.begin_shapes_rec(l1))
+    cat.scan_collection(rdb.create_cell("TOP"), RBA::CplxTrans::new(0.001), r)  # hierarchical scan
     assert_equal(cat.num_items, 3)
     cn = []
     rdb.each_cell { |c| cn << c.to_s_test }
-    assert_equal(cn.join(";"), "c1[]")
+    assert_equal(cn.join(";"), "TOP[];c1[TOP->r0 *1 0,0];c2[c1->r0 *1 0.01,0.02];c3[c1->r0 *1 0.021,0.041]")
     cn = []
     rdb.each_cell { |c| cn << c.to_s_items }
-    assert_equal(cn.join(";"), "c1[polygon: (0,0.001;0,0.03;0.02,0.03;0.02,0.001),polygon: (0.01,0.021;0.01,0.051;0.031,0.051;0.031,0.021),polygon: (0.021,0.042;0.021,0.073;0.043,0.073;0.043,0.042)]")
+    assert_equal(cn.join(";"), "TOP[];c1[polygon: (0,0.001;0,0.03;0.02,0.03;0.02,0.001)];c2[polygon: (0,0.001;0,0.031;0.021,0.031;0.021,0.001)];c3[polygon: (0,0.001;0,0.032;0.022,0.032;0.022,0.001)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat = rdb.create_category("l1")
+    r = RBA::Region::new(c1.begin_shapes_rec(l1))
+    cat.scan_collection(rdb.create_cell("TOP"), RBA::CplxTrans::new(0.001), r, true)  # flat scan
+    assert_equal(cat.num_items, 3)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_test }
+    assert_equal(cn.join(";"), "TOP[]")
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "TOP[polygon: (0,0.001;0,0.03;0.02,0.03;0.02,0.001),polygon: (0.01,0.021;0.01,0.051;0.031,0.051;0.031,0.021),polygon: (0.021,0.042;0.021,0.073;0.043,0.073;0.043,0.042)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat = rdb.create_category("l1")
+    r = RBA::Region::new(c1.begin_shapes_rec(l1)).merged
+    cat.scan_collection(rdb.create_cell("TOP"), RBA::CplxTrans::new(0.001), r, true)  # flat scan
+    assert_equal(cat.num_items, 1)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_test }
+    assert_equal(cn.join(";"), "TOP[]")
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "TOP[polygon: (0,0.001;0,0.03;0.01,0.03;0.01,0.051;0.021,0.051;0.021,0.073;0.043,0.073;0.043,0.042;0.031,0.042;0.031,0.021;0.02,0.021;0.02,0.001)]")
 
   end
 

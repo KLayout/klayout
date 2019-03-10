@@ -267,9 +267,27 @@ static void scan_layer3 (rdb::Category *cat, const db::Layout &layout, unsigned 
   rdb::scan_layer (cat, layout, layer, from_cell, levels);
 }
 
-static void scan_shapes (rdb::Category *cat, const db::RecursiveShapeIterator &iter)
+static void scan_shapes (rdb::Category *cat, const db::RecursiveShapeIterator &iter, bool flat)
 {
-  rdb::scan_layer (cat, iter);
+  rdb::scan_layer (cat, iter, flat);
+}
+
+static void scan_region (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, const db::Region &region, bool flat)
+{
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = region.begin_iter ();
+  rdb::scan_layer (cat, cell, trans * it.second, it.first, flat);
+}
+
+static void scan_edges (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, const db::Edges &edges, bool flat)
+{
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = edges.begin_iter ();
+  rdb::scan_layer (cat, cell, trans * it.second, it.first, flat);
+}
+
+static void scan_edge_pairs (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, const db::EdgePairs &edge_pairs, bool flat)
+{
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = edge_pairs.begin_iter ();
+  rdb::scan_layer (cat, cell, trans * it.second, it.first, flat);
 }
 
 Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
@@ -289,13 +307,41 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method_ext ("scan_shapes", &scan_shapes,
+  gsi::method_ext ("scan_shapes", &scan_shapes, gsi::arg ("iter"), gsi::arg ("flat", false),
     "@brief Scans the polygon or edge shapes from the shape iterator into the category\n"
-    "@args iter\n"
     "Creates RDB items for each polygon or edge shape read from the iterator and puts them into this category.\n"
     "A similar, but lower-level method is \\ReportDatabase#create_items with a \\RecursiveShapeIterator argument.\n"
+    "In contrast to \\ReportDatabase#create_items, 'scan_shapes' can also produce hierarchical databases "
+    "if the \\flat argument is false. In this case, the hierarchy the recursive shape iterator traverses is "
+    "copied into the report database using sample references.\n"
     "\n"
-    "This method has been introduced in version 0.23.\n"
+    "This method has been introduced in version 0.23. The flat mode argument has been added in version 0.26.\n"
+  ) +
+  gsi::method_ext ("scan_collection", &scan_region, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("region"), gsi::arg ("flat", false),
+    "@brief Turns the given region into a hierarchical or flat report database\n"
+    "The exact behavior depends on the nature of the region. If the region is a hierarchical (original or deep) region "
+    "and the 'flat' argument is false, this method will produce a hierarchical report database in the given category. "
+    "The 'cell_id' parameter is ignored in this case. Sample references will be produced to supply "
+    "minimal instantiation information.\n"
+    "\n"
+    "If the region is a flat one or the 'flat' argument is true, the region's polygons will be produced as "
+    "report database items in this category and in the cell given by 'cell_id'.\n"
+    "\n"
+    "The transformation argument needs to supply the dbu-to-micron transformation.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  gsi::method_ext ("scan_collection", &scan_edges, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("edges"), gsi::arg ("flat", false),
+    "@brief Turns the given edge collection into a hierarchical or flat report database\n"
+    "This a another flavour of \\scan_collection accepting an edge collection.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  gsi::method_ext ("scan_collection", &scan_edge_pairs, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("edge_pairs"), gsi::arg ("flat", false),
+    "@brief Turns the given edge pair collection into a hierarchical or flat report database\n"
+    "This a another flavour of \\scan_collection accepting an edge pair collection.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
   ) +
   gsi::method_ext ("scan_layer", &scan_layer1,
     "@brief Scans a layer from a layout into this category\n"
@@ -966,98 +1012,19 @@ void database_set_tag_description (rdb::Database *db, rdb::id_type tag, const st
   db->set_tag_description (tag, d);
 }
 
-void create_items_from_iterator (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::RecursiveShapeIterator &iter)
-{
-  tl_assert (iter.layout ());
-  double dbu = iter.layout ()->dbu ();
-
-  for (db::RecursiveShapeIterator i = iter; !i.at_end (); ++i) {
-    std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*i, db::CplxTrans (dbu) * i.trans ()));
-    if (value.get ()) {
-      rdb::Item *item = db->create_item (cell_id, cat_id);
-      item->values ().add (value.release ());
-    }
-  }
-}
-
-void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shapes &shapes)
-{
-  for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All); !s.at_end (); ++s) {
-    std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*s, trans));
-    if (value.get ()) {
-      rdb::Item *item = db->create_item (cell_id, cat_id);
-      item->values ().add (value.release ());
-    }
-  }
-}
-
-void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shape &shape)
-{
-  std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (shape, trans));
-  if (value.get ()) {
-    rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (value.release ());
-  }
-}
-
-void create_items_from_region (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Region &collection)
-{
-  typedef db::Region::const_iterator iter;
-
-  for (iter o = collection.begin (); ! o.at_end (); ++o) {
-    rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (new rdb::Value <db::DPolygon> (o->transformed (trans)));
-  }
-}
-
-void create_items_from_edges (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Edges &collection)
-{
-  typedef db::Edges::const_iterator iter;
-
-  for (iter o = collection.begin (); ! o.at_end (); ++o) {
-    rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (new rdb::Value <db::DEdge> (o->transformed (trans)));
-  }
-}
-
-void create_items_from_edge_pairs (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::EdgePairs &collection)
-{
-  typedef db::EdgePairs::const_iterator iter;
-
-  for (iter o = collection.begin (); o != collection.end (); ++o) {
-    rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (new rdb::Value <db::DEdgePair> (o->transformed (trans)));
-  }
-}
-
 void create_items_from_polygon_array (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const std::vector<db::Polygon> &collection)
 {
-  typedef std::vector<db::Polygon>::const_iterator iter;
-
-  for (iter o = collection.begin (); o != collection.end (); ++o) {
-    rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (new rdb::Value <db::DPolygon> (o->transformed (trans)));
-  }
+  rdb::create_items_from_sequence (db, cell_id, cat_id, trans, collection.begin (), collection.end ());
 }
 
 void create_items_from_edge_array (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const std::vector<db::Edge> &collection)
 {
-  typedef std::vector<db::Edge>::const_iterator iter;
-
-  for (iter o = collection.begin (); o != collection.end (); ++o) {
-    rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (new rdb::Value <db::DEdge> (o->transformed (trans)));
-  }
+  rdb::create_items_from_sequence (db, cell_id, cat_id, trans, collection.begin (), collection.end ());
 }
 
 void create_items_from_edge_pair_array (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const std::vector<db::EdgePair> &collection)
 {
-  typedef std::vector<db::EdgePair>::const_iterator iter;
-
-  for (iter o = collection.begin (); o != collection.end (); ++o) {
-    rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (new rdb::Value <db::DEdgePair> (o->transformed (trans)));
-  }
+  rdb::create_items_from_sequence (db, cell_id, cat_id, trans, collection.begin (), collection.end ());
 }
 
 static rdb::Item *create_item (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id)
@@ -1081,9 +1048,8 @@ static rdb::Item *create_item_from_objects (rdb::Database *db, rdb::Cell *cell, 
 }
 
 Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
-  gsi::constructor ("new", &create_rdb, 
+  gsi::constructor ("new", &create_rdb, gsi::arg ("name"),
     "@brief Creates a report database\n"
-    "@args name\n"
     "@param name The name of the database\n"
     "The name of the database will be used in the user interface to refer to a certain database."
   ) + 
@@ -1093,9 +1059,8 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "in a human-readable form.\n"
     "@return The description string\n"
   ) +
-  gsi::method ("description=", &rdb::Database::set_description, 
+  gsi::method ("description=", &rdb::Database::set_description, gsi::arg ("desc"),
     "@brief Sets the databases description\n"
-    "@args desc\n"
     "@param desc The description string\n"
   ) + 
   gsi::method ("generator", &rdb::Database::generator, 
@@ -1104,9 +1069,8 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "In a later version this should allow to rerun the tool that created the report.\n"
     "@return The generator string\n"
   ) +
-  gsi::method ("generator=", &rdb::Database::set_generator, 
+  gsi::method ("generator=", &rdb::Database::set_generator, gsi::arg ("generator"),
     "@brief Sets the generator string\n"
-    "@args generator\n"
     "@param generator The generator string\n"
   ) + 
   gsi::method ("filename", &rdb::Database::filename, 
@@ -1126,9 +1090,8 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "This property must be set to establish a proper hierarchical context for a hierarchical report database. "
     "@return The top cell name\n"
   ) +
-  gsi::method ("top_cell_name=", &rdb::Database::set_top_cell_name, 
+  gsi::method ("top_cell_name=", &rdb::Database::set_top_cell_name, gsi::arg ("cell_name"),
     "@brief Sets the top cell name string\n"
-    "@args cell_name\n"
     "@param cell_name The top cell name\n"
   ) + 
   gsi::method ("original_file", &rdb::Database::original_file, 
@@ -1136,14 +1099,12 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "The original file name is supposed to describe the file from which this report database was generated. "
     "@return The original file name and path\n"
   ) +
-  gsi::method ("original_file=", &rdb::Database::set_original_file, 
+  gsi::method ("original_file=", &rdb::Database::set_original_file, gsi::arg ("path"),
     "@brief Sets the original file name and path\n"
-    "@args path\n"
     "@param path The path\n"
   ) +
-  gsi::method_ext ("tag_id", &database_tag_id,
+  gsi::method_ext ("tag_id", &database_tag_id, gsi::arg ("name"),
     "@brief Gets the tag ID for a given tag name\n"
-    "@args name\n"
     "@param name The tag name\n"
     "@return The corresponding tag ID\n"
     "Tags are used to tag items in the database and to specify tagged (named) values. "
@@ -1153,9 +1114,8 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\n"
     "\\tag_id handles system tags while \\user_tag_id handles user tags.\n"
   ) +
-  gsi::method_ext ("user_tag_id", &database_user_tag_id,
+  gsi::method_ext ("user_tag_id", &database_user_tag_id, gsi::arg ("name"),
     "@brief Gets the tag ID for a given user tag name\n"
-    "@args name\n"
     "@param name The user tag name\n"
     "@return The corresponding tag ID\n"
     "This method will always succeed and the tag will be created if it does not exist yet. "
@@ -1163,23 +1123,20 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\n"
     "This method has been added in version 0.24.\n"
   ) +
-  gsi::method_ext ("set_tag_description", &database_set_tag_description,
+  gsi::method_ext ("set_tag_description", &database_set_tag_description, gsi::arg ("tag_id"), gsi::arg ("description"),
     "@brief Sets the tag description for the given tag ID\n"
-    "@args tag_id, description\n"
     "@param tag_id The ID of the tag\n"
     "@param description The description string\n"
     "See \\tag_id for a details about tags.\n"
   ) +
-  gsi::method_ext ("tag_description", &database_tag_description,
+  gsi::method_ext ("tag_description", &database_tag_description, gsi::arg ("tag_id"),
     "@brief Gets the tag description for the given tag ID\n"
-    "@args tag_id\n"
     "@param tag_id The ID of the tag\n"
     "@return The description string\n"
     "See \\tag_id for a details about tags.\n"
   ) +
-  gsi::method_ext ("tag_name", &database_tag_name,
+  gsi::method_ext ("tag_name", &database_tag_name, gsi::arg ("tag_id"),
     "@brief Gets the tag name for the given tag ID\n"
-    "@args tag_id\n"
     "@param tag_id The ID of the tag\n"
     "@return The name of the tag\n"
     "See \\tag_id for a details about tags.\n\n"
@@ -1188,54 +1145,45 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
   gsi::iterator_ext ("each_category", &database_begin_categories, &database_end_categories,
     "@brief Iterates over all top-level categories\n"
   ) +
-  gsi::method ("create_category", (rdb::Category *(rdb::Database::*) (const std::string &)) &rdb::Database::create_category,
+  gsi::method ("create_category", (rdb::Category *(rdb::Database::*) (const std::string &)) &rdb::Database::create_category, gsi::arg ("name"),
     "@brief Creates a new top level category\n"
-    "@args name\n"
     "@param name The name of the category\n"
   ) +
-  gsi::method ("create_category", (rdb::Category *(rdb::Database::*) (rdb::Category *, const std::string &)) &rdb::Database::create_category,
+  gsi::method ("create_category", (rdb::Category *(rdb::Database::*) (rdb::Category *, const std::string &)) &rdb::Database::create_category, gsi::arg ("parent"), gsi::arg ("name"),
     "@brief Creates a new sub-category\n"
-    "@args parent,name\n"
     "@param parent The category under which the category should be created\n"
     "@param name The name of the category\n"
   ) +
-  gsi::method ("category_by_path", &rdb::Database::category_by_name,
+  gsi::method ("category_by_path", &rdb::Database::category_by_name, gsi::arg ("path"),
     "@brief Gets a category by path\n"
-    "@args path\n"
     "@param path The full path to the category starting from the top level (subcategories separated by dots)\n"
     "@return The (const) category object or nil if the name is not valid\n"
   ) +
-  gsi::method ("category_by_id", &rdb::Database::category_by_id,
+  gsi::method ("category_by_id", &rdb::Database::category_by_id, gsi::arg ("id"),
     "@brief Gets a category by ID\n"
-    "@args id\n"
     "@return The (const) category object or nil if the ID is not valid\n"
   ) +
-  gsi::method ("create_cell", (rdb::Cell *(rdb::Database::*) (const std::string &)) &rdb::Database::create_cell,
+  gsi::method ("create_cell", (rdb::Cell *(rdb::Database::*) (const std::string &)) &rdb::Database::create_cell, gsi::arg ("name"),
     "@brief Creates a new cell\n"
-    "@args name\n"
     "@param name The name of the cell\n"
   ) +
-  gsi::method ("create_cell", (rdb::Cell *(rdb::Database::*) (const std::string &, const std::string &)) &rdb::Database::create_cell,
+  gsi::method ("create_cell", (rdb::Cell *(rdb::Database::*) (const std::string &, const std::string &)) &rdb::Database::create_cell, gsi::arg ("name"), gsi::arg ("variant"),
     "@brief Creates a new cell, potentially as a variant for a cell with the same name\n"
-    "@args name, variant\n"
     "@param name The name of the cell\n"
     "@param variant The variant name of the cell\n"
   ) +
-  gsi::method ("variants", &rdb::Database::variants,
+  gsi::method ("variants", &rdb::Database::variants, gsi::arg ("name"),
     "@brief Gets the variants for a given cell name\n"
-    "@args name\n"
     "@param name The basic name of the cell\n"
     "@return An array of ID's representing cells that are variants for the given base name\n"
   ) +
-  gsi::method ("cell_by_qname", &rdb::Database::cell_by_qname,
+  gsi::method ("cell_by_qname", &rdb::Database::cell_by_qname, gsi::arg ("qname"),
     "@brief Returns the cell for a given qualified name\n"
-    "@args qname\n"
     "@param qname The qualified name of the cell (name plus variant name optionally)\n"
     "@return The cell object or nil if no such cell exists\n"
   ) +
-  gsi::method ("cell_by_id", &rdb::Database::cell_by_id,
+  gsi::method ("cell_by_id", &rdb::Database::cell_by_id, gsi::arg ("id"),
     "@brief Returns the cell for a given ID\n"
-    "@args id\n"
     "@param id The ID of the cell\n"
     "@return The cell object or nil if no cell with that ID exists\n"
   ) +
@@ -1281,12 +1229,13 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\n"
     "This convenience method has been added in version 0.25.\n"
   ) +
-  gsi::method_ext ("create_items", &create_items_from_iterator, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("iter"),
+  gsi::method_ext ("create_items", &rdb::create_items_from_iterator, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("iter"),
     "@brief Creates new items from a shape iterator\n"
     "This method takes the shapes from the given iterator and produces items from them.\n"
     "It accepts various kind of shapes, such as texts, polygons, boxes and paths and "
-    "converts them to corresponding items. "
-    "A similar method, which is intended for production of polygon or edge error layers is \\RdbCategory#scan_shapes.\n"
+    "converts them to corresponding items. This method will produce a flat version of the shapes iterated by the shape iterator. "
+    "A similar method, which is intended for production of polygon or edge error layers and also provides hierarchical database "
+    "construction is \\RdbCategory#scan_shapes.\n"
     "\n"
     "This method has been introduced in version 0.25.3.\n"
     "\n"
@@ -1294,7 +1243,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param category_id The ID of the category to which the item is associated\n"
     "@param iter The iterator (a \\RecursiveShapeIterator object) from which to take the items\n"
   ) +
-  gsi::method_ext ("create_item", &create_item_from_shape, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("shape"),
+  gsi::method_ext ("create_item", &rdb::create_item_from_shape, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("shape"),
     "@brief Creates a new item from a single shape\n"
     "This method produces an item from the given shape.\n"
     "It accepts various kind of shapes, such as texts, polygons, boxes and paths and "
@@ -1308,7 +1257,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param shape The shape to take the geometrical object from\n"
     "@param trans The transformation to apply\n"
   ) +
-  gsi::method_ext ("create_items", &create_items_from_shapes, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("shapes"),
+  gsi::method_ext ("create_items", &rdb::create_items_from_shapes, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("shapes"),
     "@brief Creates new items from a shape container\n"
     "This method takes the shapes from the given container and produces items from them.\n"
     "It accepts various kind of shapes, such as texts, polygons, boxes and paths and "
@@ -1322,52 +1271,61 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param shapes The shape container from which to take the items\n"
     "@param trans The transformation to apply\n"
   ) +
-  gsi::method_ext ("create_items", &create_items_from_region,
+  gsi::method_ext ("create_items", &rdb::create_items_from_region, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("region"),
     "@brief Creates new polygon items for the given cell/category combination\n"
     "For each polygon in the region a single item will be created. The value of the item will be this "
     "polygon.\n"
     "A transformation can be supplied which can be used for example to convert the "
     "object's dimensions to micron units by scaling by the database unit.\n"
     "\n"
+    "This method will also produce a flat version of the shapes inside the region. "
+    "\\RdbCategory#scan_region is a similar method which also supports construction of "
+    "hierarchical databases from deep regions.\n"
+    "\n"
     "This method has been introduced in version 0.23.\n"
     "\n"
-    "@args cell_id, category_id, trans, polygons\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param region The region (a \\Region object) containing the polygons for which to create items\n"
   ) +
-  gsi::method_ext ("create_items", &create_items_from_edges,
+  gsi::method_ext ("create_items", &rdb::create_items_from_edges, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("edges"),
     "@brief Creates new edge items for the given cell/category combination\n"
     "For each edge a single item will be created. The value of the item will be this "
     "edge.\n"
     "A transformation can be supplied which can be used for example to convert the "
     "object's dimensions to micron units by scaling by the database unit.\n"
     "\n"
+    "This method will also produce a flat version of the edges inside the edge collection. "
+    "\\RdbCategory#scan_edges is a similar method which also supports construction of "
+    "hierarchical databases from deep edge collections.\n"
+    "\n"
     "This method has been introduced in version 0.23.\n"
     "\n"
-    "@args cell_id, category_id, trans, edges\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param edges The list of edges (an \\Edges object) for which the items are created\n"
   ) +
-  gsi::method_ext ("create_items", &create_items_from_edge_pairs,
+  gsi::method_ext ("create_items", &rdb::create_items_from_edge_pairs, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("edge_pairs"),
     "@brief Creates new edge pair items for the given cell/category combination\n"
     "For each edge pair a single item will be created. The value of the item will be this "
     "edge pair.\n"
     "A transformation can be supplied which can be used for example to convert the "
     "object's dimensions to micron units by scaling by the database unit.\n"
     "\n"
+    "This method will also produce a flat version of the edge pairs inside the edge pair collection. "
+    "\\RdbCategory#scan_edge_pairs is a similar method which also supports construction of "
+    "hierarchical databases from deep edge pair collections.\n"
+    "\n"
     "This method has been introduced in version 0.23.\n"
     "\n"
-    "@args cell_id, category_id, trans, edge_pairs\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param edges The list of edge pairs (an \\EdgePairs object) for which the items are created\n"
   ) +
-  gsi::method_ext ("create_items", &create_items_from_polygon_array,
+  gsi::method_ext ("create_items", &create_items_from_polygon_array, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("array"),
     "@brief Creates new polygon items for the given cell/category combination\n"
     "For each polygon a single item will be created. The value of the item will be this "
     "polygon.\n"
@@ -1376,13 +1334,12 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\n"
     "This method has been introduced in version 0.23.\n"
     "\n"
-    "@args cell_id, category_id, trans, polygons\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param polygons The list of polygons for which the items are created\n"
   ) +
-  gsi::method_ext ("create_items", &create_items_from_edge_array,
+  gsi::method_ext ("create_items", &create_items_from_edge_array, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("array"),
     "@brief Creates new edge items for the given cell/category combination\n"
     "For each edge a single item will be created. The value of the item will be this "
     "edge.\n"
@@ -1391,13 +1348,12 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\n"
     "This method has been introduced in version 0.23.\n"
     "\n"
-    "@args cell_id, category_id, trans, edges\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param edges The list of edges for which the items are created\n"
   ) +
-  gsi::method_ext ("create_items", &create_items_from_edge_pair_array,
+  gsi::method_ext ("create_items", &create_items_from_edge_pair_array, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("array"),
     "@brief Creates new edge pair items for the given cell/category combination\n"
     "For each edge pair a single item will be created. The value of the item will be this "
     "edge pair.\n"
@@ -1406,7 +1362,6 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\n"
     "This method has been introduced in version 0.23.\n"
     "\n"
-    "@args cell_id, category_id, trans, edge_pairs\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"

@@ -31,6 +31,7 @@
 #include "dbLibraryProxy.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
+#include "dbRegion.h"
 #include "tlTimer.h"
 #include "tlLog.h"
 #include "tlInternational.h"
@@ -40,6 +41,8 @@
 
 namespace db
 {
+
+static const int layout_base_verbosity = 30;
 
 // -----------------------------------------------------------------
 //  The undo/redo operations
@@ -638,7 +641,25 @@ Layout::delete_cell (cell_index_type id)
   }
 }
 
-void 
+void
+Layout::insert (db::cell_index_type cell, int layer, const db::Region &region)
+{
+  region.insert_into (this, cell, layer);
+}
+
+void
+Layout::insert (db::cell_index_type cell, int layer, const db::Edges &edges)
+{
+  edges.insert_into (this, cell, layer);
+}
+
+void
+Layout::insert (db::cell_index_type cell, int layer, const db::EdgePairs &edge_pairs)
+{
+  edge_pairs.insert_into (this, cell, layer);
+}
+
+void
 Layout::flatten (const db::Cell &source_cell, db::Cell &target_cell, const db::ICplxTrans &t, int levels)
 {
   db::ICplxTrans tt = t;
@@ -1271,7 +1292,7 @@ Layout::update () const
 void 
 Layout::do_update ()
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Sorting")));
+  tl::SelfTimer timer (tl::verbosity () > layout_base_verbosity, tl::to_string (tr ("Sorting")));
 
   //  establish a progress report since this operation can take some time.
   //  HINT: because of some gcc bug, automatic destruction of the tl::Progress
@@ -1286,12 +1307,12 @@ Layout::do_update ()
     //  the hierarchy management informations
     if (hier_dirty ()) {
       {
-        tl::SelfTimer timer (tl::verbosity () >= 31, "Updating relations");
+        tl::SelfTimer timer (tl::verbosity () > layout_base_verbosity + 10, "Updating relations");
         pr->set_desc (tl::to_string (tr ("Updating relations")));
         update_relations ();
       } 
       {
-        tl::SelfTimer timer (tl::verbosity () >= 31, "Topological sort");
+        tl::SelfTimer timer (tl::verbosity () > layout_base_verbosity + 10, "Topological sort");
         pr->set_desc (tl::to_string (tr ("Topological sorting")));
         tl_assert (topological_sort ());
       }
@@ -1309,7 +1330,7 @@ Layout::do_update ()
     if (bboxes_dirty ()) {
 
       {
-        tl::SelfTimer timer (tl::verbosity () >= 31, "Updating bounding boxes");
+        tl::SelfTimer timer (tl::verbosity () > layout_base_verbosity + 10, "Updating bounding boxes");
         unsigned int layers = 0;
         pr->set (0);
         pr->set_desc (tl::to_string (tr ("Updating bounding boxes")));
@@ -1331,7 +1352,7 @@ Layout::do_update ()
       }
 
       {
-        tl::SelfTimer timer (tl::verbosity () >= 31, "Sorting shapes");
+        tl::SelfTimer timer (tl::verbosity () > layout_base_verbosity + 10, "Sorting shapes");
         pr->set (0);
         pr->set_desc (tl::to_string (tr ("Sorting shapes")));
         for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
@@ -1344,7 +1365,7 @@ Layout::do_update ()
 
     //  sort the instance trees now, since we have computed the bboxes
     if (hier_dirty () || ! dirty_parents.empty ()) {
-      tl::SelfTimer timer (tl::verbosity () >= 31, "Sorting instances");
+      tl::SelfTimer timer (tl::verbosity () > layout_base_verbosity + 10, "Sorting instances");
       size_t layers = 0;
       pr->set (0);
       pr->set_desc (tl::to_string (tr ("Sorting instances")));
@@ -1509,6 +1530,24 @@ Layout::insert_layer (unsigned int index, const LayerProperties &props)
   }
 
   layer_properties_changed ();
+}
+
+unsigned int
+Layout::get_layer (const db::LayerProperties &lp)
+{
+  if (lp.is_null ()) {
+    //  for a null layer info always create a layer
+    return insert_layer ();
+  } else {
+    //  if we have a layer with the requested properties already, return this.
+    for (db::Layout::layer_iterator li = begin_layers (); li != end_layers (); ++li) {
+      if ((*li).second->log_equal (lp)) {
+        return (*li).first;
+      }
+    }
+    //  otherwise create a new layer
+    return insert_layer (lp);
+  }
 }
 
 unsigned int

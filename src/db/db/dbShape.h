@@ -32,6 +32,7 @@
 #include "dbPolygon.h"
 #include "dbPath.h"
 #include "dbEdge.h"
+#include "dbEdgePair.h"
 #include "dbText.h"
 #include "dbBox.h"
 #include "dbBoxConvert.h"
@@ -616,6 +617,7 @@ public:
   typedef db::path_ref<path_type, unit_trans_type> path_ptr_type;
   typedef db::array<path_ptr_type, disp_type> path_ptr_array_type;
   typedef db::edge<coord_type> edge_type;
+  typedef db::edge_pair<coord_type> edge_pair_type;
   typedef db::text<coord_type> text_type;
   typedef db::text_ref<text_type, disp_type> text_ref_type;
   typedef db::text_ref<text_type, unit_trans_type> text_ptr_type;
@@ -642,6 +644,7 @@ public:
   typedef tl::reuse_vector<db::path_ref<path_type, unit_trans_type> >::const_iterator path_ptr_iter_type;
   typedef tl::reuse_vector<db::array<path_ptr_type, disp_type> >::const_iterator path_ptr_array_iter_type;
   typedef tl::reuse_vector<db::edge<coord_type> >::const_iterator edge_iter_type;
+  typedef tl::reuse_vector<db::edge_pair<coord_type> >::const_iterator edge_pair_iter_type;
   typedef tl::reuse_vector<db::text<coord_type> >::const_iterator text_iter_type;
   typedef tl::reuse_vector<db::text_ref<text_type, disp_type> >::const_iterator text_ref_iter_type;
   typedef tl::reuse_vector<db::text_ref<text_type, unit_trans_type> >::const_iterator text_ptr_iter_type;
@@ -665,6 +668,7 @@ public:
   typedef tl::reuse_vector<db::object_with_properties<db::path_ref<path_type, unit_trans_type> > >::const_iterator ppath_ptr_iter_type;
   typedef tl::reuse_vector<db::object_with_properties<db::array<path_ptr_type, disp_type> > >::const_iterator ppath_ptr_array_iter_type;
   typedef tl::reuse_vector<db::object_with_properties<db::edge<coord_type> > >::const_iterator pedge_iter_type;
+  typedef tl::reuse_vector<db::object_with_properties<db::edge_pair<coord_type> > >::const_iterator pedge_pair_iter_type;
   typedef tl::reuse_vector<db::object_with_properties<db::text<coord_type> > >::const_iterator ptext_iter_type;
   typedef tl::reuse_vector<db::object_with_properties<db::text_ref<text_type, disp_type> > >::const_iterator ptext_ref_iter_type;
   typedef tl::reuse_vector<db::object_with_properties<db::text_ref<text_type, unit_trans_type> > >::const_iterator ptext_ptr_iter_type;
@@ -690,6 +694,7 @@ public:
     SimplePolygonPtrArray,
     SimplePolygonPtrArrayMember,
     Edge,
+    EdgePair,
     Path,
     PathRef,
     PathPtrArray,
@@ -1016,7 +1021,15 @@ public:
     m_type = Edge;
   }
 
-  /** 
+  /**
+   *  @brief Construct a shape proxy as a reference to a edge pair
+   */
+  void init (edge_pair_type::tag)
+  {
+    m_type = EdgePair;
+  }
+
+  /**
    *  @brief Construct a shape proxy as a reference to a box
    */
   void init (box_type::tag)
@@ -1344,7 +1357,23 @@ public:
     }
   }
 
-  /** 
+  /**
+   *  @brief Return the actual object that this shape reference is pointing to
+   *
+   *  This is a generalisation of the polygon (), etc. methods using a tag to identify the
+   *  target object.
+   */
+  const edge_pair_type *basic_ptr (edge_pair_type::tag) const
+  {
+    tl_assert (m_type == EdgePair);
+    if (m_stable) {
+      return m_with_props ? &**(((pedge_pair_iter_type *) m_generic.iter)) : &**(((edge_pair_iter_type *) m_generic.iter));
+    } else {
+      return m_with_props ? m_generic.pedge_pair : m_generic.edge_pair;
+    }
+  }
+
+  /**
    *  @brief Return the actual object that this shape reference is pointing to
    *
    *  This is a generalisation of the polygon (), etc. methods using a tag to identify the
@@ -1636,7 +1665,24 @@ public:
     }
   }
 
-  /** 
+  /**
+   *  @brief Return the actual object that this shape reference is pointing to for objects with properties
+   *
+   *  This is a generalisation of the polygon (), etc. methods using a tag to identify the
+   *  target object.
+   */
+  const db::object_with_properties<edge_pair_type> *basic_ptr (db::object_with_properties<edge_pair_type>::tag) const
+  {
+    tl_assert (m_type == EdgePair);
+    tl_assert (m_with_props);
+    if (m_stable) {
+      return &**(((pedge_pair_iter_type *) m_generic.iter));
+    } else {
+      return m_generic.pedge_pair;
+    }
+  }
+
+  /**
    *  @brief Return the actual object that this shape reference is pointing to for objects with properties
    *
    *  This is a generalisation of the polygon (), etc. methods using a tag to identify the
@@ -1862,7 +1908,16 @@ public:
     return *(((edge_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag
+   */
+  edge_pair_iter_type basic_iter (edge_pair_type::tag) const
+  {
+    tl_assert (m_type == EdgePair && ! m_with_props);
+    return *(((edge_pair_iter_type *) m_generic.iter));
+  }
+
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag 
    */
   text_iter_type basic_iter (text_type::tag) const
@@ -2024,7 +2079,16 @@ public:
     return *(((pedge_iter_type *) m_generic.iter));
   }
 
-  /** 
+  /**
+   *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
+   */
+  pedge_pair_iter_type basic_iter (db::object_with_properties<edge_pair_type>::tag) const
+  {
+    tl_assert (m_type == EdgePair && m_with_props);
+    return *(((pedge_pair_iter_type *) m_generic.iter));
+  }
+
+  /**
    *  @brief Return the iterator (in stable reference mode) by tag for objects with properties
    */
   ptext_iter_type basic_iter (db::object_with_properties<text_type>::tag) const
@@ -2288,7 +2352,50 @@ public:
     return edge (p);
   }
 
-  /** 
+  /**
+   *  @brief Return a reference to the edge pair if one is referenced
+   */
+  const edge_pair_type &edge_pair () const
+  {
+    tl_assert (m_type == EdgePair);
+    return *basic_ptr (edge_pair_type::tag ());
+  }
+
+  /**
+   *  @brief Test if the shape proxy points to a edge pair
+   */
+  bool is_edge_pair () const
+  {
+    return (m_type == EdgePair);
+  }
+
+  /**
+   *  @brief Instantiate the edge pair object
+   *
+   *  If an edge pair is referenced, this object is instantiated
+   *  by this method.
+   *  Returns true, if the conversion was successful.
+   */
+  bool edge_pair (edge_pair_type &e) const
+  {
+    if (is_edge_pair ()) {
+      e = edge_pair ();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   *  @brief Alias for polymorphic expansion
+   *  Returns true, if the conversion was successful.
+   */
+  bool instantiate (edge_pair_type &p) const
+  {
+    return edge_pair (p);
+  }
+
+  /**
    *  @brief Return a reference to the text if one is referenced
    */
   const text_type &text () const
@@ -2567,6 +2674,7 @@ public:
     const text_ref_type *text_ref;
     const text_ptr_array_type *text_aref;
     const edge_type *edge;
+    const edge_pair_type *edge_pair;
     const path_type *path;
     const path_ref_type *path_ref;
     const path_ptr_array_type *path_aref;
@@ -2586,6 +2694,7 @@ public:
     const db::object_with_properties<text_ref_type> *ptext_ref;
     const db::object_with_properties<text_ptr_array_type> *ptext_aref;
     const db::object_with_properties<edge_type> *pedge;
+    const db::object_with_properties<edge_pair_type> *pedge_pair;
     const db::object_with_properties<path_type> *ppath;
     const db::object_with_properties<path_ref_type> *ppath_ref;
     const db::object_with_properties<path_ptr_array_type> *ppath_aref;

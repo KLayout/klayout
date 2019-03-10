@@ -187,6 +187,12 @@ Timer::take ()
 }
 
 void
+SelfTimer::start_report () const
+{
+  tl::info << m_desc << ": " << tl::to_string (tr ("started"));
+}
+
+void
 SelfTimer::report () const
 {
 #ifdef _WIN32

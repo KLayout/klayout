@@ -33,21 +33,19 @@ TextProgress::TextProgress (int verbosity)
   //  .. nothing yet ..
 }
 
-void TextProgress::set_progress_can_cancel (bool /*f*/)
+void TextProgress::update_progress (tl::Progress *progress)
 {
-  //  .. nothing yet ..
-}
-
-void TextProgress::set_progress_text (const std::string &text)
-{
+  std::string text = progress->desc ();
   if (m_progress_text != text && tl::verbosity () >= m_verbosity) {
     tl::info << text << " ..";
     m_progress_text = text;
   }
-}
 
-void TextProgress::set_progress_value (double /*value*/, const std::string &value)
-{
+  std::string value = progress->formatted_value ();
+  for (tl::Progress *p = progress->next (); p != 0; p = p->next ()) {
+    value += " " + p->formatted_value ();
+  }
+
   if (m_progress_value != value && tl::verbosity () >= m_verbosity) {
     tl::info << ".. " << value;
     m_progress_value = value;

@@ -1,0 +1,54 @@
+
+# Hierarchical antenna check
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+# Flat mode
+
+flat_labels = labels(1, 0)
+flat_all = input(1, 0)
+flat_poly = polygons(1, 0)
+
+flat_texts_from_labels1 = flat_labels.texts(text("XYZ"))
+flat_texts_from_labels2 = flat_labels.texts("*")
+flat_texts_from_all1 = flat_all.texts(text("XYZ"))
+flat_texts_from_all2 = flat_all.texts("*")
+flat_texts_from_poly1 = flat_poly.texts(text("XYZ"))
+flat_texts_from_poly2 = flat_poly.texts("*")
+
+flat_labels.output(100, 0)
+flat_all.output(101, 0)
+flat_poly.output(102, 0)
+flat_texts_from_labels1.output(110, 0)
+flat_texts_from_labels2.output(111, 0)
+flat_texts_from_all1.output(112, 0)
+flat_texts_from_all2.output(113, 0)
+flat_texts_from_poly1.output(114, 0)
+flat_texts_from_poly2.output(115, 0)
+
+# Deep mode
+
+deep
+
+deep_labels = labels(1, 0)
+deep_all = input(1, 0)
+deep_poly = polygons(1, 0)
+
+deep_texts_from_labels1 = deep_labels.texts(text("XYZ"))
+deep_texts_from_labels2 = deep_labels.texts("*")
+deep_texts_from_all1 = deep_all.texts(text("XYZ"))
+deep_texts_from_all2 = deep_all.texts("*")
+deep_texts_from_poly1 = deep_poly.texts(text("XYZ"))
+deep_texts_from_poly2 = deep_poly.texts("*")
+
+deep_labels.output(200, 0)
+deep_all.output(201, 0)
+deep_poly.output(202, 0)
+deep_texts_from_labels1.output(210, 0)
+deep_texts_from_labels2.output(211, 0)
+deep_texts_from_all1.output(212, 0)
+deep_texts_from_all2.output(213, 0)
+deep_texts_from_poly1.output(214, 0)
+deep_texts_from_poly2.output(215, 0)
+

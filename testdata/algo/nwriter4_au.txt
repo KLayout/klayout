@@ -1,0 +1,14 @@
+* written by unit test
+
+* cell C1
+* pin p1
+* pin p2
+.SUBCKT C1 1 2
+* net 1 n1
+* net 2 n2
+* net 3 n3
+* device instance $1 0,0 DCLS
+D$1 1 3 DDCLS
+* device instance $2 0,0 DCLS
+D$2 3 2 DDCLS
+.ENDS C1

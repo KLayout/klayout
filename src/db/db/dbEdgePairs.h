@@ -24,14 +24,198 @@
 #ifndef HDR_dbEdgePairs
 #define HDR_dbEdgePairs
 
-#include "dbEdge.h"
-#include "dbEdgePair.h"
+#include "dbEdgePairsDelegate.h"
+#include "dbShape.h"
+#include "dbRecursiveShapeIterator.h"
+
+#include "gsiObject.h"
+
+#include <list>
 
 namespace db
 {
 
-class Region;
+class EdgePairFilterBase;
+class FlatEdgePairs;
+class EmptyEdgePairs;
 class Edges;
+class Region;
+class DeepShapeStore;
+class TransformationReducer;
+
+/**
+ *  @brief An edge pair set iterator
+ *
+ *  The iterator delivers the edge pairs of the edge pair set
+ */
+class DB_PUBLIC EdgePairsIterator
+{
+public:
+  typedef EdgePairsIteratorDelegate::value_type value_type;
+  typedef const value_type &reference;
+  typedef const value_type *pointer;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef void difference_type;
+
+  /**
+   *  @brief Default constructor
+   */
+  EdgePairsIterator ()
+    : mp_delegate (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Constructor from a delegate
+   *  The iterator will take ownership over the delegate
+   */
+  EdgePairsIterator (EdgePairsIteratorDelegate *delegate)
+    : mp_delegate (delegate)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Destructor
+   */
+  ~EdgePairsIterator ()
+  {
+    delete mp_delegate;
+    mp_delegate = 0;
+  }
+
+  /**
+   *  @brief Copy constructor and assignment
+   */
+  EdgePairsIterator (const EdgePairsIterator &other)
+    : mp_delegate (0)
+  {
+    operator= (other);
+  }
+
+  /**
+   *  @brief Assignment
+   */
+  EdgePairsIterator &operator= (const EdgePairsIterator &other)
+  {
+    if (this != &other) {
+      delete mp_delegate;
+      mp_delegate = other.mp_delegate ? other.mp_delegate->clone () : 0;
+    }
+    return *this;
+  }
+
+  /**
+   *  @Returns true, if the iterator is at the end
+   */
+  bool at_end () const
+  {
+    return mp_delegate == 0 || mp_delegate->at_end ();
+  }
+
+  /**
+   *  @brief Increment
+   */
+  EdgePairsIterator &operator++ ()
+  {
+    if (mp_delegate) {
+      mp_delegate->increment ();
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief Access
+   */
+  reference operator* () const
+  {
+    const value_type *value = operator-> ();
+    tl_assert (value != 0);
+    return *value;
+  }
+
+  /**
+   *  @brief Access
+   */
+  pointer operator-> () const
+  {
+    return mp_delegate ? mp_delegate->get () : 0;
+  }
+
+private:
+  EdgePairsIteratorDelegate *mp_delegate;
+};
+
+/**
+ *  @brief A helper class allowing delivery of addressable edges
+ *
+ *  In some applications (i.e. box scanner), edges need to be taken
+ *  by address. The edge set cannot always deliver adressable edges.
+ *  This class help providing this ability by keeping a temporary copy
+ *  if required.
+ */
+
+class DB_PUBLIC AddressableEdgePairDelivery
+{
+public:
+  AddressableEdgePairDelivery ()
+    : m_iter (), m_valid (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  AddressableEdgePairDelivery (const EdgePairsIterator &iter, bool valid)
+    : m_iter (iter), m_valid (valid)
+  {
+    if (! m_valid && ! m_iter.at_end ()) {
+      m_heap.push_back (*m_iter);
+    }
+  }
+
+  bool at_end () const
+  {
+    return m_iter.at_end ();
+  }
+
+  AddressableEdgePairDelivery &operator++ ()
+  {
+    ++m_iter;
+    if (! m_valid && ! m_iter.at_end ()) {
+      m_heap.push_back (*m_iter);
+    }
+    return *this;
+  }
+
+  const db::EdgePair *operator-> () const
+  {
+    if (m_valid) {
+      return m_iter.operator-> ();
+    } else {
+      return &m_heap.back ();
+    }
+  }
+
+private:
+  EdgePairsIterator m_iter;
+  bool m_valid;
+  std::list<db::EdgePair> m_heap;
+};
+
+class EdgePairs;
+
+/**
+ *  @brief A base class for edge pair filters
+ */
+class DB_PUBLIC EdgePairFilterBase
+{
+public:
+  EdgePairFilterBase () { }
+  virtual ~EdgePairFilterBase () { }
+
+  virtual bool selected (const db::EdgePair &edge) const = 0;
+  virtual const TransformationReducer *vars () const = 0;
+};
 
 /**
  *  @brief A set of edge pairs
@@ -46,92 +230,173 @@ class Edges;
  *  can be converted to polygons or to individual edges.
  */
 class DB_PUBLIC EdgePairs
+  : public gsi::ObjectBase
 {
 public:
+  typedef db::Coord coord_type;
+  typedef db::coord_traits<db::Coord> coord_traits;
   typedef db::EdgePair edge_pair_type;
-  typedef std::vector<edge_pair_type>::const_iterator const_iterator;
+  typedef db::Vector vector_type;
+  typedef db::Point point_type;
+  typedef db::Box box_type;
+  typedef coord_traits::distance_type distance_type;
+  typedef EdgePairsIterator const_iterator;
 
   /**
    *  @brief Default constructor
    *
    *  This constructor creates an empty edge pair set.
    */
-  EdgePairs ()
-  {
-    init ();
-  }
+  EdgePairs ();
   
   /**
-   *  @brief Equality
+   *  @brief Destructor
    */
-  bool operator== (const db::EdgePairs &other) const;
+  ~EdgePairs ();
 
   /**
-   *  @brief Inequality
+   *  @brief Constructor from a delegate
+   *
+   *  The region will take ownership of the delegate.
    */
-  bool operator!= (const db::EdgePairs &other) const
+  EdgePairs (EdgePairsDelegate *delegate);
+
+  /**
+   *  @brief Copy constructor
+   */
+  EdgePairs (const EdgePairs &other);
+
+  /**
+   *  @brief Assignment
+   */
+  EdgePairs &operator= (const EdgePairs &other);
+
+  /**
+   *  @brief Constructor from an object
+   *
+   *  Creates an edge pair set representing a single instance of that object
+   */
+  explicit EdgePairs (const db::EdgePair &s)
+    : mp_delegate (0)
   {
-    return !operator== (other);
+    insert (s);
   }
 
   /**
-   *  @brief Less operator
-   */
-  bool operator< (const db::EdgePairs &other) const;
-
-  /**
-   *  @brief Joining of edge pair sets
+   *  @brief Constructor from an object
    *
-   *  This method will combine the edge pairs from "other" with the egdes of "this".
+   *  Creates an edge pair set representing a single instance of that object
    */
-  db::EdgePairs operator+ (const db::EdgePairs &other) const
+  explicit EdgePairs (const db::Shape &s)
+    : mp_delegate (0)
   {
-    db::EdgePairs d (*this);
-    d += other;
-    return d;
+    insert (s);
   }
 
   /**
-   *  @brief In-place joining of edge pair sets
+   *  @brief Sequence constructor
+   *
+   *  Creates an edge set from a sequence of objects. The objects need to be edge pairs.
+   *  This version accepts iterators of the begin ... end style.
    */
-  db::EdgePairs &operator+= (const db::EdgePairs &other);
+  template <class Iter>
+  explicit EdgePairs (const Iter &b, const Iter &e)
+    : mp_delegate (0)
+  {
+    reserve (e - b);
+    for (Iter i = b; i != e; ++i) {
+      insert (*i);
+    }
+  }
 
   /**
-   *  @brief Begin iterator of the edge pair set
+   *  @brief Constructor from a RecursiveShapeIterator
    *
-   *  The iterator delivers the edge pairs of the edge pair set.
+   *  Creates an edge pair set from a recursive shape iterator. This allows to feed an edge pair set
+   *  from a hierarchy of cells.
+   */
+  explicit EdgePairs (const RecursiveShapeIterator &si);
+
+  /**
+   *  @brief Constructor from a RecursiveShapeIterator with a transformation
+   *
+   *  Creates an edge pair set from a recursive shape iterator. This allows to feed an edge pair set 
+   *  from a hierarchy of cells. The transformation is useful to scale to a specific
+   *  DBU for example.
+   */
+  explicit EdgePairs (const RecursiveShapeIterator &si, const db::ICplxTrans &trans);
+
+  /**
+   *  @brief Constructor from a RecursiveShapeIterator providing a deep representation
+   *
+   *  This version will create a hierarchical edge pair collection. The DeepShapeStore needs to be provided
+   *  during the lifetime of the collection and acts as a heap for optimized data.
+   */
+  explicit EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss);
+
+  /**
+   *  @brief Constructor from a RecursiveShapeIterator providing a deep representation with transformation
+   */
+  explicit EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans);
+
+  /**
+   *  @brief Gets the underlying delegate object
+   */
+  EdgePairsDelegate *delegate () const
+  {
+    return mp_delegate;
+  }
+
+  /**
+   *  @brief Iterator of the edge pair set
+   *
+   *  The iterator delivers the edges of the edge pair set.
+   *  It follows the at_end semantics.
    */
   const_iterator begin () const
   {
-    return m_edge_pairs.begin ();
+    return EdgePairsIterator (mp_delegate->begin ());
   }
 
   /**
-   *  @brief End iterator of the edge pair set
-   *
-   *  The iterator delivers the edge pairs of the edge pair set.
+   *  @brief Delivers a RecursiveShapeIterator pointing to the edge pairs plus the necessary transformation
    */
-  const_iterator end () const
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const
   {
-    return m_edge_pairs.end ();
+    return mp_delegate->begin_iter ();
   }
 
   /**
-   *  @brief Insert an edge pair into the edge pair set
+   *  @brief Inserts the given shape (working object) into the edge pair set
    */
-  void insert (const db::Edge &e1, const db::Edge &e2);
+  template <class Sh>
+  void insert (const Sh &shape);
 
   /**
-   *  @brief Insert an edge pair into the edge pair set
+   *  @brief Inserts an edge pair made from two edges
    */
-  void insert (const edge_pair_type &ep);
+  void insert (const db::Edge &e1, const db::Edge &e2)
+  {
+    insert (db::EdgePair (e1, e2));
+  }
+
+  /**
+   *  @brief Insert a shape reference into the edge pair set
+   */
+  void insert (const db::Shape &shape);
+
+  /**
+   *  @brief Insert a transformed shape into the edge pair set
+   */
+  template <class T>
+  void insert (const db::Shape &shape, const T &trans);
 
   /**
    *  @brief Returns true if the edge pair set is empty
    */
   bool empty () const
   {
-    return m_edge_pairs.empty ();
+    return mp_delegate->empty ();
   }
 
   /**
@@ -139,87 +404,68 @@ public:
    */
   size_t size () const
   {
-    return m_edge_pairs.size ();
+    return mp_delegate->size ();
   }
 
   /**
    *  @brief Returns a string representing the edge pair set
+   *
+   *  nmax specifies how many edge pairs are included (set to std::numeric_limits<size_t>::max() for "all".
    */
-  std::string to_string (size_t nmax = 10) const;
+  std::string to_string (size_t nmax = 10) const
+  {
+    return mp_delegate->to_string (nmax);
+  }
 
   /**
-   *  @brief Clear the edge pair set
+   *  @brief Clears the edge set
    */
   void clear ();
 
   /**
-   *  @brief Reserve memory for the given number of polygons
+   *  @brief Reserve memory for the given number of edges
    */
-  void reserve (size_t n)
-  {
-    m_edge_pairs.reserve (n);
-  }
+  void reserve (size_t n);
 
   /**
    *  @brief Returns the bounding box of the edge pair set
    */
   Box bbox () const
   {
-    ensure_bbox_valid ();
-    return m_bbox;
+    return mp_delegate->bbox ();
   }
 
   /**
-   *  @brief Filters the edge pair set 
+   *  @brief Filters the edge pairs
    *
    *  This method will keep all edge pairs for which the filter returns true.
+   *  Merged semantics applies. 
    */
-  template <class F>
-  EdgePairs &filter (F &filter)
+  EdgePairs &filter (const EdgePairFilterBase &filter)
   {
-    std::vector <edge_pair_type>::iterator ew = m_edge_pairs.begin ();
-    for (const_iterator e = begin (); e != end (); ++e) {
-      if (filter (*e)) {
-        *ew++ = *e;
-      }
-    }
-    m_edge_pairs.erase (ew, m_edge_pairs.end ());
+    set_delegate (mp_delegate->filter_in_place (filter));
     return *this;
   }
 
   /**
    *  @brief Returns the filtered edge pairs
    *
-   *  This method will return a new region with only those edge pairs which 
+   *  This method will return a new region with only those edge pairs which
    *  conform to the filter criterion.
    */
-  template <class F>
-  EdgePairs filtered (F &filter) const
+  EdgePairs filtered (const EdgePairFilterBase &filter) const
   {
-    EdgePairs d;
-    for (const_iterator e = begin (); e != end (); ++e) {
-      if (filter (*e)) {
-        d.insert (*e);
-      }
-    }
-    return d;
+    return EdgePairs (mp_delegate->filtered (filter));
   }
 
   /**
-   *  @brief Transform the edge pair set
+   *  @brief Transforms the edge pair set
    */
   template <class T>
-  EdgePairs &transform (const T &trans)
-  {
-    for (std::vector <edge_pair_type>::iterator e = m_edge_pairs.begin (); e != m_edge_pairs.end (); ++e) {
-      e->transform (trans);
-    }
-    m_bbox_valid = false;
-    return *this;
-  }
+  EdgePairs &transform (const T &trans);
 
   /**
-   *  @brief Returns the transformed edge set
+   *  @brief Returns the transformed edge pair set
    */
   template <class T>
   EdgePairs transformed (const T &trans) const
@@ -230,17 +476,124 @@ public:
   }
 
   /**
-   *  @brief Swap with the other region
+   *  @brief Swaps with the other edge set
    */
   void swap (db::EdgePairs &other)
   {
-    std::swap (m_edge_pairs, other.m_edge_pairs);
-    std::swap (m_bbox, other.m_bbox);
-    std::swap (m_bbox_valid, other.m_bbox_valid);
+    std::swap (other.mp_delegate, mp_delegate);
   }
 
   /**
-   *  @brief Convert to polygons
+   *  @brief Joining of edge pair set
+   *
+   *  This method joins the edge pair sets.
+   */
+  EdgePairs operator+ (const EdgePairs &other) const
+  {
+    return EdgePairs (mp_delegate->add (other));
+  }
+
+  /**
+   *  @brief In-place edge pair set joining
+   */
+  EdgePairs &operator+= (const EdgePairs &other)
+  {
+    set_delegate (mp_delegate->add_in_place (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edge pairs which are in the other edge pair set
+   *
+   *  This method will return all edge pairs which are part of another edge pair set.
+   *  The match is done exactly.
+   *  The "invert" flag can be used to invert the sense, i.e. with
+   *  "invert" set to true, this method will return all edge pairs not
+   *  in the other edge pair set.
+   */
+  EdgePairs in (const EdgePairs &other, bool invert = false) const
+  {
+    return EdgePairs (mp_delegate->in (other, invert));
+  }
+
+  /**
+   *  @brief Returns the nth edge pair
+   *
+   *  This operation is available only for flat regions - i.e. such for which
+   *  "has_valid_edge_pairs" is true.
+   */
+  const db::EdgePair *nth (size_t n) const
+  {
+    return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Forces flattening of the edge pair collection
+   *
+   *  This method will turn any edge pair collection into a flat one.
+   */
+  void flatten ()
+  {
+    flat_edge_pairs ();
+  }
+
+  /**
+   *  @brief Returns true, if the edge pair set has valid edges stored within itself
+   *
+   *  If the region has valid edges, it is permissable to use the edge pair's addresses
+   *  from the iterator. Furthermore, the random access operator nth() is available.
+   */
+  bool has_valid_edge_pairs () const
+  {
+    return mp_delegate->has_valid_edge_pairs ();
+  }
+
+  /**
+   *  @brief Returns an addressable delivery for edge pairs
+   *
+   *  This object allows accessing the edge pairs by address, even if they
+   *  are not delivered from a container. The magic is a heap object
+   *  inside the delivery object. Hence, the deliver object must persist
+   *  as long as the addresses are required.
+   */
+  AddressableEdgePairDelivery addressable_edge_pairs () const
+  {
+    return AddressableEdgePairDelivery (begin (), has_valid_edge_pairs ());
+  }
+
+  /**
+   *  @brief Gets the internal iterator
+   *
+   *  This method is intended for users who know what they are doing
+   */
+  const db::RecursiveShapeIterator &iter () const;
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const db::EdgePairs &other) const
+  {
+    return mp_delegate->equals (other);
+  }
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const db::EdgePairs &other) const
+  {
+    return ! mp_delegate->equals (other);
+  }
+
+  /**
+   *  @brief Less operator
+   */
+  bool operator< (const db::EdgePairs &other) const
+  {
+    return mp_delegate->less (other);
+  }
+
+  /**
+   *  @brief Converts to polygons
    *
    *  Note: because of the include hierarchy we can't use a direct return value.
    *  
@@ -263,7 +616,7 @@ public:
    */
   void edges (Edges &output) const;
 
-  /*
+  /**
    *  @brief Returns the first edges
    *
    *  Note: because of the include hierarchy we can't use a direct return value.
@@ -273,7 +626,7 @@ public:
    */  
   void first_edges (Edges &output) const;
 
-  /*
+  /**
    *  @brief Returns the second edges
    *
    *  Note: because of the include hierarchy we can't use a direct return value.
@@ -288,22 +641,44 @@ public:
    *
    *  @param progress_text The description text of the progress object
    */
-  void enable_progress (const std::string &progress_desc = std::string ());
+  void enable_progress (const std::string &progress_desc = std::string ())
+  {
+    mp_delegate->enable_progress (progress_desc);
+  }
 
   /**
    *  @brief Disable progress reporting
    */
-  void disable_progress ();
+  void disable_progress ()
+  {
+    mp_delegate->disable_progress ();
+  }
+
+  /**
+   *  @brief Inserts the edge pair collection into the given layout, cell and layer
+   *  If the edge pair collection is a hierarchical region, the hierarchy is copied into the
+   *  layout's hierarchy.
+   */
+  void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+  {
+    return mp_delegate->insert_into (layout, into_cell, into_layer);
+  }
+
+  /**
+   *  @brief Inserts the edge pair collection into the given layout, cell and layer as polygons with the given enlargement
+   *  If the edge pair collection is a hierarchical region, the hierarchy is copied into the
+   *  layout's hierarchy.
+   */
+  void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
+  {
+    return mp_delegate->insert_into_as_polygons (layout, into_cell, into_layer, enl);
+  }
 
 private:
-  std::vector<edge_pair_type> m_edge_pairs;
-  mutable db::Box m_bbox;
-  mutable bool m_bbox_valid;
-  bool m_report_progress;
-  std::string m_progress_desc;
+  EdgePairsDelegate *mp_delegate;
 
-  void init ();
-  void ensure_bbox_valid () const;
+  void set_delegate (EdgePairsDelegate *delegate);
+  FlatEdgePairs *flat_edge_pairs ();
 };
 
 }

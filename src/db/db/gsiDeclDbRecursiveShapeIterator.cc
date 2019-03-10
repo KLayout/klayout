@@ -409,7 +409,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("shape_flags=", &db::RecursiveShapeIterator::shape_flags, 
+  gsi::method ("shape_flags=", (void (db::RecursiveShapeIterator::*)(unsigned int)) &db::RecursiveShapeIterator::shape_flags,
     "@brief Specifies the shape selection flags\n"
     "@args flags\n"
     "\n"
@@ -453,7 +453,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   gsi::method ("cell_index", &db::RecursiveShapeIterator::cell_index, 
     "@brief Gets the current cell's index \n"
   ) +
-  gsi::method ("next", &db::RecursiveShapeIterator::next, 
+  gsi::method ("next", (void (db::RecursiveShapeIterator::*) ()) &db::RecursiveShapeIterator::next,
     "@brief Increment the iterator\n"
     "This moves the iterator to the next shape inside the search scope."
   ) +

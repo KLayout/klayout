@@ -296,7 +296,7 @@ DeepShapeStore::~DeepShapeStore ()
   m_layouts.clear ();
 }
 
-DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)
+DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, bool for_netlist, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)
 {
   //  reuse existing layer
   std::pair<bool, DeepLayer> lff = layer_for_flat (region);
@@ -322,12 +322,19 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, double max
   db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), m_text_enlargement, m_text_property_name);
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count);
 
-  //  try to maintain the texts - go through shape iterator
+  //  try to maintain the texts on top level - go through shape iterator
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = region.begin_iter ();
   db::ICplxTrans ttop = trans * ii.second;
   while (! ii.first.at_end ()) {
-    red.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+
+    if (for_netlist && ii.first->is_text () && ii.first.layout () && ii.first.cell () != ii.first.top_cell ()) {
+      //  Skip texts on levels below top cell. For the reasoning see the description of this method.
+    } else {
+      red.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+    }
+
     ++ii.first;
+
   }
 
   DeepLayer dl (this, 0 /*singular layout index*/, layer);

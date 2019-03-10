@@ -267,8 +267,12 @@ public:
    *
    *  After a flat layer has been created for a region, it can be retrieved
    *  from the region later with layer_for_flat (region).
+   *
+   *  If for_netlist is true, texts will be skipped except on top level. The
+   *  reasoning is that texts below top level may create name clashes if they
+   *  are used for net names.
    */
-  DeepLayer create_from_flat (const db::Region &region, double max_area_ratio = 0.0, size_t max_vertex_count = 0, const db::ICplxTrans &trans = db::ICplxTrans ());
+  DeepLayer create_from_flat (const db::Region &region, bool for_netlist, double max_area_ratio = 0.0, size_t max_vertex_count = 0, const db::ICplxTrans &trans = db::ICplxTrans ());
 
   /**
    *  @brief Gets the layer for a given flat region.

@@ -200,9 +200,9 @@ TEST(4_FlatAndEmptyInput)
 
   db::Region r3;
 
-  db::Region dr1 (new db::DeepRegion (dss.create_from_flat (r1)));
-  db::Region dr2 (new db::DeepRegion (dss.create_from_flat (r2)));
-  db::Region dr3 (new db::DeepRegion (dss.create_from_flat (r3)));
+  db::Region dr1 (new db::DeepRegion (dss.create_from_flat (r1, true)));
+  db::Region dr2 (new db::DeepRegion (dss.create_from_flat (r2, true)));
+  db::Region dr3 (new db::DeepRegion (dss.create_from_flat (r3, true)));
 
   EXPECT_EQ ((dr1 - dr2).to_string (), "(0,0;0,900;100,900;100,100;900,100;900,900;0,900;0,1000;1000,1000;1000,0)");
   EXPECT_EQ ((dr1 - dr3).to_string (), "(0,0;0,1000;1000,1000;1000,0)");

@@ -313,7 +313,7 @@ void LayoutToNetlist::register_layer (const db::Region &region, const std::strin
 
   if (m_is_flat) {
 
-    dl = dss ().create_from_flat (region);
+    dl = dss ().create_from_flat (region, true);
 
   } else {
 

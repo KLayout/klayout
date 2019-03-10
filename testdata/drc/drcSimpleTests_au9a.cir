@@ -1,0 +1,151 @@
+* RINGO netlist before simplification
+
+* cell RINGO
+.SUBCKT RINGO
+* net 11 FB
+* net 12 VDD
+* net 15 OUT
+* net 16 ENABLE
+* net 19 BULK,VSS
+* cell instance $1 r0 *1 1.8,0
+X$1 12 1 19 12 11 16 19 ND2X1
+* cell instance $2 r0 *1 4.2,0
+X$2 12 2 19 12 1 19 INVX1
+* cell instance $3 r0 *1 6,0
+X$3 12 3 19 12 2 19 INVX1
+* cell instance $4 r0 *1 7.8,0
+X$4 12 4 19 12 3 19 INVX1
+* cell instance $5 r0 *1 9.6,0
+X$5 12 5 19 12 4 19 INVX1
+* cell instance $6 r0 *1 11.4,0
+X$6 12 6 19 12 5 19 INVX1
+* cell instance $7 r0 *1 13.2,0
+X$7 12 7 19 12 6 19 INVX1
+* cell instance $8 r0 *1 15,0
+X$8 12 8 19 12 7 19 INVX1
+* cell instance $9 r0 *1 16.8,0
+X$9 12 9 19 12 8 19 INVX1
+* cell instance $10 r0 *1 18.6,0
+X$10 12 10 19 12 9 19 INVX1
+* cell instance $11 r0 *1 20.4,0
+X$11 12 11 19 12 10 19 INVX1
+* cell instance $12 r0 *1 22.2,0
+X$12 12 15 19 12 11 19 INVX1
+* cell instance $13 r0 *1 3.28,4
+X$13 11 M1M2
+* cell instance $14 r0 *1 21.42,4
+X$14 11 M1M2
+* cell instance $15 r0 *1 0.6,0
+X$15 12 19 TIE
+* cell instance $16 r0 *1 0,0
+X$16 12 19 12 EMPTY
+* cell instance $17 r0 *1 24,0
+X$17 12 19 TIE
+* cell instance $18 r0 *1 25.2,0
+X$18 12 19 12 EMPTY
+* cell instance $19 r0 *1 23.6,4
+X$19 15 M1M2
+* cell instance $20 r0 *1 2.6,3.1
+X$20 16 M1M2
+.ENDS RINGO
+
+* cell ND2X1
+* pin VDD
+* pin OUT
+* pin VSS
+* pin 
+* pin B
+* pin A
+* pin BULK
+.SUBCKT ND2X1 1 2 3 4 5 6 9
+* net 1 VDD
+* net 2 OUT
+* net 3 VSS
+* net 5 B
+* net 6 A
+* net 9 BULK
+* cell instance $1 r0 *1 0.3,5.05
+X$1 6 1 2 PMOS3
+* cell instance $2 r0 *1 1,5.05
+X$2 5 2 1 PMOS3
+* cell instance $3 r0 *1 1,1.66
+X$3 5 2 10 NMOS2
+* cell instance $4 r0 *1 0.3,1.66
+X$4 6 10 3 NMOS2
+* cell instance $5 r0 *1 1.48,4
+X$5 5 POLYM1
+* cell instance $6 r0 *1 0.8,3.1
+X$6 6 POLYM1
+* device instance $1 0.85,5.8 LVPMOS
+M$1 2 6 1 4 MLVPMOS L=0.25U W=1.5U AS=0.6375P AD=0.3375P PS=3.85U PD=1.95U
+* device instance $2 1.55,5.8 LVPMOS
+M$2 1 5 2 4 MLVPMOS L=0.25U W=1.5U AS=0.3375P AD=0.6375P PS=1.95U PD=3.85U
+* device instance $3 0.85,2.135 LVNMOS
+M$3 3 6 10 9 MLVNMOS L=0.25U W=0.95U AS=0.40375P AD=0.21375P PS=2.75U PD=1.4U
+* device instance $4 1.55,2.135 LVNMOS
+M$4 10 5 2 9 MLVNMOS L=0.25U W=0.95U AS=0.21375P AD=0.40375P PS=1.4U PD=2.75U
+.ENDS ND2X1
+
+* cell INVX1
+* pin VDD
+* pin OUT
+* pin VSS
+* pin 
+* pin IN
+* pin BULK
+.SUBCKT INVX1 1 2 3 4 5 7
+* net 1 VDD
+* net 2 OUT
+* net 3 VSS
+* net 5 IN
+* net 7 BULK
+* cell instance $1 r0 *1 0.3,5.05
+X$1 5 2 1 PMOS3
+* cell instance $2 r0 *1 0.3,1.66
+X$2 5 2 3 NMOS2
+* cell instance $3 r0 *1 0.6,3.1
+X$3 5 POLYM1
+* device instance $1 0.85,5.8 LVPMOS
+M$1 1 5 2 4 MLVPMOS L=0.25U W=1.5U AS=0.6375P AD=0.6375P PS=3.85U PD=3.85U
+* device instance $2 0.85,2.135 LVNMOS
+M$2 3 5 2 7 MLVNMOS L=0.25U W=0.95U AS=0.40375P AD=0.40375P PS=2.75U PD=2.75U
+.ENDS INVX1
+
+* cell M1M2
+* pin 
+.SUBCKT M1M2 1
+.ENDS M1M2
+
+* cell TIE
+* pin VDD
+* pin BULK,VSS
+.SUBCKT TIE 2 3
+* net 2 VDD
+* net 3 BULK,VSS
+.ENDS TIE
+
+* cell EMPTY
+* pin 
+* pin 
+* pin 
+.SUBCKT EMPTY 1 2 3
+.ENDS EMPTY
+
+* cell POLYM1
+* pin 
+.SUBCKT POLYM1 1
+.ENDS POLYM1
+
+* cell NMOS2
+* pin 
+* pin 
+* pin 
+.SUBCKT NMOS2 1 2 3
+.ENDS NMOS2
+
+* cell PMOS3
+* pin 
+* pin 
+* pin 
+.SUBCKT PMOS3 1 2 3
+.ENDS PMOS3

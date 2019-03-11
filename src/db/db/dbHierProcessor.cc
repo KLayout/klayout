@@ -138,7 +138,7 @@ template <>
 class shape_reference_translator<db::Edge>
 {
 public:
-  typedef typename db::Edge shape_type;
+  typedef db::Edge shape_type;
 
   shape_reference_translator (db::Layout * /*target_layout*/)
   {
@@ -476,7 +476,13 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
         CRONOLOGY_COMPUTE_BRACKET(event_propagate)
         c->second->propagate (res);
 
+//  gcc 4.4.7 (at least) doesn't have an operator== in std::unordered_set, so we skip this
+//  optimization
+#if defined(__GNUC__) && __GNUC__ == 4
+      } else {
+#else
       } else if (res != common) {
+#endif
 
         CRONOLOGY_COMPUTE_BRACKET(event_propagate)
 

@@ -173,6 +173,16 @@ void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const 
   extract_without_initialize (layout, cell, clusters, layers);
 }
 
+namespace {
+
+struct ExtractorCacheValueType {
+  ExtractorCacheValueType () { }
+  db::Vector disp;
+  tl::vector<db::Device *> devices;
+};
+
+}
+
 void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers)
 {
   tl_assert (layers.size () == m_layer_definitions.size ());
@@ -232,12 +242,6 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   }
 
   tl::RelativeProgress progress (tl::to_string (tr ("Extracting devices")), n, 1);
-
-  struct ExtractorCacheValueType {
-    ExtractorCacheValueType () { }
-    db::Vector disp;
-    tl::vector<db::Device *> devices;
-  };
 
   typedef std::map<std::vector<db::Region>, ExtractorCacheValueType> extractor_cache_type;
   extractor_cache_type extractor_cache;

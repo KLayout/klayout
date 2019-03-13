@@ -323,7 +323,7 @@ void LayoutToNetlist::register_layer (const db::Region &region, const std::strin
       if (region.empty ()) {
         dl = dss ().empty_layer (m_layout_index);
       } else {
-        throw tl::Exception (tl::to_string (tr ("Layer is not a deep region and cannot be registered with name: ")) + n);
+        dl = dss ().create_from_flat (region, true);
       }
 
     } else {

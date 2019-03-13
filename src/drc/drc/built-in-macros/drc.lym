@@ -2367,7 +2367,7 @@ CODE
     # to a flat collection of polygons, edges or edge pairs.
     
     def flatten
-      @engine._cmd(@data, :flatten)
+      DRC::DRCLayer::new(@engine, @engine._cmd(@data, :flatten))
     end
     
     # %DRC%

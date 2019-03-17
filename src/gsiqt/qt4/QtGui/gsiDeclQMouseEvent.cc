@@ -212,12 +212,12 @@ static void _call_f_createExtendedMouseEvent_12512 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  const QPoint &arg3 = args.read<const QPoint & > (heap);
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg4 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
-  QFlags<Qt::MouseButton> arg5 = args.read<QFlags<Qt::MouseButton> > (heap);
-  QFlags<Qt::KeyboardModifier> arg6 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPoint &arg3 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg4 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
+  QFlags<Qt::MouseButton> arg5 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg6 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   ret.write<QMouseEvent * > ((QMouseEvent *)QMouseEvent::createExtendedMouseEvent (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg4).cref(), arg5, arg6));
 }
 
@@ -296,11 +296,11 @@ static void _call_ctor_QMouseEvent_Adaptor_10634 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg3 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
-  QFlags<Qt::MouseButton> arg4 = args.read<QFlags<Qt::MouseButton> > (heap);
-  QFlags<Qt::KeyboardModifier> arg5 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
+  QFlags<Qt::MouseButton> arg4 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg5 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   ret.write<QMouseEvent_Adaptor *> (new QMouseEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg3).cref(), arg4, arg5));
 }
 
@@ -328,12 +328,12 @@ static void _call_ctor_QMouseEvent_Adaptor_12442 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
-  const QPoint &arg3 = args.read<const QPoint & > (heap);
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg4 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
-  QFlags<Qt::MouseButton> arg5 = args.read<QFlags<Qt::MouseButton> > (heap);
-  QFlags<Qt::KeyboardModifier> arg6 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const QPoint &arg3 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg4 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
+  QFlags<Qt::MouseButton> arg5 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg6 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   ret.write<QMouseEvent_Adaptor *> (new QMouseEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg4).cref(), arg5, arg6));
 }
 

@@ -66,7 +66,7 @@ static void _call_ctor_QSizeF_1805 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   ret.write<QSizeF *> (new QSizeF (arg1));
 }
 
@@ -87,8 +87,8 @@ static void _call_ctor_QSizeF_2034 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QSizeF *> (new QSizeF (arg1, arg2));
 }
 
@@ -107,7 +107,7 @@ static void _call_f_boundedTo_c1875 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   ret.write<QSizeF > ((QSizeF)((QSizeF *)cls)->boundedTo (arg1));
 }
 
@@ -126,7 +126,7 @@ static void _call_f_expandedTo_c1875 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   ret.write<QSizeF > ((QSizeF)((QSizeF *)cls)->expandedTo (arg1));
 }
 
@@ -205,7 +205,7 @@ static void _call_f_operator_star__eq__1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QSizeF & > ((QSizeF &)((QSizeF *)cls)->operator*= (arg1));
 }
 
@@ -224,7 +224,7 @@ static void _call_f_operator_plus__eq__1875 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   ret.write<QSizeF & > ((QSizeF &)((QSizeF *)cls)->operator+= (arg1));
 }
 
@@ -243,7 +243,7 @@ static void _call_f_operator_minus__eq__1875 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   ret.write<QSizeF & > ((QSizeF &)((QSizeF *)cls)->operator-= (arg1));
 }
 
@@ -262,7 +262,7 @@ static void _call_f_operator_slash__eq__1071 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QSizeF & > ((QSizeF &)((QSizeF *)cls)->operator/= (arg1));
 }
 
@@ -315,9 +315,9 @@ static void _call_f_scale_4183 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg3 = args.read<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizeF *)cls)->scale (arg1, arg2, qt_gsi::QtToCppAdaptor<Qt::AspectRatioMode>(arg3).cref());
 }
@@ -339,8 +339,8 @@ static void _call_f_scale_4024 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
-  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
+  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizeF *)cls)->scale (arg1, qt_gsi::QtToCppAdaptor<Qt::AspectRatioMode>(arg2).cref());
 }
@@ -360,7 +360,7 @@ static void _call_f_setHeight_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizeF *)cls)->setHeight (arg1);
 }
@@ -380,7 +380,7 @@ static void _call_f_setWidth_1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizeF *)cls)->setWidth (arg1);
 }

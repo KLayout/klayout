@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionProgressBarV2_3686 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionProgressBar &arg1 = args.read<const QStyleOptionProgressBar & > (heap);
+  const QStyleOptionProgressBar &arg1 = gsi::arg_reader<const QStyleOptionProgressBar & >() (args, heap);
   ret.write<QStyleOptionProgressBarV2 *> (new QStyleOptionProgressBarV2 (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QStyleOptionProgressBarV2_3822 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionProgressBarV2 &arg1 = args.read<const QStyleOptionProgressBarV2 & > (heap);
+  const QStyleOptionProgressBarV2 &arg1 = gsi::arg_reader<const QStyleOptionProgressBarV2 & >() (args, heap);
   ret.write<QStyleOptionProgressBarV2 *> (new QStyleOptionProgressBarV2 (arg1));
 }
 
@@ -105,7 +105,7 @@ static void _call_f_operator_eq__3686 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionProgressBar &arg1 = args.read<const QStyleOptionProgressBar & > (heap);
+  const QStyleOptionProgressBar &arg1 = gsi::arg_reader<const QStyleOptionProgressBar & >() (args, heap);
   ret.write<QStyleOptionProgressBarV2 & > ((QStyleOptionProgressBarV2 &)((QStyleOptionProgressBarV2 *)cls)->operator= (arg1));
 }
 

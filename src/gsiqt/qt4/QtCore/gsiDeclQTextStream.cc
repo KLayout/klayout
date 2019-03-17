@@ -394,7 +394,7 @@ static void _call_f_read_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<QString > ((QString)((QTextStream *)cls)->read (arg1));
 }
 
@@ -428,7 +428,7 @@ static void _call_f_readLine_986 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args ? args.read<qint64 > (heap) : (qint64)(0);
+  qint64 arg1 = args ? gsi::arg_reader<qint64 >() (args, heap) : gsi::arg_maker<qint64 >() (0, heap);
   ret.write<QString > ((QString)((QTextStream *)cls)->readLine (arg1));
 }
 
@@ -509,7 +509,7 @@ static void _call_f_seek_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<bool > ((bool)((QTextStream *)cls)->seek (arg1));
 }
 
@@ -528,7 +528,7 @@ static void _call_f_setAutoDetectUnicode_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setAutoDetectUnicode (arg1);
 }
@@ -548,7 +548,7 @@ static void _call_f_setCodec_1602 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextCodec *arg1 = args.read<QTextCodec * > (heap);
+  QTextCodec *arg1 = gsi::arg_reader<QTextCodec * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setCodec (arg1);
 }
@@ -568,7 +568,7 @@ static void _call_f_setCodec_1731 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setCodec (arg1);
 }
@@ -588,7 +588,7 @@ static void _call_f_setDevice_1447 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setDevice (arg1);
 }
@@ -608,7 +608,7 @@ static void _call_f_setFieldAlignment_3085 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextStream::FieldAlignment>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextStream::FieldAlignment>::target_type & > (heap);
+  const qt_gsi::Converter<QTextStream::FieldAlignment>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextStream::FieldAlignment>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setFieldAlignment (qt_gsi::QtToCppAdaptor<QTextStream::FieldAlignment>(arg1).cref());
 }
@@ -628,7 +628,7 @@ static void _call_f_setFieldWidth_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setFieldWidth (arg1);
 }
@@ -648,7 +648,7 @@ static void _call_f_setGenerateByteOrderMark_864 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setGenerateByteOrderMark (arg1);
 }
@@ -668,7 +668,7 @@ static void _call_f_setIntegerBase_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setIntegerBase (arg1);
 }
@@ -688,7 +688,7 @@ static void _call_f_setLocale_1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLocale &arg1 = args.read<const QLocale & > (heap);
+  const QLocale &arg1 = gsi::arg_reader<const QLocale & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setLocale (arg1);
 }
@@ -708,7 +708,7 @@ static void _call_f_setNumberFlags_3365 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QTextStream::NumberFlag> arg1 = args.read<QFlags<QTextStream::NumberFlag> > (heap);
+  QFlags<QTextStream::NumberFlag> arg1 = gsi::arg_reader<QFlags<QTextStream::NumberFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setNumberFlags (arg1);
 }
@@ -728,7 +728,7 @@ static void _call_f_setPadChar_899 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type & arg1 = args.read<const qt_gsi::Converter<QChar>::target_type & > (heap);
+  const qt_gsi::Converter<QChar>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setPadChar (qt_gsi::QtToCppAdaptor<QChar>(arg1).cref());
 }
@@ -748,7 +748,7 @@ static void _call_f_setRealNumberNotation_3523 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextStream::RealNumberNotation>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextStream::RealNumberNotation>::target_type & > (heap);
+  const qt_gsi::Converter<QTextStream::RealNumberNotation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextStream::RealNumberNotation>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setRealNumberNotation (qt_gsi::QtToCppAdaptor<QTextStream::RealNumberNotation>(arg1).cref());
 }
@@ -768,7 +768,7 @@ static void _call_f_setRealNumberPrecision_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setRealNumberPrecision (arg1);
 }
@@ -788,7 +788,7 @@ static void _call_f_setStatus_2318 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextStream::Status>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextStream::Status>::target_type & > (heap);
+  const qt_gsi::Converter<QTextStream::Status>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextStream::Status>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setStatus (qt_gsi::QtToCppAdaptor<QTextStream::Status>(arg1).cref());
 }
@@ -810,8 +810,8 @@ static void _call_f_setString_4468 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString *arg1 = args.read<QString * > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg2 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
+  QString *arg1 = gsi::arg_reader<QString * >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg2 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextStream *)cls)->setString (arg1, arg2);
 }
@@ -1004,7 +1004,7 @@ static void _call_ctor_QTextStream_Adaptor_1447 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QTextStream_Adaptor *> (new QTextStream_Adaptor (arg1));
 }
 
@@ -1024,8 +1024,8 @@ static void _call_ctor_QTextStream_Adaptor_4468 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString *arg1 = args.read<QString * > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg2 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
+  QString *arg1 = gsi::arg_reader<QString * >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg2 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
   ret.write<QTextStream_Adaptor *> (new QTextStream_Adaptor (arg1, arg2));
 }
 

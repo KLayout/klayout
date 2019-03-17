@@ -71,8 +71,8 @@ static void _call_f_effectiveSizeHint_c3330 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::SizeHint>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::SizeHint>::target_type & > (heap);
-  const QSizeF &arg2 = args ? args.read<const QSizeF & > (heap) : (const QSizeF &)(QSizeF());
+  const qt_gsi::Converter<Qt::SizeHint>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::SizeHint>::target_type & >() (args, heap);
+  const QSizeF &arg2 = args ? gsi::arg_reader<const QSizeF & >() (args, heap) : gsi::arg_maker<const QSizeF & >() (QSizeF(), heap);
   ret.write<QSizeF > ((QSizeF)((QGraphicsLayoutItem *)cls)->effectiveSizeHint (qt_gsi::QtToCppAdaptor<Qt::SizeHint>(arg1).cref(), arg2));
 }
 
@@ -112,10 +112,10 @@ static void _call_f_getContentsMargins_c4704 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double *arg1 = args.read<double * > (heap);
-  double *arg2 = args.read<double * > (heap);
-  double *arg3 = args.read<double * > (heap);
-  double *arg4 = args.read<double * > (heap);
+  double *arg1 = gsi::arg_reader<double * >() (args, heap);
+  double *arg2 = gsi::arg_reader<double * >() (args, heap);
+  double *arg3 = gsi::arg_reader<double * >() (args, heap);
+  double *arg4 = gsi::arg_reader<double * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->getContentsMargins (arg1, arg2, arg3, arg4);
 }
@@ -330,7 +330,7 @@ static void _call_f_setGeometry_1862 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setGeometry (arg1);
 }
@@ -350,7 +350,7 @@ static void _call_f_setMaximumHeight_1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setMaximumHeight (arg1);
 }
@@ -370,7 +370,7 @@ static void _call_f_setMaximumSize_1875 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setMaximumSize (arg1);
 }
@@ -392,8 +392,8 @@ static void _call_f_setMaximumSize_2034 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setMaximumSize (arg1, arg2);
 }
@@ -413,7 +413,7 @@ static void _call_f_setMaximumWidth_1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setMaximumWidth (arg1);
 }
@@ -433,7 +433,7 @@ static void _call_f_setMinimumHeight_1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setMinimumHeight (arg1);
 }
@@ -453,7 +453,7 @@ static void _call_f_setMinimumSize_1875 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setMinimumSize (arg1);
 }
@@ -475,8 +475,8 @@ static void _call_f_setMinimumSize_2034 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setMinimumSize (arg1, arg2);
 }
@@ -496,7 +496,7 @@ static void _call_f_setMinimumWidth_1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setMinimumWidth (arg1);
 }
@@ -516,7 +516,7 @@ static void _call_f_setParentLayoutItem_2557 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setParentLayoutItem (arg1);
 }
@@ -536,7 +536,7 @@ static void _call_f_setPreferredHeight_1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setPreferredHeight (arg1);
 }
@@ -556,7 +556,7 @@ static void _call_f_setPreferredSize_1875 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setPreferredSize (arg1);
 }
@@ -578,8 +578,8 @@ static void _call_f_setPreferredSize_2034 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setPreferredSize (arg1, arg2);
 }
@@ -599,7 +599,7 @@ static void _call_f_setPreferredWidth_1071 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setPreferredWidth (arg1);
 }
@@ -619,7 +619,7 @@ static void _call_f_setSizePolicy_2429 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizePolicy &arg1 = args.read<const QSizePolicy & > (heap);
+  const QSizePolicy &arg1 = gsi::arg_reader<const QSizePolicy & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setSizePolicy (arg1);
 }
@@ -643,9 +643,9 @@ static void _call_f_setSizePolicy_7191 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap);
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg2 = args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap);
-  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & > (heap) : (const qt_gsi::Converter<QSizePolicy::ControlType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSizePolicy::ControlType>(heap, QSizePolicy::DefaultType));
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSizePolicy::ControlType>(heap, QSizePolicy::DefaultType), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem *)cls)->setSizePolicy (qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg1).cref(), qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg2).cref(), qt_gsi::QtToCppAdaptor<QSizePolicy::ControlType>(arg3).cref());
 }
@@ -853,8 +853,8 @@ static void _call_ctor_QGraphicsLayoutItem_Adaptor_3313 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args ? args.read<QGraphicsLayoutItem * > (heap) : (QGraphicsLayoutItem *)(0);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(false);
+  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<QGraphicsLayoutItem_Adaptor *> (new QGraphicsLayoutItem_Adaptor (arg1, arg2));
 }
 
@@ -929,7 +929,7 @@ static void _call_fp_setGraphicsItem_1919 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args.read<QGraphicsItem * > (heap);
+  QGraphicsItem *arg1 = gsi::arg_reader<QGraphicsItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem_Adaptor *)cls)->fp_QGraphicsLayoutItem_setGraphicsItem_1919 (arg1);
 }
@@ -948,7 +948,7 @@ static void _call_fp_setOwnedByLayout_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayoutItem_Adaptor *)cls)->fp_QGraphicsLayoutItem_setOwnedByLayout_864 (arg1);
 }

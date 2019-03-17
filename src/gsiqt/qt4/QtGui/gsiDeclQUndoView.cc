@@ -165,7 +165,7 @@ static void _call_f_setCleanIcon_1787 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView *)cls)->setCleanIcon (arg1);
 }
@@ -185,7 +185,7 @@ static void _call_f_setEmptyLabel_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView *)cls)->setEmptyLabel (arg1);
 }
@@ -205,7 +205,7 @@ static void _call_f_setGroup_1634 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUndoGroup *arg1 = args.read<QUndoGroup * > (heap);
+  QUndoGroup *arg1 = gsi::arg_reader<QUndoGroup * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView *)cls)->setGroup (arg1);
 }
@@ -225,7 +225,7 @@ static void _call_f_setStack_1611 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUndoStack *arg1 = args.read<QUndoStack * > (heap);
+  QUndoStack *arg1 = gsi::arg_reader<QUndoStack * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView *)cls)->setStack (arg1);
 }
@@ -262,8 +262,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QUndoView::tr (arg1, arg2));
 }
 
@@ -286,9 +286,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QUndoView::tr (arg1, arg2, arg3));
 }
 
@@ -309,8 +309,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QUndoView::trUtf8 (arg1, arg2));
 }
 
@@ -333,9 +333,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QUndoView::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2035,7 +2035,7 @@ static void _call_ctor_QUndoView_Adaptor_1315 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QUndoView_Adaptor *> (new QUndoView_Adaptor (arg1));
 }
 
@@ -2055,8 +2055,8 @@ static void _call_ctor_QUndoView_Adaptor_2818 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUndoStack *arg1 = args.read<QUndoStack * > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QUndoStack *arg1 = gsi::arg_reader<QUndoStack * >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QUndoView_Adaptor *> (new QUndoView_Adaptor (arg1, arg2));
 }
 
@@ -2076,8 +2076,8 @@ static void _call_ctor_QUndoView_Adaptor_2841 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUndoGroup *arg1 = args.read<QUndoGroup * > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QUndoGroup *arg1 = gsi::arg_reader<QUndoGroup * >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QUndoView_Adaptor *> (new QUndoView_Adaptor (arg1, arg2));
 }
 
@@ -2119,7 +2119,7 @@ static void _call_emitter_activated_2395 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QUndoView_Adaptor *)cls)->emitter_QUndoView_activated_2395 (arg1);
 }
 
@@ -2185,7 +2185,7 @@ static void _call_emitter_clicked_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QUndoView_Adaptor *)cls)->emitter_QUndoView_clicked_2395 (arg1);
 }
 
@@ -2320,9 +2320,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_create_2208 (arg1, arg2, arg3);
 }
@@ -2368,7 +2368,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QUndoView_Adaptor *)cls)->emitter_QUndoView_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2439,8 +2439,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_destroy_1620 (arg1, arg2);
 }
@@ -2459,7 +2459,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QUndoView_Adaptor *)cls)->emitter_QUndoView_destroyed_1302 (arg1);
 }
 
@@ -2550,7 +2550,7 @@ static void _call_emitter_doubleClicked_2395 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QUndoView_Adaptor *)cls)->emitter_QUndoView_doubleClicked_2395 (arg1);
 }
 
@@ -2640,7 +2640,7 @@ static void _call_fp_drawFrame_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_drawFrame_1426 (arg1);
 }
@@ -2798,7 +2798,7 @@ static void _call_emitter_entered_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QUndoView_Adaptor *)cls)->emitter_QUndoView_entered_2395 (arg1);
 }
 
@@ -3154,7 +3154,7 @@ static void _call_emitter_indexesMoved_3010 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
   ((QUndoView_Adaptor *)cls)->emitter_QUndoView_indexesMoved_3010 (arg1);
 }
 
@@ -3219,7 +3219,7 @@ static void _call_fp_internalDrag_2456 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::DropAction> arg1 = args.read<QFlags<Qt::DropAction> > (heap);
+  QFlags<Qt::DropAction> arg1 = gsi::arg_reader<QFlags<Qt::DropAction> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_internalDrag_2456 (arg1);
 }
@@ -3238,7 +3238,7 @@ static void _call_fp_internalDrop_1622 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDropEvent *arg1 = args.read<QDropEvent * > (heap);
+  QDropEvent *arg1 = gsi::arg_reader<QDropEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_internalDrop_1622 (arg1);
 }
@@ -3651,7 +3651,7 @@ static void _call_emitter_pressed_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QUndoView_Adaptor *)cls)->emitter_QUndoView_pressed_2395 (arg1);
 }
 
@@ -3669,7 +3669,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QUndoView_Adaptor *)cls)->fp_QUndoView_receivers_c1731 (arg1));
 }
 
@@ -3687,7 +3687,7 @@ static void _call_fp_rectForIndex_c2395 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QRect > ((QRect)((QUndoView_Adaptor *)cls)->fp_QUndoView_rectForIndex_c2395 (arg1));
 }
 
@@ -3742,8 +3742,8 @@ static void _call_fp_resizeContents_1426 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_resizeContents_1426 (arg1, arg2);
 }
@@ -3890,8 +3890,8 @@ static void _call_fp_scrollDirtyRegion_1426 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_scrollDirtyRegion_1426 (arg1, arg2);
 }
@@ -4043,7 +4043,7 @@ static void _call_fp_setDirtyRegion_2006 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_setDirtyRegion_2006 (arg1);
 }
@@ -4062,7 +4062,7 @@ static void _call_fp_setHorizontalStepsPerItem_767 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_setHorizontalStepsPerItem_767 (arg1);
 }
@@ -4107,8 +4107,8 @@ static void _call_fp_setPositionForIndex_4203 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_setPositionForIndex_4203 (arg1, arg2);
 }
@@ -4202,7 +4202,7 @@ static void _call_fp_setState_2776 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_setState_2776 (arg1);
 }
@@ -4221,7 +4221,7 @@ static void _call_fp_setVerticalStepsPerItem_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_setVerticalStepsPerItem_767 (arg1);
 }
@@ -4246,10 +4246,10 @@ static void _call_fp_setViewportMargins_2744 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_setViewportMargins_2744 (arg1, arg2, arg3, arg4);
 }
@@ -4268,7 +4268,7 @@ static void _call_fp_setViewportMargins_2115 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_setViewportMargins_2115 (arg1);
 }
@@ -4311,7 +4311,7 @@ static void _call_fp_setupViewport_1315 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoView_Adaptor *)cls)->fp_QUndoView_setupViewport_1315 (arg1);
 }

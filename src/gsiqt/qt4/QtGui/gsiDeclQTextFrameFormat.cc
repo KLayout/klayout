@@ -256,7 +256,7 @@ static void _call_f_setBorder_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setBorder (arg1);
 }
@@ -276,7 +276,7 @@ static void _call_f_setBorderBrush_1910 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setBorderBrush (arg1);
 }
@@ -296,7 +296,7 @@ static void _call_f_setBorderStyle_3297 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextFrameFormat::BorderStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextFrameFormat::BorderStyle>::target_type & > (heap);
+  const qt_gsi::Converter<QTextFrameFormat::BorderStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextFrameFormat::BorderStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setBorderStyle (qt_gsi::QtToCppAdaptor<QTextFrameFormat::BorderStyle>(arg1).cref());
 }
@@ -316,7 +316,7 @@ static void _call_f_setBottomMargin_1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setBottomMargin (arg1);
 }
@@ -336,7 +336,7 @@ static void _call_f_setHeight_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setHeight (arg1);
 }
@@ -356,7 +356,7 @@ static void _call_f_setHeight_2425 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextLength &arg1 = args.read<const QTextLength & > (heap);
+  const QTextLength &arg1 = gsi::arg_reader<const QTextLength & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setHeight (arg1);
 }
@@ -376,7 +376,7 @@ static void _call_f_setLeftMargin_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setLeftMargin (arg1);
 }
@@ -396,7 +396,7 @@ static void _call_f_setMargin_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setMargin (arg1);
 }
@@ -416,7 +416,7 @@ static void _call_f_setPadding_1071 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setPadding (arg1);
 }
@@ -436,7 +436,7 @@ static void _call_f_setPageBreakPolicy_3611 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QTextFormat::PageBreakFlag> arg1 = args.read<QFlags<QTextFormat::PageBreakFlag> > (heap);
+  QFlags<QTextFormat::PageBreakFlag> arg1 = gsi::arg_reader<QFlags<QTextFormat::PageBreakFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setPageBreakPolicy (arg1);
 }
@@ -456,7 +456,7 @@ static void _call_f_setPosition_3015 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextFrameFormat::Position>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextFrameFormat::Position>::target_type & > (heap);
+  const qt_gsi::Converter<QTextFrameFormat::Position>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextFrameFormat::Position>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setPosition (qt_gsi::QtToCppAdaptor<QTextFrameFormat::Position>(arg1).cref());
 }
@@ -476,7 +476,7 @@ static void _call_f_setRightMargin_1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setRightMargin (arg1);
 }
@@ -496,7 +496,7 @@ static void _call_f_setTopMargin_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setTopMargin (arg1);
 }
@@ -516,7 +516,7 @@ static void _call_f_setWidth_1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setWidth (arg1);
 }
@@ -536,7 +536,7 @@ static void _call_f_setWidth_2425 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextLength &arg1 = args.read<const QTextLength & > (heap);
+  const QTextLength &arg1 = gsi::arg_reader<const QTextLength & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrameFormat *)cls)->setWidth (arg1);
 }

@@ -71,7 +71,7 @@ static void _call_ctor_QIcon_2017 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<QIcon *> (new QIcon (arg1));
 }
 
@@ -90,7 +90,7 @@ static void _call_ctor_QIcon_1787 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ret.write<QIcon *> (new QIcon (arg1));
 }
 
@@ -109,7 +109,7 @@ static void _call_ctor_QIcon_2025 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QIcon *> (new QIcon (arg1));
 }
 
@@ -128,7 +128,7 @@ static void _call_ctor_QIcon_1694 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIconEngine *arg1 = args.read<QIconEngine * > (heap);
+  QIconEngine *arg1 = gsi::arg_reader<QIconEngine * >() (args, heap);
   ret.write<QIcon *> (new QIcon (arg1));
 }
 
@@ -147,7 +147,7 @@ static void _call_ctor_QIcon_1830 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIconEngineV2 *arg1 = args.read<QIconEngineV2 * > (heap);
+  QIconEngineV2 *arg1 = gsi::arg_reader<QIconEngineV2 * >() (args, heap);
   ret.write<QIcon *> (new QIcon (arg1));
 }
 
@@ -170,9 +170,9 @@ static void _call_f_actualSize_c4543 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   ret.write<QSize > ((QSize)((QIcon *)cls)->actualSize (arg1, qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg2).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg3).cref()));
 }
 
@@ -197,10 +197,10 @@ static void _call_f_addFile_6460 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QSize &arg2 = args ? args.read<const QSize & > (heap) : (const QSize &)(QSize());
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QSize &arg2 = args ? gsi::arg_reader<const QSize & >() (args, heap) : gsi::arg_maker<const QSize & >() (QSize(), heap);
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QIcon *)cls)->addFile (arg1, arg2, qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg3).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg4).cref());
 }
@@ -224,9 +224,9 @@ static void _call_f_addPixmap_4755 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QIcon *)cls)->addPixmap (arg1, qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg2).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg3).cref());
 }
@@ -248,8 +248,8 @@ static void _call_f_availableSizes_c2846 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   ret.write<QList<QSize> > ((QList<QSize>)((QIcon *)cls)->availableSizes (qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg1).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg2).cref()));
 }
 
@@ -329,7 +329,7 @@ static void _call_f_operator_eq__1787 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ret.write<QIcon & > ((QIcon &)((QIcon *)cls)->operator= (arg1));
 }
 
@@ -356,11 +356,11 @@ static void _call_f_paint_c8490 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QRect &arg2 = args.read<const QRect & > (heap);
-  QFlags<Qt::AlignmentFlag> arg3 = args ? args.read<QFlags<Qt::AlignmentFlag> > (heap) : (QFlags<Qt::AlignmentFlag>)(Qt::AlignCenter);
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QRect &arg2 = gsi::arg_reader<const QRect & >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg3 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::AlignCenter, heap);
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QIcon *)cls)->paint (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg4).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg5).cref());
 }
@@ -394,14 +394,14 @@ static void _call_f_paint_c9442 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  int arg5 = args.read<int > (heap);
-  QFlags<Qt::AlignmentFlag> arg6 = args ? args.read<QFlags<Qt::AlignmentFlag> > (heap) : (QFlags<Qt::AlignmentFlag>)(Qt::AlignCenter);
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg7 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg8 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::AlignCenter, heap);
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg7 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg8 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QIcon *)cls)->paint (arg1, arg2, arg3, arg4, arg5, arg6, qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg7).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg8).cref());
 }
@@ -425,9 +425,9 @@ static void _call_f_pixmap_c4543 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   ret.write<QPixmap > ((QPixmap)((QIcon *)cls)->pixmap (arg1, qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg2).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg3).cref()));
 }
 
@@ -452,10 +452,10 @@ static void _call_f_pixmap_c4164 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   ret.write<QPixmap > ((QPixmap)((QIcon *)cls)->pixmap (arg1, arg2, qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg3).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg4).cref()));
 }
 
@@ -478,9 +478,9 @@ static void _call_f_pixmap_c3505 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   ret.write<QPixmap > ((QPixmap)((QIcon *)cls)->pixmap (arg1, qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg2).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg3).cref()));
 }
 
@@ -516,8 +516,8 @@ static void _call_f_fromTheme_3704 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QIcon &arg2 = args ? args.read<const QIcon & > (heap) : (const QIcon &)(QIcon());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QIcon &arg2 = args ? gsi::arg_reader<const QIcon & >() (args, heap) : gsi::arg_maker<const QIcon & >() (QIcon(), heap);
   ret.write<QIcon > ((QIcon)QIcon::fromTheme (arg1, arg2));
 }
 
@@ -536,7 +536,7 @@ static void _call_f_hasThemeIcon_2025 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QIcon::hasThemeIcon (arg1));
 }
 
@@ -555,7 +555,7 @@ static void _call_f_setThemeName_2025 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QIcon::setThemeName (arg1);
 }
@@ -575,7 +575,7 @@ static void _call_f_setThemeSearchPaths_2437 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QIcon::setThemeSearchPaths (arg1);
 }

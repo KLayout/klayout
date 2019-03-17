@@ -197,7 +197,7 @@ static void _call_f_setAlignment_2750 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextTableFormat *)cls)->setAlignment (arg1);
 }
@@ -217,7 +217,7 @@ static void _call_f_setCellPadding_1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextTableFormat *)cls)->setCellPadding (arg1);
 }
@@ -237,7 +237,7 @@ static void _call_f_setCellSpacing_1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextTableFormat *)cls)->setCellSpacing (arg1);
 }
@@ -257,7 +257,7 @@ static void _call_f_setColumnWidthConstraints_3255 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<QTextLength> &arg1 = args.read<const QVector<QTextLength> & > (heap);
+  const QVector<QTextLength> &arg1 = gsi::arg_reader<const QVector<QTextLength> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextTableFormat *)cls)->setColumnWidthConstraints (arg1);
 }
@@ -277,7 +277,7 @@ static void _call_f_setColumns_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextTableFormat *)cls)->setColumns (arg1);
 }
@@ -297,7 +297,7 @@ static void _call_f_setHeaderRowCount_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextTableFormat *)cls)->setHeaderRowCount (arg1);
 }

@@ -80,7 +80,7 @@ static void _call_f_blockBoundingRect_c2306 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPlainTextDocumentLayout *)cls)->blockBoundingRect (arg1));
 }
 
@@ -131,8 +131,8 @@ static void _call_f_draw_6787 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QAbstractTextDocumentLayout::PaintContext &arg2 = args.read<const QAbstractTextDocumentLayout::PaintContext & > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QAbstractTextDocumentLayout::PaintContext &arg2 = gsi::arg_reader<const QAbstractTextDocumentLayout::PaintContext & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout *)cls)->draw (arg1, arg2);
 }
@@ -152,7 +152,7 @@ static void _call_f_ensureBlockLayout_c2306 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout *)cls)->ensureBlockLayout (arg1);
 }
@@ -172,7 +172,7 @@ static void _call_f_frameBoundingRect_c1615 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextFrame *arg1 = args.read<QTextFrame * > (heap);
+  QTextFrame *arg1 = gsi::arg_reader<QTextFrame * >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPlainTextDocumentLayout *)cls)->frameBoundingRect (arg1));
 }
 
@@ -193,8 +193,8 @@ static void _call_f_hitTest_c4147 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const qt_gsi::Converter<Qt::HitTestAccuracy>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::HitTestAccuracy>::target_type & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const qt_gsi::Converter<Qt::HitTestAccuracy>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::HitTestAccuracy>::target_type & >() (args, heap);
   ret.write<int > ((int)((QPlainTextDocumentLayout *)cls)->hitTest (arg1, qt_gsi::QtToCppAdaptor<Qt::HitTestAccuracy>(arg2).cref()));
 }
 
@@ -244,7 +244,7 @@ static void _call_f_setCursorWidth_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextDocumentLayout *)cls)->setCursorWidth (arg1);
 }
@@ -266,8 +266,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QPlainTextDocumentLayout::tr (arg1, arg2));
 }
 
@@ -290,9 +290,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QPlainTextDocumentLayout::tr (arg1, arg2, arg3));
 }
 
@@ -313,8 +313,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QPlainTextDocumentLayout::trUtf8 (arg1, arg2));
 }
 
@@ -337,9 +337,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QPlainTextDocumentLayout::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -718,7 +718,7 @@ static void _call_ctor_QPlainTextDocumentLayout_Adaptor_1955 (const qt_gsi::Gene
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextDocument *arg1 = args.read<QTextDocument * > (heap);
+  QTextDocument *arg1 = gsi::arg_reader<QTextDocument * >() (args, heap);
   ret.write<QPlainTextDocumentLayout_Adaptor *> (new QPlainTextDocumentLayout_Adaptor (arg1));
 }
 
@@ -807,7 +807,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->emitter_QPlainTextDocumentLayout_destroyed_1302 (arg1);
 }
 
@@ -898,7 +898,7 @@ static void _call_emitter_documentSizeChanged_1875 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->emitter_QPlainTextDocumentLayout_documentSizeChanged_1875 (arg1);
 }
 
@@ -1028,7 +1028,7 @@ static void _call_fp_format_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextCharFormat > ((QTextCharFormat)((QPlainTextDocumentLayout_Adaptor *)cls)->fp_QPlainTextDocumentLayout_format_767 (arg1));
 }
 
@@ -1046,7 +1046,7 @@ static void _call_fp_formatIndex_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QPlainTextDocumentLayout_Adaptor *)cls)->fp_QPlainTextDocumentLayout_formatIndex_767 (arg1));
 }
 
@@ -1132,7 +1132,7 @@ static void _call_emitter_pageCountChanged_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->emitter_QPlainTextDocumentLayout_pageCountChanged_767 (arg1);
 }
 
@@ -1180,7 +1180,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QPlainTextDocumentLayout_Adaptor *)cls)->fp_QPlainTextDocumentLayout_receivers_c1731 (arg1));
 }
 
@@ -1266,7 +1266,7 @@ static void _call_emitter_update_1862 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args ? args.read<const QRectF & > (heap) : (const QRectF &)(QRectF(0., 0., 1000000000., 1000000000.));
+  const QRectF &arg1 = args ? gsi::arg_reader<const QRectF & >() (args, heap) : gsi::arg_maker<const QRectF & >() (QRectF(0., 0., 1000000000., 1000000000.), heap);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->emitter_QPlainTextDocumentLayout_update_1862 (arg1);
 }
 
@@ -1284,7 +1284,7 @@ static void _call_emitter_updateBlock_2306 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ((QPlainTextDocumentLayout_Adaptor *)cls)->emitter_QPlainTextDocumentLayout_updateBlock_2306 (arg1);
 }
 

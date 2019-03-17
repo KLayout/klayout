@@ -81,7 +81,7 @@ static void _call_ctor_QDomNode_2072 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<QDomNode *> (new QDomNode (arg1));
 }
 
@@ -100,7 +100,7 @@ static void _call_f_appendChild_2072 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNode *)cls)->appendChild (arg1));
 }
 
@@ -165,7 +165,7 @@ static void _call_f_cloneNode_c864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNode *)cls)->cloneNode (arg1));
 }
 
@@ -214,7 +214,7 @@ static void _call_f_firstChildElement_c2025 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QDomElement > ((QDomElement)((QDomNode *)cls)->firstChildElement (arg1));
 }
 
@@ -265,8 +265,8 @@ static void _call_f_insertAfter_4036 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
-  const QDomNode &arg2 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
+  const QDomNode &arg2 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNode *)cls)->insertAfter (arg1, arg2));
 }
 
@@ -287,8 +287,8 @@ static void _call_f_insertBefore_4036 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
-  const QDomNode &arg2 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
+  const QDomNode &arg2 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNode *)cls)->insertBefore (arg1, arg2));
 }
 
@@ -504,8 +504,8 @@ static void _call_f_isSupported_c3942 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDomNode *)cls)->isSupported (arg1, arg2));
 }
 
@@ -554,7 +554,7 @@ static void _call_f_lastChildElement_c2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QDomElement > ((QDomElement)((QDomNode *)cls)->lastChildElement (arg1));
 }
 
@@ -603,7 +603,7 @@ static void _call_f_namedItem_c2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNode *)cls)->namedItem (arg1));
 }
 
@@ -652,7 +652,7 @@ static void _call_f_nextSiblingElement_c2025 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QDomElement > ((QDomElement)((QDomNode *)cls)->nextSiblingElement (arg1));
 }
 
@@ -732,7 +732,7 @@ static void _call_f_operator_excl__eq__c2072 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<bool > ((bool)((QDomNode *)cls)->operator!= (arg1));
 }
 
@@ -751,7 +751,7 @@ static void _call_f_operator_eq__2072 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<QDomNode & > ((QDomNode &)((QDomNode *)cls)->operator= (arg1));
 }
 
@@ -770,7 +770,7 @@ static void _call_f_operator_eq__eq__c2072 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<bool > ((bool)((QDomNode *)cls)->operator== (arg1));
 }
 
@@ -849,7 +849,7 @@ static void _call_f_previousSiblingElement_c2025 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QDomElement > ((QDomElement)((QDomNode *)cls)->previousSiblingElement (arg1));
 }
 
@@ -868,7 +868,7 @@ static void _call_f_removeChild_2072 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNode *)cls)->removeChild (arg1));
 }
 
@@ -889,8 +889,8 @@ static void _call_f_replaceChild_4036 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
-  const QDomNode &arg2 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
+  const QDomNode &arg2 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNode *)cls)->replaceChild (arg1, arg2));
 }
 
@@ -911,8 +911,8 @@ static void _call_f_save_c2399 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextStream &arg1 = args.read<QTextStream & > (heap);
-  int arg2 = args.read<int > (heap);
+  QTextStream &arg1 = gsi::arg_reader<QTextStream & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomNode *)cls)->save (arg1, arg2);
 }
@@ -936,9 +936,9 @@ static void _call_f_save_c5033 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextStream &arg1 = args.read<QTextStream & > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<QDomNode::EncodingPolicy>::target_type & arg3 = args.read<const qt_gsi::Converter<QDomNode::EncodingPolicy>::target_type & > (heap);
+  QTextStream &arg1 = gsi::arg_reader<QTextStream & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QDomNode::EncodingPolicy>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QDomNode::EncodingPolicy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomNode *)cls)->save (arg1, arg2, qt_gsi::QtToCppAdaptor<QDomNode::EncodingPolicy>(arg3).cref());
 }
@@ -958,7 +958,7 @@ static void _call_f_setNodeValue_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomNode *)cls)->setNodeValue (arg1);
 }
@@ -978,7 +978,7 @@ static void _call_f_setPrefix_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomNode *)cls)->setPrefix (arg1);
 }

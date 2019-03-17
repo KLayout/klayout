@@ -94,7 +94,7 @@ static void _call_f_contains_c1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPathItem *)cls)->contains (arg1));
 }
 
@@ -113,7 +113,7 @@ static void _call_f_isObscuredBy_c2614 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPathItem *)cls)->isObscuredBy (arg1));
 }
 
@@ -151,9 +151,9 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QStyleOptionGraphicsItem *arg2 = args.read<const QStyleOptionGraphicsItem * > (heap);
-  QWidget *arg3 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
+  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPathItem *)cls)->paint (arg1, arg2, arg3);
 }
@@ -188,7 +188,7 @@ static void _call_f_setPath_2514 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPathItem *)cls)->setPath (arg1);
 }
@@ -888,8 +888,8 @@ static void _call_ctor_QGraphicsPathItem_Adaptor_3825 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
-  QGraphicsScene *arg2 = args ? args.read<QGraphicsScene * > (heap) : (QGraphicsScene *)(0);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsScene *arg2 = args ? gsi::arg_reader<QGraphicsScene * >() (args, heap) : gsi::arg_maker<QGraphicsScene * >() (0, heap);
   ret.write<QGraphicsPathItem_Adaptor *> (new QGraphicsPathItem_Adaptor (arg1, arg2));
 }
 
@@ -911,9 +911,9 @@ static void _call_ctor_QGraphicsPathItem_Adaptor_6231 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
-  QGraphicsItem *arg2 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
-  QGraphicsScene *arg3 = args ? args.read<QGraphicsScene * > (heap) : (QGraphicsScene *)(0);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
+  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsScene *arg3 = args ? gsi::arg_reader<QGraphicsScene * >() (args, heap) : gsi::arg_maker<QGraphicsScene * >() (0, heap);
   ret.write<QGraphicsPathItem_Adaptor *> (new QGraphicsPathItem_Adaptor (arg1, arg2, arg3));
 }
 

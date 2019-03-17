@@ -51,7 +51,7 @@ static void _call_ctor_QTextDecoder_2297 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCodec *arg1 = args.read<const QTextCodec * > (heap);
+  const QTextCodec *arg1 = gsi::arg_reader<const QTextCodec * >() (args, heap);
   ret.write<QTextDecoder *> (new QTextDecoder (arg1));
 }
 
@@ -87,8 +87,8 @@ static void _call_f_toUnicode_2390 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  int arg2 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QTextDecoder *)cls)->toUnicode (arg1, arg2));
 }
 
@@ -107,7 +107,7 @@ static void _call_f_toUnicode_2309 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)((QTextDecoder *)cls)->toUnicode (arg1));
 }
 
@@ -130,9 +130,9 @@ static void _call_f_toUnicode_3616 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString *arg1 = args.read<QString * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  QString *arg1 = gsi::arg_reader<QString * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDecoder *)cls)->toUnicode (arg1, arg2, arg3);
 }

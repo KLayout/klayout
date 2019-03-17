@@ -50,7 +50,7 @@ static void _call_f_encodedData_c1731 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QMimeSource *)cls)->encodedData (arg1));
 }
 
@@ -69,7 +69,7 @@ static void _call_f_format_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<const char * > ((const char *)((QMimeSource *)cls)->format (arg1));
 }
 
@@ -88,7 +88,7 @@ static void _call_f_provides_c1731 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<bool > ((bool)((QMimeSource *)cls)->provides (arg1));
 }
 

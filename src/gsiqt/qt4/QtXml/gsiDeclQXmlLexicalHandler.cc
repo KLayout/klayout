@@ -50,7 +50,7 @@ static void _call_f_comment_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlLexicalHandler *)cls)->comment (arg1));
 }
 
@@ -99,7 +99,7 @@ static void _call_f_endEntity_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlLexicalHandler *)cls)->endEntity (arg1));
 }
 
@@ -152,9 +152,9 @@ static void _call_f_startDTD_5859 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlLexicalHandler *)cls)->startDTD (arg1, arg2, arg3));
 }
 
@@ -173,7 +173,7 @@ static void _call_f_startEntity_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlLexicalHandler *)cls)->startEntity (arg1));
 }
 

@@ -73,10 +73,10 @@ static void _call_ctor_QVector4D_3960 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   ret.write<QVector4D *> (new QVector4D (arg1, arg2, arg3, arg4));
 }
 
@@ -95,7 +95,7 @@ static void _call_ctor_QVector4D_1916 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QVector4D *> (new QVector4D (arg1));
 }
 
@@ -114,7 +114,7 @@ static void _call_ctor_QVector4D_1986 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QVector4D *> (new QVector4D (arg1));
 }
 
@@ -133,7 +133,7 @@ static void _call_ctor_QVector4D_2139 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector2D &arg1 = args.read<const QVector2D & > (heap);
+  const QVector2D &arg1 = gsi::arg_reader<const QVector2D & >() (args, heap);
   ret.write<QVector4D *> (new QVector4D (arg1));
 }
 
@@ -156,9 +156,9 @@ static void _call_ctor_QVector4D_4065 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector2D &arg1 = args.read<const QVector2D & > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  const QVector2D &arg1 = gsi::arg_reader<const QVector2D & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   ret.write<QVector4D *> (new QVector4D (arg1, arg2, arg3));
 }
 
@@ -177,7 +177,7 @@ static void _call_ctor_QVector4D_2140 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector4D *> (new QVector4D (arg1));
 }
 
@@ -198,8 +198,8 @@ static void _call_ctor_QVector4D_3103 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
-  double arg2 = args.read<double > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QVector4D *> (new QVector4D (arg1, arg2));
 }
 
@@ -294,7 +294,7 @@ static void _call_f_operator_star__eq__1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QVector4D & > ((QVector4D &)((QVector4D *)cls)->operator*= (arg1));
 }
 
@@ -313,7 +313,7 @@ static void _call_f_operator_star__eq__2141 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector4D &arg1 = args.read<const QVector4D & > (heap);
+  const QVector4D &arg1 = gsi::arg_reader<const QVector4D & >() (args, heap);
   ret.write<QVector4D & > ((QVector4D &)((QVector4D *)cls)->operator*= (arg1));
 }
 
@@ -332,7 +332,7 @@ static void _call_f_operator_plus__eq__2141 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector4D &arg1 = args.read<const QVector4D & > (heap);
+  const QVector4D &arg1 = gsi::arg_reader<const QVector4D & >() (args, heap);
   ret.write<QVector4D & > ((QVector4D &)((QVector4D *)cls)->operator+= (arg1));
 }
 
@@ -351,7 +351,7 @@ static void _call_f_operator_minus__eq__2141 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector4D &arg1 = args.read<const QVector4D & > (heap);
+  const QVector4D &arg1 = gsi::arg_reader<const QVector4D & >() (args, heap);
   ret.write<QVector4D & > ((QVector4D &)((QVector4D *)cls)->operator-= (arg1));
 }
 
@@ -370,7 +370,7 @@ static void _call_f_operator_slash__eq__1071 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QVector4D & > ((QVector4D &)((QVector4D *)cls)->operator/= (arg1));
 }
 
@@ -389,7 +389,7 @@ static void _call_f_setW_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVector4D *)cls)->setW (arg1);
 }
@@ -409,7 +409,7 @@ static void _call_f_setX_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVector4D *)cls)->setX (arg1);
 }
@@ -429,7 +429,7 @@ static void _call_f_setY_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVector4D *)cls)->setY (arg1);
 }
@@ -449,7 +449,7 @@ static void _call_f_setZ_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVector4D *)cls)->setZ (arg1);
 }
@@ -621,8 +621,8 @@ static void _call_f_dotProduct_4174 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector4D &arg1 = args.read<const QVector4D & > (heap);
-  const QVector4D &arg2 = args.read<const QVector4D & > (heap);
+  const QVector4D &arg1 = gsi::arg_reader<const QVector4D & >() (args, heap);
+  const QVector4D &arg2 = gsi::arg_reader<const QVector4D & >() (args, heap);
   ret.write<double > ((double)QVector4D::dotProduct (arg1, arg2));
 }
 

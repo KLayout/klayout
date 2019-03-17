@@ -63,10 +63,10 @@ static void _call_f_addAnchor_8538 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
-  const qt_gsi::Converter<Qt::AnchorPoint>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::AnchorPoint>::target_type & > (heap);
-  QGraphicsLayoutItem *arg3 = args.read<QGraphicsLayoutItem * > (heap);
-  const qt_gsi::Converter<Qt::AnchorPoint>::target_type & arg4 = args.read<const qt_gsi::Converter<Qt::AnchorPoint>::target_type & > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  const qt_gsi::Converter<Qt::AnchorPoint>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::AnchorPoint>::target_type & >() (args, heap);
+  QGraphicsLayoutItem *arg3 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  const qt_gsi::Converter<Qt::AnchorPoint>::target_type & arg4 = gsi::arg_reader<const qt_gsi::Converter<Qt::AnchorPoint>::target_type & >() (args, heap);
   ret.write<QGraphicsAnchor * > ((QGraphicsAnchor *)((QGraphicsAnchorLayout *)cls)->addAnchor (arg1, qt_gsi::QtToCppAdaptor<Qt::AnchorPoint>(arg2).cref(), arg3, qt_gsi::QtToCppAdaptor<Qt::AnchorPoint>(arg4).cref()));
 }
 
@@ -89,9 +89,9 @@ static void _call_f_addAnchors_7507 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
-  QGraphicsLayoutItem *arg2 = args.read<QGraphicsLayoutItem * > (heap);
-  QFlags<Qt::Orientation> arg3 = args ? args.read<QFlags<Qt::Orientation> > (heap) : (QFlags<Qt::Orientation>)(Qt::Horizontal | Qt::Vertical);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  QGraphicsLayoutItem *arg2 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  QFlags<Qt::Orientation> arg3 = args ? gsi::arg_reader<QFlags<Qt::Orientation> >() (args, heap) : gsi::arg_maker<QFlags<Qt::Orientation> >() (Qt::Horizontal | Qt::Vertical, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout *)cls)->addAnchors (arg1, arg2, arg3);
 }
@@ -117,10 +117,10 @@ static void _call_f_addCornerAnchors_7522 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
-  const qt_gsi::Converter<Qt::Corner>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::Corner>::target_type & > (heap);
-  QGraphicsLayoutItem *arg3 = args.read<QGraphicsLayoutItem * > (heap);
-  const qt_gsi::Converter<Qt::Corner>::target_type & arg4 = args.read<const qt_gsi::Converter<Qt::Corner>::target_type & > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  const qt_gsi::Converter<Qt::Corner>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::Corner>::target_type & >() (args, heap);
+  QGraphicsLayoutItem *arg3 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  const qt_gsi::Converter<Qt::Corner>::target_type & arg4 = gsi::arg_reader<const qt_gsi::Converter<Qt::Corner>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout *)cls)->addCornerAnchors (arg1, qt_gsi::QtToCppAdaptor<Qt::Corner>(arg2).cref(), arg3, qt_gsi::QtToCppAdaptor<Qt::Corner>(arg4).cref());
 }
@@ -146,10 +146,10 @@ static void _call_f_anchor_8538 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
-  const qt_gsi::Converter<Qt::AnchorPoint>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::AnchorPoint>::target_type & > (heap);
-  QGraphicsLayoutItem *arg3 = args.read<QGraphicsLayoutItem * > (heap);
-  const qt_gsi::Converter<Qt::AnchorPoint>::target_type & arg4 = args.read<const qt_gsi::Converter<Qt::AnchorPoint>::target_type & > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  const qt_gsi::Converter<Qt::AnchorPoint>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::AnchorPoint>::target_type & >() (args, heap);
+  QGraphicsLayoutItem *arg3 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  const qt_gsi::Converter<Qt::AnchorPoint>::target_type & arg4 = gsi::arg_reader<const qt_gsi::Converter<Qt::AnchorPoint>::target_type & >() (args, heap);
   ret.write<QGraphicsAnchor * > ((QGraphicsAnchor *)((QGraphicsAnchorLayout *)cls)->anchor (arg1, qt_gsi::QtToCppAdaptor<Qt::AnchorPoint>(arg2).cref(), arg3, qt_gsi::QtToCppAdaptor<Qt::AnchorPoint>(arg4).cref()));
 }
 
@@ -214,7 +214,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QGraphicsLayoutItem * > ((QGraphicsLayoutItem *)((QGraphicsAnchorLayout *)cls)->itemAt (arg1));
 }
 
@@ -233,7 +233,7 @@ static void _call_f_removeAt_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout *)cls)->removeAt (arg1);
 }
@@ -253,7 +253,7 @@ static void _call_f_setGeometry_1862 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout *)cls)->setGeometry (arg1);
 }
@@ -273,7 +273,7 @@ static void _call_f_setHorizontalSpacing_1071 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout *)cls)->setHorizontalSpacing (arg1);
 }
@@ -293,7 +293,7 @@ static void _call_f_setSpacing_1071 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout *)cls)->setSpacing (arg1);
 }
@@ -313,7 +313,7 @@ static void _call_f_setVerticalSpacing_1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout *)cls)->setVerticalSpacing (arg1);
 }
@@ -561,7 +561,7 @@ static void _call_ctor_QGraphicsAnchorLayout_Adaptor_2557 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args ? args.read<QGraphicsLayoutItem * > (heap) : (QGraphicsLayoutItem *)(0);
+  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
   ret.write<QGraphicsAnchorLayout_Adaptor *> (new QGraphicsAnchorLayout_Adaptor (arg1));
 }
 
@@ -579,7 +579,7 @@ static void _call_fp_addChildLayoutItem_2557 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout_Adaptor *)cls)->fp_QGraphicsAnchorLayout_addChildLayoutItem_2557 (arg1);
 }
@@ -741,7 +741,7 @@ static void _call_fp_setGraphicsItem_1919 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args.read<QGraphicsItem * > (heap);
+  QGraphicsItem *arg1 = gsi::arg_reader<QGraphicsItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout_Adaptor *)cls)->fp_QGraphicsAnchorLayout_setGraphicsItem_1919 (arg1);
 }
@@ -760,7 +760,7 @@ static void _call_fp_setOwnedByLayout_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsAnchorLayout_Adaptor *)cls)->fp_QGraphicsAnchorLayout_setOwnedByLayout_864 (arg1);
 }

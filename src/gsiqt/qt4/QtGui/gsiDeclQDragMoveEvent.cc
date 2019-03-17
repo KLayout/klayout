@@ -70,7 +70,7 @@ static void _call_f_accept_1792 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDragMoveEvent *)cls)->accept (arg1);
 }
@@ -121,7 +121,7 @@ static void _call_f_ignore_1792 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDragMoveEvent *)cls)->ignore (arg1);
 }
@@ -244,12 +244,12 @@ static void _call_ctor_QDragMoveEvent_Adaptor_13244 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
-  QFlags<Qt::DropAction> arg2 = args.read<QFlags<Qt::DropAction> > (heap);
-  const QMimeData *arg3 = args.read<const QMimeData * > (heap);
-  QFlags<Qt::MouseButton> arg4 = args.read<QFlags<Qt::MouseButton> > (heap);
-  QFlags<Qt::KeyboardModifier> arg5 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg6 = args ? args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap) : (const qt_gsi::Converter<QEvent::Type>::target_type &)(qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::DragMove));
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  QFlags<Qt::DropAction> arg2 = gsi::arg_reader<QFlags<Qt::DropAction> >() (args, heap);
+  const QMimeData *arg3 = gsi::arg_reader<const QMimeData * >() (args, heap);
+  QFlags<Qt::MouseButton> arg4 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg5 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg6 = args ? gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QEvent::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::DragMove), heap);
   ret.write<QDragMoveEvent_Adaptor *> (new QDragMoveEvent_Adaptor (arg1, arg2, arg3, arg4, arg5, qt_gsi::QtToCppAdaptor<QEvent::Type>(arg6).cref()));
 }
 

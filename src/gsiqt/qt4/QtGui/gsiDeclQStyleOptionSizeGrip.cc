@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionSizeGrip_3369 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionSizeGrip &arg1 = args.read<const QStyleOptionSizeGrip & > (heap);
+  const QStyleOptionSizeGrip &arg1 = gsi::arg_reader<const QStyleOptionSizeGrip & >() (args, heap);
   ret.write<QStyleOptionSizeGrip *> (new QStyleOptionSizeGrip (arg1));
 }
 

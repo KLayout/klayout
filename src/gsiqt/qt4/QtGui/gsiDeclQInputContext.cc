@@ -88,7 +88,7 @@ static void _call_f_filterEvent_1912 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEvent *arg1 = args.read<const QEvent * > (heap);
+  const QEvent *arg1 = gsi::arg_reader<const QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QInputContext *)cls)->filterEvent (arg1));
 }
 
@@ -184,8 +184,8 @@ static void _call_f_mouseHandler_2397 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QMouseEvent *arg2 = args.read<QMouseEvent * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QMouseEvent *arg2 = gsi::arg_reader<QMouseEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputContext *)cls)->mouseHandler (arg1, arg2);
 }
@@ -221,7 +221,7 @@ static void _call_f_sendEvent_3045 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QInputMethodEvent &arg1 = args.read<const QInputMethodEvent & > (heap);
+  const QInputMethodEvent &arg1 = gsi::arg_reader<const QInputMethodEvent & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputContext *)cls)->sendEvent (arg1);
 }
@@ -241,7 +241,7 @@ static void _call_f_setFocusWidget_1315 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputContext *)cls)->setFocusWidget (arg1);
 }
@@ -261,7 +261,7 @@ static void _call_f_standardFormat_c3336 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QInputContext::StandardFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<QInputContext::StandardFormat>::target_type & > (heap);
+  const qt_gsi::Converter<QInputContext::StandardFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QInputContext::StandardFormat>::target_type & >() (args, heap);
   ret.write<QTextFormat > ((QTextFormat)((QInputContext *)cls)->standardFormat (qt_gsi::QtToCppAdaptor<QInputContext::StandardFormat>(arg1).cref()));
 }
 
@@ -296,7 +296,7 @@ static void _call_f_widgetDestroyed_1315 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputContext *)cls)->widgetDestroyed (arg1);
 }
@@ -318,8 +318,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QInputContext::tr (arg1, arg2));
 }
 
@@ -342,9 +342,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QInputContext::tr (arg1, arg2, arg3));
 }
 
@@ -365,8 +365,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QInputContext::trUtf8 (arg1, arg2));
 }
 
@@ -389,9 +389,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QInputContext::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -758,7 +758,7 @@ static void _call_ctor_QInputContext_Adaptor_1302 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QInputContext_Adaptor *> (new QInputContext_Adaptor (arg1));
 }
 
@@ -843,7 +843,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QInputContext_Adaptor *)cls)->emitter_QInputContext_destroyed_1302 (arg1);
 }
 
@@ -1060,7 +1060,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QInputContext_Adaptor *)cls)->fp_QInputContext_receivers_c1731 (arg1));
 }
 

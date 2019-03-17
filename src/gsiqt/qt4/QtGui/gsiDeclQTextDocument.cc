@@ -86,9 +86,9 @@ static void _call_f_addResource_4371 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QUrl &arg2 = args.read<const QUrl & > (heap);
-  const QVariant &arg3 = args.read<const QVariant & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QUrl &arg2 = gsi::arg_reader<const QUrl & >() (args, heap);
+  const QVariant &arg3 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->addResource (arg1, arg2, arg3);
 }
@@ -199,7 +199,7 @@ static void _call_f_characterAt_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<qt_gsi::Converter<QChar>::target_type > ((qt_gsi::Converter<QChar>::target_type)qt_gsi::CppToQtAdaptor<QChar>(((QTextDocument *)cls)->characterAt (arg1)));
 }
 
@@ -249,7 +249,7 @@ static void _call_f_clone_c1302 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QTextDocument * > ((QTextDocument *)((QTextDocument *)cls)->clone (arg1));
 }
 
@@ -345,8 +345,8 @@ static void _call_f_drawContents_3180 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QRectF &arg2 = args ? args.read<const QRectF & > (heap) : (const QRectF &)(QRectF());
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QRectF &arg2 = args ? gsi::arg_reader<const QRectF & >() (args, heap) : gsi::arg_maker<const QRectF & >() (QRectF(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->drawContents (arg1, arg2);
 }
@@ -385,9 +385,9 @@ static void _call_f_find_c5920 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? args.read<QFlags<QTextDocument::FindFlag> > (heap) : (QFlags<QTextDocument::FindFlag>)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -410,9 +410,9 @@ static void _call_f_find_c7606 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QTextCursor &arg2 = args.read<const QTextCursor & > (heap);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? args.read<QFlags<QTextDocument::FindFlag> > (heap) : (QFlags<QTextDocument::FindFlag>)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QTextCursor &arg2 = gsi::arg_reader<const QTextCursor & >() (args, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -435,9 +435,9 @@ static void _call_f_find_c5876 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? args.read<QFlags<QTextDocument::FindFlag> > (heap) : (QFlags<QTextDocument::FindFlag>)(0);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -460,9 +460,9 @@ static void _call_f_find_c7562 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
-  const QTextCursor &arg2 = args.read<const QTextCursor & > (heap);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? args.read<QFlags<QTextDocument::FindFlag> > (heap) : (QFlags<QTextDocument::FindFlag>)(0);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
+  const QTextCursor &arg2 = gsi::arg_reader<const QTextCursor & >() (args, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -481,7 +481,7 @@ static void _call_f_findBlock_c767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextBlock > ((QTextBlock)((QTextDocument *)cls)->findBlock (arg1));
 }
 
@@ -500,7 +500,7 @@ static void _call_f_findBlockByLineNumber_c767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextBlock > ((QTextBlock)((QTextDocument *)cls)->findBlockByLineNumber (arg1));
 }
 
@@ -519,7 +519,7 @@ static void _call_f_findBlockByNumber_c767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextBlock > ((QTextBlock)((QTextDocument *)cls)->findBlockByNumber (arg1));
 }
 
@@ -553,7 +553,7 @@ static void _call_f_frameAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextFrame * > ((QTextFrame *)((QTextDocument *)cls)->frameAt (arg1));
 }
 
@@ -709,8 +709,8 @@ static void _call_f_markContentsDirty_1426 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->markContentsDirty (arg1, arg2);
 }
@@ -745,7 +745,7 @@ static void _call_f_metaInformation_c3434 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextDocument::MetaInformation>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextDocument::MetaInformation>::target_type & > (heap);
+  const qt_gsi::Converter<QTextDocument::MetaInformation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextDocument::MetaInformation>::target_type & >() (args, heap);
   ret.write<QString > ((QString)((QTextDocument *)cls)->metaInformation (qt_gsi::QtToCppAdaptor<QTextDocument::MetaInformation>(arg1).cref()));
 }
 
@@ -764,7 +764,7 @@ static void _call_f_object_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextObject * > ((QTextObject *)((QTextDocument *)cls)->object (arg1));
 }
 
@@ -783,7 +783,7 @@ static void _call_f_objectForFormat_c2432 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFormat &arg1 = args.read<const QTextFormat & > (heap);
+  const QTextFormat &arg1 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   ret.write<QTextObject * > ((QTextObject *)((QTextDocument *)cls)->objectForFormat (arg1));
 }
 
@@ -832,7 +832,7 @@ static void _call_f_print_c1443 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPrinter *arg1 = args.read<QPrinter * > (heap);
+  QPrinter *arg1 = gsi::arg_reader<QPrinter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->print (arg1);
 }
@@ -852,7 +852,7 @@ static void _call_f_redo_1762 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextCursor *arg1 = args.read<QTextCursor * > (heap);
+  QTextCursor *arg1 = gsi::arg_reader<QTextCursor * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->redo (arg1);
 }
@@ -890,8 +890,8 @@ static void _call_f_resource_c2360 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QUrl &arg2 = args.read<const QUrl & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QUrl &arg2 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QTextDocument *)cls)->resource (arg1, arg2));
 }
 
@@ -940,7 +940,7 @@ static void _call_f_setDefaultFont_1801 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setDefaultFont (arg1);
 }
@@ -960,7 +960,7 @@ static void _call_f_setDefaultStyleSheet_2025 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setDefaultStyleSheet (arg1);
 }
@@ -980,7 +980,7 @@ static void _call_f_setDefaultTextOption_2448 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextOption &arg1 = args.read<const QTextOption & > (heap);
+  const QTextOption &arg1 = gsi::arg_reader<const QTextOption & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setDefaultTextOption (arg1);
 }
@@ -1000,7 +1000,7 @@ static void _call_f_setDocumentLayout_3413 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractTextDocumentLayout *arg1 = args.read<QAbstractTextDocumentLayout * > (heap);
+  QAbstractTextDocumentLayout *arg1 = gsi::arg_reader<QAbstractTextDocumentLayout * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setDocumentLayout (arg1);
 }
@@ -1020,7 +1020,7 @@ static void _call_f_setDocumentMargin_1071 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setDocumentMargin (arg1);
 }
@@ -1040,7 +1040,7 @@ static void _call_f_setHtml_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setHtml (arg1);
 }
@@ -1060,7 +1060,7 @@ static void _call_f_setIndentWidth_1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setIndentWidth (arg1);
 }
@@ -1080,7 +1080,7 @@ static void _call_f_setMaximumBlockCount_767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setMaximumBlockCount (arg1);
 }
@@ -1102,8 +1102,8 @@ static void _call_f_setMetaInformation_5351 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextDocument::MetaInformation>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextDocument::MetaInformation>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const qt_gsi::Converter<QTextDocument::MetaInformation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextDocument::MetaInformation>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setMetaInformation (qt_gsi::QtToCppAdaptor<QTextDocument::MetaInformation>(arg1).cref(), arg2);
 }
@@ -1123,7 +1123,7 @@ static void _call_f_setModified_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setModified (arg1);
 }
@@ -1143,7 +1143,7 @@ static void _call_f_setPageSize_1875 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setPageSize (arg1);
 }
@@ -1163,7 +1163,7 @@ static void _call_f_setPlainText_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setPlainText (arg1);
 }
@@ -1183,7 +1183,7 @@ static void _call_f_setTextWidth_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setTextWidth (arg1);
 }
@@ -1203,7 +1203,7 @@ static void _call_f_setUndoRedoEnabled_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setUndoRedoEnabled (arg1);
 }
@@ -1223,7 +1223,7 @@ static void _call_f_setUseDesignMetrics_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->setUseDesignMetrics (arg1);
 }
@@ -1273,7 +1273,7 @@ static void _call_f_toHtml_c2309 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const QByteArray &arg1 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QString > ((QString)((QTextDocument *)cls)->toHtml (arg1));
 }
 
@@ -1307,7 +1307,7 @@ static void _call_f_undo_1762 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextCursor *arg1 = args.read<QTextCursor * > (heap);
+  QTextCursor *arg1 = gsi::arg_reader<QTextCursor * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocument *)cls)->undo (arg1);
 }
@@ -1360,8 +1360,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTextDocument::tr (arg1, arg2));
 }
 
@@ -1384,9 +1384,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTextDocument::tr (arg1, arg2, arg3));
 }
 
@@ -1407,8 +1407,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTextDocument::trUtf8 (arg1, arg2));
 }
 
@@ -1431,9 +1431,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTextDocument::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1804,7 +1804,7 @@ static void _call_ctor_QTextDocument_Adaptor_1302 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QTextDocument_Adaptor *> (new QTextDocument_Adaptor (arg1));
 }
 
@@ -1824,8 +1824,8 @@ static void _call_ctor_QTextDocument_Adaptor_3219 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QObject *arg2 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QTextDocument_Adaptor *> (new QTextDocument_Adaptor (arg1, arg2));
 }
 
@@ -1843,7 +1843,7 @@ static void _call_emitter_blockCountChanged_767 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QTextDocument_Adaptor *)cls)->emitter_QTextDocument_blockCountChanged_767 (arg1);
 }
 
@@ -1909,9 +1909,9 @@ static void _call_emitter_contentsChange_2085 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ((QTextDocument_Adaptor *)cls)->emitter_QTextDocument_contentsChange_2085 (arg1, arg2, arg3);
 }
 
@@ -1966,7 +1966,7 @@ static void _call_emitter_cursorPositionChanged_2453 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCursor &arg1 = args.read<const QTextCursor & > (heap);
+  const QTextCursor &arg1 = gsi::arg_reader<const QTextCursor & >() (args, heap);
   ((QTextDocument_Adaptor *)cls)->emitter_QTextDocument_cursorPositionChanged_2453 (arg1);
 }
 
@@ -2008,7 +2008,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QTextDocument_Adaptor *)cls)->emitter_QTextDocument_destroyed_1302 (arg1);
 }
 
@@ -2139,7 +2139,7 @@ static void _call_emitter_modificationChanged_864 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QTextDocument_Adaptor *)cls)->emitter_QTextDocument_modificationChanged_864 (arg1);
 }
 
@@ -2157,7 +2157,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QTextDocument_Adaptor *)cls)->fp_QTextDocument_receivers_c1731 (arg1));
 }
 
@@ -2175,7 +2175,7 @@ static void _call_emitter_redoAvailable_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QTextDocument_Adaptor *)cls)->emitter_QTextDocument_redoAvailable_864 (arg1);
 }
 
@@ -2231,7 +2231,7 @@ static void _call_emitter_undoAvailable_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QTextDocument_Adaptor *)cls)->emitter_QTextDocument_undoAvailable_864 (arg1);
 }
 

@@ -51,7 +51,7 @@ static void _call_ctor_QDir_1681 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
   ret.write<QDir *> (new QDir (arg1));
 }
 
@@ -70,7 +70,7 @@ static void _call_ctor_QDir_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QDir *> (new QDir (arg1));
 }
 
@@ -95,10 +95,10 @@ static void _call_ctor_QDir_8374 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  QFlags<QDir::SortFlag> arg3 = args ? args.read<QFlags<QDir::SortFlag> > (heap) : (QFlags<QDir::SortFlag>)(QDir::SortFlags(QDir::Name | QDir::IgnoreCase));
-  QFlags<QDir::Filter> arg4 = args ? args.read<QFlags<QDir::Filter> > (heap) : (QFlags<QDir::Filter>)(QDir::AllEntries);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QDir::SortFlag> arg3 = args ? gsi::arg_reader<QFlags<QDir::SortFlag> >() (args, heap) : gsi::arg_maker<QFlags<QDir::SortFlag> >() (QDir::SortFlags(QDir::Name | QDir::IgnoreCase), heap);
+  QFlags<QDir::Filter> arg4 = args ? gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap) : gsi::arg_maker<QFlags<QDir::Filter> >() (QDir::AllEntries, heap);
   ret.write<QDir *> (new QDir (arg1, arg2, arg3, arg4));
 }
 
@@ -117,7 +117,7 @@ static void _call_f_absoluteFilePath_c2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QDir *)cls)->absoluteFilePath (arg1));
 }
 
@@ -166,7 +166,7 @@ static void _call_f_cd_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->cd (arg1));
 }
 
@@ -232,8 +232,8 @@ static void _call_f_entryInfoList_c4540 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QDir::Filter> arg1 = args ? args.read<QFlags<QDir::Filter> > (heap) : (QFlags<QDir::Filter>)(QDir::NoFilter);
-  QFlags<QDir::SortFlag> arg2 = args ? args.read<QFlags<QDir::SortFlag> > (heap) : (QFlags<QDir::SortFlag>)(QDir::NoSort);
+  QFlags<QDir::Filter> arg1 = args ? gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap) : gsi::arg_maker<QFlags<QDir::Filter> >() (QDir::NoFilter, heap);
+  QFlags<QDir::SortFlag> arg2 = args ? gsi::arg_reader<QFlags<QDir::SortFlag> >() (args, heap) : gsi::arg_maker<QFlags<QDir::SortFlag> >() (QDir::NoSort, heap);
   ret.write<QList<QFileInfo> > ((QList<QFileInfo>)((QDir *)cls)->entryInfoList (arg1, arg2));
 }
 
@@ -256,9 +256,9 @@ static void _call_f_entryInfoList_c6869 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
-  QFlags<QDir::Filter> arg2 = args ? args.read<QFlags<QDir::Filter> > (heap) : (QFlags<QDir::Filter>)(QDir::NoFilter);
-  QFlags<QDir::SortFlag> arg3 = args ? args.read<QFlags<QDir::SortFlag> > (heap) : (QFlags<QDir::SortFlag>)(QDir::NoSort);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
+  QFlags<QDir::Filter> arg2 = args ? gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap) : gsi::arg_maker<QFlags<QDir::Filter> >() (QDir::NoFilter, heap);
+  QFlags<QDir::SortFlag> arg3 = args ? gsi::arg_reader<QFlags<QDir::SortFlag> >() (args, heap) : gsi::arg_maker<QFlags<QDir::SortFlag> >() (QDir::NoSort, heap);
   ret.write<QList<QFileInfo> > ((QList<QFileInfo>)((QDir *)cls)->entryInfoList (arg1, arg2, arg3));
 }
 
@@ -279,8 +279,8 @@ static void _call_f_entryList_c4540 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QDir::Filter> arg1 = args ? args.read<QFlags<QDir::Filter> > (heap) : (QFlags<QDir::Filter>)(QDir::NoFilter);
-  QFlags<QDir::SortFlag> arg2 = args ? args.read<QFlags<QDir::SortFlag> > (heap) : (QFlags<QDir::SortFlag>)(QDir::NoSort);
+  QFlags<QDir::Filter> arg1 = args ? gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap) : gsi::arg_maker<QFlags<QDir::Filter> >() (QDir::NoFilter, heap);
+  QFlags<QDir::SortFlag> arg2 = args ? gsi::arg_reader<QFlags<QDir::SortFlag> >() (args, heap) : gsi::arg_maker<QFlags<QDir::SortFlag> >() (QDir::NoSort, heap);
   ret.write<QStringList > ((QStringList)((QDir *)cls)->entryList (arg1, arg2));
 }
 
@@ -303,9 +303,9 @@ static void _call_f_entryList_c6869 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
-  QFlags<QDir::Filter> arg2 = args ? args.read<QFlags<QDir::Filter> > (heap) : (QFlags<QDir::Filter>)(QDir::NoFilter);
-  QFlags<QDir::SortFlag> arg3 = args ? args.read<QFlags<QDir::SortFlag> > (heap) : (QFlags<QDir::SortFlag>)(QDir::NoSort);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
+  QFlags<QDir::Filter> arg2 = args ? gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap) : gsi::arg_maker<QFlags<QDir::Filter> >() (QDir::NoFilter, heap);
+  QFlags<QDir::SortFlag> arg3 = args ? gsi::arg_reader<QFlags<QDir::SortFlag> >() (args, heap) : gsi::arg_maker<QFlags<QDir::SortFlag> >() (QDir::NoSort, heap);
   ret.write<QStringList > ((QStringList)((QDir *)cls)->entryList (arg1, arg2, arg3));
 }
 
@@ -339,7 +339,7 @@ static void _call_f_exists_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->exists (arg1));
 }
 
@@ -358,7 +358,7 @@ static void _call_f_filePath_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QDir *)cls)->filePath (arg1));
 }
 
@@ -467,7 +467,7 @@ static void _call_f_mkdir_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->mkdir (arg1));
 }
 
@@ -486,7 +486,7 @@ static void _call_f_mkpath_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->mkpath (arg1));
 }
 
@@ -520,7 +520,7 @@ static void _call_f_operator_excl__eq__c1681 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->operator!= (arg1));
 }
 
@@ -539,7 +539,7 @@ static void _call_f_operator_eq__1681 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
   ret.write<QDir & > ((QDir &)((QDir *)cls)->operator= (arg1));
 }
 
@@ -558,7 +558,7 @@ static void _call_f_operator_eq__2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDir & > ((QDir &)((QDir *)cls)->operator= (arg1));
 }
 
@@ -577,7 +577,7 @@ static void _call_f_operator_eq__eq__c1681 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->operator== (arg1));
 }
 
@@ -596,7 +596,7 @@ static void _call_f_operator_index__c767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QDir *)cls)->operator[] (arg1));
 }
 
@@ -646,7 +646,7 @@ static void _call_f_relativeFilePath_c2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QDir *)cls)->relativeFilePath (arg1));
 }
 
@@ -665,7 +665,7 @@ static void _call_f_remove_2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->remove (arg1));
 }
 
@@ -686,8 +686,8 @@ static void _call_f_rename_3942 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->rename (arg1, arg2));
 }
 
@@ -706,7 +706,7 @@ static void _call_f_rmdir_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->rmdir (arg1));
 }
 
@@ -725,7 +725,7 @@ static void _call_f_rmpath_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDir *)cls)->rmpath (arg1));
 }
 
@@ -744,7 +744,7 @@ static void _call_f_setFilter_2230 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QDir::Filter> arg1 = args.read<QFlags<QDir::Filter> > (heap);
+  QFlags<QDir::Filter> arg1 = gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDir *)cls)->setFilter (arg1);
 }
@@ -764,7 +764,7 @@ static void _call_f_setNameFilters_2437 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDir *)cls)->setNameFilters (arg1);
 }
@@ -784,7 +784,7 @@ static void _call_f_setPath_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDir *)cls)->setPath (arg1);
 }
@@ -804,7 +804,7 @@ static void _call_f_setSorting_2418 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QDir::SortFlag> arg1 = args.read<QFlags<QDir::SortFlag> > (heap);
+  QFlags<QDir::SortFlag> arg1 = gsi::arg_reader<QFlags<QDir::SortFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDir *)cls)->setSorting (arg1);
 }
@@ -839,7 +839,7 @@ static void _call_f_addResourceSearchPath_2025 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QDir::addResourceSearchPath (arg1);
 }
@@ -861,8 +861,8 @@ static void _call_f_addSearchPath_3942 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QDir::addSearchPath (arg1, arg2);
 }
@@ -882,7 +882,7 @@ static void _call_f_cleanPath_2025 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)QDir::cleanPath (arg1));
 }
 
@@ -901,7 +901,7 @@ static void _call_f_convertSeparators_2025 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)QDir::convertSeparators (arg1));
 }
 
@@ -965,7 +965,7 @@ static void _call_f_fromNativeSeparators_2025 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)QDir::fromNativeSeparators (arg1));
 }
 
@@ -1014,7 +1014,7 @@ static void _call_f_isAbsolutePath_2025 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QDir::isAbsolutePath (arg1));
 }
 
@@ -1033,7 +1033,7 @@ static void _call_f_isRelativePath_2025 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QDir::isRelativePath (arg1));
 }
 
@@ -1054,8 +1054,8 @@ static void _call_f_match_4354 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QDir::match (arg1, arg2));
 }
 
@@ -1076,8 +1076,8 @@ static void _call_f_match_3942 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QDir::match (arg1, arg2));
 }
 
@@ -1096,7 +1096,7 @@ static void _call_f_nameFiltersFromString_2025 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)QDir::nameFiltersFromString (arg1));
 }
 
@@ -1145,7 +1145,7 @@ static void _call_f_searchPaths_2025 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)QDir::searchPaths (arg1));
 }
 
@@ -1179,7 +1179,7 @@ static void _call_f_setCurrent_2025 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QDir::setCurrent (arg1));
 }
 
@@ -1200,8 +1200,8 @@ static void _call_f_setSearchPaths_4354 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QStringList &arg2 = args.read<const QStringList & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QDir::setSearchPaths (arg1, arg2);
 }
@@ -1251,7 +1251,7 @@ static void _call_f_toNativeSeparators_2025 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)QDir::toNativeSeparators (arg1));
 }
 

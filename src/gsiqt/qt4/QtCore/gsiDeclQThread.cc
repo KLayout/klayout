@@ -67,7 +67,7 @@ static void _call_f_exit_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QThread *)cls)->exit (arg1);
 }
@@ -148,7 +148,7 @@ static void _call_f_setPriority_2099 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QThread::Priority>::target_type & arg1 = args.read<const qt_gsi::Converter<QThread::Priority>::target_type & > (heap);
+  const qt_gsi::Converter<QThread::Priority>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QThread::Priority>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QThread *)cls)->setPriority (qt_gsi::QtToCppAdaptor<QThread::Priority>(arg1).cref());
 }
@@ -168,7 +168,7 @@ static void _call_f_setStackSize_1772 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QThread *)cls)->setStackSize (arg1);
 }
@@ -203,7 +203,7 @@ static void _call_f_start_2099 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QThread::Priority>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QThread::Priority>::target_type & > (heap) : (const qt_gsi::Converter<QThread::Priority>::target_type &)(qt_gsi::CppToQtReadAdaptor<QThread::Priority>(heap, QThread::InheritPriority));
+  const qt_gsi::Converter<QThread::Priority>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QThread::Priority>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QThread::Priority>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QThread::Priority>(heap, QThread::InheritPriority), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QThread *)cls)->start (qt_gsi::QtToCppAdaptor<QThread::Priority>(arg1).cref());
 }
@@ -239,7 +239,7 @@ static void _call_f_wait_2348 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned long int arg1 = args ? args.read<unsigned long int > (heap) : (unsigned long int)(ULONG_MAX);
+  unsigned long int arg1 = args ? gsi::arg_reader<unsigned long int >() (args, heap) : gsi::arg_maker<unsigned long int >() (ULONG_MAX, heap);
   ret.write<bool > ((bool)((QThread *)cls)->wait (arg1));
 }
 
@@ -305,8 +305,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QThread::tr (arg1, arg2));
 }
 
@@ -329,9 +329,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QThread::tr (arg1, arg2, arg3));
 }
 
@@ -352,8 +352,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QThread::trUtf8 (arg1, arg2));
 }
 
@@ -376,9 +376,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QThread::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -648,7 +648,7 @@ static void _call_ctor_QThread_Adaptor_1302 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QThread_Adaptor *> (new QThread_Adaptor (arg1));
 }
 
@@ -714,7 +714,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QThread_Adaptor *)cls)->emitter_QThread_destroyed_1302 (arg1);
 }
 
@@ -833,7 +833,7 @@ static void _call_fp_msleep_2348 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned long int arg1 = args.read<unsigned long int > (heap);
+  unsigned long int arg1 = gsi::arg_reader<unsigned long int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QThread_Adaptor::fp_QThread_msleep_2348 (arg1);
 }
@@ -852,7 +852,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QThread_Adaptor *)cls)->fp_QThread_receivers_c1731 (arg1));
 }
 
@@ -904,7 +904,7 @@ static void _call_fp_setTerminationEnabled_864 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QThread_Adaptor::fp_QThread_setTerminationEnabled_864 (arg1);
 }
@@ -923,7 +923,7 @@ static void _call_fp_sleep_2348 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned long int arg1 = args.read<unsigned long int > (heap);
+  unsigned long int arg1 = gsi::arg_reader<unsigned long int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QThread_Adaptor::fp_QThread_sleep_2348 (arg1);
 }
@@ -994,7 +994,7 @@ static void _call_fp_usleep_2348 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned long int arg1 = args.read<unsigned long int > (heap);
+  unsigned long int arg1 = gsi::arg_reader<unsigned long int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QThread_Adaptor::fp_QThread_usleep_2348 (arg1);
 }

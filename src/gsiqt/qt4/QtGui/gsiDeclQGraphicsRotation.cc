@@ -85,7 +85,7 @@ static void _call_f_applyTo_c1556 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMatrix4x4 *arg1 = args.read<QMatrix4x4 * > (heap);
+  QMatrix4x4 *arg1 = gsi::arg_reader<QMatrix4x4 * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsRotation *)cls)->applyTo (arg1);
 }
@@ -135,7 +135,7 @@ static void _call_f_setAngle_1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsRotation *)cls)->setAngle (arg1);
 }
@@ -155,7 +155,7 @@ static void _call_f_setAxis_2140 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsRotation *)cls)->setAxis (arg1);
 }
@@ -175,7 +175,7 @@ static void _call_f_setAxis_1154 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Axis>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Axis>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::Axis>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Axis>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsRotation *)cls)->setAxis (qt_gsi::QtToCppAdaptor<Qt::Axis>(arg1).cref());
 }
@@ -195,7 +195,7 @@ static void _call_f_setOrigin_2140 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsRotation *)cls)->setOrigin (arg1);
 }
@@ -217,8 +217,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QGraphicsRotation::tr (arg1, arg2));
 }
 
@@ -241,9 +241,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QGraphicsRotation::tr (arg1, arg2, arg3));
 }
 
@@ -264,8 +264,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QGraphicsRotation::trUtf8 (arg1, arg2));
 }
 
@@ -288,9 +288,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QGraphicsRotation::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -517,7 +517,7 @@ static void _call_ctor_QGraphicsRotation_Adaptor_1302 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QGraphicsRotation_Adaptor *> (new QGraphicsRotation_Adaptor (arg1));
 }
 
@@ -635,7 +635,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QGraphicsRotation_Adaptor *)cls)->emitter_QGraphicsRotation_destroyed_1302 (arg1);
 }
 
@@ -740,7 +740,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QGraphicsRotation_Adaptor *)cls)->fp_QGraphicsRotation_receivers_c1731 (arg1));
 }
 

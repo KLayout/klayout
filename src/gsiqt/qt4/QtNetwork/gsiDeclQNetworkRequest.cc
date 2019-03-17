@@ -53,7 +53,7 @@ static void _call_ctor_QNetworkRequest_1701 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
+  const QUrl &arg1 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
   ret.write<QNetworkRequest *> (new QNetworkRequest (arg1));
 }
 
@@ -72,7 +72,7 @@ static void _call_ctor_QNetworkRequest_2885 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
   ret.write<QNetworkRequest *> (new QNetworkRequest (arg1));
 }
 
@@ -93,8 +93,8 @@ static void _call_f_attribute_c5083 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & > (heap);
-  const QVariant &arg2 = args ? args.read<const QVariant & > (heap) : (const QVariant &)(QVariant());
+  const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & >() (args, heap);
+  const QVariant &arg2 = args ? gsi::arg_reader<const QVariant & >() (args, heap) : gsi::arg_maker<const QVariant & >() (QVariant(), heap);
   ret.write<QVariant > ((QVariant)((QNetworkRequest *)cls)->attribute (qt_gsi::QtToCppAdaptor<QNetworkRequest::Attribute>(arg1).cref(), arg2));
 }
 
@@ -113,7 +113,7 @@ static void _call_f_hasRawHeader_c2309 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkRequest *)cls)->hasRawHeader (arg1));
 }
 
@@ -132,7 +132,7 @@ static void _call_f_header_c3349 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & > (heap);
+  const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QNetworkRequest *)cls)->header (qt_gsi::QtToCppAdaptor<QNetworkRequest::KnownHeaders>(arg1).cref()));
 }
 
@@ -151,7 +151,7 @@ static void _call_f_operator_excl__eq__c2885 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkRequest *)cls)->operator!= (arg1));
 }
 
@@ -170,7 +170,7 @@ static void _call_f_operator_eq__2885 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
   ret.write<QNetworkRequest & > ((QNetworkRequest &)((QNetworkRequest *)cls)->operator= (arg1));
 }
 
@@ -189,7 +189,7 @@ static void _call_f_operator_eq__eq__c2885 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkRequest *)cls)->operator== (arg1));
 }
 
@@ -223,7 +223,7 @@ static void _call_f_rawHeader_c2309 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QNetworkRequest *)cls)->rawHeader (arg1));
 }
 
@@ -259,8 +259,8 @@ static void _call_f_setAttribute_5083 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkRequest *)cls)->setAttribute (qt_gsi::QtToCppAdaptor<QNetworkRequest::Attribute>(arg1).cref(), arg2);
 }
@@ -282,8 +282,8 @@ static void _call_f_setHeader_5360 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkRequest *)cls)->setHeader (qt_gsi::QtToCppAdaptor<QNetworkRequest::KnownHeaders>(arg1).cref(), arg2);
 }
@@ -303,7 +303,7 @@ static void _call_f_setOriginatingObject_1302 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkRequest *)cls)->setOriginatingObject (arg1);
 }
@@ -325,8 +325,8 @@ static void _call_f_setRawHeader_4510 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkRequest *)cls)->setRawHeader (arg1, arg2);
 }
@@ -346,7 +346,7 @@ static void _call_f_setSslConfiguration_3068 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslConfiguration &arg1 = args.read<const QSslConfiguration & > (heap);
+  const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkRequest *)cls)->setSslConfiguration (arg1);
 }
@@ -366,7 +366,7 @@ static void _call_f_setUrl_1701 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkRequest *)cls)->setUrl (arg1);
 }

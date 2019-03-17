@@ -114,7 +114,7 @@ static void _call_f_addPage_1709 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWizardPage *arg1 = args.read<QWizardPage * > (heap);
+  QWizardPage *arg1 = gsi::arg_reader<QWizardPage * >() (args, heap);
   ret.write<int > ((int)((QWizard *)cls)->addPage (arg1));
 }
 
@@ -149,7 +149,7 @@ static void _call_f_button_c2519 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QWizard::WizardButton>::target_type & arg1 = args.read<const qt_gsi::Converter<QWizard::WizardButton>::target_type & > (heap);
+  const qt_gsi::Converter<QWizard::WizardButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QWizard::WizardButton>::target_type & >() (args, heap);
   ret.write<QAbstractButton * > ((QAbstractButton *)((QWizard *)cls)->button (qt_gsi::QtToCppAdaptor<QWizard::WizardButton>(arg1).cref()));
 }
 
@@ -168,7 +168,7 @@ static void _call_f_buttonText_c2519 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QWizard::WizardButton>::target_type & arg1 = args.read<const qt_gsi::Converter<QWizard::WizardButton>::target_type & > (heap);
+  const qt_gsi::Converter<QWizard::WizardButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QWizard::WizardButton>::target_type & >() (args, heap);
   ret.write<QString > ((QString)((QWizard *)cls)->buttonText (qt_gsi::QtToCppAdaptor<QWizard::WizardButton>(arg1).cref()));
 }
 
@@ -217,7 +217,7 @@ static void _call_f_field_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QWizard *)cls)->field (arg1));
 }
 
@@ -236,7 +236,7 @@ static void _call_f_hasVisitedPage_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QWizard *)cls)->hasVisitedPage (arg1));
 }
 
@@ -301,7 +301,7 @@ static void _call_f_page_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QWizardPage * > ((QWizardPage *)((QWizard *)cls)->page (arg1));
 }
 
@@ -335,7 +335,7 @@ static void _call_f_pixmap_c2506 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QWizard::WizardPixmap>::target_type & arg1 = args.read<const qt_gsi::Converter<QWizard::WizardPixmap>::target_type & > (heap);
+  const qt_gsi::Converter<QWizard::WizardPixmap>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QWizard::WizardPixmap>::target_type & >() (args, heap);
   ret.write<QPixmap > ((QPixmap)((QWizard *)cls)->pixmap (qt_gsi::QtToCppAdaptor<QWizard::WizardPixmap>(arg1).cref()));
 }
 
@@ -354,7 +354,7 @@ static void _call_f_removePage_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->removePage (arg1);
 }
@@ -392,8 +392,8 @@ static void _call_f_setButton_4570 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QWizard::WizardButton>::target_type & arg1 = args.read<const qt_gsi::Converter<QWizard::WizardButton>::target_type & > (heap);
-  QAbstractButton *arg2 = args.read<QAbstractButton * > (heap);
+  const qt_gsi::Converter<QWizard::WizardButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QWizard::WizardButton>::target_type & >() (args, heap);
+  QAbstractButton *arg2 = gsi::arg_reader<QAbstractButton * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setButton (qt_gsi::QtToCppAdaptor<QWizard::WizardButton>(arg1).cref(), arg2);
 }
@@ -413,7 +413,7 @@ static void _call_f_setButtonLayout_4011 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QWizard::WizardButton> &arg1 = args.read<const QList<QWizard::WizardButton> & > (heap);
+  const QList<QWizard::WizardButton> &arg1 = gsi::arg_reader<const QList<QWizard::WizardButton> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setButtonLayout (arg1);
 }
@@ -435,8 +435,8 @@ static void _call_f_setButtonText_4436 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QWizard::WizardButton>::target_type & arg1 = args.read<const qt_gsi::Converter<QWizard::WizardButton>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const qt_gsi::Converter<QWizard::WizardButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QWizard::WizardButton>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setButtonText (qt_gsi::QtToCppAdaptor<QWizard::WizardButton>(arg1).cref(), arg2);
 }
@@ -460,9 +460,9 @@ static void _call_f_setDefaultProperty_4977 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  const char *arg3 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setDefaultProperty (arg1, arg2, arg3);
 }
@@ -484,8 +484,8 @@ static void _call_f_setField_4036 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setField (arg1, arg2);
 }
@@ -507,8 +507,8 @@ static void _call_f_setOption_3272 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QWizard::WizardOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QWizard::WizardOption>::target_type & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<QWizard::WizardOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QWizard::WizardOption>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setOption (qt_gsi::QtToCppAdaptor<QWizard::WizardOption>(arg1).cref(), arg2);
 }
@@ -528,7 +528,7 @@ static void _call_f_setOptions_3212 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QWizard::WizardOption> arg1 = args.read<QFlags<QWizard::WizardOption> > (heap);
+  QFlags<QWizard::WizardOption> arg1 = gsi::arg_reader<QFlags<QWizard::WizardOption> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setOptions (arg1);
 }
@@ -550,8 +550,8 @@ static void _call_f_setPage_2368 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QWizardPage *arg2 = args.read<QWizardPage * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QWizardPage *arg2 = gsi::arg_reader<QWizardPage * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setPage (arg1, arg2);
 }
@@ -573,8 +573,8 @@ static void _call_f_setPixmap_4415 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QWizard::WizardPixmap>::target_type & arg1 = args.read<const qt_gsi::Converter<QWizard::WizardPixmap>::target_type & > (heap);
-  const QPixmap &arg2 = args.read<const QPixmap & > (heap);
+  const qt_gsi::Converter<QWizard::WizardPixmap>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QWizard::WizardPixmap>::target_type & >() (args, heap);
+  const QPixmap &arg2 = gsi::arg_reader<const QPixmap & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setPixmap (qt_gsi::QtToCppAdaptor<QWizard::WizardPixmap>(arg1).cref(), arg2);
 }
@@ -594,7 +594,7 @@ static void _call_f_setStartId_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setStartId (arg1);
 }
@@ -614,7 +614,7 @@ static void _call_f_setSubTitleFormat_1787 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TextFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::TextFormat>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::TextFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TextFormat>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setSubTitleFormat (qt_gsi::QtToCppAdaptor<Qt::TextFormat>(arg1).cref());
 }
@@ -634,7 +634,7 @@ static void _call_f_setTitleFormat_1787 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TextFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::TextFormat>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::TextFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TextFormat>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setTitleFormat (qt_gsi::QtToCppAdaptor<Qt::TextFormat>(arg1).cref());
 }
@@ -654,7 +654,7 @@ static void _call_f_setVisible_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setVisible (arg1);
 }
@@ -674,7 +674,7 @@ static void _call_f_setWizardStyle_2412 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QWizard::WizardStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<QWizard::WizardStyle>::target_type & > (heap);
+  const qt_gsi::Converter<QWizard::WizardStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QWizard::WizardStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard *)cls)->setWizardStyle (qt_gsi::QtToCppAdaptor<QWizard::WizardStyle>(arg1).cref());
 }
@@ -739,7 +739,7 @@ static void _call_f_testOption_c2516 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QWizard::WizardOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QWizard::WizardOption>::target_type & > (heap);
+  const qt_gsi::Converter<QWizard::WizardOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QWizard::WizardOption>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QWizard *)cls)->testOption (qt_gsi::QtToCppAdaptor<QWizard::WizardOption>(arg1).cref()));
 }
 
@@ -820,8 +820,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QWizard::tr (arg1, arg2));
 }
 
@@ -844,9 +844,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QWizard::tr (arg1, arg2, arg3));
 }
 
@@ -867,8 +867,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QWizard::trUtf8 (arg1, arg2));
 }
 
@@ -891,9 +891,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QWizard::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1952,8 +1952,8 @@ static void _call_ctor_QWizard_Adaptor_3702 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  QFlags<Qt::WindowType> arg2 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<QWizard_Adaptor *> (new QWizard_Adaptor (arg1, arg2));
 }
 
@@ -2029,7 +2029,7 @@ static void _call_fp_adjustPosition_1315 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard_Adaptor *)cls)->fp_QWizard_adjustPosition_1315 (arg1);
 }
@@ -2172,9 +2172,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard_Adaptor *)cls)->fp_QWizard_create_2208 (arg1, arg2, arg3);
 }
@@ -2193,7 +2193,7 @@ static void _call_emitter_currentIdChanged_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QWizard_Adaptor *)cls)->emitter_QWizard_currentIdChanged_767 (arg1);
 }
 
@@ -2211,7 +2211,7 @@ static void _call_emitter_customButtonClicked_767 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QWizard_Adaptor *)cls)->emitter_QWizard_customButtonClicked_767 (arg1);
 }
 
@@ -2229,7 +2229,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QWizard_Adaptor *)cls)->emitter_QWizard_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2273,8 +2273,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWizard_Adaptor *)cls)->fp_QWizard_destroy_1620 (arg1, arg2);
 }
@@ -2293,7 +2293,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QWizard_Adaptor *)cls)->emitter_QWizard_destroyed_1302 (arg1);
 }
 
@@ -2552,7 +2552,7 @@ static void _call_emitter_finished_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QWizard_Adaptor *)cls)->emitter_QWizard_finished_767 (arg1);
 }
 
@@ -3165,7 +3165,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QWizard_Adaptor *)cls)->fp_QWizard_receivers_c1731 (arg1));
 }
 

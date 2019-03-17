@@ -70,8 +70,8 @@ static void _call_ctor_QLinearGradient_3864 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QLinearGradient *> (new QLinearGradient (arg1, arg2));
 }
 
@@ -96,10 +96,10 @@ static void _call_ctor_QLinearGradient_3960 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   ret.write<QLinearGradient *> (new QLinearGradient (arg1, arg2, arg3, arg4));
 }
 
@@ -133,7 +133,7 @@ static void _call_f_setFinalStop_1986 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLinearGradient *)cls)->setFinalStop (arg1);
 }
@@ -155,8 +155,8 @@ static void _call_f_setFinalStop_2034 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLinearGradient *)cls)->setFinalStop (arg1, arg2);
 }
@@ -176,7 +176,7 @@ static void _call_f_setStart_1986 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLinearGradient *)cls)->setStart (arg1);
 }
@@ -198,8 +198,8 @@ static void _call_f_setStart_2034 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLinearGradient *)cls)->setStart (arg1, arg2);
 }

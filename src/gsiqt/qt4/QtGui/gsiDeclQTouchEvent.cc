@@ -66,7 +66,7 @@ static void _call_f_setDeviceType_2672 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type & arg1 = args.read<const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type & > (heap);
+  const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent *)cls)->setDeviceType (qt_gsi::QtToCppAdaptor<QTouchEvent::DeviceType>(arg1).cref());
 }
@@ -86,7 +86,7 @@ static void _call_f_setTouchPointStates_2995 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::TouchPointState> arg1 = args.read<QFlags<Qt::TouchPointState> > (heap);
+  QFlags<Qt::TouchPointState> arg1 = gsi::arg_reader<QFlags<Qt::TouchPointState> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent *)cls)->setTouchPointStates (arg1);
 }
@@ -106,7 +106,7 @@ static void _call_f_setTouchPoints_4191 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QTouchEvent::TouchPoint> &arg1 = args.read<const QList<QTouchEvent::TouchPoint> & > (heap);
+  const QList<QTouchEvent::TouchPoint> &arg1 = gsi::arg_reader<const QList<QTouchEvent::TouchPoint> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent *)cls)->setTouchPoints (arg1);
 }
@@ -126,7 +126,7 @@ static void _call_f_setWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent *)cls)->setWidget (arg1);
 }
@@ -266,11 +266,11 @@ static void _call_ctor_QTouchEvent_Adaptor_14068 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type & > (heap) : (const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QTouchEvent::DeviceType>(heap, QTouchEvent::TouchScreen));
-  QFlags<Qt::KeyboardModifier> arg3 = args ? args.read<QFlags<Qt::KeyboardModifier> > (heap) : (QFlags<Qt::KeyboardModifier>)(Qt::NoModifier);
-  QFlags<Qt::TouchPointState> arg4 = args ? args.read<QFlags<Qt::TouchPointState> > (heap) : (QFlags<Qt::TouchPointState>)(0);
-  const QList<QTouchEvent::TouchPoint> &arg5 = args ? args.read<const QList<QTouchEvent::TouchPoint> & > (heap) : (const QList<QTouchEvent::TouchPoint> &)(QList<QTouchEvent::TouchPoint>());
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTouchEvent::DeviceType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTouchEvent::DeviceType>(heap, QTouchEvent::TouchScreen), heap);
+  QFlags<Qt::KeyboardModifier> arg3 = args ? gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap) : gsi::arg_maker<QFlags<Qt::KeyboardModifier> >() (Qt::NoModifier, heap);
+  QFlags<Qt::TouchPointState> arg4 = args ? gsi::arg_reader<QFlags<Qt::TouchPointState> >() (args, heap) : gsi::arg_maker<QFlags<Qt::TouchPointState> >() (0, heap);
+  const QList<QTouchEvent::TouchPoint> &arg5 = args ? gsi::arg_reader<const QList<QTouchEvent::TouchPoint> & >() (args, heap) : gsi::arg_maker<const QList<QTouchEvent::TouchPoint> & >() (QList<QTouchEvent::TouchPoint>(), heap);
   ret.write<QTouchEvent_Adaptor *> (new QTouchEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), qt_gsi::QtToCppAdaptor<QTouchEvent::DeviceType>(arg2).cref(), arg3, arg4, arg5));
 }
 

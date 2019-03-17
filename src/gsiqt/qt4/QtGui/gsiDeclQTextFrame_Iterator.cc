@@ -67,7 +67,7 @@ static void _call_ctor_QTextFrame_Iterator_3296u1 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFrame::iterator &arg1 = args.read<const QTextFrame::iterator & > (heap);
+  const QTextFrame::iterator &arg1 = gsi::arg_reader<const QTextFrame::iterator & >() (args, heap);
   ret.write<QTextFrame::iterator *> (new QTextFrame::iterator (arg1));
 }
 
@@ -131,7 +131,7 @@ static void _call_f_operator_excl__eq__c3296u1 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFrame::iterator &arg1 = args.read<const QTextFrame::iterator & > (heap);
+  const QTextFrame::iterator &arg1 = gsi::arg_reader<const QTextFrame::iterator & >() (args, heap);
   ret.write<bool > ((bool)((QTextFrame::iterator *)cls)->operator!= (arg1));
 }
 
@@ -165,7 +165,7 @@ static void _call_f_operator_plus__plus__767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextFrame::iterator > ((QTextFrame::iterator)((QTextFrame::iterator *)cls)->operator++ (arg1));
 }
 
@@ -199,7 +199,7 @@ static void _call_f_operator_minus__minus__767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextFrame::iterator > ((QTextFrame::iterator)((QTextFrame::iterator *)cls)->operator-- (arg1));
 }
 
@@ -218,7 +218,7 @@ static void _call_f_operator_eq__3296 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFrame::iterator &arg1 = args.read<const QTextFrame::iterator & > (heap);
+  const QTextFrame::iterator &arg1 = gsi::arg_reader<const QTextFrame::iterator & >() (args, heap);
   ret.write<QTextFrame::iterator & > ((QTextFrame::iterator &)((QTextFrame::iterator *)cls)->operator= (arg1));
 }
 
@@ -237,7 +237,7 @@ static void _call_f_operator_eq__eq__c3296u1 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFrame::iterator &arg1 = args.read<const QTextFrame::iterator & > (heap);
+  const QTextFrame::iterator &arg1 = gsi::arg_reader<const QTextFrame::iterator & >() (args, heap);
   ret.write<bool > ((bool)((QTextFrame::iterator *)cls)->operator== (arg1));
 }
 

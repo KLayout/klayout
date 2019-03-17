@@ -56,10 +56,10 @@ static void _call_ctor_QSqlError_6892 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const qt_gsi::Converter<QSqlError::ErrorType>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QSqlError::ErrorType>::target_type & > (heap) : (const qt_gsi::Converter<QSqlError::ErrorType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSqlError::ErrorType>(heap, QSqlError::NoError));
-  int arg4 = args ? args.read<int > (heap) : (int)(-1);
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const qt_gsi::Converter<QSqlError::ErrorType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSqlError::ErrorType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSqlError::ErrorType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSqlError::ErrorType>(heap, QSqlError::NoError), heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QSqlError *> (new QSqlError (arg1, arg2, qt_gsi::QtToCppAdaptor<QSqlError::ErrorType>(arg3).cref(), arg4));
 }
 
@@ -78,7 +78,7 @@ static void _call_ctor_QSqlError_2220 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlError &arg1 = args.read<const QSqlError & > (heap);
+  const QSqlError &arg1 = gsi::arg_reader<const QSqlError & >() (args, heap);
   ret.write<QSqlError *> (new QSqlError (arg1));
 }
 
@@ -157,7 +157,7 @@ static void _call_f_operator_eq__2220 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlError &arg1 = args.read<const QSqlError & > (heap);
+  const QSqlError &arg1 = gsi::arg_reader<const QSqlError & >() (args, heap);
   ret.write<QSqlError & > ((QSqlError &)((QSqlError *)cls)->operator= (arg1));
 }
 
@@ -176,7 +176,7 @@ static void _call_f_setDatabaseText_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlError *)cls)->setDatabaseText (arg1);
 }
@@ -196,7 +196,7 @@ static void _call_f_setDriverText_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlError *)cls)->setDriverText (arg1);
 }
@@ -216,7 +216,7 @@ static void _call_f_setNumber_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlError *)cls)->setNumber (arg1);
 }
@@ -236,7 +236,7 @@ static void _call_f_setType_2399 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSqlError::ErrorType>::target_type & arg1 = args.read<const qt_gsi::Converter<QSqlError::ErrorType>::target_type & > (heap);
+  const qt_gsi::Converter<QSqlError::ErrorType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSqlError::ErrorType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlError *)cls)->setType (qt_gsi::QtToCppAdaptor<QSqlError::ErrorType>(arg1).cref());
 }

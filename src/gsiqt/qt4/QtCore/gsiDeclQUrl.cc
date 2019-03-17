@@ -65,7 +65,7 @@ static void _call_ctor_QUrl_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QUrl *> (new QUrl (arg1));
 }
 
@@ -86,8 +86,8 @@ static void _call_ctor_QUrl_3970 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap);
   ret.write<QUrl *> (new QUrl (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref()));
 }
 
@@ -106,7 +106,7 @@ static void _call_ctor_QUrl_1701 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QUrl *> (new QUrl (arg1));
 }
 
@@ -127,8 +127,8 @@ static void _call_f_addEncodedQueryItem_4510 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->addEncodedQueryItem (arg1, arg2);
 }
@@ -150,8 +150,8 @@ static void _call_f_addQueryItem_3942 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->addQueryItem (arg1, arg2);
 }
@@ -171,7 +171,7 @@ static void _call_f_allEncodedQueryItemValues_c2309 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QList<QByteArray> > ((QList<QByteArray>)((QUrl *)cls)->allEncodedQueryItemValues (arg1));
 }
 
@@ -190,7 +190,7 @@ static void _call_f_allQueryItemValues_c2025 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QUrl *)cls)->allQueryItemValues (arg1));
 }
 
@@ -331,7 +331,7 @@ static void _call_f_encodedQueryItemValue_c2309 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QUrl *)cls)->encodedQueryItemValue (arg1));
 }
 
@@ -410,7 +410,7 @@ static void _call_f_hasEncodedQueryItem_c2309 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->hasEncodedQueryItem (arg1));
 }
 
@@ -459,7 +459,7 @@ static void _call_f_hasQueryItem_c2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->hasQueryItem (arg1));
 }
 
@@ -523,7 +523,7 @@ static void _call_f_isParentOf_c1701 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->isParentOf (arg1));
 }
 
@@ -572,7 +572,7 @@ static void _call_f_operator_excl__eq__c1701 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->operator != (arg1));
 }
 
@@ -591,7 +591,7 @@ static void _call_f_operator_lt__c1701 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->operator < (arg1));
 }
 
@@ -610,7 +610,7 @@ static void _call_f_operator_eq__1701 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QUrl & > ((QUrl &)((QUrl *)cls)->operator = (arg1));
 }
 
@@ -629,7 +629,7 @@ static void _call_f_operator_eq__2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QUrl & > ((QUrl &)((QUrl *)cls)->operator = (arg1));
 }
 
@@ -648,7 +648,7 @@ static void _call_f_operator_eq__eq__c1701 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->operator == (arg1));
 }
 
@@ -712,7 +712,7 @@ static void _call_f_port_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QUrl *)cls)->port (arg1));
 }
 
@@ -731,7 +731,7 @@ static void _call_f_queryItemValue_c2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->queryItemValue (arg1));
 }
 
@@ -795,7 +795,7 @@ static void _call_f_removeAllEncodedQueryItems_2309 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->removeAllEncodedQueryItems (arg1);
 }
@@ -815,7 +815,7 @@ static void _call_f_removeAllQueryItems_2025 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->removeAllQueryItems (arg1);
 }
@@ -835,7 +835,7 @@ static void _call_f_removeEncodedQueryItem_2309 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->removeEncodedQueryItem (arg1);
 }
@@ -855,7 +855,7 @@ static void _call_f_removeQueryItem_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->removeQueryItem (arg1);
 }
@@ -875,7 +875,7 @@ static void _call_f_resolved_c1701 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QUrl > ((QUrl)((QUrl *)cls)->resolved (arg1));
 }
 
@@ -909,7 +909,7 @@ static void _call_f_setAuthority_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setAuthority (arg1);
 }
@@ -929,7 +929,7 @@ static void _call_f_setEncodedFragment_2309 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setEncodedFragment (arg1);
 }
@@ -949,7 +949,7 @@ static void _call_f_setEncodedHost_2309 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setEncodedHost (arg1);
 }
@@ -969,7 +969,7 @@ static void _call_f_setEncodedPassword_2309 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setEncodedPassword (arg1);
 }
@@ -989,7 +989,7 @@ static void _call_f_setEncodedPath_2309 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setEncodedPath (arg1);
 }
@@ -1009,7 +1009,7 @@ static void _call_f_setEncodedQuery_2309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setEncodedQuery (arg1);
 }
@@ -1029,7 +1029,7 @@ static void _call_f_setEncodedQueryItems_4851 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QPair<QByteArray, QByteArray> > &arg1 = args.read<const QList<QPair<QByteArray, QByteArray> > & > (heap);
+  const QList<QPair<QByteArray, QByteArray> > &arg1 = gsi::arg_reader<const QList<QPair<QByteArray, QByteArray> > & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setEncodedQueryItems (arg1);
 }
@@ -1049,7 +1049,7 @@ static void _call_f_setEncodedUrl_2309 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setEncodedUrl (arg1);
 }
@@ -1071,8 +1071,8 @@ static void _call_f_setEncodedUrl_4254 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setEncodedUrl (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -1092,7 +1092,7 @@ static void _call_f_setEncodedUserName_2309 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setEncodedUserName (arg1);
 }
@@ -1112,7 +1112,7 @@ static void _call_f_setFragment_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setFragment (arg1);
 }
@@ -1132,7 +1132,7 @@ static void _call_f_setHost_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setHost (arg1);
 }
@@ -1152,7 +1152,7 @@ static void _call_f_setPassword_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setPassword (arg1);
 }
@@ -1172,7 +1172,7 @@ static void _call_f_setPath_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setPath (arg1);
 }
@@ -1192,7 +1192,7 @@ static void _call_f_setPort_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setPort (arg1);
 }
@@ -1214,8 +1214,8 @@ static void _call_f_setQueryDelimiters_1592 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  char arg1 = args.read<char > (heap);
-  char arg2 = args.read<char > (heap);
+  char arg1 = gsi::arg_reader<char >() (args, heap);
+  char arg2 = gsi::arg_reader<char >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setQueryDelimiters (arg1, arg2);
 }
@@ -1235,7 +1235,7 @@ static void _call_f_setQueryItems_4283 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QPair<QString, QString> > &arg1 = args.read<const QList<QPair<QString, QString> > & > (heap);
+  const QList<QPair<QString, QString> > &arg1 = gsi::arg_reader<const QList<QPair<QString, QString> > & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setQueryItems (arg1);
 }
@@ -1255,7 +1255,7 @@ static void _call_f_setScheme_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setScheme (arg1);
 }
@@ -1275,7 +1275,7 @@ static void _call_f_setUrl_2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setUrl (arg1);
 }
@@ -1297,8 +1297,8 @@ static void _call_f_setUrl_3970 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setUrl (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -1318,7 +1318,7 @@ static void _call_f_setUserInfo_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setUserInfo (arg1);
 }
@@ -1338,7 +1338,7 @@ static void _call_f_setUserName_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setUserName (arg1);
 }
@@ -1358,7 +1358,7 @@ static void _call_f_toEncoded_c3320 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::FormattingOption> arg1 = args ? args.read<QFlags<QUrl::FormattingOption> > (heap) : (QFlags<QUrl::FormattingOption>)(QUrl::None);
+  QFlags<QUrl::FormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::FormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::FormattingOption> >() (QUrl::None, heap);
   ret.write<QByteArray > ((QByteArray)((QUrl *)cls)->toEncoded (arg1));
 }
 
@@ -1392,7 +1392,7 @@ static void _call_f_toString_c3320 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::FormattingOption> arg1 = args ? args.read<QFlags<QUrl::FormattingOption> > (heap) : (QFlags<QUrl::FormattingOption>)(QUrl::None);
+  QFlags<QUrl::FormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::FormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::FormattingOption> >() (QUrl::None, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->toString (arg1));
 }
 
@@ -1441,7 +1441,7 @@ static void _call_f_fromAce_2309 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)QUrl::fromAce (arg1));
 }
 
@@ -1460,7 +1460,7 @@ static void _call_f_fromEncoded_2309 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QUrl > ((QUrl)QUrl::fromEncoded (arg1));
 }
 
@@ -1481,8 +1481,8 @@ static void _call_f_fromEncoded_4254 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap);
   ret.write<QUrl > ((QUrl)QUrl::fromEncoded (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref()));
 }
 
@@ -1501,7 +1501,7 @@ static void _call_f_fromLocalFile_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QUrl > ((QUrl)QUrl::fromLocalFile (arg1));
 }
 
@@ -1520,7 +1520,7 @@ static void _call_f_fromPercentEncoding_2309 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)QUrl::fromPercentEncoding (arg1));
 }
 
@@ -1539,7 +1539,7 @@ static void _call_f_fromPunycode_2309 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)QUrl::fromPunycode (arg1));
 }
 
@@ -1558,7 +1558,7 @@ static void _call_f_fromUserInput_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QUrl > ((QUrl)QUrl::fromUserInput (arg1));
 }
 
@@ -1592,7 +1592,7 @@ static void _call_f_setIdnWhitelist_2437 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QUrl::setIdnWhitelist (arg1);
 }
@@ -1612,7 +1612,7 @@ static void _call_f_toAce_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)QUrl::toAce (arg1));
 }
 
@@ -1635,9 +1635,9 @@ static void _call_f_toPercentEncoding_6427 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QByteArray &arg2 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
-  const QByteArray &arg3 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QByteArray &arg2 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
+  const QByteArray &arg3 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QByteArray > ((QByteArray)QUrl::toPercentEncoding (arg1, arg2, arg3));
 }
 
@@ -1656,7 +1656,7 @@ static void _call_f_toPunycode_2025 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)QUrl::toPunycode (arg1));
 }
 

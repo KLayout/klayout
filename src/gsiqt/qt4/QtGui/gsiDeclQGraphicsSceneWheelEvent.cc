@@ -158,7 +158,7 @@ static void _call_f_setButtons_2602 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::MouseButton> arg1 = args.read<QFlags<Qt::MouseButton> > (heap);
+  QFlags<Qt::MouseButton> arg1 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneWheelEvent *)cls)->setButtons (arg1);
 }
@@ -178,7 +178,7 @@ static void _call_f_setDelta_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneWheelEvent *)cls)->setDelta (arg1);
 }
@@ -198,7 +198,7 @@ static void _call_f_setModifiers_3077 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::KeyboardModifier> arg1 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  QFlags<Qt::KeyboardModifier> arg1 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneWheelEvent *)cls)->setModifiers (arg1);
 }
@@ -218,7 +218,7 @@ static void _call_f_setOrientation_1913 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneWheelEvent *)cls)->setOrientation (qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg1).cref());
 }
@@ -238,7 +238,7 @@ static void _call_f_setPos_1986 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneWheelEvent *)cls)->setPos (arg1);
 }
@@ -258,7 +258,7 @@ static void _call_f_setScenePos_1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneWheelEvent *)cls)->setScenePos (arg1);
 }
@@ -278,7 +278,7 @@ static void _call_f_setScreenPos_1916 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneWheelEvent *)cls)->setScreenPos (arg1);
 }
@@ -353,7 +353,7 @@ static void _call_ctor_QGraphicsSceneWheelEvent_Adaptor_1565 (const qt_gsi::Gene
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap) : (const qt_gsi::Converter<QEvent::Type>::target_type &)(qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::None));
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QEvent::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::None), heap);
   ret.write<QGraphicsSceneWheelEvent_Adaptor *> (new QGraphicsSceneWheelEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref()));
 }
 

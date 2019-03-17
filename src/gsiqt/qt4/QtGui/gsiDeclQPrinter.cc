@@ -229,11 +229,11 @@ static void _call_f_getPageMargins_c6385 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double *arg1 = args.read<double * > (heap);
-  double *arg2 = args.read<double * > (heap);
-  double *arg3 = args.read<double * > (heap);
-  double *arg4 = args.read<double * > (heap);
-  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg5 = args.read<const qt_gsi::Converter<QPrinter::Unit>::target_type & > (heap);
+  double *arg1 = gsi::arg_reader<double * >() (args, heap);
+  double *arg2 = gsi::arg_reader<double * >() (args, heap);
+  double *arg3 = gsi::arg_reader<double * >() (args, heap);
+  double *arg4 = gsi::arg_reader<double * >() (args, heap);
+  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg5 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::Unit>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->getPageMargins (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QPrinter::Unit>(arg5).cref());
 }
@@ -373,7 +373,7 @@ static void _call_f_pageRect_c1789 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::Unit>::target_type & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPrinter *)cls)->pageRect (qt_gsi::QtToCppAdaptor<QPrinter::Unit>(arg1).cref()));
 }
 
@@ -437,7 +437,7 @@ static void _call_f_paperRect_c1789 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::Unit>::target_type & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPrinter *)cls)->paperRect (qt_gsi::QtToCppAdaptor<QPrinter::Unit>(arg1).cref()));
 }
 
@@ -471,7 +471,7 @@ static void _call_f_paperSize_c1789 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::Unit>::target_type & >() (args, heap);
   ret.write<QSizeF > ((QSizeF)((QPrinter *)cls)->paperSize (qt_gsi::QtToCppAdaptor<QPrinter::Unit>(arg1).cref()));
 }
 
@@ -595,7 +595,7 @@ static void _call_f_setCollateCopies_864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setCollateCopies (arg1);
 }
@@ -615,7 +615,7 @@ static void _call_f_setColorMode_2273 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::ColorMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::ColorMode>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::ColorMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::ColorMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setColorMode (qt_gsi::QtToCppAdaptor<QPrinter::ColorMode>(arg1).cref());
 }
@@ -635,7 +635,7 @@ static void _call_f_setCreator_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setCreator (arg1);
 }
@@ -655,7 +655,7 @@ static void _call_f_setDocName_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setDocName (arg1);
 }
@@ -675,7 +675,7 @@ static void _call_f_setDoubleSidedPrinting_864 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setDoubleSidedPrinting (arg1);
 }
@@ -695,7 +695,7 @@ static void _call_f_setDuplex_2388 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::DuplexMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::DuplexMode>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::DuplexMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::DuplexMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setDuplex (qt_gsi::QtToCppAdaptor<QPrinter::DuplexMode>(arg1).cref());
 }
@@ -715,7 +715,7 @@ static void _call_f_setFontEmbeddingEnabled_864 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setFontEmbeddingEnabled (arg1);
 }
@@ -737,8 +737,8 @@ static void _call_f_setFromTo_1426 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setFromTo (arg1, arg2);
 }
@@ -758,7 +758,7 @@ static void _call_f_setFullPage_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setFullPage (arg1);
 }
@@ -778,7 +778,7 @@ static void _call_f_setNumCopies_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setNumCopies (arg1);
 }
@@ -798,7 +798,7 @@ static void _call_f_setOrientation_2537 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::Orientation>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::Orientation>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setOrientation (qt_gsi::QtToCppAdaptor<QPrinter::Orientation>(arg1).cref());
 }
@@ -818,7 +818,7 @@ static void _call_f_setOutputFileName_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setOutputFileName (arg1);
 }
@@ -838,7 +838,7 @@ static void _call_f_setOutputFormat_2647 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::OutputFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::OutputFormat>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::OutputFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::OutputFormat>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setOutputFormat (qt_gsi::QtToCppAdaptor<QPrinter::OutputFormat>(arg1).cref());
 }
@@ -866,11 +866,11 @@ static void _call_f_setPageMargins_5641 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg5 = args.read<const qt_gsi::Converter<QPrinter::Unit>::target_type & > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg5 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::Unit>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setPageMargins (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QPrinter::Unit>(arg5).cref());
 }
@@ -890,7 +890,7 @@ static void _call_f_setPageOrder_2262 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::PageOrder>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::PageOrder>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::PageOrder>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::PageOrder>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setPageOrder (qt_gsi::QtToCppAdaptor<QPrinter::PageOrder>(arg1).cref());
 }
@@ -910,7 +910,7 @@ static void _call_f_setPageSize_2165 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::PageSize>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::PageSize>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::PageSize>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::PageSize>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setPageSize (qt_gsi::QtToCppAdaptor<QPrinter::PageSize>(arg1).cref());
 }
@@ -930,7 +930,7 @@ static void _call_f_setPaperSize_2165 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::PageSize>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::PageSize>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::PageSize>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::PageSize>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setPaperSize (qt_gsi::QtToCppAdaptor<QPrinter::PageSize>(arg1).cref());
 }
@@ -952,8 +952,8 @@ static void _call_f_setPaperSize_3556 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
-  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg2 = args.read<const qt_gsi::Converter<QPrinter::Unit>::target_type & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
+  const qt_gsi::Converter<QPrinter::Unit>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::Unit>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setPaperSize (arg1, qt_gsi::QtToCppAdaptor<QPrinter::Unit>(arg2).cref());
 }
@@ -973,7 +973,7 @@ static void _call_f_setPaperSource_2502 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::PaperSource>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::PaperSource>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::PaperSource>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::PaperSource>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setPaperSource (qt_gsi::QtToCppAdaptor<QPrinter::PaperSource>(arg1).cref());
 }
@@ -993,7 +993,7 @@ static void _call_f_setPrintProgram_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setPrintProgram (arg1);
 }
@@ -1013,7 +1013,7 @@ static void _call_f_setPrintRange_2391 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::PrintRange>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrinter::PrintRange>::target_type & > (heap);
+  const qt_gsi::Converter<QPrinter::PrintRange>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrinter::PrintRange>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setPrintRange (qt_gsi::QtToCppAdaptor<QPrinter::PrintRange>(arg1).cref());
 }
@@ -1033,7 +1033,7 @@ static void _call_f_setPrinterName_2025 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setPrinterName (arg1);
 }
@@ -1053,7 +1053,7 @@ static void _call_f_setResolution_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter *)cls)->setResolution (arg1);
 }
@@ -1251,7 +1251,7 @@ static void _call_ctor_QPrinter_Adaptor_2502 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & > (heap) : (const qt_gsi::Converter<QPrinter::PrinterMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPrinter::PrinterMode>(heap, QPrinter::ScreenResolution));
+  const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPrinter::PrinterMode>(heap, QPrinter::ScreenResolution), heap);
   ret.write<QPrinter_Adaptor *> (new QPrinter_Adaptor (qt_gsi::QtToCppAdaptor<QPrinter::PrinterMode>(arg1).cref()));
 }
 
@@ -1271,8 +1271,8 @@ static void _call_ctor_QPrinter_Adaptor_4924 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPrinterInfo &arg1 = args.read<const QPrinterInfo & > (heap);
-  const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & > (heap) : (const qt_gsi::Converter<QPrinter::PrinterMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPrinter::PrinterMode>(heap, QPrinter::ScreenResolution));
+  const QPrinterInfo &arg1 = gsi::arg_reader<const QPrinterInfo & >() (args, heap);
+  const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPrinter::PrinterMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPrinter::PrinterMode>(heap, QPrinter::ScreenResolution), heap);
   ret.write<QPrinter_Adaptor *> (new QPrinter_Adaptor (arg1, qt_gsi::QtToCppAdaptor<QPrinter::PrinterMode>(arg2).cref()));
 }
 
@@ -1334,8 +1334,8 @@ static void _call_fp_setEngines_3527 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPrintEngine *arg1 = args.read<QPrintEngine * > (heap);
-  QPaintEngine *arg2 = args.read<QPaintEngine * > (heap);
+  QPrintEngine *arg1 = gsi::arg_reader<QPrintEngine * >() (args, heap);
+  QPaintEngine *arg2 = gsi::arg_reader<QPaintEngine * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrinter_Adaptor *)cls)->fp_QPrinter_setEngines_3527 (arg1, arg2);
 }

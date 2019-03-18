@@ -44,6 +44,7 @@ DeviceClass &DeviceClass::operator= (const DeviceClass &other)
 {
   if (this != &other) {
     m_terminal_definitions = other.m_terminal_definitions;
+    m_parameter_definitions = other.m_parameter_definitions;
     m_name = other.m_name;
     m_description = other.m_description;
   }

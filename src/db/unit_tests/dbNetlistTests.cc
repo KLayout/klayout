@@ -501,6 +501,9 @@ TEST(4_NetlistSubcircuits)
   dc->add_terminal_definition (db::DeviceTerminalDefinition ("B", ""));
   nl->add_device_class (dc);
 
+  std::auto_ptr<db::Netlist> nldup (new db::Netlist ());
+  nldup->add_device_class (dc->clone ());
+
   db::DeviceAbstract *dm = new db::DeviceAbstract ();
   dm->set_device_class (dc);
   EXPECT_EQ (dm->device_class () == dc, true);
@@ -607,6 +610,24 @@ TEST(4_NetlistSubcircuits)
     "[c2]\n"
     "D:A,+c2p1\n"
     "D:B,+c2p2\n"
+  );
+
+  EXPECT_EQ (nl->to_string (),
+    "Circuit c1 (c1p1=n1a,c1p2=n1c):\n"
+    "  Xc2 sc1 (c2p1=n1a,c2p2=n1b)\n"
+    "  Xc2 sc2 (c2p1=n1b,c2p2=n1c)\n"
+    "Circuit c2 (c2p1=n2a,c2p2=n2b):\n"
+    "  Ddc2 D (A=n2a,B=n2b) []\n"
+  );
+
+  nldup->from_string (nl->to_parsable_string ());
+
+  EXPECT_EQ (nldup->to_string (),
+    "Circuit c1 (c1p1=n1a,c1p2=n1c):\n"
+    "  Xc2 sc1 (c2p1=n1a,c2p2=n1b)\n"
+    "  Xc2 sc2 (c2p1=n1b,c2p2=n1c)\n"
+    "Circuit c2 (c2p1=n2a,c2p2=n2b):\n"
+    "  Ddc2 D (A=n2a,B=n2b) []\n"
   );
 
   EXPECT_EQ (netlist2 (*nl),

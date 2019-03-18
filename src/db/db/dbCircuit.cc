@@ -246,6 +246,11 @@ Circuit::const_child_circuit_iterator Circuit::end_parents () const
   return reinterpret_cast<const tl::vector<const Circuit *> &> (mp_netlist->parent_circuits (const_cast <Circuit *> (this))).end ();
 }
 
+void Circuit::clear_pins ()
+{
+  m_pins.clear ();
+}
+
 const Pin &Circuit::add_pin (const std::string &name)
 {
   m_pins.push_back (Pin (name));

@@ -546,4 +546,373 @@ std::string Netlist::to_string () const
   return res;
 }
 
+std::string Netlist::to_parsable_string () const
+{
+  std::string res;
+  for (db::Netlist::const_circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
+
+    std::string ps;
+    for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p) {
+      if (! ps.empty ()) {
+        ps += ",";
+      }
+      ps += pin2string (*p) + "=" + net2string (c->net_for_pin (p->id ()));
+    }
+
+    res += std::string ("circuit ") + c->name () + " (" + ps + ");\n";
+
+    for (db::Circuit::const_device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
+      std::string ts;
+      const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
+      for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
+        if (t != td.begin ()) {
+          ts += ", ";
+        }
+        ts += t->name () + "=" + net2string (d->net_for_terminal (t->id ()));
+      }
+      std::string ps;
+      const std::vector<db::DeviceParameterDefinition> &pd = d->device_class ()->parameter_definitions ();
+      for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+        if (p != pd.begin ()) {
+          ps += ",";
+        }
+        ps += p->name () + "=" + tl::to_string (d->parameter_value (p->id ()));
+      }
+      res += std::string ("  device ") + tl::to_word_or_quoted_string (d->device_class ()->name ()) + " " + device2string (*d) + " (" + ts + ") (" + ps + ");\n";
+    }
+
+    for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
+      std::string ps;
+      const db::SubCircuit &subcircuit = *sc;
+      const db::Circuit *circuit = sc->circuit_ref ();
+      for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
+        if (p != circuit->begin_pins ()) {
+          ps += ", ";
+        }
+        ps += net2string (subcircuit.net_for_pin (p->id ()));
+      }
+      res += std::string ("  subcircuit ") + tl::to_word_or_quoted_string (circuit->name ()) + " " + subcircuit2string (*sc) + " (" + ps + ");\n";
+    }
+
+    res += std::string ("end;\n");
+
+  }
+
+  return res;
+}
+
+static db::Net *read_net (tl::Extractor &ex, db::Circuit *circuit, std::map<std::string, db::Net *> &n2n)
+{
+  std::string nn;
+  bool has_name = false;
+  size_t cluster_id = 0;
+
+  if (ex.test ("(")) {
+
+    ex.expect ("null");
+    ex.expect (")");
+
+    return 0;
+
+  } else if (ex.test ("$")) {
+
+    bool has_i = ex.test ("I");
+    ex.read (cluster_id);
+
+    nn = (has_i ? "$I" : "$") + tl::to_string (cluster_id);
+
+    if (has_i) {
+      cluster_id = (std::numeric_limits<size_t>::max () - cluster_id) + 1;
+    }
+
+  } else {
+
+    ex.read_word_or_quoted (nn);
+
+    has_name = true;
+
+  }
+
+  std::map<std::string, db::Net *>::const_iterator i = n2n.find (nn);
+  if (i == n2n.end ()) {
+
+    db::Net *net = new db::Net ();
+    circuit->add_net (net);
+    if (has_name) {
+      net->set_name (nn);
+    } else {
+      net->set_cluster_id (cluster_id);
+    }
+
+    n2n.insert (std::make_pair (nn, net));
+    return net;
+
+  } else {
+
+    return i->second;
+
+  }
+}
+
+static void read_pins (tl::Extractor &ex, db::Circuit *circuit, std::map<std::string, db::Net *> &n2n)
+{
+  size_t npins = circuit->pin_count ();
+
+  circuit->clear_pins ();
+
+  ex.expect ("(");
+  while (! ex.test (")")) {
+
+    ex.expect_more ();
+
+    std::string pn;
+    if (ex.test ("$")) {
+      size_t i;
+      ex.read (i);
+    } else {
+      ex.read_word_or_quoted (pn);
+    }
+
+    ex.expect ("=");
+
+    db::Net *net = read_net (ex, circuit, n2n);
+
+    const db::Pin &pin = circuit->add_pin (pn);
+    if (net) {
+      net->add_pin (db::NetPinRef (pin.id ()));
+    }
+
+    ex.test (",");
+
+  }
+
+  if (circuit->pin_count () < npins) {
+    ex.error (tl::to_string (tr ("Circuit defines less pins that subcircuit")));
+  }
+}
+
+static void read_device_terminals (tl::Extractor &ex, db::Device *device, std::map<std::string, db::Net *> &n2n)
+{
+  ex.expect ("(");
+  while (! ex.test (")")) {
+
+    ex.expect_more ();
+
+    std::string tn;
+    ex.read_word_or_quoted (tn);
+
+    size_t tid = std::numeric_limits<size_t>::max ();
+    const std::vector<DeviceTerminalDefinition> &td = device->device_class ()->terminal_definitions ();
+    for (std::vector<DeviceTerminalDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {
+      if (i->name () == tn) {
+        tid = i->id ();
+        break;
+      }
+    }
+
+    if (tid == std::numeric_limits<size_t>::max ()) {
+      ex.error (tl::to_string (tr ("Not a valid terminal name: ")) + tn);
+    }
+
+    ex.expect ("=");
+
+    db::Net *net = read_net (ex, device->circuit (), n2n);
+    if (net) {
+      device->connect_terminal (tid, net);
+    }
+
+    ex.test (",");
+
+  }
+}
+
+static void read_device_parameters (tl::Extractor &ex, db::Device *device)
+{
+  ex.expect ("(");
+  while (! ex.test (")")) {
+
+    ex.expect_more ();
+
+    std::string pn;
+    ex.read_word_or_quoted (pn);
+
+    size_t pid = std::numeric_limits<size_t>::max ();
+    const std::vector<DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
+    for (std::vector<DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+      if (i->name () == pn) {
+        pid = i->id ();
+        break;
+      }
+    }
+
+    if (pid == std::numeric_limits<size_t>::max ()) {
+      ex.error (tl::to_string (tr ("Not a valid parameter name: ")) + pn);
+    }
+
+    ex.expect ("=");
+
+    double value = 0;
+    ex.read (value);
+    device->set_parameter_value (pid, value);
+
+    ex.test (",");
+
+  }
+}
+
+static void read_device (tl::Extractor &ex, db::Circuit *circuit, std::map<std::string, db::Net *> &n2n)
+{
+  db::Netlist *netlist = circuit->netlist ();
+
+  std::string dcn;
+  ex.read_word_or_quoted (dcn);
+  db::DeviceClass *dc = 0;
+  for (db::Netlist::device_class_iterator i = netlist->begin_device_classes (); i != netlist->end_device_classes (); ++i) {
+    if (i->name () == dcn) {
+      dc = i.operator-> ();
+    }
+  }
+  if (! dc) {
+    ex.error (tl::to_string (tr ("Not a valid device class name: ")) + dcn);
+  }
+
+  std::string dn;
+  if (ex.test ("$")) {
+    size_t i;
+    ex.read (i);
+  } else {
+    ex.read_word_or_quoted (dn);
+  }
+
+  db::Device *device = new db::Device (dc, dn);
+  circuit->add_device (device);
+
+  read_device_terminals (ex, device, n2n);
+  read_device_parameters (ex, device);
+}
+
+static void read_subcircuit_pins (tl::Extractor &ex, db::SubCircuit *subcircuit, std::map<std::string, db::Net *> &n2n)
+{
+  db::Circuit *circuit = subcircuit->circuit_ref ();
+  db::Circuit::pin_iterator pi = circuit->begin_pins ();
+
+  ex.expect ("(");
+  while (! ex.test (")")) {
+
+    if (pi == circuit->end_pins ()) {
+      //  add a dummy pin
+      circuit->add_pin (std::string ());
+      pi = circuit->end_pins ();
+      --pi;
+    }
+
+    ex.expect_more ();
+
+    db::Net *net = read_net (ex, circuit, n2n);
+    if (net) {
+      subcircuit->connect_pin (pi->id (), net);
+    }
+
+    ex.test (",");
+
+    ++pi;
+
+  }
+
+  if (pi != circuit->end_pins ()) {
+    // @@@ ex.error (tl::to_string (tr ("Too few pins in subcircuit call")));
+  }
+}
+
+static void read_subcircuit (tl::Extractor &ex, db::Circuit *circuit, std::map<std::string, db::Net *> &n2n, std::map<std::string, db::Circuit *> &c2n)
+{
+  std::string cn;
+  ex.read_word_or_quoted (cn);
+
+  db::Circuit *cc = 0;
+  std::map<std::string, db::Circuit *>::const_iterator ic = c2n.find (cn);
+  if (ic == c2n.end ()) {
+
+    cc = new db::Circuit ();
+    circuit->netlist ()->add_circuit (cc);
+    cc->set_name (cn);
+
+    c2n.insert (std::make_pair (cn, cc));
+
+  } else {
+    cc = ic->second;
+  }
+
+  std::string scn;
+  if (ex.test ("$")) {
+    size_t i;
+    ex.read (i);
+  } else {
+    ex.read_word_or_quoted (scn);
+  }
+
+  db::SubCircuit *subcircuit = new db::SubCircuit (cc, scn);
+  circuit->add_subcircuit (subcircuit);
+
+  read_subcircuit_pins (ex, subcircuit, n2n);
+}
+
+void Netlist::from_string (const std::string &s)
+{
+  tl::Extractor ex (s.c_str ());
+
+  std::map<std::string, db::Circuit *> c2n;
+
+  while (ex.test ("circuit")) {
+
+    std::string n;
+    ex.read_word_or_quoted (n);
+
+    db::Circuit *circuit = 0;
+
+    std::map<std::string, db::Circuit *>::const_iterator ic = c2n.find (n);
+    if (ic == c2n.end ()) {
+
+      circuit = new db::Circuit ();
+      add_circuit (circuit);
+      circuit->set_name (n);
+
+      c2n.insert (std::make_pair (n, circuit));
+
+    } else {
+      circuit = ic->second;
+    }
+
+    std::map<std::string, db::Net *> n2n;
+    read_pins (ex, circuit, n2n);
+
+    ex.expect (";");
+
+    while (! ex.test ("end")) {
+
+      ex.expect_more ();
+
+      if (ex.test ("device")) {
+
+        read_device (ex, circuit, n2n);
+        ex.expect (";");
+
+      } else if (ex.test ("subcircuit")) {
+
+        read_subcircuit (ex, circuit, n2n, c2n);
+        ex.expect (";");
+
+      } else {
+        ex.error (tl::to_string (tr ("device or subcircuit expected")));
+      }
+
+    }
+
+    ex.expect (";");
+
+  }
+
+  ex.expect_end ();
+}
+
 }

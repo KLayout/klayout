@@ -235,10 +235,14 @@ public:
   }
 
   /**
-   *  @brief Adds a pin to this circuit
-   *  The circuit takes over ownership of the object.
+   *  @brief Clears the pins
    */
-  const Pin &add_pin(const std::string &name);
+  void clear_pins ();
+
+  /**
+   *  @brief Adds a pin to this circuit
+   */
+  const Pin &add_pin (const std::string &name);
 
   /**
    *  @brief Begin iterator for the pins of the circuit (non-const version)

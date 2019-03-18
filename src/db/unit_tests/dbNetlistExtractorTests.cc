@@ -304,6 +304,14 @@ TEST(1_DeviceAndNetExtraction)
     "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
   );
 
+  //  use this opportunity to test serialization to and from string
+  db::Netlist nldup;
+  for (db::Netlist::device_class_iterator i = nl.begin_device_classes (); i != nl.end_device_classes (); ++i) {
+    nldup.add_device_class (i->clone ());
+  }
+  nldup.from_string (nl.to_parsable_string ());
+  EXPECT_EQ (nldup.to_string (), nl.to_string ());
+
   // doesn't do anything here, but we test that this does not destroy anything:
   nl.combine_devices ();
 

@@ -486,7 +486,7 @@ static std::string pin2string (const db::Pin &pin)
   }
 }
 
-std::string Netlist::to_string () const
+std::string Netlist::to_string_old () const
 {
   std::string res;
   for (db::Netlist::const_circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
@@ -559,14 +559,14 @@ std::string Netlist::to_parsable_string () const
       ps += pin2string (*p) + "=" + net2string (c->net_for_pin (p->id ()));
     }
 
-    res += std::string ("circuit ") + c->name () + " (" + ps + ");\n";
+    res += std::string ("circuit ") + tl::to_word_or_quoted_string (c->name ()) + " (" + ps + ");\n";
 
     for (db::Circuit::const_device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
       std::string ts;
       const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
       for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
         if (t != td.begin ()) {
-          ts += ", ";
+          ts += ",";
         }
         ts += t->name () + "=" + net2string (d->net_for_terminal (t->id ()));
       }
@@ -587,9 +587,9 @@ std::string Netlist::to_parsable_string () const
       const db::Circuit *circuit = sc->circuit_ref ();
       for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
         if (p != circuit->begin_pins ()) {
-          ps += ", ";
+          ps += ",";
         }
-        ps += net2string (subcircuit.net_for_pin (p->id ()));
+        ps += pin2string (*p) + "=" + net2string (subcircuit.net_for_pin (p->id ()));
       }
       res += std::string ("  subcircuit ") + tl::to_word_or_quoted_string (circuit->name ()) + " " + subcircuit2string (*sc) + " (" + ps + ");\n";
     }
@@ -799,11 +799,18 @@ static void read_subcircuit_pins (tl::Extractor &ex, db::SubCircuit *subcircuit,
   ex.expect ("(");
   while (! ex.test (")")) {
 
+    std::string pn;
+    ex.read_word_or_quoted (pn);
+
+    ex.expect ("=");
+
     if (pi == circuit->end_pins ()) {
       //  add a dummy pin
-      circuit->add_pin (std::string ());
+      circuit->add_pin (pn);
       pi = circuit->end_pins ();
       --pi;
+    } else if (pi->name () != pn) {
+      ex.error (tl::to_string (tr ("Expected pin with name: ")) + pi->name ());
     }
 
     ex.expect_more ();
@@ -820,7 +827,7 @@ static void read_subcircuit_pins (tl::Extractor &ex, db::SubCircuit *subcircuit,
   }
 
   if (pi != circuit->end_pins ()) {
-    // @@@ ex.error (tl::to_string (tr ("Too few pins in subcircuit call")));
+    ex.error (tl::to_string (tr ("Too few pins in subcircuit call")));
   }
 }
 

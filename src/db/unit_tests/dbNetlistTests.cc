@@ -612,22 +612,26 @@ TEST(4_NetlistSubcircuits)
     "D:B,+c2p2\n"
   );
 
-  EXPECT_EQ (nl->to_string (),
-    "Circuit c1 (c1p1=n1a,c1p2=n1c):\n"
-    "  Xc2 sc1 (c2p1=n1a,c2p2=n1b)\n"
-    "  Xc2 sc2 (c2p1=n1b,c2p2=n1c)\n"
-    "Circuit c2 (c2p1=n2a,c2p2=n2b):\n"
-    "  Ddc2 D (A=n2a,B=n2b) []\n"
+  EXPECT_EQ (nl->to_parsable_string (),
+    "circuit c1 (c1p1=n1a,c1p2=n1c);\n"
+    "  subcircuit c2 sc1 (c2p1=n1a,c2p2=n1b);\n"
+    "  subcircuit c2 sc2 (c2p1=n1b,c2p2=n1c);\n"
+    "end;\n"
+    "circuit c2 (c2p1=n2a,c2p2=n2b);\n"
+    "  device dc2 D (A=n2a,B=n2b) ();\n"
+    "end;\n"
   );
 
   nldup->from_string (nl->to_parsable_string ());
 
-  EXPECT_EQ (nldup->to_string (),
-    "Circuit c1 (c1p1=n1a,c1p2=n1c):\n"
-    "  Xc2 sc1 (c2p1=n1a,c2p2=n1b)\n"
-    "  Xc2 sc2 (c2p1=n1b,c2p2=n1c)\n"
-    "Circuit c2 (c2p1=n2a,c2p2=n2b):\n"
-    "  Ddc2 D (A=n2a,B=n2b) []\n"
+  EXPECT_EQ (nldup->to_parsable_string (),
+    "circuit c1 (c1p1=n1a,c1p2=n1c);\n"
+    "  subcircuit c2 sc1 (c2p1=n1a,c2p2=n1b);\n"
+    "  subcircuit c2 sc2 (c2p1=n1b,c2p2=n1c);\n"
+    "end;\n"
+    "circuit c2 (c2p1=n2a,c2p2=n2b);\n"
+    "  device dc2 D (A=n2a,B=n2b) ();\n"
+    "end;\n"
   );
 
   EXPECT_EQ (netlist2 (*nl),

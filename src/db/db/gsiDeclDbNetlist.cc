@@ -972,7 +972,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::iterator ("each_device_class", (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::begin_device_classes, (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::end_device_classes,
     "@brief Iterates over the device classes of the netlist"
   ) +
-  gsi::method ("to_s", &db::Netlist::to_string,
+  gsi::method ("to_s", &db::Netlist::to_parsable_string,
     "@brief Converts the netlist to a string representation.\n"
     "This method is intended for test purposes mainly."
   ) +

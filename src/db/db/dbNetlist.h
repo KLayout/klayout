@@ -92,7 +92,7 @@ public:
    *
    *  This method is basically intended to testing.
    */
-  std::string to_string () const;
+  std::string to_string_old () const;
 
   /**
    *  @brief Returns a parsable string representation of the netlist

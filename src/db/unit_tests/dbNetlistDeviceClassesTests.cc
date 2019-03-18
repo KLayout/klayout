@@ -64,18 +64,20 @@ TEST(1_SerialResistors)
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_B, n3);
   circuit->connect_pin (pin_b.id (), n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D r1 (A=n1,B=n2) [R=1]\n"
-    "  D r2 (A=n2,B=n3) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1);\n"
+    "  device '' r2 (A=n2,B=n3) (R=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D r1 (A=n1,B=n3) [R=4]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' r1 (A=n1,B=n3) (R=4);\n"
+    "end;\n"
   );
 }
 
@@ -115,18 +117,20 @@ TEST(2_SerialResistors1Swapped)
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_A, n3);
   circuit->connect_pin (pin_b.id (), n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D r1 (A=n1,B=n2) [R=1]\n"
-    "  D r2 (A=n3,B=n2) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1);\n"
+    "  device '' r2 (A=n3,B=n2) (R=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D r1 (A=n1,B=n3) [R=4]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' r1 (A=n1,B=n3) (R=4);\n"
+    "end;\n"
   );
 }
 
@@ -166,18 +170,20 @@ TEST(3_SerialResistors1OtherSwapped)
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_B, n3);
   circuit->connect_pin (pin_b.id (), n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D r1 (A=n2,B=n1) [R=1]\n"
-    "  D r2 (A=n2,B=n3) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' r1 (A=n2,B=n1) (R=1);\n"
+    "  device '' r2 (A=n2,B=n3) (R=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D r1 (A=n3,B=n1) [R=4]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' r1 (A=n3,B=n1) (R=4);\n"
+    "end;\n"
   );
 }
 
@@ -217,18 +223,20 @@ TEST(4_SerialResistors2Swapped)
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_A, n3);
   circuit->connect_pin (pin_b.id (), n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D r1 (A=n2,B=n1) [R=1]\n"
-    "  D r2 (A=n3,B=n2) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' r1 (A=n2,B=n1) (R=1);\n"
+    "  device '' r2 (A=n3,B=n2) (R=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D r1 (A=n3,B=n1) [R=4]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' r1 (A=n3,B=n1) (R=4);\n"
+    "end;\n"
   );
 }
 
@@ -270,19 +278,21 @@ TEST(5_SerialResistorsNoCombination)
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_B, n3);
   circuit->connect_pin (pin_b.id (), n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3,C=n2):\n"
-    "  D r1 (A=n1,B=n2) [R=1]\n"
-    "  D r2 (A=n2,B=n3) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3,C=n2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1);\n"
+    "  device '' r2 (A=n2,B=n3) (R=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3,C=n2):\n"
-    "  D r1 (A=n1,B=n2) [R=1]\n"
-    "  D r2 (A=n2,B=n3) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3,C=n2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1);\n"
+    "  device '' r2 (A=n2,B=n3) (R=3);\n"
+    "end;\n"
   );
 }
 
@@ -319,18 +329,20 @@ TEST(6_ParallelResistors)
   r1->connect_terminal (db::DeviceClassResistor::terminal_id_B, n2);
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_B, n2);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D r1 (A=n1,B=n2) [R=2]\n"
-    "  D r2 (A=n1,B=n2) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=2);\n"
+    "  device '' r2 (A=n1,B=n2) (R=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D r1 (A=n1,B=n2) [R=1.2]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1.2);\n"
+    "end;\n"
   );
 }
 
@@ -367,18 +379,20 @@ TEST(7_ParallelResistors1Swapped)
   r1->connect_terminal (db::DeviceClassResistor::terminal_id_A, n2);
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_B, n2);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D r1 (A=n2,B=n1) [R=2]\n"
-    "  D r2 (A=n1,B=n2) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' r1 (A=n2,B=n1) (R=2);\n"
+    "  device '' r2 (A=n1,B=n2) (R=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D r1 (A=n2,B=n1) [R=1.2]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' r1 (A=n2,B=n1) (R=1.2);\n"
+    "end;\n"
   );
 }
 
@@ -415,18 +429,20 @@ TEST(8_ParallelResistors1OtherSwapped)
   r1->connect_terminal (db::DeviceClassResistor::terminal_id_B, n2);
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_A, n2);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D r1 (A=n1,B=n2) [R=2]\n"
-    "  D r2 (A=n2,B=n1) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=2);\n"
+    "  device '' r2 (A=n2,B=n1) (R=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D r1 (A=n1,B=n2) [R=1.2]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1.2);\n"
+    "end;\n"
   );
 }
 
@@ -463,18 +479,20 @@ TEST(9_ParallelResistors2Swapped)
   r1->connect_terminal (db::DeviceClassResistor::terminal_id_A, n2);
   r2->connect_terminal (db::DeviceClassResistor::terminal_id_A, n2);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D r1 (A=n2,B=n1) [R=2]\n"
-    "  D r2 (A=n2,B=n1) [R=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' r1 (A=n2,B=n1) (R=2);\n"
+    "  device '' r2 (A=n2,B=n1) (R=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D r1 (A=n2,B=n1) [R=1.2]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' r1 (A=n2,B=n1) (R=1.2);\n"
+    "end;\n"
   );
 }
 
@@ -536,20 +554,22 @@ TEST(10_ComplexRegistorCombination)
   circuit->connect_pin (pin_b.id (), n4);
   r4->connect_terminal (db::DeviceClassResistor::terminal_id_B, n4);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n4):\n"
-    "  D r1 (A=n1,B=n2) [R=1]\n"
-    "  D r2 (A=n2,B=n3) [R=1]\n"
-    "  D r3 (A=n1,B=n3) [R=3]\n"
-    "  D r4 (A=n3,B=n4) [R=0.8]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n4);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1);\n"
+    "  device '' r2 (A=n2,B=n3) (R=1);\n"
+    "  device '' r3 (A=n1,B=n3) (R=3);\n"
+    "  device '' r4 (A=n3,B=n4) (R=0.8);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n4):\n"
-    "  D r4 (A=n1,B=n4) [R=2]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n4);\n"
+    "  device '' r4 (A=n1,B=n4) (R=2);\n"
+    "end;\n"
   );
 }
 
@@ -589,18 +609,20 @@ TEST(11_SerialInductors)
   l2->connect_terminal (db::DeviceClassResistor::terminal_id_B, n3);
   circuit->connect_pin (pin_b.id (), n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D l1 (A=n1,B=n2) [L=1]\n"
-    "  D l2 (A=n2,B=n3) [L=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' l1 (A=n1,B=n2) (L=1);\n"
+    "  device '' l2 (A=n2,B=n3) (L=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D l1 (A=n1,B=n3) [L=4]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' l1 (A=n1,B=n3) (L=4);\n"
+    "end;\n"
   );
 }
 
@@ -637,18 +659,20 @@ TEST(12_ParallelInductors)
   l1->connect_terminal (db::DeviceClassInductor::terminal_id_B, n2);
   l2->connect_terminal (db::DeviceClassInductor::terminal_id_B, n2);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D l1 (A=n1,B=n2) [L=2]\n"
-    "  D l2 (A=n1,B=n2) [L=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' l1 (A=n1,B=n2) (L=2);\n"
+    "  device '' l2 (A=n1,B=n2) (L=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D l1 (A=n1,B=n2) [L=1.2]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' l1 (A=n1,B=n2) (L=1.2);\n"
+    "end;\n"
   );
 }
 
@@ -688,18 +712,20 @@ TEST(13_SerialCapacitors)
   c2->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n3);
   circuit->connect_pin (pin_b.id (), n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D c1 (A=n1,B=n2) [C=2]\n"
-    "  D c2 (A=n2,B=n3) [C=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' c1 (A=n1,B=n2) (C=2);\n"
+    "  device '' c2 (A=n2,B=n3) (C=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D c1 (A=n1,B=n3) [C=1.2]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' c1 (A=n1,B=n3) (C=1.2);\n"
+    "end;\n"
   );
 }
 
@@ -736,18 +762,20 @@ TEST(14_ParallelCapacitors)
   c1->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n2);
   c2->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n2);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D c1 (A=n1,B=n2) [C=1]\n"
-    "  D c2 (A=n1,B=n2) [C=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' c1 (A=n1,B=n2) (C=1);\n"
+    "  device '' c2 (A=n1,B=n2) (C=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D c1 (A=n1,B=n2) [C=4]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' c1 (A=n1,B=n2) (C=4);\n"
+    "end;\n"
   );
 }
 
@@ -787,10 +815,11 @@ TEST(15_SerialDiodes)
   d2->connect_terminal (db::DeviceClassDiode::terminal_id_C, n3);
   circuit->connect_pin (pin_b.id (), n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D d1 (A=n1,C=n2) [A=2]\n"
-    "  D d2 (A=n2,C=n3) [A=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' d1 (A=n1,C=n2) (A=2);\n"
+    "  device '' d2 (A=n2,C=n3) (A=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
@@ -798,10 +827,11 @@ TEST(15_SerialDiodes)
 
   //  serial diodes are not combined!
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n3):\n"
-    "  D d1 (A=n1,C=n2) [A=2]\n"
-    "  D d2 (A=n2,C=n3) [A=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n3);\n"
+    "  device '' d1 (A=n1,C=n2) (A=2);\n"
+    "  device '' d2 (A=n2,C=n3) (A=3);\n"
+    "end;\n"
   );
 }
 
@@ -838,18 +868,20 @@ TEST(16_ParallelDiodes)
   d1->connect_terminal (db::DeviceClassDiode::terminal_id_C, n2);
   d2->connect_terminal (db::DeviceClassDiode::terminal_id_C, n2);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D d1 (A=n1,C=n2) [A=1]\n"
-    "  D d2 (A=n1,C=n2) [A=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' d1 (A=n1,C=n2) (A=1);\n"
+    "  device '' d2 (A=n1,C=n2) (A=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D d1 (A=n1,C=n2) [A=4]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' d1 (A=n1,C=n2) (A=4);\n"
+    "end;\n"
   );
 }
 
@@ -886,10 +918,11 @@ TEST(17_AntiParallelDiodes)
   d1->connect_terminal (db::DeviceClassDiode::terminal_id_C, n2);
   d2->connect_terminal (db::DeviceClassDiode::terminal_id_A, n2);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D d1 (A=n1,C=n2) [A=1]\n"
-    "  D d2 (A=n2,C=n1) [A=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' d1 (A=n1,C=n2) (A=1);\n"
+    "  device '' d2 (A=n2,C=n1) (A=3);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
@@ -897,10 +930,11 @@ TEST(17_AntiParallelDiodes)
 
   //  anti-parallel diodes are not combined
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2):\n"
-    "  D d1 (A=n1,C=n2) [A=1]\n"
-    "  D d2 (A=n2,C=n1) [A=3]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2);\n"
+    "  device '' d1 (A=n1,C=n2) (A=1);\n"
+    "  device '' d2 (A=n2,C=n1) (A=3);\n"
+    "end;\n"
   );
 }
 
@@ -954,18 +988,20 @@ TEST(20_ParallelMOS3Transistors)
   d1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n3);
   d2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3,D=n2) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3,D=n2) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=3,AS=5,AD=7,PS=25,PD=27]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+    "end;\n"
   );
 }
 
@@ -1019,18 +1055,20 @@ TEST(21_AntiParallelMOS3Transistors)
   d1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n3);
   d2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n2,G=n3,D=n1) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n2,G=n3,D=n1) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=3,AS=5,AD=7,PS=25,PD=27]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+    "end;\n"
   );
 }
 
@@ -1089,10 +1127,11 @@ TEST(22_ParallelMOS3TransistorsDisconnectedGates)
   circuit->connect_pin (pin_c2.id (), n4);
   d2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n4);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C1=n3,C2=n4):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n4,D=n2) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C1=n3,C2=n4);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n4,D=n2) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
@@ -1100,10 +1139,11 @@ TEST(22_ParallelMOS3TransistorsDisconnectedGates)
 
   //  because of the disconnected gates, devices will no be joined:
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C1=n3,C2=n4):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n4,D=n2) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C1=n3,C2=n4);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n4,D=n2) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 }
 
@@ -1157,10 +1197,11 @@ TEST(23_ParallelMOS3TransistorsDifferentLength)
   d1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n3);
   d2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, n3);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3,D=n2) [L=0.75,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3,D=n2) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
@@ -1168,10 +1209,11 @@ TEST(23_ParallelMOS3TransistorsDifferentLength)
 
   //  because of different length, the devices will not be combined:
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3):\n"
-    "  D d1 (S=n1,G=n3,D=n2) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3,D=n2) [L=0.75,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3,D=n2) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 }
 
@@ -1232,18 +1274,20 @@ TEST(30_ParallelMOS4Transistors)
   d1->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=3,AS=5,AD=7,PS=25,PD=27]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+    "end;\n"
   );
 }
 
@@ -1304,18 +1348,20 @@ TEST(31_AntiParallelMOS4Transistors)
   d1->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n2,G=n3,D=n1,B=n0) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n2,G=n3,D=n1,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=3,AS=5,AD=7,PS=25,PD=27]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=3,AS=5,AD=7,PS=25,PD=27);\n"
+    "end;\n"
   );
 }
 
@@ -1381,10 +1427,11 @@ TEST(32_ParallelMOS4TransistorsDisconnectedGates)
   d1->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C1=n3a,C2=n3b,D=n0):\n"
-    "  D d1 (S=n1,G=n3a,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3b,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C1=n3a,C2=n3b,D=n0);\n"
+    "  device '' d1 (S=n1,G=n3a,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3b,D=n2,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
@@ -1392,10 +1439,11 @@ TEST(32_ParallelMOS4TransistorsDisconnectedGates)
 
   //  not combined because gate is different:
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C1=n3a,C2=n3b,D=n0):\n"
-    "  D d1 (S=n1,G=n3a,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3b,D=n2,B=n0) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C1=n3a,C2=n3b,D=n0);\n"
+    "  device '' d1 (S=n1,G=n3a,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3b,D=n2,B=n0) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 }
 
@@ -1461,10 +1509,11 @@ TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
   circuit->connect_pin (pin_d2.id (), n0b);
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0b);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3,D1=n0a,D2=n0b):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0a) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0b) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D1=n0a,D2=n0b);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2,B=n0a) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3,D=n2,B=n0b) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 
   //  not combined because bulk is different:
@@ -1472,10 +1521,11 @@ TEST(33_ParallelMOS4TransistorsDisconnectedBulk)
   nl.combine_devices ();
   nl.purge ();
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3,D1=n0a,D2=n0b):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0a) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0b) [L=0.5,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D1=n0a,D2=n0b);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2,B=n0a) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3,D=n2,B=n0b) (L=0.5,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 }
 
@@ -1536,10 +1586,11 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
   d1->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
   d2->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n0);
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.75,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 
   nl.combine_devices ();
@@ -1547,10 +1598,11 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
 
   //  not combined because length is different:
 
-  EXPECT_EQ (nl.to_string (),
-    "Circuit  (A=n1,B=n2,C=n3,D=n0):\n"
-    "  D d1 (S=n1,G=n3,D=n2,B=n0) [L=0.5,W=1,AS=2,AD=3,PS=12,PD=13]\n"
-    "  D d2 (S=n1,G=n3,D=n2,B=n0) [L=0.75,W=2,AS=3,AD=4,PS=13,PD=14]\n"
+  EXPECT_EQ (nl.to_parsable_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
+    "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
+    "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
   );
 }
 

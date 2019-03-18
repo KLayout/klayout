@@ -280,7 +280,7 @@ TEST(1_DeviceAndNetExtraction)
   dump_nets_to_layout (nl, cl, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_parsable_string (),
+  EXPECT_EQ (nl.to_string (),
     "circuit RINGO ();\n"
     "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
     "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);\n"
@@ -312,8 +312,8 @@ TEST(1_DeviceAndNetExtraction)
   for (db::Netlist::device_class_iterator i = nl.begin_device_classes (); i != nl.end_device_classes (); ++i) {
     nldup.add_device_class (i->clone ());
   }
-  nldup.from_string (nl.to_parsable_string ());
-  EXPECT_EQ (nldup.to_parsable_string (), nl.to_parsable_string ());
+  nldup.from_string (nl.to_string ());
+  EXPECT_EQ (nldup.to_string (), nl.to_string ());
 
   // doesn't do anything here, but we test that this does not destroy anything:
   nl.combine_devices ();
@@ -323,7 +323,7 @@ TEST(1_DeviceAndNetExtraction)
   nl.purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_parsable_string (),
+  EXPECT_EQ (nl.to_string (),
     "circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD);\n"
     "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
     "  subcircuit INV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD);\n"
@@ -508,7 +508,7 @@ TEST(2_DeviceAndNetExtractionFlat)
   //  compare netlist as string
   //  NOTE: some of the nets are called IN,OUT but are different ones. They
   //  happen to be the same because they share the same label.
-  EXPECT_EQ (nl.to_parsable_string (),
+  EXPECT_EQ (nl.to_string (),
     "circuit RINGO ();\n"
     "  device PMOS $1 (S=$16,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
     "  device PMOS $2 (S=VDD,G=$16,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
@@ -742,7 +742,7 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
   dump_nets_to_layout (nl, cl, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_parsable_string (),
+  EXPECT_EQ (nl.to_string (),
     "circuit RINGO ();\n"
     "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
     "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
@@ -777,7 +777,7 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
   nl.purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_parsable_string (),
+  EXPECT_EQ (nl.to_string (),
     "circuit RINGO (FB=FB,OSC=OSC,NEXT=NEXT,'VSSZ,VSS'='VSSZ,VSS','VDDZ,VDD'='VDDZ,VDD');\n"
     "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
     "  subcircuit INV2 $2 (IN=FB,$2=(null),OUT=$I19,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"

@@ -612,7 +612,7 @@ TEST(4_NetlistSubcircuits)
     "D:B,+c2p2\n"
   );
 
-  EXPECT_EQ (nl->to_parsable_string (),
+  EXPECT_EQ (nl->to_string (),
     "circuit c1 (c1p1=n1a,c1p2=n1c);\n"
     "  subcircuit c2 sc1 (c2p1=n1a,c2p2=n1b);\n"
     "  subcircuit c2 sc2 (c2p1=n1b,c2p2=n1c);\n"
@@ -622,9 +622,9 @@ TEST(4_NetlistSubcircuits)
     "end;\n"
   );
 
-  nldup->from_string (nl->to_parsable_string ());
+  nldup->from_string (nl->to_string ());
 
-  EXPECT_EQ (nldup->to_parsable_string (),
+  EXPECT_EQ (nldup->to_string (),
     "circuit c1 (c1p1=n1a,c1p2=n1c);\n"
     "  subcircuit c2 sc1 (c2p1=n1a,c2p2=n1b);\n"
     "  subcircuit c2 sc2 (c2p1=n1b,c2p2=n1c);\n"

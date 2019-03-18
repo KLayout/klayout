@@ -97,23 +97,26 @@ class DBLayoutToNetlist_TestClass < TestBase
     l2n.extract_netlist
 
     assert_equal(l2n.netlist.to_s, <<END)
-Circuit TRANS ($1=$1,$2=$2):
-Circuit INV2 (OUT=OUT,$2=$2,$3=$3,$4=$4):
-  XTRANS $1 ($1=$4,$2=OUT)
-  XTRANS $2 ($1=$3,$2=OUT)
-  XTRANS $3 ($1=$2,$2=$4)
-  XTRANS $4 ($1=$2,$2=$3)
-Circuit RINGO ():
-  XINV2 $1 (OUT=OSC,$2=FB,$3=VSS,$4=VDD)
-  XINV2 $2 (OUT=$I29,$2=$I20,$3=VSS,$4=VDD)
-  XINV2 $3 (OUT=$I28,$2=$I19,$3=VSS,$4=VDD)
-  XINV2 $4 (OUT=$I30,$2=$I21,$3=VSS,$4=VDD)
-  XINV2 $5 (OUT=$I31,$2=$I22,$3=VSS,$4=VDD)
-  XINV2 $6 (OUT=$I32,$2=$I23,$3=VSS,$4=VDD)
-  XINV2 $7 (OUT=$I33,$2=$I24,$3=VSS,$4=VDD)
-  XINV2 $8 (OUT=$I34,$2=$I25,$3=VSS,$4=VDD)
-  XINV2 $9 (OUT=$I35,$2=$I26,$3=VSS,$4=VDD)
-  XINV2 $10 (OUT=$I36,$2=$I27,$3=VSS,$4=VDD)
+circuit TRANS ($1=$1,$2=$2);
+end;
+circuit INV2 (OUT=OUT,$2=$2,$3=$3,$4=$4);
+  subcircuit TRANS $1 ($1=$4,$2=OUT);
+  subcircuit TRANS $2 ($1=$3,$2=OUT);
+  subcircuit TRANS $3 ($1=$2,$2=$4);
+  subcircuit TRANS $4 ($1=$2,$2=$3);
+end;
+circuit RINGO ();
+  subcircuit INV2 $1 (OUT=OSC,$2=FB,$3=VSS,$4=VDD);
+  subcircuit INV2 $2 (OUT=$I29,$2=$I20,$3=VSS,$4=VDD);
+  subcircuit INV2 $3 (OUT=$I28,$2=$I19,$3=VSS,$4=VDD);
+  subcircuit INV2 $4 (OUT=$I30,$2=$I21,$3=VSS,$4=VDD);
+  subcircuit INV2 $5 (OUT=$I31,$2=$I22,$3=VSS,$4=VDD);
+  subcircuit INV2 $6 (OUT=$I32,$2=$I23,$3=VSS,$4=VDD);
+  subcircuit INV2 $7 (OUT=$I33,$2=$I24,$3=VSS,$4=VDD);
+  subcircuit INV2 $8 (OUT=$I34,$2=$I25,$3=VSS,$4=VDD);
+  subcircuit INV2 $9 (OUT=$I35,$2=$I26,$3=VSS,$4=VDD);
+  subcircuit INV2 $10 (OUT=$I36,$2=$I27,$3=VSS,$4=VDD);
+end;
 END
 
     assert_equal(l2n.probe_net(rmetal2, RBA::DPoint::new(0.0, 1.8)).inspect, "RINGO:FB")
@@ -180,23 +183,26 @@ END
     l2n.extract_netlist
 
     assert_equal(l2n.netlist.to_s, <<END)
-Circuit TRANS ($1=$1,$2=$2,$3=$3):
-Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):
-  XTRANS $1 ($1=$2,$2=$4,$3=IN)
-  XTRANS $2 ($1=$2,$2=$5,$3=IN)
-  XTRANS $3 ($1=$5,$2=OUT,$3=$2)
-  XTRANS $4 ($1=$4,$2=OUT,$3=$2)
-Circuit RINGO ():
-  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)
-  XINV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD)
-  XINV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD)
-  XINV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD)
-  XINV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD)
-  XINV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD)
-  XINV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD)
-  XINV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD)
-  XINV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD)
-  XINV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD)
+circuit TRANS ($1=$1,$2=$2,$3=$3);
+end;
+circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
+  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);
+  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);
+  subcircuit TRANS $3 ($1=$5,$2=OUT,$3=$2);
+  subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);
+end;
+circuit RINGO ();
+  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);
+  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);
+  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD);
+  subcircuit INV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD);
+  subcircuit INV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD);
+  subcircuit INV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD);
+  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD);
+  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD);
+  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD);
+  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD);
+end;
 END
 
   end
@@ -267,27 +273,30 @@ END
     l2n.extract_netlist
 
     assert_equal(l2n.netlist.to_s, <<END)
-Circuit RINGO ():
-  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)
-  XINV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD)
-  XINV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD)
-  XINV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD)
-  XINV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD)
-  XINV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD)
-  XINV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD)
-  XINV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD)
-  XINV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD)
-  XINV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD)
-Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):
-  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]
-  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]
-  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]
-  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]
-  XTRANS $1 ($1=$2,$2=$4,$3=IN)
-  XTRANS $2 ($1=$2,$2=$5,$3=IN)
-  XTRANS $3 ($1=$5,$2=OUT,$3=$2)
-  XTRANS $4 ($1=$4,$2=OUT,$3=$2)
-Circuit TRANS ($1=$1,$2=$2,$3=$3):
+circuit RINGO ();
+  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);
+  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);
+  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD);
+  subcircuit INV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD);
+  subcircuit INV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD);
+  subcircuit INV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD);
+  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD);
+  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD);
+  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD);
+  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD);
+end;
+circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
+  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);
+  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);
+  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);
+  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);
+  subcircuit TRANS $3 ($1=$5,$2=OUT,$3=$2);
+  subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);
+end;
+circuit TRANS ($1=$1,$2=$2,$3=$3);
+end;
 END
 
     # cleanup now
@@ -380,25 +389,29 @@ END
     l2n.extract_netlist
 
     assert_equal(l2n.netlist.to_s, <<END)
-Circuit RINGO ():
-  XINV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD)
-  XINV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD)
-  XINV2PAIR $3 (BULK='BULK,VSS',$2=$I23,$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD)
-  XINV2PAIR $4 (BULK='BULK,VSS',$2=$I24,$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD)
-  XINV2PAIR $5 (BULK='BULK,VSS',$2=$I25,$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD)
-Circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1):
-  XINV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)
-  XINV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)
-Circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK):
-  DPMOS $1 (S=$3,G=IN,D=VDD,B=$1) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]
-  DPMOS $2 (S=VDD,G=$3,D=OUT,B=$1) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]
-  DNMOS $3 (S=$3,G=IN,D=VSS,B=BULK) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]
-  DNMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]
-  XTRANS $1 ($1=$3,$2=VSS,$3=IN)
-  XTRANS $2 ($1=$3,$2=VDD,$3=IN)
-  XTRANS $3 ($1=VDD,$2=OUT,$3=$3)
-  XTRANS $4 ($1=VSS,$2=OUT,$3=$3)
-Circuit TRANS ($1=$1,$2=$2,$3=$3):
+circuit RINGO ();
+  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);
+  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);
+  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=$I23,$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);
+  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=$I24,$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);
+  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=$I25,$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);
+end;
+circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);
+  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);
+  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);
+end;
+circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);
+  device PMOS $1 (S=$3,G=IN,D=VDD,B=$1) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+  device PMOS $2 (S=VDD,G=$3,D=OUT,B=$1) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);
+  device NMOS $3 (S=$3,G=IN,D=VSS,B=BULK) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+  device NMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);
+  subcircuit TRANS $1 ($1=$3,$2=VSS,$3=IN);
+  subcircuit TRANS $2 ($1=$3,$2=VDD,$3=IN);
+  subcircuit TRANS $3 ($1=VDD,$2=OUT,$3=$3);
+  subcircuit TRANS $4 ($1=VSS,$2=OUT,$3=$3);
+end;
+circuit TRANS ($1=$1,$2=$2,$3=$3);
+end;
 END
 
     l2n.netlist.combine_devices
@@ -406,20 +419,23 @@ END
     l2n.netlist.purge
 
     assert_equal(l2n.netlist.to_s, <<END)
-Circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS'):
-  XINV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD)
-  XINV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD)
-  XINV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD)
-  XINV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD)
-  XINV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD)
-Circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1):
-  XINV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)
-  XINV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)
-Circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK):
-  DPMOS $1 (S=$3,G=IN,D=VDD,B=$1) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]
-  DPMOS $2 (S=VDD,G=$3,D=OUT,B=$1) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]
-  DNMOS $3 (S=$3,G=IN,D=VSS,B=BULK) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]
-  DNMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]
+circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');
+  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);
+  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);
+  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);
+  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);
+  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);
+end;
+circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);
+  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);
+  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);
+end;
+circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);
+  device PMOS $1 (S=$3,G=IN,D=VDD,B=$1) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+  device PMOS $2 (S=VDD,G=$3,D=OUT,B=$1) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);
+  device NMOS $3 (S=$3,G=IN,D=VSS,B=BULK) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+  device NMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);
+end;
 END
 
     # cleanup now

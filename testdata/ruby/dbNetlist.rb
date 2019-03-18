@@ -610,8 +610,9 @@ class DBNetlist_TestClass < TestBase
     assert_equal(d1.parameter(1), 42)
 
     assert_equal(nl.to_s, <<END)
-Circuit C ():
-  DDC $1 () [U=-0.5,V=42]
+circuit C ();
+  device DC $1 () (U=-0.5,V=42);
+end;
 END
 
   end

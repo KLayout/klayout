@@ -486,67 +486,7 @@ static std::string pin2string (const db::Pin &pin)
   }
 }
 
-std::string Netlist::to_string_old () const
-{
-  std::string res;
-  for (db::Netlist::const_circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
-
-    std::string ps;
-    for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p) {
-      if (! ps.empty ()) {
-        ps += ",";
-      }
-      ps += pin2string (*p) + "=" + net2string (c->net_for_pin (p->id ()));
-    }
-
-    res += std::string ("Circuit ") + c->name () + " (" + ps + "):\n";
-
-#if 0  //  for debugging
-    for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      res += "  N" + net_name (n.operator-> ()) + " pins=" + tl::to_string (n->pin_count ())  + " sc_pins=" + tl::to_string (n->subcircuit_pin_count ()) + " terminals=" + tl::to_string (n->terminal_count ()) + "\n";
-    }
-#endif
-
-    for (db::Circuit::const_device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
-      std::string ts;
-      const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
-      for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
-        if (t != td.begin ()) {
-          ts += ",";
-        }
-        ts += t->name () + "=" + net2string (d->net_for_terminal (t->id ()));
-      }
-      std::string ps;
-      const std::vector<db::DeviceParameterDefinition> &pd = d->device_class ()->parameter_definitions ();
-      for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-        if (p != pd.begin ()) {
-          ps += ",";
-        }
-        ps += p->name () + "=" + tl::to_string (d->parameter_value (p->id ()));
-      }
-      res += std::string ("  D") + d->device_class ()->name () + " " + device2string (*d) + " (" + ts + ") [" + ps + "]\n";
-    }
-
-    for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
-      std::string ps;
-      const db::SubCircuit &subcircuit = *sc;
-      const db::Circuit *circuit = sc->circuit_ref ();
-      for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
-        if (p != circuit->begin_pins ()) {
-          ps += ",";
-        }
-        const db::Pin &pin = *p;
-        ps += pin2string (pin) + "=" + net2string (subcircuit.net_for_pin (pin.id ()));
-      }
-      res += std::string ("  X") + circuit->name () + " " + subcircuit2string (*sc) + " (" + ps + ")\n";
-    }
-
-  }
-
-  return res;
-}
-
-std::string Netlist::to_parsable_string () const
+std::string Netlist::to_string () const
 {
   std::string res;
   for (db::Netlist::const_circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {

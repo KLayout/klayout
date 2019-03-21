@@ -246,12 +246,21 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
 
     } else {
 
+      //  Tested with ngspice: this tool likes in net names: . $ ! & \ # + : |  (but not at beginning)
+      //  It does not like: , ;
+      //  We translate , to | for the net separator
+
       std::string n = net->expanded_name ();
       std::string nn;
-      nn.reserve (n.size ());
+      nn.reserve (n.size () + 1);
+      if (!isalnum (*n.c_str ())) {
+        nn += "\\";
+      }
       for (const char *cp = n.c_str (); *cp; ++cp) {
-        if (isspace (*cp)) {
-          nn += tl::sprintf ("$x%02x", (unsigned char) *cp);
+        if (! isalnum (*cp) && strchr (".$!&\\#+:,", *cp) == 0) {
+          nn += tl::sprintf ("\\x%02x", (unsigned char) *cp);
+        } else if (*cp == ',') {
+          nn += "|";
         } else {
           nn += *cp;
         }

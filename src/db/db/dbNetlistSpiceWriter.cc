@@ -194,7 +194,7 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev) co
 // --------------------------------------------------------------------------------
 
 NetlistSpiceWriter::NetlistSpiceWriter (NetlistSpiceWriterDelegate *delegate)
-  : mp_netlist (0), mp_stream (0), mp_delegate (delegate)
+  : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_use_net_names (false)
 {
   static NetlistSpiceWriterDelegate std_delegate;
   if (! delegate) {
@@ -205,6 +205,11 @@ NetlistSpiceWriter::NetlistSpiceWriter (NetlistSpiceWriterDelegate *delegate)
 NetlistSpiceWriter::~NetlistSpiceWriter ()
 {
   //  .. nothing yet ..
+}
+
+void NetlistSpiceWriter::set_use_net_names (bool use_net_names)
+{
+  m_use_net_names = use_net_names;
 }
 
 void NetlistSpiceWriter::write (tl::OutputStream &stream, const db::Netlist &netlist, const std::string &description)
@@ -233,12 +238,39 @@ void NetlistSpiceWriter::write (tl::OutputStream &stream, const db::Netlist &net
 
 std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
 {
-  std::map<const db::Net *, size_t>::const_iterator n = m_net_to_spice_id.find (net);
-  if (! net || n == m_net_to_spice_id.end ()) {
-    //  TODO: this should assert or similar
-    return "0";
+  if (m_use_net_names) {
+
+    if (! net) {
+
+      return "0";
+
+    } else {
+
+      std::string n = net->expanded_name ();
+      std::string nn;
+      nn.reserve (n.size ());
+      for (const char *cp = n.c_str (); *cp; ++cp) {
+        if (isspace (*cp)) {
+          nn += tl::sprintf ("$x%02x", (unsigned char) *cp);
+        } else {
+          nn += *cp;
+        }
+      }
+
+      return nn;
+
+    }
+
   } else {
-    return tl::to_string (n->second);
+
+    std::map<const db::Net *, size_t>::const_iterator n = m_net_to_spice_id.find (net);
+    if (! net || n == m_net_to_spice_id.end ()) {
+      //  TODO: this should assert or similar
+      return "0";
+    } else {
+      return tl::to_string (n->second);
+    }
+
   }
 }
 
@@ -389,9 +421,11 @@ void NetlistSpiceWriter::write_circuit_header (const db::Circuit &circuit) const
 
   emit_line (os.str ());
 
-  for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
-    if (! n->name ().empty ()) {
-      emit_comment ("net " + net_to_string (n.operator-> ()) + " " + n->name ());
+  if (! m_use_net_names) {
+    for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
+      if (! n->name ().empty ()) {
+        emit_comment ("net " + net_to_string (n.operator-> ()) + " " + n->name ());
+      }
     }
   }
 }

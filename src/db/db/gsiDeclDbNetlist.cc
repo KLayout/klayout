@@ -1168,6 +1168,13 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   ) +
   gsi::constructor ("new", &new_spice_writer2,
     "@brief Creates a new writer with a delegate.\n"
+  ) +
+  gsi::method ("use_net_names=", &db::NetlistSpiceWriter::set_use_net_names, gsi::arg ("f"),
+    "@brief Sets a value indicating whether to use net names (true) or net numbers (false).\n"
+    "The default is to use net numbers."
+  ) +
+  gsi::method ("use_net_names", &db::NetlistSpiceWriter::use_net_names,
+    "@brief Gets a value indicating whether to use net names (true) or net numbers (false).\n"
   ),
   "@brief Implements a netlist writer for the SPICE format.\n"
   "Provide a delegate for customizing the way devices are written.\n"

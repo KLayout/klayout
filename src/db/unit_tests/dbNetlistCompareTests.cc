@@ -6,6 +6,8 @@
 #include "dbNetlistDeviceClasses.h"
 #include "dbHash.h"
 #include "tlUnitTest.h"
+#include "tlProgress.h"
+#include "tlTimer.h"
 
 namespace db
 {
@@ -14,9 +16,11 @@ struct DeviceCompare
 {
   bool operator() (const db::Device *d1, const db::Device *d2) const
   {
-    if (d1->device_class () != d2->device_class ()) {
+    //  @@@ TODO: device class identity should not be defined via name
+    if (d1->device_class () != d2->device_class () && d1->device_class ()->name () != d2->device_class ()->name ()) {
       return d1->device_class ()->name () < d1->device_class ()->name ();
     }
+
     const std::vector<db::DeviceParameterDefinition> &dp = d1->device_class ()->parameter_definitions ();
     for (std::vector<db::DeviceParameterDefinition>::const_iterator i = dp.begin (); i != dp.end (); ++i) {
       double v1 = d1->parameter_value (i->id ());
@@ -211,6 +215,15 @@ namespace std
 namespace db
 {
 
+static std::string net2string (const db::Net *net)
+{
+  if (! net) {
+    return "(null)";
+  } else {
+    return net->expanded_name ();
+  }
+}
+
 class NetDeviceGraph
 {
 public:
@@ -223,6 +236,8 @@ public:
 
   void build (const db::Circuit *c)
   {
+    tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Building net graph for circuit: ")) + c->name ());
+
     m_device_map.clear ();
     m_device_prototypes.clear ();
     m_nodes.clear ();
@@ -247,8 +262,6 @@ public:
     for (std::vector<NetDeviceGraphNode>::iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
       i->apply_net_index (m_net_index);
     }
-
-    // ...
   }
 
   size_t index_for_net (const db::Net *net) const
@@ -298,7 +311,7 @@ public:
           NetDeviceGraphNode::edge_iterator ee = e;
           ++ee;
 
-          while (ee != n->end () && *ee == *e) {
+          while (ee != n->end () && ee->first == e->first) {
             ++ee;
           }
 
@@ -314,12 +327,12 @@ public:
           if (count == 1) {   //  if non-ambiguous, non-assigned
 
             NetDeviceGraphNode::edge_iterator e_other = std::lower_bound (nother->begin (), nother->end (), *ec);
-            if (e_other != nother->end () && *e_other == *ec) {
+            if (e_other != nother->end () && e_other->first == ec->first) {
 
               NetDeviceGraphNode::edge_iterator ee_other = e_other;
               ++ee_other;
 
-              while (ee_other != n->end () && *ee_other == *e_other) {
+              while (ee_other != n->end () && ee_other->first == e_other->first) {
                 ++ee_other;
               }
 
@@ -333,8 +346,7 @@ public:
               }
 
               if (count_other == 1) {
-                identify (ec->second.second, ec_other->second.second);
-                other.identify (ec_other->second.second, ec->second.second);
+                confirm_identity (*this, begin () + ec->second.second, other, other.begin () + ec_other->second.second);
                 ++added;
                 more.push_back (ec->second.second);
               }
@@ -354,13 +366,21 @@ public:
     return added;
   }
 
+  static void confirm_identity (db::NetDeviceGraph &g1, db::NetDeviceGraph::node_iterator s1, db::NetDeviceGraph &g2, db::NetDeviceGraph::node_iterator s2)
+  {
+    if (tl::verbosity () >= 30) {
+      tl::log << tl::to_string (tr ("Net identity confirmed: ")) << net2string (s1->net ()) << " - " << net2string (s2->net ());
+    }
+    g1.identify (s1 - g1.begin (), s2 - g2.begin ());
+    g2.identify (s2 - g2.begin (), s1 - g1.begin ());
+  }
+
 private:
   std::vector<NetDeviceGraphNode> m_nodes;
   std::map<const db::Device *, size_t, DeviceCompare> m_device_map;
   std::vector<const db::Device *> m_device_prototypes;
   std::map<const db::Net *, size_t> m_net_index;
 };
-
 
 static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
 {
@@ -380,7 +400,7 @@ static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
 
     bool any_without = false;
     for (db::NetDeviceGraph::node_iterator i1 = g1.begin (); i1 != g1.end () && ! any_without; ++i1) {
-      any_without = i1->has_other ();
+      any_without = ! i1->has_other ();
     }
 
     if (! any_without) {
@@ -415,8 +435,7 @@ static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
 
             if (seeds == 1) {
               //  found a candidate - a single node with the same edges
-              g1.identify (s1 - g1.begin (), s2 - g2.begin ());
-              g2.identify (s2 - g2.begin (), s1 - g1.begin ());
+              db::NetDeviceGraph::confirm_identity (g1, s1, g2, s2);
               ++new_identities;
             } else if (seeds > 1) {
               ambiguous = true;
@@ -438,8 +457,7 @@ static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
 
       if (seeds == 1) {
         //  found a candidate - a single node with the same edges
-        g1.identify (s1 - g1.begin (), s2 - g2.begin ());
-        g2.identify (s2 - g2.begin (), s1 - g1.begin ());
+        db::NetDeviceGraph::confirm_identity (g1, s1, g2, s2);
         ++new_identities;
       } else if (seeds > 1) {
         ambiguous = true;
@@ -448,15 +466,25 @@ static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
     }
 
     if (new_identities == 0) {
+      // @@@
       if (ambiguous) {
-        // @@@
         tl::error << tr ("No seed found - no non-ambiguous nets identified");
-        // @@@
       } else {
-        // @@@
         tl::error << tr ("No seed found - no equivalent nets identified");
-        // @@@
       }
+      tl::error << tr ("Unassigned in netlist A:");
+      for (db::NetDeviceGraph::node_iterator i = g1.begin (); i != g1.end (); ++i) {
+        if (! i->has_other ()) {
+          tl::error << "  " << net2string (i->net ());
+        }
+      }
+      tl::error << tr ("Unassigned in netlist B:");
+      for (db::NetDeviceGraph::node_iterator i = g2.begin (); i != g2.end (); ++i) {
+        if (! i->has_other ()) {
+          tl::error << "  " << net2string (i->net ());
+        }
+      }
+      // @@@
       return false;
     }
 

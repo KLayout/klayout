@@ -39,7 +39,9 @@ static void compare_netlists (tl::TestBase *_this, const std::string &path, cons
 
   //  normalize "1.0e-005" to "1.0e-05" for compatibility
   netlist = tl::replaced (netlist, "e-00", "e-0");
+  netlist = tl::replaced (netlist, "e-0", "e-");
   netlist_au = tl::replaced (netlist_au, "e-00", "e-0");
+  netlist_au = tl::replaced (netlist_au, "e-0", "e-");
 
   if (netlist != netlist_au) {
     _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",

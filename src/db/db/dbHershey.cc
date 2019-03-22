@@ -67,7 +67,7 @@ struct HersheyFont
   int width, height;
 };
 
-#include "fonts.cc"
+#include "fonts.cc_gen"
 
 const int line_spacing = 4;
 

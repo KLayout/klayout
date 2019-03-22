@@ -815,14 +815,7 @@ TEST(9_WriterNetNamesInsteadOfNumbers)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter9_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
 
 TEST(10_WriterLongLines)

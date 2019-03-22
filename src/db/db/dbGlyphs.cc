@@ -37,7 +37,7 @@
 #include <cctype>
 
 //  compiled with "scripts/compile_glyphs.rb":
-#include "glyphs.cc"
+#include "glyphs.cc_gen"
 
 namespace db
 {

@@ -389,11 +389,6 @@ config.add_extension(_pya)
 _db_path = os.path.join("src", "db", "db")
 _db_sources = set(glob.glob(os.path.join(_db_path, "*.cc")))
 
-# Not a real source:
-# Caveat, in source distribution tarballs from pypi, these files will
-# not exist. So we need an error-free discard method instead of list's remove.
-_db_sources.discard(os.path.join(_db_path, "fonts.cc"))
-
 _db = Library(config.root + '._db',
               define_macros=config.macros() + [('MAKE_DB_LIBRARY', 1)],
               include_dirs=[_tl_path, _gsi_path, _db_path],

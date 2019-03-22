@@ -66,7 +66,7 @@ static void _call_ctor_QSslError_2289 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSslError::SslError>::target_type & arg1 = args.read<const qt_gsi::Converter<QSslError::SslError>::target_type & > (heap);
+  const qt_gsi::Converter<QSslError::SslError>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSslError::SslError>::target_type & >() (args, heap);
   ret.write<QSslError *> (new QSslError (qt_gsi::QtToCppAdaptor<QSslError::SslError>(arg1).cref()));
 }
 
@@ -87,8 +87,8 @@ static void _call_ctor_QSslError_5004 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSslError::SslError>::target_type & arg1 = args.read<const qt_gsi::Converter<QSslError::SslError>::target_type & > (heap);
-  const QSslCertificate &arg2 = args.read<const QSslCertificate & > (heap);
+  const qt_gsi::Converter<QSslError::SslError>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSslError::SslError>::target_type & >() (args, heap);
+  const QSslCertificate &arg2 = gsi::arg_reader<const QSslCertificate & >() (args, heap);
   ret.write<QSslError *> (new QSslError (qt_gsi::QtToCppAdaptor<QSslError::SslError>(arg1).cref(), arg2));
 }
 
@@ -107,7 +107,7 @@ static void _call_ctor_QSslError_2222 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslError &arg1 = args.read<const QSslError & > (heap);
+  const QSslError &arg1 = gsi::arg_reader<const QSslError & >() (args, heap);
   ret.write<QSslError *> (new QSslError (arg1));
 }
 
@@ -171,7 +171,7 @@ static void _call_f_operator_excl__eq__c2222 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslError &arg1 = args.read<const QSslError & > (heap);
+  const QSslError &arg1 = gsi::arg_reader<const QSslError & >() (args, heap);
   ret.write<bool > ((bool)((QSslError *)cls)->operator!= (arg1));
 }
 
@@ -190,7 +190,7 @@ static void _call_f_operator_eq__2222 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslError &arg1 = args.read<const QSslError & > (heap);
+  const QSslError &arg1 = gsi::arg_reader<const QSslError & >() (args, heap);
   ret.write<QSslError & > ((QSslError &)((QSslError *)cls)->operator= (arg1));
 }
 
@@ -209,7 +209,7 @@ static void _call_f_operator_eq__eq__c2222 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslError &arg1 = args.read<const QSslError & > (heap);
+  const QSslError &arg1 = gsi::arg_reader<const QSslError & >() (args, heap);
   ret.write<bool > ((bool)((QSslError *)cls)->operator== (arg1));
 }
 

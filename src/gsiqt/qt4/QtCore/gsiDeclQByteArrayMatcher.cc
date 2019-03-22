@@ -65,7 +65,7 @@ static void _call_ctor_QByteArrayMatcher_2309 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QByteArrayMatcher *> (new QByteArrayMatcher (arg1));
 }
 
@@ -86,8 +86,8 @@ static void _call_ctor_QByteArrayMatcher_2390 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  int arg2 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QByteArrayMatcher *> (new QByteArrayMatcher (arg1, arg2));
 }
 
@@ -106,7 +106,7 @@ static void _call_ctor_QByteArrayMatcher_3017 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArrayMatcher &arg1 = args.read<const QByteArrayMatcher & > (heap);
+  const QByteArrayMatcher &arg1 = gsi::arg_reader<const QByteArrayMatcher & >() (args, heap);
   ret.write<QByteArrayMatcher *> (new QByteArrayMatcher (arg1));
 }
 
@@ -129,9 +129,9 @@ static void _call_f_indexIn_c3049 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<int > ((int)((QByteArrayMatcher *)cls)->indexIn (arg1, arg2, arg3));
 }
 
@@ -150,7 +150,7 @@ static void _call_f_operator_eq__3017 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArrayMatcher &arg1 = args.read<const QByteArrayMatcher & > (heap);
+  const QByteArrayMatcher &arg1 = gsi::arg_reader<const QByteArrayMatcher & >() (args, heap);
   ret.write<QByteArrayMatcher & > ((QByteArrayMatcher &)((QByteArrayMatcher *)cls)->operator= (arg1));
 }
 
@@ -184,7 +184,7 @@ static void _call_f_setPattern_2309 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QByteArrayMatcher *)cls)->setPattern (arg1);
 }

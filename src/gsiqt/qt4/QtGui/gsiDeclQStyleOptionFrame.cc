@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionFrame_3047 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionFrame &arg1 = args.read<const QStyleOptionFrame & > (heap);
+  const QStyleOptionFrame &arg1 = gsi::arg_reader<const QStyleOptionFrame & >() (args, heap);
   ret.write<QStyleOptionFrame *> (new QStyleOptionFrame (arg1));
 }
 

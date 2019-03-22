@@ -70,7 +70,7 @@ static void _call_f_cookiesForUrl_c1701 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QList<QNetworkCookie> > ((QList<QNetworkCookie>)((QNetworkCookieJar *)cls)->cookiesForUrl (arg1));
 }
 
@@ -91,8 +91,8 @@ static void _call_f_setCookiesFromUrl_4950 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QNetworkCookie> &arg1 = args.read<const QList<QNetworkCookie> & > (heap);
-  const QUrl &arg2 = args.read<const QUrl & > (heap);
+  const QList<QNetworkCookie> &arg1 = gsi::arg_reader<const QList<QNetworkCookie> & >() (args, heap);
+  const QUrl &arg2 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkCookieJar *)cls)->setCookiesFromUrl (arg1, arg2));
 }
 
@@ -113,8 +113,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QNetworkCookieJar::tr (arg1, arg2));
 }
 
@@ -137,9 +137,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QNetworkCookieJar::tr (arg1, arg2, arg3));
 }
 
@@ -160,8 +160,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QNetworkCookieJar::trUtf8 (arg1, arg2));
 }
 
@@ -184,9 +184,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QNetworkCookieJar::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -407,7 +407,7 @@ static void _call_ctor_QNetworkCookieJar_Adaptor_1302 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QNetworkCookieJar_Adaptor *> (new QNetworkCookieJar_Adaptor (arg1));
 }
 
@@ -510,7 +510,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QNetworkCookieJar_Adaptor *)cls)->emitter_QNetworkCookieJar_destroyed_1302 (arg1);
 }
 
@@ -601,7 +601,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QNetworkCookieJar_Adaptor *)cls)->fp_QNetworkCookieJar_receivers_c1731 (arg1));
 }
 
@@ -633,7 +633,7 @@ static void _call_fp_setAllCookies_3357 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QNetworkCookie> &arg1 = args.read<const QList<QNetworkCookie> & > (heap);
+  const QList<QNetworkCookie> &arg1 = gsi::arg_reader<const QList<QNetworkCookie> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCookieJar_Adaptor *)cls)->fp_QNetworkCookieJar_setAllCookies_3357 (arg1);
 }

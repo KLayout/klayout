@@ -65,7 +65,7 @@ static void _call_f_operator_excl__eq__c2843 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextOption::Tab &arg1 = args.read<const QTextOption::Tab & > (heap);
+  const QTextOption::Tab &arg1 = gsi::arg_reader<const QTextOption::Tab & >() (args, heap);
   ret.write<bool > ((bool)((QTextOption::Tab *)cls)->operator!= (arg1));
 }
 
@@ -84,7 +84,7 @@ static void _call_f_operator_eq__eq__c2843 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextOption::Tab &arg1 = args.read<const QTextOption::Tab & > (heap);
+  const QTextOption::Tab &arg1 = gsi::arg_reader<const QTextOption::Tab & >() (args, heap);
   ret.write<bool > ((bool)((QTextOption::Tab *)cls)->operator== (arg1));
 }
 

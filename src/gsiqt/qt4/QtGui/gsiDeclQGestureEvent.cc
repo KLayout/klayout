@@ -69,7 +69,7 @@ static void _call_f_accept_1438 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGesture *arg1 = args.read<QGesture * > (heap);
+  QGesture *arg1 = gsi::arg_reader<QGesture * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGestureEvent *)cls)->accept (arg1);
 }
@@ -89,7 +89,7 @@ static void _call_f_accept_1902 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GestureType>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GestureType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGestureEvent *)cls)->accept (qt_gsi::QtToCppAdaptor<Qt::GestureType>(arg1).cref());
 }
@@ -139,7 +139,7 @@ static void _call_f_gesture_c1902 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GestureType>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GestureType>::target_type & >() (args, heap);
   ret.write<QGesture * > ((QGesture *)((QGestureEvent *)cls)->gesture (qt_gsi::QtToCppAdaptor<Qt::GestureType>(arg1).cref()));
 }
 
@@ -189,7 +189,7 @@ static void _call_f_ignore_1438 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGesture *arg1 = args.read<QGesture * > (heap);
+  QGesture *arg1 = gsi::arg_reader<QGesture * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGestureEvent *)cls)->ignore (arg1);
 }
@@ -209,7 +209,7 @@ static void _call_f_ignore_1902 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GestureType>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GestureType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGestureEvent *)cls)->ignore (qt_gsi::QtToCppAdaptor<Qt::GestureType>(arg1).cref());
 }
@@ -244,7 +244,7 @@ static void _call_f_isAccepted_c1438 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGesture *arg1 = args.read<QGesture * > (heap);
+  QGesture *arg1 = gsi::arg_reader<QGesture * >() (args, heap);
   ret.write<bool > ((bool)((QGestureEvent *)cls)->isAccepted (arg1));
 }
 
@@ -263,7 +263,7 @@ static void _call_f_isAccepted_c1902 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GestureType>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GestureType>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QGestureEvent *)cls)->isAccepted (qt_gsi::QtToCppAdaptor<Qt::GestureType>(arg1).cref()));
 }
 
@@ -282,7 +282,7 @@ static void _call_f_mapToGraphicsScene_c1986 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QPointF > ((QPointF)((QGestureEvent *)cls)->mapToGraphicsScene (arg1));
 }
 
@@ -301,7 +301,7 @@ static void _call_f_setAccepted_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGestureEvent *)cls)->setAccepted (arg1);
 }
@@ -323,8 +323,8 @@ static void _call_f_setAccepted_2194 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGesture *arg1 = args.read<QGesture * > (heap);
-  bool arg2 = args.read<bool > (heap);
+  QGesture *arg1 = gsi::arg_reader<QGesture * >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGestureEvent *)cls)->setAccepted (arg1, arg2);
 }
@@ -346,8 +346,8 @@ static void _call_f_setAccepted_2658 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GestureType>::target_type & > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const qt_gsi::Converter<Qt::GestureType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GestureType>::target_type & >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGestureEvent *)cls)->setAccepted (qt_gsi::QtToCppAdaptor<Qt::GestureType>(arg1).cref(), arg2);
 }
@@ -367,7 +367,7 @@ static void _call_f_setWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGestureEvent *)cls)->setWidget (arg1);
 }
@@ -456,7 +456,7 @@ static void _call_ctor_QGestureEvent_Adaptor_2930 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QGesture *> &arg1 = args.read<const QList<QGesture *> & > (heap);
+  const QList<QGesture *> &arg1 = gsi::arg_reader<const QList<QGesture *> & >() (args, heap);
   ret.write<QGestureEvent_Adaptor *> (new QGestureEvent_Adaptor (arg1));
 }
 

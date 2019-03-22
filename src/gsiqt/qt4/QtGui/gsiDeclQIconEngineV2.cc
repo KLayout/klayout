@@ -57,8 +57,8 @@ static void _call_f_availableSizes_2846 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::Mode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal));
-  const qt_gsi::Converter<QIcon::State>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QIcon::State>::target_type & > (heap) : (const qt_gsi::Converter<QIcon::State>::target_type &)(qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off));
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::Mode>(heap, QIcon::Normal), heap);
+  const qt_gsi::Converter<QIcon::State>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QIcon::State>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QIcon::State>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QIcon::State>(heap, QIcon::Off), heap);
   ret.write<QList<QSize> > ((QList<QSize>)((QIconEngineV2 *)cls)->availableSizes (qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg1).cref(), qt_gsi::QtToCppAdaptor<QIcon::State>(arg2).cref()));
 }
 
@@ -107,7 +107,7 @@ static void _call_f_read_1697 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
   ret.write<bool > ((bool)((QIconEngineV2 *)cls)->read (arg1));
 }
 
@@ -128,8 +128,8 @@ static void _call_f_virtual_hook_1715 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  void *arg2 = args.read<void * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  void *arg2 = gsi::arg_reader<void * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QIconEngineV2 *)cls)->virtual_hook (arg1, arg2);
 }
@@ -149,7 +149,7 @@ static void _call_f_write_c1697 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
   ret.write<bool > ((bool)((QIconEngineV2 *)cls)->write (arg1));
 }
 

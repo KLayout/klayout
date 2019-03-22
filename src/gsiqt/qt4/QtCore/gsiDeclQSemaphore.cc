@@ -50,7 +50,7 @@ static void _call_ctor_QSemaphore_767 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QSemaphore *> (new QSemaphore (arg1));
 }
 
@@ -69,7 +69,7 @@ static void _call_f_acquire_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSemaphore *)cls)->acquire (arg1);
 }
@@ -104,7 +104,7 @@ static void _call_f_release_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSemaphore *)cls)->release (arg1);
 }
@@ -124,7 +124,7 @@ static void _call_f_tryAcquire_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   ret.write<bool > ((bool)((QSemaphore *)cls)->tryAcquire (arg1));
 }
 
@@ -145,8 +145,8 @@ static void _call_f_tryAcquire_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QSemaphore *)cls)->tryAcquire (arg1, arg2));
 }
 

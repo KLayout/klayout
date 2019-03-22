@@ -78,7 +78,7 @@ static void _call_f_operator_eq__2017 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<QBitmap & > ((QBitmap &)((QBitmap *)cls)->operator= (arg1));
 }
 
@@ -97,7 +97,7 @@ static void _call_f_transformed_c2023 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
   ret.write<QBitmap > ((QBitmap)((QBitmap *)cls)->transformed (arg1));
 }
 
@@ -116,7 +116,7 @@ static void _call_f_transformed_c2350 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
   ret.write<QBitmap > ((QBitmap)((QBitmap *)cls)->transformed (arg1));
 }
 
@@ -139,9 +139,9 @@ static void _call_f_fromData_6058 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
-  const unsigned char *arg2 = args.read<const unsigned char * > (heap);
-  const qt_gsi::Converter<QImage::Format>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QImage::Format>::target_type & > (heap) : (const qt_gsi::Converter<QImage::Format>::target_type &)(qt_gsi::CppToQtReadAdaptor<QImage::Format>(heap, QImage::Format_MonoLSB));
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
+  const unsigned char *arg2 = gsi::arg_reader<const unsigned char * >() (args, heap);
+  const qt_gsi::Converter<QImage::Format>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QImage::Format>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QImage::Format>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QImage::Format>(heap, QImage::Format_MonoLSB), heap);
   ret.write<QBitmap > ((QBitmap)QBitmap::fromData (arg1, arg2, qt_gsi::QtToCppAdaptor<QImage::Format>(arg3).cref()));
 }
 
@@ -162,8 +162,8 @@ static void _call_f_fromImage_5137 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImage &arg1 = args.read<const QImage & > (heap);
-  QFlags<Qt::ImageConversionFlag> arg2 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  const QImage &arg1 = gsi::arg_reader<const QImage & >() (args, heap);
+  QFlags<Qt::ImageConversionFlag> arg2 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   ret.write<QBitmap > ((QBitmap)QBitmap::fromImage (arg1, arg2));
 }
 
@@ -298,7 +298,7 @@ static void _call_ctor_QBitmap_Adaptor_2017 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<QBitmap_Adaptor *> (new QBitmap_Adaptor (arg1));
 }
 
@@ -318,8 +318,8 @@ static void _call_ctor_QBitmap_Adaptor_1426 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QBitmap_Adaptor *> (new QBitmap_Adaptor (arg1, arg2));
 }
 
@@ -337,7 +337,7 @@ static void _call_ctor_QBitmap_Adaptor_1805 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   ret.write<QBitmap_Adaptor *> (new QBitmap_Adaptor (arg1));
 }
 
@@ -357,8 +357,8 @@ static void _call_ctor_QBitmap_Adaptor_3648 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QBitmap_Adaptor *> (new QBitmap_Adaptor (arg1, arg2));
 }
 

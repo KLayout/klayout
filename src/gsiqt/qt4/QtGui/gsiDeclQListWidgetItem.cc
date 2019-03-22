@@ -117,7 +117,7 @@ static void _call_f_data_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QVariant > ((QVariant)((QListWidgetItem *)cls)->data (arg1));
 }
 
@@ -241,7 +241,7 @@ static void _call_f_operator_lt__c2817 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QListWidgetItem &arg1 = args.read<const QListWidgetItem & > (heap);
+  const QListWidgetItem &arg1 = gsi::arg_reader<const QListWidgetItem & >() (args, heap);
   ret.write<bool > ((bool)((QListWidgetItem *)cls)->operator< (arg1));
 }
 
@@ -260,7 +260,7 @@ static void _call_f_operator_eq__2817 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QListWidgetItem &arg1 = args.read<const QListWidgetItem & > (heap);
+  const QListWidgetItem &arg1 = gsi::arg_reader<const QListWidgetItem & >() (args, heap);
   ret.write<QListWidgetItem & > ((QListWidgetItem &)((QListWidgetItem *)cls)->operator= (arg1));
 }
 
@@ -279,7 +279,7 @@ static void _call_f_read_1697 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->read (arg1);
 }
@@ -299,7 +299,7 @@ static void _call_f_setBackground_1910 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setBackground (arg1);
 }
@@ -319,7 +319,7 @@ static void _call_f_setBackgroundColor_1905 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setBackgroundColor (arg1);
 }
@@ -339,7 +339,7 @@ static void _call_f_setCheckState_1740 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CheckState>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CheckState>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CheckState>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CheckState>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setCheckState (qt_gsi::QtToCppAdaptor<Qt::CheckState>(arg1).cref());
 }
@@ -361,8 +361,8 @@ static void _call_f_setData_2778 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setData (arg1, arg2);
 }
@@ -382,7 +382,7 @@ static void _call_f_setFlags_2222 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::ItemFlag> arg1 = args.read<QFlags<Qt::ItemFlag> > (heap);
+  QFlags<Qt::ItemFlag> arg1 = gsi::arg_reader<QFlags<Qt::ItemFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setFlags (arg1);
 }
@@ -402,7 +402,7 @@ static void _call_f_setFont_1801 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setFont (arg1);
 }
@@ -422,7 +422,7 @@ static void _call_f_setForeground_1910 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setForeground (arg1);
 }
@@ -442,7 +442,7 @@ static void _call_f_setHidden_864 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setHidden (arg1);
 }
@@ -462,7 +462,7 @@ static void _call_f_setIcon_1787 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setIcon (arg1);
 }
@@ -482,7 +482,7 @@ static void _call_f_setSelected_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setSelected (arg1);
 }
@@ -502,7 +502,7 @@ static void _call_f_setSizeHint_1805 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setSizeHint (arg1);
 }
@@ -522,7 +522,7 @@ static void _call_f_setStatusTip_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setStatusTip (arg1);
 }
@@ -542,7 +542,7 @@ static void _call_f_setText_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setText (arg1);
 }
@@ -562,7 +562,7 @@ static void _call_f_setTextAlignment_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setTextAlignment (arg1);
 }
@@ -582,7 +582,7 @@ static void _call_f_setTextColor_1905 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setTextColor (arg1);
 }
@@ -602,7 +602,7 @@ static void _call_f_setToolTip_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setToolTip (arg1);
 }
@@ -622,7 +622,7 @@ static void _call_f_setWhatsThis_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->setWhatsThis (arg1);
 }
@@ -762,7 +762,7 @@ static void _call_f_write_c1697 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QListWidgetItem *)cls)->write (arg1);
 }
@@ -1023,8 +1023,8 @@ static void _call_ctor_QListWidgetItem_Adaptor_2386 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QListWidget *arg1 = args ? args.read<QListWidget * > (heap) : (QListWidget *)(0);
-  int arg2 = args ? args.read<int > (heap) : (int)(QListWidgetItem::Type);
+  QListWidget *arg1 = args ? gsi::arg_reader<QListWidget * >() (args, heap) : gsi::arg_maker<QListWidget * >() (0, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QListWidgetItem::Type, heap);
   QListWidgetItem_Adaptor *obj = new QListWidgetItem_Adaptor (arg1, arg2);
   if (arg1) {
     qt_gsi::qt_keep (obj);
@@ -1050,9 +1050,9 @@ static void _call_ctor_QListWidgetItem_Adaptor_4303 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QListWidget *arg2 = args ? args.read<QListWidget * > (heap) : (QListWidget *)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(QListWidgetItem::Type);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QListWidget *arg2 = args ? gsi::arg_reader<QListWidget * >() (args, heap) : gsi::arg_maker<QListWidget * >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QListWidgetItem::Type, heap);
   ret.write<QListWidgetItem_Adaptor *> (new QListWidgetItem_Adaptor (arg1, arg2, arg3));
 }
 
@@ -1076,10 +1076,10 @@ static void _call_ctor_QListWidgetItem_Adaptor_5982 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  QListWidget *arg3 = args ? args.read<QListWidget * > (heap) : (QListWidget *)(0);
-  int arg4 = args ? args.read<int > (heap) : (int)(QListWidgetItem::Type);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QListWidget *arg3 = args ? gsi::arg_reader<QListWidget * >() (args, heap) : gsi::arg_maker<QListWidget * >() (0, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QListWidgetItem::Type, heap);
   ret.write<QListWidgetItem_Adaptor *> (new QListWidgetItem_Adaptor (arg1, arg2, arg3, arg4));
 }
 
@@ -1097,7 +1097,7 @@ static void _call_ctor_QListWidgetItem_Adaptor_2817 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QListWidgetItem &arg1 = args.read<const QListWidgetItem & > (heap);
+  const QListWidgetItem &arg1 = gsi::arg_reader<const QListWidgetItem & >() (args, heap);
   ret.write<QListWidgetItem_Adaptor *> (new QListWidgetItem_Adaptor (arg1));
 }
 

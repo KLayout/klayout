@@ -81,7 +81,7 @@ static void _call_ctor_QDomEntityReference_3230 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomEntityReference &arg1 = args.read<const QDomEntityReference & > (heap);
+  const QDomEntityReference &arg1 = gsi::arg_reader<const QDomEntityReference & >() (args, heap);
   ret.write<QDomEntityReference *> (new QDomEntityReference (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_operator_eq__3230 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomEntityReference &arg1 = args.read<const QDomEntityReference & > (heap);
+  const QDomEntityReference &arg1 = gsi::arg_reader<const QDomEntityReference & >() (args, heap);
   ret.write<QDomEntityReference & > ((QDomEntityReference &)((QDomEntityReference *)cls)->operator= (arg1));
 }
 

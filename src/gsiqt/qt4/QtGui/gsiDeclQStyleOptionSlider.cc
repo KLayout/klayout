@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionSlider_3167 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionSlider &arg1 = args.read<const QStyleOptionSlider & > (heap);
+  const QStyleOptionSlider &arg1 = gsi::arg_reader<const QStyleOptionSlider & >() (args, heap);
   ret.write<QStyleOptionSlider *> (new QStyleOptionSlider (arg1));
 }
 

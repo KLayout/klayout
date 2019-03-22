@@ -121,8 +121,8 @@ static void _call_f_addItem_4036 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QVariant &arg2 = args ? args.read<const QVariant & > (heap) : (const QVariant &)(QVariant());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = args ? gsi::arg_reader<const QVariant & >() (args, heap) : gsi::arg_maker<const QVariant & >() (QVariant(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->addItem (arg1, arg2);
 }
@@ -146,9 +146,9 @@ static void _call_f_addItem_5715 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QVariant &arg3 = args ? args.read<const QVariant & > (heap) : (const QVariant &)(QVariant());
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg3 = args ? gsi::arg_reader<const QVariant & >() (args, heap) : gsi::arg_maker<const QVariant & >() (QVariant(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->addItem (arg1, arg2, arg3);
 }
@@ -168,7 +168,7 @@ static void _call_f_addItems_2437 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->addItems (arg1);
 }
@@ -325,7 +325,7 @@ static void _call_f_event_1217 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QComboBox *)cls)->event (arg1));
 }
 
@@ -348,9 +348,9 @@ static void _call_f_findData_c4986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(Qt::UserRole);
-  QFlags<Qt::MatchFlag> arg3 = args ? args.read<QFlags<Qt::MatchFlag> > (heap) : (QFlags<Qt::MatchFlag>)(Qt::MatchExactly|Qt::MatchCaseSensitive);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::UserRole, heap);
+  QFlags<Qt::MatchFlag> arg3 = args ? gsi::arg_reader<QFlags<Qt::MatchFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::MatchFlag> >() (Qt::MatchExactly|Qt::MatchCaseSensitive, heap);
   ret.write<int > ((int)((QComboBox *)cls)->findData (arg1, arg2, arg3));
 }
 
@@ -371,8 +371,8 @@ static void _call_f_findText_c4233 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<Qt::MatchFlag> arg2 = args ? args.read<QFlags<Qt::MatchFlag> > (heap) : (QFlags<Qt::MatchFlag>)(Qt::MatchExactly|Qt::MatchCaseSensitive);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<Qt::MatchFlag> arg2 = args ? gsi::arg_reader<QFlags<Qt::MatchFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::MatchFlag> >() (Qt::MatchExactly|Qt::MatchCaseSensitive, heap);
   ret.write<int > ((int)((QComboBox *)cls)->findText (arg1, arg2));
 }
 
@@ -441,9 +441,9 @@ static void _call_f_insertItem_4695 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QVariant &arg3 = args ? args.read<const QVariant & > (heap) : (const QVariant &)(QVariant());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg3 = args ? gsi::arg_reader<const QVariant & >() (args, heap) : gsi::arg_maker<const QVariant & >() (QVariant(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->insertItem (arg1, arg2, arg3);
 }
@@ -469,10 +469,10 @@ static void _call_f_insertItem_6374 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QIcon &arg2 = args.read<const QIcon & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const QVariant &arg4 = args ? args.read<const QVariant & > (heap) : (const QVariant &)(QVariant());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QIcon &arg2 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg4 = args ? gsi::arg_reader<const QVariant & >() (args, heap) : gsi::arg_maker<const QVariant & >() (QVariant(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->insertItem (arg1, arg2, arg3, arg4);
 }
@@ -494,8 +494,8 @@ static void _call_f_insertItems_3096 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QStringList &arg2 = args.read<const QStringList & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->insertItems (arg1, arg2);
 }
@@ -530,7 +530,7 @@ static void _call_f_insertSeparator_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->insertSeparator (arg1);
 }
@@ -567,8 +567,8 @@ static void _call_f_itemData_c1426 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(Qt::UserRole);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::UserRole, heap);
   ret.write<QVariant > ((QVariant)((QComboBox *)cls)->itemData (arg1, arg2));
 }
 
@@ -602,7 +602,7 @@ static void _call_f_itemIcon_c767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QIcon > ((QIcon)((QComboBox *)cls)->itemIcon (arg1));
 }
 
@@ -621,7 +621,7 @@ static void _call_f_itemText_c767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QComboBox *)cls)->itemText (arg1));
 }
 
@@ -745,7 +745,7 @@ static void _call_f_removeItem_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->removeItem (arg1);
 }
@@ -780,7 +780,7 @@ static void _call_f_setAutoCompletion_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setAutoCompletion (arg1);
 }
@@ -800,7 +800,7 @@ static void _call_f_setAutoCompletionCaseSensitivity_2324 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setAutoCompletionCaseSensitivity (qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg1).cref());
 }
@@ -820,7 +820,7 @@ static void _call_f_setCompleter_1642 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QCompleter *arg1 = args.read<QCompleter * > (heap);
+  QCompleter *arg1 = gsi::arg_reader<QCompleter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setCompleter (arg1);
 }
@@ -840,7 +840,7 @@ static void _call_f_setCurrentIndex_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setCurrentIndex (arg1);
 }
@@ -860,7 +860,7 @@ static void _call_f_setDuplicatesEnabled_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setDuplicatesEnabled (arg1);
 }
@@ -880,7 +880,7 @@ static void _call_f_setEditText_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setEditText (arg1);
 }
@@ -900,7 +900,7 @@ static void _call_f_setEditable_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setEditable (arg1);
 }
@@ -920,7 +920,7 @@ static void _call_f_setFrame_864 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setFrame (arg1);
 }
@@ -940,7 +940,7 @@ static void _call_f_setIconSize_1805 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setIconSize (arg1);
 }
@@ -960,7 +960,7 @@ static void _call_f_setInsertPolicy_2679 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QComboBox::InsertPolicy>::target_type & arg1 = args.read<const qt_gsi::Converter<QComboBox::InsertPolicy>::target_type & > (heap);
+  const qt_gsi::Converter<QComboBox::InsertPolicy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QComboBox::InsertPolicy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setInsertPolicy (qt_gsi::QtToCppAdaptor<QComboBox::InsertPolicy>(arg1).cref());
 }
@@ -984,9 +984,9 @@ static void _call_f_setItemData_3437 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(Qt::UserRole);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::UserRole, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setItemData (arg1, arg2, arg3);
 }
@@ -1006,7 +1006,7 @@ static void _call_f_setItemDelegate_2717 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemDelegate *arg1 = args.read<QAbstractItemDelegate * > (heap);
+  QAbstractItemDelegate *arg1 = gsi::arg_reader<QAbstractItemDelegate * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setItemDelegate (arg1);
 }
@@ -1028,8 +1028,8 @@ static void _call_f_setItemIcon_2446 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QIcon &arg2 = args.read<const QIcon & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QIcon &arg2 = gsi::arg_reader<const QIcon & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setItemIcon (arg1, arg2);
 }
@@ -1051,8 +1051,8 @@ static void _call_f_setItemText_2684 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setItemText (arg1, arg2);
 }
@@ -1072,7 +1072,7 @@ static void _call_f_setLineEdit_1485 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLineEdit *arg1 = args.read<QLineEdit * > (heap);
+  QLineEdit *arg1 = gsi::arg_reader<QLineEdit * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setLineEdit (arg1);
 }
@@ -1092,7 +1092,7 @@ static void _call_f_setMaxCount_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setMaxCount (arg1);
 }
@@ -1112,7 +1112,7 @@ static void _call_f_setMaxVisibleItems_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setMaxVisibleItems (arg1);
 }
@@ -1132,7 +1132,7 @@ static void _call_f_setMinimumContentsLength_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setMinimumContentsLength (arg1);
 }
@@ -1152,7 +1152,7 @@ static void _call_f_setModel_2419 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemModel *arg1 = args.read<QAbstractItemModel * > (heap);
+  QAbstractItemModel *arg1 = gsi::arg_reader<QAbstractItemModel * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setModel (arg1);
 }
@@ -1172,7 +1172,7 @@ static void _call_f_setModelColumn_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setModelColumn (arg1);
 }
@@ -1192,7 +1192,7 @@ static void _call_f_setRootModelIndex_2395 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setRootModelIndex (arg1);
 }
@@ -1212,7 +1212,7 @@ static void _call_f_setSizeAdjustPolicy_3080 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QComboBox::SizeAdjustPolicy>::target_type & arg1 = args.read<const qt_gsi::Converter<QComboBox::SizeAdjustPolicy>::target_type & > (heap);
+  const qt_gsi::Converter<QComboBox::SizeAdjustPolicy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QComboBox::SizeAdjustPolicy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setSizeAdjustPolicy (qt_gsi::QtToCppAdaptor<QComboBox::SizeAdjustPolicy>(arg1).cref());
 }
@@ -1232,7 +1232,7 @@ static void _call_f_setValidator_2332 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QValidator *arg1 = args.read<const QValidator * > (heap);
+  const QValidator *arg1 = gsi::arg_reader<const QValidator * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setValidator (arg1);
 }
@@ -1252,7 +1252,7 @@ static void _call_f_setView_2333 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemView *arg1 = args.read<QAbstractItemView * > (heap);
+  QAbstractItemView *arg1 = gsi::arg_reader<QAbstractItemView * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox *)cls)->setView (arg1);
 }
@@ -1350,8 +1350,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QComboBox::tr (arg1, arg2));
 }
 
@@ -1374,9 +1374,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QComboBox::tr (arg1, arg2, arg3));
 }
 
@@ -1397,8 +1397,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QComboBox::trUtf8 (arg1, arg2));
 }
 
@@ -1421,9 +1421,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QComboBox::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2429,7 +2429,7 @@ static void _call_ctor_QComboBox_Adaptor_1315 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QComboBox_Adaptor *> (new QComboBox_Adaptor (arg1));
 }
 
@@ -2471,7 +2471,7 @@ static void _call_emitter_activated_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QComboBox_Adaptor *)cls)->emitter_QComboBox_activated_767 (arg1);
 }
 
@@ -2489,7 +2489,7 @@ static void _call_emitter_activated_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QComboBox_Adaptor *)cls)->emitter_QComboBox_activated_2025 (arg1);
 }
 
@@ -2607,9 +2607,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox_Adaptor *)cls)->fp_QComboBox_create_2208 (arg1, arg2, arg3);
 }
@@ -2628,7 +2628,7 @@ static void _call_emitter_currentIndexChanged_767 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QComboBox_Adaptor *)cls)->emitter_QComboBox_currentIndexChanged_767 (arg1);
 }
 
@@ -2646,7 +2646,7 @@ static void _call_emitter_currentIndexChanged_2025 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QComboBox_Adaptor *)cls)->emitter_QComboBox_currentIndexChanged_2025 (arg1);
 }
 
@@ -2664,7 +2664,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QComboBox_Adaptor *)cls)->emitter_QComboBox_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2708,8 +2708,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox_Adaptor *)cls)->fp_QComboBox_destroy_1620 (arg1, arg2);
 }
@@ -2728,7 +2728,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QComboBox_Adaptor *)cls)->emitter_QComboBox_destroyed_1302 (arg1);
 }
 
@@ -2866,7 +2866,7 @@ static void _call_emitter_editTextChanged_2025 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QComboBox_Adaptor *)cls)->emitter_QComboBox_editTextChanged_2025 (arg1);
 }
 
@@ -3171,7 +3171,7 @@ static void _call_emitter_highlighted_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QComboBox_Adaptor *)cls)->emitter_QComboBox_highlighted_767 (arg1);
 }
 
@@ -3189,7 +3189,7 @@ static void _call_emitter_highlighted_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QComboBox_Adaptor *)cls)->emitter_QComboBox_highlighted_2025 (arg1);
 }
 
@@ -3207,7 +3207,7 @@ static void _call_fp_initStyleOption_c2658 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionComboBox *arg1 = args.read<QStyleOptionComboBox * > (heap);
+  QStyleOptionComboBox *arg1 = gsi::arg_reader<QStyleOptionComboBox * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QComboBox_Adaptor *)cls)->fp_QComboBox_initStyleOption_c2658 (arg1);
 }
@@ -3594,7 +3594,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QComboBox_Adaptor *)cls)->fp_QComboBox_receivers_c1731 (arg1));
 }
 

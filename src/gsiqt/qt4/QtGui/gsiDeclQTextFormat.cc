@@ -76,7 +76,7 @@ static void _call_ctor_QTextFormat_767 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextFormat *> (new QTextFormat (arg1));
 }
 
@@ -95,7 +95,7 @@ static void _call_ctor_QTextFormat_2432 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFormat &arg1 = args.read<const QTextFormat & > (heap);
+  const QTextFormat &arg1 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   ret.write<QTextFormat *> (new QTextFormat (arg1));
 }
 
@@ -129,7 +129,7 @@ static void _call_f_boolProperty_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QTextFormat *)cls)->boolProperty (arg1));
 }
 
@@ -148,7 +148,7 @@ static void _call_f_brushProperty_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QBrush > ((QBrush)((QTextFormat *)cls)->brushProperty (arg1));
 }
 
@@ -199,7 +199,7 @@ static void _call_f_clearProperty_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFormat *)cls)->clearProperty (arg1);
 }
@@ -219,7 +219,7 @@ static void _call_f_colorProperty_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QColor > ((QColor)((QTextFormat *)cls)->colorProperty (arg1));
 }
 
@@ -238,7 +238,7 @@ static void _call_f_doubleProperty_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QTextFormat *)cls)->doubleProperty (arg1));
 }
 
@@ -272,7 +272,7 @@ static void _call_f_hasProperty_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QTextFormat *)cls)->hasProperty (arg1));
 }
 
@@ -291,7 +291,7 @@ static void _call_f_intProperty_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QTextFormat *)cls)->intProperty (arg1));
 }
 
@@ -445,7 +445,7 @@ static void _call_f_lengthProperty_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextLength > ((QTextLength)((QTextFormat *)cls)->lengthProperty (arg1));
 }
 
@@ -464,7 +464,7 @@ static void _call_f_lengthVectorProperty_c767 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QVector<QTextLength> > ((QVector<QTextLength>)((QTextFormat *)cls)->lengthVectorProperty (arg1));
 }
 
@@ -483,7 +483,7 @@ static void _call_f_merge_2432 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFormat &arg1 = args.read<const QTextFormat & > (heap);
+  const QTextFormat &arg1 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFormat *)cls)->merge (arg1);
 }
@@ -533,7 +533,7 @@ static void _call_f_operator_excl__eq__c2432 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFormat &arg1 = args.read<const QTextFormat & > (heap);
+  const QTextFormat &arg1 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   ret.write<bool > ((bool)((QTextFormat *)cls)->operator!= (arg1));
 }
 
@@ -552,7 +552,7 @@ static void _call_f_operator_eq__2432 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFormat &arg1 = args.read<const QTextFormat & > (heap);
+  const QTextFormat &arg1 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   ret.write<QTextFormat & > ((QTextFormat &)((QTextFormat *)cls)->operator= (arg1));
 }
 
@@ -571,7 +571,7 @@ static void _call_f_operator_eq__eq__c2432 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFormat &arg1 = args.read<const QTextFormat & > (heap);
+  const QTextFormat &arg1 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   ret.write<bool > ((bool)((QTextFormat *)cls)->operator== (arg1));
 }
 
@@ -590,7 +590,7 @@ static void _call_f_penProperty_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QPen > ((QPen)((QTextFormat *)cls)->penProperty (arg1));
 }
 
@@ -624,7 +624,7 @@ static void _call_f_property_c767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QVariant > ((QVariant)((QTextFormat *)cls)->property (arg1));
 }
 
@@ -658,7 +658,7 @@ static void _call_f_setBackground_1910 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFormat *)cls)->setBackground (arg1);
 }
@@ -678,7 +678,7 @@ static void _call_f_setForeground_1910 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFormat *)cls)->setForeground (arg1);
 }
@@ -698,7 +698,7 @@ static void _call_f_setLayoutDirection_2316 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::LayoutDirection>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::LayoutDirection>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::LayoutDirection>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::LayoutDirection>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFormat *)cls)->setLayoutDirection (qt_gsi::QtToCppAdaptor<Qt::LayoutDirection>(arg1).cref());
 }
@@ -718,7 +718,7 @@ static void _call_f_setObjectIndex_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFormat *)cls)->setObjectIndex (arg1);
 }
@@ -738,7 +738,7 @@ static void _call_f_setObjectType_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFormat *)cls)->setObjectType (arg1);
 }
@@ -760,8 +760,8 @@ static void _call_f_setProperty_2778 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFormat *)cls)->setProperty (arg1, arg2);
 }
@@ -783,8 +783,8 @@ static void _call_f_setProperty_3914 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QVector<QTextLength> &arg2 = args.read<const QVector<QTextLength> & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QVector<QTextLength> &arg2 = gsi::arg_reader<const QVector<QTextLength> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFormat *)cls)->setProperty (arg1, arg2);
 }
@@ -804,7 +804,7 @@ static void _call_f_stringProperty_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QTextFormat *)cls)->stringProperty (arg1));
 }
 

@@ -52,7 +52,7 @@ static void _call_ctor_QTouchEvent_TouchPoint_767 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(-1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QTouchEvent::TouchPoint *> (new QTouchEvent::TouchPoint (arg1));
 }
 
@@ -71,7 +71,7 @@ static void _call_ctor_QTouchEvent_TouchPoint_3576 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTouchEvent::TouchPoint &arg1 = args.read<const QTouchEvent::TouchPoint & > (heap);
+  const QTouchEvent::TouchPoint &arg1 = gsi::arg_reader<const QTouchEvent::TouchPoint & >() (args, heap);
   ret.write<QTouchEvent::TouchPoint *> (new QTouchEvent::TouchPoint (arg1));
 }
 
@@ -195,7 +195,7 @@ static void _call_f_operator_eq__3576 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTouchEvent::TouchPoint &arg1 = args.read<const QTouchEvent::TouchPoint & > (heap);
+  const QTouchEvent::TouchPoint &arg1 = gsi::arg_reader<const QTouchEvent::TouchPoint & >() (args, heap);
   ret.write<QTouchEvent::TouchPoint & > ((QTouchEvent::TouchPoint &)((QTouchEvent::TouchPoint *)cls)->operator= (arg1));
 }
 
@@ -319,7 +319,7 @@ static void _call_f_setId_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setId (arg1);
 }
@@ -339,7 +339,7 @@ static void _call_f_setLastNormalizedPos_1986 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setLastNormalizedPos (arg1);
 }
@@ -359,7 +359,7 @@ static void _call_f_setLastPos_1986 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setLastPos (arg1);
 }
@@ -379,7 +379,7 @@ static void _call_f_setLastScenePos_1986 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setLastScenePos (arg1);
 }
@@ -399,7 +399,7 @@ static void _call_f_setLastScreenPos_1986 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setLastScreenPos (arg1);
 }
@@ -419,7 +419,7 @@ static void _call_f_setNormalizedPos_1986 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setNormalizedPos (arg1);
 }
@@ -439,7 +439,7 @@ static void _call_f_setPos_1986 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setPos (arg1);
 }
@@ -459,7 +459,7 @@ static void _call_f_setPressure_1071 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setPressure (arg1);
 }
@@ -479,7 +479,7 @@ static void _call_f_setRect_1862 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setRect (arg1);
 }
@@ -499,7 +499,7 @@ static void _call_f_setScenePos_1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setScenePos (arg1);
 }
@@ -519,7 +519,7 @@ static void _call_f_setSceneRect_1862 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setSceneRect (arg1);
 }
@@ -539,7 +539,7 @@ static void _call_f_setScreenPos_1986 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setScreenPos (arg1);
 }
@@ -559,7 +559,7 @@ static void _call_f_setScreenRect_1862 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setScreenRect (arg1);
 }
@@ -579,7 +579,7 @@ static void _call_f_setStartNormalizedPos_1986 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setStartNormalizedPos (arg1);
 }
@@ -599,7 +599,7 @@ static void _call_f_setStartPos_1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setStartPos (arg1);
 }
@@ -619,7 +619,7 @@ static void _call_f_setStartScenePos_1986 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setStartScenePos (arg1);
 }
@@ -639,7 +639,7 @@ static void _call_f_setStartScreenPos_1986 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setStartScreenPos (arg1);
 }
@@ -659,7 +659,7 @@ static void _call_f_setState_2995 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::TouchPointState> arg1 = args.read<QFlags<Qt::TouchPointState> > (heap);
+  QFlags<Qt::TouchPointState> arg1 = gsi::arg_reader<QFlags<Qt::TouchPointState> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent::TouchPoint *)cls)->setState (arg1);
 }

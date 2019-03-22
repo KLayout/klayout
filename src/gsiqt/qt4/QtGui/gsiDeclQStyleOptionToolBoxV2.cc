@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionToolBoxV2_3403 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionToolBoxV2 &arg1 = args.read<const QStyleOptionToolBoxV2 & > (heap);
+  const QStyleOptionToolBoxV2 &arg1 = gsi::arg_reader<const QStyleOptionToolBoxV2 & >() (args, heap);
   ret.write<QStyleOptionToolBoxV2 *> (new QStyleOptionToolBoxV2 (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QStyleOptionToolBoxV2_3267 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionToolBox &arg1 = args.read<const QStyleOptionToolBox & > (heap);
+  const QStyleOptionToolBox &arg1 = gsi::arg_reader<const QStyleOptionToolBox & >() (args, heap);
   ret.write<QStyleOptionToolBoxV2 *> (new QStyleOptionToolBoxV2 (arg1));
 }
 
@@ -105,7 +105,7 @@ static void _call_f_operator_eq__3267 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionToolBox &arg1 = args.read<const QStyleOptionToolBox & > (heap);
+  const QStyleOptionToolBox &arg1 = gsi::arg_reader<const QStyleOptionToolBox & >() (args, heap);
   ret.write<QStyleOptionToolBoxV2 & > ((QStyleOptionToolBoxV2 &)((QStyleOptionToolBoxV2 *)cls)->operator= (arg1));
 }
 

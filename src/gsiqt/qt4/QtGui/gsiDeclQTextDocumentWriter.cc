@@ -71,8 +71,8 @@ static void _call_ctor_QTextDocumentWriter_3648 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QTextDocumentWriter *> (new QTextDocumentWriter (arg1, arg2));
 }
 
@@ -93,8 +93,8 @@ static void _call_ctor_QTextDocumentWriter_4226 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QByteArray &arg2 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QByteArray &arg2 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QTextDocumentWriter *> (new QTextDocumentWriter (arg1, arg2));
 }
 
@@ -173,7 +173,7 @@ static void _call_f_setCodec_1602 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextCodec *arg1 = args.read<QTextCodec * > (heap);
+  QTextCodec *arg1 = gsi::arg_reader<QTextCodec * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocumentWriter *)cls)->setCodec (arg1);
 }
@@ -193,7 +193,7 @@ static void _call_f_setDevice_1447 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocumentWriter *)cls)->setDevice (arg1);
 }
@@ -213,7 +213,7 @@ static void _call_f_setFileName_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocumentWriter *)cls)->setFileName (arg1);
 }
@@ -233,7 +233,7 @@ static void _call_f_setFormat_2309 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextDocumentWriter *)cls)->setFormat (arg1);
 }
@@ -253,7 +253,7 @@ static void _call_f_write_2650 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextDocument *arg1 = args.read<const QTextDocument * > (heap);
+  const QTextDocument *arg1 = gsi::arg_reader<const QTextDocument * >() (args, heap);
   ret.write<bool > ((bool)((QTextDocumentWriter *)cls)->write (arg1));
 }
 
@@ -272,7 +272,7 @@ static void _call_f_write_3466 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextDocumentFragment &arg1 = args.read<const QTextDocumentFragment & > (heap);
+  const QTextDocumentFragment &arg1 = gsi::arg_reader<const QTextDocumentFragment & >() (args, heap);
   ret.write<bool > ((bool)((QTextDocumentWriter *)cls)->write (arg1));
 }
 

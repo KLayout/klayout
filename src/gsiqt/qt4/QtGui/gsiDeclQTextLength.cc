@@ -67,8 +67,8 @@ static void _call_ctor_QTextLength_3045 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextLength::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextLength::Type>::target_type & > (heap);
-  double arg2 = args.read<double > (heap);
+  const qt_gsi::Converter<QTextLength::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextLength::Type>::target_type & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QTextLength *> (new QTextLength (qt_gsi::QtToCppAdaptor<QTextLength::Type>(arg1).cref(), arg2));
 }
 
@@ -87,7 +87,7 @@ static void _call_f_operator_excl__eq__c2425 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextLength &arg1 = args.read<const QTextLength & > (heap);
+  const QTextLength &arg1 = gsi::arg_reader<const QTextLength & >() (args, heap);
   ret.write<bool > ((bool)((QTextLength *)cls)->operator!= (arg1));
 }
 
@@ -106,7 +106,7 @@ static void _call_f_operator_eq__eq__c2425 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextLength &arg1 = args.read<const QTextLength & > (heap);
+  const QTextLength &arg1 = gsi::arg_reader<const QTextLength & >() (args, heap);
   ret.write<bool > ((bool)((QTextLength *)cls)->operator== (arg1));
 }
 
@@ -155,7 +155,7 @@ static void _call_f_value_c1071 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QTextLength *)cls)->value (arg1));
 }
 

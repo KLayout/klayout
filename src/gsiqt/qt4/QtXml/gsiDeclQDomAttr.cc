@@ -81,7 +81,7 @@ static void _call_ctor_QDomAttr_2093 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomAttr &arg1 = args.read<const QDomAttr & > (heap);
+  const QDomAttr &arg1 = gsi::arg_reader<const QDomAttr & >() (args, heap);
   ret.write<QDomAttr *> (new QDomAttr (arg1));
 }
 
@@ -130,7 +130,7 @@ static void _call_f_operator_eq__2093 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomAttr &arg1 = args.read<const QDomAttr & > (heap);
+  const QDomAttr &arg1 = gsi::arg_reader<const QDomAttr & >() (args, heap);
   ret.write<QDomAttr & > ((QDomAttr &)((QDomAttr *)cls)->operator= (arg1));
 }
 
@@ -164,7 +164,7 @@ static void _call_f_setValue_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomAttr *)cls)->setValue (arg1);
 }

@@ -52,7 +52,7 @@ static void _call_f_queryProxy_3220 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxyQuery &arg1 = args ? args.read<const QNetworkProxyQuery & > (heap) : (const QNetworkProxyQuery &)(QNetworkProxyQuery());
+  const QNetworkProxyQuery &arg1 = args ? gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap) : gsi::arg_maker<const QNetworkProxyQuery & >() (QNetworkProxyQuery(), heap);
   ret.write<QList<QNetworkProxy> > ((QList<QNetworkProxy>)((QNetworkProxyFactory *)cls)->queryProxy (arg1));
 }
 
@@ -71,7 +71,7 @@ static void _call_f_proxyForQuery_3220 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxyQuery &arg1 = args.read<const QNetworkProxyQuery & > (heap);
+  const QNetworkProxyQuery &arg1 = gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap);
   ret.write<QList<QNetworkProxy> > ((QList<QNetworkProxy>)QNetworkProxyFactory::proxyForQuery (arg1));
 }
 
@@ -90,7 +90,7 @@ static void _call_f_setApplicationProxyFactory_2723 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkProxyFactory *arg1 = args.read<QNetworkProxyFactory * > (heap);
+  QNetworkProxyFactory *arg1 = gsi::arg_reader<QNetworkProxyFactory * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QNetworkProxyFactory::setApplicationProxyFactory (arg1);
 }
@@ -110,7 +110,7 @@ static void _call_f_setUseSystemConfiguration_864 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QNetworkProxyFactory::setUseSystemConfiguration (arg1);
 }
@@ -130,7 +130,7 @@ static void _call_f_systemProxyForQuery_3220 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxyQuery &arg1 = args ? args.read<const QNetworkProxyQuery & > (heap) : (const QNetworkProxyQuery &)(QNetworkProxyQuery());
+  const QNetworkProxyQuery &arg1 = args ? gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap) : gsi::arg_maker<const QNetworkProxyQuery & >() (QNetworkProxyQuery(), heap);
   ret.write<QList<QNetworkProxy> > ((QList<QNetworkProxy>)QNetworkProxyFactory::systemProxyForQuery (arg1));
 }
 

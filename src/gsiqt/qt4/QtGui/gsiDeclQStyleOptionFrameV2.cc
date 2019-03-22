@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionFrameV2_3183 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionFrameV2 &arg1 = args.read<const QStyleOptionFrameV2 & > (heap);
+  const QStyleOptionFrameV2 &arg1 = gsi::arg_reader<const QStyleOptionFrameV2 & >() (args, heap);
   ret.write<QStyleOptionFrameV2 *> (new QStyleOptionFrameV2 (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QStyleOptionFrameV2_3047 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionFrame &arg1 = args.read<const QStyleOptionFrame & > (heap);
+  const QStyleOptionFrame &arg1 = gsi::arg_reader<const QStyleOptionFrame & >() (args, heap);
   ret.write<QStyleOptionFrameV2 *> (new QStyleOptionFrameV2 (arg1));
 }
 
@@ -105,7 +105,7 @@ static void _call_f_operator_eq__3047 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionFrame &arg1 = args.read<const QStyleOptionFrame & > (heap);
+  const QStyleOptionFrame &arg1 = gsi::arg_reader<const QStyleOptionFrame & >() (args, heap);
   ret.write<QStyleOptionFrameV2 & > ((QStyleOptionFrameV2 &)((QStyleOptionFrameV2 *)cls)->operator= (arg1));
 }
 

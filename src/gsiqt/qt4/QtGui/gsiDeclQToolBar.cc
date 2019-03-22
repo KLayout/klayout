@@ -112,7 +112,7 @@ static void _call_f_actionAt_c1916 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QAction * > ((QAction *)((QToolBar *)cls)->actionAt (arg1));
 }
 
@@ -133,8 +133,8 @@ static void _call_f_actionAt_c1426 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QAction * > ((QAction *)((QToolBar *)cls)->actionAt (arg1, arg2));
 }
 
@@ -153,7 +153,7 @@ static void _call_f_actionGeometry_c1309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ret.write<QRect > ((QRect)((QToolBar *)cls)->actionGeometry (arg1));
 }
 
@@ -172,7 +172,7 @@ static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar *)cls)->addAction (arg1);
 }
@@ -192,7 +192,7 @@ static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QAction * > ((QAction *)((QToolBar *)cls)->addAction (arg1));
 }
 
@@ -213,8 +213,8 @@ static void _call_f_addAction_3704 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QAction * > ((QAction *)((QToolBar *)cls)->addAction (arg1, arg2));
 }
 
@@ -237,9 +237,9 @@ static void _call_f_addAction_5537 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QObject *arg2 = args.read<const QObject * > (heap);
-  const char *arg3 = args.read<const char * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QObject *arg2 = gsi::arg_reader<const QObject * >() (args, heap);
+  const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QToolBar *)cls)->addAction (arg1, arg2, arg3));
 }
 
@@ -264,10 +264,10 @@ static void _call_f_addAction_7216 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QObject *arg3 = args.read<const QObject * > (heap);
-  const char *arg4 = args.read<const char * > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QObject *arg3 = gsi::arg_reader<const QObject * >() (args, heap);
+  const char *arg4 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QToolBar *)cls)->addAction (arg1, arg2, arg3, arg4));
 }
 
@@ -301,7 +301,7 @@ static void _call_f_addWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QToolBar *)cls)->addWidget (arg1));
 }
 
@@ -366,7 +366,7 @@ static void _call_f_insertSeparator_1309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QToolBar *)cls)->insertSeparator (arg1));
 }
 
@@ -387,8 +387,8 @@ static void _call_f_insertWidget_2516 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QToolBar *)cls)->insertWidget (arg1, arg2));
 }
 
@@ -407,7 +407,7 @@ static void _call_f_isAreaAllowed_c1817 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ToolBarArea>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ToolBarArea>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ToolBarArea>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ToolBarArea>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QToolBar *)cls)->isAreaAllowed (qt_gsi::QtToCppAdaptor<Qt::ToolBarArea>(arg1).cref()));
 }
 
@@ -486,7 +486,7 @@ static void _call_f_setAllowedAreas_2513 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::ToolBarArea> arg1 = args.read<QFlags<Qt::ToolBarArea> > (heap);
+  QFlags<Qt::ToolBarArea> arg1 = gsi::arg_reader<QFlags<Qt::ToolBarArea> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar *)cls)->setAllowedAreas (arg1);
 }
@@ -506,7 +506,7 @@ static void _call_f_setFloatable_864 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar *)cls)->setFloatable (arg1);
 }
@@ -526,7 +526,7 @@ static void _call_f_setIconSize_1805 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar *)cls)->setIconSize (arg1);
 }
@@ -546,7 +546,7 @@ static void _call_f_setMovable_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar *)cls)->setMovable (arg1);
 }
@@ -566,7 +566,7 @@ static void _call_f_setOrientation_1913 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar *)cls)->setOrientation (qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg1).cref());
 }
@@ -586,7 +586,7 @@ static void _call_f_setToolButtonStyle_2328 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ToolButtonStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ToolButtonStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ToolButtonStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ToolButtonStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar *)cls)->setToolButtonStyle (qt_gsi::QtToCppAdaptor<Qt::ToolButtonStyle>(arg1).cref());
 }
@@ -636,7 +636,7 @@ static void _call_f_widgetForAction_c1309 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QToolBar *)cls)->widgetForAction (arg1));
 }
 
@@ -657,8 +657,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QToolBar::tr (arg1, arg2));
 }
 
@@ -681,9 +681,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QToolBar::tr (arg1, arg2, arg3));
 }
 
@@ -704,8 +704,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QToolBar::trUtf8 (arg1, arg2));
 }
 
@@ -728,9 +728,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QToolBar::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1681,8 +1681,8 @@ static void _call_ctor_QToolBar_Adaptor_3232 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QToolBar_Adaptor *> (new QToolBar_Adaptor (arg1, arg2));
 }
 
@@ -1700,7 +1700,7 @@ static void _call_ctor_QToolBar_Adaptor_1315 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QToolBar_Adaptor *> (new QToolBar_Adaptor (arg1));
 }
 
@@ -1742,7 +1742,7 @@ static void _call_emitter_actionTriggered_1309 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ((QToolBar_Adaptor *)cls)->emitter_QToolBar_actionTriggered_1309 (arg1);
 }
 
@@ -1760,7 +1760,7 @@ static void _call_emitter_allowedAreasChanged_2513 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::ToolBarArea> arg1 = args.read<QFlags<Qt::ToolBarArea> > (heap);
+  QFlags<Qt::ToolBarArea> arg1 = gsi::arg_reader<QFlags<Qt::ToolBarArea> >() (args, heap);
   ((QToolBar_Adaptor *)cls)->emitter_QToolBar_allowedAreasChanged_2513 (arg1);
 }
 
@@ -1878,9 +1878,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar_Adaptor *)cls)->fp_QToolBar_create_2208 (arg1, arg2, arg3);
 }
@@ -1899,7 +1899,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QToolBar_Adaptor *)cls)->emitter_QToolBar_customContextMenuRequested_1916 (arg1);
 }
 
@@ -1943,8 +1943,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar_Adaptor *)cls)->fp_QToolBar_destroy_1620 (arg1, arg2);
 }
@@ -1963,7 +1963,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QToolBar_Adaptor *)cls)->emitter_QToolBar_destroyed_1302 (arg1);
 }
 
@@ -2368,7 +2368,7 @@ static void _call_emitter_iconSizeChanged_1805 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   ((QToolBar_Adaptor *)cls)->emitter_QToolBar_iconSizeChanged_1805 (arg1);
 }
 
@@ -2386,7 +2386,7 @@ static void _call_fp_initStyleOption_c2556 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionToolBar *arg1 = args.read<QStyleOptionToolBar * > (heap);
+  QStyleOptionToolBar *arg1 = gsi::arg_reader<QStyleOptionToolBar * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QToolBar_Adaptor *)cls)->fp_QToolBar_initStyleOption_c2556 (arg1);
 }
@@ -2682,7 +2682,7 @@ static void _call_emitter_movableChanged_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QToolBar_Adaptor *)cls)->emitter_QToolBar_movableChanged_864 (arg1);
 }
 
@@ -2724,7 +2724,7 @@ static void _call_emitter_orientationChanged_1913 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
   ((QToolBar_Adaptor *)cls)->emitter_QToolBar_orientationChanged_1913 (arg1);
 }
 
@@ -2809,7 +2809,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QToolBar_Adaptor *)cls)->fp_QToolBar_receivers_c1731 (arg1));
 }
 
@@ -3019,7 +3019,7 @@ static void _call_emitter_toolButtonStyleChanged_2328 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ToolButtonStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ToolButtonStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ToolButtonStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ToolButtonStyle>::target_type & >() (args, heap);
   ((QToolBar_Adaptor *)cls)->emitter_QToolBar_toolButtonStyleChanged_2328 (arg1);
 }
 
@@ -3037,7 +3037,7 @@ static void _call_emitter_topLevelChanged_864 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QToolBar_Adaptor *)cls)->emitter_QToolBar_topLevelChanged_864 (arg1);
 }
 

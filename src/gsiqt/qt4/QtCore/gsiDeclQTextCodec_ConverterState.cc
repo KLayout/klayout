@@ -50,7 +50,7 @@ static void _call_ctor_QTextCodec_ConverterState_3668 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QTextCodec::ConversionFlag> arg1 = args ? args.read<QFlags<QTextCodec::ConversionFlag> > (heap) : (QFlags<QTextCodec::ConversionFlag>)(QTextCodec::DefaultConversion);
+  QFlags<QTextCodec::ConversionFlag> arg1 = args ? gsi::arg_reader<QFlags<QTextCodec::ConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextCodec::ConversionFlag> >() (QTextCodec::DefaultConversion, heap);
   ret.write<QTextCodec::ConverterState *> (new QTextCodec::ConverterState (arg1));
 }
 

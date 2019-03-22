@@ -81,7 +81,7 @@ static void _call_f_prefix_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QXmlNamespaceSupport *)cls)->prefix (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_prefixes_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QXmlNamespaceSupport *)cls)->prefixes (arg1));
 }
 
@@ -140,10 +140,10 @@ static void _call_f_processName_c5225 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool arg2 = args.read<bool > (heap);
-  QString &arg3 = args.read<QString & > (heap);
-  QString &arg4 = args.read<QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
+  QString &arg3 = gsi::arg_reader<QString & >() (args, heap);
+  QString &arg4 = gsi::arg_reader<QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlNamespaceSupport *)cls)->processName (arg1, arg2, arg3, arg4);
 }
@@ -197,8 +197,8 @@ static void _call_f_setPrefix_3942 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlNamespaceSupport *)cls)->setPrefix (arg1, arg2);
 }
@@ -222,9 +222,9 @@ static void _call_f_splitName_c4469 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QString &arg2 = args.read<QString & > (heap);
-  QString &arg3 = args.read<QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QString &arg2 = gsi::arg_reader<QString & >() (args, heap);
+  QString &arg3 = gsi::arg_reader<QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlNamespaceSupport *)cls)->splitName (arg1, arg2, arg3);
 }
@@ -244,7 +244,7 @@ static void _call_f_uri_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QXmlNamespaceSupport *)cls)->uri (arg1));
 }
 

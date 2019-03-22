@@ -67,7 +67,7 @@ static void _call_ctor_QProcess_1302 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QProcess *> (new QProcess (arg1));
 }
 
@@ -162,7 +162,7 @@ static void _call_f_closeReadChannel_2800 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QProcess::ProcessChannel>::target_type & arg1 = args.read<const qt_gsi::Converter<QProcess::ProcessChannel>::target_type & > (heap);
+  const qt_gsi::Converter<QProcess::ProcessChannel>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QProcess::ProcessChannel>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->closeReadChannel (qt_gsi::QtToCppAdaptor<QProcess::ProcessChannel>(arg1).cref());
 }
@@ -394,7 +394,7 @@ static void _call_f_setEnvironment_2437 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setEnvironment (arg1);
 }
@@ -414,7 +414,7 @@ static void _call_f_setProcessChannelMode_3189 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QProcess::ProcessChannelMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QProcess::ProcessChannelMode>::target_type & > (heap);
+  const qt_gsi::Converter<QProcess::ProcessChannelMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QProcess::ProcessChannelMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setProcessChannelMode (qt_gsi::QtToCppAdaptor<QProcess::ProcessChannelMode>(arg1).cref());
 }
@@ -434,7 +434,7 @@ static void _call_f_setProcessEnvironment_3302 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QProcessEnvironment &arg1 = args.read<const QProcessEnvironment & > (heap);
+  const QProcessEnvironment &arg1 = gsi::arg_reader<const QProcessEnvironment & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setProcessEnvironment (arg1);
 }
@@ -454,7 +454,7 @@ static void _call_f_setReadChannel_2800 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QProcess::ProcessChannel>::target_type & arg1 = args.read<const qt_gsi::Converter<QProcess::ProcessChannel>::target_type & > (heap);
+  const qt_gsi::Converter<QProcess::ProcessChannel>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QProcess::ProcessChannel>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setReadChannel (qt_gsi::QtToCppAdaptor<QProcess::ProcessChannel>(arg1).cref());
 }
@@ -474,7 +474,7 @@ static void _call_f_setReadChannelMode_3189 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QProcess::ProcessChannelMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QProcess::ProcessChannelMode>::target_type & > (heap);
+  const qt_gsi::Converter<QProcess::ProcessChannelMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QProcess::ProcessChannelMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setReadChannelMode (qt_gsi::QtToCppAdaptor<QProcess::ProcessChannelMode>(arg1).cref());
 }
@@ -496,8 +496,8 @@ static void _call_f_setStandardErrorFile_5159 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg2 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::Truncate);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg2 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::Truncate, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setStandardErrorFile (arg1, arg2);
 }
@@ -517,7 +517,7 @@ static void _call_f_setStandardInputFile_2025 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setStandardInputFile (arg1);
 }
@@ -539,8 +539,8 @@ static void _call_f_setStandardOutputFile_5159 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg2 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::Truncate);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg2 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::Truncate, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setStandardOutputFile (arg1, arg2);
 }
@@ -560,7 +560,7 @@ static void _call_f_setStandardOutputProcess_1438 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QProcess *arg1 = args.read<QProcess * > (heap);
+  QProcess *arg1 = gsi::arg_reader<QProcess * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setStandardOutputProcess (arg1);
 }
@@ -580,7 +580,7 @@ static void _call_f_setWorkingDirectory_2025 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->setWorkingDirectory (arg1);
 }
@@ -604,9 +604,9 @@ static void _call_f_start_7488 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QStringList &arg2 = args.read<const QStringList & > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg3 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg3 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->start (arg1, arg2, arg3);
 }
@@ -628,8 +628,8 @@ static void _call_f_start_5159 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg2 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg2 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcess *)cls)->start (arg1, arg2);
 }
@@ -680,7 +680,7 @@ static void _call_f_waitForBytesWritten_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QProcess *)cls)->waitForBytesWritten (arg1));
 }
 
@@ -699,7 +699,7 @@ static void _call_f_waitForFinished_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QProcess *)cls)->waitForFinished (arg1));
 }
 
@@ -718,7 +718,7 @@ static void _call_f_waitForReadyRead_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QProcess *)cls)->waitForReadyRead (arg1));
 }
 
@@ -737,7 +737,7 @@ static void _call_f_waitForStarted_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QProcess *)cls)->waitForStarted (arg1));
 }
 
@@ -773,8 +773,8 @@ static void _call_f_execute_4354 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QStringList &arg2 = args.read<const QStringList & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
   ret.write<int > ((int)QProcess::execute (arg1, arg2));
 }
 
@@ -793,7 +793,7 @@ static void _call_f_execute_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)QProcess::execute (arg1));
 }
 
@@ -818,10 +818,10 @@ static void _call_f_startDetached_7335 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QStringList &arg2 = args.read<const QStringList & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  qint64 *arg4 = args ? args.read<qint64 * > (heap) : (qint64 *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  qint64 *arg4 = args ? gsi::arg_reader<qint64 * >() (args, heap) : gsi::arg_maker<qint64 * >() (0, heap);
   ret.write<bool > ((bool)QProcess::startDetached (arg1, arg2, arg3, arg4));
 }
 
@@ -842,8 +842,8 @@ static void _call_f_startDetached_4354 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QStringList &arg2 = args.read<const QStringList & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
   ret.write<bool > ((bool)QProcess::startDetached (arg1, arg2));
 }
 
@@ -862,7 +862,7 @@ static void _call_f_startDetached_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QProcess::startDetached (arg1));
 }
 
@@ -898,8 +898,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QProcess::tr (arg1, arg2));
 }
 
@@ -922,9 +922,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QProcess::tr (arg1, arg2, arg3));
 }
 
@@ -945,8 +945,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QProcess::trUtf8 (arg1, arg2));
 }
 
@@ -969,9 +969,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QProcess::trUtf8 (arg1, arg2, arg3));
 }
 

@@ -377,7 +377,7 @@ static void _call_f_setAnchor_864 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setAnchor (arg1);
 }
@@ -397,7 +397,7 @@ static void _call_f_setAnchorHref_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setAnchorHref (arg1);
 }
@@ -417,7 +417,7 @@ static void _call_f_setAnchorName_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setAnchorName (arg1);
 }
@@ -437,7 +437,7 @@ static void _call_f_setAnchorNames_2437 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setAnchorNames (arg1);
 }
@@ -457,7 +457,7 @@ static void _call_f_setFont_1801 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFont (arg1);
 }
@@ -477,7 +477,7 @@ static void _call_f_setFontCapitalization_2508 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFont::Capitalization>::target_type & arg1 = args.read<const qt_gsi::Converter<QFont::Capitalization>::target_type & > (heap);
+  const qt_gsi::Converter<QFont::Capitalization>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFont::Capitalization>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontCapitalization (qt_gsi::QtToCppAdaptor<QFont::Capitalization>(arg1).cref());
 }
@@ -497,7 +497,7 @@ static void _call_f_setFontFamily_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontFamily (arg1);
 }
@@ -517,7 +517,7 @@ static void _call_f_setFontFixedPitch_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontFixedPitch (arg1);
 }
@@ -537,7 +537,7 @@ static void _call_f_setFontItalic_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontItalic (arg1);
 }
@@ -557,7 +557,7 @@ static void _call_f_setFontKerning_864 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontKerning (arg1);
 }
@@ -577,7 +577,7 @@ static void _call_f_setFontLetterSpacing_1071 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontLetterSpacing (arg1);
 }
@@ -597,7 +597,7 @@ static void _call_f_setFontOverline_864 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontOverline (arg1);
 }
@@ -617,7 +617,7 @@ static void _call_f_setFontPointSize_1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontPointSize (arg1);
 }
@@ -637,7 +637,7 @@ static void _call_f_setFontStrikeOut_864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontStrikeOut (arg1);
 }
@@ -659,8 +659,8 @@ static void _call_f_setFontStyleHint_4284 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFont::StyleHint>::target_type & arg1 = args.read<const qt_gsi::Converter<QFont::StyleHint>::target_type & > (heap);
-  const qt_gsi::Converter<QFont::StyleStrategy>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QFont::StyleStrategy>::target_type & > (heap) : (const qt_gsi::Converter<QFont::StyleStrategy>::target_type &)(qt_gsi::CppToQtReadAdaptor<QFont::StyleStrategy>(heap, QFont::PreferDefault));
+  const qt_gsi::Converter<QFont::StyleHint>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFont::StyleHint>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QFont::StyleStrategy>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QFont::StyleStrategy>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QFont::StyleStrategy>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QFont::StyleStrategy>(heap, QFont::PreferDefault), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontStyleHint (qt_gsi::QtToCppAdaptor<QFont::StyleHint>(arg1).cref(), qt_gsi::QtToCppAdaptor<QFont::StyleStrategy>(arg2).cref());
 }
@@ -680,7 +680,7 @@ static void _call_f_setFontStyleStrategy_2420 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFont::StyleStrategy>::target_type & arg1 = args.read<const qt_gsi::Converter<QFont::StyleStrategy>::target_type & > (heap);
+  const qt_gsi::Converter<QFont::StyleStrategy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFont::StyleStrategy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontStyleStrategy (qt_gsi::QtToCppAdaptor<QFont::StyleStrategy>(arg1).cref());
 }
@@ -700,7 +700,7 @@ static void _call_f_setFontUnderline_864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontUnderline (arg1);
 }
@@ -720,7 +720,7 @@ static void _call_f_setFontWeight_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontWeight (arg1);
 }
@@ -740,7 +740,7 @@ static void _call_f_setFontWordSpacing_1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setFontWordSpacing (arg1);
 }
@@ -760,7 +760,7 @@ static void _call_f_setTableCellColumnSpan_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setTableCellColumnSpan (arg1);
 }
@@ -780,7 +780,7 @@ static void _call_f_setTableCellRowSpan_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setTableCellRowSpan (arg1);
 }
@@ -800,7 +800,7 @@ static void _call_f_setTextOutline_1685 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPen &arg1 = args.read<const QPen & > (heap);
+  const QPen &arg1 = gsi::arg_reader<const QPen & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setTextOutline (arg1);
 }
@@ -820,7 +820,7 @@ static void _call_f_setToolTip_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setToolTip (arg1);
 }
@@ -840,7 +840,7 @@ static void _call_f_setUnderlineColor_1905 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setUnderlineColor (arg1);
 }
@@ -860,7 +860,7 @@ static void _call_f_setUnderlineStyle_3516 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextCharFormat::UnderlineStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextCharFormat::UnderlineStyle>::target_type & > (heap);
+  const qt_gsi::Converter<QTextCharFormat::UnderlineStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextCharFormat::UnderlineStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setUnderlineStyle (qt_gsi::QtToCppAdaptor<QTextCharFormat::UnderlineStyle>(arg1).cref());
 }
@@ -880,7 +880,7 @@ static void _call_f_setVerticalAlignment_3806 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextCharFormat::VerticalAlignment>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextCharFormat::VerticalAlignment>::target_type & > (heap);
+  const qt_gsi::Converter<QTextCharFormat::VerticalAlignment>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextCharFormat::VerticalAlignment>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextCharFormat *)cls)->setVerticalAlignment (qt_gsi::QtToCppAdaptor<QTextCharFormat::VerticalAlignment>(arg1).cref());
 }

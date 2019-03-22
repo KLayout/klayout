@@ -53,8 +53,8 @@ static void _call_ctor_QNetworkCookie_4510 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
-  const QByteArray &arg2 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const QByteArray &arg1 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
+  const QByteArray &arg2 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QNetworkCookie *> (new QNetworkCookie (arg1, arg2));
 }
 
@@ -73,7 +73,7 @@ static void _call_ctor_QNetworkCookie_2742 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCookie &arg1 = args.read<const QNetworkCookie & > (heap);
+  const QNetworkCookie &arg1 = gsi::arg_reader<const QNetworkCookie & >() (args, heap);
   ret.write<QNetworkCookie *> (new QNetworkCookie (arg1));
 }
 
@@ -182,7 +182,7 @@ static void _call_f_operator_excl__eq__c2742 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCookie &arg1 = args.read<const QNetworkCookie & > (heap);
+  const QNetworkCookie &arg1 = gsi::arg_reader<const QNetworkCookie & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkCookie *)cls)->operator!= (arg1));
 }
 
@@ -201,7 +201,7 @@ static void _call_f_operator_eq__2742 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCookie &arg1 = args.read<const QNetworkCookie & > (heap);
+  const QNetworkCookie &arg1 = gsi::arg_reader<const QNetworkCookie & >() (args, heap);
   ret.write<QNetworkCookie & > ((QNetworkCookie &)((QNetworkCookie *)cls)->operator= (arg1));
 }
 
@@ -220,7 +220,7 @@ static void _call_f_operator_eq__eq__c2742 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCookie &arg1 = args.read<const QNetworkCookie & > (heap);
+  const QNetworkCookie &arg1 = gsi::arg_reader<const QNetworkCookie & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkCookie *)cls)->operator== (arg1));
 }
 
@@ -254,7 +254,7 @@ static void _call_f_setDomain_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCookie *)cls)->setDomain (arg1);
 }
@@ -274,7 +274,7 @@ static void _call_f_setExpirationDate_2175 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCookie *)cls)->setExpirationDate (arg1);
 }
@@ -294,7 +294,7 @@ static void _call_f_setHttpOnly_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCookie *)cls)->setHttpOnly (arg1);
 }
@@ -314,7 +314,7 @@ static void _call_f_setName_2309 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCookie *)cls)->setName (arg1);
 }
@@ -334,7 +334,7 @@ static void _call_f_setPath_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCookie *)cls)->setPath (arg1);
 }
@@ -354,7 +354,7 @@ static void _call_f_setSecure_864 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCookie *)cls)->setSecure (arg1);
 }
@@ -374,7 +374,7 @@ static void _call_f_setValue_2309 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCookie *)cls)->setValue (arg1);
 }
@@ -394,7 +394,7 @@ static void _call_f_toRawForm_c2683 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkCookie::RawForm>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QNetworkCookie::RawForm>::target_type & > (heap) : (const qt_gsi::Converter<QNetworkCookie::RawForm>::target_type &)(qt_gsi::CppToQtReadAdaptor<QNetworkCookie::RawForm>(heap, QNetworkCookie::Full));
+  const qt_gsi::Converter<QNetworkCookie::RawForm>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QNetworkCookie::RawForm>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNetworkCookie::RawForm>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNetworkCookie::RawForm>(heap, QNetworkCookie::Full), heap);
   ret.write<QByteArray > ((QByteArray)((QNetworkCookie *)cls)->toRawForm (qt_gsi::QtToCppAdaptor<QNetworkCookie::RawForm>(arg1).cref()));
 }
 
@@ -428,7 +428,7 @@ static void _call_f_parseCookies_2309 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QList<QNetworkCookie> > ((QList<QNetworkCookie>)QNetworkCookie::parseCookies (arg1));
 }
 

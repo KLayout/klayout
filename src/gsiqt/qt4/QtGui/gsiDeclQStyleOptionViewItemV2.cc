@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionViewItemV2_3502 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionViewItemV2 &arg1 = args.read<const QStyleOptionViewItemV2 & > (heap);
+  const QStyleOptionViewItemV2 &arg1 = gsi::arg_reader<const QStyleOptionViewItemV2 & >() (args, heap);
   ret.write<QStyleOptionViewItemV2 *> (new QStyleOptionViewItemV2 (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QStyleOptionViewItemV2_3366 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionViewItem &arg1 = args.read<const QStyleOptionViewItem & > (heap);
+  const QStyleOptionViewItem &arg1 = gsi::arg_reader<const QStyleOptionViewItem & >() (args, heap);
   ret.write<QStyleOptionViewItemV2 *> (new QStyleOptionViewItemV2 (arg1));
 }
 
@@ -105,7 +105,7 @@ static void _call_f_operator_eq__3366 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionViewItem &arg1 = args.read<const QStyleOptionViewItem & > (heap);
+  const QStyleOptionViewItem &arg1 = gsi::arg_reader<const QStyleOptionViewItem & >() (args, heap);
   ret.write<QStyleOptionViewItemV2 & > ((QStyleOptionViewItemV2 &)((QStyleOptionViewItemV2 *)cls)->operator= (arg1));
 }
 

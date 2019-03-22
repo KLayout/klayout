@@ -81,7 +81,7 @@ static void _call_ctor_QDomProcessingInstruction_3921 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomProcessingInstruction &arg1 = args.read<const QDomProcessingInstruction & > (heap);
+  const QDomProcessingInstruction &arg1 = gsi::arg_reader<const QDomProcessingInstruction & >() (args, heap);
   ret.write<QDomProcessingInstruction *> (new QDomProcessingInstruction (arg1));
 }
 
@@ -130,7 +130,7 @@ static void _call_f_operator_eq__3921 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomProcessingInstruction &arg1 = args.read<const QDomProcessingInstruction & > (heap);
+  const QDomProcessingInstruction &arg1 = gsi::arg_reader<const QDomProcessingInstruction & >() (args, heap);
   ret.write<QDomProcessingInstruction & > ((QDomProcessingInstruction &)((QDomProcessingInstruction *)cls)->operator= (arg1));
 }
 
@@ -149,7 +149,7 @@ static void _call_f_setData_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomProcessingInstruction *)cls)->setData (arg1);
 }

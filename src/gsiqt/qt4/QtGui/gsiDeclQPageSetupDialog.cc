@@ -66,7 +66,7 @@ static void _call_f_addEnabledOption_4270 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageSetupDialog *)cls)->addEnabledOption (qt_gsi::QtToCppAdaptor<QPageSetupDialog::PageSetupDialogOption>(arg1).cref());
 }
@@ -116,7 +116,7 @@ static void _call_f_isOptionEnabled_c4270 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QPageSetupDialog *)cls)->isOptionEnabled (qt_gsi::QtToCppAdaptor<QPageSetupDialog::PageSetupDialogOption>(arg1).cref()));
 }
 
@@ -153,8 +153,8 @@ static void _call_f_open_2925 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageSetupDialog *)cls)->open (arg1, arg2);
 }
@@ -189,7 +189,7 @@ static void _call_f_setEnabledOptions_4966 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPageSetupDialog::PageSetupDialogOption> arg1 = args.read<QFlags<QPageSetupDialog::PageSetupDialogOption> > (heap);
+  QFlags<QPageSetupDialog::PageSetupDialogOption> arg1 = gsi::arg_reader<QFlags<QPageSetupDialog::PageSetupDialogOption> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageSetupDialog *)cls)->setEnabledOptions (arg1);
 }
@@ -211,8 +211,8 @@ static void _call_f_setOption_5026 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageSetupDialog *)cls)->setOption (qt_gsi::QtToCppAdaptor<QPageSetupDialog::PageSetupDialogOption>(arg1).cref(), arg2);
 }
@@ -232,7 +232,7 @@ static void _call_f_setOptions_4966 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPageSetupDialog::PageSetupDialogOption> arg1 = args.read<QFlags<QPageSetupDialog::PageSetupDialogOption> > (heap);
+  QFlags<QPageSetupDialog::PageSetupDialogOption> arg1 = gsi::arg_reader<QFlags<QPageSetupDialog::PageSetupDialogOption> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageSetupDialog *)cls)->setOptions (arg1);
 }
@@ -252,7 +252,7 @@ static void _call_f_testOption_c4270 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSetupDialog::PageSetupDialogOption>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QPageSetupDialog *)cls)->testOption (qt_gsi::QtToCppAdaptor<QPageSetupDialog::PageSetupDialogOption>(arg1).cref()));
 }
 
@@ -273,8 +273,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QPageSetupDialog::tr (arg1, arg2));
 }
 
@@ -297,9 +297,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QPageSetupDialog::tr (arg1, arg2, arg3));
 }
 
@@ -320,8 +320,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QPageSetupDialog::trUtf8 (arg1, arg2));
 }
 
@@ -344,9 +344,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QPageSetupDialog::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -449,8 +449,8 @@ static void _call_ctor_QPageSetupDialog_Adaptor_2650 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPrinter *arg1 = args.read<QPrinter * > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QPrinter *arg1 = gsi::arg_reader<QPrinter * >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QPageSetupDialog_Adaptor *> (new QPageSetupDialog_Adaptor (arg1, arg2));
 }
 
@@ -468,7 +468,7 @@ static void _call_ctor_QPageSetupDialog_Adaptor_1315 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QPageSetupDialog_Adaptor *> (new QPageSetupDialog_Adaptor (arg1));
 }
 

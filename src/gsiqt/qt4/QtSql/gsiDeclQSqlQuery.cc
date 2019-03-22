@@ -55,7 +55,7 @@ static void _call_ctor_QSqlQuery_1646 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSqlResult *arg1 = args.read<QSqlResult * > (heap);
+  QSqlResult *arg1 = gsi::arg_reader<QSqlResult * >() (args, heap);
   ret.write<QSqlQuery *> (new QSqlQuery (arg1));
 }
 
@@ -76,8 +76,8 @@ static void _call_ctor_QSqlQuery_3527 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  QSqlDatabase arg2 = args ? args.read<QSqlDatabase > (heap) : (QSqlDatabase)(QSqlDatabase());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QSqlDatabase arg2 = args ? gsi::arg_reader<QSqlDatabase >() (args, heap) : gsi::arg_maker<QSqlDatabase >() (QSqlDatabase(), heap);
   ret.write<QSqlQuery *> (new QSqlQuery (arg1, arg2));
 }
 
@@ -96,7 +96,7 @@ static void _call_ctor_QSqlQuery_1610 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSqlDatabase arg1 = args.read<QSqlDatabase > (heap);
+  QSqlDatabase arg1 = gsi::arg_reader<QSqlDatabase >() (args, heap);
   ret.write<QSqlQuery *> (new QSqlQuery (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_ctor_QSqlQuery_2232 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlQuery &arg1 = args.read<const QSqlQuery & > (heap);
+  const QSqlQuery &arg1 = gsi::arg_reader<const QSqlQuery & >() (args, heap);
   ret.write<QSqlQuery *> (new QSqlQuery (arg1));
 }
 
@@ -136,8 +136,8 @@ static void _call_f_addBindValue_4937 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
-  QFlags<QSql::ParamTypeFlag> arg2 = args ? args.read<QFlags<QSql::ParamTypeFlag> > (heap) : (QFlags<QSql::ParamTypeFlag>)(QSql::In);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
+  QFlags<QSql::ParamTypeFlag> arg2 = args ? gsi::arg_reader<QFlags<QSql::ParamTypeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QSql::ParamTypeFlag> >() (QSql::In, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlQuery *)cls)->addBindValue (arg1, arg2);
 }
@@ -176,9 +176,9 @@ static void _call_f_bindValue_6854 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
-  QFlags<QSql::ParamTypeFlag> arg3 = args ? args.read<QFlags<QSql::ParamTypeFlag> > (heap) : (QFlags<QSql::ParamTypeFlag>)(QSql::In);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  QFlags<QSql::ParamTypeFlag> arg3 = args ? gsi::arg_reader<QFlags<QSql::ParamTypeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QSql::ParamTypeFlag> >() (QSql::In, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlQuery *)cls)->bindValue (arg1, arg2, arg3);
 }
@@ -202,9 +202,9 @@ static void _call_f_bindValue_5596 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
-  QFlags<QSql::ParamTypeFlag> arg3 = args ? args.read<QFlags<QSql::ParamTypeFlag> > (heap) : (QFlags<QSql::ParamTypeFlag>)(QSql::In);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  QFlags<QSql::ParamTypeFlag> arg3 = args ? gsi::arg_reader<QFlags<QSql::ParamTypeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QSql::ParamTypeFlag> >() (QSql::In, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlQuery *)cls)->bindValue (arg1, arg2, arg3);
 }
@@ -224,7 +224,7 @@ static void _call_f_boundValue_c2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QSqlQuery *)cls)->boundValue (arg1));
 }
 
@@ -243,7 +243,7 @@ static void _call_f_boundValue_c767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QVariant > ((QVariant)((QSqlQuery *)cls)->boundValue (arg1));
 }
 
@@ -308,7 +308,7 @@ static void _call_f_exec_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QSqlQuery *)cls)->exec (arg1));
 }
 
@@ -342,7 +342,7 @@ static void _call_f_execBatch_3290 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSqlQuery::BatchExecutionMode>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QSqlQuery::BatchExecutionMode>::target_type & > (heap) : (const qt_gsi::Converter<QSqlQuery::BatchExecutionMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSqlQuery::BatchExecutionMode>(heap, QSqlQuery::ValuesAsRows));
+  const qt_gsi::Converter<QSqlQuery::BatchExecutionMode>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QSqlQuery::BatchExecutionMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSqlQuery::BatchExecutionMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSqlQuery::BatchExecutionMode>(heap, QSqlQuery::ValuesAsRows), heap);
   ret.write<bool > ((bool)((QSqlQuery *)cls)->execBatch (qt_gsi::QtToCppAdaptor<QSqlQuery::BatchExecutionMode>(arg1).cref()));
 }
 
@@ -437,7 +437,7 @@ static void _call_f_isNull_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QSqlQuery *)cls)->isNull (arg1));
 }
 
@@ -606,7 +606,7 @@ static void _call_f_operator_eq__2232 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlQuery &arg1 = args.read<const QSqlQuery & > (heap);
+  const QSqlQuery &arg1 = gsi::arg_reader<const QSqlQuery & >() (args, heap);
   ret.write<QSqlQuery & > ((QSqlQuery &)((QSqlQuery *)cls)->operator= (arg1));
 }
 
@@ -625,7 +625,7 @@ static void _call_f_prepare_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QSqlQuery *)cls)->prepare (arg1));
 }
 
@@ -691,8 +691,8 @@ static void _call_f_seek_1523 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(false);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<bool > ((bool)((QSqlQuery *)cls)->seek (arg1, arg2));
 }
 
@@ -711,7 +711,7 @@ static void _call_f_setForwardOnly_864 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlQuery *)cls)->setForwardOnly (arg1);
 }
@@ -731,7 +731,7 @@ static void _call_f_setNumericalPrecisionPolicy_3429 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSql::NumericalPrecisionPolicy>::target_type & arg1 = args.read<const qt_gsi::Converter<QSql::NumericalPrecisionPolicy>::target_type & > (heap);
+  const qt_gsi::Converter<QSql::NumericalPrecisionPolicy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSql::NumericalPrecisionPolicy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlQuery *)cls)->setNumericalPrecisionPolicy (qt_gsi::QtToCppAdaptor<QSql::NumericalPrecisionPolicy>(arg1).cref());
 }
@@ -766,7 +766,7 @@ static void _call_f_value_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QVariant > ((QVariant)((QSqlQuery *)cls)->value (arg1));
 }
 

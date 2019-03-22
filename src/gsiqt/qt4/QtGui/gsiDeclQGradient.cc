@@ -96,7 +96,7 @@ static void _call_f_operator_excl__eq__c2208 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGradient &arg1 = args.read<const QGradient & > (heap);
+  const QGradient &arg1 = gsi::arg_reader<const QGradient & >() (args, heap);
   ret.write<bool > ((bool)((QGradient *)cls)->operator!= (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_operator_eq__eq__c2208 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGradient &arg1 = args.read<const QGradient & > (heap);
+  const QGradient &arg1 = gsi::arg_reader<const QGradient & >() (args, heap);
   ret.write<bool > ((bool)((QGradient *)cls)->operator== (arg1));
 }
 
@@ -134,7 +134,7 @@ static void _call_f_operator_eq__eq__2208 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGradient &arg1 = args.read<const QGradient & > (heap);
+  const QGradient &arg1 = gsi::arg_reader<const QGradient & >() (args, heap);
   ret.write<bool > ((bool)((QGradient *)cls)->operator== (arg1));
 }
 
@@ -155,8 +155,8 @@ static void _call_f_setColorAt_2868 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  const QColor &arg2 = args.read<const QColor & > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  const QColor &arg2 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGradient *)cls)->setColorAt (arg1, arg2);
 }
@@ -176,7 +176,7 @@ static void _call_f_setCoordinateMode_2868 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGradient::CoordinateMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QGradient::CoordinateMode>::target_type & > (heap);
+  const qt_gsi::Converter<QGradient::CoordinateMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGradient::CoordinateMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGradient *)cls)->setCoordinateMode (qt_gsi::QtToCppAdaptor<QGradient::CoordinateMode>(arg1).cref());
 }
@@ -196,7 +196,7 @@ static void _call_f_setInterpolationMode_3220 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGradient::InterpolationMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QGradient::InterpolationMode>::target_type & > (heap);
+  const qt_gsi::Converter<QGradient::InterpolationMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGradient::InterpolationMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGradient *)cls)->setInterpolationMode (qt_gsi::QtToCppAdaptor<QGradient::InterpolationMode>(arg1).cref());
 }
@@ -216,7 +216,7 @@ static void _call_f_setSpread_2054 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGradient::Spread>::target_type & arg1 = args.read<const qt_gsi::Converter<QGradient::Spread>::target_type & > (heap);
+  const qt_gsi::Converter<QGradient::Spread>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGradient::Spread>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGradient *)cls)->setSpread (qt_gsi::QtToCppAdaptor<QGradient::Spread>(arg1).cref());
 }
@@ -236,7 +236,7 @@ static void _call_f_setStops_3460 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<QGradientStop> &arg1 = args.read<const QVector<QGradientStop> & > (heap);
+  const QVector<QGradientStop> &arg1 = gsi::arg_reader<const QVector<QGradientStop> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGradient *)cls)->setStops (arg1);
 }

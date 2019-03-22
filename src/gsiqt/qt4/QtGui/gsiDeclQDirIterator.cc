@@ -231,8 +231,8 @@ static void _call_ctor_QDirIterator_Adaptor_5251 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
-  QFlags<QDirIterator::IteratorFlag> arg2 = args ? args.read<QFlags<QDirIterator::IteratorFlag> > (heap) : (QFlags<QDirIterator::IteratorFlag>)(QDirIterator::NoIteratorFlags);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
+  QFlags<QDirIterator::IteratorFlag> arg2 = args ? gsi::arg_reader<QFlags<QDirIterator::IteratorFlag> >() (args, heap) : gsi::arg_maker<QFlags<QDirIterator::IteratorFlag> >() (QDirIterator::NoIteratorFlags, heap);
   ret.write<QDirIterator_Adaptor *> (new QDirIterator_Adaptor (arg1, arg2));
 }
 
@@ -252,8 +252,8 @@ static void _call_ctor_QDirIterator_Adaptor_5595 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<QDirIterator::IteratorFlag> arg2 = args ? args.read<QFlags<QDirIterator::IteratorFlag> > (heap) : (QFlags<QDirIterator::IteratorFlag>)(QDirIterator::NoIteratorFlags);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QDirIterator::IteratorFlag> arg2 = args ? gsi::arg_reader<QFlags<QDirIterator::IteratorFlag> >() (args, heap) : gsi::arg_maker<QFlags<QDirIterator::IteratorFlag> >() (QDirIterator::NoIteratorFlags, heap);
   ret.write<QDirIterator_Adaptor *> (new QDirIterator_Adaptor (arg1, arg2));
 }
 
@@ -275,9 +275,9 @@ static void _call_ctor_QDirIterator_Adaptor_7717 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<QDir::Filter> arg2 = args.read<QFlags<QDir::Filter> > (heap);
-  QFlags<QDirIterator::IteratorFlag> arg3 = args ? args.read<QFlags<QDirIterator::IteratorFlag> > (heap) : (QFlags<QDirIterator::IteratorFlag>)(QDirIterator::NoIteratorFlags);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QDir::Filter> arg2 = gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap);
+  QFlags<QDirIterator::IteratorFlag> arg3 = args ? gsi::arg_reader<QFlags<QDirIterator::IteratorFlag> >() (args, heap) : gsi::arg_maker<QFlags<QDirIterator::IteratorFlag> >() (QDirIterator::NoIteratorFlags, heap);
   ret.write<QDirIterator_Adaptor *> (new QDirIterator_Adaptor (arg1, arg2, arg3));
 }
 
@@ -301,10 +301,10 @@ static void _call_ctor_QDirIterator_Adaptor_10046 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QStringList &arg2 = args.read<const QStringList & > (heap);
-  QFlags<QDir::Filter> arg3 = args ? args.read<QFlags<QDir::Filter> > (heap) : (QFlags<QDir::Filter>)(QDir::NoFilter);
-  QFlags<QDirIterator::IteratorFlag> arg4 = args ? args.read<QFlags<QDirIterator::IteratorFlag> > (heap) : (QFlags<QDirIterator::IteratorFlag>)(QDirIterator::NoIteratorFlags);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
+  QFlags<QDir::Filter> arg3 = args ? gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap) : gsi::arg_maker<QFlags<QDir::Filter> >() (QDir::NoFilter, heap);
+  QFlags<QDirIterator::IteratorFlag> arg4 = args ? gsi::arg_reader<QFlags<QDirIterator::IteratorFlag> >() (args, heap) : gsi::arg_maker<QFlags<QDirIterator::IteratorFlag> >() (QDirIterator::NoIteratorFlags, heap);
   ret.write<QDirIterator_Adaptor *> (new QDirIterator_Adaptor (arg1, arg2, arg3, arg4));
 }
 

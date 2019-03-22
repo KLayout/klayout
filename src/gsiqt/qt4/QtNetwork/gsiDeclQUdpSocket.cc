@@ -69,7 +69,7 @@ static void _call_ctor_QUdpSocket_1302 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QUdpSocket *> (new QUdpSocket (arg1));
 }
 
@@ -90,8 +90,8 @@ static void _call_f_bind_3510 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
   ret.write<bool > ((bool)((QUdpSocket *)cls)->bind (arg1, arg2));
 }
 
@@ -110,7 +110,7 @@ static void _call_f_bind_1100 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  quint16 arg1 = args ? args.read<quint16 > (heap) : (quint16)(0);
+  quint16 arg1 = args ? gsi::arg_reader<quint16 >() (args, heap) : gsi::arg_maker<quint16 >() (0, heap);
   ret.write<bool > ((bool)((QUdpSocket *)cls)->bind (arg1));
 }
 
@@ -133,9 +133,9 @@ static void _call_f_bind_6404 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
-  QFlags<QUdpSocket::BindFlag> arg3 = args.read<QFlags<QUdpSocket::BindFlag> > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
+  QFlags<QUdpSocket::BindFlag> arg3 = gsi::arg_reader<QFlags<QUdpSocket::BindFlag> >() (args, heap);
   ret.write<bool > ((bool)((QUdpSocket *)cls)->bind (arg1, arg2, arg3));
 }
 
@@ -156,8 +156,8 @@ static void _call_f_bind_3994 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  quint16 arg1 = args.read<quint16 > (heap);
-  QFlags<QUdpSocket::BindFlag> arg2 = args.read<QFlags<QUdpSocket::BindFlag> > (heap);
+  quint16 arg1 = gsi::arg_reader<quint16 >() (args, heap);
+  QFlags<QUdpSocket::BindFlag> arg2 = gsi::arg_reader<QFlags<QUdpSocket::BindFlag> >() (args, heap);
   ret.write<bool > ((bool)((QUdpSocket *)cls)->bind (arg1, arg2));
 }
 
@@ -212,10 +212,10 @@ static void _call_f_writeDatagram_6011 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  qint64 arg2 = args.read<qint64 > (heap);
-  const QHostAddress &arg3 = args.read<const QHostAddress & > (heap);
-  quint16 arg4 = args.read<quint16 > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  qint64 arg2 = gsi::arg_reader<qint64 >() (args, heap);
+  const QHostAddress &arg3 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  quint16 arg4 = gsi::arg_reader<quint16 >() (args, heap);
   ret.write<qint64 > ((qint64)((QUdpSocket *)cls)->writeDatagram (arg1, arg2, arg3, arg4));
 }
 
@@ -238,9 +238,9 @@ static void _call_f_writeDatagram_5711 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QHostAddress &arg2 = args.read<const QHostAddress & > (heap);
-  quint16 arg3 = args.read<quint16 > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QHostAddress &arg2 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  quint16 arg3 = gsi::arg_reader<quint16 >() (args, heap);
   ret.write<qint64 > ((qint64)((QUdpSocket *)cls)->writeDatagram (arg1, arg2, arg3));
 }
 
@@ -261,8 +261,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QUdpSocket::tr (arg1, arg2));
 }
 
@@ -285,9 +285,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QUdpSocket::tr (arg1, arg2, arg3));
 }
 
@@ -308,8 +308,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QUdpSocket::trUtf8 (arg1, arg2));
 }
 
@@ -332,9 +332,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QUdpSocket::trUtf8 (arg1, arg2, arg3));
 }
 

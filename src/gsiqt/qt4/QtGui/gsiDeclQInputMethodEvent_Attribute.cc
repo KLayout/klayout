@@ -56,10 +56,10 @@ static void _call_ctor_QInputMethodEvent_Attribute_6102 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QInputMethodEvent::AttributeType>::target_type & arg1 = args.read<const qt_gsi::Converter<QInputMethodEvent::AttributeType>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  QVariant arg4 = args.read<QVariant > (heap);
+  const qt_gsi::Converter<QInputMethodEvent::AttributeType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QInputMethodEvent::AttributeType>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  QVariant arg4 = gsi::arg_reader<QVariant >() (args, heap);
   ret.write<QInputMethodEvent::Attribute *> (new QInputMethodEvent::Attribute (qt_gsi::QtToCppAdaptor<QInputMethodEvent::AttributeType>(arg1).cref(), arg2, arg3, arg4));
 }
 

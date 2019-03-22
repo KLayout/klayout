@@ -216,7 +216,7 @@ static void _call_f_operator_excl__eq__c2097 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlInfo &arg1 = args.read<const QUrlInfo & > (heap);
+  const QUrlInfo &arg1 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
   ret.write<bool > ((bool)((QUrlInfo *)cls)->operator!= (arg1));
 }
 
@@ -235,7 +235,7 @@ static void _call_f_operator_eq__2097 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlInfo &arg1 = args.read<const QUrlInfo & > (heap);
+  const QUrlInfo &arg1 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
   ret.write<QUrlInfo & > ((QUrlInfo &)((QUrlInfo *)cls)->operator= (arg1));
 }
 
@@ -254,7 +254,7 @@ static void _call_f_operator_eq__eq__c2097 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlInfo &arg1 = args.read<const QUrlInfo & > (heap);
+  const QUrlInfo &arg1 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
   ret.write<bool > ((bool)((QUrlInfo *)cls)->operator== (arg1));
 }
 
@@ -303,7 +303,7 @@ static void _call_f_setDir_864 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setDir (arg1);
 }
@@ -323,7 +323,7 @@ static void _call_f_setFile_864 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setFile (arg1);
 }
@@ -343,7 +343,7 @@ static void _call_f_setGroup_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setGroup (arg1);
 }
@@ -363,7 +363,7 @@ static void _call_f_setLastModified_2175 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setLastModified (arg1);
 }
@@ -383,7 +383,7 @@ static void _call_f_setLastRead_2175 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setLastRead (arg1);
 }
@@ -403,7 +403,7 @@ static void _call_f_setName_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setName (arg1);
 }
@@ -423,7 +423,7 @@ static void _call_f_setOwner_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setOwner (arg1);
 }
@@ -443,7 +443,7 @@ static void _call_f_setPermissions_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setPermissions (arg1);
 }
@@ -463,7 +463,7 @@ static void _call_f_setReadable_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setReadable (arg1);
 }
@@ -483,7 +483,7 @@ static void _call_f_setSize_986 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setSize (arg1);
 }
@@ -503,7 +503,7 @@ static void _call_f_setSymLink_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setSymLink (arg1);
 }
@@ -523,7 +523,7 @@ static void _call_f_setWritable_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlInfo *)cls)->setWritable (arg1);
 }
@@ -562,9 +562,9 @@ static void _call_f_equal_4745 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlInfo &arg1 = args.read<const QUrlInfo & > (heap);
-  const QUrlInfo &arg2 = args.read<const QUrlInfo & > (heap);
-  int arg3 = args.read<int > (heap);
+  const QUrlInfo &arg1 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
+  const QUrlInfo &arg2 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)QUrlInfo::equal (arg1, arg2, arg3));
 }
 
@@ -587,9 +587,9 @@ static void _call_f_greaterThan_4745 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlInfo &arg1 = args.read<const QUrlInfo & > (heap);
-  const QUrlInfo &arg2 = args.read<const QUrlInfo & > (heap);
-  int arg3 = args.read<int > (heap);
+  const QUrlInfo &arg1 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
+  const QUrlInfo &arg2 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)QUrlInfo::greaterThan (arg1, arg2, arg3));
 }
 
@@ -612,9 +612,9 @@ static void _call_f_lessThan_4745 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlInfo &arg1 = args.read<const QUrlInfo & > (heap);
-  const QUrlInfo &arg2 = args.read<const QUrlInfo & > (heap);
-  int arg3 = args.read<int > (heap);
+  const QUrlInfo &arg1 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
+  const QUrlInfo &arg2 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)QUrlInfo::lessThan (arg1, arg2, arg3));
 }
 
@@ -893,7 +893,7 @@ static void _call_ctor_QUrlInfo_Adaptor_2097 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlInfo &arg1 = args.read<const QUrlInfo & > (heap);
+  const QUrlInfo &arg1 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
   ret.write<QUrlInfo_Adaptor *> (new QUrlInfo_Adaptor (arg1));
 }
 

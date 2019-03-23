@@ -119,8 +119,8 @@ static void _call_f_addButton_4728 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractButton *arg1 = args.read<QAbstractButton * > (heap);
-  const qt_gsi::Converter<QMessageBox::ButtonRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QMessageBox::ButtonRole>::target_type & > (heap);
+  QAbstractButton *arg1 = gsi::arg_reader<QAbstractButton * >() (args, heap);
+  const qt_gsi::Converter<QMessageBox::ButtonRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::ButtonRole>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->addButton (arg1, qt_gsi::QtToCppAdaptor<QMessageBox::ButtonRole>(arg2).cref());
 }
@@ -142,8 +142,8 @@ static void _call_f_addButton_4594 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QMessageBox::ButtonRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QMessageBox::ButtonRole>::target_type & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QMessageBox::ButtonRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::ButtonRole>::target_type & >() (args, heap);
   ret.write<QPushButton * > ((QPushButton *)((QMessageBox *)cls)->addButton (arg1, qt_gsi::QtToCppAdaptor<QMessageBox::ButtonRole>(arg2).cref()));
 }
 
@@ -162,7 +162,7 @@ static void _call_f_addButton_3092 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg1 = args.read<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & > (heap);
+  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (args, heap);
   ret.write<QPushButton * > ((QPushButton *)((QMessageBox *)cls)->addButton (qt_gsi::QtToCppAdaptor<QMessageBox::StandardButton>(arg1).cref()));
 }
 
@@ -181,7 +181,7 @@ static void _call_f_button_c3092 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg1 = args.read<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & > (heap);
+  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (args, heap);
   ret.write<QAbstractButton * > ((QAbstractButton *)((QMessageBox *)cls)->button (qt_gsi::QtToCppAdaptor<QMessageBox::StandardButton>(arg1).cref()));
 }
 
@@ -200,7 +200,7 @@ static void _call_f_buttonRole_c2159 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractButton *arg1 = args.read<QAbstractButton * > (heap);
+  QAbstractButton *arg1 = gsi::arg_reader<QAbstractButton * >() (args, heap);
   ret.write<qt_gsi::Converter<QMessageBox::ButtonRole>::target_type > ((qt_gsi::Converter<QMessageBox::ButtonRole>::target_type)qt_gsi::CppToQtAdaptor<QMessageBox::ButtonRole>(((QMessageBox *)cls)->buttonRole (arg1)));
 }
 
@@ -219,7 +219,7 @@ static void _call_f_buttonText_c767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QMessageBox *)cls)->buttonText (arg1));
 }
 
@@ -391,8 +391,8 @@ static void _call_f_open_2925 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->open (arg1, arg2);
 }
@@ -412,7 +412,7 @@ static void _call_f_removeButton_2159 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractButton *arg1 = args.read<QAbstractButton * > (heap);
+  QAbstractButton *arg1 = gsi::arg_reader<QAbstractButton * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->removeButton (arg1);
 }
@@ -434,8 +434,8 @@ static void _call_f_setButtonText_2684 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setButtonText (arg1, arg2);
 }
@@ -455,7 +455,7 @@ static void _call_f_setCheckBox_1478 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QCheckBox *arg1 = args.read<QCheckBox * > (heap);
+  QCheckBox *arg1 = gsi::arg_reader<QCheckBox * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setCheckBox (arg1);
 }
@@ -475,7 +475,7 @@ static void _call_f_setDefaultButton_1755 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPushButton *arg1 = args.read<QPushButton * > (heap);
+  QPushButton *arg1 = gsi::arg_reader<QPushButton * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setDefaultButton (arg1);
 }
@@ -495,7 +495,7 @@ static void _call_f_setDefaultButton_3092 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg1 = args.read<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & > (heap);
+  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setDefaultButton (qt_gsi::QtToCppAdaptor<QMessageBox::StandardButton>(arg1).cref());
 }
@@ -515,7 +515,7 @@ static void _call_f_setDetailedText_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setDetailedText (arg1);
 }
@@ -535,7 +535,7 @@ static void _call_f_setEscapeButton_2159 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractButton *arg1 = args.read<QAbstractButton * > (heap);
+  QAbstractButton *arg1 = gsi::arg_reader<QAbstractButton * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setEscapeButton (arg1);
 }
@@ -555,7 +555,7 @@ static void _call_f_setEscapeButton_3092 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg1 = args.read<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & > (heap);
+  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setEscapeButton (qt_gsi::QtToCppAdaptor<QMessageBox::StandardButton>(arg1).cref());
 }
@@ -575,7 +575,7 @@ static void _call_f_setIcon_2032 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMessageBox::Icon>::target_type & arg1 = args.read<const qt_gsi::Converter<QMessageBox::Icon>::target_type & > (heap);
+  const qt_gsi::Converter<QMessageBox::Icon>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::Icon>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setIcon (qt_gsi::QtToCppAdaptor<QMessageBox::Icon>(arg1).cref());
 }
@@ -595,7 +595,7 @@ static void _call_f_setIconPixmap_2017 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setIconPixmap (arg1);
 }
@@ -615,7 +615,7 @@ static void _call_f_setInformativeText_2025 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setInformativeText (arg1);
 }
@@ -635,7 +635,7 @@ static void _call_f_setStandardButtons_3788 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QMessageBox::StandardButton> arg1 = args.read<QFlags<QMessageBox::StandardButton> > (heap);
+  QFlags<QMessageBox::StandardButton> arg1 = gsi::arg_reader<QFlags<QMessageBox::StandardButton> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setStandardButtons (arg1);
 }
@@ -655,7 +655,7 @@ static void _call_f_setText_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setText (arg1);
 }
@@ -675,7 +675,7 @@ static void _call_f_setTextFormat_1787 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TextFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::TextFormat>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::TextFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TextFormat>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setTextFormat (qt_gsi::QtToCppAdaptor<Qt::TextFormat>(arg1).cref());
 }
@@ -695,7 +695,7 @@ static void _call_f_setTextInteractionFlags_3396 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::TextInteractionFlag> arg1 = args.read<QFlags<Qt::TextInteractionFlag> > (heap);
+  QFlags<Qt::TextInteractionFlag> arg1 = gsi::arg_reader<QFlags<Qt::TextInteractionFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setTextInteractionFlags (arg1);
 }
@@ -715,7 +715,7 @@ static void _call_f_setWindowModality_2216 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::WindowModality>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::WindowModality>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::WindowModality>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::WindowModality>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setWindowModality (qt_gsi::QtToCppAdaptor<Qt::WindowModality>(arg1).cref());
 }
@@ -735,7 +735,7 @@ static void _call_f_setWindowTitle_2025 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox *)cls)->setWindowTitle (arg1);
 }
@@ -755,7 +755,7 @@ static void _call_f_standardButton_c2159 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractButton *arg1 = args.read<QAbstractButton * > (heap);
+  QAbstractButton *arg1 = gsi::arg_reader<QAbstractButton * >() (args, heap);
   ret.write<qt_gsi::Converter<QMessageBox::StandardButton>::target_type > ((qt_gsi::Converter<QMessageBox::StandardButton>::target_type)qt_gsi::CppToQtAdaptor<QMessageBox::StandardButton>(((QMessageBox *)cls)->standardButton (arg1)));
 }
 
@@ -838,9 +838,9 @@ static void _call_f_about_5149 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QMessageBox::about (arg1, arg2, arg3);
 }
@@ -862,8 +862,8 @@ static void _call_f_aboutQt_3232 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QMessageBox::aboutQt (arg1, arg2);
 }
@@ -891,11 +891,11 @@ static void _call_f_critical_11813 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  QFlags<QMessageBox::StandardButton> arg4 = args ? args.read<QFlags<QMessageBox::StandardButton> > (heap) : (QFlags<QMessageBox::StandardButton>)(QMessageBox::Ok);
-  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & > (heap) : (const qt_gsi::Converter<QMessageBox::StandardButton>::target_type &)(qt_gsi::CppToQtReadAdaptor<QMessageBox::StandardButton>(heap, QMessageBox::NoButton));
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QMessageBox::StandardButton> arg4 = args ? gsi::arg_reader<QFlags<QMessageBox::StandardButton> >() (args, heap) : gsi::arg_maker<QFlags<QMessageBox::StandardButton> >() (QMessageBox::Ok, heap);
+  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QMessageBox::StandardButton>(heap, QMessageBox::NoButton), heap);
   ret.write<qt_gsi::Converter<QMessageBox::StandardButton>::target_type > ((qt_gsi::Converter<QMessageBox::StandardButton>::target_type)qt_gsi::CppToQtAdaptor<QMessageBox::StandardButton>(QMessageBox::critical (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QMessageBox::StandardButton>(arg5).cref())));
 }
 
@@ -922,11 +922,11 @@ static void _call_f_information_11813 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  QFlags<QMessageBox::StandardButton> arg4 = args ? args.read<QFlags<QMessageBox::StandardButton> > (heap) : (QFlags<QMessageBox::StandardButton>)(QMessageBox::Ok);
-  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & > (heap) : (const qt_gsi::Converter<QMessageBox::StandardButton>::target_type &)(qt_gsi::CppToQtReadAdaptor<QMessageBox::StandardButton>(heap, QMessageBox::NoButton));
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QMessageBox::StandardButton> arg4 = args ? gsi::arg_reader<QFlags<QMessageBox::StandardButton> >() (args, heap) : gsi::arg_maker<QFlags<QMessageBox::StandardButton> >() (QMessageBox::Ok, heap);
+  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QMessageBox::StandardButton>(heap, QMessageBox::NoButton), heap);
   ret.write<qt_gsi::Converter<QMessageBox::StandardButton>::target_type > ((qt_gsi::Converter<QMessageBox::StandardButton>::target_type)qt_gsi::CppToQtAdaptor<QMessageBox::StandardButton>(QMessageBox::information (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QMessageBox::StandardButton>(arg5).cref())));
 }
 
@@ -953,11 +953,11 @@ static void _call_f_question_11813 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  QFlags<QMessageBox::StandardButton> arg4 = args ? args.read<QFlags<QMessageBox::StandardButton> > (heap) : (QFlags<QMessageBox::StandardButton>)(QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No));
-  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & > (heap) : (const qt_gsi::Converter<QMessageBox::StandardButton>::target_type &)(qt_gsi::CppToQtReadAdaptor<QMessageBox::StandardButton>(heap, QMessageBox::NoButton));
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QMessageBox::StandardButton> arg4 = args ? gsi::arg_reader<QFlags<QMessageBox::StandardButton> >() (args, heap) : gsi::arg_maker<QFlags<QMessageBox::StandardButton> >() (QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No), heap);
+  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QMessageBox::StandardButton>(heap, QMessageBox::NoButton), heap);
   ret.write<qt_gsi::Converter<QMessageBox::StandardButton>::target_type > ((qt_gsi::Converter<QMessageBox::StandardButton>::target_type)qt_gsi::CppToQtAdaptor<QMessageBox::StandardButton>(QMessageBox::question (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QMessageBox::StandardButton>(arg5).cref())));
 }
 
@@ -980,9 +980,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMessageBox::tr (arg1, arg2, arg3));
 }
 
@@ -1005,9 +1005,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMessageBox::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1034,11 +1034,11 @@ static void _call_f_warning_11813 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  QFlags<QMessageBox::StandardButton> arg4 = args ? args.read<QFlags<QMessageBox::StandardButton> > (heap) : (QFlags<QMessageBox::StandardButton>)(QMessageBox::Ok);
-  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & > (heap) : (const qt_gsi::Converter<QMessageBox::StandardButton>::target_type &)(qt_gsi::CppToQtReadAdaptor<QMessageBox::StandardButton>(heap, QMessageBox::NoButton));
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QMessageBox::StandardButton> arg4 = args ? gsi::arg_reader<QFlags<QMessageBox::StandardButton> >() (args, heap) : gsi::arg_maker<QFlags<QMessageBox::StandardButton> >() (QMessageBox::Ok, heap);
+  const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QMessageBox::StandardButton>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QMessageBox::StandardButton>(heap, QMessageBox::NoButton), heap);
   ret.write<qt_gsi::Converter<QMessageBox::StandardButton>::target_type > ((qt_gsi::Converter<QMessageBox::StandardButton>::target_type)qt_gsi::CppToQtAdaptor<QMessageBox::StandardButton>(QMessageBox::warning (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QMessageBox::StandardButton>(arg5).cref())));
 }
 
@@ -2100,7 +2100,7 @@ static void _call_ctor_QMessageBox_Adaptor_1315 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QMessageBox_Adaptor *> (new QMessageBox_Adaptor (arg1));
 }
 
@@ -2128,12 +2128,12 @@ static void _call_ctor_QMessageBox_Adaptor_13140 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMessageBox::Icon>::target_type & arg1 = args.read<const qt_gsi::Converter<QMessageBox::Icon>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  QFlags<QMessageBox::StandardButton> arg4 = args ? args.read<QFlags<QMessageBox::StandardButton> > (heap) : (QFlags<QMessageBox::StandardButton>)(QMessageBox::NoButton);
-  QWidget *arg5 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  QFlags<Qt::WindowType> arg6 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+  const qt_gsi::Converter<QMessageBox::Icon>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::Icon>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QMessageBox::StandardButton> arg4 = args ? gsi::arg_reader<QFlags<QMessageBox::StandardButton> >() (args, heap) : gsi::arg_maker<QFlags<QMessageBox::StandardButton> >() (QMessageBox::NoButton, heap);
+  QWidget *arg5 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QFlags<Qt::WindowType> arg6 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint, heap);
   ret.write<QMessageBox_Adaptor *> (new QMessageBox_Adaptor (qt_gsi::QtToCppAdaptor<QMessageBox::Icon>(arg1).cref(), arg2, arg3, arg4, arg5, arg6));
 }
 
@@ -2165,14 +2165,14 @@ static void _call_ctor_QMessageBox_Adaptor_11437 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QMessageBox::Icon>::target_type & arg3 = args.read<const qt_gsi::Converter<QMessageBox::Icon>::target_type & > (heap);
-  int arg4 = args.read<int > (heap);
-  int arg5 = args.read<int > (heap);
-  int arg6 = args.read<int > (heap);
-  QWidget *arg7 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  QFlags<Qt::WindowType> arg8 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QMessageBox::Icon>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QMessageBox::Icon>::target_type & >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  int arg6 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg7 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QFlags<Qt::WindowType> arg8 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint, heap);
   ret.write<QMessageBox_Adaptor *> (new QMessageBox_Adaptor (arg1, arg2, qt_gsi::QtToCppAdaptor<QMessageBox::Icon>(arg3).cref(), arg4, arg5, arg6, arg7, arg8));
 }
 
@@ -2248,7 +2248,7 @@ static void _call_fp_adjustPosition_1315 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox_Adaptor *)cls)->fp_QMessageBox_adjustPosition_1315 (arg1);
 }
@@ -2267,7 +2267,7 @@ static void _call_emitter_buttonClicked_2159 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractButton *arg1 = args.read<QAbstractButton * > (heap);
+  QAbstractButton *arg1 = gsi::arg_reader<QAbstractButton * >() (args, heap);
   ((QMessageBox_Adaptor *)cls)->emitter_QMessageBox_buttonClicked_2159 (arg1);
 }
 
@@ -2385,9 +2385,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox_Adaptor *)cls)->fp_QMessageBox_create_2208 (arg1, arg2, arg3);
 }
@@ -2406,7 +2406,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QMessageBox_Adaptor *)cls)->emitter_QMessageBox_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2450,8 +2450,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageBox_Adaptor *)cls)->fp_QMessageBox_destroy_1620 (arg1, arg2);
 }
@@ -2470,7 +2470,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QMessageBox_Adaptor *)cls)->emitter_QMessageBox_destroyed_1302 (arg1);
 }
 
@@ -2724,7 +2724,7 @@ static void _call_emitter_finished_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QMessageBox_Adaptor *)cls)->emitter_QMessageBox_finished_767 (arg1);
 }
 
@@ -2978,7 +2978,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QMessageBox_Adaptor *)cls)->fp_QMessageBox_isSignalConnected_c2394 (arg1));
 }
 
@@ -3322,7 +3322,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QMessageBox_Adaptor *)cls)->fp_QMessageBox_receivers_c1731 (arg1));
 }
 
@@ -3622,7 +3622,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QMessageBox_Adaptor *)cls)->emitter_QMessageBox_windowIconChanged_1787 (arg1);
 }
 
@@ -3640,7 +3640,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QMessageBox_Adaptor *)cls)->emitter_QMessageBox_windowIconTextChanged_2025 (arg1);
 }
 
@@ -3658,7 +3658,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QMessageBox_Adaptor *)cls)->emitter_QMessageBox_windowTitleChanged_2025 (arg1);
 }
 

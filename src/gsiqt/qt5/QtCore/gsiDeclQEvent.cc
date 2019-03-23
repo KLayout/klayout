@@ -97,7 +97,7 @@ static void _call_f_operator_eq__1908 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEvent &arg1 = args.read<const QEvent & > (heap);
+  const QEvent &arg1 = gsi::arg_reader<const QEvent & >() (args, heap);
   ret.write<QEvent & > ((QEvent &)((QEvent *)cls)->operator= (arg1));
 }
 
@@ -116,7 +116,7 @@ static void _call_f_setAccepted_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEvent *)cls)->setAccepted (arg1);
 }
@@ -166,7 +166,7 @@ static void _call_f_registerEventType_767 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(-1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<int > ((int)QEvent::registerEventType (arg1));
 }
 
@@ -232,7 +232,7 @@ static void _call_ctor_QEvent_Adaptor_1565 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
   ret.write<QEvent_Adaptor *> (new QEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref()));
 }
 
@@ -250,7 +250,7 @@ static void _call_ctor_QEvent_Adaptor_1908 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEvent &arg1 = args.read<const QEvent & > (heap);
+  const QEvent &arg1 = gsi::arg_reader<const QEvent & >() (args, heap);
   ret.write<QEvent_Adaptor *> (new QEvent_Adaptor (arg1));
 }
 

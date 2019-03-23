@@ -272,7 +272,7 @@ static void _call_f_setName_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDnsLookup *)cls)->setName (arg1);
 }
@@ -292,7 +292,7 @@ static void _call_f_setNameserver_2518 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDnsLookup *)cls)->setNameserver (arg1);
 }
@@ -312,7 +312,7 @@ static void _call_f_setType_1978 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QDnsLookup::Type>::target_type & > (heap);
+  const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDnsLookup::Type>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDnsLookup *)cls)->setType (qt_gsi::QtToCppAdaptor<QDnsLookup::Type>(arg1).cref());
 }
@@ -366,9 +366,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QDnsLookup::tr (arg1, arg2, arg3));
 }
 
@@ -391,9 +391,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QDnsLookup::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -648,7 +648,7 @@ static void _call_ctor_QDnsLookup_Adaptor_1302 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QDnsLookup_Adaptor *> (new QDnsLookup_Adaptor (arg1));
 }
 
@@ -670,9 +670,9 @@ static void _call_ctor_QDnsLookup_Adaptor_5089 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QDnsLookup::Type>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  QObject *arg3 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDnsLookup::Type>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QDnsLookup_Adaptor *> (new QDnsLookup_Adaptor (qt_gsi::QtToCppAdaptor<QDnsLookup::Type>(arg1).cref(), arg2, arg3));
 }
 
@@ -696,10 +696,10 @@ static void _call_ctor_QDnsLookup_Adaptor_7499 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QDnsLookup::Type>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QHostAddress &arg3 = args.read<const QHostAddress & > (heap);
-  QObject *arg4 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDnsLookup::Type>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QHostAddress &arg3 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  QObject *arg4 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QDnsLookup_Adaptor *> (new QDnsLookup_Adaptor (qt_gsi::QtToCppAdaptor<QDnsLookup::Type>(arg1).cref(), arg2, arg3, arg4));
 }
 
@@ -765,7 +765,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QDnsLookup_Adaptor *)cls)->emitter_QDnsLookup_destroyed_1302 (arg1);
 }
 
@@ -870,7 +870,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QDnsLookup_Adaptor *)cls)->fp_QDnsLookup_isSignalConnected_c2394 (arg1));
 }
 
@@ -888,7 +888,7 @@ static void _call_emitter_nameChanged_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QDnsLookup_Adaptor *)cls)->emitter_QDnsLookup_nameChanged_2025 (arg1);
 }
 
@@ -906,7 +906,7 @@ static void _call_emitter_nameserverChanged_2518 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   ((QDnsLookup_Adaptor *)cls)->emitter_QDnsLookup_nameserverChanged_2518 (arg1);
 }
 
@@ -924,7 +924,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QDnsLookup_Adaptor *)cls)->fp_QDnsLookup_receivers_c1731 (arg1));
 }
 
@@ -994,7 +994,7 @@ static void _call_emitter_typeChanged_1978 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QDnsLookup::Type>::target_type & > (heap);
+  const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDnsLookup::Type>::target_type & >() (args, heap);
   ((QDnsLookup_Adaptor *)cls)->emitter_QDnsLookup_typeChanged_1978 (arg1);
 }
 

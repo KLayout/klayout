@@ -65,7 +65,7 @@ static void _call_ctor_QXmlStreamStringRef_2310 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
   ret.write<QXmlStreamStringRef *> (new QXmlStreamStringRef (arg1));
 }
 
@@ -84,7 +84,7 @@ static void _call_ctor_QXmlStreamStringRef_2025 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QXmlStreamStringRef *> (new QXmlStreamStringRef (arg1));
 }
 

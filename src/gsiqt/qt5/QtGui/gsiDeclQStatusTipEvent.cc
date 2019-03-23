@@ -102,7 +102,7 @@ static void _call_ctor_QStatusTipEvent_Adaptor_2025 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStatusTipEvent_Adaptor *> (new QStatusTipEvent_Adaptor (arg1));
 }
 

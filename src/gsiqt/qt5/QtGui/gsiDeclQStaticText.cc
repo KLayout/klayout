@@ -69,7 +69,7 @@ static void _call_ctor_QStaticText_2025 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStaticText *> (new QStaticText (arg1));
 }
 
@@ -88,7 +88,7 @@ static void _call_ctor_QStaticText_2431 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStaticText &arg1 = args.read<const QStaticText & > (heap);
+  const QStaticText &arg1 = gsi::arg_reader<const QStaticText & >() (args, heap);
   ret.write<QStaticText *> (new QStaticText (arg1));
 }
 
@@ -107,7 +107,7 @@ static void _call_f_operator_excl__eq__c2431 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStaticText &arg1 = args.read<const QStaticText & > (heap);
+  const QStaticText &arg1 = gsi::arg_reader<const QStaticText & >() (args, heap);
   ret.write<bool > ((bool)((QStaticText *)cls)->operator!= (arg1));
 }
 
@@ -126,7 +126,7 @@ static void _call_f_operator_eq__2431 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStaticText &arg1 = args.read<const QStaticText & > (heap);
+  const QStaticText &arg1 = gsi::arg_reader<const QStaticText & >() (args, heap);
   ret.write<QStaticText & > ((QStaticText &)((QStaticText *)cls)->operator= (arg1));
 }
 
@@ -145,7 +145,7 @@ static void _call_f_operator_eq__eq__c2431 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStaticText &arg1 = args.read<const QStaticText & > (heap);
+  const QStaticText &arg1 = gsi::arg_reader<const QStaticText & >() (args, heap);
   ret.write<bool > ((bool)((QStaticText *)cls)->operator== (arg1));
 }
 
@@ -181,8 +181,8 @@ static void _call_f_prepare_4043 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args ? args.read<const QTransform & > (heap) : (const QTransform &)(QTransform());
-  const QFont &arg2 = args ? args.read<const QFont & > (heap) : (const QFont &)(QFont());
+  const QTransform &arg1 = args ? gsi::arg_reader<const QTransform & >() (args, heap) : gsi::arg_maker<const QTransform & >() (QTransform(), heap);
+  const QFont &arg2 = args ? gsi::arg_reader<const QFont & >() (args, heap) : gsi::arg_maker<const QFont & >() (QFont(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStaticText *)cls)->prepare (arg1, arg2);
 }
@@ -202,7 +202,7 @@ static void _call_f_setPerformanceHint_3211 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStaticText::PerformanceHint>::target_type & arg1 = args.read<const qt_gsi::Converter<QStaticText::PerformanceHint>::target_type & > (heap);
+  const qt_gsi::Converter<QStaticText::PerformanceHint>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStaticText::PerformanceHint>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStaticText *)cls)->setPerformanceHint (qt_gsi::QtToCppAdaptor<QStaticText::PerformanceHint>(arg1).cref());
 }
@@ -222,7 +222,7 @@ static void _call_f_setText_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStaticText *)cls)->setText (arg1);
 }
@@ -242,7 +242,7 @@ static void _call_f_setTextFormat_1787 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TextFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::TextFormat>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::TextFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TextFormat>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStaticText *)cls)->setTextFormat (qt_gsi::QtToCppAdaptor<Qt::TextFormat>(arg1).cref());
 }
@@ -262,7 +262,7 @@ static void _call_f_setTextOption_2448 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextOption &arg1 = args.read<const QTextOption & > (heap);
+  const QTextOption &arg1 = gsi::arg_reader<const QTextOption & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStaticText *)cls)->setTextOption (arg1);
 }
@@ -282,7 +282,7 @@ static void _call_f_setTextWidth_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStaticText *)cls)->setTextWidth (arg1);
 }
@@ -317,7 +317,7 @@ static void _call_f_swap_1736 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStaticText &arg1 = args.read<QStaticText & > (heap);
+  QStaticText &arg1 = gsi::arg_reader<QStaticText & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStaticText *)cls)->swap (arg1);
 }

@@ -101,7 +101,7 @@ static void _call_ctor_QToolBarChangeEvent_Adaptor_864 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ret.write<QToolBarChangeEvent_Adaptor *> (new QToolBarChangeEvent_Adaptor (arg1));
 }
 

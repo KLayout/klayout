@@ -51,7 +51,7 @@ static void _call_ctor_QColormap_2223 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColormap &arg1 = args.read<const QColormap & > (heap);
+  const QColormap &arg1 = gsi::arg_reader<const QColormap & >() (args, heap);
   ret.write<QColormap *> (new QColormap (arg1));
 }
 
@@ -70,7 +70,7 @@ static void _call_f_colorAt_c1772 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<const QColor > ((const QColor)((QColormap *)cls)->colorAt (arg1));
 }
 
@@ -134,7 +134,7 @@ static void _call_f_operator_eq__2223 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColormap &arg1 = args.read<const QColormap & > (heap);
+  const QColormap &arg1 = gsi::arg_reader<const QColormap & >() (args, heap);
   ret.write<QColormap & > ((QColormap &)((QColormap *)cls)->operator= (arg1));
 }
 
@@ -153,7 +153,7 @@ static void _call_f_pixel_c1905 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   ret.write<unsigned int > ((unsigned int)((QColormap *)cls)->pixel (arg1));
 }
 
@@ -203,7 +203,7 @@ static void _call_f_instance_767 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(-1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QColormap > ((QColormap)QColormap::instance (arg1));
 }
 

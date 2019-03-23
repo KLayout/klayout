@@ -115,7 +115,7 @@ static void _call_f_animateClick_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(100);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (100, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->animateClick (arg1);
 }
@@ -301,7 +301,7 @@ static void _call_f_setAutoExclusive_864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setAutoExclusive (arg1);
 }
@@ -321,7 +321,7 @@ static void _call_f_setAutoRepeat_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setAutoRepeat (arg1);
 }
@@ -341,7 +341,7 @@ static void _call_f_setAutoRepeatDelay_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setAutoRepeatDelay (arg1);
 }
@@ -361,7 +361,7 @@ static void _call_f_setAutoRepeatInterval_767 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setAutoRepeatInterval (arg1);
 }
@@ -381,7 +381,7 @@ static void _call_f_setCheckable_864 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setCheckable (arg1);
 }
@@ -401,7 +401,7 @@ static void _call_f_setChecked_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setChecked (arg1);
 }
@@ -421,7 +421,7 @@ static void _call_f_setDown_864 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setDown (arg1);
 }
@@ -441,7 +441,7 @@ static void _call_f_setIcon_1787 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setIcon (arg1);
 }
@@ -461,7 +461,7 @@ static void _call_f_setIconSize_1805 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setIconSize (arg1);
 }
@@ -481,7 +481,7 @@ static void _call_f_setShortcut_2516 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setShortcut (arg1);
 }
@@ -501,7 +501,7 @@ static void _call_f_setText_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton *)cls)->setText (arg1);
 }
@@ -571,9 +571,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractButton::tr (arg1, arg2, arg3));
 }
 
@@ -596,9 +596,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractButton::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1563,7 +1563,7 @@ static void _call_ctor_QAbstractButton_Adaptor_1315 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QAbstractButton_Adaptor *> (new QAbstractButton_Adaptor (arg1));
 }
 
@@ -1673,7 +1673,7 @@ static void _call_emitter_clicked_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(false);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ((QAbstractButton_Adaptor *)cls)->emitter_QAbstractButton_clicked_864 (arg1);
 }
 
@@ -1743,9 +1743,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton_Adaptor *)cls)->fp_QAbstractButton_create_2208 (arg1, arg2, arg3);
 }
@@ -1764,7 +1764,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QAbstractButton_Adaptor *)cls)->emitter_QAbstractButton_customContextMenuRequested_1916 (arg1);
 }
 
@@ -1808,8 +1808,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractButton_Adaptor *)cls)->fp_QAbstractButton_destroy_1620 (arg1, arg2);
 }
@@ -1828,7 +1828,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QAbstractButton_Adaptor *)cls)->emitter_QAbstractButton_destroyed_1302 (arg1);
 }
 
@@ -2298,7 +2298,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractButton_Adaptor *)cls)->fp_QAbstractButton_isSignalConnected_c2394 (arg1));
 }
 
@@ -2656,7 +2656,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QAbstractButton_Adaptor *)cls)->fp_QAbstractButton_receivers_c1731 (arg1));
 }
 
@@ -2897,7 +2897,7 @@ static void _call_emitter_toggled_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QAbstractButton_Adaptor *)cls)->emitter_QAbstractButton_toggled_864 (arg1);
 }
 
@@ -2954,7 +2954,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QAbstractButton_Adaptor *)cls)->emitter_QAbstractButton_windowIconChanged_1787 (arg1);
 }
 
@@ -2972,7 +2972,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QAbstractButton_Adaptor *)cls)->emitter_QAbstractButton_windowIconTextChanged_2025 (arg1);
 }
 
@@ -2990,7 +2990,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QAbstractButton_Adaptor *)cls)->emitter_QAbstractButton_windowTitleChanged_2025 (arg1);
 }
 

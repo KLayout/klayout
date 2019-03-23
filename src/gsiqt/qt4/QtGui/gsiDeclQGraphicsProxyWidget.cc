@@ -109,7 +109,7 @@ static void _call_f_createProxyForChildWidget_1315 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QGraphicsProxyWidget * > ((QGraphicsProxyWidget *)((QGraphicsProxyWidget *)cls)->createProxyForChildWidget (arg1));
 }
 
@@ -132,9 +132,9 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QStyleOptionGraphicsItem *arg2 = args.read<const QStyleOptionGraphicsItem * > (heap);
-  QWidget *arg3 = args.read<QWidget * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
+  QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsProxyWidget *)cls)->paint (arg1, arg2, arg3);
 }
@@ -154,7 +154,7 @@ static void _call_f_setGeometry_1862 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsProxyWidget *)cls)->setGeometry (arg1);
 }
@@ -174,7 +174,7 @@ static void _call_f_setWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsProxyWidget *)cls)->setWidget (arg1);
 }
@@ -194,7 +194,7 @@ static void _call_f_subWidgetRect_c2010 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QWidget *arg1 = args.read<const QWidget * > (heap);
+  const QWidget *arg1 = gsi::arg_reader<const QWidget * >() (args, heap);
   ret.write<QRectF > ((QRectF)((QGraphicsProxyWidget *)cls)->subWidgetRect (arg1));
 }
 
@@ -245,8 +245,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QGraphicsProxyWidget::tr (arg1, arg2));
 }
 
@@ -269,9 +269,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QGraphicsProxyWidget::tr (arg1, arg2, arg3));
 }
 
@@ -292,8 +292,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QGraphicsProxyWidget::trUtf8 (arg1, arg2));
 }
 
@@ -316,9 +316,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QGraphicsProxyWidget::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1499,8 +1499,8 @@ static void _call_ctor_QGraphicsProxyWidget_Adaptor_4306 (const qt_gsi::GenericS
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
-  QFlags<Qt::WindowType> arg2 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<QGraphicsProxyWidget_Adaptor *> (new QGraphicsProxyWidget_Adaptor (arg1, arg2));
 }
 
@@ -1771,7 +1771,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QGraphicsProxyWidget_Adaptor *)cls)->emitter_QGraphicsProxyWidget_destroyed_1302 (arg1);
 }
 
@@ -2531,7 +2531,7 @@ static void _call_fp_newProxyWidget_2010 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QWidget *arg1 = args.read<const QWidget * > (heap);
+  const QWidget *arg1 = gsi::arg_reader<const QWidget * >() (args, heap);
   ret.write<QGraphicsProxyWidget * > ((QGraphicsProxyWidget *)((QGraphicsProxyWidget_Adaptor *)cls)->fp_QGraphicsProxyWidget_newProxyWidget_2010 (arg1));
 }
 
@@ -2717,7 +2717,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QGraphicsProxyWidget_Adaptor *)cls)->fp_QGraphicsProxyWidget_receivers_c1731 (arg1));
 }
 
@@ -2916,7 +2916,7 @@ static void _call_fp_setGraphicsItem_1919 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args.read<QGraphicsItem * > (heap);
+  QGraphicsItem *arg1 = gsi::arg_reader<QGraphicsItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsProxyWidget_Adaptor *)cls)->fp_QGraphicsProxyWidget_setGraphicsItem_1919 (arg1);
 }
@@ -2935,7 +2935,7 @@ static void _call_fp_setOwnedByLayout_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsProxyWidget_Adaptor *)cls)->fp_QGraphicsProxyWidget_setOwnedByLayout_864 (arg1);
 }

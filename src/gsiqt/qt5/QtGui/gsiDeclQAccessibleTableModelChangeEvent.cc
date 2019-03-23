@@ -127,7 +127,7 @@ static void _call_f_setFirstColumn_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTableModelChangeEvent *)cls)->setFirstColumn (arg1);
 }
@@ -147,7 +147,7 @@ static void _call_f_setFirstRow_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTableModelChangeEvent *)cls)->setFirstRow (arg1);
 }
@@ -167,7 +167,7 @@ static void _call_f_setLastColumn_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTableModelChangeEvent *)cls)->setLastColumn (arg1);
 }
@@ -187,7 +187,7 @@ static void _call_f_setLastRow_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTableModelChangeEvent *)cls)->setLastRow (arg1);
 }
@@ -207,7 +207,7 @@ static void _call_f_setModelChangeType_5217 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & arg1 = args.read<const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & > (heap);
+  const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTableModelChangeEvent *)cls)->setModelChangeType (qt_gsi::QtToCppAdaptor<QAccessibleTableModelChangeEvent::ModelChangeType>(arg1).cref());
 }
@@ -295,8 +295,8 @@ static void _call_ctor_QAccessibleTableModelChangeEvent_Adaptor_6411 (const qt_g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & arg2 = args.read<const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & >() (args, heap);
   ret.write<QAccessibleTableModelChangeEvent_Adaptor *> (new QAccessibleTableModelChangeEvent_Adaptor (arg1, qt_gsi::QtToCppAdaptor<QAccessibleTableModelChangeEvent::ModelChangeType>(arg2).cref()));
 }
 
@@ -316,8 +316,8 @@ static void _call_ctor_QAccessibleTableModelChangeEvent_Adaptor_7731 (const qt_g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleInterface *arg1 = args.read<QAccessibleInterface * > (heap);
-  const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & arg2 = args.read<const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & > (heap);
+  QAccessibleInterface *arg1 = gsi::arg_reader<QAccessibleInterface * >() (args, heap);
+  const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAccessibleTableModelChangeEvent::ModelChangeType>::target_type & >() (args, heap);
   ret.write<QAccessibleTableModelChangeEvent_Adaptor *> (new QAccessibleTableModelChangeEvent_Adaptor (arg1, qt_gsi::QtToCppAdaptor<QAccessibleTableModelChangeEvent::ModelChangeType>(arg2).cref()));
 }
 

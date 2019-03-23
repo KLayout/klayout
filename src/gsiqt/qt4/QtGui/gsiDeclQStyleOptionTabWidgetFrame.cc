@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionTabWidgetFrame_3938 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTabWidgetFrame &arg1 = args.read<const QStyleOptionTabWidgetFrame & > (heap);
+  const QStyleOptionTabWidgetFrame &arg1 = gsi::arg_reader<const QStyleOptionTabWidgetFrame & >() (args, heap);
   ret.write<QStyleOptionTabWidgetFrame *> (new QStyleOptionTabWidgetFrame (arg1));
 }
 

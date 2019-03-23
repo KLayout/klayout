@@ -139,9 +139,9 @@ static void _call_ctor_QScrollEvent_Adaptor_6662 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  const qt_gsi::Converter<QScrollEvent::ScrollState>::target_type & arg3 = args.read<const qt_gsi::Converter<QScrollEvent::ScrollState>::target_type & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const qt_gsi::Converter<QScrollEvent::ScrollState>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QScrollEvent::ScrollState>::target_type & >() (args, heap);
   ret.write<QScrollEvent_Adaptor *> (new QScrollEvent_Adaptor (arg1, arg2, qt_gsi::QtToCppAdaptor<QScrollEvent::ScrollState>(arg3).cref()));
 }
 

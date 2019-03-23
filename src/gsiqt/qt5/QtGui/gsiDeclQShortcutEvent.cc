@@ -145,9 +145,9 @@ static void _call_ctor_QShortcutEvent_Adaptor_3931 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
-  int arg2 = args.read<int > (heap);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(false);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<QShortcutEvent_Adaptor *> (new QShortcutEvent_Adaptor (arg1, arg2, arg3));
 }
 

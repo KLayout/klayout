@@ -67,8 +67,8 @@ static void _call_ctor_QCamera_FrameRateRange_2034 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QCamera::FrameRateRange *> (new QCamera::FrameRateRange (arg1, arg2));
 }
 

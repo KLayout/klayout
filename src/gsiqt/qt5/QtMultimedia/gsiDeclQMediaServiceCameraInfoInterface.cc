@@ -50,7 +50,7 @@ static void _call_f_cameraOrientation_c2309 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<int > ((int)((QMediaServiceCameraInfoInterface *)cls)->cameraOrientation (arg1));
 }
 
@@ -69,7 +69,7 @@ static void _call_f_cameraPosition_c2309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<qt_gsi::Converter<QCamera::Position>::target_type > ((qt_gsi::Converter<QCamera::Position>::target_type)qt_gsi::CppToQtAdaptor<QCamera::Position>(((QMediaServiceCameraInfoInterface *)cls)->cameraPosition (arg1)));
 }
 

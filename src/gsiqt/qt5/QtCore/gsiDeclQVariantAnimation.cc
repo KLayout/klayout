@@ -131,7 +131,7 @@ static void _call_f_keyValueAt_c1071 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QVariant > ((QVariant)((QVariantAnimation *)cls)->keyValueAt (arg1));
 }
 
@@ -165,7 +165,7 @@ static void _call_f_setDuration_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation *)cls)->setDuration (arg1);
 }
@@ -185,7 +185,7 @@ static void _call_f_setEasingCurve_2510 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation *)cls)->setEasingCurve (arg1);
 }
@@ -205,7 +205,7 @@ static void _call_f_setEndValue_2119 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation *)cls)->setEndValue (arg1);
 }
@@ -227,8 +227,8 @@ static void _call_f_setKeyValueAt_3082 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation *)cls)->setKeyValueAt (arg1, arg2);
 }
@@ -248,7 +248,7 @@ static void _call_f_setKeyValues_4799 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<QVariantAnimation::KeyValue> &arg1 = args.read<const QVector<QVariantAnimation::KeyValue> & > (heap);
+  const QVector<QVariantAnimation::KeyValue> &arg1 = gsi::arg_reader<const QVector<QVariantAnimation::KeyValue> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation *)cls)->setKeyValues (arg1);
 }
@@ -268,7 +268,7 @@ static void _call_f_setStartValue_2119 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVariantAnimation *)cls)->setStartValue (arg1);
 }
@@ -307,9 +307,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QVariantAnimation::tr (arg1, arg2, arg3));
 }
 
@@ -332,9 +332,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QVariantAnimation::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -663,7 +663,7 @@ static void _call_ctor_QVariantAnimation_Adaptor_1302 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QVariantAnimation_Adaptor *> (new QVariantAnimation_Adaptor (arg1));
 }
 
@@ -705,7 +705,7 @@ static void _call_emitter_currentLoopChanged_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QVariantAnimation_Adaptor *)cls)->emitter_QVariantAnimation_currentLoopChanged_767 (arg1);
 }
 
@@ -747,7 +747,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QVariantAnimation_Adaptor *)cls)->emitter_QVariantAnimation_destroyed_1302 (arg1);
 }
 
@@ -765,7 +765,7 @@ static void _call_emitter_directionChanged_3310 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractAnimation::Direction>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractAnimation::Direction>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractAnimation::Direction>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractAnimation::Direction>::target_type & >() (args, heap);
   ((QVariantAnimation_Adaptor *)cls)->emitter_QVariantAnimation_directionChanged_3310 (arg1);
 }
 
@@ -918,7 +918,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QVariantAnimation_Adaptor *)cls)->fp_QVariantAnimation_isSignalConnected_c2394 (arg1));
 }
 
@@ -936,7 +936,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QVariantAnimation_Adaptor *)cls)->fp_QVariantAnimation_receivers_c1731 (arg1));
 }
 
@@ -984,8 +984,8 @@ static void _call_emitter_stateChanged_5680 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractAnimation::State>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractAnimation::State>::target_type & > (heap);
-  const qt_gsi::Converter<QAbstractAnimation::State>::target_type & arg2 = args.read<const qt_gsi::Converter<QAbstractAnimation::State>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractAnimation::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractAnimation::State>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QAbstractAnimation::State>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAbstractAnimation::State>::target_type & >() (args, heap);
   ((QVariantAnimation_Adaptor *)cls)->emitter_QVariantAnimation_stateChanged_5680 (arg1, arg2);
 }
 
@@ -1126,7 +1126,7 @@ static void _call_emitter_valueChanged_2119 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   ((QVariantAnimation_Adaptor *)cls)->emitter_QVariantAnimation_valueChanged_2119 (arg1);
 }
 

@@ -55,7 +55,7 @@ static void _call_ctor_QFontMetricsF_1801 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   ret.write<QFontMetricsF *> (new QFontMetricsF (arg1));
 }
 
@@ -76,8 +76,8 @@ static void _call_ctor_QFontMetricsF_3496 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
-  QPaintDevice *arg2 = args.read<QPaintDevice * > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
+  QPaintDevice *arg2 = gsi::arg_reader<QPaintDevice * >() (args, heap);
   ret.write<QFontMetricsF *> (new QFontMetricsF (arg1, arg2));
 }
 
@@ -96,7 +96,7 @@ static void _call_ctor_QFontMetricsF_2528 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFontMetrics &arg1 = args.read<const QFontMetrics & > (heap);
+  const QFontMetrics &arg1 = gsi::arg_reader<const QFontMetrics & >() (args, heap);
   ret.write<QFontMetricsF *> (new QFontMetricsF (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_ctor_QFontMetricsF_2598 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFontMetricsF &arg1 = args.read<const QFontMetricsF & > (heap);
+  const QFontMetricsF &arg1 = gsi::arg_reader<const QFontMetricsF & >() (args, heap);
   ret.write<QFontMetricsF *> (new QFontMetricsF (arg1));
 }
 
@@ -164,7 +164,7 @@ static void _call_f_boundingRect_c2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QFontMetricsF *)cls)->boundingRect (arg1));
 }
 
@@ -183,7 +183,7 @@ static void _call_f_boundingRect_c899 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type & arg1 = args.read<const qt_gsi::Converter<QChar>::target_type & > (heap);
+  const qt_gsi::Converter<QChar>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QFontMetricsF *)cls)->boundingRect (qt_gsi::QtToCppAdaptor<QChar>(arg1).cref()));
 }
 
@@ -210,11 +210,11 @@ static void _call_f_boundingRect_c5942 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  int arg2 = args.read<int > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(0);
-  int *arg5 = args ? args.read<int * > (heap) : (int *)(0);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
   ret.write<QRectF > ((QRectF)((QFontMetricsF *)cls)->boundingRect (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -254,10 +254,10 @@ static void _call_f_elidedText_c5581 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<Qt::TextElideMode>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::TextElideMode>::target_type & > (heap);
-  double arg3 = args.read<double > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<Qt::TextElideMode>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::TextElideMode>::target_type & >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QString > ((QString)((QFontMetricsF *)cls)->elidedText (arg1, qt_gsi::QtToCppAdaptor<Qt::TextElideMode>(arg2).cref(), arg3, arg4));
 }
 
@@ -291,7 +291,7 @@ static void _call_f_inFont_c899 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type & arg1 = args.read<const qt_gsi::Converter<QChar>::target_type & > (heap);
+  const qt_gsi::Converter<QChar>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QFontMetricsF *)cls)->inFont (qt_gsi::QtToCppAdaptor<QChar>(arg1).cref()));
 }
 
@@ -310,7 +310,7 @@ static void _call_f_inFontUcs4_c1772 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<bool > ((bool)((QFontMetricsF *)cls)->inFontUcs4 (arg1));
 }
 
@@ -344,7 +344,7 @@ static void _call_f_leftBearing_c899 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type & arg1 = args.read<const qt_gsi::Converter<QChar>::target_type & > (heap);
+  const qt_gsi::Converter<QChar>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
   ret.write<double > ((double)((QFontMetricsF *)cls)->leftBearing (qt_gsi::QtToCppAdaptor<QChar>(arg1).cref()));
 }
 
@@ -438,7 +438,7 @@ static void _call_f_operator_excl__eq__c2598 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFontMetricsF &arg1 = args.read<const QFontMetricsF & > (heap);
+  const QFontMetricsF &arg1 = gsi::arg_reader<const QFontMetricsF & >() (args, heap);
   ret.write<bool > ((bool)((QFontMetricsF *)cls)->operator != (arg1));
 }
 
@@ -457,7 +457,7 @@ static void _call_f_operator_eq__2598 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFontMetricsF &arg1 = args.read<const QFontMetricsF & > (heap);
+  const QFontMetricsF &arg1 = gsi::arg_reader<const QFontMetricsF & >() (args, heap);
   ret.write<QFontMetricsF & > ((QFontMetricsF &)((QFontMetricsF *)cls)->operator= (arg1));
 }
 
@@ -476,7 +476,7 @@ static void _call_f_operator_eq__2528 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFontMetrics &arg1 = args.read<const QFontMetrics & > (heap);
+  const QFontMetrics &arg1 = gsi::arg_reader<const QFontMetrics & >() (args, heap);
   ret.write<QFontMetricsF & > ((QFontMetricsF &)((QFontMetricsF *)cls)->operator= (arg1));
 }
 
@@ -495,7 +495,7 @@ static void _call_f_operator_eq__eq__c2598 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFontMetricsF &arg1 = args.read<const QFontMetricsF & > (heap);
+  const QFontMetricsF &arg1 = gsi::arg_reader<const QFontMetricsF & >() (args, heap);
   ret.write<bool > ((bool)((QFontMetricsF *)cls)->operator== (arg1));
 }
 
@@ -529,7 +529,7 @@ static void _call_f_rightBearing_c899 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type & arg1 = args.read<const qt_gsi::Converter<QChar>::target_type & > (heap);
+  const qt_gsi::Converter<QChar>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
   ret.write<double > ((double)((QFontMetricsF *)cls)->rightBearing (qt_gsi::QtToCppAdaptor<QChar>(arg1).cref()));
 }
 
@@ -554,10 +554,10 @@ static void _call_f_size_c4188 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
-  int *arg4 = args ? args.read<int * > (heap) : (int *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
   ret.write<QSizeF > ((QSizeF)((QFontMetricsF *)cls)->size (arg1, arg2, arg3, arg4));
 }
 
@@ -591,7 +591,7 @@ static void _call_f_swap_1903 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFontMetricsF &arg1 = args.read<QFontMetricsF & > (heap);
+  QFontMetricsF &arg1 = gsi::arg_reader<QFontMetricsF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFontMetricsF *)cls)->swap (arg1);
 }
@@ -611,7 +611,7 @@ static void _call_f_tightBoundingRect_c2025 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QFontMetricsF *)cls)->tightBoundingRect (arg1));
 }
 
@@ -645,7 +645,7 @@ static void _call_f_width_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<double > ((double)((QFontMetricsF *)cls)->width (arg1));
 }
 
@@ -664,7 +664,7 @@ static void _call_f_width_c899 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type & arg1 = args.read<const qt_gsi::Converter<QChar>::target_type & > (heap);
+  const qt_gsi::Converter<QChar>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
   ret.write<double > ((double)((QFontMetricsF *)cls)->width (qt_gsi::QtToCppAdaptor<QChar>(arg1).cref()));
 }
 

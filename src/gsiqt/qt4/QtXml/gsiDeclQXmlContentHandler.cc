@@ -52,7 +52,7 @@ static void _call_f_characters_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler *)cls)->characters (arg1));
 }
 
@@ -90,9 +90,9 @@ static void _call_f_endElement_5859 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler *)cls)->endElement (arg1, arg2, arg3));
 }
 
@@ -111,7 +111,7 @@ static void _call_f_endPrefixMapping_2025 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler *)cls)->endPrefixMapping (arg1));
 }
 
@@ -145,7 +145,7 @@ static void _call_f_ignorableWhitespace_2025 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler *)cls)->ignorableWhitespace (arg1));
 }
 
@@ -166,8 +166,8 @@ static void _call_f_processingInstruction_3942 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler *)cls)->processingInstruction (arg1, arg2));
 }
 
@@ -186,7 +186,7 @@ static void _call_f_setDocumentLocator_1732 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlLocator *arg1 = args.read<QXmlLocator * > (heap);
+  QXmlLocator *arg1 = gsi::arg_reader<QXmlLocator * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlContentHandler *)cls)->setDocumentLocator (arg1);
 }
@@ -206,7 +206,7 @@ static void _call_f_skippedEntity_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler *)cls)->skippedEntity (arg1));
 }
 
@@ -246,10 +246,10 @@ static void _call_f_startElement_8513 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const QXmlAttributes &arg4 = args.read<const QXmlAttributes & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  const QXmlAttributes &arg4 = gsi::arg_reader<const QXmlAttributes & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler *)cls)->startElement (arg1, arg2, arg3, arg4));
 }
 
@@ -270,8 +270,8 @@ static void _call_f_startPrefixMapping_3942 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlContentHandler *)cls)->startPrefixMapping (arg1, arg2));
 }
 

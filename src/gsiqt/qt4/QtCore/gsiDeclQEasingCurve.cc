@@ -50,7 +50,7 @@ static void _call_ctor_QEasingCurve_2167 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEasingCurve::Type>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QEasingCurve::Type>::target_type & > (heap) : (const qt_gsi::Converter<QEasingCurve::Type>::target_type &)(qt_gsi::CppToQtReadAdaptor<QEasingCurve::Type>(heap, QEasingCurve::Linear));
+  const qt_gsi::Converter<QEasingCurve::Type>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QEasingCurve::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QEasingCurve::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QEasingCurve::Type>(heap, QEasingCurve::Linear), heap);
   ret.write<QEasingCurve *> (new QEasingCurve (qt_gsi::QtToCppAdaptor<QEasingCurve::Type>(arg1).cref()));
 }
 
@@ -69,7 +69,7 @@ static void _call_ctor_QEasingCurve_2510 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   ret.write<QEasingCurve *> (new QEasingCurve (arg1));
 }
 
@@ -103,7 +103,7 @@ static void _call_f_operator_excl__eq__c2510 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   ret.write<bool > ((bool)((QEasingCurve *)cls)->operator!= (arg1));
 }
 
@@ -122,7 +122,7 @@ static void _call_f_operator_eq__2510 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   ret.write<QEasingCurve & > ((QEasingCurve &)((QEasingCurve *)cls)->operator= (arg1));
 }
 
@@ -141,7 +141,7 @@ static void _call_f_operator_eq__eq__c2510 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   ret.write<bool > ((bool)((QEasingCurve *)cls)->operator== (arg1));
 }
 
@@ -190,7 +190,7 @@ static void _call_f_setAmplitude_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->setAmplitude (arg1);
 }
@@ -210,7 +210,7 @@ static void _call_f_setOvershoot_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->setOvershoot (arg1);
 }
@@ -230,7 +230,7 @@ static void _call_f_setPeriod_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->setPeriod (arg1);
 }
@@ -250,7 +250,7 @@ static void _call_f_setType_2167 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEasingCurve::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEasingCurve::Type>::target_type & > (heap);
+  const qt_gsi::Converter<QEasingCurve::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEasingCurve::Type>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->setType (qt_gsi::QtToCppAdaptor<QEasingCurve::Type>(arg1).cref());
 }
@@ -285,7 +285,7 @@ static void _call_f_valueForProgress_c1071 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QEasingCurve *)cls)->valueForProgress (arg1));
 }
 

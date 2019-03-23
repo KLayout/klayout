@@ -120,8 +120,8 @@ static void _call_ctor_QResizeEvent_Adaptor_3502 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
-  const QSize &arg2 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
+  const QSize &arg2 = gsi::arg_reader<const QSize & >() (args, heap);
   ret.write<QResizeEvent_Adaptor *> (new QResizeEvent_Adaptor (arg1, arg2));
 }
 

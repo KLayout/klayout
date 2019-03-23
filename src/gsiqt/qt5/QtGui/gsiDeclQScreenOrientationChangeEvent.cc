@@ -120,8 +120,8 @@ static void _call_ctor_QScreenOrientationChangeEvent_Adaptor_3724 (const qt_gsi:
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QScreen *arg1 = args.read<QScreen * > (heap);
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
+  QScreen *arg1 = gsi::arg_reader<QScreen * >() (args, heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
   ret.write<QScreenOrientationChangeEvent_Adaptor *> (new QScreenOrientationChangeEvent_Adaptor (arg1, qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg2).cref()));
 }
 

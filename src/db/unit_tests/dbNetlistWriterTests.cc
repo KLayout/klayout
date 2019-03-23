@@ -29,6 +29,27 @@
 #include "tlStream.h"
 #include "tlFileUtils.h"
 
+static void compare_netlists (tl::TestBase *_this, const std::string &path, const std::string &au_path)
+{
+  tl::InputStream is (path);
+  tl::InputStream is_au (au_path);
+
+  std::string netlist = is.read_all ();
+  std::string netlist_au = is_au.read_all ();
+
+  //  normalize "1.0e-005" to "1.0e-05" for compatibility
+  netlist = tl::replaced (netlist, "e-00", "e-0");
+  netlist = tl::replaced (netlist, "e-0", "e-");
+  netlist_au = tl::replaced (netlist_au, "e-00", "e-0");
+  netlist_au = tl::replaced (netlist_au, "e-0", "e-");
+
+  if (netlist != netlist_au) {
+    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
+                               tl::absolute_file_path (path),
+                               tl::absolute_file_path (au_path)));
+  }
+}
+
 TEST(1_WriterResistorDevices)
 {
   db::Netlist nl;
@@ -98,14 +119,7 @@ TEST(1_WriterResistorDevices)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter1_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
 
 TEST(2_WriterCapacitorDevices)
@@ -177,14 +191,7 @@ TEST(2_WriterCapacitorDevices)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter2_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
 
 TEST(3_WriterInductorDevices)
@@ -256,14 +263,7 @@ TEST(3_WriterInductorDevices)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter3_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
 
 TEST(4_WriterDiodeDevices)
@@ -335,14 +335,7 @@ TEST(4_WriterDiodeDevices)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter4_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
 
 TEST(5_WriterMOS3Devices)
@@ -431,14 +424,7 @@ TEST(5_WriterMOS3Devices)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter5_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
 
 TEST(6_WriterMOS4Devices)
@@ -534,14 +520,7 @@ TEST(6_WriterMOS4Devices)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter6_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
 
 TEST(7_WriterAnyDevices)
@@ -603,14 +582,7 @@ TEST(7_WriterAnyDevices)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter7_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
 
 TEST(8_WriterSubcircuits)
@@ -753,14 +725,97 @@ TEST(8_WriterSubcircuits)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter8_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
+  compare_netlists (_this, path, au_path);
+}
 
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
+TEST(9_WriterNetNamesInsteadOfNumbers)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *cls = new db::DeviceClass ();
+  cls->add_terminal_definition (db::DeviceTerminalDefinition ("A", "a"));
+  cls->add_terminal_definition (db::DeviceTerminalDefinition ("B", "b"));
+  cls->add_parameter_definition (db::DeviceParameterDefinition ("U", "u"));
+  cls->add_parameter_definition (db::DeviceParameterDefinition ("V", "v"));
+  cls->set_name ("XCLS");
+
+  nl.add_device_class (cls);
+
+  db::Circuit *circuit1 = new db::Circuit ();
+  circuit1->set_name ("C1");
+  nl.add_circuit (circuit1);
+
+  {
+    db::Net *n1, *n2, *n3;
+    n1 = new db::Net ();
+    n1->set_name ("N1");
+    circuit1->add_net (n1);
+    n2 = new db::Net ();
+    n2->set_name ("N 2");
+    circuit1->add_net (n2);
+    n3 = new db::Net ();
+    n3->set_name ("n3");
+    circuit1->add_net (n3);
+
+    db::Device *ddev1 = new db::Device (cls);
+    ddev1->set_parameter_value (0, -17);
+    ddev1->set_parameter_value (1, 42);
+    db::Device *ddev2 = new db::Device (cls);
+    ddev2->set_parameter_value (0, 17);
+    ddev2->set_parameter_value (1, -42);
+    circuit1->add_device (ddev1);
+    circuit1->add_device (ddev2);
+
+    size_t pid1 = circuit1->add_pin ("p1").id ();
+    size_t pid2 = circuit1->add_pin ("p2").id ();
+
+    circuit1->connect_pin (pid1, n1);
+    circuit1->connect_pin (pid2, n2);
+
+    ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("A"), n1);
+    ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("B"), n3);
+    ddev2->connect_terminal (ddev2->device_class ()->terminal_id_for_name ("A"), n3);
+    ddev2->connect_terminal (ddev2->device_class ()->terminal_id_for_name ("B"), n2);
   }
+
+  db::Circuit *circuit2 = new db::Circuit ();
+  circuit2->set_name ("C2");
+  nl.add_circuit (circuit2);
+
+  {
+    db::Net *n1, *n2;
+    n1 = new db::Net ();
+    n1->set_name ("n1");
+    circuit2->add_net (n1);
+    n2 = new db::Net ();
+    n2->set_name ("n2");
+    circuit2->add_net (n2);
+
+    db::SubCircuit *sc1 = new db::SubCircuit (circuit1, "SC1");
+    circuit2->add_subcircuit (sc1);
+    sc1->connect_pin (0, n1);
+    sc1->connect_pin (1, n2);
+
+    size_t pid1 = circuit2->add_pin ("p1").id ();
+    size_t pid2 = circuit2->add_pin ("p2").id ();
+
+    circuit2->connect_pin (pid1, n1);
+    circuit2->connect_pin (pid2, n2);
+  }
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp_nwriter9.txt");
+  {
+    tl::OutputStream stream (path);
+    db::NetlistSpiceWriter writer;
+    writer.set_use_net_names (true);
+    writer.write (stream, nl, "written by unit test");
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter9_au.txt");
+
+  compare_netlists (_this, path, au_path);
 }
 
 TEST(10_WriterLongLines)
@@ -809,14 +864,7 @@ TEST(10_WriterLongLines)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter10_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
 
 namespace {
@@ -919,13 +967,5 @@ TEST(20_Delegate)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter20_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_netlists (_this, path, au_path);
 }
-

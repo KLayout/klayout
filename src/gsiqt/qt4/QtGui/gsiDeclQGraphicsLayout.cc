@@ -93,10 +93,10 @@ static void _call_f_getContentsMargins_c4704 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double *arg1 = args.read<double * > (heap);
-  double *arg2 = args.read<double * > (heap);
-  double *arg3 = args.read<double * > (heap);
-  double *arg4 = args.read<double * > (heap);
+  double *arg1 = gsi::arg_reader<double * >() (args, heap);
+  double *arg2 = gsi::arg_reader<double * >() (args, heap);
+  double *arg3 = gsi::arg_reader<double * >() (args, heap);
+  double *arg4 = gsi::arg_reader<double * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayout *)cls)->getContentsMargins (arg1, arg2, arg3, arg4);
 }
@@ -147,7 +147,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QGraphicsLayoutItem * > ((QGraphicsLayoutItem *)((QGraphicsLayout *)cls)->itemAt (arg1));
 }
 
@@ -166,7 +166,7 @@ static void _call_f_removeAt_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayout *)cls)->removeAt (arg1);
 }
@@ -192,10 +192,10 @@ static void _call_f_setContentsMargins_3960 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayout *)cls)->setContentsMargins (arg1, arg2, arg3, arg4);
 }
@@ -231,7 +231,7 @@ static void _call_f_widgetEvent_1217 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayout *)cls)->widgetEvent (arg1);
 }
@@ -464,7 +464,7 @@ static void _call_ctor_QGraphicsLayout_Adaptor_2557 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args ? args.read<QGraphicsLayoutItem * > (heap) : (QGraphicsLayoutItem *)(0);
+  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
   ret.write<QGraphicsLayout_Adaptor *> (new QGraphicsLayout_Adaptor (arg1));
 }
 
@@ -482,7 +482,7 @@ static void _call_fp_addChildLayoutItem_2557 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayout_Adaptor *)cls)->fp_QGraphicsLayout_addChildLayoutItem_2557 (arg1);
 }
@@ -644,7 +644,7 @@ static void _call_fp_setGraphicsItem_1919 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args.read<QGraphicsItem * > (heap);
+  QGraphicsItem *arg1 = gsi::arg_reader<QGraphicsItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayout_Adaptor *)cls)->fp_QGraphicsLayout_setGraphicsItem_1919 (arg1);
 }
@@ -663,7 +663,7 @@ static void _call_fp_setOwnedByLayout_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLayout_Adaptor *)cls)->fp_QGraphicsLayout_setOwnedByLayout_864 (arg1);
 }

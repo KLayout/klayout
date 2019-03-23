@@ -65,7 +65,7 @@ static void _call_ctor_QMimeType_2204 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeType &arg1 = args.read<const QMimeType & > (heap);
+  const QMimeType &arg1 = gsi::arg_reader<const QMimeType & >() (args, heap);
   ret.write<QMimeType *> (new QMimeType (arg1));
 }
 
@@ -189,7 +189,7 @@ static void _call_f_inherits_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QMimeType *)cls)->inherits (arg1));
 }
 
@@ -253,7 +253,7 @@ static void _call_f_operator_excl__eq__c2204 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeType &arg1 = args.read<const QMimeType & > (heap);
+  const QMimeType &arg1 = gsi::arg_reader<const QMimeType & >() (args, heap);
   ret.write<bool > ((bool)((QMimeType *)cls)->operator!= (arg1));
 }
 
@@ -272,7 +272,7 @@ static void _call_f_operator_eq__2204 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeType &arg1 = args.read<const QMimeType & > (heap);
+  const QMimeType &arg1 = gsi::arg_reader<const QMimeType & >() (args, heap);
   ret.write<QMimeType & > ((QMimeType &)((QMimeType *)cls)->operator= (arg1));
 }
 
@@ -291,7 +291,7 @@ static void _call_f_operator_eq__eq__c2204 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeType &arg1 = args.read<const QMimeType & > (heap);
+  const QMimeType &arg1 = gsi::arg_reader<const QMimeType & >() (args, heap);
   ret.write<bool > ((bool)((QMimeType *)cls)->operator== (arg1));
 }
 
@@ -355,7 +355,7 @@ static void _call_f_swap_1509 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMimeType &arg1 = args.read<QMimeType & > (heap);
+  QMimeType &arg1 = gsi::arg_reader<QMimeType & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMimeType *)cls)->swap (arg1);
 }

@@ -67,7 +67,7 @@ static void _call_ctor_QItemSelectionRange_3220 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelectionRange &arg1 = args.read<const QItemSelectionRange & > (heap);
+  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
   ret.write<QItemSelectionRange *> (new QItemSelectionRange (arg1));
 }
 
@@ -88,8 +88,8 @@ static void _call_ctor_QItemSelectionRange_4682 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QItemSelectionRange *> (new QItemSelectionRange (arg1, arg2));
 }
 
@@ -108,7 +108,7 @@ static void _call_ctor_QItemSelectionRange_2395 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QItemSelectionRange *> (new QItemSelectionRange (arg1));
 }
 
@@ -157,7 +157,7 @@ static void _call_f_contains_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QItemSelectionRange *)cls)->contains (arg1));
 }
 
@@ -180,9 +180,9 @@ static void _call_f_contains_c3713 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QItemSelectionRange *)cls)->contains (arg1, arg2, arg3));
 }
 
@@ -231,7 +231,7 @@ static void _call_f_intersect_c3220 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelectionRange &arg1 = args.read<const QItemSelectionRange & > (heap);
+  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
   ret.write<QItemSelectionRange > ((QItemSelectionRange)((QItemSelectionRange *)cls)->intersect (arg1));
 }
 
@@ -250,7 +250,7 @@ static void _call_f_intersected_c3220 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelectionRange &arg1 = args.read<const QItemSelectionRange & > (heap);
+  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
   ret.write<QItemSelectionRange > ((QItemSelectionRange)((QItemSelectionRange *)cls)->intersected (arg1));
 }
 
@@ -269,7 +269,7 @@ static void _call_f_intersects_c3220 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelectionRange &arg1 = args.read<const QItemSelectionRange & > (heap);
+  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
   ret.write<bool > ((bool)((QItemSelectionRange *)cls)->intersects (arg1));
 }
 
@@ -333,7 +333,7 @@ static void _call_f_operator_excl__eq__c3220 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelectionRange &arg1 = args.read<const QItemSelectionRange & > (heap);
+  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
   ret.write<bool > ((bool)((QItemSelectionRange *)cls)->operator!= (arg1));
 }
 
@@ -352,7 +352,7 @@ static void _call_f_operator_eq__eq__c3220 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelectionRange &arg1 = args.read<const QItemSelectionRange & > (heap);
+  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
   ret.write<bool > ((bool)((QItemSelectionRange *)cls)->operator== (arg1));
 }
 

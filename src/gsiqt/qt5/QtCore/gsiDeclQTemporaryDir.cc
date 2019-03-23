@@ -65,7 +65,7 @@ static void _call_ctor_QTemporaryDir_2025 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTemporaryDir *> (new QTemporaryDir (arg1));
 }
 
@@ -144,7 +144,7 @@ static void _call_f_setAutoRemove_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTemporaryDir *)cls)->setAutoRemove (arg1);
 }

@@ -69,8 +69,8 @@ static void _call_f_wait_3474 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMutex *arg1 = args.read<QMutex * > (heap);
-  unsigned long int arg2 = args ? args.read<unsigned long int > (heap) : (unsigned long int)(ULONG_MAX);
+  QMutex *arg1 = gsi::arg_reader<QMutex * >() (args, heap);
+  unsigned long int arg2 = args ? gsi::arg_reader<unsigned long int >() (args, heap) : gsi::arg_maker<unsigned long int >() (ULONG_MAX, heap);
   ret.write<bool > ((bool)((QWaitCondition *)cls)->wait (arg1, arg2));
 }
 
@@ -91,8 +91,8 @@ static void _call_f_wait_4239 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QReadWriteLock *arg1 = args.read<QReadWriteLock * > (heap);
-  unsigned long int arg2 = args ? args.read<unsigned long int > (heap) : (unsigned long int)(ULONG_MAX);
+  QReadWriteLock *arg1 = gsi::arg_reader<QReadWriteLock * >() (args, heap);
+  unsigned long int arg2 = args ? gsi::arg_reader<unsigned long int >() (args, heap) : gsi::arg_maker<unsigned long int >() (ULONG_MAX, heap);
   ret.write<bool > ((bool)((QWaitCondition *)cls)->wait (arg1, arg2));
 }
 

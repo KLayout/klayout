@@ -189,7 +189,7 @@ static void _call_f_frameForTime_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QTimeLine *)cls)->frameForTime (arg1));
 }
 
@@ -239,7 +239,7 @@ static void _call_f_setCurrentTime_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setCurrentTime (arg1);
 }
@@ -259,7 +259,7 @@ static void _call_f_setCurveShape_2438 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTimeLine::CurveShape>::target_type & arg1 = args.read<const qt_gsi::Converter<QTimeLine::CurveShape>::target_type & > (heap);
+  const qt_gsi::Converter<QTimeLine::CurveShape>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTimeLine::CurveShape>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setCurveShape (qt_gsi::QtToCppAdaptor<QTimeLine::CurveShape>(arg1).cref());
 }
@@ -279,7 +279,7 @@ static void _call_f_setDirection_2353 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTimeLine::Direction>::target_type & arg1 = args.read<const qt_gsi::Converter<QTimeLine::Direction>::target_type & > (heap);
+  const qt_gsi::Converter<QTimeLine::Direction>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTimeLine::Direction>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setDirection (qt_gsi::QtToCppAdaptor<QTimeLine::Direction>(arg1).cref());
 }
@@ -299,7 +299,7 @@ static void _call_f_setDuration_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setDuration (arg1);
 }
@@ -319,7 +319,7 @@ static void _call_f_setEasingCurve_2510 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setEasingCurve (arg1);
 }
@@ -339,7 +339,7 @@ static void _call_f_setEndFrame_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setEndFrame (arg1);
 }
@@ -361,8 +361,8 @@ static void _call_f_setFrameRange_1426 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setFrameRange (arg1, arg2);
 }
@@ -382,7 +382,7 @@ static void _call_f_setLoopCount_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setLoopCount (arg1);
 }
@@ -402,7 +402,7 @@ static void _call_f_setPaused_864 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setPaused (arg1);
 }
@@ -422,7 +422,7 @@ static void _call_f_setStartFrame_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setStartFrame (arg1);
 }
@@ -442,7 +442,7 @@ static void _call_f_setUpdateInterval_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeLine *)cls)->setUpdateInterval (arg1);
 }
@@ -555,7 +555,7 @@ static void _call_f_valueForTime_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QTimeLine *)cls)->valueForTime (arg1));
 }
 
@@ -576,8 +576,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTimeLine::tr (arg1, arg2));
 }
 
@@ -600,9 +600,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTimeLine::tr (arg1, arg2, arg3));
 }
 
@@ -623,8 +623,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTimeLine::trUtf8 (arg1, arg2));
 }
 
@@ -647,9 +647,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTimeLine::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -907,8 +907,8 @@ static void _call_ctor_QTimeLine_Adaptor_1961 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1000);
-  QObject *arg2 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1000, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QTimeLine_Adaptor *> (new QTimeLine_Adaptor (arg1, arg2));
 }
 
@@ -974,7 +974,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QTimeLine_Adaptor *)cls)->emitter_QTimeLine_destroyed_1302 (arg1);
 }
 
@@ -1079,7 +1079,7 @@ static void _call_emitter_frameChanged_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QTimeLine_Adaptor *)cls)->emitter_QTimeLine_frameChanged_767 (arg1);
 }
 
@@ -1097,7 +1097,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QTimeLine_Adaptor *)cls)->fp_QTimeLine_receivers_c1731 (arg1));
 }
 
@@ -1129,7 +1129,7 @@ static void _call_emitter_stateChanged_1937 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTimeLine::State>::target_type & arg1 = args.read<const qt_gsi::Converter<QTimeLine::State>::target_type & > (heap);
+  const qt_gsi::Converter<QTimeLine::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTimeLine::State>::target_type & >() (args, heap);
   ((QTimeLine_Adaptor *)cls)->emitter_QTimeLine_stateChanged_1937 (arg1);
 }
 
@@ -1171,7 +1171,7 @@ static void _call_emitter_valueChanged_1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QTimeLine_Adaptor *)cls)->emitter_QTimeLine_valueChanged_1071 (arg1);
 }
 

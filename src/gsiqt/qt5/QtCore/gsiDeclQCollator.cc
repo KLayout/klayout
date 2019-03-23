@@ -52,7 +52,7 @@ static void _call_ctor_QCollator_1986 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLocale &arg1 = args ? args.read<const QLocale & > (heap) : (const QLocale &)(QLocale());
+  const QLocale &arg1 = args ? gsi::arg_reader<const QLocale & >() (args, heap) : gsi::arg_maker<const QLocale & >() (QLocale(), heap);
   ret.write<QCollator *> (new QCollator (arg1));
 }
 
@@ -71,7 +71,7 @@ static void _call_ctor_QCollator_2226 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCollator &arg1 = args.read<const QCollator & > (heap);
+  const QCollator &arg1 = gsi::arg_reader<const QCollator & >() (args, heap);
   ret.write<QCollator *> (new QCollator (arg1));
 }
 
@@ -107,8 +107,8 @@ static void _call_f_compare_c3942 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QCollator *)cls)->compare (arg1, arg2));
 }
 
@@ -129,8 +129,8 @@ static void _call_f_compare_c4512 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  const QStringRef &arg2 = args.read<const QStringRef & > (heap);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  const QStringRef &arg2 = gsi::arg_reader<const QStringRef & >() (args, heap);
   ret.write<int > ((int)((QCollator *)cls)->compare (arg1, arg2));
 }
 
@@ -155,10 +155,10 @@ static void _call_f_compare_c4770 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type * arg1 = args.read<const qt_gsi::Converter<QChar>::target_type * > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<QChar>::target_type * arg3 = args.read<const qt_gsi::Converter<QChar>::target_type * > (heap);
-  int arg4 = args.read<int > (heap);
+  const qt_gsi::Converter<QChar>::target_type * arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QChar>::target_type * arg3 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type * >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QCollator *)cls)->compare (qt_gsi::QtToCppAdaptor<QChar>(arg1).cptr(), arg2, qt_gsi::QtToCppAdaptor<QChar>(arg3).cptr(), arg4));
 }
 
@@ -224,8 +224,8 @@ static void _call_f_operator_func__c3942 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QCollator *)cls)->operator() (arg1, arg2));
 }
 
@@ -244,7 +244,7 @@ static void _call_f_operator_eq__2226 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCollator &arg1 = args.read<const QCollator & > (heap);
+  const QCollator &arg1 = gsi::arg_reader<const QCollator & >() (args, heap);
   ret.write<QCollator & > ((QCollator &)((QCollator *)cls)->operator= (arg1));
 }
 
@@ -263,7 +263,7 @@ static void _call_f_setCaseSensitivity_2324 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCollator *)cls)->setCaseSensitivity (qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg1).cref());
 }
@@ -283,7 +283,7 @@ static void _call_f_setIgnorePunctuation_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCollator *)cls)->setIgnorePunctuation (arg1);
 }
@@ -303,7 +303,7 @@ static void _call_f_setLocale_1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLocale &arg1 = args.read<const QLocale & > (heap);
+  const QLocale &arg1 = gsi::arg_reader<const QLocale & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCollator *)cls)->setLocale (arg1);
 }
@@ -323,7 +323,7 @@ static void _call_f_setNumericMode_864 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCollator *)cls)->setNumericMode (arg1);
 }
@@ -343,7 +343,7 @@ static void _call_f_sortKey_c2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QCollatorSortKey > ((QCollatorSortKey)((QCollator *)cls)->sortKey (arg1));
 }
 
@@ -362,7 +362,7 @@ static void _call_f_swap_1531 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QCollator &arg1 = args.read<QCollator & > (heap);
+  QCollator &arg1 = gsi::arg_reader<QCollator & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCollator *)cls)->swap (arg1);
 }

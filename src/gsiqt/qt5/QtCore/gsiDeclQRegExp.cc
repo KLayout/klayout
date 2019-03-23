@@ -69,9 +69,9 @@ static void _call_ctor_QRegExp_6734 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (heap) : (const qt_gsi::Converter<Qt::CaseSensitivity>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::CaseSensitivity>(heap, Qt::CaseSensitive));
-  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & > (heap) : (const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRegExp::PatternSyntax>(heap, QRegExp::RegExp));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::CaseSensitivity>(heap, Qt::CaseSensitive), heap);
+  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegExp::PatternSyntax>(heap, QRegExp::RegExp), heap);
   ret.write<QRegExp *> (new QRegExp (arg1, qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg2).cref(), qt_gsi::QtToCppAdaptor<QRegExp::PatternSyntax>(arg3).cref()));
 }
 
@@ -90,7 +90,7 @@ static void _call_ctor_QRegExp_1981 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
   ret.write<QRegExp *> (new QRegExp (arg1));
 }
 
@@ -109,7 +109,7 @@ static void _call_f_cap_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QString > ((QString)((QRegExp *)cls)->cap (arg1));
 }
 
@@ -128,7 +128,7 @@ static void _call_f_cap_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QString > ((QString)((QRegExp *)cls)->cap (arg1));
 }
 
@@ -237,7 +237,7 @@ static void _call_f_exactMatch_c2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QRegExp *)cls)->exactMatch (arg1));
 }
 
@@ -260,9 +260,9 @@ static void _call_f_indexIn_c4680 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  const qt_gsi::Converter<QRegExp::CaretMode>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QRegExp::CaretMode>::target_type & > (heap) : (const qt_gsi::Converter<QRegExp::CaretMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRegExp::CaretMode>(heap, QRegExp::CaretAtZero));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  const qt_gsi::Converter<QRegExp::CaretMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegExp::CaretMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegExp::CaretMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegExp::CaretMode>(heap, QRegExp::CaretAtZero), heap);
   ret.write<int > ((int)((QRegExp *)cls)->indexIn (arg1, arg2, qt_gsi::QtToCppAdaptor<QRegExp::CaretMode>(arg3).cref()));
 }
 
@@ -330,9 +330,9 @@ static void _call_f_lastIndexIn_c4680 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(-1);
-  const qt_gsi::Converter<QRegExp::CaretMode>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QRegExp::CaretMode>::target_type & > (heap) : (const qt_gsi::Converter<QRegExp::CaretMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRegExp::CaretMode>(heap, QRegExp::CaretAtZero));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  const qt_gsi::Converter<QRegExp::CaretMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegExp::CaretMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegExp::CaretMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegExp::CaretMode>(heap, QRegExp::CaretAtZero), heap);
   ret.write<int > ((int)((QRegExp *)cls)->lastIndexIn (arg1, arg2, qt_gsi::QtToCppAdaptor<QRegExp::CaretMode>(arg3).cref()));
 }
 
@@ -366,7 +366,7 @@ static void _call_f_operator_excl__eq__c1981 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
   ret.write<bool > ((bool)((QRegExp *)cls)->operator!= (arg1));
 }
 
@@ -385,7 +385,7 @@ static void _call_f_operator_eq__1981 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
   ret.write<QRegExp & > ((QRegExp &)((QRegExp *)cls)->operator= (arg1));
 }
 
@@ -404,7 +404,7 @@ static void _call_f_operator_eq__eq__c1981 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
   ret.write<bool > ((bool)((QRegExp *)cls)->operator== (arg1));
 }
 
@@ -453,7 +453,7 @@ static void _call_f_pos_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<int > ((int)((QRegExp *)cls)->pos (arg1));
 }
 
@@ -472,7 +472,7 @@ static void _call_f_pos_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<int > ((int)((QRegExp *)cls)->pos (arg1));
 }
 
@@ -491,7 +491,7 @@ static void _call_f_setCaseSensitivity_2324 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRegExp *)cls)->setCaseSensitivity (qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg1).cref());
 }
@@ -511,7 +511,7 @@ static void _call_f_setMinimal_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRegExp *)cls)->setMinimal (arg1);
 }
@@ -531,7 +531,7 @@ static void _call_f_setPattern_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRegExp *)cls)->setPattern (arg1);
 }
@@ -551,7 +551,7 @@ static void _call_f_setPatternSyntax_2601 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg1 = args.read<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & > (heap);
+  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRegExp *)cls)->setPatternSyntax (qt_gsi::QtToCppAdaptor<QRegExp::PatternSyntax>(arg1).cref());
 }
@@ -571,7 +571,7 @@ static void _call_f_swap_1286 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QRegExp &arg1 = args.read<QRegExp & > (heap);
+  QRegExp &arg1 = gsi::arg_reader<QRegExp & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRegExp *)cls)->swap (arg1);
 }
@@ -591,7 +591,7 @@ static void _call_f_escape_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)QRegExp::escape (arg1));
 }
 

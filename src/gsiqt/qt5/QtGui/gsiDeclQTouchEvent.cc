@@ -69,7 +69,7 @@ static void _call_f_setDevice_1810 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTouchDevice *arg1 = args.read<QTouchDevice * > (heap);
+  QTouchDevice *arg1 = gsi::arg_reader<QTouchDevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent *)cls)->setDevice (arg1);
 }
@@ -89,7 +89,7 @@ static void _call_f_setTarget_1302 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent *)cls)->setTarget (arg1);
 }
@@ -109,7 +109,7 @@ static void _call_f_setTouchPointStates_2995 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::TouchPointState> arg1 = args.read<QFlags<Qt::TouchPointState> > (heap);
+  QFlags<Qt::TouchPointState> arg1 = gsi::arg_reader<QFlags<Qt::TouchPointState> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent *)cls)->setTouchPointStates (arg1);
 }
@@ -129,7 +129,7 @@ static void _call_f_setTouchPoints_4191 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QTouchEvent::TouchPoint> &arg1 = args.read<const QList<QTouchEvent::TouchPoint> & > (heap);
+  const QList<QTouchEvent::TouchPoint> &arg1 = gsi::arg_reader<const QList<QTouchEvent::TouchPoint> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent *)cls)->setTouchPoints (arg1);
 }
@@ -149,7 +149,7 @@ static void _call_f_setWindow_1335 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWindow *arg1 = args.read<QWindow * > (heap);
+  QWindow *arg1 = gsi::arg_reader<QWindow * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTouchEvent *)cls)->setWindow (arg1);
 }
@@ -306,11 +306,11 @@ static void _call_ctor_QTouchEvent_Adaptor_13206 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  QTouchDevice *arg2 = args ? args.read<QTouchDevice * > (heap) : (QTouchDevice *)(0);
-  QFlags<Qt::KeyboardModifier> arg3 = args ? args.read<QFlags<Qt::KeyboardModifier> > (heap) : (QFlags<Qt::KeyboardModifier>)(Qt::NoModifier);
-  QFlags<Qt::TouchPointState> arg4 = args ? args.read<QFlags<Qt::TouchPointState> > (heap) : (QFlags<Qt::TouchPointState>)(0);
-  const QList<QTouchEvent::TouchPoint> &arg5 = args ? args.read<const QList<QTouchEvent::TouchPoint> & > (heap) : (const QList<QTouchEvent::TouchPoint> &)(QList<QTouchEvent::TouchPoint>());
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  QTouchDevice *arg2 = args ? gsi::arg_reader<QTouchDevice * >() (args, heap) : gsi::arg_maker<QTouchDevice * >() (0, heap);
+  QFlags<Qt::KeyboardModifier> arg3 = args ? gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap) : gsi::arg_maker<QFlags<Qt::KeyboardModifier> >() (Qt::NoModifier, heap);
+  QFlags<Qt::TouchPointState> arg4 = args ? gsi::arg_reader<QFlags<Qt::TouchPointState> >() (args, heap) : gsi::arg_maker<QFlags<Qt::TouchPointState> >() (0, heap);
+  const QList<QTouchEvent::TouchPoint> &arg5 = args ? gsi::arg_reader<const QList<QTouchEvent::TouchPoint> & >() (args, heap) : gsi::arg_maker<const QList<QTouchEvent::TouchPoint> & >() (QList<QTouchEvent::TouchPoint>(), heap);
   ret.write<QTouchEvent_Adaptor *> (new QTouchEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, arg4, arg5));
 }
 

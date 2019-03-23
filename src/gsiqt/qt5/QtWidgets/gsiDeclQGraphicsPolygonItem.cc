@@ -94,7 +94,7 @@ static void _call_f_contains_c1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPolygonItem *)cls)->contains (arg1));
 }
 
@@ -128,7 +128,7 @@ static void _call_f_isObscuredBy_c2614 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPolygonItem *)cls)->isObscuredBy (arg1));
 }
 
@@ -166,9 +166,9 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QStyleOptionGraphicsItem *arg2 = args.read<const QStyleOptionGraphicsItem * > (heap);
-  QWidget *arg3 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
+  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPolygonItem *)cls)->paint (arg1, arg2, arg3);
 }
@@ -203,7 +203,7 @@ static void _call_f_setFillRule_1548 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::FillRule>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::FillRule>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::FillRule>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::FillRule>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPolygonItem *)cls)->setFillRule (qt_gsi::QtToCppAdaptor<Qt::FillRule>(arg1).cref());
 }
@@ -223,7 +223,7 @@ static void _call_f_setPolygon_2208 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygonF &arg1 = args.read<const QPolygonF & > (heap);
+  const QPolygonF &arg1 = gsi::arg_reader<const QPolygonF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPolygonItem *)cls)->setPolygon (arg1);
 }
@@ -916,7 +916,7 @@ static void _call_ctor_QGraphicsPolygonItem_Adaptor_1919 (const qt_gsi::GenericS
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
   ret.write<QGraphicsPolygonItem_Adaptor *> (new QGraphicsPolygonItem_Adaptor (arg1));
 }
 
@@ -936,8 +936,8 @@ static void _call_ctor_QGraphicsPolygonItem_Adaptor_4019 (const qt_gsi::GenericS
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygonF &arg1 = args.read<const QPolygonF & > (heap);
-  QGraphicsItem *arg2 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
+  const QPolygonF &arg1 = gsi::arg_reader<const QPolygonF & >() (args, heap);
+  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
   ret.write<QGraphicsPolygonItem_Adaptor *> (new QGraphicsPolygonItem_Adaptor (arg1, arg2));
 }
 

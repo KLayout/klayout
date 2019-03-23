@@ -129,7 +129,7 @@ static void _call_f_finish_1315 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplashScreen *)cls)->finish (arg1);
 }
@@ -180,7 +180,7 @@ static void _call_f_setPixmap_2017 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplashScreen *)cls)->setPixmap (arg1);
 }
@@ -204,9 +204,9 @@ static void _call_f_showMessage_4481 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(Qt::AlignLeft);
-  const QColor &arg3 = args ? args.read<const QColor & > (heap) : (const QColor &)(Qt::black);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::AlignLeft, heap);
+  const QColor &arg3 = args ? gsi::arg_reader<const QColor & >() (args, heap) : gsi::arg_maker<const QColor & >() (Qt::black, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplashScreen *)cls)->showMessage (arg1, arg2, arg3);
 }
@@ -228,8 +228,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QSplashScreen::tr (arg1, arg2));
 }
 
@@ -252,9 +252,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QSplashScreen::tr (arg1, arg2, arg3));
 }
 
@@ -275,8 +275,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QSplashScreen::trUtf8 (arg1, arg2));
 }
 
@@ -299,9 +299,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QSplashScreen::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1210,8 +1210,8 @@ static void _call_ctor_QSplashScreen_Adaptor_4404 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args ? args.read<const QPixmap & > (heap) : (const QPixmap &)(QPixmap());
-  QFlags<Qt::WindowType> arg2 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  const QPixmap &arg1 = args ? gsi::arg_reader<const QPixmap & >() (args, heap) : gsi::arg_maker<const QPixmap & >() (QPixmap(), heap);
+  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<QSplashScreen_Adaptor *> (new QSplashScreen_Adaptor (arg1, arg2));
 }
 
@@ -1233,9 +1233,9 @@ static void _call_ctor_QSplashScreen_Adaptor_5611 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QPixmap &arg2 = args ? args.read<const QPixmap & > (heap) : (const QPixmap &)(QPixmap());
-  QFlags<Qt::WindowType> arg3 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QPixmap &arg2 = args ? gsi::arg_reader<const QPixmap & >() (args, heap) : gsi::arg_maker<const QPixmap & >() (QPixmap(), heap);
+  QFlags<Qt::WindowType> arg3 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<QSplashScreen_Adaptor *> (new QSplashScreen_Adaptor (arg1, arg2, arg3));
 }
 
@@ -1377,9 +1377,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplashScreen_Adaptor *)cls)->fp_QSplashScreen_create_2208 (arg1, arg2, arg3);
 }
@@ -1398,7 +1398,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QSplashScreen_Adaptor *)cls)->emitter_QSplashScreen_customContextMenuRequested_1916 (arg1);
 }
 
@@ -1442,8 +1442,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSplashScreen_Adaptor *)cls)->fp_QSplashScreen_destroy_1620 (arg1, arg2);
 }
@@ -1462,7 +1462,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QSplashScreen_Adaptor *)cls)->emitter_QSplashScreen_destroyed_1302 (arg1);
 }
 
@@ -2030,7 +2030,7 @@ static void _call_emitter_messageChanged_2025 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QSplashScreen_Adaptor *)cls)->emitter_QSplashScreen_messageChanged_2025 (arg1);
 }
 
@@ -2277,7 +2277,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QSplashScreen_Adaptor *)cls)->fp_QSplashScreen_receivers_c1731 (arg1));
 }
 

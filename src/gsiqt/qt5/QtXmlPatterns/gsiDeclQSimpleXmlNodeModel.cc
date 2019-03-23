@@ -56,7 +56,7 @@ static void _call_f_baseUri_c3090 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QUrl > ((QUrl)((QSimpleXmlNodeModel *)cls)->baseUri (arg1));
 }
 
@@ -75,7 +75,7 @@ static void _call_f_elementById_c2084 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   ret.write<QXmlNodeModelIndex > ((QXmlNodeModelIndex)((QSimpleXmlNodeModel *)cls)->elementById (arg1));
 }
 
@@ -109,7 +109,7 @@ static void _call_f_namespaceBindings_c3090 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QVector<QXmlName> > ((QVector<QXmlName>)((QSimpleXmlNodeModel *)cls)->namespaceBindings (arg1));
 }
 
@@ -128,7 +128,7 @@ static void _call_f_nodesByIdref_c2084 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   ret.write<QVector<QXmlNodeModelIndex> > ((QVector<QXmlNodeModelIndex>)((QSimpleXmlNodeModel *)cls)->nodesByIdref (arg1));
 }
 
@@ -147,7 +147,7 @@ static void _call_f_stringValue_c3090 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QString > ((QString)((QSimpleXmlNodeModel *)cls)->stringValue (arg1));
 }
 

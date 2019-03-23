@@ -72,10 +72,10 @@ static void _call_ctor_QXmlName_7550 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlNamePool &arg1 = args.read<QXmlNamePool & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  QXmlNamePool &arg1 = gsi::arg_reader<QXmlNamePool & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QXmlName *> (new QXmlName (arg1, arg2, arg3, arg4));
 }
 
@@ -109,7 +109,7 @@ static void _call_f_namespaceUri_c2494 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNamePool &arg1 = args.read<const QXmlNamePool & > (heap);
+  const QXmlNamePool &arg1 = gsi::arg_reader<const QXmlNamePool & >() (args, heap);
   ret.write<QString > ((QString)((QXmlName *)cls)->namespaceUri (arg1));
 }
 
@@ -128,7 +128,7 @@ static void _call_f_operator_excl__eq__c2084 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   ret.write<bool > ((bool)((QXmlName *)cls)->operator!= (arg1));
 }
 
@@ -147,7 +147,7 @@ static void _call_f_operator_eq__2084 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   ret.write<QXmlName & > ((QXmlName &)((QXmlName *)cls)->operator= (arg1));
 }
 
@@ -166,7 +166,7 @@ static void _call_f_operator_eq__eq__c2084 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   ret.write<bool > ((bool)((QXmlName *)cls)->operator== (arg1));
 }
 
@@ -185,7 +185,7 @@ static void _call_f_toClarkName_c2494 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNamePool &arg1 = args.read<const QXmlNamePool & > (heap);
+  const QXmlNamePool &arg1 = gsi::arg_reader<const QXmlNamePool & >() (args, heap);
   ret.write<QString > ((QString)((QXmlName *)cls)->toClarkName (arg1));
 }
 
@@ -206,8 +206,8 @@ static void _call_f_fromClarkName_4411 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QXmlNamePool &arg2 = args.read<const QXmlNamePool & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QXmlNamePool &arg2 = gsi::arg_reader<const QXmlNamePool & >() (args, heap);
   ret.write<QXmlName > ((QXmlName)QXmlName::fromClarkName (arg1, arg2));
 }
 
@@ -226,7 +226,7 @@ static void _call_f_isNCName_2025 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QXmlName::isNCName (arg1));
 }
 

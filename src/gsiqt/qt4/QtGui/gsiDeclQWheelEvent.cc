@@ -256,11 +256,11 @@ static void _call_ctor_QWheelEvent_Adaptor_9843 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
-  int arg2 = args.read<int > (heap);
-  QFlags<Qt::MouseButton> arg3 = args.read<QFlags<Qt::MouseButton> > (heap);
-  QFlags<Qt::KeyboardModifier> arg4 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap) : (const qt_gsi::Converter<Qt::Orientation>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::Orientation>(heap, Qt::Vertical));
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::MouseButton> arg3 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg4 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::Orientation>(heap, Qt::Vertical), heap);
   ret.write<QWheelEvent_Adaptor *> (new QWheelEvent_Adaptor (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg5).cref()));
 }
 
@@ -288,12 +288,12 @@ static void _call_ctor_QWheelEvent_Adaptor_11651 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
-  int arg3 = args.read<int > (heap);
-  QFlags<Qt::MouseButton> arg4 = args.read<QFlags<Qt::MouseButton> > (heap);
-  QFlags<Qt::KeyboardModifier> arg5 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg6 = args ? args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap) : (const qt_gsi::Converter<Qt::Orientation>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::Orientation>(heap, Qt::Vertical));
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::MouseButton> arg4 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg5 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg6 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::Orientation>(heap, Qt::Vertical), heap);
   ret.write<QWheelEvent_Adaptor *> (new QWheelEvent_Adaptor (arg1, arg2, arg3, arg4, arg5, qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg6).cref()));
 }
 

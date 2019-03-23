@@ -70,8 +70,8 @@ static void _call_ctor_QConicalGradient_2949 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  double arg2 = args.read<double > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QConicalGradient *> (new QConicalGradient (arg1, arg2));
 }
 
@@ -94,9 +94,9 @@ static void _call_ctor_QConicalGradient_2997 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   ret.write<QConicalGradient *> (new QConicalGradient (arg1, arg2, arg3));
 }
 
@@ -145,7 +145,7 @@ static void _call_f_setAngle_1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QConicalGradient *)cls)->setAngle (arg1);
 }
@@ -165,7 +165,7 @@ static void _call_f_setCenter_1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QConicalGradient *)cls)->setCenter (arg1);
 }
@@ -187,8 +187,8 @@ static void _call_f_setCenter_2034 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QConicalGradient *)cls)->setCenter (arg1, arg2);
 }

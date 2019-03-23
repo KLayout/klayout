@@ -67,8 +67,8 @@ static void _call_ctor_QMediaTimeInterval_1864 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
-  qint64 arg2 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  qint64 arg2 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<QMediaTimeInterval *> (new QMediaTimeInterval (arg1, arg2));
 }
 
@@ -87,7 +87,7 @@ static void _call_ctor_QMediaTimeInterval_3110 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeInterval &arg1 = args.read<const QMediaTimeInterval & > (heap);
+  const QMediaTimeInterval &arg1 = gsi::arg_reader<const QMediaTimeInterval & >() (args, heap);
   ret.write<QMediaTimeInterval *> (new QMediaTimeInterval (arg1));
 }
 
@@ -106,7 +106,7 @@ static void _call_f_contains_c986 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<bool > ((bool)((QMediaTimeInterval *)cls)->contains (arg1));
 }
 
@@ -185,7 +185,7 @@ static void _call_f_translated_c986 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<QMediaTimeInterval > ((QMediaTimeInterval)((QMediaTimeInterval *)cls)->translated (arg1));
 }
 

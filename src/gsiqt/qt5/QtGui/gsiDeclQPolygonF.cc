@@ -175,7 +175,7 @@ static void _call_ctor_QPolygonF_767 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QPolygonF *> (new QPolygonF (arg1));
 }
 
@@ -194,7 +194,7 @@ static void _call_ctor_QPolygonF_2208 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygonF &arg1 = args.read<const QPolygonF & > (heap);
+  const QPolygonF &arg1 = gsi::arg_reader<const QPolygonF & >() (args, heap);
   ret.write<QPolygonF *> (new QPolygonF (arg1));
 }
 
@@ -213,7 +213,7 @@ static void _call_ctor_QPolygonF_2816 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<QPointF> &arg1 = args.read<const QVector<QPointF> & > (heap);
+  const QVector<QPointF> &arg1 = gsi::arg_reader<const QVector<QPointF> & >() (args, heap);
   ret.write<QPolygonF *> (new QPolygonF (arg1));
 }
 
@@ -232,7 +232,7 @@ static void _call_ctor_QPolygonF_1862 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   ret.write<QPolygonF *> (new QPolygonF (arg1));
 }
 
@@ -251,7 +251,7 @@ static void _call_ctor_QPolygonF_2138 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygon &arg1 = args.read<const QPolygon & > (heap);
+  const QPolygon &arg1 = gsi::arg_reader<const QPolygon & >() (args, heap);
   ret.write<QPolygonF *> (new QPolygonF (arg1));
 }
 
@@ -287,8 +287,8 @@ static void _call_f_containsPoint_c3426 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const qt_gsi::Converter<Qt::FillRule>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::FillRule>::target_type & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const qt_gsi::Converter<Qt::FillRule>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::FillRule>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QPolygonF *)cls)->containsPoint (arg1, qt_gsi::QtToCppAdaptor<Qt::FillRule>(arg2).cref()));
 }
 
@@ -307,7 +307,7 @@ static void _call_f_intersected_c2208 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygonF &arg1 = args.read<const QPolygonF & > (heap);
+  const QPolygonF &arg1 = gsi::arg_reader<const QPolygonF & >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QPolygonF *)cls)->intersected (arg1));
 }
 
@@ -341,7 +341,7 @@ static void _call_f_subtracted_c2208 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygonF &arg1 = args.read<const QPolygonF & > (heap);
+  const QPolygonF &arg1 = gsi::arg_reader<const QPolygonF & >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QPolygonF *)cls)->subtracted (arg1));
 }
 
@@ -360,7 +360,7 @@ static void _call_f_swap_1513 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPolygonF &arg1 = args.read<QPolygonF & > (heap);
+  QPolygonF &arg1 = gsi::arg_reader<QPolygonF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPolygonF *)cls)->swap (arg1);
 }
@@ -397,8 +397,8 @@ static void _call_f_translate_2034 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPolygonF *)cls)->translate (arg1, arg2);
 }
@@ -418,7 +418,7 @@ static void _call_f_translate_1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPolygonF *)cls)->translate (arg1);
 }
@@ -440,8 +440,8 @@ static void _call_f_translated_c2034 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QPolygonF *)cls)->translated (arg1, arg2));
 }
 
@@ -460,7 +460,7 @@ static void _call_f_translated_c1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QPolygonF *)cls)->translated (arg1));
 }
 
@@ -479,7 +479,7 @@ static void _call_f_united_c2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygonF &arg1 = args.read<const QPolygonF & > (heap);
+  const QPolygonF &arg1 = gsi::arg_reader<const QPolygonF & >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QPolygonF *)cls)->united (arg1));
 }
 

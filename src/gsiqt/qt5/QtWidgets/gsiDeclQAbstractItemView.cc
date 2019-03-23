@@ -168,7 +168,7 @@ static void _call_f_closePersistentEditor_2395 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->closePersistentEditor (arg1);
 }
@@ -279,7 +279,7 @@ static void _call_f_edit_2395 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->edit (arg1);
 }
@@ -359,7 +359,7 @@ static void _call_f_indexAt_c1916 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QAbstractItemView *)cls)->indexAt (arg1));
 }
 
@@ -378,7 +378,7 @@ static void _call_f_indexWidget_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QAbstractItemView *)cls)->indexWidget (arg1));
 }
 
@@ -397,7 +397,7 @@ static void _call_f_inputMethodQuery_c2420 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QAbstractItemView *)cls)->inputMethodQuery (qt_gsi::QtToCppAdaptor<Qt::InputMethodQuery>(arg1).cref()));
 }
 
@@ -431,7 +431,7 @@ static void _call_f_itemDelegate_c2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QAbstractItemDelegate * > ((QAbstractItemDelegate *)((QAbstractItemView *)cls)->itemDelegate (arg1));
 }
 
@@ -450,7 +450,7 @@ static void _call_f_itemDelegateForColumn_c767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QAbstractItemDelegate * > ((QAbstractItemDelegate *)((QAbstractItemView *)cls)->itemDelegateForColumn (arg1));
 }
 
@@ -469,7 +469,7 @@ static void _call_f_itemDelegateForRow_c767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QAbstractItemDelegate * > ((QAbstractItemDelegate *)((QAbstractItemView *)cls)->itemDelegateForRow (arg1));
 }
 
@@ -488,7 +488,7 @@ static void _call_f_keyboardSearch_2025 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->keyboardSearch (arg1);
 }
@@ -523,7 +523,7 @@ static void _call_f_openPersistentEditor_2395 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->openPersistentEditor (arg1);
 }
@@ -576,8 +576,8 @@ static void _call_f_scrollTo_5576 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractItemView::ScrollHint>(heap, QAbstractItemView::EnsureVisible));
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractItemView::ScrollHint>(heap, QAbstractItemView::EnsureVisible), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->scrollTo (arg1, qt_gsi::QtToCppAdaptor<QAbstractItemView::ScrollHint>(arg2).cref());
 }
@@ -690,7 +690,7 @@ static void _call_f_setAlternatingRowColors_864 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setAlternatingRowColors (arg1);
 }
@@ -710,7 +710,7 @@ static void _call_f_setAutoScroll_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setAutoScroll (arg1);
 }
@@ -730,7 +730,7 @@ static void _call_f_setAutoScrollMargin_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setAutoScrollMargin (arg1);
 }
@@ -750,7 +750,7 @@ static void _call_f_setCurrentIndex_2395 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setCurrentIndex (arg1);
 }
@@ -770,7 +770,7 @@ static void _call_f_setDefaultDropAction_1760 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::DropAction>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::DropAction>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::DropAction>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::DropAction>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setDefaultDropAction (qt_gsi::QtToCppAdaptor<Qt::DropAction>(arg1).cref());
 }
@@ -790,7 +790,7 @@ static void _call_f_setDragDropMode_3439 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractItemView::DragDropMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractItemView::DragDropMode>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractItemView::DragDropMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractItemView::DragDropMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setDragDropMode (qt_gsi::QtToCppAdaptor<QAbstractItemView::DragDropMode>(arg1).cref());
 }
@@ -810,7 +810,7 @@ static void _call_f_setDragDropOverwriteMode_864 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setDragDropOverwriteMode (arg1);
 }
@@ -830,7 +830,7 @@ static void _call_f_setDragEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setDragEnabled (arg1);
 }
@@ -850,7 +850,7 @@ static void _call_f_setDropIndicatorShown_864 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setDropIndicatorShown (arg1);
 }
@@ -870,7 +870,7 @@ static void _call_f_setEditTriggers_4073 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QAbstractItemView::EditTrigger> arg1 = args.read<QFlags<QAbstractItemView::EditTrigger> > (heap);
+  QFlags<QAbstractItemView::EditTrigger> arg1 = gsi::arg_reader<QFlags<QAbstractItemView::EditTrigger> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setEditTriggers (arg1);
 }
@@ -890,7 +890,7 @@ static void _call_f_setHorizontalScrollMode_3275 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractItemView::ScrollMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractItemView::ScrollMode>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractItemView::ScrollMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractItemView::ScrollMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setHorizontalScrollMode (qt_gsi::QtToCppAdaptor<QAbstractItemView::ScrollMode>(arg1).cref());
 }
@@ -910,7 +910,7 @@ static void _call_f_setIconSize_1805 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setIconSize (arg1);
 }
@@ -932,8 +932,8 @@ static void _call_f_setIndexWidget_3602 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setIndexWidget (arg1, arg2);
 }
@@ -953,7 +953,7 @@ static void _call_f_setItemDelegate_2717 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemDelegate *arg1 = args.read<QAbstractItemDelegate * > (heap);
+  QAbstractItemDelegate *arg1 = gsi::arg_reader<QAbstractItemDelegate * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setItemDelegate (arg1);
 }
@@ -975,8 +975,8 @@ static void _call_f_setItemDelegateForColumn_3376 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QAbstractItemDelegate *arg2 = args.read<QAbstractItemDelegate * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QAbstractItemDelegate *arg2 = gsi::arg_reader<QAbstractItemDelegate * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setItemDelegateForColumn (arg1, arg2);
 }
@@ -998,8 +998,8 @@ static void _call_f_setItemDelegateForRow_3376 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QAbstractItemDelegate *arg2 = args.read<QAbstractItemDelegate * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QAbstractItemDelegate *arg2 = gsi::arg_reader<QAbstractItemDelegate * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setItemDelegateForRow (arg1, arg2);
 }
@@ -1019,7 +1019,7 @@ static void _call_f_setModel_2419 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemModel *arg1 = args.read<QAbstractItemModel * > (heap);
+  QAbstractItemModel *arg1 = gsi::arg_reader<QAbstractItemModel * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setModel (arg1);
 }
@@ -1039,7 +1039,7 @@ static void _call_f_setRootIndex_2395 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setRootIndex (arg1);
 }
@@ -1059,7 +1059,7 @@ static void _call_f_setSelectionBehavior_4013 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractItemView::SelectionBehavior>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractItemView::SelectionBehavior>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractItemView::SelectionBehavior>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractItemView::SelectionBehavior>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setSelectionBehavior (qt_gsi::QtToCppAdaptor<QAbstractItemView::SelectionBehavior>(arg1).cref());
 }
@@ -1079,7 +1079,7 @@ static void _call_f_setSelectionMode_3586 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractItemView::SelectionMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractItemView::SelectionMode>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractItemView::SelectionMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractItemView::SelectionMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setSelectionMode (qt_gsi::QtToCppAdaptor<QAbstractItemView::SelectionMode>(arg1).cref());
 }
@@ -1099,7 +1099,7 @@ static void _call_f_setSelectionModel_2533 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QItemSelectionModel *arg1 = args.read<QItemSelectionModel * > (heap);
+  QItemSelectionModel *arg1 = gsi::arg_reader<QItemSelectionModel * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setSelectionModel (arg1);
 }
@@ -1119,7 +1119,7 @@ static void _call_f_setTabKeyNavigation_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setTabKeyNavigation (arg1);
 }
@@ -1139,7 +1139,7 @@ static void _call_f_setTextElideMode_2042 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TextElideMode>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::TextElideMode>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::TextElideMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TextElideMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setTextElideMode (qt_gsi::QtToCppAdaptor<Qt::TextElideMode>(arg1).cref());
 }
@@ -1159,7 +1159,7 @@ static void _call_f_setVerticalScrollMode_3275 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractItemView::ScrollMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractItemView::ScrollMode>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractItemView::ScrollMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractItemView::ScrollMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->setVerticalScrollMode (qt_gsi::QtToCppAdaptor<QAbstractItemView::ScrollMode>(arg1).cref());
 }
@@ -1194,7 +1194,7 @@ static void _call_f_sizeHintForColumn_c767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QAbstractItemView *)cls)->sizeHintForColumn (arg1));
 }
 
@@ -1213,7 +1213,7 @@ static void _call_f_sizeHintForIndex_c2395 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QSize > ((QSize)((QAbstractItemView *)cls)->sizeHintForIndex (arg1));
 }
 
@@ -1232,7 +1232,7 @@ static void _call_f_sizeHintForRow_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QAbstractItemView *)cls)->sizeHintForRow (arg1));
 }
 
@@ -1281,7 +1281,7 @@ static void _call_f_update_2006 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->update (arg1);
 }
@@ -1301,7 +1301,7 @@ static void _call_f_update_2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView *)cls)->update (arg1);
 }
@@ -1336,7 +1336,7 @@ static void _call_f_visualRect_c2395 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QRect > ((QRect)((QAbstractItemView *)cls)->visualRect (arg1));
 }
 
@@ -1359,9 +1359,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractItemView::tr (arg1, arg2, arg3));
 }
 
@@ -1384,9 +1384,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractItemView::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -3147,7 +3147,7 @@ static void _call_ctor_QAbstractItemView_Adaptor_1315 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QAbstractItemView_Adaptor *> (new QAbstractItemView_Adaptor (arg1));
 }
 
@@ -3189,7 +3189,7 @@ static void _call_emitter_activated_2395 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_activated_2395 (arg1);
 }
 
@@ -3255,7 +3255,7 @@ static void _call_emitter_clicked_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_clicked_2395 (arg1);
 }
 
@@ -3376,9 +3376,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_create_2208 (arg1, arg2, arg3);
 }
@@ -3424,7 +3424,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_customContextMenuRequested_1916 (arg1);
 }
 
@@ -3498,8 +3498,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_destroy_1620 (arg1, arg2);
 }
@@ -3518,7 +3518,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_destroyed_1302 (arg1);
 }
 
@@ -3609,7 +3609,7 @@ static void _call_emitter_doubleClicked_2395 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_doubleClicked_2395 (arg1);
 }
 
@@ -3699,7 +3699,7 @@ static void _call_fp_drawFrame_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_drawFrame_1426 (arg1);
 }
@@ -3833,7 +3833,7 @@ static void _call_emitter_entered_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_entered_2395 (arg1);
 }
 
@@ -4161,7 +4161,7 @@ static void _call_emitter_iconSizeChanged_1805 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_iconSizeChanged_1805 (arg1);
 }
 
@@ -4226,7 +4226,7 @@ static void _call_fp_initStyleOption_c2356 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionFrame *arg1 = args.read<QStyleOptionFrame * > (heap);
+  QStyleOptionFrame *arg1 = gsi::arg_reader<QStyleOptionFrame * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_initStyleOption_c2356 (arg1);
 }
@@ -4315,7 +4315,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_isSignalConnected_c2394 (arg1));
 }
 
@@ -4689,7 +4689,7 @@ static void _call_emitter_pressed_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_pressed_2395 (arg1);
 }
 
@@ -4707,7 +4707,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_receivers_c1731 (arg1));
 }
 
@@ -4896,8 +4896,8 @@ static void _call_fp_scrollDirtyRegion_1426 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_scrollDirtyRegion_1426 (arg1, arg2);
 }
@@ -5063,7 +5063,7 @@ static void _call_fp_setDirtyRegion_2006 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_setDirtyRegion_2006 (arg1);
 }
@@ -5082,7 +5082,7 @@ static void _call_fp_setHorizontalStepsPerItem_767 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_setHorizontalStepsPerItem_767 (arg1);
 }
@@ -5200,7 +5200,7 @@ static void _call_fp_setState_2776 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_setState_2776 (arg1);
 }
@@ -5219,7 +5219,7 @@ static void _call_fp_setVerticalStepsPerItem_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_setVerticalStepsPerItem_767 (arg1);
 }
@@ -5244,10 +5244,10 @@ static void _call_fp_setViewportMargins_2744 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_setViewportMargins_2744 (arg1, arg2, arg3, arg4);
 }
@@ -5266,7 +5266,7 @@ static void _call_fp_setViewportMargins_2115 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractItemView_Adaptor *)cls)->fp_QAbstractItemView_setViewportMargins_2115 (arg1);
 }
@@ -5872,7 +5872,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_windowIconChanged_1787 (arg1);
 }
 
@@ -5890,7 +5890,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_windowIconTextChanged_2025 (arg1);
 }
 
@@ -5908,7 +5908,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QAbstractItemView_Adaptor *)cls)->emitter_QAbstractItemView_windowTitleChanged_2025 (arg1);
 }
 

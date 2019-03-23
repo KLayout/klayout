@@ -65,7 +65,7 @@ static void _call_f_setModifiers_3077 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::KeyboardModifier> arg1 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  QFlags<Qt::KeyboardModifier> arg1 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputEvent *)cls)->setModifiers (arg1);
 }
@@ -130,8 +130,8 @@ static void _call_ctor_QInputEvent_Adaptor_4534 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  QFlags<Qt::KeyboardModifier> arg2 = args ? args.read<QFlags<Qt::KeyboardModifier> > (heap) : (QFlags<Qt::KeyboardModifier>)(Qt::NoModifier);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg2 = args ? gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap) : gsi::arg_maker<QFlags<Qt::KeyboardModifier> >() (Qt::NoModifier, heap);
   ret.write<QInputEvent_Adaptor *> (new QInputEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2));
 }
 

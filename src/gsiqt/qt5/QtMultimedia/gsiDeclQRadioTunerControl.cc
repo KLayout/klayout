@@ -145,7 +145,7 @@ static void _call_f_frequencyRange_c2027 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = args.read<const qt_gsi::Converter<QRadioTuner::Band>::target_type & > (heap);
+  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Band>::target_type & >() (args, heap);
   ret.write<QPair<int, int> > ((QPair<int, int>)((QRadioTunerControl *)cls)->frequencyRange (qt_gsi::QtToCppAdaptor<QRadioTuner::Band>(arg1).cref()));
 }
 
@@ -164,7 +164,7 @@ static void _call_f_frequencyStep_c2027 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = args.read<const qt_gsi::Converter<QRadioTuner::Band>::target_type & > (heap);
+  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Band>::target_type & >() (args, heap);
   ret.write<int > ((int)((QRadioTunerControl *)cls)->frequencyStep (qt_gsi::QtToCppAdaptor<QRadioTuner::Band>(arg1).cref()));
 }
 
@@ -198,7 +198,7 @@ static void _call_f_isBandSupported_c2027 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = args.read<const qt_gsi::Converter<QRadioTuner::Band>::target_type & > (heap);
+  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Band>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QRadioTunerControl *)cls)->isBandSupported (qt_gsi::QtToCppAdaptor<QRadioTuner::Band>(arg1).cref()));
 }
 
@@ -262,7 +262,7 @@ static void _call_f_searchAllStations_2641 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::SearchMode>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QRadioTuner::SearchMode>::target_type & > (heap) : (const qt_gsi::Converter<QRadioTuner::SearchMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRadioTuner::SearchMode>(heap, QRadioTuner::SearchFast));
+  const qt_gsi::Converter<QRadioTuner::SearchMode>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::SearchMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRadioTuner::SearchMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRadioTuner::SearchMode>(heap, QRadioTuner::SearchFast), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadioTunerControl *)cls)->searchAllStations (qt_gsi::QtToCppAdaptor<QRadioTuner::SearchMode>(arg1).cref());
 }
@@ -314,7 +314,7 @@ static void _call_f_setBand_2027 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = args.read<const qt_gsi::Converter<QRadioTuner::Band>::target_type & > (heap);
+  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Band>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadioTunerControl *)cls)->setBand (qt_gsi::QtToCppAdaptor<QRadioTuner::Band>(arg1).cref());
 }
@@ -334,7 +334,7 @@ static void _call_f_setFrequency_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadioTunerControl *)cls)->setFrequency (arg1);
 }
@@ -354,7 +354,7 @@ static void _call_f_setMuted_864 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadioTunerControl *)cls)->setMuted (arg1);
 }
@@ -374,7 +374,7 @@ static void _call_f_setStereoMode_2669 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::StereoMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QRadioTuner::StereoMode>::target_type & > (heap);
+  const qt_gsi::Converter<QRadioTuner::StereoMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::StereoMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadioTunerControl *)cls)->setStereoMode (qt_gsi::QtToCppAdaptor<QRadioTuner::StereoMode>(arg1).cref());
 }
@@ -394,7 +394,7 @@ static void _call_f_setVolume_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadioTunerControl *)cls)->setVolume (arg1);
 }
@@ -510,9 +510,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QRadioTunerControl::tr (arg1, arg2, arg3));
 }
 
@@ -535,9 +535,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QRadioTunerControl::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1238,7 +1238,7 @@ static void _call_emitter_antennaConnectedChanged_864 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_antennaConnectedChanged_864 (arg1);
 }
 
@@ -1275,7 +1275,7 @@ static void _call_emitter_bandChanged_2027 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = args.read<const qt_gsi::Converter<QRadioTuner::Band>::target_type & > (heap);
+  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Band>::target_type & >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_bandChanged_2027 (arg1);
 }
 
@@ -1361,7 +1361,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_destroyed_1302 (arg1);
 }
 
@@ -1422,7 +1422,7 @@ static void _call_emitter_error_2176 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::Error>::target_type & arg1 = args.read<const qt_gsi::Converter<QRadioTuner::Error>::target_type & > (heap);
+  const qt_gsi::Converter<QRadioTuner::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Error>::target_type & >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_error_2176 (arg1);
 }
 
@@ -1527,7 +1527,7 @@ static void _call_emitter_frequencyChanged_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_frequencyChanged_767 (arg1);
 }
 
@@ -1671,7 +1671,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QRadioTunerControl_Adaptor *)cls)->fp_QRadioTunerControl_isSignalConnected_c2394 (arg1));
 }
 
@@ -1708,7 +1708,7 @@ static void _call_emitter_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_mutedChanged_864 (arg1);
 }
 
@@ -1726,7 +1726,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QRadioTunerControl_Adaptor *)cls)->fp_QRadioTunerControl_receivers_c1731 (arg1));
 }
 
@@ -1808,7 +1808,7 @@ static void _call_emitter_searchingChanged_864 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_searchingChanged_864 (arg1);
 }
 
@@ -1993,7 +1993,7 @@ static void _call_emitter_signalStrengthChanged_767 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_signalStrengthChanged_767 (arg1);
 }
 
@@ -2050,7 +2050,7 @@ static void _call_emitter_stateChanged_2167 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::State>::target_type & arg1 = args.read<const qt_gsi::Converter<QRadioTuner::State>::target_type & > (heap);
+  const qt_gsi::Converter<QRadioTuner::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::State>::target_type & >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_stateChanged_2167 (arg1);
 }
 
@@ -2070,8 +2070,8 @@ static void _call_emitter_stationFound_1807 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QString arg2 = args.read<QString > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QString arg2 = gsi::arg_reader<QString >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_stationFound_1807 (arg1, arg2);
 }
 
@@ -2108,7 +2108,7 @@ static void _call_emitter_stereoStatusChanged_864 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_stereoStatusChanged_864 (arg1);
 }
 
@@ -2189,7 +2189,7 @@ static void _call_emitter_volumeChanged_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_volumeChanged_767 (arg1);
 }
 

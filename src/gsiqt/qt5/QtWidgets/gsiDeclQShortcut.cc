@@ -161,7 +161,7 @@ static void _call_f_setAutoRepeat_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QShortcut *)cls)->setAutoRepeat (arg1);
 }
@@ -181,7 +181,7 @@ static void _call_f_setContext_2350 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ShortcutContext>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ShortcutContext>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ShortcutContext>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ShortcutContext>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QShortcut *)cls)->setContext (qt_gsi::QtToCppAdaptor<Qt::ShortcutContext>(arg1).cref());
 }
@@ -201,7 +201,7 @@ static void _call_f_setEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QShortcut *)cls)->setEnabled (arg1);
 }
@@ -221,7 +221,7 @@ static void _call_f_setKey_2516 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QShortcut *)cls)->setKey (arg1);
 }
@@ -241,7 +241,7 @@ static void _call_f_setWhatsThis_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QShortcut *)cls)->setWhatsThis (arg1);
 }
@@ -280,9 +280,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QShortcut::tr (arg1, arg2, arg3));
 }
 
@@ -305,9 +305,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QShortcut::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -536,7 +536,7 @@ static void _call_ctor_QShortcut_Adaptor_1315 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QShortcut_Adaptor *> (new QShortcut_Adaptor (arg1));
 }
 
@@ -562,11 +562,11 @@ static void _call_ctor_QShortcut_Adaptor_9211 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
-  const char *arg3 = args ? args.read<const char * > (heap) : (const char *)(0);
-  const char *arg4 = args ? args.read<const char * > (heap) : (const char *)(0);
-  const qt_gsi::Converter<Qt::ShortcutContext>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<Qt::ShortcutContext>::target_type & > (heap) : (const qt_gsi::Converter<Qt::ShortcutContext>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::ShortcutContext>(heap, Qt::WindowShortcut));
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  const char *arg3 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg4 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const qt_gsi::Converter<Qt::ShortcutContext>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ShortcutContext>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ShortcutContext>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ShortcutContext>(heap, Qt::WindowShortcut), heap);
   ret.write<QShortcut_Adaptor *> (new QShortcut_Adaptor (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<Qt::ShortcutContext>(arg5).cref()));
 }
 
@@ -660,7 +660,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QShortcut_Adaptor *)cls)->emitter_QShortcut_destroyed_1302 (arg1);
 }
 
@@ -751,7 +751,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QShortcut_Adaptor *)cls)->fp_QShortcut_isSignalConnected_c2394 (arg1));
 }
 
@@ -769,7 +769,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QShortcut_Adaptor *)cls)->fp_QShortcut_receivers_c1731 (arg1));
 }
 

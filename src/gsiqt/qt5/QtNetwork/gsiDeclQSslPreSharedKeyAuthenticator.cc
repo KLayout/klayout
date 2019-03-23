@@ -65,7 +65,7 @@ static void _call_ctor_QSslPreSharedKeyAuthenticator_4262 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslPreSharedKeyAuthenticator &arg1 = args.read<const QSslPreSharedKeyAuthenticator & > (heap);
+  const QSslPreSharedKeyAuthenticator &arg1 = gsi::arg_reader<const QSslPreSharedKeyAuthenticator & >() (args, heap);
   ret.write<QSslPreSharedKeyAuthenticator *> (new QSslPreSharedKeyAuthenticator (arg1));
 }
 
@@ -144,7 +144,7 @@ static void _call_f_operator_eq__4262 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslPreSharedKeyAuthenticator &arg1 = args.read<const QSslPreSharedKeyAuthenticator & > (heap);
+  const QSslPreSharedKeyAuthenticator &arg1 = gsi::arg_reader<const QSslPreSharedKeyAuthenticator & >() (args, heap);
   ret.write<QSslPreSharedKeyAuthenticator & > ((QSslPreSharedKeyAuthenticator &)((QSslPreSharedKeyAuthenticator *)cls)->operator= (arg1));
 }
 
@@ -178,7 +178,7 @@ static void _call_f_setIdentity_2309 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslPreSharedKeyAuthenticator *)cls)->setIdentity (arg1);
 }
@@ -198,7 +198,7 @@ static void _call_f_setPreSharedKey_2309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslPreSharedKeyAuthenticator *)cls)->setPreSharedKey (arg1);
 }
@@ -218,7 +218,7 @@ static void _call_f_swap_3567 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSslPreSharedKeyAuthenticator &arg1 = args.read<QSslPreSharedKeyAuthenticator & > (heap);
+  QSslPreSharedKeyAuthenticator &arg1 = gsi::arg_reader<QSslPreSharedKeyAuthenticator & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslPreSharedKeyAuthenticator *)cls)->swap (arg1);
 }

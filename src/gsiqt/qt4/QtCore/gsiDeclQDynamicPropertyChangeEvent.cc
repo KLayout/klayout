@@ -101,7 +101,7 @@ static void _call_ctor_QDynamicPropertyChangeEvent_Adaptor_2309 (const qt_gsi::G
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QDynamicPropertyChangeEvent_Adaptor *> (new QDynamicPropertyChangeEvent_Adaptor (arg1));
 }
 

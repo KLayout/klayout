@@ -69,8 +69,8 @@ static void _call_f_create_3219 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QInputContext * > ((QInputContext *)QInputContextFactory::create (arg1, arg2));
 }
 
@@ -89,7 +89,7 @@ static void _call_f_description_2025 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)QInputContextFactory::description (arg1));
 }
 
@@ -108,7 +108,7 @@ static void _call_f_displayName_2025 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)QInputContextFactory::displayName (arg1));
 }
 
@@ -142,7 +142,7 @@ static void _call_f_languages_2025 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)QInputContextFactory::languages (arg1));
 }
 

@@ -187,8 +187,8 @@ static void _call_ctor_QChildEvent_Adaptor_2759 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QChildEvent_Adaptor *> (new QChildEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2));
 }
 

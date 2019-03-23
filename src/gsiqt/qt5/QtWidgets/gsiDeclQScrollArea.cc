@@ -137,10 +137,10 @@ static void _call_f_ensureVisible_2744 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(50);
-  int arg4 = args ? args.read<int > (heap) : (int)(50);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea *)cls)->ensureVisible (arg1, arg2, arg3, arg4);
 }
@@ -164,9 +164,9 @@ static void _call_f_ensureWidgetVisible_2633 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(50);
-  int arg3 = args ? args.read<int > (heap) : (int)(50);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea *)cls)->ensureWidgetVisible (arg1, arg2, arg3);
 }
@@ -186,7 +186,7 @@ static void _call_f_focusNextPrevChild_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ret.write<bool > ((bool)((QScrollArea *)cls)->focusNextPrevChild (arg1));
 }
 
@@ -205,7 +205,7 @@ static void _call_f_setAlignment_2750 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea *)cls)->setAlignment (arg1);
 }
@@ -225,7 +225,7 @@ static void _call_f_setWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea *)cls)->setWidget (arg1);
 }
@@ -245,7 +245,7 @@ static void _call_f_setWidgetResizable_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea *)cls)->setWidgetResizable (arg1);
 }
@@ -329,9 +329,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QScrollArea::tr (arg1, arg2, arg3));
 }
 
@@ -354,9 +354,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QScrollArea::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1318,7 +1318,7 @@ static void _call_ctor_QScrollArea_Adaptor_1315 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QScrollArea_Adaptor *> (new QScrollArea_Adaptor (arg1));
 }
 
@@ -1460,9 +1460,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea_Adaptor *)cls)->fp_QScrollArea_create_2208 (arg1, arg2, arg3);
 }
@@ -1481,7 +1481,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QScrollArea_Adaptor *)cls)->emitter_QScrollArea_customContextMenuRequested_1916 (arg1);
 }
 
@@ -1525,8 +1525,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea_Adaptor *)cls)->fp_QScrollArea_destroy_1620 (arg1, arg2);
 }
@@ -1545,7 +1545,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QScrollArea_Adaptor *)cls)->emitter_QScrollArea_destroyed_1302 (arg1);
 }
 
@@ -1659,7 +1659,7 @@ static void _call_fp_drawFrame_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea_Adaptor *)cls)->fp_QScrollArea_drawFrame_1426 (arg1);
 }
@@ -1964,7 +1964,7 @@ static void _call_fp_initStyleOption_c2356 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionFrame *arg1 = args.read<QStyleOptionFrame * > (heap);
+  QStyleOptionFrame *arg1 = gsi::arg_reader<QStyleOptionFrame * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea_Adaptor *)cls)->fp_QScrollArea_initStyleOption_c2356 (arg1);
 }
@@ -2030,7 +2030,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QScrollArea_Adaptor *)cls)->fp_QScrollArea_isSignalConnected_c2394 (arg1));
 }
 
@@ -2354,7 +2354,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QScrollArea_Adaptor *)cls)->fp_QScrollArea_receivers_c1731 (arg1));
 }
 
@@ -2480,10 +2480,10 @@ static void _call_fp_setViewportMargins_2744 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea_Adaptor *)cls)->fp_QScrollArea_setViewportMargins_2744 (arg1, arg2, arg3, arg4);
 }
@@ -2502,7 +2502,7 @@ static void _call_fp_setViewportMargins_2115 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollArea_Adaptor *)cls)->fp_QScrollArea_setViewportMargins_2115 (arg1);
 }
@@ -2774,7 +2774,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QScrollArea_Adaptor *)cls)->emitter_QScrollArea_windowIconChanged_1787 (arg1);
 }
 
@@ -2792,7 +2792,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QScrollArea_Adaptor *)cls)->emitter_QScrollArea_windowIconTextChanged_2025 (arg1);
 }
 
@@ -2810,7 +2810,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QScrollArea_Adaptor *)cls)->emitter_QScrollArea_windowTitleChanged_2025 (arg1);
 }
 

@@ -118,8 +118,8 @@ static void _call_f_addTab_3232 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QTabWidget *)cls)->addTab (arg1, arg2));
 }
 
@@ -142,9 +142,9 @@ static void _call_f_addTab_4911 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QIcon &arg2 = args.read<const QIcon & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QIcon &arg2 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QTabWidget *)cls)->addTab (arg1, arg2, arg3));
 }
 
@@ -179,7 +179,7 @@ static void _call_f_cornerWidget_c1366 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Corner>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<Qt::Corner>::target_type & > (heap) : (const qt_gsi::Converter<Qt::Corner>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::Corner>(heap, Qt::TopRightCorner));
+  const qt_gsi::Converter<Qt::Corner>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::Corner>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::Corner>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::Corner>(heap, Qt::TopRightCorner), heap);
   ret.write<QWidget * > ((QWidget *)((QTabWidget *)cls)->cornerWidget (qt_gsi::QtToCppAdaptor<Qt::Corner>(arg1).cref()));
 }
 
@@ -288,7 +288,7 @@ static void _call_f_heightForWidth_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QTabWidget *)cls)->heightForWidth (arg1));
 }
 
@@ -322,7 +322,7 @@ static void _call_f_indexOf_c1315 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<int > ((int)((QTabWidget *)cls)->indexOf (arg1));
 }
 
@@ -345,9 +345,9 @@ static void _call_f_insertTab_3891 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QTabWidget *)cls)->insertTab (arg1, arg2, arg3));
 }
 
@@ -372,10 +372,10 @@ static void _call_f_insertTab_5570 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
-  const QIcon &arg3 = args.read<const QIcon & > (heap);
-  const QString &arg4 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QIcon &arg3 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg4 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QTabWidget *)cls)->insertTab (arg1, arg2, arg3, arg4));
 }
 
@@ -409,7 +409,7 @@ static void _call_f_isTabEnabled_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QTabWidget *)cls)->isTabEnabled (arg1));
 }
 
@@ -443,7 +443,7 @@ static void _call_f_removeTab_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->removeTab (arg1);
 }
@@ -465,8 +465,8 @@ static void _call_f_setCornerWidget_2573 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const qt_gsi::Converter<Qt::Corner>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::Corner>::target_type & > (heap) : (const qt_gsi::Converter<Qt::Corner>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::Corner>(heap, Qt::TopRightCorner));
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const qt_gsi::Converter<Qt::Corner>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::Corner>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::Corner>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::Corner>(heap, Qt::TopRightCorner), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setCornerWidget (arg1, qt_gsi::QtToCppAdaptor<Qt::Corner>(arg2).cref());
 }
@@ -486,7 +486,7 @@ static void _call_f_setCurrentIndex_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setCurrentIndex (arg1);
 }
@@ -506,7 +506,7 @@ static void _call_f_setCurrentWidget_1315 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setCurrentWidget (arg1);
 }
@@ -526,7 +526,7 @@ static void _call_f_setDocumentMode_864 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setDocumentMode (arg1);
 }
@@ -546,7 +546,7 @@ static void _call_f_setElideMode_2042 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TextElideMode>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::TextElideMode>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::TextElideMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TextElideMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setElideMode (qt_gsi::QtToCppAdaptor<Qt::TextElideMode>(arg1).cref());
 }
@@ -566,7 +566,7 @@ static void _call_f_setIconSize_1805 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setIconSize (arg1);
 }
@@ -586,7 +586,7 @@ static void _call_f_setMovable_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setMovable (arg1);
 }
@@ -606,7 +606,7 @@ static void _call_f_setTabBarAutoHide_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setTabBarAutoHide (arg1);
 }
@@ -628,8 +628,8 @@ static void _call_f_setTabEnabled_1523 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  bool arg2 = args.read<bool > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setTabEnabled (arg1, arg2);
 }
@@ -651,8 +651,8 @@ static void _call_f_setTabIcon_2446 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QIcon &arg2 = args.read<const QIcon & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QIcon &arg2 = gsi::arg_reader<const QIcon & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setTabIcon (arg1, arg2);
 }
@@ -672,7 +672,7 @@ static void _call_f_setTabPosition_2656 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTabWidget::TabPosition>::target_type & arg1 = args.read<const qt_gsi::Converter<QTabWidget::TabPosition>::target_type & > (heap);
+  const qt_gsi::Converter<QTabWidget::TabPosition>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTabWidget::TabPosition>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setTabPosition (qt_gsi::QtToCppAdaptor<QTabWidget::TabPosition>(arg1).cref());
 }
@@ -692,7 +692,7 @@ static void _call_f_setTabShape_2300 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTabWidget::TabShape>::target_type & arg1 = args.read<const qt_gsi::Converter<QTabWidget::TabShape>::target_type & > (heap);
+  const qt_gsi::Converter<QTabWidget::TabShape>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTabWidget::TabShape>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setTabShape (qt_gsi::QtToCppAdaptor<QTabWidget::TabShape>(arg1).cref());
 }
@@ -714,8 +714,8 @@ static void _call_f_setTabText_2684 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setTabText (arg1, arg2);
 }
@@ -737,8 +737,8 @@ static void _call_f_setTabToolTip_2684 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setTabToolTip (arg1, arg2);
 }
@@ -760,8 +760,8 @@ static void _call_f_setTabWhatsThis_2684 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setTabWhatsThis (arg1, arg2);
 }
@@ -781,7 +781,7 @@ static void _call_f_setTabsClosable_864 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setTabsClosable (arg1);
 }
@@ -801,7 +801,7 @@ static void _call_f_setUsesScrollButtons_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget *)cls)->setUsesScrollButtons (arg1);
 }
@@ -866,7 +866,7 @@ static void _call_f_tabIcon_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QIcon > ((QIcon)((QTabWidget *)cls)->tabIcon (arg1));
 }
 
@@ -915,7 +915,7 @@ static void _call_f_tabText_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QTabWidget *)cls)->tabText (arg1));
 }
 
@@ -934,7 +934,7 @@ static void _call_f_tabToolTip_c767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QTabWidget *)cls)->tabToolTip (arg1));
 }
 
@@ -953,7 +953,7 @@ static void _call_f_tabWhatsThis_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QTabWidget *)cls)->tabWhatsThis (arg1));
 }
 
@@ -1002,7 +1002,7 @@ static void _call_f_widget_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QTabWidget *)cls)->widget (arg1));
 }
 
@@ -1025,9 +1025,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QTabWidget::tr (arg1, arg2, arg3));
 }
 
@@ -1050,9 +1050,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QTabWidget::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2032,7 +2032,7 @@ static void _call_ctor_QTabWidget_Adaptor_1315 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QTabWidget_Adaptor *> (new QTabWidget_Adaptor (arg1));
 }
 
@@ -2174,9 +2174,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget_Adaptor *)cls)->fp_QTabWidget_create_2208 (arg1, arg2, arg3);
 }
@@ -2195,7 +2195,7 @@ static void _call_emitter_currentChanged_767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QTabWidget_Adaptor *)cls)->emitter_QTabWidget_currentChanged_767 (arg1);
 }
 
@@ -2213,7 +2213,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QTabWidget_Adaptor *)cls)->emitter_QTabWidget_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2257,8 +2257,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget_Adaptor *)cls)->fp_QTabWidget_destroy_1620 (arg1, arg2);
 }
@@ -2277,7 +2277,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QTabWidget_Adaptor *)cls)->emitter_QTabWidget_destroyed_1302 (arg1);
 }
 
@@ -2677,7 +2677,7 @@ static void _call_fp_initStyleOption_c3247 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionTabWidgetFrame *arg1 = args.read<QStyleOptionTabWidgetFrame * > (heap);
+  QStyleOptionTabWidgetFrame *arg1 = gsi::arg_reader<QStyleOptionTabWidgetFrame * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget_Adaptor *)cls)->fp_QTabWidget_initStyleOption_c3247 (arg1);
 }
@@ -2743,7 +2743,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QTabWidget_Adaptor *)cls)->fp_QTabWidget_isSignalConnected_c2394 (arg1));
 }
 
@@ -3067,7 +3067,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QTabWidget_Adaptor *)cls)->fp_QTabWidget_receivers_c1731 (arg1));
 }
 
@@ -3160,7 +3160,7 @@ static void _call_fp_setTabBar_1259 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTabBar *arg1 = args.read<QTabBar * > (heap);
+  QTabBar *arg1 = gsi::arg_reader<QTabBar * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTabWidget_Adaptor *)cls)->fp_QTabWidget_setTabBar_1259 (arg1);
 }
@@ -3265,7 +3265,7 @@ static void _call_emitter_tabBarClicked_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QTabWidget_Adaptor *)cls)->emitter_QTabWidget_tabBarClicked_767 (arg1);
 }
 
@@ -3283,7 +3283,7 @@ static void _call_emitter_tabBarDoubleClicked_767 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QTabWidget_Adaptor *)cls)->emitter_QTabWidget_tabBarDoubleClicked_767 (arg1);
 }
 
@@ -3301,7 +3301,7 @@ static void _call_emitter_tabCloseRequested_767 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QTabWidget_Adaptor *)cls)->emitter_QTabWidget_tabCloseRequested_767 (arg1);
 }
 
@@ -3454,7 +3454,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QTabWidget_Adaptor *)cls)->emitter_QTabWidget_windowIconChanged_1787 (arg1);
 }
 
@@ -3472,7 +3472,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QTabWidget_Adaptor *)cls)->emitter_QTabWidget_windowIconTextChanged_2025 (arg1);
 }
 
@@ -3490,7 +3490,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QTabWidget_Adaptor *)cls)->emitter_QTabWidget_windowTitleChanged_2025 (arg1);
 }
 

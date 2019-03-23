@@ -113,7 +113,7 @@ static void _call_f_setData_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlInputSource *)cls)->setData (arg1);
 }
@@ -286,7 +286,7 @@ static void _call_ctor_QXmlInputSource_Adaptor_1447 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QXmlInputSource_Adaptor *> (new QXmlInputSource_Adaptor (arg1));
 }
 

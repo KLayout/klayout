@@ -71,7 +71,7 @@ static void _call_ctor_QBrush_1794 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::BrushStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::BrushStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::BrushStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::BrushStyle>::target_type & >() (args, heap);
   ret.write<QBrush *> (new QBrush (qt_gsi::QtToCppAdaptor<Qt::BrushStyle>(arg1).cref()));
 }
 
@@ -92,8 +92,8 @@ static void _call_ctor_QBrush_3591 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
-  const qt_gsi::Converter<Qt::BrushStyle>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::BrushStyle>::target_type & > (heap) : (const qt_gsi::Converter<Qt::BrushStyle>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::BrushStyle>(heap, Qt::SolidPattern));
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
+  const qt_gsi::Converter<Qt::BrushStyle>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::BrushStyle>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::BrushStyle>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::BrushStyle>(heap, Qt::SolidPattern), heap);
   ret.write<QBrush *> (new QBrush (arg1, qt_gsi::QtToCppAdaptor<Qt::BrushStyle>(arg2).cref()));
 }
 
@@ -114,8 +114,8 @@ static void _call_ctor_QBrush_3539 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GlobalColor>::target_type & > (heap);
-  const qt_gsi::Converter<Qt::BrushStyle>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::BrushStyle>::target_type & > (heap) : (const qt_gsi::Converter<Qt::BrushStyle>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::BrushStyle>(heap, Qt::SolidPattern));
+  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GlobalColor>::target_type & >() (args, heap);
+  const qt_gsi::Converter<Qt::BrushStyle>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::BrushStyle>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::BrushStyle>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::BrushStyle>(heap, Qt::SolidPattern), heap);
   ret.write<QBrush *> (new QBrush (qt_gsi::QtToCppAdaptor<Qt::GlobalColor>(arg1).cref(), qt_gsi::QtToCppAdaptor<Qt::BrushStyle>(arg2).cref()));
 }
 
@@ -136,8 +136,8 @@ static void _call_ctor_QBrush_3814 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
-  const QPixmap &arg2 = args.read<const QPixmap & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
+  const QPixmap &arg2 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<QBrush *> (new QBrush (arg1, arg2));
 }
 
@@ -158,8 +158,8 @@ static void _call_ctor_QBrush_3762 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GlobalColor>::target_type & > (heap);
-  const QPixmap &arg2 = args.read<const QPixmap & > (heap);
+  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GlobalColor>::target_type & >() (args, heap);
+  const QPixmap &arg2 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<QBrush *> (new QBrush (qt_gsi::QtToCppAdaptor<Qt::GlobalColor>(arg1).cref(), arg2));
 }
 
@@ -178,7 +178,7 @@ static void _call_ctor_QBrush_2017 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<QBrush *> (new QBrush (arg1));
 }
 
@@ -197,7 +197,7 @@ static void _call_ctor_QBrush_1877 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImage &arg1 = args.read<const QImage & > (heap);
+  const QImage &arg1 = gsi::arg_reader<const QImage & >() (args, heap);
   ret.write<QBrush *> (new QBrush (arg1));
 }
 
@@ -216,7 +216,7 @@ static void _call_ctor_QBrush_1910 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   ret.write<QBrush *> (new QBrush (arg1));
 }
 
@@ -235,7 +235,7 @@ static void _call_ctor_QBrush_2208 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGradient &arg1 = args.read<const QGradient & > (heap);
+  const QGradient &arg1 = gsi::arg_reader<const QGradient & >() (args, heap);
   ret.write<QBrush *> (new QBrush (arg1));
 }
 
@@ -329,7 +329,7 @@ static void _call_f_operator_excl__eq__c1910 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   ret.write<bool > ((bool)((QBrush *)cls)->operator!= (arg1));
 }
 
@@ -348,7 +348,7 @@ static void _call_f_operator_eq__1910 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   ret.write<QBrush & > ((QBrush &)((QBrush *)cls)->operator= (arg1));
 }
 
@@ -367,7 +367,7 @@ static void _call_f_operator_eq__eq__c1910 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   ret.write<bool > ((bool)((QBrush *)cls)->operator== (arg1));
 }
 
@@ -386,7 +386,7 @@ static void _call_f_setColor_1905 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBrush *)cls)->setColor (arg1);
 }
@@ -406,7 +406,7 @@ static void _call_f_setColor_1853 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GlobalColor>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GlobalColor>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBrush *)cls)->setColor (qt_gsi::QtToCppAdaptor<Qt::GlobalColor>(arg1).cref());
 }
@@ -426,7 +426,7 @@ static void _call_f_setMatrix_2023 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBrush *)cls)->setMatrix (arg1);
 }
@@ -446,7 +446,7 @@ static void _call_f_setStyle_1794 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::BrushStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::BrushStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::BrushStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::BrushStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBrush *)cls)->setStyle (qt_gsi::QtToCppAdaptor<Qt::BrushStyle>(arg1).cref());
 }
@@ -466,7 +466,7 @@ static void _call_f_setTexture_2017 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBrush *)cls)->setTexture (arg1);
 }
@@ -486,7 +486,7 @@ static void _call_f_setTextureImage_1877 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImage &arg1 = args.read<const QImage & > (heap);
+  const QImage &arg1 = gsi::arg_reader<const QImage & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBrush *)cls)->setTextureImage (arg1);
 }
@@ -506,7 +506,7 @@ static void _call_f_setTransform_2350 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBrush *)cls)->setTransform (arg1);
 }
@@ -541,7 +541,7 @@ static void _call_f_swap_1215 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QBrush &arg1 = args.read<QBrush & > (heap);
+  QBrush &arg1 = gsi::arg_reader<QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBrush *)cls)->swap (arg1);
 }

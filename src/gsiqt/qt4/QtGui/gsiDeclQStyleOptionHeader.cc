@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionHeader_3141 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionHeader &arg1 = args.read<const QStyleOptionHeader & > (heap);
+  const QStyleOptionHeader &arg1 = gsi::arg_reader<const QStyleOptionHeader & >() (args, heap);
   ret.write<QStyleOptionHeader *> (new QStyleOptionHeader (arg1));
 }
 

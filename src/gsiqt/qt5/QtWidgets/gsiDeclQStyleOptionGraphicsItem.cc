@@ -68,7 +68,7 @@ static void _call_ctor_QStyleOptionGraphicsItem_3772 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionGraphicsItem &arg1 = args.read<const QStyleOptionGraphicsItem & > (heap);
+  const QStyleOptionGraphicsItem &arg1 = gsi::arg_reader<const QStyleOptionGraphicsItem & >() (args, heap);
   ret.write<QStyleOptionGraphicsItem *> (new QStyleOptionGraphicsItem (arg1));
 }
 
@@ -87,7 +87,7 @@ static void _call_f_levelOfDetailFromTransform_2350 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
   ret.write<double > ((double)QStyleOptionGraphicsItem::levelOfDetailFromTransform (arg1));
 }
 

@@ -139,9 +139,9 @@ static void _call_ctor_QStateMachine_SignalEvent_Adaptor_4587 (const qt_gsi::Gen
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  int arg2 = args.read<int > (heap);
-  const QList<QVariant> &arg3 = args.read<const QList<QVariant> & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QList<QVariant> &arg3 = gsi::arg_reader<const QList<QVariant> & >() (args, heap);
   ret.write<QStateMachine_SignalEvent_Adaptor *> (new QStateMachine_SignalEvent_Adaptor (arg1, arg2, arg3));
 }
 

@@ -65,7 +65,7 @@ static void _call_f_child_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<const QUndoCommand * > ((const QUndoCommand *)((QUndoCommand *)cls)->child (arg1));
 }
 
@@ -114,7 +114,7 @@ static void _call_f_mergeWith_2507 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUndoCommand *arg1 = args.read<const QUndoCommand * > (heap);
+  const QUndoCommand *arg1 = gsi::arg_reader<const QUndoCommand * >() (args, heap);
   ret.write<bool > ((bool)((QUndoCommand *)cls)->mergeWith (arg1));
 }
 
@@ -149,7 +149,7 @@ static void _call_f_setText_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoCommand *)cls)->setText (arg1);
 }
@@ -323,7 +323,7 @@ static void _call_ctor_QUndoCommand_Adaptor_1812 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUndoCommand *arg1 = args ? args.read<QUndoCommand * > (heap) : (QUndoCommand *)(0);
+  QUndoCommand *arg1 = args ? gsi::arg_reader<QUndoCommand * >() (args, heap) : gsi::arg_maker<QUndoCommand * >() (0, heap);
   ret.write<QUndoCommand_Adaptor *> (new QUndoCommand_Adaptor (arg1));
 }
 
@@ -343,8 +343,8 @@ static void _call_ctor_QUndoCommand_Adaptor_3729 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QUndoCommand *arg2 = args ? args.read<QUndoCommand * > (heap) : (QUndoCommand *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QUndoCommand *arg2 = args ? gsi::arg_reader<QUndoCommand * >() (args, heap) : gsi::arg_maker<QUndoCommand * >() (0, heap);
   ret.write<QUndoCommand_Adaptor *> (new QUndoCommand_Adaptor (arg1, arg2));
 }
 

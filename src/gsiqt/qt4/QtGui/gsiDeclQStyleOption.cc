@@ -53,8 +53,8 @@ static void _call_ctor_QStyleOption_1426 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(QStyleOption::Version);
-  int arg2 = args ? args.read<int > (heap) : (int)(QStyleOption::SO_Default);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QStyleOption::Version, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QStyleOption::SO_Default, heap);
   ret.write<QStyleOption *> (new QStyleOption (arg1, arg2));
 }
 
@@ -73,7 +73,7 @@ static void _call_ctor_QStyleOption_2556 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOption &arg1 = args.read<const QStyleOption & > (heap);
+  const QStyleOption &arg1 = gsi::arg_reader<const QStyleOption & >() (args, heap);
   ret.write<QStyleOption *> (new QStyleOption (arg1));
 }
 
@@ -92,7 +92,7 @@ static void _call_f_init_2010 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QWidget *arg1 = args.read<const QWidget * > (heap);
+  const QWidget *arg1 = gsi::arg_reader<const QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyleOption *)cls)->init (arg1);
 }
@@ -112,7 +112,7 @@ static void _call_f_initFrom_2010 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QWidget *arg1 = args.read<const QWidget * > (heap);
+  const QWidget *arg1 = gsi::arg_reader<const QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyleOption *)cls)->initFrom (arg1);
 }
@@ -132,7 +132,7 @@ static void _call_f_operator_eq__2556 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOption &arg1 = args.read<const QStyleOption & > (heap);
+  const QStyleOption &arg1 = gsi::arg_reader<const QStyleOption & >() (args, heap);
   ret.write<QStyleOption & > ((QStyleOption &)((QStyleOption *)cls)->operator= (arg1));
 }
 

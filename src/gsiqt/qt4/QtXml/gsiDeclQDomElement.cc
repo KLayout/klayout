@@ -81,7 +81,7 @@ static void _call_ctor_QDomElement_2396 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomElement &arg1 = args.read<const QDomElement & > (heap);
+  const QDomElement &arg1 = gsi::arg_reader<const QDomElement & >() (args, heap);
   ret.write<QDomElement *> (new QDomElement (arg1));
 }
 
@@ -102,8 +102,8 @@ static void _call_f_attribute_c3942 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QDomElement *)cls)->attribute (arg1, arg2));
 }
 
@@ -126,9 +126,9 @@ static void _call_f_attributeNS_c5677 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString arg1 = args.read<const QString > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString arg1 = gsi::arg_reader<const QString >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QDomElement *)cls)->attributeNS (arg1, arg2, arg3));
 }
 
@@ -147,7 +147,7 @@ static void _call_f_attributeNode_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomAttr > ((QDomAttr)((QDomElement *)cls)->attributeNode (arg1));
 }
 
@@ -168,8 +168,8 @@ static void _call_f_attributeNodeNS_3942 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomAttr > ((QDomAttr)((QDomElement *)cls)->attributeNodeNS (arg1, arg2));
 }
 
@@ -203,7 +203,7 @@ static void _call_f_elementsByTagName_c2025 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomNodeList > ((QDomNodeList)((QDomElement *)cls)->elementsByTagName (arg1));
 }
 
@@ -224,8 +224,8 @@ static void _call_f_elementsByTagNameNS_c3942 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomNodeList > ((QDomNodeList)((QDomElement *)cls)->elementsByTagNameNS (arg1, arg2));
 }
 
@@ -244,7 +244,7 @@ static void _call_f_hasAttribute_c2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDomElement *)cls)->hasAttribute (arg1));
 }
 
@@ -265,8 +265,8 @@ static void _call_f_hasAttributeNS_c3942 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDomElement *)cls)->hasAttributeNS (arg1, arg2));
 }
 
@@ -300,7 +300,7 @@ static void _call_f_operator_eq__2396 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomElement &arg1 = args.read<const QDomElement & > (heap);
+  const QDomElement &arg1 = gsi::arg_reader<const QDomElement & >() (args, heap);
   ret.write<QDomElement & > ((QDomElement &)((QDomElement *)cls)->operator= (arg1));
 }
 
@@ -319,7 +319,7 @@ static void _call_f_removeAttribute_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->removeAttribute (arg1);
 }
@@ -341,8 +341,8 @@ static void _call_f_removeAttributeNS_3942 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->removeAttributeNS (arg1, arg2);
 }
@@ -362,7 +362,7 @@ static void _call_f_removeAttributeNode_2093 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomAttr &arg1 = args.read<const QDomAttr & > (heap);
+  const QDomAttr &arg1 = gsi::arg_reader<const QDomAttr & >() (args, heap);
   ret.write<QDomAttr > ((QDomAttr)((QDomElement *)cls)->removeAttributeNode (arg1));
 }
 
@@ -383,8 +383,8 @@ static void _call_f_setAttribute_3942 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttribute (arg1, arg2);
 }
@@ -406,8 +406,8 @@ static void _call_f_setAttribute_3330 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  qlonglong arg2 = args.read<qlonglong > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  qlonglong arg2 = gsi::arg_reader<qlonglong >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttribute (arg1, arg2);
 }
@@ -429,8 +429,8 @@ static void _call_f_setAttribute_3447 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  qulonglong arg2 = args.read<qulonglong > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  qulonglong arg2 = gsi::arg_reader<qulonglong >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttribute (arg1, arg2);
 }
@@ -452,8 +452,8 @@ static void _call_f_setAttribute_2684 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args.read<int > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttribute (arg1, arg2);
 }
@@ -475,8 +475,8 @@ static void _call_f_setAttribute_3689 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  unsigned int arg2 = args.read<unsigned int > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  unsigned int arg2 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttribute (arg1, arg2);
 }
@@ -498,8 +498,8 @@ static void _call_f_setAttribute_2887 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  float arg2 = args.read<float > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttribute (arg1, arg2);
 }
@@ -521,8 +521,8 @@ static void _call_f_setAttribute_2988 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  double arg2 = args.read<double > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttribute (arg1, arg2);
 }
@@ -546,9 +546,9 @@ static void _call_f_setAttributeNS_5677 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString arg1 = args.read<const QString > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  const QString arg1 = gsi::arg_reader<const QString >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttributeNS (arg1, arg2, arg3);
 }
@@ -572,9 +572,9 @@ static void _call_f_setAttributeNS_4419 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString arg1 = args.read<const QString > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  int arg3 = args.read<int > (heap);
+  const QString arg1 = gsi::arg_reader<const QString >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttributeNS (arg1, arg2, arg3);
 }
@@ -598,9 +598,9 @@ static void _call_f_setAttributeNS_5424 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString arg1 = args.read<const QString > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  unsigned int arg3 = args.read<unsigned int > (heap);
+  const QString arg1 = gsi::arg_reader<const QString >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  unsigned int arg3 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttributeNS (arg1, arg2, arg3);
 }
@@ -624,9 +624,9 @@ static void _call_f_setAttributeNS_5065 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString arg1 = args.read<const QString > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  qlonglong arg3 = args.read<qlonglong > (heap);
+  const QString arg1 = gsi::arg_reader<const QString >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  qlonglong arg3 = gsi::arg_reader<qlonglong >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttributeNS (arg1, arg2, arg3);
 }
@@ -650,9 +650,9 @@ static void _call_f_setAttributeNS_5182 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString arg1 = args.read<const QString > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  qulonglong arg3 = args.read<qulonglong > (heap);
+  const QString arg1 = gsi::arg_reader<const QString >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  qulonglong arg3 = gsi::arg_reader<qulonglong >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttributeNS (arg1, arg2, arg3);
 }
@@ -676,9 +676,9 @@ static void _call_f_setAttributeNS_4723 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString arg1 = args.read<const QString > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  double arg3 = args.read<double > (heap);
+  const QString arg1 = gsi::arg_reader<const QString >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setAttributeNS (arg1, arg2, arg3);
 }
@@ -698,7 +698,7 @@ static void _call_f_setAttributeNode_2093 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomAttr &arg1 = args.read<const QDomAttr & > (heap);
+  const QDomAttr &arg1 = gsi::arg_reader<const QDomAttr & >() (args, heap);
   ret.write<QDomAttr > ((QDomAttr)((QDomElement *)cls)->setAttributeNode (arg1));
 }
 
@@ -717,7 +717,7 @@ static void _call_f_setAttributeNodeNS_2093 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomAttr &arg1 = args.read<const QDomAttr & > (heap);
+  const QDomAttr &arg1 = gsi::arg_reader<const QDomAttr & >() (args, heap);
   ret.write<QDomAttr > ((QDomAttr)((QDomElement *)cls)->setAttributeNodeNS (arg1));
 }
 
@@ -736,7 +736,7 @@ static void _call_f_setTagName_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomElement *)cls)->setTagName (arg1);
 }

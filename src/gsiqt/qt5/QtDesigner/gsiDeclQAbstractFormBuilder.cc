@@ -85,8 +85,8 @@ static void _call_f_load_2654 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QWidget * > ((QWidget *)((QAbstractFormBuilder *)cls)->load (arg1, arg2));
 }
 
@@ -107,8 +107,8 @@ static void _call_f_save_2654 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractFormBuilder *)cls)->save (arg1, arg2);
 }
@@ -128,7 +128,7 @@ static void _call_f_setWorkingDirectory_1681 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractFormBuilder *)cls)->setWorkingDirectory (arg1);
 }

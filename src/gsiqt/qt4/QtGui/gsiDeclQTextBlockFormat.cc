@@ -196,7 +196,7 @@ static void _call_f_setAlignment_2750 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setAlignment (arg1);
 }
@@ -216,7 +216,7 @@ static void _call_f_setBottomMargin_1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setBottomMargin (arg1);
 }
@@ -236,7 +236,7 @@ static void _call_f_setIndent_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setIndent (arg1);
 }
@@ -256,7 +256,7 @@ static void _call_f_setLeftMargin_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setLeftMargin (arg1);
 }
@@ -276,7 +276,7 @@ static void _call_f_setNonBreakableLines_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setNonBreakableLines (arg1);
 }
@@ -296,7 +296,7 @@ static void _call_f_setPageBreakPolicy_3611 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QTextFormat::PageBreakFlag> arg1 = args.read<QFlags<QTextFormat::PageBreakFlag> > (heap);
+  QFlags<QTextFormat::PageBreakFlag> arg1 = gsi::arg_reader<QFlags<QTextFormat::PageBreakFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setPageBreakPolicy (arg1);
 }
@@ -316,7 +316,7 @@ static void _call_f_setRightMargin_1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setRightMargin (arg1);
 }
@@ -336,7 +336,7 @@ static void _call_f_setTabPositions_3458 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QTextOption::Tab> &arg1 = args.read<const QList<QTextOption::Tab> & > (heap);
+  const QList<QTextOption::Tab> &arg1 = gsi::arg_reader<const QList<QTextOption::Tab> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setTabPositions (arg1);
 }
@@ -356,7 +356,7 @@ static void _call_f_setTextIndent_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setTextIndent (arg1);
 }
@@ -376,7 +376,7 @@ static void _call_f_setTopMargin_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setTopMargin (arg1);
 }

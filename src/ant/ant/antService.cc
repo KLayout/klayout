@@ -892,16 +892,18 @@ void
 Service::drag_cancel () 
 {
   if (m_drawing) {
-
     widget ()->ungrab_mouse (this);
-
-    if (mp_active_ruler) {
-      delete mp_active_ruler;
-      mp_active_ruler = 0;
-    }
-
     m_drawing = false;
+  }
 
+  if (mp_active_ruler) {
+    delete mp_active_ruler;
+    mp_active_ruler = 0;
+  }
+
+  if (mp_transient_ruler) {
+    delete mp_transient_ruler;
+    mp_transient_ruler = 0;
   }
 }
 

@@ -53,8 +53,8 @@ static void _call_f_extension_c3219 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QObject * > ((QObject *)((QAbstractExtensionFactory *)cls)->extension (arg1, arg2));
 }
 

@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionComboBox_3349 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionComboBox &arg1 = args.read<const QStyleOptionComboBox & > (heap);
+  const QStyleOptionComboBox &arg1 = gsi::arg_reader<const QStyleOptionComboBox & >() (args, heap);
   ret.write<QStyleOptionComboBox *> (new QStyleOptionComboBox (arg1));
 }
 

@@ -88,7 +88,7 @@ static void _call_f_setSenderObject_1997 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QObject *arg1 = args.read<const QObject * > (heap);
+  const QObject *arg1 = gsi::arg_reader<const QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSignalTransition *)cls)->setSenderObject (arg1);
 }
@@ -108,7 +108,7 @@ static void _call_f_setSignal_2309 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSignalTransition *)cls)->setSignal (arg1);
 }
@@ -147,9 +147,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QSignalTransition::tr (arg1, arg2, arg3));
 }
 
@@ -172,9 +172,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QSignalTransition::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -407,7 +407,7 @@ static void _call_ctor_QSignalTransition_Adaptor_1216 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QState *arg1 = args ? args.read<QState * > (heap) : (QState *)(0);
+  QState *arg1 = args ? gsi::arg_reader<QState * >() (args, heap) : gsi::arg_maker<QState * >() (0, heap);
   ret.write<QSignalTransition_Adaptor *> (new QSignalTransition_Adaptor (arg1));
 }
 
@@ -429,9 +429,9 @@ static void _call_ctor_QSignalTransition_Adaptor_4728 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QObject *arg1 = args.read<const QObject * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  QState *arg3 = args ? args.read<QState * > (heap) : (QState *)(0);
+  const QObject *arg1 = gsi::arg_reader<const QObject * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  QState *arg3 = args ? gsi::arg_reader<QState * >() (args, heap) : gsi::arg_maker<QState * >() (0, heap);
   ret.write<QSignalTransition_Adaptor *> (new QSignalTransition_Adaptor (arg1, arg2, arg3));
 }
 
@@ -497,7 +497,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QSignalTransition_Adaptor *)cls)->emitter_QSignalTransition_destroyed_1302 (arg1);
 }
 
@@ -611,7 +611,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QSignalTransition_Adaptor *)cls)->fp_QSignalTransition_isSignalConnected_c2394 (arg1));
 }
 
@@ -653,7 +653,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QSignalTransition_Adaptor *)cls)->fp_QSignalTransition_receivers_c1731 (arg1));
 }
 

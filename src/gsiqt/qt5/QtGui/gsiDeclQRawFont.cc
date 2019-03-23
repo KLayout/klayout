@@ -75,9 +75,9 @@ static void _call_ctor_QRawFont_5664 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  double arg2 = args.read<double > (heap);
-  const qt_gsi::Converter<QFont::HintingPreference>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QFont::HintingPreference>::target_type & > (heap) : (const qt_gsi::Converter<QFont::HintingPreference>::target_type &)(qt_gsi::CppToQtReadAdaptor<QFont::HintingPreference>(heap, QFont::PreferDefaultHinting));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<QFont::HintingPreference>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QFont::HintingPreference>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QFont::HintingPreference>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QFont::HintingPreference>(heap, QFont::PreferDefaultHinting), heap);
   ret.write<QRawFont *> (new QRawFont (arg1, arg2, qt_gsi::QtToCppAdaptor<QFont::HintingPreference>(arg3).cref()));
 }
 
@@ -100,9 +100,9 @@ static void _call_ctor_QRawFont_5948 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  double arg2 = args.read<double > (heap);
-  const qt_gsi::Converter<QFont::HintingPreference>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QFont::HintingPreference>::target_type & > (heap) : (const qt_gsi::Converter<QFont::HintingPreference>::target_type &)(qt_gsi::CppToQtReadAdaptor<QFont::HintingPreference>(heap, QFont::PreferDefaultHinting));
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<QFont::HintingPreference>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QFont::HintingPreference>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QFont::HintingPreference>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QFont::HintingPreference>(heap, QFont::PreferDefaultHinting), heap);
   ret.write<QRawFont *> (new QRawFont (arg1, arg2, qt_gsi::QtToCppAdaptor<QFont::HintingPreference>(arg3).cref()));
 }
 
@@ -121,7 +121,7 @@ static void _call_ctor_QRawFont_2099 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRawFont &arg1 = args.read<const QRawFont & > (heap);
+  const QRawFont &arg1 = gsi::arg_reader<const QRawFont & >() (args, heap);
   ret.write<QRawFont *> (new QRawFont (arg1));
 }
 
@@ -140,7 +140,7 @@ static void _call_f_advancesForGlyphIndexes_c2805 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<quint32> &arg1 = args.read<const QVector<quint32> & > (heap);
+  const QVector<quint32> &arg1 = gsi::arg_reader<const QVector<quint32> & >() (args, heap);
   ret.write<QVector<QPointF> > ((QVector<QPointF>)((QRawFont *)cls)->advancesForGlyphIndexes (arg1));
 }
 
@@ -161,8 +161,8 @@ static void _call_f_advancesForGlyphIndexes_c5747 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<quint32> &arg1 = args.read<const QVector<quint32> & > (heap);
-  QFlags<QRawFont::LayoutFlag> arg2 = args.read<QFlags<QRawFont::LayoutFlag> > (heap);
+  const QVector<quint32> &arg1 = gsi::arg_reader<const QVector<quint32> & >() (args, heap);
+  QFlags<QRawFont::LayoutFlag> arg2 = gsi::arg_reader<QFlags<QRawFont::LayoutFlag> >() (args, heap);
   ret.write<QVector<QPointF> > ((QVector<QPointF>)((QRawFont *)cls)->advancesForGlyphIndexes (arg1, arg2));
 }
 
@@ -185,9 +185,9 @@ static void _call_f_advancesForGlyphIndexes_c3825 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const quint32 *arg1 = args.read<const quint32 * > (heap);
-  QPointF *arg2 = args.read<QPointF * > (heap);
-  int arg3 = args.read<int > (heap);
+  const quint32 *arg1 = gsi::arg_reader<const quint32 * >() (args, heap);
+  QPointF *arg2 = gsi::arg_reader<QPointF * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QRawFont *)cls)->advancesForGlyphIndexes (arg1, arg2, arg3));
 }
 
@@ -212,10 +212,10 @@ static void _call_f_advancesForGlyphIndexes_c6767 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const quint32 *arg1 = args.read<const quint32 * > (heap);
-  QPointF *arg2 = args.read<QPointF * > (heap);
-  int arg3 = args.read<int > (heap);
-  QFlags<QRawFont::LayoutFlag> arg4 = args.read<QFlags<QRawFont::LayoutFlag> > (heap);
+  const quint32 *arg1 = gsi::arg_reader<const quint32 * >() (args, heap);
+  QPointF *arg2 = gsi::arg_reader<QPointF * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  QFlags<QRawFont::LayoutFlag> arg4 = gsi::arg_reader<QFlags<QRawFont::LayoutFlag> >() (args, heap);
   ret.write<bool > ((bool)((QRawFont *)cls)->advancesForGlyphIndexes (arg1, arg2, arg3, arg4));
 }
 
@@ -238,9 +238,9 @@ static void _call_f_alphaMapForGlyph_c6224 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  quint32 arg1 = args.read<quint32 > (heap);
-  const qt_gsi::Converter<QRawFont::AntialiasingType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QRawFont::AntialiasingType>::target_type & > (heap) : (const qt_gsi::Converter<QRawFont::AntialiasingType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRawFont::AntialiasingType>(heap, QRawFont::SubPixelAntialiasing));
-  const QTransform &arg3 = args ? args.read<const QTransform & > (heap) : (const QTransform &)(QTransform());
+  quint32 arg1 = gsi::arg_reader<quint32 >() (args, heap);
+  const qt_gsi::Converter<QRawFont::AntialiasingType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QRawFont::AntialiasingType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRawFont::AntialiasingType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRawFont::AntialiasingType>(heap, QRawFont::SubPixelAntialiasing), heap);
+  const QTransform &arg3 = args ? gsi::arg_reader<const QTransform & >() (args, heap) : gsi::arg_maker<const QTransform & >() (QTransform(), heap);
   ret.write<QImage > ((QImage)((QRawFont *)cls)->alphaMapForGlyph (arg1, qt_gsi::QtToCppAdaptor<QRawFont::AntialiasingType>(arg2).cref(), arg3));
 }
 
@@ -289,7 +289,7 @@ static void _call_f_boundingRect_c1098 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  quint32 arg1 = args.read<quint32 > (heap);
+  quint32 arg1 = gsi::arg_reader<quint32 >() (args, heap);
   ret.write<QRectF > ((QRectF)((QRawFont *)cls)->boundingRect (arg1));
 }
 
@@ -338,7 +338,7 @@ static void _call_f_fontTable_c1731 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QRawFont *)cls)->fontTable (arg1));
 }
 
@@ -363,10 +363,10 @@ static void _call_f_glyphIndexesForChars_c4460 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type * arg1 = args.read<const qt_gsi::Converter<QChar>::target_type * > (heap);
-  int arg2 = args.read<int > (heap);
-  quint32 *arg3 = args.read<quint32 * > (heap);
-  int *arg4 = args.read<int * > (heap);
+  const qt_gsi::Converter<QChar>::target_type * arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  quint32 *arg3 = gsi::arg_reader<quint32 * >() (args, heap);
+  int *arg4 = gsi::arg_reader<int * >() (args, heap);
   ret.write<bool > ((bool)((QRawFont *)cls)->glyphIndexesForChars (qt_gsi::QtToCppAdaptor<QChar>(arg1).cptr(), arg2, arg3, arg4));
 }
 
@@ -385,7 +385,7 @@ static void _call_f_glyphIndexesForString_c2025 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVector<quint32> > ((QVector<quint32>)((QRawFont *)cls)->glyphIndexesForString (arg1));
 }
 
@@ -468,9 +468,9 @@ static void _call_f_loadFromData_5948 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  double arg2 = args.read<double > (heap);
-  const qt_gsi::Converter<QFont::HintingPreference>::target_type & arg3 = args.read<const qt_gsi::Converter<QFont::HintingPreference>::target_type & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<QFont::HintingPreference>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QFont::HintingPreference>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRawFont *)cls)->loadFromData (arg1, arg2, qt_gsi::QtToCppAdaptor<QFont::HintingPreference>(arg3).cref());
 }
@@ -494,9 +494,9 @@ static void _call_f_loadFromFile_5664 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  double arg2 = args.read<double > (heap);
-  const qt_gsi::Converter<QFont::HintingPreference>::target_type & arg3 = args.read<const qt_gsi::Converter<QFont::HintingPreference>::target_type & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<QFont::HintingPreference>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QFont::HintingPreference>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRawFont *)cls)->loadFromFile (arg1, arg2, qt_gsi::QtToCppAdaptor<QFont::HintingPreference>(arg3).cref());
 }
@@ -531,7 +531,7 @@ static void _call_f_operator_excl__eq__c2099 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRawFont &arg1 = args.read<const QRawFont & > (heap);
+  const QRawFont &arg1 = gsi::arg_reader<const QRawFont & >() (args, heap);
   ret.write<bool > ((bool)((QRawFont *)cls)->operator!= (arg1));
 }
 
@@ -550,7 +550,7 @@ static void _call_f_operator_eq__2099 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRawFont &arg1 = args.read<const QRawFont & > (heap);
+  const QRawFont &arg1 = gsi::arg_reader<const QRawFont & >() (args, heap);
   ret.write<QRawFont & > ((QRawFont &)((QRawFont *)cls)->operator= (arg1));
 }
 
@@ -569,7 +569,7 @@ static void _call_f_operator_eq__eq__c2099 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRawFont &arg1 = args.read<const QRawFont & > (heap);
+  const QRawFont &arg1 = gsi::arg_reader<const QRawFont & >() (args, heap);
   ret.write<bool > ((bool)((QRawFont *)cls)->operator== (arg1));
 }
 
@@ -588,7 +588,7 @@ static void _call_f_pathForGlyph_c1098 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  quint32 arg1 = args.read<quint32 > (heap);
+  quint32 arg1 = gsi::arg_reader<quint32 >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QRawFont *)cls)->pathForGlyph (arg1));
 }
 
@@ -622,7 +622,7 @@ static void _call_f_setPixelSize_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRawFont *)cls)->setPixelSize (arg1);
 }
@@ -687,7 +687,7 @@ static void _call_f_supportsCharacter_c1772 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<bool > ((bool)((QRawFont *)cls)->supportsCharacter (arg1));
 }
 
@@ -706,7 +706,7 @@ static void _call_f_supportsCharacter_c899 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type & arg1 = args.read<const qt_gsi::Converter<QChar>::target_type & > (heap);
+  const qt_gsi::Converter<QChar>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QRawFont *)cls)->supportsCharacter (qt_gsi::QtToCppAdaptor<QChar>(arg1).cref()));
 }
 
@@ -725,7 +725,7 @@ static void _call_f_swap_1404 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QRawFont &arg1 = args.read<QRawFont & > (heap);
+  QRawFont &arg1 = gsi::arg_reader<QRawFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRawFont *)cls)->swap (arg1);
 }
@@ -807,8 +807,8 @@ static void _call_f_fromFont_4907 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
-  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & > (heap) : (const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type &)(qt_gsi::CppToQtReadAdaptor<QFontDatabase::WritingSystem>(heap, QFontDatabase::Any));
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
+  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QFontDatabase::WritingSystem>(heap, QFontDatabase::Any), heap);
   ret.write<QRawFont > ((QRawFont)QRawFont::fromFont (arg1, qt_gsi::QtToCppAdaptor<QFontDatabase::WritingSystem>(arg2).cref()));
 }
 

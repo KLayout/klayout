@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionProgressBar_3686 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionProgressBar &arg1 = args.read<const QStyleOptionProgressBar & > (heap);
+  const QStyleOptionProgressBar &arg1 = gsi::arg_reader<const QStyleOptionProgressBar & >() (args, heap);
   ret.write<QStyleOptionProgressBar *> (new QStyleOptionProgressBar (arg1));
 }
 

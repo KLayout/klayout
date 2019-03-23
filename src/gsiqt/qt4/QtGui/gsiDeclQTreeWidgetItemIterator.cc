@@ -52,7 +52,7 @@ static void _call_ctor_QTreeWidgetItemIterator_3647 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItemIterator &arg1 = args.read<const QTreeWidgetItemIterator & > (heap);
+  const QTreeWidgetItemIterator &arg1 = gsi::arg_reader<const QTreeWidgetItemIterator & >() (args, heap);
   ret.write<QTreeWidgetItemIterator *> (new QTreeWidgetItemIterator (arg1));
 }
 
@@ -73,8 +73,8 @@ static void _call_ctor_QTreeWidgetItemIterator_6409 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidget *arg1 = args.read<QTreeWidget * > (heap);
-  QFlags<QTreeWidgetItemIterator::IteratorFlag> arg2 = args ? args.read<QFlags<QTreeWidgetItemIterator::IteratorFlag> > (heap) : (QFlags<QTreeWidgetItemIterator::IteratorFlag>)(QTreeWidgetItemIterator::All);
+  QTreeWidget *arg1 = gsi::arg_reader<QTreeWidget * >() (args, heap);
+  QFlags<QTreeWidgetItemIterator::IteratorFlag> arg2 = args ? gsi::arg_reader<QFlags<QTreeWidgetItemIterator::IteratorFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTreeWidgetItemIterator::IteratorFlag> >() (QTreeWidgetItemIterator::All, heap);
   ret.write<QTreeWidgetItemIterator *> (new QTreeWidgetItemIterator (arg1, arg2));
 }
 
@@ -95,8 +95,8 @@ static void _call_ctor_QTreeWidgetItemIterator_6808 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  QFlags<QTreeWidgetItemIterator::IteratorFlag> arg2 = args ? args.read<QFlags<QTreeWidgetItemIterator::IteratorFlag> > (heap) : (QFlags<QTreeWidgetItemIterator::IteratorFlag>)(QTreeWidgetItemIterator::All);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  QFlags<QTreeWidgetItemIterator::IteratorFlag> arg2 = args ? gsi::arg_reader<QFlags<QTreeWidgetItemIterator::IteratorFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTreeWidgetItemIterator::IteratorFlag> >() (QTreeWidgetItemIterator::All, heap);
   ret.write<QTreeWidgetItemIterator *> (new QTreeWidgetItemIterator (arg1, arg2));
 }
 
@@ -145,7 +145,7 @@ static void _call_f_operator_plus__plus__767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<const QTreeWidgetItemIterator > ((const QTreeWidgetItemIterator)((QTreeWidgetItemIterator *)cls)->operator++ (arg1));
 }
 
@@ -164,7 +164,7 @@ static void _call_f_operator_plus__eq__767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTreeWidgetItemIterator & > ((QTreeWidgetItemIterator &)((QTreeWidgetItemIterator *)cls)->operator+= (arg1));
 }
 
@@ -198,7 +198,7 @@ static void _call_f_operator_minus__minus__767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<const QTreeWidgetItemIterator > ((const QTreeWidgetItemIterator)((QTreeWidgetItemIterator *)cls)->operator-- (arg1));
 }
 
@@ -217,7 +217,7 @@ static void _call_f_operator_minus__eq__767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTreeWidgetItemIterator & > ((QTreeWidgetItemIterator &)((QTreeWidgetItemIterator *)cls)->operator-= (arg1));
 }
 
@@ -236,7 +236,7 @@ static void _call_f_operator_eq__3647 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItemIterator &arg1 = args.read<const QTreeWidgetItemIterator & > (heap);
+  const QTreeWidgetItemIterator &arg1 = gsi::arg_reader<const QTreeWidgetItemIterator & >() (args, heap);
   ret.write<QTreeWidgetItemIterator & > ((QTreeWidgetItemIterator &)((QTreeWidgetItemIterator *)cls)->operator= (arg1));
 }
 

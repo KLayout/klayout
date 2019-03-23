@@ -70,7 +70,7 @@ static void _call_f_allConfigurations_c4334 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QNetworkConfiguration::StateFlag> arg1 = args ? args.read<QFlags<QNetworkConfiguration::StateFlag> > (heap) : (QFlags<QNetworkConfiguration::StateFlag>)(0);
+  QFlags<QNetworkConfiguration::StateFlag> arg1 = args ? gsi::arg_reader<QFlags<QNetworkConfiguration::StateFlag> >() (args, heap) : gsi::arg_maker<QFlags<QNetworkConfiguration::StateFlag> >() (0, heap);
   ret.write<QList<QNetworkConfiguration> > ((QList<QNetworkConfiguration>)((QNetworkConfigurationManager *)cls)->allConfigurations (arg1));
 }
 
@@ -104,7 +104,7 @@ static void _call_f_configurationFromIdentifier_c2025 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QNetworkConfiguration > ((QNetworkConfiguration)((QNetworkConfigurationManager *)cls)->configurationFromIdentifier (arg1));
 }
 
@@ -173,9 +173,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QNetworkConfigurationManager::tr (arg1, arg2, arg3));
 }
 
@@ -198,9 +198,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QNetworkConfigurationManager::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -426,7 +426,7 @@ static void _call_ctor_QNetworkConfigurationManager_Adaptor_1302 (const qt_gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QNetworkConfigurationManager_Adaptor *> (new QNetworkConfigurationManager_Adaptor (arg1));
 }
 
@@ -468,7 +468,7 @@ static void _call_emitter_configurationAdded_3508 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
   ((QNetworkConfigurationManager_Adaptor *)cls)->emitter_QNetworkConfigurationManager_configurationAdded_3508 (arg1);
 }
 
@@ -486,7 +486,7 @@ static void _call_emitter_configurationChanged_3508 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
   ((QNetworkConfigurationManager_Adaptor *)cls)->emitter_QNetworkConfigurationManager_configurationChanged_3508 (arg1);
 }
 
@@ -504,7 +504,7 @@ static void _call_emitter_configurationRemoved_3508 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
   ((QNetworkConfigurationManager_Adaptor *)cls)->emitter_QNetworkConfigurationManager_configurationRemoved_3508 (arg1);
 }
 
@@ -546,7 +546,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QNetworkConfigurationManager_Adaptor *)cls)->emitter_QNetworkConfigurationManager_destroyed_1302 (arg1);
 }
 
@@ -637,7 +637,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkConfigurationManager_Adaptor *)cls)->fp_QNetworkConfigurationManager_isSignalConnected_c2394 (arg1));
 }
 
@@ -655,7 +655,7 @@ static void _call_emitter_onlineStateChanged_864 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QNetworkConfigurationManager_Adaptor *)cls)->emitter_QNetworkConfigurationManager_onlineStateChanged_864 (arg1);
 }
 
@@ -673,7 +673,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QNetworkConfigurationManager_Adaptor *)cls)->fp_QNetworkConfigurationManager_receivers_c1731 (arg1));
 }
 

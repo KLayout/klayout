@@ -587,6 +587,46 @@ private:
 };
 
 // ------------------------------------------------------------
+//  A rebinding of SerialArgs::read to a functor
+
+template <class X>
+struct GSI_PUBLIC_TEMPLATE arg_reader
+{
+  inline X operator() (gsi::SerialArgs &args, tl::Heap &heap) { return args.read<X> (heap); }
+};
+
+// ------------------------------------------------------------
+//  Provides a function analog to arg_reader, but for a static value
+//  The reasoning behind this functor is to support default arguments.
+//  Specifically in the case of (const X &) arguments, this must not
+//  create references to temporaries.
+
+template <class X>
+struct GSI_PUBLIC_TEMPLATE arg_maker
+{
+  inline X operator() (const X &x, tl::Heap &) { return x; }
+};
+
+template <class X>
+struct GSI_PUBLIC_TEMPLATE arg_maker<X &>
+{
+  inline X &operator() (X &x, tl::Heap &) { return x; }
+};
+
+template <class X>
+struct GSI_PUBLIC_TEMPLATE arg_maker<const X &>
+{
+  inline const X &operator() (const X &x, tl::Heap &heap)
+  { 
+    //  avoid references to temp. With this copy we can create a const
+    //  reference from a static value.
+    X *copy = new X (x);
+    heap.push (copy);
+    return *copy; 
+  }
+};
+
+// ------------------------------------------------------------
 //  Basic adaptor 
 
 class GSI_PUBLIC AdaptorBase

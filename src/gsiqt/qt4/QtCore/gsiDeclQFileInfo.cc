@@ -68,7 +68,7 @@ static void _call_ctor_QFileInfo_2025 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QFileInfo *> (new QFileInfo (arg1));
 }
 
@@ -87,7 +87,7 @@ static void _call_ctor_QFileInfo_1778 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFile &arg1 = args.read<const QFile & > (heap);
+  const QFile &arg1 = gsi::arg_reader<const QFile & >() (args, heap);
   ret.write<QFileInfo *> (new QFileInfo (arg1));
 }
 
@@ -108,8 +108,8 @@ static void _call_ctor_QFileInfo_3598 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QFileInfo *> (new QFileInfo (arg1, arg2));
 }
 
@@ -128,7 +128,7 @@ static void _call_ctor_QFileInfo_2174 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<QFileInfo *> (new QFileInfo (arg1));
 }
 
@@ -628,7 +628,7 @@ static void _call_f_operator_excl__eq__2174 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<bool > ((bool)((QFileInfo *)cls)->operator!= (arg1));
 }
 
@@ -647,7 +647,7 @@ static void _call_f_operator_excl__eq__c2174 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<bool > ((bool)((QFileInfo *)cls)->operator!= (arg1));
 }
 
@@ -666,7 +666,7 @@ static void _call_f_operator_eq__2174 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<QFileInfo & > ((QFileInfo &)((QFileInfo *)cls)->operator= (arg1));
 }
 
@@ -685,7 +685,7 @@ static void _call_f_operator_eq__eq__2174 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<bool > ((bool)((QFileInfo *)cls)->operator== (arg1));
 }
 
@@ -704,7 +704,7 @@ static void _call_f_operator_eq__eq__c2174 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<bool > ((bool)((QFileInfo *)cls)->operator== (arg1));
 }
 
@@ -768,7 +768,7 @@ static void _call_f_permission_c2778 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QFile::Permission> arg1 = args.read<QFlags<QFile::Permission> > (heap);
+  QFlags<QFile::Permission> arg1 = gsi::arg_reader<QFlags<QFile::Permission> >() (args, heap);
   ret.write<bool > ((bool)((QFileInfo *)cls)->permission (arg1));
 }
 
@@ -833,7 +833,7 @@ static void _call_f_setCaching_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileInfo *)cls)->setCaching (arg1);
 }
@@ -853,7 +853,7 @@ static void _call_f_setFile_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileInfo *)cls)->setFile (arg1);
 }
@@ -873,7 +873,7 @@ static void _call_f_setFile_1778 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFile &arg1 = args.read<const QFile & > (heap);
+  const QFile &arg1 = gsi::arg_reader<const QFile & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileInfo *)cls)->setFile (arg1);
 }
@@ -895,8 +895,8 @@ static void _call_f_setFile_3598 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileInfo *)cls)->setFile (arg1, arg2);
 }

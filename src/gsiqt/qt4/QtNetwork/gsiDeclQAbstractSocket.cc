@@ -71,8 +71,8 @@ static void _call_ctor_QAbstractSocket_4299 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractSocket::SocketType>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractSocket::SocketType>::target_type & > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
+  const qt_gsi::Converter<QAbstractSocket::SocketType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::SocketType>::target_type & >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QAbstractSocket *> (new QAbstractSocket (qt_gsi::QtToCppAdaptor<QAbstractSocket::SocketType>(arg1).cref(), arg2));
 }
 
@@ -187,9 +187,9 @@ static void _call_f_connectToHost_6151 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg3 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg3 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractSocket *)cls)->connectToHost (arg1, arg2, arg3);
 }
@@ -213,9 +213,9 @@ static void _call_f_connectToHost_6644 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg3 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg3 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractSocket *)cls)->connectToHost (arg1, arg2, arg3);
 }
@@ -416,7 +416,7 @@ static void _call_f_setProxy_2686 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxy &arg1 = args.read<const QNetworkProxy & > (heap);
+  const QNetworkProxy &arg1 = gsi::arg_reader<const QNetworkProxy & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractSocket *)cls)->setProxy (arg1);
 }
@@ -436,7 +436,7 @@ static void _call_f_setReadBufferSize_986 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractSocket *)cls)->setReadBufferSize (arg1);
 }
@@ -460,9 +460,9 @@ static void _call_f_setSocketDescriptor_6993 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractSocket::SocketState>(heap, QAbstractSocket::ConnectedState));
-  QFlags<QIODevice::OpenModeFlag> arg3 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractSocket::SocketState>(heap, QAbstractSocket::ConnectedState), heap);
+  QFlags<QIODevice::OpenModeFlag> arg3 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
   ret.write<bool > ((bool)((QAbstractSocket *)cls)->setSocketDescriptor (arg1, qt_gsi::QtToCppAdaptor<QAbstractSocket::SocketState>(arg2).cref(), arg3));
 }
 
@@ -483,8 +483,8 @@ static void _call_f_setSocketOption_5331 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractSocket *)cls)->setSocketOption (qt_gsi::QtToCppAdaptor<QAbstractSocket::SocketOption>(arg1).cref(), arg2);
 }
@@ -519,7 +519,7 @@ static void _call_f_socketOption_3320 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QAbstractSocket *)cls)->socketOption (qt_gsi::QtToCppAdaptor<QAbstractSocket::SocketOption>(arg1).cref()));
 }
 
@@ -568,7 +568,7 @@ static void _call_f_waitForBytesWritten_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QAbstractSocket *)cls)->waitForBytesWritten (arg1));
 }
 
@@ -587,7 +587,7 @@ static void _call_f_waitForConnected_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QAbstractSocket *)cls)->waitForConnected (arg1));
 }
 
@@ -606,7 +606,7 @@ static void _call_f_waitForDisconnected_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QAbstractSocket *)cls)->waitForDisconnected (arg1));
 }
 
@@ -625,7 +625,7 @@ static void _call_f_waitForReadyRead_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QAbstractSocket *)cls)->waitForReadyRead (arg1));
 }
 
@@ -646,8 +646,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QAbstractSocket::tr (arg1, arg2));
 }
 
@@ -670,9 +670,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QAbstractSocket::tr (arg1, arg2, arg3));
 }
 
@@ -693,8 +693,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QAbstractSocket::trUtf8 (arg1, arg2));
 }
 
@@ -717,9 +717,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QAbstractSocket::trUtf8 (arg1, arg2, arg3));
 }
 

@@ -67,7 +67,7 @@ static void _call_ctor_QTextTableCell_2687 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextTableCell &arg1 = args.read<const QTextTableCell & > (heap);
+  const QTextTableCell &arg1 = gsi::arg_reader<const QTextTableCell & >() (args, heap);
   ret.write<QTextTableCell *> (new QTextTableCell (arg1));
 }
 
@@ -206,7 +206,7 @@ static void _call_f_operator_excl__eq__c2687 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextTableCell &arg1 = args.read<const QTextTableCell & > (heap);
+  const QTextTableCell &arg1 = gsi::arg_reader<const QTextTableCell & >() (args, heap);
   ret.write<bool > ((bool)((QTextTableCell *)cls)->operator!= (arg1));
 }
 
@@ -225,7 +225,7 @@ static void _call_f_operator_eq__2687 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextTableCell &arg1 = args.read<const QTextTableCell & > (heap);
+  const QTextTableCell &arg1 = gsi::arg_reader<const QTextTableCell & >() (args, heap);
   ret.write<QTextTableCell & > ((QTextTableCell &)((QTextTableCell *)cls)->operator= (arg1));
 }
 
@@ -244,7 +244,7 @@ static void _call_f_operator_eq__eq__c2687 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextTableCell &arg1 = args.read<const QTextTableCell & > (heap);
+  const QTextTableCell &arg1 = gsi::arg_reader<const QTextTableCell & >() (args, heap);
   ret.write<bool > ((bool)((QTextTableCell *)cls)->operator== (arg1));
 }
 
@@ -293,7 +293,7 @@ static void _call_f_setFormat_2814 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCharFormat &arg1 = args.read<const QTextCharFormat & > (heap);
+  const QTextCharFormat &arg1 = gsi::arg_reader<const QTextCharFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextTableCell *)cls)->setFormat (arg1);
 }

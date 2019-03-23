@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionTab_2835 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTab &arg1 = args.read<const QStyleOptionTab & > (heap);
+  const QStyleOptionTab &arg1 = gsi::arg_reader<const QStyleOptionTab & >() (args, heap);
   ret.write<QStyleOptionTab *> (new QStyleOptionTab (arg1));
 }
 

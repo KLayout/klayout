@@ -122,7 +122,7 @@ static void _call_f_setCreator_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter *)cls)->setCreator (arg1);
 }
@@ -142,7 +142,7 @@ static void _call_f_setMargins_3812 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPagedPaintDevice::Margins &arg1 = args.read<const QPagedPaintDevice::Margins & > (heap);
+  const QPagedPaintDevice::Margins &arg1 = gsi::arg_reader<const QPagedPaintDevice::Margins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter *)cls)->setMargins (arg1);
 }
@@ -162,7 +162,7 @@ static void _call_f_setPageSize_3006 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPagedPaintDevice::PageSize>::target_type & arg1 = args.read<const qt_gsi::Converter<QPagedPaintDevice::PageSize>::target_type & > (heap);
+  const qt_gsi::Converter<QPagedPaintDevice::PageSize>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPagedPaintDevice::PageSize>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter *)cls)->setPageSize (qt_gsi::QtToCppAdaptor<QPagedPaintDevice::PageSize>(arg1).cref());
 }
@@ -182,7 +182,7 @@ static void _call_f_setPageSizeMM_1875 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter *)cls)->setPageSizeMM (arg1);
 }
@@ -202,7 +202,7 @@ static void _call_f_setResolution_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter *)cls)->setResolution (arg1);
 }
@@ -222,7 +222,7 @@ static void _call_f_setTitle_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter *)cls)->setTitle (arg1);
 }
@@ -261,9 +261,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QPdfWriter::tr (arg1, arg2, arg3));
 }
 
@@ -286,9 +286,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QPdfWriter::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -686,7 +686,7 @@ static void _call_ctor_QPdfWriter_Adaptor_2025 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QPdfWriter_Adaptor *> (new QPdfWriter_Adaptor (arg1));
 }
 
@@ -704,7 +704,7 @@ static void _call_ctor_QPdfWriter_Adaptor_1447 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QPdfWriter_Adaptor *> (new QPdfWriter_Adaptor (arg1));
 }
 
@@ -770,7 +770,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QPdfWriter_Adaptor *)cls)->emitter_QPdfWriter_destroyed_1302 (arg1);
 }
 
@@ -913,7 +913,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QPdfWriter_Adaptor *)cls)->fp_QPdfWriter_isSignalConnected_c2394 (arg1));
 }
 
@@ -992,7 +992,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QPdfWriter_Adaptor *)cls)->fp_QPdfWriter_receivers_c1731 (arg1));
 }
 

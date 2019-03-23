@@ -75,7 +75,7 @@ static void _call_ctor_QTextLayout_2025 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTextLayout *> (new QTextLayout (arg1));
 }
 
@@ -98,9 +98,9 @@ static void _call_ctor_QTextLayout_5413 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QFont &arg2 = args.read<const QFont & > (heap);
-  QPaintDevice *arg3 = args ? args.read<QPaintDevice * > (heap) : (QPaintDevice *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QFont &arg2 = gsi::arg_reader<const QFont & >() (args, heap);
+  QPaintDevice *arg3 = args ? gsi::arg_reader<QPaintDevice * >() (args, heap) : gsi::arg_maker<QPaintDevice * >() (0, heap);
   ret.write<QTextLayout *> (new QTextLayout (arg1, arg2, arg3));
 }
 
@@ -119,7 +119,7 @@ static void _call_ctor_QTextLayout_2306 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<QTextLayout *> (new QTextLayout (arg1));
 }
 
@@ -267,10 +267,10 @@ static void _call_f_draw_c9459 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  const QVector<QTextLayout::FormatRange> &arg3 = args ? args.read<const QVector<QTextLayout::FormatRange> & > (heap) : (const QVector<QTextLayout::FormatRange> &)(QVector<QTextLayout::FormatRange>());
-  const QRectF &arg4 = args ? args.read<const QRectF & > (heap) : (const QRectF &)(QRectF());
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QVector<QTextLayout::FormatRange> &arg3 = args ? gsi::arg_reader<const QVector<QTextLayout::FormatRange> & >() (args, heap) : gsi::arg_maker<const QVector<QTextLayout::FormatRange> & >() (QVector<QTextLayout::FormatRange>(), heap);
+  const QRectF &arg4 = args ? gsi::arg_reader<const QRectF & >() (args, heap) : gsi::arg_maker<const QRectF & >() (QRectF(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->draw (arg1, arg2, arg3, arg4);
 }
@@ -294,9 +294,9 @@ static void _call_f_drawCursor_c3963 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  int arg3 = args.read<int > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->drawCursor (arg1, arg2, arg3);
 }
@@ -322,10 +322,10 @@ static void _call_f_drawCursor_c4622 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->drawCursor (arg1, arg2, arg3, arg4);
 }
@@ -378,8 +378,8 @@ static void _call_f_glyphRuns_c1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(-1);
-  int arg2 = args ? args.read<int > (heap) : (int)(-1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QList<QGlyphRun> > ((QList<QGlyphRun>)((QTextLayout *)cls)->glyphRuns (arg1, arg2));
 }
 
@@ -398,7 +398,7 @@ static void _call_f_isValidCursorPosition_c767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QTextLayout *)cls)->isValidCursorPosition (arg1));
 }
 
@@ -417,7 +417,7 @@ static void _call_f_leftCursorPosition_c767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QTextLayout *)cls)->leftCursorPosition (arg1));
 }
 
@@ -436,7 +436,7 @@ static void _call_f_lineAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextLine > ((QTextLine)((QTextLayout *)cls)->lineAt (arg1));
 }
 
@@ -470,7 +470,7 @@ static void _call_f_lineForTextPosition_c767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextLine > ((QTextLine)((QTextLayout *)cls)->lineForTextPosition (arg1));
 }
 
@@ -521,8 +521,8 @@ static void _call_f_nextCursorPosition_c3378 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & > (heap) : (const qt_gsi::Converter<QTextLayout::CursorMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QTextLayout::CursorMode>(heap, QTextLayout::SkipCharacters));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTextLayout::CursorMode>(heap, QTextLayout::SkipCharacters), heap);
   ret.write<int > ((int)((QTextLayout *)cls)->nextCursorPosition (arg1, qt_gsi::QtToCppAdaptor<QTextLayout::CursorMode>(arg2).cref()));
 }
 
@@ -588,8 +588,8 @@ static void _call_f_previousCursorPosition_c3378 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & > (heap) : (const qt_gsi::Converter<QTextLayout::CursorMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QTextLayout::CursorMode>(heap, QTextLayout::SkipCharacters));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTextLayout::CursorMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTextLayout::CursorMode>(heap, QTextLayout::SkipCharacters), heap);
   ret.write<int > ((int)((QTextLayout *)cls)->previousCursorPosition (arg1, qt_gsi::QtToCppAdaptor<QTextLayout::CursorMode>(arg2).cref()));
 }
 
@@ -608,7 +608,7 @@ static void _call_f_rightCursorPosition_c767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QTextLayout *)cls)->rightCursorPosition (arg1));
 }
 
@@ -627,7 +627,7 @@ static void _call_f_setAdditionalFormats_4294 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QTextLayout::FormatRange> &arg1 = args.read<const QList<QTextLayout::FormatRange> & > (heap);
+  const QList<QTextLayout::FormatRange> &arg1 = gsi::arg_reader<const QList<QTextLayout::FormatRange> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setAdditionalFormats (arg1);
 }
@@ -647,7 +647,7 @@ static void _call_f_setCacheEnabled_864 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setCacheEnabled (arg1);
 }
@@ -667,7 +667,7 @@ static void _call_f_setCursorMoveStyle_2323 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CursorMoveStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CursorMoveStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CursorMoveStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CursorMoveStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setCursorMoveStyle (qt_gsi::QtToCppAdaptor<Qt::CursorMoveStyle>(arg1).cref());
 }
@@ -687,7 +687,7 @@ static void _call_f_setFlags_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setFlags (arg1);
 }
@@ -707,7 +707,7 @@ static void _call_f_setFont_1801 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setFont (arg1);
 }
@@ -727,7 +727,7 @@ static void _call_f_setPosition_1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setPosition (arg1);
 }
@@ -749,8 +749,8 @@ static void _call_f_setPreeditArea_2684 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setPreeditArea (arg1, arg2);
 }
@@ -770,7 +770,7 @@ static void _call_f_setRawFont_2099 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRawFont &arg1 = args.read<const QRawFont & > (heap);
+  const QRawFont &arg1 = gsi::arg_reader<const QRawFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setRawFont (arg1);
 }
@@ -790,7 +790,7 @@ static void _call_f_setText_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setText (arg1);
 }
@@ -810,7 +810,7 @@ static void _call_f_setTextOption_2448 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextOption &arg1 = args.read<const QTextOption & > (heap);
+  const QTextOption &arg1 = gsi::arg_reader<const QTextOption & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLayout *)cls)->setTextOption (arg1);
 }

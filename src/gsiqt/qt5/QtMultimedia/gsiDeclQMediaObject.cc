@@ -100,7 +100,7 @@ static void _call_f_bind_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<bool > ((bool)((QMediaObject *)cls)->bind (arg1));
 }
 
@@ -149,7 +149,7 @@ static void _call_f_metaData_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QMediaObject *)cls)->metaData (arg1));
 }
 
@@ -198,7 +198,7 @@ static void _call_f_setNotifyInterval_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaObject *)cls)->setNotifyInterval (arg1);
 }
@@ -218,7 +218,7 @@ static void _call_f_unbind_1302 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaObject *)cls)->unbind (arg1);
 }
@@ -242,9 +242,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMediaObject::tr (arg1, arg2, arg3));
 }
 
@@ -267,9 +267,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMediaObject::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -584,7 +584,7 @@ static void _call_fp_addPropertyWatch_2309 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray const &arg1 = args.read<QByteArray const & > (heap);
+  QByteArray const &arg1 = gsi::arg_reader<QByteArray const & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaObject_Adaptor *)cls)->fp_QMediaObject_addPropertyWatch_2309 (arg1);
 }
@@ -622,7 +622,7 @@ static void _call_emitter_availabilityChanged_864 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QMediaObject_Adaptor *)cls)->emitter_QMediaObject_availabilityChanged_864 (arg1);
 }
 
@@ -640,7 +640,7 @@ static void _call_emitter_availabilityChanged_3555 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = args.read<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > (heap);
+  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & >() (args, heap);
   ((QMediaObject_Adaptor *)cls)->emitter_QMediaObject_availabilityChanged_3555 (arg1);
 }
 
@@ -729,7 +729,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QMediaObject_Adaptor *)cls)->emitter_QMediaObject_destroyed_1302 (arg1);
 }
 
@@ -839,7 +839,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QMediaObject_Adaptor *)cls)->fp_QMediaObject_isSignalConnected_c2394 (arg1));
 }
 
@@ -857,7 +857,7 @@ static void _call_emitter_metaDataAvailableChanged_864 (const qt_gsi::GenericMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QMediaObject_Adaptor *)cls)->emitter_QMediaObject_metaDataAvailableChanged_864 (arg1);
 }
 
@@ -891,8 +891,8 @@ static void _call_emitter_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   ((QMediaObject_Adaptor *)cls)->emitter_QMediaObject_metaDataChanged_4036 (arg1, arg2);
 }
 
@@ -910,7 +910,7 @@ static void _call_emitter_notifyIntervalChanged_767 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QMediaObject_Adaptor *)cls)->emitter_QMediaObject_notifyIntervalChanged_767 (arg1);
 }
 
@@ -928,7 +928,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QMediaObject_Adaptor *)cls)->fp_QMediaObject_receivers_c1731 (arg1));
 }
 
@@ -946,7 +946,7 @@ static void _call_fp_removePropertyWatch_2309 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray const &arg1 = args.read<QByteArray const & > (heap);
+  QByteArray const &arg1 = gsi::arg_reader<QByteArray const & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaObject_Adaptor *)cls)->fp_QMediaObject_removePropertyWatch_2309 (arg1);
 }

@@ -88,7 +88,7 @@ static void _call_f_complete_1792 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args ? args.read<const QRect & > (heap) : (const QRect &)(QRect());
+  const QRect &arg1 = args ? gsi::arg_reader<const QRect & >() (args, heap) : gsi::arg_maker<const QRect & >() (QRect(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->complete (arg1);
 }
@@ -288,7 +288,7 @@ static void _call_f_pathFromIndex_c2395 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QString > ((QString)((QCompleter *)cls)->pathFromIndex (arg1));
 }
 
@@ -322,7 +322,7 @@ static void _call_f_setCaseSensitivity_2324 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setCaseSensitivity (qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg1).cref());
 }
@@ -342,7 +342,7 @@ static void _call_f_setCompletionColumn_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setCompletionColumn (arg1);
 }
@@ -362,7 +362,7 @@ static void _call_f_setCompletionMode_3011 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCompleter::CompletionMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCompleter::CompletionMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCompleter::CompletionMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCompleter::CompletionMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setCompletionMode (qt_gsi::QtToCppAdaptor<QCompleter::CompletionMode>(arg1).cref());
 }
@@ -382,7 +382,7 @@ static void _call_f_setCompletionPrefix_2025 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setCompletionPrefix (arg1);
 }
@@ -402,7 +402,7 @@ static void _call_f_setCompletionRole_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setCompletionRole (arg1);
 }
@@ -422,7 +422,7 @@ static void _call_f_setCurrentRow_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QCompleter *)cls)->setCurrentRow (arg1));
 }
 
@@ -441,7 +441,7 @@ static void _call_f_setMaxVisibleItems_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setMaxVisibleItems (arg1);
 }
@@ -461,7 +461,7 @@ static void _call_f_setModel_2419 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemModel *arg1 = args.read<QAbstractItemModel * > (heap);
+  QAbstractItemModel *arg1 = gsi::arg_reader<QAbstractItemModel * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setModel (arg1);
 }
@@ -481,7 +481,7 @@ static void _call_f_setModelSorting_2811 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCompleter::ModelSorting>::target_type & arg1 = args.read<const qt_gsi::Converter<QCompleter::ModelSorting>::target_type & > (heap);
+  const qt_gsi::Converter<QCompleter::ModelSorting>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCompleter::ModelSorting>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setModelSorting (qt_gsi::QtToCppAdaptor<QCompleter::ModelSorting>(arg1).cref());
 }
@@ -501,7 +501,7 @@ static void _call_f_setPopup_2333 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemView *arg1 = args.read<QAbstractItemView * > (heap);
+  QAbstractItemView *arg1 = gsi::arg_reader<QAbstractItemView * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setPopup (arg1);
 }
@@ -521,7 +521,7 @@ static void _call_f_setWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setWidget (arg1);
 }
@@ -541,7 +541,7 @@ static void _call_f_setWrapAround_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCompleter *)cls)->setWrapAround (arg1);
 }
@@ -561,7 +561,7 @@ static void _call_f_splitPath_c2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QCompleter *)cls)->splitPath (arg1));
 }
 
@@ -612,8 +612,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QCompleter::tr (arg1, arg2));
 }
 
@@ -636,9 +636,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QCompleter::tr (arg1, arg2, arg3));
 }
 
@@ -659,8 +659,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QCompleter::trUtf8 (arg1, arg2));
 }
 
@@ -683,9 +683,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QCompleter::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -977,7 +977,7 @@ static void _call_ctor_QCompleter_Adaptor_1302 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QCompleter_Adaptor *> (new QCompleter_Adaptor (arg1));
 }
 
@@ -997,8 +997,8 @@ static void _call_ctor_QCompleter_Adaptor_3613 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemModel *arg1 = args.read<QAbstractItemModel * > (heap);
-  QObject *arg2 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QAbstractItemModel *arg1 = gsi::arg_reader<QAbstractItemModel * >() (args, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QCompleter_Adaptor *> (new QCompleter_Adaptor (arg1, arg2));
 }
 
@@ -1018,8 +1018,8 @@ static void _call_ctor_QCompleter_Adaptor_3631 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
-  QObject *arg2 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QCompleter_Adaptor *> (new QCompleter_Adaptor (arg1, arg2));
 }
 
@@ -1037,7 +1037,7 @@ static void _call_emitter_activated_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QCompleter_Adaptor *)cls)->emitter_QCompleter_activated_2025 (arg1);
 }
 
@@ -1055,7 +1055,7 @@ static void _call_emitter_activated_2395 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QCompleter_Adaptor *)cls)->emitter_QCompleter_activated_2395 (arg1);
 }
 
@@ -1121,7 +1121,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QCompleter_Adaptor *)cls)->emitter_QCompleter_destroyed_1302 (arg1);
 }
 
@@ -1212,7 +1212,7 @@ static void _call_emitter_highlighted_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QCompleter_Adaptor *)cls)->emitter_QCompleter_highlighted_2025 (arg1);
 }
 
@@ -1230,7 +1230,7 @@ static void _call_emitter_highlighted_2395 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QCompleter_Adaptor *)cls)->emitter_QCompleter_highlighted_2395 (arg1);
 }
 
@@ -1271,7 +1271,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QCompleter_Adaptor *)cls)->fp_QCompleter_receivers_c1731 (arg1));
 }
 

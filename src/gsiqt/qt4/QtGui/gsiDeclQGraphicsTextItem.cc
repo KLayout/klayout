@@ -129,7 +129,7 @@ static void _call_f_contains_c1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsTextItem *)cls)->contains (arg1));
 }
 
@@ -193,7 +193,7 @@ static void _call_f_isObscuredBy_c2614 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsTextItem *)cls)->isObscuredBy (arg1));
 }
 
@@ -246,9 +246,9 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QStyleOptionGraphicsItem *arg2 = args.read<const QStyleOptionGraphicsItem * > (heap);
-  QWidget *arg3 = args.read<QWidget * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
+  QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->paint (arg1, arg2, arg3);
 }
@@ -268,7 +268,7 @@ static void _call_f_setDefaultTextColor_1905 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setDefaultTextColor (arg1);
 }
@@ -288,7 +288,7 @@ static void _call_f_setDocument_1955 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextDocument *arg1 = args.read<QTextDocument * > (heap);
+  QTextDocument *arg1 = gsi::arg_reader<QTextDocument * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setDocument (arg1);
 }
@@ -308,7 +308,7 @@ static void _call_f_setFont_1801 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setFont (arg1);
 }
@@ -328,7 +328,7 @@ static void _call_f_setHtml_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setHtml (arg1);
 }
@@ -348,7 +348,7 @@ static void _call_f_setOpenExternalLinks_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setOpenExternalLinks (arg1);
 }
@@ -368,7 +368,7 @@ static void _call_f_setPlainText_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setPlainText (arg1);
 }
@@ -388,7 +388,7 @@ static void _call_f_setTabChangesFocus_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setTabChangesFocus (arg1);
 }
@@ -408,7 +408,7 @@ static void _call_f_setTextCursor_2453 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCursor &arg1 = args.read<const QTextCursor & > (heap);
+  const QTextCursor &arg1 = gsi::arg_reader<const QTextCursor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setTextCursor (arg1);
 }
@@ -428,7 +428,7 @@ static void _call_f_setTextInteractionFlags_3396 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::TextInteractionFlag> arg1 = args.read<QFlags<Qt::TextInteractionFlag> > (heap);
+  QFlags<Qt::TextInteractionFlag> arg1 = gsi::arg_reader<QFlags<Qt::TextInteractionFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setTextInteractionFlags (arg1);
 }
@@ -448,7 +448,7 @@ static void _call_f_setTextWidth_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsTextItem *)cls)->setTextWidth (arg1);
 }
@@ -590,8 +590,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QGraphicsTextItem::tr (arg1, arg2));
 }
 
@@ -614,9 +614,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QGraphicsTextItem::tr (arg1, arg2, arg3));
 }
 
@@ -637,8 +637,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QGraphicsTextItem::trUtf8 (arg1, arg2));
 }
 
@@ -661,9 +661,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QGraphicsTextItem::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1546,8 +1546,8 @@ static void _call_ctor_QGraphicsTextItem_Adaptor_3825 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
-  QGraphicsScene *arg2 = args ? args.read<QGraphicsScene * > (heap) : (QGraphicsScene *)(0);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsScene *arg2 = args ? gsi::arg_reader<QGraphicsScene * >() (args, heap) : gsi::arg_maker<QGraphicsScene * >() (0, heap);
   ret.write<QGraphicsTextItem_Adaptor *> (new QGraphicsTextItem_Adaptor (arg1, arg2));
 }
 
@@ -1569,9 +1569,9 @@ static void _call_ctor_QGraphicsTextItem_Adaptor_5742 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QGraphicsItem *arg2 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
-  QGraphicsScene *arg3 = args ? args.read<QGraphicsScene * > (heap) : (QGraphicsScene *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsScene *arg3 = args ? gsi::arg_reader<QGraphicsScene * >() (args, heap) : gsi::arg_maker<QGraphicsScene * >() (0, heap);
   ret.write<QGraphicsTextItem_Adaptor *> (new QGraphicsTextItem_Adaptor (arg1, arg2, arg3));
 }
 
@@ -1794,7 +1794,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QGraphicsTextItem_Adaptor *)cls)->emitter_QGraphicsTextItem_destroyed_1302 (arg1);
 }
 
@@ -2282,7 +2282,7 @@ static void _call_emitter_linkActivated_2025 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QGraphicsTextItem_Adaptor *)cls)->emitter_QGraphicsTextItem_linkActivated_2025 (arg1);
 }
 
@@ -2300,7 +2300,7 @@ static void _call_emitter_linkHovered_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QGraphicsTextItem_Adaptor *)cls)->emitter_QGraphicsTextItem_linkHovered_2025 (arg1);
 }
 
@@ -2506,7 +2506,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QGraphicsTextItem_Adaptor *)cls)->fp_QGraphicsTextItem_receivers_c1731 (arg1));
 }
 

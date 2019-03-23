@@ -56,7 +56,7 @@ static void _call_f_addItem_2557 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->addItem (arg1);
 }
@@ -76,7 +76,7 @@ static void _call_f_addStretch_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->addStretch (arg1);
 }
@@ -96,7 +96,7 @@ static void _call_f_alignment_c2557 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   ret.write<QFlags<Qt::AlignmentFlag> > ((QFlags<Qt::AlignmentFlag>)((QGraphicsLinearLayout *)cls)->alignment (arg1));
 }
 
@@ -130,7 +130,7 @@ static void _call_f_dump_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->dump (arg1);
 }
@@ -152,8 +152,8 @@ static void _call_f_insertItem_3216 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QGraphicsLayoutItem *arg2 = args.read<QGraphicsLayoutItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QGraphicsLayoutItem *arg2 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->insertItem (arg1, arg2);
 }
@@ -175,8 +175,8 @@ static void _call_f_insertStretch_1426 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->insertStretch (arg1, arg2);
 }
@@ -212,7 +212,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QGraphicsLayoutItem * > ((QGraphicsLayoutItem *)((QGraphicsLinearLayout *)cls)->itemAt (arg1));
 }
 
@@ -231,7 +231,7 @@ static void _call_f_itemSpacing_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QGraphicsLinearLayout *)cls)->itemSpacing (arg1));
 }
 
@@ -265,7 +265,7 @@ static void _call_f_removeAt_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->removeAt (arg1);
 }
@@ -285,7 +285,7 @@ static void _call_f_removeItem_2557 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->removeItem (arg1);
 }
@@ -307,8 +307,8 @@ static void _call_f_setAlignment_5199 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
-  QFlags<Qt::AlignmentFlag> arg2 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg2 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->setAlignment (arg1, arg2);
 }
@@ -328,7 +328,7 @@ static void _call_f_setGeometry_1862 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->setGeometry (arg1);
 }
@@ -350,8 +350,8 @@ static void _call_f_setItemSpacing_1730 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->setItemSpacing (arg1, arg2);
 }
@@ -371,7 +371,7 @@ static void _call_f_setOrientation_1913 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->setOrientation (qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg1).cref());
 }
@@ -391,7 +391,7 @@ static void _call_f_setSpacing_1071 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->setSpacing (arg1);
 }
@@ -413,8 +413,8 @@ static void _call_f_setStretchFactor_3216 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout *)cls)->setStretchFactor (arg1, arg2);
 }
@@ -436,8 +436,8 @@ static void _call_f_sizeHint_c3330 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::SizeHint>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::SizeHint>::target_type & > (heap);
-  const QSizeF &arg2 = args ? args.read<const QSizeF & > (heap) : (const QSizeF &)(QSizeF());
+  const qt_gsi::Converter<Qt::SizeHint>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::SizeHint>::target_type & >() (args, heap);
+  const QSizeF &arg2 = args ? gsi::arg_reader<const QSizeF & >() (args, heap) : gsi::arg_maker<const QSizeF & >() (QSizeF(), heap);
   ret.write<QSizeF > ((QSizeF)((QGraphicsLinearLayout *)cls)->sizeHint (qt_gsi::QtToCppAdaptor<Qt::SizeHint>(arg1).cref(), arg2));
 }
 
@@ -471,7 +471,7 @@ static void _call_f_stretchFactor_c2557 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   ret.write<int > ((int)((QGraphicsLinearLayout *)cls)->stretchFactor (arg1));
 }
 
@@ -723,7 +723,7 @@ static void _call_ctor_QGraphicsLinearLayout_Adaptor_2557 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args ? args.read<QGraphicsLayoutItem * > (heap) : (QGraphicsLayoutItem *)(0);
+  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
   ret.write<QGraphicsLinearLayout_Adaptor *> (new QGraphicsLinearLayout_Adaptor (arg1));
 }
 
@@ -743,8 +743,8 @@ static void _call_ctor_QGraphicsLinearLayout_Adaptor_4362 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  QGraphicsLayoutItem *arg2 = args ? args.read<QGraphicsLayoutItem * > (heap) : (QGraphicsLayoutItem *)(0);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  QGraphicsLayoutItem *arg2 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
   ret.write<QGraphicsLinearLayout_Adaptor *> (new QGraphicsLinearLayout_Adaptor (qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg1).cref(), arg2));
 }
 
@@ -762,7 +762,7 @@ static void _call_fp_addChildLayoutItem_2557 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout_Adaptor *)cls)->fp_QGraphicsLinearLayout_addChildLayoutItem_2557 (arg1);
 }
@@ -924,7 +924,7 @@ static void _call_fp_setGraphicsItem_1919 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args.read<QGraphicsItem * > (heap);
+  QGraphicsItem *arg1 = gsi::arg_reader<QGraphicsItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout_Adaptor *)cls)->fp_QGraphicsLinearLayout_setGraphicsItem_1919 (arg1);
 }
@@ -943,7 +943,7 @@ static void _call_fp_setOwnedByLayout_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsLinearLayout_Adaptor *)cls)->fp_QGraphicsLinearLayout_setOwnedByLayout_864 (arg1);
 }

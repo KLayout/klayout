@@ -53,8 +53,8 @@ static void _call_ctor_QMessageAuthenticationCode_5532 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg1 = args.read<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & > (heap);
-  const QByteArray &arg2 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & >() (args, heap);
+  const QByteArray &arg2 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QMessageAuthenticationCode *> (new QMessageAuthenticationCode (qt_gsi::QtToCppAdaptor<QCryptographicHash::Algorithm>(arg1).cref(), arg2));
 }
 
@@ -75,8 +75,8 @@ static void _call_f_addData_2390 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  int arg2 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageAuthenticationCode *)cls)->addData (arg1, arg2);
 }
@@ -96,7 +96,7 @@ static void _call_f_addData_2309 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageAuthenticationCode *)cls)->addData (arg1);
 }
@@ -116,7 +116,7 @@ static void _call_f_addData_1447 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<bool > ((bool)((QMessageAuthenticationCode *)cls)->addData (arg1));
 }
 
@@ -166,7 +166,7 @@ static void _call_f_setKey_2309 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMessageAuthenticationCode *)cls)->setKey (arg1);
 }
@@ -190,9 +190,9 @@ static void _call_f_hash_7733 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg3 = args.read<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)QMessageAuthenticationCode::hash (arg1, arg2, qt_gsi::QtToCppAdaptor<QCryptographicHash::Algorithm>(arg3).cref()));
 }
 

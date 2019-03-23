@@ -68,7 +68,7 @@ static void _call_ctor_QPrinterInfo_2530 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPrinterInfo &arg1 = args.read<const QPrinterInfo & > (heap);
+  const QPrinterInfo &arg1 = gsi::arg_reader<const QPrinterInfo & >() (args, heap);
   ret.write<QPrinterInfo *> (new QPrinterInfo (arg1));
 }
 
@@ -87,7 +87,7 @@ static void _call_ctor_QPrinterInfo_2134 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPrinter &arg1 = args.read<const QPrinter & > (heap);
+  const QPrinter &arg1 = gsi::arg_reader<const QPrinter & >() (args, heap);
   ret.write<QPrinterInfo *> (new QPrinterInfo (arg1));
 }
 
@@ -256,7 +256,7 @@ static void _call_f_operator_eq__2530 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPrinterInfo &arg1 = args.read<const QPrinterInfo & > (heap);
+  const QPrinterInfo &arg1 = gsi::arg_reader<const QPrinterInfo & >() (args, heap);
   ret.write<QPrinterInfo & > ((QPrinterInfo &)((QPrinterInfo *)cls)->operator= (arg1));
 }
 
@@ -455,7 +455,7 @@ static void _call_f_printerInfo_2025 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QPrinterInfo > ((QPrinterInfo)QPrinterInfo::printerInfo (arg1));
 }
 

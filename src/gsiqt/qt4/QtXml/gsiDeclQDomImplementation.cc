@@ -67,7 +67,7 @@ static void _call_ctor_QDomImplementation_3160 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomImplementation &arg1 = args.read<const QDomImplementation & > (heap);
+  const QDomImplementation &arg1 = gsi::arg_reader<const QDomImplementation & >() (args, heap);
   ret.write<QDomImplementation *> (new QDomImplementation (arg1));
 }
 
@@ -90,9 +90,9 @@ static void _call_f_createDocument_6765 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QDomDocumentType &arg3 = args.read<const QDomDocumentType & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QDomDocumentType &arg3 = gsi::arg_reader<const QDomDocumentType & >() (args, heap);
   ret.write<QDomDocument > ((QDomDocument)((QDomImplementation *)cls)->createDocument (arg1, arg2, arg3));
 }
 
@@ -115,9 +115,9 @@ static void _call_f_createDocumentType_5859 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomDocumentType > ((QDomDocumentType)((QDomImplementation *)cls)->createDocumentType (arg1, arg2, arg3));
 }
 
@@ -138,8 +138,8 @@ static void _call_f_hasFeature_c3942 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDomImplementation *)cls)->hasFeature (arg1, arg2));
 }
 
@@ -173,7 +173,7 @@ static void _call_f_operator_excl__eq__c3160 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomImplementation &arg1 = args.read<const QDomImplementation & > (heap);
+  const QDomImplementation &arg1 = gsi::arg_reader<const QDomImplementation & >() (args, heap);
   ret.write<bool > ((bool)((QDomImplementation *)cls)->operator!= (arg1));
 }
 
@@ -192,7 +192,7 @@ static void _call_f_operator_eq__3160 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomImplementation &arg1 = args.read<const QDomImplementation & > (heap);
+  const QDomImplementation &arg1 = gsi::arg_reader<const QDomImplementation & >() (args, heap);
   ret.write<QDomImplementation & > ((QDomImplementation &)((QDomImplementation *)cls)->operator= (arg1));
 }
 
@@ -211,7 +211,7 @@ static void _call_f_operator_eq__eq__c3160 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomImplementation &arg1 = args.read<const QDomImplementation & > (heap);
+  const QDomImplementation &arg1 = gsi::arg_reader<const QDomImplementation & >() (args, heap);
   ret.write<bool > ((bool)((QDomImplementation *)cls)->operator== (arg1));
 }
 
@@ -245,7 +245,7 @@ static void _call_f_setInvalidDataPolicy_4112 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDomImplementation::InvalidDataPolicy>::target_type & arg1 = args.read<const qt_gsi::Converter<QDomImplementation::InvalidDataPolicy>::target_type & > (heap);
+  const qt_gsi::Converter<QDomImplementation::InvalidDataPolicy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDomImplementation::InvalidDataPolicy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QDomImplementation::setInvalidDataPolicy (qt_gsi::QtToCppAdaptor<QDomImplementation::InvalidDataPolicy>(arg1).cref());
 }

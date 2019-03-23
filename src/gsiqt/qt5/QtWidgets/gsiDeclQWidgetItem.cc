@@ -115,7 +115,7 @@ static void _call_f_heightForWidth_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QWidgetItem *)cls)->heightForWidth (arg1));
 }
 
@@ -179,7 +179,7 @@ static void _call_f_setGeometry_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QWidgetItem *)cls)->setGeometry (arg1);
 }
@@ -514,7 +514,7 @@ static void _call_ctor_QWidgetItem_Adaptor_1315 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QWidgetItem_Adaptor *> (new QWidgetItem_Adaptor (arg1));
 }
 

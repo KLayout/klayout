@@ -134,8 +134,8 @@ static void _call_f_load_3070 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<bool > ((bool)((QPicture *)cls)->load (arg1, arg2));
 }
 
@@ -156,8 +156,8 @@ static void _call_f_load_3648 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<bool > ((bool)((QPicture *)cls)->load (arg1, arg2));
 }
 
@@ -176,7 +176,7 @@ static void _call_f_operator_eq__2126 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPicture &arg1 = args.read<const QPicture & > (heap);
+  const QPicture &arg1 = gsi::arg_reader<const QPicture & >() (args, heap);
   ret.write<QPicture & > ((QPicture &)((QPicture *)cls)->operator= (arg1));
 }
 
@@ -210,7 +210,7 @@ static void _call_f_play_1426 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   ret.write<bool > ((bool)((QPicture *)cls)->play (arg1));
 }
 
@@ -231,8 +231,8 @@ static void _call_f_save_3070 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<bool > ((bool)((QPicture *)cls)->save (arg1, arg2));
 }
 
@@ -253,8 +253,8 @@ static void _call_f_save_3648 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<bool > ((bool)((QPicture *)cls)->save (arg1, arg2));
 }
 
@@ -273,7 +273,7 @@ static void _call_f_setBoundingRect_1792 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPicture *)cls)->setBoundingRect (arg1);
 }
@@ -295,8 +295,8 @@ static void _call_f_setData_3395 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  unsigned int arg2 = args.read<unsigned int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  unsigned int arg2 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPicture *)cls)->setData (arg1, arg2);
 }
@@ -331,7 +331,7 @@ static void _call_f_swap_1431 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPicture &arg1 = args.read<QPicture & > (heap);
+  QPicture &arg1 = gsi::arg_reader<QPicture & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPicture *)cls)->swap (arg1);
 }
@@ -411,7 +411,7 @@ static void _call_f_pictureFormat_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<const char * > ((const char *)QPicture::pictureFormat (arg1));
 }
 
@@ -593,7 +593,7 @@ static void _call_ctor_QPicture_Adaptor_767 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(-1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QPicture_Adaptor *> (new QPicture_Adaptor (arg1));
 }
 
@@ -611,7 +611,7 @@ static void _call_ctor_QPicture_Adaptor_2126 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPicture &arg1 = args.read<const QPicture & > (heap);
+  const QPicture &arg1 = gsi::arg_reader<const QPicture & >() (args, heap);
   ret.write<QPicture_Adaptor *> (new QPicture_Adaptor (arg1));
 }
 

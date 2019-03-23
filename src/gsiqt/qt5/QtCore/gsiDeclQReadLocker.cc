@@ -51,7 +51,7 @@ static void _call_ctor_QReadLocker_1999 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QReadWriteLock *arg1 = args.read<QReadWriteLock * > (heap);
+  QReadWriteLock *arg1 = gsi::arg_reader<QReadWriteLock * >() (args, heap);
   ret.write<QReadLocker *> (new QReadLocker (arg1));
 }
 

@@ -124,8 +124,8 @@ static void _call_f_cellWidget_c1426 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QTableWidget *)cls)->cellWidget (arg1, arg2));
 }
 
@@ -176,7 +176,7 @@ static void _call_f_closePersistentEditor_2202 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->closePersistentEditor (arg1);
 }
@@ -196,7 +196,7 @@ static void _call_f_column_c2897 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTableWidgetItem *arg1 = args.read<const QTableWidgetItem * > (heap);
+  const QTableWidgetItem *arg1 = gsi::arg_reader<const QTableWidgetItem * >() (args, heap);
   ret.write<int > ((int)((QTableWidget *)cls)->column (arg1));
 }
 
@@ -275,7 +275,7 @@ static void _call_f_editItem_2202 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->editItem (arg1);
 }
@@ -297,8 +297,8 @@ static void _call_f_findItems_c4233 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<Qt::MatchFlag> arg2 = args.read<QFlags<Qt::MatchFlag> > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<Qt::MatchFlag> arg2 = gsi::arg_reader<QFlags<Qt::MatchFlag> >() (args, heap);
   ret.write<QList<QTableWidgetItem*> > ((QList<QTableWidgetItem*>)((QTableWidget *)cls)->findItems (arg1, arg2));
 }
 
@@ -317,7 +317,7 @@ static void _call_f_horizontalHeaderItem_c767 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTableWidgetItem * > ((QTableWidgetItem *)((QTableWidget *)cls)->horizontalHeaderItem (arg1));
 }
 
@@ -336,7 +336,7 @@ static void _call_f_insertColumn_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->insertColumn (arg1);
 }
@@ -356,7 +356,7 @@ static void _call_f_insertRow_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->insertRow (arg1);
 }
@@ -376,7 +376,7 @@ static void _call_f_isItemSelected_c2897 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTableWidgetItem *arg1 = args.read<const QTableWidgetItem * > (heap);
+  const QTableWidgetItem *arg1 = gsi::arg_reader<const QTableWidgetItem * >() (args, heap);
   ret.write<bool > ((bool)((QTableWidget *)cls)->isItemSelected (arg1));
 }
 
@@ -412,8 +412,8 @@ static void _call_f_item_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTableWidgetItem * > ((QTableWidgetItem *)((QTableWidget *)cls)->item (arg1, arg2));
 }
 
@@ -432,7 +432,7 @@ static void _call_f_itemAt_c1916 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QTableWidgetItem * > ((QTableWidgetItem *)((QTableWidget *)cls)->itemAt (arg1));
 }
 
@@ -453,8 +453,8 @@ static void _call_f_itemAt_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTableWidgetItem * > ((QTableWidgetItem *)((QTableWidget *)cls)->itemAt (arg1, arg2));
 }
 
@@ -488,7 +488,7 @@ static void _call_f_openPersistentEditor_2202 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->openPersistentEditor (arg1);
 }
@@ -510,8 +510,8 @@ static void _call_f_removeCellWidget_1426 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->removeCellWidget (arg1, arg2);
 }
@@ -531,7 +531,7 @@ static void _call_f_removeColumn_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->removeColumn (arg1);
 }
@@ -551,7 +551,7 @@ static void _call_f_removeRow_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->removeRow (arg1);
 }
@@ -571,7 +571,7 @@ static void _call_f_row_c2897 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTableWidgetItem *arg1 = args.read<const QTableWidgetItem * > (heap);
+  const QTableWidgetItem *arg1 = gsi::arg_reader<const QTableWidgetItem * >() (args, heap);
   ret.write<int > ((int)((QTableWidget *)cls)->row (arg1));
 }
 
@@ -607,8 +607,8 @@ static void _call_f_scrollToItem_6078 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTableWidgetItem *arg1 = args.read<const QTableWidgetItem * > (heap);
-  const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractItemView::ScrollHint>(heap, QAbstractItemView::EnsureVisible));
+  const QTableWidgetItem *arg1 = gsi::arg_reader<const QTableWidgetItem * >() (args, heap);
+  const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractItemView::ScrollHint>(heap, QAbstractItemView::EnsureVisible), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->scrollToItem (arg1, qt_gsi::QtToCppAdaptor<QAbstractItemView::ScrollHint>(arg2).cref());
 }
@@ -662,9 +662,9 @@ static void _call_f_setCellWidget_2633 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  QWidget *arg3 = args.read<QWidget * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setCellWidget (arg1, arg2, arg3);
 }
@@ -684,7 +684,7 @@ static void _call_f_setColumnCount_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setColumnCount (arg1);
 }
@@ -706,8 +706,8 @@ static void _call_f_setCurrentCell_1426 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setCurrentCell (arg1, arg2);
 }
@@ -731,9 +731,9 @@ static void _call_f_setCurrentCell_5789 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  QFlags<QItemSelectionModel::SelectionFlag> arg3 = args.read<QFlags<QItemSelectionModel::SelectionFlag> > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QFlags<QItemSelectionModel::SelectionFlag> arg3 = gsi::arg_reader<QFlags<QItemSelectionModel::SelectionFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setCurrentCell (arg1, arg2, arg3);
 }
@@ -753,7 +753,7 @@ static void _call_f_setCurrentItem_2202 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setCurrentItem (arg1);
 }
@@ -775,8 +775,8 @@ static void _call_f_setCurrentItem_6565 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
-  QFlags<QItemSelectionModel::SelectionFlag> arg2 = args.read<QFlags<QItemSelectionModel::SelectionFlag> > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
+  QFlags<QItemSelectionModel::SelectionFlag> arg2 = gsi::arg_reader<QFlags<QItemSelectionModel::SelectionFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setCurrentItem (arg1, arg2);
 }
@@ -798,8 +798,8 @@ static void _call_f_setHorizontalHeaderItem_2861 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QTableWidgetItem *arg2 = args.read<QTableWidgetItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QTableWidgetItem *arg2 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setHorizontalHeaderItem (arg1, arg2);
 }
@@ -819,7 +819,7 @@ static void _call_f_setHorizontalHeaderLabels_2437 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setHorizontalHeaderLabels (arg1);
 }
@@ -843,9 +843,9 @@ static void _call_f_setItem_3520 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  QTableWidgetItem *arg3 = args.read<QTableWidgetItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QTableWidgetItem *arg3 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   qt_gsi::qt_keep (arg3);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setItem (arg1, arg2, arg3);
@@ -866,7 +866,7 @@ static void _call_f_setItemPrototype_2897 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTableWidgetItem *arg1 = args.read<const QTableWidgetItem * > (heap);
+  const QTableWidgetItem *arg1 = gsi::arg_reader<const QTableWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setItemPrototype (arg1);
 }
@@ -888,8 +888,8 @@ static void _call_f_setItemSelected_3653 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTableWidgetItem *arg1 = args.read<const QTableWidgetItem * > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QTableWidgetItem *arg1 = gsi::arg_reader<const QTableWidgetItem * >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setItemSelected (arg1, arg2);
 }
@@ -911,8 +911,8 @@ static void _call_f_setRangeSelected_4677 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTableWidgetSelectionRange &arg1 = args.read<const QTableWidgetSelectionRange & > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QTableWidgetSelectionRange &arg1 = gsi::arg_reader<const QTableWidgetSelectionRange & >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setRangeSelected (arg1, arg2);
 }
@@ -932,7 +932,7 @@ static void _call_f_setRowCount_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setRowCount (arg1);
 }
@@ -952,7 +952,7 @@ static void _call_f_setSortingEnabled_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setSortingEnabled (arg1);
 }
@@ -974,8 +974,8 @@ static void _call_f_setVerticalHeaderItem_2861 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QTableWidgetItem *arg2 = args.read<QTableWidgetItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QTableWidgetItem *arg2 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setVerticalHeaderItem (arg1, arg2);
 }
@@ -995,7 +995,7 @@ static void _call_f_setVerticalHeaderLabels_2437 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->setVerticalHeaderLabels (arg1);
 }
@@ -1017,8 +1017,8 @@ static void _call_f_sortItems_2340 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::SortOrder>::target_type & > (heap) : (const qt_gsi::Converter<Qt::SortOrder>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::SortOrder>(heap, Qt::AscendingOrder));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::SortOrder>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::SortOrder>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::SortOrder>(heap, Qt::AscendingOrder), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget *)cls)->sortItems (arg1, qt_gsi::QtToCppAdaptor<Qt::SortOrder>(arg2).cref());
 }
@@ -1038,7 +1038,7 @@ static void _call_f_takeHorizontalHeaderItem_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTableWidgetItem * > ((QTableWidgetItem *)((QTableWidget *)cls)->takeHorizontalHeaderItem (arg1));
 }
 
@@ -1059,8 +1059,8 @@ static void _call_f_takeItem_1426 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTableWidgetItem * > ((QTableWidgetItem *)((QTableWidget *)cls)->takeItem (arg1, arg2));
 }
 
@@ -1079,7 +1079,7 @@ static void _call_f_takeVerticalHeaderItem_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTableWidgetItem * > ((QTableWidgetItem *)((QTableWidget *)cls)->takeVerticalHeaderItem (arg1));
 }
 
@@ -1098,7 +1098,7 @@ static void _call_f_verticalHeaderItem_c767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTableWidgetItem * > ((QTableWidgetItem *)((QTableWidget *)cls)->verticalHeaderItem (arg1));
 }
 
@@ -1117,7 +1117,7 @@ static void _call_f_visualColumn_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QTableWidget *)cls)->visualColumn (arg1));
 }
 
@@ -1136,7 +1136,7 @@ static void _call_f_visualItemRect_c2897 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTableWidgetItem *arg1 = args.read<const QTableWidgetItem * > (heap);
+  const QTableWidgetItem *arg1 = gsi::arg_reader<const QTableWidgetItem * >() (args, heap);
   ret.write<QRect > ((QRect)((QTableWidget *)cls)->visualItemRect (arg1));
 }
 
@@ -1155,7 +1155,7 @@ static void _call_f_visualRow_c767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QTableWidget *)cls)->visualRow (arg1));
 }
 
@@ -1176,8 +1176,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTableWidget::tr (arg1, arg2));
 }
 
@@ -1200,9 +1200,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTableWidget::tr (arg1, arg2, arg3));
 }
 
@@ -1223,8 +1223,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTableWidget::trUtf8 (arg1, arg2));
 }
 
@@ -1247,9 +1247,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTableWidget::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -3143,7 +3143,7 @@ static void _call_ctor_QTableWidget_Adaptor_1315 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QTableWidget_Adaptor *> (new QTableWidget_Adaptor (arg1));
 }
 
@@ -3165,9 +3165,9 @@ static void _call_ctor_QTableWidget_Adaptor_2633 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  QWidget *arg3 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QTableWidget_Adaptor *> (new QTableWidget_Adaptor (arg1, arg2, arg3));
 }
 
@@ -3209,7 +3209,7 @@ static void _call_emitter_activated_2395 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_activated_2395 (arg1);
 }
 
@@ -3229,8 +3229,8 @@ static void _call_emitter_cellActivated_1426 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_cellActivated_1426 (arg1, arg2);
 }
 
@@ -3250,8 +3250,8 @@ static void _call_emitter_cellChanged_1426 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_cellChanged_1426 (arg1, arg2);
 }
 
@@ -3271,8 +3271,8 @@ static void _call_emitter_cellClicked_1426 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_cellClicked_1426 (arg1, arg2);
 }
 
@@ -3292,8 +3292,8 @@ static void _call_emitter_cellDoubleClicked_1426 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_cellDoubleClicked_1426 (arg1, arg2);
 }
 
@@ -3313,8 +3313,8 @@ static void _call_emitter_cellEntered_1426 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_cellEntered_1426 (arg1, arg2);
 }
 
@@ -3334,8 +3334,8 @@ static void _call_emitter_cellPressed_1426 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_cellPressed_1426 (arg1, arg2);
 }
 
@@ -3401,7 +3401,7 @@ static void _call_emitter_clicked_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_clicked_2395 (arg1);
 }
 
@@ -3472,8 +3472,8 @@ static void _call_fp_columnCountChanged_1426 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_columnCountChanged_1426 (arg1, arg2);
 }
@@ -3496,9 +3496,9 @@ static void _call_fp_columnMoved_2085 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_columnMoved_2085 (arg1, arg2, arg3);
 }
@@ -3521,9 +3521,9 @@ static void _call_fp_columnResized_2085 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_columnResized_2085 (arg1, arg2, arg3);
 }
@@ -3594,9 +3594,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_create_2208 (arg1, arg2, arg3);
 }
@@ -3621,10 +3621,10 @@ static void _call_emitter_currentCellChanged_2744 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_currentCellChanged_2744 (arg1, arg2, arg3, arg4);
 }
 
@@ -3671,8 +3671,8 @@ static void _call_emitter_currentItemChanged_4296 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
-  QTableWidgetItem *arg2 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
+  QTableWidgetItem *arg2 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_currentItemChanged_4296 (arg1, arg2);
 }
 
@@ -3690,7 +3690,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_customContextMenuRequested_1916 (arg1);
 }
 
@@ -3761,8 +3761,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_destroy_1620 (arg1, arg2);
 }
@@ -3781,7 +3781,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_destroyed_1302 (arg1);
 }
 
@@ -3872,7 +3872,7 @@ static void _call_emitter_doubleClicked_2395 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_doubleClicked_2395 (arg1);
 }
 
@@ -3962,7 +3962,7 @@ static void _call_fp_drawFrame_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_drawFrame_1426 (arg1);
 }
@@ -4152,7 +4152,7 @@ static void _call_emitter_entered_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_entered_2395 (arg1);
 }
 
@@ -4508,7 +4508,7 @@ static void _call_fp_indexFromItem_c2202 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QTableWidget_Adaptor *)cls)->fp_QTableWidget_indexFromItem_c2202 (arg1));
 }
 
@@ -4596,7 +4596,7 @@ static void _call_emitter_itemActivated_2202 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_itemActivated_2202 (arg1);
 }
 
@@ -4614,7 +4614,7 @@ static void _call_emitter_itemChanged_2202 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_itemChanged_2202 (arg1);
 }
 
@@ -4632,7 +4632,7 @@ static void _call_emitter_itemClicked_2202 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_itemClicked_2202 (arg1);
 }
 
@@ -4650,7 +4650,7 @@ static void _call_emitter_itemDoubleClicked_2202 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_itemDoubleClicked_2202 (arg1);
 }
 
@@ -4668,7 +4668,7 @@ static void _call_emitter_itemEntered_2202 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_itemEntered_2202 (arg1);
 }
 
@@ -4686,7 +4686,7 @@ static void _call_fp_itemFromIndex_c2395 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QTableWidgetItem * > ((QTableWidgetItem *)((QTableWidget_Adaptor *)cls)->fp_QTableWidget_itemFromIndex_c2395 (arg1));
 }
 
@@ -4704,7 +4704,7 @@ static void _call_emitter_itemPressed_2202 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTableWidgetItem *arg1 = args.read<QTableWidgetItem * > (heap);
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_itemPressed_2202 (arg1);
 }
 
@@ -4736,7 +4736,7 @@ static void _call_fp_items_c2168 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeData *arg1 = args.read<const QMimeData * > (heap);
+  const QMimeData *arg1 = gsi::arg_reader<const QMimeData * >() (args, heap);
   ret.write<QList<QTableWidgetItem*> > ((QList<QTableWidgetItem*>)((QTableWidget_Adaptor *)cls)->fp_QTableWidget_items_c2168 (arg1));
 }
 
@@ -5167,7 +5167,7 @@ static void _call_emitter_pressed_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_pressed_2395 (arg1);
 }
 
@@ -5185,7 +5185,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QTableWidget_Adaptor *)cls)->fp_QTableWidget_receivers_c1731 (arg1));
 }
 
@@ -5264,8 +5264,8 @@ static void _call_fp_rowCountChanged_1426 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_rowCountChanged_1426 (arg1, arg2);
 }
@@ -5288,9 +5288,9 @@ static void _call_fp_rowMoved_2085 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_rowMoved_2085 (arg1, arg2, arg3);
 }
@@ -5313,9 +5313,9 @@ static void _call_fp_rowResized_2085 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_rowResized_2085 (arg1, arg2, arg3);
 }
@@ -5438,8 +5438,8 @@ static void _call_fp_scrollDirtyRegion_1426 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_scrollDirtyRegion_1426 (arg1, arg2);
 }
@@ -5591,7 +5591,7 @@ static void _call_fp_setDirtyRegion_2006 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_setDirtyRegion_2006 (arg1);
 }
@@ -5610,7 +5610,7 @@ static void _call_fp_setHorizontalStepsPerItem_767 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_setHorizontalStepsPerItem_767 (arg1);
 }
@@ -5704,7 +5704,7 @@ static void _call_fp_setState_2776 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_setState_2776 (arg1);
 }
@@ -5723,7 +5723,7 @@ static void _call_fp_setVerticalStepsPerItem_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_setVerticalStepsPerItem_767 (arg1);
 }
@@ -5748,10 +5748,10 @@ static void _call_fp_setViewportMargins_2744 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_setViewportMargins_2744 (arg1, arg2, arg3, arg4);
 }
@@ -5770,7 +5770,7 @@ static void _call_fp_setViewportMargins_2115 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_setViewportMargins_2115 (arg1);
 }
@@ -5813,7 +5813,7 @@ static void _call_fp_setupViewport_1315 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTableWidget_Adaptor *)cls)->fp_QTableWidget_setupViewport_1315 (arg1);
 }

@@ -68,7 +68,7 @@ static void _call_f_buttonDownPos_c1906 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
   ret.write<QPointF > ((QPointF)((QGraphicsSceneMouseEvent *)cls)->buttonDownPos (qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg1).cref()));
 }
 
@@ -87,7 +87,7 @@ static void _call_f_buttonDownScenePos_c1906 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
   ret.write<QPointF > ((QPointF)((QGraphicsSceneMouseEvent *)cls)->buttonDownScenePos (qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg1).cref()));
 }
 
@@ -106,7 +106,7 @@ static void _call_f_buttonDownScreenPos_c1906 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
   ret.write<QPoint > ((QPoint)((QGraphicsSceneMouseEvent *)cls)->buttonDownScreenPos (qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg1).cref()));
 }
 
@@ -260,7 +260,7 @@ static void _call_f_setButton_1906 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setButton (qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg1).cref());
 }
@@ -282,8 +282,8 @@ static void _call_f_setButtonDownPos_3784 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setButtonDownPos (qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg1).cref(), arg2);
 }
@@ -305,8 +305,8 @@ static void _call_f_setButtonDownScenePos_3784 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setButtonDownScenePos (qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg1).cref(), arg2);
 }
@@ -328,8 +328,8 @@ static void _call_f_setButtonDownScreenPos_3714 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setButtonDownScreenPos (qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg1).cref(), arg2);
 }
@@ -349,7 +349,7 @@ static void _call_f_setButtons_2602 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::MouseButton> arg1 = args.read<QFlags<Qt::MouseButton> > (heap);
+  QFlags<Qt::MouseButton> arg1 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setButtons (arg1);
 }
@@ -369,7 +369,7 @@ static void _call_f_setFlags_2858 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::MouseEventFlag> arg1 = args.read<QFlags<Qt::MouseEventFlag> > (heap);
+  QFlags<Qt::MouseEventFlag> arg1 = gsi::arg_reader<QFlags<Qt::MouseEventFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setFlags (arg1);
 }
@@ -389,7 +389,7 @@ static void _call_f_setLastPos_1986 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setLastPos (arg1);
 }
@@ -409,7 +409,7 @@ static void _call_f_setLastScenePos_1986 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setLastScenePos (arg1);
 }
@@ -429,7 +429,7 @@ static void _call_f_setLastScreenPos_1916 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setLastScreenPos (arg1);
 }
@@ -449,7 +449,7 @@ static void _call_f_setModifiers_3077 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::KeyboardModifier> arg1 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  QFlags<Qt::KeyboardModifier> arg1 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setModifiers (arg1);
 }
@@ -469,7 +469,7 @@ static void _call_f_setPos_1986 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setPos (arg1);
 }
@@ -489,7 +489,7 @@ static void _call_f_setScenePos_1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setScenePos (arg1);
 }
@@ -509,7 +509,7 @@ static void _call_f_setScreenPos_1916 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setScreenPos (arg1);
 }
@@ -529,7 +529,7 @@ static void _call_f_setSource_2409 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::MouseEventSource>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::MouseEventSource>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneMouseEvent *)cls)->setSource (qt_gsi::QtToCppAdaptor<Qt::MouseEventSource>(arg1).cref());
 }
@@ -633,7 +633,7 @@ static void _call_ctor_QGraphicsSceneMouseEvent_Adaptor_1565 (const qt_gsi::Gene
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap) : (const qt_gsi::Converter<QEvent::Type>::target_type &)(qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::None));
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QEvent::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::None), heap);
   ret.write<QGraphicsSceneMouseEvent_Adaptor *> (new QGraphicsSceneMouseEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref()));
 }
 

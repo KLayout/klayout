@@ -93,7 +93,7 @@ static void _call_f_contains_c1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPixmapItem *)cls)->contains (arg1));
 }
 
@@ -112,7 +112,7 @@ static void _call_f_isObscuredBy_c2614 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsPixmapItem *)cls)->isObscuredBy (arg1));
 }
 
@@ -165,9 +165,9 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QStyleOptionGraphicsItem *arg2 = args.read<const QStyleOptionGraphicsItem * > (heap);
-  QWidget *arg3 = args.read<QWidget * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
+  QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem *)cls)->paint (arg1, arg2, arg3);
 }
@@ -202,7 +202,7 @@ static void _call_f_setOffset_1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem *)cls)->setOffset (arg1);
 }
@@ -224,8 +224,8 @@ static void _call_f_setOffset_2034 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem *)cls)->setOffset (arg1, arg2);
 }
@@ -245,7 +245,7 @@ static void _call_f_setPixmap_2017 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem *)cls)->setPixmap (arg1);
 }
@@ -265,7 +265,7 @@ static void _call_f_setShapeMode_3358 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGraphicsPixmapItem::ShapeMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QGraphicsPixmapItem::ShapeMode>::target_type & > (heap);
+  const qt_gsi::Converter<QGraphicsPixmapItem::ShapeMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGraphicsPixmapItem::ShapeMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem *)cls)->setShapeMode (qt_gsi::QtToCppAdaptor<QGraphicsPixmapItem::ShapeMode>(arg1).cref());
 }
@@ -285,7 +285,7 @@ static void _call_f_setTransformationMode_2633 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::TransformationMode>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsPixmapItem *)cls)->setTransformationMode (qt_gsi::QtToCppAdaptor<Qt::TransformationMode>(arg1).cref());
 }
@@ -1013,7 +1013,7 @@ static void _call_ctor_QGraphicsPixmapItem_Adaptor_1919 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
   ret.write<QGraphicsPixmapItem_Adaptor *> (new QGraphicsPixmapItem_Adaptor (arg1));
 }
 
@@ -1033,8 +1033,8 @@ static void _call_ctor_QGraphicsPixmapItem_Adaptor_3828 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
-  QGraphicsItem *arg2 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
+  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
   ret.write<QGraphicsPixmapItem_Adaptor *> (new QGraphicsPixmapItem_Adaptor (arg1, arg2));
 }
 

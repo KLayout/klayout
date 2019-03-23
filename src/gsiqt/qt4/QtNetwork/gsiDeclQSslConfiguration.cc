@@ -68,7 +68,7 @@ static void _call_ctor_QSslConfiguration_3068 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslConfiguration &arg1 = args.read<const QSslConfiguration & > (heap);
+  const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   ret.write<QSslConfiguration *> (new QSslConfiguration (arg1));
 }
 
@@ -147,7 +147,7 @@ static void _call_f_operator_excl__eq__c3068 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslConfiguration &arg1 = args.read<const QSslConfiguration & > (heap);
+  const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   ret.write<bool > ((bool)((QSslConfiguration *)cls)->operator!= (arg1));
 }
 
@@ -166,7 +166,7 @@ static void _call_f_operator_eq__3068 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslConfiguration &arg1 = args.read<const QSslConfiguration & > (heap);
+  const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   ret.write<QSslConfiguration & > ((QSslConfiguration &)((QSslConfiguration *)cls)->operator= (arg1));
 }
 
@@ -185,7 +185,7 @@ static void _call_f_operator_eq__eq__c3068 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslConfiguration &arg1 = args.read<const QSslConfiguration & > (heap);
+  const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   ret.write<bool > ((bool)((QSslConfiguration *)cls)->operator== (arg1));
 }
 
@@ -309,7 +309,7 @@ static void _call_f_setCaCertificates_3438 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslCertificate> &arg1 = args.read<const QList<QSslCertificate> & > (heap);
+  const QList<QSslCertificate> &arg1 = gsi::arg_reader<const QList<QSslCertificate> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslConfiguration *)cls)->setCaCertificates (arg1);
 }
@@ -329,7 +329,7 @@ static void _call_f_setCiphers_2918 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslCipher> &arg1 = args.read<const QList<QSslCipher> & > (heap);
+  const QList<QSslCipher> &arg1 = gsi::arg_reader<const QList<QSslCipher> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslConfiguration *)cls)->setCiphers (arg1);
 }
@@ -349,7 +349,7 @@ static void _call_f_setLocalCertificate_2823 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificate &arg1 = args.read<const QSslCertificate & > (heap);
+  const QSslCertificate &arg1 = gsi::arg_reader<const QSslCertificate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslConfiguration *)cls)->setLocalCertificate (arg1);
 }
@@ -369,7 +369,7 @@ static void _call_f_setPeerVerifyDepth_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslConfiguration *)cls)->setPeerVerifyDepth (arg1);
 }
@@ -389,7 +389,7 @@ static void _call_f_setPeerVerifyMode_2970 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & > (heap);
+  const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslConfiguration *)cls)->setPeerVerifyMode (qt_gsi::QtToCppAdaptor<QSslSocket::PeerVerifyMode>(arg1).cref());
 }
@@ -409,7 +409,7 @@ static void _call_f_setPrivateKey_1997 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslKey &arg1 = args.read<const QSslKey & > (heap);
+  const QSslKey &arg1 = gsi::arg_reader<const QSslKey & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslConfiguration *)cls)->setPrivateKey (arg1);
 }
@@ -429,7 +429,7 @@ static void _call_f_setProtocol_2095 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSsl::SslProtocol>::target_type & arg1 = args.read<const qt_gsi::Converter<QSsl::SslProtocol>::target_type & > (heap);
+  const qt_gsi::Converter<QSsl::SslProtocol>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSsl::SslProtocol>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslConfiguration *)cls)->setProtocol (qt_gsi::QtToCppAdaptor<QSsl::SslProtocol>(arg1).cref());
 }
@@ -464,7 +464,7 @@ static void _call_f_setDefaultConfiguration_3068 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslConfiguration &arg1 = args.read<const QSslConfiguration & > (heap);
+  const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QSslConfiguration::setDefaultConfiguration (arg1);
 }

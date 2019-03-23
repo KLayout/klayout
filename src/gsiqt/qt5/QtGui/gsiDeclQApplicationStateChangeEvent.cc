@@ -51,7 +51,7 @@ static void _call_ctor_QApplicationStateChangeEvent_2402 (const qt_gsi::GenericS
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ApplicationState>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ApplicationState>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ApplicationState>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ApplicationState>::target_type & >() (args, heap);
   ret.write<QApplicationStateChangeEvent *> (new QApplicationStateChangeEvent (qt_gsi::QtToCppAdaptor<Qt::ApplicationState>(arg1).cref()));
 }
 

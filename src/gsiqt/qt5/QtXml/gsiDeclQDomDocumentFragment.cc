@@ -81,7 +81,7 @@ static void _call_ctor_QDomDocumentFragment_3333 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomDocumentFragment &arg1 = args.read<const QDomDocumentFragment & > (heap);
+  const QDomDocumentFragment &arg1 = gsi::arg_reader<const QDomDocumentFragment & >() (args, heap);
   ret.write<QDomDocumentFragment *> (new QDomDocumentFragment (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_operator_eq__3333 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomDocumentFragment &arg1 = args.read<const QDomDocumentFragment & > (heap);
+  const QDomDocumentFragment &arg1 = gsi::arg_reader<const QDomDocumentFragment & >() (args, heap);
   ret.write<QDomDocumentFragment & > ((QDomDocumentFragment &)((QDomDocumentFragment *)cls)->operator= (arg1));
 }
 

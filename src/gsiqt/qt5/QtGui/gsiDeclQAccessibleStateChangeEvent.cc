@@ -126,8 +126,8 @@ static void _call_ctor_QAccessibleStateChangeEvent_Adaptor_3346 (const qt_gsi::G
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QAccessible::State arg2 = args.read<QAccessible::State > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QAccessible::State arg2 = gsi::arg_reader<QAccessible::State >() (args, heap);
   ret.write<QAccessibleStateChangeEvent_Adaptor *> (new QAccessibleStateChangeEvent_Adaptor (arg1, arg2));
 }
 
@@ -147,8 +147,8 @@ static void _call_ctor_QAccessibleStateChangeEvent_Adaptor_4666 (const qt_gsi::G
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleInterface *arg1 = args.read<QAccessibleInterface * > (heap);
-  QAccessible::State arg2 = args.read<QAccessible::State > (heap);
+  QAccessibleInterface *arg1 = gsi::arg_reader<QAccessibleInterface * >() (args, heap);
+  QAccessible::State arg2 = gsi::arg_reader<QAccessible::State >() (args, heap);
   ret.write<QAccessibleStateChangeEvent_Adaptor *> (new QAccessibleStateChangeEvent_Adaptor (arg1, arg2));
 }
 

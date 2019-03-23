@@ -52,7 +52,7 @@ static void _call_ctor_QHostInfo_767 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(-1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QHostInfo *> (new QHostInfo (arg1));
 }
 
@@ -71,7 +71,7 @@ static void _call_ctor_QHostInfo_2204 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostInfo &arg1 = args.read<const QHostInfo & > (heap);
+  const QHostInfo &arg1 = gsi::arg_reader<const QHostInfo & >() (args, heap);
   ret.write<QHostInfo *> (new QHostInfo (arg1));
 }
 
@@ -165,7 +165,7 @@ static void _call_f_operator_eq__2204 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostInfo &arg1 = args.read<const QHostInfo & > (heap);
+  const QHostInfo &arg1 = gsi::arg_reader<const QHostInfo & >() (args, heap);
   ret.write<QHostInfo & > ((QHostInfo &)((QHostInfo *)cls)->operator= (arg1));
 }
 
@@ -184,7 +184,7 @@ static void _call_f_setAddresses_3133 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QHostAddress> &arg1 = args.read<const QList<QHostAddress> & > (heap);
+  const QList<QHostAddress> &arg1 = gsi::arg_reader<const QList<QHostAddress> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHostInfo *)cls)->setAddresses (arg1);
 }
@@ -204,7 +204,7 @@ static void _call_f_setError_2775 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QHostInfo::HostInfoError>::target_type & arg1 = args.read<const qt_gsi::Converter<QHostInfo::HostInfoError>::target_type & > (heap);
+  const qt_gsi::Converter<QHostInfo::HostInfoError>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QHostInfo::HostInfoError>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHostInfo *)cls)->setError (qt_gsi::QtToCppAdaptor<QHostInfo::HostInfoError>(arg1).cref());
 }
@@ -224,7 +224,7 @@ static void _call_f_setErrorString_2025 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHostInfo *)cls)->setErrorString (arg1);
 }
@@ -244,7 +244,7 @@ static void _call_f_setHostName_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHostInfo *)cls)->setHostName (arg1);
 }
@@ -264,7 +264,7 @@ static void _call_f_setLookupId_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHostInfo *)cls)->setLookupId (arg1);
 }
@@ -284,7 +284,7 @@ static void _call_f_abortHostLookup_767 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QHostInfo::abortHostLookup (arg1);
 }
@@ -304,7 +304,7 @@ static void _call_f_fromName_2025 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QHostInfo > ((QHostInfo)QHostInfo::fromName (arg1));
 }
 
@@ -357,9 +357,9 @@ static void _call_f_lookupHost_4842 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
-  const char *arg3 = args.read<const char * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
+  const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)QHostInfo::lookupHost (arg1, arg2, arg3));
 }
 

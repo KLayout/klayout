@@ -52,8 +52,8 @@ static void _call_ctor_QStyleHintReturn_1426 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(QStyleOption::Version);
-  int arg2 = args ? args.read<int > (heap) : (int)(QStyleHintReturn::SH_Default);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QStyleOption::Version, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QStyleHintReturn::SH_Default, heap);
   ret.write<QStyleHintReturn *> (new QStyleHintReturn (arg1, arg2));
 }
 

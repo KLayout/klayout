@@ -85,7 +85,7 @@ static void _call_f_setRegExp_1981 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRegExpValidator *)cls)->setRegExp (arg1);
 }
@@ -107,8 +107,8 @@ static void _call_f_validate_c2171 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString &arg1 = args.read<QString & > (heap);
-  int &arg2 = args.read<int & > (heap);
+  QString &arg1 = gsi::arg_reader<QString & >() (args, heap);
+  int &arg2 = gsi::arg_reader<int & >() (args, heap);
   ret.write<qt_gsi::Converter<QValidator::State>::target_type > ((qt_gsi::Converter<QValidator::State>::target_type)qt_gsi::CppToQtAdaptor<QValidator::State>(((QRegExpValidator *)cls)->validate (arg1, arg2)));
 }
 
@@ -129,8 +129,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QRegExpValidator::tr (arg1, arg2));
 }
 
@@ -153,9 +153,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QRegExpValidator::tr (arg1, arg2, arg3));
 }
 
@@ -176,8 +176,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QRegExpValidator::trUtf8 (arg1, arg2));
 }
 
@@ -200,9 +200,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QRegExpValidator::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -414,7 +414,7 @@ static void _call_ctor_QRegExpValidator_Adaptor_1302 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QRegExpValidator_Adaptor *> (new QRegExpValidator_Adaptor (arg1));
 }
 
@@ -434,8 +434,8 @@ static void _call_ctor_QRegExpValidator_Adaptor_3175 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QRegExpValidator_Adaptor *> (new QRegExpValidator_Adaptor (arg1, arg2));
 }
 
@@ -501,7 +501,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QRegExpValidator_Adaptor *)cls)->emitter_QRegExpValidator_destroyed_1302 (arg1);
 }
 
@@ -616,7 +616,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QRegExpValidator_Adaptor *)cls)->fp_QRegExpValidator_receivers_c1731 (arg1));
 }
 

@@ -66,7 +66,7 @@ static void _call_ctor_QHttpPart_2217 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHttpPart &arg1 = args.read<const QHttpPart & > (heap);
+  const QHttpPart &arg1 = gsi::arg_reader<const QHttpPart & >() (args, heap);
   ret.write<QHttpPart *> (new QHttpPart (arg1));
 }
 
@@ -85,7 +85,7 @@ static void _call_f_operator_excl__eq__c2217 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHttpPart &arg1 = args.read<const QHttpPart & > (heap);
+  const QHttpPart &arg1 = gsi::arg_reader<const QHttpPart & >() (args, heap);
   ret.write<bool > ((bool)((QHttpPart *)cls)->operator!= (arg1));
 }
 
@@ -104,7 +104,7 @@ static void _call_f_operator_eq__2217 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHttpPart &arg1 = args.read<const QHttpPart & > (heap);
+  const QHttpPart &arg1 = gsi::arg_reader<const QHttpPart & >() (args, heap);
   ret.write<QHttpPart & > ((QHttpPart &)((QHttpPart *)cls)->operator= (arg1));
 }
 
@@ -123,7 +123,7 @@ static void _call_f_operator_eq__eq__c2217 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHttpPart &arg1 = args.read<const QHttpPart & > (heap);
+  const QHttpPart &arg1 = gsi::arg_reader<const QHttpPart & >() (args, heap);
   ret.write<bool > ((bool)((QHttpPart *)cls)->operator== (arg1));
 }
 
@@ -142,7 +142,7 @@ static void _call_f_setBody_2309 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHttpPart *)cls)->setBody (arg1);
 }
@@ -162,7 +162,7 @@ static void _call_f_setBodyDevice_1447 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHttpPart *)cls)->setBodyDevice (arg1);
 }
@@ -184,8 +184,8 @@ static void _call_f_setHeader_5360 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHttpPart *)cls)->setHeader (qt_gsi::QtToCppAdaptor<QNetworkRequest::KnownHeaders>(arg1).cref(), arg2);
 }
@@ -207,8 +207,8 @@ static void _call_f_setRawHeader_4510 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHttpPart *)cls)->setRawHeader (arg1, arg2);
 }
@@ -228,7 +228,7 @@ static void _call_f_swap_1522 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QHttpPart &arg1 = args.read<QHttpPart & > (heap);
+  QHttpPart &arg1 = gsi::arg_reader<QHttpPart & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHttpPart *)cls)->swap (arg1);
 }

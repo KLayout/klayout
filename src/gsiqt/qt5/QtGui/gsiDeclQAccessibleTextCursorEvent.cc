@@ -67,7 +67,7 @@ static void _call_f_setCursorPosition_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTextCursorEvent *)cls)->setCursorPosition (arg1);
 }
@@ -147,8 +147,8 @@ static void _call_ctor_QAccessibleTextCursorEvent_Adaptor_1961 (const qt_gsi::Ge
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  int arg2 = args.read<int > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QAccessibleTextCursorEvent_Adaptor *> (new QAccessibleTextCursorEvent_Adaptor (arg1, arg2));
 }
 
@@ -168,8 +168,8 @@ static void _call_ctor_QAccessibleTextCursorEvent_Adaptor_3281 (const qt_gsi::Ge
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleInterface *arg1 = args.read<QAccessibleInterface * > (heap);
-  int arg2 = args.read<int > (heap);
+  QAccessibleInterface *arg1 = gsi::arg_reader<QAccessibleInterface * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QAccessibleTextCursorEvent_Adaptor *> (new QAccessibleTextCursorEvent_Adaptor (arg1, arg2));
 }
 

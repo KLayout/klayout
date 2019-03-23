@@ -177,7 +177,7 @@ static void _call_f_setFrameFormat_2923 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFrameFormat &arg1 = args.read<const QTextFrameFormat & > (heap);
+  const QTextFrameFormat &arg1 = gsi::arg_reader<const QTextFrameFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrame *)cls)->setFrameFormat (arg1);
 }
@@ -199,8 +199,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTextFrame::tr (arg1, arg2));
 }
 
@@ -223,9 +223,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTextFrame::tr (arg1, arg2, arg3));
 }
 
@@ -246,8 +246,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTextFrame::trUtf8 (arg1, arg2));
 }
 
@@ -270,9 +270,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTextFrame::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -456,7 +456,7 @@ static void _call_ctor_QTextFrame_Adaptor_1955 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextDocument *arg1 = args.read<QTextDocument * > (heap);
+  QTextDocument *arg1 = gsi::arg_reader<QTextDocument * >() (args, heap);
   ret.write<QTextFrame_Adaptor *> (new QTextFrame_Adaptor (arg1));
 }
 
@@ -522,7 +522,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QTextFrame_Adaptor *)cls)->emitter_QTextFrame_destroyed_1302 (arg1);
 }
 
@@ -613,7 +613,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QTextFrame_Adaptor *)cls)->fp_QTextFrame_receivers_c1731 (arg1));
 }
 
@@ -645,7 +645,7 @@ static void _call_fp_setFormat_2432 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFormat &arg1 = args.read<const QTextFormat & > (heap);
+  const QTextFormat &arg1 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextFrame_Adaptor *)cls)->fp_QTextFrame_setFormat_2432 (arg1);
 }

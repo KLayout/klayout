@@ -134,8 +134,8 @@ static void _call_f_listen_3510 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args ? args.read<const QHostAddress & > (heap) : (const QHostAddress &)(QHostAddress::Any);
-  quint16 arg2 = args ? args.read<quint16 > (heap) : (quint16)(0);
+  const QHostAddress &arg1 = args ? gsi::arg_reader<const QHostAddress & >() (args, heap) : gsi::arg_maker<const QHostAddress & >() (QHostAddress::Any, heap);
+  quint16 arg2 = args ? gsi::arg_reader<quint16 >() (args, heap) : gsi::arg_maker<quint16 >() (0, heap);
   ret.write<bool > ((bool)((QTcpServer *)cls)->listen (arg1, arg2));
 }
 
@@ -244,7 +244,7 @@ static void _call_f_setMaxPendingConnections_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTcpServer *)cls)->setMaxPendingConnections (arg1);
 }
@@ -264,7 +264,7 @@ static void _call_f_setProxy_2686 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxy &arg1 = args.read<const QNetworkProxy & > (heap);
+  const QNetworkProxy &arg1 = gsi::arg_reader<const QNetworkProxy & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTcpServer *)cls)->setProxy (arg1);
 }
@@ -284,7 +284,7 @@ static void _call_f_setSocketDescriptor_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QTcpServer *)cls)->setSocketDescriptor (arg1));
 }
 
@@ -320,8 +320,8 @@ static void _call_f_waitForNewConnection_1709 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<bool > ((bool)((QTcpServer *)cls)->waitForNewConnection (arg1, arg2));
 }
 
@@ -342,8 +342,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTcpServer::tr (arg1, arg2));
 }
 
@@ -366,9 +366,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTcpServer::tr (arg1, arg2, arg3));
 }
 
@@ -389,8 +389,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QTcpServer::trUtf8 (arg1, arg2));
 }
 
@@ -413,9 +413,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QTcpServer::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -663,7 +663,7 @@ static void _call_ctor_QTcpServer_Adaptor_1302 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QTcpServer_Adaptor *> (new QTcpServer_Adaptor (arg1));
 }
 
@@ -729,7 +729,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QTcpServer_Adaptor *)cls)->emitter_QTcpServer_destroyed_1302 (arg1);
 }
 
@@ -896,7 +896,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QTcpServer_Adaptor *)cls)->fp_QTcpServer_receivers_c1731 (arg1));
 }
 

@@ -50,7 +50,7 @@ static void _call_ctor_QLoggingCategory_1731 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QLoggingCategory *> (new QLoggingCategory (arg1));
 }
 
@@ -71,8 +71,8 @@ static void _call_ctor_QLoggingCategory_2969 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const qt_gsi::Converter<QtMsgType>::target_type & arg2 = args.read<const qt_gsi::Converter<QtMsgType>::target_type & > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const qt_gsi::Converter<QtMsgType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QtMsgType>::target_type & >() (args, heap);
   ret.write<QLoggingCategory *> (new QLoggingCategory (arg1, qt_gsi::QtToCppAdaptor<QtMsgType>(arg2).cref()));
 }
 
@@ -136,7 +136,7 @@ static void _call_f_isEnabled_c1346 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QtMsgType>::target_type & arg1 = args.read<const qt_gsi::Converter<QtMsgType>::target_type & > (heap);
+  const qt_gsi::Converter<QtMsgType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QtMsgType>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QLoggingCategory *)cls)->isEnabled (qt_gsi::QtToCppAdaptor<QtMsgType>(arg1).cref()));
 }
 
@@ -217,8 +217,8 @@ static void _call_f_setEnabled_2102 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QtMsgType>::target_type & arg1 = args.read<const qt_gsi::Converter<QtMsgType>::target_type & > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const qt_gsi::Converter<QtMsgType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QtMsgType>::target_type & >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLoggingCategory *)cls)->setEnabled (qt_gsi::QtToCppAdaptor<QtMsgType>(arg1).cref(), arg2);
 }
@@ -253,7 +253,7 @@ static void _call_f_setFilterRules_2025 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QLoggingCategory::setFilterRules (arg1);
 }

@@ -144,11 +144,11 @@ static void _call_ctor_QDragEnterEvent_Adaptor_11787 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
-  QFlags<Qt::DropAction> arg2 = args.read<QFlags<Qt::DropAction> > (heap);
-  const QMimeData *arg3 = args.read<const QMimeData * > (heap);
-  QFlags<Qt::MouseButton> arg4 = args.read<QFlags<Qt::MouseButton> > (heap);
-  QFlags<Qt::KeyboardModifier> arg5 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  QFlags<Qt::DropAction> arg2 = gsi::arg_reader<QFlags<Qt::DropAction> >() (args, heap);
+  const QMimeData *arg3 = gsi::arg_reader<const QMimeData * >() (args, heap);
+  QFlags<Qt::MouseButton> arg4 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg5 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   ret.write<QDragEnterEvent_Adaptor *> (new QDragEnterEvent_Adaptor (arg1, arg2, arg3, arg4, arg5));
 }
 

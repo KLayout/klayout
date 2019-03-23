@@ -162,10 +162,10 @@ static void _call_ctor_QAccessibleTextUpdateEvent_Adaptor_5795 (const qt_gsi::Ge
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  int arg2 = args.read<int > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const QString &arg4 = args.read<const QString & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg4 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QAccessibleTextUpdateEvent_Adaptor *> (new QAccessibleTextUpdateEvent_Adaptor (arg1, arg2, arg3, arg4));
 }
 
@@ -189,10 +189,10 @@ static void _call_ctor_QAccessibleTextUpdateEvent_Adaptor_7115 (const qt_gsi::Ge
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleInterface *arg1 = args.read<QAccessibleInterface * > (heap);
-  int arg2 = args.read<int > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const QString &arg4 = args.read<const QString & > (heap);
+  QAccessibleInterface *arg1 = gsi::arg_reader<QAccessibleInterface * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg4 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QAccessibleTextUpdateEvent_Adaptor *> (new QAccessibleTextUpdateEvent_Adaptor (arg1, arg2, arg3, arg4));
 }
 

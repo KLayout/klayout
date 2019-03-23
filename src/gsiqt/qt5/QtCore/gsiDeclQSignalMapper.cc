@@ -86,7 +86,7 @@ static void _call_f_map_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSignalMapper *)cls)->map (arg1);
 }
@@ -106,7 +106,7 @@ static void _call_f_mapping_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QObject * > ((QObject *)((QSignalMapper *)cls)->mapping (arg1));
 }
 
@@ -125,7 +125,7 @@ static void _call_f_mapping_c2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QObject * > ((QObject *)((QSignalMapper *)cls)->mapping (arg1));
 }
 
@@ -144,7 +144,7 @@ static void _call_f_mapping_c1315 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QObject * > ((QObject *)((QSignalMapper *)cls)->mapping (arg1));
 }
 
@@ -163,7 +163,7 @@ static void _call_f_mapping_c1302 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QObject * > ((QObject *)((QSignalMapper *)cls)->mapping (arg1));
 }
 
@@ -182,7 +182,7 @@ static void _call_f_removeMappings_1302 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSignalMapper *)cls)->removeMappings (arg1);
 }
@@ -204,8 +204,8 @@ static void _call_f_setMapping_1961 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  int arg2 = args.read<int > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSignalMapper *)cls)->setMapping (arg1, arg2);
 }
@@ -227,8 +227,8 @@ static void _call_f_setMapping_3219 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSignalMapper *)cls)->setMapping (arg1, arg2);
 }
@@ -250,8 +250,8 @@ static void _call_f_setMapping_2509 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSignalMapper *)cls)->setMapping (arg1, arg2);
 }
@@ -273,8 +273,8 @@ static void _call_f_setMapping_2496 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSignalMapper *)cls)->setMapping (arg1, arg2);
 }
@@ -298,9 +298,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QSignalMapper::tr (arg1, arg2, arg3));
 }
 
@@ -323,9 +323,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QSignalMapper::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -549,7 +549,7 @@ static void _call_ctor_QSignalMapper_Adaptor_1302 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QSignalMapper_Adaptor *> (new QSignalMapper_Adaptor (arg1));
 }
 
@@ -615,7 +615,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QSignalMapper_Adaptor *)cls)->emitter_QSignalMapper_destroyed_1302 (arg1);
 }
 
@@ -706,7 +706,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QSignalMapper_Adaptor *)cls)->fp_QSignalMapper_isSignalConnected_c2394 (arg1));
 }
 
@@ -724,7 +724,7 @@ static void _call_emitter_mapped_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QSignalMapper_Adaptor *)cls)->emitter_QSignalMapper_mapped_767 (arg1);
 }
 
@@ -742,7 +742,7 @@ static void _call_emitter_mapped_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QSignalMapper_Adaptor *)cls)->emitter_QSignalMapper_mapped_2025 (arg1);
 }
 
@@ -760,7 +760,7 @@ static void _call_emitter_mapped_1315 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ((QSignalMapper_Adaptor *)cls)->emitter_QSignalMapper_mapped_1315 (arg1);
 }
 
@@ -778,7 +778,7 @@ static void _call_emitter_mapped_1302 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ((QSignalMapper_Adaptor *)cls)->emitter_QSignalMapper_mapped_1302 (arg1);
 }
 
@@ -796,7 +796,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QSignalMapper_Adaptor *)cls)->fp_QSignalMapper_receivers_c1731 (arg1));
 }
 

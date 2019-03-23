@@ -84,6 +84,11 @@ public:
 #endif
 
   /**
+   *  @brief Loads from the given binary data
+   */
+  void load_from_data (const char *data, size_t ndata, const std::string &name, const std::string &description);
+
+  /**
    *  @brief Loads the font from the given file
    */
   void load_from_file (const std::string &filename);

@@ -52,7 +52,7 @@ static void _call_f_icon_c3064 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFileIconProvider::IconType>::target_type & arg1 = args.read<const qt_gsi::Converter<QFileIconProvider::IconType>::target_type & > (heap);
+  const qt_gsi::Converter<QFileIconProvider::IconType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileIconProvider::IconType>::target_type & >() (args, heap);
   ret.write<QIcon > ((QIcon)((QFileIconProvider *)cls)->icon (qt_gsi::QtToCppAdaptor<QFileIconProvider::IconType>(arg1).cref()));
 }
 
@@ -71,7 +71,7 @@ static void _call_f_icon_c2174 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<QIcon > ((QIcon)((QFileIconProvider *)cls)->icon (arg1));
 }
 
@@ -90,7 +90,7 @@ static void _call_f_type_c2174 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<QString > ((QString)((QFileIconProvider *)cls)->type (arg1));
 }
 

@@ -66,7 +66,7 @@ static void _call_ctor_QModelIndex_2395 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QModelIndex *> (new QModelIndex (arg1));
 }
 
@@ -87,8 +87,8 @@ static void _call_f_child_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QModelIndex *)cls)->child (arg1, arg2));
 }
 
@@ -122,7 +122,7 @@ static void _call_f_data_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(Qt::DisplayRole);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::DisplayRole, heap);
   ret.write<QVariant > ((QVariant)((QModelIndex *)cls)->data (arg1));
 }
 
@@ -216,7 +216,7 @@ static void _call_f_operator_excl__eq__c2395 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QModelIndex *)cls)->operator!= (arg1));
 }
 
@@ -235,7 +235,7 @@ static void _call_f_operator_lt__c2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QModelIndex *)cls)->operator< (arg1));
 }
 
@@ -254,7 +254,7 @@ static void _call_f_operator_eq__eq__c2395 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QModelIndex *)cls)->operator== (arg1));
 }
 
@@ -305,8 +305,8 @@ static void _call_f_sibling_c1426 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QModelIndex *)cls)->sibling (arg1, arg2));
 }
 

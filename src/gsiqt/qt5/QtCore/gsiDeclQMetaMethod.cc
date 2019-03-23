@@ -111,7 +111,7 @@ static void _call_f_getParameterTypes_c953 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args.read<int * > (heap);
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMetaMethod *)cls)->getParameterTypes (arg1);
 }
@@ -236,7 +236,7 @@ static void _call_f_parameterType_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QMetaMethod *)cls)->parameterType (arg1));
 }
 

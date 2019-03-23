@@ -76,7 +76,7 @@ static void _call_ctor_QSslSocket_1302 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QSslSocket *> (new QSslSocket (arg1));
 }
 
@@ -111,7 +111,7 @@ static void _call_f_addCaCertificate_2823 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificate &arg1 = args.read<const QSslCertificate & > (heap);
+  const QSslCertificate &arg1 = gsi::arg_reader<const QSslCertificate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->addCaCertificate (arg1);
 }
@@ -135,9 +135,9 @@ static void _call_f_addCaCertificates_6773 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
-  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & > (heap) : (const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRegExp::PatternSyntax>(heap, QRegExp::FixedString));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
+  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegExp::PatternSyntax>(heap, QRegExp::FixedString), heap);
   ret.write<bool > ((bool)((QSslSocket *)cls)->addCaCertificates (arg1, qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg2).cref(), qt_gsi::QtToCppAdaptor<QRegExp::PatternSyntax>(arg3).cref()));
 }
 
@@ -156,7 +156,7 @@ static void _call_f_addCaCertificates_3438 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslCertificate> &arg1 = args.read<const QList<QSslCertificate> & > (heap);
+  const QList<QSslCertificate> &arg1 = gsi::arg_reader<const QList<QSslCertificate> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->addCaCertificates (arg1);
 }
@@ -286,9 +286,9 @@ static void _call_f_connectToHost_6644 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg3 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg3 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->connectToHost (arg1, arg2, arg3);
 }
@@ -314,10 +314,10 @@ static void _call_f_connectToHost_10218 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg3 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
-  const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractSocket::NetworkLayerProtocol>(heap, QAbstractSocket::AnyIPProtocol));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg3 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
+  const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractSocket::NetworkLayerProtocol>(heap, QAbstractSocket::AnyIPProtocol), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->connectToHost (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<QAbstractSocket::NetworkLayerProtocol>(arg4).cref());
 }
@@ -343,10 +343,10 @@ static void _call_f_connectToHostEncrypted_10218 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg3 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
-  const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractSocket::NetworkLayerProtocol>(heap, QAbstractSocket::AnyIPProtocol));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg3 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
+  const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractSocket::NetworkLayerProtocol>(heap, QAbstractSocket::AnyIPProtocol), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->connectToHostEncrypted (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<QAbstractSocket::NetworkLayerProtocol>(arg4).cref());
 }
@@ -374,11 +374,11 @@ static void _call_f_connectToHostEncrypted_12135 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg4 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
-  const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractSocket::NetworkLayerProtocol>(heap, QAbstractSocket::AnyIPProtocol));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg4 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
+  const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractSocket::NetworkLayerProtocol>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractSocket::NetworkLayerProtocol>(heap, QAbstractSocket::AnyIPProtocol), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->connectToHostEncrypted (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QAbstractSocket::NetworkLayerProtocol>(arg5).cref());
 }
@@ -459,7 +459,7 @@ static void _call_f_ignoreSslErrors_2837 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslError> &arg1 = args.read<const QList<QSslError> & > (heap);
+  const QList<QSslError> &arg1 = gsi::arg_reader<const QList<QSslError> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->ignoreSslErrors (arg1);
 }
@@ -706,7 +706,7 @@ static void _call_f_setCaCertificates_3438 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslCertificate> &arg1 = args.read<const QList<QSslCertificate> & > (heap);
+  const QList<QSslCertificate> &arg1 = gsi::arg_reader<const QList<QSslCertificate> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setCaCertificates (arg1);
 }
@@ -726,7 +726,7 @@ static void _call_f_setCiphers_2918 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslCipher> &arg1 = args.read<const QList<QSslCipher> & > (heap);
+  const QList<QSslCipher> &arg1 = gsi::arg_reader<const QList<QSslCipher> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setCiphers (arg1);
 }
@@ -746,7 +746,7 @@ static void _call_f_setCiphers_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setCiphers (arg1);
 }
@@ -766,7 +766,7 @@ static void _call_f_setLocalCertificate_2823 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificate &arg1 = args.read<const QSslCertificate & > (heap);
+  const QSslCertificate &arg1 = gsi::arg_reader<const QSslCertificate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setLocalCertificate (arg1);
 }
@@ -788,8 +788,8 @@ static void _call_f_setLocalCertificate_4280 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setLocalCertificate (arg1, qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg2).cref());
 }
@@ -809,7 +809,7 @@ static void _call_f_setLocalCertificateChain_3438 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslCertificate> &arg1 = args.read<const QList<QSslCertificate> & > (heap);
+  const QList<QSslCertificate> &arg1 = gsi::arg_reader<const QList<QSslCertificate> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setLocalCertificateChain (arg1);
 }
@@ -829,7 +829,7 @@ static void _call_f_setPeerVerifyDepth_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setPeerVerifyDepth (arg1);
 }
@@ -849,7 +849,7 @@ static void _call_f_setPeerVerifyMode_2970 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & > (heap);
+  const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setPeerVerifyMode (qt_gsi::QtToCppAdaptor<QSslSocket::PeerVerifyMode>(arg1).cref());
 }
@@ -869,7 +869,7 @@ static void _call_f_setPeerVerifyName_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setPeerVerifyName (arg1);
 }
@@ -889,7 +889,7 @@ static void _call_f_setPrivateKey_1997 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslKey &arg1 = args.read<const QSslKey & > (heap);
+  const QSslKey &arg1 = gsi::arg_reader<const QSslKey & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setPrivateKey (arg1);
 }
@@ -915,10 +915,10 @@ static void _call_f_setPrivateKey_8544 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::KeyAlgorithm>(heap, QSsl::Rsa));
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
-  const QByteArray &arg4 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::KeyAlgorithm>(heap, QSsl::Rsa), heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
+  const QByteArray &arg4 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setPrivateKey (arg1, qt_gsi::QtToCppAdaptor<QSsl::KeyAlgorithm>(arg2).cref(), qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg3).cref(), arg4);
 }
@@ -938,7 +938,7 @@ static void _call_f_setProtocol_2095 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSsl::SslProtocol>::target_type & arg1 = args.read<const qt_gsi::Converter<QSsl::SslProtocol>::target_type & > (heap);
+  const qt_gsi::Converter<QSsl::SslProtocol>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSsl::SslProtocol>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setProtocol (qt_gsi::QtToCppAdaptor<QSsl::SslProtocol>(arg1).cref());
 }
@@ -958,7 +958,7 @@ static void _call_f_setReadBufferSize_986 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setReadBufferSize (arg1);
 }
@@ -982,9 +982,9 @@ static void _call_f_setSocketDescriptor_9696 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIntegerForSizeof<void*>::Signed arg1 = args.read<QIntegerForSizeof<void*>::Signed > (heap);
-  const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractSocket::SocketState>(heap, QAbstractSocket::ConnectedState));
-  QFlags<QIODevice::OpenModeFlag> arg3 = args ? args.read<QFlags<QIODevice::OpenModeFlag> > (heap) : (QFlags<QIODevice::OpenModeFlag>)(QIODevice::ReadWrite);
+  QIntegerForSizeof<void*>::Signed arg1 = gsi::arg_reader<QIntegerForSizeof<void*>::Signed >() (args, heap);
+  const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractSocket::SocketState>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractSocket::SocketState>(heap, QAbstractSocket::ConnectedState), heap);
+  QFlags<QIODevice::OpenModeFlag> arg3 = args ? gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap) : gsi::arg_maker<QFlags<QIODevice::OpenModeFlag> >() (QIODevice::ReadWrite, heap);
   ret.write<bool > ((bool)((QSslSocket *)cls)->setSocketDescriptor (arg1, qt_gsi::QtToCppAdaptor<QAbstractSocket::SocketState>(arg2).cref(), arg3));
 }
 
@@ -1005,8 +1005,8 @@ static void _call_f_setSocketOption_5331 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setSocketOption (qt_gsi::QtToCppAdaptor<QAbstractSocket::SocketOption>(arg1).cref(), arg2);
 }
@@ -1026,7 +1026,7 @@ static void _call_f_setSslConfiguration_3068 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslConfiguration &arg1 = args.read<const QSslConfiguration & > (heap);
+  const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslSocket *)cls)->setSslConfiguration (arg1);
 }
@@ -1046,7 +1046,7 @@ static void _call_f_socketOption_3320 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::SocketOption>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QSslSocket *)cls)->socketOption (qt_gsi::QtToCppAdaptor<QAbstractSocket::SocketOption>(arg1).cref()));
 }
 
@@ -1127,7 +1127,7 @@ static void _call_f_waitForBytesWritten_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QSslSocket *)cls)->waitForBytesWritten (arg1));
 }
 
@@ -1146,7 +1146,7 @@ static void _call_f_waitForConnected_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QSslSocket *)cls)->waitForConnected (arg1));
 }
 
@@ -1165,7 +1165,7 @@ static void _call_f_waitForDisconnected_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QSslSocket *)cls)->waitForDisconnected (arg1));
 }
 
@@ -1184,7 +1184,7 @@ static void _call_f_waitForEncrypted_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QSslSocket *)cls)->waitForEncrypted (arg1));
 }
 
@@ -1203,7 +1203,7 @@ static void _call_f_waitForReadyRead_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(30000);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (30000, heap);
   ret.write<bool > ((bool)((QSslSocket *)cls)->waitForReadyRead (arg1));
 }
 
@@ -1222,7 +1222,7 @@ static void _call_f_addDefaultCaCertificate_2823 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificate &arg1 = args.read<const QSslCertificate & > (heap);
+  const QSslCertificate &arg1 = gsi::arg_reader<const QSslCertificate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QSslSocket::addDefaultCaCertificate (arg1);
 }
@@ -1246,9 +1246,9 @@ static void _call_f_addDefaultCaCertificates_6773 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
-  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & > (heap) : (const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRegExp::PatternSyntax>(heap, QRegExp::FixedString));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
+  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegExp::PatternSyntax>(heap, QRegExp::FixedString), heap);
   ret.write<bool > ((bool)QSslSocket::addDefaultCaCertificates (arg1, qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg2).cref(), qt_gsi::QtToCppAdaptor<QRegExp::PatternSyntax>(arg3).cref()));
 }
 
@@ -1267,7 +1267,7 @@ static void _call_f_addDefaultCaCertificates_3438 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslCertificate> &arg1 = args.read<const QList<QSslCertificate> & > (heap);
+  const QList<QSslCertificate> &arg1 = gsi::arg_reader<const QList<QSslCertificate> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QSslSocket::addDefaultCaCertificates (arg1);
 }
@@ -1317,7 +1317,7 @@ static void _call_f_setDefaultCaCertificates_3438 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslCertificate> &arg1 = args.read<const QList<QSslCertificate> & > (heap);
+  const QList<QSslCertificate> &arg1 = gsi::arg_reader<const QList<QSslCertificate> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QSslSocket::setDefaultCaCertificates (arg1);
 }
@@ -1337,7 +1337,7 @@ static void _call_f_setDefaultCiphers_2918 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslCipher> &arg1 = args.read<const QList<QSslCipher> & > (heap);
+  const QList<QSslCipher> &arg1 = gsi::arg_reader<const QList<QSslCipher> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QSslSocket::setDefaultCiphers (arg1);
 }
@@ -1466,9 +1466,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QSslSocket::tr (arg1, arg2, arg3));
 }
 
@@ -1491,9 +1491,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QSslSocket::trUtf8 (arg1, arg2, arg3));
 }
 

@@ -50,7 +50,7 @@ static void _call_f_operator_excl__eq__c3301 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QScrollerProperties &arg1 = args.read<const QScrollerProperties & > (heap);
+  const QScrollerProperties &arg1 = gsi::arg_reader<const QScrollerProperties & >() (args, heap);
   ret.write<bool > ((bool)((QScrollerProperties *)cls)->operator!= (arg1));
 }
 
@@ -69,7 +69,7 @@ static void _call_f_operator_eq__3301 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QScrollerProperties &arg1 = args.read<const QScrollerProperties & > (heap);
+  const QScrollerProperties &arg1 = gsi::arg_reader<const QScrollerProperties & >() (args, heap);
   ret.write<QScrollerProperties & > ((QScrollerProperties &)((QScrollerProperties *)cls)->operator= (arg1));
 }
 
@@ -88,7 +88,7 @@ static void _call_f_operator_eq__eq__c3301 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QScrollerProperties &arg1 = args.read<const QScrollerProperties & > (heap);
+  const QScrollerProperties &arg1 = gsi::arg_reader<const QScrollerProperties & >() (args, heap);
   ret.write<bool > ((bool)((QScrollerProperties *)cls)->operator== (arg1));
 }
 
@@ -107,7 +107,7 @@ static void _call_f_scrollMetric_c3775 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QScrollerProperties::ScrollMetric>::target_type & arg1 = args.read<const qt_gsi::Converter<QScrollerProperties::ScrollMetric>::target_type & > (heap);
+  const qt_gsi::Converter<QScrollerProperties::ScrollMetric>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QScrollerProperties::ScrollMetric>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QScrollerProperties *)cls)->scrollMetric (qt_gsi::QtToCppAdaptor<QScrollerProperties::ScrollMetric>(arg1).cref()));
 }
 
@@ -128,8 +128,8 @@ static void _call_f_setScrollMetric_5786 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QScrollerProperties::ScrollMetric>::target_type & arg1 = args.read<const qt_gsi::Converter<QScrollerProperties::ScrollMetric>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QScrollerProperties::ScrollMetric>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QScrollerProperties::ScrollMetric>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollerProperties *)cls)->setScrollMetric (qt_gsi::QtToCppAdaptor<QScrollerProperties::ScrollMetric>(arg1).cref(), arg2);
 }
@@ -149,7 +149,7 @@ static void _call_f_setDefaultScrollerProperties_3301 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QScrollerProperties &arg1 = args.read<const QScrollerProperties & > (heap);
+  const QScrollerProperties &arg1 = gsi::arg_reader<const QScrollerProperties & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QScrollerProperties::setDefaultScrollerProperties (arg1);
 }
@@ -245,7 +245,7 @@ static void _call_ctor_QScrollerProperties_Adaptor_3301 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QScrollerProperties &arg1 = args.read<const QScrollerProperties & > (heap);
+  const QScrollerProperties &arg1 = gsi::arg_reader<const QScrollerProperties & >() (args, heap);
   ret.write<QScrollerProperties_Adaptor *> (new QScrollerProperties_Adaptor (arg1));
 }
 

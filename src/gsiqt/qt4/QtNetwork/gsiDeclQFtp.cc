@@ -101,7 +101,7 @@ static void _call_f_cd_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QFtp *)cls)->cd (arg1));
 }
 
@@ -153,8 +153,8 @@ static void _call_f_connectToHost_3017 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  quint16 arg2 = args ? args.read<quint16 > (heap) : (quint16)(21);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  quint16 arg2 = args ? gsi::arg_reader<quint16 >() (args, heap) : gsi::arg_maker<quint16 >() (21, heap);
   ret.write<int > ((int)((QFtp *)cls)->connectToHost (arg1, arg2));
 }
 
@@ -252,9 +252,9 @@ static void _call_f_get_5442 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QIODevice *arg2 = args ? args.read<QIODevice * > (heap) : (QIODevice *)(0);
-  const qt_gsi::Converter<QFtp::TransferType>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QFtp::TransferType>::target_type & > (heap) : (const qt_gsi::Converter<QFtp::TransferType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QFtp::TransferType>(heap, QFtp::Binary));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QIODevice *arg2 = args ? gsi::arg_reader<QIODevice * >() (args, heap) : gsi::arg_maker<QIODevice * >() (0, heap);
+  const qt_gsi::Converter<QFtp::TransferType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QFtp::TransferType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QFtp::TransferType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QFtp::TransferType>(heap, QFtp::Binary), heap);
   ret.write<int > ((int)((QFtp *)cls)->get (arg1, arg2, qt_gsi::QtToCppAdaptor<QFtp::TransferType>(arg3).cref()));
 }
 
@@ -288,7 +288,7 @@ static void _call_f_list_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<int > ((int)((QFtp *)cls)->list (arg1));
 }
 
@@ -309,8 +309,8 @@ static void _call_f_login_3942 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<int > ((int)((QFtp *)cls)->login (arg1, arg2));
 }
 
@@ -329,7 +329,7 @@ static void _call_f_mkdir_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QFtp *)cls)->mkdir (arg1));
 }
 
@@ -352,9 +352,9 @@ static void _call_f_put_6304 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QFtp::TransferType>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QFtp::TransferType>::target_type & > (heap) : (const qt_gsi::Converter<QFtp::TransferType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QFtp::TransferType>(heap, QFtp::Binary));
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QFtp::TransferType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QFtp::TransferType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QFtp::TransferType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QFtp::TransferType>(heap, QFtp::Binary), heap);
   ret.write<int > ((int)((QFtp *)cls)->put (arg1, arg2, qt_gsi::QtToCppAdaptor<QFtp::TransferType>(arg3).cref()));
 }
 
@@ -377,9 +377,9 @@ static void _call_f_put_5442 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QFtp::TransferType>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QFtp::TransferType>::target_type & > (heap) : (const qt_gsi::Converter<QFtp::TransferType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QFtp::TransferType>(heap, QFtp::Binary));
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QFtp::TransferType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QFtp::TransferType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QFtp::TransferType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QFtp::TransferType>(heap, QFtp::Binary), heap);
   ret.write<int > ((int)((QFtp *)cls)->put (arg1, arg2, qt_gsi::QtToCppAdaptor<QFtp::TransferType>(arg3).cref()));
 }
 
@@ -398,7 +398,7 @@ static void _call_f_rawCommand_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QFtp *)cls)->rawCommand (arg1));
 }
 
@@ -432,7 +432,7 @@ static void _call_f_remove_2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QFtp *)cls)->remove (arg1));
 }
 
@@ -453,8 +453,8 @@ static void _call_f_rename_3942 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QFtp *)cls)->rename (arg1, arg2));
 }
 
@@ -473,7 +473,7 @@ static void _call_f_rmdir_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QFtp *)cls)->rmdir (arg1));
 }
 
@@ -494,8 +494,8 @@ static void _call_f_setProxy_3017 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
   ret.write<int > ((int)((QFtp *)cls)->setProxy (arg1, arg2));
 }
 
@@ -514,7 +514,7 @@ static void _call_f_setTransferMode_2157 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFtp::TransferMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QFtp::TransferMode>::target_type & > (heap);
+  const qt_gsi::Converter<QFtp::TransferMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFtp::TransferMode>::target_type & >() (args, heap);
   ret.write<int > ((int)((QFtp *)cls)->setTransferMode (qt_gsi::QtToCppAdaptor<QFtp::TransferMode>(arg1).cref()));
 }
 
@@ -550,8 +550,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QFtp::tr (arg1, arg2));
 }
 
@@ -574,9 +574,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QFtp::tr (arg1, arg2, arg3));
 }
 
@@ -597,8 +597,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QFtp::trUtf8 (arg1, arg2));
 }
 
@@ -621,9 +621,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QFtp::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -882,7 +882,7 @@ static void _call_ctor_QFtp_Adaptor_1302 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QFtp_Adaptor *> (new QFtp_Adaptor (arg1));
 }
 
@@ -926,8 +926,8 @@ static void _call_emitter_commandFinished_1523 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  bool arg2 = args.read<bool > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   ((QFtp_Adaptor *)cls)->emitter_QFtp_commandFinished_1523 (arg1, arg2);
 }
 
@@ -945,7 +945,7 @@ static void _call_emitter_commandStarted_767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QFtp_Adaptor *)cls)->emitter_QFtp_commandStarted_767 (arg1);
 }
 
@@ -989,8 +989,8 @@ static void _call_emitter_dataTransferProgress_1864 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
-  qint64 arg2 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  qint64 arg2 = gsi::arg_reader<qint64 >() (args, heap);
   ((QFtp_Adaptor *)cls)->emitter_QFtp_dataTransferProgress_1864 (arg1, arg2);
 }
 
@@ -1008,7 +1008,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QFtp_Adaptor *)cls)->emitter_QFtp_destroyed_1302 (arg1);
 }
 
@@ -1050,7 +1050,7 @@ static void _call_emitter_done_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QFtp_Adaptor *)cls)->emitter_QFtp_done_864 (arg1);
 }
 
@@ -1117,7 +1117,7 @@ static void _call_emitter_listInfo_2097 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlInfo &arg1 = args.read<const QUrlInfo & > (heap);
+  const QUrlInfo &arg1 = gsi::arg_reader<const QUrlInfo & >() (args, heap);
   ((QFtp_Adaptor *)cls)->emitter_QFtp_listInfo_2097 (arg1);
 }
 
@@ -1137,8 +1137,8 @@ static void _call_emitter_rawCommandReply_2684 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFtp_Adaptor *)cls)->emitter_QFtp_rawCommandReply_2684 (arg1, arg2);
 }
 
@@ -1170,7 +1170,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QFtp_Adaptor *)cls)->fp_QFtp_receivers_c1731 (arg1));
 }
 
@@ -1202,7 +1202,7 @@ static void _call_emitter_stateChanged_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QFtp_Adaptor *)cls)->emitter_QFtp_stateChanged_767 (arg1);
 }
 

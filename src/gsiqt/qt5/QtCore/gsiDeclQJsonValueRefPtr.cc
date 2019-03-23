@@ -55,8 +55,8 @@ static void _call_ctor_QJsonValueRefPtr_2283 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QJsonArray *arg1 = args.read<QJsonArray * > (heap);
-  int arg2 = args.read<int > (heap);
+  QJsonArray *arg1 = gsi::arg_reader<QJsonArray * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QJsonValueRefPtr *> (new QJsonValueRefPtr (arg1, arg2));
 }
 
@@ -77,8 +77,8 @@ static void _call_ctor_QJsonValueRefPtr_2371 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QJsonObject *arg1 = args.read<QJsonObject * > (heap);
-  int arg2 = args.read<int > (heap);
+  QJsonObject *arg1 = gsi::arg_reader<QJsonObject * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QJsonValueRefPtr *> (new QJsonValueRefPtr (arg1, arg2));
 }
 

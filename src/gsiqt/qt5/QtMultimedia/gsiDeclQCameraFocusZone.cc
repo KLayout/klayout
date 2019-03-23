@@ -68,8 +68,8 @@ static void _call_ctor_QCameraFocusZone_5464 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type & > (heap) : (const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type &)(qt_gsi::CppToQtReadAdaptor<QCameraFocusZone::FocusZoneStatus>(heap, QCameraFocusZone::Selected));
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QCameraFocusZone::FocusZoneStatus>(heap, QCameraFocusZone::Selected), heap);
   ret.write<QCameraFocusZone *> (new QCameraFocusZone (arg1, qt_gsi::QtToCppAdaptor<QCameraFocusZone::FocusZoneStatus>(arg2).cref()));
 }
 
@@ -88,7 +88,7 @@ static void _call_ctor_QCameraFocusZone_2903 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraFocusZone &arg1 = args.read<const QCameraFocusZone & > (heap);
+  const QCameraFocusZone &arg1 = gsi::arg_reader<const QCameraFocusZone & >() (args, heap);
   ret.write<QCameraFocusZone *> (new QCameraFocusZone (arg1));
 }
 
@@ -137,7 +137,7 @@ static void _call_f_operator_excl__eq__c2903 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraFocusZone &arg1 = args.read<const QCameraFocusZone & > (heap);
+  const QCameraFocusZone &arg1 = gsi::arg_reader<const QCameraFocusZone & >() (args, heap);
   ret.write<bool > ((bool)((QCameraFocusZone *)cls)->operator!= (arg1));
 }
 
@@ -156,7 +156,7 @@ static void _call_f_operator_eq__2903 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraFocusZone &arg1 = args.read<const QCameraFocusZone & > (heap);
+  const QCameraFocusZone &arg1 = gsi::arg_reader<const QCameraFocusZone & >() (args, heap);
   ret.write<QCameraFocusZone & > ((QCameraFocusZone &)((QCameraFocusZone *)cls)->operator= (arg1));
 }
 
@@ -175,7 +175,7 @@ static void _call_f_operator_eq__eq__c2903 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraFocusZone &arg1 = args.read<const QCameraFocusZone & > (heap);
+  const QCameraFocusZone &arg1 = gsi::arg_reader<const QCameraFocusZone & >() (args, heap);
   ret.write<bool > ((bool)((QCameraFocusZone *)cls)->operator== (arg1));
 }
 
@@ -194,7 +194,7 @@ static void _call_f_setStatus_3710 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraFocusZone::FocusZoneStatus>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraFocusZone *)cls)->setStatus (qt_gsi::QtToCppAdaptor<QCameraFocusZone::FocusZoneStatus>(arg1).cref());
 }

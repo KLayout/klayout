@@ -191,7 +191,7 @@ static void _call_f_setDropAction_1760 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::DropAction>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::DropAction>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::DropAction>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::DropAction>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDropEvent *)cls)->setDropAction (qt_gsi::QtToCppAdaptor<Qt::DropAction>(arg1).cref());
 }
@@ -288,12 +288,12 @@ static void _call_ctor_QDropEvent_Adaptor_13314 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  QFlags<Qt::DropAction> arg2 = args.read<QFlags<Qt::DropAction> > (heap);
-  const QMimeData *arg3 = args.read<const QMimeData * > (heap);
-  QFlags<Qt::MouseButton> arg4 = args.read<QFlags<Qt::MouseButton> > (heap);
-  QFlags<Qt::KeyboardModifier> arg5 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg6 = args ? args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap) : (const qt_gsi::Converter<QEvent::Type>::target_type &)(qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::Drop));
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  QFlags<Qt::DropAction> arg2 = gsi::arg_reader<QFlags<Qt::DropAction> >() (args, heap);
+  const QMimeData *arg3 = gsi::arg_reader<const QMimeData * >() (args, heap);
+  QFlags<Qt::MouseButton> arg4 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg5 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg6 = args ? gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QEvent::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::Drop), heap);
   ret.write<QDropEvent_Adaptor *> (new QDropEvent_Adaptor (arg1, arg2, arg3, arg4, arg5, qt_gsi::QtToCppAdaptor<QEvent::Type>(arg6).cref()));
 }
 

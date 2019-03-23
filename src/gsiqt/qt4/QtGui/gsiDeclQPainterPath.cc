@@ -72,7 +72,7 @@ static void _call_ctor_QPainterPath_1986 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QPainterPath *> (new QPainterPath (arg1));
 }
 
@@ -91,7 +91,7 @@ static void _call_ctor_QPainterPath_2514 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath *> (new QPainterPath (arg1));
 }
 
@@ -110,7 +110,7 @@ static void _call_f_addEllipse_1862 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addEllipse (arg1);
 }
@@ -136,10 +136,10 @@ static void _call_f_addEllipse_3960 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addEllipse (arg1, arg2, arg3, arg4);
 }
@@ -163,9 +163,9 @@ static void _call_f_addEllipse_3912 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addEllipse (arg1, arg2, arg3);
 }
@@ -185,7 +185,7 @@ static void _call_f_addPath_2514 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addPath (arg1);
 }
@@ -205,7 +205,7 @@ static void _call_f_addPolygon_2208 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygonF &arg1 = args.read<const QPolygonF & > (heap);
+  const QPolygonF &arg1 = gsi::arg_reader<const QPolygonF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addPolygon (arg1);
 }
@@ -225,7 +225,7 @@ static void _call_f_addRect_1862 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addRect (arg1);
 }
@@ -251,10 +251,10 @@ static void _call_f_addRect_3960 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addRect (arg1, arg2, arg3, arg4);
 }
@@ -274,7 +274,7 @@ static void _call_f_addRegion_2006 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addRegion (arg1);
 }
@@ -298,9 +298,9 @@ static void _call_f_addRoundRect_3180 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addRoundRect (arg1, arg2, arg3);
 }
@@ -330,12 +330,12 @@ static void _call_f_addRoundRect_5278 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  int arg5 = args.read<int > (heap);
-  int arg6 = args.read<int > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  int arg6 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addRoundRect (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -357,8 +357,8 @@ static void _call_f_addRoundRect_2521 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  int arg2 = args.read<int > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addRoundRect (arg1, arg2);
 }
@@ -386,11 +386,11 @@ static void _call_f_addRoundRect_4619 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  int arg5 = args.read<int > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addRoundRect (arg1, arg2, arg3, arg4, arg5);
 }
@@ -416,10 +416,10 @@ static void _call_f_addRoundedRect_5229 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  const qt_gsi::Converter<Qt::SizeMode>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<Qt::SizeMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::SizeMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::SizeMode>(heap, Qt::AbsoluteSize));
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<Qt::SizeMode>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::SizeMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::SizeMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::SizeMode>(heap, Qt::AbsoluteSize), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addRoundedRect (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<Qt::SizeMode>(arg4).cref());
 }
@@ -451,13 +451,13 @@ static void _call_f_addRoundedRect_7327 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args.read<double > (heap);
-  double arg6 = args.read<double > (heap);
-  const qt_gsi::Converter<Qt::SizeMode>::target_type & arg7 = args ? args.read<const qt_gsi::Converter<Qt::SizeMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::SizeMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::SizeMode>(heap, Qt::AbsoluteSize));
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
+  double arg6 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<Qt::SizeMode>::target_type & arg7 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::SizeMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::SizeMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::SizeMode>(heap, Qt::AbsoluteSize), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addRoundedRect (arg1, arg2, arg3, arg4, arg5, arg6, qt_gsi::QtToCppAdaptor<Qt::SizeMode>(arg7).cref());
 }
@@ -481,9 +481,9 @@ static void _call_f_addText_5596 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QFont &arg2 = args.read<const QFont & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QFont &arg2 = gsi::arg_reader<const QFont & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addText (arg1, arg2, arg3);
 }
@@ -509,10 +509,10 @@ static void _call_f_addText_5644 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  const QFont &arg3 = args.read<const QFont & > (heap);
-  const QString &arg4 = args.read<const QString & > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  const QFont &arg3 = gsi::arg_reader<const QFont & >() (args, heap);
+  const QString &arg4 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->addText (arg1, arg2, arg3, arg4);
 }
@@ -532,7 +532,7 @@ static void _call_f_angleAtPercent_c1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QPainterPath *)cls)->angleAtPercent (arg1));
 }
 
@@ -553,8 +553,8 @@ static void _call_f_arcMoveTo_2825 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  double arg2 = args.read<double > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->arcMoveTo (arg1, arg2);
 }
@@ -582,11 +582,11 @@ static void _call_f_arcMoveTo_4923 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->arcMoveTo (arg1, arg2, arg3, arg4, arg5);
 }
@@ -610,9 +610,9 @@ static void _call_f_arcTo_3788 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->arcTo (arg1, arg2, arg3);
 }
@@ -642,12 +642,12 @@ static void _call_f_arcTo_5886 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args.read<double > (heap);
-  double arg6 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
+  double arg6 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->arcTo (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -698,7 +698,7 @@ static void _call_f_connectPath_2514 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->connectPath (arg1);
 }
@@ -718,7 +718,7 @@ static void _call_f_contains_c1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<bool > ((bool)((QPainterPath *)cls)->contains (arg1));
 }
 
@@ -737,7 +737,7 @@ static void _call_f_contains_c1862 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   ret.write<bool > ((bool)((QPainterPath *)cls)->contains (arg1));
 }
 
@@ -756,7 +756,7 @@ static void _call_f_contains_c2514 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<bool > ((bool)((QPainterPath *)cls)->contains (arg1));
 }
 
@@ -794,9 +794,9 @@ static void _call_f_cubicTo_5742 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  const QPointF &arg3 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->cubicTo (arg1, arg2, arg3);
 }
@@ -826,12 +826,12 @@ static void _call_f_cubicTo_5886 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args.read<double > (heap);
-  double arg6 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
+  double arg6 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->cubicTo (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -866,7 +866,7 @@ static void _call_f_elementAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<const QPainterPath::Element & > ((const QPainterPath::Element &)((QPainterPath *)cls)->elementAt (arg1));
 }
 
@@ -915,7 +915,7 @@ static void _call_f_intersected_c2514 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->intersected (arg1));
 }
 
@@ -934,7 +934,7 @@ static void _call_f_intersects_c1862 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   ret.write<bool > ((bool)((QPainterPath *)cls)->intersects (arg1));
 }
 
@@ -953,7 +953,7 @@ static void _call_f_intersects_c2514 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<bool > ((bool)((QPainterPath *)cls)->intersects (arg1));
 }
 
@@ -1002,7 +1002,7 @@ static void _call_f_lineTo_1986 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->lineTo (arg1);
 }
@@ -1024,8 +1024,8 @@ static void _call_f_lineTo_2034 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->lineTo (arg1, arg2);
 }
@@ -1045,7 +1045,7 @@ static void _call_f_moveTo_1986 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->moveTo (arg1);
 }
@@ -1067,8 +1067,8 @@ static void _call_f_moveTo_2034 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->moveTo (arg1, arg2);
 }
@@ -1088,7 +1088,7 @@ static void _call_f_operator_excl__eq__c2514 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<bool > ((bool)((QPainterPath *)cls)->operator!= (arg1));
 }
 
@@ -1107,7 +1107,7 @@ static void _call_f_operator_amp__c2514 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->operator& (arg1));
 }
 
@@ -1126,7 +1126,7 @@ static void _call_f_operator_amp__eq__2514 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath & > ((QPainterPath &)((QPainterPath *)cls)->operator&= (arg1));
 }
 
@@ -1145,7 +1145,7 @@ static void _call_f_operator_plus__c2514 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->operator+ (arg1));
 }
 
@@ -1164,7 +1164,7 @@ static void _call_f_operator_plus__eq__2514 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath & > ((QPainterPath &)((QPainterPath *)cls)->operator+= (arg1));
 }
 
@@ -1183,7 +1183,7 @@ static void _call_f_operator_minus__c2514 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->operator- (arg1));
 }
 
@@ -1202,7 +1202,7 @@ static void _call_f_operator_minus__eq__2514 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath & > ((QPainterPath &)((QPainterPath *)cls)->operator-= (arg1));
 }
 
@@ -1221,7 +1221,7 @@ static void _call_f_operator_eq__2514 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath & > ((QPainterPath &)((QPainterPath *)cls)->operator= (arg1));
 }
 
@@ -1240,7 +1240,7 @@ static void _call_f_operator_eq__eq__c2514 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<bool > ((bool)((QPainterPath *)cls)->operator== (arg1));
 }
 
@@ -1259,7 +1259,7 @@ static void _call_f_operator_pipe__c2514 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->operator| (arg1));
 }
 
@@ -1278,7 +1278,7 @@ static void _call_f_operator_pipe__eq__2514 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath & > ((QPainterPath &)((QPainterPath *)cls)->operator|= (arg1));
 }
 
@@ -1297,7 +1297,7 @@ static void _call_f_percentAtLength_c1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QPainterPath *)cls)->percentAtLength (arg1));
 }
 
@@ -1316,7 +1316,7 @@ static void _call_f_pointAtPercent_c1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QPointF > ((QPointF)((QPainterPath *)cls)->pointAtPercent (arg1));
 }
 
@@ -1337,8 +1337,8 @@ static void _call_f_quadTo_3864 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->quadTo (arg1, arg2);
 }
@@ -1364,10 +1364,10 @@ static void _call_f_quadTo_3960 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->quadTo (arg1, arg2, arg3, arg4);
 }
@@ -1391,9 +1391,9 @@ static void _call_f_setElementPositionAt_2693 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->setElementPositionAt (arg1, arg2, arg3);
 }
@@ -1413,7 +1413,7 @@ static void _call_f_setFillRule_1548 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::FillRule>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::FillRule>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::FillRule>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::FillRule>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->setFillRule (qt_gsi::QtToCppAdaptor<Qt::FillRule>(arg1).cref());
 }
@@ -1448,7 +1448,7 @@ static void _call_f_slopeAtPercent_c1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QPainterPath *)cls)->slopeAtPercent (arg1));
 }
 
@@ -1467,7 +1467,7 @@ static void _call_f_subtracted_c2514 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->subtracted (arg1));
 }
 
@@ -1486,7 +1486,7 @@ static void _call_f_subtractedInverted_c2514 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->subtractedInverted (arg1));
 }
 
@@ -1505,7 +1505,7 @@ static void _call_f_toFillPolygon_c2023 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args ? args.read<const QMatrix & > (heap) : (const QMatrix &)(QMatrix());
+  const QMatrix &arg1 = args ? gsi::arg_reader<const QMatrix & >() (args, heap) : gsi::arg_maker<const QMatrix & >() (QMatrix(), heap);
   ret.write<QPolygonF > ((QPolygonF)((QPainterPath *)cls)->toFillPolygon (arg1));
 }
 
@@ -1524,7 +1524,7 @@ static void _call_f_toFillPolygon_c2350 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QPainterPath *)cls)->toFillPolygon (arg1));
 }
 
@@ -1543,7 +1543,7 @@ static void _call_f_toFillPolygons_c2023 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args ? args.read<const QMatrix & > (heap) : (const QMatrix &)(QMatrix());
+  const QMatrix &arg1 = args ? gsi::arg_reader<const QMatrix & >() (args, heap) : gsi::arg_maker<const QMatrix & >() (QMatrix(), heap);
   ret.write<QList<QPolygonF> > ((QList<QPolygonF>)((QPainterPath *)cls)->toFillPolygons (arg1));
 }
 
@@ -1562,7 +1562,7 @@ static void _call_f_toFillPolygons_c2350 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
   ret.write<QList<QPolygonF> > ((QList<QPolygonF>)((QPainterPath *)cls)->toFillPolygons (arg1));
 }
 
@@ -1596,7 +1596,7 @@ static void _call_f_toSubpathPolygons_c2023 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args ? args.read<const QMatrix & > (heap) : (const QMatrix &)(QMatrix());
+  const QMatrix &arg1 = args ? gsi::arg_reader<const QMatrix & >() (args, heap) : gsi::arg_maker<const QMatrix & >() (QMatrix(), heap);
   ret.write<QList<QPolygonF> > ((QList<QPolygonF>)((QPainterPath *)cls)->toSubpathPolygons (arg1));
 }
 
@@ -1615,7 +1615,7 @@ static void _call_f_toSubpathPolygons_c2350 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
   ret.write<QList<QPolygonF> > ((QList<QPolygonF>)((QPainterPath *)cls)->toSubpathPolygons (arg1));
 }
 
@@ -1636,8 +1636,8 @@ static void _call_f_translate_2034 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->translate (arg1, arg2);
 }
@@ -1657,7 +1657,7 @@ static void _call_f_translate_1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPath *)cls)->translate (arg1);
 }
@@ -1679,8 +1679,8 @@ static void _call_f_translated_c2034 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->translated (arg1, arg2));
 }
 
@@ -1699,7 +1699,7 @@ static void _call_f_translated_c1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->translated (arg1));
 }
 
@@ -1718,7 +1718,7 @@ static void _call_f_united_c2514 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPath *)cls)->united (arg1));
 }
 

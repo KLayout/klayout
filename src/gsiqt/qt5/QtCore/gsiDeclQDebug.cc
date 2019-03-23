@@ -51,7 +51,7 @@ static void _call_ctor_QDebug_1447 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QDebug *> (new QDebug (arg1));
 }
 
@@ -70,7 +70,7 @@ static void _call_ctor_QDebug_1334 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString *arg1 = args.read<QString * > (heap);
+  QString *arg1 = gsi::arg_reader<QString * >() (args, heap);
   ret.write<QDebug *> (new QDebug (arg1));
 }
 
@@ -89,7 +89,7 @@ static void _call_ctor_QDebug_1346 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QtMsgType>::target_type & arg1 = args.read<const qt_gsi::Converter<QtMsgType>::target_type & > (heap);
+  const qt_gsi::Converter<QtMsgType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QtMsgType>::target_type & >() (args, heap);
   ret.write<QDebug *> (new QDebug (qt_gsi::QtToCppAdaptor<QtMsgType>(arg1).cref()));
 }
 
@@ -108,7 +108,7 @@ static void _call_ctor_QDebug_1881 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDebug &arg1 = args.read<const QDebug & > (heap);
+  const QDebug &arg1 = gsi::arg_reader<const QDebug & >() (args, heap);
   ret.write<QDebug *> (new QDebug (arg1));
 }
 
@@ -142,7 +142,7 @@ static void _call_f_maybeQuote_850 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  char arg1 = args ? args.read<char > (heap) : (char)('"');
+  char arg1 = args ? gsi::arg_reader<char >() (args, heap) : gsi::arg_maker<char >() ('"', heap);
   ret.write<QDebug & > ((QDebug &)((QDebug *)cls)->maybeQuote (arg1));
 }
 
@@ -206,7 +206,7 @@ static void _call_f_operator_lt__lt__2025 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDebug & > ((QDebug &)((QDebug *)cls)->operator<< (arg1));
 }
 
@@ -225,7 +225,7 @@ static void _call_f_operator_eq__1881 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDebug &arg1 = args.read<const QDebug & > (heap);
+  const QDebug &arg1 = gsi::arg_reader<const QDebug & >() (args, heap);
   ret.write<QDebug & > ((QDebug &)((QDebug *)cls)->operator= (arg1));
 }
 
@@ -274,7 +274,7 @@ static void _call_f_setAutoInsertSpaces_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDebug *)cls)->setAutoInsertSpaces (arg1);
 }
@@ -309,7 +309,7 @@ static void _call_f_swap_1186 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDebug &arg1 = args.read<QDebug & > (heap);
+  QDebug &arg1 = gsi::arg_reader<QDebug & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDebug *)cls)->swap (arg1);
 }

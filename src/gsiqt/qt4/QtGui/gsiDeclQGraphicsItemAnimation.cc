@@ -88,7 +88,7 @@ static void _call_f_horizontalScaleAt_c1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QGraphicsItemAnimation *)cls)->horizontalScaleAt (arg1));
 }
 
@@ -107,7 +107,7 @@ static void _call_f_horizontalShearAt_c1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QGraphicsItemAnimation *)cls)->horizontalShearAt (arg1));
 }
 
@@ -141,7 +141,7 @@ static void _call_f_matrixAt_c1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMatrix > ((QMatrix)((QGraphicsItemAnimation *)cls)->matrixAt (arg1));
 }
 
@@ -160,7 +160,7 @@ static void _call_f_posAt_c1071 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QPointF > ((QPointF)((QGraphicsItemAnimation *)cls)->posAt (arg1));
 }
 
@@ -210,7 +210,7 @@ static void _call_f_rotationAt_c1071 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QGraphicsItemAnimation *)cls)->rotationAt (arg1));
 }
 
@@ -259,7 +259,7 @@ static void _call_f_setItem_1919 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args.read<QGraphicsItem * > (heap);
+  QGraphicsItem *arg1 = gsi::arg_reader<QGraphicsItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsItemAnimation *)cls)->setItem (arg1);
 }
@@ -281,8 +281,8 @@ static void _call_f_setPosAt_2949 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsItemAnimation *)cls)->setPosAt (arg1, arg2);
 }
@@ -304,8 +304,8 @@ static void _call_f_setRotationAt_2034 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsItemAnimation *)cls)->setRotationAt (arg1, arg2);
 }
@@ -329,9 +329,9 @@ static void _call_f_setScaleAt_2997 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsItemAnimation *)cls)->setScaleAt (arg1, arg2, arg3);
 }
@@ -355,9 +355,9 @@ static void _call_f_setShearAt_2997 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsItemAnimation *)cls)->setShearAt (arg1, arg2, arg3);
 }
@@ -377,7 +377,7 @@ static void _call_f_setStep_1071 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsItemAnimation *)cls)->setStep (arg1);
 }
@@ -397,7 +397,7 @@ static void _call_f_setTimeLine_1494 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimeLine *arg1 = args.read<QTimeLine * > (heap);
+  QTimeLine *arg1 = gsi::arg_reader<QTimeLine * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsItemAnimation *)cls)->setTimeLine (arg1);
 }
@@ -421,9 +421,9 @@ static void _call_f_setTranslationAt_2997 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsItemAnimation *)cls)->setTranslationAt (arg1, arg2, arg3);
 }
@@ -488,7 +488,7 @@ static void _call_f_verticalScaleAt_c1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QGraphicsItemAnimation *)cls)->verticalScaleAt (arg1));
 }
 
@@ -507,7 +507,7 @@ static void _call_f_verticalShearAt_c1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QGraphicsItemAnimation *)cls)->verticalShearAt (arg1));
 }
 
@@ -526,7 +526,7 @@ static void _call_f_xTranslationAt_c1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QGraphicsItemAnimation *)cls)->xTranslationAt (arg1));
 }
 
@@ -545,7 +545,7 @@ static void _call_f_yTranslationAt_c1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QGraphicsItemAnimation *)cls)->yTranslationAt (arg1));
 }
 
@@ -566,8 +566,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QGraphicsItemAnimation::tr (arg1, arg2));
 }
 
@@ -590,9 +590,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QGraphicsItemAnimation::tr (arg1, arg2, arg3));
 }
 
@@ -613,8 +613,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QGraphicsItemAnimation::trUtf8 (arg1, arg2));
 }
 
@@ -637,9 +637,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QGraphicsItemAnimation::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -874,7 +874,7 @@ static void _call_ctor_QGraphicsItemAnimation_Adaptor_1302 (const qt_gsi::Generi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QGraphicsItemAnimation_Adaptor *> (new QGraphicsItemAnimation_Adaptor (arg1));
 }
 
@@ -988,7 +988,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QGraphicsItemAnimation_Adaptor *)cls)->emitter_QGraphicsItemAnimation_destroyed_1302 (arg1);
 }
 
@@ -1079,7 +1079,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QGraphicsItemAnimation_Adaptor *)cls)->fp_QGraphicsItemAnimation_receivers_c1731 (arg1));
 }
 

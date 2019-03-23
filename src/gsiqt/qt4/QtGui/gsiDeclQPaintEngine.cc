@@ -62,7 +62,7 @@ static void _call_f_begin_1803 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPaintDevice *arg1 = args.read<QPaintDevice * > (heap);
+  QPaintDevice *arg1 = gsi::arg_reader<QPaintDevice * >() (args, heap);
   ret.write<bool > ((bool)((QPaintEngine *)cls)->begin (arg1));
 }
 
@@ -81,7 +81,7 @@ static void _call_f_clearDirty_3337 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPaintEngine::DirtyFlag> arg1 = args.read<QFlags<QPaintEngine::DirtyFlag> > (heap);
+  QFlags<QPaintEngine::DirtyFlag> arg1 = gsi::arg_reader<QFlags<QPaintEngine::DirtyFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->clearDirty (arg1);
 }
@@ -116,7 +116,7 @@ static void _call_f_drawEllipse_1862 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->drawEllipse (arg1);
 }
@@ -136,7 +136,7 @@ static void _call_f_drawEllipse_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->drawEllipse (arg1);
 }
@@ -162,10 +162,10 @@ static void _call_f_drawImage_8645 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  const QImage &arg2 = args.read<const QImage & > (heap);
-  const QRectF &arg3 = args.read<const QRectF & > (heap);
-  QFlags<Qt::ImageConversionFlag> arg4 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  const QImage &arg2 = gsi::arg_reader<const QImage & >() (args, heap);
+  const QRectF &arg3 = gsi::arg_reader<const QRectF & >() (args, heap);
+  QFlags<Qt::ImageConversionFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->drawImage (arg1, arg2, arg3, arg4);
 }
@@ -185,7 +185,7 @@ static void _call_f_drawPath_2514 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->drawPath (arg1);
 }
@@ -209,9 +209,9 @@ static void _call_f_drawPixmap_5525 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  const QPixmap &arg2 = args.read<const QPixmap & > (heap);
-  const QRectF &arg3 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  const QPixmap &arg2 = gsi::arg_reader<const QPixmap & >() (args, heap);
+  const QRectF &arg3 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->drawPixmap (arg1, arg2, arg3);
 }
@@ -233,8 +233,8 @@ static void _call_f_drawTextItem_4092 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QTextItem &arg2 = args.read<const QTextItem & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QTextItem &arg2 = gsi::arg_reader<const QTextItem & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->drawTextItem (arg1, arg2);
 }
@@ -258,9 +258,9 @@ static void _call_f_drawTiledPixmap_5649 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  const QPixmap &arg2 = args.read<const QPixmap & > (heap);
-  const QPointF &arg3 = args.read<const QPointF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  const QPixmap &arg2 = gsi::arg_reader<const QPixmap & >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->drawTiledPixmap (arg1, arg2, arg3);
 }
@@ -295,7 +295,7 @@ static void _call_f_hasFeature_c4257 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPaintEngine::PaintEngineFeature> arg1 = args.read<QFlags<QPaintEngine::PaintEngineFeature> > (heap);
+  QFlags<QPaintEngine::PaintEngineFeature> arg1 = gsi::arg_reader<QFlags<QPaintEngine::PaintEngineFeature> >() (args, heap);
   ret.write<bool > ((bool)((QPaintEngine *)cls)->hasFeature (arg1));
 }
 
@@ -374,7 +374,7 @@ static void _call_f_setActive_864 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->setActive (arg1);
 }
@@ -394,7 +394,7 @@ static void _call_f_setDirty_3337 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPaintEngine::DirtyFlag> arg1 = args.read<QFlags<QPaintEngine::DirtyFlag> > (heap);
+  QFlags<QPaintEngine::DirtyFlag> arg1 = gsi::arg_reader<QFlags<QPaintEngine::DirtyFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->setDirty (arg1);
 }
@@ -414,7 +414,7 @@ static void _call_f_setPaintDevice_1803 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPaintDevice *arg1 = args.read<QPaintDevice * > (heap);
+  QPaintDevice *arg1 = gsi::arg_reader<QPaintDevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->setPaintDevice (arg1);
 }
@@ -434,7 +434,7 @@ static void _call_f_setSystemClip_2006 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->setSystemClip (arg1);
 }
@@ -454,7 +454,7 @@ static void _call_f_setSystemRect_1792 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->setSystemRect (arg1);
 }
@@ -520,7 +520,7 @@ static void _call_f_testDirty_3337 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPaintEngine::DirtyFlag> arg1 = args.read<QFlags<QPaintEngine::DirtyFlag> > (heap);
+  QFlags<QPaintEngine::DirtyFlag> arg1 = gsi::arg_reader<QFlags<QPaintEngine::DirtyFlag> >() (args, heap);
   ret.write<bool > ((bool)((QPaintEngine *)cls)->testDirty (arg1));
 }
 
@@ -554,7 +554,7 @@ static void _call_f_updateState_3013 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPaintEngineState &arg1 = args.read<const QPaintEngineState & > (heap);
+  const QPaintEngineState &arg1 = gsi::arg_reader<const QPaintEngineState & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPaintEngine *)cls)->updateState (arg1);
 }
@@ -836,7 +836,7 @@ static void _call_ctor_QPaintEngine_Adaptor_4257 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPaintEngine::PaintEngineFeature> arg1 = args ? args.read<QFlags<QPaintEngine::PaintEngineFeature> > (heap) : (QFlags<QPaintEngine::PaintEngineFeature>)(0);
+  QFlags<QPaintEngine::PaintEngineFeature> arg1 = args ? gsi::arg_reader<QFlags<QPaintEngine::PaintEngineFeature> >() (args, heap) : gsi::arg_maker<QFlags<QPaintEngine::PaintEngineFeature> >() (0, heap);
   ret.write<QPaintEngine_Adaptor *> (new QPaintEngine_Adaptor (arg1));
 }
 

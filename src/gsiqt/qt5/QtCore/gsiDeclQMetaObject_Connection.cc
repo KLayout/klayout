@@ -65,7 +65,7 @@ static void _call_ctor_QMetaObject_Connection_3540 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaObject::Connection &arg1 = args.read<const QMetaObject::Connection & > (heap);
+  const QMetaObject::Connection &arg1 = gsi::arg_reader<const QMetaObject::Connection & >() (args, heap);
   ret.write<QMetaObject::Connection *> (new QMetaObject::Connection (arg1));
 }
 
@@ -84,7 +84,7 @@ static void _call_f_operator_eq__3540 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaObject::Connection &arg1 = args.read<const QMetaObject::Connection & > (heap);
+  const QMetaObject::Connection &arg1 = gsi::arg_reader<const QMetaObject::Connection & >() (args, heap);
   ret.write<QMetaObject::Connection & > ((QMetaObject::Connection &)((QMetaObject::Connection *)cls)->operator= (arg1));
 }
 

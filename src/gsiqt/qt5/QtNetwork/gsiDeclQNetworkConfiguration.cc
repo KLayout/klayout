@@ -65,7 +65,7 @@ static void _call_ctor_QNetworkConfiguration_3508 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
   ret.write<QNetworkConfiguration *> (new QNetworkConfiguration (arg1));
 }
 
@@ -204,7 +204,7 @@ static void _call_f_operator_excl__eq__c3508 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkConfiguration *)cls)->operator!= (arg1));
 }
 
@@ -223,7 +223,7 @@ static void _call_f_operator_eq__3508 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
   ret.write<QNetworkConfiguration & > ((QNetworkConfiguration &)((QNetworkConfiguration *)cls)->operator= (arg1));
 }
 
@@ -242,7 +242,7 @@ static void _call_f_operator_eq__eq__c3508 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkConfiguration *)cls)->operator== (arg1));
 }
 
@@ -291,7 +291,7 @@ static void _call_f_swap_2813 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkConfiguration &arg1 = args.read<QNetworkConfiguration & > (heap);
+  QNetworkConfiguration &arg1 = gsi::arg_reader<QNetworkConfiguration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkConfiguration *)cls)->swap (arg1);
 }

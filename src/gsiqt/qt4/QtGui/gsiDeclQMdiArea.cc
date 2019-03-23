@@ -178,8 +178,8 @@ static void _call_f_addSubWindow_3702 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  QFlags<Qt::WindowType> arg2 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<QMdiSubWindow * > ((QMdiSubWindow *)((QMdiArea *)cls)->addSubWindow (arg1, arg2));
 }
 
@@ -306,7 +306,7 @@ static void _call_f_removeSubWindow_1315 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea *)cls)->removeSubWindow (arg1);
 }
@@ -326,7 +326,7 @@ static void _call_f_setActivationOrder_2432 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type & arg1 = args.read<const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type & > (heap);
+  const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea *)cls)->setActivationOrder (qt_gsi::QtToCppAdaptor<QMdiArea::WindowOrder>(arg1).cref());
 }
@@ -346,7 +346,7 @@ static void _call_f_setActiveSubWindow_1915 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMdiSubWindow *arg1 = args.read<QMdiSubWindow * > (heap);
+  QMdiSubWindow *arg1 = gsi::arg_reader<QMdiSubWindow * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea *)cls)->setActiveSubWindow (arg1);
 }
@@ -366,7 +366,7 @@ static void _call_f_setBackground_1910 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea *)cls)->setBackground (arg1);
 }
@@ -386,7 +386,7 @@ static void _call_f_setDocumentMode_864 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea *)cls)->setDocumentMode (arg1);
 }
@@ -408,8 +408,8 @@ static void _call_f_setOption_3058 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMdiArea::AreaOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QMdiArea::AreaOption>::target_type & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<QMdiArea::AreaOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMdiArea::AreaOption>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea *)cls)->setOption (qt_gsi::QtToCppAdaptor<QMdiArea::AreaOption>(arg1).cref(), arg2);
 }
@@ -429,7 +429,7 @@ static void _call_f_setTabPosition_2656 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTabWidget::TabPosition>::target_type & arg1 = args.read<const qt_gsi::Converter<QTabWidget::TabPosition>::target_type & > (heap);
+  const qt_gsi::Converter<QTabWidget::TabPosition>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTabWidget::TabPosition>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea *)cls)->setTabPosition (qt_gsi::QtToCppAdaptor<QTabWidget::TabPosition>(arg1).cref());
 }
@@ -449,7 +449,7 @@ static void _call_f_setTabShape_2300 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTabWidget::TabShape>::target_type & arg1 = args.read<const qt_gsi::Converter<QTabWidget::TabShape>::target_type & > (heap);
+  const qt_gsi::Converter<QTabWidget::TabShape>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTabWidget::TabShape>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea *)cls)->setTabShape (qt_gsi::QtToCppAdaptor<QTabWidget::TabShape>(arg1).cref());
 }
@@ -469,7 +469,7 @@ static void _call_f_setViewMode_2092 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMdiArea::ViewMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QMdiArea::ViewMode>::target_type & > (heap);
+  const qt_gsi::Converter<QMdiArea::ViewMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMdiArea::ViewMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea *)cls)->setViewMode (qt_gsi::QtToCppAdaptor<QMdiArea::ViewMode>(arg1).cref());
 }
@@ -504,7 +504,7 @@ static void _call_f_subWindowList_c2432 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type & > (heap) : (const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type &)(qt_gsi::CppToQtReadAdaptor<QMdiArea::WindowOrder>(heap, QMdiArea::CreationOrder));
+  const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QMdiArea::WindowOrder>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QMdiArea::WindowOrder>(heap, QMdiArea::CreationOrder), heap);
   ret.write<QList<QMdiSubWindow *> > ((QList<QMdiSubWindow *>)((QMdiArea *)cls)->subWindowList (qt_gsi::QtToCppAdaptor<QMdiArea::WindowOrder>(arg1).cref()));
 }
 
@@ -553,7 +553,7 @@ static void _call_f_testOption_c2302 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMdiArea::AreaOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QMdiArea::AreaOption>::target_type & > (heap);
+  const qt_gsi::Converter<QMdiArea::AreaOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMdiArea::AreaOption>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QMdiArea *)cls)->testOption (qt_gsi::QtToCppAdaptor<QMdiArea::AreaOption>(arg1).cref()));
 }
 
@@ -605,8 +605,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QMdiArea::tr (arg1, arg2));
 }
 
@@ -629,9 +629,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QMdiArea::tr (arg1, arg2, arg3));
 }
 
@@ -652,8 +652,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QMdiArea::trUtf8 (arg1, arg2));
 }
 
@@ -676,9 +676,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QMdiArea::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1619,7 +1619,7 @@ static void _call_ctor_QMdiArea_Adaptor_1315 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QMdiArea_Adaptor *> (new QMdiArea_Adaptor (arg1));
 }
 
@@ -1761,9 +1761,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea_Adaptor *)cls)->fp_QMdiArea_create_2208 (arg1, arg2, arg3);
 }
@@ -1782,7 +1782,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QMdiArea_Adaptor *)cls)->emitter_QMdiArea_customContextMenuRequested_1916 (arg1);
 }
 
@@ -1826,8 +1826,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea_Adaptor *)cls)->fp_QMdiArea_destroy_1620 (arg1, arg2);
 }
@@ -1846,7 +1846,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QMdiArea_Adaptor *)cls)->emitter_QMdiArea_destroyed_1302 (arg1);
 }
 
@@ -1960,7 +1960,7 @@ static void _call_fp_drawFrame_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea_Adaptor *)cls)->fp_QMdiArea_drawFrame_1426 (arg1);
 }
@@ -2638,7 +2638,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QMdiArea_Adaptor *)cls)->fp_QMdiArea_receivers_c1731 (arg1));
 }
 
@@ -2742,10 +2742,10 @@ static void _call_fp_setViewportMargins_2744 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea_Adaptor *)cls)->fp_QMdiArea_setViewportMargins_2744 (arg1, arg2, arg3, arg4);
 }
@@ -2764,7 +2764,7 @@ static void _call_fp_setViewportMargins_2115 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea_Adaptor *)cls)->fp_QMdiArea_setViewportMargins_2115 (arg1);
 }
@@ -2807,7 +2807,7 @@ static void _call_fp_setupViewport_1315 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMdiArea_Adaptor *)cls)->fp_QMdiArea_setupViewport_1315 (arg1);
 }
@@ -2893,7 +2893,7 @@ static void _call_emitter_subWindowActivated_1915 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMdiSubWindow *arg1 = args.read<QMdiSubWindow * > (heap);
+  QMdiSubWindow *arg1 = gsi::arg_reader<QMdiSubWindow * >() (args, heap);
   ((QMdiArea_Adaptor *)cls)->emitter_QMdiArea_subWindowActivated_1915 (arg1);
 }
 

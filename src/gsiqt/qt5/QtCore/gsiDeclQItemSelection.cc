@@ -69,8 +69,8 @@ static void _call_ctor_QItemSelection_4682 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QItemSelection *> (new QItemSelection (arg1, arg2));
 }
 
@@ -89,7 +89,7 @@ static void _call_f_contains_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QItemSelection *)cls)->contains (arg1));
 }
 
@@ -125,8 +125,8 @@ static void _call_f_merge_7090 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelection &arg1 = args.read<const QItemSelection & > (heap);
-  QFlags<QItemSelectionModel::SelectionFlag> arg2 = args.read<QFlags<QItemSelectionModel::SelectionFlag> > (heap);
+  const QItemSelection &arg1 = gsi::arg_reader<const QItemSelection & >() (args, heap);
+  QFlags<QItemSelectionModel::SelectionFlag> arg2 = gsi::arg_reader<QFlags<QItemSelectionModel::SelectionFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QItemSelection *)cls)->merge (arg1, arg2);
 }
@@ -148,8 +148,8 @@ static void _call_f_select_4682 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QItemSelection *)cls)->select (arg1, arg2);
 }
@@ -173,9 +173,9 @@ static void _call_f_split_8260 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelectionRange &arg1 = args.read<const QItemSelectionRange & > (heap);
-  const QItemSelectionRange &arg2 = args.read<const QItemSelectionRange & > (heap);
-  QItemSelection *arg3 = args.read<QItemSelection * > (heap);
+  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
+  const QItemSelectionRange &arg2 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
+  QItemSelection *arg3 = gsi::arg_reader<QItemSelection * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QItemSelection::split (arg1, arg2, arg3);
 }

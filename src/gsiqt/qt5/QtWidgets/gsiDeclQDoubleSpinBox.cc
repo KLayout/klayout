@@ -146,7 +146,7 @@ static void _call_f_fixup_c1330 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString &arg1 = args.read<QString & > (heap);
+  QString &arg1 = gsi::arg_reader<QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox *)cls)->fixup (arg1);
 }
@@ -211,7 +211,7 @@ static void _call_f_setDecimals_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox *)cls)->setDecimals (arg1);
 }
@@ -231,7 +231,7 @@ static void _call_f_setMaximum_1071 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox *)cls)->setMaximum (arg1);
 }
@@ -251,7 +251,7 @@ static void _call_f_setMinimum_1071 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox *)cls)->setMinimum (arg1);
 }
@@ -271,7 +271,7 @@ static void _call_f_setPrefix_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox *)cls)->setPrefix (arg1);
 }
@@ -293,8 +293,8 @@ static void _call_f_setRange_2034 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox *)cls)->setRange (arg1, arg2);
 }
@@ -314,7 +314,7 @@ static void _call_f_setSingleStep_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox *)cls)->setSingleStep (arg1);
 }
@@ -334,7 +334,7 @@ static void _call_f_setSuffix_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox *)cls)->setSuffix (arg1);
 }
@@ -354,7 +354,7 @@ static void _call_f_setValue_1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox *)cls)->setValue (arg1);
 }
@@ -404,7 +404,7 @@ static void _call_f_textFromValue_c1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QString > ((QString)((QDoubleSpinBox *)cls)->textFromValue (arg1));
 }
 
@@ -425,8 +425,8 @@ static void _call_f_validate_c2171 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString &arg1 = args.read<QString & > (heap);
-  int &arg2 = args.read<int & > (heap);
+  QString &arg1 = gsi::arg_reader<QString & >() (args, heap);
+  int &arg2 = gsi::arg_reader<int & >() (args, heap);
   ret.write<qt_gsi::Converter<QValidator::State>::target_type > ((qt_gsi::Converter<QValidator::State>::target_type)qt_gsi::CppToQtAdaptor<QValidator::State>(((QDoubleSpinBox *)cls)->validate (arg1, arg2)));
 }
 
@@ -460,7 +460,7 @@ static void _call_f_valueFromText_c2025 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<double > ((double)((QDoubleSpinBox *)cls)->valueFromText (arg1));
 }
 
@@ -483,9 +483,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QDoubleSpinBox::tr (arg1, arg2, arg3));
 }
 
@@ -508,9 +508,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QDoubleSpinBox::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1540,7 +1540,7 @@ static void _call_ctor_QDoubleSpinBox_Adaptor_1315 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QDoubleSpinBox_Adaptor *> (new QDoubleSpinBox_Adaptor (arg1));
 }
 
@@ -1702,9 +1702,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox_Adaptor *)cls)->fp_QDoubleSpinBox_create_2208 (arg1, arg2, arg3);
 }
@@ -1723,7 +1723,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QDoubleSpinBox_Adaptor *)cls)->emitter_QDoubleSpinBox_customContextMenuRequested_1916 (arg1);
 }
 
@@ -1767,8 +1767,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox_Adaptor *)cls)->fp_QDoubleSpinBox_destroy_1620 (arg1, arg2);
 }
@@ -1787,7 +1787,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QDoubleSpinBox_Adaptor *)cls)->emitter_QDoubleSpinBox_destroyed_1302 (arg1);
 }
 
@@ -2225,7 +2225,7 @@ static void _call_fp_initStyleOption_c2572 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionSpinBox *arg1 = args.read<QStyleOptionSpinBox * > (heap);
+  QStyleOptionSpinBox *arg1 = gsi::arg_reader<QStyleOptionSpinBox * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox_Adaptor *)cls)->fp_QDoubleSpinBox_initStyleOption_c2572 (arg1);
 }
@@ -2291,7 +2291,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QDoubleSpinBox_Adaptor *)cls)->fp_QDoubleSpinBox_isSignalConnected_c2394 (arg1));
 }
 
@@ -2629,7 +2629,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QDoubleSpinBox_Adaptor *)cls)->fp_QDoubleSpinBox_receivers_c1731 (arg1));
 }
 
@@ -2722,7 +2722,7 @@ static void _call_fp_setLineEdit_1485 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLineEdit *arg1 = args.read<QLineEdit * > (heap);
+  QLineEdit *arg1 = gsi::arg_reader<QLineEdit * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleSpinBox_Adaptor *)cls)->fp_QDoubleSpinBox_setLineEdit_1485 (arg1);
 }
@@ -2982,7 +2982,7 @@ static void _call_emitter_valueChanged_1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QDoubleSpinBox_Adaptor *)cls)->emitter_QDoubleSpinBox_valueChanged_1071 (arg1);
 }
 
@@ -3000,7 +3000,7 @@ static void _call_emitter_valueChanged_2025 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QDoubleSpinBox_Adaptor *)cls)->emitter_QDoubleSpinBox_valueChanged_2025 (arg1);
 }
 
@@ -3065,7 +3065,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QDoubleSpinBox_Adaptor *)cls)->emitter_QDoubleSpinBox_windowIconChanged_1787 (arg1);
 }
 
@@ -3083,7 +3083,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QDoubleSpinBox_Adaptor *)cls)->emitter_QDoubleSpinBox_windowIconTextChanged_2025 (arg1);
 }
 
@@ -3101,7 +3101,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QDoubleSpinBox_Adaptor *)cls)->emitter_QDoubleSpinBox_windowTitleChanged_2025 (arg1);
 }
 

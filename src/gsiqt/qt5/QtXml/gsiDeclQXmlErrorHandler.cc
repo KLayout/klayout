@@ -51,7 +51,7 @@ static void _call_f_error_3149 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlParseException &arg1 = args.read<const QXmlParseException & > (heap);
+  const QXmlParseException &arg1 = gsi::arg_reader<const QXmlParseException & >() (args, heap);
   ret.write<bool > ((bool)((QXmlErrorHandler *)cls)->error (arg1));
 }
 
@@ -85,7 +85,7 @@ static void _call_f_fatalError_3149 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlParseException &arg1 = args.read<const QXmlParseException & > (heap);
+  const QXmlParseException &arg1 = gsi::arg_reader<const QXmlParseException & >() (args, heap);
   ret.write<bool > ((bool)((QXmlErrorHandler *)cls)->fatalError (arg1));
 }
 
@@ -104,7 +104,7 @@ static void _call_f_warning_3149 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlParseException &arg1 = args.read<const QXmlParseException & > (heap);
+  const QXmlParseException &arg1 = gsi::arg_reader<const QXmlParseException & >() (args, heap);
   ret.write<bool > ((bool)((QXmlErrorHandler *)cls)->warning (arg1));
 }
 

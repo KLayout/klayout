@@ -335,7 +335,7 @@ static void _call_f_setByteOrder_2543 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDataStream::ByteOrder>::target_type & arg1 = args.read<const qt_gsi::Converter<QDataStream::ByteOrder>::target_type & > (heap);
+  const qt_gsi::Converter<QDataStream::ByteOrder>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDataStream::ByteOrder>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataStream *)cls)->setByteOrder (qt_gsi::QtToCppAdaptor<QDataStream::ByteOrder>(arg1).cref());
 }
@@ -355,7 +355,7 @@ static void _call_f_setDevice_1447 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataStream *)cls)->setDevice (arg1);
 }
@@ -375,7 +375,7 @@ static void _call_f_setFloatingPointPrecision_3913 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDataStream::FloatingPointPrecision>::target_type & arg1 = args.read<const qt_gsi::Converter<QDataStream::FloatingPointPrecision>::target_type & > (heap);
+  const qt_gsi::Converter<QDataStream::FloatingPointPrecision>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDataStream::FloatingPointPrecision>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataStream *)cls)->setFloatingPointPrecision (qt_gsi::QtToCppAdaptor<QDataStream::FloatingPointPrecision>(arg1).cref());
 }
@@ -395,7 +395,7 @@ static void _call_f_setStatus_2275 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDataStream::Status>::target_type & arg1 = args.read<const qt_gsi::Converter<QDataStream::Status>::target_type & > (heap);
+  const qt_gsi::Converter<QDataStream::Status>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDataStream::Status>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataStream *)cls)->setStatus (qt_gsi::QtToCppAdaptor<QDataStream::Status>(arg1).cref());
 }
@@ -415,7 +415,7 @@ static void _call_f_setVersion_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataStream *)cls)->setVersion (arg1);
 }
@@ -435,7 +435,7 @@ static void _call_f_skipRawData_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QDataStream *)cls)->skipRawData (arg1));
 }
 
@@ -502,8 +502,8 @@ static void _call_f_writeBytes_3395 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  unsigned int arg2 = args.read<unsigned int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  unsigned int arg2 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<QDataStream & > ((QDataStream &)((QDataStream *)cls)->writeBytes (arg1, arg2));
 }
 
@@ -524,8 +524,8 @@ static void _call_f_writeRawData_2390 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  int arg2 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QDataStream *)cls)->writeRawData (arg1, arg2));
 }
 
@@ -658,7 +658,7 @@ static void _call_ctor_QDataStream_Adaptor_1447 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QDataStream_Adaptor *> (new QDataStream_Adaptor (arg1));
 }
 
@@ -678,8 +678,8 @@ static void _call_ctor_QDataStream_Adaptor_4752 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray *arg1 = args.read<QByteArray * > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg2 = args.read<QFlags<QIODevice::OpenModeFlag> > (heap);
+  QByteArray *arg1 = gsi::arg_reader<QByteArray * >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg2 = gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap);
   ret.write<QDataStream_Adaptor *> (new QDataStream_Adaptor (arg1, arg2));
 }
 
@@ -697,7 +697,7 @@ static void _call_ctor_QDataStream_Adaptor_2309 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QDataStream_Adaptor *> (new QDataStream_Adaptor (arg1));
 }
 

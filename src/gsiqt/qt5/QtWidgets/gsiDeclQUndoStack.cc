@@ -71,7 +71,7 @@ static void _call_f_beginMacro_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoStack *)cls)->beginMacro (arg1);
 }
@@ -152,7 +152,7 @@ static void _call_f_command_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<const QUndoCommand * > ((const QUndoCommand *)((QUndoStack *)cls)->command (arg1));
 }
 
@@ -188,8 +188,8 @@ static void _call_f_createRedoAction_c3219 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QAction * > ((QAction *)((QUndoStack *)cls)->createRedoAction (arg1, arg2));
 }
 
@@ -210,8 +210,8 @@ static void _call_f_createUndoAction_c3219 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QAction * > ((QAction *)((QUndoStack *)cls)->createUndoAction (arg1, arg2));
 }
 
@@ -291,7 +291,7 @@ static void _call_f_push_1812 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUndoCommand *arg1 = args.read<QUndoCommand * > (heap);
+  QUndoCommand *arg1 = gsi::arg_reader<QUndoCommand * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoStack *)cls)->push (arg1);
 }
@@ -342,7 +342,7 @@ static void _call_f_setActive_864 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoStack *)cls)->setActive (arg1);
 }
@@ -378,7 +378,7 @@ static void _call_f_setIndex_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoStack *)cls)->setIndex (arg1);
 }
@@ -398,7 +398,7 @@ static void _call_f_setUndoLimit_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUndoStack *)cls)->setUndoLimit (arg1);
 }
@@ -418,7 +418,7 @@ static void _call_f_text_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QUndoStack *)cls)->text (arg1));
 }
 
@@ -487,9 +487,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QUndoStack::tr (arg1, arg2, arg3));
 }
 
@@ -512,9 +512,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QUndoStack::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -765,7 +765,7 @@ static void _call_ctor_QUndoStack_Adaptor_1302 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QUndoStack_Adaptor *> (new QUndoStack_Adaptor (arg1));
 }
 
@@ -783,7 +783,7 @@ static void _call_emitter_canRedoChanged_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QUndoStack_Adaptor *)cls)->emitter_QUndoStack_canRedoChanged_864 (arg1);
 }
 
@@ -801,7 +801,7 @@ static void _call_emitter_canUndoChanged_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QUndoStack_Adaptor *)cls)->emitter_QUndoStack_canUndoChanged_864 (arg1);
 }
 
@@ -843,7 +843,7 @@ static void _call_emitter_cleanChanged_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QUndoStack_Adaptor *)cls)->emitter_QUndoStack_cleanChanged_864 (arg1);
 }
 
@@ -885,7 +885,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QUndoStack_Adaptor *)cls)->emitter_QUndoStack_destroyed_1302 (arg1);
 }
 
@@ -976,7 +976,7 @@ static void _call_emitter_indexChanged_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QUndoStack_Adaptor *)cls)->emitter_QUndoStack_indexChanged_767 (arg1);
 }
 
@@ -994,7 +994,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QUndoStack_Adaptor *)cls)->fp_QUndoStack_isSignalConnected_c2394 (arg1));
 }
 
@@ -1012,7 +1012,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QUndoStack_Adaptor *)cls)->fp_QUndoStack_receivers_c1731 (arg1));
 }
 
@@ -1030,7 +1030,7 @@ static void _call_emitter_redoTextChanged_2025 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QUndoStack_Adaptor *)cls)->emitter_QUndoStack_redoTextChanged_2025 (arg1);
 }
 
@@ -1100,7 +1100,7 @@ static void _call_emitter_undoTextChanged_2025 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QUndoStack_Adaptor *)cls)->emitter_QUndoStack_undoTextChanged_2025 (arg1);
 }
 

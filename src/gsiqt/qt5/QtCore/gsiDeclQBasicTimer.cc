@@ -83,8 +83,8 @@ static void _call_f_start_1961 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBasicTimer *)cls)->start (arg1, arg2);
 }
@@ -108,9 +108,9 @@ static void _call_f_start_3533 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::TimerType>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::TimerType>::target_type & > (heap);
-  QObject *arg3 = args.read<QObject * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::TimerType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimerType>::target_type & >() (args, heap);
+  QObject *arg3 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBasicTimer *)cls)->start (arg1, qt_gsi::QtToCppAdaptor<Qt::TimerType>(arg2).cref(), arg3);
 }

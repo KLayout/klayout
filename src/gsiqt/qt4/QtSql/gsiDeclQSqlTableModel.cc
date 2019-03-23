@@ -95,8 +95,8 @@ static void _call_f_data_c3054 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(Qt::DisplayRole);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::DisplayRole, heap);
   ret.write<QVariant > ((QVariant)((QSqlTableModel *)cls)->data (arg1, arg2));
 }
 
@@ -145,7 +145,7 @@ static void _call_f_fieldIndex_c2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QSqlTableModel *)cls)->fieldIndex (arg1));
 }
 
@@ -179,7 +179,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QFlags<Qt::ItemFlag> > ((QFlags<Qt::ItemFlag>)((QSqlTableModel *)cls)->flags (arg1));
 }
 
@@ -202,9 +202,9 @@ static void _call_f_headerData_c3231 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(Qt::DisplayRole);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::DisplayRole, heap);
   ret.write<QVariant > ((QVariant)((QSqlTableModel *)cls)->headerData (arg1, qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg2).cref(), arg3));
 }
 
@@ -225,8 +225,8 @@ static void _call_f_insertRecord_2964 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QSqlRecord &arg2 = args.read<const QSqlRecord & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QSqlRecord &arg2 = gsi::arg_reader<const QSqlRecord & >() (args, heap);
   ret.write<bool > ((bool)((QSqlTableModel *)cls)->insertRecord (arg1, arg2));
 }
 
@@ -249,9 +249,9 @@ static void _call_f_insertRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QSqlTableModel *)cls)->insertRows (arg1, arg2, arg3));
 }
 
@@ -270,7 +270,7 @@ static void _call_f_isDirty_c2395 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QSqlTableModel *)cls)->isDirty (arg1));
 }
 
@@ -308,9 +308,9 @@ static void _call_f_removeColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QSqlTableModel *)cls)->removeColumns (arg1, arg2, arg3));
 }
 
@@ -333,9 +333,9 @@ static void _call_f_removeRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QSqlTableModel *)cls)->removeRows (arg1, arg2, arg3));
 }
 
@@ -386,7 +386,7 @@ static void _call_f_revertRow_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel *)cls)->revertRow (arg1);
 }
@@ -406,7 +406,7 @@ static void _call_f_rowCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  const QModelIndex &arg1 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<int > ((int)((QSqlTableModel *)cls)->rowCount (arg1));
 }
 
@@ -444,9 +444,9 @@ static void _call_f_setData_5065 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(Qt::EditRole);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::EditRole, heap);
   ret.write<bool > ((bool)((QSqlTableModel *)cls)->setData (arg1, arg2, arg3));
 }
 
@@ -465,7 +465,7 @@ static void _call_f_setEditStrategy_3163 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSqlTableModel::EditStrategy>::target_type & arg1 = args.read<const qt_gsi::Converter<QSqlTableModel::EditStrategy>::target_type & > (heap);
+  const qt_gsi::Converter<QSqlTableModel::EditStrategy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSqlTableModel::EditStrategy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel *)cls)->setEditStrategy (qt_gsi::QtToCppAdaptor<QSqlTableModel::EditStrategy>(arg1).cref());
 }
@@ -485,7 +485,7 @@ static void _call_f_setFilter_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel *)cls)->setFilter (arg1);
 }
@@ -507,8 +507,8 @@ static void _call_f_setRecord_2964 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QSqlRecord &arg2 = args.read<const QSqlRecord & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QSqlRecord &arg2 = gsi::arg_reader<const QSqlRecord & >() (args, heap);
   ret.write<bool > ((bool)((QSqlTableModel *)cls)->setRecord (arg1, arg2));
 }
 
@@ -529,8 +529,8 @@ static void _call_f_setSort_2340 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::SortOrder>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::SortOrder>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel *)cls)->setSort (arg1, qt_gsi::QtToCppAdaptor<Qt::SortOrder>(arg2).cref());
 }
@@ -550,7 +550,7 @@ static void _call_f_setTable_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel *)cls)->setTable (arg1);
 }
@@ -572,8 +572,8 @@ static void _call_f_sort_2340 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::SortOrder>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::SortOrder>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel *)cls)->sort (arg1, qt_gsi::QtToCppAdaptor<Qt::SortOrder>(arg2).cref());
 }
@@ -640,8 +640,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QSqlTableModel::tr (arg1, arg2));
 }
 
@@ -664,9 +664,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QSqlTableModel::tr (arg1, arg2, arg3));
 }
 
@@ -687,8 +687,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QSqlTableModel::trUtf8 (arg1, arg2));
 }
 
@@ -711,9 +711,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QSqlTableModel::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1747,8 +1747,8 @@ static void _call_ctor_QSqlTableModel_Adaptor_2804 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
-  QSqlDatabase arg2 = args ? args.read<QSqlDatabase > (heap) : (QSqlDatabase)(QSqlDatabase());
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QSqlDatabase arg2 = args ? gsi::arg_reader<QSqlDatabase >() (args, heap) : gsi::arg_maker<QSqlDatabase >() (QSqlDatabase(), heap);
   ret.write<QSqlTableModel_Adaptor *> (new QSqlTableModel_Adaptor (arg1, arg2));
 }
 
@@ -1766,7 +1766,7 @@ static void _call_emitter_beforeDelete_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QSqlTableModel_Adaptor *)cls)->emitter_QSqlTableModel_beforeDelete_767 (arg1);
 }
 
@@ -1784,7 +1784,7 @@ static void _call_emitter_beforeInsert_1610 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSqlRecord &arg1 = args.read<QSqlRecord & > (heap);
+  QSqlRecord &arg1 = gsi::arg_reader<QSqlRecord & >() (args, heap);
   ((QSqlTableModel_Adaptor *)cls)->emitter_QSqlTableModel_beforeInsert_1610 (arg1);
 }
 
@@ -1804,8 +1804,8 @@ static void _call_emitter_beforeUpdate_2269 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QSqlRecord &arg2 = args.read<QSqlRecord & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QSqlRecord &arg2 = gsi::arg_reader<QSqlRecord & >() (args, heap);
   ((QSqlTableModel_Adaptor *)cls)->emitter_QSqlTableModel_beforeUpdate_2269 (arg1, arg2);
 }
 
@@ -1827,9 +1827,9 @@ static void _call_fp_beginInsertColumns_3713 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_beginInsertColumns_3713 (arg1, arg2, arg3);
 }
@@ -1852,9 +1852,9 @@ static void _call_fp_beginInsertRows_3713 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_beginInsertRows_3713 (arg1, arg2, arg3);
 }
@@ -1881,11 +1881,11 @@ static void _call_fp_beginMoveColumns_6659 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
-  int arg5 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_beginMoveColumns_6659 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -1911,11 +1911,11 @@ static void _call_fp_beginMoveRows_6659 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
-  int arg5 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_beginMoveRows_6659 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -1937,9 +1937,9 @@ static void _call_fp_beginRemoveColumns_3713 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_beginRemoveColumns_3713 (arg1, arg2, arg3);
 }
@@ -1962,9 +1962,9 @@ static void _call_fp_beginRemoveRows_3713 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_beginRemoveRows_3713 (arg1, arg2, arg3);
 }
@@ -2046,8 +2046,8 @@ static void _call_fp_changePersistentIndex_4682 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_changePersistentIndex_4682 (arg1, arg2);
 }
@@ -2068,8 +2068,8 @@ static void _call_fp_changePersistentIndexList_5912 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
-  const QList<QModelIndex> &arg2 = args.read<const QList<QModelIndex> & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
+  const QList<QModelIndex> &arg2 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_changePersistentIndexList_5912 (arg1, arg2);
 }
@@ -2159,9 +2159,9 @@ static void _call_fp_createIndex_c2374 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  void *arg3 = args ? args.read<void * > (heap) : (void *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (0, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_createIndex_c2374 (arg1, arg2, arg3));
 }
 
@@ -2183,9 +2183,9 @@ static void _call_fp_createIndex_c2085 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_createIndex_c2085 (arg1, arg2, arg3));
 }
 
@@ -2207,9 +2207,9 @@ static void _call_fp_createIndex_c2416 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  quint32 arg3 = args.read<quint32 > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  quint32 arg3 = gsi::arg_reader<quint32 >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_createIndex_c2416 (arg1, arg2, arg3));
 }
 
@@ -2279,8 +2279,8 @@ static void _call_emitter_dataChanged_4682 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QSqlTableModel_Adaptor *)cls)->emitter_QSqlTableModel_dataChanged_4682 (arg1, arg2);
 }
 
@@ -2304,10 +2304,10 @@ static void _call_fp_decodeData_5302 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
-  QDataStream &arg4 = args.read<QDataStream & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  QDataStream &arg4 = gsi::arg_reader<QDataStream & >() (args, heap);
   ret.write<bool > ((bool)((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_decodeData_5302 (arg1, arg2, arg3, arg4));
 }
 
@@ -2348,7 +2348,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QSqlTableModel_Adaptor *)cls)->emitter_QSqlTableModel_destroyed_1302 (arg1);
 }
 
@@ -2427,8 +2427,8 @@ static void _call_fp_encodeData_c4599 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
-  QDataStream &arg2 = args.read<QDataStream & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
+  QDataStream &arg2 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_encodeData_c4599 (arg1, arg2);
 }
@@ -2681,9 +2681,9 @@ static void _call_emitter_headerDataChanged_3231 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ((QSqlTableModel_Adaptor *)cls)->emitter_QSqlTableModel_headerDataChanged_3231 (arg1, arg2, arg3);
 }
 
@@ -2730,7 +2730,7 @@ static void _call_fp_indexInQuery_c2395 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_indexInQuery_c2395 (arg1));
 }
 
@@ -2992,8 +2992,8 @@ static void _call_emitter_primeInsert_2269 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QSqlRecord &arg2 = args.read<QSqlRecord & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QSqlRecord &arg2 = gsi::arg_reader<QSqlRecord & >() (args, heap);
   ((QSqlTableModel_Adaptor *)cls)->emitter_QSqlTableModel_primeInsert_2269 (arg1, arg2);
 }
 
@@ -3031,7 +3031,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_receivers_c1731 (arg1));
 }
 
@@ -3376,7 +3376,7 @@ static void _call_fp_setLastError_2220 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlError &arg1 = args.read<const QSqlError & > (heap);
+  const QSqlError &arg1 = gsi::arg_reader<const QSqlError & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_setLastError_2220 (arg1);
 }
@@ -3395,7 +3395,7 @@ static void _call_fp_setPrimaryKey_2202 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlIndex &arg1 = args.read<const QSqlIndex & > (heap);
+  const QSqlIndex &arg1 = gsi::arg_reader<const QSqlIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_setPrimaryKey_2202 (arg1);
 }
@@ -3414,7 +3414,7 @@ static void _call_fp_setQuery_2232 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlQuery &arg1 = args.read<const QSqlQuery & > (heap);
+  const QSqlQuery &arg1 = gsi::arg_reader<const QSqlQuery & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_setQuery_2232 (arg1);
 }
@@ -3433,7 +3433,7 @@ static void _call_fp_setRoleNames_3419 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHash<int, QByteArray> &arg1 = args.read<const QHash<int, QByteArray> & > (heap);
+  const QHash<int, QByteArray> &arg1 = gsi::arg_reader<const QHash<int, QByteArray> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlTableModel_Adaptor *)cls)->fp_QSqlTableModel_setRoleNames_3419 (arg1);
 }

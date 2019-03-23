@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionDockWidget_3553 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionDockWidget &arg1 = args.read<const QStyleOptionDockWidget & > (heap);
+  const QStyleOptionDockWidget &arg1 = gsi::arg_reader<const QStyleOptionDockWidget & >() (args, heap);
   ret.write<QStyleOptionDockWidget *> (new QStyleOptionDockWidget (arg1));
 }
 

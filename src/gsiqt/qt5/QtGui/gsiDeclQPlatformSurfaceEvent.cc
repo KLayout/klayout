@@ -102,7 +102,7 @@ static void _call_ctor_QPlatformSurfaceEvent_Adaptor_4342 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPlatformSurfaceEvent::SurfaceEventType>::target_type & arg1 = args.read<const qt_gsi::Converter<QPlatformSurfaceEvent::SurfaceEventType>::target_type & > (heap);
+  const qt_gsi::Converter<QPlatformSurfaceEvent::SurfaceEventType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPlatformSurfaceEvent::SurfaceEventType>::target_type & >() (args, heap);
   ret.write<QPlatformSurfaceEvent_Adaptor *> (new QPlatformSurfaceEvent_Adaptor (qt_gsi::QtToCppAdaptor<QPlatformSurfaceEvent::SurfaceEventType>(arg1).cref()));
 }
 

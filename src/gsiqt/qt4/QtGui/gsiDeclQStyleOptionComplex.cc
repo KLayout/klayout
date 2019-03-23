@@ -54,8 +54,8 @@ static void _call_ctor_QStyleOptionComplex_1426 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(QStyleOptionComplex::Version);
-  int arg2 = args ? args.read<int > (heap) : (int)(QStyleOption::SO_Complex);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QStyleOptionComplex::Version, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QStyleOption::SO_Complex, heap);
   ret.write<QStyleOptionComplex *> (new QStyleOptionComplex (arg1, arg2));
 }
 
@@ -74,7 +74,7 @@ static void _call_ctor_QStyleOptionComplex_3284 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionComplex &arg1 = args.read<const QStyleOptionComplex & > (heap);
+  const QStyleOptionComplex &arg1 = gsi::arg_reader<const QStyleOptionComplex & >() (args, heap);
   ret.write<QStyleOptionComplex *> (new QStyleOptionComplex (arg1));
 }
 

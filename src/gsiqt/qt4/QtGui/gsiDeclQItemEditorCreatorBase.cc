@@ -51,7 +51,7 @@ static void _call_f_createWidget_c1315 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QItemEditorCreatorBase *)cls)->createWidget (arg1));
 }
 

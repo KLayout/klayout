@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionFocusRect_3466 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionFocusRect &arg1 = args.read<const QStyleOptionFocusRect & > (heap);
+  const QStyleOptionFocusRect &arg1 = gsi::arg_reader<const QStyleOptionFocusRect & >() (args, heap);
   ret.write<QStyleOptionFocusRect *> (new QStyleOptionFocusRect (arg1));
 }
 

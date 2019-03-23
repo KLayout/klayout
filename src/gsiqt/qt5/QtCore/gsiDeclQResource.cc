@@ -53,8 +53,8 @@ static void _call_ctor_QResource_3903 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QLocale &arg2 = args ? args.read<const QLocale & > (heap) : (const QLocale &)(QLocale());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QLocale &arg2 = args ? gsi::arg_reader<const QLocale & >() (args, heap) : gsi::arg_maker<const QLocale & >() (QLocale(), heap);
   ret.write<QResource *> (new QResource (arg1, arg2));
 }
 
@@ -163,7 +163,7 @@ static void _call_f_setFileName_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QResource *)cls)->setFileName (arg1);
 }
@@ -183,7 +183,7 @@ static void _call_f_setLocale_1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLocale &arg1 = args.read<const QLocale & > (heap);
+  const QLocale &arg1 = gsi::arg_reader<const QLocale & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QResource *)cls)->setLocale (arg1);
 }
@@ -218,7 +218,7 @@ static void _call_f_addSearchPath_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QResource::addSearchPath (arg1);
 }
@@ -240,8 +240,8 @@ static void _call_f_registerResource_3942 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<bool > ((bool)QResource::registerResource (arg1, arg2));
 }
 
@@ -262,8 +262,8 @@ static void _call_f_registerResource_4653 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const unsigned char *arg1 = args.read<const unsigned char * > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const unsigned char *arg1 = gsi::arg_reader<const unsigned char * >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<bool > ((bool)QResource::registerResource (arg1, arg2));
 }
 
@@ -299,8 +299,8 @@ static void _call_f_unregisterResource_3942 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<bool > ((bool)QResource::unregisterResource (arg1, arg2));
 }
 
@@ -321,8 +321,8 @@ static void _call_f_unregisterResource_4653 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const unsigned char *arg1 = args.read<const unsigned char * > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const unsigned char *arg1 = gsi::arg_reader<const unsigned char * >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<bool > ((bool)QResource::unregisterResource (arg1, arg2));
 }
 

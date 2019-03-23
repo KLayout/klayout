@@ -83,11 +83,11 @@ static void _call_ctor_QRegion_4911 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  const qt_gsi::Converter<QRegion::RegionType>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<QRegion::RegionType>::target_type & > (heap) : (const qt_gsi::Converter<QRegion::RegionType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRegion::RegionType>(heap, QRegion::Rectangle));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QRegion::RegionType>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegion::RegionType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegion::RegionType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegion::RegionType>(heap, QRegion::Rectangle), heap);
   ret.write<QRegion *> (new QRegion (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QRegion::RegionType>(arg5).cref()));
 }
 
@@ -108,8 +108,8 @@ static void _call_ctor_QRegion_3959 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
-  const qt_gsi::Converter<QRegion::RegionType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QRegion::RegionType>::target_type & > (heap) : (const qt_gsi::Converter<QRegion::RegionType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRegion::RegionType>(heap, QRegion::Rectangle));
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
+  const qt_gsi::Converter<QRegion::RegionType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegion::RegionType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegion::RegionType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegion::RegionType>(heap, QRegion::Rectangle), heap);
   ret.write<QRegion *> (new QRegion (arg1, qt_gsi::QtToCppAdaptor<QRegion::RegionType>(arg2).cref()));
 }
 
@@ -130,8 +130,8 @@ static void _call_ctor_QRegion_3578 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygon &arg1 = args.read<const QPolygon & > (heap);
-  const qt_gsi::Converter<Qt::FillRule>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::FillRule>::target_type & > (heap) : (const qt_gsi::Converter<Qt::FillRule>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::FillRule>(heap, Qt::OddEvenFill));
+  const QPolygon &arg1 = gsi::arg_reader<const QPolygon & >() (args, heap);
+  const qt_gsi::Converter<Qt::FillRule>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::FillRule>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::FillRule>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::FillRule>(heap, Qt::OddEvenFill), heap);
   ret.write<QRegion *> (new QRegion (arg1, qt_gsi::QtToCppAdaptor<Qt::FillRule>(arg2).cref()));
 }
 
@@ -150,7 +150,7 @@ static void _call_ctor_QRegion_2006 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion *> (new QRegion (arg1));
 }
 
@@ -169,7 +169,7 @@ static void _call_ctor_QRegion_1999 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBitmap &arg1 = args.read<const QBitmap & > (heap);
+  const QBitmap &arg1 = gsi::arg_reader<const QBitmap & >() (args, heap);
   ret.write<QRegion *> (new QRegion (arg1));
 }
 
@@ -203,7 +203,7 @@ static void _call_f_contains_c1916 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<bool > ((bool)((QRegion *)cls)->contains (arg1));
 }
 
@@ -222,7 +222,7 @@ static void _call_f_contains_c1792 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<bool > ((bool)((QRegion *)cls)->contains (arg1));
 }
 
@@ -241,7 +241,7 @@ static void _call_f_eor_c2006 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->eor (arg1));
 }
 
@@ -260,7 +260,7 @@ static void _call_f_intersect_c2006 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->intersect (arg1));
 }
 
@@ -279,7 +279,7 @@ static void _call_f_intersect_c1792 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->intersect (arg1));
 }
 
@@ -298,7 +298,7 @@ static void _call_f_intersected_c2006 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->intersected (arg1));
 }
 
@@ -317,7 +317,7 @@ static void _call_f_intersected_c1792 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->intersected (arg1));
 }
 
@@ -336,7 +336,7 @@ static void _call_f_intersects_c2006 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<bool > ((bool)((QRegion *)cls)->intersects (arg1));
 }
 
@@ -355,7 +355,7 @@ static void _call_f_intersects_c1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<bool > ((bool)((QRegion *)cls)->intersects (arg1));
 }
 
@@ -404,7 +404,7 @@ static void _call_f_operator_excl__eq__c2006 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<bool > ((bool)((QRegion *)cls)->operator!= (arg1));
 }
 
@@ -423,7 +423,7 @@ static void _call_f_operator_amp__c2006 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<const QRegion > ((const QRegion)((QRegion *)cls)->operator& (arg1));
 }
 
@@ -442,7 +442,7 @@ static void _call_f_operator_amp__c1792 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<const QRegion > ((const QRegion)((QRegion *)cls)->operator& (arg1));
 }
 
@@ -461,7 +461,7 @@ static void _call_f_operator_amp__eq__2006 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion & > ((QRegion &)((QRegion *)cls)->operator&= (arg1));
 }
 
@@ -480,7 +480,7 @@ static void _call_f_operator_amp__eq__1792 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRegion & > ((QRegion &)((QRegion *)cls)->operator&= (arg1));
 }
 
@@ -499,7 +499,7 @@ static void _call_f_operator_plus__c2006 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<const QRegion > ((const QRegion)((QRegion *)cls)->operator+ (arg1));
 }
 
@@ -518,7 +518,7 @@ static void _call_f_operator_plus__c1792 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<const QRegion > ((const QRegion)((QRegion *)cls)->operator+ (arg1));
 }
 
@@ -537,7 +537,7 @@ static void _call_f_operator_plus__eq__2006 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion & > ((QRegion &)((QRegion *)cls)->operator+= (arg1));
 }
 
@@ -556,7 +556,7 @@ static void _call_f_operator_plus__eq__1792 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRegion & > ((QRegion &)((QRegion *)cls)->operator+= (arg1));
 }
 
@@ -575,7 +575,7 @@ static void _call_f_operator_minus__c2006 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<const QRegion > ((const QRegion)((QRegion *)cls)->operator- (arg1));
 }
 
@@ -594,7 +594,7 @@ static void _call_f_operator_minus__eq__2006 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion & > ((QRegion &)((QRegion *)cls)->operator-= (arg1));
 }
 
@@ -613,7 +613,7 @@ static void _call_f_operator_eq__2006 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion & > ((QRegion &)((QRegion *)cls)->operator= (arg1));
 }
 
@@ -632,7 +632,7 @@ static void _call_f_operator_eq__eq__c2006 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<bool > ((bool)((QRegion *)cls)->operator== (arg1));
 }
 
@@ -651,7 +651,7 @@ static void _call_f_operator_acute__c2006 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<const QRegion > ((const QRegion)((QRegion *)cls)->operator^ (arg1));
 }
 
@@ -670,7 +670,7 @@ static void _call_f_operator_acute__eq__2006 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion & > ((QRegion &)((QRegion *)cls)->operator^= (arg1));
 }
 
@@ -689,7 +689,7 @@ static void _call_f_operator_pipe__c2006 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<const QRegion > ((const QRegion)((QRegion *)cls)->operator| (arg1));
 }
 
@@ -708,7 +708,7 @@ static void _call_f_operator_pipe__eq__2006 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion & > ((QRegion &)((QRegion *)cls)->operator|= (arg1));
 }
 
@@ -757,7 +757,7 @@ static void _call_f_subtract_c2006 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->subtract (arg1));
 }
 
@@ -776,7 +776,7 @@ static void _call_f_subtracted_c2006 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->subtracted (arg1));
 }
 
@@ -797,8 +797,8 @@ static void _call_f_translate_1426 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRegion *)cls)->translate (arg1, arg2);
 }
@@ -818,7 +818,7 @@ static void _call_f_translate_1916 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRegion *)cls)->translate (arg1);
 }
@@ -840,8 +840,8 @@ static void _call_f_translated_c1426 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->translated (arg1, arg2));
 }
 
@@ -860,7 +860,7 @@ static void _call_f_translated_c1916 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->translated (arg1));
 }
 
@@ -879,7 +879,7 @@ static void _call_f_unite_c2006 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->unite (arg1));
 }
 
@@ -898,7 +898,7 @@ static void _call_f_unite_c1792 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->unite (arg1));
 }
 
@@ -917,7 +917,7 @@ static void _call_f_united_c2006 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->united (arg1));
 }
 
@@ -936,7 +936,7 @@ static void _call_f_united_c1792 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->united (arg1));
 }
 
@@ -955,7 +955,7 @@ static void _call_f_xored_c2006 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QRegion *)cls)->xored (arg1));
 }
 

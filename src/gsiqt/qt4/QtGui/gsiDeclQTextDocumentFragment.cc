@@ -67,7 +67,7 @@ static void _call_ctor_QTextDocumentFragment_2650 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextDocument *arg1 = args.read<const QTextDocument * > (heap);
+  const QTextDocument *arg1 = gsi::arg_reader<const QTextDocument * >() (args, heap);
   ret.write<QTextDocumentFragment *> (new QTextDocumentFragment (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QTextDocumentFragment_2453 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCursor &arg1 = args.read<const QTextCursor & > (heap);
+  const QTextCursor &arg1 = gsi::arg_reader<const QTextCursor & >() (args, heap);
   ret.write<QTextDocumentFragment *> (new QTextDocumentFragment (arg1));
 }
 
@@ -105,7 +105,7 @@ static void _call_ctor_QTextDocumentFragment_3466 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextDocumentFragment &arg1 = args.read<const QTextDocumentFragment & > (heap);
+  const QTextDocumentFragment &arg1 = gsi::arg_reader<const QTextDocumentFragment & >() (args, heap);
   ret.write<QTextDocumentFragment *> (new QTextDocumentFragment (arg1));
 }
 
@@ -139,7 +139,7 @@ static void _call_f_operator_eq__3466 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextDocumentFragment &arg1 = args.read<const QTextDocumentFragment & > (heap);
+  const QTextDocumentFragment &arg1 = gsi::arg_reader<const QTextDocumentFragment & >() (args, heap);
   ret.write<QTextDocumentFragment & > ((QTextDocumentFragment &)((QTextDocumentFragment *)cls)->operator= (arg1));
 }
 
@@ -173,7 +173,7 @@ static void _call_f_toHtml_c2309 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)((QTextDocumentFragment *)cls)->toHtml (arg1));
 }
 
@@ -207,7 +207,7 @@ static void _call_f_fromHtml_2025 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTextDocumentFragment > ((QTextDocumentFragment)QTextDocumentFragment::fromHtml (arg1));
 }
 
@@ -228,8 +228,8 @@ static void _call_f_fromHtml_4567 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QTextDocument *arg2 = args.read<const QTextDocument * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QTextDocument *arg2 = gsi::arg_reader<const QTextDocument * >() (args, heap);
   ret.write<QTextDocumentFragment > ((QTextDocumentFragment)QTextDocumentFragment::fromHtml (arg1, arg2));
 }
 
@@ -248,7 +248,7 @@ static void _call_f_fromPlainText_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTextDocumentFragment > ((QTextDocumentFragment)QTextDocumentFragment::fromPlainText (arg1));
 }
 

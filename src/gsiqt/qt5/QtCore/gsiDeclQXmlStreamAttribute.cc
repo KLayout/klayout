@@ -67,8 +67,8 @@ static void _call_ctor_QXmlStreamAttribute_3942 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QXmlStreamAttribute *> (new QXmlStreamAttribute (arg1, arg2));
 }
 
@@ -91,9 +91,9 @@ static void _call_ctor_QXmlStreamAttribute_5859 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QXmlStreamAttribute *> (new QXmlStreamAttribute (arg1, arg2, arg3));
 }
 
@@ -112,7 +112,7 @@ static void _call_ctor_QXmlStreamAttribute_3267 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamAttribute &arg1 = args.read<const QXmlStreamAttribute & > (heap);
+  const QXmlStreamAttribute &arg1 = gsi::arg_reader<const QXmlStreamAttribute & >() (args, heap);
   ret.write<QXmlStreamAttribute *> (new QXmlStreamAttribute (arg1));
 }
 
@@ -176,7 +176,7 @@ static void _call_f_operator_excl__eq__c3267 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamAttribute &arg1 = args.read<const QXmlStreamAttribute & > (heap);
+  const QXmlStreamAttribute &arg1 = gsi::arg_reader<const QXmlStreamAttribute & >() (args, heap);
   ret.write<bool > ((bool)((QXmlStreamAttribute *)cls)->operator!= (arg1));
 }
 
@@ -195,7 +195,7 @@ static void _call_f_operator_eq__3267 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamAttribute &arg1 = args.read<const QXmlStreamAttribute & > (heap);
+  const QXmlStreamAttribute &arg1 = gsi::arg_reader<const QXmlStreamAttribute & >() (args, heap);
   ret.write<QXmlStreamAttribute & > ((QXmlStreamAttribute &)((QXmlStreamAttribute *)cls)->operator= (arg1));
 }
 
@@ -214,7 +214,7 @@ static void _call_f_operator_eq__eq__c3267 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamAttribute &arg1 = args.read<const QXmlStreamAttribute & > (heap);
+  const QXmlStreamAttribute &arg1 = gsi::arg_reader<const QXmlStreamAttribute & >() (args, heap);
   ret.write<bool > ((bool)((QXmlStreamAttribute *)cls)->operator== (arg1));
 }
 

@@ -106,7 +106,7 @@ static void _call_f_setIndent_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextListFormat *)cls)->setIndent (arg1);
 }
@@ -126,7 +126,7 @@ static void _call_f_setStyle_2612 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextListFormat::Style>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextListFormat::Style>::target_type & > (heap);
+  const qt_gsi::Converter<QTextListFormat::Style>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextListFormat::Style>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextListFormat *)cls)->setStyle (qt_gsi::QtToCppAdaptor<QTextListFormat::Style>(arg1).cref());
 }

@@ -54,9 +54,9 @@ static void _call_f_nativeEventFilter_4678 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  void *arg2 = args.read<void * > (heap);
-  long int *arg3 = args.read<long int * > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  void *arg2 = gsi::arg_reader<void * >() (args, heap);
+  long int *arg3 = gsi::arg_reader<long int * >() (args, heap);
   ret.write<bool > ((bool)((QAbstractNativeEventFilter *)cls)->nativeEventFilter (arg1, arg2, arg3));
 }
 

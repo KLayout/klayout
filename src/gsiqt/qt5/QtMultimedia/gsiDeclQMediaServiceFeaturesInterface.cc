@@ -50,7 +50,7 @@ static void _call_f_supportedFeatures_c2309 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QFlags<QMediaServiceProviderHint::Feature> > ((QFlags<QMediaServiceProviderHint::Feature>)((QMediaServiceFeaturesInterface *)cls)->supportedFeatures (arg1));
 }
 

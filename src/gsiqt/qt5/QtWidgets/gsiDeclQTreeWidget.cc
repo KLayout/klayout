@@ -125,7 +125,7 @@ static void _call_f_addTopLevelItem_2114 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
   qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->addTopLevelItem (arg1);
@@ -146,7 +146,7 @@ static void _call_f_addTopLevelItems_3462 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QTreeWidgetItem*> &arg1 = args.read<const QList<QTreeWidgetItem*> & > (heap);
+  const QList<QTreeWidgetItem*> &arg1 = gsi::arg_reader<const QList<QTreeWidgetItem*> & >() (args, heap);
   qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->addTopLevelItems (arg1);
@@ -185,8 +185,8 @@ static void _call_f_closePersistentEditor_2773 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->closePersistentEditor (arg1, arg2);
 }
@@ -206,7 +206,7 @@ static void _call_f_collapseItem_2809 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->collapseItem (arg1);
 }
@@ -273,8 +273,8 @@ static void _call_f_editItem_2773 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->editItem (arg1, arg2);
 }
@@ -294,7 +294,7 @@ static void _call_f_expandItem_2809 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->expandItem (arg1);
 }
@@ -318,9 +318,9 @@ static void _call_f_findItems_c4892 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<Qt::MatchFlag> arg2 = args.read<QFlags<Qt::MatchFlag> > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<Qt::MatchFlag> arg2 = gsi::arg_reader<QFlags<Qt::MatchFlag> >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QList<QTreeWidgetItem*> > ((QList<QTreeWidgetItem*>)((QTreeWidget *)cls)->findItems (arg1, arg2, arg3));
 }
 
@@ -354,7 +354,7 @@ static void _call_f_indexOfTopLevelItem_c2114 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
   ret.write<int > ((int)((QTreeWidget *)cls)->indexOfTopLevelItem (arg1));
 }
 
@@ -375,8 +375,8 @@ static void _call_f_insertTopLevelItem_2773 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QTreeWidgetItem *arg2 = args.read<QTreeWidgetItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QTreeWidgetItem *arg2 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
   qt_gsi::qt_keep (arg2);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->insertTopLevelItem (arg1, arg2);
@@ -399,8 +399,8 @@ static void _call_f_insertTopLevelItems_4121 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QList<QTreeWidgetItem*> &arg2 = args.read<const QList<QTreeWidgetItem*> & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QList<QTreeWidgetItem*> &arg2 = gsi::arg_reader<const QList<QTreeWidgetItem*> & >() (args, heap);
   qt_gsi::qt_keep (arg2);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->insertTopLevelItems (arg1, arg2);
@@ -436,7 +436,7 @@ static void _call_f_isFirstItemColumnSpanned_c2809 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
   ret.write<bool > ((bool)((QTreeWidget *)cls)->isFirstItemColumnSpanned (arg1));
 }
 
@@ -455,7 +455,7 @@ static void _call_f_isItemExpanded_c2809 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
   ret.write<bool > ((bool)((QTreeWidget *)cls)->isItemExpanded (arg1));
 }
 
@@ -474,7 +474,7 @@ static void _call_f_isItemHidden_c2809 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
   ret.write<bool > ((bool)((QTreeWidget *)cls)->isItemHidden (arg1));
 }
 
@@ -493,7 +493,7 @@ static void _call_f_isItemSelected_c2809 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
   ret.write<bool > ((bool)((QTreeWidget *)cls)->isItemSelected (arg1));
 }
 
@@ -512,7 +512,7 @@ static void _call_f_itemAbove_c2809 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
   ret.write<QTreeWidgetItem * > ((QTreeWidgetItem *)((QTreeWidget *)cls)->itemAbove (arg1));
 }
 
@@ -531,7 +531,7 @@ static void _call_f_itemAt_c1916 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QTreeWidgetItem * > ((QTreeWidgetItem *)((QTreeWidget *)cls)->itemAt (arg1));
 }
 
@@ -552,8 +552,8 @@ static void _call_f_itemAt_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTreeWidgetItem * > ((QTreeWidgetItem *)((QTreeWidget *)cls)->itemAt (arg1, arg2));
 }
 
@@ -572,7 +572,7 @@ static void _call_f_itemBelow_c2809 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
   ret.write<QTreeWidgetItem * > ((QTreeWidgetItem *)((QTreeWidget *)cls)->itemBelow (arg1));
 }
 
@@ -593,8 +593,8 @@ static void _call_f_itemWidget_c2773 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QTreeWidget *)cls)->itemWidget (arg1, arg2));
 }
 
@@ -615,8 +615,8 @@ static void _call_f_openPersistentEditor_2773 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->openPersistentEditor (arg1, arg2);
 }
@@ -638,8 +638,8 @@ static void _call_f_removeItemWidget_2773 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->removeItemWidget (arg1, arg2);
 }
@@ -661,8 +661,8 @@ static void _call_f_scrollToItem_5990 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
-  const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractItemView::ScrollHint>(heap, QAbstractItemView::EnsureVisible));
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
+  const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractItemView::ScrollHint>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractItemView::ScrollHint>(heap, QAbstractItemView::EnsureVisible), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->scrollToItem (arg1, qt_gsi::QtToCppAdaptor<QAbstractItemView::ScrollHint>(arg2).cref());
 }
@@ -697,7 +697,7 @@ static void _call_f_setColumnCount_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setColumnCount (arg1);
 }
@@ -717,7 +717,7 @@ static void _call_f_setCurrentItem_2114 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setCurrentItem (arg1);
 }
@@ -739,8 +739,8 @@ static void _call_f_setCurrentItem_2773 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setCurrentItem (arg1, arg2);
 }
@@ -764,9 +764,9 @@ static void _call_f_setCurrentItem_7136 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
-  QFlags<QItemSelectionModel::SelectionFlag> arg3 = args.read<QFlags<QItemSelectionModel::SelectionFlag> > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QFlags<QItemSelectionModel::SelectionFlag> arg3 = gsi::arg_reader<QFlags<QItemSelectionModel::SelectionFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setCurrentItem (arg1, arg2, arg3);
 }
@@ -788,8 +788,8 @@ static void _call_f_setFirstItemColumnSpanned_3565 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setFirstItemColumnSpanned (arg1, arg2);
 }
@@ -809,7 +809,7 @@ static void _call_f_setHeaderItem_2114 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setHeaderItem (arg1);
 }
@@ -829,7 +829,7 @@ static void _call_f_setHeaderLabel_2025 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setHeaderLabel (arg1);
 }
@@ -849,7 +849,7 @@ static void _call_f_setHeaderLabels_2437 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setHeaderLabels (arg1);
 }
@@ -871,8 +871,8 @@ static void _call_f_setItemExpanded_3565 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setItemExpanded (arg1, arg2);
 }
@@ -894,8 +894,8 @@ static void _call_f_setItemHidden_3565 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setItemHidden (arg1, arg2);
 }
@@ -917,8 +917,8 @@ static void _call_f_setItemSelected_3565 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setItemSelected (arg1, arg2);
 }
@@ -942,9 +942,9 @@ static void _call_f_setItemWidget_3980 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
-  QWidget *arg3 = args.read<QWidget * > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setItemWidget (arg1, arg2, arg3);
 }
@@ -964,7 +964,7 @@ static void _call_f_setSelectionModel_2533 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QItemSelectionModel *arg1 = args.read<QItemSelectionModel * > (heap);
+  QItemSelectionModel *arg1 = gsi::arg_reader<QItemSelectionModel * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->setSelectionModel (arg1);
 }
@@ -1001,8 +1001,8 @@ static void _call_f_sortItems_2340 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::SortOrder>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::SortOrder>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget *)cls)->sortItems (arg1, qt_gsi::QtToCppAdaptor<Qt::SortOrder>(arg2).cref());
 }
@@ -1022,7 +1022,7 @@ static void _call_f_takeTopLevelItem_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTreeWidgetItem * > ((QTreeWidgetItem *)((QTreeWidget *)cls)->takeTopLevelItem (arg1));
 }
 
@@ -1041,7 +1041,7 @@ static void _call_f_topLevelItem_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTreeWidgetItem * > ((QTreeWidgetItem *)((QTreeWidget *)cls)->topLevelItem (arg1));
 }
 
@@ -1075,7 +1075,7 @@ static void _call_f_visualItemRect_c2809 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTreeWidgetItem *arg1 = args.read<const QTreeWidgetItem * > (heap);
+  const QTreeWidgetItem *arg1 = gsi::arg_reader<const QTreeWidgetItem * >() (args, heap);
   ret.write<QRect > ((QRect)((QTreeWidget *)cls)->visualItemRect (arg1));
 }
 
@@ -1098,9 +1098,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QTreeWidget::tr (arg1, arg2, arg3));
 }
 
@@ -1123,9 +1123,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QTreeWidget::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -3075,7 +3075,7 @@ static void _call_ctor_QTreeWidget_Adaptor_1315 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QTreeWidget_Adaptor *> (new QTreeWidget_Adaptor (arg1));
 }
 
@@ -3117,7 +3117,7 @@ static void _call_emitter_activated_2395 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_activated_2395 (arg1);
 }
 
@@ -3183,7 +3183,7 @@ static void _call_emitter_clicked_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_clicked_2395 (arg1);
 }
 
@@ -3252,7 +3252,7 @@ static void _call_emitter_collapsed_2395 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_collapsed_2395 (arg1);
 }
 
@@ -3272,8 +3272,8 @@ static void _call_fp_columnCountChanged_1426 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_columnCountChanged_1426 (arg1, arg2);
 }
@@ -3311,9 +3311,9 @@ static void _call_fp_columnResized_2085 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_columnResized_2085 (arg1, arg2, arg3);
 }
@@ -3384,9 +3384,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_create_2208 (arg1, arg2, arg3);
 }
@@ -3434,8 +3434,8 @@ static void _call_emitter_currentItemChanged_4120 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  QTreeWidgetItem *arg2 = args.read<QTreeWidgetItem * > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  QTreeWidgetItem *arg2 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_currentItemChanged_4120 (arg1, arg2);
 }
 
@@ -3453,7 +3453,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_customContextMenuRequested_1916 (arg1);
 }
 
@@ -3527,8 +3527,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_destroy_1620 (arg1, arg2);
 }
@@ -3547,7 +3547,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_destroyed_1302 (arg1);
 }
 
@@ -3638,7 +3638,7 @@ static void _call_emitter_doubleClicked_2395 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_doubleClicked_2395 (arg1);
 }
 
@@ -3758,7 +3758,7 @@ static void _call_fp_drawFrame_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_drawFrame_1426 (arg1);
 }
@@ -3809,8 +3809,8 @@ static void _call_fp_drawTree_c3324 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QRegion &arg2 = args.read<const QRegion & > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QRegion &arg2 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_drawTree_c3324 (arg1, arg2);
 }
@@ -3976,7 +3976,7 @@ static void _call_emitter_entered_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_entered_2395 (arg1);
 }
 
@@ -4058,7 +4058,7 @@ static void _call_emitter_expanded_2395 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_expanded_2395 (arg1);
 }
 
@@ -4322,7 +4322,7 @@ static void _call_emitter_iconSizeChanged_1805 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_iconSizeChanged_1805 (arg1);
 }
 
@@ -4365,8 +4365,8 @@ static void _call_fp_indexFromItem_c2773 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QModelIndex > ((QModelIndex)((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_indexFromItem_c2773 (arg1, arg2));
 }
 
@@ -4384,7 +4384,7 @@ static void _call_fp_indexRowSizeHint_c2395 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<int > ((int)((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_indexRowSizeHint_c2395 (arg1));
 }
 
@@ -4426,7 +4426,7 @@ static void _call_fp_initStyleOption_c2356 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionFrame *arg1 = args.read<QStyleOptionFrame * > (heap);
+  QStyleOptionFrame *arg1 = gsi::arg_reader<QStyleOptionFrame * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_initStyleOption_c2356 (arg1);
 }
@@ -4515,7 +4515,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_isSignalConnected_c2394 (arg1));
 }
 
@@ -4535,8 +4535,8 @@ static void _call_emitter_itemActivated_2773 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_itemActivated_2773 (arg1, arg2);
 }
 
@@ -4556,8 +4556,8 @@ static void _call_emitter_itemChanged_2773 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_itemChanged_2773 (arg1, arg2);
 }
 
@@ -4577,8 +4577,8 @@ static void _call_emitter_itemClicked_2773 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_itemClicked_2773 (arg1, arg2);
 }
 
@@ -4596,7 +4596,7 @@ static void _call_emitter_itemCollapsed_2114 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_itemCollapsed_2114 (arg1);
 }
 
@@ -4616,8 +4616,8 @@ static void _call_emitter_itemDoubleClicked_2773 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_itemDoubleClicked_2773 (arg1, arg2);
 }
 
@@ -4637,8 +4637,8 @@ static void _call_emitter_itemEntered_2773 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_itemEntered_2773 (arg1, arg2);
 }
 
@@ -4656,7 +4656,7 @@ static void _call_emitter_itemExpanded_2114 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_itemExpanded_2114 (arg1);
 }
 
@@ -4674,7 +4674,7 @@ static void _call_fp_itemFromIndex_c2395 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QTreeWidgetItem * > ((QTreeWidgetItem *)((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_itemFromIndex_c2395 (arg1));
 }
 
@@ -4694,8 +4694,8 @@ static void _call_emitter_itemPressed_2773 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTreeWidgetItem *arg1 = args.read<QTreeWidgetItem * > (heap);
-  int arg2 = args.read<int > (heap);
+  QTreeWidgetItem *arg1 = gsi::arg_reader<QTreeWidgetItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_itemPressed_2773 (arg1, arg2);
 }
 
@@ -4727,7 +4727,7 @@ static void _call_fp_items_c2168 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeData *arg1 = args.read<const QMimeData * > (heap);
+  const QMimeData *arg1 = gsi::arg_reader<const QMimeData * >() (args, heap);
   ret.write<QList<QTreeWidgetItem*> > ((QList<QTreeWidgetItem*>)((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_items_c2168 (arg1));
 }
 
@@ -5143,7 +5143,7 @@ static void _call_emitter_pressed_2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_pressed_2395 (arg1);
 }
 
@@ -5161,7 +5161,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_receivers_c1731 (arg1));
 }
 
@@ -5261,7 +5261,7 @@ static void _call_fp_rowHeight_c2395 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<int > ((int)((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_rowHeight_c2395 (arg1));
 }
 
@@ -5343,9 +5343,9 @@ static void _call_fp_rowsRemoved_3713 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_rowsRemoved_3713 (arg1, arg2, arg3);
 }
@@ -5408,8 +5408,8 @@ static void _call_fp_scrollDirtyRegion_1426 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_scrollDirtyRegion_1426 (arg1, arg2);
 }
@@ -5575,7 +5575,7 @@ static void _call_fp_setDirtyRegion_2006 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_setDirtyRegion_2006 (arg1);
 }
@@ -5594,7 +5594,7 @@ static void _call_fp_setHorizontalStepsPerItem_767 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_setHorizontalStepsPerItem_767 (arg1);
 }
@@ -5688,7 +5688,7 @@ static void _call_fp_setState_2776 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_setState_2776 (arg1);
 }
@@ -5707,7 +5707,7 @@ static void _call_fp_setVerticalStepsPerItem_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_setVerticalStepsPerItem_767 (arg1);
 }
@@ -5732,10 +5732,10 @@ static void _call_fp_setViewportMargins_2744 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_setViewportMargins_2744 (arg1, arg2, arg3, arg4);
 }
@@ -5754,7 +5754,7 @@ static void _call_fp_setViewportMargins_2115 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTreeWidget_Adaptor *)cls)->fp_QTreeWidget_setViewportMargins_2115 (arg1);
 }
@@ -6379,7 +6379,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_windowIconChanged_1787 (arg1);
 }
 
@@ -6397,7 +6397,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_windowIconTextChanged_2025 (arg1);
 }
 
@@ -6415,7 +6415,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QTreeWidget_Adaptor *)cls)->emitter_QTreeWidget_windowTitleChanged_2025 (arg1);
 }
 

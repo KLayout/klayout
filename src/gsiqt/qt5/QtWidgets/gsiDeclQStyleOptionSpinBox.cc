@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionSpinBox_3263 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionSpinBox &arg1 = args.read<const QStyleOptionSpinBox & > (heap);
+  const QStyleOptionSpinBox &arg1 = gsi::arg_reader<const QStyleOptionSpinBox & >() (args, heap);
   ret.write<QStyleOptionSpinBox *> (new QStyleOptionSpinBox (arg1));
 }
 

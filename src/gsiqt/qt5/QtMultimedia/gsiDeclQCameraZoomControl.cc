@@ -161,8 +161,8 @@ static void _call_f_zoomTo_2034 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraZoomControl *)cls)->zoomTo (arg1, arg2);
 }
@@ -186,9 +186,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraZoomControl::tr (arg1, arg2, arg3));
 }
 
@@ -211,9 +211,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraZoomControl::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -612,7 +612,7 @@ static void _call_emitter_currentDigitalZoomChanged_1071 (const qt_gsi::GenericM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QCameraZoomControl_Adaptor *)cls)->emitter_QCameraZoomControl_currentDigitalZoomChanged_1071 (arg1);
 }
 
@@ -649,7 +649,7 @@ static void _call_emitter_currentOpticalZoomChanged_1071 (const qt_gsi::GenericM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QCameraZoomControl_Adaptor *)cls)->emitter_QCameraZoomControl_currentOpticalZoomChanged_1071 (arg1);
 }
 
@@ -691,7 +691,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QCameraZoomControl_Adaptor *)cls)->emitter_QCameraZoomControl_destroyed_1302 (arg1);
 }
 
@@ -782,7 +782,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QCameraZoomControl_Adaptor *)cls)->fp_QCameraZoomControl_isSignalConnected_c2394 (arg1));
 }
 
@@ -819,7 +819,7 @@ static void _call_emitter_maximumDigitalZoomChanged_1071 (const qt_gsi::GenericM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QCameraZoomControl_Adaptor *)cls)->emitter_QCameraZoomControl_maximumDigitalZoomChanged_1071 (arg1);
 }
 
@@ -856,7 +856,7 @@ static void _call_emitter_maximumOpticalZoomChanged_1071 (const qt_gsi::GenericM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QCameraZoomControl_Adaptor *)cls)->emitter_QCameraZoomControl_maximumOpticalZoomChanged_1071 (arg1);
 }
 
@@ -874,7 +874,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QCameraZoomControl_Adaptor *)cls)->fp_QCameraZoomControl_receivers_c1731 (arg1));
 }
 
@@ -911,7 +911,7 @@ static void _call_emitter_requestedDigitalZoomChanged_1071 (const qt_gsi::Generi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QCameraZoomControl_Adaptor *)cls)->emitter_QCameraZoomControl_requestedDigitalZoomChanged_1071 (arg1);
 }
 
@@ -948,7 +948,7 @@ static void _call_emitter_requestedOpticalZoomChanged_1071 (const qt_gsi::Generi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QCameraZoomControl_Adaptor *)cls)->emitter_QCameraZoomControl_requestedOpticalZoomChanged_1071 (arg1);
 }
 

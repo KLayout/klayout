@@ -65,7 +65,7 @@ static void _call_ctor_QProcessEnvironment_3302 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QProcessEnvironment &arg1 = args.read<const QProcessEnvironment & > (heap);
+  const QProcessEnvironment &arg1 = gsi::arg_reader<const QProcessEnvironment & >() (args, heap);
   ret.write<QProcessEnvironment *> (new QProcessEnvironment (arg1));
 }
 
@@ -100,7 +100,7 @@ static void _call_f_contains_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QProcessEnvironment *)cls)->contains (arg1));
 }
 
@@ -121,8 +121,8 @@ static void _call_f_insert_3942 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcessEnvironment *)cls)->insert (arg1, arg2);
 }
@@ -142,7 +142,7 @@ static void _call_f_insert_3302 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QProcessEnvironment &arg1 = args.read<const QProcessEnvironment & > (heap);
+  const QProcessEnvironment &arg1 = gsi::arg_reader<const QProcessEnvironment & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcessEnvironment *)cls)->insert (arg1);
 }
@@ -192,7 +192,7 @@ static void _call_f_operator_excl__eq__c3302 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QProcessEnvironment &arg1 = args.read<const QProcessEnvironment & > (heap);
+  const QProcessEnvironment &arg1 = gsi::arg_reader<const QProcessEnvironment & >() (args, heap);
   ret.write<bool > ((bool)((QProcessEnvironment *)cls)->operator!= (arg1));
 }
 
@@ -211,7 +211,7 @@ static void _call_f_operator_eq__3302 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QProcessEnvironment &arg1 = args.read<const QProcessEnvironment & > (heap);
+  const QProcessEnvironment &arg1 = gsi::arg_reader<const QProcessEnvironment & >() (args, heap);
   ret.write<QProcessEnvironment & > ((QProcessEnvironment &)((QProcessEnvironment *)cls)->operator= (arg1));
 }
 
@@ -230,7 +230,7 @@ static void _call_f_operator_eq__eq__c3302 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QProcessEnvironment &arg1 = args.read<const QProcessEnvironment & > (heap);
+  const QProcessEnvironment &arg1 = gsi::arg_reader<const QProcessEnvironment & >() (args, heap);
   ret.write<bool > ((bool)((QProcessEnvironment *)cls)->operator== (arg1));
 }
 
@@ -249,7 +249,7 @@ static void _call_f_remove_2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcessEnvironment *)cls)->remove (arg1);
 }
@@ -269,7 +269,7 @@ static void _call_f_swap_2607 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QProcessEnvironment &arg1 = args.read<QProcessEnvironment & > (heap);
+  QProcessEnvironment &arg1 = gsi::arg_reader<QProcessEnvironment & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QProcessEnvironment *)cls)->swap (arg1);
 }
@@ -306,8 +306,8 @@ static void _call_f_value_c3942 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QProcessEnvironment *)cls)->value (arg1, arg2));
 }
 

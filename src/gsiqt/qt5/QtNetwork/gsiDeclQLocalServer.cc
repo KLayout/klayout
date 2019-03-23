@@ -146,7 +146,7 @@ static void _call_f_listen_2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QLocalServer *)cls)->listen (arg1));
 }
 
@@ -165,7 +165,7 @@ static void _call_f_listen_3470 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIntegerForSizeof<void*>::Signed arg1 = args.read<QIntegerForSizeof<void*>::Signed > (heap);
+  QIntegerForSizeof<void*>::Signed arg1 = gsi::arg_reader<QIntegerForSizeof<void*>::Signed >() (args, heap);
   ret.write<bool > ((bool)((QLocalServer *)cls)->listen (arg1));
 }
 
@@ -244,7 +244,7 @@ static void _call_f_setMaxPendingConnections_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLocalServer *)cls)->setMaxPendingConnections (arg1);
 }
@@ -264,7 +264,7 @@ static void _call_f_setSocketOptions_3701 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QLocalServer::SocketOption> arg1 = args.read<QFlags<QLocalServer::SocketOption> > (heap);
+  QFlags<QLocalServer::SocketOption> arg1 = gsi::arg_reader<QFlags<QLocalServer::SocketOption> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLocalServer *)cls)->setSocketOptions (arg1);
 }
@@ -301,8 +301,8 @@ static void _call_f_waitForNewConnection_1709 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<bool > ((bool)((QLocalServer *)cls)->waitForNewConnection (arg1, arg2));
 }
 
@@ -321,7 +321,7 @@ static void _call_f_removeServer_2025 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QLocalServer::removeServer (arg1));
 }
 
@@ -344,9 +344,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QLocalServer::tr (arg1, arg2, arg3));
 }
 
@@ -369,9 +369,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QLocalServer::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -627,7 +627,7 @@ static void _call_ctor_QLocalServer_Adaptor_1302 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QLocalServer_Adaptor *> (new QLocalServer_Adaptor (arg1));
 }
 
@@ -693,7 +693,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QLocalServer_Adaptor *)cls)->emitter_QLocalServer_destroyed_1302 (arg1);
 }
 
@@ -827,7 +827,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QLocalServer_Adaptor *)cls)->fp_QLocalServer_isSignalConnected_c2394 (arg1));
 }
 
@@ -878,7 +878,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QLocalServer_Adaptor *)cls)->fp_QLocalServer_receivers_c1731 (arg1));
 }
 

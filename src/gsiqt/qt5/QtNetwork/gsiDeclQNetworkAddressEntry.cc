@@ -66,7 +66,7 @@ static void _call_ctor_QNetworkAddressEntry_3380 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkAddressEntry &arg1 = args.read<const QNetworkAddressEntry & > (heap);
+  const QNetworkAddressEntry &arg1 = gsi::arg_reader<const QNetworkAddressEntry & >() (args, heap);
   ret.write<QNetworkAddressEntry *> (new QNetworkAddressEntry (arg1));
 }
 
@@ -130,7 +130,7 @@ static void _call_f_operator_excl__eq__c3380 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkAddressEntry &arg1 = args.read<const QNetworkAddressEntry & > (heap);
+  const QNetworkAddressEntry &arg1 = gsi::arg_reader<const QNetworkAddressEntry & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkAddressEntry *)cls)->operator!= (arg1));
 }
 
@@ -149,7 +149,7 @@ static void _call_f_operator_eq__3380 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkAddressEntry &arg1 = args.read<const QNetworkAddressEntry & > (heap);
+  const QNetworkAddressEntry &arg1 = gsi::arg_reader<const QNetworkAddressEntry & >() (args, heap);
   ret.write<QNetworkAddressEntry & > ((QNetworkAddressEntry &)((QNetworkAddressEntry *)cls)->operator= (arg1));
 }
 
@@ -168,7 +168,7 @@ static void _call_f_operator_eq__eq__c3380 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkAddressEntry &arg1 = args.read<const QNetworkAddressEntry & > (heap);
+  const QNetworkAddressEntry &arg1 = gsi::arg_reader<const QNetworkAddressEntry & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkAddressEntry *)cls)->operator== (arg1));
 }
 
@@ -202,7 +202,7 @@ static void _call_f_setBroadcast_2518 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAddressEntry *)cls)->setBroadcast (arg1);
 }
@@ -222,7 +222,7 @@ static void _call_f_setIp_2518 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAddressEntry *)cls)->setIp (arg1);
 }
@@ -242,7 +242,7 @@ static void _call_f_setNetmask_2518 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAddressEntry *)cls)->setNetmask (arg1);
 }
@@ -262,7 +262,7 @@ static void _call_f_setPrefixLength_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAddressEntry *)cls)->setPrefixLength (arg1);
 }
@@ -282,7 +282,7 @@ static void _call_f_swap_2685 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkAddressEntry &arg1 = args.read<QNetworkAddressEntry & > (heap);
+  QNetworkAddressEntry &arg1 = gsi::arg_reader<QNetworkAddressEntry & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAddressEntry *)cls)->swap (arg1);
 }

@@ -51,7 +51,7 @@ static void _call_ctor_QJsonValuePtr_2313 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonValue &arg1 = args.read<const QJsonValue & > (heap);
+  const QJsonValue &arg1 = gsi::arg_reader<const QJsonValue & >() (args, heap);
   ret.write<QJsonValuePtr *> (new QJsonValuePtr (arg1));
 }
 

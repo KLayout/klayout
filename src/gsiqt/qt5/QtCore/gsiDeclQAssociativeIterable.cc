@@ -65,7 +65,7 @@ static void _call_f_value_c2119 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QAssociativeIterable *)cls)->value (arg1));
 }
 

@@ -65,7 +65,7 @@ static void _call_f_maybeQuote_1545 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char arg1 = args ? args.read<const char > (heap) : (const char)('"');
+  const char arg1 = args ? gsi::arg_reader<const char >() (args, heap) : gsi::arg_maker<const char >() ('"', heap);
   ret.write<QNoDebug & > ((QNoDebug &)((QNoDebug *)cls)->maybeQuote (arg1));
 }
 

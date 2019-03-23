@@ -67,7 +67,7 @@ static void _call_ctor_QUrl_1701 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QUrl *> (new QUrl (arg1));
 }
 
@@ -88,8 +88,8 @@ static void _call_ctor_QUrl_3970 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode), heap);
   ret.write<QUrl *> (new QUrl (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref()));
 }
 
@@ -108,7 +108,7 @@ static void _call_f_adjusted_c7571 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = args.read<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> > (heap);
+  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = gsi::arg_reader<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (args, heap);
   ret.write<QUrl > ((QUrl)((QUrl *)cls)->adjusted (arg1));
 }
 
@@ -127,7 +127,7 @@ static void _call_f_authority_c4267 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::PrettyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::PrettyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->authority (arg1));
 }
 
@@ -193,7 +193,7 @@ static void _call_f_fileName_c4267 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::FullyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::FullyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->fileName (arg1));
 }
 
@@ -212,7 +212,7 @@ static void _call_f_fragment_c4267 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::PrettyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::PrettyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->fragment (arg1));
 }
 
@@ -261,7 +261,7 @@ static void _call_f_host_c4267 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::FullyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::FullyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->host (arg1));
 }
 
@@ -325,7 +325,7 @@ static void _call_f_isParentOf_c1701 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->isParentOf (arg1));
 }
 
@@ -376,8 +376,8 @@ static void _call_f_matches_c9164 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
-  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg2 = args.read<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
+  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg2 = gsi::arg_reader<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->matches (arg1, arg2));
 }
 
@@ -396,7 +396,7 @@ static void _call_f_operator_excl__eq__c1701 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->operator != (arg1));
 }
 
@@ -415,7 +415,7 @@ static void _call_f_operator_lt__c1701 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->operator < (arg1));
 }
 
@@ -434,7 +434,7 @@ static void _call_f_operator_eq__1701 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QUrl & > ((QUrl &)((QUrl *)cls)->operator = (arg1));
 }
 
@@ -453,7 +453,7 @@ static void _call_f_operator_eq__eq__c1701 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QUrl *)cls)->operator == (arg1));
 }
 
@@ -472,7 +472,7 @@ static void _call_f_operator_eq__2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QUrl & > ((QUrl &)((QUrl *)cls)->operator= (arg1));
 }
 
@@ -491,7 +491,7 @@ static void _call_f_password_c4267 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::FullyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::FullyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->password (arg1));
 }
 
@@ -510,7 +510,7 @@ static void _call_f_path_c4267 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::FullyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::FullyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->path (arg1));
 }
 
@@ -529,7 +529,7 @@ static void _call_f_port_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(-1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<int > ((int)((QUrl *)cls)->port (arg1));
 }
 
@@ -548,7 +548,7 @@ static void _call_f_query_c4267 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::PrettyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::PrettyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->query (arg1));
 }
 
@@ -567,7 +567,7 @@ static void _call_f_resolved_c1701 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QUrl > ((QUrl)((QUrl *)cls)->resolved (arg1));
 }
 
@@ -603,8 +603,8 @@ static void _call_f_setAuthority_3970 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setAuthority (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -626,8 +626,8 @@ static void _call_f_setFragment_3970 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setFragment (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -649,8 +649,8 @@ static void _call_f_setHost_3970 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::DecodedMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::DecodedMode), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setHost (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -672,8 +672,8 @@ static void _call_f_setPassword_3970 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::DecodedMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::DecodedMode), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setPassword (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -695,8 +695,8 @@ static void _call_f_setPath_3970 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::DecodedMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::DecodedMode), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setPath (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -716,7 +716,7 @@ static void _call_f_setPort_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setPort (arg1);
 }
@@ -738,8 +738,8 @@ static void _call_f_setQuery_3970 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setQuery (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -759,7 +759,7 @@ static void _call_f_setQuery_2235 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlQuery &arg1 = args.read<const QUrlQuery & > (heap);
+  const QUrlQuery &arg1 = gsi::arg_reader<const QUrlQuery & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setQuery (arg1);
 }
@@ -779,7 +779,7 @@ static void _call_f_setScheme_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setScheme (arg1);
 }
@@ -801,8 +801,8 @@ static void _call_f_setUrl_3970 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setUrl (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -824,8 +824,8 @@ static void _call_f_setUserInfo_3970 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setUserInfo (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -847,8 +847,8 @@ static void _call_f_setUserName_3970 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::DecodedMode));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::DecodedMode), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->setUserName (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref());
 }
@@ -868,7 +868,7 @@ static void _call_f_swap_1006 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUrl &arg1 = args.read<QUrl & > (heap);
+  QUrl &arg1 = gsi::arg_reader<QUrl & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrl *)cls)->swap (arg1);
 }
@@ -888,7 +888,7 @@ static void _call_f_toDisplayString_c7571 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = args ? args.read<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> > (heap) : (QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption>)(QUrl::FormattingOptions(QUrl::PrettyDecoded));
+  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (QUrl::FormattingOptions(QUrl::PrettyDecoded), heap);
   ret.write<QString > ((QString)((QUrl *)cls)->toDisplayString (arg1));
 }
 
@@ -907,7 +907,7 @@ static void _call_f_toEncoded_c7571 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = args ? args.read<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> > (heap) : (QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption>)(QUrl::FullyEncoded);
+  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (QUrl::FullyEncoded, heap);
   ret.write<QByteArray > ((QByteArray)((QUrl *)cls)->toEncoded (arg1));
 }
 
@@ -941,7 +941,7 @@ static void _call_f_toString_c7571 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = args ? args.read<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> > (heap) : (QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption>)(QUrl::FormattingOptions(QUrl::PrettyDecoded));
+  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (QUrl::FormattingOptions(QUrl::PrettyDecoded), heap);
   ret.write<QString > ((QString)((QUrl *)cls)->toString (arg1));
 }
 
@@ -960,7 +960,7 @@ static void _call_f_topLevelDomain_c4267 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::FullyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::FullyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->topLevelDomain (arg1));
 }
 
@@ -979,7 +979,7 @@ static void _call_f_url_c7571 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = args ? args.read<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> > (heap) : (QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption>)(QUrl::FormattingOptions(QUrl::PrettyDecoded));
+  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (QUrl::FormattingOptions(QUrl::PrettyDecoded), heap);
   ret.write<QString > ((QString)((QUrl *)cls)->url (arg1));
 }
 
@@ -998,7 +998,7 @@ static void _call_f_userInfo_c4267 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::PrettyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::PrettyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->userInfo (arg1));
 }
 
@@ -1017,7 +1017,7 @@ static void _call_f_userName_c4267 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::FullyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::FullyDecoded, heap);
   ret.write<QString > ((QString)((QUrl *)cls)->userName (arg1));
 }
 
@@ -1036,7 +1036,7 @@ static void _call_f_fromAce_2309 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)QUrl::fromAce (arg1));
 }
 
@@ -1057,8 +1057,8 @@ static void _call_f_fromEncoded_4254 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode));
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode), heap);
   ret.write<QUrl > ((QUrl)QUrl::fromEncoded (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref()));
 }
 
@@ -1077,7 +1077,7 @@ static void _call_f_fromLocalFile_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QUrl > ((QUrl)QUrl::fromLocalFile (arg1));
 }
 
@@ -1096,7 +1096,7 @@ static void _call_f_fromPercentEncoding_2309 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)QUrl::fromPercentEncoding (arg1));
 }
 
@@ -1117,8 +1117,8 @@ static void _call_f_fromStringList_4382 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
-  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & > (heap) : (const qt_gsi::Converter<QUrl::ParsingMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode));
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
+  const qt_gsi::Converter<QUrl::ParsingMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QUrl::ParsingMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QUrl::ParsingMode>(heap, QUrl::TolerantMode), heap);
   ret.write<QList<QUrl> > ((QList<QUrl>)QUrl::fromStringList (arg1, qt_gsi::QtToCppAdaptor<QUrl::ParsingMode>(arg2).cref()));
 }
 
@@ -1137,7 +1137,7 @@ static void _call_f_fromUserInput_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QUrl > ((QUrl)QUrl::fromUserInput (arg1));
 }
 
@@ -1160,9 +1160,9 @@ static void _call_f_fromUserInput_8122 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  QFlags<QUrl::UserInputResolutionOption> arg3 = args ? args.read<QFlags<QUrl::UserInputResolutionOption> > (heap) : (QFlags<QUrl::UserInputResolutionOption>)(QUrl::DefaultResolution);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QUrl::UserInputResolutionOption> arg3 = args ? gsi::arg_reader<QFlags<QUrl::UserInputResolutionOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::UserInputResolutionOption> >() (QUrl::DefaultResolution, heap);
   ret.write<QUrl > ((QUrl)QUrl::fromUserInput (arg1, arg2, arg3));
 }
 
@@ -1196,7 +1196,7 @@ static void _call_f_setIdnWhitelist_2437 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QUrl::setIdnWhitelist (arg1);
 }
@@ -1216,7 +1216,7 @@ static void _call_f_toAce_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)QUrl::toAce (arg1));
 }
 
@@ -1239,9 +1239,9 @@ static void _call_f_toPercentEncoding_6427 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QByteArray &arg2 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
-  const QByteArray &arg3 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QByteArray &arg2 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
+  const QByteArray &arg3 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QByteArray > ((QByteArray)QUrl::toPercentEncoding (arg1, arg2, arg3));
 }
 
@@ -1262,8 +1262,8 @@ static void _call_f_toStringList_9779 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QUrl> &arg1 = args.read<const QList<QUrl> & > (heap);
-  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg2 = args ? args.read<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> > (heap) : (QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption>)(QUrl::FormattingOptions(QUrl::PrettyDecoded));
+  const QList<QUrl> &arg1 = gsi::arg_reader<const QList<QUrl> & >() (args, heap);
+  QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> arg2 = args ? gsi::arg_reader<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> >() (QUrl::FormattingOptions(QUrl::PrettyDecoded), heap);
   ret.write<QStringList > ((QStringList)QUrl::toStringList (arg1, arg2));
 }
 

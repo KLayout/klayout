@@ -127,7 +127,7 @@ static void _call_f_isColorFilterSupported_c3879 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraImageProcessing::ColorFilter>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraImageProcessing::ColorFilter>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraImageProcessing::ColorFilter>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraImageProcessing::ColorFilter>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QCameraImageProcessing *)cls)->isColorFilterSupported (qt_gsi::QtToCppAdaptor<QCameraImageProcessing::ColorFilter>(arg1).cref()));
 }
 
@@ -146,7 +146,7 @@ static void _call_f_isWhiteBalanceModeSupported_c4334 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraImageProcessing::WhiteBalanceMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraImageProcessing::WhiteBalanceMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraImageProcessing::WhiteBalanceMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraImageProcessing::WhiteBalanceMode>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QCameraImageProcessing *)cls)->isWhiteBalanceModeSupported (qt_gsi::QtToCppAdaptor<QCameraImageProcessing::WhiteBalanceMode>(arg1).cref()));
 }
 
@@ -195,7 +195,7 @@ static void _call_f_setColorFilter_3879 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraImageProcessing::ColorFilter>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraImageProcessing::ColorFilter>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraImageProcessing::ColorFilter>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraImageProcessing::ColorFilter>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraImageProcessing *)cls)->setColorFilter (qt_gsi::QtToCppAdaptor<QCameraImageProcessing::ColorFilter>(arg1).cref());
 }
@@ -215,7 +215,7 @@ static void _call_f_setContrast_1071 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraImageProcessing *)cls)->setContrast (arg1);
 }
@@ -235,7 +235,7 @@ static void _call_f_setDenoisingLevel_1071 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraImageProcessing *)cls)->setDenoisingLevel (arg1);
 }
@@ -255,7 +255,7 @@ static void _call_f_setManualWhiteBalance_1071 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraImageProcessing *)cls)->setManualWhiteBalance (arg1);
 }
@@ -275,7 +275,7 @@ static void _call_f_setSaturation_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraImageProcessing *)cls)->setSaturation (arg1);
 }
@@ -295,7 +295,7 @@ static void _call_f_setSharpeningLevel_1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraImageProcessing *)cls)->setSharpeningLevel (arg1);
 }
@@ -315,7 +315,7 @@ static void _call_f_setWhiteBalanceMode_4334 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraImageProcessing::WhiteBalanceMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraImageProcessing::WhiteBalanceMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraImageProcessing::WhiteBalanceMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraImageProcessing::WhiteBalanceMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraImageProcessing *)cls)->setWhiteBalanceMode (qt_gsi::QtToCppAdaptor<QCameraImageProcessing::WhiteBalanceMode>(arg1).cref());
 }
@@ -369,9 +369,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraImageProcessing::tr (arg1, arg2, arg3));
 }
 
@@ -394,9 +394,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraImageProcessing::trUtf8 (arg1, arg2, arg3));
 }
 

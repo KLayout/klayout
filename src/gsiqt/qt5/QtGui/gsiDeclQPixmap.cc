@@ -82,8 +82,8 @@ static void _call_f_convertFromImage_5137 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImage &arg1 = args.read<const QImage & > (heap);
-  QFlags<Qt::ImageConversionFlag> arg2 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  const QImage &arg1 = gsi::arg_reader<const QImage & >() (args, heap);
+  QFlags<Qt::ImageConversionFlag> arg2 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   ret.write<bool > ((bool)((QPixmap *)cls)->convertFromImage (arg1, arg2));
 }
 
@@ -108,10 +108,10 @@ static void _call_f_copy_c2744 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   ret.write<QPixmap > ((QPixmap)((QPixmap *)cls)->copy (arg1, arg2, arg3, arg4));
 }
 
@@ -130,7 +130,7 @@ static void _call_f_copy_c1792 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args ? args.read<const QRect & > (heap) : (const QRect &)(QRect());
+  const QRect &arg1 = args ? gsi::arg_reader<const QRect & >() (args, heap) : gsi::arg_maker<const QRect & >() (QRect(), heap);
   ret.write<QPixmap > ((QPixmap)((QPixmap *)cls)->copy (arg1));
 }
 
@@ -149,7 +149,7 @@ static void _call_f_createHeuristicMask_c864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   ret.write<QBitmap > ((QBitmap)((QPixmap *)cls)->createHeuristicMask (arg1));
 }
 
@@ -170,8 +170,8 @@ static void _call_f_createMaskFromColor_c3331 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
-  const qt_gsi::Converter<Qt::MaskMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::MaskMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::MaskMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::MaskMode>(heap, Qt::MaskInColor));
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
+  const qt_gsi::Converter<Qt::MaskMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::MaskMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::MaskMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::MaskMode>(heap, Qt::MaskInColor), heap);
   ret.write<QBitmap > ((QBitmap)((QPixmap *)cls)->createMaskFromColor (arg1, qt_gsi::QtToCppAdaptor<Qt::MaskMode>(arg2).cref()));
 }
 
@@ -236,7 +236,7 @@ static void _call_f_fill_1905 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args ? args.read<const QColor & > (heap) : (const QColor &)(Qt::white);
+  const QColor &arg1 = args ? gsi::arg_reader<const QColor & >() (args, heap) : gsi::arg_maker<const QColor & >() (Qt::white, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPixmap *)cls)->fill (arg1);
 }
@@ -258,8 +258,8 @@ static void _call_f_fill_4306 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPaintDevice *arg1 = args.read<const QPaintDevice * > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
+  const QPaintDevice *arg1 = gsi::arg_reader<const QPaintDevice * >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPixmap *)cls)->fill (arg1, arg2);
 }
@@ -283,9 +283,9 @@ static void _call_f_fill_3816 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPaintDevice *arg1 = args.read<const QPaintDevice * > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QPaintDevice *arg1 = gsi::arg_reader<const QPaintDevice * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPixmap *)cls)->fill (arg1, arg2, arg3);
 }
@@ -399,9 +399,9 @@ static void _call_f_load_6908 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
-  QFlags<Qt::ImageConversionFlag> arg3 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  QFlags<Qt::ImageConversionFlag> arg3 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   ret.write<bool > ((bool)((QPixmap *)cls)->load (arg1, arg2, arg3));
 }
 
@@ -426,10 +426,10 @@ static void _call_f_loadFromData_9283 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const unsigned char *arg1 = args.read<const unsigned char * > (heap);
-  unsigned int arg2 = args.read<unsigned int > (heap);
-  const char *arg3 = args ? args.read<const char * > (heap) : (const char *)(0);
-  QFlags<Qt::ImageConversionFlag> arg4 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  const unsigned char *arg1 = gsi::arg_reader<const unsigned char * >() (args, heap);
+  unsigned int arg2 = gsi::arg_reader<unsigned int >() (args, heap);
+  const char *arg3 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  QFlags<Qt::ImageConversionFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   ret.write<bool > ((bool)((QPixmap *)cls)->loadFromData (arg1, arg2, arg3, arg4));
 }
 
@@ -452,9 +452,9 @@ static void _call_f_loadFromData_7192 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
-  QFlags<Qt::ImageConversionFlag> arg3 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  QFlags<Qt::ImageConversionFlag> arg3 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   ret.write<bool > ((bool)((QPixmap *)cls)->loadFromData (arg1, arg2, arg3));
 }
 
@@ -503,7 +503,7 @@ static void _call_f_operator_eq__2017 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<QPixmap & > ((QPixmap &)((QPixmap *)cls)->operator= (arg1));
 }
 
@@ -556,9 +556,9 @@ static void _call_f_save_c4307 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<bool > ((bool)((QPixmap *)cls)->save (arg1, arg2, arg3));
 }
 
@@ -581,9 +581,9 @@ static void _call_f_save_c3729 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<bool > ((bool)((QPixmap *)cls)->save (arg1, arg2, arg3));
 }
 
@@ -608,10 +608,10 @@ static void _call_f_scaled_c6100 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::AspectRatioMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio));
-  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<Qt::TransformationMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::TransformationMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio), heap);
+  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation), heap);
   ret.write<QPixmap > ((QPixmap)((QPixmap *)cls)->scaled (arg1, arg2, qt_gsi::QtToCppAdaptor<Qt::AspectRatioMode>(arg3).cref(), qt_gsi::QtToCppAdaptor<Qt::TransformationMode>(arg4).cref()));
 }
 
@@ -634,9 +634,9 @@ static void _call_f_scaled_c6479 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
-  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::AspectRatioMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio));
-  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<Qt::TransformationMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::TransformationMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation));
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
+  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio), heap);
+  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation), heap);
   ret.write<QPixmap > ((QPixmap)((QPixmap *)cls)->scaled (arg1, qt_gsi::QtToCppAdaptor<Qt::AspectRatioMode>(arg2).cref(), qt_gsi::QtToCppAdaptor<Qt::TransformationMode>(arg3).cref()));
 }
 
@@ -657,8 +657,8 @@ static void _call_f_scaledToHeight_c3292 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::TransformationMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::TransformationMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation), heap);
   ret.write<QPixmap > ((QPixmap)((QPixmap *)cls)->scaledToHeight (arg1, qt_gsi::QtToCppAdaptor<Qt::TransformationMode>(arg2).cref()));
 }
 
@@ -679,8 +679,8 @@ static void _call_f_scaledToWidth_c3292 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::TransformationMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::TransformationMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation), heap);
   ret.write<QPixmap > ((QPixmap)((QPixmap *)cls)->scaledToWidth (arg1, qt_gsi::QtToCppAdaptor<Qt::TransformationMode>(arg2).cref()));
 }
 
@@ -711,13 +711,13 @@ static void _call_f_scroll_5269 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  int arg5 = args.read<int > (heap);
-  int arg6 = args.read<int > (heap);
-  QRegion *arg7 = args ? args.read<QRegion * > (heap) : (QRegion *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  int arg6 = gsi::arg_reader<int >() (args, heap);
+  QRegion *arg7 = args ? gsi::arg_reader<QRegion * >() (args, heap) : gsi::arg_maker<QRegion * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPixmap *)cls)->scroll (arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 }
@@ -743,10 +743,10 @@ static void _call_f_scroll_4317 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QRect &arg3 = args.read<const QRect & > (heap);
-  QRegion *arg4 = args ? args.read<QRegion * > (heap) : (QRegion *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QRect &arg3 = gsi::arg_reader<const QRect & >() (args, heap);
+  QRegion *arg4 = args ? gsi::arg_reader<QRegion * >() (args, heap) : gsi::arg_maker<QRegion * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPixmap *)cls)->scroll (arg1, arg2, arg3, arg4);
 }
@@ -766,7 +766,7 @@ static void _call_f_setDevicePixelRatio_1071 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPixmap *)cls)->setDevicePixelRatio (arg1);
 }
@@ -786,7 +786,7 @@ static void _call_f_setMask_1999 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBitmap &arg1 = args.read<const QBitmap & > (heap);
+  const QBitmap &arg1 = gsi::arg_reader<const QBitmap & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPixmap *)cls)->setMask (arg1);
 }
@@ -821,7 +821,7 @@ static void _call_f_swap_1322 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPixmap &arg1 = args.read<QPixmap & > (heap);
+  QPixmap &arg1 = gsi::arg_reader<QPixmap & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPixmap *)cls)->swap (arg1);
 }
@@ -858,8 +858,8 @@ static void _call_f_transformed_c4548 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
-  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::TransformationMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::TransformationMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation));
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
+  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation), heap);
   ret.write<QPixmap > ((QPixmap)((QPixmap *)cls)->transformed (arg1, qt_gsi::QtToCppAdaptor<Qt::TransformationMode>(arg2).cref()));
 }
 
@@ -880,8 +880,8 @@ static void _call_f_transformed_c4875 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
-  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::TransformationMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::TransformationMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation));
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
+  const qt_gsi::Converter<Qt::TransformationMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::TransformationMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::TransformationMode>(heap, Qt::FastTransformation), heap);
   ret.write<QPixmap > ((QPixmap)((QPixmap *)cls)->transformed (arg1, qt_gsi::QtToCppAdaptor<Qt::TransformationMode>(arg2).cref()));
 }
 
@@ -932,8 +932,8 @@ static void _call_f_fromImage_5137 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImage &arg1 = args.read<const QImage & > (heap);
-  QFlags<Qt::ImageConversionFlag> arg2 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  const QImage &arg1 = gsi::arg_reader<const QImage & >() (args, heap);
+  QFlags<Qt::ImageConversionFlag> arg2 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   ret.write<QPixmap > ((QPixmap)QPixmap::fromImage (arg1, arg2));
 }
 
@@ -954,8 +954,8 @@ static void _call_f_fromImageReader_5041 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QImageReader *arg1 = args.read<QImageReader * > (heap);
-  QFlags<Qt::ImageConversionFlag> arg2 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  QImageReader *arg1 = gsi::arg_reader<QImageReader * >() (args, heap);
+  QFlags<Qt::ImageConversionFlag> arg2 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   ret.write<QPixmap > ((QPixmap)QPixmap::fromImageReader (arg1, arg2));
 }
 
@@ -976,8 +976,8 @@ static void _call_f_grabWidget_2986 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const QRect &arg2 = args.read<const QRect & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const QRect &arg2 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QPixmap > ((QPixmap)QPixmap::grabWidget (arg1, arg2));
 }
 
@@ -1004,11 +1004,11 @@ static void _call_f_grabWidget_3938 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
-  int arg4 = args ? args.read<int > (heap) : (int)(-1);
-  int arg5 = args ? args.read<int > (heap) : (int)(-1);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QPixmap > ((QPixmap)QPixmap::grabWidget (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -1035,11 +1035,11 @@ static void _call_f_grabWindow_3332 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args.read<const qt_gsi::Converter<WId>::target_type & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
-  int arg4 = args ? args.read<int > (heap) : (int)(-1);
-  int arg5 = args ? args.read<int > (heap) : (int)(-1);
+  const qt_gsi::Converter<WId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QPixmap > ((QPixmap)QPixmap::grabWindow (qt_gsi::QtToCppAdaptor<WId>(arg1).cref(), arg2, arg3, arg4, arg5));
 }
 
@@ -1062,9 +1062,9 @@ static void _call_f_trueMatrix_3341 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QMatrix > ((QMatrix)QPixmap::trueMatrix (arg1, arg2, arg3));
 }
 
@@ -1087,9 +1087,9 @@ static void _call_f_trueMatrix_3668 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTransform > ((QTransform)QPixmap::trueMatrix (arg1, arg2, arg3));
 }
 
@@ -1329,8 +1329,8 @@ static void _call_ctor_QPixmap_Adaptor_1426 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QPixmap_Adaptor *> (new QPixmap_Adaptor (arg1, arg2));
 }
 
@@ -1348,7 +1348,7 @@ static void _call_ctor_QPixmap_Adaptor_1805 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   ret.write<QPixmap_Adaptor *> (new QPixmap_Adaptor (arg1));
 }
 
@@ -1370,9 +1370,9 @@ static void _call_ctor_QPixmap_Adaptor_6908 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
-  QFlags<Qt::ImageConversionFlag> arg3 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  QFlags<Qt::ImageConversionFlag> arg3 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   ret.write<QPixmap_Adaptor *> (new QPixmap_Adaptor (arg1, arg2, arg3));
 }
 
@@ -1390,7 +1390,7 @@ static void _call_ctor_QPixmap_Adaptor_2017 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<QPixmap_Adaptor *> (new QPixmap_Adaptor (arg1));
 }
 
@@ -1410,8 +1410,8 @@ static void _call_fp_fromImageInPlace_4442 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QImage &arg1 = args.read<QImage & > (heap);
-  QFlags<Qt::ImageConversionFlag> arg2 = args ? args.read<QFlags<Qt::ImageConversionFlag> > (heap) : (QFlags<Qt::ImageConversionFlag>)(Qt::AutoColor);
+  QImage &arg1 = gsi::arg_reader<QImage & >() (args, heap);
+  QFlags<Qt::ImageConversionFlag> arg2 = args ? gsi::arg_reader<QFlags<Qt::ImageConversionFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::ImageConversionFlag> >() (Qt::AutoColor, heap);
   ret.write<QPixmap > ((QPixmap)QPixmap_Adaptor::fp_QPixmap_fromImageInPlace_4442 (arg1, arg2));
 }
 

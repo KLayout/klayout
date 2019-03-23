@@ -65,7 +65,7 @@ static void _call_ctor_QXmlStreamNamespaceDeclaration_4354 (const qt_gsi::Generi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamNamespaceDeclaration &arg1 = args.read<const QXmlStreamNamespaceDeclaration & > (heap);
+  const QXmlStreamNamespaceDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNamespaceDeclaration & >() (args, heap);
   ret.write<QXmlStreamNamespaceDeclaration *> (new QXmlStreamNamespaceDeclaration (arg1));
 }
 
@@ -86,8 +86,8 @@ static void _call_ctor_QXmlStreamNamespaceDeclaration_3942 (const qt_gsi::Generi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QXmlStreamNamespaceDeclaration *> (new QXmlStreamNamespaceDeclaration (arg1, arg2));
 }
 
@@ -121,7 +121,7 @@ static void _call_f_operator_excl__eq__c4354 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamNamespaceDeclaration &arg1 = args.read<const QXmlStreamNamespaceDeclaration & > (heap);
+  const QXmlStreamNamespaceDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNamespaceDeclaration & >() (args, heap);
   ret.write<bool > ((bool)((QXmlStreamNamespaceDeclaration *)cls)->operator!= (arg1));
 }
 
@@ -140,7 +140,7 @@ static void _call_f_operator_eq__4354 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamNamespaceDeclaration &arg1 = args.read<const QXmlStreamNamespaceDeclaration & > (heap);
+  const QXmlStreamNamespaceDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNamespaceDeclaration & >() (args, heap);
   ret.write<QXmlStreamNamespaceDeclaration & > ((QXmlStreamNamespaceDeclaration &)((QXmlStreamNamespaceDeclaration *)cls)->operator= (arg1));
 }
 
@@ -159,7 +159,7 @@ static void _call_f_operator_eq__eq__c4354 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamNamespaceDeclaration &arg1 = args.read<const QXmlStreamNamespaceDeclaration & > (heap);
+  const QXmlStreamNamespaceDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNamespaceDeclaration & >() (args, heap);
   ret.write<bool > ((bool)((QXmlStreamNamespaceDeclaration *)cls)->operator== (arg1));
 }
 

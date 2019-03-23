@@ -86,7 +86,7 @@ static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QActionGroup *)cls)->addAction (arg1));
 }
 
@@ -105,7 +105,7 @@ static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QAction * > ((QAction *)((QActionGroup *)cls)->addAction (arg1));
 }
 
@@ -126,8 +126,8 @@ static void _call_f_addAction_3704 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QAction * > ((QAction *)((QActionGroup *)cls)->addAction (arg1, arg2));
 }
 
@@ -206,7 +206,7 @@ static void _call_f_removeAction_1309 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QActionGroup *)cls)->removeAction (arg1);
 }
@@ -226,7 +226,7 @@ static void _call_f_setDisabled_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QActionGroup *)cls)->setDisabled (arg1);
 }
@@ -246,7 +246,7 @@ static void _call_f_setEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QActionGroup *)cls)->setEnabled (arg1);
 }
@@ -266,7 +266,7 @@ static void _call_f_setExclusive_864 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QActionGroup *)cls)->setExclusive (arg1);
 }
@@ -286,7 +286,7 @@ static void _call_f_setVisible_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QActionGroup *)cls)->setVisible (arg1);
 }
@@ -310,9 +310,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QActionGroup::tr (arg1, arg2, arg3));
 }
 
@@ -335,9 +335,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QActionGroup::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -543,7 +543,7 @@ static void _call_ctor_QActionGroup_Adaptor_1302 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QActionGroup_Adaptor *> (new QActionGroup_Adaptor (arg1));
 }
 
@@ -609,7 +609,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QActionGroup_Adaptor *)cls)->emitter_QActionGroup_destroyed_1302 (arg1);
 }
 
@@ -700,7 +700,7 @@ static void _call_emitter_hovered_1309 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ((QActionGroup_Adaptor *)cls)->emitter_QActionGroup_hovered_1309 (arg1);
 }
 
@@ -718,7 +718,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QActionGroup_Adaptor *)cls)->fp_QActionGroup_isSignalConnected_c2394 (arg1));
 }
 
@@ -736,7 +736,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QActionGroup_Adaptor *)cls)->fp_QActionGroup_receivers_c1731 (arg1));
 }
 
@@ -806,7 +806,7 @@ static void _call_emitter_triggered_1309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ((QActionGroup_Adaptor *)cls)->emitter_QActionGroup_triggered_1309 (arg1);
 }
 

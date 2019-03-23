@@ -66,7 +66,7 @@ static void _call_ctor_QDomNodeList_2484 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNodeList &arg1 = args.read<const QDomNodeList & > (heap);
+  const QDomNodeList &arg1 = gsi::arg_reader<const QDomNodeList & >() (args, heap);
   ret.write<QDomNodeList *> (new QDomNodeList (arg1));
 }
 
@@ -85,7 +85,7 @@ static void _call_f_at_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNodeList *)cls)->at (arg1));
 }
 
@@ -134,7 +134,7 @@ static void _call_f_item_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNodeList *)cls)->item (arg1));
 }
 
@@ -168,7 +168,7 @@ static void _call_f_operator_excl__eq__c2484 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNodeList &arg1 = args.read<const QDomNodeList & > (heap);
+  const QDomNodeList &arg1 = gsi::arg_reader<const QDomNodeList & >() (args, heap);
   ret.write<bool > ((bool)((QDomNodeList *)cls)->operator!= (arg1));
 }
 
@@ -187,7 +187,7 @@ static void _call_f_operator_eq__2484 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNodeList &arg1 = args.read<const QDomNodeList & > (heap);
+  const QDomNodeList &arg1 = gsi::arg_reader<const QDomNodeList & >() (args, heap);
   ret.write<QDomNodeList & > ((QDomNodeList &)((QDomNodeList *)cls)->operator= (arg1));
 }
 
@@ -206,7 +206,7 @@ static void _call_f_operator_eq__eq__c2484 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNodeList &arg1 = args.read<const QDomNodeList & > (heap);
+  const QDomNodeList &arg1 = gsi::arg_reader<const QDomNodeList & >() (args, heap);
   ret.write<bool > ((bool)((QDomNodeList *)cls)->operator== (arg1));
 }
 

@@ -66,7 +66,7 @@ static void _call_ctor_QStorageInfo_2025 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStorageInfo *> (new QStorageInfo (arg1));
 }
 
@@ -85,7 +85,7 @@ static void _call_ctor_QStorageInfo_1681 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
   ret.write<QStorageInfo *> (new QStorageInfo (arg1));
 }
 
@@ -104,7 +104,7 @@ static void _call_ctor_QStorageInfo_2515 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStorageInfo &arg1 = args.read<const QStorageInfo & > (heap);
+  const QStorageInfo &arg1 = gsi::arg_reader<const QStorageInfo & >() (args, heap);
   ret.write<QStorageInfo *> (new QStorageInfo (arg1));
 }
 
@@ -288,7 +288,7 @@ static void _call_f_operator_eq__2515 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStorageInfo &arg1 = args.read<const QStorageInfo & > (heap);
+  const QStorageInfo &arg1 = gsi::arg_reader<const QStorageInfo & >() (args, heap);
   ret.write<QStorageInfo & > ((QStorageInfo &)((QStorageInfo *)cls)->operator= (arg1));
 }
 
@@ -338,7 +338,7 @@ static void _call_f_setPath_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStorageInfo *)cls)->setPath (arg1);
 }
@@ -358,7 +358,7 @@ static void _call_f_swap_1820 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStorageInfo &arg1 = args.read<QStorageInfo & > (heap);
+  QStorageInfo &arg1 = gsi::arg_reader<QStorageInfo & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStorageInfo *)cls)->swap (arg1);
 }

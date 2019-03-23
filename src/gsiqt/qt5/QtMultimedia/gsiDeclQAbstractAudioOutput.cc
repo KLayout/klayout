@@ -238,7 +238,7 @@ static void _call_f_setBufferSize_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractAudioOutput *)cls)->setBufferSize (arg1);
 }
@@ -258,7 +258,7 @@ static void _call_f_setCategory_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractAudioOutput *)cls)->setCategory (arg1);
 }
@@ -278,7 +278,7 @@ static void _call_f_setFormat_2509 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioFormat &arg1 = args.read<const QAudioFormat & > (heap);
+  const QAudioFormat &arg1 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractAudioOutput *)cls)->setFormat (arg1);
 }
@@ -298,7 +298,7 @@ static void _call_f_setNotifyInterval_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractAudioOutput *)cls)->setNotifyInterval (arg1);
 }
@@ -318,7 +318,7 @@ static void _call_f_setVolume_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractAudioOutput *)cls)->setVolume (arg1);
 }
@@ -338,7 +338,7 @@ static void _call_f_start_1447 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractAudioOutput *)cls)->start (arg1);
 }
@@ -439,9 +439,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractAudioOutput::tr (arg1, arg2, arg3));
 }
 
@@ -464,9 +464,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractAudioOutput::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1163,7 +1163,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QAbstractAudioOutput_Adaptor *)cls)->emitter_QAbstractAudioOutput_destroyed_1302 (arg1);
 }
 
@@ -1243,7 +1243,7 @@ static void _call_emitter_errorChanged_1653 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAudio::Error>::target_type & arg1 = args.read<const qt_gsi::Converter<QAudio::Error>::target_type & > (heap);
+  const qt_gsi::Converter<QAudio::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Error>::target_type & >() (args, heap);
   ((QAbstractAudioOutput_Adaptor *)cls)->emitter_QAbstractAudioOutput_errorChanged_1653 (arg1);
 }
 
@@ -1329,7 +1329,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractAudioOutput_Adaptor *)cls)->fp_QAbstractAudioOutput_isSignalConnected_c2394 (arg1));
 }
 
@@ -1418,7 +1418,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QAbstractAudioOutput_Adaptor *)cls)->fp_QAbstractAudioOutput_receivers_c1731 (arg1));
 }
 
@@ -1686,7 +1686,7 @@ static void _call_emitter_stateChanged_1644 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAudio::State>::target_type & arg1 = args.read<const qt_gsi::Converter<QAudio::State>::target_type & > (heap);
+  const qt_gsi::Converter<QAudio::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudio::State>::target_type & >() (args, heap);
   ((QAbstractAudioOutput_Adaptor *)cls)->emitter_QAbstractAudioOutput_stateChanged_1644 (arg1);
 }
 

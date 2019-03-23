@@ -217,10 +217,10 @@ static void _call_ctor_QContextMenuEvent_Adaptor_9494 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & arg1 = args.read<const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
-  const QPoint &arg3 = args.read<const QPoint & > (heap);
-  QFlags<Qt::KeyboardModifier> arg4 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const QPoint &arg3 = gsi::arg_reader<const QPoint & >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg4 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   ret.write<QContextMenuEvent_Adaptor *> (new QContextMenuEvent_Adaptor (qt_gsi::QtToCppAdaptor<QContextMenuEvent::Reason>(arg1).cref(), arg2, arg3, arg4));
 }
 
@@ -242,9 +242,9 @@ static void _call_ctor_QContextMenuEvent_Adaptor_6525 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & arg1 = args.read<const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
-  const QPoint &arg3 = args.read<const QPoint & > (heap);
+  const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const QPoint &arg3 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QContextMenuEvent_Adaptor *> (new QContextMenuEvent_Adaptor (qt_gsi::QtToCppAdaptor<QContextMenuEvent::Reason>(arg1).cref(), arg2, arg3));
 }
 
@@ -264,8 +264,8 @@ static void _call_ctor_QContextMenuEvent_Adaptor_4717 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & arg1 = args.read<const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
+  const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QContextMenuEvent_Adaptor *> (new QContextMenuEvent_Adaptor (qt_gsi::QtToCppAdaptor<QContextMenuEvent::Reason>(arg1).cref(), arg2));
 }
 

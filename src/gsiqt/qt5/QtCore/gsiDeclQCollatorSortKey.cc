@@ -50,7 +50,7 @@ static void _call_ctor_QCollatorSortKey_2947 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCollatorSortKey &arg1 = args.read<const QCollatorSortKey & > (heap);
+  const QCollatorSortKey &arg1 = gsi::arg_reader<const QCollatorSortKey & >() (args, heap);
   ret.write<QCollatorSortKey *> (new QCollatorSortKey (arg1));
 }
 
@@ -69,7 +69,7 @@ static void _call_f_compare_c2947 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCollatorSortKey &arg1 = args.read<const QCollatorSortKey & > (heap);
+  const QCollatorSortKey &arg1 = gsi::arg_reader<const QCollatorSortKey & >() (args, heap);
   ret.write<int > ((int)((QCollatorSortKey *)cls)->compare (arg1));
 }
 
@@ -88,7 +88,7 @@ static void _call_f_operator_eq__2947 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCollatorSortKey &arg1 = args.read<const QCollatorSortKey & > (heap);
+  const QCollatorSortKey &arg1 = gsi::arg_reader<const QCollatorSortKey & >() (args, heap);
   ret.write<QCollatorSortKey & > ((QCollatorSortKey &)((QCollatorSortKey *)cls)->operator= (arg1));
 }
 
@@ -107,7 +107,7 @@ static void _call_f_swap_2252 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QCollatorSortKey &arg1 = args.read<QCollatorSortKey & > (heap);
+  QCollatorSortKey &arg1 = gsi::arg_reader<QCollatorSortKey & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCollatorSortKey *)cls)->swap (arg1);
 }

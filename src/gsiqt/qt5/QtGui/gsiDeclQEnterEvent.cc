@@ -236,9 +236,9 @@ static void _call_ctor_QEnterEvent_Adaptor_5742 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  const QPointF &arg3 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QEnterEvent_Adaptor *> (new QEnterEvent_Adaptor (arg1, arg2, arg3));
 }
 

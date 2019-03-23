@@ -54,8 +54,8 @@ static void _call_f_createEditor_c1974 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QItemEditorFactory *)cls)->createEditor (arg1, arg2));
 }
 
@@ -76,8 +76,8 @@ static void _call_f_registerEditor_3475 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QItemEditorCreatorBase *arg2 = args.read<QItemEditorCreatorBase * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QItemEditorCreatorBase *arg2 = gsi::arg_reader<QItemEditorCreatorBase * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QItemEditorFactory *)cls)->registerEditor (arg1, arg2);
 }
@@ -97,7 +97,7 @@ static void _call_f_valuePropertyName_c767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QItemEditorFactory *)cls)->valuePropertyName (arg1));
 }
 
@@ -131,7 +131,7 @@ static void _call_f_setDefaultFactory_2445 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QItemEditorFactory *arg1 = args.read<QItemEditorFactory * > (heap);
+  QItemEditorFactory *arg1 = gsi::arg_reader<QItemEditorFactory * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QItemEditorFactory::setDefaultFactory (arg1);
 }

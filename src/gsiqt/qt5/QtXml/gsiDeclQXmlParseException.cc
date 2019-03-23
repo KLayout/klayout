@@ -58,11 +58,11 @@ static void _call_ctor_QXmlParseException_7177 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  int arg2 = args ? args.read<int > (heap) : (int)(-1);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg5 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg5 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QXmlParseException *> (new QXmlParseException (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -81,7 +81,7 @@ static void _call_ctor_QXmlParseException_3149 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlParseException &arg1 = args.read<const QXmlParseException & > (heap);
+  const QXmlParseException &arg1 = gsi::arg_reader<const QXmlParseException & >() (args, heap);
   ret.write<QXmlParseException *> (new QXmlParseException (arg1));
 }
 

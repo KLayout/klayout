@@ -675,8 +675,8 @@ static void _call_fp_addBindValue_4937 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
-  QFlags<QSql::ParamTypeFlag> arg2 = args.read<QFlags<QSql::ParamTypeFlag> > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
+  QFlags<QSql::ParamTypeFlag> arg2 = gsi::arg_reader<QFlags<QSql::ParamTypeFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlResult_Adaptor *)cls)->fp_QSqlResult_addBindValue_4937 (arg1, arg2);
 }
@@ -769,7 +769,7 @@ static void _call_fp_bindValueType_c2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QFlags<QSql::ParamTypeFlag> > ((QFlags<QSql::ParamTypeFlag>)((QSqlResult_Adaptor *)cls)->fp_QSqlResult_bindValueType_c2025 (arg1));
 }
 
@@ -787,7 +787,7 @@ static void _call_fp_bindValueType_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QFlags<QSql::ParamTypeFlag> > ((QFlags<QSql::ParamTypeFlag>)((QSqlResult_Adaptor *)cls)->fp_QSqlResult_bindValueType_c767 (arg1));
 }
 
@@ -819,7 +819,7 @@ static void _call_fp_boundValue_c2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QSqlResult_Adaptor *)cls)->fp_QSqlResult_boundValue_c2025 (arg1));
 }
 
@@ -837,7 +837,7 @@ static void _call_fp_boundValue_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QVariant > ((QVariant)((QSqlResult_Adaptor *)cls)->fp_QSqlResult_boundValue_c767 (arg1));
 }
 
@@ -869,7 +869,7 @@ static void _call_fp_boundValueName_c767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QSqlResult_Adaptor *)cls)->fp_QSqlResult_boundValueName_c767 (arg1));
 }
 

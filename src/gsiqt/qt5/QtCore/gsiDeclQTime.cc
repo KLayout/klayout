@@ -71,10 +71,10 @@ static void _call_ctor_QTime_2744 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
-  int arg4 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QTime *> (new QTime (arg1, arg2, arg3, arg4));
 }
 
@@ -93,7 +93,7 @@ static void _call_f_addMSecs_c767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTime > ((QTime)((QTime *)cls)->addMSecs (arg1));
 }
 
@@ -112,7 +112,7 @@ static void _call_f_addSecs_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTime > ((QTime)((QTime *)cls)->addSecs (arg1));
 }
 
@@ -236,7 +236,7 @@ static void _call_f_msecsTo_c1793 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   ret.write<int > ((int)((QTime *)cls)->msecsTo (arg1));
 }
 
@@ -255,7 +255,7 @@ static void _call_f_operator_excl__eq__c1793 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   ret.write<bool > ((bool)((QTime *)cls)->operator!= (arg1));
 }
 
@@ -274,7 +274,7 @@ static void _call_f_operator_lt__c1793 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   ret.write<bool > ((bool)((QTime *)cls)->operator< (arg1));
 }
 
@@ -293,7 +293,7 @@ static void _call_f_operator_lt__eq__c1793 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   ret.write<bool > ((bool)((QTime *)cls)->operator<= (arg1));
 }
 
@@ -312,7 +312,7 @@ static void _call_f_operator_eq__eq__c1793 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   ret.write<bool > ((bool)((QTime *)cls)->operator== (arg1));
 }
 
@@ -331,7 +331,7 @@ static void _call_f_operator_gt__c1793 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   ret.write<bool > ((bool)((QTime *)cls)->operator> (arg1));
 }
 
@@ -350,7 +350,7 @@ static void _call_f_operator_gt__eq__c1793 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   ret.write<bool > ((bool)((QTime *)cls)->operator>= (arg1));
 }
 
@@ -399,7 +399,7 @@ static void _call_f_secsTo_c1793 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   ret.write<int > ((int)((QTime *)cls)->secsTo (arg1));
 }
 
@@ -424,10 +424,10 @@ static void _call_f_setHMS_2744 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<bool > ((bool)((QTime *)cls)->setHMS (arg1, arg2, arg3, arg4));
 }
 
@@ -462,7 +462,7 @@ static void _call_f_toString_c1748 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<Qt::DateFormat>::target_type & > (heap) : (const qt_gsi::Converter<Qt::DateFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate));
+  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate), heap);
   ret.write<QString > ((QString)((QTime *)cls)->toString (qt_gsi::QtToCppAdaptor<Qt::DateFormat>(arg1).cref()));
 }
 
@@ -481,7 +481,7 @@ static void _call_f_toString_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QTime *)cls)->toString (arg1));
 }
 
@@ -515,7 +515,7 @@ static void _call_f_fromMSecsSinceStartOfDay_767 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTime > ((QTime)QTime::fromMSecsSinceStartOfDay (arg1));
 }
 
@@ -536,8 +536,8 @@ static void _call_f_fromString_3665 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::DateFormat>::target_type & > (heap) : (const qt_gsi::Converter<Qt::DateFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate), heap);
   ret.write<QTime > ((QTime)QTime::fromString (arg1, qt_gsi::QtToCppAdaptor<Qt::DateFormat>(arg2).cref()));
 }
 
@@ -558,8 +558,8 @@ static void _call_f_fromString_3942 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTime > ((QTime)QTime::fromString (arg1, arg2));
 }
 
@@ -584,10 +584,10 @@ static void _call_f_isValid_2744 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<bool > ((bool)QTime::isValid (arg1, arg2, arg3, arg4));
 }
 

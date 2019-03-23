@@ -50,7 +50,7 @@ static void _call_ctor_QLockFile_2025 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QLockFile *> (new QLockFile (arg1));
 }
 
@@ -88,9 +88,9 @@ static void _call_f_getLockInfo_c3624 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 *arg1 = args.read<qint64 * > (heap);
-  QString *arg2 = args.read<QString * > (heap);
-  QString *arg3 = args.read<QString * > (heap);
+  qint64 *arg1 = gsi::arg_reader<qint64 * >() (args, heap);
+  QString *arg2 = gsi::arg_reader<QString * >() (args, heap);
+  QString *arg3 = gsi::arg_reader<QString * >() (args, heap);
   ret.write<bool > ((bool)((QLockFile *)cls)->getLockInfo (arg1, arg2, arg3));
 }
 
@@ -154,7 +154,7 @@ static void _call_f_setStaleLockTime_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLockFile *)cls)->setStaleLockTime (arg1);
 }
@@ -189,7 +189,7 @@ static void _call_f_tryLock_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<bool > ((bool)((QLockFile *)cls)->tryLock (arg1));
 }
 

@@ -51,7 +51,7 @@ static void _call_ctor_QSignalBlocker_1302 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QSignalBlocker *> (new QSignalBlocker (arg1));
 }
 
@@ -70,7 +70,7 @@ static void _call_ctor_QSignalBlocker_1298 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject &arg1 = args.read<QObject & > (heap);
+  QObject &arg1 = gsi::arg_reader<QObject & >() (args, heap);
   ret.write<QSignalBlocker *> (new QSignalBlocker (arg1));
 }
 

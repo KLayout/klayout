@@ -66,7 +66,7 @@ static void _call_ctor_QVideoEncoderSettings_3450 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoEncoderSettings &arg1 = args.read<const QVideoEncoderSettings & > (heap);
+  const QVideoEncoderSettings &arg1 = gsi::arg_reader<const QVideoEncoderSettings & >() (args, heap);
   ret.write<QVideoEncoderSettings *> (new QVideoEncoderSettings (arg1));
 }
 
@@ -130,7 +130,7 @@ static void _call_f_encodingOption_c2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QVideoEncoderSettings *)cls)->encodingOption (arg1));
 }
 
@@ -194,7 +194,7 @@ static void _call_f_operator_excl__eq__c3450 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoEncoderSettings &arg1 = args.read<const QVideoEncoderSettings & > (heap);
+  const QVideoEncoderSettings &arg1 = gsi::arg_reader<const QVideoEncoderSettings & >() (args, heap);
   ret.write<bool > ((bool)((QVideoEncoderSettings *)cls)->operator!= (arg1));
 }
 
@@ -213,7 +213,7 @@ static void _call_f_operator_eq__3450 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoEncoderSettings &arg1 = args.read<const QVideoEncoderSettings & > (heap);
+  const QVideoEncoderSettings &arg1 = gsi::arg_reader<const QVideoEncoderSettings & >() (args, heap);
   ret.write<QVideoEncoderSettings & > ((QVideoEncoderSettings &)((QVideoEncoderSettings *)cls)->operator= (arg1));
 }
 
@@ -232,7 +232,7 @@ static void _call_f_operator_eq__eq__c3450 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoEncoderSettings &arg1 = args.read<const QVideoEncoderSettings & > (heap);
+  const QVideoEncoderSettings &arg1 = gsi::arg_reader<const QVideoEncoderSettings & >() (args, heap);
   ret.write<bool > ((bool)((QVideoEncoderSettings *)cls)->operator== (arg1));
 }
 
@@ -281,7 +281,7 @@ static void _call_f_setBitRate_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoEncoderSettings *)cls)->setBitRate (arg1);
 }
@@ -301,7 +301,7 @@ static void _call_f_setCodec_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoEncoderSettings *)cls)->setCodec (arg1);
 }
@@ -321,7 +321,7 @@ static void _call_f_setEncodingMode_2864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMultimedia::EncodingMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QMultimedia::EncodingMode>::target_type & > (heap);
+  const qt_gsi::Converter<QMultimedia::EncodingMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::EncodingMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoEncoderSettings *)cls)->setEncodingMode (qt_gsi::QtToCppAdaptor<QMultimedia::EncodingMode>(arg1).cref());
 }
@@ -343,8 +343,8 @@ static void _call_f_setEncodingOption_4036 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoEncoderSettings *)cls)->setEncodingOption (arg1, arg2);
 }
@@ -364,7 +364,7 @@ static void _call_f_setEncodingOptions_3508 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMap<QString, QVariant> &arg1 = args.read<const QMap<QString, QVariant> & > (heap);
+  const QMap<QString, QVariant> &arg1 = gsi::arg_reader<const QMap<QString, QVariant> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoEncoderSettings *)cls)->setEncodingOptions (arg1);
 }
@@ -384,7 +384,7 @@ static void _call_f_setFrameRate_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoEncoderSettings *)cls)->setFrameRate (arg1);
 }
@@ -404,7 +404,7 @@ static void _call_f_setQuality_3220 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMultimedia::EncodingQuality>::target_type & arg1 = args.read<const qt_gsi::Converter<QMultimedia::EncodingQuality>::target_type & > (heap);
+  const qt_gsi::Converter<QMultimedia::EncodingQuality>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::EncodingQuality>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoEncoderSettings *)cls)->setQuality (qt_gsi::QtToCppAdaptor<QMultimedia::EncodingQuality>(arg1).cref());
 }
@@ -424,7 +424,7 @@ static void _call_f_setResolution_1805 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoEncoderSettings *)cls)->setResolution (arg1);
 }
@@ -446,8 +446,8 @@ static void _call_f_setResolution_1426 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoEncoderSettings *)cls)->setResolution (arg1, arg2);
 }

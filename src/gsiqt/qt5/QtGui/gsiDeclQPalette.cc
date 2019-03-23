@@ -67,7 +67,7 @@ static void _call_ctor_QPalette_1905 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   ret.write<QPalette *> (new QPalette (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QPalette_1853 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GlobalColor>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GlobalColor>::target_type & >() (args, heap);
   ret.write<QPalette *> (new QPalette (qt_gsi::QtToCppAdaptor<Qt::GlobalColor>(arg1).cref()));
 }
 
@@ -107,8 +107,8 @@ static void _call_ctor_QPalette_3702 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
-  const QColor &arg2 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
+  const QColor &arg2 = gsi::arg_reader<const QColor & >() (args, heap);
   ret.write<QPalette *> (new QPalette (arg1, arg2));
 }
 
@@ -143,15 +143,15 @@ static void _call_ctor_QPalette_16326 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
-  const QBrush &arg2 = args.read<const QBrush & > (heap);
-  const QBrush &arg3 = args.read<const QBrush & > (heap);
-  const QBrush &arg4 = args.read<const QBrush & > (heap);
-  const QBrush &arg5 = args.read<const QBrush & > (heap);
-  const QBrush &arg6 = args.read<const QBrush & > (heap);
-  const QBrush &arg7 = args.read<const QBrush & > (heap);
-  const QBrush &arg8 = args.read<const QBrush & > (heap);
-  const QBrush &arg9 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg2 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg3 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg4 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg5 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg6 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg7 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg8 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg9 = gsi::arg_reader<const QBrush & >() (args, heap);
   ret.write<QPalette *> (new QPalette (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
 }
 
@@ -182,13 +182,13 @@ static void _call_ctor_QPalette_12687 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
-  const QColor &arg2 = args.read<const QColor & > (heap);
-  const QColor &arg3 = args.read<const QColor & > (heap);
-  const QColor &arg4 = args.read<const QColor & > (heap);
-  const QColor &arg5 = args.read<const QColor & > (heap);
-  const QColor &arg6 = args.read<const QColor & > (heap);
-  const QColor &arg7 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
+  const QColor &arg2 = gsi::arg_reader<const QColor & >() (args, heap);
+  const QColor &arg3 = gsi::arg_reader<const QColor & >() (args, heap);
+  const QColor &arg4 = gsi::arg_reader<const QColor & >() (args, heap);
+  const QColor &arg5 = gsi::arg_reader<const QColor & >() (args, heap);
+  const QColor &arg6 = gsi::arg_reader<const QColor & >() (args, heap);
+  const QColor &arg7 = gsi::arg_reader<const QColor & >() (args, heap);
   ret.write<QPalette *> (new QPalette (arg1, arg2, arg3, arg4, arg5, arg6, arg7));
 }
 
@@ -207,7 +207,7 @@ static void _call_ctor_QPalette_2113 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPalette &arg1 = args.read<const QPalette & > (heap);
+  const QPalette &arg1 = gsi::arg_reader<const QPalette & >() (args, heap);
   ret.write<QPalette *> (new QPalette (arg1));
 }
 
@@ -288,8 +288,8 @@ static void _call_f_brush_c4545 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & > (heap);
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap);
+  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap);
   ret.write<const QBrush & > ((const QBrush &)((QPalette *)cls)->brush (qt_gsi::QtToCppAdaptor<QPalette::ColorGroup>(arg1).cref(), qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg2).cref()));
 }
 
@@ -308,7 +308,7 @@ static void _call_f_brush_c2265 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap);
   ret.write<const QBrush & > ((const QBrush &)((QPalette *)cls)->brush (qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg1).cref()));
 }
 
@@ -374,8 +374,8 @@ static void _call_f_color_c4545 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & > (heap);
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap);
+  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap);
   ret.write<const QColor & > ((const QColor &)((QPalette *)cls)->color (qt_gsi::QtToCppAdaptor<QPalette::ColorGroup>(arg1).cref(), qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg2).cref()));
 }
 
@@ -394,7 +394,7 @@ static void _call_f_color_c2265 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap);
   ret.write<const QColor & > ((const QColor &)((QPalette *)cls)->color (qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg1).cref()));
 }
 
@@ -490,8 +490,8 @@ static void _call_f_isBrushSet_c4545 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & > (heap);
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap);
+  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QPalette *)cls)->isBrushSet (qt_gsi::QtToCppAdaptor<QPalette::ColorGroup>(arg1).cref(), qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg2).cref()));
 }
 
@@ -510,7 +510,7 @@ static void _call_f_isCopyOf_c2113 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPalette &arg1 = args.read<const QPalette & > (heap);
+  const QPalette &arg1 = gsi::arg_reader<const QPalette & >() (args, heap);
   ret.write<bool > ((bool)((QPalette *)cls)->isCopyOf (arg1));
 }
 
@@ -531,8 +531,8 @@ static void _call_f_isEqual_c4668 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & > (heap);
-  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg2 = args.read<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & > (heap);
+  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QPalette *)cls)->isEqual (qt_gsi::QtToCppAdaptor<QPalette::ColorGroup>(arg1).cref(), qt_gsi::QtToCppAdaptor<QPalette::ColorGroup>(arg2).cref()));
 }
 
@@ -626,7 +626,7 @@ static void _call_f_operator_excl__eq__c2113 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPalette &arg1 = args.read<const QPalette & > (heap);
+  const QPalette &arg1 = gsi::arg_reader<const QPalette & >() (args, heap);
   ret.write<bool > ((bool)((QPalette *)cls)->operator!= (arg1));
 }
 
@@ -645,7 +645,7 @@ static void _call_f_operator_eq__2113 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPalette &arg1 = args.read<const QPalette & > (heap);
+  const QPalette &arg1 = gsi::arg_reader<const QPalette & >() (args, heap);
   ret.write<QPalette & > ((QPalette &)((QPalette *)cls)->operator= (arg1));
 }
 
@@ -664,7 +664,7 @@ static void _call_f_operator_eq__eq__c2113 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPalette &arg1 = args.read<const QPalette & > (heap);
+  const QPalette &arg1 = gsi::arg_reader<const QPalette & >() (args, heap);
   ret.write<bool > ((bool)((QPalette *)cls)->operator== (arg1));
 }
 
@@ -683,7 +683,7 @@ static void _call_f_resolve_c2113 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPalette &arg1 = args.read<const QPalette & > (heap);
+  const QPalette &arg1 = gsi::arg_reader<const QPalette & >() (args, heap);
   ret.write<QPalette > ((QPalette)((QPalette *)cls)->resolve (arg1));
 }
 
@@ -704,8 +704,8 @@ static void _call_f_setBrush_4067 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap);
-  const QBrush &arg2 = args.read<const QBrush & > (heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap);
+  const QBrush &arg2 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPalette *)cls)->setBrush (qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg1).cref(), arg2);
 }
@@ -729,9 +729,9 @@ static void _call_f_setBrush_6347 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & > (heap);
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap);
-  const QBrush &arg3 = args.read<const QBrush & > (heap);
+  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap);
+  const QBrush &arg3 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPalette *)cls)->setBrush (qt_gsi::QtToCppAdaptor<QPalette::ColorGroup>(arg1).cref(), qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg2).cref(), arg3);
 }
@@ -755,9 +755,9 @@ static void _call_f_setColor_6342 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & > (heap);
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap);
-  const QColor &arg3 = args.read<const QColor & > (heap);
+  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap);
+  const QColor &arg3 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPalette *)cls)->setColor (qt_gsi::QtToCppAdaptor<QPalette::ColorGroup>(arg1).cref(), qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg2).cref(), arg3);
 }
@@ -779,8 +779,8 @@ static void _call_f_setColor_4062 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap);
-  const QColor &arg2 = args.read<const QColor & > (heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap);
+  const QColor &arg2 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPalette *)cls)->setColor (qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg1).cref(), arg2);
 }
@@ -818,16 +818,16 @@ static void _call_f_setColorGroup_18606 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & > (heap);
-  const QBrush &arg2 = args.read<const QBrush & > (heap);
-  const QBrush &arg3 = args.read<const QBrush & > (heap);
-  const QBrush &arg4 = args.read<const QBrush & > (heap);
-  const QBrush &arg5 = args.read<const QBrush & > (heap);
-  const QBrush &arg6 = args.read<const QBrush & > (heap);
-  const QBrush &arg7 = args.read<const QBrush & > (heap);
-  const QBrush &arg8 = args.read<const QBrush & > (heap);
-  const QBrush &arg9 = args.read<const QBrush & > (heap);
-  const QBrush &arg10 = args.read<const QBrush & > (heap);
+  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & >() (args, heap);
+  const QBrush &arg2 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg3 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg4 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg5 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg6 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg7 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg8 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg9 = gsi::arg_reader<const QBrush & >() (args, heap);
+  const QBrush &arg10 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPalette *)cls)->setColorGroup (qt_gsi::QtToCppAdaptor<QPalette::ColorGroup>(arg1).cref(), arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 }
@@ -847,7 +847,7 @@ static void _call_f_setCurrentColorGroup_2388 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = args.read<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & > (heap);
+  const qt_gsi::Converter<QPalette::ColorGroup>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorGroup>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPalette *)cls)->setCurrentColorGroup (qt_gsi::QtToCppAdaptor<QPalette::ColorGroup>(arg1).cref());
 }
@@ -882,7 +882,7 @@ static void _call_f_swap_1418 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPalette &arg1 = args.read<QPalette & > (heap);
+  QPalette &arg1 = gsi::arg_reader<QPalette & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPalette *)cls)->swap (arg1);
 }

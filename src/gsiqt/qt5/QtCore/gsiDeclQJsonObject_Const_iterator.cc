@@ -70,8 +70,8 @@ static void _call_ctor_QJsonObject_Const_iterator_3066 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonObject *arg1 = args.read<const QJsonObject * > (heap);
-  int arg2 = args.read<int > (heap);
+  const QJsonObject *arg1 = gsi::arg_reader<const QJsonObject * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QJsonObject::const_iterator *> (new QJsonObject::const_iterator (arg1, arg2));
 }
 
@@ -90,7 +90,7 @@ static void _call_ctor_QJsonObject_Const_iterator_3393 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonObject::iterator &arg1 = args.read<const QJsonObject::iterator & > (heap);
+  const QJsonObject::iterator &arg1 = gsi::arg_reader<const QJsonObject::iterator & >() (args, heap);
   ret.write<QJsonObject::const_iterator *> (new QJsonObject::const_iterator (arg1));
 }
 
@@ -124,7 +124,7 @@ static void _call_f_operator_excl__eq__c4039 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonObject::const_iterator &arg1 = args.read<const QJsonObject::const_iterator & > (heap);
+  const QJsonObject::const_iterator &arg1 = gsi::arg_reader<const QJsonObject::const_iterator & >() (args, heap);
   ret.write<bool > ((bool)((QJsonObject::const_iterator *)cls)->operator!= (arg1));
 }
 
@@ -143,7 +143,7 @@ static void _call_f_operator_excl__eq__c3393 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonObject::iterator &arg1 = args.read<const QJsonObject::iterator & > (heap);
+  const QJsonObject::iterator &arg1 = gsi::arg_reader<const QJsonObject::iterator & >() (args, heap);
   ret.write<bool > ((bool)((QJsonObject::const_iterator *)cls)->operator!= (arg1));
 }
 
@@ -177,7 +177,7 @@ static void _call_f_operator_plus__c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject::const_iterator *)cls)->operator+ (arg1));
 }
 
@@ -211,7 +211,7 @@ static void _call_f_operator_plus__plus__767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject::const_iterator *)cls)->operator++ (arg1));
 }
 
@@ -230,7 +230,7 @@ static void _call_f_operator_plus__eq__767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QJsonObject::const_iterator & > ((QJsonObject::const_iterator &)((QJsonObject::const_iterator *)cls)->operator+= (arg1));
 }
 
@@ -249,7 +249,7 @@ static void _call_f_operator_minus__c767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject::const_iterator *)cls)->operator- (arg1));
 }
 
@@ -283,7 +283,7 @@ static void _call_f_operator_minus__minus__767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject::const_iterator *)cls)->operator-- (arg1));
 }
 
@@ -302,7 +302,7 @@ static void _call_f_operator_minus__eq__767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QJsonObject::const_iterator & > ((QJsonObject::const_iterator &)((QJsonObject::const_iterator *)cls)->operator-= (arg1));
 }
 
@@ -336,7 +336,7 @@ static void _call_f_operator_eq__eq__c4039 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonObject::const_iterator &arg1 = args.read<const QJsonObject::const_iterator & > (heap);
+  const QJsonObject::const_iterator &arg1 = gsi::arg_reader<const QJsonObject::const_iterator & >() (args, heap);
   ret.write<bool > ((bool)((QJsonObject::const_iterator *)cls)->operator== (arg1));
 }
 
@@ -355,7 +355,7 @@ static void _call_f_operator_eq__eq__c3393 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonObject::iterator &arg1 = args.read<const QJsonObject::iterator & > (heap);
+  const QJsonObject::iterator &arg1 = gsi::arg_reader<const QJsonObject::iterator & >() (args, heap);
   ret.write<bool > ((bool)((QJsonObject::const_iterator *)cls)->operator== (arg1));
 }
 

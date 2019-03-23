@@ -70,8 +70,8 @@ static void _call_f_openFile_c4217 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFile &arg1 = args.read<QFile & > (heap);
-  QFlags<QIODevice::OpenModeFlag> arg2 = args.read<QFlags<QIODevice::OpenModeFlag> > (heap);
+  QFile &arg1 = gsi::arg_reader<QFile & >() (args, heap);
+  QFlags<QIODevice::OpenModeFlag> arg2 = gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap);
   ret.write<bool > ((bool)((QFileOpenEvent *)cls)->openFile (arg1, arg2));
 }
 
@@ -149,7 +149,7 @@ static void _call_ctor_QFileOpenEvent_Adaptor_2025 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QFileOpenEvent_Adaptor *> (new QFileOpenEvent_Adaptor (arg1));
 }
 
@@ -167,7 +167,7 @@ static void _call_ctor_QFileOpenEvent_Adaptor_1701 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QFileOpenEvent_Adaptor *> (new QFileOpenEvent_Adaptor (arg1));
 }
 

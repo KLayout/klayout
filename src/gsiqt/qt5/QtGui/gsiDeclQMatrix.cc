@@ -85,12 +85,12 @@ static void _call_ctor_QMatrix_5886 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args.read<double > (heap);
-  double arg6 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
+  double arg6 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMatrix *> (new QMatrix (arg1, arg2, arg3, arg4, arg5, arg6));
 }
 
@@ -109,7 +109,7 @@ static void _call_ctor_QMatrix_2023 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
   ret.write<QMatrix *> (new QMatrix (arg1));
 }
 
@@ -173,7 +173,7 @@ static void _call_f_inverted_c1050 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? args.read<bool * > (heap) : (bool *)(0);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<QMatrix > ((QMatrix)((QMatrix *)cls)->inverted (arg1));
 }
 
@@ -288,10 +288,10 @@ static void _call_f_map_c3116 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int *arg3 = args.read<int * > (heap);
-  int *arg4 = args.read<int * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  int *arg4 = gsi::arg_reader<int * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix *)cls)->map (arg1, arg2, arg3, arg4);
 }
@@ -317,10 +317,10 @@ static void _call_f_map_c4332 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double *arg3 = args.read<double * > (heap);
-  double *arg4 = args.read<double * > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double *arg3 = gsi::arg_reader<double * >() (args, heap);
+  double *arg4 = gsi::arg_reader<double * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix *)cls)->map (arg1, arg2, arg3, arg4);
 }
@@ -340,7 +340,7 @@ static void _call_f_map_c1916 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QPoint > ((QPoint)((QMatrix *)cls)->map (arg1));
 }
 
@@ -359,7 +359,7 @@ static void _call_f_map_c1986 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QPointF > ((QPointF)((QMatrix *)cls)->map (arg1));
 }
 
@@ -378,7 +378,7 @@ static void _call_f_map_c1786 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLine &arg1 = args.read<const QLine & > (heap);
+  const QLine &arg1 = gsi::arg_reader<const QLine & >() (args, heap);
   ret.write<QLine > ((QLine)((QMatrix *)cls)->map (arg1));
 }
 
@@ -397,7 +397,7 @@ static void _call_f_map_c1856 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLineF &arg1 = args.read<const QLineF & > (heap);
+  const QLineF &arg1 = gsi::arg_reader<const QLineF & >() (args, heap);
   ret.write<QLineF > ((QLineF)((QMatrix *)cls)->map (arg1));
 }
 
@@ -416,7 +416,7 @@ static void _call_f_map_c2208 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygonF &arg1 = args.read<const QPolygonF & > (heap);
+  const QPolygonF &arg1 = gsi::arg_reader<const QPolygonF & >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QMatrix *)cls)->map (arg1));
 }
 
@@ -435,7 +435,7 @@ static void _call_f_map_c2138 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygon &arg1 = args.read<const QPolygon & > (heap);
+  const QPolygon &arg1 = gsi::arg_reader<const QPolygon & >() (args, heap);
   ret.write<QPolygon > ((QPolygon)((QMatrix *)cls)->map (arg1));
 }
 
@@ -454,7 +454,7 @@ static void _call_f_map_c2006 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QRegion > ((QRegion)((QMatrix *)cls)->map (arg1));
 }
 
@@ -473,7 +473,7 @@ static void _call_f_map_c2514 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QMatrix *)cls)->map (arg1));
 }
 
@@ -492,7 +492,7 @@ static void _call_f_mapRect_c1792 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRect > ((QRect)((QMatrix *)cls)->mapRect (arg1));
 }
 
@@ -511,7 +511,7 @@ static void _call_f_mapRect_c1862 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QMatrix *)cls)->mapRect (arg1));
 }
 
@@ -530,7 +530,7 @@ static void _call_f_mapToPolygon_c1792 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QPolygon > ((QPolygon)((QMatrix *)cls)->mapToPolygon (arg1));
 }
 
@@ -549,7 +549,7 @@ static void _call_f_operator_excl__eq__c2023 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
   ret.write<bool > ((bool)((QMatrix *)cls)->operator!= (arg1));
 }
 
@@ -568,7 +568,7 @@ static void _call_f_operator_star__c2023 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
   ret.write<QMatrix > ((QMatrix)((QMatrix *)cls)->operator* (arg1));
 }
 
@@ -587,7 +587,7 @@ static void _call_f_operator_star__eq__2023 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
   ret.write<QMatrix & > ((QMatrix &)((QMatrix *)cls)->operator*= (arg1));
 }
 
@@ -606,7 +606,7 @@ static void _call_f_operator_eq__2023 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
   ret.write<QMatrix & > ((QMatrix &)((QMatrix *)cls)->operator= (arg1));
 }
 
@@ -625,7 +625,7 @@ static void _call_f_operator_eq__eq__c2023 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
   ret.write<bool > ((bool)((QMatrix *)cls)->operator== (arg1));
 }
 
@@ -660,7 +660,7 @@ static void _call_f_rotate_1071 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMatrix & > ((QMatrix &)((QMatrix *)cls)->rotate (arg1));
 }
 
@@ -681,8 +681,8 @@ static void _call_f_scale_2034 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMatrix & > ((QMatrix &)((QMatrix *)cls)->scale (arg1, arg2));
 }
 
@@ -711,12 +711,12 @@ static void _call_f_setMatrix_5886 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args.read<double > (heap);
-  double arg6 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
+  double arg6 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix *)cls)->setMatrix (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -738,8 +738,8 @@ static void _call_f_shear_2034 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMatrix & > ((QMatrix &)((QMatrix *)cls)->shear (arg1, arg2));
 }
 
@@ -760,8 +760,8 @@ static void _call_f_translate_2034 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMatrix & > ((QMatrix &)((QMatrix *)cls)->translate (arg1, arg2));
 }
 

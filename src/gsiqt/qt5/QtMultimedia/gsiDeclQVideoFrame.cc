@@ -72,9 +72,9 @@ static void _call_ctor_QVideoFrame_6975 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractVideoBuffer *arg1 = args.read<QAbstractVideoBuffer * > (heap);
-  const QSize &arg2 = args.read<const QSize & > (heap);
-  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg3 = args.read<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & > (heap);
+  QAbstractVideoBuffer *arg1 = gsi::arg_reader<QAbstractVideoBuffer * >() (args, heap);
+  const QSize &arg2 = gsi::arg_reader<const QSize & >() (args, heap);
+  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & >() (args, heap);
   ret.write<QVideoFrame *> (new QVideoFrame (arg1, arg2, qt_gsi::QtToCppAdaptor<QVideoFrame::PixelFormat>(arg3).cref()));
 }
 
@@ -99,10 +99,10 @@ static void _call_ctor_QVideoFrame_5773 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QSize &arg2 = args.read<const QSize & > (heap);
-  int arg3 = args.read<int > (heap);
-  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg4 = args.read<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QSize &arg2 = gsi::arg_reader<const QSize & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg4 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & >() (args, heap);
   ret.write<QVideoFrame *> (new QVideoFrame (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<QVideoFrame::PixelFormat>(arg4).cref()));
 }
 
@@ -121,7 +121,7 @@ static void _call_ctor_QVideoFrame_1877 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImage &arg1 = args.read<const QImage & > (heap);
+  const QImage &arg1 = gsi::arg_reader<const QImage & >() (args, heap);
   ret.write<QVideoFrame *> (new QVideoFrame (arg1));
 }
 
@@ -140,7 +140,7 @@ static void _call_ctor_QVideoFrame_2388 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoFrame &arg1 = args.read<const QVideoFrame & > (heap);
+  const QVideoFrame &arg1 = gsi::arg_reader<const QVideoFrame & >() (args, heap);
   ret.write<QVideoFrame *> (new QVideoFrame (arg1));
 }
 
@@ -189,7 +189,7 @@ static void _call_f_bits_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<const unsigned char * > ((const unsigned char *)((QVideoFrame *)cls)->bits (arg1));
 }
 
@@ -223,7 +223,7 @@ static void _call_f_bytesPerLine_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QVideoFrame *)cls)->bytesPerLine (arg1));
 }
 
@@ -377,7 +377,7 @@ static void _call_f_map_3233 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractVideoBuffer::MapMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractVideoBuffer::MapMode>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractVideoBuffer::MapMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractVideoBuffer::MapMode>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QVideoFrame *)cls)->map (qt_gsi::QtToCppAdaptor<QAbstractVideoBuffer::MapMode>(arg1).cref()));
 }
 
@@ -426,7 +426,7 @@ static void _call_f_metaData_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QVideoFrame *)cls)->metaData (arg1));
 }
 
@@ -445,7 +445,7 @@ static void _call_f_operator_eq__2388 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoFrame &arg1 = args.read<const QVideoFrame & > (heap);
+  const QVideoFrame &arg1 = gsi::arg_reader<const QVideoFrame & >() (args, heap);
   ret.write<QVideoFrame & > ((QVideoFrame &)((QVideoFrame *)cls)->operator = (arg1));
 }
 
@@ -464,7 +464,7 @@ static void _call_f_operator_excl__eq__c2388 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoFrame &arg1 = args.read<const QVideoFrame & > (heap);
+  const QVideoFrame &arg1 = gsi::arg_reader<const QVideoFrame & >() (args, heap);
   ret.write<bool > ((bool)((QVideoFrame *)cls)->operator!= (arg1));
 }
 
@@ -483,7 +483,7 @@ static void _call_f_operator_eq__eq__c2388 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoFrame &arg1 = args.read<const QVideoFrame & > (heap);
+  const QVideoFrame &arg1 = gsi::arg_reader<const QVideoFrame & >() (args, heap);
   ret.write<bool > ((bool)((QVideoFrame *)cls)->operator== (arg1));
 }
 
@@ -532,7 +532,7 @@ static void _call_f_setEndTime_986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoFrame *)cls)->setEndTime (arg1);
 }
@@ -552,7 +552,7 @@ static void _call_f_setFieldType_2529 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QVideoFrame::FieldType>::target_type & arg1 = args.read<const qt_gsi::Converter<QVideoFrame::FieldType>::target_type & > (heap);
+  const qt_gsi::Converter<QVideoFrame::FieldType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrame::FieldType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoFrame *)cls)->setFieldType (qt_gsi::QtToCppAdaptor<QVideoFrame::FieldType>(arg1).cref());
 }
@@ -574,8 +574,8 @@ static void _call_f_setMetaData_4036 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoFrame *)cls)->setMetaData (arg1, arg2);
 }
@@ -595,7 +595,7 @@ static void _call_f_setStartTime_986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoFrame *)cls)->setStartTime (arg1);
 }
@@ -676,7 +676,7 @@ static void _call_f_imageFormatFromPixelFormat_2758 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & > (heap);
+  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & >() (args, heap);
   ret.write<qt_gsi::Converter<QImage::Format>::target_type > ((qt_gsi::Converter<QImage::Format>::target_type)qt_gsi::CppToQtAdaptor<QImage::Format>(QVideoFrame::imageFormatFromPixelFormat (qt_gsi::QtToCppAdaptor<QVideoFrame::PixelFormat>(arg1).cref())));
 }
 
@@ -695,7 +695,7 @@ static void _call_f_pixelFormatFromImageFormat_1733 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QImage::Format>::target_type & arg1 = args.read<const qt_gsi::Converter<QImage::Format>::target_type & > (heap);
+  const qt_gsi::Converter<QImage::Format>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QImage::Format>::target_type & >() (args, heap);
   ret.write<qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type > ((qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type)qt_gsi::CppToQtAdaptor<QVideoFrame::PixelFormat>(QVideoFrame::pixelFormatFromImageFormat (qt_gsi::QtToCppAdaptor<QImage::Format>(arg1).cref())));
 }
 

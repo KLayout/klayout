@@ -81,7 +81,7 @@ static void _call_ctor_QDomCharacterData_2969 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomCharacterData &arg1 = args.read<const QDomCharacterData & > (heap);
+  const QDomCharacterData &arg1 = gsi::arg_reader<const QDomCharacterData & >() (args, heap);
   ret.write<QDomCharacterData *> (new QDomCharacterData (arg1));
 }
 
@@ -100,7 +100,7 @@ static void _call_f_appendData_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomCharacterData *)cls)->appendData (arg1);
 }
@@ -137,8 +137,8 @@ static void _call_f_deleteData_4588 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned long int arg1 = args.read<unsigned long int > (heap);
-  unsigned long int arg2 = args.read<unsigned long int > (heap);
+  unsigned long int arg1 = gsi::arg_reader<unsigned long int >() (args, heap);
+  unsigned long int arg2 = gsi::arg_reader<unsigned long int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomCharacterData *)cls)->deleteData (arg1, arg2);
 }
@@ -160,8 +160,8 @@ static void _call_f_insertData_4265 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned long int arg1 = args.read<unsigned long int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  unsigned long int arg1 = gsi::arg_reader<unsigned long int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomCharacterData *)cls)->insertData (arg1, arg2);
 }
@@ -211,7 +211,7 @@ static void _call_f_operator_eq__2969 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomCharacterData &arg1 = args.read<const QDomCharacterData & > (heap);
+  const QDomCharacterData &arg1 = gsi::arg_reader<const QDomCharacterData & >() (args, heap);
   ret.write<QDomCharacterData & > ((QDomCharacterData &)((QDomCharacterData *)cls)->operator= (arg1));
 }
 
@@ -234,9 +234,9 @@ static void _call_f_replaceData_6505 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned long int arg1 = args.read<unsigned long int > (heap);
-  unsigned long int arg2 = args.read<unsigned long int > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  unsigned long int arg1 = gsi::arg_reader<unsigned long int >() (args, heap);
+  unsigned long int arg2 = gsi::arg_reader<unsigned long int >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomCharacterData *)cls)->replaceData (arg1, arg2, arg3);
 }
@@ -256,7 +256,7 @@ static void _call_f_setData_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDomCharacterData *)cls)->setData (arg1);
 }
@@ -278,8 +278,8 @@ static void _call_f_substringData_4588 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned long int arg1 = args.read<unsigned long int > (heap);
-  unsigned long int arg2 = args.read<unsigned long int > (heap);
+  unsigned long int arg1 = gsi::arg_reader<unsigned long int >() (args, heap);
+  unsigned long int arg2 = gsi::arg_reader<unsigned long int >() (args, heap);
   ret.write<QString > ((QString)((QDomCharacterData *)cls)->substringData (arg1, arg2));
 }
 

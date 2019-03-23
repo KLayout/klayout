@@ -69,8 +69,8 @@ static void _call_ctor_QNetworkProxyQuery_5004 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
-  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & > (heap) : (const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::UrlRequest));
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
+  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::UrlRequest), heap);
   ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1, qt_gsi::QtToCppAdaptor<QNetworkProxyQuery::QueryType>(arg2).cref()));
 }
 
@@ -95,10 +95,10 @@ static void _call_ctor_QNetworkProxyQuery_7904 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args.read<int > (heap);
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & > (heap) : (const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::TcpSocket));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::TcpSocket), heap);
   ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<QNetworkProxyQuery::QueryType>(arg4).cref()));
 }
 
@@ -121,9 +121,9 @@ static void _call_ctor_QNetworkProxyQuery_6320 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  quint16 arg1 = args.read<quint16 > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & > (heap) : (const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::TcpServer));
+  quint16 arg1 = gsi::arg_reader<quint16 >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::TcpServer), heap);
   ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1, arg2, qt_gsi::QtToCppAdaptor<QNetworkProxyQuery::QueryType>(arg3).cref()));
 }
 
@@ -142,7 +142,7 @@ static void _call_ctor_QNetworkProxyQuery_3220 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxyQuery &arg1 = args.read<const QNetworkProxyQuery & > (heap);
+  const QNetworkProxyQuery &arg1 = gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap);
   ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1));
 }
 
@@ -165,9 +165,9 @@ static void _call_ctor_QNetworkProxyQuery_8404 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
-  const QUrl &arg2 = args.read<const QUrl & > (heap);
-  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & > (heap) : (const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::UrlRequest));
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
+  const QUrl &arg2 = gsi::arg_reader<const QUrl & >() (args, heap);
+  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::UrlRequest), heap);
   ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1, arg2, qt_gsi::QtToCppAdaptor<QNetworkProxyQuery::QueryType>(arg3).cref()));
 }
 
@@ -194,11 +194,11 @@ static void _call_ctor_QNetworkProxyQuery_11304 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  int arg3 = args.read<int > (heap);
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & > (heap) : (const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::TcpSocket));
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::TcpSocket), heap);
   ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QNetworkProxyQuery::QueryType>(arg5).cref()));
 }
 
@@ -223,10 +223,10 @@ static void _call_ctor_QNetworkProxyQuery_9720 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
-  quint16 arg2 = args.read<quint16 > (heap);
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & > (heap) : (const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::TcpServer));
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
+  quint16 arg2 = gsi::arg_reader<quint16 >() (args, heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::TcpServer), heap);
   ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<QNetworkProxyQuery::QueryType>(arg4).cref()));
 }
 
@@ -275,7 +275,7 @@ static void _call_f_operator_excl__eq__c3220 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxyQuery &arg1 = args.read<const QNetworkProxyQuery & > (heap);
+  const QNetworkProxyQuery &arg1 = gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkProxyQuery *)cls)->operator!= (arg1));
 }
 
@@ -294,7 +294,7 @@ static void _call_f_operator_eq__3220 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxyQuery &arg1 = args.read<const QNetworkProxyQuery & > (heap);
+  const QNetworkProxyQuery &arg1 = gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap);
   ret.write<QNetworkProxyQuery & > ((QNetworkProxyQuery &)((QNetworkProxyQuery *)cls)->operator= (arg1));
 }
 
@@ -313,7 +313,7 @@ static void _call_f_operator_eq__eq__c3220 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxyQuery &arg1 = args.read<const QNetworkProxyQuery & > (heap);
+  const QNetworkProxyQuery &arg1 = gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkProxyQuery *)cls)->operator== (arg1));
 }
 
@@ -392,7 +392,7 @@ static void _call_f_setLocalPort_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkProxyQuery *)cls)->setLocalPort (arg1);
 }
@@ -412,7 +412,7 @@ static void _call_f_setNetworkConfiguration_3508 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkProxyQuery *)cls)->setNetworkConfiguration (arg1);
 }
@@ -432,7 +432,7 @@ static void _call_f_setPeerHostName_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkProxyQuery *)cls)->setPeerHostName (arg1);
 }
@@ -452,7 +452,7 @@ static void _call_f_setPeerPort_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkProxyQuery *)cls)->setPeerPort (arg1);
 }
@@ -472,7 +472,7 @@ static void _call_f_setProtocolTag_2025 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkProxyQuery *)cls)->setProtocolTag (arg1);
 }
@@ -492,7 +492,7 @@ static void _call_f_setQueryType_3411 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & > (heap);
+  const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkProxyQuery *)cls)->setQueryType (qt_gsi::QtToCppAdaptor<QNetworkProxyQuery::QueryType>(arg1).cref());
 }
@@ -512,7 +512,7 @@ static void _call_f_setUrl_1701 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkProxyQuery *)cls)->setUrl (arg1);
 }
@@ -532,7 +532,7 @@ static void _call_f_swap_2525 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkProxyQuery &arg1 = args.read<QNetworkProxyQuery & > (heap);
+  QNetworkProxyQuery &arg1 = gsi::arg_reader<QNetworkProxyQuery & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkProxyQuery *)cls)->swap (arg1);
 }

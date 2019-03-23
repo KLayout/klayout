@@ -54,8 +54,8 @@ static void _call_ctor_QSqlIndex_3942 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QSqlIndex *> (new QSqlIndex (arg1, arg2));
 }
 
@@ -74,7 +74,7 @@ static void _call_ctor_QSqlIndex_2202 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlIndex &arg1 = args.read<const QSqlIndex & > (heap);
+  const QSqlIndex &arg1 = gsi::arg_reader<const QSqlIndex & >() (args, heap);
   ret.write<QSqlIndex *> (new QSqlIndex (arg1));
 }
 
@@ -93,7 +93,7 @@ static void _call_f_append_2182 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlField &arg1 = args.read<const QSqlField & > (heap);
+  const QSqlField &arg1 = gsi::arg_reader<const QSqlField & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlIndex *)cls)->append (arg1);
 }
@@ -115,8 +115,8 @@ static void _call_f_append_2938 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlField &arg1 = args.read<const QSqlField & > (heap);
-  bool arg2 = args.read<bool > (heap);
+  const QSqlField &arg1 = gsi::arg_reader<const QSqlField & >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlIndex *)cls)->append (arg1, arg2);
 }
@@ -151,7 +151,7 @@ static void _call_f_isDescending_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QSqlIndex *)cls)->isDescending (arg1));
 }
 
@@ -185,7 +185,7 @@ static void _call_f_operator_eq__2202 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlIndex &arg1 = args.read<const QSqlIndex & > (heap);
+  const QSqlIndex &arg1 = gsi::arg_reader<const QSqlIndex & >() (args, heap);
   ret.write<QSqlIndex & > ((QSqlIndex &)((QSqlIndex *)cls)->operator= (arg1));
 }
 
@@ -204,7 +204,7 @@ static void _call_f_setCursorName_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlIndex *)cls)->setCursorName (arg1);
 }
@@ -226,8 +226,8 @@ static void _call_f_setDescending_1523 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  bool arg2 = args.read<bool > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlIndex *)cls)->setDescending (arg1, arg2);
 }
@@ -247,7 +247,7 @@ static void _call_f_setName_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlIndex *)cls)->setName (arg1);
 }

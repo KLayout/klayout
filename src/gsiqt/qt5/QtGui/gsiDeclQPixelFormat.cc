@@ -89,19 +89,19 @@ static void _call_ctor_QPixelFormat_30295 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPixelFormat::ColorModel>::target_type & arg1 = args.read<const qt_gsi::Converter<QPixelFormat::ColorModel>::target_type & > (heap);
-  unsigned char arg2 = args.read<unsigned char > (heap);
-  unsigned char arg3 = args.read<unsigned char > (heap);
-  unsigned char arg4 = args.read<unsigned char > (heap);
-  unsigned char arg5 = args.read<unsigned char > (heap);
-  unsigned char arg6 = args.read<unsigned char > (heap);
-  unsigned char arg7 = args.read<unsigned char > (heap);
-  const qt_gsi::Converter<QPixelFormat::AlphaUsage>::target_type & arg8 = args.read<const qt_gsi::Converter<QPixelFormat::AlphaUsage>::target_type & > (heap);
-  const qt_gsi::Converter<QPixelFormat::AlphaPosition>::target_type & arg9 = args.read<const qt_gsi::Converter<QPixelFormat::AlphaPosition>::target_type & > (heap);
-  const qt_gsi::Converter<QPixelFormat::AlphaPremultiplied>::target_type & arg10 = args.read<const qt_gsi::Converter<QPixelFormat::AlphaPremultiplied>::target_type & > (heap);
-  const qt_gsi::Converter<QPixelFormat::TypeInterpretation>::target_type & arg11 = args.read<const qt_gsi::Converter<QPixelFormat::TypeInterpretation>::target_type & > (heap);
-  const qt_gsi::Converter<QPixelFormat::ByteOrder>::target_type & arg12 = args ? args.read<const qt_gsi::Converter<QPixelFormat::ByteOrder>::target_type & > (heap) : (const qt_gsi::Converter<QPixelFormat::ByteOrder>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPixelFormat::ByteOrder>(heap, QPixelFormat::CurrentSystemEndian));
-  unsigned char arg13 = args ? args.read<unsigned char > (heap) : (unsigned char)(0);
+  const qt_gsi::Converter<QPixelFormat::ColorModel>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPixelFormat::ColorModel>::target_type & >() (args, heap);
+  unsigned char arg2 = gsi::arg_reader<unsigned char >() (args, heap);
+  unsigned char arg3 = gsi::arg_reader<unsigned char >() (args, heap);
+  unsigned char arg4 = gsi::arg_reader<unsigned char >() (args, heap);
+  unsigned char arg5 = gsi::arg_reader<unsigned char >() (args, heap);
+  unsigned char arg6 = gsi::arg_reader<unsigned char >() (args, heap);
+  unsigned char arg7 = gsi::arg_reader<unsigned char >() (args, heap);
+  const qt_gsi::Converter<QPixelFormat::AlphaUsage>::target_type & arg8 = gsi::arg_reader<const qt_gsi::Converter<QPixelFormat::AlphaUsage>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPixelFormat::AlphaPosition>::target_type & arg9 = gsi::arg_reader<const qt_gsi::Converter<QPixelFormat::AlphaPosition>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPixelFormat::AlphaPremultiplied>::target_type & arg10 = gsi::arg_reader<const qt_gsi::Converter<QPixelFormat::AlphaPremultiplied>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPixelFormat::TypeInterpretation>::target_type & arg11 = gsi::arg_reader<const qt_gsi::Converter<QPixelFormat::TypeInterpretation>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPixelFormat::ByteOrder>::target_type & arg12 = args ? gsi::arg_reader<const qt_gsi::Converter<QPixelFormat::ByteOrder>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPixelFormat::ByteOrder>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPixelFormat::ByteOrder>(heap, QPixelFormat::CurrentSystemEndian), heap);
+  unsigned char arg13 = args ? gsi::arg_reader<unsigned char >() (args, heap) : gsi::arg_maker<unsigned char >() (0, heap);
   ret.write<QPixelFormat *> (new QPixelFormat (qt_gsi::QtToCppAdaptor<QPixelFormat::ColorModel>(arg1).cref(), arg2, arg3, arg4, arg5, arg6, arg7, qt_gsi::QtToCppAdaptor<QPixelFormat::AlphaUsage>(arg8).cref(), qt_gsi::QtToCppAdaptor<QPixelFormat::AlphaPosition>(arg9).cref(), qt_gsi::QtToCppAdaptor<QPixelFormat::AlphaPremultiplied>(arg10).cref(), qt_gsi::QtToCppAdaptor<QPixelFormat::TypeInterpretation>(arg11).cref(), qt_gsi::QtToCppAdaptor<QPixelFormat::ByteOrder>(arg12).cref(), arg13));
 }
 

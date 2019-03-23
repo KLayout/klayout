@@ -66,7 +66,7 @@ static void _call_ctor_QUrlQuery_1701 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QUrlQuery *> (new QUrlQuery (arg1));
 }
 
@@ -85,7 +85,7 @@ static void _call_ctor_QUrlQuery_2025 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QUrlQuery *> (new QUrlQuery (arg1));
 }
 
@@ -104,7 +104,7 @@ static void _call_ctor_QUrlQuery_2235 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlQuery &arg1 = args.read<const QUrlQuery & > (heap);
+  const QUrlQuery &arg1 = gsi::arg_reader<const QUrlQuery & >() (args, heap);
   ret.write<QUrlQuery *> (new QUrlQuery (arg1));
 }
 
@@ -125,8 +125,8 @@ static void _call_f_addQueryItem_3942 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlQuery *)cls)->addQueryItem (arg1, arg2);
 }
@@ -148,8 +148,8 @@ static void _call_f_allQueryItemValues_c6184 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<QUrl::ComponentFormattingOption> arg2 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::PrettyDecoded);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QUrl::ComponentFormattingOption> arg2 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::PrettyDecoded, heap);
   ret.write<QStringList > ((QStringList)((QUrlQuery *)cls)->allQueryItemValues (arg1, arg2));
 }
 
@@ -184,7 +184,7 @@ static void _call_f_hasQueryItem_c2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QUrlQuery *)cls)->hasQueryItem (arg1));
 }
 
@@ -233,7 +233,7 @@ static void _call_f_operator_excl__eq__c2235 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlQuery &arg1 = args.read<const QUrlQuery & > (heap);
+  const QUrlQuery &arg1 = gsi::arg_reader<const QUrlQuery & >() (args, heap);
   ret.write<bool > ((bool)((QUrlQuery *)cls)->operator!= (arg1));
 }
 
@@ -252,7 +252,7 @@ static void _call_f_operator_eq__2235 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlQuery &arg1 = args.read<const QUrlQuery & > (heap);
+  const QUrlQuery &arg1 = gsi::arg_reader<const QUrlQuery & >() (args, heap);
   ret.write<QUrlQuery & > ((QUrlQuery &)((QUrlQuery *)cls)->operator= (arg1));
 }
 
@@ -271,7 +271,7 @@ static void _call_f_operator_eq__eq__c2235 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrlQuery &arg1 = args.read<const QUrlQuery & > (heap);
+  const QUrlQuery &arg1 = gsi::arg_reader<const QUrlQuery & >() (args, heap);
   ret.write<bool > ((bool)((QUrlQuery *)cls)->operator== (arg1));
 }
 
@@ -290,7 +290,7 @@ static void _call_f_query_c4267 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::PrettyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::PrettyDecoded, heap);
   ret.write<QString > ((QString)((QUrlQuery *)cls)->query (arg1));
 }
 
@@ -311,8 +311,8 @@ static void _call_f_queryItemValue_c6184 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<QUrl::ComponentFormattingOption> arg2 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::PrettyDecoded);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QUrl::ComponentFormattingOption> arg2 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::PrettyDecoded, heap);
   ret.write<QString > ((QString)((QUrlQuery *)cls)->queryItemValue (arg1, arg2));
 }
 
@@ -331,7 +331,7 @@ static void _call_f_queryItems_c4267 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::PrettyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::PrettyDecoded, heap);
   ret.write<QList<QPair<QString, QString> > > ((QList<QPair<QString, QString> >)((QUrlQuery *)cls)->queryItems (arg1));
 }
 
@@ -380,7 +380,7 @@ static void _call_f_removeAllQueryItems_2025 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlQuery *)cls)->removeAllQueryItems (arg1);
 }
@@ -400,7 +400,7 @@ static void _call_f_removeQueryItem_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlQuery *)cls)->removeQueryItem (arg1);
 }
@@ -420,7 +420,7 @@ static void _call_f_setQuery_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlQuery *)cls)->setQuery (arg1);
 }
@@ -442,8 +442,8 @@ static void _call_f_setQueryDelimiters_1690 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QChar>::target_type & arg1 = args.read<const qt_gsi::Converter<QChar>::target_type & > (heap);
-  const qt_gsi::Converter<QChar>::target_type & arg2 = args.read<const qt_gsi::Converter<QChar>::target_type & > (heap);
+  const qt_gsi::Converter<QChar>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QChar>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlQuery *)cls)->setQueryDelimiters (qt_gsi::QtToCppAdaptor<QChar>(arg1).cref(), qt_gsi::QtToCppAdaptor<QChar>(arg2).cref());
 }
@@ -463,7 +463,7 @@ static void _call_f_setQueryItems_4283 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QPair<QString, QString> > &arg1 = args.read<const QList<QPair<QString, QString> > & > (heap);
+  const QList<QPair<QString, QString> > &arg1 = gsi::arg_reader<const QList<QPair<QString, QString> > & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlQuery *)cls)->setQueryItems (arg1);
 }
@@ -483,7 +483,7 @@ static void _call_f_swap_1540 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QUrlQuery &arg1 = args.read<QUrlQuery & > (heap);
+  QUrlQuery &arg1 = gsi::arg_reader<QUrlQuery & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUrlQuery *)cls)->swap (arg1);
 }
@@ -503,7 +503,7 @@ static void _call_f_toString_c4267 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? args.read<QFlags<QUrl::ComponentFormattingOption> > (heap) : (QFlags<QUrl::ComponentFormattingOption>)(QUrl::PrettyDecoded);
+  QFlags<QUrl::ComponentFormattingOption> arg1 = args ? gsi::arg_reader<QFlags<QUrl::ComponentFormattingOption> >() (args, heap) : gsi::arg_maker<QFlags<QUrl::ComponentFormattingOption> >() (QUrl::PrettyDecoded, heap);
   ret.write<QString > ((QString)((QUrlQuery *)cls)->toString (arg1));
 }
 

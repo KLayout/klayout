@@ -91,9 +91,9 @@ static void _call_f_filterNativeEvent_4678 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  void *arg2 = args.read<void * > (heap);
-  long int *arg3 = args.read<long int * > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  void *arg2 = gsi::arg_reader<void * >() (args, heap);
+  long int *arg3 = gsi::arg_reader<long int * >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher *)cls)->filterNativeEvent (arg1, arg2, arg3));
 }
 
@@ -143,7 +143,7 @@ static void _call_f_installNativeEventFilter_3266 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractNativeEventFilter *arg1 = args.read<QAbstractNativeEventFilter * > (heap);
+  QAbstractNativeEventFilter *arg1 = gsi::arg_reader<QAbstractNativeEventFilter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher *)cls)->installNativeEventFilter (arg1);
 }
@@ -179,7 +179,7 @@ static void _call_f_processEvents_3995 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QEventLoop::ProcessEventsFlag> arg1 = args.read<QFlags<QEventLoop::ProcessEventsFlag> > (heap);
+  QFlags<QEventLoop::ProcessEventsFlag> arg1 = gsi::arg_reader<QFlags<QEventLoop::ProcessEventsFlag> >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher *)cls)->processEvents (arg1));
 }
 
@@ -198,7 +198,7 @@ static void _call_f_registerSocketNotifier_2152 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSocketNotifier *arg1 = args.read<QSocketNotifier * > (heap);
+  QSocketNotifier *arg1 = gsi::arg_reader<QSocketNotifier * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher *)cls)->registerSocketNotifier (arg1);
 }
@@ -222,9 +222,9 @@ static void _call_f_registerTimer_3533 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::TimerType>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::TimerType>::target_type & > (heap);
-  QObject *arg3 = args.read<QObject * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::TimerType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimerType>::target_type & >() (args, heap);
+  QObject *arg3 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<int > ((int)((QAbstractEventDispatcher *)cls)->registerTimer (arg1, qt_gsi::QtToCppAdaptor<Qt::TimerType>(arg2).cref(), arg3));
 }
 
@@ -249,10 +249,10 @@ static void _call_f_registerTimer_4192 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::TimerType>::target_type & arg3 = args.read<const qt_gsi::Converter<Qt::TimerType>::target_type & > (heap);
-  QObject *arg4 = args.read<QObject * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::TimerType>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimerType>::target_type & >() (args, heap);
+  QObject *arg4 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher *)cls)->registerTimer (arg1, arg2, qt_gsi::QtToCppAdaptor<Qt::TimerType>(arg3).cref(), arg4);
 }
@@ -272,7 +272,7 @@ static void _call_f_registeredTimers_c1302 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QList<QAbstractEventDispatcher::TimerInfo> > ((QList<QAbstractEventDispatcher::TimerInfo>)((QAbstractEventDispatcher *)cls)->registeredTimers (arg1));
 }
 
@@ -291,7 +291,7 @@ static void _call_f_remainingTime_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QAbstractEventDispatcher *)cls)->remainingTime (arg1));
 }
 
@@ -310,7 +310,7 @@ static void _call_f_removeNativeEventFilter_3266 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractNativeEventFilter *arg1 = args.read<QAbstractNativeEventFilter * > (heap);
+  QAbstractNativeEventFilter *arg1 = gsi::arg_reader<QAbstractNativeEventFilter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher *)cls)->removeNativeEventFilter (arg1);
 }
@@ -346,7 +346,7 @@ static void _call_f_unregisterSocketNotifier_2152 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSocketNotifier *arg1 = args.read<QSocketNotifier * > (heap);
+  QSocketNotifier *arg1 = gsi::arg_reader<QSocketNotifier * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractEventDispatcher *)cls)->unregisterSocketNotifier (arg1);
 }
@@ -366,7 +366,7 @@ static void _call_f_unregisterTimer_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher *)cls)->unregisterTimer (arg1));
 }
 
@@ -385,7 +385,7 @@ static void _call_f_unregisterTimers_1302 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher *)cls)->unregisterTimers (arg1));
 }
 
@@ -420,7 +420,7 @@ static void _call_f_instance_1303 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QThread *arg1 = args ? args.read<QThread * > (heap) : (QThread *)(0);
+  QThread *arg1 = args ? gsi::arg_reader<QThread * >() (args, heap) : gsi::arg_maker<QThread * >() (0, heap);
   ret.write<QAbstractEventDispatcher * > ((QAbstractEventDispatcher *)QAbstractEventDispatcher::instance (arg1));
 }
 
@@ -443,9 +443,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractEventDispatcher::tr (arg1, arg2, arg3));
 }
 
@@ -468,9 +468,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractEventDispatcher::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -927,7 +927,7 @@ static void _call_ctor_QAbstractEventDispatcher_Adaptor_1302 (const qt_gsi::Gene
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QAbstractEventDispatcher_Adaptor *> (new QAbstractEventDispatcher_Adaptor (arg1));
 }
 
@@ -1041,7 +1041,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QAbstractEventDispatcher_Adaptor *)cls)->emitter_QAbstractEventDispatcher_destroyed_1302 (arg1);
 }
 
@@ -1191,7 +1191,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractEventDispatcher_Adaptor *)cls)->fp_QAbstractEventDispatcher_isSignalConnected_c2394 (arg1));
 }
 
@@ -1232,7 +1232,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QAbstractEventDispatcher_Adaptor *)cls)->fp_QAbstractEventDispatcher_receivers_c1731 (arg1));
 }
 

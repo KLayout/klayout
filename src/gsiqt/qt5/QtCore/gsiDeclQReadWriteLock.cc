@@ -50,7 +50,7 @@ static void _call_ctor_QReadWriteLock_3272 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QReadWriteLock::RecursionMode>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QReadWriteLock::RecursionMode>::target_type & > (heap) : (const qt_gsi::Converter<QReadWriteLock::RecursionMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QReadWriteLock::RecursionMode>(heap, QReadWriteLock::NonRecursive));
+  const qt_gsi::Converter<QReadWriteLock::RecursionMode>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QReadWriteLock::RecursionMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QReadWriteLock::RecursionMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QReadWriteLock::RecursionMode>(heap, QReadWriteLock::NonRecursive), heap);
   ret.write<QReadWriteLock *> (new QReadWriteLock (qt_gsi::QtToCppAdaptor<QReadWriteLock::RecursionMode>(arg1).cref()));
 }
 
@@ -116,7 +116,7 @@ static void _call_f_tryLockForRead_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QReadWriteLock *)cls)->tryLockForRead (arg1));
 }
 
@@ -150,7 +150,7 @@ static void _call_f_tryLockForWrite_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QReadWriteLock *)cls)->tryLockForWrite (arg1));
 }
 

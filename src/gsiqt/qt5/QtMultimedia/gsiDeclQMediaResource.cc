@@ -70,8 +70,8 @@ static void _call_ctor_QMediaResource_3618 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QMediaResource *> (new QMediaResource (arg1, arg2));
 }
 
@@ -92,8 +92,8 @@ static void _call_ctor_QMediaResource_4802 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QMediaResource *> (new QMediaResource (arg1, arg2));
 }
 
@@ -112,7 +112,7 @@ static void _call_ctor_QMediaResource_2714 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaResource &arg1 = args.read<const QMediaResource & > (heap);
+  const QMediaResource &arg1 = gsi::arg_reader<const QMediaResource & >() (args, heap);
   ret.write<QMediaResource *> (new QMediaResource (arg1));
 }
 
@@ -236,7 +236,7 @@ static void _call_f_operator_excl__eq__c2714 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaResource &arg1 = args.read<const QMediaResource & > (heap);
+  const QMediaResource &arg1 = gsi::arg_reader<const QMediaResource & >() (args, heap);
   ret.write<bool > ((bool)((QMediaResource *)cls)->operator != (arg1));
 }
 
@@ -255,7 +255,7 @@ static void _call_f_operator_eq__2714 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaResource &arg1 = args.read<const QMediaResource & > (heap);
+  const QMediaResource &arg1 = gsi::arg_reader<const QMediaResource & >() (args, heap);
   ret.write<QMediaResource & > ((QMediaResource &)((QMediaResource *)cls)->operator = (arg1));
 }
 
@@ -274,7 +274,7 @@ static void _call_f_operator_eq__eq__c2714 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaResource &arg1 = args.read<const QMediaResource & > (heap);
+  const QMediaResource &arg1 = gsi::arg_reader<const QMediaResource & >() (args, heap);
   ret.write<bool > ((bool)((QMediaResource *)cls)->operator == (arg1));
 }
 
@@ -338,7 +338,7 @@ static void _call_f_setAudioBitRate_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setAudioBitRate (arg1);
 }
@@ -358,7 +358,7 @@ static void _call_f_setAudioCodec_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setAudioCodec (arg1);
 }
@@ -378,7 +378,7 @@ static void _call_f_setChannelCount_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setChannelCount (arg1);
 }
@@ -398,7 +398,7 @@ static void _call_f_setDataSize_1681 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qint64 arg1 = args.read<const qint64 > (heap);
+  const qint64 arg1 = gsi::arg_reader<const qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setDataSize (arg1);
 }
@@ -418,7 +418,7 @@ static void _call_f_setLanguage_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setLanguage (arg1);
 }
@@ -438,7 +438,7 @@ static void _call_f_setResolution_1805 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setResolution (arg1);
 }
@@ -460,8 +460,8 @@ static void _call_f_setResolution_1426 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setResolution (arg1, arg2);
 }
@@ -481,7 +481,7 @@ static void _call_f_setSampleRate_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setSampleRate (arg1);
 }
@@ -501,7 +501,7 @@ static void _call_f_setVideoBitRate_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setVideoBitRate (arg1);
 }
@@ -521,7 +521,7 @@ static void _call_f_setVideoCodec_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaResource *)cls)->setVideoCodec (arg1);
 }

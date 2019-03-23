@@ -67,7 +67,7 @@ static void _call_ctor_QCursor_1884 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CursorShape>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CursorShape>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CursorShape>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CursorShape>::target_type & >() (args, heap);
   ret.write<QCursor *> (new QCursor (qt_gsi::QtToCppAdaptor<Qt::CursorShape>(arg1).cref()));
 }
 
@@ -92,10 +92,10 @@ static void _call_ctor_QCursor_5208 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBitmap &arg1 = args.read<const QBitmap & > (heap);
-  const QBitmap &arg2 = args.read<const QBitmap & > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
-  int arg4 = args ? args.read<int > (heap) : (int)(-1);
+  const QBitmap &arg1 = gsi::arg_reader<const QBitmap & >() (args, heap);
+  const QBitmap &arg2 = gsi::arg_reader<const QBitmap & >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QCursor *> (new QCursor (arg1, arg2, arg3, arg4));
 }
 
@@ -118,9 +118,9 @@ static void _call_ctor_QCursor_3335 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPixmap &arg1 = args.read<const QPixmap & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(-1);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QCursor *> (new QCursor (arg1, arg2, arg3));
 }
 
@@ -139,7 +139,7 @@ static void _call_ctor_QCursor_2032 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCursor &arg1 = args.read<const QCursor & > (heap);
+  const QCursor &arg1 = gsi::arg_reader<const QCursor & >() (args, heap);
   ret.write<QCursor *> (new QCursor (arg1));
 }
 
@@ -203,7 +203,7 @@ static void _call_f_operator_eq__2032 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCursor &arg1 = args.read<const QCursor & > (heap);
+  const QCursor &arg1 = gsi::arg_reader<const QCursor & >() (args, heap);
   ret.write<QCursor & > ((QCursor &)((QCursor *)cls)->operator= (arg1));
 }
 
@@ -237,7 +237,7 @@ static void _call_f_setShape_1884 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CursorShape>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CursorShape>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CursorShape>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CursorShape>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCursor *)cls)->setShape (qt_gsi::QtToCppAdaptor<Qt::CursorShape>(arg1).cref());
 }
@@ -287,7 +287,7 @@ static void _call_f_pos_2006 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi:
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QScreen *arg1 = args.read<const QScreen * > (heap);
+  const QScreen *arg1 = gsi::arg_reader<const QScreen * >() (args, heap);
   ret.write<QPoint > ((QPoint)QCursor::pos (arg1));
 }
 
@@ -308,8 +308,8 @@ static void _call_f_setPos_1426 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QCursor::setPos (arg1, arg2);
 }
@@ -333,9 +333,9 @@ static void _call_f_setPos_2629 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QScreen *arg1 = args.read<QScreen * > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  QScreen *arg1 = gsi::arg_reader<QScreen * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QCursor::setPos (arg1, arg2, arg3);
 }
@@ -355,7 +355,7 @@ static void _call_f_setPos_1916 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QCursor::setPos (arg1);
 }
@@ -377,8 +377,8 @@ static void _call_f_setPos_3119 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QScreen *arg1 = args.read<QScreen * > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
+  QScreen *arg1 = gsi::arg_reader<QScreen * >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QCursor::setPos (arg1, arg2);
 }

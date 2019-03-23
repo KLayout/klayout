@@ -77,12 +77,12 @@ static void _call_f_create_7592 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QRectF &arg2 = args.read<const QRectF & > (heap);
-  double arg3 = args ? args.read<double > (heap) : (double)(1);
-  double arg4 = args ? args.read<double > (heap) : (double)(1);
-  double arg5 = args ? args.read<double > (heap) : (double)(0);
-  double arg6 = args ? args.read<double > (heap) : (double)(1);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QRectF &arg2 = gsi::arg_reader<const QRectF & >() (args, heap);
+  double arg3 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1, heap);
+  double arg4 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1, heap);
+  double arg5 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (0, heap);
+  double arg6 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1, heap);
   ret.write<QPainter::PixmapFragment > ((QPainter::PixmapFragment)QPainter::PixmapFragment::create (arg1, arg2, arg3, arg4, arg5, arg6));
 }
 

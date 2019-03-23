@@ -65,7 +65,7 @@ static void _call_ctor_QDnsMailExchangeRecord_3484 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDnsMailExchangeRecord &arg1 = args.read<const QDnsMailExchangeRecord & > (heap);
+  const QDnsMailExchangeRecord &arg1 = gsi::arg_reader<const QDnsMailExchangeRecord & >() (args, heap);
   ret.write<QDnsMailExchangeRecord *> (new QDnsMailExchangeRecord (arg1));
 }
 
@@ -114,7 +114,7 @@ static void _call_f_operator_eq__3484 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDnsMailExchangeRecord &arg1 = args.read<const QDnsMailExchangeRecord & > (heap);
+  const QDnsMailExchangeRecord &arg1 = gsi::arg_reader<const QDnsMailExchangeRecord & >() (args, heap);
   ret.write<QDnsMailExchangeRecord & > ((QDnsMailExchangeRecord &)((QDnsMailExchangeRecord *)cls)->operator= (arg1));
 }
 
@@ -148,7 +148,7 @@ static void _call_f_swap_2789 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDnsMailExchangeRecord &arg1 = args.read<QDnsMailExchangeRecord & > (heap);
+  QDnsMailExchangeRecord &arg1 = gsi::arg_reader<QDnsMailExchangeRecord & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDnsMailExchangeRecord *)cls)->swap (arg1);
 }

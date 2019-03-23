@@ -65,7 +65,7 @@ static void _call_ctor_QAudioEncoderSettings_3445 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioEncoderSettings &arg1 = args.read<const QAudioEncoderSettings & > (heap);
+  const QAudioEncoderSettings &arg1 = gsi::arg_reader<const QAudioEncoderSettings & >() (args, heap);
   ret.write<QAudioEncoderSettings *> (new QAudioEncoderSettings (arg1));
 }
 
@@ -144,7 +144,7 @@ static void _call_f_encodingOption_c2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QAudioEncoderSettings *)cls)->encodingOption (arg1));
 }
 
@@ -193,7 +193,7 @@ static void _call_f_operator_excl__eq__c3445 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioEncoderSettings &arg1 = args.read<const QAudioEncoderSettings & > (heap);
+  const QAudioEncoderSettings &arg1 = gsi::arg_reader<const QAudioEncoderSettings & >() (args, heap);
   ret.write<bool > ((bool)((QAudioEncoderSettings *)cls)->operator!= (arg1));
 }
 
@@ -212,7 +212,7 @@ static void _call_f_operator_eq__3445 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioEncoderSettings &arg1 = args.read<const QAudioEncoderSettings & > (heap);
+  const QAudioEncoderSettings &arg1 = gsi::arg_reader<const QAudioEncoderSettings & >() (args, heap);
   ret.write<QAudioEncoderSettings & > ((QAudioEncoderSettings &)((QAudioEncoderSettings *)cls)->operator= (arg1));
 }
 
@@ -231,7 +231,7 @@ static void _call_f_operator_eq__eq__c3445 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioEncoderSettings &arg1 = args.read<const QAudioEncoderSettings & > (heap);
+  const QAudioEncoderSettings &arg1 = gsi::arg_reader<const QAudioEncoderSettings & >() (args, heap);
   ret.write<bool > ((bool)((QAudioEncoderSettings *)cls)->operator== (arg1));
 }
 
@@ -280,7 +280,7 @@ static void _call_f_setBitRate_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioEncoderSettings *)cls)->setBitRate (arg1);
 }
@@ -300,7 +300,7 @@ static void _call_f_setChannelCount_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioEncoderSettings *)cls)->setChannelCount (arg1);
 }
@@ -320,7 +320,7 @@ static void _call_f_setCodec_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioEncoderSettings *)cls)->setCodec (arg1);
 }
@@ -340,7 +340,7 @@ static void _call_f_setEncodingMode_2864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMultimedia::EncodingMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QMultimedia::EncodingMode>::target_type & > (heap);
+  const qt_gsi::Converter<QMultimedia::EncodingMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::EncodingMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioEncoderSettings *)cls)->setEncodingMode (qt_gsi::QtToCppAdaptor<QMultimedia::EncodingMode>(arg1).cref());
 }
@@ -362,8 +362,8 @@ static void _call_f_setEncodingOption_4036 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioEncoderSettings *)cls)->setEncodingOption (arg1, arg2);
 }
@@ -383,7 +383,7 @@ static void _call_f_setEncodingOptions_3508 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMap<QString, QVariant> &arg1 = args.read<const QMap<QString, QVariant> & > (heap);
+  const QMap<QString, QVariant> &arg1 = gsi::arg_reader<const QMap<QString, QVariant> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioEncoderSettings *)cls)->setEncodingOptions (arg1);
 }
@@ -403,7 +403,7 @@ static void _call_f_setQuality_3220 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMultimedia::EncodingQuality>::target_type & arg1 = args.read<const qt_gsi::Converter<QMultimedia::EncodingQuality>::target_type & > (heap);
+  const qt_gsi::Converter<QMultimedia::EncodingQuality>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::EncodingQuality>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioEncoderSettings *)cls)->setQuality (qt_gsi::QtToCppAdaptor<QMultimedia::EncodingQuality>(arg1).cref());
 }
@@ -423,7 +423,7 @@ static void _call_f_setSampleRate_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioEncoderSettings *)cls)->setSampleRate (arg1);
 }

@@ -67,7 +67,7 @@ static void _call_f_openUrl_1701 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)QDesktopServices::openUrl (arg1));
 }
 
@@ -90,9 +90,9 @@ static void _call_f_setUrlHandler_4842 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
-  const char *arg3 = args.read<const char * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
+  const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QDesktopServices::setUrlHandler (arg1, arg2, arg3);
 }
@@ -112,7 +112,7 @@ static void _call_f_unsetUrlHandler_2025 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QDesktopServices::unsetUrlHandler (arg1);
 }

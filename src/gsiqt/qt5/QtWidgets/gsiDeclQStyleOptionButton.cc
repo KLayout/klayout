@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionButton_3192 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionButton &arg1 = args.read<const QStyleOptionButton & > (heap);
+  const QStyleOptionButton &arg1 = gsi::arg_reader<const QStyleOptionButton & >() (args, heap);
   ret.write<QStyleOptionButton *> (new QStyleOptionButton (arg1));
 }
 

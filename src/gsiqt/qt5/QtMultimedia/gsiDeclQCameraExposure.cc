@@ -143,7 +143,7 @@ static void _call_f_isExposureModeSupported_c3325 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraExposure::ExposureMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraExposure::ExposureMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraExposure::ExposureMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraExposure::ExposureMode>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QCameraExposure *)cls)->isExposureModeSupported (qt_gsi::QtToCppAdaptor<QCameraExposure::ExposureMode>(arg1).cref()));
 }
 
@@ -162,7 +162,7 @@ static void _call_f_isFlashModeSupported_c3656 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QCameraExposure::FlashMode> arg1 = args.read<QFlags<QCameraExposure::FlashMode> > (heap);
+  QFlags<QCameraExposure::FlashMode> arg1 = gsi::arg_reader<QFlags<QCameraExposure::FlashMode> >() (args, heap);
   ret.write<bool > ((bool)((QCameraExposure *)cls)->isFlashModeSupported (arg1));
 }
 
@@ -196,7 +196,7 @@ static void _call_f_isMeteringModeSupported_c3293 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraExposure::MeteringMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraExposure::MeteringMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraExposure::MeteringMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraExposure::MeteringMode>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QCameraExposure *)cls)->isMeteringModeSupported (qt_gsi::QtToCppAdaptor<QCameraExposure::MeteringMode>(arg1).cref()));
 }
 
@@ -338,7 +338,7 @@ static void _call_f_setExposureCompensation_1071 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraExposure *)cls)->setExposureCompensation (arg1);
 }
@@ -358,7 +358,7 @@ static void _call_f_setExposureMode_3325 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraExposure::ExposureMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraExposure::ExposureMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraExposure::ExposureMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraExposure::ExposureMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraExposure *)cls)->setExposureMode (qt_gsi::QtToCppAdaptor<QCameraExposure::ExposureMode>(arg1).cref());
 }
@@ -378,7 +378,7 @@ static void _call_f_setFlashMode_3656 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QCameraExposure::FlashMode> arg1 = args.read<QFlags<QCameraExposure::FlashMode> > (heap);
+  QFlags<QCameraExposure::FlashMode> arg1 = gsi::arg_reader<QFlags<QCameraExposure::FlashMode> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraExposure *)cls)->setFlashMode (arg1);
 }
@@ -398,7 +398,7 @@ static void _call_f_setManualAperture_1071 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraExposure *)cls)->setManualAperture (arg1);
 }
@@ -418,7 +418,7 @@ static void _call_f_setManualIsoSensitivity_767 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraExposure *)cls)->setManualIsoSensitivity (arg1);
 }
@@ -438,7 +438,7 @@ static void _call_f_setManualShutterSpeed_1071 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraExposure *)cls)->setManualShutterSpeed (arg1);
 }
@@ -458,7 +458,7 @@ static void _call_f_setMeteringMode_3293 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraExposure::MeteringMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraExposure::MeteringMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraExposure::MeteringMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraExposure::MeteringMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraExposure *)cls)->setMeteringMode (qt_gsi::QtToCppAdaptor<QCameraExposure::MeteringMode>(arg1).cref());
 }
@@ -478,7 +478,7 @@ static void _call_f_setSpotMeteringPoint_1986 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraExposure *)cls)->setSpotMeteringPoint (arg1);
 }
@@ -528,7 +528,7 @@ static void _call_f_supportedApertures_c1050 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? args.read<bool * > (heap) : (bool *)(0);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<QList<qreal> > ((QList<qreal>)((QCameraExposure *)cls)->supportedApertures (arg1));
 }
 
@@ -547,7 +547,7 @@ static void _call_f_supportedIsoSensitivities_c1050 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? args.read<bool * > (heap) : (bool *)(0);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<QList<int> > ((QList<int>)((QCameraExposure *)cls)->supportedIsoSensitivities (arg1));
 }
 
@@ -566,7 +566,7 @@ static void _call_f_supportedShutterSpeeds_c1050 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? args.read<bool * > (heap) : (bool *)(0);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<QList<qreal> > ((QList<qreal>)((QCameraExposure *)cls)->supportedShutterSpeeds (arg1));
 }
 
@@ -589,9 +589,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraExposure::tr (arg1, arg2, arg3));
 }
 
@@ -614,9 +614,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraExposure::trUtf8 (arg1, arg2, arg3));
 }
 

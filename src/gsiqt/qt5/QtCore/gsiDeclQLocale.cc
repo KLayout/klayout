@@ -68,7 +68,7 @@ static void _call_ctor_QLocale_2025 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QLocale *> (new QLocale (arg1));
 }
 
@@ -89,8 +89,8 @@ static void _call_ctor_QLocale_3902 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = args.read<const qt_gsi::Converter<QLocale::Language>::target_type & > (heap);
-  const qt_gsi::Converter<QLocale::Country>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::Country>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::Country>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::Country>(heap, QLocale::AnyCountry));
+  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Language>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QLocale::Country>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::Country>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::Country>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::Country>(heap, QLocale::AnyCountry), heap);
   ret.write<QLocale *> (new QLocale (qt_gsi::QtToCppAdaptor<QLocale::Language>(arg1).cref(), qt_gsi::QtToCppAdaptor<QLocale::Country>(arg2).cref()));
 }
 
@@ -113,9 +113,9 @@ static void _call_ctor_QLocale_5648 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = args.read<const qt_gsi::Converter<QLocale::Language>::target_type & > (heap);
-  const qt_gsi::Converter<QLocale::Script>::target_type & arg2 = args.read<const qt_gsi::Converter<QLocale::Script>::target_type & > (heap);
-  const qt_gsi::Converter<QLocale::Country>::target_type & arg3 = args.read<const qt_gsi::Converter<QLocale::Country>::target_type & > (heap);
+  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Language>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QLocale::Script>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Script>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QLocale::Country>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Country>::target_type & >() (args, heap);
   ret.write<QLocale *> (new QLocale (qt_gsi::QtToCppAdaptor<QLocale::Language>(arg1).cref(), qt_gsi::QtToCppAdaptor<QLocale::Script>(arg2).cref(), qt_gsi::QtToCppAdaptor<QLocale::Country>(arg3).cref()));
 }
 
@@ -134,7 +134,7 @@ static void _call_ctor_QLocale_1986 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLocale &arg1 = args.read<const QLocale & > (heap);
+  const QLocale &arg1 = gsi::arg_reader<const QLocale & >() (args, heap);
   ret.write<QLocale *> (new QLocale (arg1));
 }
 
@@ -198,7 +198,7 @@ static void _call_f_createSeparatedList_c2437 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->createSeparatedList (arg1));
 }
 
@@ -217,7 +217,7 @@ static void _call_f_currencySymbol_c3315 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::CurrencySymbolFormat>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QLocale::CurrencySymbolFormat>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::CurrencySymbolFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::CurrencySymbolFormat>(heap, QLocale::CurrencySymbol));
+  const qt_gsi::Converter<QLocale::CurrencySymbolFormat>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::CurrencySymbolFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::CurrencySymbolFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::CurrencySymbolFormat>(heap, QLocale::CurrencySymbol), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->currencySymbol (qt_gsi::QtToCppAdaptor<QLocale::CurrencySymbolFormat>(arg1).cref()));
 }
 
@@ -236,7 +236,7 @@ static void _call_f_dateFormat_c2260 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->dateFormat (qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg1).cref()));
 }
 
@@ -255,7 +255,7 @@ static void _call_f_dateTimeFormat_c2260 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->dateTimeFormat (qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg1).cref()));
 }
 
@@ -276,8 +276,8 @@ static void _call_f_dayName_c2919 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->dayName (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -388,8 +388,8 @@ static void _call_f_monthName_c2919 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->monthName (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -483,7 +483,7 @@ static void _call_f_operator_excl__eq__c1986 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLocale &arg1 = args.read<const QLocale & > (heap);
+  const QLocale &arg1 = gsi::arg_reader<const QLocale & >() (args, heap);
   ret.write<bool > ((bool)((QLocale *)cls)->operator!= (arg1));
 }
 
@@ -502,7 +502,7 @@ static void _call_f_operator_eq__1986 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLocale &arg1 = args.read<const QLocale & > (heap);
+  const QLocale &arg1 = gsi::arg_reader<const QLocale & >() (args, heap);
   ret.write<QLocale & > ((QLocale &)((QLocale *)cls)->operator= (arg1));
 }
 
@@ -521,7 +521,7 @@ static void _call_f_operator_eq__eq__c1986 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLocale &arg1 = args.read<const QLocale & > (heap);
+  const QLocale &arg1 = gsi::arg_reader<const QLocale & >() (args, heap);
   ret.write<bool > ((bool)((QLocale *)cls)->operator== (arg1));
 }
 
@@ -587,8 +587,8 @@ static void _call_f_quoteString_c4635 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::QuotationStyle>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::QuotationStyle>(heap, QLocale::StandardQuotation));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::QuotationStyle>(heap, QLocale::StandardQuotation), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->quoteString (arg1, qt_gsi::QtToCppAdaptor<QLocale::QuotationStyle>(arg2).cref()));
 }
 
@@ -609,8 +609,8 @@ static void _call_f_quoteString_c4920 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::QuotationStyle>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::QuotationStyle>(heap, QLocale::StandardQuotation));
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::QuotationStyle>(heap, QLocale::StandardQuotation), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->quoteString (arg1, qt_gsi::QtToCppAdaptor<QLocale::QuotationStyle>(arg2).cref()));
 }
 
@@ -644,7 +644,7 @@ static void _call_f_setNumberOptions_3171 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QLocale::NumberOption> arg1 = args.read<QFlags<QLocale::NumberOption> > (heap);
+  QFlags<QLocale::NumberOption> arg1 = gsi::arg_reader<QFlags<QLocale::NumberOption> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLocale *)cls)->setNumberOptions (arg1);
 }
@@ -666,8 +666,8 @@ static void _call_f_standaloneDayName_c2919 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->standaloneDayName (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -688,8 +688,8 @@ static void _call_f_standaloneMonthName_c2919 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->standaloneMonthName (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -723,7 +723,7 @@ static void _call_f_timeFormat_c2260 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->timeFormat (qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg1).cref()));
 }
 
@@ -744,8 +744,8 @@ static void _call_f_toCurrencyString_c3330 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qlonglong arg1 = args.read<qlonglong > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  qlonglong arg1 = gsi::arg_reader<qlonglong >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2));
 }
 
@@ -766,8 +766,8 @@ static void _call_f_toCurrencyString_c3447 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qulonglong arg1 = args.read<qulonglong > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  qulonglong arg1 = gsi::arg_reader<qulonglong >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2));
 }
 
@@ -788,8 +788,8 @@ static void _call_f_toCurrencyString_c3388 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  short int arg1 = args.read<short int > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  short int arg1 = gsi::arg_reader<short int >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2));
 }
 
@@ -810,8 +810,8 @@ static void _call_f_toCurrencyString_c4393 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned short int arg1 = args.read<unsigned short int > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  unsigned short int arg1 = gsi::arg_reader<unsigned short int >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2));
 }
 
@@ -832,8 +832,8 @@ static void _call_f_toCurrencyString_c2684 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2));
 }
 
@@ -854,8 +854,8 @@ static void _call_f_toCurrencyString_c3689 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2));
 }
 
@@ -876,8 +876,8 @@ static void _call_f_toCurrencyString_c2988 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2));
 }
 
@@ -898,8 +898,8 @@ static void _call_f_toCurrencyString_c2887 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2));
 }
 
@@ -920,8 +920,8 @@ static void _call_f_toDate_c4177 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QDate > ((QDate)((QLocale *)cls)->toDate (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -942,8 +942,8 @@ static void _call_f_toDate_c3942 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDate > ((QDate)((QLocale *)cls)->toDate (arg1, arg2));
 }
 
@@ -964,8 +964,8 @@ static void _call_f_toDateTime_c4177 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QDateTime > ((QDateTime)((QLocale *)cls)->toDateTime (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -986,8 +986,8 @@ static void _call_f_toDateTime_c3942 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDateTime > ((QDateTime)((QLocale *)cls)->toDateTime (arg1, arg2));
 }
 
@@ -1008,8 +1008,8 @@ static void _call_f_toDouble_c2967 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<double > ((double)((QLocale *)cls)->toDouble (arg1, arg2));
 }
 
@@ -1030,8 +1030,8 @@ static void _call_f_toDouble_c3252 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<double > ((double)((QLocale *)cls)->toDouble (arg1, arg2));
 }
 
@@ -1052,8 +1052,8 @@ static void _call_f_toFloat_c2967 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<float > ((float)((QLocale *)cls)->toFloat (arg1, arg2));
 }
 
@@ -1074,8 +1074,8 @@ static void _call_f_toFloat_c3252 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<float > ((float)((QLocale *)cls)->toFloat (arg1, arg2));
 }
 
@@ -1096,8 +1096,8 @@ static void _call_f_toInt_c2967 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<int > ((int)((QLocale *)cls)->toInt (arg1, arg2));
 }
 
@@ -1118,8 +1118,8 @@ static void _call_f_toInt_c3252 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<int > ((int)((QLocale *)cls)->toInt (arg1, arg2));
 }
 
@@ -1140,8 +1140,8 @@ static void _call_f_toLongLong_c2967 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<qlonglong > ((qlonglong)((QLocale *)cls)->toLongLong (arg1, arg2));
 }
 
@@ -1162,8 +1162,8 @@ static void _call_f_toLongLong_c3252 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<qlonglong > ((qlonglong)((QLocale *)cls)->toLongLong (arg1, arg2));
 }
 
@@ -1182,7 +1182,7 @@ static void _call_f_toLower_c2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toLower (arg1));
 }
 
@@ -1203,8 +1203,8 @@ static void _call_f_toShort_c2967 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<short int > ((short int)((QLocale *)cls)->toShort (arg1, arg2));
 }
 
@@ -1225,8 +1225,8 @@ static void _call_f_toShort_c3252 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<short int > ((short int)((QLocale *)cls)->toShort (arg1, arg2));
 }
 
@@ -1245,7 +1245,7 @@ static void _call_f_toString_c1413 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qlonglong arg1 = args.read<qlonglong > (heap);
+  qlonglong arg1 = gsi::arg_reader<qlonglong >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1));
 }
 
@@ -1264,7 +1264,7 @@ static void _call_f_toString_c1530 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qulonglong arg1 = args.read<qulonglong > (heap);
+  qulonglong arg1 = gsi::arg_reader<qulonglong >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1));
 }
 
@@ -1283,7 +1283,7 @@ static void _call_f_toString_c1471 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  short int arg1 = args.read<short int > (heap);
+  short int arg1 = gsi::arg_reader<short int >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1));
 }
 
@@ -1302,7 +1302,7 @@ static void _call_f_toString_c2476 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned short int arg1 = args.read<unsigned short int > (heap);
+  unsigned short int arg1 = gsi::arg_reader<unsigned short int >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1));
 }
 
@@ -1321,7 +1321,7 @@ static void _call_f_toString_c767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1));
 }
 
@@ -1340,7 +1340,7 @@ static void _call_f_toString_c1772 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1));
 }
 
@@ -1363,9 +1363,9 @@ static void _call_f_toString_c2472 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  char arg2 = args ? args.read<char > (heap) : (char)('g');
-  int arg3 = args ? args.read<int > (heap) : (int)(6);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  char arg2 = args ? gsi::arg_reader<char >() (args, heap) : gsi::arg_maker<char >() ('g', heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (6, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2, arg3));
 }
 
@@ -1388,9 +1388,9 @@ static void _call_f_toString_c2371 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  char arg2 = args ? args.read<char > (heap) : (char)('g');
-  int arg3 = args ? args.read<int > (heap) : (int)(6);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  char arg2 = args ? gsi::arg_reader<char >() (args, heap) : gsi::arg_maker<char >() ('g', heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (6, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2, arg3));
 }
 
@@ -1411,8 +1411,8 @@ static void _call_f_toString_c3693 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2));
 }
 
@@ -1433,8 +1433,8 @@ static void _call_f_toString_c3928 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -1455,8 +1455,8 @@ static void _call_f_toString_c3710 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2));
 }
 
@@ -1477,8 +1477,8 @@ static void _call_f_toString_c3945 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -1499,8 +1499,8 @@ static void _call_f_toString_c4327 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -1521,8 +1521,8 @@ static void _call_f_toString_c4092 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2));
 }
 
@@ -1543,8 +1543,8 @@ static void _call_f_toTime_c4177 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::FormatType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QTime > ((QTime)((QLocale *)cls)->toTime (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
@@ -1565,8 +1565,8 @@ static void _call_f_toTime_c3942 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTime > ((QTime)((QLocale *)cls)->toTime (arg1, arg2));
 }
 
@@ -1587,8 +1587,8 @@ static void _call_f_toUInt_c2967 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<unsigned int > ((unsigned int)((QLocale *)cls)->toUInt (arg1, arg2));
 }
 
@@ -1609,8 +1609,8 @@ static void _call_f_toUInt_c3252 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<unsigned int > ((unsigned int)((QLocale *)cls)->toUInt (arg1, arg2));
 }
 
@@ -1631,8 +1631,8 @@ static void _call_f_toULongLong_c2967 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<qulonglong > ((qulonglong)((QLocale *)cls)->toULongLong (arg1, arg2));
 }
 
@@ -1653,8 +1653,8 @@ static void _call_f_toULongLong_c3252 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<qulonglong > ((qulonglong)((QLocale *)cls)->toULongLong (arg1, arg2));
 }
 
@@ -1675,8 +1675,8 @@ static void _call_f_toUShort_c2967 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<unsigned short int > ((unsigned short int)((QLocale *)cls)->toUShort (arg1, arg2));
 }
 
@@ -1697,8 +1697,8 @@ static void _call_f_toUShort_c3252 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<unsigned short int > ((unsigned short int)((QLocale *)cls)->toUShort (arg1, arg2));
 }
 
@@ -1717,7 +1717,7 @@ static void _call_f_toUpper_c2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toUpper (arg1));
 }
 
@@ -1796,7 +1796,7 @@ static void _call_f_countriesForLanguage_2029 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = args.read<const qt_gsi::Converter<QLocale::Language>::target_type & > (heap);
+  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Language>::target_type & >() (args, heap);
   ret.write<QList<QLocale::Country> > ((QList<QLocale::Country>)QLocale::countriesForLanguage (qt_gsi::QtToCppAdaptor<QLocale::Language>(arg1).cref()));
 }
 
@@ -1815,7 +1815,7 @@ static void _call_f_countryToString_1981 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::Country>::target_type & arg1 = args.read<const qt_gsi::Converter<QLocale::Country>::target_type & > (heap);
+  const qt_gsi::Converter<QLocale::Country>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Country>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QLocale::countryToString (qt_gsi::QtToCppAdaptor<QLocale::Country>(arg1).cref()));
 }
 
@@ -1834,7 +1834,7 @@ static void _call_f_languageToString_2029 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = args.read<const qt_gsi::Converter<QLocale::Language>::target_type & > (heap);
+  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Language>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QLocale::languageToString (qt_gsi::QtToCppAdaptor<QLocale::Language>(arg1).cref()));
 }
 
@@ -1857,9 +1857,9 @@ static void _call_f_matchingLocales_5648 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = args.read<const qt_gsi::Converter<QLocale::Language>::target_type & > (heap);
-  const qt_gsi::Converter<QLocale::Script>::target_type & arg2 = args.read<const qt_gsi::Converter<QLocale::Script>::target_type & > (heap);
-  const qt_gsi::Converter<QLocale::Country>::target_type & arg3 = args.read<const qt_gsi::Converter<QLocale::Country>::target_type & > (heap);
+  const qt_gsi::Converter<QLocale::Language>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Language>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QLocale::Script>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Script>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QLocale::Country>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Country>::target_type & >() (args, heap);
   ret.write<QList<QLocale> > ((QList<QLocale>)QLocale::matchingLocales (qt_gsi::QtToCppAdaptor<QLocale::Language>(arg1).cref(), qt_gsi::QtToCppAdaptor<QLocale::Script>(arg2).cref(), qt_gsi::QtToCppAdaptor<QLocale::Country>(arg3).cref()));
 }
 
@@ -1878,7 +1878,7 @@ static void _call_f_scriptToString_1854 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::Script>::target_type & arg1 = args.read<const qt_gsi::Converter<QLocale::Script>::target_type & > (heap);
+  const qt_gsi::Converter<QLocale::Script>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Script>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QLocale::scriptToString (qt_gsi::QtToCppAdaptor<QLocale::Script>(arg1).cref()));
 }
 
@@ -1897,7 +1897,7 @@ static void _call_f_setDefault_1986 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLocale &arg1 = args.read<const QLocale & > (heap);
+  const QLocale &arg1 = gsi::arg_reader<const QLocale & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QLocale::setDefault (arg1);
 }

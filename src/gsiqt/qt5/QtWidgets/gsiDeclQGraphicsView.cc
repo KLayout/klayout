@@ -171,7 +171,7 @@ static void _call_f_centerOn_1986 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->centerOn (arg1);
 }
@@ -193,8 +193,8 @@ static void _call_f_centerOn_2034 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->centerOn (arg1, arg2);
 }
@@ -214,7 +214,7 @@ static void _call_f_centerOn_2614 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->centerOn (arg1);
 }
@@ -253,9 +253,9 @@ static void _call_f_ensureVisible_3180 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(50);
-  int arg3 = args ? args.read<int > (heap) : (int)(50);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->ensureVisible (arg1, arg2, arg3);
 }
@@ -285,12 +285,12 @@ static void _call_f_ensureVisible_5278 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  int arg5 = args ? args.read<int > (heap) : (int)(50);
-  int arg6 = args ? args.read<int > (heap) : (int)(50);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
+  int arg6 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->ensureVisible (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -314,9 +314,9 @@ static void _call_f_ensureVisible_3932 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(50);
-  int arg3 = args ? args.read<int > (heap) : (int)(50);
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (50, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->ensureVisible (arg1, arg2, arg3);
 }
@@ -338,8 +338,8 @@ static void _call_f_fitInView_4011 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::AspectRatioMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio));
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->fitInView (arg1, qt_gsi::QtToCppAdaptor<Qt::AspectRatioMode>(arg2).cref());
 }
@@ -367,11 +367,11 @@ static void _call_f_fitInView_6109 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::AspectRatioMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio));
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->fitInView (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<Qt::AspectRatioMode>(arg5).cref());
 }
@@ -393,8 +393,8 @@ static void _call_f_fitInView_4763 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
-  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::AspectRatioMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio));
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
+  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::IgnoreAspectRatio), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->fitInView (arg1, qt_gsi::QtToCppAdaptor<Qt::AspectRatioMode>(arg2).cref());
 }
@@ -429,7 +429,7 @@ static void _call_f_inputMethodQuery_c2420 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QGraphicsView *)cls)->inputMethodQuery (qt_gsi::QtToCppAdaptor<Qt::InputMethodQuery>(arg1).cref()));
 }
 
@@ -450,8 +450,8 @@ static void _call_f_invalidateScene_5397 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args ? args.read<const QRectF & > (heap) : (const QRectF &)(QRectF());
-  QFlags<QGraphicsScene::SceneLayer> arg2 = args ? args.read<QFlags<QGraphicsScene::SceneLayer> > (heap) : (QFlags<QGraphicsScene::SceneLayer>)(QGraphicsScene::AllLayers);
+  const QRectF &arg1 = args ? gsi::arg_reader<const QRectF & >() (args, heap) : gsi::arg_maker<const QRectF & >() (QRectF(), heap);
+  QFlags<QGraphicsScene::SceneLayer> arg2 = args ? gsi::arg_reader<QFlags<QGraphicsScene::SceneLayer> >() (args, heap) : gsi::arg_maker<QFlags<QGraphicsScene::SceneLayer> >() (QGraphicsScene::AllLayers, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->invalidateScene (arg1, arg2);
 }
@@ -501,7 +501,7 @@ static void _call_f_itemAt_c1916 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QGraphicsItem * > ((QGraphicsItem *)((QGraphicsView *)cls)->itemAt (arg1));
 }
 
@@ -522,8 +522,8 @@ static void _call_f_itemAt_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QGraphicsItem * > ((QGraphicsItem *)((QGraphicsView *)cls)->itemAt (arg1, arg2));
 }
 
@@ -557,7 +557,7 @@ static void _call_f_items_c1916 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QList<QGraphicsItem *> > ((QList<QGraphicsItem *>)((QGraphicsView *)cls)->items (arg1));
 }
 
@@ -578,8 +578,8 @@ static void _call_f_items_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QList<QGraphicsItem *> > ((QList<QGraphicsItem *>)((QGraphicsView *)cls)->items (arg1, arg2));
 }
 
@@ -600,8 +600,8 @@ static void _call_f_items_c4155 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
-  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape));
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
+  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape), heap);
   ret.write<QList<QGraphicsItem *> > ((QList<QGraphicsItem *>)((QGraphicsView *)cls)->items (arg1, qt_gsi::QtToCppAdaptor<Qt::ItemSelectionMode>(arg2).cref()));
 }
 
@@ -628,11 +628,11 @@ static void _call_f_items_c5107 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape), heap);
   ret.write<QList<QGraphicsItem *> > ((QList<QGraphicsItem *>)((QGraphicsView *)cls)->items (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<Qt::ItemSelectionMode>(arg5).cref()));
 }
 
@@ -653,8 +653,8 @@ static void _call_f_items_c4501 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygon &arg1 = args.read<const QPolygon & > (heap);
-  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape));
+  const QPolygon &arg1 = gsi::arg_reader<const QPolygon & >() (args, heap);
+  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape), heap);
   ret.write<QList<QGraphicsItem *> > ((QList<QGraphicsItem *>)((QGraphicsView *)cls)->items (arg1, qt_gsi::QtToCppAdaptor<Qt::ItemSelectionMode>(arg2).cref()));
 }
 
@@ -675,8 +675,8 @@ static void _call_f_items_c4877 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
-  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape));
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
+  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ItemSelectionMode>(heap, Qt::IntersectsItemShape), heap);
   ret.write<QList<QGraphicsItem *> > ((QList<QGraphicsItem *>)((QGraphicsView *)cls)->items (arg1, qt_gsi::QtToCppAdaptor<Qt::ItemSelectionMode>(arg2).cref()));
 }
 
@@ -695,7 +695,7 @@ static void _call_f_mapFromScene_c1986 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QPoint > ((QPoint)((QGraphicsView *)cls)->mapFromScene (arg1));
 }
 
@@ -714,7 +714,7 @@ static void _call_f_mapFromScene_c1862 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   ret.write<QPolygon > ((QPolygon)((QGraphicsView *)cls)->mapFromScene (arg1));
 }
 
@@ -733,7 +733,7 @@ static void _call_f_mapFromScene_c2208 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygonF &arg1 = args.read<const QPolygonF & > (heap);
+  const QPolygonF &arg1 = gsi::arg_reader<const QPolygonF & >() (args, heap);
   ret.write<QPolygon > ((QPolygon)((QGraphicsView *)cls)->mapFromScene (arg1));
 }
 
@@ -752,7 +752,7 @@ static void _call_f_mapFromScene_c2514 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QGraphicsView *)cls)->mapFromScene (arg1));
 }
 
@@ -773,8 +773,8 @@ static void _call_f_mapFromScene_c2034 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QPoint > ((QPoint)((QGraphicsView *)cls)->mapFromScene (arg1, arg2));
 }
 
@@ -799,10 +799,10 @@ static void _call_f_mapFromScene_c3960 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   ret.write<QPolygon > ((QPolygon)((QGraphicsView *)cls)->mapFromScene (arg1, arg2, arg3, arg4));
 }
 
@@ -821,7 +821,7 @@ static void _call_f_mapToScene_c1916 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QPointF > ((QPointF)((QGraphicsView *)cls)->mapToScene (arg1));
 }
 
@@ -840,7 +840,7 @@ static void _call_f_mapToScene_c1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QGraphicsView *)cls)->mapToScene (arg1));
 }
 
@@ -859,7 +859,7 @@ static void _call_f_mapToScene_c2138 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPolygon &arg1 = args.read<const QPolygon & > (heap);
+  const QPolygon &arg1 = gsi::arg_reader<const QPolygon & >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QGraphicsView *)cls)->mapToScene (arg1));
 }
 
@@ -878,7 +878,7 @@ static void _call_f_mapToScene_c2514 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QGraphicsView *)cls)->mapToScene (arg1));
 }
 
@@ -899,8 +899,8 @@ static void _call_f_mapToScene_c1426 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QPointF > ((QPointF)((QGraphicsView *)cls)->mapToScene (arg1, arg2));
 }
 
@@ -925,10 +925,10 @@ static void _call_f_mapToScene_c2744 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   ret.write<QPolygonF > ((QPolygonF)((QGraphicsView *)cls)->mapToScene (arg1, arg2, arg3, arg4));
 }
 
@@ -983,10 +983,10 @@ static void _call_f_render_7013 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QRectF &arg2 = args ? args.read<const QRectF & > (heap) : (const QRectF &)(QRectF());
-  const QRect &arg3 = args ? args.read<const QRect & > (heap) : (const QRect &)(QRect());
-  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & > (heap) : (const qt_gsi::Converter<Qt::AspectRatioMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::KeepAspectRatio));
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QRectF &arg2 = args ? gsi::arg_reader<const QRectF & >() (args, heap) : gsi::arg_maker<const QRectF & >() (QRectF(), heap);
+  const QRect &arg3 = args ? gsi::arg_reader<const QRect & >() (args, heap) : gsi::arg_maker<const QRect & >() (QRect(), heap);
+  const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::AspectRatioMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::AspectRatioMode>(heap, Qt::KeepAspectRatio), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->render (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<Qt::AspectRatioMode>(arg4).cref());
 }
@@ -1084,7 +1084,7 @@ static void _call_f_rotate_1071 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->rotate (arg1);
 }
@@ -1136,8 +1136,8 @@ static void _call_f_scale_2034 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->scale (arg1, arg2);
 }
@@ -1187,7 +1187,7 @@ static void _call_f_setAlignment_2750 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setAlignment (arg1);
 }
@@ -1207,7 +1207,7 @@ static void _call_f_setBackgroundBrush_1910 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setBackgroundBrush (arg1);
 }
@@ -1227,7 +1227,7 @@ static void _call_f_setCacheMode_3792 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QGraphicsView::CacheModeFlag> arg1 = args.read<QFlags<QGraphicsView::CacheModeFlag> > (heap);
+  QFlags<QGraphicsView::CacheModeFlag> arg1 = gsi::arg_reader<QFlags<QGraphicsView::CacheModeFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setCacheMode (arg1);
 }
@@ -1247,7 +1247,7 @@ static void _call_f_setDragMode_2632 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGraphicsView::DragMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QGraphicsView::DragMode>::target_type & > (heap);
+  const qt_gsi::Converter<QGraphicsView::DragMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGraphicsView::DragMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setDragMode (qt_gsi::QtToCppAdaptor<QGraphicsView::DragMode>(arg1).cref());
 }
@@ -1267,7 +1267,7 @@ static void _call_f_setForegroundBrush_1910 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setForegroundBrush (arg1);
 }
@@ -1287,7 +1287,7 @@ static void _call_f_setInteractive_864 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setInteractive (arg1);
 }
@@ -1309,8 +1309,8 @@ static void _call_f_setMatrix_2779 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(false);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setMatrix (arg1, arg2);
 }
@@ -1332,8 +1332,8 @@ static void _call_f_setOptimizationFlag_4282 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGraphicsView::OptimizationFlag>::target_type & arg1 = args.read<const qt_gsi::Converter<QGraphicsView::OptimizationFlag>::target_type & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<QGraphicsView::OptimizationFlag>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGraphicsView::OptimizationFlag>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setOptimizationFlag (qt_gsi::QtToCppAdaptor<QGraphicsView::OptimizationFlag>(arg1).cref(), arg2);
 }
@@ -1353,7 +1353,7 @@ static void _call_f_setOptimizationFlags_4222 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QGraphicsView::OptimizationFlag> arg1 = args.read<QFlags<QGraphicsView::OptimizationFlag> > (heap);
+  QFlags<QGraphicsView::OptimizationFlag> arg1 = gsi::arg_reader<QFlags<QGraphicsView::OptimizationFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setOptimizationFlags (arg1);
 }
@@ -1375,8 +1375,8 @@ static void _call_f_setRenderHint_3123 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPainter::RenderHint>::target_type & arg1 = args.read<const qt_gsi::Converter<QPainter::RenderHint>::target_type & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<QPainter::RenderHint>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPainter::RenderHint>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setRenderHint (qt_gsi::QtToCppAdaptor<QPainter::RenderHint>(arg1).cref(), arg2);
 }
@@ -1396,7 +1396,7 @@ static void _call_f_setRenderHints_3063 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPainter::RenderHint> arg1 = args.read<QFlags<QPainter::RenderHint> > (heap);
+  QFlags<QPainter::RenderHint> arg1 = gsi::arg_reader<QFlags<QPainter::RenderHint> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setRenderHints (arg1);
 }
@@ -1416,7 +1416,7 @@ static void _call_f_setResizeAnchor_3328 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGraphicsView::ViewportAnchor>::target_type & arg1 = args.read<const qt_gsi::Converter<QGraphicsView::ViewportAnchor>::target_type & > (heap);
+  const qt_gsi::Converter<QGraphicsView::ViewportAnchor>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGraphicsView::ViewportAnchor>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setResizeAnchor (qt_gsi::QtToCppAdaptor<QGraphicsView::ViewportAnchor>(arg1).cref());
 }
@@ -1436,7 +1436,7 @@ static void _call_f_setRubberBandSelectionMode_2471 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setRubberBandSelectionMode (qt_gsi::QtToCppAdaptor<Qt::ItemSelectionMode>(arg1).cref());
 }
@@ -1456,7 +1456,7 @@ static void _call_f_setScene_2014 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsScene *arg1 = args.read<QGraphicsScene * > (heap);
+  QGraphicsScene *arg1 = gsi::arg_reader<QGraphicsScene * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setScene (arg1);
 }
@@ -1476,7 +1476,7 @@ static void _call_f_setSceneRect_1862 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setSceneRect (arg1);
 }
@@ -1502,10 +1502,10 @@ static void _call_f_setSceneRect_3960 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setSceneRect (arg1, arg2, arg3, arg4);
 }
@@ -1527,8 +1527,8 @@ static void _call_f_setTransform_3106 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(false);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setTransform (arg1, arg2);
 }
@@ -1548,7 +1548,7 @@ static void _call_f_setTransformationAnchor_3328 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGraphicsView::ViewportAnchor>::target_type & arg1 = args.read<const qt_gsi::Converter<QGraphicsView::ViewportAnchor>::target_type & > (heap);
+  const qt_gsi::Converter<QGraphicsView::ViewportAnchor>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGraphicsView::ViewportAnchor>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setTransformationAnchor (qt_gsi::QtToCppAdaptor<QGraphicsView::ViewportAnchor>(arg1).cref());
 }
@@ -1568,7 +1568,7 @@ static void _call_f_setViewportUpdateMode_3725 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGraphicsView::ViewportUpdateMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QGraphicsView::ViewportUpdateMode>::target_type & > (heap);
+  const qt_gsi::Converter<QGraphicsView::ViewportUpdateMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGraphicsView::ViewportUpdateMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->setViewportUpdateMode (qt_gsi::QtToCppAdaptor<QGraphicsView::ViewportUpdateMode>(arg1).cref());
 }
@@ -1590,8 +1590,8 @@ static void _call_f_shear_2034 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->shear (arg1, arg2);
 }
@@ -1658,8 +1658,8 @@ static void _call_f_translate_2034 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->translate (arg1, arg2);
 }
@@ -1679,7 +1679,7 @@ static void _call_f_updateScene_2477 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QRectF> &arg1 = args.read<const QList<QRectF> & > (heap);
+  const QList<QRectF> &arg1 = gsi::arg_reader<const QList<QRectF> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->updateScene (arg1);
 }
@@ -1699,7 +1699,7 @@ static void _call_f_updateSceneRect_1862 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView *)cls)->updateSceneRect (arg1);
 }
@@ -1753,9 +1753,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QGraphicsView::tr (arg1, arg2, arg3));
 }
 
@@ -1778,9 +1778,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QGraphicsView::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2863,7 +2863,7 @@ static void _call_ctor_QGraphicsView_Adaptor_1315 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QGraphicsView_Adaptor *> (new QGraphicsView_Adaptor (arg1));
 }
 
@@ -2883,8 +2883,8 @@ static void _call_ctor_QGraphicsView_Adaptor_3221 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsScene *arg1 = args.read<QGraphicsScene * > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QGraphicsScene *arg1 = gsi::arg_reader<QGraphicsScene * >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QGraphicsView_Adaptor *> (new QGraphicsView_Adaptor (arg1, arg2));
 }
 
@@ -3026,9 +3026,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView_Adaptor *)cls)->fp_QGraphicsView_create_2208 (arg1, arg2, arg3);
 }
@@ -3047,7 +3047,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QGraphicsView_Adaptor *)cls)->emitter_QGraphicsView_customContextMenuRequested_1916 (arg1);
 }
 
@@ -3091,8 +3091,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView_Adaptor *)cls)->fp_QGraphicsView_destroy_1620 (arg1, arg2);
 }
@@ -3111,7 +3111,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QGraphicsView_Adaptor *)cls)->emitter_QGraphicsView_destroyed_1302 (arg1);
 }
 
@@ -3279,7 +3279,7 @@ static void _call_fp_drawFrame_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView_Adaptor *)cls)->fp_QGraphicsView_drawFrame_1426 (arg1);
 }
@@ -3584,7 +3584,7 @@ static void _call_fp_initStyleOption_c2356 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionFrame *arg1 = args.read<QStyleOptionFrame * > (heap);
+  QStyleOptionFrame *arg1 = gsi::arg_reader<QStyleOptionFrame * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView_Adaptor *)cls)->fp_QGraphicsView_initStyleOption_c2356 (arg1);
 }
@@ -3650,7 +3650,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsView_Adaptor *)cls)->fp_QGraphicsView_isSignalConnected_c2394 (arg1));
 }
 
@@ -3974,7 +3974,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QGraphicsView_Adaptor *)cls)->fp_QGraphicsView_receivers_c1731 (arg1));
 }
 
@@ -4043,9 +4043,9 @@ static void _call_emitter_rubberBandChanged_2917 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QRect arg1 = args.read<QRect > (heap);
-  QPointF arg2 = args.read<QPointF > (heap);
-  QPointF arg3 = args.read<QPointF > (heap);
+  QRect arg1 = gsi::arg_reader<QRect >() (args, heap);
+  QPointF arg2 = gsi::arg_reader<QPointF >() (args, heap);
+  QPointF arg3 = gsi::arg_reader<QPointF >() (args, heap);
   ((QGraphicsView_Adaptor *)cls)->emitter_QGraphicsView_rubberBandChanged_2917 (arg1, arg2, arg3);
 }
 
@@ -4124,10 +4124,10 @@ static void _call_fp_setViewportMargins_2744 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView_Adaptor *)cls)->fp_QGraphicsView_setViewportMargins_2744 (arg1, arg2, arg3, arg4);
 }
@@ -4146,7 +4146,7 @@ static void _call_fp_setViewportMargins_2115 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsView_Adaptor *)cls)->fp_QGraphicsView_setViewportMargins_2115 (arg1);
 }
@@ -4418,7 +4418,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QGraphicsView_Adaptor *)cls)->emitter_QGraphicsView_windowIconChanged_1787 (arg1);
 }
 
@@ -4436,7 +4436,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QGraphicsView_Adaptor *)cls)->emitter_QGraphicsView_windowIconTextChanged_2025 (arg1);
 }
 
@@ -4454,7 +4454,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QGraphicsView_Adaptor *)cls)->emitter_QGraphicsView_windowTitleChanged_2025 (arg1);
 }
 

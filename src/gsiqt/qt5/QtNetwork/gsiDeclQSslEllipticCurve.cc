@@ -125,7 +125,7 @@ static void _call_f_fromLongName_2025 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QSslEllipticCurve > ((QSslEllipticCurve)QSslEllipticCurve::fromLongName (arg1));
 }
 
@@ -144,7 +144,7 @@ static void _call_f_fromShortName_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QSslEllipticCurve > ((QSslEllipticCurve)QSslEllipticCurve::fromShortName (arg1));
 }
 

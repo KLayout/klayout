@@ -66,7 +66,7 @@ static void _call_ctor_QDnsHostAddressRecord_3418 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDnsHostAddressRecord &arg1 = args.read<const QDnsHostAddressRecord & > (heap);
+  const QDnsHostAddressRecord &arg1 = gsi::arg_reader<const QDnsHostAddressRecord & >() (args, heap);
   ret.write<QDnsHostAddressRecord *> (new QDnsHostAddressRecord (arg1));
 }
 
@@ -100,7 +100,7 @@ static void _call_f_operator_eq__3418 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDnsHostAddressRecord &arg1 = args.read<const QDnsHostAddressRecord & > (heap);
+  const QDnsHostAddressRecord &arg1 = gsi::arg_reader<const QDnsHostAddressRecord & >() (args, heap);
   ret.write<QDnsHostAddressRecord & > ((QDnsHostAddressRecord &)((QDnsHostAddressRecord *)cls)->operator= (arg1));
 }
 
@@ -119,7 +119,7 @@ static void _call_f_swap_2723 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDnsHostAddressRecord &arg1 = args.read<QDnsHostAddressRecord & > (heap);
+  QDnsHostAddressRecord &arg1 = gsi::arg_reader<QDnsHostAddressRecord & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDnsHostAddressRecord *)cls)->swap (arg1);
 }

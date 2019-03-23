@@ -68,7 +68,7 @@ static void _call_ctor_QJsonDocument_2403 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonObject &arg1 = args.read<const QJsonObject & > (heap);
+  const QJsonObject &arg1 = gsi::arg_reader<const QJsonObject & >() (args, heap);
   ret.write<QJsonDocument *> (new QJsonDocument (arg1));
 }
 
@@ -87,7 +87,7 @@ static void _call_ctor_QJsonDocument_2315 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonArray &arg1 = args.read<const QJsonArray & > (heap);
+  const QJsonArray &arg1 = gsi::arg_reader<const QJsonArray & >() (args, heap);
   ret.write<QJsonDocument *> (new QJsonDocument (arg1));
 }
 
@@ -106,7 +106,7 @@ static void _call_ctor_QJsonDocument_2635 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonDocument &arg1 = args.read<const QJsonDocument & > (heap);
+  const QJsonDocument &arg1 = gsi::arg_reader<const QJsonDocument & >() (args, heap);
   ret.write<QJsonDocument *> (new QJsonDocument (arg1));
 }
 
@@ -215,7 +215,7 @@ static void _call_f_operator_eq__2635 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonDocument &arg1 = args.read<const QJsonDocument & > (heap);
+  const QJsonDocument &arg1 = gsi::arg_reader<const QJsonDocument & >() (args, heap);
   ret.write<QJsonDocument & > ((QJsonDocument &)((QJsonDocument *)cls)->operator = (arg1));
 }
 
@@ -234,7 +234,7 @@ static void _call_f_operator_excl__eq__c2635 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonDocument &arg1 = args.read<const QJsonDocument & > (heap);
+  const QJsonDocument &arg1 = gsi::arg_reader<const QJsonDocument & >() (args, heap);
   ret.write<bool > ((bool)((QJsonDocument *)cls)->operator!= (arg1));
 }
 
@@ -253,7 +253,7 @@ static void _call_f_operator_eq__eq__c2635 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonDocument &arg1 = args.read<const QJsonDocument & > (heap);
+  const QJsonDocument &arg1 = gsi::arg_reader<const QJsonDocument & >() (args, heap);
   ret.write<bool > ((bool)((QJsonDocument *)cls)->operator== (arg1));
 }
 
@@ -272,7 +272,7 @@ static void _call_f_rawData_c953 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args.read<int * > (heap);
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
   ret.write<const char * > ((const char *)((QJsonDocument *)cls)->rawData (arg1));
 }
 
@@ -291,7 +291,7 @@ static void _call_f_setArray_2315 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonArray &arg1 = args.read<const QJsonArray & > (heap);
+  const QJsonArray &arg1 = gsi::arg_reader<const QJsonArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QJsonDocument *)cls)->setArray (arg1);
 }
@@ -311,7 +311,7 @@ static void _call_f_setObject_2403 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QJsonObject &arg1 = args.read<const QJsonObject & > (heap);
+  const QJsonObject &arg1 = gsi::arg_reader<const QJsonObject & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QJsonDocument *)cls)->setObject (arg1);
 }
@@ -361,7 +361,7 @@ static void _call_f_toJson_c2901 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QJsonDocument::JsonFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<QJsonDocument::JsonFormat>::target_type & > (heap);
+  const qt_gsi::Converter<QJsonDocument::JsonFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QJsonDocument::JsonFormat>::target_type & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QJsonDocument *)cls)->toJson (qt_gsi::QtToCppAdaptor<QJsonDocument::JsonFormat>(arg1).cref()));
 }
 
@@ -397,8 +397,8 @@ static void _call_f_fromBinaryData_5488 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & > (heap) : (const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type &)(qt_gsi::CppToQtReadAdaptor<QJsonDocument::DataValidation>(heap, QJsonDocument::Validate));
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QJsonDocument::DataValidation>(heap, QJsonDocument::Validate), heap);
   ret.write<QJsonDocument > ((QJsonDocument)QJsonDocument::fromBinaryData (arg1, qt_gsi::QtToCppAdaptor<QJsonDocument::DataValidation>(arg2).cref()));
 }
 
@@ -419,8 +419,8 @@ static void _call_f_fromJson_4343 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  QJsonParseError *arg2 = args ? args.read<QJsonParseError * > (heap) : (QJsonParseError *)(0);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  QJsonParseError *arg2 = args ? gsi::arg_reader<QJsonParseError * >() (args, heap) : gsi::arg_maker<QJsonParseError * >() (0, heap);
   ret.write<QJsonDocument > ((QJsonDocument)QJsonDocument::fromJson (arg1, arg2));
 }
 
@@ -443,9 +443,9 @@ static void _call_f_fromRawData_5569 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & > (heap) : (const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type &)(qt_gsi::CppToQtReadAdaptor<QJsonDocument::DataValidation>(heap, QJsonDocument::Validate));
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QJsonDocument::DataValidation>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QJsonDocument::DataValidation>(heap, QJsonDocument::Validate), heap);
   ret.write<QJsonDocument > ((QJsonDocument)QJsonDocument::fromRawData (arg1, arg2, qt_gsi::QtToCppAdaptor<QJsonDocument::DataValidation>(arg3).cref()));
 }
 
@@ -464,7 +464,7 @@ static void _call_f_fromVariant_2119 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   ret.write<QJsonDocument > ((QJsonDocument)QJsonDocument::fromVariant (arg1));
 }
 

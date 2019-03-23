@@ -66,7 +66,7 @@ static void _call_ctor_QXmlItem_2098 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlItem &arg1 = args.read<const QXmlItem & > (heap);
+  const QXmlItem &arg1 = gsi::arg_reader<const QXmlItem & >() (args, heap);
   ret.write<QXmlItem *> (new QXmlItem (arg1));
 }
 
@@ -85,7 +85,7 @@ static void _call_ctor_QXmlItem_3090 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QXmlItem *> (new QXmlItem (arg1));
 }
 
@@ -104,7 +104,7 @@ static void _call_ctor_QXmlItem_2119 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   ret.write<QXmlItem *> (new QXmlItem (arg1));
 }
 
@@ -168,7 +168,7 @@ static void _call_f_operator_eq__2098 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlItem &arg1 = args.read<const QXmlItem & > (heap);
+  const QXmlItem &arg1 = gsi::arg_reader<const QXmlItem & >() (args, heap);
   ret.write<QXmlItem & > ((QXmlItem &)((QXmlItem *)cls)->operator= (arg1));
 }
 

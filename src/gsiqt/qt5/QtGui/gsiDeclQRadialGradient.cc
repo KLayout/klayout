@@ -72,9 +72,9 @@ static void _call_ctor_QRadialGradient_4827 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  double arg2 = args.read<double > (heap);
-  const QPointF &arg3 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QRadialGradient *> (new QRadialGradient (arg1, arg2, arg3));
 }
 
@@ -101,11 +101,11 @@ static void _call_ctor_QRadialGradient_4923 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
   ret.write<QRadialGradient *> (new QRadialGradient (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -126,8 +126,8 @@ static void _call_ctor_QRadialGradient_2949 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  double arg2 = args.read<double > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QRadialGradient *> (new QRadialGradient (arg1, arg2));
 }
 
@@ -150,9 +150,9 @@ static void _call_ctor_QRadialGradient_2997 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   ret.write<QRadialGradient *> (new QRadialGradient (arg1, arg2, arg3));
 }
 
@@ -177,10 +177,10 @@ static void _call_ctor_QRadialGradient_5790 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  double arg2 = args.read<double > (heap);
-  const QPointF &arg3 = args.read<const QPointF & > (heap);
-  double arg4 = args.read<double > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   ret.write<QRadialGradient *> (new QRadialGradient (arg1, arg2, arg3, arg4));
 }
 
@@ -209,12 +209,12 @@ static void _call_ctor_QRadialGradient_5886 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args.read<double > (heap);
-  double arg6 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
+  double arg6 = gsi::arg_reader<double >() (args, heap);
   ret.write<QRadialGradient *> (new QRadialGradient (arg1, arg2, arg3, arg4, arg5, arg6));
 }
 
@@ -308,7 +308,7 @@ static void _call_f_setCenter_1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadialGradient *)cls)->setCenter (arg1);
 }
@@ -330,8 +330,8 @@ static void _call_f_setCenter_2034 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadialGradient *)cls)->setCenter (arg1, arg2);
 }
@@ -351,7 +351,7 @@ static void _call_f_setCenterRadius_1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadialGradient *)cls)->setCenterRadius (arg1);
 }
@@ -371,7 +371,7 @@ static void _call_f_setFocalPoint_1986 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadialGradient *)cls)->setFocalPoint (arg1);
 }
@@ -393,8 +393,8 @@ static void _call_f_setFocalPoint_2034 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadialGradient *)cls)->setFocalPoint (arg1, arg2);
 }
@@ -414,7 +414,7 @@ static void _call_f_setFocalRadius_1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadialGradient *)cls)->setFocalRadius (arg1);
 }
@@ -434,7 +434,7 @@ static void _call_f_setRadius_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadialGradient *)cls)->setRadius (arg1);
 }

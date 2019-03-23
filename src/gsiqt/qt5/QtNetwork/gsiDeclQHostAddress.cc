@@ -65,7 +65,7 @@ static void _call_ctor_QHostAddress_1098 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  quint32 arg1 = args.read<quint32 > (heap);
+  quint32 arg1 = gsi::arg_reader<quint32 >() (args, heap);
   ret.write<QHostAddress *> (new QHostAddress (arg1));
 }
 
@@ -84,7 +84,7 @@ static void _call_ctor_QHostAddress_2025 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QHostAddress *> (new QHostAddress (arg1));
 }
 
@@ -103,7 +103,7 @@ static void _call_ctor_QHostAddress_2518 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   ret.write<QHostAddress *> (new QHostAddress (arg1));
 }
 
@@ -122,7 +122,7 @@ static void _call_ctor_QHostAddress_3172 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & arg1 = args.read<const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & > (heap);
+  const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & >() (args, heap);
   ret.write<QHostAddress *> (new QHostAddress (qt_gsi::QtToCppAdaptor<QHostAddress::SpecialAddress>(arg1).cref()));
 }
 
@@ -159,8 +159,8 @@ static void _call_f_isInSubnet_c3177 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
-  int arg2 = args.read<int > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QHostAddress *)cls)->isInSubnet (arg1, arg2));
 }
 
@@ -179,7 +179,7 @@ static void _call_f_isInSubnet_c3636 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPair<QHostAddress, int> &arg1 = args.read<const QPair<QHostAddress, int> & > (heap);
+  const QPair<QHostAddress, int> &arg1 = gsi::arg_reader<const QPair<QHostAddress, int> & >() (args, heap);
   ret.write<bool > ((bool)((QHostAddress *)cls)->isInSubnet (arg1));
 }
 
@@ -228,7 +228,7 @@ static void _call_f_operator_excl__eq__c2518 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   ret.write<bool > ((bool)((QHostAddress *)cls)->operator != (arg1));
 }
 
@@ -247,7 +247,7 @@ static void _call_f_operator_excl__eq__c3172 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & arg1 = args.read<const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & > (heap);
+  const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QHostAddress *)cls)->operator != (qt_gsi::QtToCppAdaptor<QHostAddress::SpecialAddress>(arg1).cref()));
 }
 
@@ -266,7 +266,7 @@ static void _call_f_operator_eq__eq__c2518 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   ret.write<bool > ((bool)((QHostAddress *)cls)->operator == (arg1));
 }
 
@@ -285,7 +285,7 @@ static void _call_f_operator_eq__eq__c3172 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & arg1 = args.read<const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & > (heap);
+  const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QHostAddress::SpecialAddress>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QHostAddress *)cls)->operator == (qt_gsi::QtToCppAdaptor<QHostAddress::SpecialAddress>(arg1).cref()));
 }
 
@@ -304,7 +304,7 @@ static void _call_f_operator_eq__2518 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHostAddress &arg1 = args.read<const QHostAddress & > (heap);
+  const QHostAddress &arg1 = gsi::arg_reader<const QHostAddress & >() (args, heap);
   ret.write<QHostAddress & > ((QHostAddress &)((QHostAddress *)cls)->operator= (arg1));
 }
 
@@ -323,7 +323,7 @@ static void _call_f_operator_eq__2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QHostAddress & > ((QHostAddress &)((QHostAddress *)cls)->operator= (arg1));
 }
 
@@ -372,7 +372,7 @@ static void _call_f_setAddress_1098 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  quint32 arg1 = args.read<quint32 > (heap);
+  quint32 arg1 = gsi::arg_reader<quint32 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHostAddress *)cls)->setAddress (arg1);
 }
@@ -392,7 +392,7 @@ static void _call_f_setAddress_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QHostAddress *)cls)->setAddress (arg1));
 }
 
@@ -411,7 +411,7 @@ static void _call_f_setScopeId_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHostAddress *)cls)->setScopeId (arg1);
 }
@@ -446,7 +446,7 @@ static void _call_f_toIPv4Address_c1050 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args.read<bool * > (heap);
+  bool *arg1 = gsi::arg_reader<bool * >() (args, heap);
   ret.write<quint32 > ((quint32)((QHostAddress *)cls)->toIPv4Address (arg1));
 }
 
@@ -480,7 +480,7 @@ static void _call_f_parseSubnet_2025 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QPair<QHostAddress, int> > ((QPair<QHostAddress, int>)QHostAddress::parseSubnet (arg1));
 }
 

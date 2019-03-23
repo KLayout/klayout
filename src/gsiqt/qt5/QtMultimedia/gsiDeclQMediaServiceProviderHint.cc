@@ -67,8 +67,8 @@ static void _call_ctor_QMediaServiceProviderHint_4354 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QStringList &arg2 = args.read<const QStringList & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
   ret.write<QMediaServiceProviderHint *> (new QMediaServiceProviderHint (arg1, arg2));
 }
 
@@ -87,7 +87,7 @@ static void _call_ctor_QMediaServiceProviderHint_2309 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QMediaServiceProviderHint *> (new QMediaServiceProviderHint (arg1));
 }
 
@@ -106,7 +106,7 @@ static void _call_ctor_QMediaServiceProviderHint_2071 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCamera::Position>::target_type & arg1 = args.read<const qt_gsi::Converter<QCamera::Position>::target_type & > (heap);
+  const qt_gsi::Converter<QCamera::Position>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::Position>::target_type & >() (args, heap);
   ret.write<QMediaServiceProviderHint *> (new QMediaServiceProviderHint (qt_gsi::QtToCppAdaptor<QCamera::Position>(arg1).cref()));
 }
 
@@ -125,7 +125,7 @@ static void _call_ctor_QMediaServiceProviderHint_4492 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QMediaServiceProviderHint::Feature> arg1 = args.read<QFlags<QMediaServiceProviderHint::Feature> > (heap);
+  QFlags<QMediaServiceProviderHint::Feature> arg1 = gsi::arg_reader<QFlags<QMediaServiceProviderHint::Feature> >() (args, heap);
   ret.write<QMediaServiceProviderHint *> (new QMediaServiceProviderHint (arg1));
 }
 
@@ -144,7 +144,7 @@ static void _call_ctor_QMediaServiceProviderHint_3841 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaServiceProviderHint &arg1 = args.read<const QMediaServiceProviderHint & > (heap);
+  const QMediaServiceProviderHint &arg1 = gsi::arg_reader<const QMediaServiceProviderHint & >() (args, heap);
   ret.write<QMediaServiceProviderHint *> (new QMediaServiceProviderHint (arg1));
 }
 
@@ -253,7 +253,7 @@ static void _call_f_operator_excl__eq__c3841 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaServiceProviderHint &arg1 = args.read<const QMediaServiceProviderHint & > (heap);
+  const QMediaServiceProviderHint &arg1 = gsi::arg_reader<const QMediaServiceProviderHint & >() (args, heap);
   ret.write<bool > ((bool)((QMediaServiceProviderHint *)cls)->operator != (arg1));
 }
 
@@ -272,7 +272,7 @@ static void _call_f_operator_eq__eq__c3841 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaServiceProviderHint &arg1 = args.read<const QMediaServiceProviderHint & > (heap);
+  const QMediaServiceProviderHint &arg1 = gsi::arg_reader<const QMediaServiceProviderHint & >() (args, heap);
   ret.write<bool > ((bool)((QMediaServiceProviderHint *)cls)->operator == (arg1));
 }
 
@@ -291,7 +291,7 @@ static void _call_f_operator_eq__3841 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaServiceProviderHint &arg1 = args.read<const QMediaServiceProviderHint & > (heap);
+  const QMediaServiceProviderHint &arg1 = gsi::arg_reader<const QMediaServiceProviderHint & >() (args, heap);
   ret.write<QMediaServiceProviderHint & > ((QMediaServiceProviderHint &)((QMediaServiceProviderHint *)cls)->operator= (arg1));
 }
 

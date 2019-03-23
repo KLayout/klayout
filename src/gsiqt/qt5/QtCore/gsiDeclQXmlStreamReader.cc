@@ -71,7 +71,7 @@ static void _call_ctor_QXmlStreamReader_1447 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QXmlStreamReader *> (new QXmlStreamReader (arg1));
 }
 
@@ -90,7 +90,7 @@ static void _call_ctor_QXmlStreamReader_2309 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QXmlStreamReader *> (new QXmlStreamReader (arg1));
 }
 
@@ -109,7 +109,7 @@ static void _call_ctor_QXmlStreamReader_2025 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QXmlStreamReader *> (new QXmlStreamReader (arg1));
 }
 
@@ -128,7 +128,7 @@ static void _call_ctor_QXmlStreamReader_1731 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QXmlStreamReader *> (new QXmlStreamReader (arg1));
 }
 
@@ -147,7 +147,7 @@ static void _call_f_addData_2309 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->addData (arg1);
 }
@@ -167,7 +167,7 @@ static void _call_f_addData_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->addData (arg1);
 }
@@ -187,7 +187,7 @@ static void _call_f_addData_1731 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->addData (arg1);
 }
@@ -207,7 +207,7 @@ static void _call_f_addExtraNamespaceDeclaration_4354 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamNamespaceDeclaration &arg1 = args.read<const QXmlStreamNamespaceDeclaration & > (heap);
+  const QXmlStreamNamespaceDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNamespaceDeclaration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->addExtraNamespaceDeclaration (arg1);
 }
@@ -227,7 +227,7 @@ static void _call_f_addExtraNamespaceDeclarations_5184 (const qt_gsi::GenericMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<QXmlStreamNamespaceDeclaration> &arg1 = args.read<const QVector<QXmlStreamNamespaceDeclaration> & > (heap);
+  const QVector<QXmlStreamNamespaceDeclaration> &arg1 = gsi::arg_reader<const QVector<QXmlStreamNamespaceDeclaration> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->addExtraNamespaceDeclarations (arg1);
 }
@@ -818,7 +818,7 @@ static void _call_f_raiseError_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->raiseError (arg1);
 }
@@ -838,7 +838,7 @@ static void _call_f_readElementText_4601 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QXmlStreamReader::ReadElementTextBehaviour>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QXmlStreamReader::ReadElementTextBehaviour>::target_type & > (heap) : (const qt_gsi::Converter<QXmlStreamReader::ReadElementTextBehaviour>::target_type &)(qt_gsi::CppToQtReadAdaptor<QXmlStreamReader::ReadElementTextBehaviour>(heap, QXmlStreamReader::ErrorOnUnexpectedElement));
+  const qt_gsi::Converter<QXmlStreamReader::ReadElementTextBehaviour>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QXmlStreamReader::ReadElementTextBehaviour>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QXmlStreamReader::ReadElementTextBehaviour>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QXmlStreamReader::ReadElementTextBehaviour>(heap, QXmlStreamReader::ErrorOnUnexpectedElement), heap);
   ret.write<QString > ((QString)((QXmlStreamReader *)cls)->readElementText (qt_gsi::QtToCppAdaptor<QXmlStreamReader::ReadElementTextBehaviour>(arg1).cref()));
 }
 
@@ -887,7 +887,7 @@ static void _call_f_setDevice_1447 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->setDevice (arg1);
 }
@@ -907,7 +907,7 @@ static void _call_f_setEntityResolver_3115 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlStreamEntityResolver *arg1 = args.read<QXmlStreamEntityResolver * > (heap);
+  QXmlStreamEntityResolver *arg1 = gsi::arg_reader<QXmlStreamEntityResolver * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->setEntityResolver (arg1);
 }
@@ -927,7 +927,7 @@ static void _call_f_setNamespaceProcessing_864 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->setNamespaceProcessing (arg1);
 }

@@ -66,7 +66,7 @@ static void _call_f_create_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStyle * > ((QStyle *)QStyleFactory::create (arg1));
 }
 

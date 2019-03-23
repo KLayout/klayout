@@ -84,8 +84,8 @@ static void _call_f_setSelection_1426 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleTextSelectionEvent *)cls)->setSelection (arg1, arg2);
 }
@@ -168,9 +168,9 @@ static void _call_ctor_QAccessibleTextSelectionEvent_Adaptor_2620 (const qt_gsi:
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QAccessibleTextSelectionEvent_Adaptor *> (new QAccessibleTextSelectionEvent_Adaptor (arg1, arg2, arg3));
 }
 
@@ -192,9 +192,9 @@ static void _call_ctor_QAccessibleTextSelectionEvent_Adaptor_3940 (const qt_gsi:
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleInterface *arg1 = args.read<QAccessibleInterface * > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  QAccessibleInterface *arg1 = gsi::arg_reader<QAccessibleInterface * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QAccessibleTextSelectionEvent_Adaptor *> (new QAccessibleTextSelectionEvent_Adaptor (arg1, arg2, arg3));
 }
 

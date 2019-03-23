@@ -71,10 +71,10 @@ static void _call_ctor_QMessageLogContext_5636 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  int arg2 = args.read<int > (heap);
-  const char *arg3 = args.read<const char * > (heap);
-  const char *arg4 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg4 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QMessageLogContext *> (new QMessageLogContext (arg1, arg2, arg3, arg4));
 }
 

@@ -205,7 +205,7 @@ static void _call_f_setButtons_2602 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::MouseButton> arg1 = args.read<QFlags<Qt::MouseButton> > (heap);
+  QFlags<Qt::MouseButton> arg1 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setButtons (arg1);
 }
@@ -225,7 +225,7 @@ static void _call_f_setDropAction_1760 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::DropAction>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::DropAction>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::DropAction>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::DropAction>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setDropAction (qt_gsi::QtToCppAdaptor<Qt::DropAction>(arg1).cref());
 }
@@ -245,7 +245,7 @@ static void _call_f_setMimeData_2168 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeData *arg1 = args.read<const QMimeData * > (heap);
+  const QMimeData *arg1 = gsi::arg_reader<const QMimeData * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setMimeData (arg1);
 }
@@ -265,7 +265,7 @@ static void _call_f_setModifiers_3077 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::KeyboardModifier> arg1 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  QFlags<Qt::KeyboardModifier> arg1 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setModifiers (arg1);
 }
@@ -285,7 +285,7 @@ static void _call_f_setPos_1986 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setPos (arg1);
 }
@@ -305,7 +305,7 @@ static void _call_f_setPossibleActions_2456 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::DropAction> arg1 = args.read<QFlags<Qt::DropAction> > (heap);
+  QFlags<Qt::DropAction> arg1 = gsi::arg_reader<QFlags<Qt::DropAction> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setPossibleActions (arg1);
 }
@@ -325,7 +325,7 @@ static void _call_f_setProposedAction_1760 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::DropAction>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::DropAction>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::DropAction>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::DropAction>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setProposedAction (qt_gsi::QtToCppAdaptor<Qt::DropAction>(arg1).cref());
 }
@@ -345,7 +345,7 @@ static void _call_f_setScenePos_1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setScenePos (arg1);
 }
@@ -365,7 +365,7 @@ static void _call_f_setScreenPos_1916 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setScreenPos (arg1);
 }
@@ -385,7 +385,7 @@ static void _call_f_setSource_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneDragDropEvent *)cls)->setSource (arg1);
 }
@@ -482,7 +482,7 @@ static void _call_ctor_QGraphicsSceneDragDropEvent_Adaptor_1565 (const qt_gsi::G
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap) : (const qt_gsi::Converter<QEvent::Type>::target_type &)(qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::None));
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QEvent::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::None), heap);
   ret.write<QGraphicsSceneDragDropEvent_Adaptor *> (new QGraphicsSceneDragDropEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref()));
 }
 

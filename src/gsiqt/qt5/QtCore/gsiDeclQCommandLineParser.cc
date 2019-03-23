@@ -82,7 +82,7 @@ static void _call_f_addOption_3122 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCommandLineOption &arg1 = args.read<const QCommandLineOption & > (heap);
+  const QCommandLineOption &arg1 = gsi::arg_reader<const QCommandLineOption & >() (args, heap);
   ret.write<bool > ((bool)((QCommandLineParser *)cls)->addOption (arg1));
 }
 
@@ -101,7 +101,7 @@ static void _call_f_addOptions_3737 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QCommandLineOption> &arg1 = args.read<const QList<QCommandLineOption> & > (heap);
+  const QList<QCommandLineOption> &arg1 = gsi::arg_reader<const QList<QCommandLineOption> & >() (args, heap);
   ret.write<bool > ((bool)((QCommandLineParser *)cls)->addOptions (arg1));
 }
 
@@ -124,9 +124,9 @@ static void _call_f_addPositionalArgument_5859 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCommandLineParser *)cls)->addPositionalArgument (arg1, arg2, arg3);
 }
@@ -222,7 +222,7 @@ static void _call_f_isSet_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QCommandLineParser *)cls)->isSet (arg1));
 }
 
@@ -241,7 +241,7 @@ static void _call_f_isSet_c3122 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCommandLineOption &arg1 = args.read<const QCommandLineOption & > (heap);
+  const QCommandLineOption &arg1 = gsi::arg_reader<const QCommandLineOption & >() (args, heap);
   ret.write<bool > ((bool)((QCommandLineParser *)cls)->isSet (arg1));
 }
 
@@ -275,7 +275,7 @@ static void _call_f_parse_2437 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   ret.write<bool > ((bool)((QCommandLineParser *)cls)->parse (arg1));
 }
 
@@ -309,7 +309,7 @@ static void _call_f_process_2437 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCommandLineParser *)cls)->process (arg1);
 }
@@ -329,7 +329,7 @@ static void _call_f_process_2927 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCoreApplication &arg1 = args.read<const QCoreApplication & > (heap);
+  const QCoreApplication &arg1 = gsi::arg_reader<const QCoreApplication & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCommandLineParser *)cls)->process (arg1);
 }
@@ -349,7 +349,7 @@ static void _call_f_setApplicationDescription_2025 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCommandLineParser *)cls)->setApplicationDescription (arg1);
 }
@@ -369,7 +369,7 @@ static void _call_f_setSingleDashWordOptionMode_4777 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCommandLineParser::SingleDashWordOptionMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCommandLineParser::SingleDashWordOptionMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCommandLineParser::SingleDashWordOptionMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCommandLineParser::SingleDashWordOptionMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCommandLineParser *)cls)->setSingleDashWordOptionMode (qt_gsi::QtToCppAdaptor<QCommandLineParser::SingleDashWordOptionMode>(arg1).cref());
 }
@@ -389,7 +389,7 @@ static void _call_f_showHelp_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCommandLineParser *)cls)->showHelp (arg1);
 }
@@ -440,7 +440,7 @@ static void _call_f_value_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QCommandLineParser *)cls)->value (arg1));
 }
 
@@ -459,7 +459,7 @@ static void _call_f_value_c3122 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCommandLineOption &arg1 = args.read<const QCommandLineOption & > (heap);
+  const QCommandLineOption &arg1 = gsi::arg_reader<const QCommandLineOption & >() (args, heap);
   ret.write<QString > ((QString)((QCommandLineParser *)cls)->value (arg1));
 }
 
@@ -478,7 +478,7 @@ static void _call_f_values_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QCommandLineParser *)cls)->values (arg1));
 }
 
@@ -497,7 +497,7 @@ static void _call_f_values_c3122 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCommandLineOption &arg1 = args.read<const QCommandLineOption & > (heap);
+  const QCommandLineOption &arg1 = gsi::arg_reader<const QCommandLineOption & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QCommandLineParser *)cls)->values (arg1));
 }
 
@@ -520,9 +520,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCommandLineParser::tr (arg1, arg2, arg3));
 }
 
@@ -545,9 +545,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCommandLineParser::trUtf8 (arg1, arg2, arg3));
 }
 

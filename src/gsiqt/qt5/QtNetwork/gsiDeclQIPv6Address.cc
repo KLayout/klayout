@@ -65,7 +65,7 @@ static void _call_f_operator_index__767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<quint8 & > ((quint8 &)((QIPv6Address *)cls)->operator [] (arg1));
 }
 
@@ -84,7 +84,7 @@ static void _call_f_operator_index__c767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<quint8 > ((quint8)((QIPv6Address *)cls)->operator [] (arg1));
 }
 

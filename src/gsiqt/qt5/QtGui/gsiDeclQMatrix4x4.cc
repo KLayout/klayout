@@ -74,7 +74,7 @@ static void _call_ctor_QMatrix4x4_1851 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const float *arg1 = args.read<const float * > (heap);
+  const float *arg1 = gsi::arg_reader<const float * >() (args, heap);
   ret.write<QMatrix4x4 *> (new QMatrix4x4 (arg1));
 }
 
@@ -123,22 +123,22 @@ static void _call_ctor_QMatrix4x4_13900 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
-  float arg3 = args.read<float > (heap);
-  float arg4 = args.read<float > (heap);
-  float arg5 = args.read<float > (heap);
-  float arg6 = args.read<float > (heap);
-  float arg7 = args.read<float > (heap);
-  float arg8 = args.read<float > (heap);
-  float arg9 = args.read<float > (heap);
-  float arg10 = args.read<float > (heap);
-  float arg11 = args.read<float > (heap);
-  float arg12 = args.read<float > (heap);
-  float arg13 = args.read<float > (heap);
-  float arg14 = args.read<float > (heap);
-  float arg15 = args.read<float > (heap);
-  float arg16 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
+  float arg4 = gsi::arg_reader<float >() (args, heap);
+  float arg5 = gsi::arg_reader<float >() (args, heap);
+  float arg6 = gsi::arg_reader<float >() (args, heap);
+  float arg7 = gsi::arg_reader<float >() (args, heap);
+  float arg8 = gsi::arg_reader<float >() (args, heap);
+  float arg9 = gsi::arg_reader<float >() (args, heap);
+  float arg10 = gsi::arg_reader<float >() (args, heap);
+  float arg11 = gsi::arg_reader<float >() (args, heap);
+  float arg12 = gsi::arg_reader<float >() (args, heap);
+  float arg13 = gsi::arg_reader<float >() (args, heap);
+  float arg14 = gsi::arg_reader<float >() (args, heap);
+  float arg15 = gsi::arg_reader<float >() (args, heap);
+  float arg16 = gsi::arg_reader<float >() (args, heap);
   ret.write<QMatrix4x4 *> (new QMatrix4x4 (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16));
 }
 
@@ -161,9 +161,9 @@ static void _call_ctor_QMatrix4x4_3169 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const float *arg1 = args.read<const float * > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const float *arg1 = gsi::arg_reader<const float * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QMatrix4x4 *> (new QMatrix4x4 (arg1, arg2, arg3));
 }
 
@@ -182,7 +182,7 @@ static void _call_ctor_QMatrix4x4_2350 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
   ret.write<QMatrix4x4 *> (new QMatrix4x4 (arg1));
 }
 
@@ -201,7 +201,7 @@ static void _call_ctor_QMatrix4x4_2023 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix &arg1 = args.read<const QMatrix & > (heap);
+  const QMatrix &arg1 = gsi::arg_reader<const QMatrix & >() (args, heap);
   ret.write<QMatrix4x4 *> (new QMatrix4x4 (arg1));
 }
 
@@ -220,7 +220,7 @@ static void _call_f_column_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QVector4D > ((QVector4D)((QMatrix4x4 *)cls)->column (arg1));
 }
 
@@ -254,7 +254,7 @@ static void _call_f_copyDataTo_c1156 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float *arg1 = args.read<float * > (heap);
+  float *arg1 = gsi::arg_reader<float * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->copyDataTo (arg1);
 }
@@ -319,7 +319,7 @@ static void _call_f_fill_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->fill (arg1);
 }
@@ -365,12 +365,12 @@ static void _call_f_frustum_5280 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
-  float arg3 = args.read<float > (heap);
-  float arg4 = args.read<float > (heap);
-  float arg5 = args.read<float > (heap);
-  float arg6 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
+  float arg4 = gsi::arg_reader<float >() (args, heap);
+  float arg5 = gsi::arg_reader<float >() (args, heap);
+  float arg6 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->frustum (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -390,7 +390,7 @@ static void _call_f_inverted_c1050 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? args.read<bool * > (heap) : (bool *)(0);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<QMatrix4x4 > ((QMatrix4x4)((QMatrix4x4 *)cls)->inverted (arg1));
 }
 
@@ -443,9 +443,9 @@ static void _call_f_lookAt_6204 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg2 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg3 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg2 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg3 = gsi::arg_reader<const QVector3D & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->lookAt (arg1, arg2, arg3);
 }
@@ -465,7 +465,7 @@ static void _call_f_map_c1916 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QPoint > ((QPoint)((QMatrix4x4 *)cls)->map (arg1));
 }
 
@@ -484,7 +484,7 @@ static void _call_f_map_c1986 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QPointF > ((QPointF)((QMatrix4x4 *)cls)->map (arg1));
 }
 
@@ -503,7 +503,7 @@ static void _call_f_map_c2140 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector3D > ((QVector3D)((QMatrix4x4 *)cls)->map (arg1));
 }
 
@@ -522,7 +522,7 @@ static void _call_f_map_c2141 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector4D &arg1 = args.read<const QVector4D & > (heap);
+  const QVector4D &arg1 = gsi::arg_reader<const QVector4D & >() (args, heap);
   ret.write<QVector4D > ((QVector4D)((QMatrix4x4 *)cls)->map (arg1));
 }
 
@@ -541,7 +541,7 @@ static void _call_f_mapRect_c1792 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRect > ((QRect)((QMatrix4x4 *)cls)->mapRect (arg1));
 }
 
@@ -560,7 +560,7 @@ static void _call_f_mapRect_c1862 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QMatrix4x4 *)cls)->mapRect (arg1));
 }
 
@@ -579,7 +579,7 @@ static void _call_f_mapVector_c2140 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector3D > ((QVector3D)((QMatrix4x4 *)cls)->mapVector (arg1));
 }
 
@@ -598,7 +598,7 @@ static void _call_f_operator_excl__eq__c2247 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix4x4 &arg1 = args.read<const QMatrix4x4 & > (heap);
+  const QMatrix4x4 &arg1 = gsi::arg_reader<const QMatrix4x4 & >() (args, heap);
   ret.write<bool > ((bool)((QMatrix4x4 *)cls)->operator!= (arg1));
 }
 
@@ -619,8 +619,8 @@ static void _call_f_operator_func__c1426 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<const float & > ((const float &)((QMatrix4x4 *)cls)->operator() (arg1, arg2));
 }
 
@@ -641,8 +641,8 @@ static void _call_f_operator_func__1426 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<float & > ((float &)((QMatrix4x4 *)cls)->operator() (arg1, arg2));
 }
 
@@ -661,7 +661,7 @@ static void _call_f_operator_star__eq__2247 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix4x4 &arg1 = args.read<const QMatrix4x4 & > (heap);
+  const QMatrix4x4 &arg1 = gsi::arg_reader<const QMatrix4x4 & >() (args, heap);
   ret.write<QMatrix4x4 & > ((QMatrix4x4 &)((QMatrix4x4 *)cls)->operator*= (arg1));
 }
 
@@ -680,7 +680,7 @@ static void _call_f_operator_star__eq__970 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   ret.write<QMatrix4x4 & > ((QMatrix4x4 &)((QMatrix4x4 *)cls)->operator*= (arg1));
 }
 
@@ -699,7 +699,7 @@ static void _call_f_operator_plus__eq__2247 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix4x4 &arg1 = args.read<const QMatrix4x4 & > (heap);
+  const QMatrix4x4 &arg1 = gsi::arg_reader<const QMatrix4x4 & >() (args, heap);
   ret.write<QMatrix4x4 & > ((QMatrix4x4 &)((QMatrix4x4 *)cls)->operator+= (arg1));
 }
 
@@ -718,7 +718,7 @@ static void _call_f_operator_minus__eq__2247 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix4x4 &arg1 = args.read<const QMatrix4x4 & > (heap);
+  const QMatrix4x4 &arg1 = gsi::arg_reader<const QMatrix4x4 & >() (args, heap);
   ret.write<QMatrix4x4 & > ((QMatrix4x4 &)((QMatrix4x4 *)cls)->operator-= (arg1));
 }
 
@@ -737,7 +737,7 @@ static void _call_f_operator_slash__eq__970 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   ret.write<QMatrix4x4 & > ((QMatrix4x4 &)((QMatrix4x4 *)cls)->operator/= (arg1));
 }
 
@@ -756,7 +756,7 @@ static void _call_f_operator_eq__eq__c2247 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix4x4 &arg1 = args.read<const QMatrix4x4 & > (heap);
+  const QMatrix4x4 &arg1 = gsi::arg_reader<const QMatrix4x4 & >() (args, heap);
   ret.write<bool > ((bool)((QMatrix4x4 *)cls)->operator== (arg1));
 }
 
@@ -791,7 +791,7 @@ static void _call_f_ortho_1792 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->ortho (arg1);
 }
@@ -811,7 +811,7 @@ static void _call_f_ortho_1862 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->ortho (arg1);
 }
@@ -841,12 +841,12 @@ static void _call_f_ortho_5280 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
-  float arg3 = args.read<float > (heap);
-  float arg4 = args.read<float > (heap);
-  float arg5 = args.read<float > (heap);
-  float arg6 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
+  float arg4 = gsi::arg_reader<float >() (args, heap);
+  float arg5 = gsi::arg_reader<float >() (args, heap);
+  float arg6 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->ortho (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -872,10 +872,10 @@ static void _call_f_perspective_3556 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
-  float arg3 = args.read<float > (heap);
-  float arg4 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
+  float arg4 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->perspective (arg1, arg2, arg3, arg4);
 }
@@ -897,8 +897,8 @@ static void _call_f_rotate_3002 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  const QVector3D &arg2 = args.read<const QVector3D & > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  const QVector3D &arg2 = gsi::arg_reader<const QVector3D & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->rotate (arg1, arg2);
 }
@@ -924,10 +924,10 @@ static void _call_f_rotate_3556 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
-  float arg3 = args.read<float > (heap);
-  float arg4 = args ? args.read<float > (heap) : (float)(0.0f);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
+  float arg4 = args ? gsi::arg_reader<float >() (args, heap) : gsi::arg_maker<float >() (0.0f, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->rotate (arg1, arg2, arg3, arg4);
 }
@@ -947,7 +947,7 @@ static void _call_f_rotate_2456 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QQuaternion &arg1 = args.read<const QQuaternion & > (heap);
+  const QQuaternion &arg1 = gsi::arg_reader<const QQuaternion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->rotate (arg1);
 }
@@ -967,7 +967,7 @@ static void _call_f_row_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QVector4D > ((QVector4D)((QMatrix4x4 *)cls)->row (arg1));
 }
 
@@ -986,7 +986,7 @@ static void _call_f_scale_2140 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->scale (arg1);
 }
@@ -1008,8 +1008,8 @@ static void _call_f_scale_1832 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->scale (arg1, arg2);
 }
@@ -1033,9 +1033,9 @@ static void _call_f_scale_2694 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
-  float arg3 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->scale (arg1, arg2, arg3);
 }
@@ -1055,7 +1055,7 @@ static void _call_f_scale_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->scale (arg1);
 }
@@ -1077,8 +1077,8 @@ static void _call_f_setColumn_2800 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QVector4D &arg2 = args.read<const QVector4D & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QVector4D &arg2 = gsi::arg_reader<const QVector4D & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->setColumn (arg1, arg2);
 }
@@ -1100,8 +1100,8 @@ static void _call_f_setRow_2800 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QVector4D &arg2 = args.read<const QVector4D & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QVector4D &arg2 = gsi::arg_reader<const QVector4D & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->setRow (arg1, arg2);
 }
@@ -1167,7 +1167,7 @@ static void _call_f_toTransform_c970 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   ret.write<QTransform > ((QTransform)((QMatrix4x4 *)cls)->toTransform (arg1));
 }
 
@@ -1186,7 +1186,7 @@ static void _call_f_translate_2140 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->translate (arg1);
 }
@@ -1208,8 +1208,8 @@ static void _call_f_translate_1832 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->translate (arg1, arg2);
 }
@@ -1233,9 +1233,9 @@ static void _call_f_translate_2694 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
-  float arg3 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->translate (arg1, arg2, arg3);
 }
@@ -1270,7 +1270,7 @@ static void _call_f_viewport_1862 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->viewport (arg1);
 }
@@ -1300,12 +1300,12 @@ static void _call_f_viewport_5280 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
-  float arg3 = args.read<float > (heap);
-  float arg4 = args.read<float > (heap);
-  float arg5 = args ? args.read<float > (heap) : (float)(0.0f);
-  float arg6 = args ? args.read<float > (heap) : (float)(1.0f);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
+  float arg4 = gsi::arg_reader<float >() (args, heap);
+  float arg5 = args ? gsi::arg_reader<float >() (args, heap) : gsi::arg_maker<float >() (0.0f, heap);
+  float arg6 = args ? gsi::arg_reader<float >() (args, heap) : gsi::arg_maker<float >() (1.0f, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMatrix4x4 *)cls)->viewport (arg1, arg2, arg3, arg4, arg5, arg6);
 }

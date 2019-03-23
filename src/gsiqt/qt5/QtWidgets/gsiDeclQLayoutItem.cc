@@ -130,7 +130,7 @@ static void _call_f_heightForWidth_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QLayoutItem *)cls)->heightForWidth (arg1));
 }
 
@@ -210,7 +210,7 @@ static void _call_f_minimumHeightForWidth_c767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QLayoutItem *)cls)->minimumHeightForWidth (arg1));
 }
 
@@ -244,7 +244,7 @@ static void _call_f_setAlignment_2750 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayoutItem *)cls)->setAlignment (arg1);
 }
@@ -264,7 +264,7 @@ static void _call_f_setGeometry_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayoutItem *)cls)->setGeometry (arg1);
 }
@@ -625,7 +625,7 @@ static void _call_ctor_QLayoutItem_Adaptor_2750 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args ? args.read<QFlags<Qt::AlignmentFlag> > (heap) : (QFlags<Qt::AlignmentFlag>)(0);
+  QFlags<Qt::AlignmentFlag> arg1 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
   ret.write<QLayoutItem_Adaptor *> (new QLayoutItem_Adaptor (arg1));
 }
 

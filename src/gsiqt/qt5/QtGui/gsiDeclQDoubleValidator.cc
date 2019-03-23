@@ -115,7 +115,7 @@ static void _call_f_setBottom_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleValidator *)cls)->setBottom (arg1);
 }
@@ -135,7 +135,7 @@ static void _call_f_setDecimals_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleValidator *)cls)->setDecimals (arg1);
 }
@@ -155,7 +155,7 @@ static void _call_f_setNotation_3014 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDoubleValidator::Notation>::target_type & arg1 = args.read<const qt_gsi::Converter<QDoubleValidator::Notation>::target_type & > (heap);
+  const qt_gsi::Converter<QDoubleValidator::Notation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDoubleValidator::Notation>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleValidator *)cls)->setNotation (qt_gsi::QtToCppAdaptor<QDoubleValidator::Notation>(arg1).cref());
 }
@@ -179,9 +179,9 @@ static void _call_f_setRange_2693 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleValidator *)cls)->setRange (arg1, arg2, arg3);
 }
@@ -201,7 +201,7 @@ static void _call_f_setTop_1071 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDoubleValidator *)cls)->setTop (arg1);
 }
@@ -238,8 +238,8 @@ static void _call_f_validate_c2171 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString &arg1 = args.read<QString & > (heap);
-  int &arg2 = args.read<int & > (heap);
+  QString &arg1 = gsi::arg_reader<QString & >() (args, heap);
+  int &arg2 = gsi::arg_reader<int & >() (args, heap);
   ret.write<qt_gsi::Converter<QValidator::State>::target_type > ((qt_gsi::Converter<QValidator::State>::target_type)qt_gsi::CppToQtAdaptor<QValidator::State>(((QDoubleValidator *)cls)->validate (arg1, arg2)));
 }
 
@@ -262,9 +262,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QDoubleValidator::tr (arg1, arg2, arg3));
 }
 
@@ -287,9 +287,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QDoubleValidator::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -579,7 +579,7 @@ static void _call_ctor_QDoubleValidator_Adaptor_1302 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QDoubleValidator_Adaptor *> (new QDoubleValidator_Adaptor (arg1));
 }
 
@@ -603,10 +603,10 @@ static void _call_ctor_QDoubleValidator_Adaptor_3887 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  int arg3 = args.read<int > (heap);
-  QObject *arg4 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  QObject *arg4 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QDoubleValidator_Adaptor *> (new QDoubleValidator_Adaptor (arg1, arg2, arg3, arg4));
 }
 
@@ -624,7 +624,7 @@ static void _call_emitter_bottomChanged_1071 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QDoubleValidator_Adaptor *)cls)->emitter_QDoubleValidator_bottomChanged_1071 (arg1);
 }
 
@@ -704,7 +704,7 @@ static void _call_emitter_decimalsChanged_767 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QDoubleValidator_Adaptor *)cls)->emitter_QDoubleValidator_decimalsChanged_767 (arg1);
 }
 
@@ -722,7 +722,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QDoubleValidator_Adaptor *)cls)->emitter_QDoubleValidator_destroyed_1302 (arg1);
 }
 
@@ -837,7 +837,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QDoubleValidator_Adaptor *)cls)->fp_QDoubleValidator_isSignalConnected_c2394 (arg1));
 }
 
@@ -855,7 +855,7 @@ static void _call_emitter_notationChanged_3014 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDoubleValidator::Notation>::target_type & arg1 = args.read<const qt_gsi::Converter<QDoubleValidator::Notation>::target_type & > (heap);
+  const qt_gsi::Converter<QDoubleValidator::Notation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDoubleValidator::Notation>::target_type & >() (args, heap);
   ((QDoubleValidator_Adaptor *)cls)->emitter_QDoubleValidator_notationChanged_3014 (arg1);
 }
 
@@ -873,7 +873,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QDoubleValidator_Adaptor *)cls)->fp_QDoubleValidator_receivers_c1731 (arg1));
 }
 
@@ -973,7 +973,7 @@ static void _call_emitter_topChanged_1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QDoubleValidator_Adaptor *)cls)->emitter_QDoubleValidator_topChanged_1071 (arg1);
 }
 

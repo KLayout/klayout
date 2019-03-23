@@ -67,7 +67,7 @@ static void _call_ctor_QBuffer_1302 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QBuffer *> (new QBuffer (arg1));
 }
 
@@ -88,8 +88,8 @@ static void _call_ctor_QBuffer_2812 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray *arg1 = args.read<QByteArray * > (heap);
-  QObject *arg2 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QByteArray *arg1 = gsi::arg_reader<QByteArray * >() (args, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QBuffer *> (new QBuffer (arg1, arg2));
 }
 
@@ -199,7 +199,7 @@ static void _call_f_open_3242 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QIODevice::OpenModeFlag> arg1 = args.read<QFlags<QIODevice::OpenModeFlag> > (heap);
+  QFlags<QIODevice::OpenModeFlag> arg1 = gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap);
   ret.write<bool > ((bool)((QBuffer *)cls)->open (arg1));
 }
 
@@ -233,7 +233,7 @@ static void _call_f_seek_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<bool > ((bool)((QBuffer *)cls)->seek (arg1));
 }
 
@@ -252,7 +252,7 @@ static void _call_f_setBuffer_1618 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray *arg1 = args.read<QByteArray * > (heap);
+  QByteArray *arg1 = gsi::arg_reader<QByteArray * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBuffer *)cls)->setBuffer (arg1);
 }
@@ -272,7 +272,7 @@ static void _call_f_setData_2309 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBuffer *)cls)->setData (arg1);
 }
@@ -294,8 +294,8 @@ static void _call_f_setData_2390 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  int arg2 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBuffer *)cls)->setData (arg1, arg2);
 }
@@ -334,9 +334,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QBuffer::tr (arg1, arg2, arg3));
 }
 
@@ -359,9 +359,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QBuffer::trUtf8 (arg1, arg2, arg3));
 }
 

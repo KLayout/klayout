@@ -57,8 +57,8 @@ static void _call_ctor_QSslCertificate_3702 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
   ret.write<QSslCertificate *> (new QSslCertificate (arg1, qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg2).cref()));
 }
 
@@ -79,8 +79,8 @@ static void _call_ctor_QSslCertificate_4564 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
+  const QByteArray &arg1 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
   ret.write<QSslCertificate *> (new QSslCertificate (arg1, qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg2).cref()));
 }
 
@@ -99,7 +99,7 @@ static void _call_ctor_QSslCertificate_2823 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificate &arg1 = args.read<const QSslCertificate & > (heap);
+  const QSslCertificate &arg1 = gsi::arg_reader<const QSslCertificate & >() (args, heap);
   ret.write<QSslCertificate *> (new QSslCertificate (arg1));
 }
 
@@ -134,7 +134,7 @@ static void _call_f_digest_c3331 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & > (heap) : (const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type &)(qt_gsi::CppToQtReadAdaptor<QCryptographicHash::Algorithm>(heap, QCryptographicHash::Md5));
+  const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QCryptographicHash::Algorithm>(heap, QCryptographicHash::Md5), heap);
   ret.write<QByteArray > ((QByteArray)((QSslCertificate *)cls)->digest (qt_gsi::QtToCppAdaptor<QCryptographicHash::Algorithm>(arg1).cref()));
 }
 
@@ -258,7 +258,7 @@ static void _call_f_issuerInfo_c3178 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSslCertificate::SubjectInfo>::target_type & arg1 = args.read<const qt_gsi::Converter<QSslCertificate::SubjectInfo>::target_type & > (heap);
+  const qt_gsi::Converter<QSslCertificate::SubjectInfo>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSslCertificate::SubjectInfo>::target_type & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QSslCertificate *)cls)->issuerInfo (qt_gsi::QtToCppAdaptor<QSslCertificate::SubjectInfo>(arg1).cref()));
 }
 
@@ -277,7 +277,7 @@ static void _call_f_issuerInfo_c2309 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QSslCertificate *)cls)->issuerInfo (arg1));
 }
 
@@ -311,7 +311,7 @@ static void _call_f_operator_excl__eq__c2823 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificate &arg1 = args.read<const QSslCertificate & > (heap);
+  const QSslCertificate &arg1 = gsi::arg_reader<const QSslCertificate & >() (args, heap);
   ret.write<bool > ((bool)((QSslCertificate *)cls)->operator!= (arg1));
 }
 
@@ -330,7 +330,7 @@ static void _call_f_operator_eq__2823 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificate &arg1 = args.read<const QSslCertificate & > (heap);
+  const QSslCertificate &arg1 = gsi::arg_reader<const QSslCertificate & >() (args, heap);
   ret.write<QSslCertificate & > ((QSslCertificate &)((QSslCertificate *)cls)->operator= (arg1));
 }
 
@@ -349,7 +349,7 @@ static void _call_f_operator_eq__eq__c2823 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificate &arg1 = args.read<const QSslCertificate & > (heap);
+  const QSslCertificate &arg1 = gsi::arg_reader<const QSslCertificate & >() (args, heap);
   ret.write<bool > ((bool)((QSslCertificate *)cls)->operator== (arg1));
 }
 
@@ -398,7 +398,7 @@ static void _call_f_subjectInfo_c3178 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSslCertificate::SubjectInfo>::target_type & arg1 = args.read<const qt_gsi::Converter<QSslCertificate::SubjectInfo>::target_type & > (heap);
+  const qt_gsi::Converter<QSslCertificate::SubjectInfo>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSslCertificate::SubjectInfo>::target_type & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QSslCertificate *)cls)->subjectInfo (qt_gsi::QtToCppAdaptor<QSslCertificate::SubjectInfo>(arg1).cref()));
 }
 
@@ -417,7 +417,7 @@ static void _call_f_subjectInfo_c2309 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QSslCertificate *)cls)->subjectInfo (arg1));
 }
 
@@ -451,7 +451,7 @@ static void _call_f_swap_2128 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSslCertificate &arg1 = args.read<QSslCertificate & > (heap);
+  QSslCertificate &arg1 = gsi::arg_reader<QSslCertificate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslCertificate *)cls)->swap (arg1);
 }
@@ -533,8 +533,8 @@ static void _call_f_fromData_4564 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
   ret.write<QList<QSslCertificate> > ((QList<QSslCertificate>)QSslCertificate::fromData (arg1, qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg2).cref()));
 }
 
@@ -555,8 +555,8 @@ static void _call_f_fromDevice_3702 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
   ret.write<QList<QSslCertificate> > ((QList<QSslCertificate>)QSslCertificate::fromDevice (arg1, qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg2).cref()));
 }
 
@@ -579,9 +579,9 @@ static void _call_f_fromPath_6773 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
-  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & > (heap) : (const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type &)(qt_gsi::CppToQtReadAdaptor<QRegExp::PatternSyntax>(heap, QRegExp::FixedString));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
+  const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegExp::PatternSyntax>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegExp::PatternSyntax>(heap, QRegExp::FixedString), heap);
   ret.write<QList<QSslCertificate> > ((QList<QSslCertificate>)QSslCertificate::fromPath (arg1, qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg2).cref(), qt_gsi::QtToCppAdaptor<QRegExp::PatternSyntax>(arg3).cref()));
 }
 
@@ -608,11 +608,11 @@ static void _call_f_importPkcs12_9509 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  QSslKey *arg2 = args.read<QSslKey * > (heap);
-  QSslCertificate *arg3 = args.read<QSslCertificate * > (heap);
-  QList<QSslCertificate> *arg4 = args ? args.read<QList<QSslCertificate> * > (heap) : (QList<QSslCertificate> *)(0);
-  const QByteArray &arg5 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  QSslKey *arg2 = gsi::arg_reader<QSslKey * >() (args, heap);
+  QSslCertificate *arg3 = gsi::arg_reader<QSslCertificate * >() (args, heap);
+  QList<QSslCertificate> *arg4 = args ? gsi::arg_reader<QList<QSslCertificate> * >() (args, heap) : gsi::arg_maker<QList<QSslCertificate> * >() (0, heap);
+  const QByteArray &arg5 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<bool > ((bool)QSslCertificate::importPkcs12 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -633,8 +633,8 @@ static void _call_f_verify_4478 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QList<QSslCertificate> arg1 = args.read<QList<QSslCertificate> > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  QList<QSslCertificate> arg1 = gsi::arg_reader<QList<QSslCertificate> >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QList<QSslError> > ((QList<QSslError>)QSslCertificate::verify (arg1, arg2));
 }
 

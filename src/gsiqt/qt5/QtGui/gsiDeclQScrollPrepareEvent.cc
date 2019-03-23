@@ -84,7 +84,7 @@ static void _call_f_setContentPos_1986 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollPrepareEvent *)cls)->setContentPos (arg1);
 }
@@ -104,7 +104,7 @@ static void _call_f_setContentPosRange_1862 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollPrepareEvent *)cls)->setContentPosRange (arg1);
 }
@@ -124,7 +124,7 @@ static void _call_f_setViewportSize_1875 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScrollPrepareEvent *)cls)->setViewportSize (arg1);
 }
@@ -216,7 +216,7 @@ static void _call_ctor_QScrollPrepareEvent_Adaptor_1986 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QScrollPrepareEvent_Adaptor *> (new QScrollPrepareEvent_Adaptor (arg1));
 }
 

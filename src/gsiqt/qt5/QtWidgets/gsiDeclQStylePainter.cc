@@ -97,7 +97,7 @@ static void _call_ctor_QStylePainter_1315 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QStylePainter *> (new QStylePainter (arg1));
 }
 
@@ -118,8 +118,8 @@ static void _call_ctor_QStylePainter_3010 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPaintDevice *arg1 = args.read<QPaintDevice * > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  QPaintDevice *arg1 = gsi::arg_reader<QPaintDevice * >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QStylePainter *> (new QStylePainter (arg1, arg2));
 }
 
@@ -138,7 +138,7 @@ static void _call_f_begin_1315 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<bool > ((bool)((QStylePainter *)cls)->begin (arg1));
 }
 
@@ -159,8 +159,8 @@ static void _call_f_begin_3010 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPaintDevice *arg1 = args.read<QPaintDevice * > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  QPaintDevice *arg1 = gsi::arg_reader<QPaintDevice * >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<bool > ((bool)((QStylePainter *)cls)->begin (arg1, arg2));
 }
 
@@ -181,8 +181,8 @@ static void _call_f_drawComplexControl_5803 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::ComplexControl>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::ComplexControl>::target_type & > (heap);
-  const QStyleOptionComplex &arg2 = args.read<const QStyleOptionComplex & > (heap);
+  const qt_gsi::Converter<QStyle::ComplexControl>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::ComplexControl>::target_type & >() (args, heap);
+  const QStyleOptionComplex &arg2 = gsi::arg_reader<const QStyleOptionComplex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStylePainter *)cls)->drawComplexControl (qt_gsi::QtToCppAdaptor<QStyle::ComplexControl>(arg1).cref(), arg2);
 }
@@ -204,8 +204,8 @@ static void _call_f_drawControl_5061 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::ControlElement>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::ControlElement>::target_type & > (heap);
-  const QStyleOption &arg2 = args.read<const QStyleOption & > (heap);
+  const qt_gsi::Converter<QStyle::ControlElement>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::ControlElement>::target_type & >() (args, heap);
+  const QStyleOption &arg2 = gsi::arg_reader<const QStyleOption & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStylePainter *)cls)->drawControl (qt_gsi::QtToCppAdaptor<QStyle::ControlElement>(arg1).cref(), arg2);
 }
@@ -229,9 +229,9 @@ static void _call_f_drawItemPixmap_4360 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
-  int arg2 = args.read<int > (heap);
-  const QPixmap &arg3 = args.read<const QPixmap & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QPixmap &arg3 = gsi::arg_reader<const QPixmap & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStylePainter *)cls)->drawItemPixmap (arg1, arg2, arg3);
 }
@@ -261,12 +261,12 @@ static void _call_f_drawItemText_9286 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
-  int arg2 = args.read<int > (heap);
-  const QPalette &arg3 = args.read<const QPalette & > (heap);
-  bool arg4 = args.read<bool > (heap);
-  const QString &arg5 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg6 = args ? args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap) : (const qt_gsi::Converter<QPalette::ColorRole>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPalette::ColorRole>(heap, QPalette::NoRole));
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QPalette &arg3 = gsi::arg_reader<const QPalette & >() (args, heap);
+  bool arg4 = gsi::arg_reader<bool >() (args, heap);
+  const QString &arg5 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg6 = args ? gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPalette::ColorRole>(heap, QPalette::NoRole), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStylePainter *)cls)->drawItemText (arg1, arg2, arg3, arg4, arg5, qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg6).cref());
 }
@@ -288,8 +288,8 @@ static void _call_f_drawPrimitive_5277 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::PrimitiveElement>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::PrimitiveElement>::target_type & > (heap);
-  const QStyleOption &arg2 = args.read<const QStyleOption & > (heap);
+  const qt_gsi::Converter<QStyle::PrimitiveElement>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::PrimitiveElement>::target_type & >() (args, heap);
+  const QStyleOption &arg2 = gsi::arg_reader<const QStyleOption & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStylePainter *)cls)->drawPrimitive (qt_gsi::QtToCppAdaptor<QStyle::PrimitiveElement>(arg1).cref(), arg2);
 }

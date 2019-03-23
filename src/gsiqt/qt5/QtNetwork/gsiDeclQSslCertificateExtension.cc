@@ -65,7 +65,7 @@ static void _call_ctor_QSslCertificateExtension_3780 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificateExtension &arg1 = args.read<const QSslCertificateExtension & > (heap);
+  const QSslCertificateExtension &arg1 = gsi::arg_reader<const QSslCertificateExtension & >() (args, heap);
   ret.write<QSslCertificateExtension *> (new QSslCertificateExtension (arg1));
 }
 
@@ -144,7 +144,7 @@ static void _call_f_operator_eq__3780 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCertificateExtension &arg1 = args.read<const QSslCertificateExtension & > (heap);
+  const QSslCertificateExtension &arg1 = gsi::arg_reader<const QSslCertificateExtension & >() (args, heap);
   ret.write<QSslCertificateExtension & > ((QSslCertificateExtension &)((QSslCertificateExtension *)cls)->operator= (arg1));
 }
 
@@ -163,7 +163,7 @@ static void _call_f_swap_3085 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSslCertificateExtension &arg1 = args.read<QSslCertificateExtension & > (heap);
+  QSslCertificateExtension &arg1 = gsi::arg_reader<QSslCertificateExtension & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslCertificateExtension *)cls)->swap (arg1);
 }

@@ -126,7 +126,7 @@ static void _call_ctor_QPaintEvent_Adaptor_2006 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QPaintEvent_Adaptor *> (new QPaintEvent_Adaptor (arg1));
 }
 
@@ -144,7 +144,7 @@ static void _call_ctor_QPaintEvent_Adaptor_1792 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QPaintEvent_Adaptor *> (new QPaintEvent_Adaptor (arg1));
 }
 

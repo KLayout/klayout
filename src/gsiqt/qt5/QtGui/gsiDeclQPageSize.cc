@@ -69,7 +69,7 @@ static void _call_ctor_QPageSize_2390 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & >() (args, heap);
   ret.write<QPageSize *> (new QPageSize (qt_gsi::QtToCppAdaptor<QPageSize::PageSizeId>(arg1).cref()));
 }
 
@@ -92,9 +92,9 @@ static void _call_ctor_QPageSize_6567 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & > (heap) : (const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPageSize::SizeMatchPolicy>(heap, QPageSize::FuzzyMatch));
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPageSize::SizeMatchPolicy>(heap, QPageSize::FuzzyMatch), heap);
   ret.write<QPageSize *> (new QPageSize (arg1, arg2, qt_gsi::QtToCppAdaptor<QPageSize::SizeMatchPolicy>(arg3).cref()));
 }
 
@@ -119,10 +119,10 @@ static void _call_ctor_QPageSize_8370 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
-  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg2 = args.read<const qt_gsi::Converter<QPageSize::Unit>::target_type & > (heap);
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & > (heap) : (const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPageSize::SizeMatchPolicy>(heap, QPageSize::FuzzyMatch));
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
+  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::Unit>::target_type & >() (args, heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPageSize::SizeMatchPolicy>(heap, QPageSize::FuzzyMatch), heap);
   ret.write<QPageSize *> (new QPageSize (arg1, qt_gsi::QtToCppAdaptor<QPageSize::Unit>(arg2).cref(), arg3, qt_gsi::QtToCppAdaptor<QPageSize::SizeMatchPolicy>(arg4).cref()));
 }
 
@@ -141,7 +141,7 @@ static void _call_ctor_QPageSize_2186 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageSize &arg1 = args.read<const QPageSize & > (heap);
+  const QPageSize &arg1 = gsi::arg_reader<const QPageSize & >() (args, heap);
   ret.write<QPageSize *> (new QPageSize (arg1));
 }
 
@@ -205,7 +205,7 @@ static void _call_f_isEquivalentTo_c2186 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageSize &arg1 = args.read<const QPageSize & > (heap);
+  const QPageSize &arg1 = gsi::arg_reader<const QPageSize & >() (args, heap);
   ret.write<bool > ((bool)((QPageSize *)cls)->isEquivalentTo (arg1));
 }
 
@@ -269,7 +269,7 @@ static void _call_f_operator_eq__2186 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageSize &arg1 = args.read<const QPageSize & > (heap);
+  const QPageSize &arg1 = gsi::arg_reader<const QPageSize & >() (args, heap);
   ret.write<QPageSize & > ((QPageSize &)((QPageSize *)cls)->operator= (arg1));
 }
 
@@ -288,7 +288,7 @@ static void _call_f_rect_c1841 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::Unit>::target_type & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPageSize *)cls)->rect (qt_gsi::QtToCppAdaptor<QPageSize::Unit>(arg1).cref()));
 }
 
@@ -307,7 +307,7 @@ static void _call_f_rectPixels_c767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QRect > ((QRect)((QPageSize *)cls)->rectPixels (arg1));
 }
 
@@ -341,7 +341,7 @@ static void _call_f_size_c1841 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::Unit>::target_type & >() (args, heap);
   ret.write<QSizeF > ((QSizeF)((QPageSize *)cls)->size (qt_gsi::QtToCppAdaptor<QPageSize::Unit>(arg1).cref()));
 }
 
@@ -360,7 +360,7 @@ static void _call_f_sizePixels_c767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QSize > ((QSize)((QPageSize *)cls)->sizePixels (arg1));
 }
 
@@ -394,7 +394,7 @@ static void _call_f_swap_1491 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPageSize &arg1 = args.read<QPageSize & > (heap);
+  QPageSize &arg1 = gsi::arg_reader<QPageSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageSize *)cls)->swap (arg1);
 }
@@ -429,7 +429,7 @@ static void _call_f_definitionSize_2390 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & >() (args, heap);
   ret.write<QSizeF > ((QSizeF)QPageSize::definitionSize (qt_gsi::QtToCppAdaptor<QPageSize::PageSizeId>(arg1).cref()));
 }
 
@@ -448,7 +448,7 @@ static void _call_f_definitionUnits_2390 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & >() (args, heap);
   ret.write<qt_gsi::Converter<QPageSize::Unit>::target_type > ((qt_gsi::Converter<QPageSize::Unit>::target_type)qt_gsi::CppToQtAdaptor<QPageSize::Unit>(QPageSize::definitionUnits (qt_gsi::QtToCppAdaptor<QPageSize::PageSizeId>(arg1).cref())));
 }
 
@@ -469,8 +469,8 @@ static void _call_f_id_4650 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
-  const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & > (heap) : (const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPageSize::SizeMatchPolicy>(heap, QPageSize::FuzzyMatch));
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
+  const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPageSize::SizeMatchPolicy>(heap, QPageSize::FuzzyMatch), heap);
   ret.write<qt_gsi::Converter<QPageSize::PageSizeId>::target_type > ((qt_gsi::Converter<QPageSize::PageSizeId>::target_type)qt_gsi::CppToQtAdaptor<QPageSize::PageSizeId>(QPageSize::id (arg1, qt_gsi::QtToCppAdaptor<QPageSize::SizeMatchPolicy>(arg2).cref())));
 }
 
@@ -493,9 +493,9 @@ static void _call_f_id_6453 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
-  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg2 = args.read<const qt_gsi::Converter<QPageSize::Unit>::target_type & > (heap);
-  const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & > (heap) : (const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPageSize::SizeMatchPolicy>(heap, QPageSize::FuzzyMatch));
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
+  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::Unit>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPageSize::SizeMatchPolicy>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPageSize::SizeMatchPolicy>(heap, QPageSize::FuzzyMatch), heap);
   ret.write<qt_gsi::Converter<QPageSize::PageSizeId>::target_type > ((qt_gsi::Converter<QPageSize::PageSizeId>::target_type)qt_gsi::CppToQtAdaptor<QPageSize::PageSizeId>(QPageSize::id (arg1, qt_gsi::QtToCppAdaptor<QPageSize::Unit>(arg2).cref(), qt_gsi::QtToCppAdaptor<QPageSize::SizeMatchPolicy>(arg3).cref())));
 }
 
@@ -514,7 +514,7 @@ static void _call_f_id_767 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::S
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<qt_gsi::Converter<QPageSize::PageSizeId>::target_type > ((qt_gsi::Converter<QPageSize::PageSizeId>::target_type)qt_gsi::CppToQtAdaptor<QPageSize::PageSizeId>(QPageSize::id (arg1)));
 }
 
@@ -533,7 +533,7 @@ static void _call_f_key_2390 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi:
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QPageSize::key (qt_gsi::QtToCppAdaptor<QPageSize::PageSizeId>(arg1).cref()));
 }
 
@@ -552,7 +552,7 @@ static void _call_f_name_2390 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QPageSize::name (qt_gsi::QtToCppAdaptor<QPageSize::PageSizeId>(arg1).cref()));
 }
 
@@ -573,8 +573,8 @@ static void _call_f_size_4123 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & > (heap);
-  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg2 = args.read<const qt_gsi::Converter<QPageSize::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QPageSize::Unit>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::Unit>::target_type & >() (args, heap);
   ret.write<QSizeF > ((QSizeF)QPageSize::size (qt_gsi::QtToCppAdaptor<QPageSize::PageSizeId>(arg1).cref(), qt_gsi::QtToCppAdaptor<QPageSize::Unit>(arg2).cref()));
 }
 
@@ -595,8 +595,8 @@ static void _call_f_sizePixels_3049 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
+  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QSize > ((QSize)QPageSize::sizePixels (qt_gsi::QtToCppAdaptor<QPageSize::PageSizeId>(arg1).cref(), arg2));
 }
 
@@ -615,7 +615,7 @@ static void _call_f_sizePoints_2390 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & >() (args, heap);
   ret.write<QSize > ((QSize)QPageSize::sizePoints (qt_gsi::QtToCppAdaptor<QPageSize::PageSizeId>(arg1).cref()));
 }
 
@@ -634,7 +634,7 @@ static void _call_f_windowsId_2390 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & > (heap);
+  const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageSize::PageSizeId>::target_type & >() (args, heap);
   ret.write<int > ((int)QPageSize::windowsId (qt_gsi::QtToCppAdaptor<QPageSize::PageSizeId>(arg1).cref()));
 }
 

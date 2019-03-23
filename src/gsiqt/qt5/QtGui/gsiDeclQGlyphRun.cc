@@ -68,7 +68,7 @@ static void _call_ctor_QGlyphRun_2219 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGlyphRun &arg1 = args.read<const QGlyphRun & > (heap);
+  const QGlyphRun &arg1 = gsi::arg_reader<const QGlyphRun & >() (args, heap);
   ret.write<QGlyphRun *> (new QGlyphRun (arg1));
 }
 
@@ -178,7 +178,7 @@ static void _call_f_operator_excl__eq__c2219 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGlyphRun &arg1 = args.read<const QGlyphRun & > (heap);
+  const QGlyphRun &arg1 = gsi::arg_reader<const QGlyphRun & >() (args, heap);
   ret.write<bool > ((bool)((QGlyphRun *)cls)->operator!= (arg1));
 }
 
@@ -197,7 +197,7 @@ static void _call_f_operator_eq__2219 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGlyphRun &arg1 = args.read<const QGlyphRun & > (heap);
+  const QGlyphRun &arg1 = gsi::arg_reader<const QGlyphRun & >() (args, heap);
   ret.write<QGlyphRun & > ((QGlyphRun &)((QGlyphRun *)cls)->operator= (arg1));
 }
 
@@ -216,7 +216,7 @@ static void _call_f_operator_eq__eq__c2219 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGlyphRun &arg1 = args.read<const QGlyphRun & > (heap);
+  const QGlyphRun &arg1 = gsi::arg_reader<const QGlyphRun & >() (args, heap);
   ret.write<bool > ((bool)((QGlyphRun *)cls)->operator== (arg1));
 }
 
@@ -280,7 +280,7 @@ static void _call_f_setBoundingRect_1862 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setBoundingRect (arg1);
 }
@@ -302,8 +302,8 @@ static void _call_f_setFlag_3417 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGlyphRun::GlyphRunFlag>::target_type & arg1 = args.read<const qt_gsi::Converter<QGlyphRun::GlyphRunFlag>::target_type & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<QGlyphRun::GlyphRunFlag>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGlyphRun::GlyphRunFlag>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setFlag (qt_gsi::QtToCppAdaptor<QGlyphRun::GlyphRunFlag>(arg1).cref(), arg2);
 }
@@ -323,7 +323,7 @@ static void _call_f_setFlags_3357 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QGlyphRun::GlyphRunFlag> arg1 = args.read<QFlags<QGlyphRun::GlyphRunFlag> > (heap);
+  QFlags<QGlyphRun::GlyphRunFlag> arg1 = gsi::arg_reader<QFlags<QGlyphRun::GlyphRunFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setFlags (arg1);
 }
@@ -343,7 +343,7 @@ static void _call_f_setGlyphIndexes_2805 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<quint32> &arg1 = args.read<const QVector<quint32> & > (heap);
+  const QVector<quint32> &arg1 = gsi::arg_reader<const QVector<quint32> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setGlyphIndexes (arg1);
 }
@@ -363,7 +363,7 @@ static void _call_f_setOverline_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setOverline (arg1);
 }
@@ -383,7 +383,7 @@ static void _call_f_setPositions_2816 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<QPointF> &arg1 = args.read<const QVector<QPointF> & > (heap);
+  const QVector<QPointF> &arg1 = gsi::arg_reader<const QVector<QPointF> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setPositions (arg1);
 }
@@ -407,9 +407,9 @@ static void _call_f_setRawData_4520 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const quint32 *arg1 = args.read<const quint32 * > (heap);
-  const QPointF *arg2 = args.read<const QPointF * > (heap);
-  int arg3 = args.read<int > (heap);
+  const quint32 *arg1 = gsi::arg_reader<const quint32 * >() (args, heap);
+  const QPointF *arg2 = gsi::arg_reader<const QPointF * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setRawData (arg1, arg2, arg3);
 }
@@ -429,7 +429,7 @@ static void _call_f_setRawFont_2099 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRawFont &arg1 = args.read<const QRawFont & > (heap);
+  const QRawFont &arg1 = gsi::arg_reader<const QRawFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setRawFont (arg1);
 }
@@ -449,7 +449,7 @@ static void _call_f_setRightToLeft_864 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setRightToLeft (arg1);
 }
@@ -469,7 +469,7 @@ static void _call_f_setStrikeOut_864 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setStrikeOut (arg1);
 }
@@ -489,7 +489,7 @@ static void _call_f_setUnderline_864 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->setUnderline (arg1);
 }
@@ -524,7 +524,7 @@ static void _call_f_swap_1524 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGlyphRun &arg1 = args.read<QGlyphRun & > (heap);
+  QGlyphRun &arg1 = gsi::arg_reader<QGlyphRun & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGlyphRun *)cls)->swap (arg1);
 }

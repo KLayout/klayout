@@ -111,7 +111,7 @@ static void _call_f_key_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<const char * > ((const char *)((QMetaEnum *)cls)->key (arg1));
 }
 
@@ -147,8 +147,8 @@ static void _call_f_keyToValue_c2673 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<int > ((int)((QMetaEnum *)cls)->keyToValue (arg1, arg2));
 }
 
@@ -169,8 +169,8 @@ static void _call_f_keysToValue_c2673 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  bool *arg2 = args ? args.read<bool * > (heap) : (bool *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
   ret.write<int > ((int)((QMetaEnum *)cls)->keysToValue (arg1, arg2));
 }
 
@@ -219,7 +219,7 @@ static void _call_f_value_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QMetaEnum *)cls)->value (arg1));
 }
 
@@ -238,7 +238,7 @@ static void _call_f_valueToKey_c767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<const char * > ((const char *)((QMetaEnum *)cls)->valueToKey (arg1));
 }
 
@@ -257,7 +257,7 @@ static void _call_f_valueToKeys_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QMetaEnum *)cls)->valueToKeys (arg1));
 }
 

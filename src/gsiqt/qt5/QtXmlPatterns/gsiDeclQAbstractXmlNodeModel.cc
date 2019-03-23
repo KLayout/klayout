@@ -55,7 +55,7 @@ static void _call_f_baseUri_c3090 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QUrl > ((QUrl)((QAbstractXmlNodeModel *)cls)->baseUri (arg1));
 }
 
@@ -76,8 +76,8 @@ static void _call_f_compareOrder_c6072 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
-  const QXmlNodeModelIndex &arg2 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
+  const QXmlNodeModelIndex &arg2 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<qt_gsi::Converter<QXmlNodeModelIndex::DocumentOrder>::target_type > ((qt_gsi::Converter<QXmlNodeModelIndex::DocumentOrder>::target_type)qt_gsi::CppToQtAdaptor<QXmlNodeModelIndex::DocumentOrder>(((QAbstractXmlNodeModel *)cls)->compareOrder (arg1, arg2)));
 }
 
@@ -100,9 +100,9 @@ static void _call_f_copyNodeTo_c11827 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
-  QAbstractXmlReceiver *const arg2 = args.read<QAbstractXmlReceiver *const > (heap);
-  const QFlags<QAbstractXmlNodeModel::NodeCopySetting> &arg3 = args.read<const QFlags<QAbstractXmlNodeModel::NodeCopySetting> & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
+  QAbstractXmlReceiver *const arg2 = gsi::arg_reader<QAbstractXmlReceiver *const >() (args, heap);
+  const QFlags<QAbstractXmlNodeModel::NodeCopySetting> &arg3 = gsi::arg_reader<const QFlags<QAbstractXmlNodeModel::NodeCopySetting> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlNodeModel *)cls)->copyNodeTo (arg1, arg2, arg3);
 }
@@ -122,7 +122,7 @@ static void _call_f_documentUri_c3090 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QUrl > ((QUrl)((QAbstractXmlNodeModel *)cls)->documentUri (arg1));
 }
 
@@ -141,7 +141,7 @@ static void _call_f_elementById_c2084 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   ret.write<QXmlNodeModelIndex > ((QXmlNodeModelIndex)((QAbstractXmlNodeModel *)cls)->elementById (arg1));
 }
 
@@ -162,8 +162,8 @@ static void _call_f_isDeepEqual_c6072 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
-  const QXmlNodeModelIndex &arg2 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
+  const QXmlNodeModelIndex &arg2 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractXmlNodeModel *)cls)->isDeepEqual (arg1, arg2));
 }
 
@@ -182,7 +182,7 @@ static void _call_f_kind_c3090 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<qt_gsi::Converter<QXmlNodeModelIndex::NodeKind>::target_type > ((qt_gsi::Converter<QXmlNodeModelIndex::NodeKind>::target_type)qt_gsi::CppToQtAdaptor<QXmlNodeModelIndex::NodeKind>(((QAbstractXmlNodeModel *)cls)->kind (arg1)));
 }
 
@@ -201,7 +201,7 @@ static void _call_f_name_c3090 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QXmlName > ((QXmlName)((QAbstractXmlNodeModel *)cls)->name (arg1));
 }
 
@@ -220,7 +220,7 @@ static void _call_f_namespaceBindings_c3090 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QVector<QXmlName> > ((QVector<QXmlName>)((QAbstractXmlNodeModel *)cls)->namespaceBindings (arg1));
 }
 
@@ -241,8 +241,8 @@ static void _call_f_namespaceForPrefix_c4660 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
-  const qint16 arg2 = args.read<const qint16 > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
+  const qint16 arg2 = gsi::arg_reader<const qint16 >() (args, heap);
   ret.write<qint16 > ((qint16)((QAbstractXmlNodeModel *)cls)->namespaceForPrefix (arg1, arg2));
 }
 
@@ -261,7 +261,7 @@ static void _call_f_nodesByIdref_c2084 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   ret.write<QVector<QXmlNodeModelIndex> > ((QVector<QXmlNodeModelIndex>)((QAbstractXmlNodeModel *)cls)->nodesByIdref (arg1));
 }
 
@@ -280,7 +280,7 @@ static void _call_f_root_c3090 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QXmlNodeModelIndex > ((QXmlNodeModelIndex)((QAbstractXmlNodeModel *)cls)->root (arg1));
 }
 
@@ -301,8 +301,8 @@ static void _call_f_sendNamespaces_c6182 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
-  QAbstractXmlReceiver *const arg2 = args.read<QAbstractXmlReceiver *const > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
+  QAbstractXmlReceiver *const arg2 = gsi::arg_reader<QAbstractXmlReceiver *const >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlNodeModel *)cls)->sendNamespaces (arg1, arg2);
 }
@@ -322,7 +322,7 @@ static void _call_f_sourceLocation_c3090 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QSourceLocation > ((QSourceLocation)((QAbstractXmlNodeModel *)cls)->sourceLocation (arg1));
 }
 
@@ -341,7 +341,7 @@ static void _call_f_stringValue_c3090 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QString > ((QString)((QAbstractXmlNodeModel *)cls)->stringValue (arg1));
 }
 

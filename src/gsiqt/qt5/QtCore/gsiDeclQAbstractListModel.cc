@@ -82,11 +82,11 @@ static void _call_f_dropMimeData_7425 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeData *arg1 = args.read<const QMimeData * > (heap);
-  const qt_gsi::Converter<Qt::DropAction>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::DropAction>::target_type & > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  const QModelIndex &arg5 = args.read<const QModelIndex & > (heap);
+  const QMimeData *arg1 = gsi::arg_reader<const QMimeData * >() (args, heap);
+  const qt_gsi::Converter<Qt::DropAction>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::DropAction>::target_type & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg5 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractListModel *)cls)->dropMimeData (arg1, qt_gsi::QtToCppAdaptor<Qt::DropAction>(arg2).cref(), arg3, arg4, arg5));
 }
 
@@ -105,7 +105,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QFlags<Qt::ItemFlag> > ((QFlags<Qt::ItemFlag>)((QAbstractListModel *)cls)->flags (arg1));
 }
 
@@ -128,9 +128,9 @@ static void _call_f_index_c3713 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<QModelIndex > ((QModelIndex)((QAbstractListModel *)cls)->index (arg1, arg2, arg3));
 }
 
@@ -168,9 +168,9 @@ static void _call_f_sibling_c3713 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QAbstractListModel *)cls)->sibling (arg1, arg2, arg3));
 }
 
@@ -193,9 +193,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractListModel::tr (arg1, arg2, arg3));
 }
 
@@ -218,9 +218,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractListModel::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1047,7 +1047,7 @@ static void _call_ctor_QAbstractListModel_Adaptor_1302 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QAbstractListModel_Adaptor *> (new QAbstractListModel_Adaptor (arg1));
 }
 
@@ -1069,9 +1069,9 @@ static void _call_fp_beginInsertColumns_3713 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_beginInsertColumns_3713 (arg1, arg2, arg3);
 }
@@ -1094,9 +1094,9 @@ static void _call_fp_beginInsertRows_3713 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_beginInsertRows_3713 (arg1, arg2, arg3);
 }
@@ -1123,11 +1123,11 @@ static void _call_fp_beginMoveColumns_6659 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
-  int arg5 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_beginMoveColumns_6659 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -1153,11 +1153,11 @@ static void _call_fp_beginMoveRows_6659 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
-  int arg5 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_beginMoveRows_6659 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -1179,9 +1179,9 @@ static void _call_fp_beginRemoveColumns_3713 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_beginRemoveColumns_3713 (arg1, arg2, arg3);
 }
@@ -1204,9 +1204,9 @@ static void _call_fp_beginRemoveRows_3713 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_beginRemoveRows_3713 (arg1, arg2, arg3);
 }
@@ -1323,8 +1323,8 @@ static void _call_fp_changePersistentIndex_4682 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_changePersistentIndex_4682 (arg1, arg2);
 }
@@ -1345,8 +1345,8 @@ static void _call_fp_changePersistentIndexList_5912 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
-  const QList<QModelIndex> &arg2 = args.read<const QList<QModelIndex> & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
+  const QList<QModelIndex> &arg2 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_changePersistentIndexList_5912 (arg1, arg2);
 }
@@ -1393,9 +1393,9 @@ static void _call_fp_createIndex_c2374 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  void *arg3 = args ? args.read<void * > (heap) : (void *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (0, heap);
   ret.write<QModelIndex > ((QModelIndex)((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_createIndex_c2374 (arg1, arg2, arg3));
 }
 
@@ -1417,9 +1417,9 @@ static void _call_fp_createIndex_c2657 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  quintptr arg3 = args.read<quintptr > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  quintptr arg3 = gsi::arg_reader<quintptr >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_createIndex_c2657 (arg1, arg2, arg3));
 }
 
@@ -1491,9 +1491,9 @@ static void _call_emitter_dataChanged_7048 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
-  const QVector<int> &arg3 = args ? args.read<const QVector<int> & > (heap) : (const QVector<int> &)(QVector<int>());
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QVector<int> &arg3 = args ? gsi::arg_reader<const QVector<int> & >() (args, heap) : gsi::arg_maker<const QVector<int> & >() (QVector<int>(), heap);
   ((QAbstractListModel_Adaptor *)cls)->emitter_QAbstractListModel_dataChanged_7048 (arg1, arg2, arg3);
 }
 
@@ -1517,10 +1517,10 @@ static void _call_fp_decodeData_5302 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
-  QDataStream &arg4 = args.read<QDataStream & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  QDataStream &arg4 = gsi::arg_reader<QDataStream & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_decodeData_5302 (arg1, arg2, arg3, arg4));
 }
 
@@ -1538,7 +1538,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QAbstractListModel_Adaptor *)cls)->emitter_QAbstractListModel_destroyed_1302 (arg1);
 }
 
@@ -1617,8 +1617,8 @@ static void _call_fp_encodeData_c4599 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
-  QDataStream &arg2 = args.read<QDataStream & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
+  QDataStream &arg2 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_encodeData_c4599 (arg1, arg2);
 }
@@ -1871,9 +1871,9 @@ static void _call_emitter_headerDataChanged_3231 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ((QAbstractListModel_Adaptor *)cls)->emitter_QAbstractListModel_headerDataChanged_3231 (arg1, arg2, arg3);
 }
 
@@ -1978,7 +1978,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_isSignalConnected_c2394 (arg1));
 }
 
@@ -2021,8 +2021,8 @@ static void _call_emitter_layoutAboutToBeChanged_7947 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QPersistentModelIndex> &arg1 = args ? args.read<const QList<QPersistentModelIndex> & > (heap) : (const QList<QPersistentModelIndex> &)(QList<QPersistentModelIndex>());
-  const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractItemModel::LayoutChangeHint>(heap, QAbstractItemModel::NoLayoutChangeHint));
+  const QList<QPersistentModelIndex> &arg1 = args ? gsi::arg_reader<const QList<QPersistentModelIndex> & >() (args, heap) : gsi::arg_maker<const QList<QPersistentModelIndex> & >() (QList<QPersistentModelIndex>(), heap);
+  const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractItemModel::LayoutChangeHint>(heap, QAbstractItemModel::NoLayoutChangeHint), heap);
   ((QAbstractListModel_Adaptor *)cls)->emitter_QAbstractListModel_layoutAboutToBeChanged_7947 (arg1, arg2);
 }
 
@@ -2042,8 +2042,8 @@ static void _call_emitter_layoutChanged_7947 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QPersistentModelIndex> &arg1 = args ? args.read<const QList<QPersistentModelIndex> & > (heap) : (const QList<QPersistentModelIndex> &)(QList<QPersistentModelIndex>());
-  const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractItemModel::LayoutChangeHint>(heap, QAbstractItemModel::NoLayoutChangeHint));
+  const QList<QPersistentModelIndex> &arg1 = args ? gsi::arg_reader<const QList<QPersistentModelIndex> & >() (args, heap) : gsi::arg_maker<const QList<QPersistentModelIndex> & >() (QList<QPersistentModelIndex>(), heap);
+  const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractItemModel::LayoutChangeHint>(heap, QAbstractItemModel::NoLayoutChangeHint), heap);
   ((QAbstractListModel_Adaptor *)cls)->emitter_QAbstractListModel_layoutChanged_7947 (arg1, arg2);
 }
 
@@ -2222,7 +2222,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QAbstractListModel_Adaptor *)cls)->fp_QAbstractListModel_receivers_c1731 (arg1));
 }
 

@@ -65,7 +65,7 @@ static void _call_ctor_QDnsDomainNameRecord_3279 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDnsDomainNameRecord &arg1 = args.read<const QDnsDomainNameRecord & > (heap);
+  const QDnsDomainNameRecord &arg1 = gsi::arg_reader<const QDnsDomainNameRecord & >() (args, heap);
   ret.write<QDnsDomainNameRecord *> (new QDnsDomainNameRecord (arg1));
 }
 
@@ -99,7 +99,7 @@ static void _call_f_operator_eq__3279 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDnsDomainNameRecord &arg1 = args.read<const QDnsDomainNameRecord & > (heap);
+  const QDnsDomainNameRecord &arg1 = gsi::arg_reader<const QDnsDomainNameRecord & >() (args, heap);
   ret.write<QDnsDomainNameRecord & > ((QDnsDomainNameRecord &)((QDnsDomainNameRecord *)cls)->operator= (arg1));
 }
 
@@ -118,7 +118,7 @@ static void _call_f_swap_2584 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDnsDomainNameRecord &arg1 = args.read<QDnsDomainNameRecord & > (heap);
+  QDnsDomainNameRecord &arg1 = gsi::arg_reader<QDnsDomainNameRecord & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDnsDomainNameRecord *)cls)->swap (arg1);
 }

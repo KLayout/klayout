@@ -66,7 +66,7 @@ static void _call_ctor_QDomNamedNodeMap_2843 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNamedNodeMap &arg1 = args.read<const QDomNamedNodeMap & > (heap);
+  const QDomNamedNodeMap &arg1 = gsi::arg_reader<const QDomNamedNodeMap & >() (args, heap);
   ret.write<QDomNamedNodeMap *> (new QDomNamedNodeMap (arg1));
 }
 
@@ -85,7 +85,7 @@ static void _call_f_contains_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QDomNamedNodeMap *)cls)->contains (arg1));
 }
 
@@ -134,7 +134,7 @@ static void _call_f_item_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNamedNodeMap *)cls)->item (arg1));
 }
 
@@ -168,7 +168,7 @@ static void _call_f_namedItem_c2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNamedNodeMap *)cls)->namedItem (arg1));
 }
 
@@ -189,8 +189,8 @@ static void _call_f_namedItemNS_c3942 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNamedNodeMap *)cls)->namedItemNS (arg1, arg2));
 }
 
@@ -209,7 +209,7 @@ static void _call_f_operator_excl__eq__c2843 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNamedNodeMap &arg1 = args.read<const QDomNamedNodeMap & > (heap);
+  const QDomNamedNodeMap &arg1 = gsi::arg_reader<const QDomNamedNodeMap & >() (args, heap);
   ret.write<bool > ((bool)((QDomNamedNodeMap *)cls)->operator!= (arg1));
 }
 
@@ -228,7 +228,7 @@ static void _call_f_operator_eq__2843 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNamedNodeMap &arg1 = args.read<const QDomNamedNodeMap & > (heap);
+  const QDomNamedNodeMap &arg1 = gsi::arg_reader<const QDomNamedNodeMap & >() (args, heap);
   ret.write<QDomNamedNodeMap & > ((QDomNamedNodeMap &)((QDomNamedNodeMap *)cls)->operator= (arg1));
 }
 
@@ -247,7 +247,7 @@ static void _call_f_operator_eq__eq__c2843 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNamedNodeMap &arg1 = args.read<const QDomNamedNodeMap & > (heap);
+  const QDomNamedNodeMap &arg1 = gsi::arg_reader<const QDomNamedNodeMap & >() (args, heap);
   ret.write<bool > ((bool)((QDomNamedNodeMap *)cls)->operator== (arg1));
 }
 
@@ -266,7 +266,7 @@ static void _call_f_removeNamedItem_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNamedNodeMap *)cls)->removeNamedItem (arg1));
 }
 
@@ -287,8 +287,8 @@ static void _call_f_removeNamedItemNS_3942 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNamedNodeMap *)cls)->removeNamedItemNS (arg1, arg2));
 }
 
@@ -307,7 +307,7 @@ static void _call_f_setNamedItem_2072 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNamedNodeMap *)cls)->setNamedItem (arg1));
 }
 
@@ -326,7 +326,7 @@ static void _call_f_setNamedItemNS_2072 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNode &arg1 = args.read<const QDomNode & > (heap);
+  const QDomNode &arg1 = gsi::arg_reader<const QDomNode & >() (args, heap);
   ret.write<QDomNode > ((QDomNode)((QDomNamedNodeMap *)cls)->setNamedItemNS (arg1));
 }
 

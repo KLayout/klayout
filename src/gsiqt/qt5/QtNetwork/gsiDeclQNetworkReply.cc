@@ -89,7 +89,7 @@ static void _call_f_attribute_c3072 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & > (heap);
+  const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkRequest::Attribute>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QNetworkReply *)cls)->attribute (qt_gsi::QtToCppAdaptor<QNetworkRequest::Attribute>(arg1).cref()));
 }
 
@@ -139,7 +139,7 @@ static void _call_f_hasRawHeader_c2309 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkReply *)cls)->hasRawHeader (arg1));
 }
 
@@ -158,7 +158,7 @@ static void _call_f_header_c3349 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & > (heap);
+  const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkRequest::KnownHeaders>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QNetworkReply *)cls)->header (qt_gsi::QtToCppAdaptor<QNetworkRequest::KnownHeaders>(arg1).cref()));
 }
 
@@ -177,7 +177,7 @@ static void _call_f_ignoreSslErrors_2837 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QSslError> &arg1 = args.read<const QList<QSslError> & > (heap);
+  const QList<QSslError> &arg1 = gsi::arg_reader<const QList<QSslError> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkReply *)cls)->ignoreSslErrors (arg1);
 }
@@ -288,7 +288,7 @@ static void _call_f_rawHeader_c2309 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QNetworkReply *)cls)->rawHeader (arg1));
 }
 
@@ -367,7 +367,7 @@ static void _call_f_setReadBufferSize_986 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkReply *)cls)->setReadBufferSize (arg1);
 }
@@ -387,7 +387,7 @@ static void _call_f_setSslConfiguration_3068 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslConfiguration &arg1 = args.read<const QSslConfiguration & > (heap);
+  const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkReply *)cls)->setSslConfiguration (arg1);
 }
@@ -441,9 +441,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QNetworkReply::tr (arg1, arg2, arg3));
 }
 
@@ -466,9 +466,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QNetworkReply::trUtf8 (arg1, arg2, arg3));
 }
 

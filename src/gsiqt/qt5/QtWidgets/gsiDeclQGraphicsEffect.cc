@@ -88,7 +88,7 @@ static void _call_f_boundingRectFor_c1862 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QGraphicsEffect *)cls)->boundingRectFor (arg1));
 }
 
@@ -122,7 +122,7 @@ static void _call_f_setEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsEffect *)cls)->setEnabled (arg1);
 }
@@ -162,9 +162,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QGraphicsEffect::tr (arg1, arg2, arg3));
 }
 
@@ -187,9 +187,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QGraphicsEffect::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -460,7 +460,7 @@ static void _call_ctor_QGraphicsEffect_Adaptor_1302 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QGraphicsEffect_Adaptor *> (new QGraphicsEffect_Adaptor (arg1));
 }
 
@@ -549,7 +549,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QGraphicsEffect_Adaptor *)cls)->emitter_QGraphicsEffect_destroyed_1302 (arg1);
 }
 
@@ -615,7 +615,7 @@ static void _call_fp_drawSource_1426 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsEffect_Adaptor *)cls)->fp_QGraphicsEffect_drawSource_1426 (arg1);
 }
@@ -634,7 +634,7 @@ static void _call_emitter_enabledChanged_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QGraphicsEffect_Adaptor *)cls)->emitter_QGraphicsEffect_enabledChanged_864 (arg1);
 }
 
@@ -701,7 +701,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QGraphicsEffect_Adaptor *)cls)->fp_QGraphicsEffect_isSignalConnected_c2394 (arg1));
 }
 
@@ -719,7 +719,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QGraphicsEffect_Adaptor *)cls)->fp_QGraphicsEffect_receivers_c1731 (arg1));
 }
 
@@ -765,7 +765,7 @@ static void _call_fp_sourceBoundingRect_c2426 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & > (heap) : (const qt_gsi::Converter<Qt::CoordinateSystem>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::CoordinateSystem>(heap, Qt::LogicalCoordinates));
+  const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::CoordinateSystem>(heap, Qt::LogicalCoordinates), heap);
   ret.write<QRectF > ((QRectF)((QGraphicsEffect_Adaptor *)cls)->fp_QGraphicsEffect_sourceBoundingRect_c2426 (arg1));
 }
 
@@ -825,9 +825,9 @@ static void _call_fp_sourcePixmap_c6763 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & > (heap) : (const qt_gsi::Converter<Qt::CoordinateSystem>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::CoordinateSystem>(heap, Qt::LogicalCoordinates));
-  QPoint *arg2 = args ? args.read<QPoint * > (heap) : (QPoint *)(0);
-  const qt_gsi::Converter<QGraphicsEffect::PixmapPadMode>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QGraphicsEffect::PixmapPadMode>::target_type & > (heap) : (const qt_gsi::Converter<QGraphicsEffect::PixmapPadMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QGraphicsEffect::PixmapPadMode>(heap, QGraphicsEffect::PadToEffectiveBoundingRect));
+  const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::CoordinateSystem>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::CoordinateSystem>(heap, Qt::LogicalCoordinates), heap);
+  QPoint *arg2 = args ? gsi::arg_reader<QPoint * >() (args, heap) : gsi::arg_maker<QPoint * >() (0, heap);
+  const qt_gsi::Converter<QGraphicsEffect::PixmapPadMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QGraphicsEffect::PixmapPadMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QGraphicsEffect::PixmapPadMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QGraphicsEffect::PixmapPadMode>(heap, QGraphicsEffect::PadToEffectiveBoundingRect), heap);
   ret.write<QPixmap > ((QPixmap)((QGraphicsEffect_Adaptor *)cls)->fp_QGraphicsEffect_sourcePixmap_c6763 (arg1, arg2, arg3));
 }
 

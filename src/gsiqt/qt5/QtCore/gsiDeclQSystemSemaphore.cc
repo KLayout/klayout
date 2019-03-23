@@ -54,9 +54,9 @@ static void _call_ctor_QSystemSemaphore_5769 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & > (heap) : (const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSystemSemaphore::AccessMode>(heap, QSystemSemaphore::Open));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSystemSemaphore::AccessMode>(heap, QSystemSemaphore::Open), heap);
   ret.write<QSystemSemaphore *> (new QSystemSemaphore (arg1, arg2, qt_gsi::QtToCppAdaptor<QSystemSemaphore::AccessMode>(arg3).cref()));
 }
 
@@ -135,7 +135,7 @@ static void _call_f_release_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   ret.write<bool > ((bool)((QSystemSemaphore *)cls)->release (arg1));
 }
 
@@ -158,9 +158,9 @@ static void _call_f_setKey_5769 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & > (heap) : (const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSystemSemaphore::AccessMode>(heap, QSystemSemaphore::Open));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSystemSemaphore::AccessMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSystemSemaphore::AccessMode>(heap, QSystemSemaphore::Open), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSystemSemaphore *)cls)->setKey (arg1, arg2, qt_gsi::QtToCppAdaptor<QSystemSemaphore::AccessMode>(arg3).cref());
 }

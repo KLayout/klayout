@@ -172,7 +172,7 @@ static void _call_f_isCaptureModeSupported_c3027 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QCamera::CaptureMode> arg1 = args.read<QFlags<QCamera::CaptureMode> > (heap);
+  QFlags<QCamera::CaptureMode> arg1 = gsi::arg_reader<QFlags<QCamera::CaptureMode> >() (args, heap);
   ret.write<bool > ((bool)((QCamera *)cls)->isCaptureModeSupported (arg1));
 }
 
@@ -222,7 +222,7 @@ static void _call_f_lockStatus_c2029 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCamera::LockType>::target_type & arg1 = args.read<const qt_gsi::Converter<QCamera::LockType>::target_type & > (heap);
+  const qt_gsi::Converter<QCamera::LockType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::LockType>::target_type & >() (args, heap);
   ret.write<qt_gsi::Converter<QCamera::LockStatus>::target_type > ((qt_gsi::Converter<QCamera::LockStatus>::target_type)qt_gsi::CppToQtAdaptor<QCamera::LockStatus>(((QCamera *)cls)->lockStatus (qt_gsi::QtToCppAdaptor<QCamera::LockType>(arg1).cref())));
 }
 
@@ -272,7 +272,7 @@ static void _call_f_searchAndLock_2725 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QCamera::LockType> arg1 = args.read<QFlags<QCamera::LockType> > (heap);
+  QFlags<QCamera::LockType> arg1 = gsi::arg_reader<QFlags<QCamera::LockType> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCamera *)cls)->searchAndLock (arg1);
 }
@@ -292,7 +292,7 @@ static void _call_f_setCaptureMode_3027 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QCamera::CaptureMode> arg1 = args.read<QFlags<QCamera::CaptureMode> > (heap);
+  QFlags<QCamera::CaptureMode> arg1 = gsi::arg_reader<QFlags<QCamera::CaptureMode> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCamera *)cls)->setCaptureMode (arg1);
 }
@@ -312,7 +312,7 @@ static void _call_f_setViewfinder_1818 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QVideoWidget *arg1 = args.read<QVideoWidget * > (heap);
+  QVideoWidget *arg1 = gsi::arg_reader<QVideoWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCamera *)cls)->setViewfinder (arg1);
 }
@@ -332,7 +332,7 @@ static void _call_f_setViewfinder_2422 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsVideoItem *arg1 = args.read<QGraphicsVideoItem * > (heap);
+  QGraphicsVideoItem *arg1 = gsi::arg_reader<QGraphicsVideoItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCamera *)cls)->setViewfinder (arg1);
 }
@@ -352,7 +352,7 @@ static void _call_f_setViewfinder_2739 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractVideoSurface *arg1 = args.read<QAbstractVideoSurface * > (heap);
+  QAbstractVideoSurface *arg1 = gsi::arg_reader<QAbstractVideoSurface * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCamera *)cls)->setViewfinder (arg1);
 }
@@ -372,7 +372,7 @@ static void _call_f_setViewfinderSettings_3871 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraViewfinderSettings &arg1 = args.read<const QCameraViewfinderSettings & > (heap);
+  const QCameraViewfinderSettings &arg1 = gsi::arg_reader<const QCameraViewfinderSettings & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCamera *)cls)->setViewfinderSettings (arg1);
 }
@@ -469,7 +469,7 @@ static void _call_f_supportedViewfinderFrameRateRanges_c3871 (const qt_gsi::Gene
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraViewfinderSettings &arg1 = args ? args.read<const QCameraViewfinderSettings & > (heap) : (const QCameraViewfinderSettings &)(QCameraViewfinderSettings());
+  const QCameraViewfinderSettings &arg1 = args ? gsi::arg_reader<const QCameraViewfinderSettings & >() (args, heap) : gsi::arg_maker<const QCameraViewfinderSettings & >() (QCameraViewfinderSettings(), heap);
   ret.write<QList<QCamera::FrameRateRange> > ((QList<QCamera::FrameRateRange>)((QCamera *)cls)->supportedViewfinderFrameRateRanges (arg1));
 }
 
@@ -488,7 +488,7 @@ static void _call_f_supportedViewfinderPixelFormats_c3871 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraViewfinderSettings &arg1 = args ? args.read<const QCameraViewfinderSettings & > (heap) : (const QCameraViewfinderSettings &)(QCameraViewfinderSettings());
+  const QCameraViewfinderSettings &arg1 = args ? gsi::arg_reader<const QCameraViewfinderSettings & >() (args, heap) : gsi::arg_maker<const QCameraViewfinderSettings & >() (QCameraViewfinderSettings(), heap);
   ret.write<QList<QVideoFrame::PixelFormat> > ((QList<QVideoFrame::PixelFormat>)((QCamera *)cls)->supportedViewfinderPixelFormats (arg1));
 }
 
@@ -507,7 +507,7 @@ static void _call_f_supportedViewfinderResolutions_c3871 (const qt_gsi::GenericM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraViewfinderSettings &arg1 = args ? args.read<const QCameraViewfinderSettings & > (heap) : (const QCameraViewfinderSettings &)(QCameraViewfinderSettings());
+  const QCameraViewfinderSettings &arg1 = args ? gsi::arg_reader<const QCameraViewfinderSettings & >() (args, heap) : gsi::arg_maker<const QCameraViewfinderSettings & >() (QCameraViewfinderSettings(), heap);
   ret.write<QList<QSize> > ((QList<QSize>)((QCamera *)cls)->supportedViewfinderResolutions (arg1));
 }
 
@@ -526,7 +526,7 @@ static void _call_f_supportedViewfinderSettings_c3871 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraViewfinderSettings &arg1 = args ? args.read<const QCameraViewfinderSettings & > (heap) : (const QCameraViewfinderSettings &)(QCameraViewfinderSettings());
+  const QCameraViewfinderSettings &arg1 = args ? gsi::arg_reader<const QCameraViewfinderSettings & >() (args, heap) : gsi::arg_maker<const QCameraViewfinderSettings & >() (QCameraViewfinderSettings(), heap);
   ret.write<QList<QCameraViewfinderSettings> > ((QList<QCameraViewfinderSettings>)((QCamera *)cls)->supportedViewfinderSettings (arg1));
 }
 
@@ -577,7 +577,7 @@ static void _call_f_unlock_2725 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QCamera::LockType> arg1 = args.read<QFlags<QCamera::LockType> > (heap);
+  QFlags<QCamera::LockType> arg1 = gsi::arg_reader<QFlags<QCamera::LockType> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCamera *)cls)->unlock (arg1);
 }
@@ -627,7 +627,7 @@ static void _call_f_deviceDescription_2309 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)QCamera::deviceDescription (arg1));
 }
 
@@ -650,9 +650,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCamera::tr (arg1, arg2, arg3));
 }
 
@@ -675,9 +675,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCamera::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1120,7 +1120,7 @@ static void _call_ctor_QCamera_Adaptor_1302 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QCamera_Adaptor *> (new QCamera_Adaptor (arg1));
 }
 
@@ -1140,8 +1140,8 @@ static void _call_ctor_QCamera_Adaptor_3503 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  QObject *arg2 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QCamera_Adaptor *> (new QCamera_Adaptor (arg1, arg2));
 }
 
@@ -1161,8 +1161,8 @@ static void _call_ctor_QCamera_Adaptor_3569 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraInfo &arg1 = args.read<const QCameraInfo & > (heap);
-  QObject *arg2 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  const QCameraInfo &arg1 = gsi::arg_reader<const QCameraInfo & >() (args, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QCamera_Adaptor *> (new QCamera_Adaptor (arg1, arg2));
 }
 
@@ -1182,8 +1182,8 @@ static void _call_ctor_QCamera_Adaptor_3265 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCamera::Position>::target_type & arg1 = args.read<const qt_gsi::Converter<QCamera::Position>::target_type & > (heap);
-  QObject *arg2 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  const qt_gsi::Converter<QCamera::Position>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::Position>::target_type & >() (args, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QCamera_Adaptor *> (new QCamera_Adaptor (qt_gsi::QtToCppAdaptor<QCamera::Position>(arg1).cref(), arg2));
 }
 
@@ -1201,7 +1201,7 @@ static void _call_fp_addPropertyWatch_2309 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray const &arg1 = args.read<QByteArray const & > (heap);
+  QByteArray const &arg1 = gsi::arg_reader<QByteArray const & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCamera_Adaptor *)cls)->fp_QCamera_addPropertyWatch_2309 (arg1);
 }
@@ -1239,7 +1239,7 @@ static void _call_emitter_availabilityChanged_864 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_availabilityChanged_864 (arg1);
 }
 
@@ -1257,7 +1257,7 @@ static void _call_emitter_availabilityChanged_3555 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = args.read<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > (heap);
+  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_availabilityChanged_3555 (arg1);
 }
 
@@ -1298,7 +1298,7 @@ static void _call_emitter_captureModeChanged_3027 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QCamera::CaptureMode> arg1 = args.read<QFlags<QCamera::CaptureMode> > (heap);
+  QFlags<QCamera::CaptureMode> arg1 = gsi::arg_reader<QFlags<QCamera::CaptureMode> >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_captureModeChanged_3027 (arg1);
 }
 
@@ -1364,7 +1364,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_destroyed_1302 (arg1);
 }
 
@@ -1406,7 +1406,7 @@ static void _call_emitter_error_1740 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCamera::Error>::target_type & arg1 = args.read<const qt_gsi::Converter<QCamera::Error>::target_type & > (heap);
+  const qt_gsi::Converter<QCamera::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::Error>::target_type & >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_error_1740 (arg1);
 }
 
@@ -1492,7 +1492,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QCamera_Adaptor *)cls)->fp_QCamera_isSignalConnected_c2394 (arg1));
 }
 
@@ -1526,8 +1526,8 @@ static void _call_emitter_lockStatusChanged_4956 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCamera::LockStatus>::target_type & arg1 = args.read<const qt_gsi::Converter<QCamera::LockStatus>::target_type & > (heap);
-  const qt_gsi::Converter<QCamera::LockChangeReason>::target_type & arg2 = args.read<const qt_gsi::Converter<QCamera::LockChangeReason>::target_type & > (heap);
+  const qt_gsi::Converter<QCamera::LockStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::LockStatus>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QCamera::LockChangeReason>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QCamera::LockChangeReason>::target_type & >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_lockStatusChanged_4956 (arg1, arg2);
 }
 
@@ -1549,9 +1549,9 @@ static void _call_emitter_lockStatusChanged_6877 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCamera::LockType>::target_type & arg1 = args.read<const qt_gsi::Converter<QCamera::LockType>::target_type & > (heap);
-  const qt_gsi::Converter<QCamera::LockStatus>::target_type & arg2 = args.read<const qt_gsi::Converter<QCamera::LockStatus>::target_type & > (heap);
-  const qt_gsi::Converter<QCamera::LockChangeReason>::target_type & arg3 = args.read<const qt_gsi::Converter<QCamera::LockChangeReason>::target_type & > (heap);
+  const qt_gsi::Converter<QCamera::LockType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::LockType>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QCamera::LockStatus>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QCamera::LockStatus>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QCamera::LockChangeReason>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QCamera::LockChangeReason>::target_type & >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_lockStatusChanged_6877 (arg1, arg2, arg3);
 }
 
@@ -1583,7 +1583,7 @@ static void _call_emitter_metaDataAvailableChanged_864 (const qt_gsi::GenericMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_metaDataAvailableChanged_864 (arg1);
 }
 
@@ -1617,8 +1617,8 @@ static void _call_emitter_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_metaDataChanged_4036 (arg1, arg2);
 }
 
@@ -1636,7 +1636,7 @@ static void _call_emitter_notifyIntervalChanged_767 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_notifyIntervalChanged_767 (arg1);
 }
 
@@ -1654,7 +1654,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QCamera_Adaptor *)cls)->fp_QCamera_receivers_c1731 (arg1));
 }
 
@@ -1672,7 +1672,7 @@ static void _call_fp_removePropertyWatch_2309 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray const &arg1 = args.read<QByteArray const & > (heap);
+  QByteArray const &arg1 = gsi::arg_reader<QByteArray const & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCamera_Adaptor *)cls)->fp_QCamera_removePropertyWatch_2309 (arg1);
 }
@@ -1738,7 +1738,7 @@ static void _call_emitter_stateChanged_1731 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCamera::State>::target_type & arg1 = args.read<const qt_gsi::Converter<QCamera::State>::target_type & > (heap);
+  const qt_gsi::Converter<QCamera::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::State>::target_type & >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_stateChanged_1731 (arg1);
 }
 
@@ -1756,7 +1756,7 @@ static void _call_emitter_statusChanged_1862 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCamera::Status>::target_type & arg1 = args.read<const qt_gsi::Converter<QCamera::Status>::target_type & > (heap);
+  const qt_gsi::Converter<QCamera::Status>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::Status>::target_type & >() (args, heap);
   ((QCamera_Adaptor *)cls)->emitter_QCamera_statusChanged_1862 (arg1);
 }
 

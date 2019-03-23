@@ -66,7 +66,7 @@ static void _call_ctor_QSourceLocation_2844 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSourceLocation &arg1 = args.read<const QSourceLocation & > (heap);
+  const QSourceLocation &arg1 = gsi::arg_reader<const QSourceLocation & >() (args, heap);
   ret.write<QSourceLocation *> (new QSourceLocation (arg1));
 }
 
@@ -89,9 +89,9 @@ static void _call_ctor_QSourceLocation_3019 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(-1);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QSourceLocation *> (new QSourceLocation (arg1, arg2, arg3));
 }
 
@@ -155,7 +155,7 @@ static void _call_f_operator_excl__eq__c2844 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSourceLocation &arg1 = args.read<const QSourceLocation & > (heap);
+  const QSourceLocation &arg1 = gsi::arg_reader<const QSourceLocation & >() (args, heap);
   ret.write<bool > ((bool)((QSourceLocation *)cls)->operator!= (arg1));
 }
 
@@ -174,7 +174,7 @@ static void _call_f_operator_eq__2844 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSourceLocation &arg1 = args.read<const QSourceLocation & > (heap);
+  const QSourceLocation &arg1 = gsi::arg_reader<const QSourceLocation & >() (args, heap);
   ret.write<QSourceLocation & > ((QSourceLocation &)((QSourceLocation *)cls)->operator= (arg1));
 }
 
@@ -193,7 +193,7 @@ static void _call_f_operator_eq__eq__c2844 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSourceLocation &arg1 = args.read<const QSourceLocation & > (heap);
+  const QSourceLocation &arg1 = gsi::arg_reader<const QSourceLocation & >() (args, heap);
   ret.write<bool > ((bool)((QSourceLocation *)cls)->operator== (arg1));
 }
 
@@ -212,7 +212,7 @@ static void _call_f_setColumn_986 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSourceLocation *)cls)->setColumn (arg1);
 }
@@ -232,7 +232,7 @@ static void _call_f_setLine_986 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSourceLocation *)cls)->setLine (arg1);
 }
@@ -252,7 +252,7 @@ static void _call_f_setUri_1701 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSourceLocation *)cls)->setUri (arg1);
 }

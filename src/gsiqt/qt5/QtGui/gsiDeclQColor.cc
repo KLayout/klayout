@@ -65,7 +65,7 @@ static void _call_ctor_QColor_1853 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GlobalColor>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GlobalColor>::target_type & >() (args, heap);
   ret.write<QColor *> (new QColor (qt_gsi::QtToCppAdaptor<Qt::GlobalColor>(arg1).cref()));
 }
 
@@ -90,10 +90,10 @@ static void _call_ctor_QColor_2744 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(255);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (255, heap);
   ret.write<QColor *> (new QColor (arg1, arg2, arg3, arg4));
 }
 
@@ -112,7 +112,7 @@ static void _call_ctor_QColor_1772 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<QColor *> (new QColor (arg1));
 }
 
@@ -131,7 +131,7 @@ static void _call_ctor_QColor_1731 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QColor *> (new QColor (arg1));
 }
 
@@ -150,7 +150,7 @@ static void _call_ctor_QColor_1905 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   ret.write<QColor *> (new QColor (arg1));
 }
 
@@ -169,7 +169,7 @@ static void _call_ctor_QColor_1539 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QColor::Spec>::target_type & arg1 = args.read<const qt_gsi::Converter<QColor::Spec>::target_type & > (heap);
+  const qt_gsi::Converter<QColor::Spec>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QColor::Spec>::target_type & >() (args, heap);
   ret.write<QColor *> (new QColor (qt_gsi::QtToCppAdaptor<QColor::Spec>(arg1).cref()));
 }
 
@@ -278,7 +278,7 @@ static void _call_f_convertTo_c1539 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QColor::Spec>::target_type & arg1 = args.read<const qt_gsi::Converter<QColor::Spec>::target_type & > (heap);
+  const qt_gsi::Converter<QColor::Spec>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QColor::Spec>::target_type & >() (args, heap);
   ret.write<QColor > ((QColor)((QColor *)cls)->convertTo (qt_gsi::QtToCppAdaptor<QColor::Spec>(arg1).cref()));
 }
 
@@ -327,7 +327,7 @@ static void _call_f_dark_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(200);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (200, heap);
   ret.write<QColor > ((QColor)((QColor *)cls)->dark (arg1));
 }
 
@@ -346,7 +346,7 @@ static void _call_f_darker_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(200);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (200, heap);
   ret.write<QColor > ((QColor)((QColor *)cls)->darker (arg1));
 }
 
@@ -373,11 +373,11 @@ static void _call_f_getCmyk_4333 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args.read<int * > (heap);
-  int *arg2 = args.read<int * > (heap);
-  int *arg3 = args.read<int * > (heap);
-  int *arg4 = args.read<int * > (heap);
-  int *arg5 = args ? args.read<int * > (heap) : (int *)(0);
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  int *arg4 = gsi::arg_reader<int * >() (args, heap);
+  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->getCmyk (arg1, arg2, arg3, arg4, arg5);
 }
@@ -405,11 +405,11 @@ static void _call_f_getCmykF_5853 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double *arg1 = args.read<double * > (heap);
-  double *arg2 = args.read<double * > (heap);
-  double *arg3 = args.read<double * > (heap);
-  double *arg4 = args.read<double * > (heap);
-  double *arg5 = args ? args.read<double * > (heap) : (double *)(0);
+  double *arg1 = gsi::arg_reader<double * >() (args, heap);
+  double *arg2 = gsi::arg_reader<double * >() (args, heap);
+  double *arg3 = gsi::arg_reader<double * >() (args, heap);
+  double *arg4 = gsi::arg_reader<double * >() (args, heap);
+  double *arg5 = args ? gsi::arg_reader<double * >() (args, heap) : gsi::arg_maker<double * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->getCmykF (arg1, arg2, arg3, arg4, arg5);
 }
@@ -435,10 +435,10 @@ static void _call_f_getHsl_c3488 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args.read<int * > (heap);
-  int *arg2 = args.read<int * > (heap);
-  int *arg3 = args.read<int * > (heap);
-  int *arg4 = args ? args.read<int * > (heap) : (int *)(0);
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->getHsl (arg1, arg2, arg3, arg4);
 }
@@ -464,10 +464,10 @@ static void _call_f_getHslF_c4704 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double *arg1 = args.read<double * > (heap);
-  double *arg2 = args.read<double * > (heap);
-  double *arg3 = args.read<double * > (heap);
-  double *arg4 = args ? args.read<double * > (heap) : (double *)(0);
+  double *arg1 = gsi::arg_reader<double * >() (args, heap);
+  double *arg2 = gsi::arg_reader<double * >() (args, heap);
+  double *arg3 = gsi::arg_reader<double * >() (args, heap);
+  double *arg4 = args ? gsi::arg_reader<double * >() (args, heap) : gsi::arg_maker<double * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->getHslF (arg1, arg2, arg3, arg4);
 }
@@ -493,10 +493,10 @@ static void _call_f_getHsv_c3488 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args.read<int * > (heap);
-  int *arg2 = args.read<int * > (heap);
-  int *arg3 = args.read<int * > (heap);
-  int *arg4 = args ? args.read<int * > (heap) : (int *)(0);
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->getHsv (arg1, arg2, arg3, arg4);
 }
@@ -522,10 +522,10 @@ static void _call_f_getHsvF_c4704 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double *arg1 = args.read<double * > (heap);
-  double *arg2 = args.read<double * > (heap);
-  double *arg3 = args.read<double * > (heap);
-  double *arg4 = args ? args.read<double * > (heap) : (double *)(0);
+  double *arg1 = gsi::arg_reader<double * >() (args, heap);
+  double *arg2 = gsi::arg_reader<double * >() (args, heap);
+  double *arg3 = gsi::arg_reader<double * >() (args, heap);
+  double *arg4 = args ? gsi::arg_reader<double * >() (args, heap) : gsi::arg_maker<double * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->getHsvF (arg1, arg2, arg3, arg4);
 }
@@ -551,10 +551,10 @@ static void _call_f_getRgb_c3488 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args.read<int * > (heap);
-  int *arg2 = args.read<int * > (heap);
-  int *arg3 = args.read<int * > (heap);
-  int *arg4 = args ? args.read<int * > (heap) : (int *)(0);
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->getRgb (arg1, arg2, arg3, arg4);
 }
@@ -580,10 +580,10 @@ static void _call_f_getRgbF_c4704 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double *arg1 = args.read<double * > (heap);
-  double *arg2 = args.read<double * > (heap);
-  double *arg3 = args.read<double * > (heap);
-  double *arg4 = args ? args.read<double * > (heap) : (double *)(0);
+  double *arg1 = gsi::arg_reader<double * >() (args, heap);
+  double *arg2 = gsi::arg_reader<double * >() (args, heap);
+  double *arg3 = gsi::arg_reader<double * >() (args, heap);
+  double *arg4 = args ? gsi::arg_reader<double * >() (args, heap) : gsi::arg_maker<double * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->getRgbF (arg1, arg2, arg3, arg4);
 }
@@ -798,7 +798,7 @@ static void _call_f_light_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(150);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (150, heap);
   ret.write<QColor > ((QColor)((QColor *)cls)->light (arg1));
 }
 
@@ -817,7 +817,7 @@ static void _call_f_lighter_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(150);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (150, heap);
   ret.write<QColor > ((QColor)((QColor *)cls)->lighter (arg1));
 }
 
@@ -911,7 +911,7 @@ static void _call_f_name_c2146 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QColor::NameFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<QColor::NameFormat>::target_type & > (heap);
+  const qt_gsi::Converter<QColor::NameFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QColor::NameFormat>::target_type & >() (args, heap);
   ret.write<QString > ((QString)((QColor *)cls)->name (qt_gsi::QtToCppAdaptor<QColor::NameFormat>(arg1).cref()));
 }
 
@@ -930,7 +930,7 @@ static void _call_f_operator_excl__eq__c1905 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   ret.write<bool > ((bool)((QColor *)cls)->operator!= (arg1));
 }
 
@@ -949,7 +949,7 @@ static void _call_f_operator_eq__1905 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   ret.write<QColor & > ((QColor &)((QColor *)cls)->operator= (arg1));
 }
 
@@ -968,7 +968,7 @@ static void _call_f_operator_eq__1853 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::GlobalColor>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::GlobalColor>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::GlobalColor>::target_type & >() (args, heap);
   ret.write<QColor & > ((QColor &)((QColor *)cls)->operator= (qt_gsi::QtToCppAdaptor<Qt::GlobalColor>(arg1).cref()));
 }
 
@@ -987,7 +987,7 @@ static void _call_f_operator_eq__eq__c1905 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   ret.write<bool > ((bool)((QColor *)cls)->operator== (arg1));
 }
 
@@ -1096,7 +1096,7 @@ static void _call_f_setAlpha_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setAlpha (arg1);
 }
@@ -1116,7 +1116,7 @@ static void _call_f_setAlphaF_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setAlphaF (arg1);
 }
@@ -1136,7 +1136,7 @@ static void _call_f_setBlue_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setBlue (arg1);
 }
@@ -1156,7 +1156,7 @@ static void _call_f_setBlueF_1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setBlueF (arg1);
 }
@@ -1184,11 +1184,11 @@ static void _call_f_setCmyk_3403 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  int arg5 = args ? args.read<int > (heap) : (int)(255);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (255, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setCmyk (arg1, arg2, arg3, arg4, arg5);
 }
@@ -1216,11 +1216,11 @@ static void _call_f_setCmykF_4923 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args ? args.read<double > (heap) : (double)(1.0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1.0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setCmykF (arg1, arg2, arg3, arg4, arg5);
 }
@@ -1240,7 +1240,7 @@ static void _call_f_setGreen_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setGreen (arg1);
 }
@@ -1260,7 +1260,7 @@ static void _call_f_setGreenF_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setGreenF (arg1);
 }
@@ -1286,10 +1286,10 @@ static void _call_f_setHsl_2744 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(255);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (255, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setHsl (arg1, arg2, arg3, arg4);
 }
@@ -1315,10 +1315,10 @@ static void _call_f_setHslF_3960 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args ? args.read<double > (heap) : (double)(1.0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1.0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setHslF (arg1, arg2, arg3, arg4);
 }
@@ -1344,10 +1344,10 @@ static void _call_f_setHsv_2744 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(255);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (255, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setHsv (arg1, arg2, arg3, arg4);
 }
@@ -1373,10 +1373,10 @@ static void _call_f_setHsvF_3960 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args ? args.read<double > (heap) : (double)(1.0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1.0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setHsvF (arg1, arg2, arg3, arg4);
 }
@@ -1396,7 +1396,7 @@ static void _call_f_setNamedColor_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setNamedColor (arg1);
 }
@@ -1416,7 +1416,7 @@ static void _call_f_setRed_767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setRed (arg1);
 }
@@ -1436,7 +1436,7 @@ static void _call_f_setRedF_1071 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setRedF (arg1);
 }
@@ -1462,10 +1462,10 @@ static void _call_f_setRgb_2744 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(255);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (255, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setRgb (arg1, arg2, arg3, arg4);
 }
@@ -1485,7 +1485,7 @@ static void _call_f_setRgb_1772 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setRgb (arg1);
 }
@@ -1511,10 +1511,10 @@ static void _call_f_setRgbF_3960 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args ? args.read<double > (heap) : (double)(1.0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1.0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setRgbF (arg1, arg2, arg3, arg4);
 }
@@ -1534,7 +1534,7 @@ static void _call_f_setRgba_1772 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QColor *)cls)->setRgba (arg1);
 }
@@ -1712,11 +1712,11 @@ static void _call_f_fromCmyk_3403 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  int arg5 = args ? args.read<int > (heap) : (int)(255);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (255, heap);
   ret.write<QColor > ((QColor)QColor::fromCmyk (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -1743,11 +1743,11 @@ static void _call_f_fromCmykF_4923 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
-  double arg5 = args ? args.read<double > (heap) : (double)(1.0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
+  double arg5 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1.0, heap);
   ret.write<QColor > ((QColor)QColor::fromCmykF (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -1772,10 +1772,10 @@ static void _call_f_fromHsl_2744 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(255);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (255, heap);
   ret.write<QColor > ((QColor)QColor::fromHsl (arg1, arg2, arg3, arg4));
 }
 
@@ -1800,10 +1800,10 @@ static void _call_f_fromHslF_3960 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args ? args.read<double > (heap) : (double)(1.0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1.0, heap);
   ret.write<QColor > ((QColor)QColor::fromHslF (arg1, arg2, arg3, arg4));
 }
 
@@ -1828,10 +1828,10 @@ static void _call_f_fromHsv_2744 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(255);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (255, heap);
   ret.write<QColor > ((QColor)QColor::fromHsv (arg1, arg2, arg3, arg4));
 }
 
@@ -1856,10 +1856,10 @@ static void _call_f_fromHsvF_3960 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args ? args.read<double > (heap) : (double)(1.0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1.0, heap);
   ret.write<QColor > ((QColor)QColor::fromHsvF (arg1, arg2, arg3, arg4));
 }
 
@@ -1878,7 +1878,7 @@ static void _call_f_fromRgb_1772 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<QColor > ((QColor)QColor::fromRgb (arg1));
 }
 
@@ -1903,10 +1903,10 @@ static void _call_f_fromRgb_2744 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(255);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (255, heap);
   ret.write<QColor > ((QColor)QColor::fromRgb (arg1, arg2, arg3, arg4));
 }
 
@@ -1931,10 +1931,10 @@ static void _call_f_fromRgbF_3960 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args ? args.read<double > (heap) : (double)(1.0);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (1.0, heap);
   ret.write<QColor > ((QColor)QColor::fromRgbF (arg1, arg2, arg3, arg4));
 }
 
@@ -1953,7 +1953,7 @@ static void _call_f_fromRgba_1772 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<QColor > ((QColor)QColor::fromRgba (arg1));
 }
 
@@ -1972,7 +1972,7 @@ static void _call_f_isValidColor_2025 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QColor::isValidColor (arg1));
 }
 

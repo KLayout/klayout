@@ -145,8 +145,8 @@ static void _call_f_connectToHost_3017 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  quint16 arg2 = args ? args.read<quint16 > (heap) : (quint16)(80);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  quint16 arg2 = args ? gsi::arg_reader<quint16 >() (args, heap) : gsi::arg_maker<quint16 >() (80, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAccessManager *)cls)->connectToHost (arg1, arg2);
 }
@@ -170,9 +170,9 @@ static void _call_f_connectToHostEncrypted_5977 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  quint16 arg2 = args ? args.read<quint16 > (heap) : (quint16)(443);
-  const QSslConfiguration &arg3 = args ? args.read<const QSslConfiguration & > (heap) : (const QSslConfiguration &)(QSslConfiguration::defaultConfiguration());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  quint16 arg2 = args ? gsi::arg_reader<quint16 >() (args, heap) : gsi::arg_maker<quint16 >() (443, heap);
+  const QSslConfiguration &arg3 = args ? gsi::arg_reader<const QSslConfiguration & >() (args, heap) : gsi::arg_maker<const QSslConfiguration & >() (QSslConfiguration::defaultConfiguration(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAccessManager *)cls)->connectToHostEncrypted (arg1, arg2, arg3);
 }
@@ -207,7 +207,7 @@ static void _call_f_deleteResource_2885 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->deleteResource (arg1));
 }
 
@@ -226,7 +226,7 @@ static void _call_f_get_2885 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->get (arg1));
 }
 
@@ -245,7 +245,7 @@ static void _call_f_head_2885 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->head (arg1));
 }
 
@@ -281,8 +281,8 @@ static void _call_f_post_4224 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
-  QIODevice *arg2 = args.read<QIODevice * > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
+  QIODevice *arg2 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->post (arg1, arg2));
 }
 
@@ -303,8 +303,8 @@ static void _call_f_post_5086 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->post (arg1, arg2));
 }
 
@@ -325,8 +325,8 @@ static void _call_f_post_4826 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
-  QHttpMultiPart *arg2 = args.read<QHttpMultiPart * > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
+  QHttpMultiPart *arg2 = gsi::arg_reader<QHttpMultiPart * >() (args, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->post (arg1, arg2));
 }
 
@@ -377,8 +377,8 @@ static void _call_f_put_4224 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
-  QIODevice *arg2 = args.read<QIODevice * > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
+  QIODevice *arg2 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->put (arg1, arg2));
 }
 
@@ -399,8 +399,8 @@ static void _call_f_put_5086 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->put (arg1, arg2));
 }
 
@@ -421,8 +421,8 @@ static void _call_f_put_4826 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
-  QHttpMultiPart *arg2 = args.read<QHttpMultiPart * > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
+  QHttpMultiPart *arg2 = gsi::arg_reader<QHttpMultiPart * >() (args, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->put (arg1, arg2));
 }
 
@@ -445,9 +445,9 @@ static void _call_f_sendCustomRequest_6425 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
-  QIODevice *arg3 = args ? args.read<QIODevice * > (heap) : (QIODevice *)(0);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  QIODevice *arg3 = args ? gsi::arg_reader<QIODevice * >() (args, heap) : gsi::arg_maker<QIODevice * >() (0, heap);
   ret.write<QNetworkReply * > ((QNetworkReply *)((QNetworkAccessManager *)cls)->sendCustomRequest (arg1, arg2, arg3));
 }
 
@@ -466,7 +466,7 @@ static void _call_f_setCache_2737 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractNetworkCache *arg1 = args.read<QAbstractNetworkCache * > (heap);
+  QAbstractNetworkCache *arg1 = gsi::arg_reader<QAbstractNetworkCache * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAccessManager *)cls)->setCache (arg1);
 }
@@ -486,7 +486,7 @@ static void _call_f_setConfiguration_3508 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkConfiguration &arg1 = args.read<const QNetworkConfiguration & > (heap);
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAccessManager *)cls)->setConfiguration (arg1);
 }
@@ -506,7 +506,7 @@ static void _call_f_setCookieJar_2336 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkCookieJar *arg1 = args.read<QNetworkCookieJar * > (heap);
+  QNetworkCookieJar *arg1 = gsi::arg_reader<QNetworkCookieJar * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAccessManager *)cls)->setCookieJar (arg1);
 }
@@ -526,7 +526,7 @@ static void _call_f_setNetworkAccessible_4770 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkAccessManager::NetworkAccessibility>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkAccessManager::NetworkAccessibility>::target_type & > (heap);
+  const qt_gsi::Converter<QNetworkAccessManager::NetworkAccessibility>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkAccessManager::NetworkAccessibility>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAccessManager *)cls)->setNetworkAccessible (qt_gsi::QtToCppAdaptor<QNetworkAccessManager::NetworkAccessibility>(arg1).cref());
 }
@@ -546,7 +546,7 @@ static void _call_f_setProxy_2686 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxy &arg1 = args.read<const QNetworkProxy & > (heap);
+  const QNetworkProxy &arg1 = gsi::arg_reader<const QNetworkProxy & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAccessManager *)cls)->setProxy (arg1);
 }
@@ -566,7 +566,7 @@ static void _call_f_setProxyFactory_2723 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkProxyFactory *arg1 = args.read<QNetworkProxyFactory * > (heap);
+  QNetworkProxyFactory *arg1 = gsi::arg_reader<QNetworkProxyFactory * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkAccessManager *)cls)->setProxyFactory (arg1);
 }
@@ -605,9 +605,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QNetworkAccessManager::tr (arg1, arg2, arg3));
 }
 
@@ -630,9 +630,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QNetworkAccessManager::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -921,7 +921,7 @@ static void _call_ctor_QNetworkAccessManager_Adaptor_1302 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QNetworkAccessManager_Adaptor *> (new QNetworkAccessManager_Adaptor (arg1));
 }
 
@@ -941,8 +941,8 @@ static void _call_emitter_authenticationRequired_3939 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkReply *arg1 = args.read<QNetworkReply * > (heap);
-  QAuthenticator *arg2 = args.read<QAuthenticator * > (heap);
+  QNetworkReply *arg1 = gsi::arg_reader<QNetworkReply * >() (args, heap);
+  QAuthenticator *arg2 = gsi::arg_reader<QAuthenticator * >() (args, heap);
   ((QNetworkAccessManager_Adaptor *)cls)->emitter_QNetworkAccessManager_authenticationRequired_3939 (arg1, arg2);
 }
 
@@ -1037,7 +1037,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QNetworkAccessManager_Adaptor *)cls)->emitter_QNetworkAccessManager_destroyed_1302 (arg1);
 }
 
@@ -1079,7 +1079,7 @@ static void _call_emitter_encrypted_1973 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkReply *arg1 = args.read<QNetworkReply * > (heap);
+  QNetworkReply *arg1 = gsi::arg_reader<QNetworkReply * >() (args, heap);
   ((QNetworkAccessManager_Adaptor *)cls)->emitter_QNetworkAccessManager_encrypted_1973 (arg1);
 }
 
@@ -1146,7 +1146,7 @@ static void _call_emitter_finished_1973 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkReply *arg1 = args.read<QNetworkReply * > (heap);
+  QNetworkReply *arg1 = gsi::arg_reader<QNetworkReply * >() (args, heap);
   ((QNetworkAccessManager_Adaptor *)cls)->emitter_QNetworkAccessManager_finished_1973 (arg1);
 }
 
@@ -1164,7 +1164,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkAccessManager_Adaptor *)cls)->fp_QNetworkAccessManager_isSignalConnected_c2394 (arg1));
 }
 
@@ -1182,7 +1182,7 @@ static void _call_emitter_networkAccessibleChanged_4770 (const qt_gsi::GenericMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QNetworkAccessManager::NetworkAccessibility>::target_type & arg1 = args.read<const qt_gsi::Converter<QNetworkAccessManager::NetworkAccessibility>::target_type & > (heap);
+  const qt_gsi::Converter<QNetworkAccessManager::NetworkAccessibility>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkAccessManager::NetworkAccessibility>::target_type & >() (args, heap);
   ((QNetworkAccessManager_Adaptor *)cls)->emitter_QNetworkAccessManager_networkAccessibleChanged_4770 (arg1);
 }
 
@@ -1216,8 +1216,8 @@ static void _call_emitter_preSharedKeyAuthenticationRequired_5436 (const qt_gsi:
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkReply *arg1 = args.read<QNetworkReply * > (heap);
-  QSslPreSharedKeyAuthenticator *arg2 = args.read<QSslPreSharedKeyAuthenticator * > (heap);
+  QNetworkReply *arg1 = gsi::arg_reader<QNetworkReply * >() (args, heap);
+  QSslPreSharedKeyAuthenticator *arg2 = gsi::arg_reader<QSslPreSharedKeyAuthenticator * >() (args, heap);
   ((QNetworkAccessManager_Adaptor *)cls)->emitter_QNetworkAccessManager_preSharedKeyAuthenticationRequired_5436 (arg1, arg2);
 }
 
@@ -1237,8 +1237,8 @@ static void _call_emitter_proxyAuthenticationRequired_4652 (const qt_gsi::Generi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkProxy &arg1 = args.read<const QNetworkProxy & > (heap);
-  QAuthenticator *arg2 = args.read<QAuthenticator * > (heap);
+  const QNetworkProxy &arg1 = gsi::arg_reader<const QNetworkProxy & >() (args, heap);
+  QAuthenticator *arg2 = gsi::arg_reader<QAuthenticator * >() (args, heap);
   ((QNetworkAccessManager_Adaptor *)cls)->emitter_QNetworkAccessManager_proxyAuthenticationRequired_4652 (arg1, arg2);
 }
 
@@ -1256,7 +1256,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QNetworkAccessManager_Adaptor *)cls)->fp_QNetworkAccessManager_receivers_c1731 (arg1));
 }
 
@@ -1304,8 +1304,8 @@ static void _call_emitter_sslErrors_4702 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkReply *arg1 = args.read<QNetworkReply * > (heap);
-  const QList<QSslError> &arg2 = args.read<const QList<QSslError> & > (heap);
+  QNetworkReply *arg1 = gsi::arg_reader<QNetworkReply * >() (args, heap);
+  const QList<QSslError> &arg2 = gsi::arg_reader<const QList<QSslError> & >() (args, heap);
   ((QNetworkAccessManager_Adaptor *)cls)->emitter_QNetworkAccessManager_sslErrors_4702 (arg1, arg2);
 }
 

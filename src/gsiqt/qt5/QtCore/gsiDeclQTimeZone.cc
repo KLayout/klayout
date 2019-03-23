@@ -67,7 +67,7 @@ static void _call_ctor_QTimeZone_2309 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QTimeZone *> (new QTimeZone (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QTimeZone_767 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTimeZone *> (new QTimeZone (arg1));
 }
 
@@ -115,12 +115,12 @@ static void _call_ctor_QTimeZone_10592 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  int arg2 = args.read<int > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const QString &arg4 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QLocale::Country>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<QLocale::Country>::target_type & > (heap) : (const qt_gsi::Converter<QLocale::Country>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLocale::Country>(heap, QLocale::AnyCountry));
-  const QString &arg6 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg4 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QLocale::Country>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::Country>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::Country>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::Country>(heap, QLocale::AnyCountry), heap);
+  const QString &arg6 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QTimeZone *> (new QTimeZone (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QLocale::Country>(arg5).cref(), arg6));
 }
 
@@ -139,7 +139,7 @@ static void _call_ctor_QTimeZone_2205 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTimeZone &arg1 = args.read<const QTimeZone & > (heap);
+  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
   ret.write<QTimeZone *> (new QTimeZone (arg1));
 }
 
@@ -158,7 +158,7 @@ static void _call_f_abbreviation_c2175 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<QString > ((QString)((QTimeZone *)cls)->abbreviation (arg1));
 }
 
@@ -207,7 +207,7 @@ static void _call_f_daylightTimeOffset_c2175 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<int > ((int)((QTimeZone *)cls)->daylightTimeOffset (arg1));
 }
 
@@ -230,9 +230,9 @@ static void _call_f_displayName_c6192 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
-  const qt_gsi::Converter<QTimeZone::NameType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QTimeZone::NameType>::target_type & > (heap) : (const qt_gsi::Converter<QTimeZone::NameType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QTimeZone::NameType>(heap, QTimeZone::DefaultName));
-  const QLocale &arg3 = args ? args.read<const QLocale & > (heap) : (const QLocale &)(QLocale());
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
+  const qt_gsi::Converter<QTimeZone::NameType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTimeZone::NameType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTimeZone::NameType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTimeZone::NameType>(heap, QTimeZone::DefaultName), heap);
+  const QLocale &arg3 = args ? gsi::arg_reader<const QLocale & >() (args, heap) : gsi::arg_maker<const QLocale & >() (QLocale(), heap);
   ret.write<QString > ((QString)((QTimeZone *)cls)->displayName (arg1, qt_gsi::QtToCppAdaptor<QTimeZone::NameType>(arg2).cref(), arg3));
 }
 
@@ -255,9 +255,9 @@ static void _call_f_displayName_c6278 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTimeZone::TimeType>::target_type & arg1 = args.read<const qt_gsi::Converter<QTimeZone::TimeType>::target_type & > (heap);
-  const qt_gsi::Converter<QTimeZone::NameType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QTimeZone::NameType>::target_type & > (heap) : (const qt_gsi::Converter<QTimeZone::NameType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QTimeZone::NameType>(heap, QTimeZone::DefaultName));
-  const QLocale &arg3 = args ? args.read<const QLocale & > (heap) : (const QLocale &)(QLocale());
+  const qt_gsi::Converter<QTimeZone::TimeType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTimeZone::TimeType>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QTimeZone::NameType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTimeZone::NameType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTimeZone::NameType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTimeZone::NameType>(heap, QTimeZone::DefaultName), heap);
+  const QLocale &arg3 = args ? gsi::arg_reader<const QLocale & >() (args, heap) : gsi::arg_maker<const QLocale & >() (QLocale(), heap);
   ret.write<QString > ((QString)((QTimeZone *)cls)->displayName (qt_gsi::QtToCppAdaptor<QTimeZone::TimeType>(arg1).cref(), qt_gsi::QtToCppAdaptor<QTimeZone::NameType>(arg2).cref(), arg3));
 }
 
@@ -321,7 +321,7 @@ static void _call_f_isDaylightTime_c2175 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<bool > ((bool)((QTimeZone *)cls)->isDaylightTime (arg1));
 }
 
@@ -355,7 +355,7 @@ static void _call_f_nextTransition_c2175 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<QTimeZone::OffsetData > ((QTimeZone::OffsetData)((QTimeZone *)cls)->nextTransition (arg1));
 }
 
@@ -374,7 +374,7 @@ static void _call_f_offsetData_c2175 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<QTimeZone::OffsetData > ((QTimeZone::OffsetData)((QTimeZone *)cls)->offsetData (arg1));
 }
 
@@ -393,7 +393,7 @@ static void _call_f_offsetFromUtc_c2175 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<int > ((int)((QTimeZone *)cls)->offsetFromUtc (arg1));
 }
 
@@ -412,7 +412,7 @@ static void _call_f_operator_excl__eq__c2205 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTimeZone &arg1 = args.read<const QTimeZone & > (heap);
+  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
   ret.write<bool > ((bool)((QTimeZone *)cls)->operator!= (arg1));
 }
 
@@ -431,7 +431,7 @@ static void _call_f_operator_eq__2205 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTimeZone &arg1 = args.read<const QTimeZone & > (heap);
+  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
   ret.write<QTimeZone & > ((QTimeZone &)((QTimeZone *)cls)->operator= (arg1));
 }
 
@@ -450,7 +450,7 @@ static void _call_f_operator_eq__eq__c2205 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTimeZone &arg1 = args.read<const QTimeZone & > (heap);
+  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
   ret.write<bool > ((bool)((QTimeZone *)cls)->operator== (arg1));
 }
 
@@ -469,7 +469,7 @@ static void _call_f_previousTransition_c2175 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<QTimeZone::OffsetData > ((QTimeZone::OffsetData)((QTimeZone *)cls)->previousTransition (arg1));
 }
 
@@ -488,7 +488,7 @@ static void _call_f_standardTimeOffset_c2175 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<int > ((int)((QTimeZone *)cls)->standardTimeOffset (arg1));
 }
 
@@ -507,7 +507,7 @@ static void _call_f_swap_1510 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTimeZone &arg1 = args.read<QTimeZone & > (heap);
+  QTimeZone &arg1 = gsi::arg_reader<QTimeZone & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTimeZone *)cls)->swap (arg1);
 }
@@ -529,8 +529,8 @@ static void _call_f_transitions_c4242 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
-  const QDateTime &arg2 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
+  const QDateTime &arg2 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ret.write<QVector<QTimeZone::OffsetData> > ((QVector<QTimeZone::OffsetData>)((QTimeZone *)cls)->transitions (arg1, arg2));
 }
 
@@ -564,7 +564,7 @@ static void _call_f_availableTimeZoneIds_1981 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLocale::Country>::target_type & arg1 = args.read<const qt_gsi::Converter<QLocale::Country>::target_type & > (heap);
+  const qt_gsi::Converter<QLocale::Country>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Country>::target_type & >() (args, heap);
   ret.write<QList<QByteArray> > ((QList<QByteArray>)QTimeZone::availableTimeZoneIds (qt_gsi::QtToCppAdaptor<QLocale::Country>(arg1).cref()));
 }
 
@@ -583,7 +583,7 @@ static void _call_f_availableTimeZoneIds_767 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QList<QByteArray> > ((QList<QByteArray>)QTimeZone::availableTimeZoneIds (arg1));
 }
 
@@ -602,7 +602,7 @@ static void _call_f_ianaIdToWindowsId_2309 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)QTimeZone::ianaIdToWindowsId (arg1));
 }
 
@@ -621,7 +621,7 @@ static void _call_f_isTimeZoneIdAvailable_2309 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<bool > ((bool)QTimeZone::isTimeZoneIdAvailable (arg1));
 }
 
@@ -685,7 +685,7 @@ static void _call_f_windowsIdToDefaultIanaId_2309 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)QTimeZone::windowsIdToDefaultIanaId (arg1));
 }
 
@@ -706,8 +706,8 @@ static void _call_f_windowsIdToDefaultIanaId_4182 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QLocale::Country>::target_type & arg2 = args.read<const qt_gsi::Converter<QLocale::Country>::target_type & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QLocale::Country>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Country>::target_type & >() (args, heap);
   ret.write<QByteArray > ((QByteArray)QTimeZone::windowsIdToDefaultIanaId (arg1, qt_gsi::QtToCppAdaptor<QLocale::Country>(arg2).cref()));
 }
 
@@ -726,7 +726,7 @@ static void _call_f_windowsIdToIanaIds_2309 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QList<QByteArray> > ((QList<QByteArray>)QTimeZone::windowsIdToIanaIds (arg1));
 }
 
@@ -747,8 +747,8 @@ static void _call_f_windowsIdToIanaIds_4182 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QLocale::Country>::target_type & arg2 = args.read<const qt_gsi::Converter<QLocale::Country>::target_type & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QLocale::Country>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QLocale::Country>::target_type & >() (args, heap);
   ret.write<QList<QByteArray> > ((QList<QByteArray>)QTimeZone::windowsIdToIanaIds (arg1, qt_gsi::QtToCppAdaptor<QLocale::Country>(arg2).cref()));
 }
 

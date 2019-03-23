@@ -187,9 +187,9 @@ static void _call_ctor_QHelpEvent_Adaptor_5181 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
-  const QPoint &arg3 = args.read<const QPoint & > (heap);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const QPoint &arg3 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QHelpEvent_Adaptor *> (new QHelpEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3));
 }
 

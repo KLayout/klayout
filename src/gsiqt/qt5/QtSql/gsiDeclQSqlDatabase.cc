@@ -71,7 +71,7 @@ static void _call_ctor_QSqlDatabase_2487 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlDatabase &arg1 = args.read<const QSqlDatabase & > (heap);
+  const QSqlDatabase &arg1 = gsi::arg_reader<const QSqlDatabase & >() (args, heap);
   ret.write<QSqlDatabase *> (new QSqlDatabase (arg1));
 }
 
@@ -196,7 +196,7 @@ static void _call_f_exec_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QSqlQuery > ((QSqlQuery)((QSqlDatabase *)cls)->exec (arg1));
 }
 
@@ -322,8 +322,8 @@ static void _call_f_open_3942 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QSqlDatabase *)cls)->open (arg1, arg2));
 }
 
@@ -342,7 +342,7 @@ static void _call_f_operator_eq__2487 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlDatabase &arg1 = args.read<const QSqlDatabase & > (heap);
+  const QSqlDatabase &arg1 = gsi::arg_reader<const QSqlDatabase & >() (args, heap);
   ret.write<QSqlDatabase & > ((QSqlDatabase &)((QSqlDatabase *)cls)->operator= (arg1));
 }
 
@@ -391,7 +391,7 @@ static void _call_f_primaryIndex_c2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QSqlIndex > ((QSqlIndex)((QSqlDatabase *)cls)->primaryIndex (arg1));
 }
 
@@ -410,7 +410,7 @@ static void _call_f_record_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QSqlRecord > ((QSqlRecord)((QSqlDatabase *)cls)->record (arg1));
 }
 
@@ -444,7 +444,7 @@ static void _call_f_setConnectOptions_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDatabase *)cls)->setConnectOptions (arg1);
 }
@@ -464,7 +464,7 @@ static void _call_f_setDatabaseName_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDatabase *)cls)->setDatabaseName (arg1);
 }
@@ -484,7 +484,7 @@ static void _call_f_setHostName_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDatabase *)cls)->setHostName (arg1);
 }
@@ -504,7 +504,7 @@ static void _call_f_setNumericalPrecisionPolicy_3429 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSql::NumericalPrecisionPolicy>::target_type & arg1 = args.read<const qt_gsi::Converter<QSql::NumericalPrecisionPolicy>::target_type & > (heap);
+  const qt_gsi::Converter<QSql::NumericalPrecisionPolicy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSql::NumericalPrecisionPolicy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDatabase *)cls)->setNumericalPrecisionPolicy (qt_gsi::QtToCppAdaptor<QSql::NumericalPrecisionPolicy>(arg1).cref());
 }
@@ -524,7 +524,7 @@ static void _call_f_setPassword_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDatabase *)cls)->setPassword (arg1);
 }
@@ -544,7 +544,7 @@ static void _call_f_setPort_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDatabase *)cls)->setPort (arg1);
 }
@@ -564,7 +564,7 @@ static void _call_f_setUserName_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSqlDatabase *)cls)->setUserName (arg1);
 }
@@ -584,7 +584,7 @@ static void _call_f_tables_c1843 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSql::TableType>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QSql::TableType>::target_type & > (heap) : (const qt_gsi::Converter<QSql::TableType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSql::TableType>(heap, QSql::Tables));
+  const qt_gsi::Converter<QSql::TableType>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QSql::TableType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSql::TableType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSql::TableType>(heap, QSql::Tables), heap);
   ret.write<QStringList > ((QStringList)((QSqlDatabase *)cls)->tables (qt_gsi::QtToCppAdaptor<QSql::TableType>(arg1).cref()));
 }
 
@@ -635,8 +635,8 @@ static void _call_f_addDatabase_3942 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QLatin1String(QSqlDatabase::defaultConnection));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1String(QSqlDatabase::defaultConnection), heap);
   ret.write<QSqlDatabase > ((QSqlDatabase)QSqlDatabase::addDatabase (arg1, arg2));
 }
 
@@ -657,8 +657,8 @@ static void _call_f_addDatabase_3544 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSqlDriver *arg1 = args.read<QSqlDriver * > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QLatin1String(QSqlDatabase::defaultConnection));
+  QSqlDriver *arg1 = gsi::arg_reader<QSqlDriver * >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1String(QSqlDatabase::defaultConnection), heap);
   ret.write<QSqlDatabase > ((QSqlDatabase)QSqlDatabase::addDatabase (arg1, arg2));
 }
 
@@ -679,8 +679,8 @@ static void _call_f_cloneDatabase_4404 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSqlDatabase &arg1 = args.read<const QSqlDatabase & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QSqlDatabase &arg1 = gsi::arg_reader<const QSqlDatabase & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QSqlDatabase > ((QSqlDatabase)QSqlDatabase::cloneDatabase (arg1, arg2));
 }
 
@@ -714,7 +714,7 @@ static void _call_f_contains_2025 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QLatin1String(QSqlDatabase::defaultConnection));
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1String(QSqlDatabase::defaultConnection), heap);
   ret.write<bool > ((bool)QSqlDatabase::contains (arg1));
 }
 
@@ -735,8 +735,8 @@ static void _call_f_database_2781 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? args.read<const QString & > (heap) : (const QString &)(QLatin1String(QSqlDatabase::defaultConnection));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QLatin1String(QSqlDatabase::defaultConnection), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   ret.write<QSqlDatabase > ((QSqlDatabase)QSqlDatabase::database (arg1, arg2));
 }
 
@@ -770,7 +770,7 @@ static void _call_f_isDriverAvailable_2025 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QSqlDatabase::isDriverAvailable (arg1));
 }
 
@@ -791,8 +791,8 @@ static void _call_f_registerSqlDriver_4643 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QSqlDriverCreatorBase *arg2 = args.read<QSqlDriverCreatorBase * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QSqlDriverCreatorBase *arg2 = gsi::arg_reader<QSqlDriverCreatorBase * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QSqlDatabase::registerSqlDriver (arg1, arg2);
 }
@@ -812,7 +812,7 @@ static void _call_f_removeDatabase_2025 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QSqlDatabase::removeDatabase (arg1);
 }

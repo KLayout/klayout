@@ -73,7 +73,7 @@ static void _call_f_addAnimation_2451 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractAnimation *arg1 = args.read<QAbstractAnimation * > (heap);
+  QAbstractAnimation *arg1 = gsi::arg_reader<QAbstractAnimation * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractTransition *)cls)->addAnimation (arg1);
 }
@@ -123,7 +123,7 @@ static void _call_f_removeAnimation_2451 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractAnimation *arg1 = args.read<QAbstractAnimation * > (heap);
+  QAbstractAnimation *arg1 = gsi::arg_reader<QAbstractAnimation * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractTransition *)cls)->removeAnimation (arg1);
 }
@@ -143,7 +143,7 @@ static void _call_f_setTargetState_2036 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractState *arg1 = args.read<QAbstractState * > (heap);
+  QAbstractState *arg1 = gsi::arg_reader<QAbstractState * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractTransition *)cls)->setTargetState (arg1);
 }
@@ -163,7 +163,7 @@ static void _call_f_setTargetStates_3384 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QAbstractState*> &arg1 = args.read<const QList<QAbstractState*> & > (heap);
+  const QList<QAbstractState*> &arg1 = gsi::arg_reader<const QList<QAbstractState*> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractTransition *)cls)->setTargetStates (arg1);
 }
@@ -183,7 +183,7 @@ static void _call_f_setTransitionType_4005 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAbstractTransition::TransitionType>::target_type & arg1 = args.read<const qt_gsi::Converter<QAbstractTransition::TransitionType>::target_type & > (heap);
+  const qt_gsi::Converter<QAbstractTransition::TransitionType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractTransition::TransitionType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractTransition *)cls)->setTransitionType (qt_gsi::QtToCppAdaptor<QAbstractTransition::TransitionType>(arg1).cref());
 }
@@ -267,9 +267,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractTransition::tr (arg1, arg2, arg3));
 }
 
@@ -292,9 +292,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QAbstractTransition::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -524,7 +524,7 @@ static void _call_ctor_QAbstractTransition_Adaptor_1216 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QState *arg1 = args ? args.read<QState * > (heap) : (QState *)(0);
+  QState *arg1 = args ? gsi::arg_reader<QState * >() (args, heap) : gsi::arg_maker<QState * >() (0, heap);
   ret.write<QAbstractTransition_Adaptor *> (new QAbstractTransition_Adaptor (arg1));
 }
 
@@ -590,7 +590,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QAbstractTransition_Adaptor *)cls)->emitter_QAbstractTransition_destroyed_1302 (arg1);
 }
 
@@ -704,7 +704,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractTransition_Adaptor *)cls)->fp_QAbstractTransition_isSignalConnected_c2394 (arg1));
 }
 
@@ -746,7 +746,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QAbstractTransition_Adaptor *)cls)->fp_QAbstractTransition_receivers_c1731 (arg1));
 }
 

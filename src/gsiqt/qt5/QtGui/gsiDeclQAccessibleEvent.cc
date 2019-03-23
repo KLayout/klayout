@@ -54,8 +54,8 @@ static void _call_ctor_QAccessibleEvent_3347 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const qt_gsi::Converter<QAccessible::Event>::target_type & arg2 = args.read<const qt_gsi::Converter<QAccessible::Event>::target_type & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const qt_gsi::Converter<QAccessible::Event>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAccessible::Event>::target_type & >() (args, heap);
   ret.write<QAccessibleEvent *> (new QAccessibleEvent (arg1, qt_gsi::QtToCppAdaptor<QAccessible::Event>(arg2).cref()));
 }
 
@@ -76,8 +76,8 @@ static void _call_ctor_QAccessibleEvent_4667 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleInterface *arg1 = args.read<QAccessibleInterface * > (heap);
-  const qt_gsi::Converter<QAccessible::Event>::target_type & arg2 = args.read<const qt_gsi::Converter<QAccessible::Event>::target_type & > (heap);
+  QAccessibleInterface *arg1 = gsi::arg_reader<QAccessibleInterface * >() (args, heap);
+  const qt_gsi::Converter<QAccessible::Event>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAccessible::Event>::target_type & >() (args, heap);
   ret.write<QAccessibleEvent *> (new QAccessibleEvent (arg1, qt_gsi::QtToCppAdaptor<QAccessible::Event>(arg2).cref()));
 }
 
@@ -141,7 +141,7 @@ static void _call_f_setChild_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleEvent *)cls)->setChild (arg1);
 }

@@ -106,7 +106,7 @@ static void _call_f_rehighlightBlock_2306 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSyntaxHighlighter *)cls)->rehighlightBlock (arg1);
 }
@@ -126,7 +126,7 @@ static void _call_f_setDocument_1955 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextDocument *arg1 = args.read<QTextDocument * > (heap);
+  QTextDocument *arg1 = gsi::arg_reader<QTextDocument * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSyntaxHighlighter *)cls)->setDocument (arg1);
 }
@@ -150,9 +150,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QSyntaxHighlighter::tr (arg1, arg2, arg3));
 }
 
@@ -175,9 +175,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QSyntaxHighlighter::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -433,7 +433,7 @@ static void _call_ctor_QSyntaxHighlighter_Adaptor_1302 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QSyntaxHighlighter_Adaptor *> (new QSyntaxHighlighter_Adaptor (arg1));
 }
 
@@ -451,7 +451,7 @@ static void _call_ctor_QSyntaxHighlighter_Adaptor_1955 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextDocument *arg1 = args.read<QTextDocument * > (heap);
+  QTextDocument *arg1 = gsi::arg_reader<QTextDocument * >() (args, heap);
   ret.write<QSyntaxHighlighter_Adaptor *> (new QSyntaxHighlighter_Adaptor (arg1));
 }
 
@@ -559,7 +559,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QSyntaxHighlighter_Adaptor *)cls)->emitter_QSyntaxHighlighter_destroyed_1302 (arg1);
 }
 
@@ -650,7 +650,7 @@ static void _call_fp_format_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextCharFormat > ((QTextCharFormat)((QSyntaxHighlighter_Adaptor *)cls)->fp_QSyntaxHighlighter_format_c767 (arg1));
 }
 
@@ -692,7 +692,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QSyntaxHighlighter_Adaptor *)cls)->fp_QSyntaxHighlighter_isSignalConnected_c2394 (arg1));
 }
 
@@ -724,7 +724,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QSyntaxHighlighter_Adaptor *)cls)->fp_QSyntaxHighlighter_receivers_c1731 (arg1));
 }
 
@@ -770,7 +770,7 @@ static void _call_fp_setCurrentBlockState_767 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSyntaxHighlighter_Adaptor *)cls)->fp_QSyntaxHighlighter_setCurrentBlockState_767 (arg1);
 }
@@ -789,7 +789,7 @@ static void _call_fp_setCurrentBlockUserData_2408 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextBlockUserData *arg1 = args.read<QTextBlockUserData * > (heap);
+  QTextBlockUserData *arg1 = gsi::arg_reader<QTextBlockUserData * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSyntaxHighlighter_Adaptor *)cls)->fp_QSyntaxHighlighter_setCurrentBlockUserData_2408 (arg1);
 }
@@ -812,9 +812,9 @@ static void _call_fp_setFormat_4132 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QTextCharFormat &arg3 = args.read<const QTextCharFormat & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QTextCharFormat &arg3 = gsi::arg_reader<const QTextCharFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSyntaxHighlighter_Adaptor *)cls)->fp_QSyntaxHighlighter_setFormat_4132 (arg1, arg2, arg3);
 }
@@ -837,9 +837,9 @@ static void _call_fp_setFormat_3223 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QColor &arg3 = args.read<const QColor & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QColor &arg3 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSyntaxHighlighter_Adaptor *)cls)->fp_QSyntaxHighlighter_setFormat_3223 (arg1, arg2, arg3);
 }
@@ -862,9 +862,9 @@ static void _call_fp_setFormat_3119 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QFont &arg3 = args.read<const QFont & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QFont &arg3 = gsi::arg_reader<const QFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSyntaxHighlighter_Adaptor *)cls)->fp_QSyntaxHighlighter_setFormat_3119 (arg1, arg2, arg3);
 }

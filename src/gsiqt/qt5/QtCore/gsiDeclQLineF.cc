@@ -69,8 +69,8 @@ static void _call_ctor_QLineF_3864 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QLineF *> (new QLineF (arg1, arg2));
 }
 
@@ -95,10 +95,10 @@ static void _call_ctor_QLineF_3960 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   ret.write<QLineF *> (new QLineF (arg1, arg2, arg3, arg4));
 }
 
@@ -117,7 +117,7 @@ static void _call_ctor_QLineF_1786 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLine &arg1 = args.read<const QLine & > (heap);
+  const QLine &arg1 = gsi::arg_reader<const QLine & >() (args, heap);
   ret.write<QLineF *> (new QLineF (arg1));
 }
 
@@ -151,7 +151,7 @@ static void _call_f_angle_c1856 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLineF &arg1 = args.read<const QLineF & > (heap);
+  const QLineF &arg1 = gsi::arg_reader<const QLineF & >() (args, heap);
   ret.write<double > ((double)((QLineF *)cls)->angle (arg1));
 }
 
@@ -170,7 +170,7 @@ static void _call_f_angleTo_c1856 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLineF &arg1 = args.read<const QLineF & > (heap);
+  const QLineF &arg1 = gsi::arg_reader<const QLineF & >() (args, heap);
   ret.write<double > ((double)((QLineF *)cls)->angleTo (arg1));
 }
 
@@ -221,8 +221,8 @@ static void _call_f_intersect_c3043 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLineF &arg1 = args.read<const QLineF & > (heap);
-  QPointF *arg2 = args.read<QPointF * > (heap);
+  const QLineF &arg1 = gsi::arg_reader<const QLineF & >() (args, heap);
+  QPointF *arg2 = gsi::arg_reader<QPointF * >() (args, heap);
   ret.write<qt_gsi::Converter<QLineF::IntersectType>::target_type > ((qt_gsi::Converter<QLineF::IntersectType>::target_type)qt_gsi::CppToQtAdaptor<QLineF::IntersectType>(((QLineF *)cls)->intersect (arg1, arg2)));
 }
 
@@ -286,7 +286,7 @@ static void _call_f_operator_excl__eq__c1856 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLineF &arg1 = args.read<const QLineF & > (heap);
+  const QLineF &arg1 = gsi::arg_reader<const QLineF & >() (args, heap);
   ret.write<bool > ((bool)((QLineF *)cls)->operator!= (arg1));
 }
 
@@ -305,7 +305,7 @@ static void _call_f_operator_eq__eq__c1856 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QLineF &arg1 = args.read<const QLineF & > (heap);
+  const QLineF &arg1 = gsi::arg_reader<const QLineF & >() (args, heap);
   ret.write<bool > ((bool)((QLineF *)cls)->operator== (arg1));
 }
 
@@ -354,7 +354,7 @@ static void _call_f_pointAt_c1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QPointF > ((QPointF)((QLineF *)cls)->pointAt (arg1));
 }
 
@@ -373,7 +373,7 @@ static void _call_f_setAngle_1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLineF *)cls)->setAngle (arg1);
 }
@@ -393,7 +393,7 @@ static void _call_f_setLength_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLineF *)cls)->setLength (arg1);
 }
@@ -419,10 +419,10 @@ static void _call_f_setLine_3960 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLineF *)cls)->setLine (arg1, arg2, arg3, arg4);
 }
@@ -442,7 +442,7 @@ static void _call_f_setP1_1986 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLineF *)cls)->setP1 (arg1);
 }
@@ -462,7 +462,7 @@ static void _call_f_setP2_1986 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLineF *)cls)->setP2 (arg1);
 }
@@ -484,8 +484,8 @@ static void _call_f_setPoints_3864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLineF *)cls)->setPoints (arg1, arg2);
 }
@@ -520,7 +520,7 @@ static void _call_f_translate_1986 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLineF *)cls)->translate (arg1);
 }
@@ -542,8 +542,8 @@ static void _call_f_translate_2034 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLineF *)cls)->translate (arg1, arg2);
 }
@@ -563,7 +563,7 @@ static void _call_f_translated_c1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QLineF > ((QLineF)((QLineF *)cls)->translated (arg1));
 }
 
@@ -584,8 +584,8 @@ static void _call_f_translated_c2034 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QLineF > ((QLineF)((QLineF *)cls)->translated (arg1, arg2));
 }
 
@@ -681,8 +681,8 @@ static void _call_f_fromPolar_2034 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   ret.write<QLineF > ((QLineF)QLineF::fromPolar (arg1, arg2));
 }
 

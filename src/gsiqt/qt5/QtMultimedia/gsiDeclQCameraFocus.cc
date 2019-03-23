@@ -159,7 +159,7 @@ static void _call_f_isFocusModeSupported_c3327 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QCameraFocus::FocusMode> arg1 = args.read<QFlags<QCameraFocus::FocusMode> > (heap);
+  QFlags<QCameraFocus::FocusMode> arg1 = gsi::arg_reader<QFlags<QCameraFocus::FocusMode> >() (args, heap);
   ret.write<bool > ((bool)((QCameraFocus *)cls)->isFocusModeSupported (arg1));
 }
 
@@ -178,7 +178,7 @@ static void _call_f_isFocusPointModeSupported_c3153 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QCameraFocus *)cls)->isFocusPointModeSupported (qt_gsi::QtToCppAdaptor<QCameraFocus::FocusPointMode>(arg1).cref()));
 }
 
@@ -242,7 +242,7 @@ static void _call_f_setCustomFocusPoint_1986 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraFocus *)cls)->setCustomFocusPoint (arg1);
 }
@@ -262,7 +262,7 @@ static void _call_f_setFocusMode_3327 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QCameraFocus::FocusMode> arg1 = args.read<QFlags<QCameraFocus::FocusMode> > (heap);
+  QFlags<QCameraFocus::FocusMode> arg1 = gsi::arg_reader<QFlags<QCameraFocus::FocusMode> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraFocus *)cls)->setFocusMode (arg1);
 }
@@ -282,7 +282,7 @@ static void _call_f_setFocusPointMode_3153 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraFocus *)cls)->setFocusPointMode (qt_gsi::QtToCppAdaptor<QCameraFocus::FocusPointMode>(arg1).cref());
 }
@@ -304,8 +304,8 @@ static void _call_f_zoomTo_2034 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraFocus *)cls)->zoomTo (arg1, arg2);
 }
@@ -329,9 +329,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraFocus::tr (arg1, arg2, arg3));
 }
 
@@ -354,9 +354,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraFocus::trUtf8 (arg1, arg2, arg3));
 }
 

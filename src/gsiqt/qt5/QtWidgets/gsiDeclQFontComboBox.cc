@@ -152,7 +152,7 @@ static void _call_f_setCurrentFont_1801 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFontComboBox *)cls)->setCurrentFont (arg1);
 }
@@ -172,7 +172,7 @@ static void _call_f_setFontFilters_3550 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QFontComboBox::FontFilter> arg1 = args.read<QFlags<QFontComboBox::FontFilter> > (heap);
+  QFlags<QFontComboBox::FontFilter> arg1 = gsi::arg_reader<QFlags<QFontComboBox::FontFilter> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFontComboBox *)cls)->setFontFilters (arg1);
 }
@@ -192,7 +192,7 @@ static void _call_f_setWritingSystem_3214 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = args.read<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & > (heap);
+  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFontComboBox *)cls)->setWritingSystem (qt_gsi::QtToCppAdaptor<QFontDatabase::WritingSystem>(arg1).cref());
 }
@@ -246,9 +246,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QFontComboBox::tr (arg1, arg2, arg3));
 }
 
@@ -271,9 +271,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QFontComboBox::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1242,7 +1242,7 @@ static void _call_ctor_QFontComboBox_Adaptor_1315 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QFontComboBox_Adaptor *> (new QFontComboBox_Adaptor (arg1));
 }
 
@@ -1284,7 +1284,7 @@ static void _call_emitter_activated_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_activated_767 (arg1);
 }
 
@@ -1302,7 +1302,7 @@ static void _call_emitter_activated_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_activated_2025 (arg1);
 }
 
@@ -1420,9 +1420,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFontComboBox_Adaptor *)cls)->fp_QFontComboBox_create_2208 (arg1, arg2, arg3);
 }
@@ -1441,7 +1441,7 @@ static void _call_emitter_currentFontChanged_1801 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_currentFontChanged_1801 (arg1);
 }
 
@@ -1459,7 +1459,7 @@ static void _call_emitter_currentIndexChanged_767 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_currentIndexChanged_767 (arg1);
 }
 
@@ -1477,7 +1477,7 @@ static void _call_emitter_currentIndexChanged_2025 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_currentIndexChanged_2025 (arg1);
 }
 
@@ -1495,7 +1495,7 @@ static void _call_emitter_currentTextChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_currentTextChanged_2025 (arg1);
 }
 
@@ -1513,7 +1513,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_customContextMenuRequested_1916 (arg1);
 }
 
@@ -1557,8 +1557,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFontComboBox_Adaptor *)cls)->fp_QFontComboBox_destroy_1620 (arg1, arg2);
 }
@@ -1577,7 +1577,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_destroyed_1302 (arg1);
 }
 
@@ -1715,7 +1715,7 @@ static void _call_emitter_editTextChanged_2025 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_editTextChanged_2025 (arg1);
 }
 
@@ -1991,7 +1991,7 @@ static void _call_emitter_highlighted_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_highlighted_767 (arg1);
 }
 
@@ -2009,7 +2009,7 @@ static void _call_emitter_highlighted_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_highlighted_2025 (arg1);
 }
 
@@ -2051,7 +2051,7 @@ static void _call_fp_initStyleOption_c2658 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionComboBox *arg1 = args.read<QStyleOptionComboBox * > (heap);
+  QStyleOptionComboBox *arg1 = gsi::arg_reader<QStyleOptionComboBox * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFontComboBox_Adaptor *)cls)->fp_QFontComboBox_initStyleOption_c2658 (arg1);
 }
@@ -2117,7 +2117,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QFontComboBox_Adaptor *)cls)->fp_QFontComboBox_isSignalConnected_c2394 (arg1));
 }
 
@@ -2441,7 +2441,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QFontComboBox_Adaptor *)cls)->fp_QFontComboBox_receivers_c1731 (arg1));
 }
 
@@ -2727,7 +2727,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_windowIconChanged_1787 (arg1);
 }
 
@@ -2745,7 +2745,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_windowIconTextChanged_2025 (arg1);
 }
 
@@ -2763,7 +2763,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_windowTitleChanged_2025 (arg1);
 }
 

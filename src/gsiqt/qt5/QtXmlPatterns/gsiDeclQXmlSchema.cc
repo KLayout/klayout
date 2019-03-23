@@ -71,7 +71,7 @@ static void _call_ctor_QXmlSchema_2292 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlSchema &arg1 = args.read<const QXmlSchema & > (heap);
+  const QXmlSchema &arg1 = gsi::arg_reader<const QXmlSchema & >() (args, heap);
   ret.write<QXmlSchema *> (new QXmlSchema (arg1));
 }
 
@@ -120,7 +120,7 @@ static void _call_f_load_1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QXmlSchema *)cls)->load (arg1));
 }
 
@@ -141,8 +141,8 @@ static void _call_f_load_3040 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const QUrl &arg2 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const QUrl &arg2 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
   ret.write<bool > ((bool)((QXmlSchema *)cls)->load (arg1, arg2));
 }
 
@@ -163,8 +163,8 @@ static void _call_f_load_3902 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QUrl &arg2 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QUrl &arg2 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
   ret.write<bool > ((bool)((QXmlSchema *)cls)->load (arg1, arg2));
 }
 
@@ -228,7 +228,7 @@ static void _call_f_operator_eq__2292 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlSchema &arg1 = args.read<const QXmlSchema & > (heap);
+  const QXmlSchema &arg1 = gsi::arg_reader<const QXmlSchema & >() (args, heap);
   ret.write<QXmlSchema & > ((QXmlSchema &)((QXmlSchema *)cls)->operator= (arg1));
 }
 
@@ -247,7 +247,7 @@ static void _call_f_setMessageHandler_2934 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractMessageHandler *arg1 = args.read<QAbstractMessageHandler * > (heap);
+  QAbstractMessageHandler *arg1 = gsi::arg_reader<QAbstractMessageHandler * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSchema *)cls)->setMessageHandler (arg1);
 }
@@ -267,7 +267,7 @@ static void _call_f_setNetworkAccessManager_2742 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkAccessManager *arg1 = args.read<QNetworkAccessManager * > (heap);
+  QNetworkAccessManager *arg1 = gsi::arg_reader<QNetworkAccessManager * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSchema *)cls)->setNetworkAccessManager (arg1);
 }
@@ -287,7 +287,7 @@ static void _call_f_setUriResolver_3372 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAbstractUriResolver *arg1 = args.read<const QAbstractUriResolver * > (heap);
+  const QAbstractUriResolver *arg1 = gsi::arg_reader<const QAbstractUriResolver * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSchema *)cls)->setUriResolver (arg1);
 }

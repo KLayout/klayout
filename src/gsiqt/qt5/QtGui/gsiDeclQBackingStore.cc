@@ -50,7 +50,7 @@ static void _call_ctor_QBackingStore_1335 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWindow *arg1 = args.read<QWindow * > (heap);
+  QWindow *arg1 = gsi::arg_reader<QWindow * >() (args, heap);
   ret.write<QBackingStore *> (new QBackingStore (arg1));
 }
 
@@ -69,7 +69,7 @@ static void _call_f_beginPaint_2006 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBackingStore *)cls)->beginPaint (arg1);
 }
@@ -109,9 +109,9 @@ static void _call_f_flush_5041 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
-  QWindow *arg2 = args ? args.read<QWindow * > (heap) : (QWindow *)(0);
-  const QPoint &arg3 = args ? args.read<const QPoint & > (heap) : (const QPoint &)(QPoint());
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
+  QWindow *arg2 = args ? gsi::arg_reader<QWindow * >() (args, heap) : gsi::arg_maker<QWindow * >() (0, heap);
+  const QPoint &arg3 = args ? gsi::arg_reader<const QPoint & >() (args, heap) : gsi::arg_maker<const QPoint & >() (QPoint(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBackingStore *)cls)->flush (arg1, arg2, arg3);
 }
@@ -161,7 +161,7 @@ static void _call_f_resize_1805 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBackingStore *)cls)->resize (arg1);
 }
@@ -185,9 +185,9 @@ static void _call_f_scroll_3324 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QBackingStore *)cls)->scroll (arg1, arg2, arg3));
 }
 
@@ -206,7 +206,7 @@ static void _call_f_setStaticContents_2006 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBackingStore *)cls)->setStaticContents (arg1);
 }

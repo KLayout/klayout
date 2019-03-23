@@ -126,7 +126,7 @@ static void _call_f_location_3304 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLibraryInfo::LibraryLocation>::target_type & arg1 = args.read<const qt_gsi::Converter<QLibraryInfo::LibraryLocation>::target_type & > (heap);
+  const qt_gsi::Converter<QLibraryInfo::LibraryLocation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLibraryInfo::LibraryLocation>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QLibraryInfo::location (qt_gsi::QtToCppAdaptor<QLibraryInfo::LibraryLocation>(arg1).cref()));
 }
 
@@ -145,7 +145,7 @@ static void _call_f_platformPluginArguments_2025 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)QLibraryInfo::platformPluginArguments (arg1));
 }
 

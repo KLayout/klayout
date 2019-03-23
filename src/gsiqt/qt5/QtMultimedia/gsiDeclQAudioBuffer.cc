@@ -65,7 +65,7 @@ static void _call_ctor_QAudioBuffer_2494 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioBuffer &arg1 = args.read<const QAudioBuffer & > (heap);
+  const QAudioBuffer &arg1 = gsi::arg_reader<const QAudioBuffer & >() (args, heap);
   ret.write<QAudioBuffer *> (new QAudioBuffer (arg1));
 }
 
@@ -88,9 +88,9 @@ static void _call_ctor_QAudioBuffer_5588 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QAudioFormat &arg2 = args.read<const QAudioFormat & > (heap);
-  qint64 arg3 = args ? args.read<qint64 > (heap) : (qint64)(-1);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QAudioFormat &arg2 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
+  qint64 arg3 = args ? gsi::arg_reader<qint64 >() (args, heap) : gsi::arg_maker<qint64 >() (-1, heap);
   ret.write<QAudioBuffer *> (new QAudioBuffer (arg1, arg2, arg3));
 }
 
@@ -113,9 +113,9 @@ static void _call_ctor_QAudioBuffer_4046 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QAudioFormat &arg2 = args.read<const QAudioFormat & > (heap);
-  qint64 arg3 = args ? args.read<qint64 > (heap) : (qint64)(-1);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QAudioFormat &arg2 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
+  qint64 arg3 = args ? gsi::arg_reader<qint64 >() (args, heap) : gsi::arg_maker<qint64 >() (-1, heap);
   ret.write<QAudioBuffer *> (new QAudioBuffer (arg1, arg2, arg3));
 }
 
@@ -254,7 +254,7 @@ static void _call_f_operator_eq__2494 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioBuffer &arg1 = args.read<const QAudioBuffer & > (heap);
+  const QAudioBuffer &arg1 = gsi::arg_reader<const QAudioBuffer & >() (args, heap);
   ret.write<QAudioBuffer & > ((QAudioBuffer &)((QAudioBuffer *)cls)->operator= (arg1));
 }
 

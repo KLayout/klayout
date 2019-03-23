@@ -83,7 +83,7 @@ static void _call_ctor_QTemporaryFile_2025 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTemporaryFile *> (new QTemporaryFile (arg1));
 }
 
@@ -102,7 +102,7 @@ static void _call_ctor_QTemporaryFile_1302 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QTemporaryFile *> (new QTemporaryFile (arg1));
 }
 
@@ -123,8 +123,8 @@ static void _call_ctor_QTemporaryFile_3219 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QObject *arg2 = args.read<QObject * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QTemporaryFile *> (new QTemporaryFile (arg1, arg2));
 }
 
@@ -203,7 +203,7 @@ static void _call_f_setAutoRemove_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTemporaryFile *)cls)->setAutoRemove (arg1);
 }
@@ -223,7 +223,7 @@ static void _call_f_setFileTemplate_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTemporaryFile *)cls)->setFileTemplate (arg1);
 }
@@ -243,7 +243,7 @@ static void _call_f_createLocalFile_2025 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTemporaryFile * > ((QTemporaryFile *)QTemporaryFile::createLocalFile (arg1));
 }
 
@@ -262,7 +262,7 @@ static void _call_f_createLocalFile_1083 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFile &arg1 = args.read<QFile & > (heap);
+  QFile &arg1 = gsi::arg_reader<QFile & >() (args, heap);
   ret.write<QTemporaryFile * > ((QTemporaryFile *)QTemporaryFile::createLocalFile (arg1));
 }
 
@@ -281,7 +281,7 @@ static void _call_f_createNativeFile_2025 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTemporaryFile * > ((QTemporaryFile *)QTemporaryFile::createNativeFile (arg1));
 }
 
@@ -300,7 +300,7 @@ static void _call_f_createNativeFile_1083 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFile &arg1 = args.read<QFile & > (heap);
+  QFile &arg1 = gsi::arg_reader<QFile & >() (args, heap);
   ret.write<QTemporaryFile * > ((QTemporaryFile *)QTemporaryFile::createNativeFile (arg1));
 }
 
@@ -323,9 +323,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QTemporaryFile::tr (arg1, arg2, arg3));
 }
 
@@ -348,9 +348,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QTemporaryFile::trUtf8 (arg1, arg2, arg3));
 }
 

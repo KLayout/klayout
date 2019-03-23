@@ -96,7 +96,7 @@ static void _call_f_matches_c2869 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & arg1 = args.read<const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & > (heap);
+  const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QKeyEvent *)cls)->matches (qt_gsi::QtToCppAdaptor<QKeySequence::StandardKey>(arg1).cref()));
 }
 
@@ -286,12 +286,12 @@ static void _call_ctor_QKeyEvent_Adaptor_10234 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
-  QFlags<Qt::KeyboardModifier> arg3 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  bool arg5 = args ? args.read<bool > (heap) : (bool)(false);
-  unsigned short int arg6 = args ? args.read<unsigned short int > (heap) : (unsigned short int)(1);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg3 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  bool arg5 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
+  unsigned short int arg6 = args ? gsi::arg_reader<unsigned short int >() (args, heap) : gsi::arg_maker<unsigned short int >() (1, heap);
   ret.write<QKeyEvent_Adaptor *> (new QKeyEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, arg4, arg5, arg6));
 }
 
@@ -325,15 +325,15 @@ static void _call_ctor_QKeyEvent_Adaptor_13204 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
-  QFlags<Qt::KeyboardModifier> arg3 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
-  quint32 arg4 = args.read<quint32 > (heap);
-  quint32 arg5 = args.read<quint32 > (heap);
-  quint32 arg6 = args.read<quint32 > (heap);
-  const QString &arg7 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  bool arg8 = args ? args.read<bool > (heap) : (bool)(false);
-  unsigned short int arg9 = args ? args.read<unsigned short int > (heap) : (unsigned short int)(1);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg3 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
+  quint32 arg4 = gsi::arg_reader<quint32 >() (args, heap);
+  quint32 arg5 = gsi::arg_reader<quint32 >() (args, heap);
+  quint32 arg6 = gsi::arg_reader<quint32 >() (args, heap);
+  const QString &arg7 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  bool arg8 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
+  unsigned short int arg9 = args ? gsi::arg_reader<unsigned short int >() (args, heap) : gsi::arg_maker<unsigned short int >() (1, heap);
   ret.write<QKeyEvent_Adaptor *> (new QKeyEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
 }
 

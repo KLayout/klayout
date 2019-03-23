@@ -65,7 +65,7 @@ static void _call_ctor_QTextBoundaryFinder_3251 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBoundaryFinder &arg1 = args.read<const QTextBoundaryFinder & > (heap);
+  const QTextBoundaryFinder &arg1 = gsi::arg_reader<const QTextBoundaryFinder & >() (args, heap);
   ret.write<QTextBoundaryFinder *> (new QTextBoundaryFinder (arg1));
 }
 
@@ -86,8 +86,8 @@ static void _call_ctor_QTextBoundaryFinder_5661 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextBoundaryFinder::BoundaryType>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextBoundaryFinder::BoundaryType>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const qt_gsi::Converter<QTextBoundaryFinder::BoundaryType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextBoundaryFinder::BoundaryType>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QTextBoundaryFinder *> (new QTextBoundaryFinder (qt_gsi::QtToCppAdaptor<QTextBoundaryFinder::BoundaryType>(arg1).cref(), arg2));
 }
 
@@ -151,7 +151,7 @@ static void _call_f_operator_eq__3251 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBoundaryFinder &arg1 = args.read<const QTextBoundaryFinder & > (heap);
+  const QTextBoundaryFinder &arg1 = gsi::arg_reader<const QTextBoundaryFinder & >() (args, heap);
   ret.write<QTextBoundaryFinder & > ((QTextBoundaryFinder &)((QTextBoundaryFinder *)cls)->operator= (arg1));
 }
 
@@ -185,7 +185,7 @@ static void _call_f_setPosition_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBoundaryFinder *)cls)->setPosition (arg1);
 }

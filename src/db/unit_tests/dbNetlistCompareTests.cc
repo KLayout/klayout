@@ -12,6 +12,94 @@
 namespace db
 {
 
+class NetlistCompareLogger
+{
+public:
+  NetlistCompareLogger () { }
+  virtual ~NetlistCompareLogger () { }
+
+  /**
+   *  @brief Begin logging for netlist a and b
+   */
+  virtual void begin_netlist (const db::Netlist * /*a*/, const db::Netlist * /*b*/) { }
+
+  /**
+   *  @brief End logging for netlist a and b
+   */
+  virtual void end_netlist (const db::Netlist * /*a*/, const db::Netlist * /*b*/) { }
+
+  /**
+   *  @brief Begin logging for circuit a and b
+   */
+  virtual void begin_circuit (const db::Circuit * /*a*/, const db::Circuit * /*b*/) { }
+
+  /**
+   *  @brief End logging for circuit a and b
+   */
+  virtual void end_circuit (const db::Circuit * /*a*/, const db::Circuit * /*b*/, bool /*matching*/) { }
+
+  /**
+   *  @brief There is a circuit mismatch
+   *  "a" is null if there is no match for b and vice versa.
+   */
+  virtual void circuit_mismatch (const db::Circuit * /*a*/, const db::Circuit * /*b*/) { }
+
+  /**
+   *  @brief Nets a and b match exactly
+   */
+  virtual void match_nets (const db::Net * /*a*/, const db::Net * /*b*/) { }
+
+  /**
+   *  @brief Nets a and b are matched, but are ambiguous
+   *  Other nets might also match with a and also with b. Matching this a and b is
+   *  an arbitrary decision.
+   */
+  virtual void match_ambiguous_nets (const db::Net * /*a*/, const db::Net * /*b*/) { }
+
+  /**
+   *  @brief Net a or b doesn't match
+   *  "a" is null if there is no match for b and vice versa.
+   */
+  virtual void net_mismatch (const db::Net * /*a*/, const db::Net * /*b*/) { }
+
+  /**
+   *  @brief Devices a and b match exactly
+   */
+  virtual void match_devices (const db::Device * /*a*/, const db::Device * /*b*/) { }
+
+  /**
+   *  @brief Devices a and b are matched but have different parameters
+   */
+  virtual void match_devices_with_different_parameters (const db::Device * /*a*/, const db::Device * /*b*/) { }
+
+  /**
+   *  @brief Devices a and b are matched but have different device classes
+   */
+  virtual void match_devices_with_different_device_classes (const db::Device * /*a*/, const db::Device * /*b*/) { }
+
+  /**
+   *  @brief Pins a and b of the current circuit are matched
+   */
+  virtual void match_pins (const db::Pin * /*a*/, const db::Pin * /*b*/) { }
+
+  /**
+   *  @brief Pin a or b doesn't match
+   *  "a" is null if there is no match for b and vice versa.
+   */
+  virtual void pin_mismatch (const db::Pin * /*a*/, const db::Pin * /*b*/) { }
+
+  /**
+   *  @brief Subcircuits a and b match exactly
+   */
+  virtual void match_subcircuits (const db::SubCircuit * /*a*/, const db::SubCircuit * /*b*/) { }
+
+  /**
+   *  @brief SubCircuit a or b doesn't match
+   *  "a" is null if there is no match for b and vice versa.
+   */
+  virtual void subcircuit_mismatch (const db::SubCircuit * /*a*/, const db::SubCircuit * /*b*/) { }
+};
+
 struct DeviceCompare
 {
   bool operator() (const db::Device *d1, const db::Device *d2) const
@@ -215,15 +303,6 @@ namespace std
 namespace db
 {
 
-static std::string net2string (const db::Net *net)
-{
-  if (! net) {
-    return "(null)";
-  } else {
-    return net->expanded_name ();
-  }
-}
-
 class NetDeviceGraph
 {
 public:
@@ -286,7 +365,7 @@ public:
     return m_nodes.end ();
   }
 
-  size_t derive_node_identities (size_t net_index, NetDeviceGraph &other)
+  size_t derive_node_identities (size_t net_index, NetDeviceGraph &other, NetlistCompareLogger *logger)
   {
     size_t added = 0;
 
@@ -346,7 +425,7 @@ public:
               }
 
               if (count_other == 1) {
-                confirm_identity (*this, begin () + ec->second.second, other, other.begin () + ec_other->second.second);
+                confirm_identity (*this, begin () + ec->second.second, other, other.begin () + ec_other->second.second, logger);
                 ++added;
                 more.push_back (ec->second.second);
               }
@@ -366,10 +445,10 @@ public:
     return added;
   }
 
-  static void confirm_identity (db::NetDeviceGraph &g1, db::NetDeviceGraph::node_iterator s1, db::NetDeviceGraph &g2, db::NetDeviceGraph::node_iterator s2)
+  static void confirm_identity (db::NetDeviceGraph &g1, db::NetDeviceGraph::node_iterator s1, db::NetDeviceGraph &g2, db::NetDeviceGraph::node_iterator s2, db::NetlistCompareLogger *logger)
   {
-    if (tl::verbosity () >= 30) {
-      tl::log << tl::to_string (tr ("Net identity confirmed: ")) << net2string (s1->net ()) << " - " << net2string (s2->net ());
+    if (logger) {
+      logger->match_nets (s1->net (), s2->net ());
     }
     g1.identify (s1 - g1.begin (), s2 - g2.begin ());
     g2.identify (s2 - g2.begin (), s1 - g1.begin ());
@@ -382,7 +461,75 @@ private:
   std::map<const db::Net *, size_t> m_net_index;
 };
 
-static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
+class NetlistComparer
+{
+public:
+  NetlistComparer (NetlistCompareLogger *logger)
+    : mp_logger (logger)
+  { }
+
+  bool compare (const db::Netlist *a, const db::Netlist *b) const
+  {
+    bool good = true;
+
+    std::map<std::string, std::pair<const db::Circuit *, const db::Circuit *> > name2circuits;
+
+    for (db::Netlist::const_circuit_iterator i = a->begin_circuits (); i != a->end_circuits (); ++i) {
+      name2circuits[i->name ()].first = i.operator-> ();
+    }
+
+    for (db::Netlist::const_circuit_iterator i = b->begin_circuits (); i != b->end_circuits (); ++i) {
+      name2circuits[i->name ()].second = i.operator-> ();
+    }
+
+    if (mp_logger) {
+      mp_logger->begin_netlist (a, b);
+    }
+
+    for (std::map<std::string, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = name2circuits.begin (); i != name2circuits.end (); ++i) {
+      if (! i->second.first || ! i->second.second) {
+        good = false;
+        if (mp_logger) {
+          mp_logger->circuit_mismatch (i->second.first, i->second.second);
+        }
+      }
+    }
+
+    for (db::Netlist::const_bottom_up_circuit_iterator c = a->begin_bottom_up (); c != a->end_bottom_up (); ++c) {
+
+      std::map<std::string, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = name2circuits.find ((*c)->name ());
+      tl_assert (i != name2circuits.end ());
+
+      if (i->second.first && i->second.second) {
+        if (mp_logger) {
+          mp_logger->begin_circuit (i->second.first, i->second.second);
+        }
+        bool g = compare_circuits (i->second.first, i->second.second);
+        if (! g) {
+          good = false;
+        }
+        if (mp_logger) {
+          mp_logger->end_circuit (i->second.first, i->second.second, g);
+        }
+      }
+
+    }
+
+    if (mp_logger) {
+      mp_logger->begin_netlist (a, b);
+    }
+
+    return good;
+  }
+
+protected:
+  bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2) const;
+
+  NetlistCompareLogger *mp_logger;
+};
+
+bool
+NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2) const
 {
   db::NetDeviceGraph g1, g2;
 
@@ -394,7 +541,7 @@ static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
     size_t new_identities = 0;
     for (db::NetDeviceGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
       if (i1->has_other ()) {
-        new_identities += g1.derive_node_identities (i1 - g1.begin (), g2);
+        new_identities += g1.derive_node_identities (i1 - g1.begin (), g2, mp_logger);
       }
     }
 
@@ -435,7 +582,7 @@ static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
 
             if (seeds == 1) {
               //  found a candidate - a single node with the same edges
-              db::NetDeviceGraph::confirm_identity (g1, s1, g2, s2);
+              db::NetDeviceGraph::confirm_identity (g1, s1, g2, s2, mp_logger);
               ++new_identities;
             } else if (seeds > 1) {
               ambiguous = true;
@@ -457,7 +604,7 @@ static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
 
       if (seeds == 1) {
         //  found a candidate - a single node with the same edges
-        db::NetDeviceGraph::confirm_identity (g1, s1, g2, s2);
+        db::NetDeviceGraph::confirm_identity (g1, s1, g2, s2, mp_logger);
         ++new_identities;
       } else if (seeds > 1) {
         ambiguous = true;
@@ -475,13 +622,13 @@ static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
       tl::error << tr ("Unassigned in netlist A:");
       for (db::NetDeviceGraph::node_iterator i = g1.begin (); i != g1.end (); ++i) {
         if (! i->has_other ()) {
-          tl::error << "  " << net2string (i->net ());
+          tl::error << "  " << i->net ()->expanded_name ();
         }
       }
       tl::error << tr ("Unassigned in netlist B:");
       for (db::NetDeviceGraph::node_iterator i = g2.begin (); i != g2.end (); ++i) {
         if (! i->has_other ()) {
-          tl::error << "  " << net2string (i->net ());
+          tl::error << "  " << i->net ()->expanded_name ();
         }
       }
       // @@@
@@ -492,6 +639,112 @@ static bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2)
 }
 
 }
+
+class NetlistCompareTestLogger
+  : public db::NetlistCompareLogger
+{
+public:
+  NetlistCompareTestLogger () { }
+
+  virtual void begin_circuit (const db::Circuit *a, const db::Circuit *b)
+  {
+    m_texts.push_back ("begin_circuit " + circuit2str (a) + " " + circuit2str (b));
+  }
+
+  virtual void end_circuit (const db::Circuit *a, const db::Circuit *b, bool matching)
+  {
+    m_texts.push_back ("end_circuit " + circuit2str (a) + " " + circuit2str (b) + " " + (matching ? "MATCH" : "NOMATCH"));
+  }
+
+  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b)
+  {
+    m_texts.push_back ("circuit_mismatch " + circuit2str (a) + " " + circuit2str (b));
+  }
+
+  virtual void match_nets (const db::Net *a, const db::Net *b)
+  {
+    m_texts.push_back ("match_nets " + net2str (a) + " " + net2str (b));
+  }
+
+  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b)
+  {
+    m_texts.push_back ("match_ambiguous_nets " + net2str (a) + " " + net2str (b));
+  }
+
+  virtual void net_mismatch (const db::Net *a, const db::Net *b)
+  {
+    m_texts.push_back ("net_mismatch " + net2str (a) + " " + net2str (b));
+  }
+
+  virtual void match_devices (const db::Device *a, const db::Device *b)
+  {
+    m_texts.push_back ("match_devices " + device2str (a) + " " + device2str (b));
+  }
+
+  virtual void match_devices_with_different_parameters (const db::Device *a, const db::Device *b)
+  {
+    m_texts.push_back ("match_devices_with_different_parameters " + device2str (a) + " " + device2str (b));
+  }
+
+  virtual void match_devices_with_different_device_classes (const db::Device *a, const db::Device *b)
+  {
+    m_texts.push_back ("match_devices_with_different_device_classes " + device2str (a) + " " + device2str (b));
+  }
+
+  virtual void match_pins (const db::Pin *a, const db::Pin *b)
+  {
+    m_texts.push_back ("match_pins " + pin2str (a) + " " + pin2str (b));
+  }
+
+  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b)
+  {
+    m_texts.push_back ("pin_mismatch " + pin2str (a) + " " + pin2str (b));
+  }
+
+  virtual void match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b)
+  {
+    m_texts.push_back ("match_subcircuits " + subcircuit2str (a) + " " + subcircuit2str (b));
+  }
+
+  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b)
+  {
+    m_texts.push_back ("subcircuit_mismatch " + subcircuit2str (a) + " " + subcircuit2str (b));
+  }
+
+  std::string text () const
+  {
+    return tl::join (m_texts, "\n");
+  }
+
+private:
+  std::vector<std::string> m_texts;
+
+  std::string circuit2str (const db::Circuit *x) const
+  {
+    return x ? x->name () : "(null)";
+  }
+
+  std::string device2str (const db::Device *x) const
+  {
+    return x ? x->expanded_name () : "(null)";
+  }
+
+  std::string net2str (const db::Net *x) const
+  {
+    return x ? x->expanded_name () : "(null)";
+  }
+
+  std::string pin2str (const db::Pin *x) const
+  {
+    return x ? x->expanded_name () : "(null)";
+  }
+
+  std::string subcircuit2str (const db::SubCircuit *x) const
+  {
+    return x ? x->expanded_name () : "(null)";
+  }
+};
+
 
 TEST(1)
 {
@@ -603,5 +856,13 @@ TEST(1)
   nl1.from_string (nls1);
   nl2.from_string (nls2);
 
-  db::compare_circuits (nl1.circuit_by_name ("RINGO"), nl2.circuit_by_name ("RINGO"));
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (), 
+    ""
+  );
+  EXPECT_EQ (good, true);
 }

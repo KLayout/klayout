@@ -182,7 +182,15 @@ public:
     }
   };
 
-  typedef std::vector<std::pair<std::vector<EdgeDesc>, std::pair<const db::Net *, size_t> > >::const_iterator edge_iterator;
+  struct EdgeToEdgeOnlyCompare
+  {
+    bool operator() (const std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > &a, const std::vector<EdgeDesc> &b) const
+    {
+      return a.first < b;
+    }
+  };
+
+  typedef std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > >::const_iterator edge_iterator;
 
   NetDeviceGraphNode (const db::Net *net, std::map<const db::Device *, size_t, DeviceCompare> &devmap, std::vector<const db::Device *> &device_prototypes)
     : mp_net (net), m_other_net_index (std::numeric_limits<size_t>::max ())
@@ -218,7 +226,7 @@ public:
           std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net2);
           if (in == n2entry.end ()) {
             in = n2entry.insert (std::make_pair (net2, m_edges.size ())).first;
-            m_edges.push_back (std::make_pair (std::vector<EdgeDesc> (), std::make_pair (net2, size_t (0))));
+            m_edges.push_back (std::make_pair (std::vector<EdgeDesc> (), std::make_pair (size_t (0), net2)));
           }
 
           m_edges [in->second].first.push_back (ed2);
@@ -228,13 +236,6 @@ public:
       }
 
     }
-
-    //  "deep sorting" of the edge descriptor
-    for (std::vector<std::pair<std::vector<EdgeDesc>, std::pair<const db::Net *, size_t> > >::iterator i = m_edges.begin (); i != m_edges.end (); ++i) {
-      std::sort (i->first.begin (), i->first.end ());
-    }
-
-    std::sort (m_edges.begin (), m_edges.end ());
   }
 
   const db::Net *net () const
@@ -259,11 +260,18 @@ public:
 
   void apply_net_index (const std::map<const db::Net *, size_t> &ni)
   {
-    for (std::vector<std::pair<std::vector<EdgeDesc>, std::pair<const db::Net *, size_t> > >::iterator i = m_edges.begin (); i != m_edges.end (); ++i) {
-      std::map<const db::Net *, size_t>::const_iterator j = ni.find (i->second.first);
+    for (std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > >::iterator i = m_edges.begin (); i != m_edges.end (); ++i) {
+      std::map<const db::Net *, size_t>::const_iterator j = ni.find (i->second.second);
       tl_assert (j != ni.end ());
-      i->second.second = j->second;
+      i->second.first = j->second;
     }
+
+    //  "deep sorting" of the edge descriptor
+    for (std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > >::iterator i = m_edges.begin (); i != m_edges.end (); ++i) {
+      std::sort (i->first.begin (), i->first.end ());
+    }
+
+    std::sort (m_edges.begin (), m_edges.end ());
   }
 
   bool operator< (const NetDeviceGraphNode &node) const
@@ -309,10 +317,20 @@ public:
     return m_edges.end ();
   }
 
+  edge_iterator find_edge (const std::vector<EdgeDesc> &edge) const
+  {
+    edge_iterator res = std::lower_bound (begin (), end (), edge, NetDeviceGraphNode::EdgeToEdgeOnlyCompare ());
+    if (res->first != edge) {
+      return end ();
+    } else {
+      return res;
+    }
+  }
+
 private:
   const db::Net *mp_net;
   size_t m_other_net_index;
-  std::vector<std::pair<std::vector<EdgeDesc>, std::pair<const db::Net *, size_t> > > m_edges;
+  std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > > m_edges;
 };
 
 }
@@ -427,7 +445,7 @@ public:
           size_t count = 0;
           NetDeviceGraphNode::edge_iterator ec;
           for (NetDeviceGraphNode::edge_iterator i = e; i != ee; ++i) {
-            if (! m_nodes[i->second.second].has_other ()) {
+            if (! m_nodes[i->second.first].has_other ()) {
               ec = i;
               ++count;
             }
@@ -435,29 +453,39 @@ public:
 
           if (count == 1) {   //  if non-ambiguous, non-assigned
 
-            NetDeviceGraphNode::edge_iterator e_other = std::lower_bound (nother->begin (), nother->end (), *ec);
-            if (e_other != nother->end () && e_other->first == ec->first) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+            tl::log << "considering " << n->net ()->expanded_name () << " to " << ec->second.second->expanded_name ();
+#endif
 
+            NetDeviceGraphNode::edge_iterator e_other = nother->find_edge (ec->first);
+            if (e_other != nother->end ()) {
+
+#if defined(PRINT_DEBUG_NETCOMPARE)
+              tl::log << "candidate accepted";
+#endif
               NetDeviceGraphNode::edge_iterator ee_other = e_other;
               ++ee_other;
 
-              while (ee_other != n->end () && ee_other->first == e_other->first) {
+              while (ee_other != nother->end () && ee_other->first == e_other->first) {
                 ++ee_other;
               }
 
               size_t count_other = 0;
               NetDeviceGraphNode::edge_iterator ec_other;
               for (NetDeviceGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
-                if (! m_nodes[i->second.second].has_other ()) {
+                if (! m_nodes[i->second.first].has_other ()) {
                   ec_other = i;
                   ++count_other;
                 }
               }
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+              tl::log << "identity count = " << count_other;
+#endif
               if (count_other == 1) {
-                confirm_identity (*this, begin () + ec->second.second, other, other.begin () + ec_other->second.second, logger);
+                confirm_identity (*this, begin () + ec->second.first, other, other.begin () + ec_other->second.first, logger);
                 ++added;
-                more.push_back (ec->second.second);
+                more.push_back (ec->second.first);
               }
 
             }
@@ -648,10 +676,23 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   bool good = true;
   while (good) {
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+    tl::log << "new iteration ...";
+#endif
+
     size_t new_identities = 0;
     for (db::NetDeviceGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
       if (i1->has_other ()) {
-        new_identities += g1.derive_node_identities (i1 - g1.begin (), g2, mp_logger);
+#if defined(PRINT_DEBUG_NETCOMPARE)
+        tl::log << "deriving new identities from " << i1->net ()->expanded_name ();
+#endif
+        size_t ni = g1.derive_node_identities (i1 - g1.begin (), g2, mp_logger);
+        new_identities += ni;
+        if (ni > 0) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+        tl::log << ni << " new identities.";
+#endif
+        }
       }
     }
 
@@ -666,6 +707,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     if (new_identities == 0) {
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+      tl::log << "checking topological identity ...";
+#endif
       //  derive new identities through topology
 
       db::NetDeviceGraph::node_iterator i1 = g1.begin (), i2 = g2.begin ();
@@ -711,7 +755,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       mp_logger->net_mismatch (i->net (), 0);
     }
   }
-  tl::error << tr ("Unassigned in netlist B:");
+
   for (db::NetDeviceGraph::node_iterator i = g2.begin (); i != g2.end (); ++i) {
     if (! i->has_other ()) {
       mp_logger->net_mismatch (0, i->net ());
@@ -814,10 +858,23 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     std::map<std::vector<std::pair<size_t, size_t> >, const db::Device *>::const_iterator dm = device_map.find (k);
 
     if (! mapped || dm == device_map.end ()) {
+
       mp_logger->device_mismatch (0, d.operator-> ());
+
     } else {
-      //  @@@ compare parameters, device class
-      mp_logger->match_devices (dm->second, d.operator-> ());
+
+      db::DeviceCompare dc;
+
+      if (dc (dm->second, d.operator-> ()) || dc (d.operator-> (), dm->second)) {
+        if (dm->second->device_class ()->name () != d->device_class ()->name ()) {
+          mp_logger->match_devices_with_different_device_classes (dm->second, d.operator-> ());
+        } else {
+          mp_logger->match_devices_with_different_parameters (dm->second, d.operator-> ());
+        }
+      } else {
+        mp_logger->match_devices (dm->second, d.operator-> ());
+      }
+
     }
 
   }
@@ -833,79 +890,87 @@ class NetlistCompareTestLogger
 public:
   NetlistCompareTestLogger () { }
 
+  void out (const std::string &text)
+  {
+    m_texts.push_back (text);
+#if defined(PRINT_DEBUG_NETCOMPARE)
+    tl::log << m_texts.back ();
+#endif
+  }
+
   virtual void begin_circuit (const db::Circuit *a, const db::Circuit *b)
   {
-    m_texts.push_back ("begin_circuit " + circuit2str (a) + " " + circuit2str (b));
+    out ("begin_circuit " + circuit2str (a) + " " + circuit2str (b));
   }
 
   virtual void end_circuit (const db::Circuit *a, const db::Circuit *b, bool matching)
   {
-    m_texts.push_back ("end_circuit " + circuit2str (a) + " " + circuit2str (b) + " " + (matching ? "MATCH" : "NOMATCH"));
+    out ("end_circuit " + circuit2str (a) + " " + circuit2str (b) + " " + (matching ? "MATCH" : "NOMATCH"));
   }
 
   virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b)
   {
-    m_texts.push_back ("circuit_skipped " + circuit2str (a) + " " + circuit2str (b));
+    out ("circuit_skipped " + circuit2str (a) + " " + circuit2str (b));
   }
 
   virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b)
   {
-    m_texts.push_back ("circuit_mismatch " + circuit2str (a) + " " + circuit2str (b));
+    out ("circuit_mismatch " + circuit2str (a) + " " + circuit2str (b));
   }
 
   virtual void match_nets (const db::Net *a, const db::Net *b)
   {
-    m_texts.push_back ("match_nets " + net2str (a) + " " + net2str (b));
+    out ("match_nets " + net2str (a) + " " + net2str (b));
   }
 
   virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b)
   {
-    m_texts.push_back ("match_ambiguous_nets " + net2str (a) + " " + net2str (b));
+    out ("match_ambiguous_nets " + net2str (a) + " " + net2str (b));
   }
 
   virtual void net_mismatch (const db::Net *a, const db::Net *b)
   {
-    m_texts.push_back ("net_mismatch " + net2str (a) + " " + net2str (b));
+    out ("net_mismatch " + net2str (a) + " " + net2str (b));
   }
 
   virtual void match_devices (const db::Device *a, const db::Device *b)
   {
-    m_texts.push_back ("match_devices " + device2str (a) + " " + device2str (b));
+    out ("match_devices " + device2str (a) + " " + device2str (b));
   }
 
   virtual void device_mismatch (const db::Device *a, const db::Device *b)
   {
-    m_texts.push_back ("device_mismatch " + device2str (a) + " " + device2str (b));
+    out ("device_mismatch " + device2str (a) + " " + device2str (b));
   }
 
   virtual void match_devices_with_different_parameters (const db::Device *a, const db::Device *b)
   {
-    m_texts.push_back ("match_devices_with_different_parameters " + device2str (a) + " " + device2str (b));
+    out ("match_devices_with_different_parameters " + device2str (a) + " " + device2str (b));
   }
 
   virtual void match_devices_with_different_device_classes (const db::Device *a, const db::Device *b)
   {
-    m_texts.push_back ("match_devices_with_different_device_classes " + device2str (a) + " " + device2str (b));
+    out ("match_devices_with_different_device_classes " + device2str (a) + " " + device2str (b));
   }
 
   virtual void match_pins (const db::Pin *a, const db::Pin *b)
   {
-    m_texts.push_back ("match_pins " + pin2str (a) + " " + pin2str (b));
+    out ("match_pins " + pin2str (a) + " " + pin2str (b));
   }
 
   virtual void pin_mismatch (const db::Pin *a, const db::Pin *b)
   {
-    m_texts.push_back ("pin_mismatch " + pin2str (a) + " " + pin2str (b));
+    out ("pin_mismatch " + pin2str (a) + " " + pin2str (b));
   }
 
   virtual void match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b)
   {
-    m_texts.push_back ("match_subcircuits " + subcircuit2str (a) + " " + subcircuit2str (b));
+    out ("match_subcircuits " + subcircuit2str (a) + " " + subcircuit2str (b));
   }
 
   virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b)
   {
-    m_texts.push_back ("subcircuit_mismatch " + subcircuit2str (a) + " " + subcircuit2str (b));
+    out ("subcircuit_mismatch " + subcircuit2str (a) + " " + subcircuit2str (b));
   }
 
   std::string text () const
@@ -1070,13 +1135,13 @@ TEST(3_Buffer)
      "begin_circuit BUF BUF\n"
      "match_nets VSS VSS\n"
      "match_nets OUT OUT\n"
-     "match_nets IN IN\n"
      "match_nets VDD VDD\n"
+     "match_nets IN IN\n"
      "match_nets INT $10\n"
      "match_pins $3 $2\n"
      "match_pins $1 $3\n"
-     "match_pins $0 $1\n"
      "match_pins $2 $0\n"
+     "match_pins $0 $1\n"
      "match_devices $1 $1\n"
      "match_devices $3 $2\n"
      "match_devices $2 $3\n"
@@ -1127,12 +1192,12 @@ TEST(4_BufferTwoPaths)
      "match_nets OUT OUT\n"
      "match_ambiguous_nets INT $10\n"
      "match_nets INT2 $11\n"
-     "match_nets IN IN\n"
      "match_nets VDD VDD\n"
+     "match_nets IN IN\n"
      "match_pins $3 $2\n"
      "match_pins $1 $3\n"
-     "match_pins $0 $1\n"
      "match_pins $2 $0\n"
+     "match_pins $0 $1\n"
      "match_devices $1 $1\n"
      "match_devices $3 $2\n"
      "match_devices $5 $3\n"
@@ -1142,6 +1207,70 @@ TEST(4_BufferTwoPaths)
      "match_devices $6 $7\n"
      "match_devices $8 $8\n"
      "end_circuit BUF BUF MATCH"
+  );
+  EXPECT_EQ (good, true);
+}
+
+TEST(5_BufferTwoPathsDifferentParameters)
+{
+  const char *nls1 =
+    "circuit BUF ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $5 (S=VDD,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=VSS,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $7 (S=VDD,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $8 (S=VSS,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit BUF ($1=VDD,$2=IN,$3=VSS,$4=OUT);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=$10) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$10,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=IN,D=$11) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $4 (S=VDD,G=$11,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $5 (S=$10,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=OUT,G=$10,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $7 (S=$11,G=IN,D=VSS) (L=0.35,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"   //  NOTE: 0.35 instead of 0.25
+    "  device NMOS $8 (S=OUT,G=$11,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  //  Forcing the power nets into equality makes the parameter error harder to detect
+  const db::Circuit *ca = nl1.circuit_by_name ("BUF");
+  const db::Circuit *cb = nl2.circuit_by_name ("BUF");
+  comp.same_nets (ca, ca->net_by_name ("VDD"), cb, cb->net_by_name ("VDD"));
+  comp.same_nets (ca, ca->net_by_name ("VSS"), cb, cb->net_by_name ("VSS"));
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_ambiguous_nets INT $10\n"
+    "match_nets INT2 $11\n"
+    "match_pins $3 $2\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $0 $1\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices_with_different_parameters $6 $7\n"
+    "match_devices $8 $8\n"
+    "end_circuit BUF BUF MATCH"
   );
   EXPECT_EQ (good, true);
 }

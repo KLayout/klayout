@@ -133,6 +133,64 @@ struct DeviceCompare
   }
 };
 
+struct SubCircuitCompare
+{
+  bool operator() (const db::SubCircuit *sc1, const db::SubCircuit *sc2) const
+  {
+    //  @@@ TODO: device class identity should not be defined via name
+    if (sc1->circuit_ref () != sc2->circuit_ref () && sc1->circuit_ref ()->name () != sc2->circuit_ref ()->name ()) {
+      return sc1->circuit_ref ()->name () < sc2->circuit_ref ()->name ();
+    }
+
+    //  no parameters
+    return false;
+  }
+};
+
+class CircuitMapper
+{
+public:
+  CircuitMapper ()
+    : mp_other (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  void set_other (const db::Circuit *other)
+  {
+    mp_other = other;
+  }
+
+  const db::Circuit *other () const
+  {
+    return mp_other;
+  }
+
+  void map_pin (size_t this_pin, size_t other_pin)
+  {
+    m_pin_map.insert (std::make_pair (this_pin, other_pin));
+    m_rev_pin_map.insert (std::make_pair (other_pin, this_pin));
+  }
+
+  size_t other_pin_from_this_pin (size_t this_pin) const
+  {
+    std::map<size_t, size_t>::const_iterator i = m_pin_map.find (this_pin);
+    tl_assert (i != m_pin_map.end ());
+    return i->second;
+  }
+
+  size_t this_pin_from_other_pin (size_t other_pin) const
+  {
+    std::map<size_t, size_t>::const_iterator i = m_rev_pin_map.find (other_pin);
+    tl_assert (i != m_rev_pin_map.end ());
+    return i->second;
+  }
+
+private:
+  const db::Circuit *mp_other;
+  std::map<size_t, size_t> m_pin_map, m_rev_pin_map;
+};
+
 static size_t translate_terminal_id (size_t tid, const db::Device *device)
 {
   // @@@ delegate to device class
@@ -149,36 +207,97 @@ static size_t translate_terminal_id (size_t tid, const db::Device *device)
   // @@@
 }
 
+static size_t translate_subcircuit_pin_id (size_t pid, const db::Circuit * /*circuit*/)
+{
+  // @@@ not implemented yet
+  return pid;
+  // @@@
+}
+
 class NetDeviceGraphNode
 {
 public:
   struct EdgeDesc {
+
+    //  @@@ TODO: there can be only devices or subcircuits, so we can
+    //  compress this structure.
     const db::Device *device;
     size_t terminal1_id, terminal2_id;
+    const db::SubCircuit *subcircuit;
+    size_t pin1_id, pin2_id;
+
+    EdgeDesc ()
+      : device (0), terminal1_id (0), terminal2_id (0),
+        subcircuit (0), pin1_id (0), pin2_id (0)
+    {
+      //  .. nothing yet ..
+    }
 
     bool operator< (const EdgeDesc &other) const
     {
-      DeviceCompare dc;
-      bool dlt = dc (device, other.device);
-      if (dlt || dc (other.device, device)) {
-        return dlt;
+      if ((device != 0) != (other.device != 0)) {
+        return (device != 0) < (other.device != 0);
       }
-      if (terminal1_id != other.terminal1_id) {
-        return terminal1_id < other.terminal1_id;
+
+      if (device != 0) {
+
+        DeviceCompare dc;
+        bool dlt = dc (device, other.device);
+        if (dlt || dc (other.device, device)) {
+          return dlt;
+        }
+
+        if (terminal1_id != other.terminal1_id) {
+          return terminal1_id < other.terminal1_id;
+        }
+        return terminal2_id < other.terminal2_id;
+
+      } else {
+
+        SubCircuitCompare sc;
+        bool sclt = sc (subcircuit, other.subcircuit);
+        if (sclt || sc (other.subcircuit, subcircuit)) {
+          return sclt;
+        }
+
+        if (pin1_id != other.pin1_id) {
+          return pin1_id < other.pin1_id;
+        }
+        return pin2_id < other.pin2_id;
+
       }
-      return terminal2_id < other.terminal2_id;
     }
 
     bool operator== (const EdgeDesc &other) const
     {
-      DeviceCompare dc;
-      if (dc (device, other.device) || dc (other.device, device)) {
+      if ((device != 0) != (other.device != 0)) {
         return false;
       }
-      if (terminal1_id != other.terminal1_id) {
-        return false;
+
+      if (device != 0) {
+
+        DeviceCompare dc;
+        if (dc (device, other.device) || dc (other.device, device)) {
+          return false;
+        }
+        if (terminal1_id != other.terminal1_id) {
+          return false;
+        }
+        return terminal2_id == other.terminal2_id;
+
+      } else {
+
+        SubCircuitCompare sc;
+        if (sc (subcircuit, other.subcircuit) || sc (other.subcircuit, subcircuit)) {
+          return false;
+        }
+
+        if (pin1_id != other.pin1_id) {
+          return false;
+        }
+        return pin2_id == other.pin2_id;
+
       }
-      return terminal2_id == other.terminal2_id;
     }
   };
 
@@ -192,10 +311,77 @@ public:
 
   typedef std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > >::const_iterator edge_iterator;
 
-  NetDeviceGraphNode (const db::Net *net, std::map<const db::Device *, size_t, DeviceCompare> &devmap, std::vector<const db::Device *> &device_prototypes)
+  NetDeviceGraphNode (const db::Net *net, std::map<const db::Device *, size_t, DeviceCompare> &devmap, std::vector<const db::Device *> &device_prototypes, const std::map<const db::Circuit *, CircuitMapper> *circuit_map)
     : mp_net (net), m_other_net_index (std::numeric_limits<size_t>::max ())
   {
     std::map<const db::Net *, size_t> n2entry;
+
+    for (db::Net::const_subcircuit_pin_iterator i = net->begin_subcircuit_pins (); i != net->end_subcircuit_pins (); ++i) {
+
+      const db::SubCircuit *sc = i->subcircuit ();
+      size_t pin_id = i->pin ()->id ();
+      const db::Circuit *cr = sc->circuit_ref ();
+
+      const CircuitMapper *cm = 0;
+
+      if (circuit_map) {
+        std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
+        tl_assert (icm != circuit_map->end ());
+        cm = & icm->second;
+      }
+
+      //  NOTE: if cm is given, cr and pin_id are given in terms of the "other" circuit
+
+      if (cm) {
+        cr = cm->other ();
+        pin_id = cm->other_pin_from_this_pin (pin_id);
+      }
+
+      //  we cannot afford creating edges from all to all other pins, so we just create edges to the previous and next
+      //  pin. This may take more iterations to solve, but should be equivalent.
+
+      db::Circuit::const_pin_iterator p = cr->begin_pins ();
+      for ( ; p != cr->end_pins () && p->id () != pin_id; ++p)
+        ;
+      tl_assert (p != cr->end_pins ());
+
+      db::Circuit::const_pin_iterator pp = p;
+      if (pp == cr->begin_pins ()) {
+        pp = cr->end_pins ();
+      }
+      --pp;
+
+      db::Circuit::const_pin_iterator pn = p;
+      ++pn;
+      if (pn == cr->end_pins ()) {
+        pn = cr->begin_pins ();
+      }
+
+      for (int i = 0; i < 2; ++i) {
+
+        size_t pin2_id = (i == 0 ? pp->id () : pn->id ());
+
+        EdgeDesc ed;
+        ed.subcircuit = sc;
+        //  NOTE: if a pin mapping is given, EdgeDesc::pin1_id and EdgeDesc::pin2_id are given
+        //  as pin ID's of the other circuit.
+        ed.pin1_id = translate_subcircuit_pin_id (pin_id, cr);
+        ed.pin2_id = translate_subcircuit_pin_id (pin2_id, cr);
+
+        size_t this_pin2_id = cm ? cm->this_pin_from_other_pin (pin2_id) : pin2_id;
+        const db::Net *net2 = sc->net_for_pin (this_pin2_id);
+
+        std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net2);
+        if (in == n2entry.end ()) {
+          in = n2entry.insert (std::make_pair (net2, m_edges.size ())).first;
+          m_edges.push_back (std::make_pair (std::vector<EdgeDesc> (), std::make_pair (size_t (0), net2)));
+        }
+
+        m_edges [in->second].first.push_back (ed);
+
+      }
+
+    }
 
     for (db::Net::const_terminal_iterator i = net->begin_terminals (); i != net->end_terminals (); ++i) {
 
@@ -356,7 +542,7 @@ public:
     //  .. nothing yet ..
   }
 
-  void build (const db::Circuit *c)
+  void build (const db::Circuit *c, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping)
   {
     tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Building net graph for circuit: ")) + c->name ());
 
@@ -372,7 +558,7 @@ public:
     m_nodes.reserve (nets);
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      NetDeviceGraphNode node (n.operator-> (), m_device_map, m_device_prototypes);
+      NetDeviceGraphNode node (n.operator-> (), m_device_map, m_device_prototypes, circuit_and_pin_mapping);
       m_nodes.push_back (node);
     }
 
@@ -563,6 +749,7 @@ public:
     }
 
     std::set<const db::Circuit *> verified_circuits_a, verified_circuits_b;
+    std::map<const db::Circuit *, CircuitMapper> pin_mapping;
 
     for (db::Netlist::const_bottom_up_circuit_iterator c = a->begin_bottom_up (); c != a->end_bottom_up (); ++c) {
 
@@ -588,7 +775,7 @@ public:
           }
 
           bool pin_mismatch = false;
-          bool g = compare_circuits (ca, cb, *net_identity, pin_mismatch);
+          bool g = compare_circuits (ca, cb, *net_identity, pin_mismatch, pin_mapping);
           if (! g) {
             good = false;
           }
@@ -622,7 +809,7 @@ public:
   }
 
 protected:
-  bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch) const;
+  bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &circuit_and_pin_map) const;
   bool all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const;
 
   NetlistCompareLogger *mp_logger;
@@ -658,13 +845,49 @@ compute_device_key (const db::Device &device, const db::NetDeviceGraph &g)
   return k;
 }
 
+static std::vector<std::pair<size_t, size_t> >
+compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map)
+{
+  std::vector<std::pair<size_t, size_t> > k;
+
+  const db::Circuit *cr = subcircuit.circuit_ref ();
+
+  const CircuitMapper *cm = 0;
+
+  if (circuit_map) {
+    std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
+    tl_assert (icm != circuit_map->end ());
+    cm = & icm->second;
+    cr = cm->other ();
+  }
+
+  //  NOTE: if cm is given, cr is given in terms of the "other" circuit
+
+  for (db::Circuit::const_pin_iterator p = cr->begin_pins (); p != cr->end_pins (); ++p) {
+
+    size_t this_pin_id = cm ? cm->this_pin_from_other_pin (p->id ()) : p->id ();
+
+    size_t pin_id = translate_subcircuit_pin_id (p->id (), cr);
+    const db::Net *net = subcircuit.net_for_pin (this_pin_id);
+    size_t net_id = g.node_index_for_net (net);
+    k.push_back (std::make_pair (pin_id, net_id));
+
+  }
+
+  std::sort (k.begin (), k.end ());
+
+  return k;
+}
+
 bool
-NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch) const
+NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &circuit_and_pin_mapping) const
 {
   db::NetDeviceGraph g1, g2;
 
-  g1.build (c1);
-  g2.build (c2);
+  //  NOTE: for normalization we map all subcircuits of c1 to c2.
+  //  Also, pin swapping will only happen there.
+  g1.build (c1, &circuit_and_pin_mapping);
+  g2.build (c2, 0);
 
   for (std::vector<std::pair<const Net *, const Net *> >::const_iterator p = net_identity.begin (); p != net_identity.end (); ++p) {
     size_t ni1 = g1.node_index_for_net (p->first);
@@ -748,6 +971,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   }
 
+
   //  Report missing net assignment
 
   for (db::NetDeviceGraph::node_iterator i = g1.begin (); i != g1.end (); ++i) {
@@ -771,6 +995,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     tl_assert (net != 0);
     net2pin.insert (std::make_pair (net, p.operator-> ()));
   }
+
+  CircuitMapper &pin_mapping = circuit_and_pin_mapping [c1];
+  pin_mapping.set_other (c2);
 
   for (db::NetDeviceGraph::node_iterator i = g1.begin (); i != g1.end (); ++i) {
 
@@ -797,6 +1024,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       if (np != net2pin.end () && np->first == other_net) {
 
         mp_logger->match_pins (pi->pin (), np->second);
+        pin_mapping.map_pin (pi->pin ()->id (), np->second->id ());
 
         std::multimap<const db::Net *, const db::Pin *>::iterator np_delete = np;
         ++np;
@@ -873,6 +1101,65 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
         }
       } else {
         mp_logger->match_devices (dm->second, d.operator-> ());
+      }
+
+    }
+
+  }
+
+  //  Report subcircuit assignment
+
+  std::map<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *> subcircuit_map;
+
+  for (db::Circuit::const_subcircuit_iterator sc = c1->begin_subcircuits (); sc != c1->end_subcircuits (); ++sc) {
+
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g1, &circuit_and_pin_mapping);
+
+    bool mapped = true;
+    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
+      if (! g1.begin () [i->second].has_other ()) {
+        mapped = false;
+      }
+    }
+
+    if (! mapped) {
+      mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
+    } else {
+      //  TODO: report devices which cannot be distiguished topologically?
+      subcircuit_map[k] = sc.operator-> ();
+    }
+
+  }
+
+  for (db::Circuit::const_subcircuit_iterator sc = c2->begin_subcircuits (); sc != c2->end_subcircuits (); ++sc) {
+
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, 0);
+
+    bool mapped = true;
+    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
+      if (! g1.begin () [i->second].has_other ()) {
+        mapped = false;
+      } else {
+        i->second = g2.begin () [i->second].other_net_index ();
+      }
+    }
+
+    std::sort (k.begin (), k.end ());
+
+    std::map<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *>::const_iterator scm = subcircuit_map.find (k);
+
+    if (! mapped || scm == subcircuit_map.end ()) {
+
+      mp_logger->subcircuit_mismatch (0, sc.operator-> ());
+
+    } else {
+
+      db::SubCircuitCompare scc;
+
+      if (scc (scm->second, sc.operator-> ()) || scc (sc.operator-> (), scm->second)) {
+        mp_logger->subcircuit_mismatch (scm->second, sc.operator-> ());
+      } else {
+        mp_logger->match_subcircuits (scm->second, sc.operator-> ());
       }
 
     }
@@ -1275,19 +1562,26 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (good, true);
 }
 
-TEST(100_SimpleInverterWithWrongTransistorParameter)
+TEST(10_SimpleSubCircuits)
 {
-return; // @@@ doesn't work yet.
   const char *nls1 =
     "circuit INV ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
     "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
     "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit INV $1 ($1=IN,$2=INT,$3=VDD,$4=VSS);\n"
+    "  subcircuit INV $2 ($1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
     "end;\n";
 
   const char *nls2 =
     "circuit INV ($1=VDD,$2=IN,$3=VSS,$4=OUT);\n"
     "  device NMOS $1 (S=OUT,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $2 (S=VDD,G=IN,D=OUT) (L=0.30,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($1=OUT,$2=VDD,$3=IN,$4=VSS);\n"
+    "  subcircuit INV $1 ($1=VDD,$2=INT,$3=VSS,$4=OUT);\n"
+    "  subcircuit INV $2 ($1=VDD,$2=IN,$3=VSS,$4=INT);\n"
     "end;\n";
 
   db::Netlist nl1, nl2;
@@ -1296,145 +1590,36 @@ return; // @@@ doesn't work yet.
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
-  const db::Circuit *ca = nl1.circuit_by_name ("INV");
-  const db::Circuit *cb = nl2.circuit_by_name ("INV");
-  comp.same_nets (ca, ca->net_by_name ("VDD"), cb, cb->net_by_name ("VDD"));
-  comp.same_nets (ca, ca->net_by_name ("VSS"), cb, cb->net_by_name ("VSS"));
 
   bool good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
-     "begin_circuit INV INV\n"
-     "match_nets OUT OUT\n"
-     "match_nets IN IN\n"
-     "match_pins $3 $2\n"
-     "match_pins $2 $0\n"
-     "match_pins $1 $3\n"
-     "match_pins $0 $1\n"
-     "end_circuit INV INV MATCH"
+    "begin_circuit INV INV\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_pins $3 $2\n"
+    "match_pins $2 $0\n"
+    "match_pins $1 $3\n"
+    "match_pins $0 $1\n"
+    "match_devices $2 $1\n"
+    "match_devices $1 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TOP TOP\n"
+    "match_nets IN IN\n"
+    "match_nets OUT OUT\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
+    "match_nets INT INT\n"
+    "match_pins $0 $2\n"
+    "match_pins $1 $0\n"
+    "match_pins $2 $1\n"
+    "match_pins $3 $3\n"
+    "match_subcircuits $2 $1\n"
+    "match_subcircuits $1 $2\n"
+    "end_circuit TOP TOP MATCH"
   );
+
   EXPECT_EQ (good, true);
 }
-
-#if 0
-TEST(2)
-{
-  const char *nls2 =
-    "circuit RINGO ();\n"
-    "  device PMOS $1 (S=$16,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $2 (S=VDD,G=$16,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $3 (S=$14,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $4 (S=VDD,G=$14,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $5 (S=$12,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $6 (S=VDD,G=$12,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $7 (S='IN,FB',G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $8 (S=VDD,G='IN,FB',D='OUT,OSC') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $9 (S=$4,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $10 (S=VDD,G=$4,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $11 (S=$8,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $12 (S=VDD,G=$8,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $13 (S=$2,G='IN,FB',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $14 (S=VDD,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $15 (S=$6,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $16 (S=VDD,G=$6,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $17 (S=$18,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $18 (S=VDD,G=$18,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $19 (S=$10,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $20 (S=VDD,G=$10,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $21 (S='IN,FB',G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $22 (S=VSS,G='IN,FB',D='OUT,OSC') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $23 (S=$18,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $24 (S=VSS,G=$18,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $25 (S=$14,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $26 (S=VSS,G=$14,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $27 (S=$12,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $28 (S=VSS,G=$12,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $29 (S=$4,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $30 (S=VSS,G=$4,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $31 (S=$2,G='IN,FB',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $32 (S=VSS,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $33 (S=$8,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $34 (S=VSS,G=$8,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $35 (S=$6,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $36 (S=VSS,G=$6,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $37 (S=$16,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $38 (S=VSS,G=$16,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $39 (S=$10,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $40 (S=VSS,G=$10,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "end;\n";
-
-  const char *nls1 =
-    "circuit RINGO ();\n"
-    "  device PMOS $1 (S=$16,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $2 (S=VDD,G=$16,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $3 (S=$14,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $4 (S=VDD,G=$14,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $5 (S=$12,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $6 (S=VDD,G=$12,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $7 (S='IN,FB',G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $8 (S=VDD,G='IN,FB',D='OUT,OSC') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $9 (S=$4,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $10 (S=VDD,G=$4,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $11 (S=$8,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $12 (S=VDD,G=$8,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $13 (S=$2,G='IN,FB',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $14 (S=VDD,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $15 (S=$6,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $16 (S=VDD,G=$6,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $17 (S=$18,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $18 (S=VDD,G=$18,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $19 (S=$10,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $20 (S=VDD,G=$10,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $21 (S='IN,FB',G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $22 (S=VSS,G='IN,FB',D='OUT,OSC') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $23 (S=$18,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $24 (S=VSS,G=$18,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $25 (S=$14,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $26 (S=VSS,G=$14,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $27 (S=$12,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $28 (S=VSS,G=$12,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $29 (S=$4,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $30 (S=VSS,G=$4,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $31 (S=$2,G='IN,FB',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $32 (S=VSS,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $33 (S=$8,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $34 (S=VSS,G=$8,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $35 (S=$6,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $36 (S=VSS,G=$6,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $37 (S=$16,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $38 (S=VSS,G=$16,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $39 (S=$10,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $40 (S=VSS,G=$10,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "end;\n";
-
-  db::DeviceClass *dc;
-
-  db::Netlist nl1, nl2;
-
-  db::Netlist *nlp[] = { &nl1, &nl2 };
-  for (int i = 0; i < 2; ++i) {
-
-    dc = new db::DeviceClassMOS3Transistor ();
-    dc->set_name ("PMOS");
-    nlp[i]->add_device_class (dc);
-
-    dc = new db::DeviceClassMOS3Transistor ();
-    dc->set_name ("NMOS");
-    nlp[i]->add_device_class (dc);
-
-  }
-
-  nl1.from_string (nls1);
-  nl2.from_string (nls2);
-
-  NetlistCompareTestLogger logger;
-  db::NetlistComparer comp (&logger);
-
-  bool good = comp.compare (&nl1, &nl2);
-
-  EXPECT_EQ (logger.text (), 
-    ""
-  );
-  EXPECT_EQ (good, true);
-}
-#endif

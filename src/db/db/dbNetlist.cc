@@ -731,10 +731,10 @@ static void read_device (tl::Extractor &ex, db::Circuit *circuit, std::map<std::
   read_device_parameters (ex, device);
 }
 
-static void read_subcircuit_pins (tl::Extractor &ex, db::SubCircuit *subcircuit, std::map<std::string, db::Net *> &n2n)
+static void read_subcircuit_pins (tl::Extractor &ex, db::Circuit *circuit, db::SubCircuit *subcircuit, std::map<std::string, db::Net *> &n2n)
 {
-  db::Circuit *circuit = subcircuit->circuit_ref ();
-  db::Circuit::pin_iterator pi = circuit->begin_pins ();
+  db::Circuit *circuit_ref = subcircuit->circuit_ref ();
+  db::Circuit::pin_iterator pi = circuit_ref->begin_pins ();
 
   ex.expect ("(");
   while (! ex.test (")")) {
@@ -744,12 +744,12 @@ static void read_subcircuit_pins (tl::Extractor &ex, db::SubCircuit *subcircuit,
 
     ex.expect ("=");
 
-    if (pi == circuit->end_pins ()) {
+    if (pi == circuit_ref->end_pins ()) {
       //  add a dummy pin
-      circuit->add_pin (pn);
-      pi = circuit->end_pins ();
+      circuit_ref->add_pin (pn);
+      pi = circuit_ref->end_pins ();
       --pi;
-    } else if (pi->name () != pn) {
+    } else if (! pi->name ().empty () && pi->name () != pn) {
       ex.error (tl::to_string (tr ("Expected pin with name: ")) + pi->name ());
     }
 
@@ -766,7 +766,7 @@ static void read_subcircuit_pins (tl::Extractor &ex, db::SubCircuit *subcircuit,
 
   }
 
-  if (pi != circuit->end_pins ()) {
+  if (pi != circuit_ref->end_pins ()) {
     ex.error (tl::to_string (tr ("Too few pins in subcircuit call")));
   }
 }
@@ -801,7 +801,7 @@ static void read_subcircuit (tl::Extractor &ex, db::Circuit *circuit, std::map<s
   db::SubCircuit *subcircuit = new db::SubCircuit (cc, scn);
   circuit->add_subcircuit (subcircuit);
 
-  read_subcircuit_pins (ex, subcircuit, n2n);
+  read_subcircuit_pins (ex, circuit, subcircuit, n2n);
 }
 
 void Netlist::from_string (const std::string &s)

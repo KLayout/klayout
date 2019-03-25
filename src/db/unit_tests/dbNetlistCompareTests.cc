@@ -340,6 +340,7 @@ public:
       //  we cannot afford creating edges from all to all other pins, so we just create edges to the previous and next
       //  pin. This may take more iterations to solve, but should be equivalent.
 
+      //  @@@ this is just pin_id + 1 or pin_id - 1!!!
       db::Circuit::const_pin_iterator p = cr->begin_pins ();
       for ( ; p != cr->end_pins () && p->id () != pin_id; ++p)
         ;
@@ -1012,6 +1013,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       for (db::Net::const_pin_iterator pi = net->begin_pins (); pi != net->end_pins (); ++pi) {
         mp_logger->pin_mismatch (pi->pin (), 0);
         pin_mismatch = true;
+        good = false;
       }
       continue;
     }
@@ -1033,6 +1035,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       } else {
         mp_logger->pin_mismatch (pi->pin (), 0);
         pin_mismatch = true;
+        good = false;
       }
 
     }
@@ -1042,12 +1045,13 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   for (std::multimap<const db::Net *, const db::Pin *>::iterator np = net2pin.begin (); np != net2pin.end (); ++np) {
     mp_logger->pin_mismatch (0, np->second);
     pin_mismatch = true;
+    good = false;
   }
 
 
   //  Report device assignment
 
-  std::map<std::vector<std::pair<size_t, size_t> >, const db::Device *> device_map;
+  std::multimap<std::vector<std::pair<size_t, size_t> >, const db::Device *> device_map;
 
   for (db::Circuit::const_device_iterator d = c1->begin_devices (); d != c1->end_devices (); ++d) {
 
@@ -1062,9 +1066,10 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     if (! mapped) {
       mp_logger->device_mismatch (d.operator-> (), 0);
+      good = false;
     } else {
       //  TODO: report devices which cannot be distiguished topologically?
-      device_map[k] = d.operator-> ();
+      device_map.insert (std::make_pair (k, d.operator-> ()));
     }
 
   }
@@ -1084,11 +1089,12 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     std::sort (k.begin (), k.end ());
 
-    std::map<std::vector<std::pair<size_t, size_t> >, const db::Device *>::const_iterator dm = device_map.find (k);
+    std::multimap<std::vector<std::pair<size_t, size_t> >, const db::Device *>::const_iterator dm = device_map.find (k);
 
-    if (! mapped || dm == device_map.end ()) {
+    if (! mapped || dm == device_map.end () || dm->first != k) {
 
       mp_logger->device_mismatch (0, d.operator-> ());
+      good = false;
 
     } else {
 
@@ -1112,14 +1118,15 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   }
 
-  for (std::map<std::vector<std::pair<size_t, size_t> >, const db::Device *>::const_iterator dm = device_map.begin (); dm != device_map.end (); ++dm) {
+  for (std::multimap<std::vector<std::pair<size_t, size_t> >, const db::Device *>::const_iterator dm = device_map.begin (); dm != device_map.end (); ++dm) {
     mp_logger->device_mismatch (dm->second, 0);
+    good = false;
   }
 
 
   //  Report subcircuit assignment
 
-  std::map<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *> subcircuit_map;
+  std::multimap<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *> subcircuit_map;
 
   for (db::Circuit::const_subcircuit_iterator sc = c1->begin_subcircuits (); sc != c1->end_subcircuits (); ++sc) {
 
@@ -1134,9 +1141,10 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     if (! mapped) {
       mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
+      good = false;
     } else {
       //  TODO: report devices which cannot be distiguished topologically?
-      subcircuit_map[k] = sc.operator-> ();
+      subcircuit_map.insert (std::make_pair (k, sc.operator-> ()));
     }
 
   }
@@ -1156,11 +1164,12 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     std::sort (k.begin (), k.end ());
 
-    std::map<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *>::const_iterator scm = subcircuit_map.find (k);
+    std::multimap<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *>::const_iterator scm = subcircuit_map.find (k);
 
     if (! mapped || scm == subcircuit_map.end ()) {
 
       mp_logger->subcircuit_mismatch (0, sc.operator-> ());
+      good = false;
 
     } else {
 
@@ -1168,12 +1177,20 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       if (scc (scm->second, sc.operator-> ()) || scc (sc.operator-> (), scm->second)) {
         mp_logger->subcircuit_mismatch (scm->second, sc.operator-> ());
+        good = false;
       } else {
         mp_logger->match_subcircuits (scm->second, sc.operator-> ());
       }
 
+      subcircuit_map.erase (scm);
+
     }
 
+  }
+
+  for (std::multimap<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *>::const_iterator scm = subcircuit_map.begin (); scm != subcircuit_map.end (); ++scm) {
+    mp_logger->subcircuit_mismatch (scm->second, 0);
+    good = false;
   }
 
   return good;
@@ -1572,6 +1589,70 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (good, false);
 }
 
+TEST(6_BufferTwoPathsAdditionalDevices)
+{
+  const char *nls1 =
+    "circuit BUF ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $5 (S=VDD,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=VSS,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $7 (S=VDD,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $8 (S=VSS,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $9 (S=VSS,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit BUF ($1=VDD,$2=IN,$3=VSS,$4=OUT);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=$10) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$10,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=$10,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $4 (S=VDD,G=IN,D=$11) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $5 (S=VDD,G=$11,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=$10,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $7 (S=OUT,G=$10,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $8 (S=$11,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $9 (S=OUT,G=$11,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets INT $11\n"
+    "match_nets VSS VSS\n"
+    "match_nets IN IN\n"
+    "match_nets OUT OUT\n"
+    "match_nets VDD VDD\n"
+    "match_nets INT2 $10\n"
+    "match_pins $3 $2\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $0 $1\n"
+    "match_devices $5 $1\n"
+    "match_devices $7 $2\n"
+    "device_mismatch (null) $3\n"
+    "match_devices $1 $4\n"
+    "match_devices $3 $5\n"
+    "match_devices $6 $6\n"
+    "match_devices $8 $7\n"
+    "match_devices $2 $8\n"
+    "match_devices $4 $9\n"
+    "device_mismatch $9 (null)\n"
+    "end_circuit BUF BUF NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+}
+
 TEST(10_SimpleSubCircuits)
 {
   const char *nls1 =
@@ -1655,6 +1736,60 @@ TEST(11_MismatchingSubcircuits)
     "circuit TOP ($0=OUT,$1=VDD,$2=IN,$3=VSS);\n"
     "  subcircuit INV $1 ($1=VDD,$2=INT,$3=VSS,$4=OUT);\n"
     "  subcircuit INV $2 ($1=VDD,$2=IN,$3=VSS,$4=INT);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit INV INV\n"
+    "match_nets VSS VSS\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "net_mismatch VDD (null)\n"
+    "net_mismatch (null) VDD\n"
+    "match_pins $3 $2\n"
+    "pin_mismatch $2 (null)\n"
+    "match_pins $1 $3\n"
+    "match_pins $0 $1\n"
+    "pin_mismatch (null) $0\n"
+    "device_mismatch $1 (null)\n"
+    "match_devices $2 $1\n"
+    "device_mismatch (null) $2\n"
+    "end_circuit INV INV NOMATCH\n"
+    "circuit_skipped TOP TOP"
+  );
+
+  EXPECT_EQ (good, false);
+}
+
+TEST(12_MismatchingSubcircuitsDuplicates)
+{
+  const char *nls1 =
+    "circuit INV ($0=IN,$1=OUT,$2=VDD,$3=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=IN,$1=OUT,$2=VDD,$3=VSS);\n"
+    "  subcircuit INV $1 ($1=IN,$2=INT,$3=VDD,$4=VSS);\n"
+    "  subcircuit INV $2 ($1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit INV $3 ($1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit INV ($0=VDD,$1=VSS,$2=IN,$3=OUT);\n"
+    "  device NMOS $1 (S=OUT,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=OUT,$1=IN,$2=VDD,$3=VSS);\n"
+    "  subcircuit INV $1 ($1=VDD,$2=VSS,$3=INT,$4=OUT);\n"
+    "  subcircuit INV $2 ($1=VDD,$2=VSS,$3=IN,$4=INT);\n"
     "end;\n";
 
   db::Netlist nl1, nl2;

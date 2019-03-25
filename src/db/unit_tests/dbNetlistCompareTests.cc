@@ -1044,6 +1044,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     pin_mismatch = true;
   }
 
+
   //  Report device assignment
 
   std::map<std::vector<std::pair<size_t, size_t> >, const db::Device *> device_map;
@@ -1074,7 +1075,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
-      if (! g1.begin () [i->second].has_other ()) {
+      if (! g2.begin () [i->second].has_other ()) {
         mapped = false;
       } else {
         i->second = g2.begin () [i->second].other_net_index ();
@@ -1096,16 +1097,25 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       if (dc (dm->second, d.operator-> ()) || dc (d.operator-> (), dm->second)) {
         if (dm->second->device_class ()->name () != d->device_class ()->name ()) {
           mp_logger->match_devices_with_different_device_classes (dm->second, d.operator-> ());
+          good = false;
         } else {
           mp_logger->match_devices_with_different_parameters (dm->second, d.operator-> ());
+          good = false;
         }
       } else {
         mp_logger->match_devices (dm->second, d.operator-> ());
       }
 
+      device_map.erase (dm);
+
     }
 
   }
+
+  for (std::map<std::vector<std::pair<size_t, size_t> >, const db::Device *>::const_iterator dm = device_map.begin (); dm != device_map.end (); ++dm) {
+    mp_logger->device_mismatch (dm->second, 0);
+  }
+
 
   //  Report subcircuit assignment
 
@@ -1557,9 +1567,9 @@ TEST(5_BufferTwoPathsDifferentParameters)
     "match_devices $4 $6\n"
     "match_devices_with_different_parameters $6 $7\n"
     "match_devices $8 $8\n"
-    "end_circuit BUF BUF MATCH"
+    "end_circuit BUF BUF NOMATCH"
   );
-  EXPECT_EQ (good, true);
+  EXPECT_EQ (good, false);
 }
 
 TEST(10_SimpleSubCircuits)
@@ -1622,4 +1632,58 @@ TEST(10_SimpleSubCircuits)
   );
 
   EXPECT_EQ (good, true);
+}
+
+TEST(11_MismatchingSubcircuits)
+{
+  const char *nls1 =
+    "circuit INV ($0=IN,$1=OUT,$2=VDD,$3=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=IN,$1=OUT,$2=VDD,$3=VSS);\n"
+    "  subcircuit INV $1 ($1=IN,$2=INT,$3=VDD,$4=VSS);\n"
+    "  subcircuit INV $2 ($1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit INV ($0=VDD,$1=IN,$2=VSS,$3=OUT);\n"
+    "  device NMOS $1 (S=OUT,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    //  wrong wiring:
+    "  device PMOS $2 (S=IN,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=OUT,$1=VDD,$2=IN,$3=VSS);\n"
+    "  subcircuit INV $1 ($1=VDD,$2=INT,$3=VSS,$4=OUT);\n"
+    "  subcircuit INV $2 ($1=VDD,$2=IN,$3=VSS,$4=INT);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit INV INV\n"
+    "match_nets VSS VSS\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "net_mismatch VDD (null)\n"
+    "net_mismatch (null) VDD\n"
+    "match_pins $3 $2\n"
+    "pin_mismatch $2 (null)\n"
+    "match_pins $1 $3\n"
+    "match_pins $0 $1\n"
+    "pin_mismatch (null) $0\n"
+    "device_mismatch $1 (null)\n"
+    "match_devices $2 $1\n"
+    "device_mismatch (null) $2\n"
+    "end_circuit INV INV NOMATCH\n"
+    "circuit_skipped TOP TOP"
+  );
+
+  EXPECT_EQ (good, false);
 }

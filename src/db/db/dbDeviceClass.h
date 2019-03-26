@@ -403,6 +403,17 @@ public:
     return false;
   }
 
+  /**
+   *  @brief Normalizes the terminal IDs to indicate terminal swapping
+   *
+   *  This method returns a "normalized" terminal ID. For example, for MOS
+   *  transistors where S and D can be exchanged, D will be mapped to S.
+   */
+  virtual size_t normalize_terminal_id (size_t tid) const
+  {
+    return tid;
+  }
+
 private:
   friend class Netlist;
 

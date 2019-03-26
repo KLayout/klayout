@@ -193,18 +193,7 @@ private:
 
 static size_t translate_terminal_id (size_t tid, const db::Device *device)
 {
-  // @@@ delegate to device class
-  if (dynamic_cast<const db::DeviceClassMOS3Transistor *> (device->device_class ())) {
-    if (tid == db::DeviceClassMOS3Transistor::terminal_id_D) {
-      return db::DeviceClassMOS3Transistor::terminal_id_S;
-    }
-  } else if (dynamic_cast<const db::DeviceClassMOS4Transistor *> (device->device_class ())) {
-    if (tid == db::DeviceClassMOS4Transistor::terminal_id_D) {
-      return db::DeviceClassMOS4Transistor::terminal_id_S;
-    }
-  }
-  return tid;
-  // @@@
+  return device->device_class () ? device->device_class ()->normalize_terminal_id (tid) : tid;
 }
 
 static size_t translate_subcircuit_pin_id (size_t pid, const db::Circuit * /*circuit*/)
@@ -326,7 +315,11 @@ public:
 
       if (circuit_map) {
         std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
-        tl_assert (icm != circuit_map->end ());
+        if (icm == circuit_map->end ()) {
+          //  this can happen if the other circuit is not present - this is allowed for single-pin
+          //  circuits.
+          continue;
+        }
         cm = & icm->second;
       }
 
@@ -820,10 +813,17 @@ bool
 NetlistComparer::all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const
 {
   for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
-    if (verified_circuits.find (sc->circuit_ref ()) == verified_circuits.end ()) {
+
+    const db::Circuit *cr = sc->circuit_ref ();
+
+    //  typical via subcircuits attach through one pin. We can safely ignore such subcircuits because they don't
+    //  contribute graph edges.
+    if (cr->pin_count () > 1 && verified_circuits.find (cr) == verified_circuits.end ()) {
       return false;
     }
+
   }
+
   return true;
 }
 
@@ -856,7 +856,11 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGra
 
   if (circuit_map) {
     std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
-    tl_assert (icm != circuit_map->end ());
+    if (icm == circuit_map->end ()) {
+      //  this can happen if the other circuit does not exist - in this case the key is an invalid one which cannot
+      //  be produced by a regular subcircuit.
+      return k;
+    }
     cm = & icm->second;
     cr = cm->other ();
   }
@@ -1141,7 +1145,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     if (! mapped) {
       mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
       good = false;
-    } else {
+    } else if (! k.empty ()) {
       //  TODO: report devices which cannot be distiguished topologically?
       subcircuit_map.insert (std::make_pair (k, sc.operator-> ()));
     }
@@ -1330,6 +1334,30 @@ static void prep_nl (db::Netlist &nl, const char *str)
 
   dc = new db::DeviceClassMOS3Transistor ();
   dc->set_name ("NMOS");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS4Transistor ();
+  dc->set_name ("PMOS4");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS4Transistor ();
+  dc->set_name ("NMOS4");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassResistor ();
+  dc->set_name ("RES");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassCapacitor ();
+  dc->set_name ("CAP");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassInductor ();
+  dc->set_name ("IND");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassDiode ();
+  dc->set_name ("DIODE");
   nl.add_device_class (dc);
 
   nl.from_string (str);
@@ -1652,6 +1680,214 @@ TEST(6_BufferTwoPathsAdditionalDevices)
   EXPECT_EQ (good, false);
 }
 
+TEST(7_Resistors)
+{
+  const char *nls1 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device RES $1 (A=P1,B=P2) (R=1.5);\n"
+    "  device RES $2 (A=P2,B=P3) (R=2.5);\n"
+    "  device RES $3 (A=P3,B=P1) (R=3);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device RES $2 (A=P2,B=P3) (R=2.5);\n"
+    "  device RES $1 (A=P2,B=P1) (R=1.5);\n"
+    "  device RES $3 (A=P3,B=P1) (R=3);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit TRIANGLE TRIANGLE\n"
+    "match_nets P1 P1\n"
+    "match_nets P3 P3\n"
+    "match_nets P2 P2\n"
+    "match_pins $1 $1\n"
+    "match_pins $0 $0\n"
+    "match_pins $2 $2\n"
+    "match_devices $2 $1\n"
+    "match_devices $1 $2\n"
+    "match_devices $3 $3\n"
+    "end_circuit TRIANGLE TRIANGLE MATCH"
+  );
+  EXPECT_EQ (good, true);
+}
+
+TEST(7_ResistorsParameterMismatch)
+{
+  const char *nls1 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device RES $1 (A=P1,B=P2) (R=1.5);\n"
+    "  device RES $2 (A=P2,B=P3) (R=2.5);\n"
+    "  device RES $3 (A=P3,B=P1) (R=3);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device RES $1 (A=P2,B=P1) (R=1.5);\n"
+    "  device RES $3 (A=P3,B=P1) (R=3.5);\n"
+    "  device RES $2 (A=P2,B=P3) (R=2.5);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit TRIANGLE TRIANGLE\n"
+    "match_nets P2 P2\n"
+    "match_nets P1 P1\n"
+    "match_nets P3 P3\n"
+    "match_pins $1 $1\n"
+    "match_pins $0 $0\n"
+    "match_pins $2 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices_with_different_parameters $3 $2\n"
+    "match_devices $2 $3\n"
+    "end_circuit TRIANGLE TRIANGLE NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+}
+
+TEST(7_ResistorsPlusOneDevice)
+{
+  const char *nls1 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device RES $1 (A=P1,B=P2) (R=1.5);\n"
+    "  device RES $2 (A=P2,B=P3) (R=2.5);\n"
+    "  device RES $3 (A=P3,B=P1) (R=3);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device RES $1 (A=P2,B=P1) (R=1.5);\n"
+    "  device RES $3 (A=P3,B=P1) (R=3);\n"
+    "  device CAP $4 (A=P1,B=P2) (C=1e-4);\n"
+    "  device RES $2 (A=P2,B=P3) (R=2.5);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit TRIANGLE TRIANGLE\n"
+    "match_nets P3 P3\n"
+    "match_nets P2 P2\n"
+    "match_nets P1 P1\n"
+    "match_pins $1 $1\n"
+    "match_pins $0 $0\n"
+    "match_pins $2 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "device_mismatch (null) $3\n"
+    "match_devices $2 $4\n"
+    "end_circuit TRIANGLE TRIANGLE NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+}
+
+TEST(8_Diodes)
+{
+  const char *nls1 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device DIODE $1 (A=P1,C=P2);\n"
+    "  device DIODE $2 (A=P1,C=P3);\n"
+    "  device DIODE $3 (A=P3,C=P2);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device DIODE $1 (A=P3,C=P2);\n"
+    "  device DIODE $2 (A=P1,C=P3);\n"
+    "  device DIODE $3 (A=P1,C=P2);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit TRIANGLE TRIANGLE\n"
+    "match_nets P1 P1\n"
+    "match_nets P3 P3\n"
+    "match_nets P2 P2\n"
+    "match_pins $0 $0\n"
+    "match_pins $2 $2\n"
+    "match_pins $1 $1\n"
+    "match_devices $3 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $1 $3\n"
+    "end_circuit TRIANGLE TRIANGLE MATCH"
+  );
+  EXPECT_EQ (good, true);
+}
+
+TEST(8_DiodesDontMatchOnSwappedPins)
+{
+  const char *nls1 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device DIODE $1 (A=P1,C=P2);\n"
+    "  device DIODE $2 (A=P2,C=P3);\n"
+    "  device DIODE $3 (A=P3,C=P1);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit TRIANGLE ($0=P1,$1=P2,$2=P3);\n"
+    "  device DIODE $3 (A=P3,C=P1);\n"
+    "  device DIODE $1 (A=P2,C=P1);\n"
+    "  device DIODE $2 (A=P2,C=P3);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit TRIANGLE TRIANGLE\n"
+    "match_ambiguous_nets P1 P3\n"
+    "match_nets P2 P1\n"
+    "match_nets P3 P2\n"
+    "match_pins $0 $2\n"
+    "match_pins $1 $0\n"
+    "match_pins $2 $1\n"
+    "match_devices $1 $1\n"
+    "device_mismatch (null) $2\n"
+    "match_devices $3 $3\n"
+    "device_mismatch $2 (null)\n"
+    "end_circuit TRIANGLE TRIANGLE NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+}
+
 TEST(10_SimpleSubCircuits)
 {
   const char *nls1 =
@@ -1830,6 +2066,73 @@ TEST(12_MismatchingSubcircuitsDuplicates)
     "subcircuit_mismatch (null) $1\n"
     "match_subcircuits $1 $2\n"
     "end_circuit TOP TOP NOMATCH"
+  );
+
+  EXPECT_EQ (good, false);
+}
+
+TEST(13_MismatchingSubcircuitsAdditionalHierarchy)
+{
+  const char *nls1 =
+    "circuit INV ($0=IN,$1=OUT,$2=VDD,$3=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    //  a typical via:
+    "circuit VIA ($0=IN);\n"
+    "end;\n"
+    "circuit TOP ($0=IN,$1=OUT,$2=VDD,$3=VSS);\n"
+    "  subcircuit INV $1 ($0=IN,$1=INT,$2=VDD,$3=VSS);\n"
+    "  subcircuit VIA $3 ($0=IN);\n"
+    "  subcircuit INV $2 ($0=INT,$1=OUT,$2=VDD,$3=VSS);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit INV ($0=VDD,$1=IN,$2=VSS,$3=OUT);\n"
+    "  device NMOS $1 (S=OUT,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=OUT,$1=IN,$2=VDD,$3=VSS);\n"
+    "  subcircuit INV $1 ($0=VDD,$1=INT,$2=VSS,$3=OUT);\n"
+    "  subcircuit INV $2 ($0=VDD,$1=IN,$2=VSS,$3=INT);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "circuit_mismatch VIA (null)\n"
+    "begin_circuit INV INV\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_pins $3 $2\n"
+    "match_pins $2 $0\n"
+    "match_pins $1 $3\n"
+    "match_pins $0 $1\n"
+    "match_devices $2 $1\n"
+    "match_devices $1 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TOP TOP\n"
+    "match_nets IN IN\n"
+    "match_nets OUT OUT\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
+    "match_nets INT INT\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $0\n"
+    "match_pins $2 $2\n"
+    "match_pins $3 $3\n"
+    "match_subcircuits $3 $1\n"
+    "match_subcircuits $1 $2\n"
+    "end_circuit TOP TOP MATCH"
   );
 
   EXPECT_EQ (good, false);

@@ -586,11 +586,27 @@ public:
     m_supports_serial_combination = f;
   }
 
+  void equivalent_terminal_id (size_t tid, size_t equiv_tid)
+  {
+    m_equivalent_terminal_ids.insert (std::make_pair (tid, equiv_tid));
+  }
+
+  virtual size_t normalize_terminal_id (size_t tid) const
+  {
+    std::map<size_t, size_t>::const_iterator ntid = m_equivalent_terminal_ids.find (tid);
+    if (ntid != m_equivalent_terminal_ids.end ()) {
+      return ntid->second;
+    } else {
+      return tid;
+    }
+  }
+
   gsi::Callback cb_combine_devices;
 
 private:
   bool m_supports_parallel_combination;
   bool m_supports_serial_combination;
+  std::map<size_t, size_t> m_equivalent_terminal_ids;
 };
 
 }
@@ -655,6 +671,11 @@ Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "Ge
     "Serial device combination means that the devices are connected by internal nodes. "
     "If the device does not support this combination mode, this predicate can be set to false. This will make the device "
     "extractor skip the combination test in serial mode and improve performance somewhat."
+  ) +
+  gsi::method ("equivalent_terminal_id", &GenericDeviceClass::equivalent_terminal_id, gsi::arg ("original_id"), gsi::arg ("equivalent_id"),
+    "@brief Specifies a terminal to be equivalent to another.\n"
+    "Use this method to specify two terminals to be exchangeable. For example to make S and D of a MOS transistor equivalent, "
+    "call this method with S and D terminal IDs. In netlist matching, S will be translated to D and thus made equivalent to D."
   ),
   "@brief A generic device class\n"
   "This class allows building generic device classes. Specificially, terminals can be defined "

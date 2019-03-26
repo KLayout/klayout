@@ -668,7 +668,10 @@ static void read_device_terminals (tl::Extractor &ex, db::Device *device, std::m
 
 static void read_device_parameters (tl::Extractor &ex, db::Device *device)
 {
-  ex.expect ("(");
+  if (! ex.test ("(")) {
+    return;
+  }
+
   while (! ex.test (")")) {
 
     ex.expect_more ();

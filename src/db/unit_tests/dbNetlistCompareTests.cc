@@ -340,27 +340,26 @@ public:
       //  we cannot afford creating edges from all to all other pins, so we just create edges to the previous and next
       //  pin. This may take more iterations to solve, but should be equivalent.
 
-      //  @@@ this is just pin_id + 1 or pin_id - 1!!!
-      db::Circuit::const_pin_iterator p = cr->begin_pins ();
-      for ( ; p != cr->end_pins () && p->id () != pin_id; ++p)
-        ;
-      tl_assert (p != cr->end_pins ());
+      std::vector<size_t> pids;
+      size_t pin_count = cr->pin_count ();
 
-      db::Circuit::const_pin_iterator pp = p;
-      if (pp == cr->begin_pins ()) {
-        pp = cr->end_pins ();
+      //  take the previous, next and second-next pin as targets for edges
+      //  (using the second-next pin avoid isolation of OUT vs. IN in case
+      //  of a pin configuration of VSS-IN-VDD-OUT like for an inverter).
+
+      if (pin_count >= 2) {
+        pids.push_back ((pin_id + pin_count - 1) % pin_count);
+        if (pin_count >= 3) {
+          pids.push_back ((pin_id + 1) % pin_count);
+          if (pin_count >= 4) {
+            pids.push_back ((pin_id + 2) % pin_count);
+          }
+        }
       }
-      --pp;
 
-      db::Circuit::const_pin_iterator pn = p;
-      ++pn;
-      if (pn == cr->end_pins ()) {
-        pn = cr->begin_pins ();
-      }
+      for (std::vector<size_t>::const_iterator i = pids.begin (); i != pids.end (); ++i) {
 
-      for (int i = 0; i < 2; ++i) {
-
-        size_t pin2_id = (i == 0 ? pp->id () : pn->id ());
+        size_t pin2_id = *i;
 
         EdgeDesc ed;
         ed.subcircuit = sc;
@@ -507,7 +506,7 @@ public:
   edge_iterator find_edge (const std::vector<EdgeDesc> &edge) const
   {
     edge_iterator res = std::lower_bound (begin (), end (), edge, NetDeviceGraphNode::EdgeToEdgeOnlyCompare ());
-    if (res->first != edge) {
+    if (res == end () || res->first != edge) {
       return end ();
     } else {
       return res;
@@ -660,7 +659,7 @@ public:
               size_t count_other = 0;
               NetDeviceGraphNode::edge_iterator ec_other;
               for (NetDeviceGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
-                if (! m_nodes[i->second.first].has_other ()) {
+                if (! other.m_nodes[i->second.first].has_other ()) {
                   ec_other = i;
                   ++count_other;
                 }
@@ -1783,13 +1782,13 @@ TEST(12_MismatchingSubcircuitsDuplicates)
     "end;\n";
 
   const char *nls2 =
-    "circuit INV ($0=VDD,$1=VSS,$2=IN,$3=OUT);\n"
+    "circuit INV ($0=VDD,$1=IN,$2=VSS,$3=OUT);\n"
     "  device NMOS $1 (S=OUT,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
     "  device PMOS $2 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
     "end;\n"
     "circuit TOP ($0=OUT,$1=IN,$2=VDD,$3=VSS);\n"
-    "  subcircuit INV $1 ($1=VDD,$2=VSS,$3=INT,$4=OUT);\n"
-    "  subcircuit INV $2 ($1=VDD,$2=VSS,$3=IN,$4=INT);\n"
+    "  subcircuit INV $1 ($1=VDD,$2=INT,$3=VSS,$4=OUT);\n"
+    "  subcircuit INV $2 ($1=VDD,$2=IN,$3=VSS,$4=INT);\n"
     "end;\n";
 
   db::Netlist nl1, nl2;
@@ -1804,20 +1803,33 @@ TEST(12_MismatchingSubcircuitsDuplicates)
   EXPECT_EQ (logger.text (),
     "begin_circuit INV INV\n"
     "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
     "match_nets OUT OUT\n"
     "match_nets IN IN\n"
-    "net_mismatch VDD (null)\n"
-    "net_mismatch (null) VDD\n"
     "match_pins $3 $2\n"
-    "pin_mismatch $2 (null)\n"
+    "match_pins $2 $0\n"
     "match_pins $1 $3\n"
     "match_pins $0 $1\n"
-    "pin_mismatch (null) $0\n"
-    "device_mismatch $1 (null)\n"
     "match_devices $2 $1\n"
-    "device_mismatch (null) $2\n"
-    "end_circuit INV INV NOMATCH\n"
-    "circuit_skipped TOP TOP"
+    "match_devices $1 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TOP TOP\n"
+    "match_nets IN IN\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
+    "match_nets INT INT\n"
+    "net_mismatch OUT (null)\n"
+    "net_mismatch (null) OUT\n"
+    "match_pins $0 $1\n"
+    "pin_mismatch $1 (null)\n"
+    "match_pins $2 $2\n"
+    "match_pins $3 $3\n"
+    "pin_mismatch (null) $0\n"
+    "subcircuit_mismatch $2 (null)\n"
+    "subcircuit_mismatch $3 (null)\n"
+    "subcircuit_mismatch (null) $1\n"
+    "match_subcircuits $1 $2\n"
+    "end_circuit TOP TOP NOMATCH"
   );
 
   EXPECT_EQ (good, false);

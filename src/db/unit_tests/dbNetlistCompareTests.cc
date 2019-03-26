@@ -147,6 +147,47 @@ struct SubCircuitCompare
   }
 };
 
+class CircuitPinMapper
+{
+public:
+  CircuitPinMapper ()
+  {
+    //  .. nothing yet ..
+  }
+
+  void map_pins (const db::Circuit *circuit, size_t pin1_id, size_t pin2_id)
+  {
+    m_pin_map [circuit].insert (std::make_pair (pin1_id, pin2_id));
+  }
+
+  void map_pins (const db::Circuit *circuit, const std::vector<size_t> &pin_ids)
+  {
+    if (pin_ids.size () < 2) {
+      return;
+    }
+
+    std::map<size_t, size_t> &pm = m_pin_map [circuit];
+    for (size_t i = 1; i < pin_ids.size (); ++i) {
+      pm.insert (std::make_pair (pin_ids [i], pin_ids [0]));
+    }
+  }
+
+  size_t normalize_pin_id (const db::Circuit *circuit, size_t pin_id) const
+  {
+    std::map<const db::Circuit *, std::map<size_t, size_t> >::const_iterator pm = m_pin_map.find (circuit);
+    if (pm != m_pin_map.end ()) {
+      std::map<size_t, size_t>::const_iterator ipm = pm->second.find (pin_id);
+      if (ipm != pm->second.end ()) {
+        return ipm->second;
+      }
+    }
+    return pin_id;
+  }
+
+private:
+  std::map<const db::Circuit *, std::map<size_t, size_t> > m_pin_map;
+};
+
 class CircuitMapper
 {
 public:
@@ -194,13 +235,6 @@ private:
 static size_t translate_terminal_id (size_t tid, const db::Device *device)
 {
   return device->device_class () ? device->device_class ()->normalize_terminal_id (tid) : tid;
-}
-
-static size_t translate_subcircuit_pin_id (size_t pid, const db::Circuit * /*circuit*/)
-{
-  // @@@ not implemented yet
-  return pid;
-  // @@@
 }
 
 class NetDeviceGraphNode
@@ -300,7 +334,7 @@ public:
 
   typedef std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > >::const_iterator edge_iterator;
 
-  NetDeviceGraphNode (const db::Net *net, std::map<const db::Device *, size_t, DeviceCompare> &devmap, std::vector<const db::Device *> &device_prototypes, const std::map<const db::Circuit *, CircuitMapper> *circuit_map)
+  NetDeviceGraphNode (const db::Net *net, std::map<const db::Device *, size_t, DeviceCompare> &devmap, std::vector<const db::Device *> &device_prototypes, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
     : mp_net (net), m_other_net_index (std::numeric_limits<size_t>::max ())
   {
     std::map<const db::Net *, size_t> n2entry;
@@ -328,6 +362,10 @@ public:
       if (cm) {
         cr = cm->other ();
         pin_id = cm->other_pin_from_this_pin (pin_id);
+      }
+
+      if (pin_map) {
+        pin_id = pin_map->normalize_pin_id (cr, pin_id);
       }
 
       //  we cannot afford creating edges from all to all other pins, so we just create edges to the previous and next
@@ -358,8 +396,8 @@ public:
         ed.subcircuit = sc;
         //  NOTE: if a pin mapping is given, EdgeDesc::pin1_id and EdgeDesc::pin2_id are given
         //  as pin ID's of the other circuit.
-        ed.pin1_id = translate_subcircuit_pin_id (pin_id, cr);
-        ed.pin2_id = translate_subcircuit_pin_id (pin2_id, cr);
+        ed.pin1_id = pin_id;
+        ed.pin2_id = pin_map ? pin_map->normalize_pin_id (cr, pin2_id) : pin2_id;
 
         size_t this_pin2_id = cm ? cm->this_pin_from_other_pin (pin2_id) : pin2_id;
         const db::Net *net2 = sc->net_for_pin (this_pin2_id);
@@ -535,7 +573,7 @@ public:
     //  .. nothing yet ..
   }
 
-  void build (const db::Circuit *c, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping)
+  void build (const db::Circuit *c, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper)
   {
     tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Building net graph for circuit: ")) + c->name ());
 
@@ -551,7 +589,7 @@ public:
     m_nodes.reserve (nets);
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      NetDeviceGraphNode node (n.operator-> (), m_device_map, m_device_prototypes, circuit_and_pin_mapping);
+      NetDeviceGraphNode node (n.operator-> (), m_device_map, m_device_prototypes, circuit_and_pin_mapping, circuit_pin_mapper);
       m_nodes.push_back (node);
     }
 
@@ -714,6 +752,29 @@ public:
     m_same_nets [std::make_pair (a, b)].push_back (std::make_pair (na, nb));
   }
 
+  /**
+   *  @brief Mark two pins as equivalent (i.e. can be swapped)
+   *
+   *  Only circuits from the *second* input can be given swappable pins.
+   *  This will imply the same swappable pins on the equivalent circuit of the first input.
+   *  To mark multiple pins as swappable, use the version that takes a list of pins.
+   */
+  void equivalent_pins (const db::Circuit *cb, size_t pin1_id, size_t pin2_id)
+  {
+    m_circuit_pin_mapper.map_pins (cb, pin1_id, pin2_id);
+  }
+
+  /**
+   *  @brief Mark multiple pins as equivalent (i.e. can be swapped)
+   *
+   *  Only circuits from the *second* input can be given swappable pins.
+   *  This will imply the same swappable pins on the equivalent circuit of the first input.
+   */
+  void equivalent_pins (const db::Circuit *cb, const std::vector<size_t> &pin_ids)
+  {
+    m_circuit_pin_mapper.map_pins (cb, pin_ids);
+  }
+
   bool compare (const db::Netlist *a, const db::Netlist *b) const
   {
     bool good = true;
@@ -807,6 +868,7 @@ protected:
 
   NetlistCompareLogger *mp_logger;
   std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > > m_same_nets;
+  CircuitPinMapper m_circuit_pin_mapper;
 };
 
 bool
@@ -846,7 +908,7 @@ compute_device_key (const db::Device &device, const db::NetDeviceGraph &g)
 }
 
 static std::vector<std::pair<size_t, size_t> >
-compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map)
+compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGraph &g, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
 {
   std::vector<std::pair<size_t, size_t> > k;
 
@@ -870,8 +932,8 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGra
   for (db::Circuit::const_pin_iterator p = cr->begin_pins (); p != cr->end_pins (); ++p) {
 
     size_t this_pin_id = cm ? cm->this_pin_from_other_pin (p->id ()) : p->id ();
+    size_t pin_id = pin_map ? pin_map->normalize_pin_id (cr, p->id ()) : p->id ();
 
-    size_t pin_id = translate_subcircuit_pin_id (p->id (), cr);
     const db::Net *net = subcircuit.net_for_pin (this_pin_id);
     size_t net_id = g.node_index_for_net (net);
     k.push_back (std::make_pair (pin_id, net_id));
@@ -890,8 +952,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   //  NOTE: for normalization we map all subcircuits of c1 to c2.
   //  Also, pin swapping will only happen there.
-  g1.build (c1, &circuit_and_pin_mapping);
-  g2.build (c2, 0);
+  g1.build (c1, &circuit_and_pin_mapping, &m_circuit_pin_mapper);
+  g2.build (c2, 0, &m_circuit_pin_mapper);
 
   for (std::vector<std::pair<const Net *, const Net *> >::const_iterator p = net_identity.begin (); p != net_identity.end (); ++p) {
     size_t ni1 = g1.node_index_for_net (p->first);
@@ -1133,7 +1195,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::Circuit::const_subcircuit_iterator sc = c1->begin_subcircuits (); sc != c1->end_subcircuits (); ++sc) {
 
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g1, &circuit_and_pin_mapping);
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g1, &circuit_and_pin_mapping, &m_circuit_pin_mapper);
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
@@ -1154,7 +1216,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::Circuit::const_subcircuit_iterator sc = c2->begin_subcircuits (); sc != c2->end_subcircuits (); ++sc) {
 
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, 0);
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, 0, &m_circuit_pin_mapper);
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
@@ -2137,3 +2199,230 @@ TEST(13_MismatchingSubcircuitsAdditionalHierarchy)
 
   EXPECT_EQ (good, false);
 }
+
+TEST(14_Subcircuit2Nand)
+{
+  const char *nls1 =
+    "circuit NAND ($0=A,$1=B,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=A,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $3 (S=VSS,G=A,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=INT,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=IN1,$1=IN2,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $1 ($0=IN1,$1=IN2,$2=INT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $2 ($0=IN1,$1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit NAND ($0=A,$1=B,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=A,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $3 (S=VSS,G=A,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=INT,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=IN1,$1=IN2,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $2 ($0=IN1,$1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $1 ($0=IN1,$1=IN2,$2=INT,$3=VDD,$4=VSS);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+  comp.equivalent_pins (nl2.circuit_by_name ("NAND"), 0, 1);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit NAND NAND\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets B B\n"
+    "match_nets INT INT\n"
+    "match_nets OUT OUT\n"
+    "match_nets A A\n"
+    "match_pins $4 $4\n"
+    "match_pins $3 $3\n"
+    "match_pins $1 $1\n"
+    "match_pins $2 $2\n"
+    "match_pins $0 $0\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $3 $3\n"
+    "match_devices $4 $4\n"
+    "end_circuit NAND NAND MATCH\n"
+    "begin_circuit TOP TOP\n"
+    "match_nets IN2 IN2\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN1 IN1\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
+    "match_nets INT INT\n"
+    "match_pins $1 $1\n"
+    "match_pins $2 $2\n"
+    "match_pins $0 $0\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "match_subcircuits $2 $1\n"
+    "match_subcircuits $1 $2\n"
+    "end_circuit TOP TOP MATCH"
+  );
+
+  EXPECT_EQ (good, true);
+}
+
+TEST(14_Subcircuit2NandMismatchNoSwap)
+{
+  const char *nls1 =
+    "circuit NAND ($0=A,$1=B,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=A,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $3 (S=VSS,G=A,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=INT,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=IN1,$1=IN2,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $1 ($0=IN1,$1=IN2,$2=INT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $2 ($0=IN1,$1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit NAND ($0=A,$1=B,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=A,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $3 (S=VSS,G=A,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=INT,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=IN1,$1=IN2,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $2 ($0=INT,$1=IN1,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $1 ($0=IN2,$1=IN1,$2=INT,$3=VDD,$4=VSS);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+  //  intentionally missing: comp.equivalent_pins (nl2.circuit_by_name ("NAND"), 0, 1);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit NAND NAND\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets B B\n"
+    "match_nets INT INT\n"
+    "match_nets OUT OUT\n"
+    "match_nets A A\n"
+    "match_pins $4 $4\n"
+    "match_pins $3 $3\n"
+    "match_pins $1 $1\n"
+    "match_pins $2 $2\n"
+    "match_pins $0 $0\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $3 $3\n"
+    "match_devices $4 $4\n"
+    "end_circuit NAND NAND MATCH\n"
+    "begin_circuit TOP TOP\n"
+    "match_nets OUT OUT\n"
+    "match_nets INT IN1\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
+    "match_nets IN1 IN2\n"
+    "net_mismatch IN2 (null)\n"
+    "net_mismatch (null) INT\n"
+    "pin_mismatch $1 (null)\n"
+    "match_pins $2 $2\n"
+    "match_pins $0 $1\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "pin_mismatch (null) $0\n"
+    "subcircuit_mismatch $1 (null)\n"
+    "subcircuit_mismatch (null) $1\n"
+    "subcircuit_mismatch (null) $2\n"
+    "subcircuit_mismatch $2 (null)\n"
+    "end_circuit TOP TOP NOMATCH"
+  );
+
+  EXPECT_EQ (good, false);
+}
+
+TEST(14_Subcircuit2MatchWithSwap)
+{
+  const char *nls1 =
+    "circuit NAND ($0=A,$1=B,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=A,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $3 (S=VSS,G=A,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=INT,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=IN1,$1=IN2,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $1 ($0=IN1,$1=IN2,$2=INT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $2 ($0=IN1,$1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit NAND ($0=A,$1=B,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=A,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $3 (S=VSS,G=A,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=INT,G=B,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($0=IN1,$1=IN2,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $2 ($0=INT,$1=IN1,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit NAND $1 ($0=IN2,$1=IN1,$2=INT,$3=VDD,$4=VSS);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+  comp.equivalent_pins (nl2.circuit_by_name ("NAND"), 0, 1);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit NAND NAND\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets B B\n"
+    "match_nets INT INT\n"
+    "match_nets OUT OUT\n"
+    "match_nets A A\n"
+    "match_pins $4 $4\n"
+    "match_pins $3 $3\n"
+    "match_pins $1 $1\n"
+    "match_pins $2 $2\n"
+    "match_pins $0 $0\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $3 $3\n"
+    "match_devices $4 $4\n"
+    "end_circuit NAND NAND MATCH\n"
+    "begin_circuit TOP TOP\n"
+    "match_nets IN2 IN2\n"
+    "match_nets OUT OUT\n"
+    "match_nets VSS VSS\n"
+    "match_nets INT INT\n"
+    "match_nets VDD VDD\n"
+    "match_nets IN1 IN1\n"
+    "match_pins $1 $1\n"
+    "match_pins $2 $2\n"
+    "match_pins $0 $0\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "match_subcircuits $2 $1\n"
+    "match_subcircuits $1 $2\n"
+    "end_circuit TOP TOP MATCH"
+  );
+
+  EXPECT_EQ (good, true);
+}
+

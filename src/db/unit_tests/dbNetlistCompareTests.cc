@@ -114,36 +114,51 @@ public:
 
 struct DeviceCompare
 {
-  bool operator() (const db::Device *d1, const db::Device *d2) const
+  bool operator() (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
   {
-    //  @@@ TODO: device class identity should not be defined via name
-    if (d1->device_class () != d2->device_class () && d1->device_class ()->name () != d2->device_class ()->name ()) {
-      return d1->device_class ()->name () < d2->device_class ()->name ();
+    if (d1.second != d2.second) {
+      return d1.second < d2.second;
     }
 
-    const std::vector<db::DeviceParameterDefinition> &dp = d1->device_class ()->parameter_definitions ();
+    const std::vector<db::DeviceParameterDefinition> &dp = d1.first->device_class ()->parameter_definitions ();
     for (std::vector<db::DeviceParameterDefinition>::const_iterator i = dp.begin (); i != dp.end (); ++i) {
-      double v1 = d1->parameter_value (i->id ());
-      double v2 = d2->parameter_value (i->id ());
+      double v1 = d1.first->parameter_value (i->id ());
+      double v2 = d2.first->parameter_value (i->id ());
       if (fabs (v1 - v2) > db::epsilon) {
         return v1 < v2;
       }
     }
     return false;
   }
+
+  bool equals (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
+  {
+    if (d1.second != d2.second) {
+      return false;
+    }
+
+    const std::vector<db::DeviceParameterDefinition> &dp = d1.first->device_class ()->parameter_definitions ();
+    for (std::vector<db::DeviceParameterDefinition>::const_iterator i = dp.begin (); i != dp.end (); ++i) {
+      double v1 = d1.first->parameter_value (i->id ());
+      double v2 = d2.first->parameter_value (i->id ());
+      if (fabs (v1 - v2) > db::epsilon) {
+        return false;
+      }
+    }
+    return true;
+  }
 };
 
 struct SubCircuitCompare
 {
-  bool operator() (const db::SubCircuit *sc1, const db::SubCircuit *sc2) const
+  bool operator() (const std::pair<const db::SubCircuit *, size_t> &sc1, const std::pair<const db::SubCircuit *, size_t> &sc2) const
   {
-    //  @@@ TODO: device class identity should not be defined via name
-    if (sc1->circuit_ref () != sc2->circuit_ref () && sc1->circuit_ref ()->name () != sc2->circuit_ref ()->name ()) {
-      return sc1->circuit_ref ()->name () < sc2->circuit_ref ()->name ();
-    }
+    return sc1.second < sc2.second;
+  }
 
-    //  no parameters
-    return false;
+  bool equals (const std::pair<const db::SubCircuit *, size_t> &sc1, const std::pair<const db::SubCircuit *, size_t> &sc2) const
+  {
+    return sc1.second == sc2.second;
   }
 };
 
@@ -232,6 +247,94 @@ private:
   std::map<size_t, size_t> m_pin_map, m_rev_pin_map;
 };
 
+struct DeviceCategorizer
+{
+public:
+  DeviceCategorizer ()
+    : m_next_cat (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  void same_class (const db::DeviceClass *ca, const db::DeviceClass *cb)
+  {
+    ++m_next_cat;
+    m_cat_by_ptr.insert (std::make_pair (ca, m_next_cat));
+    m_cat_by_ptr.insert (std::make_pair (cb, m_next_cat));
+  }
+
+  size_t cat_for_device (const db::Device *device)
+  {
+    const db::DeviceClass *cls = device->device_class ();
+    if (! cls) {
+      return 0;
+    }
+
+    std::map<const db::DeviceClass *, size_t>::const_iterator cp = m_cat_by_ptr.find (cls);
+    if (cp != m_cat_by_ptr.end ()) {
+      return cp->second;
+    }
+
+    std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cls->name ());
+    if (c != m_cat_by_name.end ()) {
+      return c->second;
+    } else {
+      ++m_next_cat;
+      m_cat_by_name.insert (std::make_pair (cls->name (), m_next_cat));
+      return m_next_cat;
+    }
+  }
+
+public:
+  std::map<const db::DeviceClass *, size_t> m_cat_by_ptr;
+  std::map<std::string, size_t> m_cat_by_name;
+  size_t m_next_cat;
+};
+
+struct CircuitCategorizer
+{
+public:
+  CircuitCategorizer ()
+    : m_next_cat (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  void same_circuit (const db::Circuit *ca, const db::Circuit *cb)
+  {
+    ++m_next_cat;
+    m_cat_by_ptr.insert (std::make_pair (ca, m_next_cat));
+    m_cat_by_ptr.insert (std::make_pair (cb, m_next_cat));
+  }
+
+  size_t cat_for_subcircuit (const db::SubCircuit *subcircuit)
+  {
+    const db::Circuit *cr = subcircuit->circuit_ref ();
+    if (! cr) {
+      return 0;
+    }
+
+    std::map<const db::Circuit *, size_t>::const_iterator cp = m_cat_by_ptr.find (cr);
+    if (cp != m_cat_by_ptr.end ()) {
+      return cp->second;
+    }
+
+    std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cr->name ());
+    if (c != m_cat_by_name.end ()) {
+      return c->second;
+    } else {
+      ++m_next_cat;
+      m_cat_by_name.insert (std::make_pair (cr->name (), m_next_cat));
+      return m_next_cat;
+    }
+  }
+
+public:
+  std::map<const db::Circuit *, size_t> m_cat_by_ptr;
+  std::map<std::string, size_t> m_cat_by_name;
+  size_t m_next_cat;
+};
+
 static size_t translate_terminal_id (size_t tid, const db::Device *device)
 {
   return device->device_class () ? device->device_class ()->normalize_terminal_id (tid) : tid;
@@ -242,85 +345,113 @@ class NetDeviceGraphNode
 public:
   struct EdgeDesc {
 
-    //  @@@ TODO: there can be only devices or subcircuits, so we can
-    //  compress this structure.
-    const db::Device *device;
-    size_t terminal1_id, terminal2_id;
-    const db::SubCircuit *subcircuit;
-    size_t pin1_id, pin2_id;
-
-    EdgeDesc ()
-      : device (0), terminal1_id (0), terminal2_id (0),
-        subcircuit (0), pin1_id (0), pin2_id (0)
+    EdgeDesc (const db::Device *device, size_t device_category, size_t terminal1_id, size_t terminal2_id)
     {
-      //  .. nothing yet ..
+      device_pair ().first = device;
+      device_pair ().second = device_category;
+      m_id1 = terminal1_id;
+      m_id2 = terminal2_id;
+    }
+
+    EdgeDesc (const db::SubCircuit *subcircuit, size_t subcircuit_category, size_t pin1_id, size_t pin2_id)
+    {
+      subcircuit_pair ().first = subcircuit;
+      subcircuit_pair ().second = subcircuit_category;
+      m_id1 = std::numeric_limits<size_t>::max () - pin1_id;
+      m_id2 = pin2_id;
     }
 
     bool operator< (const EdgeDesc &other) const
     {
-      if ((device != 0) != (other.device != 0)) {
-        return (device != 0) < (other.device != 0);
-      }
+      if (m_id1 > std::numeric_limits<size_t>::max () / 2) {
 
-      if (device != 0) {
-
-        DeviceCompare dc;
-        bool dlt = dc (device, other.device);
-        if (dlt || dc (other.device, device)) {
-          return dlt;
+        if ((subcircuit_pair ().first != 0) != (other.subcircuit_pair ().first != 0)) {
+          return (subcircuit_pair ().first != 0) < (other.subcircuit_pair ().first != 0);
         }
 
-        if (terminal1_id != other.terminal1_id) {
-          return terminal1_id < other.terminal1_id;
+        if (subcircuit_pair ().first != 0) {
+          SubCircuitCompare scc;
+          if (! scc.equals (subcircuit_pair (), other.subcircuit_pair ())) {
+            return scc (subcircuit_pair (), other.subcircuit_pair ());
+          }
         }
-        return terminal2_id < other.terminal2_id;
 
       } else {
 
-        SubCircuitCompare sc;
-        bool sclt = sc (subcircuit, other.subcircuit);
-        if (sclt || sc (other.subcircuit, subcircuit)) {
-          return sclt;
+        if ((device_pair ().first != 0) != (other.device_pair ().first != 0)) {
+          return (device_pair ().first != 0) < (other.device_pair ().first != 0);
         }
 
-        if (pin1_id != other.pin1_id) {
-          return pin1_id < other.pin1_id;
+        if (device_pair ().first != 0) {
+          DeviceCompare dc;
+          if (! dc.equals (device_pair (), other.device_pair ())) {
+            return dc (device_pair (), other.device_pair ());
+          }
         }
-        return pin2_id < other.pin2_id;
 
       }
+
+      if (m_id1 != other.m_id1) {
+        return m_id1 < other.m_id1;
+      }
+      return m_id2 < other.m_id2;
     }
 
     bool operator== (const EdgeDesc &other) const
     {
-      if ((device != 0) != (other.device != 0)) {
-        return false;
-      }
+      if (m_id1 > std::numeric_limits<size_t>::max () / 2) {
 
-      if (device != 0) {
-
-        DeviceCompare dc;
-        if (dc (device, other.device) || dc (other.device, device)) {
+        if ((subcircuit_pair ().first != 0) != (other.subcircuit_pair ().first != 0)) {
           return false;
         }
-        if (terminal1_id != other.terminal1_id) {
-          return false;
+
+        if (subcircuit_pair ().first != 0) {
+          SubCircuitCompare scc;
+          if (! scc.equals (subcircuit_pair (), other.subcircuit_pair ())) {
+            return false;
+          }
         }
-        return terminal2_id == other.terminal2_id;
 
       } else {
 
-        SubCircuitCompare sc;
-        if (sc (subcircuit, other.subcircuit) || sc (other.subcircuit, subcircuit)) {
+        if ((device_pair ().first != 0) != (other.device_pair ().first != 0)) {
           return false;
         }
 
-        if (pin1_id != other.pin1_id) {
-          return false;
+        if (device_pair ().first != 0) {
+          DeviceCompare dc;
+          if (! dc.equals (device_pair (), other.device_pair ())) {
+            return false;
+          }
         }
-        return pin2_id == other.pin2_id;
 
       }
+
+      return (m_id1 == other.m_id1 && m_id2 == other.m_id2);
+    }
+
+  private:
+    char m_ref [sizeof (std::pair<const void *, size_t>)];
+    size_t m_id1, m_id2;
+
+    std::pair<const db::Device *, size_t> &device_pair ()
+    {
+      return *reinterpret_cast<std::pair<const db::Device *, size_t> *> ((void *) &m_ref);
+    }
+
+    const std::pair<const db::Device *, size_t> &device_pair () const
+    {
+      return *reinterpret_cast<const std::pair<const db::Device *, size_t> *> ((const void *) &m_ref);
+    }
+
+    std::pair<const db::SubCircuit *, size_t> &subcircuit_pair ()
+    {
+      return *reinterpret_cast<std::pair<const db::SubCircuit *, size_t> *> ((void *) &m_ref);
+    }
+
+    const std::pair<const db::SubCircuit *, size_t> &subcircuit_pair () const
+    {
+      return *reinterpret_cast<const std::pair<const db::SubCircuit *, size_t> *> ((const void *) &m_ref);
     }
   };
 
@@ -334,7 +465,7 @@ public:
 
   typedef std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > >::const_iterator edge_iterator;
 
-  NetDeviceGraphNode (const db::Net *net, std::map<const db::Device *, size_t, DeviceCompare> &devmap, std::vector<const db::Device *> &device_prototypes, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
+  NetDeviceGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
     : mp_net (net), m_other_net_index (std::numeric_limits<size_t>::max ())
   {
     std::map<const db::Net *, size_t> n2entry;
@@ -392,12 +523,9 @@ public:
 
         size_t pin2_id = *i;
 
-        EdgeDesc ed;
-        ed.subcircuit = sc;
         //  NOTE: if a pin mapping is given, EdgeDesc::pin1_id and EdgeDesc::pin2_id are given
         //  as pin ID's of the other circuit.
-        ed.pin1_id = pin_id;
-        ed.pin2_id = pin_map ? pin_map->normalize_pin_id (cr, pin2_id) : pin2_id;
+        EdgeDesc ed (sc, circuit_categorizer.cat_for_subcircuit (sc), pin_id, pin_map ? pin_map->normalize_pin_id (cr, pin2_id) : pin2_id);
 
         size_t this_pin2_id = cm ? cm->this_pin_from_other_pin (pin2_id) : pin2_id;
         const db::Net *net2 = sc->net_for_pin (this_pin2_id);
@@ -417,27 +545,17 @@ public:
     for (db::Net::const_terminal_iterator i = net->begin_terminals (); i != net->end_terminals (); ++i) {
 
       const db::Device *d = i->device ();
-
-      size_t dev_id = 0;
-      std::map<const db::Device *, size_t, DeviceCompare>::iterator di = devmap.find (d);
-      if (di != devmap.end ()) {
-        dev_id = di->second;
-      } else {
-        dev_id = device_prototypes.size ();
-        device_prototypes.push_back (d);
-      }
-
-      EdgeDesc ed;
-      ed.device = device_prototypes [dev_id];
-      ed.terminal1_id = translate_terminal_id (i->terminal_id (), d);
+      size_t device_cat = device_categorizer.cat_for_device (d);
+      size_t terminal1_id = translate_terminal_id (i->terminal_id (), d);
 
       const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
       for (std::vector<db::DeviceTerminalDefinition>::const_iterator it = td.begin (); it != td.end (); ++it) {
 
         if (it->id () != i->terminal_id ()) {
 
-          EdgeDesc ed2 = ed;
-          ed2.terminal2_id = translate_terminal_id (it->id (), d);
+          size_t terminal2_id = translate_terminal_id (it->id (), d);
+          EdgeDesc ed2 (d, device_cat, terminal1_id, terminal2_id);
+
           const db::Net *net2 = d->net_for_terminal (it->id ());
 
           std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net2);
@@ -573,12 +691,10 @@ public:
     //  .. nothing yet ..
   }
 
-  void build (const db::Circuit *c, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper)
+  void build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper)
   {
     tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Building net graph for circuit: ")) + c->name ());
 
-    m_device_map.clear ();
-    m_device_prototypes.clear ();
     m_nodes.clear ();
     m_net_index.clear ();
 
@@ -589,7 +705,7 @@ public:
     m_nodes.reserve (nets);
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      NetDeviceGraphNode node (n.operator-> (), m_device_map, m_device_prototypes, circuit_and_pin_mapping, circuit_pin_mapper);
+      NetDeviceGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper);
       m_nodes.push_back (node);
     }
 
@@ -735,8 +851,6 @@ public:
 
 private:
   std::vector<NetDeviceGraphNode> m_nodes;
-  std::map<const db::Device *, size_t, DeviceCompare> m_device_map;
-  std::vector<const db::Device *> m_device_prototypes;
   std::map<const db::Net *, size_t> m_net_index;
 };
 
@@ -747,9 +861,16 @@ public:
     : mp_logger (logger)
   { }
 
-  void same_nets (const db::Circuit *a, const db::Net *na, const db::Circuit *b, const db::Net *nb)
+  /**
+   *  @brief Mark two nets as identical
+   *
+   *  This makes a net na in netlist a identical to the corresponding
+   *  net nb in netlist b.
+   *  By default nets are not identical expect through their topology.
+   */
+  void same_nets (const db::Net *na, const db::Net *nb)
   {
-    m_same_nets [std::make_pair (a, b)].push_back (std::make_pair (na, nb));
+    m_same_nets [std::make_pair (na->circuit (), nb->circuit ())].push_back (std::make_pair (na, nb));
   }
 
   /**
@@ -775,8 +896,36 @@ public:
     m_circuit_pin_mapper.map_pins (cb, pin_ids);
   }
 
+  /**
+   *  @brief Mark two device classes as identical
+   *
+   *  This makes a device class ca in netlist a identical to the corresponding
+   *  device class cb in netlist b.
+   *  By default device classes with the same name are identical.
+   */
+  void same_device_classes (const db::DeviceClass *ca, const db::DeviceClass *cb)
+  {
+    m_device_categorizer.same_class (ca, cb);
+  }
+
+  /**
+   *  @brief Mark two circuits as identical
+   *
+   *  This makes a circuit ca in netlist a identical to the corresponding
+   *  circuit cb in netlist b.
+   *  By default circuits with the same name are identical.
+   */
+  void same_circuits (const db::Circuit *ca, const db::Circuit *cb)
+  {
+    m_circuit_categorizer.same_circuit (ca, cb);
+  }
+
   bool compare (const db::Netlist *a, const db::Netlist *b) const
   {
+    //  we need to create a copy because this method is supposed to be const.
+    db::CircuitCategorizer circuit_categorizer = m_circuit_categorizer;
+    db::DeviceCategorizer device_categorizer = m_device_categorizer;
+
     bool good = true;
 
     std::map<std::string, std::pair<const db::Circuit *, const db::Circuit *> > name2circuits;
@@ -829,7 +978,7 @@ public:
           }
 
           bool pin_mismatch = false;
-          bool g = compare_circuits (ca, cb, *net_identity, pin_mismatch, pin_mapping);
+          bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, *net_identity, pin_mismatch, pin_mapping);
           if (! g) {
             good = false;
           }
@@ -863,12 +1012,14 @@ public:
   }
 
 protected:
-  bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &circuit_and_pin_map) const;
+  bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &circuit_and_pin_mapping) const;
   bool all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const;
 
   NetlistCompareLogger *mp_logger;
   std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > > m_same_nets;
   CircuitPinMapper m_circuit_pin_mapper;
+  DeviceCategorizer m_device_categorizer;
+  CircuitCategorizer m_circuit_categorizer;
 };
 
 bool
@@ -946,14 +1097,14 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGra
 }
 
 bool
-NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &circuit_and_pin_mapping) const
+NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &circuit_and_pin_mapping) const
 {
   db::NetDeviceGraph g1, g2;
 
   //  NOTE: for normalization we map all subcircuits of c1 to c2.
   //  Also, pin swapping will only happen there.
-  g1.build (c1, &circuit_and_pin_mapping, &m_circuit_pin_mapper);
-  g2.build (c2, 0, &m_circuit_pin_mapper);
+  g1.build (c1, device_categorizer, circuit_categorizer, &circuit_and_pin_mapping, &m_circuit_pin_mapper);
+  g2.build (c2, device_categorizer, circuit_categorizer, 0, &m_circuit_pin_mapper);
 
   for (std::vector<std::pair<const Net *, const Net *> >::const_iterator p = net_identity.begin (); p != net_identity.end (); ++p) {
     size_t ni1 = g1.node_index_for_net (p->first);
@@ -1116,7 +1267,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   //  Report device assignment
 
-  std::multimap<std::vector<std::pair<size_t, size_t> >, const db::Device *> device_map;
+  std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> > device_map;
 
   for (db::Circuit::const_device_iterator d = c1->begin_devices (); d != c1->end_devices (); ++d) {
 
@@ -1134,7 +1285,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       good = false;
     } else {
       //  TODO: report devices which cannot be distiguished topologically?
-      device_map.insert (std::make_pair (k, d.operator-> ()));
+      device_map.insert (std::make_pair (k, std::make_pair (d.operator-> (), device_categorizer.cat_for_device (d.operator-> ()))));
     }
 
   }
@@ -1154,7 +1305,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     std::sort (k.begin (), k.end ());
 
-    std::multimap<std::vector<std::pair<size_t, size_t> >, const db::Device *>::const_iterator dm = device_map.find (k);
+    std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::const_iterator dm = device_map.find (k);
 
     if (! mapped || dm == device_map.end () || dm->first != k) {
 
@@ -1165,16 +1316,18 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       db::DeviceCompare dc;
 
-      if (dc (dm->second, d.operator-> ()) || dc (d.operator-> (), dm->second)) {
-        if (dm->second->device_class ()->name () != d->device_class ()->name ()) {
-          mp_logger->match_devices_with_different_device_classes (dm->second, d.operator-> ());
+      size_t device_cat = device_categorizer.cat_for_device (d.operator-> ());
+
+      if (! dc.equals (dm->second, std::make_pair (d.operator-> (), device_cat))) {
+        if (dm->second.second != device_cat) {
+          mp_logger->match_devices_with_different_device_classes (dm->second.first, d.operator-> ());
           good = false;
         } else {
-          mp_logger->match_devices_with_different_parameters (dm->second, d.operator-> ());
+          mp_logger->match_devices_with_different_parameters (dm->second.first, d.operator-> ());
           good = false;
         }
       } else {
-        mp_logger->match_devices (dm->second, d.operator-> ());
+        mp_logger->match_devices (dm->second.first, d.operator-> ());
       }
 
       device_map.erase (dm);
@@ -1183,15 +1336,15 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   }
 
-  for (std::multimap<std::vector<std::pair<size_t, size_t> >, const db::Device *>::const_iterator dm = device_map.begin (); dm != device_map.end (); ++dm) {
-    mp_logger->device_mismatch (dm->second, 0);
+  for (std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::const_iterator dm = device_map.begin (); dm != device_map.end (); ++dm) {
+    mp_logger->device_mismatch (dm->second.first, 0);
     good = false;
   }
 
 
   //  Report subcircuit assignment
 
-  std::multimap<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *> subcircuit_map;
+  std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> > subcircuit_map;
 
   for (db::Circuit::const_subcircuit_iterator sc = c1->begin_subcircuits (); sc != c1->end_subcircuits (); ++sc) {
 
@@ -1209,7 +1362,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       good = false;
     } else if (! k.empty ()) {
       //  TODO: report devices which cannot be distiguished topologically?
-      subcircuit_map.insert (std::make_pair (k, sc.operator-> ()));
+      subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), circuit_categorizer.cat_for_subcircuit (sc.operator-> ()))));
     }
 
   }
@@ -1229,7 +1382,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     std::sort (k.begin (), k.end ());
 
-    std::multimap<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *>::const_iterator scm = subcircuit_map.find (k);
+    std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::const_iterator scm = subcircuit_map.find (k);
 
     if (! mapped || scm == subcircuit_map.end ()) {
 
@@ -1239,12 +1392,13 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     } else {
 
       db::SubCircuitCompare scc;
+      size_t sc_cat = circuit_categorizer.cat_for_subcircuit (sc.operator-> ());
 
-      if (scc (scm->second, sc.operator-> ()) || scc (sc.operator-> (), scm->second)) {
-        mp_logger->subcircuit_mismatch (scm->second, sc.operator-> ());
+      if (! scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
+        mp_logger->subcircuit_mismatch (scm->second.first, sc.operator-> ());
         good = false;
       } else {
-        mp_logger->match_subcircuits (scm->second, sc.operator-> ());
+        mp_logger->match_subcircuits (scm->second.first, sc.operator-> ());
       }
 
       subcircuit_map.erase (scm);
@@ -1253,8 +1407,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   }
 
-  for (std::multimap<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *>::const_iterator scm = subcircuit_map.begin (); scm != subcircuit_map.end (); ++scm) {
-    mp_logger->subcircuit_mismatch (scm->second, 0);
+  for (std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::const_iterator scm = subcircuit_map.begin (); scm != subcircuit_map.end (); ++scm) {
+    mp_logger->subcircuit_mismatch (scm->second.first, 0);
     good = false;
   }
 
@@ -1450,12 +1604,12 @@ TEST(1_SimpleInverter)
 
   EXPECT_EQ (logger.text (),
      "begin_circuit INV INV\n"
-     "match_nets VSS VSS\n"
      "match_nets VDD VDD\n"
+     "match_nets VSS VSS\n"
      "match_nets OUT OUT\n"
      "match_nets IN IN\n"
-     "match_pins $3 $2\n"
      "match_pins $2 $0\n"
+     "match_pins $3 $2\n"
      "match_pins $1 $3\n"
      "match_pins $0 $1\n"
      "match_devices $2 $1\n"
@@ -1487,8 +1641,8 @@ TEST(2_SimpleInverterWithForcedNetAssignment)
   db::NetlistComparer comp (&logger);
   const db::Circuit *ca = nl1.circuit_by_name ("INV");
   const db::Circuit *cb = nl2.circuit_by_name ("INV");
-  comp.same_nets (ca, ca->net_by_name ("VDD"), cb, cb->net_by_name ("VDD"));
-  comp.same_nets (ca, ca->net_by_name ("VSS"), cb, cb->net_by_name ("VSS"));
+  comp.same_nets (ca->net_by_name ("VDD"), cb->net_by_name ("VDD"));
+  comp.same_nets (ca->net_by_name ("VSS"), cb->net_by_name ("VSS"));
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1496,8 +1650,8 @@ TEST(2_SimpleInverterWithForcedNetAssignment)
      "begin_circuit INV INV\n"
      "match_nets OUT OUT\n"
      "match_nets IN IN\n"
-     "match_pins $3 $2\n"
      "match_pins $2 $0\n"
+     "match_pins $3 $2\n"
      "match_pins $1 $3\n"
      "match_pins $0 $1\n"
      "match_devices $2 $1\n"
@@ -1536,15 +1690,15 @@ TEST(3_Buffer)
 
   EXPECT_EQ (logger.text (),
      "begin_circuit BUF BUF\n"
-     "match_nets VSS VSS\n"
      "match_nets OUT OUT\n"
      "match_nets VDD VDD\n"
      "match_nets IN IN\n"
+     "match_nets VSS VSS\n"
      "match_nets INT $10\n"
-     "match_pins $3 $2\n"
      "match_pins $1 $3\n"
      "match_pins $2 $0\n"
      "match_pins $0 $1\n"
+     "match_pins $3 $2\n"
      "match_devices $1 $1\n"
      "match_devices $3 $2\n"
      "match_devices $2 $3\n"
@@ -1591,16 +1745,16 @@ TEST(4_BufferTwoPaths)
 
   EXPECT_EQ (logger.text (),
      "begin_circuit BUF BUF\n"
-     "match_nets VSS VSS\n"
      "match_nets OUT OUT\n"
      "match_ambiguous_nets INT $10\n"
      "match_nets INT2 $11\n"
      "match_nets VDD VDD\n"
      "match_nets IN IN\n"
-     "match_pins $3 $2\n"
+     "match_nets VSS VSS\n"
      "match_pins $1 $3\n"
      "match_pins $2 $0\n"
      "match_pins $0 $1\n"
+     "match_pins $3 $2\n"
      "match_devices $1 $1\n"
      "match_devices $3 $2\n"
      "match_devices $5 $3\n"
@@ -1650,8 +1804,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
   //  Forcing the power nets into equality makes the parameter error harder to detect
   const db::Circuit *ca = nl1.circuit_by_name ("BUF");
   const db::Circuit *cb = nl2.circuit_by_name ("BUF");
-  comp.same_nets (ca, ca->net_by_name ("VDD"), cb, cb->net_by_name ("VDD"));
-  comp.same_nets (ca, ca->net_by_name ("VSS"), cb, cb->net_by_name ("VSS"));
+  comp.same_nets (ca->net_by_name ("VDD"), cb->net_by_name ("VDD"));
+  comp.same_nets (ca->net_by_name ("VSS"), cb->net_by_name ("VSS"));
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1661,10 +1815,10 @@ TEST(5_BufferTwoPathsDifferentParameters)
     "match_nets IN IN\n"
     "match_ambiguous_nets INT $10\n"
     "match_nets INT2 $11\n"
-    "match_pins $3 $2\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
     "match_pins $0 $1\n"
+    "match_pins $3 $2\n"
     "match_devices $1 $1\n"
     "match_devices $3 $2\n"
     "match_devices $5 $3\n"
@@ -1718,15 +1872,15 @@ TEST(6_BufferTwoPathsAdditionalDevices)
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
     "match_nets INT $11\n"
-    "match_nets VSS VSS\n"
     "match_nets IN IN\n"
-    "match_nets OUT OUT\n"
     "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets VSS VSS\n"
     "match_nets INT2 $10\n"
-    "match_pins $3 $2\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
     "match_pins $0 $1\n"
+    "match_pins $3 $2\n"
     "match_devices $5 $1\n"
     "match_devices $7 $2\n"
     "device_mismatch (null) $3\n"
@@ -1983,27 +2137,27 @@ TEST(10_SimpleSubCircuits)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit INV INV\n"
-    "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets IN IN\n"
-    "match_pins $3 $2\n"
     "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
     "match_pins $1 $3\n"
     "match_pins $0 $1\n"
     "match_devices $2 $1\n"
     "match_devices $1 $2\n"
     "end_circuit INV INV MATCH\n"
     "begin_circuit TOP TOP\n"
-    "match_nets IN IN\n"
     "match_nets OUT OUT\n"
-    "match_nets VDD VDD\n"
+    "match_nets IN IN\n"
     "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
     "match_nets INT INT\n"
-    "match_pins $0 $2\n"
     "match_pins $1 $0\n"
-    "match_pins $2 $1\n"
+    "match_pins $0 $2\n"
     "match_pins $3 $3\n"
+    "match_pins $2 $1\n"
     "match_subcircuits $2 $1\n"
     "match_subcircuits $1 $2\n"
     "end_circuit TOP TOP MATCH"
@@ -2051,8 +2205,8 @@ TEST(11_MismatchingSubcircuits)
     "match_nets IN IN\n"
     "net_mismatch VDD (null)\n"
     "net_mismatch (null) VDD\n"
-    "match_pins $3 $2\n"
     "pin_mismatch $2 (null)\n"
+    "match_pins $3 $2\n"
     "match_pins $1 $3\n"
     "match_pins $0 $1\n"
     "pin_mismatch (null) $0\n"
@@ -2100,12 +2254,12 @@ TEST(12_MismatchingSubcircuitsDuplicates)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit INV INV\n"
-    "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets IN IN\n"
-    "match_pins $3 $2\n"
     "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
     "match_pins $1 $3\n"
     "match_pins $0 $1\n"
     "match_devices $2 $1\n"
@@ -2118,10 +2272,10 @@ TEST(12_MismatchingSubcircuitsDuplicates)
     "match_nets INT INT\n"
     "net_mismatch OUT (null)\n"
     "net_mismatch (null) OUT\n"
-    "match_pins $0 $1\n"
     "pin_mismatch $1 (null)\n"
-    "match_pins $2 $2\n"
+    "match_pins $0 $1\n"
     "match_pins $3 $3\n"
+    "match_pins $2 $2\n"
     "pin_mismatch (null) $0\n"
     "subcircuit_mismatch $2 (null)\n"
     "subcircuit_mismatch $3 (null)\n"
@@ -2171,27 +2325,27 @@ TEST(13_MismatchingSubcircuitsAdditionalHierarchy)
   EXPECT_EQ (logger.text (),
     "circuit_mismatch VIA (null)\n"
     "begin_circuit INV INV\n"
-    "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets IN IN\n"
-    "match_pins $3 $2\n"
     "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
     "match_pins $1 $3\n"
     "match_pins $0 $1\n"
     "match_devices $2 $1\n"
     "match_devices $1 $2\n"
     "end_circuit INV INV MATCH\n"
     "begin_circuit TOP TOP\n"
-    "match_nets IN IN\n"
     "match_nets OUT OUT\n"
-    "match_nets VDD VDD\n"
+    "match_nets IN IN\n"
     "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
     "match_nets INT INT\n"
-    "match_pins $0 $1\n"
     "match_pins $1 $0\n"
-    "match_pins $2 $2\n"
+    "match_pins $0 $1\n"
     "match_pins $3 $3\n"
+    "match_pins $2 $2\n"
     "match_subcircuits $3 $1\n"
     "match_subcircuits $1 $2\n"
     "end_circuit TOP TOP MATCH"
@@ -2241,9 +2395,9 @@ TEST(14_Subcircuit2Nand)
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
     "match_nets B B\n"
-    "match_nets INT INT\n"
     "match_nets OUT OUT\n"
     "match_nets A A\n"
+    "match_nets INT INT\n"
     "match_pins $4 $4\n"
     "match_pins $3 $3\n"
     "match_pins $1 $1\n"
@@ -2255,17 +2409,17 @@ TEST(14_Subcircuit2Nand)
     "match_devices $4 $4\n"
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit TOP TOP\n"
-    "match_nets IN2 IN2\n"
     "match_nets OUT OUT\n"
-    "match_nets IN1 IN1\n"
-    "match_nets VDD VDD\n"
+    "match_nets IN2 IN2\n"
     "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets IN1 IN1\n"
     "match_nets INT INT\n"
-    "match_pins $1 $1\n"
     "match_pins $2 $2\n"
-    "match_pins $0 $0\n"
-    "match_pins $3 $3\n"
+    "match_pins $1 $1\n"
     "match_pins $4 $4\n"
+    "match_pins $3 $3\n"
+    "match_pins $0 $0\n"
     "match_subcircuits $2 $1\n"
     "match_subcircuits $1 $2\n"
     "end_circuit TOP TOP MATCH"
@@ -2315,9 +2469,9 @@ TEST(14_Subcircuit2NandMismatchNoSwap)
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
     "match_nets B B\n"
-    "match_nets INT INT\n"
     "match_nets OUT OUT\n"
     "match_nets A A\n"
+    "match_nets INT INT\n"
     "match_pins $4 $4\n"
     "match_pins $3 $3\n"
     "match_pins $1 $1\n"
@@ -2336,11 +2490,11 @@ TEST(14_Subcircuit2NandMismatchNoSwap)
     "match_nets IN1 IN2\n"
     "net_mismatch IN2 (null)\n"
     "net_mismatch (null) INT\n"
-    "pin_mismatch $1 (null)\n"
     "match_pins $2 $2\n"
-    "match_pins $0 $1\n"
-    "match_pins $3 $3\n"
+    "pin_mismatch $1 (null)\n"
     "match_pins $4 $4\n"
+    "match_pins $3 $3\n"
+    "match_pins $0 $1\n"
     "pin_mismatch (null) $0\n"
     "subcircuit_mismatch $1 (null)\n"
     "subcircuit_mismatch (null) $1\n"
@@ -2393,9 +2547,9 @@ TEST(14_Subcircuit2MatchWithSwap)
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
     "match_nets B B\n"
-    "match_nets INT INT\n"
     "match_nets OUT OUT\n"
     "match_nets A A\n"
+    "match_nets INT INT\n"
     "match_pins $4 $4\n"
     "match_pins $3 $3\n"
     "match_pins $1 $1\n"
@@ -2407,17 +2561,17 @@ TEST(14_Subcircuit2MatchWithSwap)
     "match_devices $4 $4\n"
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit TOP TOP\n"
-    "match_nets IN2 IN2\n"
     "match_nets OUT OUT\n"
+    "match_nets IN2 IN2\n"
     "match_nets VSS VSS\n"
     "match_nets INT INT\n"
     "match_nets VDD VDD\n"
     "match_nets IN1 IN1\n"
-    "match_pins $1 $1\n"
     "match_pins $2 $2\n"
-    "match_pins $0 $0\n"
-    "match_pins $3 $3\n"
+    "match_pins $1 $1\n"
     "match_pins $4 $4\n"
+    "match_pins $3 $3\n"
+    "match_pins $0 $0\n"
     "match_subcircuits $2 $1\n"
     "match_subcircuits $1 $2\n"
     "end_circuit TOP TOP MATCH"

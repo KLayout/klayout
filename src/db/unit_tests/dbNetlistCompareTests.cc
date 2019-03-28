@@ -277,10 +277,12 @@ public:
 
     std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cls->name ());
     if (c != m_cat_by_name.end ()) {
+      m_cat_by_ptr.insert (std::make_pair (cls, c->second));
       return c->second;
     } else {
       ++m_next_cat;
       m_cat_by_name.insert (std::make_pair (cls->name (), m_next_cat));
+      m_cat_by_ptr.insert (std::make_pair (cls, m_next_cat));
       return m_next_cat;
     }
   }
@@ -312,8 +314,13 @@ public:
     const db::Circuit *cr = subcircuit->circuit_ref ();
     if (! cr) {
       return 0;
+    } else {
+      return cat_for_circuit (cr);
     }
+  }
 
+  size_t cat_for_circuit (const db::Circuit *cr)
+  {
     std::map<const db::Circuit *, size_t>::const_iterator cp = m_cat_by_ptr.find (cr);
     if (cp != m_cat_by_ptr.end ()) {
       return cp->second;
@@ -321,10 +328,12 @@ public:
 
     std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cr->name ());
     if (c != m_cat_by_name.end ()) {
+      m_cat_by_ptr.insert (std::make_pair (cr, c->second));
       return c->second;
     } else {
       ++m_next_cat;
       m_cat_by_name.insert (std::make_pair (cr->name (), m_next_cat));
+      m_cat_by_ptr.insert (std::make_pair (cr, m_next_cat));
       return m_next_cat;
     }
   }
@@ -928,21 +937,23 @@ public:
 
     bool good = true;
 
-    std::map<std::string, std::pair<const db::Circuit *, const db::Circuit *> > name2circuits;
+    std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> > cat2circuits;
 
     for (db::Netlist::const_circuit_iterator i = a->begin_circuits (); i != a->end_circuits (); ++i) {
-      name2circuits[i->name ()].first = i.operator-> ();
+      size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
+      cat2circuits[cat].first = i.operator-> ();
     }
 
     for (db::Netlist::const_circuit_iterator i = b->begin_circuits (); i != b->end_circuits (); ++i) {
-      name2circuits[i->name ()].second = i.operator-> ();
+      size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
+      cat2circuits[cat].second = i.operator-> ();
     }
 
     if (mp_logger) {
       mp_logger->begin_netlist (a, b);
     }
 
-    for (std::map<std::string, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = name2circuits.begin (); i != name2circuits.end (); ++i) {
+    for (std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
       if (! i->second.first || ! i->second.second) {
         good = false;
         if (mp_logger) {
@@ -956,8 +967,10 @@ public:
 
     for (db::Netlist::const_bottom_up_circuit_iterator c = a->begin_bottom_up (); c != a->end_bottom_up (); ++c) {
 
-      std::map<std::string, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = name2circuits.find ((*c)->name ());
-      tl_assert (i != name2circuits.end ());
+      size_t ccat = circuit_categorizer.cat_for_circuit (*c);
+
+      std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = cat2circuits.find (ccat);
+      tl_assert (i != cat2circuits.end ());
 
       if (i->second.first && i->second.second) {
 
@@ -2207,6 +2220,73 @@ TEST(10_SimpleSubCircuits)
     "match_devices $2 $1\n"
     "match_devices $1 $2\n"
     "end_circuit INV INV MATCH\n"
+    "begin_circuit TOP TOP\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets INT INT\n"
+    "match_pins $1 $0\n"
+    "match_pins $0 $2\n"
+    "match_pins $3 $3\n"
+    "match_pins $2 $1\n"
+    "match_subcircuits $2 $1\n"
+    "match_subcircuits $1 $2\n"
+    "end_circuit TOP TOP MATCH"
+  );
+
+  EXPECT_EQ (good, true);
+}
+
+TEST(10_SimpleSubCircuitsMatchedNames)
+{
+  const char *nls1 =
+    "circuit INV ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit INV $1 ($1=IN,$2=INT,$3=VDD,$4=VSS);\n"
+    "  subcircuit INV $2 ($1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit INVB ($1=VDD,$2=IN,$3=VSS,$4=OUT);\n"
+    "  device NMOS $1 (S=OUT,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TOP ($1=OUT,$2=VDD,$3=IN,$4=VSS);\n"
+    "  subcircuit INVB $1 ($1=VDD,$2=INT,$3=VSS,$4=OUT);\n"
+    "  subcircuit INVB $2 ($1=VDD,$2=IN,$3=VSS,$4=INT);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+  EXPECT_EQ (good, false);
+
+  logger.clear ();
+  comp.same_circuits (nl1.circuit_by_name ("INV"), nl2.circuit_by_name ("INVB"));
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit INV INVB\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_pins $1 $3\n"
+    "match_pins $0 $1\n"
+    "match_devices $2 $1\n"
+    "match_devices $1 $2\n"
+    "end_circuit INV INVB MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
     "match_nets IN IN\n"

@@ -105,6 +105,9 @@ class DBNetlist_TestClass < TestBase
     nl.add(cc)
     cc.name = "UVW"
 
+    assert_equal(nl.device_class_by_name("UVW") == cc, true)
+    assert_equal(nl.device_class_by_name("doesntexist") == nil, true)
+
     names = []
     nl.each_device_class { |i| names << i.name }
     assert_equal(names, [ c.name, cc.name ])

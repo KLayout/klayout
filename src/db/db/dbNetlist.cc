@@ -369,6 +369,16 @@ void Netlist::remove_circuit (Circuit *circuit)
   m_circuits.erase (circuit);
 }
 
+DeviceClass *Netlist::device_class_by_name (const std::string &name)
+{
+  for (device_class_iterator d = begin_device_classes (); d != end_device_classes (); ++d) {
+    if (d->name () == name) {
+      return d.operator-> ();
+    }
+  }
+  return 0;
+}
+
 void Netlist::add_device_class (DeviceClass *device_class)
 {
   m_device_classes.push_back (device_class);

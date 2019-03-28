@@ -959,7 +959,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   ) +
   gsi::method ("circuit_by_name", (db::Circuit *(db::Netlist::*) (const std::string &)) &db::Netlist::circuit_by_name, gsi::arg ("name"),
     "@brief Gets the circuit object for a given name.\n"
-    "If the ID is not a valid circuit name, nil is returned."
+    "If the name is not a valid circuit name, nil is returned."
   ) +
   gsi::iterator ("each_circuit_top_down", (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_top_down, (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_top_down,
     "@brief Iterates over the circuits top-down\n"
@@ -989,6 +989,10 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "After the object has been removed, it becomes invalid and cannot be used further. "
     "Use this method with care as it may corrupt the internal structure of the netlist. "
     "Only use this method when device refers to this device class."
+  ) +
+  gsi::method ("device_class_by_name", (db::DeviceClass *(db::Netlist::*) (const std::string &)) &db::Netlist::device_class_by_name, gsi::arg ("name"),
+    "@brief Gets the device class for a given name.\n"
+    "If the name is not a valid device class name, nil is returned."
   ) +
   gsi::iterator ("each_device_class", (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::begin_device_classes, (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::end_device_classes,
     "@brief Iterates over the device classes of the netlist"

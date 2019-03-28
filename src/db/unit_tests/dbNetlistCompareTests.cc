@@ -1511,6 +1511,11 @@ public:
     return tl::join (m_texts, "\n");
   }
 
+  void clear ()
+  {
+    m_texts.clear ();
+  }
+
 private:
   std::vector<std::string> m_texts;
 
@@ -1550,6 +1555,14 @@ static void prep_nl (db::Netlist &nl, const char *str)
 
   dc = new db::DeviceClassMOS3Transistor ();
   dc->set_name ("NMOS");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("PMOSB");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("NMOSB");
   nl.add_device_class (dc);
 
   dc = new db::DeviceClassMOS4Transistor ();
@@ -1601,6 +1614,52 @@ TEST(1_SimpleInverter)
   db::NetlistComparer comp (&logger);
 
   bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+     "begin_circuit INV INV\n"
+     "match_nets VDD VDD\n"
+     "match_nets VSS VSS\n"
+     "match_nets OUT OUT\n"
+     "match_nets IN IN\n"
+     "match_pins $2 $0\n"
+     "match_pins $3 $2\n"
+     "match_pins $1 $3\n"
+     "match_pins $0 $1\n"
+     "match_devices $2 $1\n"
+     "match_devices $1 $2\n"
+     "end_circuit INV INV MATCH"
+  );
+  EXPECT_EQ (good, true);
+}
+
+TEST(1_SimpleInverterMatchedDeviceClasses)
+{
+  const char *nls1 =
+    "circuit INV ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit INV ($1=VDD,$2=IN,$3=VSS,$4=OUT);\n"
+    "  device NMOSB $1 (S=OUT,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOSB $2 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+  comp.same_device_classes (nl1.device_class_by_name ("PMOS"), nl2.device_class_by_name ("PMOSB"));
+
+  bool good = comp.compare (&nl1, &nl2);
+  EXPECT_EQ (good, false);
+
+  logger.clear ();
+  comp.same_device_classes (nl1.device_class_by_name ("NMOS"), nl2.device_class_by_name ("NMOSB"));
+  good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
      "begin_circuit INV INV\n"

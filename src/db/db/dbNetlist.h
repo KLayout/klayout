@@ -282,6 +282,23 @@ public:
   void remove_device_class (DeviceClass *device_class);
 
   /**
+   *  @brief Gets a device class by it's name (const version)
+   *
+   *  This method returns 0 if there is no class with this name.
+   */
+  const DeviceClass *device_class_by_name (const std::string &name) const
+  {
+    return const_cast<Netlist *> (this)->device_class_by_name (name);
+  }
+
+  /**
+   *  @brief Gets a device class by it's name (non-const version)
+   *
+   *  This method returns 0 if there is no class with this name.
+   */
+  DeviceClass *device_class_by_name (const std::string &name);
+
+  /**
    *  @brief Begin iterator for the device classes of the netlist (non-const version)
    */
   device_class_iterator begin_device_classes ()

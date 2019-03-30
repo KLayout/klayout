@@ -412,11 +412,11 @@ TEST(4_BufferTwoPaths)
   EXPECT_EQ (logger.text (),
      "begin_circuit BUF BUF\n"
      "match_nets OUT OUT\n"
-     "match_ambiguous_nets INT $10\n"
-     "match_nets INT2 $11\n"
      "match_nets VDD VDD\n"
      "match_nets IN IN\n"
      "match_nets VSS VSS\n"
+     "match_ambiguous_nets INT $10\n"
+     "match_ambiguous_nets INT2 $11\n"
      "match_pins $1 $3\n"
      "match_pins $2 $0\n"
      "match_pins $0 $1\n"
@@ -1308,6 +1308,77 @@ TEST(14_Subcircuit2MatchWithSwap)
     "match_subcircuits $2 $1\n"
     "match_subcircuits $1 $2\n"
     "end_circuit TOP TOP MATCH"
+  );
+
+  EXPECT_EQ (good, true);
+}
+
+TEST(15_EmptySubCircuitTest)
+{
+  const char *nls1 =
+    "circuit RINGO ();\n"
+    "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 (S=$2,G=$4,D=IN);\n"
+    "  subcircuit TRANS $2 (S=$2,G=$5,D=IN);\n"
+    "  subcircuit TRANS $3 (S=$5,G=OUT,D=$2);\n"
+    "  subcircuit TRANS $4 (S=$4,G=OUT,D=$2);\n"
+    "end;\n"
+    "circuit TRANS (S=$1,G=$2,D=$3);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit RINGO ();\n"
+    "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $4 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $5 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $6 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 (G=$4,S=$2,D=IN);\n"
+    "  subcircuit TRANS $2 (G=$5,S=$2,D=IN);\n"
+    "  subcircuit TRANS $3 (G=OUT,S=$5,D=$2);\n"
+    "  subcircuit TRANS $4 (G=OUT,S=$4,D=$2);\n"
+    "end;\n"
+    //  This circuit is an abstract and it's pins are defined by the pin names
+    "circuit TRANS (G=$1,S=$2,D=$3);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "..."
   );
 
   EXPECT_EQ (good, true);

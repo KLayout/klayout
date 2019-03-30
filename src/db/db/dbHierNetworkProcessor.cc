@@ -268,6 +268,13 @@ local_cluster<T>::clear ()
 }
 
 template <class T>
+bool
+local_cluster<T>::empty () const
+{
+  return m_global_nets.empty () && m_shapes.empty ();
+}
+
+template <class T>
 void
 local_cluster<T>::set_global_nets (const global_nets &gn)
 {

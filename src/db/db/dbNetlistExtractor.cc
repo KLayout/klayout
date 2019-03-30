@@ -127,11 +127,18 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     for (connected_clusters_type::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
 
+      const db::local_cluster<db::PolygonRef> &lc = clusters.cluster_by_id (*c);
+      if (clusters.connections_for_cluster (*c).empty () && lc.empty ()) {
+        //  this is an entirely empty cluster so we skip it.
+        //  Such clusters are left over when joining clusters.
+        continue;
+      }
+
       db::Net *net = new db::Net ();
       net->set_cluster_id (*c);
       circuit->add_net (net);
 
-      const db::local_cluster<db::PolygonRef>::global_nets &gn = clusters.cluster_by_id (*c).get_global_nets ();
+      const db::local_cluster<db::PolygonRef>::global_nets &gn = lc.get_global_nets ();
       for (db::local_cluster<db::PolygonRef>::global_nets::const_iterator g = gn.begin (); g != gn.end (); ++g) {
         assign_net_name (conn.global_net_name (*g), net);
       }

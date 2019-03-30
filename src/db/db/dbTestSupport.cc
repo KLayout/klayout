@@ -28,6 +28,8 @@
 #include "dbCell.h"
 #include "dbCellInst.h"
 #include "dbLayoutDiff.h"
+#include "dbNetlist.h"
+#include "dbNetlistCompare.h"
 
 #include "tlUnitTest.h"
 #include "tlFileUtils.h"
@@ -151,5 +153,153 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
                                (n > 1 ? "\nand variants" : "")));
   }
 }
+
+class CompareLogger
+  : public db::NetlistCompareLogger
+{
+public:
+  CompareLogger ()
+    : m_new_circuit (true) { }
+
+  void out (const std::string &text)
+  {
+    if (m_new_circuit) {
+      tl::log << m_circuit;
+      m_new_circuit = false;
+    }
+    tl::log << text;
+  }
+
+  virtual void begin_netlist ()
+  {
+    tl::log << "Comparing netlists:";
+  }
+
+  virtual void end_netlist ()
+  {
+    tl::log << "End of difference log.";
+  }
+
+  virtual void begin_circuit (const db::Circuit *a, const db::Circuit *b)
+  {
+    m_new_circuit = true;
+    m_circuit = circuit2str (a) + " vs. " + circuit2str (b);
+  }
+
+  virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b)
+  {
+    out ("circuit_skipped " + circuit2str (a) + " " + circuit2str (b));
+  }
+
+  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b)
+  {
+    out ("circuit_mismatch " + circuit2str (a) + " " + circuit2str (b));
+  }
+
+  virtual void match_nets (const db::Net *a, const db::Net *b)
+  {
+    out ("match_nets " + net2str (a) + " " + net2str (b));
+  }
+
+  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b)
+  {
+    out ("match_ambiguous_nets " + net2str (a) + " " + net2str (b));
+  }
+
+  virtual void net_mismatch (const db::Net *a, const db::Net *b)
+  {
+    out ("net_mismatch " + net2str (a) + " " + net2str (b));
+  }
+
+  virtual void match_devices (const db::Device *a, const db::Device *b)
+  {
+    out ("match_devices " + device2str (a) + " " + device2str (b));
+  }
+
+  virtual void device_mismatch (const db::Device *a, const db::Device *b)
+  {
+    out ("device_mismatch " + device2str (a) + " " + device2str (b));
+  }
+
+  virtual void match_devices_with_different_parameters (const db::Device *a, const db::Device *b)
+  {
+    out ("match_devices_with_different_parameters " + device2str (a) + " " + device2str (b));
+  }
+
+  virtual void match_devices_with_different_device_classes (const db::Device *a, const db::Device *b)
+  {
+    out ("match_devices_with_different_device_classes " + device2str (a) + " " + device2str (b));
+  }
+
+  virtual void match_pins (const db::Pin *a, const db::Pin *b)
+  {
+    out ("match_pins " + pin2str (a) + " " + pin2str (b));
+  }
+
+  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b)
+  {
+    out ("pin_mismatch " + pin2str (a) + " " + pin2str (b));
+  }
+
+  virtual void match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b)
+  {
+    out ("match_subcircuits " + subcircuit2str (a) + " " + subcircuit2str (b));
+  }
+
+  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b)
+  {
+    out ("subcircuit_mismatch " + subcircuit2str (a) + " " + subcircuit2str (b));
+  }
+
+private:
+  bool m_new_circuit;
+  std::string m_circuit;
+
+  std::string circuit2str (const db::Circuit *x) const
+  {
+    return x ? x->name () : "(null)";
+  }
+
+  std::string device2str (const db::Device *x) const
+  {
+    return x ? x->expanded_name () : "(null)";
+  }
+
+  std::string net2str (const db::Net *x) const
+  {
+    return x ? x->expanded_name () : "(null)";
+  }
+
+  std::string pin2str (const db::Pin *x) const
+  {
+    return x ? x->expanded_name () : "(null)";
+  }
+
+  std::string subcircuit2str (const db::SubCircuit *x) const
+  {
+    return x ? x->expanded_name () : "(null)";
+  }
+};
+
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string)
+{
+  db::NetlistComparer comp (0);
+
+  db::Netlist au_nl;
+  for (db::Netlist::const_device_class_iterator d = netlist.begin_device_classes (); d != netlist.end_device_classes (); ++d) {
+    au_nl.add_device_class (d->clone ());
+  }
+
+  au_nl.from_string (au_nl_string);
+
+  if (! comp.compare (&netlist, &au_nl)) {
+    _this->raise ("Compare failed - see log for details.\n\nActual:\n" + netlist.to_string () + "\nGolden:\n" + au_nl_string);
+    //  Compare once again - this time with logger
+    CompareLogger logger;
+    db::NetlistComparer comp (&logger);
+    comp.compare (&netlist, &au_nl);
+  }
+}
+
 
 }

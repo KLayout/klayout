@@ -219,6 +219,11 @@ public:
   void clear ();
 
   /**
+   *  @brief Returns true if the cluster is empty
+   */
+  bool empty () const;
+
+  /**
    *  @brief Adds a shape with the given layer to the cluster
    */
   void add (const T &s, unsigned int la);

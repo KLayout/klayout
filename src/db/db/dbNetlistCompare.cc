@@ -157,6 +157,16 @@ public:
     m_rev_pin_map.insert (std::make_pair (other_pin, this_pin));
   }
 
+  bool has_other_pin_for_this_pin (size_t this_pin) const
+  {
+    return m_pin_map.find (this_pin) != m_pin_map.end ();
+  }
+
+  bool has_this_pin_for_other_pin (size_t other_pin) const
+  {
+    return m_rev_pin_map.find (other_pin) != m_rev_pin_map.end ();
+  }
+
   size_t other_pin_from_this_pin (size_t this_pin) const
   {
     std::map<size_t, size_t>::const_iterator i = m_pin_map.find (this_pin);
@@ -440,28 +450,28 @@ public:
       size_t pin_id = i->pin ()->id ();
       const db::Circuit *cr = sc->circuit_ref ();
 
-      const CircuitMapper *cm = 0;
+      pin_id = pin_map->normalize_pin_id (cr, pin_id);
 
-      if (circuit_map) {
-        std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
-        if (icm == circuit_map->end ()) {
-          //  this can happen if the other circuit is not present - this is allowed for single-pin
-          //  circuits.
-          continue;
-        }
-        cm = & icm->second;
+      std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
+      if (icm == circuit_map->end ()) {
+        //  this can happen if the other circuit is not present - this is allowed for single-pin
+        //  circuits.
+        continue;
       }
 
-      //  NOTE: if cm is given, cr and pin_id are given in terms of the "other" circuit
+      const CircuitMapper *cm = & icm->second;
 
-      if (cm) {
-        cr = cm->other ();
-        pin_id = cm->other_pin_from_this_pin (pin_id);
+      //  A pin assignment may be missing because there is no net for a pin -> skip this
+
+      if (! cm->has_other_pin_for_this_pin (pin_id)) {
+        continue;
       }
 
-      if (pin_map) {
-        pin_id = pin_map->normalize_pin_id (cr, pin_id);
-      }
+      //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
+      //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
+
+      cr = cm->other ();
+      pin_id = cm->other_pin_from_this_pin (pin_id);
 
       //  we cannot afford creating edges from all to all other pins, so we just create edges to the previous and next
       //  pin. This may take more iterations to solve, but should be equivalent.
@@ -469,17 +479,21 @@ public:
       std::vector<size_t> pids;
       size_t pin_count = cr->pin_count ();
 
-      //  take the previous, next and second-next pin as targets for edges
-      //  (using the second-next pin avoid isolation of OUT vs. IN in case
-      //  of a pin configuration of VSS-IN-VDD-OUT like for an inverter).
+      //  take a number if additional pins as edges: this allows identifying a pin as dependent
+      //  from other pins hence nets are propagated. We assume that there are 4 power pins max so
+      //  5 additional pins should be sufficient to capture one additional non-power pin.
 
-      if (pin_count >= 2) {
-        pids.push_back ((pin_id + pin_count - 1) % pin_count);
-        if (pin_count >= 3) {
-          pids.push_back ((pin_id + 1) % pin_count);
-          if (pin_count >= 4) {
-            pids.push_back ((pin_id + 2) % pin_count);
-          }
+      size_t take_additional_pins = 5;
+      for (size_t n = 0; n < take_additional_pins; ++n) {
+        size_t add_pin_id = (pin_id + n + 1) % pin_count;
+        if (add_pin_id == pin_id) {
+          break;
+        }
+        if (cm->has_this_pin_for_other_pin (add_pin_id)) {
+          pids.push_back (add_pin_id);
+        } else {
+          //  skip pins without mapping
+          ++take_additional_pins;
         }
       }
 
@@ -489,9 +503,9 @@ public:
 
         //  NOTE: if a pin mapping is given, EdgeDesc::pin1_id and EdgeDesc::pin2_id are given
         //  as pin ID's of the other circuit.
-        EdgeDesc ed (sc, circuit_categorizer.cat_for_subcircuit (sc), pin_id, pin_map ? pin_map->normalize_pin_id (cr, pin2_id) : pin2_id);
+        EdgeDesc ed (sc, circuit_categorizer.cat_for_subcircuit (sc), pin_id, pin_map->normalize_pin_id (cr, pin2_id));
 
-        size_t this_pin2_id = cm ? cm->this_pin_from_other_pin (pin2_id) : pin2_id;
+        size_t this_pin2_id = cm->this_pin_from_other_pin (pin2_id);
         const db::Net *net2 = sc->net_for_pin (this_pin2_id);
 
         std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net2);
@@ -966,7 +980,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
   }
 
   std::set<const db::Circuit *> verified_circuits_a, verified_circuits_b;
-  std::map<const db::Circuit *, CircuitMapper> pin_mapping;
+  std::map<const db::Circuit *, CircuitMapper> c12_pin_mapping, c22_pin_mapping;
 
   for (db::Netlist::const_bottom_up_circuit_iterator c = a->begin_bottom_up (); c != a->end_bottom_up (); ++c) {
 
@@ -994,7 +1008,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
         }
 
         bool pin_mismatch = false;
-        bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, *net_identity, pin_mismatch, pin_mapping);
+        bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, *net_identity, pin_mismatch, c12_pin_mapping, c22_pin_mapping);
         if (! g) {
           good = false;
         }
@@ -1070,29 +1084,30 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGra
 
   const db::Circuit *cr = subcircuit.circuit_ref ();
 
-  const CircuitMapper *cm = 0;
-
-  if (circuit_map) {
-    std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
-    if (icm == circuit_map->end ()) {
-      //  this can happen if the other circuit does not exist - in this case the key is an invalid one which cannot
-      //  be produced by a regular subcircuit.
-      return k;
-    }
-    cm = & icm->second;
-    cr = cm->other ();
+  std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
+  if (icm == circuit_map->end ()) {
+    //  this can happen if the other circuit does not exist - in this case the key is an invalid one which cannot
+    //  be produced by a regular subcircuit.
+    return k;
   }
 
-  //  NOTE: if cm is given, cr is given in terms of the "other" circuit
+  const CircuitMapper *cm = & icm->second;
+  cr = cm->other ();
+
+  //  NOTE: cr is given in terms of the canonical "other" circuit.
 
   for (db::Circuit::const_pin_iterator p = cr->begin_pins (); p != cr->end_pins (); ++p) {
 
-    size_t this_pin_id = cm ? cm->this_pin_from_other_pin (p->id ()) : p->id ();
-    size_t pin_id = pin_map ? pin_map->normalize_pin_id (cr, p->id ()) : p->id ();
+    if (cm->has_this_pin_for_other_pin (p->id ())) {
 
-    const db::Net *net = subcircuit.net_for_pin (this_pin_id);
-    size_t net_id = g.node_index_for_net (net);
-    k.push_back (std::make_pair (pin_id, net_id));
+      size_t this_pin_id = cm->this_pin_from_other_pin (p->id ());
+      size_t pin_id = pin_map->normalize_pin_id (cr, p->id ());
+
+      const db::Net *net = subcircuit.net_for_pin (this_pin_id);
+      size_t net_id = g.node_index_for_net (net);
+      k.push_back (std::make_pair (pin_id, net_id));
+
+    }
 
   }
 
@@ -1102,14 +1117,14 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGra
 }
 
 bool
-NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &circuit_and_pin_mapping) const
+NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
 {
   db::NetDeviceGraph g1, g2;
 
   //  NOTE: for normalization we map all subcircuits of c1 to c2.
   //  Also, pin swapping will only happen there.
-  g1.build (c1, device_categorizer, circuit_categorizer, &circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
-  g2.build (c2, device_categorizer, circuit_categorizer, 0, mp_circuit_pin_mapper.get ());
+  g1.build (c1, device_categorizer, circuit_categorizer, &c12_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
+  g2.build (c2, device_categorizer, circuit_categorizer, &c22_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
 
   //  Match dummy nodes for null nets
   g1.identify (0, 0);
@@ -1228,48 +1243,54 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
 
   //  Report pin assignment
+  //  This step also does the pin identity mapping.
 
-  std::multimap<const db::Net *, const db::Pin *> net2pin;
+  std::multimap<size_t, const db::Pin *> net2pin;
   for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
     const db::Net *net = c2->net_for_pin (p->id ());
-    tl_assert (net != 0);
-    net2pin.insert (std::make_pair (net, p.operator-> ()));
+    if (net) {
+      net2pin.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
+    }
   }
 
-  CircuitMapper &pin_mapping = circuit_and_pin_mapping [c1];
-  pin_mapping.set_other (c2);
+  CircuitMapper &c12_pin_mapping = c12_circuit_and_pin_mapping [c1];
+  c12_pin_mapping.set_other (c2);
 
-  for (db::NetDeviceGraph::node_iterator i = g1.begin (); i != g1.end (); ++i) {
+  //  dummy mapping: we show this circuit is used.
+  CircuitMapper &c22_pin_mapping = c22_circuit_and_pin_mapping [c2];
+  c22_pin_mapping.set_other (c2);
 
-    const db::Net *net = i->net ();
-    if (! net || net->pin_count () == 0) {
+  for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
+
+    const db::Net *net = c1->net_for_pin (p->id ());
+    if (! net) {
       continue;
     }
 
-    if (! i->has_other ()) {
-      for (db::Net::const_pin_iterator pi = net->begin_pins (); pi != net->end_pins (); ++pi) {
-        if (mp_logger) {
-          mp_logger->pin_mismatch (pi->pin (), 0);
-        }
-        pin_mismatch = true;
-        good = false;
+    const db::NetGraphNode &n = *(g1.begin () + g1.node_index_for_net (net));
+
+    if (! n.has_other ()) {
+      if (mp_logger) {
+        mp_logger->pin_mismatch (p.operator-> (), 0);
       }
+      pin_mismatch = true;
+      good = false;
       continue;
     }
 
-    const db::Net *other_net = g2.net_by_node_index (i->other_net_index ());
-
-    std::multimap<const db::Net *, const db::Pin *>::iterator np = net2pin.find (other_net);
+    std::multimap<size_t, const db::Pin *>::iterator np = net2pin.find (n.other_net_index ());
     for (db::Net::const_pin_iterator pi = net->begin_pins (); pi != net->end_pins (); ++pi) {
 
-      if (np != net2pin.end () && np->first == other_net) {
+      if (np != net2pin.end () && np->first == n.other_net_index ()) {
 
         if (mp_logger) {
           mp_logger->match_pins (pi->pin (), np->second);
         }
-        pin_mapping.map_pin (pi->pin ()->id (), np->second->id ());
+        c12_pin_mapping.map_pin (pi->pin ()->id (), np->second->id ());
+        //  dummy mapping: we show this pin is used.
+        c22_pin_mapping.map_pin (np->second->id (), np->second->id ());
 
-        std::multimap<const db::Net *, const db::Pin *>::iterator np_delete = np;
+        std::multimap<size_t, const db::Pin *>::iterator np_delete = np;
         ++np;
         net2pin.erase (np_delete);
 
@@ -1287,7 +1308,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   }
 
-  for (std::multimap<const db::Net *, const db::Pin *>::iterator np = net2pin.begin (); np != net2pin.end (); ++np) {
+  for (std::multimap<size_t, const db::Pin *>::iterator np = net2pin.begin (); np != net2pin.end (); ++np) {
     if (mp_logger) {
       mp_logger->pin_mismatch (0, np->second);
     }
@@ -1391,7 +1412,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::Circuit::const_subcircuit_iterator sc = c1->begin_subcircuits (); sc != c1->end_subcircuits (); ++sc) {
 
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g1, &circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g1, &c12_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
@@ -1414,7 +1435,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::Circuit::const_subcircuit_iterator sc = c2->begin_subcircuits (); sc != c2->end_subcircuits (); ++sc) {
 
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, 0, mp_circuit_pin_mapper.get ());
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, &c22_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {

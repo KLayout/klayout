@@ -337,7 +337,8 @@ TEST(1_BasicExtraction)
   db::compare_layouts (_this, ly, au);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO ();\n"
     "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
     "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);\n"
@@ -495,7 +496,8 @@ TEST(1_BasicExtraction)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD);\n"
     "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
     "  subcircuit INV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD);\n"
@@ -689,7 +691,8 @@ TEST(2_Probing)
   dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO ();\n"
     "  subcircuit INV2PAIR $1 ($1=FB,$2=VDD,$3=VSS,$4=$I3,$5=OSC);\n"
     "  subcircuit INV2PAIR $2 ($1=$I18,$2=VDD,$3=VSS,$4=FB,$5=$I9);\n"
@@ -745,7 +748,8 @@ TEST(2_Probing)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD);\n"
     "  subcircuit INV2PAIR $1 ($1=FB,$2=VDD,$3=VSS,$4=$I3,$5=OSC);\n"
     "  subcircuit INV2PAIR $2 ($1=(null),$2=VDD,$3=VSS,$4=FB,$5=$I9);\n"
@@ -968,7 +972,8 @@ TEST(3_GlobalNetConnections)
   dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO ();\n"
     "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
     "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
@@ -1024,7 +1029,8 @@ TEST(3_GlobalNetConnections)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');\n"
     "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
     "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
@@ -1253,7 +1259,8 @@ TEST(4_GlobalNetDeviceExtraction)
   dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO ();\n"
     "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
     "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
@@ -1309,7 +1316,8 @@ TEST(4_GlobalNetDeviceExtraction)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');\n"
     "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
     "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
@@ -1538,7 +1546,8 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO ();\n"
     "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=FB,$5=$I7,$6=OSC,$7=VDD);\n"
     "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=$I22,$5=FB,$6=$I13,$7=VDD);\n"
@@ -1591,7 +1600,8 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');\n"
     "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=FB,$5=$I7,$6=OSC,$7=VDD);\n"
     "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=FB,$6=$I13,$7=VDD);\n"
@@ -1765,7 +1775,8 @@ TEST(6_MoreDeviceTypes)
   l2n.extract_netlist ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit TOP ();\n"
     "  device HVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) (L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4);\n"
     "  device HVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) (L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8);\n"
@@ -1921,7 +1932,8 @@ TEST(7_MoreByEmptyDeviceTypes)
   l2n.extract_netlist ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit TOP ();\n"
     "  device LVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) (L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4);\n"
     "  device LVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) (L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8);\n"
@@ -2099,7 +2111,8 @@ TEST(8_FlatExtraction)
   l2n.extract_netlist ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit TOP ();\n"
     "  device HVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) (L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4);\n"
     "  device HVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) (L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8);\n"
@@ -2282,7 +2295,8 @@ TEST(9_FlatExtractionWithExternalDSS)
   l2n.extract_netlist ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
     "circuit TOP ();\n"
     "  device LVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) (L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4);\n"
     "  device LVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) (L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8);\n"

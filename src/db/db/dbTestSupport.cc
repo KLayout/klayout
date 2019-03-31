@@ -164,20 +164,20 @@ public:
   void out (const std::string &text)
   {
     if (m_new_circuit) {
-      tl::log << m_circuit;
+      tl::info << m_circuit;
       m_new_circuit = false;
     }
-    tl::log << text;
+    tl::info << text;
   }
 
-  virtual void begin_netlist ()
+  virtual void begin_netlist (const db::Netlist * /*a*/, const db::Netlist * /*b*/)
   {
-    tl::log << "Comparing netlists:";
+    tl::info << "Comparing netlists:";
   }
 
-  virtual void end_netlist ()
+  virtual void end_netlist (const db::Netlist * /*a*/, const db::Netlist * /*b*/)
   {
-    tl::log << "End of difference log.";
+    tl::info << "End of difference log.";
   }
 
   virtual void begin_circuit (const db::Circuit *a, const db::Circuit *b)

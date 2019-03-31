@@ -498,6 +498,136 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (good, false);
 }
 
+TEST(5_BufferTwoPathsDifferentDeviceClasses)
+{
+  const char *nls1 =
+    "circuit BUF ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $5 (S=VDD,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=VSS,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOSB $7 (S=VDD,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOSB $8 (S=VSS,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit BUF ($1=VDD,$2=IN,$3=VSS,$4=OUT);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=$10) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$10,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=IN,D=$11) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $4 (S=VDD,G=$11,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $5 (S=$10,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=OUT,G=$10,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $7 (S=$11,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOSB $8 (S=OUT,G=$11,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  //  NOTE: adding this power hint makes the device class error harder to detect
+  const db::Circuit *ca = nl1.circuit_by_name ("BUF");
+  const db::Circuit *cb = nl2.circuit_by_name ("BUF");
+  comp.same_nets (ca->net_by_name ("VDD"), cb->net_by_name ("VDD"));
+  comp.same_nets (ca->net_by_name ("VSS"), cb->net_by_name ("VSS"));
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets IN IN\n"
+    "match_nets INT $10\n"
+    "match_nets OUT OUT\n"
+    "match_nets INT2 $11\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $0 $1\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices_with_different_device_classes $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices $6 $7\n"
+    "match_devices $8 $8\n"
+    "end_circuit BUF BUF NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+}
+
+TEST(6_BufferTwoPathsAdditionalResistor)
+{
+  const char *nls1 =
+    "circuit BUF ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=INT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=INT,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $5 (S=VDD,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=VSS,G=IN,D=INT2) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOSB $7 (S=VDD,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOSB $8 (S=VSS,G=INT2,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit BUF ($1=VDD,$2=IN,$3=VSS,$4=OUT);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=$10) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$10,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=VDD,G=IN,D=$11) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOSB $4 (S=VDD,G=$11,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $5 (S=$10,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $6 (S=OUT,G=$10,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $7 (S=$11,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOSB $8 (S=OUT,G=$11,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device RES $9 (A=$10,B=$11) (R=42);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  //  Forcing the power nets into equality makes the resistor error harder to detect
+  const db::Circuit *ca = nl1.circuit_by_name ("BUF");
+  const db::Circuit *cb = nl2.circuit_by_name ("BUF");
+  comp.same_nets (ca->net_by_name ("VDD"), cb->net_by_name ("VDD"));
+  comp.same_nets (ca->net_by_name ("VSS"), cb->net_by_name ("VSS"));
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets INT $10\n"
+    "match_nets OUT OUT\n"
+    "match_nets INT2 $11\n"
+    "match_nets IN IN\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $0 $1\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices $6 $7\n"
+    "match_devices $8 $8\n"
+    "device_mismatch (null) $9\n"
+    "end_circuit BUF BUF NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+}
+
 TEST(6_BufferTwoPathsAdditionalDevices)
 {
   const char *nls1 =

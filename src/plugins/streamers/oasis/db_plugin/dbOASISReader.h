@@ -119,14 +119,14 @@ public:
   virtual const char *format () const { return "OASIS"; }
 
   /**
-   *  @brief Issue an error with positional informations
+   *  @brief Issue an error with positional information
    *
    *  Reimplements OASISDiagnostics
    */
   virtual void error (const std::string &txt);
 
   /**
-   *  @brief Issue a warning with positional informations
+   *  @brief Issue a warning with positional information
    *
    *  Reimplements OASISDiagnostics
    */

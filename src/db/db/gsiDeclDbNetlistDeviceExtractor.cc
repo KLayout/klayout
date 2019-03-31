@@ -154,8 +154,8 @@ Class<db::NetlistDeviceExtractorError> decl_dbNetlistDeviceExtractorError ("db",
     "@brief Sets the category description.\n"
     "See \\category_name= for details about categories."
   ),
-  "@brief An error that occured during device extraction\n"
-  "The device extractor will keep errors that occured during extraction of the devices. "
+  "@brief An error that occurred during device extraction\n"
+  "The device extractor will keep errors that occurred during extraction of the devices. "
   "It does not by using this error class.\n"
   "\n"
   "An error is basically described by the cell/circuit it occures in and the message. "

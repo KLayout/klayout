@@ -37,7 +37,7 @@ namespace tl
  *  @brief The unspecific exception class
  *
  *  This class is the base class for all exceptions in this 
- *  framework. It does not carry further informations except 
+ *  framework. It does not carry further information except 
  *  a message string that can be created through different 
  *  constructor methods.
  */

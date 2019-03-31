@@ -159,7 +159,7 @@ end</pre>
   <p>
   The layout view is the representation of a layout tab (<class_doc href="LayoutView"/>). That is basically the window to 
   the layouts loaded into that tab. 
-  All related information such as the display settings, the zoom area, the layer properties and the informations about the 
+  All related information such as the display settings, the zoom area, the layer properties and the information about the 
   cell shown, the hierarchy levels and further settings go here. 
   </p>
 

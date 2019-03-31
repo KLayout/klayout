@@ -140,7 +140,7 @@ public:
    *  The pattern returned is guaranteed to be at least of
    *  size (32*pattern_stride)x64 bits. If the actual width or height is smaller,
    *  the pattern is repeated to fill this area.
-   *  The pattern stride may be bigger than 1 to accomodate pattern with
+   *  The pattern stride may be bigger than 1 to accommodate pattern with
    *  a width that is not a fraction of 32. Such pattern are repeated until
    *  they fill a multiple of 32 bits.
    */

@@ -50,7 +50,7 @@
   <p>
   By creating conductor layers with boolean expressions, it is possible for example to separate an active area
   layer of a CMOS transistor into source and drain regions by subtracting the gate poly. Symbolic layers are useful
-  to use "speaking" names for layers instead of the numeric layer/datatype specificiation.
+  to use "speaking" names for layers instead of the numeric layer/datatype specification.
   Please note, that the net tracer is considerably slower when using boolean expressions.
   </p>
 

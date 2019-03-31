@@ -123,7 +123,7 @@ public:
   }
 
   /**
-   *  @brief Gets the cell name the error occured in
+   *  @brief Gets the cell name the error occurred in
    */
   const std::string &cell_name () const
   {

@@ -15,7 +15,7 @@
   </p>
 
   <p>
-  Two copy modes are provided: deep and shallow copy. When "copy" or "cut" is choosen and 
+  Two copy modes are provided: deep and shallow copy. When "copy" or "cut" is chosen and 
   the cell instantiates other cells, a dialog will been shown in which the mode can be selected:
   </p>
 

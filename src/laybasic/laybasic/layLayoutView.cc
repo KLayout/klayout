@@ -2613,7 +2613,7 @@ LayoutView::add_new_layers (const std::vector <unsigned int> &layer_ids, int cv_
     lay::LayerPropertiesList new_props (get_properties ());
 
     //  don't create new layers for those, for which there are layers already: compute a 
-    //  set of layers alreay present
+    //  set of layers already present
     std::set <db::LayerProperties, db::LPLogicalLessFunc> present_layers;
     for (LayerPropertiesConstIterator lay_iter = begin_layers (); ! lay_iter.at_end (); ++lay_iter) {
       if (! lay_iter->has_children () && lay_iter->cellview_index () == cv_index) {
@@ -4279,7 +4279,7 @@ LayoutView::max_hier_changed (int i)
 }
 
 /**
- *  @brief set the maximum hierachy level to the number of levels available
+ *  @brief set the maximum hierarchy level to the number of levels available
  */
 void 
 LayoutView::max_hier ()

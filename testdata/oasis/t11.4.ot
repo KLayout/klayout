@@ -176,7 +176,7 @@ uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00111111 ;# CNXYRAAF
   int 2000      ;# placement-x
   int 0         ;# placement-y
-  uint 8        ;# repetition (3x4 matrix, arbitary displacement vectors)
+  uint 8        ;# repetition (3x4 matrix, arbitrary displacement vectors)
     uint 1      ;# n-dimension 
     uint 2      ;# m-dimension 
     uint [ expr 4*310+1 ]    ;# n-displacement (g-delta: 310,320) 

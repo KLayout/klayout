@@ -376,7 +376,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@li No connection indicated (circuit_cell_name_prefix == 0: the net shapes are simply put into their\n"
     "   respective circuits. The connections are not indicated. @/li\n"
     "@li Subnet hierarchy (circuit_cell_name_prefix != 0): for each root net, a full hierarchy is built\n"
-    "   to accomodate the subnets (see build_net in recursive mode). @/li\n"
+    "   to accommodate the subnets (see build_net in recursive mode). @/li\n"
     "@/ul\n"
     "\n"
     "If a device name prefix is given, device shapes will be output on device cells named\n"

@@ -910,7 +910,7 @@ TilingProcessor::execute (const std::string &desc)
   }
 
   if (job.has_error ()) {
-    throw tl::Exception (tl::to_string (tr ("Errors occured during processing. First error message says:\n")) + job.error_messages ().front ());
+    throw tl::Exception (tl::to_string (tr ("Errors occurred during processing. First error message says:\n")) + job.error_messages ().front ());
   }
 }
 

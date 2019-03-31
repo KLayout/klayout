@@ -208,7 +208,7 @@ public:
    *  @param box The region to select
    *  @param mode See above
    *  @param flags The kind of shapes to iterate over (or-ed constants of flags_type)
-   *  @param prop_sel The propery selection
+   *  @param prop_sel The property selection
    *  @param inv_prop_sel True, if shapes not matching the property selection shall be reported
    */
   ShapeIterator (const shapes_type &shapes, const box_type &box, region_mode mode, unsigned int flags = All, const property_selector *prop_sel = 0, bool inv_prop_sel = false);

@@ -34,7 +34,7 @@ namespace db
 /**
  *  @brief A structure describing the meta information from the reader
  *
- *  In the meta information block, the reader provides additional informations
+ *  In the meta information block, the reader provides additional information
  *  about the file and content etc.
  *  "name" is a unique name that can be used to identify the information.
  *  "description" is a "speaking" description of the information.

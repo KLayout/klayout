@@ -76,7 +76,7 @@ result will be the edges of the first operand which are inside or on the
 borders of the polygons of the second operand.
 </p><p>
 The following images show the effect of the "and" method
-on polygons and egdes (layer1: red, layer2: blue):
+on polygons and edges (layer1: red, layer2: blue):
 </p><p>
 <table>
 <tr>
@@ -847,7 +847,7 @@ It is an alias for the "+" operator.
 This method is available for polygon, edge and edge pair layers.
 </p><p>
 The following images show the effect of the "join" method
-on polygons and egdes (layer1: red, layer2: blue):
+on polygons and edges (layer1: red, layer2: blue):
 </p><p>
 <table>
 <tr>
@@ -1017,7 +1017,7 @@ result will be the edges of the first operand which are outside the polygons
 of the second operand.
 </p><p>
 The following images show the effect of the "not" method
-on polygons and egdes (layer1: red, layer2: blue):
+on polygons and edges (layer1: red, layer2: blue):
 </p><p>
 <table>
 <tr>
@@ -1203,7 +1203,7 @@ It is an alias for the "|" operator.
 This method is available for polygon and edge layers.
 </p><p>
 The following images show the effect of the "or" method
-on polygons and egdes (layer1: red, layer2: blue):
+on polygons and edges (layer1: red, layer2: blue):
 </p><p>
 <table>
 <tr>
@@ -2321,7 +2321,7 @@ It is an alias for the "^" operator.
 This method is available for polygon and edge layers.
 </p><p>
 The following images show the effect of the "xor" method
-on polygons and egdes (layer1: red, layer2: blue):
+on polygons and edges (layer1: red, layer2: blue):
 </p><p>
 <table>
 <tr>

@@ -557,7 +557,7 @@ gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
     "@param landmarks_before The points before the transformation.\n"
     "@param landmarks_after The points after the transformation.\n"
     "@param mode Selects the adjustment mode. Must be one of the Adjust... constants.\n"
-    "@param fixed_point The index of the fixed point (one that is definitly mapped to the target) or -1 if there is none\n"
+    "@param fixed_point The index of the fixed point (one that is definitely mapped to the target) or -1 if there is none\n"
   ) +
   gsi::method ("AdjustNone", &adjust_none,
     "@brief Mode for \\adjust: adjust nothing\n"

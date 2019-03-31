@@ -1451,7 +1451,7 @@ public:
    *  @brief Set the path to the current cell
    *
    *  The current cell is the one highlighted in the browser with the focus rectangle. The
-   *  cell given by the path is hightlighted and scrolled into view.
+   *  cell given by the path is highlighted and scrolled into view.
    */
   void set_current_cell_path (int cv_index, const cell_path_type &path);
   

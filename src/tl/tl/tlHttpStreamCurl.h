@@ -114,7 +114,7 @@ public:
   /**
    *  @brief Checks for errors
    *  This method can be used after the ready event to check for errors.
-   *  It will throw an exception if errors occured.
+   *  It will throw an exception if errors occurred.
    *  read() will do the same.
    */
   void check ();

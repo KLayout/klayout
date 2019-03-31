@@ -1451,7 +1451,7 @@ struct compute_pass_obj<arg_pass_ownership, X>
  *
  *  The type declaration carries the basic type code and flags, if the argument 
  *  is an iterator delivering the given types of a vector of the given types and
- *  adds class informations if the type is "T_object", "T_object_ref", "T_object_cref". 
+ *  adds class information if the type is "T_object", "T_object_ref", "T_object_cref". 
  */
 class GSI_PUBLIC ArgType
 {

@@ -431,7 +431,7 @@ public:
 
   /**
    *  @brief Checks the response once finished is true
-   *  This method will throw an exception if an error occured
+   *  This method will throw an exception if an error occurred
    */
   void check () const;
 
@@ -1300,7 +1300,7 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
   if (m_connection->finished ()) {
     m_connection->check ();
   } else if (tl::verbosity() >= 40) {
-    tl::info << "HTTP reponse data read: " << m_connection->read_data_to_string ();
+    tl::info << "HTTP response data read: " << m_connection->read_data_to_string ();
   }
 
   return m_connection->fetch_read_data (b, n);

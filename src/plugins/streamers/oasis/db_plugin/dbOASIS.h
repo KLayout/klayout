@@ -48,12 +48,12 @@ public:
   virtual ~OASISDiagnostics ();
 
   /**
-   *  @brief Issue an error with positional informations
+   *  @brief Issue an error with positional information
    */
   virtual void error (const std::string &txt) = 0;
 
   /**
-   *  @brief Issue a warning with positional informations
+   *  @brief Issue a warning with positional information
    */
   virtual void warn (const std::string &txt) = 0;
 };

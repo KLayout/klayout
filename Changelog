@@ -1315,7 +1315,7 @@
      * The net tracer now allows to use layer combinations (derived by boolean operations)
        for the conductive and via layers. See The Net Tracing Feature for details.
      * A technology management is integrated into Klayout.
-       That allows to switch various settings depending on the choosen technology.
+       That allows to switch various settings depending on the chosen technology.
        See About Technology Management for details about this feature.
      * The drawing can now be rotated or flipped without having to modify the layout.
        This function can be found in the "Display" menu under "Global Transformation".
@@ -1865,7 +1865,7 @@
      * The instance browser now has a "Choose cell" button where the cell can be
        chosen whose instances will be presented.
      * For most editing operations, the status bar will now indicate more detailed
-       informations such as move distance.
+       information such as move distance.
      * Pasted shapes and instances now are selected initially.
      * Enhanced OASIS compression mode (can be chosen from the options dialog on
        saving). Reduces file size considerably by creating regular shape arrays if

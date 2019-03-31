@@ -606,7 +606,10 @@ static db::Net *read_net (tl::Extractor &ex, db::Circuit *circuit, std::map<std:
 
 static void read_pins (tl::Extractor &ex, db::Circuit *circuit, std::map<std::string, db::Net *> &n2n)
 {
-  size_t npins = circuit->pin_count ();
+  std::vector<std::string> org_pins;
+  for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
+    org_pins.push_back (p->name ());
+  }
 
   circuit->clear_pins ();
 
@@ -627,6 +630,10 @@ static void read_pins (tl::Extractor &ex, db::Circuit *circuit, std::map<std::st
 
     db::Net *net = read_net (ex, circuit, n2n);
 
+    if (circuit->pin_count () < org_pins.size () && pn != org_pins [circuit->pin_count ()]) {
+      ex.error (tl::sprintf (tl::to_string (tr ("Circuit defines different name for pin than subcircuit: %s (circuit) vs. %s (subcircuit)")), pn, org_pins [circuit->pin_count ()]));
+    }
+
     const db::Pin &pin = circuit->add_pin (pn);
     if (net) {
       net->add_pin (db::NetPinRef (pin.id ()));
@@ -636,8 +643,10 @@ static void read_pins (tl::Extractor &ex, db::Circuit *circuit, std::map<std::st
 
   }
 
-  if (circuit->pin_count () < npins) {
+  if (circuit->pin_count () < org_pins.size ()) {
     ex.error (tl::to_string (tr ("Circuit defines less pins that subcircuit")));
+  } else if (org_pins.size () > 0 && circuit->pin_count () > org_pins.size ()) {
+    ex.error (tl::to_string (tr ("Circuit defines more pins that subcircuit")));
   }
 }
 
@@ -753,7 +762,12 @@ static void read_subcircuit_pins (tl::Extractor &ex, db::Circuit *circuit, db::S
   while (! ex.test (")")) {
 
     std::string pn;
-    ex.read_word_or_quoted (pn);
+    if (ex.test ("$")) {
+      size_t i;
+      ex.read (i);
+    } else {
+      ex.read_word_or_quoted (pn);
+    }
 
     ex.expect ("=");
 

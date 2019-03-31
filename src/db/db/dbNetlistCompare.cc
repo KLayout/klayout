@@ -287,7 +287,7 @@ static size_t translate_terminal_id (size_t tid, const db::Device *device)
   return device->device_class () ? device->device_class ()->normalize_terminal_id (tid) : tid;
 }
 
-class NetDeviceGraphNode
+class NetGraphNode
 {
 public:
   struct EdgeDesc {
@@ -310,7 +310,11 @@ public:
 
     bool operator< (const EdgeDesc &other) const
     {
-      if (m_id1 > std::numeric_limits<size_t>::max () / 2) {
+      if (is_for_subcircuit () != other.is_for_subcircuit ()) {
+        return is_for_subcircuit () < other.is_for_subcircuit ();
+      }
+
+      if (is_for_subcircuit ()) {
 
         if ((subcircuit_pair ().first != 0) != (other.subcircuit_pair ().first != 0)) {
           return (subcircuit_pair ().first != 0) < (other.subcircuit_pair ().first != 0);
@@ -346,7 +350,11 @@ public:
 
     bool operator== (const EdgeDesc &other) const
     {
-      if (m_id1 > std::numeric_limits<size_t>::max () / 2) {
+      if (is_for_subcircuit () != other.is_for_subcircuit ()) {
+        return false;
+      }
+
+      if (is_for_subcircuit ()) {
 
         if ((subcircuit_pair ().first != 0) != (other.subcircuit_pair ().first != 0)) {
           return false;
@@ -381,6 +389,11 @@ public:
     char m_ref [sizeof (std::pair<const void *, size_t>)];
     size_t m_id1, m_id2;
 
+    inline bool is_for_subcircuit () const
+    {
+      return m_id1 > std::numeric_limits<size_t>::max () / 2;
+    }
+
     std::pair<const db::Device *, size_t> &device_pair ()
     {
       return *reinterpret_cast<std::pair<const db::Device *, size_t> *> ((void *) &m_ref);
@@ -412,7 +425,7 @@ public:
 
   typedef std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > >::const_iterator edge_iterator;
 
-  NetDeviceGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
+  NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
     : mp_net (net), m_other_net_index (std::numeric_limits<size_t>::max ())
   {
     if (! net) {
@@ -544,6 +557,11 @@ public:
     m_other_net_index = index;
   }
 
+  bool empty () const
+  {
+    return m_edges.empty ();
+  }
+
   void apply_net_index (const std::map<const db::Net *, size_t> &ni)
   {
     for (std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > >::iterator i = m_edges.begin (); i != m_edges.end (); ++i) {
@@ -560,7 +578,7 @@ public:
     std::sort (m_edges.begin (), m_edges.end ());
   }
 
-  bool operator< (const NetDeviceGraphNode &node) const
+  bool operator< (const NetGraphNode &node) const
   {
     if (m_edges.size () != node.m_edges.size ()) {
       return m_edges.size () < node.m_edges.size ();
@@ -570,10 +588,14 @@ public:
         return m_edges [i].first < node.m_edges [i].first;
       }
     }
+    if (m_edges.empty ()) {
+      //  do a more detailed analysis on the edges
+      return edge_less (net (), node.net ());
+    }
     return false;
   }
 
-  bool operator== (const NetDeviceGraphNode &node) const
+  bool operator== (const NetGraphNode &node) const
   {
     if (m_edges.size () != node.m_edges.size ()) {
       return false;
@@ -583,10 +605,14 @@ public:
         return false;
       }
     }
+    if (m_edges.empty ()) {
+      //  do a more detailed analysis on the edges
+      return edge_equal (net (), node.net ());
+    }
     return true;
   }
 
-  void swap (NetDeviceGraphNode &other)
+  void swap (NetGraphNode &other)
   {
     std::swap (m_other_net_index, other.m_other_net_index);
     std::swap (mp_net, other.mp_net);
@@ -605,7 +631,7 @@ public:
 
   edge_iterator find_edge (const std::vector<EdgeDesc> &edge) const
   {
-    edge_iterator res = std::lower_bound (begin (), end (), edge, NetDeviceGraphNode::EdgeToEdgeOnlyCompare ());
+    edge_iterator res = std::lower_bound (begin (), end (), edge, NetGraphNode::EdgeToEdgeOnlyCompare ());
     if (res == end () || res->first != edge) {
       return end ();
     } else {
@@ -617,6 +643,59 @@ private:
   const db::Net *mp_net;
   size_t m_other_net_index;
   std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > > m_edges;
+
+  /**
+   *  @brief Compares edges as "less"
+   *  Edge comparison is based on the pins attached (name of the first pin) or net
+   *  name if no pins are attached on both nets.
+   */
+  static bool edge_less (const db::Net *a, const db::Net *b)
+  {
+    if ((a != 0) != (b != 0)) {
+      return (a != 0) < (b != 0);
+    }
+    if (a != 0) {
+      if (a->pin_count () != b->pin_count ()) {
+        return a->pin_count () < b->pin_count ();
+      }
+      if (a->pin_count () > 0) {
+        const std::string &pna = a->begin_pins ()->pin ()->name ();
+        const std::string &pnb = b->begin_pins ()->pin ()->name ();
+        if (! pna.empty () && ! pnb.empty ()) {
+          return pna < pnb;
+        }
+      }
+      return a->name () < b->name ();
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   *  @brief Compares edges as "equal"
+   *  See edge_less for the comparison details.
+   */
+  static bool edge_equal (const db::Net *a, const db::Net *b)
+  {
+    if ((a != 0) != (b != 0)) {
+      return false;
+    }
+    if (a != 0) {
+      if (a->pin_count () != b->pin_count ()) {
+        return false;
+      }
+      if (a->pin_count () > 0) {
+        const std::string &pna = a->begin_pins ()->pin ()->name ();
+        const std::string &pnb = b->begin_pins ()->pin ()->name ();
+        if (! pna.empty () && ! pnb.empty ()) {
+          return pna == pnb;
+        }
+      }
+      return a->name () == b->name ();
+    } else {
+      return true;
+    }
+  }
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -626,7 +705,7 @@ private:
 
 namespace std
 {
-  void swap (db::NetDeviceGraphNode &a, db::NetDeviceGraphNode &b)
+  void swap (db::NetGraphNode &a, db::NetGraphNode &b)
   {
     a.swap (b);
   }
@@ -638,7 +717,7 @@ namespace db
 class NetDeviceGraph
 {
 public:
-  typedef std::vector<NetDeviceGraphNode>::const_iterator node_iterator;
+  typedef std::vector<NetGraphNode>::const_iterator node_iterator;
 
   NetDeviceGraph ()
   {
@@ -653,7 +732,7 @@ public:
     m_net_index.clear ();
 
     //  create a dummy node for a null net
-    m_nodes.push_back (NetDeviceGraphNode (0, device_categorizer, circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper));
+    m_nodes.push_back (NetGraphNode (0, device_categorizer, circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper));
 
     size_t nets = 0;
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
@@ -662,16 +741,16 @@ public:
     m_nodes.reserve (nets);
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      NetDeviceGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper);
+      NetGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper);
       m_nodes.push_back (node);
     }
 
     std::sort (m_nodes.begin (), m_nodes.end ());
 
-    for (std::vector<NetDeviceGraphNode>::const_iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
+    for (std::vector<NetGraphNode>::const_iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
       m_net_index.insert (std::make_pair (i->net (), i - m_nodes.begin ()));
     }
-    for (std::vector<NetDeviceGraphNode>::iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
+    for (std::vector<NetGraphNode>::iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
       i->apply_net_index (m_net_index);
     }
   }
@@ -717,15 +796,15 @@ public:
 
       for (std::vector<size_t>::const_iterator index = todo.begin (); index != todo.end (); ++index) {
 
-        NetDeviceGraphNode *n = & m_nodes[*index];
-        NetDeviceGraphNode *nother = & other.m_nodes[n->other_net_index ()];
+        NetGraphNode *n = & m_nodes[*index];
+        NetGraphNode *nother = & other.m_nodes[n->other_net_index ()];
 
         //  non-ambiguous paths to non-assigned nodes create a node identity on the
         //  end of this path
 
-        for (NetDeviceGraphNode::edge_iterator e = n->begin (); e != n->end (); ) {
+        for (NetGraphNode::edge_iterator e = n->begin (); e != n->end (); ) {
 
-          NetDeviceGraphNode::edge_iterator ee = e;
+          NetGraphNode::edge_iterator ee = e;
           ++ee;
 
           while (ee != n->end () && ee->first == e->first) {
@@ -733,8 +812,8 @@ public:
           }
 
           size_t count = 0;
-          NetDeviceGraphNode::edge_iterator ec;
-          for (NetDeviceGraphNode::edge_iterator i = e; i != ee; ++i) {
+          NetGraphNode::edge_iterator ec;
+          for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
             if (! m_nodes[i->second.first].has_other ()) {
               ec = i;
               ++count;
@@ -747,13 +826,13 @@ public:
             tl::log << "considering " << n->net ()->expanded_name () << " to " << ec->second.second->expanded_name ();
 #endif
 
-            NetDeviceGraphNode::edge_iterator e_other = nother->find_edge (ec->first);
+            NetGraphNode::edge_iterator e_other = nother->find_edge (ec->first);
             if (e_other != nother->end ()) {
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
               tl::log << "candidate accepted";
 #endif
-              NetDeviceGraphNode::edge_iterator ee_other = e_other;
+              NetGraphNode::edge_iterator ee_other = e_other;
               ++ee_other;
 
               while (ee_other != nother->end () && ee_other->first == e_other->first) {
@@ -761,8 +840,8 @@ public:
               }
 
               size_t count_other = 0;
-              NetDeviceGraphNode::edge_iterator ec_other;
-              for (NetDeviceGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
+              NetGraphNode::edge_iterator ec_other;
+              for (NetGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
                 if (! other.m_nodes[i->second.first].has_other ()) {
                   ec_other = i;
                   ++count_other;
@@ -807,7 +886,7 @@ public:
   }
 
 private:
-  std::vector<NetDeviceGraphNode> m_nodes;
+  std::vector<NetGraphNode> m_nodes;
   std::map<const db::Net *, size_t> m_net_index;
 };
 

@@ -20,49 +20,12 @@
 
 */
 
-#ifndef HDR_dbNetlistWriter
-#define HDR_dbNetlistWriter
 
-#include "dbCommon.h"
-#include "tlTypeTraits.h"
-
-#include <string>
-
-namespace tl
-{
-  class OutputStream;
-}
+#include "dbNetlistReader.h"
 
 namespace db
 {
 
-class Netlist;
-
-/**
- *  @brief A common base class for netlist writers
- */
-class DB_PUBLIC NetlistWriter
-{
-public:
-  NetlistWriter () { }
-  virtual ~NetlistWriter () { }
-
-  virtual void write (tl::OutputStream &stream, const db::Netlist &netlist, const std::string &description = std::string ()) = 0;
-};
+  //  .. nothing yet ..
 
 }
-
-namespace tl
-{
-
-template <>
-struct type_traits<db::NetlistWriter>
-  : public tl::type_traits<void>
-{
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_copy_constructor;
-};
-
-}
-
-#endif

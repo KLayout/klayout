@@ -70,7 +70,8 @@ SOURCES = \
     dbCellVariantsTests.cc \
     dbDeepEdgesTests.cc \
     dbDeepEdgePairsTests.cc \
-    dbNetlistCompareTests.cc
+    dbNetlistCompareTests.cc \
+    dbNetlistReaderTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

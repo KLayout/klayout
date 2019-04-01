@@ -173,7 +173,9 @@ SOURCES = \
     dbRegionUtils.cc \
     dbEdgesUtils.cc \
     dbRegionProcessors.cc \
-    dbNetlistCompare.cc
+    dbNetlistCompare.cc \
+    dbNetlistReader.cc \
+    dbNetlistSpiceReader.cc
 
 HEADERS = \
   dbArray.h \
@@ -312,7 +314,9 @@ HEADERS = \
     dbEdgesUtils.h \
     dbRegionProcessors.h \
     gsiDeclDbHelpers.h \
-    dbNetlistCompare.h
+    dbNetlistCompare.h \
+    dbNetlistReader.h \
+    dbNetlistSpiceReader.h
 
 !equals(HAVE_QT, "0") {
 

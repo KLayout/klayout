@@ -24,6 +24,8 @@
 #include "dbNetlist.h"
 #include "dbNetlistWriter.h"
 #include "dbNetlistSpiceWriter.h"
+#include "dbNetlistReader.h"
+#include "dbNetlistSpiceReader.h"
 #include "tlException.h"
 #include "tlInternational.h"
 #include "tlStream.h"
@@ -943,6 +945,13 @@ static void write_netlist (const db::Netlist *nl, const std::string &file, db::N
   writer->write (os, *nl, description);
 }
 
+static void read_netlist (db::Netlist *nl, const std::string &file, db::NetlistReader *reader)
+{
+  tl_assert (reader != 0);
+  tl::InputStream os (file);
+  reader->read (os, *nl);
+}
+
 Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method_ext ("add", &gsi::add_circuit, gsi::arg ("circuit"),
     "@brief Adds the circuit to the netlist\n"
@@ -1023,6 +1032,10 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Purges floating nets.\n"
     "Floating nets can be created as effect of reconnections of devices or pins. "
     "This method will eliminate all nets that make less than two connections."
+  ) +
+  gsi::method_ext ("read", &read_netlist, gsi::arg ("file"), gsi::arg ("reader"),
+    "@brief Writes the netlist to the given file using the given reader object to parse the file\n"
+    "See \\NetlistSpiceReader for an example for a parser. "
   ) +
   gsi::method_ext ("write", &write_netlist, gsi::arg ("file"), gsi::arg ("writer"), gsi::arg ("description", std::string ()),
     "@brief Writes the netlist to the given file using the given writer object to format the file\n"
@@ -1254,5 +1267,32 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "\n"
   "This class has been introduced in version 0.26."
 );
+
+Class<db::NetlistReader> db_NetlistReader ("db", "NetlistReader",
+  gsi::Methods (),
+  "@hide\n"
+);
+
+db::NetlistSpiceReader *new_spice_reader ()
+{
+  return new db::NetlistSpiceReader ();
+}
+
+Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "NetlistSpiceReader",
+  gsi::constructor ("new", &new_spice_reader,
+    "@brief Creates a new reader.\n"
+  ),
+  "@brief Implements a netlist Reader for the SPICE format.\n"
+  "Use the SPICE reader like this:\n"
+  "\n"
+  "@code\n"
+  "writer = RBA::NetlistSpiceReader::new\n"
+  "netlist = RBA::Netlist::new\n"
+  "netlist.read(path, reader)\n"
+  "@endcode\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
 
 }

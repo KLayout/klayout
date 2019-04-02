@@ -123,7 +123,7 @@ Class<lay::AbstractMenu> decl_AbstractMenu ("lay", "AbstractMenu",
   "\n"
   "@<table>\n"
   "  @<tr>@<td>\"\"                 @</td>@<td>is the root@</td>@</tr> \n"
-  "  @<tr>@<td>\"[<path>.]<name>\"  @</td>@<td>is an element of the submenu given by <path>. If <path> is ommitted, this refers to an element in the root@</td>@</tr> \n"
+  "  @<tr>@<td>\"[<path>.]<name>\"  @</td>@<td>is an element of the submenu given by <path>. If <path> is omitted, this refers to an element in the root@</td>@</tr> \n"
   "  @<tr>@<td>\"[<path>.]end\"     @</td>@<td>refers to the item past the last item of the submenu given by <path> or root@</td>@</tr>\n"
   "  @<tr>@<td>\"[<path>.]begin\"   @</td>@<td>refers to the first item of the submenu given by <path> or root@</td>@</tr>\n"
   "  @<tr>@<td>\"[<path>.]#<n>\"    @</td>@<td>refers to the nth item of the submenu given by <path> or root (n is an integer number)@</td>@</tr>\n"

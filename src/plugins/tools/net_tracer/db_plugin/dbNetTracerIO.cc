@@ -360,7 +360,7 @@ NetTracerNet::NetTracerNet (const NetTracer &tracer, const db::ICplxTrans &trans
 
   for (NetTracer::iterator s = tracer.begin (); s != tracer.end (); ++s) {
 
-    //  TODO: should reset propery ID:
+    //  TODO: should reset property ID:
     tl::ident_map<db::properties_id_type> pm;
     db::Shape new_shape = m_shapes.insert (s->shape (), trans, pm);
     m_net_shapes.push_back (*s);

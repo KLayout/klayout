@@ -42,7 +42,7 @@
   <p>
   This is the initial situation: a cell is instantiated 9 times in a 3x3 array and one shape
   inside one of these instances is selected. The two following screenshots show the full-level
-  hierarchy view and just the top level hiearchy to demonstrate that the cell is placed 
+  hierarchy view and just the top level hierarchy to demonstrate that the cell is placed 
   9 times.
   </p>
 

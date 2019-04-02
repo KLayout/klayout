@@ -2016,7 +2016,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "The algorithm supports a global fill raster as well as local (per-polygon) origin optimization. In the latter case "
     "the origin of the regular raster is optimized per individual polygon of the fill region.\n"
     "\n"
-    "A more elaborate version of this method is available which also returns informations about the non-filled parts.\n"
+    "A more elaborate version of this method is available which also returns information about the non-filled parts.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
@@ -3060,7 +3060,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
   "@brief A cell\n"
   "\n"
   "A cell object consists of a set of shape containers (called layers),\n"
-  "a set of child cell instances and auxiliary informations such as\n"
+  "a set of child cell instances and auxiliary information such as\n"
   "the parent instance list.\n"
   "A cell is identified through an index given to the cell upon instantiation.\n"
   "Cell instances refer to single instances or array instances. Both are encapsulated in the\n"

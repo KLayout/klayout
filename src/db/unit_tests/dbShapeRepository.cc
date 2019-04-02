@@ -46,7 +46,7 @@ TEST(1)
   c1.push_back (db::Point (200, 0));
   p1.assign_hull (c1.begin (), c1.end ());
 
-  //  insert two references to indentical but shifted polygons
+  //  insert two references to identical but shifted polygons
   db::PolygonRef pref1 (p1, rep);
 
   db::Polygon p2;
@@ -115,7 +115,7 @@ TEST(2)
   c1.push_back (db::Point (200, 0));
   p1.assign_hull (c1.begin (), c1.end ());
 
-  //  insert two references to indentical but shifted polygons
+  //  insert two references to identical but shifted polygons
   db::PolygonRef pr1 (p1, *rep);
 
   db::Polygon p2;
@@ -156,7 +156,7 @@ TEST(1SIMPLE)
   c1.push_back (db::Point (200, 0));
   p1.assign_hull (c1.begin (), c1.end ());
 
-  //  insert two references to indentical but shifted polygons
+  //  insert two references to identical but shifted polygons
   db::SimplePolygonRef pref1 (p1, rep);
 
   db::SimplePolygon p2;
@@ -225,7 +225,7 @@ TEST(2SIMPLE)
   c1.push_back (db::Point (200, 0));
   p1.assign_hull (c1.begin (), c1.end ());
 
-  //  insert two references to indentical but shifted polygons
+  //  insert two references to identical but shifted polygons
   db::SimplePolygonRef pr1 (p1, *rep);
 
   db::SimplePolygon p2;

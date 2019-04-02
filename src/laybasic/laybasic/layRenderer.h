@@ -51,7 +51,7 @@ class CanvasPlane;
  *  The renderer is supposed to render a set of edges to
  *  one or more bitmaps. One bitmap holds the contour
  *  information, one the fill. A third one holds the 
- *  vertex informations (dots).
+ *  vertex information (dots).
  *  
  *  The intended use model is first to reserve a number of
  *  points if necessary, the fill the renderer with the

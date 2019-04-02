@@ -1328,7 +1328,7 @@ struct polygon_defs
       "@brief Iterate over the edges that make up the polygon\n"
       "\n"
       "This iterator will deliver all edges, including those of the holes. "
-      "Hole edges are oriented counterclockwise while hull egdes are oriented clockwise.\n"
+      "Hole edges are oriented counterclockwise while hull edges are oriented clockwise.\n"
     ) +
     iterator ("each_edge", (typename C::polygon_edge_iterator (C::*)(unsigned int) const) (&C::begin_edge), 
       "@brief Iterate over the edges of one contour of the polygon\n"
@@ -1338,7 +1338,7 @@ struct polygon_defs
       "\n"
       "This iterator will deliver all edges of the contour specified by the contour parameter. "
       "The hull has contour number 0, the first hole has contour 1 etc.\n"
-      "Hole edges are oriented counterclockwise while hull egdes are oriented clockwise.\n"
+      "Hole edges are oriented counterclockwise while hull edges are oriented clockwise.\n"
       "\n"
       "This method was introduced in version 0.24."
     ) +

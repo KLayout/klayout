@@ -1046,11 +1046,11 @@ end</pre>
 
   <p>
   With version 0.23, new collection objects entered the stage: <class_doc href="Region"/>, <class_doc href="Edges"/> and
-  <class_doc href="EdgePairs"/> which basically provide a way to store polygons, edges or egde pair objects 
+  <class_doc href="EdgePairs"/> which basically provide a way to store polygons, edges or edge pair objects 
   independently from the shapes container. They are mainly used to implement bulk operations, specifically for
   the DRC functionality. The cooperate with the shapes container in the sense that they can be inserted into 
   a shapes container which will produce polygons or edges in the layout database (edge pairs are converted to single
-  egdes or polygons. These classes are discussed in <link href="/programming/geometry_api.xml"/>.
+  edges or polygons. These classes are discussed in <link href="/programming/geometry_api.xml"/>.
   </p>
 
   <h2>The Shape class</h2>

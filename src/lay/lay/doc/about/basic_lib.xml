@@ -106,7 +106,7 @@
   </p>
   
   <p>When a shape is converted to a donut, the shape's bounding box will be used to define the
-  enclosing box of the donut and the hole's diameter will be choosen to be half of the outer
+  enclosing box of the donut and the hole's diameter will be chosen to be half of the outer
   diameter.
   </p>
 
@@ -136,7 +136,7 @@
   The PCell features a parameter that defines the radius. The path itself
   can be manipulated as usual, in particular with partial edit mode.
   Path objects can be converted to ROUND_PATH pcells. In that case, the initial radius
-  will be choosen to be roughly 10 percent of the minimum bounding box dimensions
+  will be chosen to be roughly 10 percent of the minimum bounding box dimensions
   of the original path.
   </p>
 
@@ -154,7 +154,7 @@
   The PCell features a parameter that defines the radius. The polygon itself
   can be manipulated as usual, in particular with partial edit mode.
   Polygon, box or path objects can be converted to ROUND_POLYGON pcells. In that case, the initial radius
-  will be choosen to be roughly 10 percent of the minimum bounding box dimensions
+  will be chosen to be roughly 10 percent of the minimum bounding box dimensions
   of the original polygon.
   </p>
 
@@ -173,7 +173,7 @@
   The PCell features two parameters that define the radius and width of the "rim" line. 
   The polygon or box itself can be manipulated as usual.
   Polygon, box or path objects can be converted to STROKED_POLYGON or STROKED_BOX pcells. 
-  In that case, the initial radius will be zero. The width of the rim line will be choosen
+  In that case, the initial radius will be zero. The width of the rim line will be chosen
   to be roughly 10 percent of the minimum bounding box dimensions of the original polygon.
   For STROKED_BOX, the bounding box of the original shape will be used as the basic shape.
   </p>

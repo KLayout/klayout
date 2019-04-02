@@ -976,7 +976,7 @@ public:
   /**
    *  @brief Returns edges (point-like) representing the start part of the edges
    *
-   *  The length of the part can be choosen by length or a fraction of the original length.
+   *  The length of the part can be chosen by length or a fraction of the original length.
    *  If length and fraction are 0, a point at the beginning of the edge will be created.
    *  If length is non-zero and fraction is 0, a segment in the direction of the edge
    *  with the given length is created, even if the length is larger than the original

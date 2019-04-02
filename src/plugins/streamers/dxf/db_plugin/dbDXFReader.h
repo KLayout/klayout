@@ -122,14 +122,14 @@ public:
   virtual const char *format () const { return "DXF"; }
 
   /**
-   *  @brief Issue an error with positional informations
+   *  @brief Issue an error with positional information
    *
    *  Reimplements DXFDiagnostics
    */
   virtual void error (const std::string &txt);
 
   /**
-   *  @brief Issue a warning with positional informations
+   *  @brief Issue a warning with positional information
    *
    *  Reimplements DXFDiagnostics
    */

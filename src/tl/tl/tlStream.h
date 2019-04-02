@@ -396,7 +396,7 @@ public:
   /**
    *  @brief Opens a stream from a abstract path
    *
-   *  This will automatically create the approriate delegate and 
+   *  This will automatically create the appropriate delegate and 
    *  delete it later.
    */
   InputStream (const std::string &abstract_path);

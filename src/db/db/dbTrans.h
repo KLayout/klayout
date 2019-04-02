@@ -1433,7 +1433,7 @@ operator<< (std::ostream &os, const simple_trans<C> &t)
 /**
  *  @brief A complex transformation
  *
- *  A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitary
+ *  A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitrary
  *  angle and a displacement. The template parameters for this transformation are
  *  I (the input coordinate type), F (the output coordinate type) and R (the representation
  *  type used internally for representing the floating-point members).

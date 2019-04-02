@@ -897,7 +897,7 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
   ),
   "@brief A layout annotation (i.e. ruler)\n"
   "\n"
-  "Annotation objects provide a way to attach measurements or descriptive informations to a layout view. "
+  "Annotation objects provide a way to attach measurements or descriptive information to a layout view. "
   "Annotation objects can appear as rulers for example. Annotation objects can be configured in "
   "different ways using the styles provided. By configuring an annotation object properly, it can appear "
   "as a rectangle or a plain line for example.\n"

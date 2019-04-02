@@ -93,14 +93,14 @@ Class<db::Manager> decl_Manager ("db", "Manager",
     "@brief Undo the current transaction\n"
     "\n"
     "The current transaction is undone with this method.\n"
-    "The 'has_undo' method can be used to determine wether\n"
+    "The 'has_undo' method can be used to determine whether\n"
     "there are transactions to undo.\n"
   ) +
   gsi::method ("redo", &db::Manager::redo,
     "@brief Redo the next available transaction\n"
     "\n"
     "The next transaction is redone with this method.\n"
-    "The 'has_redo' method can be used to determine wether\n"
+    "The 'has_redo' method can be used to determine whether\n"
     "there are transactions to undo.\n"
   ) +
   gsi::method_ext ("has_undo?", &has_undo,

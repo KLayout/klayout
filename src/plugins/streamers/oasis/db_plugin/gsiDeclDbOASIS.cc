@@ -290,7 +290,7 @@ gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
     "@args level\n"
     "The OASIS compression level is an integer number between 0 and 10. 0 basically is no compression, "
     "1 produces shape arrays in a simple fashion. 2 and higher compression levels will use a more elaborate "
-    "algorithm to find shape arrays which uses 2nd and futher neighbor distances. The higher the level, the "
+    "algorithm to find shape arrays which uses 2nd and further neighbor distances. The higher the level, the "
     "higher the memory requirements and run times.\n"
   ) +
   gsi::method_ext ("oasis_compression_level", &get_oasis_compression,

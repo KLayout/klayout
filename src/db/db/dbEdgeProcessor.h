@@ -711,7 +711,7 @@ public:
   /**
    *  @brief Merge the given edges in a simple "non-zero wrapcount" fashion
    *
-   *  The egdes provided must form valid closed contours. Contours oriented differently "cancel" each other. 
+   *  The edges provided must form valid closed contours. Contours oriented differently "cancel" each other. 
    *  Overlapping contours are merged when the orientation is the same.
    *
    *  The result is presented as a set of edges forming closed contours. Hulls are oriented clockwise while
@@ -729,7 +729,7 @@ public:
   /**
    *  @brief Merge the given edges in a simple "non-zero wrapcount" fashion into polygons
    *
-   *  The egdes provided must form valid closed contours. Contours oriented differently "cancel" each other. 
+   *  The edges provided must form valid closed contours. Contours oriented differently "cancel" each other. 
    *  Overlapping contours are merged when the orientation is the same.
    *
    *  This method produces polygons and allows to fine-tune the parameters for that purpose.
@@ -795,7 +795,7 @@ public:
    *  on the individual result polygons of the merge step. The result may contain overlapping contours, but no self-overlaps. 
    *
    *  dx and dy describe the sizing. A positive value indicates oversize (outwards) while a negative one describes undersize (inwards).
-   *  The sizing applied can be choosen differently in x and y direction. In this case, the sign must be identical for both
+   *  The sizing applied can be chosen differently in x and y direction. In this case, the sign must be identical for both
    *  dx and dy.
    *
    *  The result is presented as a set of edges forming closed contours. Hulls are oriented clockwise while
@@ -820,7 +820,7 @@ public:
    *  Polygon overlap occures if the polygons are close enough, so a positive sizing makes polygons overlap.
    *  
    *  dx and dy describe the sizing. A positive value indicates oversize (outwards) while a negative one describes undersize (inwards).
-   *  The sizing applied can be choosen differently in x and y direction. In this case, the sign must be identical for both
+   *  The sizing applied can be chosen differently in x and y direction. In this case, the sign must be identical for both
    *  dx and dy.
    *
    *  This method produces polygons and allows to fine-tune the parameters for that purpose.

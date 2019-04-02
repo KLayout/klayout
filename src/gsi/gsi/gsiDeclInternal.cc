@@ -42,7 +42,7 @@ namespace gsi
 {
 
 // ---------------------------------------------------------------
-//  Access to the internal informations of GSI
+//  Access to the internal information of GSI
 
 static int t_void () { return T_void; }
 static int t_bool () { return T_bool; }

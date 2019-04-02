@@ -1438,7 +1438,7 @@ LayerPropertiesList::expand (const std::map<int, int> &map_cv_index, bool add_de
 
     }
 
-    //  erase the items specfied to removal (cv mapping to -1)
+    //  erase the items specified to removal (cv mapping to -1)
     for (std::set<int>::const_iterator cv = cvrefs_to_erase.begin (); cv != cvrefs_to_erase.end (); ++cv) {
       remove_cv_references (*cv, false);
     }

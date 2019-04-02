@@ -1956,7 +1956,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@brief Registers a PCell declaration under the given name\n"
     "@args name, declaration\n"
     "Registers a local PCell in the current layout. If a declaration with that name\n"
-    "alreay exists, it is replaced with the new declaration.\n"
+    "already exists, it is replaced with the new declaration.\n"
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +

@@ -624,7 +624,7 @@ private:
  *  Menu items and submenus are referred to by a "path". The path is a string with this interpretation:
  *
  *    ""                 is the root 
- *    "[<path>.]<name>"  is an element of the submenu given by <path>. If <path> is ommitted, this refers to 
+ *    "[<path>.]<name>"  is an element of the submenu given by <path>. If <path> is omitted, this refers to 
  *                       an element in the root 
  *    "[<path>.]end      refers to the item past the last item of the submenu given by <path> or root
  *    "[<path>.]begin    refers to the first item of the submenu given by <path> or root

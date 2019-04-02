@@ -96,7 +96,7 @@ void handle_exception_ui (const std::exception &ex, QWidget *parent)
 
 void handle_exception_silent ()
 {
-  tl::error << tl::to_string (tr ("An unspecific error occured"));
+  tl::error << tl::to_string (tr ("An unspecific error occurred"));
 }
 
 void handle_exception ()

@@ -99,7 +99,7 @@ public:
   /**
    *  @brief Registers an URL (with version) for download in the given target directory
    *
-   *  The target directory can be empty. In this case, the downloader will pick an approriate one.
+   *  The target directory can be empty. In this case, the downloader will pick an appropriate one.
    */
   void register_download (const std::string &name, const std::string &token, const std::string &url, const std::string &version);
 

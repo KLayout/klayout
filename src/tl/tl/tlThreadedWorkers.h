@@ -203,7 +203,7 @@ public:
   void set_num_workers (int workers);
 
   /**
-   *  @brief Returns true if an error occured during run()
+   *  @brief Returns true if an error occurred during run()
    */
   bool has_error ();
 
@@ -394,7 +394,7 @@ private:
  *  @brief Represents one task in the task queue
  *
  *  This object must be reimplemented to provide specific
- *  informations for a task. This is the base class of all
+ *  information for a task. This is the base class of all
  *  task objects.
  */
 class TL_PUBLIC Task

@@ -534,7 +534,7 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
 
     } 
 
-    //  Collect all necessary informations to transfer a single scanline ..
+    //  Collect all necessary information to transfer a single scanline ..
     
     masks.erase (masks.begin (), masks.end ());
 

@@ -54,7 +54,7 @@
     <widget class="QLabel" name="label_4" >
      <property name="text" >
       <string>Radius to apply on polygon corners
-(Radius for inner corners can be specified seperately.
+(Radius for inner corners can be specified separately.
 Leave empty to get the same radius than for outer corners)</string>
      </property>
     </widget>

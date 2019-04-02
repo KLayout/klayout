@@ -228,7 +228,7 @@ MainService::cm_descend ()
     throw tl::Exception (tl::to_string (QObject::tr ("Select an object to determine into which instance to descend")));
   }
   if (! common_inst.valid () || common_inst.ambigous ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Selection is ambigous - cannot determine into which instance to descend")));
+    throw tl::Exception (tl::to_string (QObject::tr ("Selection is ambiguous - cannot determine into which instance to descend")));
   }
 
   //  remove the common path and create a new set of selections

@@ -60,7 +60,7 @@ class ImportLayerMapping;
  *  @brief The cell object
  * 
  *  A cell object consists of a set of shape containers (called layers),
- *  a set of child cell instances and auxiliary informations such as
+ *  a set of child cell instances and auxiliary information such as
  *  the parent instance list.
  *  A cell is identified through an index given to the cell upon instantiation.
  *  The cell index is valid in the context of a cell graph object which

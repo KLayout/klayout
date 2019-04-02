@@ -63,7 +63,7 @@ struct IncompatibleReturnTypeException
  *
  *  A class declaration collects objects of this kind to represent methods and their specific
  *  implementation.
- *  This class is implemented in various specific ways that bind the abstract call to a specifc
+ *  This class is implemented in various specific ways that bind the abstract call to a specific
  *  C++ method.
  */
 class GSI_PUBLIC MethodBase 

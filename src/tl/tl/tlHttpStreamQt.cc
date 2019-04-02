@@ -385,7 +385,7 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
   QByteArray data = mp_reply->read (n);
   memcpy (b, data.constData (), data.size ());
   if (tl::verbosity() >= 40) {
-    tl::info << "HTTP reponse data read: " << data.constData ();
+    tl::info << "HTTP response data read: " << data.constData ();
   }
   return data.size ();
 }

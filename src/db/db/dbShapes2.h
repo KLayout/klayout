@@ -33,10 +33,10 @@ namespace db
 /**
  *  @brief A traits class for the various shape types
  *
- *  This class provides informations about various properties of the shape class, i.e.
- *  - wether the objects must be dereferenced into standanlone containers
- *  - wether the objects are arrays, potentially using the array repository
- *  - wether the objects have properties
+ *  This class provides information about various properties of the shape class, i.e.
+ *  - whether the objects must be dereferenced into standanlone containers
+ *  - whether the objects are arrays, potentially using the array repository
+ *  - whether the objects have properties
  */
 template <class Sh> 
 struct shape_traits 

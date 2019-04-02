@@ -87,7 +87,7 @@ TEST(1)
   }
   EXPECT_EQ (m, (unsigned int) 0x04231); // c1,c5,c3,c4,c2
 
-  //  check relation informations ..
+  //  check relation information ..
   db::Cell::child_cell_iterator ch;
   db::Cell::const_iterator chi;
   db::Cell::parent_cell_iterator pa;

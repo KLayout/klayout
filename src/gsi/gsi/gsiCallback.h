@@ -47,7 +47,7 @@ struct GSI_PUBLIC Callee
 /**
  *  @brief Callback connector object
  *
- *  This object holds informations about the actual implementation of the callback 
+ *  This object holds information about the actual implementation of the callback 
  *  on the scripting client's side.
  */
 struct Callback

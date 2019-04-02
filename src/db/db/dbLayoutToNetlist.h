@@ -471,7 +471,7 @@ public:
    *   * No connection indicated (circuit_cell_name_prefix == 0: the net shapes are simply put into their
    *     respective circuits. The connections are not indicated.
    *   * Subnet hierarchy (circuit_cell_name_prefix != 0): for each root net, a full hierarchy is built
-   *     to accomodate the subnets (see build_net in recursive mode).
+   *     to accommodate the subnets (see build_net in recursive mode).
    *
    *  If a device cell name prefix is given, cells will be produced for each device abstract
    *  using a name like device_cell_name_prefix + device name.

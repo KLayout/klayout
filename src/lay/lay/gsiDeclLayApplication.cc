@@ -170,7 +170,7 @@ static gsi::Methods application_methods ()
       "@return A value indicating whether the operation was successful\n"
       "\n"
       "This method siletly does nothing, if the config file does not\n"
-      "exist. If it does and an error occured, the error message is printed\n"
+      "exist. If it does and an error occurred, the error message is printed\n"
       "on stderr. In both cases, false is returned.\n"
     ) +
     method<C, lay::MainWindow *> ("main_window", &C::main_window,

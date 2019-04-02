@@ -144,7 +144,7 @@ public:
    *  @brief Undo the current transaction
    *
    *  The current transaction is undone with this method.
-   *  The 'available_undo' method can be used to determine wether
+   *  The 'available_undo' method can be used to determine whether
    *  there are transactions to undo.
    */
   void undo ();
@@ -153,7 +153,7 @@ public:
    *  @brief Redo the next available transaction
    *
    *  The next transaction is redone with this method.
-   *  The 'available_redo' method can be used to determine wether
+   *  The 'available_redo' method can be used to determine whether
    *  there are transactions to undo.
    */
   void redo ();

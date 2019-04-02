@@ -138,7 +138,7 @@ struct LPLogicalLessFunc
  *  @brief A layer offset 
  *
  *  This struct defines a layer offset which can be "added" to a LayerProperties object
- *  If the layer offset is defined with a name, any occurance of '*' in the string
+ *  If the layer offset is defined with a name, any occurrence of '*' in the string
  *  is replaced with the original name. This way, applying "*_A" with "+" yields a 
  *  postfix "_A" to the original layer name (if it is named).
  */

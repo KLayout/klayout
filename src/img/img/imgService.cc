@@ -618,7 +618,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
 
   } else if (mode == lay::Editable::Partial) {
   
-    //  test, wether we are moving a handle of one selected object
+    //  test, whether we are moving a handle of one selected object
     for (std::map<obj_iterator, unsigned int>::const_iterator s = m_selected.begin (); s != m_selected.end (); ++s) {
 
       MoveMode mm = move_none;

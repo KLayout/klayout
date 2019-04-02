@@ -978,7 +978,7 @@ Class<lay::LayerProperties> decl_LayerProperties ("lay", "LayerProperties",
     "This is the hierarchy level at which the drawing starts. "
     "This property is only meaningful, if \\has_upper_hier_level is true. "
     "The hierarchy level can be relative in which case, 0 refers to the context cell's level. "
-    "A mode can be specfied for the hierarchy level which is 0 for absolute, 1 for minimum "
+    "A mode can be specified for the hierarchy level which is 0 for absolute, 1 for minimum "
     "of specified level and set level and 2 for maximum of specified level and set level. "
   ) +
   method_ext ("upper_hier_level", &get_upper_hier_level_1, 
@@ -1069,7 +1069,7 @@ Class<lay::LayerProperties> decl_LayerProperties ("lay", "LayerProperties",
     "This is the hierarchy level at which the drawing starts. "
     "This property is only meaningful, if \\has_lower_hier_level is true. "
     "The hierarchy level can be relative in which case, 0 refers to the context cell's level. "
-    "A mode can be specfied for the hierarchy level which is 0 for absolute, 1 for minimum "
+    "A mode can be specified for the hierarchy level which is 0 for absolute, 1 for minimum "
     "of specified level and set level and 2 for maximum of specified level and set level. "
   ) +
   method_ext ("lower_hier_level", &get_lower_hier_level_1, 

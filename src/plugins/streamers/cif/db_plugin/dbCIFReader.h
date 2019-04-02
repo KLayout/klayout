@@ -118,14 +118,14 @@ public:
   virtual const char *format () const { return "CIF"; }
 
   /**
-   *  @brief Issue an error with positional informations
+   *  @brief Issue an error with positional information
    *
    *  Reimplements CIFDiagnostics
    */
   virtual void error (const std::string &txt);
 
   /**
-   *  @brief Issue a warning with positional informations
+   *  @brief Issue a warning with positional information
    *
    *  Reimplements CIFDiagnostics
    */

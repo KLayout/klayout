@@ -215,7 +215,7 @@ end</pre>
   Starting with version 0.24, the <tt>QFlags</tt> template is supported as a separate class.
   The name of the class indicates the relationship to the enum class.
   For example, <tt>QFlags&lt;QMessageBox::Icon&gt;</tt> is available as <tt>QMessageBox_QFlags_Icon</tt>.
-  Enum classes are derived from their respective flags class, so they can serve to initialize aguments
+  Enum classes are derived from their respective flags class, so they can serve to initialize arguments
   expecting flags.
   It's hardly required to operate with the flags classes directly, since they are created automatically
   when joining enum's with the "or" (<tt>|</tt>) operator:

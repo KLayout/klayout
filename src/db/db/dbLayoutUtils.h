@@ -66,7 +66,7 @@ private:
 };
 
 /**
- *  @brief A property mapper based on a dynamic propery id generation
+ *  @brief A property mapper based on a dynamic property id generation
  *
  *  This class can be used as property mapper for certain "insert" flavors of
  *  the Instance and Shapes class. 

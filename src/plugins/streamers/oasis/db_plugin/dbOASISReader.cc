@@ -629,7 +629,7 @@ struct LNameJoinOp2
  *  Since CBLOCK does not update this record, the position of the table will
  *  be the location of CBLOCK rather than that of the name record itself.
  *  PAD records will also call this method, so the beginning of a table 
- *  is right after any preceeding PAD records and exactly at the location
+ *  is right after any preceding PAD records and exactly at the location
  *  of the first name record after PADs.
  */
 void 
@@ -1405,21 +1405,21 @@ OASISReader::do_read (db::Layout &layout)
 
   }
 
-  //  Check the table offsets vs. real occurance
+  //  Check the table offsets vs. real occurrence
   if (m_first_cellname != 0 && m_first_cellname != m_table_cellname && m_expect_strict_mode == 1) {
-    warn (tl::sprintf (tl::to_string (tr ("CELLNAME table offset does not match first occurance of CELLNAME in strict mode - %s vs. %s")), m_table_cellname, m_first_cellname));
+    warn (tl::sprintf (tl::to_string (tr ("CELLNAME table offset does not match first occurrence of CELLNAME in strict mode - %s vs. %s")), m_table_cellname, m_first_cellname));
   }
   if (m_first_propname != 0 && m_first_propname != m_table_propname && m_expect_strict_mode == 1) {
-    warn (tl::sprintf (tl::to_string (tr ("PROPNAME table offset does not match first occurance of PROPNAME in strict mode - %s vs. %s")), m_table_propname, m_first_propname));
+    warn (tl::sprintf (tl::to_string (tr ("PROPNAME table offset does not match first occurrence of PROPNAME in strict mode - %s vs. %s")), m_table_propname, m_first_propname));
   }
   if (m_first_propstring != 0 && m_first_propstring != m_table_propstring && m_expect_strict_mode == 1) {
-    warn (tl::sprintf (tl::to_string (tr ("PROPSTRING table offset does not match first occurance of PROPSTRING in strict mode - %s vs. %s")), m_table_propstring, m_first_propstring));
+    warn (tl::sprintf (tl::to_string (tr ("PROPSTRING table offset does not match first occurrence of PROPSTRING in strict mode - %s vs. %s")), m_table_propstring, m_first_propstring));
   }
   if (m_first_layername != 0 && m_first_layername != m_table_layername && m_expect_strict_mode == 1) {
-    warn (tl::sprintf (tl::to_string (tr ("LAYERNAME table offset does not match first occurance of LAYERNAME in strict mode - %s vs. %s")), m_table_layername, m_first_layername));
+    warn (tl::sprintf (tl::to_string (tr ("LAYERNAME table offset does not match first occurrence of LAYERNAME in strict mode - %s vs. %s")), m_table_layername, m_first_layername));
   }
   if (m_first_textstring != 0 && m_first_textstring != m_table_textstring && m_expect_strict_mode == 1) {
-    warn (tl::sprintf (tl::to_string (tr ("TEXTSTRING table offset does not match first occurance of TEXTSTRING in strict mode - %s vs. %s")), m_table_textstring, m_first_textstring));
+    warn (tl::sprintf (tl::to_string (tr ("TEXTSTRING table offset does not match first occurrence of TEXTSTRING in strict mode - %s vs. %s")), m_table_textstring, m_first_textstring));
   }
 }
 

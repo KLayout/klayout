@@ -301,7 +301,7 @@ public:
   /**
    *  @brief Adds the given attribute to the attribute set
    *
-   *  Attributes are arbitary IDs attached to clusters.
+   *  Attributes are arbitrary IDs attached to clusters.
    *  The attribute value 0 is reserved for "no attribute" and is not
    *  put into the set.
    */

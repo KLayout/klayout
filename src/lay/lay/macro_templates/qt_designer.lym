@@ -17,7 +17,7 @@
   # load the UI file
   # TODO: this is how to load a file from a path next to the .lym file
   # ui_file = QFile::new(QFileInfo::new($0).dir.filePath("MyDialog.ui"))
-  # Initially we use the sample file provided as resoure
+  # Initially we use the sample file provided as resource
   ui_file = QFile::new(":/macro-templates/qt_designer.ui")
   ui_file.open(QIODevice::ReadOnly)
   dialog = QFormBuilder::new.load(ui_file, Application::instance.main_window)

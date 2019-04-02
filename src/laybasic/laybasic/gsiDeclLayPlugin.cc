@@ -905,7 +905,7 @@ Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
     "@return A value indicating whether the operation was successful\n"
     "\n"
     "This method siletly does nothing, if the config file does not\n"
-    "exist. If it does and an error occured, the error message is printed\n"
+    "exist. If it does and an error occurred, the error message is printed\n"
     "on stderr. In both cases, false is returned.\n"
   ) +
   method_ext ("get_config", &get_config,

@@ -226,7 +226,7 @@ end</pre>
   having to write "RBA::" in front of the class names.
   </p>
   
-  <p>The initialization of the object is alreay a very important step. First, it 
+  <p>The initialization of the object is already a very important step. First, it 
   must initialize the super class. Then it has to declare the PCell parameters.
   Each PCell has a set of parameters that define the appearance of the PCell.
   Parameters have a symbolic name, a type, a description and optionally a default

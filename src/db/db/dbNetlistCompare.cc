@@ -25,6 +25,7 @@
 #include "dbHash.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
+#include "tlEquivalenceClusters.h"
 
 namespace db
 {
@@ -98,7 +99,7 @@ public:
 
   void map_pins (const db::Circuit *circuit, size_t pin1_id, size_t pin2_id)
   {
-    m_pin_map [circuit].insert (std::make_pair (pin1_id, pin2_id));
+    m_pin_map [circuit].same (pin1_id, pin2_id);
   }
 
   void map_pins (const db::Circuit *circuit, const std::vector<size_t> &pin_ids)
@@ -107,26 +108,26 @@ public:
       return;
     }
 
-    std::map<size_t, size_t> &pm = m_pin_map [circuit];
+    tl::equivalence_clusters<size_t> &pm = m_pin_map [circuit];
     for (size_t i = 1; i < pin_ids.size (); ++i) {
-      pm.insert (std::make_pair (pin_ids [i], pin_ids [0]));
+      pm.same (pin_ids [0], pin_ids [i]);
     }
   }
 
   size_t normalize_pin_id (const db::Circuit *circuit, size_t pin_id) const
   {
-    std::map<const db::Circuit *, std::map<size_t, size_t> >::const_iterator pm = m_pin_map.find (circuit);
+    std::map<const db::Circuit *, tl::equivalence_clusters<size_t> >::const_iterator pm = m_pin_map.find (circuit);
     if (pm != m_pin_map.end ()) {
-      std::map<size_t, size_t>::const_iterator ipm = pm->second.find (pin_id);
-      if (ipm != pm->second.end ()) {
-        return ipm->second;
+      size_t cluster_id = pm->second.cluster_id (pin_id);
+      if (cluster_id > 0) {
+        return (*pm->second.begin_cluster (cluster_id))->first;
       }
     }
     return pin_id;
   }
 
 private:
-  std::map<const db::Circuit *, std::map<size_t, size_t> > m_pin_map;
+  std::map<const db::Circuit *, tl::equivalence_clusters<size_t> > m_pin_map;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -450,6 +451,7 @@ public:
       size_t pin_id = i->pin ()->id ();
       const db::Circuit *cr = sc->circuit_ref ();
 
+      size_t this_pin_id = pin_id;
       pin_id = pin_map->normalize_pin_id (cr, pin_id);
 
       std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
@@ -476,7 +478,6 @@ public:
       //  we cannot afford creating edges from all to all other pins, so we just create edges to the previous and next
       //  pin. This may take more iterations to solve, but should be equivalent.
 
-      std::vector<size_t> pids;
       size_t pin_count = cr->pin_count ();
 
       //  take a number if additional pins as edges: this allows identifying a pin as dependent
@@ -484,6 +485,12 @@ public:
       //  5 additional pins should be sufficient to capture one additional non-power pin.
 
       size_t take_additional_pins = 5;
+
+      std::vector<size_t> pids;
+      pids.reserve (take_additional_pins + 1);
+      //  this symmetrizes the pin list with respect to the before-normalization pin id:
+      pids.push_back (pin_id);
+
       for (size_t n = 0; n < take_additional_pins; ++n) {
         size_t add_pin_id = (pin_id + n + 1) % pin_count;
         if (add_pin_id == pin_id) {
@@ -500,12 +507,17 @@ public:
       for (std::vector<size_t>::const_iterator i = pids.begin (); i != pids.end (); ++i) {
 
         size_t pin2_id = *i;
+        size_t this_pin2_id = cm->this_pin_from_other_pin (pin2_id);
+
+        if (this_pin2_id == this_pin_id) {
+          //  we should not go back to our original, non-normalized pin
+          continue;
+        }
 
         //  NOTE: if a pin mapping is given, EdgeDesc::pin1_id and EdgeDesc::pin2_id are given
         //  as pin ID's of the other circuit.
         EdgeDesc ed (sc, circuit_categorizer.cat_for_subcircuit (sc), pin_id, pin_map->normalize_pin_id (cr, pin2_id));
 
-        size_t this_pin2_id = cm->this_pin_from_other_pin (pin2_id);
         const db::Net *net2 = sc->net_for_pin (this_pin2_id);
 
         std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net2);
@@ -660,8 +672,7 @@ private:
 
   /**
    *  @brief Compares edges as "less"
-   *  Edge comparison is based on the pins attached (name of the first pin) or net
-   *  name if no pins are attached on both nets.
+   *  Edge comparison is based on the pins attached (name of the first pin).
    */
   static bool edge_less (const db::Net *a, const db::Net *b)
   {
@@ -679,7 +690,7 @@ private:
           return pna < pnb;
         }
       }
-      return a->name () < b->name ();
+      return false;
     } else {
       return false;
     }
@@ -705,7 +716,7 @@ private:
           return pna == pnb;
         }
       }
-      return a->name () == b->name ();
+      return true;
     } else {
       return true;
     }
@@ -1205,9 +1216,35 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
             same_as_next = (i1 != g1.end () && *i1 == *ii1) || (i2 != g2.end () && *i2 == *ii2);
 
             //  found a candidate - a single node with the same edges
-            if (! (same_as_next || same_as_prev) || pass) {
-              db::NetDeviceGraph::confirm_identity (g1, ii1, g2, ii2, mp_logger, same_as_next || same_as_prev);
+
+            bool ambiguous = (same_as_next || same_as_prev);
+            if (! ambiguous || pass) {
+
+              //  For ambiguous nets make the pins exchangable
+
+              if (same_as_next) {
+
+                if (ii1->net () && i1->net ()) {
+                  for (db::Net::const_pin_iterator pp = ii1->net ()->begin_pins (); pp != ii1->net ()->end_pins (); ++pp) {
+                    for (db::Net::const_pin_iterator p = i1->net ()->begin_pins (); p != i1->net ()->end_pins (); ++p) {
+                      mp_circuit_pin_mapper->map_pins (c1, pp->pin_id (), p->pin_id ());
+                    }
+                  }
+                }
+
+                if (ii2->net () && i2->net ()) {
+                  for (db::Net::const_pin_iterator pp = ii2->net ()->begin_pins (); pp != ii2->net ()->end_pins (); ++pp) {
+                    for (db::Net::const_pin_iterator p = i2->net ()->begin_pins (); p != i2->net ()->end_pins (); ++p) {
+                      mp_circuit_pin_mapper->map_pins (c2, pp->pin_id (), p->pin_id ());
+                    }
+                  }
+                }
+
+              }
+
+              db::NetDeviceGraph::confirm_identity (g1, ii1, g2, ii2, mp_logger, ambiguous);
               ++new_identities;
+
             }
 
           }

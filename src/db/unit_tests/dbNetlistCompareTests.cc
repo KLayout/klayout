@@ -1273,11 +1273,11 @@ TEST(14_Subcircuit2Nand)
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
-    "match_nets IN2 IN2\n"
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
-    "match_nets INT INT\n"
     "match_nets IN1 IN1\n"
+    "match_nets INT INT\n"
+    "match_nets IN2 IN2\n"
     "match_pins $0 $0\n"
     "match_pins $1 $1\n"
     "match_pins $2 $2\n"
@@ -1425,11 +1425,11 @@ TEST(14_Subcircuit2MatchWithSwap)
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
-    "match_nets IN2 IN2\n"
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
-    "match_nets INT INT\n"
     "match_nets IN1 IN1\n"
+    "match_nets INT INT\n"
+    "match_nets IN2 IN2\n"
     "match_pins $0 $0\n"
     "match_pins $1 $1\n"
     "match_pins $2 $2\n"
@@ -1498,6 +1498,80 @@ TEST(15_EmptySubCircuitTest)
     "match_nets $5 $5\n"
     "match_nets $4 $4\n"
     "match_nets $2 $2\n"
+    "match_pins IN IN\n"
+    "match_pins $1 $1\n"
+    "match_pins OUT OUT\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $2 $3\n"
+    "match_devices $4 $4\n"
+    "match_subcircuits $1 $1\n"
+    "match_subcircuits $2 $2\n"
+    "match_subcircuits $3 $3\n"
+    "match_subcircuits $4 $4\n"
+    "end_circuit INV2 INV2 MATCH"
+  );
+
+  EXPECT_EQ (good, true);
+}
+
+TEST(15_EmptySubCircuitWithoutPinNames)
+{
+  const char *nls1 =
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $1 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $3 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=OUT,$2=$5,$3=$2);\n"
+    "  subcircuit TRANS $4 ($1=OUT,$2=$4,$3=$2);\n"
+    "end;\n"
+    //  This circuit is an abstract and it's pins are defined by the pin names
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit TRANS TRANS\n"
+    "match_ambiguous_nets $1 $1\n"
+    "match_ambiguous_nets $2 $2\n"
+    "match_ambiguous_nets $3 $3\n"
+    "match_pins $0 $0\n"
+    "match_pins $1 $1\n"
+    "match_pins $2 $2\n"
+    "end_circuit TRANS TRANS MATCH\n"
+    "begin_circuit INV2 INV2\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets $4 $4\n"
+    "match_nets $2 $2\n"
+    "match_nets $5 $5\n"
     "match_pins IN IN\n"
     "match_pins $1 $1\n"
     "match_pins OUT OUT\n"

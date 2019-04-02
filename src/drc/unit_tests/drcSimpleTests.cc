@@ -23,6 +23,8 @@
 #include "tlUnitTest.h"
 #include "dbReader.h"
 #include "dbTestSupport.h"
+#include "dbNetlist.h"
+#include "dbNetlistSpiceReader.h"
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
@@ -343,6 +345,25 @@ TEST(8_TextsAndPolygons)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
+static void compare_netlists (tl::TestBase *_this, const std::string &cir, const std::string &cir_au)
+{
+  db::Netlist nl, nl_au;
+
+  db::NetlistSpiceReader reader;
+
+  {
+    tl::InputStream is (cir);
+    reader.read (is, nl);
+  }
+
+  {
+    tl::InputStream is (cir_au);
+    reader.read (is, nl_au);
+  }
+
+  db::compare_netlist (_this, nl, nl_au);
+}
+
 TEST(9_NetlistExtraction)
 {
   std::string rs = tl::testsrc ();
@@ -380,27 +401,11 @@ TEST(9_NetlistExtraction)
 
   //  verify
 
-  {
-    tl::InputStream is (output);
-    tl::InputStream is_au (au);
+  CHECKPOINT ();
+  compare_netlists (_this, output, au);
 
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output),
-                                 tl::absolute_file_path (au)));
-    }
-  }
-
-  {
-    tl::InputStream is (output_simplified);
-    tl::InputStream is_au (au_simplified);
-
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed (simplified netlist) - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output_simplified),
-                                 tl::absolute_file_path (au_simplified)));
-    }
-  }
+  CHECKPOINT ();
+  compare_netlists (_this, output_simplified, au_simplified);
 }
 
 TEST(10_NetlistExtractionFlat)
@@ -440,27 +445,11 @@ TEST(10_NetlistExtractionFlat)
 
   //  verify
 
-  {
-    tl::InputStream is (output);
-    tl::InputStream is_au (au);
+  CHECKPOINT ();
+  compare_netlists (_this, output, au);
 
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output),
-                                 tl::absolute_file_path (au)));
-    }
-  }
-
-  {
-    tl::InputStream is (output_simplified);
-    tl::InputStream is_au (au_simplified);
-
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed (simplified netlist) - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output_simplified),
-                                 tl::absolute_file_path (au_simplified)));
-    }
-  }
+  CHECKPOINT ();
+  compare_netlists (_this, output_simplified, au_simplified);
 }
 
 TEST(11_CustomDevices)
@@ -500,25 +489,9 @@ TEST(11_CustomDevices)
 
   //  verify
 
-  {
-    tl::InputStream is (output);
-    tl::InputStream is_au (au);
+  CHECKPOINT ();
+  compare_netlists (_this, output, au);
 
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output),
-                                 tl::absolute_file_path (au)));
-    }
-  }
-
-  {
-    tl::InputStream is (output_simplified);
-    tl::InputStream is_au (au_simplified);
-
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed (simplified netlist) - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output_simplified),
-                                 tl::absolute_file_path (au_simplified)));
-    }
-  }
+  CHECKPOINT ();
+  compare_netlists (_this, output_simplified, au_simplified);
 }

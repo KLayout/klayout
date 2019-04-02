@@ -283,8 +283,6 @@ private:
 
 void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string)
 {
-  db::NetlistComparer comp (0);
-
   db::Netlist au_nl;
   for (db::Netlist::const_device_class_iterator d = netlist.begin_device_classes (); d != netlist.end_device_classes (); ++d) {
     au_nl.add_device_class (d->clone ());
@@ -292,12 +290,27 @@ void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist,
 
   au_nl.from_string (au_nl_string);
 
+  db::NetlistComparer comp (0);
+
   if (! comp.compare (&netlist, &au_nl)) {
     _this->raise ("Compare failed - see log for details.\n\nActual:\n" + netlist.to_string () + "\nGolden:\n" + au_nl_string);
     //  Compare once again - this time with logger
     CompareLogger logger;
     db::NetlistComparer comp (&logger);
     comp.compare (&netlist, &au_nl);
+  }
+}
+
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au)
+{
+  db::NetlistComparer comp (0);
+
+  if (! comp.compare (&netlist, &netlist_au)) {
+    _this->raise ("Compare failed - see log for details.\n\nActual:\n" + netlist.to_string () + "\nGolden:\n" + netlist_au.to_string ());
+    //  Compare once again - this time with logger
+    CompareLogger logger;
+    db::NetlistComparer comp (&logger);
+    comp.compare (&netlist, &netlist_au);
   }
 }
 

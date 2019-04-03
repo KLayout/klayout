@@ -1,58 +1,116 @@
 matrix:
   include:
+    # KLayout builds for mac
     # Python 3
-    - os: osx
+    - name: "KLayout macOS 10.13 with py3.7"
+      os: osx
       osx_image: xcode9.4 # macOS 10.13
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - python3
+            - qt
+            - ccache
+          update: true
       env:
         - MATRIX_EVAL=""
         - PYTHON_VERSION=B37
         - MACOS_VERSION=HighSierra
-    - os: osx
+        - KLAYOUT_BUILD=true
+
+    - name: "KLayout macOS 10.12 with py3.7"
+      os: osx
       osx_image: xcode8.3 # macOS 10.12
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - python3
+            - qt
+            - ccache
+          update: true
       env:
         - MATRIX_EVAL=""
         - PYTHON_VERSION=B37
         - MACOS_VERSION=Sierra
-    - os: osx
+        - KLAYOUT_BUILD=true
+
+    - name: "KLayout macOS 10.11 with py3.7"
+      os: osx
       osx_image: xcode8 # macOS 10.11
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - python3
+          update: true
       env:
-        - MATRIX_EVAL=""
+        - MATRIX_EVAL="brew update; brew config; brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/56c500b569c724b049be7ab9e12d9693f85522f9/Formula/qt.rb"  # Qt 5.11.2
         - PYTHON_VERSION=B37
         - MACOS_VERSION=ElCapitan
+        - KLAYOUT_BUILD=true
 
     # Python 2
-    - os: osx
+    - name: "KLayout macOS 10.13 with py2.7"
+      os: osx
       osx_image: xcode9.4 # macOS 10.13
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - qt
+            - ccache
+          update: true
       env:
         - MATRIX_EVAL=""
         - PYTHON_VERSION=Sys
         - MACOS_VERSION=HighSierra
-    - os: osx
+        - KLAYOUT_BUILD=true
+
+    - name: "KLayout macOS 10.12 with py2.7"
+      os: osx
       osx_image: xcode8.3 # macOS 10.12
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - qt
+            - ccache
+          update: true
       env:
         - MATRIX_EVAL=""
         - PYTHON_VERSION=Sys
         - MACOS_VERSION=Sierra
-    - os: osx
+        - KLAYOUT_BUILD=true
+
+    - name: "KLayout macOS 10.11 with py2.7"
+      os: osx
       osx_image: xcode8 # macOS 10.11
+      cache: ccache
+      addons:
+        homebrew:
+          packages:
+            - ccache
+          update: true
       env:
-        - MATRIX_EVAL=""
+        - MATRIX_EVAL="brew update; brew config; brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/56c500b569c724b049be7ab9e12d9693f85522f9/Formula/qt.rb"  # Qt 5.11.2
         - PYTHON_VERSION=Sys
         - MACOS_VERSION=ElCapitan
+        - KLAYOUT_BUILD=true
 
 before_install:
-  - eval "${MATRIX_EVAL}"
-  - find "$(brew --prefix)/Caskroom/"*'/.metadata' -type f -name '*.rb' | xargs grep 'EOS.undent' --files-with-matches | xargs sed -i '' 's/EOS.undent/EOS/'
-  - brew update
-  - brew bundle
   - env
-
-install:
   - gem install dropbox-deployment
-  - git clone https://github.com/kristovatlas/osx-config-check
-  - cd osx-config-check ; python2.7 app.py --report-only --skip-sudo-checks ; cd ..
+  - eval "${MATRIX_EVAL}"
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+        export PATH="/usr/local/opt/ccache/libexec:$PATH";
+    fi
 
-script: ./travis-build.sh
+script:
+  - if [ "$KLAYOUT_BUILD" = true ]; then
+        ./travis-build.sh;
+    fi
 
 after_success:
   - dropbox-deployment

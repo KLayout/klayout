@@ -2,6 +2,12 @@
 
 GITCOMMIT := $(shell git rev-parse --short HEAD)
 KLAYOUT_VERSION := $(shell source version.sh && echo $$KLAYOUT_VERSION)
+ifndef PYTHON_VERSION
+    PYTHON_VERSION := B37
+endif
+ifndef MACOS_VERSION
+	MACOS_VERSION := HighSierra
+endif
 
 .ONESHELL:
 
@@ -31,21 +37,22 @@ test:
 	ln -s klayout.app/Contents/MacOS/klayout klayout; \
 	export TESTTMP=testtmp; \
 	export TESTSRC=..; \
+	export DYLD_LIBRARY_PATH=.:db_plugins/:lay_plugins/; \
 	./ut_runner -h || true; \
 	cd ..
 
 dropbox-deploy:
 	@echo "Preparing for dropbox deployment $(MACOS_VERSION) $(GITCOMMIT)"
-	mkdir deploy; \
+	mkdir -p deploy/$(MACOS_VERSION)/$(PYTHON_VERSION)/$(KLAYOUT_VERSION); \
 	pwd; \
 	ls -lah; \
 	touch build.txt; \
-	cp build.txt deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).log.txt; \
+	cp build.txt deploy/$(MACOS_VERSION)/$(PYTHON_VERSION)/$(KLAYOUT_VERSION)/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).log.txt; \
 	hdiutil convert macbuild/Resources/klayoutDMGTemplate.dmg -format UDRW -o work-KLayout.dmg; \
 	hdiutil resize -size 500m work-KLayout.dmg; \
 	hdiutil attach work-KLayout.dmg -readwrite -noverify -quiet -mountpoint tempKLayout -noautoopen; \
 	cp -a qt5.pkg.macos-$(MACOS_VERSION)-release/ tempKLayout/; \
 	hdiutil detach tempKLayout; \
-	hdiutil convert work-KLayout.dmg -format UDZO -imagekey zlib-level=9 -o deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg; \
-	md5 -q deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg > deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg.md5; \
+	hdiutil convert work-KLayout.dmg -format UDZO -imagekey zlib-level=9 -o deploy/$(MACOS_VERSION)/$(PYTHON_VERSION)/$(KLAYOUT_VERSION)/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg; \
+	md5 -q deploy/$(MACOS_VERSION)/$(PYTHON_VERSION)/$(KLAYOUT_VERSION)/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg > deploy/$(MACOS_VERSION)/$(PYTHON_VERSION)/$(KLAYOUT_VERSION)/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg.md5; \
 	rm work-KLayout.dmg

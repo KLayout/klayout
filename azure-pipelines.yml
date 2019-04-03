@@ -84,6 +84,7 @@ jobs:
       python testdata/pymod/import_db.py
       python testdata/pymod/import_rdb.py
       python testdata/pymod/import_tl.py
+      python testdata/pymod/import_lib.py
       python testdata/pymod/pya_tests.py
     displayName: 'Test KLayout pymod'
 

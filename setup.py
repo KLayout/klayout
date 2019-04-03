@@ -310,6 +310,10 @@ class Config(object):
             else:
                 loader_path = '$ORIGIN/..'
             args += ['-Wl,-rpath,' + loader_path]
+            # default linux shared object compilation uses the '-g' flag,
+            # which generates unnecessary debug information
+            # removing with strip-all during the linking stage
+            args += ['-Wl,--strip-all']
             return args
 
     def macros(self):

@@ -85,7 +85,7 @@
 
   <p>
   By default, no layer mapping is specified. Layer mapping can be employed to confine input to 
-  certain layers or layer/purpose pairs and to specifiy mapping of LEF layers/purposes to GDS
+  certain layers or layer/purpose pairs and to specify mapping of LEF layers/purposes to GDS
   layer/datatypes.
   </p>
 

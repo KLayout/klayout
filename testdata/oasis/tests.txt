@@ -1,6 +1,6 @@
 
 t1.x   Empty file. 
-       Various ways to specifiy a float (database unit).
+       Various ways to specify a float (database unit).
 t2.x   Cells. 
        Various ways to specify cell names (id, string) and refer to them.
 t3.x   Texts.

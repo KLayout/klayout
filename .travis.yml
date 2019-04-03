@@ -578,4 +578,13 @@ script:
     fi
 
 after_success:
+  # upload to dropbox
+  # need DROPBOX_OAUTH_BEARER environment variable
   - dropbox-deployment
+
+  # uploading to pypi using twine
+  # need TWINE_USERNAME, TWINE_PASSWORD and TWINE_REPOSITORY_URL env variable
+  - if [ "$PYTHON_BUILD" = true ] || [ "$DOCKER_BUILD" = true ]; then
+      pip install -U twine || sudo pip install -U twine;
+      twine upload --skip-existing deploy/dist-pymod/$klayout_version/*;
+    fi

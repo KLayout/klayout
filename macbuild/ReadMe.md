@@ -115,3 +115,17 @@ Homebrew's installation of python3 (`brew install python3`) places a `Python.fra
 Because we link python to `/usr/local/opt/python/Frameworks/Python.framework/`, updating python from brew might break KLayout if the new version is incompatible. To fix this, it is better to link python directly to `/usr/local/Cellar/python/3.6.4_4/Frameworks/Python.framework`, but that might complicate release builds, because that assumes users have the exact version of python installed by brew.
 
 [End of File] 
+
+
+#### Creating a template DMG file
+
+Starting from a `klayout-0.25.8-macOS-Mojave-1-Qt5101.dmg` file:
+
+```
+hdiutil convert klayout-0.25.8-macOS-Mojave-1-Qt5101.dmg -format UDRW -o work-KLayout.dmg
+hdiutil attach work-KLayout.dmg -readwrite -noverify -quiet -mountpoint tempKLayout -noautoopen
+rm -rf tempKLayout/klayout.app/Contents
+hdiutil detach tempKLayout
+rm macbuild/Resources/klayoutDMGTemplate.dmg
+hdiutil convert work-KLayout.dmg -format UDZO -imagekey zlib-level=9 -o macbuild/Resources/klayoutDMGTemplate.dmg
+```

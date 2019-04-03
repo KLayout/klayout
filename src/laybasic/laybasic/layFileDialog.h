@@ -39,7 +39,7 @@ namespace lay
  *  @brief Generic file dialog 
  *
  *  This dialog is provided to encapsulate the Qt file dialog.
- *  This implementation allows to stay within a directory even
+ *  This implementation allows staying within a directory even
  *  if the static convenience functions are used. Under Windows,
  *  we need to use the static functions since these use the 
  *  system dialogs.

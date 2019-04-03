@@ -551,7 +551,7 @@ public:
   /**
    *  @brief Increment the iterator: deliver the next state
    *
-   *  This method is equivalent to operator++, but it allows to specify
+   *  This method is equivalent to operator++, but it allows one to specify
    *  a boolean parameter telling whether the operation requested shall be
    *  skipped. This only applies to queries with an action like "delete" or "with".
    */

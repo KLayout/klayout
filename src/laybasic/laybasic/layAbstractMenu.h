@@ -107,8 +107,8 @@ private:
  *  @brief A QAction proxy 
  *
  *  This class is provided to be better suited to automation because it provides the corresponding interfaces
- *  and allows to implement the "trigger" event by reimplementation of the slot (after being connected).
- *  In addition, by acting as a proxy, it allows to reference a QAction object created by Qt itself (i.e.
+ *  and allows implementing the "trigger" event by reimplementation of the slot (after being connected).
+ *  In addition, by acting as a proxy, it can act as a reference to a QAction object created by Qt itself (i.e.
  *  within a QMenu).
  *  To reimplement the "triggered" method, derive a class from Action and reimplement "triggered". Then
  *  pass a reference to this object to "insert_item" of AbstractMenu and store away the derived object.

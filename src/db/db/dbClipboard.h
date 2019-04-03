@@ -52,7 +52,7 @@ public:
   }
 
   /**
-   *  @brief The dtor is virtual to allow to exploit RTTI
+   *  @brief The dtor is virtual to exploit RTTI
    */
   virtual ~ClipboardObject ()
   {
@@ -114,7 +114,7 @@ private:
 /**
  *  @brief The clipboard class
  *
- *  The clipboard allows to store objects from the ClipboardObject
+ *  The clipboard allows one to store objects from the ClipboardObject
  *  class. These objects are owned by the clipboard class and must
  *  be passed after have being newed to the += operator.
  *  There is a static instance of the clipboard that should be used

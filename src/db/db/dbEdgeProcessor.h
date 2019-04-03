@@ -513,7 +513,7 @@ private:
  *  @brief Boolean operations
  *
  *  This class implements a boolean operation similar to BooleanOp, but 
- *  in addition it allows to specify the merge mode for the two inputs.
+ *  in addition it allows one  to specify the merge mode for the two inputs.
  *  See "SimpleMergeOp" for the definition of the merge modes.
  *  This operator is especially useful to implement boolean operations
  *  with sized polygons which required a >0 interpretation.
@@ -540,8 +540,8 @@ private:
  *  @brief Merge operation
  *
  *  This incarnation of the evaluator class implements a merge operation
- *  which allows to distinguish polygons (through edge properties) and 
- *  allows to specify a overlap value. Default is 0 which means that the
+ *  which allows one  to distinguish polygons (through edge properties) and
+ *  allows one to specify a overlap value. Default is 0 which means that the
  *  merge is equivalent to producing all polygins. A overlap value of 1 means
  *  that at least two polygons must overlap to produce a result.
  */
@@ -695,7 +695,7 @@ public:
    *  The other merge operation provided for this purpose is "merge" which normalizes each polygon individually before
    *  merging them. "simple_merge" is somewhat faster and consumes less memory.
    *
-   *  This method produces polygons and allows to fine-tune the parameters for that purpose.
+   *  This method produces polygons and allows fine-tuning the parameters for that purpose.
    *
    *  This is a convenience method that bundles filling of the edges, processing with
    *  a SimpleMerge operator and puts the result into an output vector.
@@ -732,7 +732,7 @@ public:
    *  The edges provided must form valid closed contours. Contours oriented differently "cancel" each other. 
    *  Overlapping contours are merged when the orientation is the same.
    *
-   *  This method produces polygons and allows to fine-tune the parameters for that purpose.
+   *  This method produces polygons and allows fine-tuning the parameters for that purpose.
    *
    *  This is a convenience method that bundles filling of the edges, processing with
    *  a SimpleMerge operator and puts the result into an output vector.
@@ -750,7 +750,7 @@ public:
    *
    *  In contrast to "simple_merge", this merge implementation considers each polygon individually before merging them.
    *  Thus self-overlaps are effectively removed before the output is computed and holes are correctly merged with the
-   *  hull. In addition, this method allows to select areas with a higher wrap count which allows to compute overlaps
+   *  hull. In addition, this method allows one to select areas with a higher wrap count which allows one to compute overlaps
    *  of polygons on the same layer. Because this method merges the polygons before the overlap is computed, self-overlapping
    *  polygons do not contribute to higher wrap count areas.
    *
@@ -771,11 +771,11 @@ public:
    *
    *  In contrast to "simple_merge", this merge implementation considers each polygon individually before merging them.
    *  Thus self-overlaps are effectively removed before the output is computed and holes are correctly merged with the
-   *  hull. In addition, this method allows to select areas with a higher wrap count which allows to compute overlaps
+   *  hull. In addition, this method allows one to select areas with a higher wrap count which allows one to compute overlaps
    *  of polygons on the same layer. Because this method merges the polygons before the overlap is computed, self-overlapping
    *  polygons do not contribute to higher wrap count areas.
    *
-   *  This method produces polygons and allows to fine-tune the parameters for that purpose.
+   *  This method produces polygons and allows one to fine-tune the parameters for that purpose.
    *
    *  This is a convenience method that bundles filling of the edges, processing with
    *  a Merge operator and puts the result into an output vector.
@@ -823,7 +823,7 @@ public:
    *  The sizing applied can be chosen differently in x and y direction. In this case, the sign must be identical for both
    *  dx and dy.
    *
-   *  This method produces polygons and allows to fine-tune the parameters for that purpose.
+   *  This method produces polygons and allows one to fine-tune the parameters for that purpose.
    *
    *  This is a convenience method that bundles filling of the edges, processing with
    *  a SimpleMerge operator and puts the result into an output vector.
@@ -891,7 +891,7 @@ public:
    *  @brief Boolean operation for a set of given polygons, creating polygons
    *
    *  This method computes the result for the given boolean operation on two sets of polygons.
-   *  This method produces polygons on output and allows to fine-tune the parameters for that purpose.
+   *  This method produces polygons on output and allows one to fine-tune the parameters for that purpose.
    *
    *  This is a convenience method that bundles filling of the edges, processing with
    *  a Boolean operator and puts the result into an output vector.
@@ -932,7 +932,7 @@ public:
    *  The input edges must form closed contours where holes and hulls must be oriented differently. 
    *  The input edges are processed with a simple non-zero wrap count rule as a whole.
    *
-   *  This method produces polygons on output and allows to fine-tune the parameters for that purpose.
+   *  This method produces polygons on output and allows one to fine-tune the parameters for that purpose.
    *
    *  This is a convenience method that bundles filling of the edges, processing with
    *  a Boolean operator and puts the result into an output vector.

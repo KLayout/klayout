@@ -36,7 +36,7 @@ namespace db {
  *
  *  This filter has two parameters: pmin and pmax.
  *  It will filter all polygons for which the perimeter is >= pmin and < pmax.
- *  There is an "invert" flag which allows to select all polygons not
+ *  There is an "invert" flag which allows selecting all polygons not
  *  matching the criterion.
  */
 
@@ -104,7 +104,7 @@ private:
  *
  *  This filter has two parameters: amin and amax.
  *  It will filter all polygons for which the area is >= amin and < amax.
- *  There is an "invert" flag which allows to select all polygons not
+ *  There is an "invert" flag which allows selecting all polygons not
  *  matching the criterion.
  */
 
@@ -266,7 +266,7 @@ private:
  *
  *  This filter has two parameters: vmin and vmax.
  *  It will filter all polygons for which the selected bounding box parameter is >= vmin and < vmax.
- *  There is an "invert" flag which allows to select all polygons not
+ *  There is an "invert" flag which allows selecting all polygons not
  *  matching the criterion.
  *
  *  For bounding box parameters the following choices are available:

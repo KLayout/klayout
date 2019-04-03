@@ -283,7 +283,7 @@ end</pre>
   The parameter declaration will create accessor methods for each parameter. These accessor methods can be
   used to get and set the current value of the parameter inside the production method and other methods.
   For that, it will use the symbolic name of the parameter. The setter is called "set_x" (where x is the parameter
-  name). Although Ruby would allow to use "x=" to mimic an assignment, this option leads to some confusion
+  name). Although Ruby would allow using "x=" to mimic an assignment, this option leads to some confusion
   with definition of local variables and was not considered here. The following methods are created in the sample:
   </p>
 

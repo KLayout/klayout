@@ -68,7 +68,7 @@ public:
   /**
    *  @brief Specify the unit of the DXF file
    *
-   *  Since DXF is unitless, this value allows to specify the units of the DXF file given as input.
+   *  Since DXF is unitless, this value allows one to specify the units of the DXF file given as input.
    */
   double unit;
 

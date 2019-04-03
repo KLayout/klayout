@@ -55,7 +55,7 @@ public:
    *
    *  Creates a tip dialog with the given parent, message text and configuration key. The configuration key
    *  is the key under which the status of the dialog is stored.
-   *  The buttons argument allows to specify which buttons to show (see buttons_type enum for the button
+   *  The buttons argument allows one to specify which buttons to show (see buttons_type enum for the button
    *  combinations available.
    */
   TipDialog (QWidget *parent, const std::string &text, const std::string &key, buttons_type buttons = close_buttons); 

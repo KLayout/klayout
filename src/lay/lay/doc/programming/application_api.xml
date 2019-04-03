@@ -866,7 +866,7 @@ lv.insert_image(image)</pre>
     Such a matrix describes the transformation from pixel coordinates to the micron unit space of the canvas.
     A 3x3 matrix is a generic way to specify a transformation, including translation, rotation, mirror, shear or 
     perspective distortion. The matrix is obtained and set using the <class_doc href="Image#matrix"/> attribute. 
-    Convenience methods like <class_doc href="Image#trans"/>, <class_doc href="Image#pixel_width"/> and <class_doc href="Image#pixel_height"/> allow to access sub-aspects
+    Convenience methods like <class_doc href="Image#trans"/>, <class_doc href="Image#pixel_width"/> and <class_doc href="Image#pixel_height"/> allow accessing sub-aspects
     of the generic transformation (affine transformation, scaling).
     </li>
   </ul>

@@ -3051,7 +3051,7 @@ public:
   /**
    *  @brief The translation constructor.
    *  
-   *  This constructor allows to copy a polygon reference from one
+   *  This constructor allows one to copy a polygon reference from one
    *  repository to another
    */
   polygon_ref (const polygon_ref &ref, repository_type &rep)
@@ -3063,7 +3063,7 @@ public:
   /**
    *  @brief The transformation translation constructor
    *  
-   *  This constructor allows to copy a polygon reference with a certain transformation
+   *  This constructor allows one to copy a polygon reference with a certain transformation
    *  to one with another transformation
    */
   template <class TransIn>

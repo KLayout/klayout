@@ -39,7 +39,7 @@ class SimplePolygonSink;
 /**
  *  @brief An inside test operator
  *
- *  This class allows to efficiently test whether multiple points are inside a given polygon.
+ *  This class allows an efficient test whether multiple points are inside a given polygon.
  *  Since the test is efficiently implemented when the polygon edges are sorted, the sorting 
  *  and memory allocation step is performed once in the test operator's constructor while 
  *  each individual test is performed efficiently.

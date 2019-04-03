@@ -147,7 +147,7 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "@brief Use multiple XY records in BOUNDARY elements for unlimited large polygons\n"
     "@args flag\n"
     "\n"
-    "Setting this property to true allows to produce unlimited polygons \n"
+    "Setting this property to true allows producing polygons with an unlimited number of points \n"
     "at the cost of incompatible formats. Setting it to true disables the \\gds2_max_vertex_count setting.\n"
     "\nThis property has been added in version 0.18.\n"
   ) +

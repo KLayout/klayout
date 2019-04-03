@@ -122,7 +122,7 @@ Class<db::Manager> decl_Manager ("db", "Manager",
   "@brief A transaction manager class\n"
   "\n"
   "Manager objects control layout and potentially other objects in the layout database "
-  "and allow to queue operations to form transactions. A transaction is a sequence of "
+  "and queue operations to form transactions. A transaction is a sequence of "
   "operations that can be undone or redone.\n"
   "\n"
   "In order to equip a layout object with undo/redo support, instantiate the layout object "

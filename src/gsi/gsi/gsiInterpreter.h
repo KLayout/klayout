@@ -105,8 +105,8 @@ public:
 /**
  *  @brief An interface controlling the execution of a script
  *
- *  This interface allows to control the execution of a script. Basically when a script
- *  is executed, the handler allows to intercept the execution and implement breakpoints 
+ *  This interface controls the execution of a script. Basically when a script
+ *  is executed, the handler allows intercepting the execution and implement breakpoints
  *  for example
  */
 class GSI_PUBLIC ExecutionHandler

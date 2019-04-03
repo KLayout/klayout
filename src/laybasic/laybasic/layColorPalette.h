@@ -146,7 +146,7 @@ public:
    *  This method will throw an exception if the string does not have a valid format
    *  like the one returned by the to_string method.
    *
-   *  If simple is true, this method allows to set a palette without luminous colors
+   *  If simple is true, this method allows setting a palette without luminous colors
    *  and without colors at all.
    */
   void from_string (const std::string &s, bool simple = false);

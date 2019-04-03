@@ -257,7 +257,7 @@ struct shape_ref
   /**
    *  @brief The translation constructor.
    *  
-   *  This constructor allows to copy a shape reference from one
+   *  This constructor allows one to copy a shape reference from one
    *  repository to another
    */
   shape_ref (const shape_ref<Sh, Trans> &ref, repository_type &rep)
@@ -272,7 +272,7 @@ struct shape_ref
   /**
    *  @brief The translation operator.
    *  
-   *  This assignment allows to assign a reference in one repository
+   *  This assignment allows assigning a reference in one repository
    *  to a reference in another repository
    */
   void translate (const shape_ref<Sh, Trans> &ref, repository_type &rep, db::ArrayRepository &)
@@ -288,7 +288,7 @@ struct shape_ref
   /**
    *  @brief The translation operator with transformation.
    *  
-   *  This assignment allows to assign a reference in one repository
+   *  This assignment allows assigning a reference in one repository
    *  to a reference in another repository
    */
   template <class T>
@@ -309,7 +309,7 @@ struct shape_ref
   /**
    *  @brief The translation operator.
    *  
-   *  This operator allows to change a reference to another repository.
+   *  This operator allows changing a reference to another repository.
    */
   void translate (repository_type &rep)
   {

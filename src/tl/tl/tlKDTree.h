@@ -362,7 +362,7 @@ private:
  *  a converter class that gets a certain value of a 
  *  given dimension from the object, "Cmp" is the compare
  *  function used to compare values in a special flavour
- *  that allows to make the comparison dependent on the
+ *  that allows making the comparison dependent on the
  *  dimension. "ObjV" is the container used for storing the
  *  objects, "ValV" is the container used for storing values.
  */

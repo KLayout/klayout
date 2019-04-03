@@ -101,7 +101,7 @@ jobs:
       artifactName: 'wheel-$(python.version).$(python.architecture)'
 
 - job: 'Deploy'
-  displayName: 'Combine Windows wheels'
+  displayName: 'Combine Windows wheels and deploy to PyPI'
   dependsOn: Build
   pool:
     vmImage: 'vs2017-win2016' # other options: 'macOS-10.13', 'ubuntu-16.04'
@@ -149,4 +149,12 @@ jobs:
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: 'windows_wheels'
+    - bash: |
+        pip install -U twine
+        twine upload --skip-existing $BUILD_ARTIFACTSTAGINGDIRECTORY/*
+      env:
+        TWINE_USERNAME: $(TWINE_USERNAME)
+        TWINE_PASSWORD: $(TWINE_PASSWORD)
+        TWINE_REPOSITORY_URL: $(TWINE_REPOSITORY_URL)
+      displayName: 'Uploading to PyPI'
 

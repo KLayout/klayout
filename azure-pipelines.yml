@@ -1,4 +1,9 @@
 # https://aka.ms/yaml
+trigger:
+  tags:
+    include:
+    - v*
+
 jobs:
 - job: Build
   pool:

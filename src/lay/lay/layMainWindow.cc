@@ -689,6 +689,14 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
 
 MainWindow::~MainWindow ()
 {
+  //  avoid deferred execution later on where there isn't a valid main window anymore
+  //  (problem case: showing a dialog inside main windows's destroyed signal - this will
+  //  process events and trigger execution if not disabled)
+  if (! tl::DeferredMethodScheduler::instance ()->is_disabled ()) {
+    tl::DeferredMethodScheduler::instance ()->execute ();
+  }
+  tl::DeferredMethodScheduler::instance ()->enable (false);
+
   lay::register_help_handler (0, 0);
 
   //  since the configuration actions unregister themselves, we need to do this before the main

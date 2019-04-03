@@ -65,7 +65,7 @@ void AdaptorBase::tie_copies (AdaptorBase *target, tl::Heap &heap)
   copy_to (target, heap);
 
   //  This object (which will be destroyed before this is responsible for copying back 
-  //  the contents ot target into this once the heap goes out of scope)
+  //  the contents of target into this once the heap goes out of scope)
   heap.push (new AdaptorSynchronizer (t.release (), this, &heap));
 }
 

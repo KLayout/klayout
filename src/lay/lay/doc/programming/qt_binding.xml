@@ -203,8 +203,8 @@ end</pre>
   <h3>Enums</h3>
 
   <p>
-  Enum types are available as classes to give them a specific context. Since Ruby does not allow to
-  declare classes within classes, enums declared inside a class must be declared as separate classes outside that class.
+  Enum types are available as classes to give them a specific context. Since Ruby does not allow
+  declaration of classes within classes, enums declared inside a class must be declared as separate classes outside that class.
   The relationship is indicated by the Enum's class name. For example, <tt>QMessageBox::Icon</tt> (C++) is available
   as the Ruby class <tt>QMessageBox_Icon</tt>. The enum values are defined as constants within that class and the enclosing class. 
   For example <tt>QMessageBox::Critical</tt> which is a value for <tt>QMessageBox::Icon</tt> is available as <tt>QMessageBox_Icon::Critical</tt> and <tt>QMessageBox::Critical</tt>

@@ -255,7 +255,7 @@ public:
   /**
    *  @brief Constructor that provides conversion and transformation
    *
-   *  This constructor allows to convert a path from any type to this one.
+   *  This constructor allows converting a path from any type to this one.
    *  In addition, transformation operators can be provided that specify
    *  how to transform points and lengths.
    *
@@ -278,7 +278,7 @@ public:
   /**
    *  @brief Constructor that provides conversion from another coordinate type
    *
-   *  This constructor allows to convert a path from any type to this one.
+   *  This constructor allows converting a path from any type to this one.
    *
    *  @param p The source path
    */
@@ -738,7 +738,7 @@ public:
    *  hull polygon. The resulting pointlist is not guaranteed not to
    *  be self-overlapping. 
    *
-   *  This version allows to override the left and right side's width hence creating
+   *  This version allows one to override the left and right side's width hence creating
    *  asymmetric paths. dleft is the shift to the left (as seen in the direction of the
    *  path) and dright the shift to the right. The default path is created if dleft+dright=width.
    */
@@ -1011,7 +1011,7 @@ struct path_ref
   /**
    *  @brief The translation constructor.
    *  
-   *  This constructor allows to copy a path reference from one
+   *  This constructor allows one to copy a path reference from one
    *  repository to another
    */
   path_ref (const path_ref &ref, repository_type &rep)
@@ -1023,7 +1023,7 @@ struct path_ref
   /**
    *  @brief The transformation translation constructor
    *  
-   *  This constructor allows to copy a path reference with a certain transformation
+   *  This constructor allows one to copy a path reference with a certain transformation
    *  to one with another transformation
    */
   template <class TransIn>

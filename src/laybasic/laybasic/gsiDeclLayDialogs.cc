@@ -435,7 +435,7 @@ Class<BrowserSource_Stub> decl_BrowserSourceStub ("lay", "BrowserSource",
     "@args url\n"
     "\n"
     "If this method returns an empty string, the browser will not be set to \n"
-    "a new location. This allows to implement any functionality behind such links.\n"
+    "a new location. This allows implementing any functionality behind such links.\n"
     "If the method returns a string, the content of this string is displayed in the HTML\n"
     "browser page."
   ),

@@ -437,7 +437,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@param add_default If true, default layers will be added for each other layer in the layout\n"
     "\n"
     "Load the layer properties from the file given in \"fn\".\n"
-    "This version allows to specify whether defaults should be used for all other layers by "
+    "This version allows one to specify whether defaults should be used for all other layers by "
     "setting \"add_default\" to true.\n"
     "\n"
     "This variant has been added on version 0.21."
@@ -450,7 +450,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@param add_default If true, default layers will be added for each other layer in the layout\n"
     "\n"
     "Load the layer properties from the file given in \"fn\".\n"
-    "This version allows to specify whether defaults should be used for all other layers by "
+    "This version allows one to specify whether defaults should be used for all other layers by "
     "setting \"add_default\" to true. It can be used to load the layer properties for a specific "
     "cellview by setting \"cv_index\" to the index for which the layer properties file should be applied. "
     "All present definitions for this layout will be removed before the properties file is loaded. \"cv_index\" can "
@@ -465,7 +465,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "@param level The minimum level above which to display something\n"
     "\n"
-    "This methods allows to set the minimum hierarchy level above which to display geometries."
+    "This methods allows setting the minimum hierarchy level above which to display geometries."
     "This method may cause a redraw if required."
   ) +
   gsi::method ("min_hier_levels", &lay::LayoutView::get_min_hier_levels,
@@ -478,7 +478,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "@param level The maximum level below which to display something\n"
     "\n"
-    "This methods allows to set the maximum hierarchy below which to display geometries."
+    "This methods allows setting the maximum hierarchy below which to display geometries."
     "This method may cause a redraw if required."
   ) +
   gsi::method ("max_hier_levels", &lay::LayoutView::get_max_hier_levels,
@@ -528,7 +528,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Create a new, empty layout and associate it with the given technology\n"
     "\n"
     "The add_cellview parameter controls whether to create a new cellview (true)\n"
-    "or clear all cellviews before (false). This variant also allows to control whether the layer properties are\n"
+    "or clear all cellviews before (false). This variant also allows one to control whether the layer properties are\n"
     "initialized (init_layers = true) or not (init_layers = false).\n"
     "\n"
     "@return The index of the cellview created.\n"
@@ -572,7 +572,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "The technology to use for that layout can be specified as well with the 'tech' parameter. Depending "
     "on the definition of the technology, layer properties may be loaded for example.\n"
     "The technology string can be empty for the default technology.\n"
-    "This variant also allows to control whether the layer properties are\n"
+    "This variant also allows one to control whether the layer properties are\n"
     "initialized (init_layers = true) or not (init_layers = false).\n"
     "\n"
     "Note: once a layout is passed to the view with show_layout, it is owned by the view and must not be "

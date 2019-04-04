@@ -63,7 +63,7 @@ public:
    *  @brief Constructor
    *
    *  This constructor takes the polygon receiver (of which is keeps a reference).
-   *  It allows to specify how holes are resolved and how touching corners are resolved.
+   *  It allows one to specify how holes are resolved and how touching corners are resolved.
    *
    *  @param psink The polygon receiver
    *  @param resolve_holes true, if holes should be resolved into the hull using stich lines
@@ -75,7 +75,7 @@ public:
    *  @brief Constructor
    *
    *  This constructor takes the simple polygon receiver (of which is keeps a reference).
-   *  It allows to specify how touching corners are resolved. Holes are always resolved since this is
+   *  It allows one to specify how touching corners are resolved. Holes are always resolved since this is
    *  the only way to create a simple polygon.
    *
    *  @param spsink The simple polygon receiver

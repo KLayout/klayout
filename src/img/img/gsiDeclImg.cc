@@ -194,7 +194,7 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
   gsi::method_ext ("gamma", &gsi::gamma, 
     "@brief The gamma value\n"
     "\n"
-    "The gamma value allows to adjust for non-linearities in the display chain and to enhance contrast.\n"
+    "The gamma value allows one to adjust for non-linearities in the display chain and to enhance contrast.\n"
     "A value for linear intensity reproduction on the screen is roughly 0.5. The exact value depends on the \n"
     "monitor calibration. Values below 1.0 give a \"softer\" appearance while values above 1.0 give a \"harder\" appearance.\n"
   ) +

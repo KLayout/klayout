@@ -37,7 +37,7 @@ namespace edt
 {
 
 /**
- *  @brief A QScrollArea that displays and allows to edit PCell parameters
+ *  @brief A QScrollArea that displays and allows editing PCell parameters
  */
 class PCellParametersPage
   : public QScrollArea

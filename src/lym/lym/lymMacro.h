@@ -1131,7 +1131,7 @@ private:
 /**
  *  @brief A signal to macro adaptor
  *
- *  This class allows to call a macro from a signal
+ *  This class allows calling a macro from a signal
  */
 class LYM_PUBLIC MacroSignalAdaptor
   : public QObject

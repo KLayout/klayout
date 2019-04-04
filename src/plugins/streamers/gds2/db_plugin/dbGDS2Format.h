@@ -61,7 +61,7 @@ public:
   /**
    *  @brief Allow multiple big records
    *
-   *  Setting this property to true allows to use up to 65535 bytes (instead of 32767) per record
+   *  Setting this property to true allows using up to 65535 bytes (instead of 32767) per record
    *  by treating the record length as unsigned short rather than signed short.
    *  This allows bigger polygons (up to ~8000 points) without having to use multiple XY records.
    */
@@ -70,7 +70,7 @@ public:
   /**
    *  @brief Allow multiple XY records in BOUNDARY elements for unlimited large polygons
    *
-   *  Setting this property to true allows to unlimited polygons 
+   *  Setting this property to true allows producing polygons with an unlimited number of points
    *  by using multiple XY records. 
    */
   bool allow_multi_xy_records;
@@ -141,7 +141,7 @@ public:
   /**
    *  @brief Use multiple XY records in BOUNDARY elements for unlimited large polygons
    *
-   *  Setting this property to true allows to produce unlimited polygons
+   *  Setting this property to true allows produce polygons with an unlimited number of points
    *  at the cost of incompatible formats.
    */
   bool multi_xy_records;

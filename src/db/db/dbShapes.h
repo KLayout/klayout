@@ -53,7 +53,7 @@ class ArrayRepository;
  *  @brief A generic shape iterator
  *
  *  This iterator can iterate any kind of shape from a "shapes" container.
- *  It allows to select certain kind of shapes. The dereferecing operator
+ *  It allows selecting certain kind of shapes. The dereferecing operator
  *  returns a shape proxy object that can be used to access the actual shape.
  *  It can iterator over all shapes and over a region selected.
  *  If the iterator is constructed, it always points to the beginning of the 
@@ -514,7 +514,7 @@ public:
    *  @brief Default ctor: create an empty collection of shapes without external references
    *
    *  Such shape containers can be used for example to store temporary shape sets
-   *  This version allows to specify whether the container should be created in editable mode 
+   *  This version allows one to specify whether the container should be created in editable mode
    *  or insert-once mode.
    */
   Shapes (bool editable)
@@ -607,7 +607,7 @@ public:
   /**
    *  @brief Assignment operator with transformation and property id mapping
    *
-   *  This version allows to specify a property mapping function. That way, shapes can be copied from
+   *  This version allows one to specify a property mapping function. That way, shapes can be copied from
    *  one layout space to another.
    */
   template <class T, class PropIdMap>
@@ -620,7 +620,7 @@ public:
   /**
    *  @brief Assignment operator with property id mapping
    *
-   *  In contrast to the operator= version allows to specify a property mapping function. That way, shapes can be copied from
+   *  In contrast to the operator= version allows one to specify a property mapping function. That way, shapes can be copied from
    *  one layout space to another.
    */
   template <class PropIdMap>
@@ -676,7 +676,7 @@ public:
    *
    *  This method insert all shapes from the given shape container using the specified transformation.
    *
-   *  This version allows to specify a property mapping function. That way, shapes can be copied from
+   *  This version allows one to specify a property mapping function. That way, shapes can be copied from
    *  one layout space to another.
    */
   template <class T, class PropIdMap>
@@ -715,7 +715,7 @@ public:
    *
    *  This method insert all shapes from the given shape container using the specified transformation.
    *
-   *  In contrast to the operator= version allows to specify a property mapping function. That way, shapes can be copied from
+   *  In contrast to the operator= version allows one to specify a property mapping function. That way, shapes can be copied from
    *  one layout space to another.
    */
   template <class PropIdMap>

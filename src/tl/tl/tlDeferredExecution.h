@@ -184,10 +184,10 @@ public:
 /**
  *  @brief Deferred execution of a const method
  *
- *  This template allows to schedule a deferred execution of a certain method.
+ *  This template allows executing a certain method in a delayed fashion.
  *  The method is not called immediately but as soon as the applications becomes
  *  idle - i.e. GUI events are being processed.
- *  This allows to schedule GUI update requests or similar. 
+ *  This allows scheduling GUI update requests or similar.
  *  The compress parameter controls whether multiple calls to the same method are 
  *  compressed and combined into a single call. This is an efficient way to 
  *  schedule a single GUI update request from frequently called and time critical

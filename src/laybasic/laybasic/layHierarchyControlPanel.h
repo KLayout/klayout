@@ -88,7 +88,7 @@ protected:
 /**
  *  @brief The hierarchy control panel 
  *
- *  The hierarchy control panel allows to change the cell shown
+ *  The hierarchy control panel allows changing the cell shown, to
  *  browse the hierarchy and disable/enable cells
  *
  *  The class communicates with a Layout interface for
@@ -186,7 +186,7 @@ public:
    *  @brief Update the contents if necessary
    *  
    *  Update the cell trees according to the hierarchy found in 
-   *  the layouts. This version allows to give an hint what cellview has changed.
+   *  the layouts. This version includes a hint which cellview has changed.
    */
   void do_update_content (int cv_index);
 

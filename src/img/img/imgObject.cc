@@ -189,7 +189,7 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
       int h2, s2, v2;
       false_color_nodes [i].second.getHsv (&h2, &s2, &v2);
 
-      //  The number of steps is choosen such that the full HSV band divides into approximately 200 steps
+      //  The number of steps is chosen such that the full HSV band divides into approximately 200 steps
       double nsteps = 0.5 * sqrt (double (h1 - h2) * double (h1 - h2) + double (s1 - s2) * double (s1 - s2) + double (v1 - v2) * double (v1 - v2));
       int n = int (floor (nsteps + 1.0));
       double dx = (false_color_nodes [i].first - false_color_nodes [i - 1].first) / n;

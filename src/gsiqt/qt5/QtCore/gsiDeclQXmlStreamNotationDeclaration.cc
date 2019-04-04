@@ -65,7 +65,7 @@ static void _call_ctor_QXmlStreamNotationDeclaration_4289 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamNotationDeclaration &arg1 = args.read<const QXmlStreamNotationDeclaration & > (heap);
+  const QXmlStreamNotationDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNotationDeclaration & >() (args, heap);
   ret.write<QXmlStreamNotationDeclaration *> (new QXmlStreamNotationDeclaration (arg1));
 }
 
@@ -99,7 +99,7 @@ static void _call_f_operator_excl__eq__c4289 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamNotationDeclaration &arg1 = args.read<const QXmlStreamNotationDeclaration & > (heap);
+  const QXmlStreamNotationDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNotationDeclaration & >() (args, heap);
   ret.write<bool > ((bool)((QXmlStreamNotationDeclaration *)cls)->operator!= (arg1));
 }
 
@@ -118,7 +118,7 @@ static void _call_f_operator_eq__4289 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamNotationDeclaration &arg1 = args.read<const QXmlStreamNotationDeclaration & > (heap);
+  const QXmlStreamNotationDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNotationDeclaration & >() (args, heap);
   ret.write<QXmlStreamNotationDeclaration & > ((QXmlStreamNotationDeclaration &)((QXmlStreamNotationDeclaration *)cls)->operator= (arg1));
 }
 
@@ -137,7 +137,7 @@ static void _call_f_operator_eq__eq__c4289 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlStreamNotationDeclaration &arg1 = args.read<const QXmlStreamNotationDeclaration & > (heap);
+  const QXmlStreamNotationDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNotationDeclaration & >() (args, heap);
   ret.write<bool > ((bool)((QXmlStreamNotationDeclaration *)cls)->operator== (arg1));
 }
 

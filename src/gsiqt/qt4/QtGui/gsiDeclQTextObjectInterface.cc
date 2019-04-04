@@ -63,11 +63,11 @@ static void _call_f_drawObject_8010 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QRectF &arg2 = args.read<const QRectF & > (heap);
-  QTextDocument *arg3 = args.read<QTextDocument * > (heap);
-  int arg4 = args.read<int > (heap);
-  const QTextFormat &arg5 = args.read<const QTextFormat & > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QRectF &arg2 = gsi::arg_reader<const QRectF & >() (args, heap);
+  QTextDocument *arg3 = gsi::arg_reader<QTextDocument * >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  const QTextFormat &arg5 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextObjectInterface *)cls)->drawObject (arg1, arg2, arg3, arg4, arg5);
 }
@@ -91,9 +91,9 @@ static void _call_f_intrinsicSize_4938 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextDocument *arg1 = args.read<QTextDocument * > (heap);
-  int arg2 = args.read<int > (heap);
-  const QTextFormat &arg3 = args.read<const QTextFormat & > (heap);
+  QTextDocument *arg1 = gsi::arg_reader<QTextDocument * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QTextFormat &arg3 = gsi::arg_reader<const QTextFormat & >() (args, heap);
   ret.write<QSizeF > ((QSizeF)((QTextObjectInterface *)cls)->intrinsicSize (arg1, arg2, arg3));
 }
 

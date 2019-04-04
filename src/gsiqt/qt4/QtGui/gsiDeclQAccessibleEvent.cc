@@ -52,8 +52,8 @@ static void _call_ctor_QAccessibleEvent_2224 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QAccessibleEvent *> (new QAccessibleEvent (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2));
 }
 
@@ -87,7 +87,7 @@ static void _call_f_setValue_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleEvent *)cls)->setValue (arg1);
 }

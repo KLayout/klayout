@@ -65,7 +65,7 @@ static void _call_ctor_QSurfaceFormat_3909 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QSurfaceFormat::FormatOption> arg1 = args.read<QFlags<QSurfaceFormat::FormatOption> > (heap);
+  QFlags<QSurfaceFormat::FormatOption> arg1 = gsi::arg_reader<QFlags<QSurfaceFormat::FormatOption> >() (args, heap);
   ret.write<QSurfaceFormat *> (new QSurfaceFormat (arg1));
 }
 
@@ -84,7 +84,7 @@ static void _call_ctor_QSurfaceFormat_2724 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSurfaceFormat &arg1 = args.read<const QSurfaceFormat & > (heap);
+  const QSurfaceFormat &arg1 = gsi::arg_reader<const QSurfaceFormat & >() (args, heap);
   ret.write<QSurfaceFormat *> (new QSurfaceFormat (arg1));
 }
 
@@ -208,7 +208,7 @@ static void _call_f_operator_eq__2724 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSurfaceFormat &arg1 = args.read<const QSurfaceFormat & > (heap);
+  const QSurfaceFormat &arg1 = gsi::arg_reader<const QSurfaceFormat & >() (args, heap);
   ret.write<QSurfaceFormat & > ((QSurfaceFormat &)((QSurfaceFormat *)cls)->operator= (arg1));
 }
 
@@ -302,7 +302,7 @@ static void _call_f_setAlphaBufferSize_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setAlphaBufferSize (arg1);
 }
@@ -322,7 +322,7 @@ static void _call_f_setBlueBufferSize_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setBlueBufferSize (arg1);
 }
@@ -342,7 +342,7 @@ static void _call_f_setDepthBufferSize_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setDepthBufferSize (arg1);
 }
@@ -362,7 +362,7 @@ static void _call_f_setGreenBufferSize_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setGreenBufferSize (arg1);
 }
@@ -382,7 +382,7 @@ static void _call_f_setMajorVersion_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setMajorVersion (arg1);
 }
@@ -402,7 +402,7 @@ static void _call_f_setMinorVersion_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setMinorVersion (arg1);
 }
@@ -422,7 +422,7 @@ static void _call_f_setOption_3909 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QSurfaceFormat::FormatOption> arg1 = args.read<QFlags<QSurfaceFormat::FormatOption> > (heap);
+  QFlags<QSurfaceFormat::FormatOption> arg1 = gsi::arg_reader<QFlags<QSurfaceFormat::FormatOption> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setOption (arg1);
 }
@@ -444,8 +444,8 @@ static void _call_f_setOption_3969 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSurfaceFormat::FormatOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QSurfaceFormat::FormatOption>::target_type & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<QSurfaceFormat::FormatOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSurfaceFormat::FormatOption>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setOption (qt_gsi::QtToCppAdaptor<QSurfaceFormat::FormatOption>(arg1).cref(), arg2);
 }
@@ -465,7 +465,7 @@ static void _call_f_setOptions_3909 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QSurfaceFormat::FormatOption> arg1 = args.read<QFlags<QSurfaceFormat::FormatOption> > (heap);
+  QFlags<QSurfaceFormat::FormatOption> arg1 = gsi::arg_reader<QFlags<QSurfaceFormat::FormatOption> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setOptions (arg1);
 }
@@ -485,7 +485,7 @@ static void _call_f_setProfile_3974 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSurfaceFormat::OpenGLContextProfile>::target_type & arg1 = args.read<const qt_gsi::Converter<QSurfaceFormat::OpenGLContextProfile>::target_type & > (heap);
+  const qt_gsi::Converter<QSurfaceFormat::OpenGLContextProfile>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSurfaceFormat::OpenGLContextProfile>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setProfile (qt_gsi::QtToCppAdaptor<QSurfaceFormat::OpenGLContextProfile>(arg1).cref());
 }
@@ -505,7 +505,7 @@ static void _call_f_setRedBufferSize_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setRedBufferSize (arg1);
 }
@@ -525,7 +525,7 @@ static void _call_f_setRenderableType_3393 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSurfaceFormat::RenderableType>::target_type & arg1 = args.read<const qt_gsi::Converter<QSurfaceFormat::RenderableType>::target_type & > (heap);
+  const qt_gsi::Converter<QSurfaceFormat::RenderableType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSurfaceFormat::RenderableType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setRenderableType (qt_gsi::QtToCppAdaptor<QSurfaceFormat::RenderableType>(arg1).cref());
 }
@@ -545,7 +545,7 @@ static void _call_f_setSamples_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setSamples (arg1);
 }
@@ -565,7 +565,7 @@ static void _call_f_setStencilBufferSize_767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setStencilBufferSize (arg1);
 }
@@ -585,7 +585,7 @@ static void _call_f_setStereo_864 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setStereo (arg1);
 }
@@ -605,7 +605,7 @@ static void _call_f_setSwapBehavior_3190 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSurfaceFormat::SwapBehavior>::target_type & arg1 = args.read<const qt_gsi::Converter<QSurfaceFormat::SwapBehavior>::target_type & > (heap);
+  const qt_gsi::Converter<QSurfaceFormat::SwapBehavior>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSurfaceFormat::SwapBehavior>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setSwapBehavior (qt_gsi::QtToCppAdaptor<QSurfaceFormat::SwapBehavior>(arg1).cref());
 }
@@ -625,7 +625,7 @@ static void _call_f_setSwapInterval_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setSwapInterval (arg1);
 }
@@ -647,8 +647,8 @@ static void _call_f_setVersion_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setVersion (arg1, arg2);
 }
@@ -728,7 +728,7 @@ static void _call_f_testOption_c3909 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QSurfaceFormat::FormatOption> arg1 = args.read<QFlags<QSurfaceFormat::FormatOption> > (heap);
+  QFlags<QSurfaceFormat::FormatOption> arg1 = gsi::arg_reader<QFlags<QSurfaceFormat::FormatOption> >() (args, heap);
   ret.write<bool > ((bool)((QSurfaceFormat *)cls)->testOption (arg1));
 }
 
@@ -747,7 +747,7 @@ static void _call_f_testOption_c3213 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSurfaceFormat::FormatOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QSurfaceFormat::FormatOption>::target_type & > (heap);
+  const qt_gsi::Converter<QSurfaceFormat::FormatOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSurfaceFormat::FormatOption>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QSurfaceFormat *)cls)->testOption (qt_gsi::QtToCppAdaptor<QSurfaceFormat::FormatOption>(arg1).cref()));
 }
 
@@ -796,7 +796,7 @@ static void _call_f_setDefaultFormat_2724 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSurfaceFormat &arg1 = args.read<const QSurfaceFormat & > (heap);
+  const QSurfaceFormat &arg1 = gsi::arg_reader<const QSurfaceFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QSurfaceFormat::setDefaultFormat (arg1);
 }

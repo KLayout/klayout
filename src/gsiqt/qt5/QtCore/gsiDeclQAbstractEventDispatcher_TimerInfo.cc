@@ -54,9 +54,9 @@ static void _call_ctor_QAbstractEventDispatcher_TimerInfo_2998 (const qt_gsi::Ge
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::TimerType>::target_type & arg3 = args.read<const qt_gsi::Converter<Qt::TimerType>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::TimerType>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimerType>::target_type & >() (args, heap);
   ret.write<QAbstractEventDispatcher::TimerInfo *> (new QAbstractEventDispatcher::TimerInfo (arg1, arg2, qt_gsi::QtToCppAdaptor<Qt::TimerType>(arg3).cref()));
 }
 

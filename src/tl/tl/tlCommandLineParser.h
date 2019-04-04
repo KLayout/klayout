@@ -82,7 +82,7 @@ public:
    *    "*..."                    - Multiple occurances allowed - values needs to be
    *                                an array and values are accumulated. Without *, the
    *                                value string is evaluated to a comma-separated list.
-   *                                "*" means one occurance at least unless combined with "?".
+   *                                "*" means one occurrence at least unless combined with "?".
    */
   ArgBase (const std::string &option, const std::string &brief_doc, const std::string &long_doc);
 

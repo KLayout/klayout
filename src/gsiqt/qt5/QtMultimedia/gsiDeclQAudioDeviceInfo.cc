@@ -66,7 +66,7 @@ static void _call_ctor_QAudioDeviceInfo_2880 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioDeviceInfo &arg1 = args.read<const QAudioDeviceInfo & > (heap);
+  const QAudioDeviceInfo &arg1 = gsi::arg_reader<const QAudioDeviceInfo & >() (args, heap);
   ret.write<QAudioDeviceInfo *> (new QAudioDeviceInfo (arg1));
 }
 
@@ -100,7 +100,7 @@ static void _call_f_isFormatSupported_c2509 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioFormat &arg1 = args.read<const QAudioFormat & > (heap);
+  const QAudioFormat &arg1 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
   ret.write<bool > ((bool)((QAudioDeviceInfo *)cls)->isFormatSupported (arg1));
 }
 
@@ -134,7 +134,7 @@ static void _call_f_nearestFormat_c2509 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioFormat &arg1 = args.read<const QAudioFormat & > (heap);
+  const QAudioFormat &arg1 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
   ret.write<QAudioFormat > ((QAudioFormat)((QAudioDeviceInfo *)cls)->nearestFormat (arg1));
 }
 
@@ -153,7 +153,7 @@ static void _call_f_operator_excl__eq__c2880 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioDeviceInfo &arg1 = args.read<const QAudioDeviceInfo & > (heap);
+  const QAudioDeviceInfo &arg1 = gsi::arg_reader<const QAudioDeviceInfo & >() (args, heap);
   ret.write<bool > ((bool)((QAudioDeviceInfo *)cls)->operator!= (arg1));
 }
 
@@ -172,7 +172,7 @@ static void _call_f_operator_eq__2880 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioDeviceInfo &arg1 = args.read<const QAudioDeviceInfo & > (heap);
+  const QAudioDeviceInfo &arg1 = gsi::arg_reader<const QAudioDeviceInfo & >() (args, heap);
   ret.write<QAudioDeviceInfo & > ((QAudioDeviceInfo &)((QAudioDeviceInfo *)cls)->operator= (arg1));
 }
 
@@ -191,7 +191,7 @@ static void _call_f_operator_eq__eq__c2880 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioDeviceInfo &arg1 = args.read<const QAudioDeviceInfo & > (heap);
+  const QAudioDeviceInfo &arg1 = gsi::arg_reader<const QAudioDeviceInfo & >() (args, heap);
   ret.write<bool > ((bool)((QAudioDeviceInfo *)cls)->operator== (arg1));
 }
 
@@ -315,7 +315,7 @@ static void _call_f_availableDevices_1520 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAudio::Mode>::target_type & arg1 = args.read<const qt_gsi::Converter<QAudio::Mode>::target_type & > (heap);
+  const qt_gsi::Converter<QAudio::Mode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Mode>::target_type & >() (args, heap);
   ret.write<QList<QAudioDeviceInfo> > ((QList<QAudioDeviceInfo>)QAudioDeviceInfo::availableDevices (qt_gsi::QtToCppAdaptor<QAudio::Mode>(arg1).cref()));
 }
 

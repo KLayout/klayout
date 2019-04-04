@@ -143,7 +143,7 @@ static void _call_f_dateTextFormat_c1776 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ret.write<QTextCharFormat > ((QTextCharFormat)((QCalendarWidget *)cls)->dateTextFormat (arg1));
 }
 
@@ -359,8 +359,8 @@ static void _call_f_setCurrentPage_1426 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setCurrentPage (arg1, arg2);
 }
@@ -380,7 +380,7 @@ static void _call_f_setDateEditAcceptDelay_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setDateEditAcceptDelay (arg1);
 }
@@ -400,7 +400,7 @@ static void _call_f_setDateEditEnabled_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setDateEditEnabled (arg1);
 }
@@ -422,8 +422,8 @@ static void _call_f_setDateRange_3444 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
-  const QDate &arg2 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
+  const QDate &arg2 = gsi::arg_reader<const QDate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setDateRange (arg1, arg2);
 }
@@ -445,8 +445,8 @@ static void _call_f_setDateTextFormat_4482 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
-  const QTextCharFormat &arg2 = args.read<const QTextCharFormat & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
+  const QTextCharFormat &arg2 = gsi::arg_reader<const QTextCharFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setDateTextFormat (arg1, arg2);
 }
@@ -466,7 +466,7 @@ static void _call_f_setFirstDayOfWeek_1612 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::DayOfWeek>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::DayOfWeek>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::DayOfWeek>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::DayOfWeek>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setFirstDayOfWeek (qt_gsi::QtToCppAdaptor<Qt::DayOfWeek>(arg1).cref());
 }
@@ -486,7 +486,7 @@ static void _call_f_setGridVisible_864 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setGridVisible (arg1);
 }
@@ -506,7 +506,7 @@ static void _call_f_setHeaderTextFormat_2814 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCharFormat &arg1 = args.read<const QTextCharFormat & > (heap);
+  const QTextCharFormat &arg1 = gsi::arg_reader<const QTextCharFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setHeaderTextFormat (arg1);
 }
@@ -526,7 +526,7 @@ static void _call_f_setHeaderVisible_864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setHeaderVisible (arg1);
 }
@@ -546,7 +546,7 @@ static void _call_f_setHorizontalHeaderFormat_4307 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCalendarWidget::HorizontalHeaderFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<QCalendarWidget::HorizontalHeaderFormat>::target_type & > (heap);
+  const qt_gsi::Converter<QCalendarWidget::HorizontalHeaderFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCalendarWidget::HorizontalHeaderFormat>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setHorizontalHeaderFormat (qt_gsi::QtToCppAdaptor<QCalendarWidget::HorizontalHeaderFormat>(arg1).cref());
 }
@@ -566,7 +566,7 @@ static void _call_f_setMaximumDate_1776 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setMaximumDate (arg1);
 }
@@ -586,7 +586,7 @@ static void _call_f_setMinimumDate_1776 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setMinimumDate (arg1);
 }
@@ -606,7 +606,7 @@ static void _call_f_setNavigationBarVisible_864 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setNavigationBarVisible (arg1);
 }
@@ -626,7 +626,7 @@ static void _call_f_setSelectedDate_1776 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setSelectedDate (arg1);
 }
@@ -646,7 +646,7 @@ static void _call_f_setSelectionMode_3362 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCalendarWidget::SelectionMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCalendarWidget::SelectionMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCalendarWidget::SelectionMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCalendarWidget::SelectionMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setSelectionMode (qt_gsi::QtToCppAdaptor<QCalendarWidget::SelectionMode>(arg1).cref());
 }
@@ -666,7 +666,7 @@ static void _call_f_setVerticalHeaderFormat_4067 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCalendarWidget::VerticalHeaderFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<QCalendarWidget::VerticalHeaderFormat>::target_type & > (heap);
+  const qt_gsi::Converter<QCalendarWidget::VerticalHeaderFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCalendarWidget::VerticalHeaderFormat>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setVerticalHeaderFormat (qt_gsi::QtToCppAdaptor<QCalendarWidget::VerticalHeaderFormat>(arg1).cref());
 }
@@ -688,8 +688,8 @@ static void _call_f_setWeekdayTextFormat_4318 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::DayOfWeek>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::DayOfWeek>::target_type & > (heap);
-  const QTextCharFormat &arg2 = args.read<const QTextCharFormat & > (heap);
+  const qt_gsi::Converter<Qt::DayOfWeek>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::DayOfWeek>::target_type & >() (args, heap);
+  const QTextCharFormat &arg2 = gsi::arg_reader<const QTextCharFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget *)cls)->setWeekdayTextFormat (qt_gsi::QtToCppAdaptor<Qt::DayOfWeek>(arg1).cref(), arg2);
 }
@@ -835,7 +835,7 @@ static void _call_f_weekdayTextFormat_c1612 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::DayOfWeek>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::DayOfWeek>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::DayOfWeek>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::DayOfWeek>::target_type & >() (args, heap);
   ret.write<QTextCharFormat > ((QTextCharFormat)((QCalendarWidget *)cls)->weekdayTextFormat (qt_gsi::QtToCppAdaptor<Qt::DayOfWeek>(arg1).cref()));
 }
 
@@ -871,8 +871,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QCalendarWidget::tr (arg1, arg2));
 }
 
@@ -895,9 +895,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QCalendarWidget::tr (arg1, arg2, arg3));
 }
 
@@ -918,8 +918,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QCalendarWidget::trUtf8 (arg1, arg2));
 }
 
@@ -942,9 +942,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QCalendarWidget::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1895,7 +1895,7 @@ static void _call_ctor_QCalendarWidget_Adaptor_1315 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QCalendarWidget_Adaptor *> (new QCalendarWidget_Adaptor (arg1));
 }
 
@@ -1937,7 +1937,7 @@ static void _call_emitter_activated_1776 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ((QCalendarWidget_Adaptor *)cls)->emitter_QCalendarWidget_activated_1776 (arg1);
 }
 
@@ -2003,7 +2003,7 @@ static void _call_emitter_clicked_1776 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ((QCalendarWidget_Adaptor *)cls)->emitter_QCalendarWidget_clicked_1776 (arg1);
 }
 
@@ -2073,9 +2073,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget_Adaptor *)cls)->fp_QCalendarWidget_create_2208 (arg1, arg2, arg3);
 }
@@ -2096,8 +2096,8 @@ static void _call_emitter_currentPageChanged_1426 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QCalendarWidget_Adaptor *)cls)->emitter_QCalendarWidget_currentPageChanged_1426 (arg1, arg2);
 }
 
@@ -2115,7 +2115,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QCalendarWidget_Adaptor *)cls)->emitter_QCalendarWidget_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2159,8 +2159,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget_Adaptor *)cls)->fp_QCalendarWidget_destroy_1620 (arg1, arg2);
 }
@@ -2179,7 +2179,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QCalendarWidget_Adaptor *)cls)->emitter_QCalendarWidget_destroyed_1302 (arg1);
 }
 
@@ -2982,7 +2982,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QCalendarWidget_Adaptor *)cls)->fp_QCalendarWidget_receivers_c1731 (arg1));
 }
 
@@ -3206,7 +3206,7 @@ static void _call_fp_updateCell_1776 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCalendarWidget_Adaptor *)cls)->fp_QCalendarWidget_updateCell_1776 (arg1);
 }

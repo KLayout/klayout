@@ -81,7 +81,7 @@ static void _call_ctor_QDomNotation_2526 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNotation &arg1 = args.read<const QDomNotation & > (heap);
+  const QDomNotation &arg1 = gsi::arg_reader<const QDomNotation & >() (args, heap);
   ret.write<QDomNotation *> (new QDomNotation (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_operator_eq__2526 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomNotation &arg1 = args.read<const QDomNotation & > (heap);
+  const QDomNotation &arg1 = gsi::arg_reader<const QDomNotation & >() (args, heap);
   ret.write<QDomNotation & > ((QDomNotation &)((QDomNotation *)cls)->operator= (arg1));
 }
 

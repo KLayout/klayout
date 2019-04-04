@@ -51,7 +51,7 @@ static void _call_ctor_QEasingCurve_2167 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEasingCurve::Type>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QEasingCurve::Type>::target_type & > (heap) : (const qt_gsi::Converter<QEasingCurve::Type>::target_type &)(qt_gsi::CppToQtReadAdaptor<QEasingCurve::Type>(heap, QEasingCurve::Linear));
+  const qt_gsi::Converter<QEasingCurve::Type>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QEasingCurve::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QEasingCurve::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QEasingCurve::Type>(heap, QEasingCurve::Linear), heap);
   ret.write<QEasingCurve *> (new QEasingCurve (qt_gsi::QtToCppAdaptor<QEasingCurve::Type>(arg1).cref()));
 }
 
@@ -70,7 +70,7 @@ static void _call_ctor_QEasingCurve_2510 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   ret.write<QEasingCurve *> (new QEasingCurve (arg1));
 }
 
@@ -93,9 +93,9 @@ static void _call_f_addCubicBezierSegment_5742 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  const QPointF &arg3 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->addCubicBezierSegment (arg1, arg2, arg3);
 }
@@ -121,10 +121,10 @@ static void _call_f_addTCBSegment_4875 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->addTCBSegment (arg1, arg2, arg3, arg4);
 }
@@ -159,7 +159,7 @@ static void _call_f_operator_excl__eq__c2510 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   ret.write<bool > ((bool)((QEasingCurve *)cls)->operator!= (arg1));
 }
 
@@ -178,7 +178,7 @@ static void _call_f_operator_eq__2510 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   ret.write<QEasingCurve & > ((QEasingCurve &)((QEasingCurve *)cls)->operator= (arg1));
 }
 
@@ -197,7 +197,7 @@ static void _call_f_operator_eq__eq__c2510 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QEasingCurve &arg1 = args.read<const QEasingCurve & > (heap);
+  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   ret.write<bool > ((bool)((QEasingCurve *)cls)->operator== (arg1));
 }
 
@@ -246,7 +246,7 @@ static void _call_f_setAmplitude_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->setAmplitude (arg1);
 }
@@ -266,7 +266,7 @@ static void _call_f_setOvershoot_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->setOvershoot (arg1);
 }
@@ -286,7 +286,7 @@ static void _call_f_setPeriod_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->setPeriod (arg1);
 }
@@ -306,7 +306,7 @@ static void _call_f_setType_2167 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEasingCurve::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEasingCurve::Type>::target_type & > (heap);
+  const qt_gsi::Converter<QEasingCurve::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEasingCurve::Type>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->setType (qt_gsi::QtToCppAdaptor<QEasingCurve::Type>(arg1).cref());
 }
@@ -326,7 +326,7 @@ static void _call_f_swap_1815 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEasingCurve &arg1 = args.read<QEasingCurve & > (heap);
+  QEasingCurve &arg1 = gsi::arg_reader<QEasingCurve & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QEasingCurve *)cls)->swap (arg1);
 }
@@ -376,7 +376,7 @@ static void _call_f_valueForProgress_c1071 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<double > ((double)((QEasingCurve *)cls)->valueForProgress (arg1));
 }
 

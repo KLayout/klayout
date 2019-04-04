@@ -81,7 +81,7 @@ static void _call_ctor_QDomDocumentType_2931 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomDocumentType &arg1 = args.read<const QDomDocumentType & > (heap);
+  const QDomDocumentType &arg1 = gsi::arg_reader<const QDomDocumentType & >() (args, heap);
   ret.write<QDomDocumentType *> (new QDomDocumentType (arg1));
 }
 
@@ -175,7 +175,7 @@ static void _call_f_operator_eq__2931 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomDocumentType &arg1 = args.read<const QDomDocumentType & > (heap);
+  const QDomDocumentType &arg1 = gsi::arg_reader<const QDomDocumentType & >() (args, heap);
   ret.write<QDomDocumentType & > ((QDomDocumentType &)((QDomDocumentType *)cls)->operator= (arg1));
 }
 

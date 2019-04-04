@@ -49,7 +49,7 @@ BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
 local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>::on_empty_intruder_mode
 BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
-  return m_is_and ? local_operation::Drop : local_operation::Copy;
+  return m_is_and ? Drop : Copy;
 }
 
 std::string
@@ -166,7 +166,7 @@ void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const sh
 
 SelfOverlapMergeLocalOperation::on_empty_intruder_mode SelfOverlapMergeLocalOperation::on_empty_intruder_hint () const
 {
-  return m_wrap_count > 1 ? local_operation::Drop : local_operation::Copy;
+  return m_wrap_count > 1 ? Drop : Copy;
 }
 
 std::string SelfOverlapMergeLocalOperation::description () const
@@ -186,7 +186,7 @@ EdgeBoolAndOrNotLocalOperation::EdgeBoolAndOrNotLocalOperation (bool is_and)
 local_operation<db::Edge, db::Edge, db::Edge>::on_empty_intruder_mode
 EdgeBoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
-  return m_is_and ? local_operation::Drop : local_operation::Copy;
+  return m_is_and ? Drop : Copy;
 }
 
 std::string
@@ -253,7 +253,7 @@ EdgeToPolygonLocalOperation::EdgeToPolygonLocalOperation (bool outside, bool inc
 local_operation<db::Edge, db::PolygonRef, db::Edge>::on_empty_intruder_mode
 EdgeToPolygonLocalOperation::on_empty_intruder_hint () const
 {
-  return m_outside ? local_operation::Copy : local_operation::Drop;
+  return m_outside ? Copy : Drop;
 }
 
 std::string

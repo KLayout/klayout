@@ -33,7 +33,7 @@ namespace tl
 /**
  *  @brief A helper compare function for the interval map
  *
- *  This version will also finds preceeding intervals
+ *  This version will also finds preceding intervals
  */
 template <class I>
 class is_compare_f
@@ -48,7 +48,7 @@ public:
 /**
  *  @brief A helper compare function for the interval map 
  *
- *  This version will not find preceeding intervals
+ *  This version will not find preceding intervals
  */
 template <class I>
 class is_compare_f2

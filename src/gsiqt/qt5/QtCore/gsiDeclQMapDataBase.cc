@@ -72,10 +72,10 @@ static void _call_f_createNode_3832 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  QMapNodeBase *arg3 = args.read<QMapNodeBase * > (heap);
-  bool arg4 = args.read<bool > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QMapNodeBase *arg3 = gsi::arg_reader<QMapNodeBase * >() (args, heap);
+  bool arg4 = gsi::arg_reader<bool >() (args, heap);
   ret.write<QMapNodeBase * > ((QMapNodeBase *)((QMapDataBase *)cls)->createNode (arg1, arg2, arg3, arg4));
 }
 
@@ -94,7 +94,7 @@ static void _call_f_freeNodeAndRebalance_1758 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMapNodeBase *arg1 = args.read<QMapNodeBase * > (heap);
+  QMapNodeBase *arg1 = gsi::arg_reader<QMapNodeBase * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMapDataBase *)cls)->freeNodeAndRebalance (arg1);
 }
@@ -116,8 +116,8 @@ static void _call_f_freeTree_2417 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMapNodeBase *arg1 = args.read<QMapNodeBase * > (heap);
-  int arg2 = args.read<int > (heap);
+  QMapNodeBase *arg1 = gsi::arg_reader<QMapNodeBase * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMapDataBase *)cls)->freeTree (arg1, arg2);
 }
@@ -137,7 +137,7 @@ static void _call_f_rebalance_1758 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMapNodeBase *arg1 = args.read<QMapNodeBase * > (heap);
+  QMapNodeBase *arg1 = gsi::arg_reader<QMapNodeBase * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMapDataBase *)cls)->rebalance (arg1);
 }
@@ -173,7 +173,7 @@ static void _call_f_rotateLeft_1758 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMapNodeBase *arg1 = args.read<QMapNodeBase * > (heap);
+  QMapNodeBase *arg1 = gsi::arg_reader<QMapNodeBase * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMapDataBase *)cls)->rotateLeft (arg1);
 }
@@ -193,7 +193,7 @@ static void _call_f_rotateRight_1758 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMapNodeBase *arg1 = args.read<QMapNodeBase * > (heap);
+  QMapNodeBase *arg1 = gsi::arg_reader<QMapNodeBase * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMapDataBase *)cls)->rotateRight (arg1);
 }
@@ -228,7 +228,7 @@ static void _call_f_freeData_1746 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMapDataBase *arg1 = args.read<QMapDataBase * > (heap);
+  QMapDataBase *arg1 = gsi::arg_reader<QMapDataBase * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QMapDataBase::freeData (arg1);
 }

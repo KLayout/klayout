@@ -71,9 +71,9 @@ static void _call_ctor_QVector3D_2694 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
-  float arg2 = args.read<float > (heap);
-  float arg3 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
+  float arg3 = gsi::arg_reader<float >() (args, heap);
   ret.write<QVector3D *> (new QVector3D (arg1, arg2, arg3));
 }
 
@@ -92,7 +92,7 @@ static void _call_ctor_QVector3D_1916 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QVector3D *> (new QVector3D (arg1));
 }
 
@@ -111,7 +111,7 @@ static void _call_ctor_QVector3D_1986 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QVector3D *> (new QVector3D (arg1));
 }
 
@@ -130,7 +130,7 @@ static void _call_ctor_QVector3D_2139 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector2D &arg1 = args.read<const QVector2D & > (heap);
+  const QVector2D &arg1 = gsi::arg_reader<const QVector2D & >() (args, heap);
   ret.write<QVector3D *> (new QVector3D (arg1));
 }
 
@@ -151,8 +151,8 @@ static void _call_ctor_QVector3D_3001 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector2D &arg1 = args.read<const QVector2D & > (heap);
-  float arg2 = args.read<float > (heap);
+  const QVector2D &arg1 = gsi::arg_reader<const QVector2D & >() (args, heap);
+  float arg2 = gsi::arg_reader<float >() (args, heap);
   ret.write<QVector3D *> (new QVector3D (arg1, arg2));
 }
 
@@ -171,7 +171,7 @@ static void _call_ctor_QVector3D_2141 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector4D &arg1 = args.read<const QVector4D & > (heap);
+  const QVector4D &arg1 = gsi::arg_reader<const QVector4D & >() (args, heap);
   ret.write<QVector3D *> (new QVector3D (arg1));
 }
 
@@ -192,8 +192,8 @@ static void _call_f_distanceToLine_c4172 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg2 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg2 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<float > ((float)((QVector3D *)cls)->distanceToLine (arg1, arg2));
 }
 
@@ -214,8 +214,8 @@ static void _call_f_distanceToPlane_c4172 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg2 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg2 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<float > ((float)((QVector3D *)cls)->distanceToPlane (arg1, arg2));
 }
 
@@ -238,9 +238,9 @@ static void _call_f_distanceToPlane_c6204 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg2 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg3 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg2 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg3 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<float > ((float)((QVector3D *)cls)->distanceToPlane (arg1, arg2, arg3));
 }
 
@@ -259,7 +259,7 @@ static void _call_f_distanceToPoint_c2140 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<float > ((float)((QVector3D *)cls)->distanceToPoint (arg1));
 }
 
@@ -354,7 +354,7 @@ static void _call_f_operator_star__eq__970 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   ret.write<QVector3D & > ((QVector3D &)((QVector3D *)cls)->operator*= (arg1));
 }
 
@@ -373,7 +373,7 @@ static void _call_f_operator_star__eq__2140 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector3D & > ((QVector3D &)((QVector3D *)cls)->operator*= (arg1));
 }
 
@@ -392,7 +392,7 @@ static void _call_f_operator_plus__eq__2140 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector3D & > ((QVector3D &)((QVector3D *)cls)->operator+= (arg1));
 }
 
@@ -411,7 +411,7 @@ static void _call_f_operator_minus__eq__2140 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector3D & > ((QVector3D &)((QVector3D *)cls)->operator-= (arg1));
 }
 
@@ -430,7 +430,7 @@ static void _call_f_operator_slash__eq__970 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   ret.write<QVector3D & > ((QVector3D &)((QVector3D *)cls)->operator/= (arg1));
 }
 
@@ -449,7 +449,7 @@ static void _call_f_operator_slash__eq__2140 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector3D & > ((QVector3D &)((QVector3D *)cls)->operator/= (arg1));
 }
 
@@ -468,7 +468,7 @@ static void _call_f_operator_index__767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<float & > ((float &)((QVector3D *)cls)->operator[] (arg1));
 }
 
@@ -487,7 +487,7 @@ static void _call_f_operator_index__c767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<float > ((float)((QVector3D *)cls)->operator[] (arg1));
 }
 
@@ -510,9 +510,9 @@ static void _call_f_project_c6070 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix4x4 &arg1 = args.read<const QMatrix4x4 & > (heap);
-  const QMatrix4x4 &arg2 = args.read<const QMatrix4x4 & > (heap);
-  const QRect &arg3 = args.read<const QRect & > (heap);
+  const QMatrix4x4 &arg1 = gsi::arg_reader<const QMatrix4x4 & >() (args, heap);
+  const QMatrix4x4 &arg2 = gsi::arg_reader<const QMatrix4x4 & >() (args, heap);
+  const QRect &arg3 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QVector3D > ((QVector3D)((QVector3D *)cls)->project (arg1, arg2, arg3));
 }
 
@@ -531,7 +531,7 @@ static void _call_f_setX_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVector3D *)cls)->setX (arg1);
 }
@@ -551,7 +551,7 @@ static void _call_f_setY_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVector3D *)cls)->setY (arg1);
 }
@@ -571,7 +571,7 @@ static void _call_f_setZ_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVector3D *)cls)->setZ (arg1);
 }
@@ -655,9 +655,9 @@ static void _call_f_unproject_c6070 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMatrix4x4 &arg1 = args.read<const QMatrix4x4 & > (heap);
-  const QMatrix4x4 &arg2 = args.read<const QMatrix4x4 & > (heap);
-  const QRect &arg3 = args.read<const QRect & > (heap);
+  const QMatrix4x4 &arg1 = gsi::arg_reader<const QMatrix4x4 & >() (args, heap);
+  const QMatrix4x4 &arg2 = gsi::arg_reader<const QMatrix4x4 & >() (args, heap);
+  const QRect &arg3 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QVector3D > ((QVector3D)((QVector3D *)cls)->unproject (arg1, arg2, arg3));
 }
 
@@ -723,8 +723,8 @@ static void _call_f_crossProduct_4172 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg2 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg2 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector3D > ((QVector3D)QVector3D::crossProduct (arg1, arg2));
 }
 
@@ -745,8 +745,8 @@ static void _call_f_dotProduct_4172 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg2 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg2 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<float > ((float)QVector3D::dotProduct (arg1, arg2));
 }
 
@@ -767,8 +767,8 @@ static void _call_f_normal_4172 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg2 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg2 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector3D > ((QVector3D)QVector3D::normal (arg1, arg2));
 }
 
@@ -791,9 +791,9 @@ static void _call_f_normal_6204 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector3D &arg1 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg2 = args.read<const QVector3D & > (heap);
-  const QVector3D &arg3 = args.read<const QVector3D & > (heap);
+  const QVector3D &arg1 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg2 = gsi::arg_reader<const QVector3D & >() (args, heap);
+  const QVector3D &arg3 = gsi::arg_reader<const QVector3D & >() (args, heap);
   ret.write<QVector3D > ((QVector3D)QVector3D::normal (arg1, arg2, arg3));
 }
 

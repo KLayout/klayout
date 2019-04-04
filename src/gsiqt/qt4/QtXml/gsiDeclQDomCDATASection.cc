@@ -81,7 +81,7 @@ static void _call_ctor_QDomCDATASection_2756 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomCDATASection &arg1 = args.read<const QDomCDATASection & > (heap);
+  const QDomCDATASection &arg1 = gsi::arg_reader<const QDomCDATASection & >() (args, heap);
   ret.write<QDomCDATASection *> (new QDomCDATASection (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_operator_eq__2756 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomCDATASection &arg1 = args.read<const QDomCDATASection & > (heap);
+  const QDomCDATASection &arg1 = gsi::arg_reader<const QDomCDATASection & >() (args, heap);
   ret.write<QDomCDATASection & > ((QDomCDATASection &)((QDomCDATASection *)cls)->operator= (arg1));
 }
 

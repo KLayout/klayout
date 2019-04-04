@@ -295,7 +295,7 @@ public:
   /**
    *  @brief Fill the layer properties for a new layer
    *
-   *  The layer's source must be set already to allow to compute the initial color.
+   *  The layer's source must be set already to allow computing of the initial color.
    *  It is assumed that the layer is appended at the end of the layer list. This
    *  is important to set the dither pattern index accordingly.
    */
@@ -798,7 +798,7 @@ public:
    *
    *  @param fn The file to load
    *
-   *  This version allows to specify whether defaults should be used for all other layers by 
+   *  This version allows one to specify whether defaults should be used for all other layers by 
    *  setting add_default to true
    */
   void load_layer_props (const std::string &fn, bool add_default);
@@ -808,7 +808,7 @@ public:
    *
    *  @param fn The file to load
    *
-   *  This version allows to specify whether defaults should be used for all other layers by 
+   *  This version allows one to specify whether defaults should be used for all other layers by 
    *  setting add_default to true. In addition, this version will apply the .lyp definitions
    *  to a specific cellview after removing all definitions for this one. If cv_index is set
    *  to -1, the .lyp file will be applied to each cellview. In any case, the cv index specs
@@ -1366,7 +1366,7 @@ public:
    *  @brief Create a new, empty layout using the specified technology
    *
    *  The add_cellview param controls whether to create a new cellview
-   *  or clear all cellviews before. This version allows to specify whether layer properties shall be created.
+   *  or clear all cellviews before. This version allows one to specify whether layer properties shall be created.
    *
    *  @return The index of the cellview created.
    */
@@ -1378,7 +1378,7 @@ public:
    *  The add_cellview param controls whether to add the layout as a new cellview
    *  or clear all cellviews before.
    *
-   *  The "initialize_layers" parameter allows to specify whether the layer properties shall be initialized.
+   *  The "initialize_layers" parameter allows one to specify whether the layer properties shall be initialized.
    *
    *  @return The index of the cellview loaded.
    */
@@ -1451,7 +1451,7 @@ public:
    *  @brief Set the path to the current cell
    *
    *  The current cell is the one highlighted in the browser with the focus rectangle. The
-   *  cell given by the path is hightlighted and scrolled into view.
+   *  cell given by the path is highlighted and scrolled into view.
    */
   void set_current_cell_path (int cv_index, const cell_path_type &path);
   

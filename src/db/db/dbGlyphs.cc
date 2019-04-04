@@ -36,6 +36,9 @@
 
 #include <cctype>
 
+//  compiled with "scripts/compile_glyphs.rb":
+#include "glyphs.cc_gen"
+
 namespace db
 {
 
@@ -155,13 +158,21 @@ TextGenerator::load_from_resource (const std::string &name)
 
   QByteArray data = qUncompress (QByteArray ((const char *) res.data (), int (res.size ())));
 
+  load_from_data (data.constData (), data.size (), tl::to_string (QFileInfo (tl::to_qstring (name)).baseName ()), name);
+}
+#endif
+
+void
+TextGenerator::load_from_data (const char *data, size_t ndata, const std::string &name, const std::string &description)
+{
   db::Layout layout;
-  tl::InputMemoryStream memory_stream (data.constData (), data.size ());
+  tl::InputMemoryStream memory_stream (data, ndata);
   tl::InputStream stream (memory_stream);
   db::Reader reader (stream);
   db::LayerMap map = reader.read (layout);
 
-  m_description = name;
+  m_description = description;
+  m_name = name;
 
   std::pair<bool, unsigned int> l1 = map.logical (db::LDPair (1, 0));
   std::pair<bool, unsigned int> l2 = map.logical (db::LDPair (2, 0));
@@ -170,10 +181,7 @@ TextGenerator::load_from_resource (const std::string &name)
   if (l1.first && l2.first) {
     read_from_layout (layout, l1.second, l2.second, l3.second);
   }
-
-  m_name = tl::to_string (QFileInfo (tl::to_qstring (name)).baseName ());
 }
-#endif
 
 void
 TextGenerator::load_from_file (const std::string &filename)
@@ -323,22 +331,8 @@ TextGenerator::generators ()
 
     s_fonts.clear ();
 
-#if defined(HAVE_QT)
-    const char *resources[] = {
-      ":/fonts/std_font.gds"
-    };
-
-    for (size_t i = 0 ; i < sizeof (resources) / sizeof (resources [0]); ++i) {
-      try {
-        tl::log << "Loading font from resource " << resources [i] << " ..";
-        s_fonts.push_back (TextGenerator ());
-        s_fonts.back ().load_from_resource (resources [i]);
-      } catch (tl::Exception &ex) {
-        tl::error << ex.msg ();
-        s_fonts.pop_back ();
-      }
-    }
-#endif
+    //  load the compiled-in glyphs
+    load_glyphs (s_fonts);
 
     //  scan for font files
     for (std::vector<std::string>::const_iterator p = s_font_paths.begin (); p != s_font_paths.end (); ++p) {

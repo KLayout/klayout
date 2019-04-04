@@ -349,7 +349,7 @@ static void _call_f_event_1217 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<bool > ((bool)((QDateTimeEdit *)cls)->event (arg1));
 }
 
@@ -458,7 +458,7 @@ static void _call_f_sectionAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<qt_gsi::Converter<QDateTimeEdit::Section>::target_type > ((qt_gsi::Converter<QDateTimeEdit::Section>::target_type)qt_gsi::CppToQtAdaptor<QDateTimeEdit::Section>(((QDateTimeEdit *)cls)->sectionAt (arg1)));
 }
 
@@ -492,7 +492,7 @@ static void _call_f_sectionText_c2529 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & arg1 = args.read<const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & > (heap);
+  const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & >() (args, heap);
   ret.write<QString > ((QString)((QDateTimeEdit *)cls)->sectionText (qt_gsi::QtToCppAdaptor<QDateTimeEdit::Section>(arg1).cref()));
 }
 
@@ -511,7 +511,7 @@ static void _call_f_setCalendarPopup_864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setCalendarPopup (arg1);
 }
@@ -531,7 +531,7 @@ static void _call_f_setCalendarWidget_2109 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QCalendarWidget *arg1 = args.read<QCalendarWidget * > (heap);
+  QCalendarWidget *arg1 = gsi::arg_reader<QCalendarWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setCalendarWidget (arg1);
 }
@@ -551,7 +551,7 @@ static void _call_f_setCurrentSection_2529 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & arg1 = args.read<const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & > (heap);
+  const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setCurrentSection (qt_gsi::QtToCppAdaptor<QDateTimeEdit::Section>(arg1).cref());
 }
@@ -571,7 +571,7 @@ static void _call_f_setCurrentSectionIndex_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setCurrentSectionIndex (arg1);
 }
@@ -591,7 +591,7 @@ static void _call_f_setDate_1776 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setDate (arg1);
 }
@@ -613,8 +613,8 @@ static void _call_f_setDateRange_3444 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
-  const QDate &arg2 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
+  const QDate &arg2 = gsi::arg_reader<const QDate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setDateRange (arg1, arg2);
 }
@@ -634,7 +634,7 @@ static void _call_f_setDateTime_2175 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setDateTime (arg1);
 }
@@ -656,8 +656,8 @@ static void _call_f_setDateTimeRange_4242 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
-  const QDateTime &arg2 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
+  const QDateTime &arg2 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setDateTimeRange (arg1, arg2);
 }
@@ -677,7 +677,7 @@ static void _call_f_setDisplayFormat_2025 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setDisplayFormat (arg1);
 }
@@ -697,7 +697,7 @@ static void _call_f_setMaximumDate_1776 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setMaximumDate (arg1);
 }
@@ -717,7 +717,7 @@ static void _call_f_setMaximumDateTime_2175 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setMaximumDateTime (arg1);
 }
@@ -737,7 +737,7 @@ static void _call_f_setMaximumTime_1793 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setMaximumTime (arg1);
 }
@@ -757,7 +757,7 @@ static void _call_f_setMinimumDate_1776 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setMinimumDate (arg1);
 }
@@ -777,7 +777,7 @@ static void _call_f_setMinimumDateTime_2175 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setMinimumDateTime (arg1);
 }
@@ -797,7 +797,7 @@ static void _call_f_setMinimumTime_1793 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setMinimumTime (arg1);
 }
@@ -817,7 +817,7 @@ static void _call_f_setSelectedSection_2529 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & arg1 = args.read<const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & > (heap);
+  const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDateTimeEdit::Section>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setSelectedSection (qt_gsi::QtToCppAdaptor<QDateTimeEdit::Section>(arg1).cref());
 }
@@ -837,7 +837,7 @@ static void _call_f_setTime_1793 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setTime (arg1);
 }
@@ -859,8 +859,8 @@ static void _call_f_setTimeRange_3478 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
-  const QTime &arg2 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
+  const QTime &arg2 = gsi::arg_reader<const QTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setTimeRange (arg1, arg2);
 }
@@ -880,7 +880,7 @@ static void _call_f_setTimeSpec_1543 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::TimeSpec>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::TimeSpec>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::TimeSpec>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->setTimeSpec (qt_gsi::QtToCppAdaptor<Qt::TimeSpec>(arg1).cref());
 }
@@ -915,7 +915,7 @@ static void _call_f_stepBy_767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit *)cls)->stepBy (arg1);
 }
@@ -967,8 +967,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QDateTimeEdit::tr (arg1, arg2));
 }
 
@@ -991,9 +991,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QDateTimeEdit::tr (arg1, arg2, arg3));
 }
 
@@ -1014,8 +1014,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QDateTimeEdit::trUtf8 (arg1, arg2));
 }
 
@@ -1038,9 +1038,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QDateTimeEdit::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2133,7 +2133,7 @@ static void _call_ctor_QDateTimeEdit_Adaptor_1315 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QDateTimeEdit_Adaptor *> (new QDateTimeEdit_Adaptor (arg1));
 }
 
@@ -2153,8 +2153,8 @@ static void _call_ctor_QDateTimeEdit_Adaptor_3382 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QDateTimeEdit_Adaptor *> (new QDateTimeEdit_Adaptor (arg1, arg2));
 }
 
@@ -2174,8 +2174,8 @@ static void _call_ctor_QDateTimeEdit_Adaptor_2983 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QDateTimeEdit_Adaptor *> (new QDateTimeEdit_Adaptor (arg1, arg2));
 }
 
@@ -2195,8 +2195,8 @@ static void _call_ctor_QDateTimeEdit_Adaptor_3000 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QDateTimeEdit_Adaptor *> (new QDateTimeEdit_Adaptor (arg1, arg2));
 }
 
@@ -2358,9 +2358,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit_Adaptor *)cls)->fp_QDateTimeEdit_create_2208 (arg1, arg2, arg3);
 }
@@ -2379,7 +2379,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QDateTimeEdit_Adaptor *)cls)->emitter_QDateTimeEdit_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2421,7 +2421,7 @@ static void _call_emitter_dateChanged_1776 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ((QDateTimeEdit_Adaptor *)cls)->emitter_QDateTimeEdit_dateChanged_1776 (arg1);
 }
 
@@ -2439,7 +2439,7 @@ static void _call_emitter_dateTimeChanged_2175 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   ((QDateTimeEdit_Adaptor *)cls)->emitter_QDateTimeEdit_dateTimeChanged_2175 (arg1);
 }
 
@@ -2482,8 +2482,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit_Adaptor *)cls)->fp_QDateTimeEdit_destroy_1620 (arg1, arg2);
 }
@@ -2502,7 +2502,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QDateTimeEdit_Adaptor *)cls)->emitter_QDateTimeEdit_destroyed_1302 (arg1);
 }
 
@@ -2945,7 +2945,7 @@ static void _call_fp_initStyleOption_c2572 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionSpinBox *arg1 = args.read<QStyleOptionSpinBox * > (heap);
+  QStyleOptionSpinBox *arg1 = gsi::arg_reader<QStyleOptionSpinBox * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit_Adaptor *)cls)->fp_QDateTimeEdit_initStyleOption_c2572 (arg1);
 }
@@ -3346,7 +3346,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QDateTimeEdit_Adaptor *)cls)->fp_QDateTimeEdit_receivers_c1731 (arg1));
 }
 
@@ -3417,7 +3417,7 @@ static void _call_fp_setLineEdit_1485 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLineEdit *arg1 = args.read<QLineEdit * > (heap);
+  QLineEdit *arg1 = gsi::arg_reader<QLineEdit * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDateTimeEdit_Adaptor *)cls)->fp_QDateTimeEdit_setLineEdit_1485 (arg1);
 }
@@ -3617,7 +3617,7 @@ static void _call_emitter_timeChanged_1793 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTime &arg1 = args.read<const QTime & > (heap);
+  const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   ((QDateTimeEdit_Adaptor *)cls)->emitter_QDateTimeEdit_timeChanged_1793 (arg1);
 }
 

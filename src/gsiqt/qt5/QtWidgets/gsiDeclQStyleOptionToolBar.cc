@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionToolBar_3247 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionToolBar &arg1 = args.read<const QStyleOptionToolBar & > (heap);
+  const QStyleOptionToolBar &arg1 = gsi::arg_reader<const QStyleOptionToolBar & >() (args, heap);
   ret.write<QStyleOptionToolBar *> (new QStyleOptionToolBar (arg1));
 }
 

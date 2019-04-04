@@ -128,7 +128,7 @@ Class<Logger> decl_Logger ("tl", "Logger",
   ),
   "@brief A logger\n"
   "\n"
-  "The logger allows to output messages to the log channels. If the log viewer is open, the "
+  "The logger outputs messages to the log channels. If the log viewer is open, the "
   "log messages will be shown in the logger view. Otherwise they will be printed to the terminal "
   "on Linux for example.\n"
   "\n"
@@ -238,7 +238,7 @@ Class<tl::Progress> decl_Progress ("tl", "Progress",
   "@brief A progress reporter\n"
   "\n"
   "This is the base class for all progress reporter objects. Progress reporter objects are used "
-  "to report the progress of some operation and to allow to abort an operation. "
+  "to report the progress of some operation and to allow aborting an operation. "
   "Progress reporter objects must be triggered periodically, i.e. a value must be set. "
   "On the display side, a progress bar usually is used to represent the progress of an operation.\n"
   "\n"
@@ -300,7 +300,7 @@ Class<tl::RelativeProgress> decl_RelativeProgress (decl_Progress, "tl", "Relativ
     "@brief Sets the progress value\n"
     "@args value, force_yield\n"
     "\n"
-    "This method is equivalent to \\value=, but it allows to force the event loop to be triggered.\n"
+    "This method is equivalent to \\value=, but it allows forcing the event loop to be triggered.\n"
     "If \"force_yield\" is true, the event loop will be triggered always, irregardless of the yield interval specified in the constructor.\n"
   ),
   "@brief A progress reporter counting progress in relative units\n"
@@ -394,7 +394,7 @@ Class<tl::AbsoluteProgress> decl_AbsoluteProgress (decl_Progress, "tl", "Absolut
     "@brief Sets the progress value\n"
     "@args value, force_yield\n"
     "\n"
-    "This method is equivalent to \\value=, but it allows to force the event loop to be triggered.\n"
+    "This method is equivalent to \\value=, but it allows forcing the event loop to be triggered.\n"
     "If \"force_yield\" is true, the event loop will be triggered always, irregardless of the yield interval specified in the constructor.\n"
   ),
   "@brief A progress reporter counting progress in absolute units\n"

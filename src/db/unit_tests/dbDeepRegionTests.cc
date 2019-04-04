@@ -469,11 +469,11 @@ TEST(9_SizingSimple)
   db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
   db::Region r6_sized = r6.sized (-50);
   EXPECT_EQ (r6_sized.is_merged (), true);
-  db::Region r6_sized_aniso = r6.sized (-20, -100);
+  db::Region r6_sized_aniso = r6.sized (-20, -100, 2);
   EXPECT_EQ (r6_sized_aniso.is_merged (), true);
   db::Region r6_sized_plus = r6.sized (50);
   EXPECT_EQ (r6_sized_plus.is_merged (), false);
-  db::Region r6_sized_aniso_plus = r6.sized (20, 100);
+  db::Region r6_sized_aniso_plus = r6.sized (20, 100, 2);
   EXPECT_EQ (r6_sized_aniso_plus.is_merged (), false);
 
   db::Layout target;
@@ -550,7 +550,7 @@ TEST(9_SizingWithScaleAndXYVariants)
 
   db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
   db::Region r1_sized = r1.sized (-2000);
-  db::Region r1_sized_aniso = r1.sized (-1000, -2000);
+  db::Region r1_sized_aniso = r1.sized (-1000, -2000, 2);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -600,7 +600,7 @@ TEST(9_SizingWithBoolean)
   db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
   db::Region r1_sized = r1.sized (2000);
   r1_sized -= r1;
-  db::Region r1_sized_aniso = r1.sized (1000, 2000);
+  db::Region r1_sized_aniso = r1.sized (1000, 2000, 2);
   r1_sized_aniso -= r1;
   EXPECT_EQ (r1_sized_aniso.is_merged (), false);
 

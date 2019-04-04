@@ -1,0 +1,19 @@
+* written by unit test
+
+* cell C2
+* pin p1
+* pin p2
+.SUBCKT C2 n1 n2
+* cell instance SC1 r0 *1 0,0
+XSC1 n1 n2 C1
+.ENDS C2
+
+* cell C1
+* pin p1
+* pin p2
+.SUBCKT C1 N1 N\x202
+* device instance $1 0,0 XCLS
+XD_$1 N1 n3 XCLS PARAMS: U=-17 V=42
+* device instance $2 0,0 XCLS
+XD_$2 n3 N\x202 XCLS PARAMS: U=17 V=-42
+.ENDS C1

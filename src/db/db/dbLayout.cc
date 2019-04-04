@@ -1304,7 +1304,7 @@ Layout::do_update ()
   try {
 
     //  if the hierarchy has been changed so far, update
-    //  the hierarchy management informations
+    //  the hierarchy management information
     if (hier_dirty ()) {
       {
         tl::SelfTimer timer (tl::verbosity () > layout_base_verbosity + 10, "Updating relations");
@@ -1324,7 +1324,7 @@ Layout::do_update ()
 
     //  if something on the bboxes (either on shape level or on 
     //  cell bbox level - i.e. by child instances) has been changed,
-    //  update the bbox informations. In addition sort the shapes
+    //  update the bbox information. In addition sort the shapes
     //  lists of region queries, since they might have changed once
     //  the bboxes are dirty.
     if (bboxes_dirty ()) {

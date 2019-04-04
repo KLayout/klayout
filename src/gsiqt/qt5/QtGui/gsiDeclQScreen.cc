@@ -76,8 +76,8 @@ static void _call_f_angleBetween_c4934 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
   ret.write<int > ((int)((QScreen *)cls)->angleBetween (qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg1).cref(), qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg2).cref()));
 }
 
@@ -209,11 +209,11 @@ static void _call_f_grabWindow_3332 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args.read<const qt_gsi::Converter<WId>::target_type & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
-  int arg4 = args ? args.read<int > (heap) : (int)(-1);
-  int arg5 = args ? args.read<int > (heap) : (int)(-1);
+  const qt_gsi::Converter<WId>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QPixmap > ((QPixmap)((QScreen *)cls)->grabWindow (qt_gsi::QtToCppAdaptor<WId>(arg1).cref(), arg2, arg3, arg4, arg5));
 }
 
@@ -232,7 +232,7 @@ static void _call_f_isLandscape_c2521 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QScreen *)cls)->isLandscape (qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg1).cref()));
 }
 
@@ -251,7 +251,7 @@ static void _call_f_isPortrait_c2521 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QScreen *)cls)->isPortrait (qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg1).cref()));
 }
 
@@ -319,9 +319,9 @@ static void _call_f_mapBetween_c6618 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
-  const QRect &arg3 = args.read<const QRect & > (heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
+  const QRect &arg3 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRect > ((QRect)((QScreen *)cls)->mapBetween (qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg1).cref(), qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg2).cref(), arg3));
 }
 
@@ -490,7 +490,7 @@ static void _call_f_setOrientationUpdateMask_3217 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::ScreenOrientation> arg1 = args.read<QFlags<Qt::ScreenOrientation> > (heap);
+  QFlags<Qt::ScreenOrientation> arg1 = gsi::arg_reader<QFlags<Qt::ScreenOrientation> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScreen *)cls)->setOrientationUpdateMask (arg1);
 }
@@ -529,9 +529,9 @@ static void _call_f_transformBetween_c6618 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
-  const QRect &arg3 = args.read<const QRect & > (heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
+  const QRect &arg3 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QTransform > ((QTransform)((QScreen *)cls)->transformBetween (qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg1).cref(), qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg2).cref(), arg3));
 }
 
@@ -599,9 +599,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QScreen::tr (arg1, arg2, arg3));
 }
 
@@ -624,9 +624,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QScreen::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -893,7 +893,7 @@ static void _call_emitter_availableGeometryChanged_1792 (const qt_gsi::GenericMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_availableGeometryChanged_1792 (arg1);
 }
 
@@ -959,7 +959,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_destroyed_1302 (arg1);
 }
 
@@ -1050,7 +1050,7 @@ static void _call_emitter_geometryChanged_1792 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_geometryChanged_1792 (arg1);
 }
 
@@ -1068,7 +1068,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QScreen_Adaptor *)cls)->fp_QScreen_isSignalConnected_c2394 (arg1));
 }
 
@@ -1086,7 +1086,7 @@ static void _call_emitter_logicalDotsPerInchChanged_1071 (const qt_gsi::GenericM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_logicalDotsPerInchChanged_1071 (arg1);
 }
 
@@ -1104,7 +1104,7 @@ static void _call_emitter_orientationChanged_2521 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_orientationChanged_2521 (arg1);
 }
 
@@ -1122,7 +1122,7 @@ static void _call_emitter_physicalDotsPerInchChanged_1071 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_physicalDotsPerInchChanged_1071 (arg1);
 }
 
@@ -1140,7 +1140,7 @@ static void _call_emitter_physicalSizeChanged_1875 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizeF &arg1 = args.read<const QSizeF & > (heap);
+  const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_physicalSizeChanged_1875 (arg1);
 }
 
@@ -1158,7 +1158,7 @@ static void _call_emitter_primaryOrientationChanged_2521 (const qt_gsi::GenericM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_primaryOrientationChanged_2521 (arg1);
 }
 
@@ -1176,7 +1176,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QScreen_Adaptor *)cls)->fp_QScreen_receivers_c1731 (arg1));
 }
 
@@ -1194,7 +1194,7 @@ static void _call_emitter_refreshRateChanged_1071 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_refreshRateChanged_1071 (arg1);
 }
 
@@ -1264,7 +1264,7 @@ static void _call_emitter_virtualGeometryChanged_1792 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_virtualGeometryChanged_1792 (arg1);
 }
 

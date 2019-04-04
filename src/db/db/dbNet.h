@@ -446,7 +446,7 @@ public:
   /**
    *  @brief Gets the qualified name
    *
-   *  The qualified name is like the expanded name, but preceeded with the
+   *  The qualified name is like the expanded name, but preceded with the
    *  Circuit name if known (e.g. "CIRCUIT:NET")
    */
   std::string qname () const;

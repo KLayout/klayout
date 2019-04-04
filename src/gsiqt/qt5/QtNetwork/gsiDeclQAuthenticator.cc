@@ -65,7 +65,7 @@ static void _call_ctor_QAuthenticator_2765 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAuthenticator &arg1 = args.read<const QAuthenticator & > (heap);
+  const QAuthenticator &arg1 = gsi::arg_reader<const QAuthenticator & >() (args, heap);
   ret.write<QAuthenticator *> (new QAuthenticator (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_operator_excl__eq__c2765 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAuthenticator &arg1 = args.read<const QAuthenticator & > (heap);
+  const QAuthenticator &arg1 = gsi::arg_reader<const QAuthenticator & >() (args, heap);
   ret.write<bool > ((bool)((QAuthenticator *)cls)->operator!= (arg1));
 }
 
@@ -134,7 +134,7 @@ static void _call_f_operator_eq__2765 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAuthenticator &arg1 = args.read<const QAuthenticator & > (heap);
+  const QAuthenticator &arg1 = gsi::arg_reader<const QAuthenticator & >() (args, heap);
   ret.write<QAuthenticator & > ((QAuthenticator &)((QAuthenticator *)cls)->operator= (arg1));
 }
 
@@ -153,7 +153,7 @@ static void _call_f_operator_eq__eq__c2765 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAuthenticator &arg1 = args.read<const QAuthenticator & > (heap);
+  const QAuthenticator &arg1 = gsi::arg_reader<const QAuthenticator & >() (args, heap);
   ret.write<bool > ((bool)((QAuthenticator *)cls)->operator== (arg1));
 }
 
@@ -172,7 +172,7 @@ static void _call_f_option_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QAuthenticator *)cls)->option (arg1));
 }
 
@@ -238,8 +238,8 @@ static void _call_f_setOption_4036 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAuthenticator *)cls)->setOption (arg1, arg2);
 }
@@ -259,7 +259,7 @@ static void _call_f_setPassword_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAuthenticator *)cls)->setPassword (arg1);
 }
@@ -279,7 +279,7 @@ static void _call_f_setRealm_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAuthenticator *)cls)->setRealm (arg1);
 }
@@ -299,7 +299,7 @@ static void _call_f_setUser_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAuthenticator *)cls)->setUser (arg1);
 }

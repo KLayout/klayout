@@ -51,7 +51,7 @@ static void _call_f_create_2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString const &arg1 = args.read<QString const & > (heap);
+  QString const &arg1 = gsi::arg_reader<QString const & >() (args, heap);
   ret.write<QMediaService * > ((QMediaService *)((QMediaServiceProviderFactoryInterface *)cls)->create (arg1));
 }
 
@@ -70,7 +70,7 @@ static void _call_f_release_1904 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMediaService *arg1 = args.read<QMediaService * > (heap);
+  QMediaService *arg1 = gsi::arg_reader<QMediaService * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaServiceProviderFactoryInterface *)cls)->release (arg1);
 }

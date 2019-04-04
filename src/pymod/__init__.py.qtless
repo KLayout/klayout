@@ -1,4 +1,4 @@
 # klayout library definition file
 
-__all__ = [ "tl", "db", "rdb" ]
+__all__ = [ "tl", "db", "lib", "rdb" ]
 

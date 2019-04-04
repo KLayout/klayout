@@ -102,7 +102,7 @@ static void _call_ctor_QTimerEvent_Adaptor_767 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTimerEvent_Adaptor *> (new QTimerEvent_Adaptor (arg1));
 }
 

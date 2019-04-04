@@ -107,8 +107,8 @@ private:
  *  @brief A QAction proxy 
  *
  *  This class is provided to be better suited to automation because it provides the corresponding interfaces
- *  and allows to implement the "trigger" event by reimplementation of the slot (after being connected).
- *  In addition, by acting as a proxy, it allows to reference a QAction object created by Qt itself (i.e.
+ *  and allows implementing the "trigger" event by reimplementation of the slot (after being connected).
+ *  In addition, by acting as a proxy, it can act as a reference to a QAction object created by Qt itself (i.e.
  *  within a QMenu).
  *  To reimplement the "triggered" method, derive a class from Action and reimplement "triggered". Then
  *  pass a reference to this object to "insert_item" of AbstractMenu and store away the derived object.
@@ -624,7 +624,7 @@ private:
  *  Menu items and submenus are referred to by a "path". The path is a string with this interpretation:
  *
  *    ""                 is the root 
- *    "[<path>.]<name>"  is an element of the submenu given by <path>. If <path> is ommitted, this refers to 
+ *    "[<path>.]<name>"  is an element of the submenu given by <path>. If <path> is omitted, this refers to 
  *                       an element in the root 
  *    "[<path>.]end      refers to the item past the last item of the submenu given by <path> or root
  *    "[<path>.]begin    refers to the first item of the submenu given by <path> or root

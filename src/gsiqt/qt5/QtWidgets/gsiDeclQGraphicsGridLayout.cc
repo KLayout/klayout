@@ -66,12 +66,12 @@ static void _call_f_addItem_7835 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  int arg5 = args.read<int > (heap);
-  QFlags<Qt::AlignmentFlag> arg6 = args ? args.read<QFlags<Qt::AlignmentFlag> > (heap) : (QFlags<Qt::AlignmentFlag>)(0);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->addItem (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -97,10 +97,10 @@ static void _call_f_addItem_6517 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  QFlags<Qt::AlignmentFlag> arg4 = args ? args.read<QFlags<Qt::AlignmentFlag> > (heap) : (QFlags<Qt::AlignmentFlag>)(0);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->addItem (arg1, arg2, arg3, arg4);
 }
@@ -120,7 +120,7 @@ static void _call_f_alignment_c2557 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   ret.write<QFlags<Qt::AlignmentFlag> > ((QFlags<Qt::AlignmentFlag>)((QGraphicsGridLayout *)cls)->alignment (arg1));
 }
 
@@ -139,7 +139,7 @@ static void _call_f_columnAlignment_c767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QFlags<Qt::AlignmentFlag> > ((QFlags<Qt::AlignmentFlag>)((QGraphicsGridLayout *)cls)->columnAlignment (arg1));
 }
 
@@ -173,7 +173,7 @@ static void _call_f_columnMaximumWidth_c767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QGraphicsGridLayout *)cls)->columnMaximumWidth (arg1));
 }
 
@@ -192,7 +192,7 @@ static void _call_f_columnMinimumWidth_c767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QGraphicsGridLayout *)cls)->columnMinimumWidth (arg1));
 }
 
@@ -211,7 +211,7 @@ static void _call_f_columnPreferredWidth_c767 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QGraphicsGridLayout *)cls)->columnPreferredWidth (arg1));
 }
 
@@ -230,7 +230,7 @@ static void _call_f_columnSpacing_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QGraphicsGridLayout *)cls)->columnSpacing (arg1));
 }
 
@@ -249,7 +249,7 @@ static void _call_f_columnStretchFactor_c767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QGraphicsGridLayout *)cls)->columnStretchFactor (arg1));
 }
 
@@ -316,8 +316,8 @@ static void _call_f_itemAt_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QGraphicsLayoutItem * > ((QGraphicsLayoutItem *)((QGraphicsGridLayout *)cls)->itemAt (arg1, arg2));
 }
 
@@ -336,7 +336,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QGraphicsLayoutItem * > ((QGraphicsLayoutItem *)((QGraphicsGridLayout *)cls)->itemAt (arg1));
 }
 
@@ -355,7 +355,7 @@ static void _call_f_removeAt_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->removeAt (arg1);
 }
@@ -375,7 +375,7 @@ static void _call_f_removeItem_2557 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->removeItem (arg1);
 }
@@ -395,7 +395,7 @@ static void _call_f_rowAlignment_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QFlags<Qt::AlignmentFlag> > ((QFlags<Qt::AlignmentFlag>)((QGraphicsGridLayout *)cls)->rowAlignment (arg1));
 }
 
@@ -429,7 +429,7 @@ static void _call_f_rowMaximumHeight_c767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QGraphicsGridLayout *)cls)->rowMaximumHeight (arg1));
 }
 
@@ -448,7 +448,7 @@ static void _call_f_rowMinimumHeight_c767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QGraphicsGridLayout *)cls)->rowMinimumHeight (arg1));
 }
 
@@ -467,7 +467,7 @@ static void _call_f_rowPreferredHeight_c767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QGraphicsGridLayout *)cls)->rowPreferredHeight (arg1));
 }
 
@@ -486,7 +486,7 @@ static void _call_f_rowSpacing_c767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<double > ((double)((QGraphicsGridLayout *)cls)->rowSpacing (arg1));
 }
 
@@ -505,7 +505,7 @@ static void _call_f_rowStretchFactor_c767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QGraphicsGridLayout *)cls)->rowStretchFactor (arg1));
 }
 
@@ -526,8 +526,8 @@ static void _call_f_setAlignment_5199 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
-  QFlags<Qt::AlignmentFlag> arg2 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg2 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setAlignment (arg1, arg2);
 }
@@ -549,8 +549,8 @@ static void _call_f_setColumnAlignment_3409 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QFlags<Qt::AlignmentFlag> arg2 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg2 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setColumnAlignment (arg1, arg2);
 }
@@ -572,8 +572,8 @@ static void _call_f_setColumnFixedWidth_1730 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setColumnFixedWidth (arg1, arg2);
 }
@@ -595,8 +595,8 @@ static void _call_f_setColumnMaximumWidth_1730 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setColumnMaximumWidth (arg1, arg2);
 }
@@ -618,8 +618,8 @@ static void _call_f_setColumnMinimumWidth_1730 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setColumnMinimumWidth (arg1, arg2);
 }
@@ -641,8 +641,8 @@ static void _call_f_setColumnPreferredWidth_1730 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setColumnPreferredWidth (arg1, arg2);
 }
@@ -664,8 +664,8 @@ static void _call_f_setColumnSpacing_1730 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setColumnSpacing (arg1, arg2);
 }
@@ -687,8 +687,8 @@ static void _call_f_setColumnStretchFactor_1426 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setColumnStretchFactor (arg1, arg2);
 }
@@ -708,7 +708,7 @@ static void _call_f_setGeometry_1862 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setGeometry (arg1);
 }
@@ -728,7 +728,7 @@ static void _call_f_setHorizontalSpacing_1071 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setHorizontalSpacing (arg1);
 }
@@ -750,8 +750,8 @@ static void _call_f_setRowAlignment_3409 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QFlags<Qt::AlignmentFlag> arg2 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg2 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setRowAlignment (arg1, arg2);
 }
@@ -773,8 +773,8 @@ static void _call_f_setRowFixedHeight_1730 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setRowFixedHeight (arg1, arg2);
 }
@@ -796,8 +796,8 @@ static void _call_f_setRowMaximumHeight_1730 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setRowMaximumHeight (arg1, arg2);
 }
@@ -819,8 +819,8 @@ static void _call_f_setRowMinimumHeight_1730 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setRowMinimumHeight (arg1, arg2);
 }
@@ -842,8 +842,8 @@ static void _call_f_setRowPreferredHeight_1730 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setRowPreferredHeight (arg1, arg2);
 }
@@ -865,8 +865,8 @@ static void _call_f_setRowSpacing_1730 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setRowSpacing (arg1, arg2);
 }
@@ -888,8 +888,8 @@ static void _call_f_setRowStretchFactor_1426 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setRowStretchFactor (arg1, arg2);
 }
@@ -909,7 +909,7 @@ static void _call_f_setSpacing_1071 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setSpacing (arg1);
 }
@@ -929,7 +929,7 @@ static void _call_f_setVerticalSpacing_1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->setVerticalSpacing (arg1);
 }
@@ -951,8 +951,8 @@ static void _call_f_sizeHint_c3330 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::SizeHint>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::SizeHint>::target_type & > (heap);
-  const QSizeF &arg2 = args ? args.read<const QSizeF & > (heap) : (const QSizeF &)(QSizeF());
+  const qt_gsi::Converter<Qt::SizeHint>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::SizeHint>::target_type & >() (args, heap);
+  const QSizeF &arg2 = args ? gsi::arg_reader<const QSizeF & >() (args, heap) : gsi::arg_maker<const QSizeF & >() (QSizeF(), heap);
   ret.write<QSizeF > ((QSizeF)((QGraphicsGridLayout *)cls)->sizeHint (qt_gsi::QtToCppAdaptor<Qt::SizeHint>(arg1).cref(), arg2));
 }
 
@@ -1230,7 +1230,7 @@ static void _call_ctor_QGraphicsGridLayout_Adaptor_2557 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args ? args.read<QGraphicsLayoutItem * > (heap) : (QGraphicsLayoutItem *)(0);
+  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
   ret.write<QGraphicsGridLayout_Adaptor *> (new QGraphicsGridLayout_Adaptor (arg1));
 }
 
@@ -1248,7 +1248,7 @@ static void _call_fp_addChildLayoutItem_2557 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args.read<QGraphicsLayoutItem * > (heap);
+  QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout_Adaptor *)cls)->fp_QGraphicsGridLayout_addChildLayoutItem_2557 (arg1);
 }
@@ -1410,7 +1410,7 @@ static void _call_fp_setGraphicsItem_1919 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args.read<QGraphicsItem * > (heap);
+  QGraphicsItem *arg1 = gsi::arg_reader<QGraphicsItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout_Adaptor *)cls)->fp_QGraphicsGridLayout_setGraphicsItem_1919 (arg1);
 }
@@ -1429,7 +1429,7 @@ static void _call_fp_setOwnedByLayout_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout_Adaptor *)cls)->fp_QGraphicsGridLayout_setOwnedByLayout_864 (arg1);
 }

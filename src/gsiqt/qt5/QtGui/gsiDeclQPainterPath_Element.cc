@@ -110,7 +110,7 @@ static void _call_f_operator_excl__eq__c3344 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath::Element &arg1 = args.read<const QPainterPath::Element & > (heap);
+  const QPainterPath::Element &arg1 = gsi::arg_reader<const QPainterPath::Element & >() (args, heap);
   ret.write<bool > ((bool)((QPainterPath::Element *)cls)->operator!= (arg1));
 }
 
@@ -129,7 +129,7 @@ static void _call_f_operator_eq__eq__c3344 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath::Element &arg1 = args.read<const QPainterPath::Element & > (heap);
+  const QPainterPath::Element &arg1 = gsi::arg_reader<const QPainterPath::Element & >() (args, heap);
   ret.write<bool > ((bool)((QPainterPath::Element *)cls)->operator== (arg1));
 }
 

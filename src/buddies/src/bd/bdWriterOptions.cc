@@ -145,7 +145,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                    )
         << tl::arg (group +
                     "#--multi-xy-records", &m_gds2_multi_xy_records, "Allows unlimited number of points",
-                    "If this option is given, multiple XY records will be written to accomodate an unlimited number "
+                    "If this option is given, multiple XY records will be written to accommodate an unlimited number "
                     "of points per polygon or path. However, such files may not be compatible with some consumers."
                    )
         << tl::arg (group +
@@ -169,7 +169,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
         << tl::arg (group +
                     "#!--no-timestamps", &m_gds2_write_timestamps, "Don't write timestamps",
                     "Writes a dummy time stamp instead of the actual time. With this option, GDS2 files become "
-                    "bytewise indentical even if written at different times. This option is useful if binary "
+                    "bytewise identical even if written at different times. This option is useful if binary "
                     "identity is important (i.e. in regression scenarios)."
                    )
         << tl::arg (group +

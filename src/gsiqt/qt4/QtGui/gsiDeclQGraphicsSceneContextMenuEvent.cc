@@ -128,7 +128,7 @@ static void _call_f_setModifiers_3077 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::KeyboardModifier> arg1 = args.read<QFlags<Qt::KeyboardModifier> > (heap);
+  QFlags<Qt::KeyboardModifier> arg1 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneContextMenuEvent *)cls)->setModifiers (arg1);
 }
@@ -148,7 +148,7 @@ static void _call_f_setPos_1986 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneContextMenuEvent *)cls)->setPos (arg1);
 }
@@ -168,7 +168,7 @@ static void _call_f_setReason_4220 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QGraphicsSceneContextMenuEvent::Reason>::target_type & arg1 = args.read<const qt_gsi::Converter<QGraphicsSceneContextMenuEvent::Reason>::target_type & > (heap);
+  const qt_gsi::Converter<QGraphicsSceneContextMenuEvent::Reason>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QGraphicsSceneContextMenuEvent::Reason>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneContextMenuEvent *)cls)->setReason (qt_gsi::QtToCppAdaptor<QGraphicsSceneContextMenuEvent::Reason>(arg1).cref());
 }
@@ -188,7 +188,7 @@ static void _call_f_setScenePos_1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneContextMenuEvent *)cls)->setScenePos (arg1);
 }
@@ -208,7 +208,7 @@ static void _call_f_setScreenPos_1916 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSceneContextMenuEvent *)cls)->setScreenPos (arg1);
 }
@@ -279,7 +279,7 @@ static void _call_ctor_QGraphicsSceneContextMenuEvent_Adaptor_1565 (const qt_gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap) : (const qt_gsi::Converter<QEvent::Type>::target_type &)(qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::None));
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QEvent::Type>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QEvent::Type>(heap, QEvent::None), heap);
   ret.write<QGraphicsSceneContextMenuEvent_Adaptor *> (new QGraphicsSceneContextMenuEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref()));
 }
 

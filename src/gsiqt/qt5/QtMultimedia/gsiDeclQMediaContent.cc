@@ -69,7 +69,7 @@ static void _call_ctor_QMediaContent_1701 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QMediaContent *> (new QMediaContent (arg1));
 }
 
@@ -88,7 +88,7 @@ static void _call_ctor_QMediaContent_2885 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
   ret.write<QMediaContent *> (new QMediaContent (arg1));
 }
 
@@ -107,7 +107,7 @@ static void _call_ctor_QMediaContent_2714 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaResource &arg1 = args.read<const QMediaResource & > (heap);
+  const QMediaResource &arg1 = gsi::arg_reader<const QMediaResource & >() (args, heap);
   ret.write<QMediaContent *> (new QMediaContent (arg1));
 }
 
@@ -126,7 +126,7 @@ static void _call_ctor_QMediaContent_3329 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QMediaResource> &arg1 = args.read<const QList<QMediaResource> & > (heap);
+  const QList<QMediaResource> &arg1 = gsi::arg_reader<const QList<QMediaResource> & >() (args, heap);
   ret.write<QMediaContent *> (new QMediaContent (arg1));
 }
 
@@ -145,7 +145,7 @@ static void _call_ctor_QMediaContent_2605 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   ret.write<QMediaContent *> (new QMediaContent (arg1));
 }
 
@@ -168,9 +168,9 @@ static void _call_ctor_QMediaContent_4382 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMediaPlaylist *arg1 = args.read<QMediaPlaylist * > (heap);
-  const QUrl &arg2 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(false);
+  QMediaPlaylist *arg1 = gsi::arg_reader<QMediaPlaylist * >() (args, heap);
+  const QUrl &arg2 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<QMediaContent *> (new QMediaContent (arg1, arg2, arg3));
 }
 
@@ -249,7 +249,7 @@ static void _call_f_operator_excl__eq__c2605 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   ret.write<bool > ((bool)((QMediaContent *)cls)->operator!= (arg1));
 }
 
@@ -268,7 +268,7 @@ static void _call_f_operator_eq__2605 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   ret.write<QMediaContent & > ((QMediaContent &)((QMediaContent *)cls)->operator= (arg1));
 }
 
@@ -287,7 +287,7 @@ static void _call_f_operator_eq__eq__c2605 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   ret.write<bool > ((bool)((QMediaContent *)cls)->operator== (arg1));
 }
 

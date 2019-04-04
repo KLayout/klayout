@@ -54,7 +54,7 @@ static void _call_f_accessibleInterface_1772 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<QAccessibleInterface * > ((QAccessibleInterface *)QAccessible::accessibleInterface (arg1));
 }
 
@@ -89,7 +89,7 @@ static void _call_f_deleteAccessibleInterface_1772 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QAccessible::deleteAccessibleInterface (arg1);
 }
@@ -109,7 +109,7 @@ static void _call_f_installActivationObserver_3707 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessible::ActivationObserver *arg1 = args.read<QAccessible::ActivationObserver * > (heap);
+  QAccessible::ActivationObserver *arg1 = gsi::arg_reader<QAccessible::ActivationObserver * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QAccessible::installActivationObserver (arg1);
 }
@@ -146,8 +146,8 @@ static void _call_f_qAccessibleTextBoundaryHelper_5659 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCursor &arg1 = args.read<const QTextCursor & > (heap);
-  const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & arg2 = args.read<const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & > (heap);
+  const QTextCursor &arg1 = gsi::arg_reader<const QTextCursor & >() (args, heap);
+  const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAccessible::TextBoundaryType>::target_type & >() (args, heap);
   ret.write<QPair<int, int> > ((QPair<int, int>)QAccessible::qAccessibleTextBoundaryHelper (arg1, qt_gsi::QtToCppAdaptor<QAccessible::TextBoundaryType>(arg2).cref()));
 }
 
@@ -166,7 +166,7 @@ static void _call_f_queryAccessibleInterface_1302 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QAccessibleInterface * > ((QAccessibleInterface *)QAccessible::queryAccessibleInterface (arg1));
 }
 
@@ -185,7 +185,7 @@ static void _call_f_registerAccessibleInterface_2622 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleInterface *arg1 = args.read<QAccessibleInterface * > (heap);
+  QAccessibleInterface *arg1 = gsi::arg_reader<QAccessibleInterface * >() (args, heap);
   ret.write<unsigned int > ((unsigned int)QAccessible::registerAccessibleInterface (arg1));
 }
 
@@ -204,7 +204,7 @@ static void _call_f_removeActivationObserver_3707 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessible::ActivationObserver *arg1 = args.read<QAccessible::ActivationObserver * > (heap);
+  QAccessible::ActivationObserver *arg1 = gsi::arg_reader<QAccessible::ActivationObserver * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QAccessible::removeActivationObserver (arg1);
 }
@@ -224,7 +224,7 @@ static void _call_f_setActive_864 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QAccessible::setActive (arg1);
 }
@@ -244,7 +244,7 @@ static void _call_f_setRootObject_1302 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QAccessible::setRootObject (arg1);
 }
@@ -264,7 +264,7 @@ static void _call_f_uniqueId_2622 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleInterface *arg1 = args.read<QAccessibleInterface * > (heap);
+  QAccessibleInterface *arg1 = gsi::arg_reader<QAccessibleInterface * >() (args, heap);
   ret.write<unsigned int > ((unsigned int)QAccessible::uniqueId (arg1));
 }
 
@@ -283,7 +283,7 @@ static void _call_f_updateAccessibility_2223 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleEvent *arg1 = args.read<QAccessibleEvent * > (heap);
+  QAccessibleEvent *arg1 = gsi::arg_reader<QAccessibleEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QAccessible::updateAccessibility (arg1);
 }

@@ -118,7 +118,7 @@ static void _call_f_data_1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QIODevice * > ((QIODevice *)((QNetworkDiskCache *)cls)->data (arg1));
 }
 
@@ -137,7 +137,7 @@ static void _call_f_fileMetaData_c2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QNetworkCacheMetaData > ((QNetworkCacheMetaData)((QNetworkDiskCache *)cls)->fileMetaData (arg1));
 }
 
@@ -156,7 +156,7 @@ static void _call_f_insert_1447 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkDiskCache *)cls)->insert (arg1);
 }
@@ -191,7 +191,7 @@ static void _call_f_metaData_1701 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QNetworkCacheMetaData > ((QNetworkCacheMetaData)((QNetworkDiskCache *)cls)->metaData (arg1));
 }
 
@@ -210,7 +210,7 @@ static void _call_f_prepare_3377 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCacheMetaData &arg1 = args.read<const QNetworkCacheMetaData & > (heap);
+  const QNetworkCacheMetaData &arg1 = gsi::arg_reader<const QNetworkCacheMetaData & >() (args, heap);
   ret.write<QIODevice * > ((QIODevice *)((QNetworkDiskCache *)cls)->prepare (arg1));
 }
 
@@ -229,7 +229,7 @@ static void _call_f_remove_1701 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkDiskCache *)cls)->remove (arg1));
 }
 
@@ -248,7 +248,7 @@ static void _call_f_setCacheDirectory_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkDiskCache *)cls)->setCacheDirectory (arg1);
 }
@@ -268,7 +268,7 @@ static void _call_f_setMaximumCacheSize_986 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkDiskCache *)cls)->setMaximumCacheSize (arg1);
 }
@@ -288,7 +288,7 @@ static void _call_f_updateMetaData_3377 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCacheMetaData &arg1 = args.read<const QNetworkCacheMetaData & > (heap);
+  const QNetworkCacheMetaData &arg1 = gsi::arg_reader<const QNetworkCacheMetaData & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkDiskCache *)cls)->updateMetaData (arg1);
 }
@@ -312,9 +312,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QNetworkDiskCache::tr (arg1, arg2, arg3));
 }
 
@@ -337,9 +337,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QNetworkDiskCache::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -681,7 +681,7 @@ static void _call_ctor_QNetworkDiskCache_Adaptor_1302 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QNetworkDiskCache_Adaptor *> (new QNetworkDiskCache_Adaptor (arg1));
 }
 
@@ -809,7 +809,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QNetworkDiskCache_Adaptor *)cls)->emitter_QNetworkDiskCache_destroyed_1302 (arg1);
 }
 
@@ -943,7 +943,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkDiskCache_Adaptor *)cls)->fp_QNetworkDiskCache_isSignalConnected_c2394 (arg1));
 }
 
@@ -1007,7 +1007,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QNetworkDiskCache_Adaptor *)cls)->fp_QNetworkDiskCache_receivers_c1731 (arg1));
 }
 

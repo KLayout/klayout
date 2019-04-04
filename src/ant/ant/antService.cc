@@ -892,16 +892,18 @@ void
 Service::drag_cancel () 
 {
   if (m_drawing) {
-
     widget ()->ungrab_mouse (this);
-
-    if (mp_active_ruler) {
-      delete mp_active_ruler;
-      mp_active_ruler = 0;
-    }
-
     m_drawing = false;
+  }
 
+  if (mp_active_ruler) {
+    delete mp_active_ruler;
+    mp_active_ruler = 0;
+  }
+
+  if (mp_transient_ruler) {
+    delete mp_transient_ruler;
+    mp_transient_ruler = 0;
   }
 }
 
@@ -1047,7 +1049,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
     double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
     db::DBox search_dbox = db::DBox (p, p).enlarged (db::DVector (l, l));
 
-    //  test, wether we are moving a handle of one selected object
+    //  test, whether we are moving a handle of one selected object
     for (std::map<obj_iterator, unsigned int>::const_iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
 
       obj_iterator ri = r->first;

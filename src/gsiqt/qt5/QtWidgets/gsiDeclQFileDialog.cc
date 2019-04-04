@@ -299,7 +299,7 @@ static void _call_f_labelText_c2681 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFileDialog::DialogLabel>::target_type & arg1 = args.read<const qt_gsi::Converter<QFileDialog::DialogLabel>::target_type & > (heap);
+  const qt_gsi::Converter<QFileDialog::DialogLabel>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileDialog::DialogLabel>::target_type & >() (args, heap);
   ret.write<QString > ((QString)((QFileDialog *)cls)->labelText (qt_gsi::QtToCppAdaptor<QFileDialog::DialogLabel>(arg1).cref()));
 }
 
@@ -366,8 +366,8 @@ static void _call_f_open_2925 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->open (arg1, arg2);
 }
@@ -432,7 +432,7 @@ static void _call_f_restoreState_2309 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<bool > ((bool)((QFileDialog *)cls)->restoreState (arg1));
 }
 
@@ -466,7 +466,7 @@ static void _call_f_selectFile_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->selectFile (arg1);
 }
@@ -486,7 +486,7 @@ static void _call_f_selectMimeTypeFilter_2025 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->selectMimeTypeFilter (arg1);
 }
@@ -506,7 +506,7 @@ static void _call_f_selectNameFilter_2025 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->selectNameFilter (arg1);
 }
@@ -526,7 +526,7 @@ static void _call_f_selectUrl_1701 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->selectUrl (arg1);
 }
@@ -591,7 +591,7 @@ static void _call_f_setAcceptMode_2590 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFileDialog::AcceptMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QFileDialog::AcceptMode>::target_type & > (heap);
+  const qt_gsi::Converter<QFileDialog::AcceptMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileDialog::AcceptMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setAcceptMode (qt_gsi::QtToCppAdaptor<QFileDialog::AcceptMode>(arg1).cref());
 }
@@ -611,7 +611,7 @@ static void _call_f_setConfirmOverwrite_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setConfirmOverwrite (arg1);
 }
@@ -631,7 +631,7 @@ static void _call_f_setDefaultSuffix_2025 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setDefaultSuffix (arg1);
 }
@@ -651,7 +651,7 @@ static void _call_f_setDirectory_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setDirectory (arg1);
 }
@@ -671,7 +671,7 @@ static void _call_f_setDirectory_1681 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDir &arg1 = args.read<const QDir & > (heap);
+  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setDirectory (arg1);
 }
@@ -691,7 +691,7 @@ static void _call_f_setDirectoryUrl_1701 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setDirectoryUrl (arg1);
 }
@@ -711,7 +711,7 @@ static void _call_f_setFileMode_2382 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFileDialog::FileMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QFileDialog::FileMode>::target_type & > (heap);
+  const qt_gsi::Converter<QFileDialog::FileMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileDialog::FileMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setFileMode (qt_gsi::QtToCppAdaptor<QFileDialog::FileMode>(arg1).cref());
 }
@@ -731,7 +731,7 @@ static void _call_f_setFilter_2230 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QDir::Filter> arg1 = args.read<QFlags<QDir::Filter> > (heap);
+  QFlags<QDir::Filter> arg1 = gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setFilter (arg1);
 }
@@ -751,7 +751,7 @@ static void _call_f_setHistory_2437 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setHistory (arg1);
 }
@@ -771,7 +771,7 @@ static void _call_f_setIconProvider_2323 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFileIconProvider *arg1 = args.read<QFileIconProvider * > (heap);
+  QFileIconProvider *arg1 = gsi::arg_reader<QFileIconProvider * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setIconProvider (arg1);
 }
@@ -791,7 +791,7 @@ static void _call_f_setItemDelegate_2717 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemDelegate *arg1 = args.read<QAbstractItemDelegate * > (heap);
+  QAbstractItemDelegate *arg1 = gsi::arg_reader<QAbstractItemDelegate * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setItemDelegate (arg1);
 }
@@ -813,8 +813,8 @@ static void _call_f_setLabelText_4598 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFileDialog::DialogLabel>::target_type & arg1 = args.read<const qt_gsi::Converter<QFileDialog::DialogLabel>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const qt_gsi::Converter<QFileDialog::DialogLabel>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileDialog::DialogLabel>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setLabelText (qt_gsi::QtToCppAdaptor<QFileDialog::DialogLabel>(arg1).cref(), arg2);
 }
@@ -834,7 +834,7 @@ static void _call_f_setMimeTypeFilters_2437 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setMimeTypeFilters (arg1);
 }
@@ -854,7 +854,7 @@ static void _call_f_setNameFilter_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setNameFilter (arg1);
 }
@@ -874,7 +874,7 @@ static void _call_f_setNameFilterDetailsVisible_864 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setNameFilterDetailsVisible (arg1);
 }
@@ -894,7 +894,7 @@ static void _call_f_setNameFilters_2437 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setNameFilters (arg1);
 }
@@ -916,8 +916,8 @@ static void _call_f_setOption_2998 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFileDialog::Option>::target_type & arg1 = args.read<const qt_gsi::Converter<QFileDialog::Option>::target_type & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<QFileDialog::Option>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileDialog::Option>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setOption (qt_gsi::QtToCppAdaptor<QFileDialog::Option>(arg1).cref(), arg2);
 }
@@ -937,7 +937,7 @@ static void _call_f_setOptions_2938 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QFileDialog::Option> arg1 = args.read<QFlags<QFileDialog::Option> > (heap);
+  QFlags<QFileDialog::Option> arg1 = gsi::arg_reader<QFlags<QFileDialog::Option> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setOptions (arg1);
 }
@@ -957,7 +957,7 @@ static void _call_f_setProxyModel_2566 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractProxyModel *arg1 = args.read<QAbstractProxyModel * > (heap);
+  QAbstractProxyModel *arg1 = gsi::arg_reader<QAbstractProxyModel * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setProxyModel (arg1);
 }
@@ -977,7 +977,7 @@ static void _call_f_setReadOnly_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setReadOnly (arg1);
 }
@@ -997,7 +997,7 @@ static void _call_f_setResolveSymlinks_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setResolveSymlinks (arg1);
 }
@@ -1017,7 +1017,7 @@ static void _call_f_setSidebarUrls_2316 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QUrl> &arg1 = args.read<const QList<QUrl> & > (heap);
+  const QList<QUrl> &arg1 = gsi::arg_reader<const QList<QUrl> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setSidebarUrls (arg1);
 }
@@ -1037,7 +1037,7 @@ static void _call_f_setViewMode_2409 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFileDialog::ViewMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QFileDialog::ViewMode>::target_type & > (heap);
+  const qt_gsi::Converter<QFileDialog::ViewMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileDialog::ViewMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setViewMode (qt_gsi::QtToCppAdaptor<QFileDialog::ViewMode>(arg1).cref());
 }
@@ -1057,7 +1057,7 @@ static void _call_f_setVisible_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog *)cls)->setVisible (arg1);
 }
@@ -1092,7 +1092,7 @@ static void _call_f_testOption_c2242 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFileDialog::Option>::target_type & arg1 = args.read<const qt_gsi::Converter<QFileDialog::Option>::target_type & > (heap);
+  const qt_gsi::Converter<QFileDialog::Option>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileDialog::Option>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QFileDialog *)cls)->testOption (qt_gsi::QtToCppAdaptor<QFileDialog::Option>(arg1).cref()));
 }
 
@@ -1132,10 +1132,10 @@ static void _call_f_getExistingDirectory_7979 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  QFlags<QFileDialog::Option> arg4 = args ? args.read<QFlags<QFileDialog::Option> > (heap) : (QFlags<QFileDialog::Option>)(QFileDialog::ShowDirsOnly);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QFlags<QFileDialog::Option> arg4 = args ? gsi::arg_reader<QFlags<QFileDialog::Option> >() (args, heap) : gsi::arg_maker<QFlags<QFileDialog::Option> >() (QFileDialog::ShowDirsOnly, heap);
   ret.write<QString > ((QString)QFileDialog::getExistingDirectory (arg1, arg2, arg3, arg4));
 }
 
@@ -1162,11 +1162,11 @@ static void _call_f_getExistingDirectoryUrl_9984 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QUrl &arg3 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
-  QFlags<QFileDialog::Option> arg4 = args ? args.read<QFlags<QFileDialog::Option> > (heap) : (QFlags<QFileDialog::Option>)(QFileDialog::ShowDirsOnly);
-  const QStringList &arg5 = args ? args.read<const QStringList & > (heap) : (const QStringList &)(QStringList());
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QUrl &arg3 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
+  QFlags<QFileDialog::Option> arg4 = args ? gsi::arg_reader<QFlags<QFileDialog::Option> >() (args, heap) : gsi::arg_maker<QFlags<QFileDialog::Option> >() (QFileDialog::ShowDirsOnly, heap);
+  const QStringList &arg5 = args ? gsi::arg_reader<const QStringList & >() (args, heap) : gsi::arg_maker<const QStringList & >() (QStringList(), heap);
   ret.write<QUrl > ((QUrl)QFileDialog::getExistingDirectoryUrl (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -1195,12 +1195,12 @@ static void _call_f_getOpenFileName_11122 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  QString *arg5 = args ? args.read<QString * > (heap) : (QString *)(0);
-  QFlags<QFileDialog::Option> arg6 = args ? args.read<QFlags<QFileDialog::Option> > (heap) : (QFlags<QFileDialog::Option>)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QString *arg5 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
+  QFlags<QFileDialog::Option> arg6 = args ? gsi::arg_reader<QFlags<QFileDialog::Option> >() (args, heap) : gsi::arg_maker<QFlags<QFileDialog::Option> >() (0, heap);
   ret.write<QString > ((QString)QFileDialog::getOpenFileName (arg1, arg2, arg3, arg4, arg5, arg6));
 }
 
@@ -1229,12 +1229,12 @@ static void _call_f_getOpenFileNames_11122 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  QString *arg5 = args ? args.read<QString * > (heap) : (QString *)(0);
-  QFlags<QFileDialog::Option> arg6 = args ? args.read<QFlags<QFileDialog::Option> > (heap) : (QFlags<QFileDialog::Option>)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QString *arg5 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
+  QFlags<QFileDialog::Option> arg6 = args ? gsi::arg_reader<QFlags<QFileDialog::Option> >() (args, heap) : gsi::arg_maker<QFlags<QFileDialog::Option> >() (0, heap);
   ret.write<QStringList > ((QStringList)QFileDialog::getOpenFileNames (arg1, arg2, arg3, arg4, arg5, arg6));
 }
 
@@ -1265,13 +1265,13 @@ static void _call_f_getOpenFileUrl_13127 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QUrl &arg3 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  QString *arg5 = args ? args.read<QString * > (heap) : (QString *)(0);
-  QFlags<QFileDialog::Option> arg6 = args ? args.read<QFlags<QFileDialog::Option> > (heap) : (QFlags<QFileDialog::Option>)(0);
-  const QStringList &arg7 = args ? args.read<const QStringList & > (heap) : (const QStringList &)(QStringList());
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QUrl &arg3 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QString *arg5 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
+  QFlags<QFileDialog::Option> arg6 = args ? gsi::arg_reader<QFlags<QFileDialog::Option> >() (args, heap) : gsi::arg_maker<QFlags<QFileDialog::Option> >() (0, heap);
+  const QStringList &arg7 = args ? gsi::arg_reader<const QStringList & >() (args, heap) : gsi::arg_maker<const QStringList & >() (QStringList(), heap);
   ret.write<QUrl > ((QUrl)QFileDialog::getOpenFileUrl (arg1, arg2, arg3, arg4, arg5, arg6, arg7));
 }
 
@@ -1302,13 +1302,13 @@ static void _call_f_getOpenFileUrls_13127 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QUrl &arg3 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  QString *arg5 = args ? args.read<QString * > (heap) : (QString *)(0);
-  QFlags<QFileDialog::Option> arg6 = args ? args.read<QFlags<QFileDialog::Option> > (heap) : (QFlags<QFileDialog::Option>)(0);
-  const QStringList &arg7 = args ? args.read<const QStringList & > (heap) : (const QStringList &)(QStringList());
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QUrl &arg3 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QString *arg5 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
+  QFlags<QFileDialog::Option> arg6 = args ? gsi::arg_reader<QFlags<QFileDialog::Option> >() (args, heap) : gsi::arg_maker<QFlags<QFileDialog::Option> >() (0, heap);
+  const QStringList &arg7 = args ? gsi::arg_reader<const QStringList & >() (args, heap) : gsi::arg_maker<const QStringList & >() (QStringList(), heap);
   ret.write<QList<QUrl> > ((QList<QUrl>)QFileDialog::getOpenFileUrls (arg1, arg2, arg3, arg4, arg5, arg6, arg7));
 }
 
@@ -1337,12 +1337,12 @@ static void _call_f_getSaveFileName_11122 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  QString *arg5 = args ? args.read<QString * > (heap) : (QString *)(0);
-  QFlags<QFileDialog::Option> arg6 = args ? args.read<QFlags<QFileDialog::Option> > (heap) : (QFlags<QFileDialog::Option>)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QString *arg5 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
+  QFlags<QFileDialog::Option> arg6 = args ? gsi::arg_reader<QFlags<QFileDialog::Option> >() (args, heap) : gsi::arg_maker<QFlags<QFileDialog::Option> >() (0, heap);
   ret.write<QString > ((QString)QFileDialog::getSaveFileName (arg1, arg2, arg3, arg4, arg5, arg6));
 }
 
@@ -1373,13 +1373,13 @@ static void _call_f_getSaveFileUrl_13127 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QUrl &arg3 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  QString *arg5 = args ? args.read<QString * > (heap) : (QString *)(0);
-  QFlags<QFileDialog::Option> arg6 = args ? args.read<QFlags<QFileDialog::Option> > (heap) : (QFlags<QFileDialog::Option>)(0);
-  const QStringList &arg7 = args ? args.read<const QStringList & > (heap) : (const QStringList &)(QStringList());
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QUrl &arg3 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  QString *arg5 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
+  QFlags<QFileDialog::Option> arg6 = args ? gsi::arg_reader<QFlags<QFileDialog::Option> >() (args, heap) : gsi::arg_maker<QFlags<QFileDialog::Option> >() (0, heap);
+  const QStringList &arg7 = args ? gsi::arg_reader<const QStringList & >() (args, heap) : gsi::arg_maker<const QStringList & >() (QStringList(), heap);
   ret.write<QUrl > ((QUrl)QFileDialog::getSaveFileUrl (arg1, arg2, arg3, arg4, arg5, arg6, arg7));
 }
 
@@ -1402,9 +1402,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QFileDialog::tr (arg1, arg2, arg3));
 }
 
@@ -1427,9 +1427,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QFileDialog::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2550,8 +2550,8 @@ static void _call_ctor_QFileDialog_Adaptor_3702 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  QFlags<Qt::WindowType> arg2 = args.read<QFlags<Qt::WindowType> > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  QFlags<Qt::WindowType> arg2 = gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap);
   ret.write<QFileDialog_Adaptor *> (new QFileDialog_Adaptor (arg1, arg2));
 }
 
@@ -2575,10 +2575,10 @@ static void _call_ctor_QFileDialog_Adaptor_7066 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  const QString &arg4 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg4 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QFileDialog_Adaptor *> (new QFileDialog_Adaptor (arg1, arg2, arg3, arg4));
 }
 
@@ -2654,7 +2654,7 @@ static void _call_fp_adjustPosition_1315 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog_Adaptor *)cls)->fp_QFileDialog_adjustPosition_1315 (arg1);
 }
@@ -2773,9 +2773,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog_Adaptor *)cls)->fp_QFileDialog_create_2208 (arg1, arg2, arg3);
 }
@@ -2794,7 +2794,7 @@ static void _call_emitter_currentChanged_2025 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_currentChanged_2025 (arg1);
 }
 
@@ -2812,7 +2812,7 @@ static void _call_emitter_currentUrlChanged_1701 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_currentUrlChanged_1701 (arg1);
 }
 
@@ -2830,7 +2830,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2874,8 +2874,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFileDialog_Adaptor *)cls)->fp_QFileDialog_destroy_1620 (arg1, arg2);
 }
@@ -2894,7 +2894,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_destroyed_1302 (arg1);
 }
 
@@ -2912,7 +2912,7 @@ static void _call_emitter_directoryEntered_2025 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_directoryEntered_2025 (arg1);
 }
 
@@ -2930,7 +2930,7 @@ static void _call_emitter_directoryUrlEntered_1701 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_directoryUrlEntered_1701 (arg1);
 }
 
@@ -3184,7 +3184,7 @@ static void _call_emitter_fileSelected_2025 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_fileSelected_2025 (arg1);
 }
 
@@ -3202,7 +3202,7 @@ static void _call_emitter_filesSelected_2437 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_filesSelected_2437 (arg1);
 }
 
@@ -3220,7 +3220,7 @@ static void _call_emitter_filterSelected_2025 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_filterSelected_2025 (arg1);
 }
 
@@ -3238,7 +3238,7 @@ static void _call_emitter_finished_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_finished_767 (arg1);
 }
 
@@ -3492,7 +3492,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QFileDialog_Adaptor *)cls)->fp_QFileDialog_isSignalConnected_c2394 (arg1));
 }
 
@@ -3836,7 +3836,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QFileDialog_Adaptor *)cls)->fp_QFileDialog_receivers_c1731 (arg1));
 }
 
@@ -4112,7 +4112,7 @@ static void _call_emitter_urlSelected_1701 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_urlSelected_1701 (arg1);
 }
 
@@ -4130,7 +4130,7 @@ static void _call_emitter_urlsSelected_2316 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QUrl> &arg1 = args.read<const QList<QUrl> & > (heap);
+  const QList<QUrl> &arg1 = gsi::arg_reader<const QList<QUrl> & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_urlsSelected_2316 (arg1);
 }
 
@@ -4172,7 +4172,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_windowIconChanged_1787 (arg1);
 }
 
@@ -4190,7 +4190,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_windowIconTextChanged_2025 (arg1);
 }
 
@@ -4208,7 +4208,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QFileDialog_Adaptor *)cls)->emitter_QFileDialog_windowTitleChanged_2025 (arg1);
 }
 

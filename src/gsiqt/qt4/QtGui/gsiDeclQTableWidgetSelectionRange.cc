@@ -71,10 +71,10 @@ static void _call_ctor_QTableWidgetSelectionRange_2744 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTableWidgetSelectionRange *> (new QTableWidgetSelectionRange (arg1, arg2, arg3, arg4));
 }
 
@@ -93,7 +93,7 @@ static void _call_ctor_QTableWidgetSelectionRange_3921 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTableWidgetSelectionRange &arg1 = args.read<const QTableWidgetSelectionRange & > (heap);
+  const QTableWidgetSelectionRange &arg1 = gsi::arg_reader<const QTableWidgetSelectionRange & >() (args, heap);
   ret.write<QTableWidgetSelectionRange *> (new QTableWidgetSelectionRange (arg1));
 }
 

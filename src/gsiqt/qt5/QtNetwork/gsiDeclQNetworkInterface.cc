@@ -67,7 +67,7 @@ static void _call_ctor_QNetworkInterface_3053 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkInterface &arg1 = args.read<const QNetworkInterface & > (heap);
+  const QNetworkInterface &arg1 = gsi::arg_reader<const QNetworkInterface & >() (args, heap);
   ret.write<QNetworkInterface *> (new QNetworkInterface (arg1));
 }
 
@@ -191,7 +191,7 @@ static void _call_f_operator_eq__3053 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkInterface &arg1 = args.read<const QNetworkInterface & > (heap);
+  const QNetworkInterface &arg1 = gsi::arg_reader<const QNetworkInterface & >() (args, heap);
   ret.write<QNetworkInterface & > ((QNetworkInterface &)((QNetworkInterface *)cls)->operator= (arg1));
 }
 
@@ -210,7 +210,7 @@ static void _call_f_swap_2358 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkInterface &arg1 = args.read<QNetworkInterface & > (heap);
+  QNetworkInterface &arg1 = gsi::arg_reader<QNetworkInterface & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkInterface *)cls)->swap (arg1);
 }
@@ -260,7 +260,7 @@ static void _call_f_interfaceFromIndex_767 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QNetworkInterface > ((QNetworkInterface)QNetworkInterface::interfaceFromIndex (arg1));
 }
 
@@ -279,7 +279,7 @@ static void _call_f_interfaceFromName_2025 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QNetworkInterface > ((QNetworkInterface)QNetworkInterface::interfaceFromName (arg1));
 }
 

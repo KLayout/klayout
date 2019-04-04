@@ -187,7 +187,7 @@ bool DB_PUBLIC compare_layouts (const db::Layout &a, const db::Layout &b, unsign
 /**
  *  @brief Compare two layouts using the specified top cells
  *
- *  This function basically works like the previous one but allows to specify top cells which 
+ *  This function basically works like the previous one but allows one to specify top cells which
  *  are compared hierarchically.
  */
 bool DB_PUBLIC compare_layouts (const db::Layout &a, db::cell_index_type top_a, const db::Layout &b, db::cell_index_type top_b, unsigned int flags, db::Coord tolerance, DifferenceReceiver &r);

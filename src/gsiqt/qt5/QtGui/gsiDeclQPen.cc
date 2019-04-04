@@ -67,7 +67,7 @@ static void _call_ctor_QPen_1569 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::PenStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::PenStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::PenStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::PenStyle>::target_type & >() (args, heap);
   ret.write<QPen *> (new QPen (qt_gsi::QtToCppAdaptor<Qt::PenStyle>(arg1).cref()));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QPen_1905 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   ret.write<QPen *> (new QPen (arg1));
 }
 
@@ -113,11 +113,11 @@ static void _call_ctor_QPen_7932 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
-  double arg2 = args.read<double > (heap);
-  const qt_gsi::Converter<Qt::PenStyle>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<Qt::PenStyle>::target_type & > (heap) : (const qt_gsi::Converter<Qt::PenStyle>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::PenStyle>(heap, Qt::SolidLine));
-  const qt_gsi::Converter<Qt::PenCapStyle>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<Qt::PenCapStyle>::target_type & > (heap) : (const qt_gsi::Converter<Qt::PenCapStyle>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::PenCapStyle>(heap, Qt::SquareCap));
-  const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & arg5 = args ? args.read<const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & > (heap) : (const qt_gsi::Converter<Qt::PenJoinStyle>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::PenJoinStyle>(heap, Qt::BevelJoin));
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<Qt::PenStyle>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::PenStyle>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::PenStyle>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::PenStyle>(heap, Qt::SolidLine), heap);
+  const qt_gsi::Converter<Qt::PenCapStyle>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::PenCapStyle>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::PenCapStyle>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::PenCapStyle>(heap, Qt::SquareCap), heap);
+  const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::PenJoinStyle>(heap, Qt::BevelJoin), heap);
   ret.write<QPen *> (new QPen (arg1, arg2, qt_gsi::QtToCppAdaptor<Qt::PenStyle>(arg3).cref(), qt_gsi::QtToCppAdaptor<Qt::PenCapStyle>(arg4).cref(), qt_gsi::QtToCppAdaptor<Qt::PenJoinStyle>(arg5).cref()));
 }
 
@@ -136,7 +136,7 @@ static void _call_ctor_QPen_1685 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPen &arg1 = args.read<const QPen & > (heap);
+  const QPen &arg1 = gsi::arg_reader<const QPen & >() (args, heap);
   ret.write<QPen *> (new QPen (arg1));
 }
 
@@ -305,7 +305,7 @@ static void _call_f_operator_excl__eq__c1685 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPen &arg1 = args.read<const QPen & > (heap);
+  const QPen &arg1 = gsi::arg_reader<const QPen & >() (args, heap);
   ret.write<bool > ((bool)((QPen *)cls)->operator!= (arg1));
 }
 
@@ -324,7 +324,7 @@ static void _call_f_operator_eq__1685 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPen &arg1 = args.read<const QPen & > (heap);
+  const QPen &arg1 = gsi::arg_reader<const QPen & >() (args, heap);
   ret.write<QPen & > ((QPen &)((QPen *)cls)->operator= (arg1));
 }
 
@@ -343,7 +343,7 @@ static void _call_f_operator_eq__eq__c1685 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPen &arg1 = args.read<const QPen & > (heap);
+  const QPen &arg1 = gsi::arg_reader<const QPen & >() (args, heap);
   ret.write<bool > ((bool)((QPen *)cls)->operator== (arg1));
 }
 
@@ -362,7 +362,7 @@ static void _call_f_setBrush_1910 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setBrush (arg1);
 }
@@ -382,7 +382,7 @@ static void _call_f_setCapStyle_1845 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::PenCapStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::PenCapStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::PenCapStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::PenCapStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setCapStyle (qt_gsi::QtToCppAdaptor<Qt::PenCapStyle>(arg1).cref());
 }
@@ -402,7 +402,7 @@ static void _call_f_setColor_1905 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QColor &arg1 = args.read<const QColor & > (heap);
+  const QColor &arg1 = gsi::arg_reader<const QColor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setColor (arg1);
 }
@@ -422,7 +422,7 @@ static void _call_f_setCosmetic_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setCosmetic (arg1);
 }
@@ -442,7 +442,7 @@ static void _call_f_setDashOffset_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setDashOffset (arg1);
 }
@@ -462,7 +462,7 @@ static void _call_f_setDashPattern_2676 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<qreal> &arg1 = args.read<const QVector<qreal> & > (heap);
+  const QVector<qreal> &arg1 = gsi::arg_reader<const QVector<qreal> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setDashPattern (arg1);
 }
@@ -482,7 +482,7 @@ static void _call_f_setJoinStyle_1969 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setJoinStyle (qt_gsi::QtToCppAdaptor<Qt::PenJoinStyle>(arg1).cref());
 }
@@ -502,7 +502,7 @@ static void _call_f_setMiterLimit_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setMiterLimit (arg1);
 }
@@ -522,7 +522,7 @@ static void _call_f_setStyle_1569u1 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::PenStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::PenStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::PenStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::PenStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setStyle (qt_gsi::QtToCppAdaptor<Qt::PenStyle>(arg1).cref());
 }
@@ -542,7 +542,7 @@ static void _call_f_setWidth_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setWidth (arg1);
 }
@@ -562,7 +562,7 @@ static void _call_f_setWidthF_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->setWidthF (arg1);
 }
@@ -597,7 +597,7 @@ static void _call_f_swap_990 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPen &arg1 = args.read<QPen & > (heap);
+  QPen &arg1 = gsi::arg_reader<QPen & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPen *)cls)->swap (arg1);
 }

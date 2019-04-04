@@ -144,7 +144,7 @@ static void _call_f_isDesignable_c1997 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QObject *arg1 = args ? args.read<const QObject * > (heap) : (const QObject *)(0);
+  const QObject *arg1 = args ? gsi::arg_reader<const QObject * >() (args, heap) : gsi::arg_maker<const QObject * >() (0, heap);
   ret.write<bool > ((bool)((QMetaProperty *)cls)->isDesignable (arg1));
 }
 
@@ -163,7 +163,7 @@ static void _call_f_isEditable_c1997 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QObject *arg1 = args ? args.read<const QObject * > (heap) : (const QObject *)(0);
+  const QObject *arg1 = args ? gsi::arg_reader<const QObject * >() (args, heap) : gsi::arg_maker<const QObject * >() (0, heap);
   ret.write<bool > ((bool)((QMetaProperty *)cls)->isEditable (arg1));
 }
 
@@ -257,7 +257,7 @@ static void _call_f_isScriptable_c1997 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QObject *arg1 = args ? args.read<const QObject * > (heap) : (const QObject *)(0);
+  const QObject *arg1 = args ? gsi::arg_reader<const QObject * >() (args, heap) : gsi::arg_maker<const QObject * >() (0, heap);
   ret.write<bool > ((bool)((QMetaProperty *)cls)->isScriptable (arg1));
 }
 
@@ -276,7 +276,7 @@ static void _call_f_isStored_c1997 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QObject *arg1 = args ? args.read<const QObject * > (heap) : (const QObject *)(0);
+  const QObject *arg1 = args ? gsi::arg_reader<const QObject * >() (args, heap) : gsi::arg_maker<const QObject * >() (0, heap);
   ret.write<bool > ((bool)((QMetaProperty *)cls)->isStored (arg1));
 }
 
@@ -295,7 +295,7 @@ static void _call_f_isUser_c1997 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QObject *arg1 = args ? args.read<const QObject * > (heap) : (const QObject *)(0);
+  const QObject *arg1 = args ? gsi::arg_reader<const QObject * >() (args, heap) : gsi::arg_maker<const QObject * >() (0, heap);
   ret.write<bool > ((bool)((QMetaProperty *)cls)->isUser (arg1));
 }
 
@@ -404,7 +404,7 @@ static void _call_f_read_c1997 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QObject *arg1 = args.read<const QObject * > (heap);
+  const QObject *arg1 = gsi::arg_reader<const QObject * >() (args, heap);
   ret.write<QVariant > ((QVariant)((QMetaProperty *)cls)->read (arg1));
 }
 
@@ -423,7 +423,7 @@ static void _call_f_reset_c1302 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<bool > ((bool)((QMetaProperty *)cls)->reset (arg1));
 }
 
@@ -489,8 +489,8 @@ static void _call_f_write_c3313 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   ret.write<bool > ((bool)((QMetaProperty *)cls)->write (arg1, arg2));
 }
 

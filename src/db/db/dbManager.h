@@ -144,7 +144,7 @@ public:
    *  @brief Undo the current transaction
    *
    *  The current transaction is undone with this method.
-   *  The 'available_undo' method can be used to determine wether
+   *  The 'available_undo' method can be used to determine whether
    *  there are transactions to undo.
    */
   void undo ();
@@ -153,7 +153,7 @@ public:
    *  @brief Redo the next available transaction
    *
    *  The next transaction is redone with this method.
-   *  The 'available_redo' method can be used to determine wether
+   *  The 'available_redo' method can be used to determine whether
    *  there are transactions to undo.
    */
   void redo ();
@@ -204,7 +204,7 @@ public:
   /**
    *  @brief Get the last queued db::Op object
    *
-   *  This method allows to fetch and modify the last queued operation for the given object in order
+   *  This method allows one to fetch and modify the last queued operation for the given object in order
    *  to allow some optimisation, i.e. joining two ops. It can be modified but must not
    *  be deleted. The returned object is guaranteed to be inside same transaction.
    *

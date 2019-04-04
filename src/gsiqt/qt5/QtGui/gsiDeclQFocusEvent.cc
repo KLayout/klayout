@@ -142,8 +142,8 @@ static void _call_ctor_QFocusEvent_Adaptor_3334 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = args.read<const qt_gsi::Converter<QEvent::Type>::target_type & > (heap);
-  const qt_gsi::Converter<Qt::FocusReason>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::FocusReason>::target_type & > (heap) : (const qt_gsi::Converter<Qt::FocusReason>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::FocusReason>(heap, Qt::OtherFocusReason));
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  const qt_gsi::Converter<Qt::FocusReason>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::FocusReason>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::FocusReason>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::FocusReason>(heap, Qt::OtherFocusReason), heap);
   ret.write<QFocusEvent_Adaptor *> (new QFocusEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), qt_gsi::QtToCppAdaptor<Qt::FocusReason>(arg2).cref()));
 }
 

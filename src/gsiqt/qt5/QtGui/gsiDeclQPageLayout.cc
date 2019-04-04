@@ -78,11 +78,11 @@ static void _call_ctor_QPageLayout_11008 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageSize &arg1 = args.read<const QPageSize & > (heap);
-  const qt_gsi::Converter<QPageLayout::Orientation>::target_type & arg2 = args.read<const qt_gsi::Converter<QPageLayout::Orientation>::target_type & > (heap);
-  const QMarginsF &arg3 = args.read<const QMarginsF & > (heap);
-  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QPageLayout::Unit>::target_type & > (heap) : (const qt_gsi::Converter<QPageLayout::Unit>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPageLayout::Unit>(heap, QPageLayout::Point));
-  const QMarginsF &arg5 = args ? args.read<const QMarginsF & > (heap) : (const QMarginsF &)(QMarginsF(0, 0, 0, 0));
+  const QPageSize &arg1 = gsi::arg_reader<const QPageSize & >() (args, heap);
+  const qt_gsi::Converter<QPageLayout::Orientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Orientation>::target_type & >() (args, heap);
+  const QMarginsF &arg3 = gsi::arg_reader<const QMarginsF & >() (args, heap);
+  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Unit>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPageLayout::Unit>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPageLayout::Unit>(heap, QPageLayout::Point), heap);
+  const QMarginsF &arg5 = args ? gsi::arg_reader<const QMarginsF & >() (args, heap) : gsi::arg_maker<const QMarginsF & >() (QMarginsF(0, 0, 0, 0), heap);
   ret.write<QPageLayout *> (new QPageLayout (arg1, qt_gsi::QtToCppAdaptor<QPageLayout::Orientation>(arg2).cref(), arg3, qt_gsi::QtToCppAdaptor<QPageLayout::Unit>(arg4).cref(), arg5));
 }
 
@@ -101,7 +101,7 @@ static void _call_ctor_QPageLayout_2413 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageLayout &arg1 = args.read<const QPageLayout & > (heap);
+  const QPageLayout &arg1 = gsi::arg_reader<const QPageLayout & >() (args, heap);
   ret.write<QPageLayout *> (new QPageLayout (arg1));
 }
 
@@ -135,7 +135,7 @@ static void _call_f_fullRect_c2068 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageLayout::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Unit>::target_type & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPageLayout *)cls)->fullRect (qt_gsi::QtToCppAdaptor<QPageLayout::Unit>(arg1).cref()));
 }
 
@@ -154,7 +154,7 @@ static void _call_f_fullRectPixels_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QRect > ((QRect)((QPageLayout *)cls)->fullRectPixels (arg1));
 }
 
@@ -188,7 +188,7 @@ static void _call_f_isEquivalentTo_c2413 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageLayout &arg1 = args.read<const QPageLayout & > (heap);
+  const QPageLayout &arg1 = gsi::arg_reader<const QPageLayout & >() (args, heap);
   ret.write<bool > ((bool)((QPageLayout *)cls)->isEquivalentTo (arg1));
 }
 
@@ -237,7 +237,7 @@ static void _call_f_margins_c2068 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageLayout::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Unit>::target_type & >() (args, heap);
   ret.write<QMarginsF > ((QMarginsF)((QPageLayout *)cls)->margins (qt_gsi::QtToCppAdaptor<QPageLayout::Unit>(arg1).cref()));
 }
 
@@ -256,7 +256,7 @@ static void _call_f_marginsPixels_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QMargins > ((QMargins)((QPageLayout *)cls)->marginsPixels (arg1));
 }
 
@@ -335,7 +335,7 @@ static void _call_f_operator_eq__2413 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageLayout &arg1 = args.read<const QPageLayout & > (heap);
+  const QPageLayout &arg1 = gsi::arg_reader<const QPageLayout & >() (args, heap);
   ret.write<QPageLayout & > ((QPageLayout &)((QPageLayout *)cls)->operator= (arg1));
 }
 
@@ -399,7 +399,7 @@ static void _call_f_paintRect_c2068 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageLayout::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Unit>::target_type & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPageLayout *)cls)->paintRect (qt_gsi::QtToCppAdaptor<QPageLayout::Unit>(arg1).cref()));
 }
 
@@ -418,7 +418,7 @@ static void _call_f_paintRectPixels_c767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QRect > ((QRect)((QPageLayout *)cls)->paintRectPixels (arg1));
 }
 
@@ -452,7 +452,7 @@ static void _call_f_setBottomMargin_1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<bool > ((bool)((QPageLayout *)cls)->setBottomMargin (arg1));
 }
 
@@ -471,7 +471,7 @@ static void _call_f_setLeftMargin_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<bool > ((bool)((QPageLayout *)cls)->setLeftMargin (arg1));
 }
 
@@ -490,7 +490,7 @@ static void _call_f_setMargins_2185 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMarginsF &arg1 = args.read<const QMarginsF & > (heap);
+  const QMarginsF &arg1 = gsi::arg_reader<const QMarginsF & >() (args, heap);
   ret.write<bool > ((bool)((QPageLayout *)cls)->setMargins (arg1));
 }
 
@@ -509,7 +509,7 @@ static void _call_f_setMinimumMargins_2185 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMarginsF &arg1 = args.read<const QMarginsF & > (heap);
+  const QMarginsF &arg1 = gsi::arg_reader<const QMarginsF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageLayout *)cls)->setMinimumMargins (arg1);
 }
@@ -529,7 +529,7 @@ static void _call_f_setMode_2041 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageLayout::Mode>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageLayout::Mode>::target_type & > (heap);
+  const qt_gsi::Converter<QPageLayout::Mode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Mode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageLayout *)cls)->setMode (qt_gsi::QtToCppAdaptor<QPageLayout::Mode>(arg1).cref());
 }
@@ -549,7 +549,7 @@ static void _call_f_setOrientation_2816 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageLayout::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageLayout::Orientation>::target_type & > (heap);
+  const qt_gsi::Converter<QPageLayout::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Orientation>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageLayout *)cls)->setOrientation (qt_gsi::QtToCppAdaptor<QPageLayout::Orientation>(arg1).cref());
 }
@@ -571,8 +571,8 @@ static void _call_f_setPageSize_4263 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPageSize &arg1 = args.read<const QPageSize & > (heap);
-  const QMarginsF &arg2 = args ? args.read<const QMarginsF & > (heap) : (const QMarginsF &)(QMarginsF(0, 0, 0, 0));
+  const QPageSize &arg1 = gsi::arg_reader<const QPageSize & >() (args, heap);
+  const QMarginsF &arg2 = args ? gsi::arg_reader<const QMarginsF & >() (args, heap) : gsi::arg_maker<const QMarginsF & >() (QMarginsF(0, 0, 0, 0), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageLayout *)cls)->setPageSize (arg1, arg2);
 }
@@ -592,7 +592,7 @@ static void _call_f_setRightMargin_1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<bool > ((bool)((QPageLayout *)cls)->setRightMargin (arg1));
 }
 
@@ -611,7 +611,7 @@ static void _call_f_setTopMargin_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<bool > ((bool)((QPageLayout *)cls)->setTopMargin (arg1));
 }
 
@@ -630,7 +630,7 @@ static void _call_f_setUnits_2068 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg1 = args.read<const qt_gsi::Converter<QPageLayout::Unit>::target_type & > (heap);
+  const qt_gsi::Converter<QPageLayout::Unit>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPageLayout::Unit>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageLayout *)cls)->setUnits (qt_gsi::QtToCppAdaptor<QPageLayout::Unit>(arg1).cref());
 }
@@ -650,7 +650,7 @@ static void _call_f_swap_1718 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPageLayout &arg1 = args.read<QPageLayout & > (heap);
+  QPageLayout &arg1 = gsi::arg_reader<QPageLayout & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPageLayout *)cls)->swap (arg1);
 }

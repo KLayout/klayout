@@ -143,7 +143,7 @@ static void _call_f_jumpToImage_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QImageIOHandler *)cls)->jumpToImage (arg1));
 }
 
@@ -222,7 +222,7 @@ static void _call_f_option_c3086 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & > (heap);
+  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QImageIOHandler *)cls)->option (qt_gsi::QtToCppAdaptor<QImageIOHandler::ImageOption>(arg1).cref()));
 }
 
@@ -241,7 +241,7 @@ static void _call_f_read_1186 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QImage *arg1 = args.read<QImage * > (heap);
+  QImage *arg1 = gsi::arg_reader<QImage * >() (args, heap);
   ret.write<bool > ((bool)((QImageIOHandler *)cls)->read (arg1));
 }
 
@@ -260,7 +260,7 @@ static void _call_f_setDevice_1447 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageIOHandler *)cls)->setDevice (arg1);
 }
@@ -280,7 +280,7 @@ static void _call_f_setFormat_2309 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageIOHandler *)cls)->setFormat (arg1);
 }
@@ -300,7 +300,7 @@ static void _call_f_setFormat_c2309 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageIOHandler *)cls)->setFormat (arg1);
 }
@@ -322,8 +322,8 @@ static void _call_f_setOption_5097 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QImageIOHandler *)cls)->setOption (qt_gsi::QtToCppAdaptor<QImageIOHandler::ImageOption>(arg1).cref(), arg2);
 }
@@ -343,7 +343,7 @@ static void _call_f_supportsOption_c3086 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & > (heap);
+  const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QImageIOHandler::ImageOption>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QImageIOHandler *)cls)->supportsOption (qt_gsi::QtToCppAdaptor<QImageIOHandler::ImageOption>(arg1).cref()));
 }
 
@@ -362,7 +362,7 @@ static void _call_f_write_1877 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImage &arg1 = args.read<const QImage & > (heap);
+  const QImage &arg1 = gsi::arg_reader<const QImage & >() (args, heap);
   ret.write<bool > ((bool)((QImageIOHandler *)cls)->write (arg1));
 }
 

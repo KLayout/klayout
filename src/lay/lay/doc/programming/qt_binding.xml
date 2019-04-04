@@ -203,8 +203,8 @@ end</pre>
   <h3>Enums</h3>
 
   <p>
-  Enum types are available as classes to give them a specific context. Since Ruby does not allow to
-  declare classes within classes, enums declared inside a class must be declared as separate classes outside that class.
+  Enum types are available as classes to give them a specific context. Since Ruby does not allow
+  declaration of classes within classes, enums declared inside a class must be declared as separate classes outside that class.
   The relationship is indicated by the Enum's class name. For example, <tt>QMessageBox::Icon</tt> (C++) is available
   as the Ruby class <tt>QMessageBox_Icon</tt>. The enum values are defined as constants within that class and the enclosing class. 
   For example <tt>QMessageBox::Critical</tt> which is a value for <tt>QMessageBox::Icon</tt> is available as <tt>QMessageBox_Icon::Critical</tt> and <tt>QMessageBox::Critical</tt>
@@ -215,7 +215,7 @@ end</pre>
   Starting with version 0.24, the <tt>QFlags</tt> template is supported as a separate class.
   The name of the class indicates the relationship to the enum class.
   For example, <tt>QFlags&lt;QMessageBox::Icon&gt;</tt> is available as <tt>QMessageBox_QFlags_Icon</tt>.
-  Enum classes are derived from their respective flags class, so they can serve to initialize aguments
+  Enum classes are derived from their respective flags class, so they can serve to initialize arguments
   expecting flags.
   It's hardly required to operate with the flags classes directly, since they are created automatically
   when joining enum's with the "or" (<tt>|</tt>) operator:

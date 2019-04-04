@@ -65,7 +65,7 @@ static void _call_ctor_QTextOption_2750 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   ret.write<QTextOption *> (new QTextOption (arg1));
 }
 
@@ -84,7 +84,7 @@ static void _call_ctor_QTextOption_2448 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextOption &arg1 = args.read<const QTextOption & > (heap);
+  const QTextOption &arg1 = gsi::arg_reader<const QTextOption & >() (args, heap);
   ret.write<QTextOption *> (new QTextOption (arg1));
 }
 
@@ -133,7 +133,7 @@ static void _call_f_operator_eq__2448 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextOption &arg1 = args.read<const QTextOption & > (heap);
+  const QTextOption &arg1 = gsi::arg_reader<const QTextOption & >() (args, heap);
   ret.write<QTextOption & > ((QTextOption &)((QTextOption *)cls)->operator= (arg1));
 }
 
@@ -152,7 +152,7 @@ static void _call_f_setAlignment_2750 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextOption *)cls)->setAlignment (arg1);
 }
@@ -172,7 +172,7 @@ static void _call_f_setFlags_2761 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QTextOption::Flag> arg1 = args.read<QFlags<QTextOption::Flag> > (heap);
+  QFlags<QTextOption::Flag> arg1 = gsi::arg_reader<QFlags<QTextOption::Flag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextOption *)cls)->setFlags (arg1);
 }
@@ -192,7 +192,7 @@ static void _call_f_setTabArray_1584 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QList<qreal> arg1 = args.read<QList<qreal> > (heap);
+  QList<qreal> arg1 = gsi::arg_reader<QList<qreal> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextOption *)cls)->setTabArray (arg1);
 }
@@ -212,7 +212,7 @@ static void _call_f_setTabStop_1071 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextOption *)cls)->setTabStop (arg1);
 }
@@ -232,7 +232,7 @@ static void _call_f_setTabs_2581 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QList<QTextOption::Tab> arg1 = args.read<QList<QTextOption::Tab> > (heap);
+  QList<QTextOption::Tab> arg1 = gsi::arg_reader<QList<QTextOption::Tab> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextOption *)cls)->setTabs (arg1);
 }
@@ -252,7 +252,7 @@ static void _call_f_setTextDirection_2316 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::LayoutDirection>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::LayoutDirection>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::LayoutDirection>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::LayoutDirection>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextOption *)cls)->setTextDirection (qt_gsi::QtToCppAdaptor<Qt::LayoutDirection>(arg1).cref());
 }
@@ -272,7 +272,7 @@ static void _call_f_setUseDesignMetrics_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextOption *)cls)->setUseDesignMetrics (arg1);
 }
@@ -292,7 +292,7 @@ static void _call_f_setWrapMode_2486 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextOption::WrapMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextOption::WrapMode>::target_type & > (heap);
+  const qt_gsi::Converter<QTextOption::WrapMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextOption::WrapMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextOption *)cls)->setWrapMode (qt_gsi::QtToCppAdaptor<QTextOption::WrapMode>(arg1).cref());
 }

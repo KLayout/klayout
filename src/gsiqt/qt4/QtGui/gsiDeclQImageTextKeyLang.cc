@@ -52,8 +52,8 @@ static void _call_ctor_QImageTextKeyLang_3354 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QImageTextKeyLang *> (new QImageTextKeyLang (arg1, arg2));
 }
 
@@ -87,7 +87,7 @@ static void _call_f_operator_excl__eq__c2981 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImageTextKeyLang &arg1 = args.read<const QImageTextKeyLang & > (heap);
+  const QImageTextKeyLang &arg1 = gsi::arg_reader<const QImageTextKeyLang & >() (args, heap);
   ret.write<bool > ((bool)((QImageTextKeyLang *)cls)->operator!= (arg1));
 }
 
@@ -106,7 +106,7 @@ static void _call_f_operator_lt__c2981 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImageTextKeyLang &arg1 = args.read<const QImageTextKeyLang & > (heap);
+  const QImageTextKeyLang &arg1 = gsi::arg_reader<const QImageTextKeyLang & >() (args, heap);
   ret.write<bool > ((bool)((QImageTextKeyLang *)cls)->operator< (arg1));
 }
 
@@ -125,7 +125,7 @@ static void _call_f_operator_eq__eq__c2981 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QImageTextKeyLang &arg1 = args.read<const QImageTextKeyLang & > (heap);
+  const QImageTextKeyLang &arg1 = gsi::arg_reader<const QImageTextKeyLang & >() (args, heap);
   ret.write<bool > ((bool)((QImageTextKeyLang *)cls)->operator== (arg1));
 }
 

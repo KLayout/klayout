@@ -69,9 +69,9 @@ static void _call_ctor_QDate_2085 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QDate *> (new QDate (arg1, arg2, arg3));
 }
 
@@ -90,7 +90,7 @@ static void _call_f_addDays_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QDate > ((QDate)((QDate *)cls)->addDays (arg1));
 }
 
@@ -109,7 +109,7 @@ static void _call_f_addMonths_c767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QDate > ((QDate)((QDate *)cls)->addMonths (arg1));
 }
 
@@ -128,7 +128,7 @@ static void _call_f_addYears_c767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QDate > ((QDate)((QDate *)cls)->addYears (arg1));
 }
 
@@ -222,7 +222,7 @@ static void _call_f_daysTo_c1776 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ret.write<int > ((int)((QDate *)cls)->daysTo (arg1));
 }
 
@@ -245,9 +245,9 @@ static void _call_f_getDate_2643 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args.read<int * > (heap);
-  int *arg2 = args.read<int * > (heap);
-  int *arg3 = args.read<int * > (heap);
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDate *)cls)->getDate (arg1, arg2, arg3);
 }
@@ -312,7 +312,7 @@ static void _call_f_operator_excl__eq__c1776 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ret.write<bool > ((bool)((QDate *)cls)->operator!= (arg1));
 }
 
@@ -331,7 +331,7 @@ static void _call_f_operator_lt__c1776 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ret.write<bool > ((bool)((QDate *)cls)->operator< (arg1));
 }
 
@@ -350,7 +350,7 @@ static void _call_f_operator_lt__eq__c1776 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ret.write<bool > ((bool)((QDate *)cls)->operator<= (arg1));
 }
 
@@ -369,7 +369,7 @@ static void _call_f_operator_eq__eq__c1776 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ret.write<bool > ((bool)((QDate *)cls)->operator== (arg1));
 }
 
@@ -388,7 +388,7 @@ static void _call_f_operator_gt__c1776 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ret.write<bool > ((bool)((QDate *)cls)->operator> (arg1));
 }
 
@@ -407,7 +407,7 @@ static void _call_f_operator_gt__eq__c1776 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDate &arg1 = args.read<const QDate & > (heap);
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
   ret.write<bool > ((bool)((QDate *)cls)->operator>= (arg1));
 }
 
@@ -430,9 +430,9 @@ static void _call_f_setDate_2085 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QDate *)cls)->setDate (arg1, arg2, arg3));
 }
 
@@ -455,9 +455,9 @@ static void _call_f_setYMD_2085 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QDate *)cls)->setYMD (arg1, arg2, arg3));
 }
 
@@ -491,7 +491,7 @@ static void _call_f_toString_c1748 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<Qt::DateFormat>::target_type & > (heap) : (const qt_gsi::Converter<Qt::DateFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate));
+  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate), heap);
   ret.write<QString > ((QString)((QDate *)cls)->toString (qt_gsi::QtToCppAdaptor<Qt::DateFormat>(arg1).cref()));
 }
 
@@ -510,7 +510,7 @@ static void _call_f_toString_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QDate *)cls)->toString (arg1));
 }
 
@@ -529,7 +529,7 @@ static void _call_f_weekNumber_c953 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args ? args.read<int * > (heap) : (int *)(0);
+  int *arg1 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
   ret.write<int > ((int)((QDate *)cls)->weekNumber (arg1));
 }
 
@@ -578,7 +578,7 @@ static void _call_f_fromJulianDay_767 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QDate > ((QDate)QDate::fromJulianDay (arg1));
 }
 
@@ -599,8 +599,8 @@ static void _call_f_fromString_3665 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::DateFormat>::target_type & > (heap) : (const qt_gsi::Converter<Qt::DateFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate), heap);
   ret.write<QDate > ((QDate)QDate::fromString (arg1, qt_gsi::QtToCppAdaptor<Qt::DateFormat>(arg2).cref()));
 }
 
@@ -621,8 +621,8 @@ static void _call_f_fromString_3942 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QDate > ((QDate)QDate::fromString (arg1, arg2));
 }
 
@@ -645,9 +645,9 @@ static void _call_f_gregorianToJulian_2085 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<unsigned int > ((unsigned int)QDate::gregorianToJulian (arg1, arg2, arg3));
 }
 
@@ -666,7 +666,7 @@ static void _call_f_isLeapYear_767 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)QDate::isLeapYear (arg1));
 }
 
@@ -689,9 +689,9 @@ static void _call_f_isValid_2085 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)QDate::isValid (arg1, arg2, arg3));
 }
 
@@ -716,10 +716,10 @@ static void _call_f_julianToGregorian_4295 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
-  int &arg2 = args.read<int & > (heap);
-  int &arg3 = args.read<int & > (heap);
-  int &arg4 = args.read<int & > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
+  int &arg2 = gsi::arg_reader<int & >() (args, heap);
+  int &arg3 = gsi::arg_reader<int & >() (args, heap);
+  int &arg4 = gsi::arg_reader<int & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QDate::julianToGregorian (arg1, arg2, arg3, arg4);
 }
@@ -739,7 +739,7 @@ static void _call_f_longDayName_767 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QDate::longDayName (arg1));
 }
 
@@ -760,8 +760,8 @@ static void _call_f_longDayName_2995 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QDate::MonthNameType>::target_type & arg2 = args.read<const qt_gsi::Converter<QDate::MonthNameType>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QDate::MonthNameType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QDate::MonthNameType>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QDate::longDayName (arg1, qt_gsi::QtToCppAdaptor<QDate::MonthNameType>(arg2).cref()));
 }
 
@@ -780,7 +780,7 @@ static void _call_f_longMonthName_767 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QDate::longMonthName (arg1));
 }
 
@@ -801,8 +801,8 @@ static void _call_f_longMonthName_2995 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QDate::MonthNameType>::target_type & arg2 = args.read<const qt_gsi::Converter<QDate::MonthNameType>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QDate::MonthNameType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QDate::MonthNameType>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QDate::longMonthName (arg1, qt_gsi::QtToCppAdaptor<QDate::MonthNameType>(arg2).cref()));
 }
 
@@ -821,7 +821,7 @@ static void _call_f_shortDayName_767 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QDate::shortDayName (arg1));
 }
 
@@ -842,8 +842,8 @@ static void _call_f_shortDayName_2995 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QDate::MonthNameType>::target_type & arg2 = args.read<const qt_gsi::Converter<QDate::MonthNameType>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QDate::MonthNameType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QDate::MonthNameType>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QDate::shortDayName (arg1, qt_gsi::QtToCppAdaptor<QDate::MonthNameType>(arg2).cref()));
 }
 
@@ -862,7 +862,7 @@ static void _call_f_shortMonthName_767 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QDate::shortMonthName (arg1));
 }
 
@@ -883,8 +883,8 @@ static void _call_f_shortMonthName_2995 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QDate::MonthNameType>::target_type & arg2 = args.read<const qt_gsi::Converter<QDate::MonthNameType>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QDate::MonthNameType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QDate::MonthNameType>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QDate::shortMonthName (arg1, qt_gsi::QtToCppAdaptor<QDate::MonthNameType>(arg2).cref()));
 }
 

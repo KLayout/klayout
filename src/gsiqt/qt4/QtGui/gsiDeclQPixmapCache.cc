@@ -97,7 +97,7 @@ static void _call_f_find_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QPixmap * > ((QPixmap *)QPixmapCache::find (arg1));
 }
 
@@ -118,8 +118,8 @@ static void _call_f_find_3239 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QPixmap &arg2 = args.read<QPixmap & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QPixmap &arg2 = gsi::arg_reader<QPixmap & >() (args, heap);
   ret.write<bool > ((bool)QPixmapCache::find (arg1, arg2));
 }
 
@@ -140,8 +140,8 @@ static void _call_f_find_3243 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QPixmap *arg2 = args.read<QPixmap * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QPixmap *arg2 = gsi::arg_reader<QPixmap * >() (args, heap);
   ret.write<bool > ((bool)QPixmapCache::find (arg1, arg2));
 }
 
@@ -162,8 +162,8 @@ static void _call_f_insert_3934 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QPixmap &arg2 = args.read<const QPixmap & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QPixmap &arg2 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<bool > ((bool)QPixmapCache::insert (arg1, arg2));
 }
 
@@ -182,7 +182,7 @@ static void _call_f_remove_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QPixmapCache::remove (arg1);
 }
@@ -202,7 +202,7 @@ static void _call_f_setCacheLimit_767 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QPixmapCache::setCacheLimit (arg1);
 }

@@ -103,7 +103,7 @@ static void _call_ctor_QExposeEvent_Adaptor_2006 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegion &arg1 = args.read<const QRegion & > (heap);
+  const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QExposeEvent_Adaptor *> (new QExposeEvent_Adaptor (arg1));
 }
 

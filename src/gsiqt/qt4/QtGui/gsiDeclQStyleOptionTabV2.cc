@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionTabV2_2971 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTabV2 &arg1 = args.read<const QStyleOptionTabV2 & > (heap);
+  const QStyleOptionTabV2 &arg1 = gsi::arg_reader<const QStyleOptionTabV2 & >() (args, heap);
   ret.write<QStyleOptionTabV2 *> (new QStyleOptionTabV2 (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QStyleOptionTabV2_2835 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTab &arg1 = args.read<const QStyleOptionTab & > (heap);
+  const QStyleOptionTab &arg1 = gsi::arg_reader<const QStyleOptionTab & >() (args, heap);
   ret.write<QStyleOptionTabV2 *> (new QStyleOptionTabV2 (arg1));
 }
 
@@ -105,7 +105,7 @@ static void _call_f_operator_eq__2835 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTab &arg1 = args.read<const QStyleOptionTab & > (heap);
+  const QStyleOptionTab &arg1 = gsi::arg_reader<const QStyleOptionTab & >() (args, heap);
   ret.write<QStyleOptionTabV2 & > ((QStyleOptionTabV2 &)((QStyleOptionTabV2 *)cls)->operator= (arg1));
 }
 

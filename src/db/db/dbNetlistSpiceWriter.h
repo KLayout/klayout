@@ -86,6 +86,12 @@ public:
 
   virtual void write (tl::OutputStream &stream, const db::Netlist &netlist, const std::string &description);
 
+  void set_use_net_names (bool use_net_names);
+  bool use_net_names () const
+  {
+    return m_use_net_names;
+  }
+
 private:
   friend class NetlistSpiceWriterDelegate;
 
@@ -93,6 +99,7 @@ private:
   tl::OutputStream *mp_stream;
   tl::weak_ptr<NetlistSpiceWriterDelegate> mp_delegate;
   std::map<const db::Net *, size_t> m_net_to_spice_id;
+  bool m_use_net_names;
 
   void do_write (const std::string &description);
 

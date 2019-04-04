@@ -382,7 +382,7 @@ struct coord_traits<int64_t>
 /** 
  *  @brief Coord_traits specialisation for double coordinates 
  *
- *  The precision is choosen such that the double coordinate
+ *  The precision is chosen such that the double coordinate
  *  can represent "micrometers" with a physical resolution limit of 0.01 nm.
  *  The area precision will render reliable vector product signs for vectors
  *  of roughly up to 60 mm length.

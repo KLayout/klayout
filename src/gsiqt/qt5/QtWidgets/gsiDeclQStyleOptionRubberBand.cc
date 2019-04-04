@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionRubberBand_3539 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionRubberBand &arg1 = args.read<const QStyleOptionRubberBand & > (heap);
+  const QStyleOptionRubberBand &arg1 = gsi::arg_reader<const QStyleOptionRubberBand & >() (args, heap);
   ret.write<QStyleOptionRubberBand *> (new QStyleOptionRubberBand (arg1));
 }
 

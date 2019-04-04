@@ -81,7 +81,7 @@ static void _call_ctor_QDomComment_2405 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomComment &arg1 = args.read<const QDomComment & > (heap);
+  const QDomComment &arg1 = gsi::arg_reader<const QDomComment & >() (args, heap);
   ret.write<QDomComment *> (new QDomComment (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_operator_eq__2405 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomComment &arg1 = args.read<const QDomComment & > (heap);
+  const QDomComment &arg1 = gsi::arg_reader<const QDomComment & >() (args, heap);
   ret.write<QDomComment & > ((QDomComment &)((QDomComment *)cls)->operator= (arg1));
 }
 

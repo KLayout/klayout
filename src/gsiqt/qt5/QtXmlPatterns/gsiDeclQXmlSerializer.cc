@@ -51,7 +51,7 @@ static void _call_f_atomicValue_2119 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSerializer *)cls)->atomicValue (arg1);
 }
@@ -73,8 +73,8 @@ static void _call_f_attribute_4286 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
-  const QStringRef &arg2 = args.read<const QStringRef & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
+  const QStringRef &arg2 = gsi::arg_reader<const QStringRef & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSerializer *)cls)->attribute (arg1, arg2);
 }
@@ -94,7 +94,7 @@ static void _call_f_characters_2310 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSerializer *)cls)->characters (arg1);
 }
@@ -129,7 +129,7 @@ static void _call_f_comment_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSerializer *)cls)->comment (arg1);
 }
@@ -197,7 +197,7 @@ static void _call_f_namespaceBinding_2084 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSerializer *)cls)->namespaceBinding (arg1);
 }
@@ -234,8 +234,8 @@ static void _call_f_processingInstruction_4001 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSerializer *)cls)->processingInstruction (arg1, arg2);
 }
@@ -255,7 +255,7 @@ static void _call_f_setCodec_2297 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCodec *arg1 = args.read<const QTextCodec * > (heap);
+  const QTextCodec *arg1 = gsi::arg_reader<const QTextCodec * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSerializer *)cls)->setCodec (arg1);
 }
@@ -291,7 +291,7 @@ static void _call_f_startElement_2084 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlSerializer *)cls)->startElement (arg1);
 }
@@ -586,8 +586,8 @@ static void _call_ctor_QXmlSerializer_Adaptor_3572 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlQuery &arg1 = args.read<const QXmlQuery & > (heap);
-  QIODevice *arg2 = args.read<QIODevice * > (heap);
+  const QXmlQuery &arg1 = gsi::arg_reader<const QXmlQuery & >() (args, heap);
+  QIODevice *arg2 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QXmlSerializer_Adaptor *> (new QXmlSerializer_Adaptor (arg1, arg2));
 }
 

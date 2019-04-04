@@ -74,11 +74,11 @@ static void _call_ctor_QSslKey_10374 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & arg2 = args.read<const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & > (heap);
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
-  const qt_gsi::Converter<QSsl::KeyType>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QSsl::KeyType>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::KeyType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::KeyType>(heap, QSsl::PrivateKey));
-  const QByteArray &arg5 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
+  const qt_gsi::Converter<QSsl::KeyType>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::KeyType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::KeyType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::KeyType>(heap, QSsl::PrivateKey), heap);
+  const QByteArray &arg5 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QSslKey *> (new QSslKey (arg1, qt_gsi::QtToCppAdaptor<QSsl::KeyAlgorithm>(arg2).cref(), qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg3).cref(), qt_gsi::QtToCppAdaptor<QSsl::KeyType>(arg4).cref(), arg5));
 }
 
@@ -105,11 +105,11 @@ static void _call_ctor_QSslKey_9512 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & arg2 = args.read<const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & > (heap);
-  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::EncodingFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem));
-  const qt_gsi::Converter<QSsl::KeyType>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QSsl::KeyType>::target_type & > (heap) : (const qt_gsi::Converter<QSsl::KeyType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSsl::KeyType>(heap, QSsl::PrivateKey));
-  const QByteArray &arg5 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSsl::KeyAlgorithm>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::EncodingFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::EncodingFormat>(heap, QSsl::Pem), heap);
+  const qt_gsi::Converter<QSsl::KeyType>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QSsl::KeyType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSsl::KeyType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSsl::KeyType>(heap, QSsl::PrivateKey), heap);
+  const QByteArray &arg5 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QSslKey *> (new QSslKey (arg1, qt_gsi::QtToCppAdaptor<QSsl::KeyAlgorithm>(arg2).cref(), qt_gsi::QtToCppAdaptor<QSsl::EncodingFormat>(arg3).cref(), qt_gsi::QtToCppAdaptor<QSsl::KeyType>(arg4).cref(), arg5));
 }
 
@@ -128,7 +128,7 @@ static void _call_ctor_QSslKey_1997 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslKey &arg1 = args.read<const QSslKey & > (heap);
+  const QSslKey &arg1 = gsi::arg_reader<const QSslKey & >() (args, heap);
   ret.write<QSslKey *> (new QSslKey (arg1));
 }
 
@@ -223,7 +223,7 @@ static void _call_f_operator_excl__eq__c1997 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslKey &arg1 = args.read<const QSslKey & > (heap);
+  const QSslKey &arg1 = gsi::arg_reader<const QSslKey & >() (args, heap);
   ret.write<bool > ((bool)((QSslKey *)cls)->operator!= (arg1));
 }
 
@@ -242,7 +242,7 @@ static void _call_f_operator_eq__1997 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslKey &arg1 = args.read<const QSslKey & > (heap);
+  const QSslKey &arg1 = gsi::arg_reader<const QSslKey & >() (args, heap);
   ret.write<QSslKey & > ((QSslKey &)((QSslKey *)cls)->operator= (arg1));
 }
 
@@ -261,7 +261,7 @@ static void _call_f_operator_eq__eq__c1997 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslKey &arg1 = args.read<const QSslKey & > (heap);
+  const QSslKey &arg1 = gsi::arg_reader<const QSslKey & >() (args, heap);
   ret.write<bool > ((bool)((QSslKey *)cls)->operator== (arg1));
 }
 
@@ -280,7 +280,7 @@ static void _call_f_toDer_c2309 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const QByteArray &arg1 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QByteArray > ((QByteArray)((QSslKey *)cls)->toDer (arg1));
 }
 
@@ -299,7 +299,7 @@ static void _call_f_toPem_c2309 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args ? args.read<const QByteArray & > (heap) : (const QByteArray &)(QByteArray());
+  const QByteArray &arg1 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<QByteArray > ((QByteArray)((QSslKey *)cls)->toPem (arg1));
 }
 

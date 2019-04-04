@@ -1040,7 +1040,7 @@ Class<db::DCplxTrans> decl_DCplxTrans ("db", "DCplxTrans",
   cplx_trans_defs<db::DCplxTrans>::methods (),
   "@brief A complex transformation\n"
   "\n"
-  "A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitary\n"
+  "A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitrary\n"
   "angle and a displacement. This is also the order, the operations are applied.\n"
   "\n"
   "A complex transformation provides a superset of the simple transformation.\n"
@@ -1129,7 +1129,7 @@ Class<db::CplxTrans> decl_CplxTrans ("db", "CplxTrans",
   cplx_trans_defs<db::CplxTrans>::methods (),
   "@brief A complex transformation\n"
   "\n"
-  "A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitary\n"
+  "A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitrary\n"
   "angle and a displacement. This is also the order, the operations are applied.\n"
   "This version can transform integer-coordinate objects into floating-point coordinate objects. "
   "This is the generic and exact case, for example for non-integer magnifications.\n"
@@ -1212,7 +1212,7 @@ Class<db::ICplxTrans> decl_ICplxTrans ("db", "ICplxTrans",
   cplx_trans_defs<db::ICplxTrans>::methods (),
   "@brief A complex transformation\n"
   "\n"
-  "A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitary\n"
+  "A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitrary\n"
   "angle and a displacement. This is also the order, the operations are applied.\n"
   "This version can transform integer-coordinate objects into the same, which may involve rounding and can be inexact.\n"
   "\n"
@@ -1294,7 +1294,7 @@ Class<db::VCplxTrans> decl_VCplxTrans ("db", "VCplxTrans",
   cplx_trans_defs<db::VCplxTrans>::methods (),
   "@brief A complex transformation\n"
   "\n"
-  "A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitary\n"
+  "A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitrary\n"
   "angle and a displacement. This is also the order, the operations are applied.\n"
   "This version can transform floating point coordinate objects into integer coordinate objects, which may involve rounding and can be inexact.\n"
   "\n"

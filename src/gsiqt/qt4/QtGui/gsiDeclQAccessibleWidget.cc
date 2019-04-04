@@ -59,9 +59,9 @@ static void _call_ctor_QAccessibleWidget_5165 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const qt_gsi::Converter<QAccessible::Role>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QAccessible::Role>::target_type & > (heap) : (const qt_gsi::Converter<QAccessible::Role>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAccessible::Role>(heap, QAccessible::Client));
-  const QString &arg3 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const qt_gsi::Converter<QAccessible::Role>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAccessible::Role>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAccessible::Role>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAccessible::Role>(heap, QAccessible::Client), heap);
+  const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QAccessibleWidget *> (new QAccessibleWidget (arg1, qt_gsi::QtToCppAdaptor<QAccessible::Role>(arg2).cref(), arg3));
 }
 
@@ -84,9 +84,9 @@ static void _call_f_actionText_c3378 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QAccessible::Text>::target_type & arg2 = args.read<const qt_gsi::Converter<QAccessible::Text>::target_type & > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QAccessible::Text>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QAccessible::Text>::target_type & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleWidget *)cls)->actionText (arg1, qt_gsi::QtToCppAdaptor<QAccessible::Text>(arg2).cref(), arg3));
 }
 
@@ -107,8 +107,8 @@ static void _call_f_childAt_c1426 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QAccessibleWidget *)cls)->childAt (arg1, arg2));
 }
 
@@ -146,9 +146,9 @@ static void _call_f_doAction_4052 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QList<QVariant> &arg3 = args.read<const QList<QVariant> & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QList<QVariant> &arg3 = gsi::arg_reader<const QList<QVariant> & >() (args, heap);
   ret.write<bool > ((bool)((QAccessibleWidget *)cls)->doAction (arg1, arg2, arg3));
 }
 
@@ -167,7 +167,7 @@ static void _call_f_indexOfChild_c3317 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAccessibleInterface *arg1 = args.read<const QAccessibleInterface * > (heap);
+  const QAccessibleInterface *arg1 = gsi::arg_reader<const QAccessibleInterface * >() (args, heap);
   ret.write<int > ((int)((QAccessibleWidget *)cls)->indexOfChild (arg1));
 }
 
@@ -186,7 +186,7 @@ static void _call_f_rect_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QRect > ((QRect)((QAccessibleWidget *)cls)->rect (arg1));
 }
 
@@ -209,9 +209,9 @@ static void _call_f_relationTo_c4635 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QAccessibleInterface *arg2 = args.read<const QAccessibleInterface * > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QAccessibleInterface *arg2 = gsi::arg_reader<const QAccessibleInterface * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QFlags<QAccessible::RelationFlag> > ((QFlags<QAccessible::RelationFlag>)((QAccessibleWidget *)cls)->relationTo (arg1, arg2, arg3));
 }
 
@@ -230,7 +230,7 @@ static void _call_f_role_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<qt_gsi::Converter<QAccessible::Role>::target_type > ((qt_gsi::Converter<QAccessible::Role>::target_type)qt_gsi::CppToQtAdaptor<QAccessible::Role>(((QAccessibleWidget *)cls)->role (arg1)));
 }
 
@@ -249,7 +249,7 @@ static void _call_f_state_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QFlags<QAccessible::StateFlag> > ((QFlags<QAccessible::StateFlag>)((QAccessibleWidget *)cls)->state (arg1));
 }
 
@@ -270,8 +270,8 @@ static void _call_f_text_c2719 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAccessible::Text>::target_type & arg1 = args.read<const qt_gsi::Converter<QAccessible::Text>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
+  const qt_gsi::Converter<QAccessible::Text>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAccessible::Text>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QAccessibleWidget *)cls)->text (qt_gsi::QtToCppAdaptor<QAccessible::Text>(arg1).cref(), arg2));
 }
 
@@ -290,7 +290,7 @@ static void _call_f_userActionCount_c767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QAccessibleWidget *)cls)->userActionCount (arg1));
 }
 

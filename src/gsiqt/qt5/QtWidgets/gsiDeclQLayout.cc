@@ -90,7 +90,7 @@ static void _call_f_addItem_1740 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayoutItem *arg1 = args.read<QLayoutItem * > (heap);
+  QLayoutItem *arg1 = gsi::arg_reader<QLayoutItem * >() (args, heap);
   qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->addItem (arg1);
@@ -111,7 +111,7 @@ static void _call_f_addWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->addWidget (arg1);
 }
@@ -227,10 +227,10 @@ static void _call_f_getContentsMargins_c3488 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args.read<int * > (heap);
-  int *arg2 = args.read<int * > (heap);
-  int *arg3 = args.read<int * > (heap);
-  int *arg4 = args.read<int * > (heap);
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  int *arg4 = gsi::arg_reader<int * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->getContentsMargins (arg1, arg2, arg3, arg4);
 }
@@ -250,7 +250,7 @@ static void _call_f_indexOf_c1315 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<int > ((int)((QLayout *)cls)->indexOf (arg1));
 }
 
@@ -315,7 +315,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QLayoutItem * > ((QLayoutItem *)((QLayout *)cls)->itemAt (arg1));
 }
 
@@ -424,7 +424,7 @@ static void _call_f_removeItem_1740 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayoutItem *arg1 = args.read<QLayoutItem * > (heap);
+  QLayoutItem *arg1 = gsi::arg_reader<QLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->removeItem (arg1);
 }
@@ -444,7 +444,7 @@ static void _call_f_removeWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->removeWidget (arg1);
 }
@@ -468,9 +468,9 @@ static void _call_f_replaceWidget_5361 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
-  QFlags<Qt::FindChildOption> arg3 = args ? args.read<QFlags<Qt::FindChildOption> > (heap) : (QFlags<Qt::FindChildOption>)(Qt::FindChildrenRecursively);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  QFlags<Qt::FindChildOption> arg3 = args ? gsi::arg_reader<QFlags<Qt::FindChildOption> >() (args, heap) : gsi::arg_maker<QFlags<Qt::FindChildOption> >() (Qt::FindChildrenRecursively, heap);
   ret.write<QLayoutItem * > ((QLayoutItem *)((QLayout *)cls)->replaceWidget (arg1, arg2, arg3));
 }
 
@@ -491,8 +491,8 @@ static void _call_f_setAlignment_3957 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  QFlags<Qt::AlignmentFlag> arg2 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg2 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   ret.write<bool > ((bool)((QLayout *)cls)->setAlignment (arg1, arg2));
 }
 
@@ -513,8 +513,8 @@ static void _call_f_setAlignment_3983 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayout *arg1 = args.read<QLayout * > (heap);
-  QFlags<Qt::AlignmentFlag> arg2 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
+  QFlags<Qt::AlignmentFlag> arg2 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   ret.write<bool > ((bool)((QLayout *)cls)->setAlignment (arg1, arg2));
 }
 
@@ -533,7 +533,7 @@ static void _call_f_setAlignment_2750 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->setAlignment (arg1);
 }
@@ -559,10 +559,10 @@ static void _call_f_setContentsMargins_2744 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->setContentsMargins (arg1, arg2, arg3, arg4);
 }
@@ -582,7 +582,7 @@ static void _call_f_setContentsMargins_2115 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->setContentsMargins (arg1);
 }
@@ -602,7 +602,7 @@ static void _call_f_setEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->setEnabled (arg1);
 }
@@ -622,7 +622,7 @@ static void _call_f_setGeometry_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->setGeometry (arg1);
 }
@@ -642,7 +642,7 @@ static void _call_f_setMargin_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->setMargin (arg1);
 }
@@ -662,7 +662,7 @@ static void _call_f_setMenuBar_1315 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->setMenuBar (arg1);
 }
@@ -682,7 +682,7 @@ static void _call_f_setSizeConstraint_2743 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLayout::SizeConstraint>::target_type & arg1 = args.read<const qt_gsi::Converter<QLayout::SizeConstraint>::target_type & > (heap);
+  const qt_gsi::Converter<QLayout::SizeConstraint>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLayout::SizeConstraint>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->setSizeConstraint (qt_gsi::QtToCppAdaptor<QLayout::SizeConstraint>(arg1).cref());
 }
@@ -702,7 +702,7 @@ static void _call_f_setSpacing_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->setSpacing (arg1);
 }
@@ -752,7 +752,7 @@ static void _call_f_takeAt_767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QLayoutItem * > ((QLayoutItem *)((QLayout *)cls)->takeAt (arg1));
 }
 
@@ -771,7 +771,7 @@ static void _call_f_totalHeightForWidth_c767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QLayout *)cls)->totalHeightForWidth (arg1));
 }
 
@@ -853,8 +853,8 @@ static void _call_f_closestAcceptableSize_3707 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QWidget *arg1 = args.read<const QWidget * > (heap);
-  const QSize &arg2 = args.read<const QSize & > (heap);
+  const QWidget *arg1 = gsi::arg_reader<const QWidget * >() (args, heap);
+  const QSize &arg2 = gsi::arg_reader<const QSize & >() (args, heap);
   ret.write<QSize > ((QSize)QLayout::closestAcceptableSize (arg1, arg2));
 }
 
@@ -877,9 +877,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QLayout::tr (arg1, arg2, arg3));
 }
 
@@ -902,9 +902,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QLayout::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1530,7 +1530,7 @@ static void _call_ctor_QLayout_Adaptor_1315 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QLayout_Adaptor *> (new QLayout_Adaptor (arg1));
 }
 
@@ -1562,7 +1562,7 @@ static void _call_fp_addChildLayout_1341 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayout *arg1 = args.read<QLayout * > (heap);
+  QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
   qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout_Adaptor *)cls)->fp_QLayout_addChildLayout_1341 (arg1);
@@ -1582,7 +1582,7 @@ static void _call_fp_addChildWidget_1315 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout_Adaptor *)cls)->fp_QLayout_addChildWidget_1315 (arg1);
 }
@@ -1625,7 +1625,7 @@ static void _call_fp_adoptLayout_1341 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayout *arg1 = args.read<QLayout * > (heap);
+  QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
   ret.write<bool > ((bool)((QLayout_Adaptor *)cls)->fp_QLayout_adoptLayout_1341 (arg1));
 }
 
@@ -1643,7 +1643,7 @@ static void _call_fp_alignmentRect_c1792 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRect > ((QRect)((QLayout_Adaptor *)cls)->fp_QLayout_alignmentRect_c1792 (arg1));
 }
 
@@ -1747,7 +1747,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QLayout_Adaptor *)cls)->emitter_QLayout_destroyed_1302 (arg1);
 }
 
@@ -1980,7 +1980,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QLayout_Adaptor *)cls)->fp_QLayout_isSignalConnected_c2394 (arg1));
 }
 
@@ -2101,7 +2101,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QLayout_Adaptor *)cls)->fp_QLayout_receivers_c1731 (arg1));
 }
 
@@ -2275,7 +2275,7 @@ static void _call_fp_widgetEvent_1217 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout_Adaptor *)cls)->fp_QLayout_widgetEvent_1217 (arg1);
 }

@@ -116,7 +116,7 @@ static void _call_f_actionAt_c1916 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QAction * > ((QAction *)((QMenuBar *)cls)->actionAt (arg1));
 }
 
@@ -135,7 +135,7 @@ static void _call_f_actionGeometry_c1309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ret.write<QRect > ((QRect)((QMenuBar *)cls)->actionGeometry (arg1));
 }
 
@@ -169,7 +169,7 @@ static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMenuBar *)cls)->addAction (arg1);
 }
@@ -189,7 +189,7 @@ static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QAction * > ((QAction *)((QMenuBar *)cls)->addAction (arg1));
 }
 
@@ -212,9 +212,9 @@ static void _call_f_addAction_5537 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QObject *arg2 = args.read<const QObject * > (heap);
-  const char *arg3 = args.read<const char * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QObject *arg2 = gsi::arg_reader<const QObject * >() (args, heap);
+  const char *arg3 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QMenuBar *)cls)->addAction (arg1, arg2, arg3));
 }
 
@@ -233,7 +233,7 @@ static void _call_f_addMenu_1108 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QMenu *arg1 = args.read<QMenu * > (heap);
+  QMenu *arg1 = gsi::arg_reader<QMenu * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QMenuBar *)cls)->addMenu (arg1));
 }
 
@@ -252,7 +252,7 @@ static void _call_f_addMenu_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QMenu * > ((QMenu *)((QMenuBar *)cls)->addMenu (arg1));
 }
 
@@ -273,8 +273,8 @@ static void _call_f_addMenu_3704 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QMenu * > ((QMenu *)((QMenuBar *)cls)->addMenu (arg1, arg2));
 }
 
@@ -324,7 +324,7 @@ static void _call_f_cornerWidget_c1366 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Corner>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<Qt::Corner>::target_type & > (heap) : (const qt_gsi::Converter<Qt::Corner>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::Corner>(heap, Qt::TopRightCorner));
+  const qt_gsi::Converter<Qt::Corner>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::Corner>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::Corner>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::Corner>(heap, Qt::TopRightCorner), heap);
   ret.write<QWidget * > ((QWidget *)((QMenuBar *)cls)->cornerWidget (qt_gsi::QtToCppAdaptor<Qt::Corner>(arg1).cref()));
 }
 
@@ -343,7 +343,7 @@ static void _call_f_heightForWidth_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QMenuBar *)cls)->heightForWidth (arg1));
 }
 
@@ -364,8 +364,8 @@ static void _call_f_insertMenu_2309 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
-  QMenu *arg2 = args.read<QMenu * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
+  QMenu *arg2 = gsi::arg_reader<QMenu * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QMenuBar *)cls)->insertMenu (arg1, arg2));
 }
 
@@ -384,7 +384,7 @@ static void _call_f_insertSeparator_1309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ret.write<QAction * > ((QAction *)((QMenuBar *)cls)->insertSeparator (arg1));
 }
 
@@ -448,7 +448,7 @@ static void _call_f_setActiveAction_1309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMenuBar *)cls)->setActiveAction (arg1);
 }
@@ -470,8 +470,8 @@ static void _call_f_setCornerWidget_2573 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const qt_gsi::Converter<Qt::Corner>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::Corner>::target_type & > (heap) : (const qt_gsi::Converter<Qt::Corner>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::Corner>(heap, Qt::TopRightCorner));
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const qt_gsi::Converter<Qt::Corner>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::Corner>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::Corner>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::Corner>(heap, Qt::TopRightCorner), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMenuBar *)cls)->setCornerWidget (arg1, qt_gsi::QtToCppAdaptor<Qt::Corner>(arg2).cref());
 }
@@ -491,7 +491,7 @@ static void _call_f_setDefaultUp_864 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMenuBar *)cls)->setDefaultUp (arg1);
 }
@@ -511,7 +511,7 @@ static void _call_f_setNativeMenuBar_864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMenuBar *)cls)->setNativeMenuBar (arg1);
 }
@@ -531,7 +531,7 @@ static void _call_f_setVisible_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMenuBar *)cls)->setVisible (arg1);
 }
@@ -570,9 +570,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMenuBar::tr (arg1, arg2, arg3));
 }
 
@@ -595,9 +595,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMenuBar::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1502,7 +1502,7 @@ static void _call_ctor_QMenuBar_Adaptor_1315 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QMenuBar_Adaptor *> (new QMenuBar_Adaptor (arg1));
 }
 
@@ -1644,9 +1644,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMenuBar_Adaptor *)cls)->fp_QMenuBar_create_2208 (arg1, arg2, arg3);
 }
@@ -1665,7 +1665,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QMenuBar_Adaptor *)cls)->emitter_QMenuBar_customContextMenuRequested_1916 (arg1);
 }
 
@@ -1709,8 +1709,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMenuBar_Adaptor *)cls)->fp_QMenuBar_destroy_1620 (arg1, arg2);
 }
@@ -1729,7 +1729,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QMenuBar_Adaptor *)cls)->emitter_QMenuBar_destroyed_1302 (arg1);
 }
 
@@ -2105,7 +2105,7 @@ static void _call_emitter_hovered_1309 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ((QMenuBar_Adaptor *)cls)->emitter_QMenuBar_hovered_1309 (arg1);
 }
 
@@ -2149,8 +2149,8 @@ static void _call_fp_initStyleOption_c4565 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionMenuItem *arg1 = args.read<QStyleOptionMenuItem * > (heap);
-  const QAction *arg2 = args.read<const QAction * > (heap);
+  QStyleOptionMenuItem *arg1 = gsi::arg_reader<QStyleOptionMenuItem * >() (args, heap);
+  const QAction *arg2 = gsi::arg_reader<const QAction * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMenuBar_Adaptor *)cls)->fp_QMenuBar_initStyleOption_c4565 (arg1, arg2);
 }
@@ -2216,7 +2216,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QMenuBar_Adaptor *)cls)->fp_QMenuBar_isSignalConnected_c2394 (arg1));
 }
 
@@ -2540,7 +2540,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QMenuBar_Adaptor *)cls)->fp_QMenuBar_receivers_c1731 (arg1));
 }
 
@@ -2767,7 +2767,7 @@ static void _call_emitter_triggered_1309 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAction *arg1 = args.read<QAction * > (heap);
+  QAction *arg1 = gsi::arg_reader<QAction * >() (args, heap);
   ((QMenuBar_Adaptor *)cls)->emitter_QMenuBar_triggered_1309 (arg1);
 }
 
@@ -2824,7 +2824,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QMenuBar_Adaptor *)cls)->emitter_QMenuBar_windowIconChanged_1787 (arg1);
 }
 
@@ -2842,7 +2842,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QMenuBar_Adaptor *)cls)->emitter_QMenuBar_windowIconTextChanged_2025 (arg1);
 }
 
@@ -2860,7 +2860,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QMenuBar_Adaptor *)cls)->emitter_QMenuBar_windowTitleChanged_2025 (arg1);
 }
 

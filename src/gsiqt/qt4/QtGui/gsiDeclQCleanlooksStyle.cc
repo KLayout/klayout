@@ -88,10 +88,10 @@ static void _call_f_drawComplexControl_c9027 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::ComplexControl>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::ComplexControl>::target_type & > (heap);
-  const QStyleOptionComplex *arg2 = args.read<const QStyleOptionComplex * > (heap);
-  QPainter *arg3 = args.read<QPainter * > (heap);
-  const QWidget *arg4 = args.read<const QWidget * > (heap);
+  const qt_gsi::Converter<QStyle::ComplexControl>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::ComplexControl>::target_type & >() (args, heap);
+  const QStyleOptionComplex *arg2 = gsi::arg_reader<const QStyleOptionComplex * >() (args, heap);
+  QPainter *arg3 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QWidget *arg4 = gsi::arg_reader<const QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->drawComplexControl (qt_gsi::QtToCppAdaptor<QStyle::ComplexControl>(arg1).cref(), arg2, arg3, arg4);
 }
@@ -117,10 +117,10 @@ static void _call_f_drawControl_c8285 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::ControlElement>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::ControlElement>::target_type & > (heap);
-  const QStyleOption *arg2 = args.read<const QStyleOption * > (heap);
-  QPainter *arg3 = args.read<QPainter * > (heap);
-  const QWidget *arg4 = args.read<const QWidget * > (heap);
+  const qt_gsi::Converter<QStyle::ControlElement>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::ControlElement>::target_type & >() (args, heap);
+  const QStyleOption *arg2 = gsi::arg_reader<const QStyleOption * >() (args, heap);
+  QPainter *arg3 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QWidget *arg4 = gsi::arg_reader<const QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->drawControl (qt_gsi::QtToCppAdaptor<QStyle::ControlElement>(arg1).cref(), arg2, arg3, arg4);
 }
@@ -146,10 +146,10 @@ static void _call_f_drawItemPixmap_c5678 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QRect &arg2 = args.read<const QRect & > (heap);
-  int arg3 = args.read<int > (heap);
-  const QPixmap &arg4 = args.read<const QPixmap & > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QRect &arg2 = gsi::arg_reader<const QRect & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QPixmap &arg4 = gsi::arg_reader<const QPixmap & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->drawItemPixmap (arg1, arg2, arg3, arg4);
 }
@@ -181,13 +181,13 @@ static void _call_f_drawItemText_c10604 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QRect &arg2 = args.read<const QRect & > (heap);
-  int arg3 = args.read<int > (heap);
-  const QPalette &arg4 = args.read<const QPalette & > (heap);
-  bool arg5 = args.read<bool > (heap);
-  const QString &arg6 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg7 = args ? args.read<const qt_gsi::Converter<QPalette::ColorRole>::target_type & > (heap) : (const qt_gsi::Converter<QPalette::ColorRole>::target_type &)(qt_gsi::CppToQtReadAdaptor<QPalette::ColorRole>(heap, QPalette::NoRole));
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QRect &arg2 = gsi::arg_reader<const QRect & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QPalette &arg4 = gsi::arg_reader<const QPalette & >() (args, heap);
+  bool arg5 = gsi::arg_reader<bool >() (args, heap);
+  const QString &arg6 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QPalette::ColorRole>::target_type & arg7 = args ? gsi::arg_reader<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QPalette::ColorRole>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QPalette::ColorRole>(heap, QPalette::NoRole), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->drawItemText (arg1, arg2, arg3, arg4, arg5, arg6, qt_gsi::QtToCppAdaptor<QPalette::ColorRole>(arg7).cref());
 }
@@ -213,10 +213,10 @@ static void _call_f_drawPrimitive_c8501 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::PrimitiveElement>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::PrimitiveElement>::target_type & > (heap);
-  const QStyleOption *arg2 = args.read<const QStyleOption * > (heap);
-  QPainter *arg3 = args.read<QPainter * > (heap);
-  const QWidget *arg4 = args ? args.read<const QWidget * > (heap) : (const QWidget *)(0);
+  const qt_gsi::Converter<QStyle::PrimitiveElement>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::PrimitiveElement>::target_type & >() (args, heap);
+  const QStyleOption *arg2 = gsi::arg_reader<const QStyleOption * >() (args, heap);
+  QPainter *arg3 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QWidget *arg4 = args ? gsi::arg_reader<const QWidget * >() (args, heap) : gsi::arg_maker<const QWidget * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->drawPrimitive (qt_gsi::QtToCppAdaptor<QStyle::PrimitiveElement>(arg1).cref(), arg2, arg3, arg4);
 }
@@ -240,9 +240,9 @@ static void _call_f_generatedIconPixmap_c5776 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QIcon::Mode>::target_type & arg1 = args.read<const qt_gsi::Converter<QIcon::Mode>::target_type & > (heap);
-  const QPixmap &arg2 = args.read<const QPixmap & > (heap);
-  const QStyleOption *arg3 = args.read<const QStyleOption * > (heap);
+  const qt_gsi::Converter<QIcon::Mode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QIcon::Mode>::target_type & >() (args, heap);
+  const QPixmap &arg2 = gsi::arg_reader<const QPixmap & >() (args, heap);
+  const QStyleOption *arg3 = gsi::arg_reader<const QStyleOption * >() (args, heap);
   ret.write<QPixmap > ((QPixmap)((QCleanlooksStyle *)cls)->generatedIconPixmap (qt_gsi::QtToCppAdaptor<QIcon::Mode>(arg1).cref(), arg2, arg3));
 }
 
@@ -267,10 +267,10 @@ static void _call_f_hitTestComplexControl_c9517 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::ComplexControl>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::ComplexControl>::target_type & > (heap);
-  const QStyleOptionComplex *arg2 = args.read<const QStyleOptionComplex * > (heap);
-  const QPoint &arg3 = args.read<const QPoint & > (heap);
-  const QWidget *arg4 = args ? args.read<const QWidget * > (heap) : (const QWidget *)(0);
+  const qt_gsi::Converter<QStyle::ComplexControl>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::ComplexControl>::target_type & >() (args, heap);
+  const QStyleOptionComplex *arg2 = gsi::arg_reader<const QStyleOptionComplex * >() (args, heap);
+  const QPoint &arg3 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const QWidget *arg4 = args ? gsi::arg_reader<const QWidget * >() (args, heap) : gsi::arg_maker<const QWidget * >() (0, heap);
   ret.write<qt_gsi::Converter<QStyle::SubControl>::target_type > ((qt_gsi::Converter<QStyle::SubControl>::target_type)qt_gsi::CppToQtAdaptor<QStyle::SubControl>(((QCleanlooksStyle *)cls)->hitTestComplexControl (qt_gsi::QtToCppAdaptor<QStyle::ComplexControl>(arg1).cref(), arg2, arg3, arg4)));
 }
 
@@ -293,9 +293,9 @@ static void _call_f_itemPixmapRect_c4360 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
-  int arg2 = args.read<int > (heap);
-  const QPixmap &arg3 = args.read<const QPixmap & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QPixmap &arg3 = gsi::arg_reader<const QPixmap & >() (args, heap);
   ret.write<QRect > ((QRect)((QCleanlooksStyle *)cls)->itemPixmapRect (arg1, arg2, arg3));
 }
 
@@ -318,9 +318,9 @@ static void _call_f_pixelMetric_c6642 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::PixelMetric>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::PixelMetric>::target_type & > (heap);
-  const QStyleOption *arg2 = args ? args.read<const QStyleOption * > (heap) : (const QStyleOption *)(0);
-  const QWidget *arg3 = args ? args.read<const QWidget * > (heap) : (const QWidget *)(0);
+  const qt_gsi::Converter<QStyle::PixelMetric>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::PixelMetric>::target_type & >() (args, heap);
+  const QStyleOption *arg2 = args ? gsi::arg_reader<const QStyleOption * >() (args, heap) : gsi::arg_maker<const QStyleOption * >() (0, heap);
+  const QWidget *arg3 = args ? gsi::arg_reader<const QWidget * >() (args, heap) : gsi::arg_maker<const QWidget * >() (0, heap);
   ret.write<int > ((int)((QCleanlooksStyle *)cls)->pixelMetric (qt_gsi::QtToCppAdaptor<QStyle::PixelMetric>(arg1).cref(), arg2, arg3));
 }
 
@@ -339,7 +339,7 @@ static void _call_f_polish_1315 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->polish (arg1);
 }
@@ -359,7 +359,7 @@ static void _call_f_polish_1843 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QApplication *arg1 = args.read<QApplication * > (heap);
+  QApplication *arg1 = gsi::arg_reader<QApplication * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->polish (arg1);
 }
@@ -379,7 +379,7 @@ static void _call_f_polish_1418 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPalette &arg1 = args.read<QPalette & > (heap);
+  QPalette &arg1 = gsi::arg_reader<QPalette & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->polish (arg1);
 }
@@ -405,10 +405,10 @@ static void _call_f_sizeFromContents_c8477 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::ContentsType>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::ContentsType>::target_type & > (heap);
-  const QStyleOption *arg2 = args.read<const QStyleOption * > (heap);
-  const QSize &arg3 = args.read<const QSize & > (heap);
-  const QWidget *arg4 = args.read<const QWidget * > (heap);
+  const qt_gsi::Converter<QStyle::ContentsType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::ContentsType>::target_type & >() (args, heap);
+  const QStyleOption *arg2 = gsi::arg_reader<const QStyleOption * >() (args, heap);
+  const QSize &arg3 = gsi::arg_reader<const QSize & >() (args, heap);
+  const QWidget *arg4 = gsi::arg_reader<const QWidget * >() (args, heap);
   ret.write<QSize > ((QSize)((QCleanlooksStyle *)cls)->sizeFromContents (qt_gsi::QtToCppAdaptor<QStyle::ContentsType>(arg1).cref(), arg2, arg3, arg4));
 }
 
@@ -446,9 +446,9 @@ static void _call_f_standardPixmap_c6956 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::StandardPixmap>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::StandardPixmap>::target_type & > (heap);
-  const QStyleOption *arg2 = args.read<const QStyleOption * > (heap);
-  const QWidget *arg3 = args ? args.read<const QWidget * > (heap) : (const QWidget *)(0);
+  const qt_gsi::Converter<QStyle::StandardPixmap>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::StandardPixmap>::target_type & >() (args, heap);
+  const QStyleOption *arg2 = gsi::arg_reader<const QStyleOption * >() (args, heap);
+  const QWidget *arg3 = args ? gsi::arg_reader<const QWidget * >() (args, heap) : gsi::arg_maker<const QWidget * >() (0, heap);
   ret.write<QPixmap > ((QPixmap)((QCleanlooksStyle *)cls)->standardPixmap (qt_gsi::QtToCppAdaptor<QStyle::StandardPixmap>(arg1).cref(), arg2, arg3));
 }
 
@@ -473,10 +473,10 @@ static void _call_f_styleHint_c8615 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::StyleHint>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::StyleHint>::target_type & > (heap);
-  const QStyleOption *arg2 = args ? args.read<const QStyleOption * > (heap) : (const QStyleOption *)(0);
-  const QWidget *arg3 = args ? args.read<const QWidget * > (heap) : (const QWidget *)(0);
-  QStyleHintReturn *arg4 = args ? args.read<QStyleHintReturn * > (heap) : (QStyleHintReturn *)(0);
+  const qt_gsi::Converter<QStyle::StyleHint>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::StyleHint>::target_type & >() (args, heap);
+  const QStyleOption *arg2 = args ? gsi::arg_reader<const QStyleOption * >() (args, heap) : gsi::arg_maker<const QStyleOption * >() (0, heap);
+  const QWidget *arg3 = args ? gsi::arg_reader<const QWidget * >() (args, heap) : gsi::arg_maker<const QWidget * >() (0, heap);
+  QStyleHintReturn *arg4 = args ? gsi::arg_reader<QStyleHintReturn * >() (args, heap) : gsi::arg_maker<QStyleHintReturn * >() (0, heap);
   ret.write<int > ((int)((QCleanlooksStyle *)cls)->styleHint (qt_gsi::QtToCppAdaptor<QStyle::StyleHint>(arg1).cref(), arg2, arg3, arg4));
 }
 
@@ -501,10 +501,10 @@ static void _call_f_subControlRect_c9798 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::ComplexControl>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::ComplexControl>::target_type & > (heap);
-  const QStyleOptionComplex *arg2 = args.read<const QStyleOptionComplex * > (heap);
-  const qt_gsi::Converter<QStyle::SubControl>::target_type & arg3 = args.read<const qt_gsi::Converter<QStyle::SubControl>::target_type & > (heap);
-  const QWidget *arg4 = args.read<const QWidget * > (heap);
+  const qt_gsi::Converter<QStyle::ComplexControl>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::ComplexControl>::target_type & >() (args, heap);
+  const QStyleOptionComplex *arg2 = gsi::arg_reader<const QStyleOptionComplex * >() (args, heap);
+  const qt_gsi::Converter<QStyle::SubControl>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QStyle::SubControl>::target_type & >() (args, heap);
+  const QWidget *arg4 = gsi::arg_reader<const QWidget * >() (args, heap);
   ret.write<QRect > ((QRect)((QCleanlooksStyle *)cls)->subControlRect (qt_gsi::QtToCppAdaptor<QStyle::ComplexControl>(arg1).cref(), arg2, qt_gsi::QtToCppAdaptor<QStyle::SubControl>(arg3).cref(), arg4));
 }
 
@@ -527,9 +527,9 @@ static void _call_f_subElementRect_c6528 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::SubElement>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::SubElement>::target_type & > (heap);
-  const QStyleOption *arg2 = args.read<const QStyleOption * > (heap);
-  const QWidget *arg3 = args ? args.read<const QWidget * > (heap) : (const QWidget *)(0);
+  const qt_gsi::Converter<QStyle::SubElement>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::SubElement>::target_type & >() (args, heap);
+  const QStyleOption *arg2 = gsi::arg_reader<const QStyleOption * >() (args, heap);
+  const QWidget *arg3 = args ? gsi::arg_reader<const QWidget * >() (args, heap) : gsi::arg_maker<const QWidget * >() (0, heap);
   ret.write<QRect > ((QRect)((QCleanlooksStyle *)cls)->subElementRect (qt_gsi::QtToCppAdaptor<QStyle::SubElement>(arg1).cref(), arg2, arg3));
 }
 
@@ -548,7 +548,7 @@ static void _call_f_unpolish_1315 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->unpolish (arg1);
 }
@@ -568,7 +568,7 @@ static void _call_f_unpolish_1843 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QApplication *arg1 = args.read<QApplication * > (heap);
+  QApplication *arg1 = gsi::arg_reader<QApplication * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCleanlooksStyle *)cls)->unpolish (arg1);
 }
@@ -590,8 +590,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QCleanlooksStyle::tr (arg1, arg2));
 }
 
@@ -614,9 +614,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QCleanlooksStyle::tr (arg1, arg2, arg3));
 }
 
@@ -637,8 +637,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QCleanlooksStyle::trUtf8 (arg1, arg2));
 }
 
@@ -661,9 +661,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QCleanlooksStyle::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1262,7 +1262,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QCleanlooksStyle_Adaptor *)cls)->emitter_QCleanlooksStyle_destroyed_1302 (arg1);
 }
 
@@ -1660,11 +1660,11 @@ static void _call_fp_layoutSpacingImplementation_c11697 (const qt_gsi::GenericMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg1 = args.read<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & > (heap);
-  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg2 = args.read<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & > (heap);
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg3 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  const QStyleOption *arg4 = args ? args.read<const QStyleOption * > (heap) : (const QStyleOption *)(0);
-  const QWidget *arg5 = args ? args.read<const QWidget * > (heap) : (const QWidget *)(0);
+  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & >() (args, heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  const QStyleOption *arg4 = args ? gsi::arg_reader<const QStyleOption * >() (args, heap) : gsi::arg_maker<const QStyleOption * >() (0, heap);
+  const QWidget *arg5 = args ? gsi::arg_reader<const QWidget * >() (args, heap) : gsi::arg_maker<const QWidget * >() (0, heap);
   ret.write<int > ((int)((QCleanlooksStyle_Adaptor *)cls)->fp_QCleanlooksStyle_layoutSpacingImplementation_c11697 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -1783,7 +1783,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QCleanlooksStyle_Adaptor *)cls)->fp_QCleanlooksStyle_receivers_c1731 (arg1));
 }
 
@@ -1851,9 +1851,9 @@ static void _call_fp_standardIconImplementation_c6956 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStyle::StandardPixmap>::target_type & arg1 = args.read<const qt_gsi::Converter<QStyle::StandardPixmap>::target_type & > (heap);
-  const QStyleOption *arg2 = args.read<const QStyleOption * > (heap);
-  const QWidget *arg3 = args ? args.read<const QWidget * > (heap) : (const QWidget *)(0);
+  const qt_gsi::Converter<QStyle::StandardPixmap>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStyle::StandardPixmap>::target_type & >() (args, heap);
+  const QStyleOption *arg2 = gsi::arg_reader<const QStyleOption * >() (args, heap);
+  const QWidget *arg3 = args ? gsi::arg_reader<const QWidget * >() (args, heap) : gsi::arg_maker<const QWidget * >() (0, heap);
   ret.write<QIcon > ((QIcon)((QCleanlooksStyle_Adaptor *)cls)->fp_QCleanlooksStyle_standardIconImplementation_c6956 (arg1, arg2, arg3));
 }
 

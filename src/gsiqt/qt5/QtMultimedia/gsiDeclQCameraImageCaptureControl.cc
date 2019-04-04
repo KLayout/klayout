@@ -87,7 +87,7 @@ static void _call_f_capture_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QCameraImageCaptureControl *)cls)->capture (arg1));
 }
 
@@ -136,7 +136,7 @@ static void _call_f_setDriveMode_3320 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QCameraImageCapture::DriveMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QCameraImageCapture::DriveMode>::target_type & > (heap);
+  const qt_gsi::Converter<QCameraImageCapture::DriveMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraImageCapture::DriveMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraImageCaptureControl *)cls)->setDriveMode (qt_gsi::QtToCppAdaptor<QCameraImageCapture::DriveMode>(arg1).cref());
 }
@@ -160,9 +160,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraImageCaptureControl::tr (arg1, arg2, arg3));
 }
 
@@ -185,9 +185,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCameraImageCaptureControl::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -607,7 +607,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QCameraImageCaptureControl_Adaptor *)cls)->emitter_QCameraImageCaptureControl_destroyed_1302 (arg1);
 }
 
@@ -672,9 +672,9 @@ static void _call_emitter_error_3343 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
   ((QCameraImageCaptureControl_Adaptor *)cls)->emitter_QCameraImageCaptureControl_error_3343 (arg1, arg2, arg3);
 }
 
@@ -743,8 +743,8 @@ static void _call_emitter_imageAvailable_3047 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QVideoFrame &arg2 = args.read<const QVideoFrame & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QVideoFrame &arg2 = gsi::arg_reader<const QVideoFrame & >() (args, heap);
   ((QCameraImageCaptureControl_Adaptor *)cls)->emitter_QCameraImageCaptureControl_imageAvailable_3047 (arg1, arg2);
 }
 
@@ -764,8 +764,8 @@ static void _call_emitter_imageCaptured_2536 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QImage &arg2 = args.read<const QImage & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QImage &arg2 = gsi::arg_reader<const QImage & >() (args, heap);
   ((QCameraImageCaptureControl_Adaptor *)cls)->emitter_QCameraImageCaptureControl_imageCaptured_2536 (arg1, arg2);
 }
 
@@ -783,7 +783,7 @@ static void _call_emitter_imageExposed_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QCameraImageCaptureControl_Adaptor *)cls)->emitter_QCameraImageCaptureControl_imageExposed_767 (arg1);
 }
 
@@ -805,9 +805,9 @@ static void _call_emitter_imageMetadataAvailable_4695 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QVariant &arg3 = args.read<const QVariant & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg3 = gsi::arg_reader<const QVariant & >() (args, heap);
   ((QCameraImageCaptureControl_Adaptor *)cls)->emitter_QCameraImageCaptureControl_imageMetadataAvailable_4695 (arg1, arg2, arg3);
 }
 
@@ -827,8 +827,8 @@ static void _call_emitter_imageSaved_2684 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ((QCameraImageCaptureControl_Adaptor *)cls)->emitter_QCameraImageCaptureControl_imageSaved_2684 (arg1, arg2);
 }
 
@@ -865,7 +865,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QCameraImageCaptureControl_Adaptor *)cls)->fp_QCameraImageCaptureControl_isSignalConnected_c2394 (arg1));
 }
 
@@ -883,7 +883,7 @@ static void _call_emitter_readyForCaptureChanged_864 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QCameraImageCaptureControl_Adaptor *)cls)->emitter_QCameraImageCaptureControl_readyForCaptureChanged_864 (arg1);
 }
 
@@ -901,7 +901,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QCameraImageCaptureControl_Adaptor *)cls)->fp_QCameraImageCaptureControl_receivers_c1731 (arg1));
 }
 

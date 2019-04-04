@@ -333,7 +333,7 @@ Class<db::Net> decl_dbNet ("db", "Net",
   ) +
   gsi::method ("qname|to_s", &db::Net::qname,
     "@brief Gets the qualified name.\n"
-    "The qualified name is like the expanded name, but the circuit's name is preceeded\n"
+    "The qualified name is like the expanded name, but the circuit's name is preceded\n"
     "(i.e. 'CIRCUIT:NET') if available.\n"
   ) +
   gsi::method ("expanded_name", &db::Net::expanded_name,
@@ -901,7 +901,7 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   "A circuit has pins by which it can connect to the outside. Pins are "
   "created using \\create_pin and are represented by the \\Pin class.\n"
   "\n"
-  "Futhermore, a circuit manages the components of the netlist. "
+  "Furthermore, a circuit manages the components of the netlist. "
   "Components are devices (class \\Device) and subcircuits (class \\SubCircuit). "
   "Devices are basic devices such as resistors or transistors. Subcircuits "
   "are other circuits to which nets from this circuit connect. "
@@ -1206,6 +1206,13 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   ) +
   gsi::constructor ("new", &new_spice_writer2,
     "@brief Creates a new writer with a delegate.\n"
+  ) +
+  gsi::method ("use_net_names=", &db::NetlistSpiceWriter::set_use_net_names, gsi::arg ("f"),
+    "@brief Sets a value indicating whether to use net names (true) or net numbers (false).\n"
+    "The default is to use net numbers."
+  ) +
+  gsi::method ("use_net_names", &db::NetlistSpiceWriter::use_net_names,
+    "@brief Gets a value indicating whether to use net names (true) or net numbers (false).\n"
   ),
   "@brief Implements a netlist writer for the SPICE format.\n"
   "Provide a delegate for customizing the way devices are written.\n"

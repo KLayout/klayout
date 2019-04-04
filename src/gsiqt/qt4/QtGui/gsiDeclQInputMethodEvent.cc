@@ -67,8 +67,8 @@ static void _call_ctor_QInputMethodEvent_6641 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QList<QInputMethodEvent::Attribute> &arg2 = args.read<const QList<QInputMethodEvent::Attribute> & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QList<QInputMethodEvent::Attribute> &arg2 = gsi::arg_reader<const QList<QInputMethodEvent::Attribute> & >() (args, heap);
   ret.write<QInputMethodEvent *> (new QInputMethodEvent (arg1, arg2));
 }
 
@@ -87,7 +87,7 @@ static void _call_ctor_QInputMethodEvent_3045 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QInputMethodEvent &arg1 = args.read<const QInputMethodEvent & > (heap);
+  const QInputMethodEvent &arg1 = gsi::arg_reader<const QInputMethodEvent & >() (args, heap);
   ret.write<QInputMethodEvent *> (new QInputMethodEvent (arg1));
 }
 
@@ -185,9 +185,9 @@ static void _call_f_setCommitString_3343 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputMethodEvent *)cls)->setCommitString (arg1, arg2, arg3);
 }

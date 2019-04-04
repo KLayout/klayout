@@ -72,7 +72,7 @@ static void _call_f_add_2306 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextList *)cls)->add (arg1);
 }
@@ -137,7 +137,7 @@ static void _call_f_item_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextBlock > ((QTextBlock)((QTextList *)cls)->item (arg1));
 }
 
@@ -156,7 +156,7 @@ static void _call_f_itemNumber_c2306 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<int > ((int)((QTextList *)cls)->itemNumber (arg1));
 }
 
@@ -175,7 +175,7 @@ static void _call_f_itemText_c2306 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<QString > ((QString)((QTextList *)cls)->itemText (arg1));
 }
 
@@ -194,7 +194,7 @@ static void _call_f_remove_2306 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextList *)cls)->remove (arg1);
 }
@@ -214,7 +214,7 @@ static void _call_f_removeItem_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextList *)cls)->removeItem (arg1);
 }
@@ -234,7 +234,7 @@ static void _call_f_setFormat_2844 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextListFormat &arg1 = args.read<const QTextListFormat & > (heap);
+  const QTextListFormat &arg1 = gsi::arg_reader<const QTextListFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextList *)cls)->setFormat (arg1);
 }
@@ -258,9 +258,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QTextList::tr (arg1, arg2, arg3));
 }
 
@@ -283,9 +283,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QTextList::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -527,7 +527,7 @@ static void _call_ctor_QTextList_Adaptor_1955 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextDocument *arg1 = args.read<QTextDocument * > (heap);
+  QTextDocument *arg1 = gsi::arg_reader<QTextDocument * >() (args, heap);
   ret.write<QTextList_Adaptor *> (new QTextList_Adaptor (arg1));
 }
 
@@ -679,7 +679,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QTextList_Adaptor *)cls)->emitter_QTextList_destroyed_1302 (arg1);
 }
 
@@ -770,7 +770,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QTextList_Adaptor *)cls)->fp_QTextList_isSignalConnected_c2394 (arg1));
 }
 
@@ -788,7 +788,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QTextList_Adaptor *)cls)->fp_QTextList_receivers_c1731 (arg1));
 }
 

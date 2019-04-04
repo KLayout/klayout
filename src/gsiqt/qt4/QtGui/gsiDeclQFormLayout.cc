@@ -75,7 +75,7 @@ static void _call_f_addItem_1740 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayoutItem *arg1 = args.read<QLayoutItem * > (heap);
+  QLayoutItem *arg1 = gsi::arg_reader<QLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addItem (arg1);
 }
@@ -97,8 +97,8 @@ static void _call_f_addRow_2522 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1, arg2);
 }
@@ -120,8 +120,8 @@ static void _call_f_addRow_2548 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  QLayout *arg2 = args.read<QLayout * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  QLayout *arg2 = gsi::arg_reader<QLayout * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1, arg2);
 }
@@ -143,8 +143,8 @@ static void _call_f_addRow_3232 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1, arg2);
 }
@@ -166,8 +166,8 @@ static void _call_f_addRow_3258 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QLayout *arg2 = args.read<QLayout * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QLayout *arg2 = gsi::arg_reader<QLayout * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1, arg2);
 }
@@ -187,7 +187,7 @@ static void _call_f_addRow_1315 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1);
 }
@@ -207,7 +207,7 @@ static void _call_f_addRow_1341 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayout *arg1 = args.read<QLayout * > (heap);
+  QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1);
 }
@@ -291,9 +291,9 @@ static void _call_f_getItemPosition_c4166 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int *arg2 = args.read<int * > (heap);
-  qt_gsi::Converter<QFormLayout::ItemRole>::target_type * arg3 = args.read<qt_gsi::Converter<QFormLayout::ItemRole>::target_type * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  qt_gsi::Converter<QFormLayout::ItemRole>::target_type * arg3 = gsi::arg_reader<qt_gsi::Converter<QFormLayout::ItemRole>::target_type * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->getItemPosition (arg1, arg2, qt_gsi::QtToCppAdaptor<QFormLayout::ItemRole>(arg3).ptr());
 }
@@ -317,9 +317,9 @@ static void _call_f_getLayoutPosition_c4740 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayout *arg1 = args.read<QLayout * > (heap);
-  int *arg2 = args.read<int * > (heap);
-  qt_gsi::Converter<QFormLayout::ItemRole>::target_type * arg3 = args.read<qt_gsi::Converter<QFormLayout::ItemRole>::target_type * > (heap);
+  QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  qt_gsi::Converter<QFormLayout::ItemRole>::target_type * arg3 = gsi::arg_reader<qt_gsi::Converter<QFormLayout::ItemRole>::target_type * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->getLayoutPosition (arg1, arg2, qt_gsi::QtToCppAdaptor<QFormLayout::ItemRole>(arg3).ptr());
 }
@@ -343,9 +343,9 @@ static void _call_f_getWidgetPosition_c4714 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  int *arg2 = args.read<int * > (heap);
-  qt_gsi::Converter<QFormLayout::ItemRole>::target_type * arg3 = args.read<qt_gsi::Converter<QFormLayout::ItemRole>::target_type * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  qt_gsi::Converter<QFormLayout::ItemRole>::target_type * arg3 = gsi::arg_reader<qt_gsi::Converter<QFormLayout::ItemRole>::target_type * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->getWidgetPosition (arg1, arg2, qt_gsi::QtToCppAdaptor<QFormLayout::ItemRole>(arg3).ptr());
 }
@@ -380,7 +380,7 @@ static void _call_f_heightForWidth_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<int > ((int)((QFormLayout *)cls)->heightForWidth (arg1));
 }
 
@@ -418,9 +418,9 @@ static void _call_f_insertRow_3181 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
-  QWidget *arg3 = args.read<QWidget * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2, arg3);
 }
@@ -444,9 +444,9 @@ static void _call_f_insertRow_3207 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
-  QLayout *arg3 = args.read<QLayout * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  QLayout *arg3 = gsi::arg_reader<QLayout * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2, arg3);
 }
@@ -470,9 +470,9 @@ static void _call_f_insertRow_3891 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  QWidget *arg3 = args.read<QWidget * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2, arg3);
 }
@@ -496,9 +496,9 @@ static void _call_f_insertRow_3917 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  QLayout *arg3 = args.read<QLayout * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QLayout *arg3 = gsi::arg_reader<QLayout * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2, arg3);
 }
@@ -520,8 +520,8 @@ static void _call_f_insertRow_1974 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QWidget *arg2 = args.read<QWidget * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2);
 }
@@ -543,8 +543,8 @@ static void _call_f_insertRow_2000 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QLayout *arg2 = args.read<QLayout * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QLayout *arg2 = gsi::arg_reader<QLayout * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2);
 }
@@ -582,8 +582,8 @@ static void _call_f_itemAt_c3135 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & >() (args, heap);
   ret.write<QLayoutItem * > ((QLayoutItem *)((QFormLayout *)cls)->itemAt (arg1, qt_gsi::QtToCppAdaptor<QFormLayout::ItemRole>(arg2).cref()));
 }
 
@@ -602,7 +602,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QLayoutItem * > ((QLayoutItem *)((QFormLayout *)cls)->itemAt (arg1));
 }
 
@@ -636,7 +636,7 @@ static void _call_f_labelForField_c1315 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QFormLayout *)cls)->labelForField (arg1));
 }
 
@@ -655,7 +655,7 @@ static void _call_f_labelForField_c1341 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayout *arg1 = args.read<QLayout * > (heap);
+  QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QFormLayout *)cls)->labelForField (arg1));
 }
 
@@ -719,7 +719,7 @@ static void _call_f_setFieldGrowthPolicy_3418 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFormLayout::FieldGrowthPolicy>::target_type & arg1 = args.read<const qt_gsi::Converter<QFormLayout::FieldGrowthPolicy>::target_type & > (heap);
+  const qt_gsi::Converter<QFormLayout::FieldGrowthPolicy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFormLayout::FieldGrowthPolicy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setFieldGrowthPolicy (qt_gsi::QtToCppAdaptor<QFormLayout::FieldGrowthPolicy>(arg1).cref());
 }
@@ -739,7 +739,7 @@ static void _call_f_setFormAlignment_2750 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setFormAlignment (arg1);
 }
@@ -759,7 +759,7 @@ static void _call_f_setGeometry_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setGeometry (arg1);
 }
@@ -779,7 +779,7 @@ static void _call_f_setHorizontalSpacing_767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setHorizontalSpacing (arg1);
 }
@@ -803,9 +803,9 @@ static void _call_f_setItem_4767 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & > (heap);
-  QLayoutItem *arg3 = args.read<QLayoutItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & >() (args, heap);
+  QLayoutItem *arg3 = gsi::arg_reader<QLayoutItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setItem (arg1, qt_gsi::QtToCppAdaptor<QFormLayout::ItemRole>(arg2).cref(), arg3);
 }
@@ -825,7 +825,7 @@ static void _call_f_setLabelAlignment_2750 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args.read<QFlags<Qt::AlignmentFlag> > (heap);
+  QFlags<Qt::AlignmentFlag> arg1 = gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setLabelAlignment (arg1);
 }
@@ -849,9 +849,9 @@ static void _call_f_setLayout_4368 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & > (heap);
-  QLayout *arg3 = args.read<QLayout * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & >() (args, heap);
+  QLayout *arg3 = gsi::arg_reader<QLayout * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setLayout (arg1, qt_gsi::QtToCppAdaptor<QFormLayout::ItemRole>(arg2).cref(), arg3);
 }
@@ -871,7 +871,7 @@ static void _call_f_setRowWrapPolicy_3021 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFormLayout::RowWrapPolicy>::target_type & arg1 = args.read<const qt_gsi::Converter<QFormLayout::RowWrapPolicy>::target_type & > (heap);
+  const qt_gsi::Converter<QFormLayout::RowWrapPolicy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFormLayout::RowWrapPolicy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setRowWrapPolicy (qt_gsi::QtToCppAdaptor<QFormLayout::RowWrapPolicy>(arg1).cref());
 }
@@ -891,7 +891,7 @@ static void _call_f_setSpacing_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setSpacing (arg1);
 }
@@ -911,7 +911,7 @@ static void _call_f_setVerticalSpacing_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setVerticalSpacing (arg1);
 }
@@ -935,9 +935,9 @@ static void _call_f_setWidget_4342 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & arg2 = args.read<const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & > (heap);
-  QWidget *arg3 = args.read<QWidget * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & >() (args, heap);
+  QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setWidget (arg1, qt_gsi::QtToCppAdaptor<QFormLayout::ItemRole>(arg2).cref(), arg3);
 }
@@ -987,7 +987,7 @@ static void _call_f_takeAt_767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QLayoutItem * > ((QLayoutItem *)((QFormLayout *)cls)->takeAt (arg1));
 }
 
@@ -1023,8 +1023,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QFormLayout::tr (arg1, arg2));
 }
 
@@ -1047,9 +1047,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QFormLayout::tr (arg1, arg2, arg3));
 }
 
@@ -1070,8 +1070,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QFormLayout::trUtf8 (arg1, arg2));
 }
 
@@ -1094,9 +1094,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QFormLayout::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1644,7 +1644,7 @@ static void _call_ctor_QFormLayout_Adaptor_1315 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QFormLayout_Adaptor *> (new QFormLayout_Adaptor (arg1));
 }
 
@@ -1662,7 +1662,7 @@ static void _call_fp_addChildLayout_1341 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QLayout *arg1 = args.read<QLayout * > (heap);
+  QLayout *arg1 = gsi::arg_reader<QLayout * >() (args, heap);
   qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout_Adaptor *)cls)->fp_QFormLayout_addChildLayout_1341 (arg1);
@@ -1682,7 +1682,7 @@ static void _call_fp_addChildWidget_1315 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout_Adaptor *)cls)->fp_QFormLayout_addChildWidget_1315 (arg1);
 }
@@ -1725,7 +1725,7 @@ static void _call_fp_alignmentRect_c1792 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRect > ((QRect)((QFormLayout_Adaptor *)cls)->fp_QFormLayout_alignmentRect_c1792 (arg1));
 }
 
@@ -1810,7 +1810,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QFormLayout_Adaptor *)cls)->emitter_QFormLayout_destroyed_1302 (arg1);
 }
 
@@ -2146,7 +2146,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QFormLayout_Adaptor *)cls)->fp_QFormLayout_receivers_c1731 (arg1));
 }
 
@@ -2306,7 +2306,7 @@ static void _call_fp_widgetEvent_1217 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEvent *arg1 = args.read<QEvent * > (heap);
+  QEvent *arg1 = gsi::arg_reader<QEvent * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout_Adaptor *)cls)->fp_QFormLayout_widgetEvent_1217 (arg1);
 }

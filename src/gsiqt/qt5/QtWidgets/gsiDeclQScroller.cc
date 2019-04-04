@@ -74,9 +74,9 @@ static void _call_f_ensureVisible_3788 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScroller *)cls)->ensureVisible (arg1, arg2, arg3);
 }
@@ -102,10 +102,10 @@ static void _call_f_ensureVisible_4447 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  int arg4 = args.read<int > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScroller *)cls)->ensureVisible (arg1, arg2, arg3, arg4);
 }
@@ -144,9 +144,9 @@ static void _call_f_handleInput_4755 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QScroller::Input>::target_type & arg1 = args.read<const qt_gsi::Converter<QScroller::Input>::target_type & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  qint64 arg3 = args ? args.read<qint64 > (heap) : (qint64)(0);
+  const qt_gsi::Converter<QScroller::Input>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QScroller::Input>::target_type & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  qint64 arg3 = args ? gsi::arg_reader<qint64 >() (args, heap) : gsi::arg_maker<qint64 >() (0, heap);
   ret.write<bool > ((bool)((QScroller *)cls)->handleInput (qt_gsi::QtToCppAdaptor<QScroller::Input>(arg1).cref(), arg2, arg3));
 }
 
@@ -196,7 +196,7 @@ static void _call_f_scrollTo_1986 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScroller *)cls)->scrollTo (arg1);
 }
@@ -218,8 +218,8 @@ static void _call_f_scrollTo_2645 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
-  int arg2 = args.read<int > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScroller *)cls)->scrollTo (arg1, arg2);
 }
@@ -254,7 +254,7 @@ static void _call_f_setScrollerProperties_3301 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QScrollerProperties &arg1 = args.read<const QScrollerProperties & > (heap);
+  const QScrollerProperties &arg1 = gsi::arg_reader<const QScrollerProperties & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScroller *)cls)->setScrollerProperties (arg1);
 }
@@ -274,7 +274,7 @@ static void _call_f_setSnapPositionsX_2461 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<qreal> &arg1 = args.read<const QList<qreal> & > (heap);
+  const QList<qreal> &arg1 = gsi::arg_reader<const QList<qreal> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScroller *)cls)->setSnapPositionsX (arg1);
 }
@@ -296,8 +296,8 @@ static void _call_f_setSnapPositionsX_2034 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScroller *)cls)->setSnapPositionsX (arg1, arg2);
 }
@@ -317,7 +317,7 @@ static void _call_f_setSnapPositionsY_2461 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<qreal> &arg1 = args.read<const QList<qreal> & > (heap);
+  const QList<qreal> &arg1 = gsi::arg_reader<const QList<qreal> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScroller *)cls)->setSnapPositionsY (arg1);
 }
@@ -339,8 +339,8 @@ static void _call_f_setSnapPositionsY_2034 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QScroller *)cls)->setSnapPositionsY (arg1, arg2);
 }
@@ -438,8 +438,8 @@ static void _call_f_grabGesture_4656 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const qt_gsi::Converter<QScroller::ScrollerGestureType>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QScroller::ScrollerGestureType>::target_type & > (heap) : (const qt_gsi::Converter<QScroller::ScrollerGestureType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QScroller::ScrollerGestureType>(heap, QScroller::TouchGesture));
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const qt_gsi::Converter<QScroller::ScrollerGestureType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QScroller::ScrollerGestureType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QScroller::ScrollerGestureType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QScroller::ScrollerGestureType>(heap, QScroller::TouchGesture), heap);
   ret.write<qt_gsi::Converter<Qt::GestureType>::target_type > ((qt_gsi::Converter<Qt::GestureType>::target_type)qt_gsi::CppToQtAdaptor<Qt::GestureType>(QScroller::grabGesture (arg1, qt_gsi::QtToCppAdaptor<QScroller::ScrollerGestureType>(arg2).cref())));
 }
 
@@ -458,7 +458,7 @@ static void _call_f_grabbedGesture_1302 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<qt_gsi::Converter<Qt::GestureType>::target_type > ((qt_gsi::Converter<Qt::GestureType>::target_type)qt_gsi::CppToQtAdaptor<Qt::GestureType>(QScroller::grabbedGesture (arg1)));
 }
 
@@ -477,7 +477,7 @@ static void _call_f_hasScroller_1302 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<bool > ((bool)QScroller::hasScroller (arg1));
 }
 
@@ -496,7 +496,7 @@ static void _call_f_scroller_1302 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   ret.write<QScroller * > ((QScroller *)QScroller::scroller (arg1));
 }
 
@@ -515,7 +515,7 @@ static void _call_f_scroller_1997 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QObject *arg1 = args.read<const QObject * > (heap);
+  const QObject *arg1 = gsi::arg_reader<const QObject * >() (args, heap);
   ret.write<const QScroller * > ((const QScroller *)QScroller::scroller (arg1));
 }
 
@@ -538,9 +538,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QScroller::tr (arg1, arg2, arg3));
 }
 
@@ -563,9 +563,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QScroller::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -584,7 +584,7 @@ static void _call_f_ungrabGesture_1302 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QScroller::ungrabGesture (arg1);
 }

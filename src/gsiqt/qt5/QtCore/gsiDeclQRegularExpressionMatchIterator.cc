@@ -67,7 +67,7 @@ static void _call_ctor_QRegularExpressionMatchIterator_4523 (const qt_gsi::Gener
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegularExpressionMatchIterator &arg1 = args.read<const QRegularExpressionMatchIterator & > (heap);
+  const QRegularExpressionMatchIterator &arg1 = gsi::arg_reader<const QRegularExpressionMatchIterator & >() (args, heap);
   ret.write<QRegularExpressionMatchIterator *> (new QRegularExpressionMatchIterator (arg1));
 }
 
@@ -161,7 +161,7 @@ static void _call_f_operator_eq__4523 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegularExpressionMatchIterator &arg1 = args.read<const QRegularExpressionMatchIterator & > (heap);
+  const QRegularExpressionMatchIterator &arg1 = gsi::arg_reader<const QRegularExpressionMatchIterator & >() (args, heap);
   ret.write<QRegularExpressionMatchIterator & > ((QRegularExpressionMatchIterator &)((QRegularExpressionMatchIterator *)cls)->operator= (arg1));
 }
 
@@ -210,7 +210,7 @@ static void _call_f_swap_3828 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QRegularExpressionMatchIterator &arg1 = args.read<QRegularExpressionMatchIterator & > (heap);
+  QRegularExpressionMatchIterator &arg1 = gsi::arg_reader<QRegularExpressionMatchIterator & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRegularExpressionMatchIterator *)cls)->swap (arg1);
 }

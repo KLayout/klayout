@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionTabBarBaseV2_3627 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTabBarBaseV2 &arg1 = args.read<const QStyleOptionTabBarBaseV2 & > (heap);
+  const QStyleOptionTabBarBaseV2 &arg1 = gsi::arg_reader<const QStyleOptionTabBarBaseV2 & >() (args, heap);
   ret.write<QStyleOptionTabBarBaseV2 *> (new QStyleOptionTabBarBaseV2 (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QStyleOptionTabBarBaseV2_3491 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTabBarBase &arg1 = args.read<const QStyleOptionTabBarBase & > (heap);
+  const QStyleOptionTabBarBase &arg1 = gsi::arg_reader<const QStyleOptionTabBarBase & >() (args, heap);
   ret.write<QStyleOptionTabBarBaseV2 *> (new QStyleOptionTabBarBaseV2 (arg1));
 }
 
@@ -105,7 +105,7 @@ static void _call_f_operator_eq__3491 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTabBarBase &arg1 = args.read<const QStyleOptionTabBarBase & > (heap);
+  const QStyleOptionTabBarBase &arg1 = gsi::arg_reader<const QStyleOptionTabBarBase & >() (args, heap);
   ret.write<QStyleOptionTabBarBaseV2 & > ((QStyleOptionTabBarBaseV2 &)((QStyleOptionTabBarBaseV2 *)cls)->operator= (arg1));
 }
 

@@ -126,8 +126,8 @@ static void _call_ctor_QWindowStateChangeEvent_Adaptor_3346 (const qt_gsi::Gener
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::WindowState> arg1 = args.read<QFlags<Qt::WindowState> > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(false);
+  QFlags<Qt::WindowState> arg1 = gsi::arg_reader<QFlags<Qt::WindowState> >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<QWindowStateChangeEvent_Adaptor *> (new QWindowStateChangeEvent_Adaptor (arg1, arg2));
 }
 

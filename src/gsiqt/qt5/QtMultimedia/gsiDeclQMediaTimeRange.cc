@@ -68,8 +68,8 @@ static void _call_ctor_QMediaTimeRange_1864 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
-  qint64 arg2 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  qint64 arg2 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<QMediaTimeRange *> (new QMediaTimeRange (arg1, arg2));
 }
 
@@ -88,7 +88,7 @@ static void _call_ctor_QMediaTimeRange_3110 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeInterval &arg1 = args.read<const QMediaTimeInterval & > (heap);
+  const QMediaTimeInterval &arg1 = gsi::arg_reader<const QMediaTimeInterval & >() (args, heap);
   ret.write<QMediaTimeRange *> (new QMediaTimeRange (arg1));
 }
 
@@ -107,7 +107,7 @@ static void _call_ctor_QMediaTimeRange_2766 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeRange &arg1 = args.read<const QMediaTimeRange & > (heap);
+  const QMediaTimeRange &arg1 = gsi::arg_reader<const QMediaTimeRange & >() (args, heap);
   ret.write<QMediaTimeRange *> (new QMediaTimeRange (arg1));
 }
 
@@ -128,8 +128,8 @@ static void _call_f_addInterval_1864 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
-  qint64 arg2 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  qint64 arg2 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaTimeRange *)cls)->addInterval (arg1, arg2);
 }
@@ -149,7 +149,7 @@ static void _call_f_addInterval_3110 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeInterval &arg1 = args.read<const QMediaTimeInterval & > (heap);
+  const QMediaTimeInterval &arg1 = gsi::arg_reader<const QMediaTimeInterval & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaTimeRange *)cls)->addInterval (arg1);
 }
@@ -169,7 +169,7 @@ static void _call_f_addTimeRange_2766 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeRange &arg1 = args.read<const QMediaTimeRange & > (heap);
+  const QMediaTimeRange &arg1 = gsi::arg_reader<const QMediaTimeRange & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaTimeRange *)cls)->addTimeRange (arg1);
 }
@@ -205,7 +205,7 @@ static void _call_f_contains_c986 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<bool > ((bool)((QMediaTimeRange *)cls)->contains (arg1));
 }
 
@@ -299,7 +299,7 @@ static void _call_f_operator_plus__eq__2766 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeRange &arg1 = args.read<const QMediaTimeRange & > (heap);
+  const QMediaTimeRange &arg1 = gsi::arg_reader<const QMediaTimeRange & >() (args, heap);
   ret.write<QMediaTimeRange & > ((QMediaTimeRange &)((QMediaTimeRange *)cls)->operator+= (arg1));
 }
 
@@ -318,7 +318,7 @@ static void _call_f_operator_plus__eq__3110 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeInterval &arg1 = args.read<const QMediaTimeInterval & > (heap);
+  const QMediaTimeInterval &arg1 = gsi::arg_reader<const QMediaTimeInterval & >() (args, heap);
   ret.write<QMediaTimeRange & > ((QMediaTimeRange &)((QMediaTimeRange *)cls)->operator+= (arg1));
 }
 
@@ -337,7 +337,7 @@ static void _call_f_operator_minus__eq__2766 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeRange &arg1 = args.read<const QMediaTimeRange & > (heap);
+  const QMediaTimeRange &arg1 = gsi::arg_reader<const QMediaTimeRange & >() (args, heap);
   ret.write<QMediaTimeRange & > ((QMediaTimeRange &)((QMediaTimeRange *)cls)->operator-= (arg1));
 }
 
@@ -356,7 +356,7 @@ static void _call_f_operator_minus__eq__3110 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeInterval &arg1 = args.read<const QMediaTimeInterval & > (heap);
+  const QMediaTimeInterval &arg1 = gsi::arg_reader<const QMediaTimeInterval & >() (args, heap);
   ret.write<QMediaTimeRange & > ((QMediaTimeRange &)((QMediaTimeRange *)cls)->operator-= (arg1));
 }
 
@@ -375,7 +375,7 @@ static void _call_f_operator_eq__2766 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeRange &arg1 = args.read<const QMediaTimeRange & > (heap);
+  const QMediaTimeRange &arg1 = gsi::arg_reader<const QMediaTimeRange & >() (args, heap);
   ret.write<QMediaTimeRange & > ((QMediaTimeRange &)((QMediaTimeRange *)cls)->operator= (arg1));
 }
 
@@ -394,7 +394,7 @@ static void _call_f_operator_eq__3110 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeInterval &arg1 = args.read<const QMediaTimeInterval & > (heap);
+  const QMediaTimeInterval &arg1 = gsi::arg_reader<const QMediaTimeInterval & >() (args, heap);
   ret.write<QMediaTimeRange & > ((QMediaTimeRange &)((QMediaTimeRange *)cls)->operator= (arg1));
 }
 
@@ -415,8 +415,8 @@ static void _call_f_removeInterval_1864 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
-  qint64 arg2 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  qint64 arg2 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaTimeRange *)cls)->removeInterval (arg1, arg2);
 }
@@ -436,7 +436,7 @@ static void _call_f_removeInterval_3110 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeInterval &arg1 = args.read<const QMediaTimeInterval & > (heap);
+  const QMediaTimeInterval &arg1 = gsi::arg_reader<const QMediaTimeInterval & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaTimeRange *)cls)->removeInterval (arg1);
 }
@@ -456,7 +456,7 @@ static void _call_f_removeTimeRange_2766 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeRange &arg1 = args.read<const QMediaTimeRange & > (heap);
+  const QMediaTimeRange &arg1 = gsi::arg_reader<const QMediaTimeRange & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaTimeRange *)cls)->removeTimeRange (arg1);
 }

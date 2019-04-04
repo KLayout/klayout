@@ -93,14 +93,14 @@ Class<db::Manager> decl_Manager ("db", "Manager",
     "@brief Undo the current transaction\n"
     "\n"
     "The current transaction is undone with this method.\n"
-    "The 'has_undo' method can be used to determine wether\n"
+    "The 'has_undo' method can be used to determine whether\n"
     "there are transactions to undo.\n"
   ) +
   gsi::method ("redo", &db::Manager::redo,
     "@brief Redo the next available transaction\n"
     "\n"
     "The next transaction is redone with this method.\n"
-    "The 'has_redo' method can be used to determine wether\n"
+    "The 'has_redo' method can be used to determine whether\n"
     "there are transactions to undo.\n"
   ) +
   gsi::method_ext ("has_undo?", &has_undo,
@@ -122,7 +122,7 @@ Class<db::Manager> decl_Manager ("db", "Manager",
   "@brief A transaction manager class\n"
   "\n"
   "Manager objects control layout and potentially other objects in the layout database "
-  "and allow to queue operations to form transactions. A transaction is a sequence of "
+  "and queue operations to form transactions. A transaction is a sequence of "
   "operations that can be undone or redone.\n"
   "\n"
   "In order to equip a layout object with undo/redo support, instantiate the layout object "

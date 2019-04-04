@@ -175,7 +175,7 @@ static void _call_f_setCenterPoint_1986 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setCenterPoint (arg1);
 }
@@ -195,7 +195,7 @@ static void _call_f_setChangeFlags_3522 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPinchGesture::ChangeFlag> arg1 = args.read<QFlags<QPinchGesture::ChangeFlag> > (heap);
+  QFlags<QPinchGesture::ChangeFlag> arg1 = gsi::arg_reader<QFlags<QPinchGesture::ChangeFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setChangeFlags (arg1);
 }
@@ -215,7 +215,7 @@ static void _call_f_setLastCenterPoint_1986 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setLastCenterPoint (arg1);
 }
@@ -235,7 +235,7 @@ static void _call_f_setLastRotationAngle_1071 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setLastRotationAngle (arg1);
 }
@@ -255,7 +255,7 @@ static void _call_f_setLastScaleFactor_1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setLastScaleFactor (arg1);
 }
@@ -275,7 +275,7 @@ static void _call_f_setRotationAngle_1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setRotationAngle (arg1);
 }
@@ -295,7 +295,7 @@ static void _call_f_setScaleFactor_1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setScaleFactor (arg1);
 }
@@ -315,7 +315,7 @@ static void _call_f_setStartCenterPoint_1986 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setStartCenterPoint (arg1);
 }
@@ -335,7 +335,7 @@ static void _call_f_setTotalChangeFlags_3522 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPinchGesture::ChangeFlag> arg1 = args.read<QFlags<QPinchGesture::ChangeFlag> > (heap);
+  QFlags<QPinchGesture::ChangeFlag> arg1 = gsi::arg_reader<QFlags<QPinchGesture::ChangeFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setTotalChangeFlags (arg1);
 }
@@ -355,7 +355,7 @@ static void _call_f_setTotalRotationAngle_1071 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setTotalRotationAngle (arg1);
 }
@@ -375,7 +375,7 @@ static void _call_f_setTotalScaleFactor_1071 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPinchGesture *)cls)->setTotalScaleFactor (arg1);
 }
@@ -459,9 +459,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QPinchGesture::tr (arg1, arg2, arg3));
 }
 
@@ -484,9 +484,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QPinchGesture::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -693,7 +693,7 @@ static void _call_ctor_QPinchGesture_Adaptor_1302 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QPinchGesture_Adaptor *> (new QPinchGesture_Adaptor (arg1));
 }
 
@@ -759,7 +759,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QPinchGesture_Adaptor *)cls)->emitter_QPinchGesture_destroyed_1302 (arg1);
 }
 
@@ -850,7 +850,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QPinchGesture_Adaptor *)cls)->fp_QPinchGesture_isSignalConnected_c2394 (arg1));
 }
 
@@ -868,7 +868,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QPinchGesture_Adaptor *)cls)->fp_QPinchGesture_receivers_c1731 (arg1));
 }
 

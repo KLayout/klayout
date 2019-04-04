@@ -84,7 +84,7 @@ static void _call_f_mimeTypeForData_c2309 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QMimeType > ((QMimeType)((QMimeDatabase *)cls)->mimeTypeForData (arg1));
 }
 
@@ -103,7 +103,7 @@ static void _call_f_mimeTypeForData_c1447 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QMimeType > ((QMimeType)((QMimeDatabase *)cls)->mimeTypeForData (arg1));
 }
 
@@ -124,8 +124,8 @@ static void _call_f_mimeTypeForFile_c4613 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & > (heap) : (const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QMimeDatabase::MatchMode>(heap, QMimeDatabase::MatchDefault));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QMimeDatabase::MatchMode>(heap, QMimeDatabase::MatchDefault), heap);
   ret.write<QMimeType > ((QMimeType)((QMimeDatabase *)cls)->mimeTypeForFile (arg1, qt_gsi::QtToCppAdaptor<QMimeDatabase::MatchMode>(arg2).cref()));
 }
 
@@ -146,8 +146,8 @@ static void _call_f_mimeTypeForFile_c4762 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFileInfo &arg1 = args.read<const QFileInfo & > (heap);
-  const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & > (heap) : (const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QMimeDatabase::MatchMode>(heap, QMimeDatabase::MatchDefault));
+  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
+  const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QMimeDatabase::MatchMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QMimeDatabase::MatchMode>(heap, QMimeDatabase::MatchDefault), heap);
   ret.write<QMimeType > ((QMimeType)((QMimeDatabase *)cls)->mimeTypeForFile (arg1, qt_gsi::QtToCppAdaptor<QMimeDatabase::MatchMode>(arg2).cref()));
 }
 
@@ -168,8 +168,8 @@ static void _call_f_mimeTypeForFileNameAndData_c3364 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QIODevice *arg2 = args.read<QIODevice * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QIODevice *arg2 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<QMimeType > ((QMimeType)((QMimeDatabase *)cls)->mimeTypeForFileNameAndData (arg1, arg2));
 }
 
@@ -190,8 +190,8 @@ static void _call_f_mimeTypeForFileNameAndData_c4226 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QMimeType > ((QMimeType)((QMimeDatabase *)cls)->mimeTypeForFileNameAndData (arg1, arg2));
 }
 
@@ -210,7 +210,7 @@ static void _call_f_mimeTypeForName_c2025 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QMimeType > ((QMimeType)((QMimeDatabase *)cls)->mimeTypeForName (arg1));
 }
 
@@ -229,7 +229,7 @@ static void _call_f_mimeTypeForUrl_c1701 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QMimeType > ((QMimeType)((QMimeDatabase *)cls)->mimeTypeForUrl (arg1));
 }
 
@@ -248,7 +248,7 @@ static void _call_f_mimeTypesForFileName_c2025 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QList<QMimeType> > ((QList<QMimeType>)((QMimeDatabase *)cls)->mimeTypesForFileName (arg1));
 }
 
@@ -267,7 +267,7 @@ static void _call_f_suffixForFileName_c2025 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QMimeDatabase *)cls)->suffixForFileName (arg1));
 }
 

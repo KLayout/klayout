@@ -129,7 +129,7 @@ public:
   /**
    *  @brief The copy constructor that converts also
    *
-   *  The copy constructor allows to convert between different
+   *  The copy constructor allows converting between different
    *  coordinate types, if possible.
    *
    *  @param d The source from which to copy
@@ -312,7 +312,7 @@ public:
    *  @brief String conversion
    *
    *  If dbu is set, it determines the factor by which the coordinates are multiplied to render
-   *  micron units. In addition, a micron format is choosen for output of these coordinates.
+   *  micron units. In addition, a micron format is chosen for output of these coordinates.
    */
   std::string
   to_string (double dbu) const 

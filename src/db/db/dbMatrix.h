@@ -845,7 +845,7 @@ public:
   /**
    *  @brief Get the x perspective tilt angle in degree
    *
-   *  To achieve the same visual effect, a different tilt angle has to be choosen for 
+   *  To achieve the same visual effect, a different tilt angle has to be chosen for 
    *  a given observer distance z. This method computes the tilt angle for the given observer
    *  distance.
    */
@@ -854,7 +854,7 @@ public:
   /**
    *  @brief Get the y perspective tilt angle in degree
    *
-   *  To achieve the same visual effect, a different tilt angle has to be choosen for 
+   *  To achieve the same visual effect, a different tilt angle has to be chosen for 
    *  a given observer distance z. This method computes the tilt angle for the given observer
    *  distance.
    */
@@ -868,7 +868,7 @@ public:
   /**
    *  @brief Returns the matrix for perspective transformation
    *
-   *  To achieve the same visual effect, a different tilt angle has to be choosen for 
+   *  To achieve the same visual effect, a different tilt angle has to be chosen for 
    *  a given observer distance z. This method computes the tilt angle for the given observer
    *  distance.
    *
@@ -970,7 +970,7 @@ struct MatrixAdjustFlags
  *  @param landmarks_before The points before the transformation.
  *  @param landmarks_after The points after the transformation.
  *  @param flags Selects the properties to adjust.
- *  @param fixed_point The index of the fixed point (one that is definitly mapped to the target) or -1 if there is none
+ *  @param fixed_point The index of the fixed point (one that is definitely mapped to the target) or -1 if there is none
  */
 void DB_PUBLIC adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::vector <db::DPoint> &landmarks_before, const std::vector <db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point = -1);
 
@@ -986,7 +986,7 @@ void DB_PUBLIC adjust_matrix (Matrix2d &matrix, db::DVector &disp, const std::ve
  *  @param landmarks_before The points before the transformation.
  *  @param landmarks_after The points after the transformation.
  *  @param flags Selects the properties to adjust.
- *  @param fixed_point The index of the fixed point (one that is definitly mapped to the target) or -1 if there is none
+ *  @param fixed_point The index of the fixed point (one that is definitely mapped to the target) or -1 if there is none
  */
 void DB_PUBLIC adjust_matrix (Matrix3d &matrix, const std::vector <db::DPoint> &landmarks_before, const std::vector <db::DPoint> &landmarks_after, MatrixAdjustFlags::Flags flags, int fixed_point = -1);
 

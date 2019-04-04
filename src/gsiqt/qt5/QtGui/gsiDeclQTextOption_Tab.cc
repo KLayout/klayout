@@ -69,9 +69,9 @@ static void _call_ctor_QTextOption_Tab_4138 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  const qt_gsi::Converter<QTextOption::TabType>::target_type & arg2 = args.read<const qt_gsi::Converter<QTextOption::TabType>::target_type & > (heap);
-  const qt_gsi::Converter<QChar>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QChar>::target_type & > (heap) : (const qt_gsi::Converter<QChar>::target_type &)(qt_gsi::CppToQtReadAdaptor<QChar>(heap, QChar()));
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<QTextOption::TabType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QTextOption::TabType>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QChar>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QChar>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QChar>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QChar>(heap, QChar()), heap);
   ret.write<QTextOption::Tab *> (new QTextOption::Tab (arg1, qt_gsi::QtToCppAdaptor<QTextOption::TabType>(arg2).cref(), qt_gsi::QtToCppAdaptor<QChar>(arg3).cref()));
 }
 
@@ -90,7 +90,7 @@ static void _call_f_operator_excl__eq__c2843 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextOption::Tab &arg1 = args.read<const QTextOption::Tab & > (heap);
+  const QTextOption::Tab &arg1 = gsi::arg_reader<const QTextOption::Tab & >() (args, heap);
   ret.write<bool > ((bool)((QTextOption::Tab *)cls)->operator!= (arg1));
 }
 
@@ -109,7 +109,7 @@ static void _call_f_operator_eq__eq__c2843 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextOption::Tab &arg1 = args.read<const QTextOption::Tab & > (heap);
+  const QTextOption::Tab &arg1 = gsi::arg_reader<const QTextOption::Tab & >() (args, heap);
   ret.write<bool > ((bool)((QTextOption::Tab *)cls)->operator== (arg1));
 }
 

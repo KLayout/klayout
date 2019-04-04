@@ -54,8 +54,8 @@ static void _call_f_extension_c3219 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QObject * > ((QObject *)((QAbstractExtensionManager *)cls)->extension (arg1, arg2));
 }
 
@@ -76,8 +76,8 @@ static void _call_f_registerExtensions_5125 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractExtensionFactory *arg1 = args.read<QAbstractExtensionFactory * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  QAbstractExtensionFactory *arg1 = gsi::arg_reader<QAbstractExtensionFactory * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractExtensionManager *)cls)->registerExtensions (arg1, arg2);
 }
@@ -99,8 +99,8 @@ static void _call_f_unregisterExtensions_5125 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractExtensionFactory *arg1 = args.read<QAbstractExtensionFactory * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  QAbstractExtensionFactory *arg1 = gsi::arg_reader<QAbstractExtensionFactory * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractExtensionManager *)cls)->unregisterExtensions (arg1, arg2);
 }

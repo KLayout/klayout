@@ -164,7 +164,7 @@ private:
   std::string m_format_name;
   db::StreamFormatDeclaration *mp_stream_fmt;
 
-  //  don't allow to override - use a special configuration page for that purpose.
+  //  don't allow overrides - use a special configuration page for that purpose.
   virtual ConfigPage *config_page (QWidget * /*parent*/, std::string & /*title*/) const
   {
     return 0;

@@ -81,7 +81,7 @@ static void _call_f_createStroke_c2514 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPainterPath &arg1 = args.read<const QPainterPath & > (heap);
+  const QPainterPath &arg1 = gsi::arg_reader<const QPainterPath & >() (args, heap);
   ret.write<QPainterPath > ((QPainterPath)((QPainterPathStroker *)cls)->createStroke (arg1));
 }
 
@@ -175,7 +175,7 @@ static void _call_f_setCapStyle_1845 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::PenCapStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::PenCapStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::PenCapStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::PenCapStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPathStroker *)cls)->setCapStyle (qt_gsi::QtToCppAdaptor<Qt::PenCapStyle>(arg1).cref());
 }
@@ -195,7 +195,7 @@ static void _call_f_setCurveThreshold_1071 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPathStroker *)cls)->setCurveThreshold (arg1);
 }
@@ -215,7 +215,7 @@ static void _call_f_setDashOffset_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPathStroker *)cls)->setDashOffset (arg1);
 }
@@ -235,7 +235,7 @@ static void _call_f_setDashPattern_1569 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::PenStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::PenStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::PenStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::PenStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPathStroker *)cls)->setDashPattern (qt_gsi::QtToCppAdaptor<Qt::PenStyle>(arg1).cref());
 }
@@ -255,7 +255,7 @@ static void _call_f_setDashPattern_2676 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVector<qreal> &arg1 = args.read<const QVector<qreal> & > (heap);
+  const QVector<qreal> &arg1 = gsi::arg_reader<const QVector<qreal> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPathStroker *)cls)->setDashPattern (arg1);
 }
@@ -275,7 +275,7 @@ static void _call_f_setJoinStyle_1969 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::PenJoinStyle>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPathStroker *)cls)->setJoinStyle (qt_gsi::QtToCppAdaptor<Qt::PenJoinStyle>(arg1).cref());
 }
@@ -295,7 +295,7 @@ static void _call_f_setMiterLimit_1071 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPathStroker *)cls)->setMiterLimit (arg1);
 }
@@ -315,7 +315,7 @@ static void _call_f_setWidth_1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPainterPathStroker *)cls)->setWidth (arg1);
 }

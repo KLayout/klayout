@@ -310,6 +310,10 @@ class Config(object):
             else:
                 loader_path = '$ORIGIN/..'
             args += ['-Wl,-rpath,' + loader_path]
+            # default linux shared object compilation uses the '-g' flag,
+            # which generates unnecessary debug information
+            # removing with strip-all during the linking stage
+            args += ['-Wl,--strip-all']
             return args
 
     def macros(self):
@@ -322,7 +326,7 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26.0.dev11"
+        return "0.26.0.dev14"
 
 
 config = Config()
@@ -389,11 +393,6 @@ config.add_extension(_pya)
 _db_path = os.path.join("src", "db", "db")
 _db_sources = set(glob.glob(os.path.join(_db_path, "*.cc")))
 
-# Not a real source:
-# Caveat, in source distribution tarballs from pypi, these files will
-# not exist. So we need an error-free discard method instead of list's remove.
-_db_sources.discard(os.path.join(_db_path, "fonts.cc"))
-
 _db = Library(config.root + '._db',
               define_macros=config.macros() + [('MAKE_DB_LIBRARY', 1)],
               include_dirs=[_tl_path, _gsi_path, _db_path],
@@ -403,6 +402,22 @@ _db = Library(config.root + '._db',
               extra_compile_args=config.compile_args('_db'),
               sources=list(_db_sources))
 config.add_extension(_db)
+
+# ------------------------------------------------------------------
+# _lib dependency library
+
+_lib_path = os.path.join("src", "lib", "lib")
+_lib_sources = set(glob.glob(os.path.join(_lib_path, "*.cc")))
+
+_lib = Library(config.root + '._lib',
+              define_macros=config.macros() + [('MAKE_LIB_LIBRARY', 1)],
+              include_dirs=[_tl_path, _gsi_path, _db_path, _lib_path],
+              extra_objects=[config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+              language='c++',
+              extra_link_args=config.link_args('_lib'),
+              extra_compile_args=config.compile_args('_lib'),
+              sources=list(_lib_sources))
+config.add_extension(_lib)
 
 # ------------------------------------------------------------------
 # _rdb dependency library
@@ -474,6 +489,19 @@ db = Extension(config.root + '.dbcore',
                sources=list(db_sources))
 
 # ------------------------------------------------------------------
+# lib extension library
+
+lib_path = os.path.join("src", "pymod", "lib")
+lib_sources = set(glob.glob(os.path.join(lib_path, "*.cc")))
+
+lib = Extension(config.root + '.libcore',
+               define_macros=config.macros(),
+               include_dirs=[_lib_path, _tl_path, _gsi_path, _pya_path],
+               extra_objects=[config.path_of('_lib', _lib_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
+               extra_link_args=config.link_args('libcore'),
+               sources=list(lib_sources))
+
+# ------------------------------------------------------------------
 # rdb extension library
 
 rdb_path = os.path.join("src", "pymod", "rdb")
@@ -482,7 +510,7 @@ rdb_sources = set(glob.glob(os.path.join(rdb_path, "*.cc")))
 rdb = Extension(config.root + '.rdbcore',
                 define_macros=config.macros(),
 
-                include_dirs=[_rdb_path, _db_path, _tl_path, _gsi_path, _pya_path],
+                include_dirs=[_rdb_path, _tl_path, _gsi_path, _pya_path],
                 extra_objects=[config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
                 extra_link_args=config.link_args('rdbcore'),
                 sources=list(rdb_sources))
@@ -512,4 +540,4 @@ if __name__ == '__main__':
           url='https://github.com/klayoutmatthias/klayout',
           packages=find_packages('src/pymod/distutils_src'),
           package_dir={'': 'src/pymod/distutils_src'},  # https://github.com/pypa/setuptools/issues/230
-          ext_modules=[_tl, _gsi, _pya, _db, _rdb] + db_plugins + [tl, db, rdb])
+          ext_modules=[_tl, _gsi, _pya, _db, _lib, _rdb] + db_plugins + [tl, db, lib, rdb])

@@ -51,7 +51,7 @@ namespace gsi
 //  TODO: these static variables are a bad hack!
 //  However it's not easy to pass parameters to a C++ classes constructor in Ruby without
 //  compromising the capability to derive from that class (at least I have not learned how
-//  to create a "new" in the super class *and* allow to "new" the derived class). Anyway,
+//  to create a "new" in the super class *and* allow a "new" of the derived class). Anyway,
 //  since PluginBase object are only allowed to be created inside the create_plugin method
 //  of the factory, this hack is a quick but dirty workaround.
 static bool s_in_create_plugin = false;
@@ -457,7 +457,7 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "@param title The title string which is supposed to appear in the tool bar and menu related to this plugin.\n"
     "@param icon The path to the icon that appears in the tool bar and menu related to this plugin.\n" 
     "\n"
-    "This version also allows to register an icon for the tool bar.\n"
+    "This version also allows registering an icon for the tool bar.\n"
     "\n"
     "Registration of the plugin factory makes the object known to the system. Registration requires that the menu items have been set "
     "already. Hence it is recommended to put the registration at the end of the initialization method of the factory class.\n"
@@ -905,7 +905,7 @@ Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
     "@return A value indicating whether the operation was successful\n"
     "\n"
     "This method siletly does nothing, if the config file does not\n"
-    "exist. If it does and an error occured, the error message is printed\n"
+    "exist. If it does and an error occurred, the error message is printed\n"
     "on stderr. In both cases, false is returned.\n"
   ) +
   method_ext ("get_config", &get_config,

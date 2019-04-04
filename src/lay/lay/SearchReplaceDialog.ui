@@ -995,7 +995,7 @@ Press 'Select+Replace' button to show items found, select some and replace them<
               <item>
                <widget class="QLabel" name="label_9" >
                 <property name="text" >
-                 <string>Press 'Execute' button to excute the query</string>
+                 <string>Press 'Execute' button to execute the query</string>
                 </property>
                 <property name="alignment" >
                  <set>Qt::AlignCenter</set>

@@ -75,7 +75,7 @@ static void _call_f_buddy_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSortFilterProxyModel *)cls)->buddy (arg1));
 }
 
@@ -94,7 +94,7 @@ static void _call_f_canFetchMore_c2395 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->canFetchMore (arg1));
 }
 
@@ -129,7 +129,7 @@ static void _call_f_columnCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  const QModelIndex &arg1 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<int > ((int)((QSortFilterProxyModel *)cls)->columnCount (arg1));
 }
 
@@ -150,8 +150,8 @@ static void _call_f_data_c3054 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(Qt::DisplayRole);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::DisplayRole, heap);
   ret.write<QVariant > ((QVariant)((QSortFilterProxyModel *)cls)->data (arg1, arg2));
 }
 
@@ -178,11 +178,11 @@ static void _call_f_dropMimeData_7425 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeData *arg1 = args.read<const QMimeData * > (heap);
-  const qt_gsi::Converter<Qt::DropAction>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::DropAction>::target_type & > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  const QModelIndex &arg5 = args.read<const QModelIndex & > (heap);
+  const QMimeData *arg1 = gsi::arg_reader<const QMimeData * >() (args, heap);
+  const qt_gsi::Converter<Qt::DropAction>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::DropAction>::target_type & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg5 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->dropMimeData (arg1, qt_gsi::QtToCppAdaptor<Qt::DropAction>(arg2).cref(), arg3, arg4, arg5));
 }
 
@@ -216,7 +216,7 @@ static void _call_f_fetchMore_2395 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->fetchMore (arg1);
 }
@@ -296,7 +296,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QFlags<Qt::ItemFlag> > ((QFlags<Qt::ItemFlag>)((QSortFilterProxyModel *)cls)->flags (arg1));
 }
 
@@ -315,7 +315,7 @@ static void _call_f_hasChildren_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  const QModelIndex &arg1 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->hasChildren (arg1));
 }
 
@@ -338,9 +338,9 @@ static void _call_f_headerData_c3231 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(Qt::DisplayRole);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::DisplayRole, heap);
   ret.write<QVariant > ((QVariant)((QSortFilterProxyModel *)cls)->headerData (arg1, qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg2).cref(), arg3));
 }
 
@@ -363,9 +363,9 @@ static void _call_f_index_c3713 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<QModelIndex > ((QModelIndex)((QSortFilterProxyModel *)cls)->index (arg1, arg2, arg3));
 }
 
@@ -388,9 +388,9 @@ static void _call_f_insertColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->insertColumns (arg1, arg2, arg3));
 }
 
@@ -413,9 +413,9 @@ static void _call_f_insertRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->insertRows (arg1, arg2, arg3));
 }
 
@@ -465,7 +465,7 @@ static void _call_f_mapFromSource_c2395 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSortFilterProxyModel *)cls)->mapFromSource (arg1));
 }
 
@@ -484,7 +484,7 @@ static void _call_f_mapSelectionFromSource_c2727 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelection &arg1 = args.read<const QItemSelection & > (heap);
+  const QItemSelection &arg1 = gsi::arg_reader<const QItemSelection & >() (args, heap);
   ret.write<QItemSelection > ((QItemSelection)((QSortFilterProxyModel *)cls)->mapSelectionFromSource (arg1));
 }
 
@@ -503,7 +503,7 @@ static void _call_f_mapSelectionToSource_c2727 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QItemSelection &arg1 = args.read<const QItemSelection & > (heap);
+  const QItemSelection &arg1 = gsi::arg_reader<const QItemSelection & >() (args, heap);
   ret.write<QItemSelection > ((QItemSelection)((QSortFilterProxyModel *)cls)->mapSelectionToSource (arg1));
 }
 
@@ -522,7 +522,7 @@ static void _call_f_mapToSource_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSortFilterProxyModel *)cls)->mapToSource (arg1));
 }
 
@@ -549,11 +549,11 @@ static void _call_f_match_c7932 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  const QVariant &arg3 = args.read<const QVariant & > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(1);
-  QFlags<Qt::MatchFlag> arg5 = args ? args.read<QFlags<Qt::MatchFlag> > (heap) : (QFlags<Qt::MatchFlag>)(Qt::MatchFlags(Qt::MatchStartsWith|Qt::MatchWrap));
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QVariant &arg3 = gsi::arg_reader<const QVariant & >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
+  QFlags<Qt::MatchFlag> arg5 = args ? gsi::arg_reader<QFlags<Qt::MatchFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::MatchFlag> >() (Qt::MatchFlags(Qt::MatchStartsWith|Qt::MatchWrap), heap);
   ret.write<QList<QModelIndex> > ((QList<QModelIndex>)((QSortFilterProxyModel *)cls)->match (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -572,7 +572,7 @@ static void _call_f_mimeData_c3010 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
   ret.write<QMimeData * > ((QMimeData *)((QSortFilterProxyModel *)cls)->mimeData (arg1));
 }
 
@@ -621,7 +621,7 @@ static void _call_f_parent_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSortFilterProxyModel *)cls)->parent (arg1));
 }
 
@@ -644,9 +644,9 @@ static void _call_f_removeColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->removeColumns (arg1, arg2, arg3));
 }
 
@@ -669,9 +669,9 @@ static void _call_f_removeRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->removeRows (arg1, arg2, arg3));
 }
 
@@ -690,7 +690,7 @@ static void _call_f_rowCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  const QModelIndex &arg1 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<int > ((int)((QSortFilterProxyModel *)cls)->rowCount (arg1));
 }
 
@@ -713,9 +713,9 @@ static void _call_f_setData_5065 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(Qt::EditRole);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::EditRole, heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->setData (arg1, arg2, arg3));
 }
 
@@ -734,7 +734,7 @@ static void _call_f_setDynamicSortFilter_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setDynamicSortFilter (arg1);
 }
@@ -754,7 +754,7 @@ static void _call_f_setFilterCaseSensitivity_2324 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setFilterCaseSensitivity (qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg1).cref());
 }
@@ -774,7 +774,7 @@ static void _call_f_setFilterFixedString_2025 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setFilterFixedString (arg1);
 }
@@ -794,7 +794,7 @@ static void _call_f_setFilterKeyColumn_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setFilterKeyColumn (arg1);
 }
@@ -814,7 +814,7 @@ static void _call_f_setFilterRegExp_1981 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setFilterRegExp (arg1);
 }
@@ -834,7 +834,7 @@ static void _call_f_setFilterRegExp_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setFilterRegExp (arg1);
 }
@@ -854,7 +854,7 @@ static void _call_f_setFilterRole_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setFilterRole (arg1);
 }
@@ -874,7 +874,7 @@ static void _call_f_setFilterWildcard_2025 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setFilterWildcard (arg1);
 }
@@ -900,10 +900,10 @@ static void _call_f_setHeaderData_5242 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  const QVariant &arg3 = args.read<const QVariant & > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(Qt::EditRole);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  const QVariant &arg3 = gsi::arg_reader<const QVariant & >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::EditRole, heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->setHeaderData (arg1, qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg2).cref(), arg3, arg4));
 }
 
@@ -922,7 +922,7 @@ static void _call_f_setSortCaseSensitivity_2324 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setSortCaseSensitivity (qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg1).cref());
 }
@@ -942,7 +942,7 @@ static void _call_f_setSortLocaleAware_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setSortLocaleAware (arg1);
 }
@@ -962,7 +962,7 @@ static void _call_f_setSortRole_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setSortRole (arg1);
 }
@@ -982,7 +982,7 @@ static void _call_f_setSourceModel_2419 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemModel *arg1 = args.read<QAbstractItemModel * > (heap);
+  QAbstractItemModel *arg1 = gsi::arg_reader<QAbstractItemModel * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->setSourceModel (arg1);
 }
@@ -1004,8 +1004,8 @@ static void _call_f_sort_2340 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::SortOrder>::target_type & > (heap) : (const qt_gsi::Converter<Qt::SortOrder>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::SortOrder>(heap, Qt::AscendingOrder));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::SortOrder>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::SortOrder>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::SortOrder>(heap, Qt::AscendingOrder), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->sort (arg1, qt_gsi::QtToCppAdaptor<Qt::SortOrder>(arg2).cref());
 }
@@ -1085,7 +1085,7 @@ static void _call_f_span_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QSize > ((QSize)((QSortFilterProxyModel *)cls)->span (arg1));
 }
 
@@ -1121,8 +1121,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QSortFilterProxyModel::tr (arg1, arg2));
 }
 
@@ -1145,9 +1145,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QSortFilterProxyModel::tr (arg1, arg2, arg3));
 }
 
@@ -1168,8 +1168,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QSortFilterProxyModel::trUtf8 (arg1, arg2));
 }
 
@@ -1192,9 +1192,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QSortFilterProxyModel::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2158,7 +2158,7 @@ static void _call_ctor_QSortFilterProxyModel_Adaptor_1302 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QSortFilterProxyModel_Adaptor *> (new QSortFilterProxyModel_Adaptor (arg1));
 }
 
@@ -2180,9 +2180,9 @@ static void _call_fp_beginInsertColumns_3713 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_beginInsertColumns_3713 (arg1, arg2, arg3);
 }
@@ -2205,9 +2205,9 @@ static void _call_fp_beginInsertRows_3713 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_beginInsertRows_3713 (arg1, arg2, arg3);
 }
@@ -2234,11 +2234,11 @@ static void _call_fp_beginMoveColumns_6659 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
-  int arg5 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_beginMoveColumns_6659 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -2264,11 +2264,11 @@ static void _call_fp_beginMoveRows_6659 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
-  int arg5 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_beginMoveRows_6659 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -2290,9 +2290,9 @@ static void _call_fp_beginRemoveColumns_3713 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_beginRemoveColumns_3713 (arg1, arg2, arg3);
 }
@@ -2315,9 +2315,9 @@ static void _call_fp_beginRemoveRows_3713 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_beginRemoveRows_3713 (arg1, arg2, arg3);
 }
@@ -2399,8 +2399,8 @@ static void _call_fp_changePersistentIndex_4682 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_changePersistentIndex_4682 (arg1, arg2);
 }
@@ -2421,8 +2421,8 @@ static void _call_fp_changePersistentIndexList_5912 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
-  const QList<QModelIndex> &arg2 = args.read<const QList<QModelIndex> & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
+  const QList<QModelIndex> &arg2 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_changePersistentIndexList_5912 (arg1, arg2);
 }
@@ -2492,9 +2492,9 @@ static void _call_fp_createIndex_c2374 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  void *arg3 = args ? args.read<void * > (heap) : (void *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (0, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_createIndex_c2374 (arg1, arg2, arg3));
 }
 
@@ -2516,9 +2516,9 @@ static void _call_fp_createIndex_c2085 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_createIndex_c2085 (arg1, arg2, arg3));
 }
 
@@ -2540,9 +2540,9 @@ static void _call_fp_createIndex_c2416 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  quint32 arg3 = args.read<quint32 > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  quint32 arg3 = gsi::arg_reader<quint32 >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_createIndex_c2416 (arg1, arg2, arg3));
 }
 
@@ -2612,8 +2612,8 @@ static void _call_emitter_dataChanged_4682 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QSortFilterProxyModel_Adaptor *)cls)->emitter_QSortFilterProxyModel_dataChanged_4682 (arg1, arg2);
 }
 
@@ -2637,10 +2637,10 @@ static void _call_fp_decodeData_5302 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
-  QDataStream &arg4 = args.read<QDataStream & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  QDataStream &arg4 = gsi::arg_reader<QDataStream & >() (args, heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_decodeData_5302 (arg1, arg2, arg3, arg4));
 }
 
@@ -2658,7 +2658,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QSortFilterProxyModel_Adaptor *)cls)->emitter_QSortFilterProxyModel_destroyed_1302 (arg1);
 }
 
@@ -2737,8 +2737,8 @@ static void _call_fp_encodeData_c4599 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
-  QDataStream &arg2 = args.read<QDataStream & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
+  QDataStream &arg2 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_encodeData_c4599 (arg1, arg2);
 }
@@ -3081,9 +3081,9 @@ static void _call_emitter_headerDataChanged_3231 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ((QSortFilterProxyModel_Adaptor *)cls)->emitter_QSortFilterProxyModel_headerDataChanged_3231 (arg1, arg2, arg3);
 }
 
@@ -3486,7 +3486,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_receivers_c1731 (arg1));
 }
 
@@ -3721,7 +3721,7 @@ static void _call_fp_setRoleNames_3419 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHash<int, QByteArray> &arg1 = args.read<const QHash<int, QByteArray> & > (heap);
+  const QHash<int, QByteArray> &arg1 = gsi::arg_reader<const QHash<int, QByteArray> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_setRoleNames_3419 (arg1);
 }

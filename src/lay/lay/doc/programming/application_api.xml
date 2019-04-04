@@ -119,7 +119,7 @@
     <li><class_doc href="MainWindow#reader_options"/>: gets the current layout reader options and allows modification of the latter. 
       The reader options configure the reading of layouts.</li>
     <li><class_doc href="MainWindow#save_session"/> and <class_doc href="MainWindow#restore_session"/>: save or restore a session. 
-      Sessions contain a window settings and informations about the layouts loaded. 
+      Sessions contain a window settings and information about the layouts loaded. 
       Sessions allows storing and restoring of the state of the main window.</li>
     <li><class_doc href="MainWindow#select_view"/>: switches to the given tab. This equivalent to using <class_doc href="MainWindow#current_view_index="/>.</li>
     <li><class_doc href="MainWindow#view"/>: gets the <class_doc href="LayoutView"/> object for a given tab index.</li>
@@ -866,7 +866,7 @@ lv.insert_image(image)</pre>
     Such a matrix describes the transformation from pixel coordinates to the micron unit space of the canvas.
     A 3x3 matrix is a generic way to specify a transformation, including translation, rotation, mirror, shear or 
     perspective distortion. The matrix is obtained and set using the <class_doc href="Image#matrix"/> attribute. 
-    Convenience methods like <class_doc href="Image#trans"/>, <class_doc href="Image#pixel_width"/> and <class_doc href="Image#pixel_height"/> allow to access sub-aspects
+    Convenience methods like <class_doc href="Image#trans"/>, <class_doc href="Image#pixel_width"/> and <class_doc href="Image#pixel_height"/> allow accessing sub-aspects
     of the generic transformation (affine transformation, scaling).
     </li>
   </ul>

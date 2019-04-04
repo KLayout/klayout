@@ -85,7 +85,7 @@
 
   <p>
   By default, no layer mapping is specified. Layer mapping can be employed to confine input to 
-  certain layers or layer/purpose pairs and to specifiy mapping of LEF layers/purposes to GDS
+  certain layers or layer/purpose pairs and to specify mapping of LEF layers/purposes to GDS
   layer/datatypes.
   </p>
 
@@ -136,7 +136,7 @@
 
   <ul>
     <li><b>Produce net names:</b> Check this option to assign user properties with the
-      net name to the net shapes in DEF files. The user propery name used for that
+      net name to the net shapes in DEF files. The user property name used for that
       purpose can be specified in the edit box below the check box. Use KLayout's 
       variant notation (see <link href="about/variant_notation.xml"/>) to specify
       value and type of the property name.

@@ -35,7 +35,7 @@ namespace tl
  *  @brief A fixed-capacity vector class
  *
  *  This vector class allocates the given number of items.
- *  It allows to push and pop, but not to exceed the given length. 
+ *  It allows one to push and pop, but not to exceed the given length.
  */
 template <class T, size_t N>
 class fixed_vector 

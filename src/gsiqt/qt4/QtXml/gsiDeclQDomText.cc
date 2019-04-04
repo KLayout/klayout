@@ -81,7 +81,7 @@ static void _call_ctor_QDomText_2103 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomText &arg1 = args.read<const QDomText & > (heap);
+  const QDomText &arg1 = gsi::arg_reader<const QDomText & >() (args, heap);
   ret.write<QDomText *> (new QDomText (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_operator_eq__2103 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDomText &arg1 = args.read<const QDomText & > (heap);
+  const QDomText &arg1 = gsi::arg_reader<const QDomText & >() (args, heap);
   ret.write<QDomText & > ((QDomText &)((QDomText *)cls)->operator= (arg1));
 }
 
@@ -134,7 +134,7 @@ static void _call_f_splitText_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QDomText > ((QDomText)((QDomText *)cls)->splitText (arg1));
 }
 

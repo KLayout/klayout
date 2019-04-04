@@ -67,8 +67,8 @@ static void _call_ctor_QStringMatcher_4241 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (heap) : (const qt_gsi::Converter<Qt::CaseSensitivity>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::CaseSensitivity>(heap, Qt::CaseSensitive));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::CaseSensitivity>(heap, Qt::CaseSensitive), heap);
   ret.write<QStringMatcher *> (new QStringMatcher (arg1, qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg2).cref()));
 }
 
@@ -87,7 +87,7 @@ static void _call_ctor_QStringMatcher_2733 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringMatcher &arg1 = args.read<const QStringMatcher & > (heap);
+  const QStringMatcher &arg1 = gsi::arg_reader<const QStringMatcher & >() (args, heap);
   ret.write<QStringMatcher *> (new QStringMatcher (arg1));
 }
 
@@ -123,8 +123,8 @@ static void _call_f_indexIn_c2684 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<int > ((int)((QStringMatcher *)cls)->indexIn (arg1, arg2));
 }
 
@@ -143,7 +143,7 @@ static void _call_f_operator_eq__2733 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringMatcher &arg1 = args.read<const QStringMatcher & > (heap);
+  const QStringMatcher &arg1 = gsi::arg_reader<const QStringMatcher & >() (args, heap);
   ret.write<QStringMatcher & > ((QStringMatcher &)((QStringMatcher *)cls)->operator= (arg1));
 }
 
@@ -177,7 +177,7 @@ static void _call_f_setCaseSensitivity_2324 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStringMatcher *)cls)->setCaseSensitivity (qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg1).cref());
 }
@@ -197,7 +197,7 @@ static void _call_f_setPattern_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStringMatcher *)cls)->setPattern (arg1);
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <klayout-macro>
- <description>Qt dialog sample (Python)\nCreates a Qt dialog that allows to take and display a screenshot</description>
+ <description>Qt dialog sample (Python)\nCreates a Qt dialog that allows one to take and display a screenshot</description>
  <version/>
  <category>pymacros</category>
  <prolog/>

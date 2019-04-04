@@ -67,7 +67,7 @@ static void _call_ctor_QTextFragment_2635 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFragment &arg1 = args.read<const QTextFragment & > (heap);
+  const QTextFragment &arg1 = gsi::arg_reader<const QTextFragment & >() (args, heap);
   ret.write<QTextFragment *> (new QTextFragment (arg1));
 }
 
@@ -116,7 +116,7 @@ static void _call_f_contains_c767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QTextFragment *)cls)->contains (arg1));
 }
 
@@ -137,8 +137,8 @@ static void _call_f_glyphRuns_c1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(-1);
-  int arg2 = args ? args.read<int > (heap) : (int)(-1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QList<QGlyphRun> > ((QList<QGlyphRun>)((QTextFragment *)cls)->glyphRuns (arg1, arg2));
 }
 
@@ -187,7 +187,7 @@ static void _call_f_operator_excl__eq__c2635 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFragment &arg1 = args.read<const QTextFragment & > (heap);
+  const QTextFragment &arg1 = gsi::arg_reader<const QTextFragment & >() (args, heap);
   ret.write<bool > ((bool)((QTextFragment *)cls)->operator!= (arg1));
 }
 
@@ -206,7 +206,7 @@ static void _call_f_operator_lt__c2635 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFragment &arg1 = args.read<const QTextFragment & > (heap);
+  const QTextFragment &arg1 = gsi::arg_reader<const QTextFragment & >() (args, heap);
   ret.write<bool > ((bool)((QTextFragment *)cls)->operator< (arg1));
 }
 
@@ -225,7 +225,7 @@ static void _call_f_operator_eq__2635 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFragment &arg1 = args.read<const QTextFragment & > (heap);
+  const QTextFragment &arg1 = gsi::arg_reader<const QTextFragment & >() (args, heap);
   ret.write<QTextFragment & > ((QTextFragment &)((QTextFragment *)cls)->operator= (arg1));
 }
 
@@ -244,7 +244,7 @@ static void _call_f_operator_eq__eq__c2635 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextFragment &arg1 = args.read<const QTextFragment & > (heap);
+  const QTextFragment &arg1 = gsi::arg_reader<const QTextFragment & >() (args, heap);
   ret.write<bool > ((bool)((QTextFragment *)cls)->operator== (arg1));
 }
 

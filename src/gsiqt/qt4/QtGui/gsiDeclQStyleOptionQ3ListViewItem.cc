@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionQ3ListViewItem_3910 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionQ3ListViewItem &arg1 = args.read<const QStyleOptionQ3ListViewItem & > (heap);
+  const QStyleOptionQ3ListViewItem &arg1 = gsi::arg_reader<const QStyleOptionQ3ListViewItem & >() (args, heap);
   ret.write<QStyleOptionQ3ListViewItem *> (new QStyleOptionQ3ListViewItem (arg1));
 }
 

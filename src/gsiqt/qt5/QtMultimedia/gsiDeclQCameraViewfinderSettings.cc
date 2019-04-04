@@ -66,7 +66,7 @@ static void _call_ctor_QCameraViewfinderSettings_3871 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraViewfinderSettings &arg1 = args.read<const QCameraViewfinderSettings & > (heap);
+  const QCameraViewfinderSettings &arg1 = gsi::arg_reader<const QCameraViewfinderSettings & >() (args, heap);
   ret.write<QCameraViewfinderSettings *> (new QCameraViewfinderSettings (arg1));
 }
 
@@ -130,7 +130,7 @@ static void _call_f_operator_eq__3871 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QCameraViewfinderSettings &arg1 = args.read<const QCameraViewfinderSettings & > (heap);
+  const QCameraViewfinderSettings &arg1 = gsi::arg_reader<const QCameraViewfinderSettings & >() (args, heap);
   ret.write<QCameraViewfinderSettings & > ((QCameraViewfinderSettings &)((QCameraViewfinderSettings *)cls)->operator= (arg1));
 }
 
@@ -194,7 +194,7 @@ static void _call_f_setMaximumFrameRate_1071 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraViewfinderSettings *)cls)->setMaximumFrameRate (arg1);
 }
@@ -214,7 +214,7 @@ static void _call_f_setMinimumFrameRate_1071 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraViewfinderSettings *)cls)->setMinimumFrameRate (arg1);
 }
@@ -234,7 +234,7 @@ static void _call_f_setPixelAspectRatio_1805 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraViewfinderSettings *)cls)->setPixelAspectRatio (arg1);
 }
@@ -256,8 +256,8 @@ static void _call_f_setPixelAspectRatio_1426 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraViewfinderSettings *)cls)->setPixelAspectRatio (arg1, arg2);
 }
@@ -277,7 +277,7 @@ static void _call_f_setPixelFormat_2758 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg1 = args.read<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & > (heap);
+  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraViewfinderSettings *)cls)->setPixelFormat (qt_gsi::QtToCppAdaptor<QVideoFrame::PixelFormat>(arg1).cref());
 }
@@ -297,7 +297,7 @@ static void _call_f_setResolution_1805 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraViewfinderSettings *)cls)->setResolution (arg1);
 }
@@ -319,8 +319,8 @@ static void _call_f_setResolution_1426 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraViewfinderSettings *)cls)->setResolution (arg1, arg2);
 }
@@ -340,7 +340,7 @@ static void _call_f_swap_3176 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QCameraViewfinderSettings &arg1 = args.read<QCameraViewfinderSettings & > (heap);
+  QCameraViewfinderSettings &arg1 = gsi::arg_reader<QCameraViewfinderSettings & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QCameraViewfinderSettings *)cls)->swap (arg1);
 }

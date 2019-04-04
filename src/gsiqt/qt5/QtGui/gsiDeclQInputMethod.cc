@@ -164,8 +164,8 @@ static void _call_f_invokeAction_3035 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QInputMethod::Action>::target_type & arg1 = args.read<const qt_gsi::Converter<QInputMethod::Action>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
+  const qt_gsi::Converter<QInputMethod::Action>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QInputMethod::Action>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputMethod *)cls)->invokeAction (qt_gsi::QtToCppAdaptor<QInputMethod::Action>(arg1).cref(), arg2);
 }
@@ -261,7 +261,7 @@ static void _call_f_setInputItemRectangle_1862 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRectF &arg1 = args.read<const QRectF & > (heap);
+  const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputMethod *)cls)->setInputItemRectangle (arg1);
 }
@@ -281,7 +281,7 @@ static void _call_f_setInputItemTransform_2350 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTransform &arg1 = args.read<const QTransform & > (heap);
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputMethod *)cls)->setInputItemTransform (arg1);
 }
@@ -301,7 +301,7 @@ static void _call_f_setVisible_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputMethod *)cls)->setVisible (arg1);
 }
@@ -337,7 +337,7 @@ static void _call_f_update_3116 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::InputMethodQuery> arg1 = args.read<QFlags<Qt::InputMethodQuery> > (heap);
+  QFlags<Qt::InputMethodQuery> arg1 = gsi::arg_reader<QFlags<Qt::InputMethodQuery> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputMethod *)cls)->update (arg1);
 }
@@ -359,8 +359,8 @@ static void _call_f_queryFocusObject_3554 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & > (heap);
-  QVariant arg2 = args.read<QVariant > (heap);
+  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & >() (args, heap);
+  QVariant arg2 = gsi::arg_reader<QVariant >() (args, heap);
   ret.write<QVariant > ((QVariant)QInputMethod::queryFocusObject (qt_gsi::QtToCppAdaptor<Qt::InputMethodQuery>(arg1).cref(), arg2));
 }
 
@@ -383,9 +383,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QInputMethod::tr (arg1, arg2, arg3));
 }
 
@@ -408,9 +408,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QInputMethod::trUtf8 (arg1, arg2, arg3));
 }
 

@@ -2613,7 +2613,7 @@ LayoutView::add_new_layers (const std::vector <unsigned int> &layer_ids, int cv_
     lay::LayerPropertiesList new_props (get_properties ());
 
     //  don't create new layers for those, for which there are layers already: compute a 
-    //  set of layers alreay present
+    //  set of layers already present
     std::set <db::LayerProperties, db::LPLogicalLessFunc> present_layers;
     for (LayerPropertiesConstIterator lay_iter = begin_layers (); ! lay_iter.at_end (); ++lay_iter) {
       if (! lay_iter->has_children () && lay_iter->cellview_index () == cv_index) {
@@ -2691,7 +2691,7 @@ LayoutView::save_screenshot (const std::string &fn)
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  //  Unfortunately the PNG writer does not allow to write long strings.
+  //  Unfortunately the PNG writer does not allow writing of long strings.
   //  We separate the description into a set of keys:
 
   for (unsigned int i = 0; i < cellviews (); ++i) {
@@ -2748,7 +2748,7 @@ LayoutView::save_image (const std::string &fn, unsigned int width, unsigned int 
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  //  Unfortunately the PNG writer does not allow to write long strings.
+  //  Unfortunately the PNG writer does not allow writing of long strings.
   //  We separate the description into a set of keys:
 
   for (unsigned int i = 0; i < cellviews (); ++i) {
@@ -2780,7 +2780,7 @@ LayoutView::save_image_with_options (const std::string &fn,
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  //  Unfortunately the PNG writer does not allow to write long strings.
+  //  Unfortunately the PNG writer does not allow writing of long strings.
   //  We separate the description into a set of keys:
 
   for (unsigned int i = 0; i < cellviews (); ++i) {
@@ -4279,7 +4279,7 @@ LayoutView::max_hier_changed (int i)
 }
 
 /**
- *  @brief set the maximum hierachy level to the number of levels available
+ *  @brief set the maximum hierarchy level to the number of levels available
  */
 void 
 LayoutView::max_hier ()

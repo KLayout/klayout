@@ -68,8 +68,8 @@ static void _call_f_setValue_4431 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputMethodQueryEvent *)cls)->setValue (qt_gsi::QtToCppAdaptor<Qt::InputMethodQuery>(arg1).cref(), arg2);
 }
@@ -89,7 +89,7 @@ static void _call_f_value_c2420 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QInputMethodQueryEvent *)cls)->value (qt_gsi::QtToCppAdaptor<Qt::InputMethodQuery>(arg1).cref()));
 }
 
@@ -146,7 +146,7 @@ static void _call_ctor_QInputMethodQueryEvent_Adaptor_3116 (const qt_gsi::Generi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::InputMethodQuery> arg1 = args.read<QFlags<Qt::InputMethodQuery> > (heap);
+  QFlags<Qt::InputMethodQuery> arg1 = gsi::arg_reader<QFlags<Qt::InputMethodQuery> >() (args, heap);
   ret.write<QInputMethodQueryEvent_Adaptor *> (new QInputMethodQueryEvent_Adaptor (arg1));
 }
 

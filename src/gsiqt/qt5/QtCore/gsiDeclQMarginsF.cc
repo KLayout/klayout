@@ -72,10 +72,10 @@ static void _call_ctor_QMarginsF_3960 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
-  double arg3 = args.read<double > (heap);
-  double arg4 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
+  double arg3 = gsi::arg_reader<double >() (args, heap);
+  double arg4 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMarginsF *> (new QMarginsF (arg1, arg2, arg3, arg4));
 }
 
@@ -94,7 +94,7 @@ static void _call_ctor_QMarginsF_2115 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   ret.write<QMarginsF *> (new QMarginsF (arg1));
 }
 
@@ -158,7 +158,7 @@ static void _call_f_operator_star__eq__1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMarginsF & > ((QMarginsF &)((QMarginsF *)cls)->operator*= (arg1));
 }
 
@@ -177,7 +177,7 @@ static void _call_f_operator_plus__eq__2185 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMarginsF &arg1 = args.read<const QMarginsF & > (heap);
+  const QMarginsF &arg1 = gsi::arg_reader<const QMarginsF & >() (args, heap);
   ret.write<QMarginsF & > ((QMarginsF &)((QMarginsF *)cls)->operator+= (arg1));
 }
 
@@ -196,7 +196,7 @@ static void _call_f_operator_plus__eq__1071 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMarginsF & > ((QMarginsF &)((QMarginsF *)cls)->operator+= (arg1));
 }
 
@@ -215,7 +215,7 @@ static void _call_f_operator_minus__eq__2185 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMarginsF &arg1 = args.read<const QMarginsF & > (heap);
+  const QMarginsF &arg1 = gsi::arg_reader<const QMarginsF & >() (args, heap);
   ret.write<QMarginsF & > ((QMarginsF &)((QMarginsF *)cls)->operator-= (arg1));
 }
 
@@ -234,7 +234,7 @@ static void _call_f_operator_minus__eq__1071 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMarginsF & > ((QMarginsF &)((QMarginsF *)cls)->operator-= (arg1));
 }
 
@@ -253,7 +253,7 @@ static void _call_f_operator_slash__eq__1071 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ret.write<QMarginsF & > ((QMarginsF &)((QMarginsF *)cls)->operator/= (arg1));
 }
 
@@ -287,7 +287,7 @@ static void _call_f_setBottom_1071 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMarginsF *)cls)->setBottom (arg1);
 }
@@ -307,7 +307,7 @@ static void _call_f_setLeft_1071 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMarginsF *)cls)->setLeft (arg1);
 }
@@ -327,7 +327,7 @@ static void _call_f_setRight_1071 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMarginsF *)cls)->setRight (arg1);
 }
@@ -347,7 +347,7 @@ static void _call_f_setTop_1071 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMarginsF *)cls)->setTop (arg1);
 }

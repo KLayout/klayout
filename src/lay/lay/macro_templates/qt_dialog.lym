@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <klayout-macro>
- <description>Qt dialog sample (Ruby)\nCreates a Qt dialog that allows to take and display a screenshot</description>
+ <description>Qt dialog sample (Ruby)\nCreates a Qt dialog that allows one to take and display a screenshot</description>
  <format>general</format>
  <autorun>false</autorun>
  <autorun-early>false</autorun-early>

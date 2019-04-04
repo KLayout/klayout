@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionQ3DockWindow_3705 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionQ3DockWindow &arg1 = args.read<const QStyleOptionQ3DockWindow & > (heap);
+  const QStyleOptionQ3DockWindow &arg1 = gsi::arg_reader<const QStyleOptionQ3DockWindow & >() (args, heap);
   ret.write<QStyleOptionQ3DockWindow *> (new QStyleOptionQ3DockWindow (arg1));
 }
 

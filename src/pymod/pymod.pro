@@ -4,6 +4,7 @@ SUBDIRS = \
   db \
   tl \
   rdb \
+  lib \
 
 !equals(HAVE_QT, "0") {
 

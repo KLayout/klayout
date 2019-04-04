@@ -52,8 +52,8 @@ static void _call_f_deviceDescription_4510 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
-  const QByteArray &arg2 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QByteArray &arg2 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QString > ((QString)((QMediaServiceSupportedDevicesInterface *)cls)->deviceDescription (arg1, arg2));
 }
 
@@ -72,7 +72,7 @@ static void _call_f_devices_c2309 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<QList<QByteArray> > ((QList<QByteArray>)((QMediaServiceSupportedDevicesInterface *)cls)->devices (arg1));
 }
 

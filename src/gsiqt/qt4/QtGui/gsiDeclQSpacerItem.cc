@@ -60,10 +60,10 @@ static void _call_f_changeSize_5794 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap) : (const qt_gsi::Converter<QSizePolicy::Policy>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSizePolicy::Policy>(heap, QSizePolicy::Minimum));
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap) : (const qt_gsi::Converter<QSizePolicy::Policy>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSizePolicy::Policy>(heap, QSizePolicy::Minimum));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSizePolicy::Policy>(heap, QSizePolicy::Minimum), heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSizePolicy::Policy>(heap, QSizePolicy::Minimum), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSpacerItem *)cls)->changeSize (arg1, arg2, qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg3).cref(), qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg4).cref());
 }
@@ -158,7 +158,7 @@ static void _call_f_setGeometry_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSpacerItem *)cls)->setGeometry (arg1);
 }
@@ -493,10 +493,10 @@ static void _call_ctor_QSpacerItem_Adaptor_5794 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap) : (const qt_gsi::Converter<QSizePolicy::Policy>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSizePolicy::Policy>(heap, QSizePolicy::Minimum));
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap) : (const qt_gsi::Converter<QSizePolicy::Policy>::target_type &)(qt_gsi::CppToQtReadAdaptor<QSizePolicy::Policy>(heap, QSizePolicy::Minimum));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSizePolicy::Policy>(heap, QSizePolicy::Minimum), heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QSizePolicy::Policy>(heap, QSizePolicy::Minimum), heap);
   ret.write<QSpacerItem_Adaptor *> (new QSpacerItem_Adaptor (arg1, arg2, qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg3).cref(), qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg4).cref()));
 }
 

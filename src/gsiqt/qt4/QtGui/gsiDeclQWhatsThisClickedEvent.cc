@@ -101,7 +101,7 @@ static void _call_ctor_QWhatsThisClickedEvent_Adaptor_2025 (const qt_gsi::Generi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QWhatsThisClickedEvent_Adaptor *> (new QWhatsThisClickedEvent_Adaptor (arg1));
 }
 

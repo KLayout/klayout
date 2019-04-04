@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionMenuItem_3360 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionMenuItem &arg1 = args.read<const QStyleOptionMenuItem & > (heap);
+  const QStyleOptionMenuItem &arg1 = gsi::arg_reader<const QStyleOptionMenuItem & >() (args, heap);
   ret.write<QStyleOptionMenuItem *> (new QStyleOptionMenuItem (arg1));
 }
 

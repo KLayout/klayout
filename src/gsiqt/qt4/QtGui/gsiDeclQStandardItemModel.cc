@@ -73,7 +73,7 @@ static void _call_f_appendColumn_3267 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QStandardItem*> &arg1 = args.read<const QList<QStandardItem*> & > (heap);
+  const QList<QStandardItem*> &arg1 = gsi::arg_reader<const QList<QStandardItem*> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->appendColumn (arg1);
 }
@@ -93,7 +93,7 @@ static void _call_f_appendRow_3267 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QStandardItem*> &arg1 = args.read<const QList<QStandardItem*> & > (heap);
+  const QList<QStandardItem*> &arg1 = gsi::arg_reader<const QList<QStandardItem*> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->appendRow (arg1);
 }
@@ -113,7 +113,7 @@ static void _call_f_appendRow_1919 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStandardItem *arg1 = args.read<QStandardItem * > (heap);
+  QStandardItem *arg1 = gsi::arg_reader<QStandardItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->appendRow (arg1);
 }
@@ -149,7 +149,7 @@ static void _call_f_columnCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  const QModelIndex &arg1 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<int > ((int)((QStandardItemModel *)cls)->columnCount (arg1));
 }
 
@@ -170,8 +170,8 @@ static void _call_f_data_c3054 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(Qt::DisplayRole);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::DisplayRole, heap);
   ret.write<QVariant > ((QVariant)((QStandardItemModel *)cls)->data (arg1, arg2));
 }
 
@@ -198,11 +198,11 @@ static void _call_f_dropMimeData_7425 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMimeData *arg1 = args.read<const QMimeData * > (heap);
-  const qt_gsi::Converter<Qt::DropAction>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::DropAction>::target_type & > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
-  const QModelIndex &arg5 = args.read<const QModelIndex & > (heap);
+  const QMimeData *arg1 = gsi::arg_reader<const QMimeData * >() (args, heap);
+  const qt_gsi::Converter<Qt::DropAction>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::DropAction>::target_type & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg5 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->dropMimeData (arg1, qt_gsi::QtToCppAdaptor<Qt::DropAction>(arg2).cref(), arg3, arg4, arg5));
 }
 
@@ -225,9 +225,9 @@ static void _call_f_findItems_c4892 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<Qt::MatchFlag> arg2 = args ? args.read<QFlags<Qt::MatchFlag> > (heap) : (QFlags<Qt::MatchFlag>)(Qt::MatchExactly);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<Qt::MatchFlag> arg2 = args ? gsi::arg_reader<QFlags<Qt::MatchFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::MatchFlag> >() (Qt::MatchExactly, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QList<QStandardItem*> > ((QList<QStandardItem*>)((QStandardItemModel *)cls)->findItems (arg1, arg2, arg3));
 }
 
@@ -246,7 +246,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QFlags<Qt::ItemFlag> > ((QFlags<Qt::ItemFlag>)((QStandardItemModel *)cls)->flags (arg1));
 }
 
@@ -265,7 +265,7 @@ static void _call_f_hasChildren_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  const QModelIndex &arg1 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->hasChildren (arg1));
 }
 
@@ -288,9 +288,9 @@ static void _call_f_headerData_c3231 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(Qt::DisplayRole);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::DisplayRole, heap);
   ret.write<QVariant > ((QVariant)((QStandardItemModel *)cls)->headerData (arg1, qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg2).cref(), arg3));
 }
 
@@ -309,7 +309,7 @@ static void _call_f_horizontalHeaderItem_c767 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QStandardItem * > ((QStandardItem *)((QStandardItemModel *)cls)->horizontalHeaderItem (arg1));
 }
 
@@ -332,9 +332,9 @@ static void _call_f_index_c3713 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<QModelIndex > ((QModelIndex)((QStandardItemModel *)cls)->index (arg1, arg2, arg3));
 }
 
@@ -353,7 +353,7 @@ static void _call_f_indexFromItem_c2614 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStandardItem *arg1 = args.read<const QStandardItem * > (heap);
+  const QStandardItem *arg1 = gsi::arg_reader<const QStandardItem * >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QStandardItemModel *)cls)->indexFromItem (arg1));
 }
 
@@ -374,8 +374,8 @@ static void _call_f_insertColumn_3926 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QList<QStandardItem*> &arg2 = args.read<const QList<QStandardItem*> & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QList<QStandardItem*> &arg2 = gsi::arg_reader<const QList<QStandardItem*> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->insertColumn (arg1, arg2);
 }
@@ -397,8 +397,8 @@ static void _call_f_insertColumn_3054 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QModelIndex &arg2 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg2 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->insertColumn (arg1, arg2));
 }
 
@@ -421,9 +421,9 @@ static void _call_f_insertColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->insertColumns (arg1, arg2, arg3));
 }
 
@@ -444,8 +444,8 @@ static void _call_f_insertRow_3926 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QList<QStandardItem*> &arg2 = args.read<const QList<QStandardItem*> & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QList<QStandardItem*> &arg2 = gsi::arg_reader<const QList<QStandardItem*> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->insertRow (arg1, arg2);
 }
@@ -467,8 +467,8 @@ static void _call_f_insertRow_2578 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QStandardItem *arg2 = args.read<QStandardItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QStandardItem *arg2 = gsi::arg_reader<QStandardItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->insertRow (arg1, arg2);
 }
@@ -490,8 +490,8 @@ static void _call_f_insertRow_3054 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QModelIndex &arg2 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg2 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->insertRow (arg1, arg2));
 }
 
@@ -514,9 +514,9 @@ static void _call_f_insertRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->insertRows (arg1, arg2, arg3));
 }
 
@@ -552,8 +552,8 @@ static void _call_f_item_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QStandardItem * > ((QStandardItem *)((QStandardItemModel *)cls)->item (arg1, arg2));
 }
 
@@ -572,7 +572,7 @@ static void _call_f_itemData_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QMap<int, QVariant> > ((QMap<int, QVariant>)((QStandardItemModel *)cls)->itemData (arg1));
 }
 
@@ -591,7 +591,7 @@ static void _call_f_itemFromIndex_c2395 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QStandardItem * > ((QStandardItem *)((QStandardItemModel *)cls)->itemFromIndex (arg1));
 }
 
@@ -625,7 +625,7 @@ static void _call_f_mimeData_c3010 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
   ret.write<QMimeData * > ((QMimeData *)((QStandardItemModel *)cls)->mimeData (arg1));
 }
 
@@ -659,7 +659,7 @@ static void _call_f_parent_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QStandardItemModel *)cls)->parent (arg1));
 }
 
@@ -697,9 +697,9 @@ static void _call_f_removeColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->removeColumns (arg1, arg2, arg3));
 }
 
@@ -722,9 +722,9 @@ static void _call_f_removeRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->removeRows (arg1, arg2, arg3));
 }
 
@@ -743,7 +743,7 @@ static void _call_f_rowCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args ? args.read<const QModelIndex & > (heap) : (const QModelIndex &)(QModelIndex());
+  const QModelIndex &arg1 = args ? gsi::arg_reader<const QModelIndex & >() (args, heap) : gsi::arg_maker<const QModelIndex & >() (QModelIndex(), heap);
   ret.write<int > ((int)((QStandardItemModel *)cls)->rowCount (arg1));
 }
 
@@ -762,7 +762,7 @@ static void _call_f_setColumnCount_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setColumnCount (arg1);
 }
@@ -786,9 +786,9 @@ static void _call_f_setData_5065 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
-  int arg3 = args ? args.read<int > (heap) : (int)(Qt::EditRole);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::EditRole, heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->setData (arg1, arg2, arg3));
 }
 
@@ -813,10 +813,10 @@ static void _call_f_setHeaderData_5242 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  const QVariant &arg3 = args.read<const QVariant & > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(Qt::EditRole);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  const QVariant &arg3 = gsi::arg_reader<const QVariant & >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::EditRole, heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->setHeaderData (arg1, qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg2).cref(), arg3, arg4));
 }
 
@@ -837,8 +837,8 @@ static void _call_f_setHorizontalHeaderItem_2578 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QStandardItem *arg2 = args.read<QStandardItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QStandardItem *arg2 = gsi::arg_reader<QStandardItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setHorizontalHeaderItem (arg1, arg2);
 }
@@ -858,7 +858,7 @@ static void _call_f_setHorizontalHeaderLabels_2437 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setHorizontalHeaderLabels (arg1);
 }
@@ -882,9 +882,9 @@ static void _call_f_setItem_3237 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  QStandardItem *arg3 = args.read<QStandardItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QStandardItem *arg3 = gsi::arg_reader<QStandardItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setItem (arg1, arg2, arg3);
 }
@@ -906,8 +906,8 @@ static void _call_f_setItem_2578 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QStandardItem *arg2 = args.read<QStandardItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QStandardItem *arg2 = gsi::arg_reader<QStandardItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setItem (arg1, arg2);
 }
@@ -929,8 +929,8 @@ static void _call_f_setItemData_5414 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QMap<int, QVariant> &arg2 = args.read<const QMap<int, QVariant> & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QMap<int, QVariant> &arg2 = gsi::arg_reader<const QMap<int, QVariant> & >() (args, heap);
   ret.write<bool > ((bool)((QStandardItemModel *)cls)->setItemData (arg1, arg2));
 }
 
@@ -949,7 +949,7 @@ static void _call_f_setItemPrototype_2614 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStandardItem *arg1 = args.read<const QStandardItem * > (heap);
+  const QStandardItem *arg1 = gsi::arg_reader<const QStandardItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setItemPrototype (arg1);
 }
@@ -969,7 +969,7 @@ static void _call_f_setRowCount_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setRowCount (arg1);
 }
@@ -989,7 +989,7 @@ static void _call_f_setSortRole_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setSortRole (arg1);
 }
@@ -1011,8 +1011,8 @@ static void _call_f_setVerticalHeaderItem_2578 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  QStandardItem *arg2 = args.read<QStandardItem * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QStandardItem *arg2 = gsi::arg_reader<QStandardItem * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setVerticalHeaderItem (arg1, arg2);
 }
@@ -1032,7 +1032,7 @@ static void _call_f_setVerticalHeaderLabels_2437 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->setVerticalHeaderLabels (arg1);
 }
@@ -1054,8 +1054,8 @@ static void _call_f_sort_2340 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<Qt::SortOrder>::target_type & > (heap) : (const qt_gsi::Converter<Qt::SortOrder>::target_type &)(qt_gsi::CppToQtReadAdaptor<Qt::SortOrder>(heap, Qt::AscendingOrder));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::SortOrder>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::SortOrder>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::SortOrder>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::SortOrder>(heap, Qt::AscendingOrder), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel *)cls)->sort (arg1, qt_gsi::QtToCppAdaptor<Qt::SortOrder>(arg2).cref());
 }
@@ -1105,7 +1105,7 @@ static void _call_f_takeColumn_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QList<QStandardItem*> > ((QList<QStandardItem*>)((QStandardItemModel *)cls)->takeColumn (arg1));
 }
 
@@ -1124,7 +1124,7 @@ static void _call_f_takeHorizontalHeaderItem_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QStandardItem * > ((QStandardItem *)((QStandardItemModel *)cls)->takeHorizontalHeaderItem (arg1));
 }
 
@@ -1145,8 +1145,8 @@ static void _call_f_takeItem_1426 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QStandardItem * > ((QStandardItem *)((QStandardItemModel *)cls)->takeItem (arg1, arg2));
 }
 
@@ -1165,7 +1165,7 @@ static void _call_f_takeRow_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QList<QStandardItem*> > ((QList<QStandardItem*>)((QStandardItemModel *)cls)->takeRow (arg1));
 }
 
@@ -1184,7 +1184,7 @@ static void _call_f_takeVerticalHeaderItem_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QStandardItem * > ((QStandardItem *)((QStandardItemModel *)cls)->takeVerticalHeaderItem (arg1));
 }
 
@@ -1203,7 +1203,7 @@ static void _call_f_verticalHeaderItem_c767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QStandardItem * > ((QStandardItem *)((QStandardItemModel *)cls)->verticalHeaderItem (arg1));
 }
 
@@ -1224,8 +1224,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QStandardItemModel::tr (arg1, arg2));
 }
 
@@ -1248,9 +1248,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QStandardItemModel::tr (arg1, arg2, arg3));
 }
 
@@ -1271,8 +1271,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QStandardItemModel::trUtf8 (arg1, arg2));
 }
 
@@ -1295,9 +1295,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QStandardItemModel::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2144,7 +2144,7 @@ static void _call_ctor_QStandardItemModel_Adaptor_1302 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QStandardItemModel_Adaptor *> (new QStandardItemModel_Adaptor (arg1));
 }
 
@@ -2166,9 +2166,9 @@ static void _call_ctor_QStandardItemModel_Adaptor_2620 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  QObject *arg3 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QStandardItemModel_Adaptor *> (new QStandardItemModel_Adaptor (arg1, arg2, arg3));
 }
 
@@ -2190,9 +2190,9 @@ static void _call_fp_beginInsertColumns_3713 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_beginInsertColumns_3713 (arg1, arg2, arg3);
 }
@@ -2215,9 +2215,9 @@ static void _call_fp_beginInsertRows_3713 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_beginInsertRows_3713 (arg1, arg2, arg3);
 }
@@ -2244,11 +2244,11 @@ static void _call_fp_beginMoveColumns_6659 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
-  int arg5 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_beginMoveColumns_6659 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -2274,11 +2274,11 @@ static void _call_fp_beginMoveRows_6659 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  const QModelIndex &arg4 = args.read<const QModelIndex & > (heap);
-  int arg5 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_beginMoveRows_6659 (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -2300,9 +2300,9 @@ static void _call_fp_beginRemoveColumns_3713 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_beginRemoveColumns_3713 (arg1, arg2, arg3);
 }
@@ -2325,9 +2325,9 @@ static void _call_fp_beginRemoveRows_3713 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_beginRemoveRows_3713 (arg1, arg2, arg3);
 }
@@ -2409,8 +2409,8 @@ static void _call_fp_changePersistentIndex_4682 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_changePersistentIndex_4682 (arg1, arg2);
 }
@@ -2431,8 +2431,8 @@ static void _call_fp_changePersistentIndexList_5912 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
-  const QList<QModelIndex> &arg2 = args.read<const QList<QModelIndex> & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
+  const QList<QModelIndex> &arg2 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_changePersistentIndexList_5912 (arg1, arg2);
 }
@@ -2502,9 +2502,9 @@ static void _call_fp_createIndex_c2374 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  void *arg3 = args ? args.read<void * > (heap) : (void *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (0, heap);
   ret.write<QModelIndex > ((QModelIndex)((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_createIndex_c2374 (arg1, arg2, arg3));
 }
 
@@ -2526,9 +2526,9 @@ static void _call_fp_createIndex_c2085 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_createIndex_c2085 (arg1, arg2, arg3));
 }
 
@@ -2550,9 +2550,9 @@ static void _call_fp_createIndex_c2416 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  quint32 arg3 = args.read<quint32 > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  quint32 arg3 = gsi::arg_reader<quint32 >() (args, heap);
   ret.write<QModelIndex > ((QModelIndex)((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_createIndex_c2416 (arg1, arg2, arg3));
 }
 
@@ -2622,8 +2622,8 @@ static void _call_emitter_dataChanged_4682 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
-  const QModelIndex &arg2 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_dataChanged_4682 (arg1, arg2);
 }
 
@@ -2647,10 +2647,10 @@ static void _call_fp_decodeData_5302 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  const QModelIndex &arg3 = args.read<const QModelIndex & > (heap);
-  QDataStream &arg4 = args.read<QDataStream & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  QDataStream &arg4 = gsi::arg_reader<QDataStream & >() (args, heap);
   ret.write<bool > ((bool)((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_decodeData_5302 (arg1, arg2, arg3, arg4));
 }
 
@@ -2668,7 +2668,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_destroyed_1302 (arg1);
 }
 
@@ -2747,8 +2747,8 @@ static void _call_fp_encodeData_c4599 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QModelIndex> &arg1 = args.read<const QList<QModelIndex> & > (heap);
-  QDataStream &arg2 = args.read<QDataStream & > (heap);
+  const QList<QModelIndex> &arg1 = gsi::arg_reader<const QList<QModelIndex> & >() (args, heap);
+  QDataStream &arg2 = gsi::arg_reader<QDataStream & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_encodeData_c4599 (arg1, arg2);
 }
@@ -3024,9 +3024,9 @@ static void _call_emitter_headerDataChanged_3231 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_headerDataChanged_3231 (arg1, arg2, arg3);
 }
 
@@ -3131,7 +3131,7 @@ static void _call_emitter_itemChanged_1919 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStandardItem *arg1 = args.read<QStandardItem * > (heap);
+  QStandardItem *arg1 = gsi::arg_reader<QStandardItem * >() (args, heap);
   ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_itemChanged_1919 (arg1);
 }
 
@@ -3314,7 +3314,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_receivers_c1731 (arg1));
 }
 
@@ -3549,7 +3549,7 @@ static void _call_fp_setRoleNames_3419 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QHash<int, QByteArray> &arg1 = args.read<const QHash<int, QByteArray> & > (heap);
+  const QHash<int, QByteArray> &arg1 = gsi::arg_reader<const QHash<int, QByteArray> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_setRoleNames_3419 (arg1);
 }

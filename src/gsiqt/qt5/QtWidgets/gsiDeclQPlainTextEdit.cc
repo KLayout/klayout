@@ -127,7 +127,7 @@ static void _call_f_anchorAt_c1916 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QString > ((QString)((QPlainTextEdit *)cls)->anchorAt (arg1));
 }
 
@@ -146,7 +146,7 @@ static void _call_f_appendHtml_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->appendHtml (arg1);
 }
@@ -166,7 +166,7 @@ static void _call_f_appendPlainText_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->appendPlainText (arg1);
 }
@@ -309,7 +309,7 @@ static void _call_f_createStandardContextMenu_1916 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QMenu * > ((QMenu *)((QPlainTextEdit *)cls)->createStandardContextMenu (arg1));
 }
 
@@ -343,7 +343,7 @@ static void _call_f_cursorForPosition_c1916 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QTextCursor > ((QTextCursor)((QPlainTextEdit *)cls)->cursorForPosition (arg1));
 }
 
@@ -362,7 +362,7 @@ static void _call_f_cursorRect_c2453 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCursor &arg1 = args.read<const QTextCursor & > (heap);
+  const QTextCursor &arg1 = gsi::arg_reader<const QTextCursor & >() (args, heap);
   ret.write<QRect > ((QRect)((QPlainTextEdit *)cls)->cursorRect (arg1));
 }
 
@@ -490,8 +490,8 @@ static void _call_f_find_5261 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QFlags<QTextDocument::FindFlag> arg2 = args ? args.read<QFlags<QTextDocument::FindFlag> > (heap) : (QFlags<QTextDocument::FindFlag>)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QTextDocument::FindFlag> arg2 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
   ret.write<bool > ((bool)((QPlainTextEdit *)cls)->find (arg1, arg2));
 }
 
@@ -512,8 +512,8 @@ static void _call_f_find_5217 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRegExp &arg1 = args.read<const QRegExp & > (heap);
-  QFlags<QTextDocument::FindFlag> arg2 = args ? args.read<QFlags<QTextDocument::FindFlag> > (heap) : (QFlags<QTextDocument::FindFlag>)(0);
+  const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
+  QFlags<QTextDocument::FindFlag> arg2 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
   ret.write<bool > ((bool)((QPlainTextEdit *)cls)->find (arg1, arg2));
 }
 
@@ -532,7 +532,7 @@ static void _call_f_inputMethodQuery_c2420 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QPlainTextEdit *)cls)->inputMethodQuery (qt_gsi::QtToCppAdaptor<Qt::InputMethodQuery>(arg1).cref()));
 }
 
@@ -553,8 +553,8 @@ static void _call_f_inputMethodQuery_c3554 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & > (heap);
-  QVariant arg2 = args.read<QVariant > (heap);
+  const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::InputMethodQuery>::target_type & >() (args, heap);
+  QVariant arg2 = gsi::arg_reader<QVariant >() (args, heap);
   ret.write<QVariant > ((QVariant)((QPlainTextEdit *)cls)->inputMethodQuery (qt_gsi::QtToCppAdaptor<Qt::InputMethodQuery>(arg1).cref(), arg2));
 }
 
@@ -573,7 +573,7 @@ static void _call_f_insertPlainText_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->insertPlainText (arg1);
 }
@@ -640,8 +640,8 @@ static void _call_f_loadResource_2360 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QUrl &arg2 = args.read<const QUrl & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QUrl &arg2 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QPlainTextEdit *)cls)->loadResource (arg1, arg2));
 }
 
@@ -675,7 +675,7 @@ static void _call_f_mergeCurrentCharFormat_2814 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCharFormat &arg1 = args.read<const QTextCharFormat & > (heap);
+  const QTextCharFormat &arg1 = gsi::arg_reader<const QTextCharFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->mergeCurrentCharFormat (arg1);
 }
@@ -697,8 +697,8 @@ static void _call_f_moveCursor_5424 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextCursor::MoveOperation>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextCursor::MoveOperation>::target_type & > (heap);
-  const qt_gsi::Converter<QTextCursor::MoveMode>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QTextCursor::MoveMode>::target_type & > (heap) : (const qt_gsi::Converter<QTextCursor::MoveMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QTextCursor::MoveMode>(heap, QTextCursor::MoveAnchor));
+  const qt_gsi::Converter<QTextCursor::MoveOperation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextCursor::MoveOperation>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QTextCursor::MoveMode>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTextCursor::MoveMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTextCursor::MoveMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTextCursor::MoveMode>(heap, QTextCursor::MoveAnchor), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->moveCursor (qt_gsi::QtToCppAdaptor<QTextCursor::MoveOperation>(arg1).cref(), qt_gsi::QtToCppAdaptor<QTextCursor::MoveMode>(arg2).cref());
 }
@@ -764,7 +764,7 @@ static void _call_f_print_c2284 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPagedPaintDevice *arg1 = args.read<QPagedPaintDevice * > (heap);
+  QPagedPaintDevice *arg1 = gsi::arg_reader<QPagedPaintDevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->print (arg1);
 }
@@ -816,7 +816,7 @@ static void _call_f_setBackgroundVisible_864 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setBackgroundVisible (arg1);
 }
@@ -836,7 +836,7 @@ static void _call_f_setCenterOnScroll_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setCenterOnScroll (arg1);
 }
@@ -856,7 +856,7 @@ static void _call_f_setCurrentCharFormat_2814 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCharFormat &arg1 = args.read<const QTextCharFormat & > (heap);
+  const QTextCharFormat &arg1 = gsi::arg_reader<const QTextCharFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setCurrentCharFormat (arg1);
 }
@@ -876,7 +876,7 @@ static void _call_f_setCursorWidth_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setCursorWidth (arg1);
 }
@@ -896,7 +896,7 @@ static void _call_f_setDocument_1955 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextDocument *arg1 = args.read<QTextDocument * > (heap);
+  QTextDocument *arg1 = gsi::arg_reader<QTextDocument * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setDocument (arg1);
 }
@@ -916,7 +916,7 @@ static void _call_f_setDocumentTitle_2025 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setDocumentTitle (arg1);
 }
@@ -936,7 +936,7 @@ static void _call_f_setExtraSelections_4386 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QTextEdit::ExtraSelection> &arg1 = args.read<const QList<QTextEdit::ExtraSelection> & > (heap);
+  const QList<QTextEdit::ExtraSelection> &arg1 = gsi::arg_reader<const QList<QTextEdit::ExtraSelection> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setExtraSelections (arg1);
 }
@@ -956,7 +956,7 @@ static void _call_f_setLineWrapMode_3135 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPlainTextEdit::LineWrapMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QPlainTextEdit::LineWrapMode>::target_type & > (heap);
+  const qt_gsi::Converter<QPlainTextEdit::LineWrapMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPlainTextEdit::LineWrapMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setLineWrapMode (qt_gsi::QtToCppAdaptor<QPlainTextEdit::LineWrapMode>(arg1).cref());
 }
@@ -976,7 +976,7 @@ static void _call_f_setMaximumBlockCount_767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setMaximumBlockCount (arg1);
 }
@@ -996,7 +996,7 @@ static void _call_f_setOverwriteMode_864 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setOverwriteMode (arg1);
 }
@@ -1016,7 +1016,7 @@ static void _call_f_setPlaceholderText_2025 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setPlaceholderText (arg1);
 }
@@ -1036,7 +1036,7 @@ static void _call_f_setPlainText_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setPlainText (arg1);
 }
@@ -1056,7 +1056,7 @@ static void _call_f_setReadOnly_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setReadOnly (arg1);
 }
@@ -1076,7 +1076,7 @@ static void _call_f_setTabChangesFocus_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setTabChangesFocus (arg1);
 }
@@ -1096,7 +1096,7 @@ static void _call_f_setTabStopWidth_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setTabStopWidth (arg1);
 }
@@ -1116,7 +1116,7 @@ static void _call_f_setTextCursor_2453 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextCursor &arg1 = args.read<const QTextCursor & > (heap);
+  const QTextCursor &arg1 = gsi::arg_reader<const QTextCursor & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setTextCursor (arg1);
 }
@@ -1136,7 +1136,7 @@ static void _call_f_setTextInteractionFlags_3396 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::TextInteractionFlag> arg1 = args.read<QFlags<Qt::TextInteractionFlag> > (heap);
+  QFlags<Qt::TextInteractionFlag> arg1 = gsi::arg_reader<QFlags<Qt::TextInteractionFlag> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setTextInteractionFlags (arg1);
 }
@@ -1156,7 +1156,7 @@ static void _call_f_setUndoRedoEnabled_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setUndoRedoEnabled (arg1);
 }
@@ -1176,7 +1176,7 @@ static void _call_f_setWordWrapMode_2486 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QTextOption::WrapMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QTextOption::WrapMode>::target_type & > (heap);
+  const qt_gsi::Converter<QTextOption::WrapMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QTextOption::WrapMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->setWordWrapMode (qt_gsi::QtToCppAdaptor<QTextOption::WrapMode>(arg1).cref());
 }
@@ -1302,7 +1302,7 @@ static void _call_f_zoomIn_767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->zoomIn (arg1);
 }
@@ -1322,7 +1322,7 @@ static void _call_f_zoomOut_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit *)cls)->zoomOut (arg1);
 }
@@ -1346,9 +1346,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QPlainTextEdit::tr (arg1, arg2, arg3));
 }
 
@@ -1371,9 +1371,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QPlainTextEdit::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2577,7 +2577,7 @@ static void _call_ctor_QPlainTextEdit_Adaptor_1315 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QPlainTextEdit_Adaptor *> (new QPlainTextEdit_Adaptor (arg1));
 }
 
@@ -2597,8 +2597,8 @@ static void _call_ctor_QPlainTextEdit_Adaptor_3232 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QWidget *arg2 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
   ret.write<QPlainTextEdit_Adaptor *> (new QPlainTextEdit_Adaptor (arg1, arg2));
 }
 
@@ -2640,7 +2640,7 @@ static void _call_fp_blockBoundingGeometry_c2306 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_blockBoundingGeometry_c2306 (arg1));
 }
 
@@ -2658,7 +2658,7 @@ static void _call_fp_blockBoundingRect_c2306 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<QRectF > ((QRectF)((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_blockBoundingRect_c2306 (arg1));
 }
 
@@ -2676,7 +2676,7 @@ static void _call_emitter_blockCountChanged_767 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_blockCountChanged_767 (arg1);
 }
 
@@ -2827,7 +2827,7 @@ static void _call_emitter_copyAvailable_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_copyAvailable_864 (arg1);
 }
 
@@ -2849,9 +2849,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_create_2208 (arg1, arg2, arg3);
 }
@@ -2903,7 +2903,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2947,8 +2947,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_destroy_1620 (arg1, arg2);
 }
@@ -2967,7 +2967,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_destroyed_1302 (arg1);
 }
 
@@ -3105,7 +3105,7 @@ static void _call_fp_drawFrame_1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_drawFrame_1426 (arg1);
 }
@@ -3438,7 +3438,7 @@ static void _call_fp_initStyleOption_c2356 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStyleOptionFrame *arg1 = args.read<QStyleOptionFrame * > (heap);
+  QStyleOptionFrame *arg1 = gsi::arg_reader<QStyleOptionFrame * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_initStyleOption_c2356 (arg1);
 }
@@ -3528,7 +3528,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_isSignalConnected_c2394 (arg1));
 }
 
@@ -3686,7 +3686,7 @@ static void _call_emitter_modificationChanged_864 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_modificationChanged_864 (arg1);
 }
 
@@ -3896,7 +3896,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_receivers_c1731 (arg1));
 }
 
@@ -3937,7 +3937,7 @@ static void _call_emitter_redoAvailable_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_redoAvailable_864 (arg1);
 }
 
@@ -4054,10 +4054,10 @@ static void _call_fp_setViewportMargins_2744 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
-  int arg3 = args.read<int > (heap);
-  int arg4 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  int arg4 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_setViewportMargins_2744 (arg1, arg2, arg3, arg4);
 }
@@ -4076,7 +4076,7 @@ static void _call_fp_setViewportMargins_2115 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMargins &arg1 = args.read<const QMargins & > (heap);
+  const QMargins &arg1 = gsi::arg_reader<const QMargins & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_setViewportMargins_2115 (arg1);
 }
@@ -4267,7 +4267,7 @@ static void _call_emitter_undoAvailable_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_undoAvailable_864 (arg1);
 }
 
@@ -4302,8 +4302,8 @@ static void _call_emitter_updateRequest_2451 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
-  int arg2 = args.read<int > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_updateRequest_2451 (arg1, arg2);
 }
 
@@ -4401,7 +4401,7 @@ static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QIcon &arg1 = args.read<const QIcon & > (heap);
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_windowIconChanged_1787 (arg1);
 }
 
@@ -4419,7 +4419,7 @@ static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_windowIconTextChanged_2025 (arg1);
 }
 
@@ -4437,7 +4437,7 @@ static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_windowTitleChanged_2025 (arg1);
 }
 
@@ -4455,7 +4455,7 @@ static void _call_fp_zoomInF_970 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  float arg1 = args.read<float > (heap);
+  float arg1 = gsi::arg_reader<float >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPlainTextEdit_Adaptor *)cls)->fp_QPlainTextEdit_zoomInF_970 (arg1);
 }

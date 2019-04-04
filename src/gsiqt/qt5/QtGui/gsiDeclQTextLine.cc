@@ -86,8 +86,8 @@ static void _call_f_cursorToX_c2664 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args.read<int * > (heap);
-  const qt_gsi::Converter<QTextLine::Edge>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QTextLine::Edge>::target_type & > (heap) : (const qt_gsi::Converter<QTextLine::Edge>::target_type &)(qt_gsi::CppToQtReadAdaptor<QTextLine::Edge>(heap, QTextLine::Leading));
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
+  const qt_gsi::Converter<QTextLine::Edge>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTextLine::Edge>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTextLine::Edge>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTextLine::Edge>(heap, QTextLine::Leading), heap);
   ret.write<double > ((double)((QTextLine *)cls)->cursorToX (arg1, qt_gsi::QtToCppAdaptor<QTextLine::Edge>(arg2).cref()));
 }
 
@@ -108,8 +108,8 @@ static void _call_f_cursorToX_c2478 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const qt_gsi::Converter<QTextLine::Edge>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QTextLine::Edge>::target_type & > (heap) : (const qt_gsi::Converter<QTextLine::Edge>::target_type &)(qt_gsi::CppToQtReadAdaptor<QTextLine::Edge>(heap, QTextLine::Leading));
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QTextLine::Edge>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTextLine::Edge>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTextLine::Edge>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTextLine::Edge>(heap, QTextLine::Leading), heap);
   ret.write<double > ((double)((QTextLine *)cls)->cursorToX (arg1, qt_gsi::QtToCppAdaptor<QTextLine::Edge>(arg2).cref()));
 }
 
@@ -147,9 +147,9 @@ static void _call_f_draw_c6879 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QPainter *arg1 = args.read<QPainter * > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  const QTextLayout::FormatRange *arg3 = args ? args.read<const QTextLayout::FormatRange * > (heap) : (const QTextLayout::FormatRange *)(0);
+  QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QTextLayout::FormatRange *arg3 = args ? gsi::arg_reader<const QTextLayout::FormatRange * >() (args, heap) : gsi::arg_maker<const QTextLayout::FormatRange * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLine *)cls)->draw (arg1, arg2, arg3);
 }
@@ -171,8 +171,8 @@ static void _call_f_glyphRuns_c1426 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(-1);
-  int arg2 = args ? args.read<int > (heap) : (int)(-1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QList<QGlyphRun> > ((QList<QGlyphRun>)((QTextLine *)cls)->glyphRuns (arg1, arg2));
 }
 
@@ -341,7 +341,7 @@ static void _call_f_setLeadingIncluded_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLine *)cls)->setLeadingIncluded (arg1);
 }
@@ -361,7 +361,7 @@ static void _call_f_setLineWidth_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLine *)cls)->setLineWidth (arg1);
 }
@@ -381,7 +381,7 @@ static void _call_f_setNumColumns_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLine *)cls)->setNumColumns (arg1);
 }
@@ -403,8 +403,8 @@ static void _call_f_setNumColumns_1730 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  double arg2 = args.read<double > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLine *)cls)->setNumColumns (arg1, arg2);
 }
@@ -424,7 +424,7 @@ static void _call_f_setPosition_1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPointF &arg1 = args.read<const QPointF & > (heap);
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLine *)cls)->setPosition (arg1);
 }
@@ -506,8 +506,8 @@ static void _call_f_xToCursor_c3900 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  const qt_gsi::Converter<QTextLine::CursorPosition>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QTextLine::CursorPosition>::target_type & > (heap) : (const qt_gsi::Converter<QTextLine::CursorPosition>::target_type &)(qt_gsi::CppToQtReadAdaptor<QTextLine::CursorPosition>(heap, QTextLine::CursorBetweenCharacters));
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  const qt_gsi::Converter<QTextLine::CursorPosition>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTextLine::CursorPosition>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTextLine::CursorPosition>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTextLine::CursorPosition>(heap, QTextLine::CursorBetweenCharacters), heap);
   ret.write<int > ((int)((QTextLine *)cls)->xToCursor (arg1, qt_gsi::QtToCppAdaptor<QTextLine::CursorPosition>(arg2).cref()));
 }
 

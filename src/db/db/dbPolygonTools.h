@@ -39,7 +39,7 @@ class SimplePolygonSink;
 /**
  *  @brief An inside test operator
  *
- *  This class allows to efficiently test whether multiple points are inside a given polygon.
+ *  This class allows an efficient test whether multiple points are inside a given polygon.
  *  Since the test is efficiently implemented when the polygon edges are sorted, the sorting 
  *  and memory allocation step is performed once in the test operator's constructor while 
  *  each individual test is performed efficiently.
@@ -118,7 +118,7 @@ void cut_polygon (const PolygonType &input, const typename PolygonType::edge_typ
  *  @brief Split a polygon into two or more parts 
  *
  *  This function splits a polygon into parts using some heuristics to determine a "suitable" cut line.
- *  The cut line is choosen through a vertex close to a center (either horizontal or vertical). The splitting
+ *  The cut line is chosen through a vertex close to a center (either horizontal or vertical). The splitting
  *  is supposed to create smaller parts with less vertices or a better area ratio of polygon to bounding box area.
  *
  *  @param polygon The input polygon

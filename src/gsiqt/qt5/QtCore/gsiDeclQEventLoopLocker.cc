@@ -67,7 +67,7 @@ static void _call_ctor_QEventLoopLocker_1627 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QEventLoop *arg1 = args.read<QEventLoop * > (heap);
+  QEventLoop *arg1 = gsi::arg_reader<QEventLoop * >() (args, heap);
   ret.write<QEventLoopLocker *> (new QEventLoopLocker (arg1));
 }
 
@@ -86,7 +86,7 @@ static void _call_ctor_QEventLoopLocker_1303 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QThread *arg1 = args.read<QThread * > (heap);
+  QThread *arg1 = gsi::arg_reader<QThread * >() (args, heap);
   ret.write<QEventLoopLocker *> (new QEventLoopLocker (arg1));
 }
 

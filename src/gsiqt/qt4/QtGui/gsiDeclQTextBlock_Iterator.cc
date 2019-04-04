@@ -66,7 +66,7 @@ static void _call_ctor_QTextBlock_Iterator_3296 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock::iterator &arg1 = args.read<const QTextBlock::iterator & > (heap);
+  const QTextBlock::iterator &arg1 = gsi::arg_reader<const QTextBlock::iterator & >() (args, heap);
   ret.write<QTextBlock::iterator *> (new QTextBlock::iterator (arg1));
 }
 
@@ -115,7 +115,7 @@ static void _call_f_operator_excl__eq__c3296 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock::iterator &arg1 = args.read<const QTextBlock::iterator & > (heap);
+  const QTextBlock::iterator &arg1 = gsi::arg_reader<const QTextBlock::iterator & >() (args, heap);
   ret.write<bool > ((bool)((QTextBlock::iterator *)cls)->operator!= (arg1));
 }
 
@@ -149,7 +149,7 @@ static void _call_f_operator_plus__plus__767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextBlock::iterator > ((QTextBlock::iterator)((QTextBlock::iterator *)cls)->operator++ (arg1));
 }
 
@@ -183,7 +183,7 @@ static void _call_f_operator_minus__minus__767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTextBlock::iterator > ((QTextBlock::iterator)((QTextBlock::iterator *)cls)->operator-- (arg1));
 }
 
@@ -202,7 +202,7 @@ static void _call_f_operator_eq__eq__c3296 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock::iterator &arg1 = args.read<const QTextBlock::iterator & > (heap);
+  const QTextBlock::iterator &arg1 = gsi::arg_reader<const QTextBlock::iterator & >() (args, heap);
   ret.write<bool > ((bool)((QTextBlock::iterator *)cls)->operator== (arg1));
 }
 

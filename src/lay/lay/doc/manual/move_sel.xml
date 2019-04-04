@@ -37,7 +37,7 @@
   </p>
 
   <p>
-  In the same way, "Move To" allows to reposition the selection to a certain point. The point which 
+  In the same way, "Move To" allows one to reposition the selection to a certain point. The point which
   is positioned can be chosen relative to the bounding box of the selection. If first example,
   the lower-left corner of the selection is picked as the reference point and a certain position
   is given in the dialog, the selection is moved such that the lower left position of it's

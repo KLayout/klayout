@@ -160,7 +160,7 @@ gsi::Class<db::NetTracerShape> decl_NetElement ("db", "NetElement",
   "In any case, the \\shape method will deliver the shape and \\trans the transformation of the shape into the original top cell. "
   "To obtain a flat representation of the net, the shapes need to be transformed by this transformation.\n"
   "\n"
-  "\\layer will give the layer the shape is located at, \\cell_index will denote the cell that containes the shape.\n"
+  "\\layer will give the layer the shape is located at, \\cell_index will denote the cell that contains the shape.\n"
   "\n"
   "This class has been introduced in version 0.25.\n"
 );

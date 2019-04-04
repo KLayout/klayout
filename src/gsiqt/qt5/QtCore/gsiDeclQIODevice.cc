@@ -233,7 +233,7 @@ static void _call_f_open_3242 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QIODevice::OpenModeFlag> arg1 = args.read<QFlags<QIODevice::OpenModeFlag> > (heap);
+  QFlags<QIODevice::OpenModeFlag> arg1 = gsi::arg_reader<QFlags<QIODevice::OpenModeFlag> >() (args, heap);
   ret.write<bool > ((bool)((QIODevice *)cls)->open (arg1));
 }
 
@@ -267,7 +267,7 @@ static void _call_f_peek_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QIODevice *)cls)->peek (arg1));
 }
 
@@ -301,7 +301,7 @@ static void _call_f_putChar_850 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  char arg1 = args.read<char > (heap);
+  char arg1 = gsi::arg_reader<char >() (args, heap);
   ret.write<bool > ((bool)((QIODevice *)cls)->putChar (arg1));
 }
 
@@ -320,7 +320,7 @@ static void _call_f_read_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QIODevice *)cls)->read (arg1));
 }
 
@@ -354,7 +354,7 @@ static void _call_f_readLine_986 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args ? args.read<qint64 > (heap) : (qint64)(0);
+  qint64 arg1 = args ? gsi::arg_reader<qint64 >() (args, heap) : gsi::arg_maker<qint64 >() (0, heap);
   ret.write<QByteArray > ((QByteArray)((QIODevice *)cls)->readLine (arg1));
 }
 
@@ -388,7 +388,7 @@ static void _call_f_seek_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<bool > ((bool)((QIODevice *)cls)->seek (arg1));
 }
 
@@ -407,7 +407,7 @@ static void _call_f_setTextModeEnabled_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QIODevice *)cls)->setTextModeEnabled (arg1);
 }
@@ -442,7 +442,7 @@ static void _call_f_ungetChar_850 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  char arg1 = args.read<char > (heap);
+  char arg1 = gsi::arg_reader<char >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QIODevice *)cls)->ungetChar (arg1);
 }
@@ -462,7 +462,7 @@ static void _call_f_waitForBytesWritten_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QIODevice *)cls)->waitForBytesWritten (arg1));
 }
 
@@ -481,7 +481,7 @@ static void _call_f_waitForReadyRead_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QIODevice *)cls)->waitForReadyRead (arg1));
 }
 
@@ -502,8 +502,8 @@ static void _call_f_write_2609 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  qint64 arg2 = args.read<qint64 > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  qint64 arg2 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<qint64 > ((qint64)((QIODevice *)cls)->write (arg1, arg2));
 }
 
@@ -522,7 +522,7 @@ static void _call_f_write_2309 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<qint64 > ((qint64)((QIODevice *)cls)->write (arg1));
 }
 
@@ -545,9 +545,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QIODevice::tr (arg1, arg2, arg3));
 }
 
@@ -570,9 +570,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QIODevice::trUtf8 (arg1, arg2, arg3));
 }
 

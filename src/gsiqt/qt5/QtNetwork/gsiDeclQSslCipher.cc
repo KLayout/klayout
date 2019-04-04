@@ -65,7 +65,7 @@ static void _call_ctor_QSslCipher_2025 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QSslCipher *> (new QSslCipher (arg1));
 }
 
@@ -86,8 +86,8 @@ static void _call_ctor_QSslCipher_4012 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QSsl::SslProtocol>::target_type & arg2 = args.read<const qt_gsi::Converter<QSsl::SslProtocol>::target_type & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QSsl::SslProtocol>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSsl::SslProtocol>::target_type & >() (args, heap);
   ret.write<QSslCipher *> (new QSslCipher (arg1, qt_gsi::QtToCppAdaptor<QSsl::SslProtocol>(arg2).cref()));
 }
 
@@ -106,7 +106,7 @@ static void _call_ctor_QSslCipher_2303 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCipher &arg1 = args.read<const QSslCipher & > (heap);
+  const QSslCipher &arg1 = gsi::arg_reader<const QSslCipher & >() (args, heap);
   ret.write<QSslCipher *> (new QSslCipher (arg1));
 }
 
@@ -200,7 +200,7 @@ static void _call_f_operator_excl__eq__c2303 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCipher &arg1 = args.read<const QSslCipher & > (heap);
+  const QSslCipher &arg1 = gsi::arg_reader<const QSslCipher & >() (args, heap);
   ret.write<bool > ((bool)((QSslCipher *)cls)->operator!= (arg1));
 }
 
@@ -219,7 +219,7 @@ static void _call_f_operator_eq__2303 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCipher &arg1 = args.read<const QSslCipher & > (heap);
+  const QSslCipher &arg1 = gsi::arg_reader<const QSslCipher & >() (args, heap);
   ret.write<QSslCipher & > ((QSslCipher &)((QSslCipher *)cls)->operator= (arg1));
 }
 
@@ -238,7 +238,7 @@ static void _call_f_operator_eq__eq__c2303 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSslCipher &arg1 = args.read<const QSslCipher & > (heap);
+  const QSslCipher &arg1 = gsi::arg_reader<const QSslCipher & >() (args, heap);
   ret.write<bool > ((bool)((QSslCipher *)cls)->operator== (arg1));
 }
 
@@ -302,7 +302,7 @@ static void _call_f_swap_1608 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QSslCipher &arg1 = args.read<QSslCipher & > (heap);
+  QSslCipher &arg1 = gsi::arg_reader<QSslCipher & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslCipher *)cls)->swap (arg1);
 }

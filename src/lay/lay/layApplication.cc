@@ -170,7 +170,7 @@ static void ui_exception_handler_def (QWidget *parent)
   if (! parent) {
     parent = QApplication::activeWindow () ? QApplication::activeWindow () : lay::MainWindow::instance ();
   }
-  QMessageBox::critical (parent, QObject::tr ("Error"), QObject::tr ("An unspecific error occured")); 
+  QMessageBox::critical (parent, QObject::tr ("Error"), QObject::tr ("An unspecific error occurred")); 
 }
 
 // --------------------------------------------------------------------------------

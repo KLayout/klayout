@@ -65,7 +65,7 @@ static void _call_ctor_QDnsTextRecord_2715 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDnsTextRecord &arg1 = args.read<const QDnsTextRecord & > (heap);
+  const QDnsTextRecord &arg1 = gsi::arg_reader<const QDnsTextRecord & >() (args, heap);
   ret.write<QDnsTextRecord *> (new QDnsTextRecord (arg1));
 }
 
@@ -99,7 +99,7 @@ static void _call_f_operator_eq__2715 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDnsTextRecord &arg1 = args.read<const QDnsTextRecord & > (heap);
+  const QDnsTextRecord &arg1 = gsi::arg_reader<const QDnsTextRecord & >() (args, heap);
   ret.write<QDnsTextRecord & > ((QDnsTextRecord &)((QDnsTextRecord *)cls)->operator= (arg1));
 }
 
@@ -118,7 +118,7 @@ static void _call_f_swap_2020 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDnsTextRecord &arg1 = args.read<QDnsTextRecord & > (heap);
+  QDnsTextRecord &arg1 = gsi::arg_reader<QDnsTextRecord & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDnsTextRecord *)cls)->swap (arg1);
 }

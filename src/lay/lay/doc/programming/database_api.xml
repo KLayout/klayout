@@ -80,7 +80,7 @@ layout.write("my_layout.gds")</pre>
 
   <p>
   The basic building blocks of layouts are layers and cells. Layers are not individual objects. Instead, a layer
-  is rather an index and the various methods allow to address shapes inside layers by using that index. However,
+  is rather an index and the various methods allow addressing shapes inside layers by using that index. However,
   the layout object stores the layer properties, i.e. the layer and datatype number.
   </p>
 
@@ -955,7 +955,7 @@ shapes.insert(RBA::Box::new(0, 0, 1000, 2000))</pre>
   Standalone Shapes objects can be useful when the methods of the Shapes object are required
   (for example, region queries through "each_overlapping"). There are are variety of "insert"
   methods available, some of which copy shapes from other Shapes containers using a Shape 
-  object as the reference for the source object. Some of these variants allow to specify a 
+  object as the reference for the source object. Some of these variants allow one to specify a
   transformation which is applied before the shape is inserted. There are also variants
   for all geometrical primitives with or without a properties ID.
   </p>
@@ -971,7 +971,7 @@ shapes.insert(RBA::Box::new(0, 0, 1000, 2000))</pre>
   The content of the Shapes container can be iterated with the <class_doc href="Shapes#each"/> iterator. If will
   deliver Shape objects pointing to the current geometrical primitive. The <class_doc href="Shapes#each_overlapping"/>
   and <class_doc href="Shapes#each_touching"/> methods deliver only those primitives whose bounding box overlaps
-  or touches the given rectangle. All iterators allow to specify flags which confine the 
+  or touches the given rectangle. All iterators allow one to specify flags which confine the
   kind of shape delivered. The flags are a combination of the "S..." constants. For example:
   </p>
 
@@ -1046,11 +1046,11 @@ end</pre>
 
   <p>
   With version 0.23, new collection objects entered the stage: <class_doc href="Region"/>, <class_doc href="Edges"/> and
-  <class_doc href="EdgePairs"/> which basically provide a way to store polygons, edges or egde pair objects 
+  <class_doc href="EdgePairs"/> which basically provide a way to store polygons, edges or edge pair objects 
   independently from the shapes container. They are mainly used to implement bulk operations, specifically for
   the DRC functionality. The cooperate with the shapes container in the sense that they can be inserted into 
   a shapes container which will produce polygons or edges in the layout database (edge pairs are converted to single
-  egdes or polygons. These classes are discussed in <link href="/programming/geometry_api.xml"/>.
+  edges or polygons. These classes are discussed in <link href="/programming/geometry_api.xml"/>.
   </p>
 
   <h2>The Shape class</h2>
@@ -1075,7 +1075,7 @@ end</pre>
   delivers the Layout object and <class_doc href="Shape#shapes"/> the Shapes object.
   </p>
 
-  <p><class_doc href="Shape#property"/>, <class_doc href="Shape#set_property"/> and <class_doc href="Shape#delete_property"/> allow to modify the
+  <p><class_doc href="Shape#property"/>, <class_doc href="Shape#set_property"/> and <class_doc href="Shape#delete_property"/> allow modification of the
   user properties of the geometrical primitive. The same can be achieved somewhat less
   conveniently using a properties
   ID with the <class_doc href="Shape#prop_id"/> attributes' write accessor (<class_doc href="Shape#prop_id="/>). Please note the

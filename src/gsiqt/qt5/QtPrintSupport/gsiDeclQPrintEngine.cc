@@ -65,7 +65,7 @@ static void _call_f_metric_c3445 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = args.read<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & > (heap);
+  const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPaintDevice::PaintDeviceMetric>::target_type & >() (args, heap);
   ret.write<int > ((int)((QPrintEngine *)cls)->metric (qt_gsi::QtToCppAdaptor<QPaintDevice::PaintDeviceMetric>(arg1).cref()));
 }
 
@@ -114,7 +114,7 @@ static void _call_f_property_c4045 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & > (heap);
+  const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QPrintEngine *)cls)->property (qt_gsi::QtToCppAdaptor<QPrintEngine::PrintEnginePropertyKey>(arg1).cref()));
 }
 
@@ -135,8 +135,8 @@ static void _call_f_setProperty_6056 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & arg1 = args.read<const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPrintEngine::PrintEnginePropertyKey>::target_type & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPrintEngine *)cls)->setProperty (qt_gsi::QtToCppAdaptor<QPrintEngine::PrintEnginePropertyKey>(arg1).cref(), arg2);
 }

@@ -332,7 +332,7 @@ public:
   /**
    *  @brief Constructor from a RecursiveShapeIterator
    *
-   *  Creates an edge set from a recursive shape iterator. This allows to feed an edge set
+   *  Creates an edge set from a recursive shape iterator. This allows feeding an edge set
    *  from a hierarchy of cells.
    */
   explicit Edges (const RecursiveShapeIterator &si, bool as_edges = true);
@@ -340,7 +340,7 @@ public:
   /**
    *  @brief Constructor from a RecursiveShapeIterator with a transformation
    *
-   *  Creates an edge set from a recursive shape iterator. This allows to feed an edge set 
+   *  Creates an edge set from a recursive shape iterator. This allows feeding an edge set
    *  from a hierarchy of cells. The transformation is useful to scale to a specific
    *  DBU for example.
    */
@@ -976,7 +976,7 @@ public:
   /**
    *  @brief Returns edges (point-like) representing the start part of the edges
    *
-   *  The length of the part can be choosen by length or a fraction of the original length.
+   *  The length of the part can be chosen by length or a fraction of the original length.
    *  If length and fraction are 0, a point at the beginning of the edge will be created.
    *  If length is non-zero and fraction is 0, a segment in the direction of the edge
    *  with the given length is created, even if the length is larger than the original

@@ -141,7 +141,7 @@ static void _call_f_done_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->done (arg1);
 }
@@ -374,8 +374,8 @@ static void _call_f_open_2925 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->open (arg1, arg2);
 }
@@ -410,7 +410,7 @@ static void _call_f_setCancelButtonText_2025 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setCancelButtonText (arg1);
 }
@@ -430,7 +430,7 @@ static void _call_f_setComboBoxEditable_864 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setComboBoxEditable (arg1);
 }
@@ -450,7 +450,7 @@ static void _call_f_setComboBoxItems_2437 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringList &arg1 = args.read<const QStringList & > (heap);
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setComboBoxItems (arg1);
 }
@@ -470,7 +470,7 @@ static void _call_f_setDoubleDecimals_767 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setDoubleDecimals (arg1);
 }
@@ -490,7 +490,7 @@ static void _call_f_setDoubleMaximum_1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setDoubleMaximum (arg1);
 }
@@ -510,7 +510,7 @@ static void _call_f_setDoubleMinimum_1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setDoubleMinimum (arg1);
 }
@@ -532,8 +532,8 @@ static void _call_f_setDoubleRange_2034 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
-  double arg2 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  double arg2 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setDoubleRange (arg1, arg2);
 }
@@ -553,7 +553,7 @@ static void _call_f_setDoubleValue_1071 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setDoubleValue (arg1);
 }
@@ -573,7 +573,7 @@ static void _call_f_setInputMode_2670 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QInputDialog::InputMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QInputDialog::InputMode>::target_type & > (heap);
+  const qt_gsi::Converter<QInputDialog::InputMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QInputDialog::InputMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setInputMode (qt_gsi::QtToCppAdaptor<QInputDialog::InputMode>(arg1).cref());
 }
@@ -593,7 +593,7 @@ static void _call_f_setIntMaximum_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setIntMaximum (arg1);
 }
@@ -613,7 +613,7 @@ static void _call_f_setIntMinimum_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setIntMinimum (arg1);
 }
@@ -635,8 +635,8 @@ static void _call_f_setIntRange_1426 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setIntRange (arg1, arg2);
 }
@@ -656,7 +656,7 @@ static void _call_f_setIntStep_767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setIntStep (arg1);
 }
@@ -676,7 +676,7 @@ static void _call_f_setIntValue_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setIntValue (arg1);
 }
@@ -696,7 +696,7 @@ static void _call_f_setLabelText_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setLabelText (arg1);
 }
@@ -716,7 +716,7 @@ static void _call_f_setOkButtonText_2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setOkButtonText (arg1);
 }
@@ -738,8 +738,8 @@ static void _call_f_setOption_4262 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QInputDialog::InputDialogOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QInputDialog::InputDialogOption>::target_type & > (heap);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<QInputDialog::InputDialogOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QInputDialog::InputDialogOption>::target_type & >() (args, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setOption (qt_gsi::QtToCppAdaptor<QInputDialog::InputDialogOption>(arg1).cref(), arg2);
 }
@@ -759,7 +759,7 @@ static void _call_f_setOptions_4202 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QInputDialog::InputDialogOption> arg1 = args.read<QFlags<QInputDialog::InputDialogOption> > (heap);
+  QFlags<QInputDialog::InputDialogOption> arg1 = gsi::arg_reader<QFlags<QInputDialog::InputDialogOption> >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setOptions (arg1);
 }
@@ -779,7 +779,7 @@ static void _call_f_setTextEchoMode_2187 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QLineEdit::EchoMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QLineEdit::EchoMode>::target_type & > (heap);
+  const qt_gsi::Converter<QLineEdit::EchoMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLineEdit::EchoMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setTextEchoMode (qt_gsi::QtToCppAdaptor<QLineEdit::EchoMode>(arg1).cref());
 }
@@ -799,7 +799,7 @@ static void _call_f_setTextValue_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setTextValue (arg1);
 }
@@ -819,7 +819,7 @@ static void _call_f_setVisible_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog *)cls)->setVisible (arg1);
 }
@@ -854,7 +854,7 @@ static void _call_f_testOption_c3506 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QInputDialog::InputDialogOption>::target_type & arg1 = args.read<const qt_gsi::Converter<QInputDialog::InputDialogOption>::target_type & > (heap);
+  const qt_gsi::Converter<QInputDialog::InputDialogOption>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QInputDialog::InputDialogOption>::target_type & >() (args, heap);
   ret.write<bool > ((bool)((QInputDialog *)cls)->testOption (qt_gsi::QtToCppAdaptor<QInputDialog::InputDialogOption>(arg1).cref()));
 }
 
@@ -919,15 +919,15 @@ static void _call_f_getDouble_12026 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  double arg4 = args ? args.read<double > (heap) : (double)(0);
-  double arg5 = args ? args.read<double > (heap) : (double)(-2147483647);
-  double arg6 = args ? args.read<double > (heap) : (double)(2147483647);
-  int arg7 = args ? args.read<int > (heap) : (int)(1);
-  bool *arg8 = args ? args.read<bool * > (heap) : (bool *)(0);
-  QFlags<Qt::WindowType> arg9 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  double arg4 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (0, heap);
+  double arg5 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (-2147483647, heap);
+  double arg6 = args ? gsi::arg_reader<double >() (args, heap) : gsi::arg_maker<double >() (2147483647, heap);
+  int arg7 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
+  bool *arg8 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  QFlags<Qt::WindowType> arg9 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<double > ((double)QInputDialog::getDouble (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
 }
 
@@ -962,15 +962,15 @@ static void _call_f_getInt_11114 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(0);
-  int arg5 = args ? args.read<int > (heap) : (int)(-2147483647);
-  int arg6 = args ? args.read<int > (heap) : (int)(2147483647);
-  int arg7 = args ? args.read<int > (heap) : (int)(1);
-  bool *arg8 = args ? args.read<bool * > (heap) : (bool *)(0);
-  QFlags<Qt::WindowType> arg9 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-2147483647, heap);
+  int arg6 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (2147483647, heap);
+  int arg7 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
+  bool *arg8 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  QFlags<Qt::WindowType> arg9 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<int > ((int)QInputDialog::getInt (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
 }
 
@@ -1005,15 +1005,15 @@ static void _call_f_getInteger_11114 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  int arg4 = args ? args.read<int > (heap) : (int)(0);
-  int arg5 = args ? args.read<int > (heap) : (int)(-2147483647);
-  int arg6 = args ? args.read<int > (heap) : (int)(2147483647);
-  int arg7 = args ? args.read<int > (heap) : (int)(1);
-  bool *arg8 = args ? args.read<bool * > (heap) : (bool *)(0);
-  QFlags<Qt::WindowType> arg9 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-2147483647, heap);
+  int arg6 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (2147483647, heap);
+  int arg7 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
+  bool *arg8 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  QFlags<Qt::WindowType> arg9 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<int > ((int)QInputDialog::getInteger (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
 }
 
@@ -1046,14 +1046,14 @@ static void _call_f_getItem_12222 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const QStringList &arg4 = args.read<const QStringList & > (heap);
-  int arg5 = args ? args.read<int > (heap) : (int)(0);
-  bool arg6 = args ? args.read<bool > (heap) : (bool)(true);
-  bool *arg7 = args ? args.read<bool * > (heap) : (bool *)(0);
-  QFlags<Qt::WindowType> arg8 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg4 = gsi::arg_reader<const QStringList & >() (args, heap);
+  int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  bool arg6 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool *arg7 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  QFlags<Qt::WindowType> arg8 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<QString > ((QString)QInputDialog::getItem (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
 }
 
@@ -1084,13 +1084,13 @@ static void _call_f_getText_12474 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  const QString &arg3 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QLineEdit::EchoMode>::target_type & arg4 = args ? args.read<const qt_gsi::Converter<QLineEdit::EchoMode>::target_type & > (heap) : (const qt_gsi::Converter<QLineEdit::EchoMode>::target_type &)(qt_gsi::CppToQtReadAdaptor<QLineEdit::EchoMode>(heap, QLineEdit::Normal));
-  const QString &arg5 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
-  bool *arg6 = args ? args.read<bool * > (heap) : (bool *)(0);
-  QFlags<Qt::WindowType> arg7 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QLineEdit::EchoMode>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QLineEdit::EchoMode>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLineEdit::EchoMode>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLineEdit::EchoMode>(heap, QLineEdit::Normal), heap);
+  const QString &arg5 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  bool *arg6 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  QFlags<Qt::WindowType> arg7 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<QString > ((QString)QInputDialog::getText (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<QLineEdit::EchoMode>(arg4).cref(), arg5, arg6, arg7));
 }
 
@@ -1111,8 +1111,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QInputDialog::tr (arg1, arg2));
 }
 
@@ -1135,9 +1135,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QInputDialog::tr (arg1, arg2, arg3));
 }
 
@@ -1158,8 +1158,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QInputDialog::trUtf8 (arg1, arg2));
 }
 
@@ -1182,9 +1182,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QInputDialog::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -2211,8 +2211,8 @@ static void _call_ctor_QInputDialog_Adaptor_3702 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? args.read<QWidget * > (heap) : (QWidget *)(0);
-  QFlags<Qt::WindowType> arg2 = args ? args.read<QFlags<Qt::WindowType> > (heap) : (QFlags<Qt::WindowType>)(0);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
   ret.write<QInputDialog_Adaptor *> (new QInputDialog_Adaptor (arg1, arg2));
 }
 
@@ -2288,7 +2288,7 @@ static void _call_fp_adjustPosition_1315 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog_Adaptor *)cls)->fp_QInputDialog_adjustPosition_1315 (arg1);
 }
@@ -2407,9 +2407,9 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<WId>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<WId>::target_type & > (heap) : (const qt_gsi::Converter<WId>::target_type &)(qt_gsi::CppToQtReadAdaptor<WId>(heap, 0));
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg3 = args ? args.read<bool > (heap) : (bool)(true);
+  const qt_gsi::Converter<WId>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<WId>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<WId>::target_type & >() (qt_gsi::CppToQtReadAdaptor<WId>(heap, 0), heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog_Adaptor *)cls)->fp_QInputDialog_create_2208 (arg1, arg2, arg3);
 }
@@ -2428,7 +2428,7 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
   ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_customContextMenuRequested_1916 (arg1);
 }
 
@@ -2472,8 +2472,8 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args ? args.read<bool > (heap) : (bool)(true);
-  bool arg2 = args ? args.read<bool > (heap) : (bool)(true);
+  bool arg1 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
+  bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QInputDialog_Adaptor *)cls)->fp_QInputDialog_destroy_1620 (arg1, arg2);
 }
@@ -2492,7 +2492,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_destroyed_1302 (arg1);
 }
 
@@ -2558,7 +2558,7 @@ static void _call_emitter_doubleValueChanged_1071 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_doubleValueChanged_1071 (arg1);
 }
 
@@ -2576,7 +2576,7 @@ static void _call_emitter_doubleValueSelected_1071 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_doubleValueSelected_1071 (arg1);
 }
 
@@ -2787,7 +2787,7 @@ static void _call_emitter_finished_767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_finished_767 (arg1);
 }
 
@@ -3022,7 +3022,7 @@ static void _call_emitter_intValueChanged_767 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_intValueChanged_767 (arg1);
 }
 
@@ -3040,7 +3040,7 @@ static void _call_emitter_intValueSelected_767 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_intValueSelected_767 (arg1);
 }
 
@@ -3379,7 +3379,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QInputDialog_Adaptor *)cls)->fp_QInputDialog_receivers_c1731 (arg1));
 }
 
@@ -3599,7 +3599,7 @@ static void _call_emitter_textValueChanged_2025 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_textValueChanged_2025 (arg1);
 }
 
@@ -3617,7 +3617,7 @@ static void _call_emitter_textValueSelected_2025 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ((QInputDialog_Adaptor *)cls)->emitter_QInputDialog_textValueSelected_2025 (arg1);
 }
 

@@ -71,9 +71,9 @@ static void _call_ctor_QVideoSurfaceFormat_7911 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
-  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg2 = args.read<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & > (heap);
-  const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type & arg3 = args ? args.read<const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type & > (heap) : (const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type &)(qt_gsi::CppToQtReadAdaptor<QAbstractVideoBuffer::HandleType>(heap, QAbstractVideoBuffer::NoHandle));
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
+  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractVideoBuffer::HandleType>(heap, QAbstractVideoBuffer::NoHandle), heap);
   ret.write<QVideoSurfaceFormat *> (new QVideoSurfaceFormat (arg1, qt_gsi::QtToCppAdaptor<QVideoFrame::PixelFormat>(arg2).cref(), qt_gsi::QtToCppAdaptor<QAbstractVideoBuffer::HandleType>(arg3).cref()));
 }
 
@@ -92,7 +92,7 @@ static void _call_ctor_QVideoSurfaceFormat_3227 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoSurfaceFormat &arg1 = args.read<const QVideoSurfaceFormat & > (heap);
+  const QVideoSurfaceFormat &arg1 = gsi::arg_reader<const QVideoSurfaceFormat & >() (args, heap);
   ret.write<QVideoSurfaceFormat *> (new QVideoSurfaceFormat (arg1));
 }
 
@@ -201,7 +201,7 @@ static void _call_f_operator_excl__eq__c3227 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoSurfaceFormat &arg1 = args.read<const QVideoSurfaceFormat & > (heap);
+  const QVideoSurfaceFormat &arg1 = gsi::arg_reader<const QVideoSurfaceFormat & >() (args, heap);
   ret.write<bool > ((bool)((QVideoSurfaceFormat *)cls)->operator != (arg1));
 }
 
@@ -220,7 +220,7 @@ static void _call_f_operator_eq__3227 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoSurfaceFormat &arg1 = args.read<const QVideoSurfaceFormat & > (heap);
+  const QVideoSurfaceFormat &arg1 = gsi::arg_reader<const QVideoSurfaceFormat & >() (args, heap);
   ret.write<QVideoSurfaceFormat & > ((QVideoSurfaceFormat &)((QVideoSurfaceFormat *)cls)->operator = (arg1));
 }
 
@@ -239,7 +239,7 @@ static void _call_f_operator_eq__eq__c3227 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVideoSurfaceFormat &arg1 = args.read<const QVideoSurfaceFormat & > (heap);
+  const QVideoSurfaceFormat &arg1 = gsi::arg_reader<const QVideoSurfaceFormat & >() (args, heap);
   ret.write<bool > ((bool)((QVideoSurfaceFormat *)cls)->operator == (arg1));
 }
 
@@ -288,7 +288,7 @@ static void _call_f_property_c1731 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QVariant > ((QVariant)((QVideoSurfaceFormat *)cls)->property (arg1));
 }
 
@@ -337,7 +337,7 @@ static void _call_f_setFrameRate_1071 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoSurfaceFormat *)cls)->setFrameRate (arg1);
 }
@@ -357,7 +357,7 @@ static void _call_f_setFrameSize_1805 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoSurfaceFormat *)cls)->setFrameSize (arg1);
 }
@@ -379,8 +379,8 @@ static void _call_f_setFrameSize_1426 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoSurfaceFormat *)cls)->setFrameSize (arg1, arg2);
 }
@@ -400,7 +400,7 @@ static void _call_f_setPixelAspectRatio_1805 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSize &arg1 = args.read<const QSize & > (heap);
+  const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoSurfaceFormat *)cls)->setPixelAspectRatio (arg1);
 }
@@ -422,8 +422,8 @@ static void _call_f_setPixelAspectRatio_1426 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoSurfaceFormat *)cls)->setPixelAspectRatio (arg1, arg2);
 }
@@ -445,8 +445,8 @@ static void _call_f_setProperty_3742 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoSurfaceFormat *)cls)->setProperty (arg1, arg2);
 }
@@ -466,7 +466,7 @@ static void _call_f_setScanLineDirection_3395 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QVideoSurfaceFormat::Direction>::target_type & arg1 = args.read<const qt_gsi::Converter<QVideoSurfaceFormat::Direction>::target_type & > (heap);
+  const qt_gsi::Converter<QVideoSurfaceFormat::Direction>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoSurfaceFormat::Direction>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoSurfaceFormat *)cls)->setScanLineDirection (qt_gsi::QtToCppAdaptor<QVideoSurfaceFormat::Direction>(arg1).cref());
 }
@@ -486,7 +486,7 @@ static void _call_f_setViewport_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QRect &arg1 = args.read<const QRect & > (heap);
+  const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoSurfaceFormat *)cls)->setViewport (arg1);
 }
@@ -506,7 +506,7 @@ static void _call_f_setYCbCrColorSpace_3904 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QVideoSurfaceFormat::YCbCrColorSpace>::target_type & arg1 = args.read<const qt_gsi::Converter<QVideoSurfaceFormat::YCbCrColorSpace>::target_type & > (heap);
+  const qt_gsi::Converter<QVideoSurfaceFormat::YCbCrColorSpace>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoSurfaceFormat::YCbCrColorSpace>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QVideoSurfaceFormat *)cls)->setYCbCrColorSpace (qt_gsi::QtToCppAdaptor<QVideoSurfaceFormat::YCbCrColorSpace>(arg1).cref());
 }

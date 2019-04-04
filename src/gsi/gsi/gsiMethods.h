@@ -63,7 +63,7 @@ struct IncompatibleReturnTypeException
  *
  *  A class declaration collects objects of this kind to represent methods and their specific
  *  implementation.
- *  This class is implemented in various specific ways that bind the abstract call to a specifc
+ *  This class is implemented in various specific ways that bind the abstract call to a specific
  *  C++ method.
  */
 class GSI_PUBLIC MethodBase 
@@ -612,7 +612,7 @@ private:
 /**
  *  @brief A collection of methods
  *
- *  The basic purpose of this object is to provide the + operator that allows to concatenate 
+ *  The basic purpose of this object is to provide the + operator that allows concatenation
  *  method declarations in the class declaration.
  */
 class GSI_PUBLIC Methods

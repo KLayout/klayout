@@ -834,7 +834,7 @@ public:
   /**
    *  @brief Returns an edge set containing all edges of the polygons in this region
    *
-   *  This version allows to specify a filter by which the edges are filtered before they are
+   *  This version allows one to specify a filter by which the edges are filtered before they are
    *  returned.
    *
    *  Merged semantics applies. In merged semantics, only full, outer edges are delivered.
@@ -1574,7 +1574,7 @@ public:
    *  @brief Constructor specifying the region where to store the polygons
    *
    *  If "clear" is set to true, the region will be cleared before the 
-   *  inserting of polygons starts. This allows to use the region as input and
+   *  inserting of polygons starts. This allows using the region as input and
    *  output for any operation.
    */
   RegionPolygonSink (Region &region, bool clear = false) 

@@ -120,8 +120,8 @@ static void _call_ctor_QMoveEvent_Adaptor_3724 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPoint &arg1 = args.read<const QPoint & > (heap);
-  const QPoint &arg2 = args.read<const QPoint & > (heap);
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QMoveEvent_Adaptor *> (new QMoveEvent_Adaptor (arg1, arg2));
 }
 

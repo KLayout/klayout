@@ -730,7 +730,7 @@ public:
   /**
    *  @brief Some syntactic sugar
    *
-   *  Allows to extract something this way: extractor >> x;
+   *  Allows extracting something this way: extractor >> x;
    */
   template <class X>
   Extractor &operator>> (X &x) 

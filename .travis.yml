@@ -265,7 +265,7 @@ matrix:
           packages:
             - ccache
       env:
-        - MATRIX_EVAL="brew update; brew install sashkab/python/python36; brew link --force --overwrite python36; shopt -s expand_aliases; alias python='/usr/local/opt/python36/bin/python3.6'; alias pip='/usr/local/opt/python36/bin/pip3.6';"
+        - MATRIX_EVAL="brew update; brew tap sashkab/python; brew install sashkab/python/python36; brew link --force --overwrite python36; shopt -s expand_aliases; alias python='/usr/local/opt/python36/bin/python3.6'; alias pip='/usr/local/opt/python36/bin/pip3.6';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
@@ -280,25 +280,25 @@ matrix:
           packages:
             - ccache
       env:
-        - MATRIX_EVAL="brew update; brew install sashkab/python/python35; brew link --force --overwrite python35; shopt -s expand_aliases; alias python='/usr/local/opt/python35/bin/python3.5'; alias pip='/usr/local/opt/python35/bin/pip3.5';"
+        - MATRIX_EVAL="brew update; brew tap sashkab/python; brew install sashkab/python/python35; brew link --force --overwrite python35; shopt -s expand_aliases; alias python='/usr/local/opt/python35/bin/python3.5'; alias pip='/usr/local/opt/python35/bin/pip3.5';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
 
-    # - name: "klayout python3.4.9 osx10.13"
-    - name: "cp34-cp34m-macosx_10_13_x86_64.whl"
-      os: osx
-      osx_image: xcode9.4  # macOS 10.13
-      cache: ccache
-      addons:
-        homebrew:
-          packages:
-            - ccache
-      env:
-        - MATRIX_EVAL="brew update; brew install sashkab/python/python34; brew link --force --overwrite python34; shopt -s expand_aliases; alias python='/usr/local/opt/python34/bin/python3.4'; alias pip='/usr/local/opt/python34/bin/pip3.4';"
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
+    # # - name: "klayout python3.4.9 osx10.13"
+    # - name: "cp34-cp34m-macosx_10_13_x86_64.whl"
+    #   os: osx
+    #   osx_image: xcode9.4  # macOS 10.13
+    #   cache: ccache
+    #   addons:
+    #     homebrew:
+    #       packages:
+    #         - ccache
+    #   env:
+    #     - MATRIX_EVAL="brew update; brew tap sashkab/python; brew install sashkab/python/python34; brew link --force --overwrite python34; shopt -s expand_aliases; alias python='/usr/local/opt/python34/bin/python3.4'; alias pip='/usr/local/opt/python34/bin/pip3.4';"
+    #     - ARCHFLAGS="-std=c++11"
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
     
     # - name: "klayout python3 osx10.12"
     - name: "cp37-cp37m-macosx_10_12_x86_64.whl"
@@ -555,6 +555,7 @@ script:
             python testdata/pymod/import_db.py;
             python testdata/pymod/import_rdb.py;
             python testdata/pymod/import_tl.py;
+            python testdata/pymod/import_lib.py;
             python testdata/pymod/pya_tests.py;
         fi
     fi 
@@ -565,6 +566,7 @@ script:
         python testdata/pymod/import_db.py;
         python testdata/pymod/import_rdb.py;
         python testdata/pymod/import_tl.py;
+        python testdata/pymod/import_lib.py;
         python testdata/pymod/pya_tests.py;
         klayout_version=$(python -c 'import setup; print(setup.Config().version())');
         mkdir -p deploy/dist-pymod/$klayout_version;
@@ -578,4 +580,13 @@ script:
     fi
 
 after_success:
+  # upload to dropbox
+  # need DROPBOX_OAUTH_BEARER environment variable
   - dropbox-deployment
+
+  # uploading to pypi using twine
+  # need TWINE_USERNAME, TWINE_PASSWORD and TWINE_REPOSITORY_URL env variable
+  - if [ "$PYTHON_BUILD" = true ] || [ "$DOCKER_BUILD" = true ]; then
+      pip install -U twine || sudo pip install -U twine;
+      twine upload --skip-existing deploy/dist-pymod/$klayout_version/*;
+    fi

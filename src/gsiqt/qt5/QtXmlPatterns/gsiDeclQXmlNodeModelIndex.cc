@@ -66,7 +66,7 @@ static void _call_ctor_QXmlNodeModelIndex_3090 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<QXmlNodeModelIndex *> (new QXmlNodeModelIndex (arg1));
 }
 
@@ -160,7 +160,7 @@ static void _call_f_operator_excl__eq__c3090 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QXmlNodeModelIndex *)cls)->operator!= (arg1));
 }
 
@@ -179,7 +179,7 @@ static void _call_f_operator_eq__eq__c3090 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNodeModelIndex &arg1 = args.read<const QXmlNodeModelIndex & > (heap);
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
   ret.write<bool > ((bool)((QXmlNodeModelIndex *)cls)->operator== (arg1));
 }
 

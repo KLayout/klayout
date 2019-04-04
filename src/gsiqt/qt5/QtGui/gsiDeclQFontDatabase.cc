@@ -69,8 +69,8 @@ static void _call_f_bold_c3942 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QFontDatabase *)cls)->bold (arg1, arg2));
 }
 
@@ -89,7 +89,7 @@ static void _call_f_families_c3214 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & > (heap) : (const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type &)(qt_gsi::CppToQtReadAdaptor<QFontDatabase::WritingSystem>(heap, QFontDatabase::Any));
+  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QFontDatabase::WritingSystem>(heap, QFontDatabase::Any), heap);
   ret.write<QStringList > ((QStringList)((QFontDatabase *)cls)->families (qt_gsi::QtToCppAdaptor<QFontDatabase::WritingSystem>(arg1).cref()));
 }
 
@@ -112,9 +112,9 @@ static void _call_f_font_c4601 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  int arg3 = args.read<int > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QFont > ((QFont)((QFontDatabase *)cls)->font (arg1, arg2, arg3));
 }
 
@@ -133,7 +133,7 @@ static void _call_f_hasFamily_c2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QFontDatabase *)cls)->hasFamily (arg1));
 }
 
@@ -154,8 +154,8 @@ static void _call_f_isBitmapScalable_c3942 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<bool > ((bool)((QFontDatabase *)cls)->isBitmapScalable (arg1, arg2));
 }
 
@@ -176,8 +176,8 @@ static void _call_f_isFixedPitch_c3942 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<bool > ((bool)((QFontDatabase *)cls)->isFixedPitch (arg1, arg2));
 }
 
@@ -196,7 +196,7 @@ static void _call_f_isPrivateFamily_c2025 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QFontDatabase *)cls)->isPrivateFamily (arg1));
 }
 
@@ -217,8 +217,8 @@ static void _call_f_isScalable_c3942 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<bool > ((bool)((QFontDatabase *)cls)->isScalable (arg1, arg2));
 }
 
@@ -239,8 +239,8 @@ static void _call_f_isSmoothlyScalable_c3942 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<bool > ((bool)((QFontDatabase *)cls)->isSmoothlyScalable (arg1, arg2));
 }
 
@@ -261,8 +261,8 @@ static void _call_f_italic_c3942 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QFontDatabase *)cls)->italic (arg1, arg2));
 }
 
@@ -283,8 +283,8 @@ static void _call_f_pointSizes_3942 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args ? args.read<const QString & > (heap) : (const QString &)(QString());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QList<int> > ((QList<int>)((QFontDatabase *)cls)->pointSizes (arg1, arg2));
 }
 
@@ -305,8 +305,8 @@ static void _call_f_smoothSizes_3942 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QList<int> > ((QList<int>)((QFontDatabase *)cls)->smoothSizes (arg1, arg2));
 }
 
@@ -325,7 +325,7 @@ static void _call_f_styleString_1801 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   ret.write<QString > ((QString)((QFontDatabase *)cls)->styleString (arg1));
 }
 
@@ -344,7 +344,7 @@ static void _call_f_styleString_2197 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFontInfo &arg1 = args.read<const QFontInfo & > (heap);
+  const QFontInfo &arg1 = gsi::arg_reader<const QFontInfo & >() (args, heap);
   ret.write<QString > ((QString)((QFontDatabase *)cls)->styleString (arg1));
 }
 
@@ -363,7 +363,7 @@ static void _call_f_styles_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QStringList > ((QStringList)((QFontDatabase *)cls)->styles (arg1));
 }
 
@@ -384,8 +384,8 @@ static void _call_f_weight_c3942 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)((QFontDatabase *)cls)->weight (arg1, arg2));
 }
 
@@ -419,7 +419,7 @@ static void _call_f_writingSystems_c2025 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QList<QFontDatabase::WritingSystem> > ((QList<QFontDatabase::WritingSystem>)((QFontDatabase *)cls)->writingSystems (arg1));
 }
 
@@ -438,7 +438,7 @@ static void _call_f_addApplicationFont_2025 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<int > ((int)QFontDatabase::addApplicationFont (arg1));
 }
 
@@ -457,7 +457,7 @@ static void _call_f_addApplicationFontFromData_2309 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QByteArray &arg1 = args.read<const QByteArray & > (heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   ret.write<int > ((int)QFontDatabase::addApplicationFontFromData (arg1));
 }
 
@@ -476,7 +476,7 @@ static void _call_f_applicationFontFamilies_767 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QStringList > ((QStringList)QFontDatabase::applicationFontFamilies (arg1));
 }
 
@@ -510,7 +510,7 @@ static void _call_f_removeApplicationFont_767 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)QFontDatabase::removeApplicationFont (arg1));
 }
 
@@ -559,7 +559,7 @@ static void _call_f_systemFont_2881 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFontDatabase::SystemFont>::target_type & arg1 = args.read<const qt_gsi::Converter<QFontDatabase::SystemFont>::target_type & > (heap);
+  const qt_gsi::Converter<QFontDatabase::SystemFont>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFontDatabase::SystemFont>::target_type & >() (args, heap);
   ret.write<QFont > ((QFont)QFontDatabase::systemFont (qt_gsi::QtToCppAdaptor<QFontDatabase::SystemFont>(arg1).cref()));
 }
 
@@ -578,7 +578,7 @@ static void _call_f_writingSystemName_3214 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = args.read<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & > (heap);
+  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QFontDatabase::writingSystemName (qt_gsi::QtToCppAdaptor<QFontDatabase::WritingSystem>(arg1).cref()));
 }
 
@@ -597,7 +597,7 @@ static void _call_f_writingSystemSample_3214 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = args.read<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & > (heap);
+  const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFontDatabase::WritingSystem>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QFontDatabase::writingSystemSample (qt_gsi::QtToCppAdaptor<QFontDatabase::WritingSystem>(arg1).cref()));
 }
 

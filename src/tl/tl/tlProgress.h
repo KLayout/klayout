@@ -92,7 +92,7 @@ class Progress;
  *  This class also allows for some kind of background processing:
  *  once the test() method is called, the 
  *  adaptor's yield() method is called once that "yield_interval" 
- *  calls have passed. The yield_interval value should be choosen
+ *  calls have passed. The yield_interval value should be chosen
  *  sufficiently large so that no performance penalty is to be paid
  *  for this. In addition, each test() call tests whether
  *  the operation may have been cancelled and may throw an 
@@ -371,7 +371,7 @@ public:
   /**
    *  @brief Set the format unit
    *
-   *  This is the unit used for formatted output. This allows to separate the format value
+   *  This is the unit used for formatted output. This allows separating the format value
    *  from the bar value which is percent.
    */
   void set_format_unit (double unit)

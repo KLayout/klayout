@@ -74,8 +74,8 @@ static void _call_f_addMapping_1974 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  int arg2 = args.read<int > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->addMapping (arg1, arg2);
 }
@@ -99,9 +99,9 @@ static void _call_f_addMapping_4175 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
-  int arg2 = args.read<int > (heap);
-  const QByteArray &arg3 = args.read<const QByteArray & > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QByteArray &arg3 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->addMapping (arg1, arg2, arg3);
 }
@@ -167,7 +167,7 @@ static void _call_f_mappedPropertyName_c1315 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QDataWidgetMapper *)cls)->mappedPropertyName (arg1));
 }
 
@@ -186,7 +186,7 @@ static void _call_f_mappedSection_c1315 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   ret.write<int > ((int)((QDataWidgetMapper *)cls)->mappedSection (arg1));
 }
 
@@ -205,7 +205,7 @@ static void _call_f_mappedWidgetAt_c767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QWidget * > ((QWidget *)((QDataWidgetMapper *)cls)->mappedWidgetAt (arg1));
 }
 
@@ -254,7 +254,7 @@ static void _call_f_removeMapping_1315 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args.read<QWidget * > (heap);
+  QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->removeMapping (arg1);
 }
@@ -305,7 +305,7 @@ static void _call_f_setCurrentIndex_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->setCurrentIndex (arg1);
 }
@@ -325,7 +325,7 @@ static void _call_f_setCurrentModelIndex_2395 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->setCurrentModelIndex (arg1);
 }
@@ -345,7 +345,7 @@ static void _call_f_setItemDelegate_2717 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemDelegate *arg1 = args.read<QAbstractItemDelegate * > (heap);
+  QAbstractItemDelegate *arg1 = gsi::arg_reader<QAbstractItemDelegate * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->setItemDelegate (arg1);
 }
@@ -365,7 +365,7 @@ static void _call_f_setModel_2419 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractItemModel *arg1 = args.read<QAbstractItemModel * > (heap);
+  QAbstractItemModel *arg1 = gsi::arg_reader<QAbstractItemModel * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->setModel (arg1);
 }
@@ -385,7 +385,7 @@ static void _call_f_setOrientation_1913 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Orientation>::target_type & > (heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->setOrientation (qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg1).cref());
 }
@@ -405,7 +405,7 @@ static void _call_f_setRootIndex_2395 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QModelIndex &arg1 = args.read<const QModelIndex & > (heap);
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->setRootIndex (arg1);
 }
@@ -425,7 +425,7 @@ static void _call_f_setSubmitPolicy_3488 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QDataWidgetMapper::SubmitPolicy>::target_type & arg1 = args.read<const qt_gsi::Converter<QDataWidgetMapper::SubmitPolicy>::target_type & > (heap);
+  const qt_gsi::Converter<QDataWidgetMapper::SubmitPolicy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDataWidgetMapper::SubmitPolicy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QDataWidgetMapper *)cls)->setSubmitPolicy (qt_gsi::QtToCppAdaptor<QDataWidgetMapper::SubmitPolicy>(arg1).cref());
 }
@@ -541,8 +541,8 @@ static void _call_f_tr_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QDataWidgetMapper::tr (arg1, arg2));
 }
 
@@ -565,9 +565,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QDataWidgetMapper::tr (arg1, arg2, arg3));
 }
 
@@ -588,8 +588,8 @@ static void _call_f_trUtf8_3354 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<QString > ((QString)QDataWidgetMapper::trUtf8 (arg1, arg2));
 }
 
@@ -612,9 +612,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
-  int arg3 = args.read<int > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)QDataWidgetMapper::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -840,7 +840,7 @@ static void _call_ctor_QDataWidgetMapper_Adaptor_1302 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QDataWidgetMapper_Adaptor *> (new QDataWidgetMapper_Adaptor (arg1));
 }
 
@@ -882,7 +882,7 @@ static void _call_emitter_currentIndexChanged_767 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QDataWidgetMapper_Adaptor *)cls)->emitter_QDataWidgetMapper_currentIndexChanged_767 (arg1);
 }
 
@@ -924,7 +924,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QDataWidgetMapper_Adaptor *)cls)->emitter_QDataWidgetMapper_destroyed_1302 (arg1);
 }
 
@@ -1015,7 +1015,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QDataWidgetMapper_Adaptor *)cls)->fp_QDataWidgetMapper_receivers_c1731 (arg1));
 }
 

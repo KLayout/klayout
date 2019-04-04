@@ -84,7 +84,7 @@ struct InputModeConverter
     case IMVisible:
       return "visible";
     case IMSpecific:
-      return "specifc";
+      return "specific";
     default:
       return "";
     }
@@ -1404,7 +1404,7 @@ XORToolDialog::run_xor ()
         if (mp_view && output_mode == OMMarkerDatabase) {
           mp_view->remove_rdb (rdb_index);
         }
-        throw tl::Exception (tl::to_string (QObject::tr ("Errors occured during processing. First error message says:\n")) + job.error_messages ().front ());
+        throw tl::Exception (tl::to_string (QObject::tr ("Errors occurred during processing. First error message says:\n")) + job.error_messages ().front ());
       }
 
       //  apply healing if required

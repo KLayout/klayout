@@ -67,8 +67,8 @@ static void _call_ctor_QSizePolicy_4476 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap);
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg2 = args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap);
   ret.write<QSizePolicy *> (new QSizePolicy (qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg1).cref(), qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg2).cref()));
 }
 
@@ -91,9 +91,9 @@ static void _call_ctor_QSizePolicy_7191 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap);
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg2 = args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap);
-  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg3 = args.read<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & > (heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap);
+  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg3 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & >() (args, heap);
   ret.write<QSizePolicy *> (new QSizePolicy (qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg1).cref(), qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg2).cref(), qt_gsi::QtToCppAdaptor<QSizePolicy::ControlType>(arg3).cref()));
 }
 
@@ -187,7 +187,7 @@ static void _call_f_operator_excl__eq__c2429 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizePolicy &arg1 = args.read<const QSizePolicy & > (heap);
+  const QSizePolicy &arg1 = gsi::arg_reader<const QSizePolicy & >() (args, heap);
   ret.write<bool > ((bool)((QSizePolicy *)cls)->operator!= (arg1));
 }
 
@@ -206,7 +206,7 @@ static void _call_f_operator_eq__eq__c2429 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QSizePolicy &arg1 = args.read<const QSizePolicy & > (heap);
+  const QSizePolicy &arg1 = gsi::arg_reader<const QSizePolicy & >() (args, heap);
   ret.write<bool > ((bool)((QSizePolicy *)cls)->operator== (arg1));
 }
 
@@ -225,7 +225,7 @@ static void _call_f_setControlType_2823 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg1 = args.read<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & > (heap);
+  const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::ControlType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizePolicy *)cls)->setControlType (qt_gsi::QtToCppAdaptor<QSizePolicy::ControlType>(arg1).cref());
 }
@@ -245,7 +245,7 @@ static void _call_f_setHeightForWidth_864 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizePolicy *)cls)->setHeightForWidth (arg1);
 }
@@ -265,7 +265,7 @@ static void _call_f_setHorizontalPolicy_2292 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizePolicy *)cls)->setHorizontalPolicy (qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg1).cref());
 }
@@ -285,7 +285,7 @@ static void _call_f_setHorizontalStretch_1855 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned char arg1 = args.read<unsigned char > (heap);
+  unsigned char arg1 = gsi::arg_reader<unsigned char >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizePolicy *)cls)->setHorizontalStretch (arg1);
 }
@@ -305,7 +305,7 @@ static void _call_f_setVerticalPolicy_2292 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = args.read<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & > (heap);
+  const qt_gsi::Converter<QSizePolicy::Policy>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSizePolicy::Policy>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizePolicy *)cls)->setVerticalPolicy (qt_gsi::QtToCppAdaptor<QSizePolicy::Policy>(arg1).cref());
 }
@@ -325,7 +325,7 @@ static void _call_f_setVerticalStretch_1855 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned char arg1 = args.read<unsigned char > (heap);
+  unsigned char arg1 = gsi::arg_reader<unsigned char >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSizePolicy *)cls)->setVerticalStretch (arg1);
 }

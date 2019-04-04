@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionToolButton_3606 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionToolButton &arg1 = args.read<const QStyleOptionToolButton & > (heap);
+  const QStyleOptionToolButton &arg1 = gsi::arg_reader<const QStyleOptionToolButton & >() (args, heap);
   ret.write<QStyleOptionToolButton *> (new QStyleOptionToolButton (arg1));
 }
 

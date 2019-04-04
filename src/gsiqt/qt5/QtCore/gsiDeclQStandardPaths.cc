@@ -50,7 +50,7 @@ static void _call_f_displayName_3604 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = args.read<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & > (heap);
+  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QStandardPaths::displayName (qt_gsi::QtToCppAdaptor<QStandardPaths::StandardLocation>(arg1).cref()));
 }
 
@@ -69,7 +69,7 @@ static void _call_f_enableTestMode_864 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QStandardPaths::enableTestMode (arg1);
 }
@@ -91,8 +91,8 @@ static void _call_f_findExecutable_4354 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QStringList &arg2 = args ? args.read<const QStringList & > (heap) : (const QStringList &)(QStringList());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QStringList &arg2 = args ? gsi::arg_reader<const QStringList & >() (args, heap) : gsi::arg_maker<const QStringList & >() (QStringList(), heap);
   ret.write<QString > ((QString)QStandardPaths::findExecutable (arg1, arg2));
 }
 
@@ -130,9 +130,9 @@ static void _call_f_locate_9304 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = args.read<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  QFlags<QStandardPaths::LocateOption> arg3 = args ? args.read<QFlags<QStandardPaths::LocateOption> > (heap) : (QFlags<QStandardPaths::LocateOption>)(QStandardPaths::LocateFile);
+  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QStandardPaths::LocateOption> arg3 = args ? gsi::arg_reader<QFlags<QStandardPaths::LocateOption> >() (args, heap) : gsi::arg_maker<QFlags<QStandardPaths::LocateOption> >() (QStandardPaths::LocateFile, heap);
   ret.write<QString > ((QString)QStandardPaths::locate (qt_gsi::QtToCppAdaptor<QStandardPaths::StandardLocation>(arg1).cref(), arg2, arg3));
 }
 
@@ -155,9 +155,9 @@ static void _call_f_locateAll_9304 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = args.read<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
-  QFlags<QStandardPaths::LocateOption> arg3 = args ? args.read<QFlags<QStandardPaths::LocateOption> > (heap) : (QFlags<QStandardPaths::LocateOption>)(QStandardPaths::LocateFile);
+  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  QFlags<QStandardPaths::LocateOption> arg3 = args ? gsi::arg_reader<QFlags<QStandardPaths::LocateOption> >() (args, heap) : gsi::arg_maker<QFlags<QStandardPaths::LocateOption> >() (QStandardPaths::LocateFile, heap);
   ret.write<QStringList > ((QStringList)QStandardPaths::locateAll (qt_gsi::QtToCppAdaptor<QStandardPaths::StandardLocation>(arg1).cref(), arg2, arg3));
 }
 
@@ -176,7 +176,7 @@ static void _call_f_setTestModeEnabled_864 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QStandardPaths::setTestModeEnabled (arg1);
 }
@@ -196,7 +196,7 @@ static void _call_f_standardLocations_3604 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = args.read<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & > (heap);
+  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & >() (args, heap);
   ret.write<QStringList > ((QStringList)QStandardPaths::standardLocations (qt_gsi::QtToCppAdaptor<QStandardPaths::StandardLocation>(arg1).cref()));
 }
 
@@ -215,7 +215,7 @@ static void _call_f_writableLocation_3604 (const qt_gsi::GenericStaticMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = args.read<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & > (heap);
+  const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QStandardPaths::StandardLocation>::target_type & >() (args, heap);
   ret.write<QString > ((QString)QStandardPaths::writableLocation (qt_gsi::QtToCppAdaptor<QStandardPaths::StandardLocation>(arg1).cref()));
 }
 

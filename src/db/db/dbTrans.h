@@ -739,7 +739,7 @@ public:
   /**
    *  @brief The copy constructor that converts also
    *
-   *  The copy constructor allows to convert between different
+   *  The copy constructor allows converting between different
    *  coordinate types, if possible.
    *
    *  @param d The source from which to copy
@@ -1093,7 +1093,7 @@ public:
   /**
    *  @brief The copy constructor that converts to a different coordinate type also
    *
-   *  The copy constructor allows to convert between different
+   *  The copy constructor allows converting between different
    *  coordinate types, if possible.
    *
    *  @param d The source from which to copy
@@ -1433,7 +1433,7 @@ operator<< (std::ostream &os, const simple_trans<C> &t)
 /**
  *  @brief A complex transformation
  *
- *  A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitary
+ *  A complex transformation provides magnification, mirroring at the x-axis, rotation by an arbitrary
  *  angle and a displacement. The template parameters for this transformation are
  *  I (the input coordinate type), F (the output coordinate type) and R (the representation
  *  type used internally for representing the floating-point members).
@@ -1625,7 +1625,7 @@ public:
   /**
    *  @brief The copy constructor that converts also
    *
-   *  The copy constructor allows to convert between different
+   *  The copy constructor allows converting between different
    *  coordinate types, if possible.
    *
    *  @param d The source from which to copy
@@ -2134,7 +2134,7 @@ public:
   /**
    *  @brief String conversion
    *
-   *  The lazy and micron flags allow to customize the output somewhat.
+   *  The lazy and micron flags allow customization of the output to some degree.
    *  When lazy is set to true, output that is not required (i.e. magnification when 1)
    *  is dropped. If dbu is set, the coordinates are multiplied with this factor to render micron units.
    */

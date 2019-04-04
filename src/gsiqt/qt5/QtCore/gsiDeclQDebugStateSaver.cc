@@ -51,7 +51,7 @@ static void _call_ctor_QDebugStateSaver_1186 (const qt_gsi::GenericStaticMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDebug &arg1 = args.read<QDebug & > (heap);
+  QDebug &arg1 = gsi::arg_reader<QDebug & >() (args, heap);
   ret.write<QDebugStateSaver *> (new QDebugStateSaver (arg1));
 }
 

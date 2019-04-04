@@ -63,7 +63,7 @@ public:
    *  This method can be overloaded by derived classes to provide actions
    *  for activation of the dialog, like setup of the controls etc.
    *  This handler is called immediately before the dialog becomes visible.
-   *  The 'active' method allows to query if the dialog is active.
+   *  The 'active' method returns a value indicating whether the dialog is active.
    */
   virtual void activated () 
   {

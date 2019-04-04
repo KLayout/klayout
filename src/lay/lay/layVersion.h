@@ -29,7 +29,7 @@
 namespace lay {
 
 /**
- *  @brief This class provides the program's version informations
+ *  @brief This class provides the program's version information
  */
 
 class LAY_PUBLIC Version

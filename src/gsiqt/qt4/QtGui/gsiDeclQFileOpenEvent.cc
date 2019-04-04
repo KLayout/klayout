@@ -124,7 +124,7 @@ static void _call_ctor_QFileOpenEvent_Adaptor_2025 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QFileOpenEvent_Adaptor *> (new QFileOpenEvent_Adaptor (arg1));
 }
 
@@ -142,7 +142,7 @@ static void _call_ctor_QFileOpenEvent_Adaptor_1701 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QFileOpenEvent_Adaptor *> (new QFileOpenEvent_Adaptor (arg1));
 }
 

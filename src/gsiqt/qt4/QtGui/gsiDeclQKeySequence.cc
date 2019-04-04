@@ -65,7 +65,7 @@ static void _call_ctor_QKeySequence_2025 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QKeySequence *> (new QKeySequence (arg1));
 }
 
@@ -90,10 +90,10 @@ static void _call_ctor_QKeySequence_2744 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args ? args.read<int > (heap) : (int)(0);
-  int arg3 = args ? args.read<int > (heap) : (int)(0);
-  int arg4 = args ? args.read<int > (heap) : (int)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
+  int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   ret.write<QKeySequence *> (new QKeySequence (arg1, arg2, arg3, arg4));
 }
 
@@ -112,7 +112,7 @@ static void _call_ctor_QKeySequence_2516 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<QKeySequence *> (new QKeySequence (arg1));
 }
 
@@ -131,7 +131,7 @@ static void _call_ctor_QKeySequence_2869 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & arg1 = args.read<const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & > (heap);
+  const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & >() (args, heap);
   ret.write<QKeySequence *> (new QKeySequence (qt_gsi::QtToCppAdaptor<QKeySequence::StandardKey>(arg1).cref()));
 }
 
@@ -195,7 +195,7 @@ static void _call_f_matches_c2516 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<qt_gsi::Converter<QKeySequence::SequenceMatch>::target_type > ((qt_gsi::Converter<QKeySequence::SequenceMatch>::target_type)qt_gsi::CppToQtAdaptor<QKeySequence::SequenceMatch>(((QKeySequence *)cls)->matches (arg1)));
 }
 
@@ -214,7 +214,7 @@ static void _call_f_operator_excl__eq__c2516 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<bool > ((bool)((QKeySequence *)cls)->operator!= (arg1));
 }
 
@@ -233,7 +233,7 @@ static void _call_f_operator_lt__c2516 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<bool > ((bool)((QKeySequence *)cls)->operator< (arg1));
 }
 
@@ -252,7 +252,7 @@ static void _call_f_operator_lt__eq__c2516 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<bool > ((bool)((QKeySequence *)cls)->operator<= (arg1));
 }
 
@@ -271,7 +271,7 @@ static void _call_f_operator_eq__2516 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<QKeySequence & > ((QKeySequence &)((QKeySequence *)cls)->operator= (arg1));
 }
 
@@ -290,7 +290,7 @@ static void _call_f_operator_eq__eq__c2516 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<bool > ((bool)((QKeySequence *)cls)->operator== (arg1));
 }
 
@@ -309,7 +309,7 @@ static void _call_f_operator_gt__c2516 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<bool > ((bool)((QKeySequence *)cls)->operator> (arg1));
 }
 
@@ -328,7 +328,7 @@ static void _call_f_operator_gt__eq__c2516 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QKeySequence &arg1 = args.read<const QKeySequence & > (heap);
+  const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   ret.write<bool > ((bool)((QKeySequence *)cls)->operator>= (arg1));
 }
 
@@ -347,7 +347,7 @@ static void _call_f_operator_index__c1772 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  unsigned int arg1 = args.read<unsigned int > (heap);
+  unsigned int arg1 = gsi::arg_reader<unsigned int >() (args, heap);
   ret.write<int > ((int)((QKeySequence *)cls)->operator[] (arg1));
 }
 
@@ -366,7 +366,7 @@ static void _call_f_toString_c3197 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & arg1 = args ? args.read<const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & > (heap) : (const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QKeySequence::SequenceFormat>(heap, QKeySequence::PortableText));
+  const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & arg1 = args ? gsi::arg_reader<const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QKeySequence::SequenceFormat>(heap, QKeySequence::PortableText), heap);
   ret.write<QString > ((QString)((QKeySequence *)cls)->toString (qt_gsi::QtToCppAdaptor<QKeySequence::SequenceFormat>(arg1).cref()));
 }
 
@@ -387,8 +387,8 @@ static void _call_f_fromString_5114 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & arg2 = args ? args.read<const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & > (heap) : (const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type &)(qt_gsi::CppToQtReadAdaptor<QKeySequence::SequenceFormat>(heap, QKeySequence::PortableText));
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QKeySequence::SequenceFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QKeySequence::SequenceFormat>(heap, QKeySequence::PortableText), heap);
   ret.write<QKeySequence > ((QKeySequence)QKeySequence::fromString (arg1, qt_gsi::QtToCppAdaptor<QKeySequence::SequenceFormat>(arg2).cref()));
 }
 
@@ -407,7 +407,7 @@ static void _call_f_keyBindings_2869 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & arg1 = args.read<const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & > (heap);
+  const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QKeySequence::StandardKey>::target_type & >() (args, heap);
   ret.write<QList<QKeySequence> > ((QList<QKeySequence>)QKeySequence::keyBindings (qt_gsi::QtToCppAdaptor<QKeySequence::StandardKey>(arg1).cref()));
 }
 
@@ -426,7 +426,7 @@ static void _call_f_mnemonic_2025 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QKeySequence > ((QKeySequence)QKeySequence::mnemonic (arg1));
 }
 

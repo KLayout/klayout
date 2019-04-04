@@ -343,8 +343,8 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
     get_string (m_cellname);
 
-    //  if the first cell is the dummy cell containing the context informations
-    //  read this cell in a special way and store the context informations separately.
+    //  if the first cell is the dummy cell containing the context information
+    //  read this cell in a special way and store the context information separately.
     if (first_cell && m_cellname == "$$$CONTEXT_INFO$$$") {
 
       read_context_info_cell ();

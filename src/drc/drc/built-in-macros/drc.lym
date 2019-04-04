@@ -1365,7 +1365,7 @@ CODE
     # borders of the polygons of the second operand.
     #
     # The following images show the effect of the "and" method
-    # on polygons and egdes (layer1: red, layer2: blue):
+    # on polygons and edges (layer1: red, layer2: blue):
     #
     # @table
     #   @tr 
@@ -1392,7 +1392,7 @@ CODE
     # of the second operand.
     #
     # The following images show the effect of the "not" method
-    # on polygons and egdes (layer1: red, layer2: blue):
+    # on polygons and edges (layer1: red, layer2: blue):
     #
     # @table
     #   @tr 
@@ -1416,7 +1416,7 @@ CODE
     # This method is available for polygon and edge layers.
     #
     # The following images show the effect of the "xor" method
-    # on polygons and egdes (layer1: red, layer2: blue):
+    # on polygons and edges (layer1: red, layer2: blue):
     #
     # @table
     #   @tr 
@@ -1439,7 +1439,7 @@ CODE
     # This method is available for polygon and edge layers.
     #
     # The following images show the effect of the "or" method
-    # on polygons and egdes (layer1: red, layer2: blue):
+    # on polygons and edges (layer1: red, layer2: blue):
     #
     # @table
     #   @tr 
@@ -1462,7 +1462,7 @@ CODE
     # This method is available for polygon, edge and edge pair layers.
     #
     # The following images show the effect of the "join" method
-    # on polygons and egdes (layer1: red, layer2: blue):
+    # on polygons and edges (layer1: red, layer2: blue):
     #
     # @table
     #   @tr 

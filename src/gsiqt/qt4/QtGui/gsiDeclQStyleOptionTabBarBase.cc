@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionTabBarBase_3491 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTabBarBase &arg1 = args.read<const QStyleOptionTabBarBase & > (heap);
+  const QStyleOptionTabBarBase &arg1 = gsi::arg_reader<const QStyleOptionTabBarBase & >() (args, heap);
   ret.write<QStyleOptionTabBarBase *> (new QStyleOptionTabBarBase (arg1));
 }
 

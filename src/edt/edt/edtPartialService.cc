@@ -1647,7 +1647,7 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
 
       if (is_single_point_selection ()) {
         //  for a single selected point we use the original point as the start location which 
-        //  allows to bring a to grid
+        //  allows bringing a to grid
         m_current = m_start = single_selected_point ();
       } else {
         m_current = m_start = p;
@@ -1842,7 +1842,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
         if (is_single_point_selection ()) {
           //  for a single selected point we use the original point as the start location which 
-          //  allows to bring a to grid
+          //  allows bringing a to grid
           m_current = m_start = single_selected_point ();
         } else {
           m_current = m_start = p;

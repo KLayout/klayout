@@ -67,7 +67,7 @@ static void _call_ctor_QNetworkCacheMetaData_3377 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCacheMetaData &arg1 = args.read<const QNetworkCacheMetaData & > (heap);
+  const QNetworkCacheMetaData &arg1 = gsi::arg_reader<const QNetworkCacheMetaData & >() (args, heap);
   ret.write<QNetworkCacheMetaData *> (new QNetworkCacheMetaData (arg1));
 }
 
@@ -131,7 +131,7 @@ static void _call_f_operator_excl__eq__c3377 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCacheMetaData &arg1 = args.read<const QNetworkCacheMetaData & > (heap);
+  const QNetworkCacheMetaData &arg1 = gsi::arg_reader<const QNetworkCacheMetaData & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkCacheMetaData *)cls)->operator!= (arg1));
 }
 
@@ -150,7 +150,7 @@ static void _call_f_operator_eq__3377 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCacheMetaData &arg1 = args.read<const QNetworkCacheMetaData & > (heap);
+  const QNetworkCacheMetaData &arg1 = gsi::arg_reader<const QNetworkCacheMetaData & >() (args, heap);
   ret.write<QNetworkCacheMetaData & > ((QNetworkCacheMetaData &)((QNetworkCacheMetaData *)cls)->operator= (arg1));
 }
 
@@ -169,7 +169,7 @@ static void _call_f_operator_eq__eq__c3377 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkCacheMetaData &arg1 = args.read<const QNetworkCacheMetaData & > (heap);
+  const QNetworkCacheMetaData &arg1 = gsi::arg_reader<const QNetworkCacheMetaData & >() (args, heap);
   ret.write<bool > ((bool)((QNetworkCacheMetaData *)cls)->operator== (arg1));
 }
 
@@ -218,7 +218,7 @@ static void _call_f_setExpirationDate_2175 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCacheMetaData *)cls)->setExpirationDate (arg1);
 }
@@ -238,7 +238,7 @@ static void _call_f_setLastModified_2175 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QDateTime &arg1 = args.read<const QDateTime & > (heap);
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCacheMetaData *)cls)->setLastModified (arg1);
 }
@@ -258,7 +258,7 @@ static void _call_f_setRawHeaders_4991 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QNetworkCacheMetaData::RawHeader> &arg1 = args.read<const QList<QNetworkCacheMetaData::RawHeader> & > (heap);
+  const QList<QNetworkCacheMetaData::RawHeader> &arg1 = gsi::arg_reader<const QList<QNetworkCacheMetaData::RawHeader> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCacheMetaData *)cls)->setRawHeaders (arg1);
 }
@@ -278,7 +278,7 @@ static void _call_f_setSaveToDisk_864 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCacheMetaData *)cls)->setSaveToDisk (arg1);
 }
@@ -298,7 +298,7 @@ static void _call_f_setUrl_1701 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkCacheMetaData *)cls)->setUrl (arg1);
 }

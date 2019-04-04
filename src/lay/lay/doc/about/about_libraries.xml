@@ -26,7 +26,7 @@
   <p>
   When a layout containing library references is saved, KLayout stores
   some meta information in that file which allows it to restore the
-  library links and related informations.
+  library links and related information.
   For GDS, that meta information is stored in a separate top cell. For OASIS,
   the meta information is stored in special per-cell properties.
   For other formats, the meta information is not stored currently.

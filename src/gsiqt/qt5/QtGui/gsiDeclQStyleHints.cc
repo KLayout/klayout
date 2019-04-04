@@ -189,7 +189,7 @@ static void _call_f_setCursorFlashTime_767 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyleHints *)cls)->setCursorFlashTime (arg1);
 }
@@ -224,7 +224,7 @@ static void _call_f_setKeyboardInputInterval_767 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyleHints *)cls)->setKeyboardInputInterval (arg1);
 }
@@ -244,7 +244,7 @@ static void _call_f_setMouseDoubleClickInterval_767 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyleHints *)cls)->setMouseDoubleClickInterval (arg1);
 }
@@ -264,7 +264,7 @@ static void _call_f_setStartDragDistance_767 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyleHints *)cls)->setStartDragDistance (arg1);
 }
@@ -284,7 +284,7 @@ static void _call_f_setStartDragTime_767 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QStyleHints *)cls)->setStartDragTime (arg1);
 }
@@ -413,9 +413,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QStyleHints::tr (arg1, arg2, arg3));
 }
 
@@ -438,9 +438,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QStyleHints::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -693,7 +693,7 @@ static void _call_emitter_cursorFlashTimeChanged_767 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QStyleHints_Adaptor *)cls)->emitter_QStyleHints_cursorFlashTimeChanged_767 (arg1);
 }
 
@@ -735,7 +735,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QStyleHints_Adaptor *)cls)->emitter_QStyleHints_destroyed_1302 (arg1);
 }
 
@@ -826,7 +826,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QStyleHints_Adaptor *)cls)->fp_QStyleHints_isSignalConnected_c2394 (arg1));
 }
 
@@ -844,7 +844,7 @@ static void _call_emitter_keyboardInputIntervalChanged_767 (const qt_gsi::Generi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QStyleHints_Adaptor *)cls)->emitter_QStyleHints_keyboardInputIntervalChanged_767 (arg1);
 }
 
@@ -862,7 +862,7 @@ static void _call_emitter_mouseDoubleClickIntervalChanged_767 (const qt_gsi::Gen
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QStyleHints_Adaptor *)cls)->emitter_QStyleHints_mouseDoubleClickIntervalChanged_767 (arg1);
 }
 
@@ -880,7 +880,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QStyleHints_Adaptor *)cls)->fp_QStyleHints_receivers_c1731 (arg1));
 }
 
@@ -926,7 +926,7 @@ static void _call_emitter_startDragDistanceChanged_767 (const qt_gsi::GenericMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QStyleHints_Adaptor *)cls)->emitter_QStyleHints_startDragDistanceChanged_767 (arg1);
 }
 
@@ -944,7 +944,7 @@ static void _call_emitter_startDragTimeChanged_767 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QStyleHints_Adaptor *)cls)->emitter_QStyleHints_startDragTimeChanged_767 (arg1);
 }
 

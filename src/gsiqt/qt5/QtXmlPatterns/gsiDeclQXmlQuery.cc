@@ -75,7 +75,7 @@ static void _call_ctor_QXmlQuery_2233 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlQuery &arg1 = args.read<const QXmlQuery & > (heap);
+  const QXmlQuery &arg1 = gsi::arg_reader<const QXmlQuery & >() (args, heap);
   ret.write<QXmlQuery *> (new QXmlQuery (arg1));
 }
 
@@ -94,7 +94,7 @@ static void _call_ctor_QXmlQuery_2494 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNamePool &arg1 = args.read<const QXmlNamePool & > (heap);
+  const QXmlNamePool &arg1 = gsi::arg_reader<const QXmlNamePool & >() (args, heap);
   ret.write<QXmlQuery *> (new QXmlQuery (arg1));
 }
 
@@ -115,8 +115,8 @@ static void _call_ctor_QXmlQuery_5196 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QXmlQuery::QueryLanguage>::target_type & arg1 = args.read<const qt_gsi::Converter<QXmlQuery::QueryLanguage>::target_type & > (heap);
-  const QXmlNamePool &arg2 = args ? args.read<const QXmlNamePool & > (heap) : (const QXmlNamePool &)(QXmlNamePool());
+  const qt_gsi::Converter<QXmlQuery::QueryLanguage>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QXmlQuery::QueryLanguage>::target_type & >() (args, heap);
+  const QXmlNamePool &arg2 = args ? gsi::arg_reader<const QXmlNamePool & >() (args, heap) : gsi::arg_maker<const QXmlNamePool & >() (QXmlNamePool(), heap);
   ret.write<QXmlQuery *> (new QXmlQuery (qt_gsi::QtToCppAdaptor<QXmlQuery::QueryLanguage>(arg1).cref(), arg2));
 }
 
@@ -137,8 +137,8 @@ static void _call_f_bindVariable_4074 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
-  const QXmlItem &arg2 = args.read<const QXmlItem & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
+  const QXmlItem &arg2 = gsi::arg_reader<const QXmlItem & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->bindVariable (arg1, arg2);
 }
@@ -160,8 +160,8 @@ static void _call_f_bindVariable_4015 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QXmlItem &arg2 = args.read<const QXmlItem & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QXmlItem &arg2 = gsi::arg_reader<const QXmlItem & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->bindVariable (arg1, arg2);
 }
@@ -183,8 +183,8 @@ static void _call_f_bindVariable_3423 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
-  QIODevice *arg2 = args.read<QIODevice * > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
+  QIODevice *arg2 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->bindVariable (arg1, arg2);
 }
@@ -206,8 +206,8 @@ static void _call_f_bindVariable_3364 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  QIODevice *arg2 = args.read<QIODevice * > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  QIODevice *arg2 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->bindVariable (arg1, arg2);
 }
@@ -229,8 +229,8 @@ static void _call_f_bindVariable_4209 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
-  const QXmlQuery &arg2 = args.read<const QXmlQuery & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
+  const QXmlQuery &arg2 = gsi::arg_reader<const QXmlQuery & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->bindVariable (arg1, arg2);
 }
@@ -252,8 +252,8 @@ static void _call_f_bindVariable_4150 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QXmlQuery &arg2 = args.read<const QXmlQuery & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QXmlQuery &arg2 = gsi::arg_reader<const QXmlQuery & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->bindVariable (arg1, arg2);
 }
@@ -273,7 +273,7 @@ static void _call_f_evaluateTo_c2161 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QXmlResultItems *arg1 = args.read<QXmlResultItems * > (heap);
+  QXmlResultItems *arg1 = gsi::arg_reader<QXmlResultItems * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->evaluateTo (arg1);
 }
@@ -293,7 +293,7 @@ static void _call_f_evaluateTo_c2649 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractXmlReceiver *arg1 = args.read<QAbstractXmlReceiver * > (heap);
+  QAbstractXmlReceiver *arg1 = gsi::arg_reader<QAbstractXmlReceiver * >() (args, heap);
   ret.write<bool > ((bool)((QXmlQuery *)cls)->evaluateTo (arg1));
 }
 
@@ -312,7 +312,7 @@ static void _call_f_evaluateTo_c1746 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QStringList *arg1 = args.read<QStringList * > (heap);
+  QStringList *arg1 = gsi::arg_reader<QStringList * >() (args, heap);
   ret.write<bool > ((bool)((QXmlQuery *)cls)->evaluateTo (arg1));
 }
 
@@ -331,7 +331,7 @@ static void _call_f_evaluateTo_c1447 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<bool > ((bool)((QXmlQuery *)cls)->evaluateTo (arg1));
 }
 
@@ -350,7 +350,7 @@ static void _call_f_evaluateTo_c1334 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString *arg1 = args.read<QString * > (heap);
+  QString *arg1 = gsi::arg_reader<QString * >() (args, heap);
   ret.write<bool > ((bool)((QXmlQuery *)cls)->evaluateTo (arg1));
 }
 
@@ -444,7 +444,7 @@ static void _call_f_operator_eq__2233 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlQuery &arg1 = args.read<const QXmlQuery & > (heap);
+  const QXmlQuery &arg1 = gsi::arg_reader<const QXmlQuery & >() (args, heap);
   ret.write<QXmlQuery & > ((QXmlQuery &)((QXmlQuery *)cls)->operator= (arg1));
 }
 
@@ -478,7 +478,7 @@ static void _call_f_setFocus_2098 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlItem &arg1 = args.read<const QXmlItem & > (heap);
+  const QXmlItem &arg1 = gsi::arg_reader<const QXmlItem & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->setFocus (arg1);
 }
@@ -498,7 +498,7 @@ static void _call_f_setFocus_1701 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<bool > ((bool)((QXmlQuery *)cls)->setFocus (arg1));
 }
 
@@ -517,7 +517,7 @@ static void _call_f_setFocus_1447 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   ret.write<bool > ((bool)((QXmlQuery *)cls)->setFocus (arg1));
 }
 
@@ -536,7 +536,7 @@ static void _call_f_setFocus_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)((QXmlQuery *)cls)->setFocus (arg1));
 }
 
@@ -555,7 +555,7 @@ static void _call_f_setInitialTemplateName_2084 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->setInitialTemplateName (arg1);
 }
@@ -575,7 +575,7 @@ static void _call_f_setInitialTemplateName_2025 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->setInitialTemplateName (arg1);
 }
@@ -595,7 +595,7 @@ static void _call_f_setMessageHandler_2934 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAbstractMessageHandler *arg1 = args.read<QAbstractMessageHandler * > (heap);
+  QAbstractMessageHandler *arg1 = gsi::arg_reader<QAbstractMessageHandler * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->setMessageHandler (arg1);
 }
@@ -615,7 +615,7 @@ static void _call_f_setNetworkAccessManager_2742 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkAccessManager *arg1 = args.read<QNetworkAccessManager * > (heap);
+  QNetworkAccessManager *arg1 = gsi::arg_reader<QNetworkAccessManager * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->setNetworkAccessManager (arg1);
 }
@@ -637,8 +637,8 @@ static void _call_f_setQuery_3618 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
-  const QUrl &arg2 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QUrl &arg2 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->setQuery (arg1, arg2);
 }
@@ -660,8 +660,8 @@ static void _call_f_setQuery_3040 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const QUrl &arg2 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const QUrl &arg2 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->setQuery (arg1, arg2);
 }
@@ -683,8 +683,8 @@ static void _call_f_setQuery_3294 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
-  const QUrl &arg2 = args ? args.read<const QUrl & > (heap) : (const QUrl &)(QUrl());
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
+  const QUrl &arg2 = args ? gsi::arg_reader<const QUrl & >() (args, heap) : gsi::arg_maker<const QUrl & >() (QUrl(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->setQuery (arg1, arg2);
 }
@@ -704,7 +704,7 @@ static void _call_f_setUriResolver_3372 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAbstractUriResolver *arg1 = args.read<const QAbstractUriResolver * > (heap);
+  const QAbstractUriResolver *arg1 = gsi::arg_reader<const QAbstractUriResolver * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlQuery *)cls)->setUriResolver (arg1);
 }

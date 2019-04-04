@@ -1365,7 +1365,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "@brief Iterates over the edges of the object\n"
     "\n"
     "This method applies to polygons and simple polygons and delivers all edges that form the polygon's contours. "
-    "Hole edges are oriented counterclockwise while hull egdes are oriented clockwise.\n"
+    "Hole edges are oriented counterclockwise while hull edges are oriented clockwise.\n"
     "\n"
     "It will throw an exception if the object is not a polygon.\n"
   ) +
@@ -1383,7 +1383,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method applies to polygons and simple polygons and delivers all edges that form the given contour of the polygon. "
     "The hull has contour number 0, the first hole has contour 1 etc.\n"
-    "Hole edges are oriented counterclockwise while hull egdes are oriented clockwise.\n"
+    "Hole edges are oriented counterclockwise while hull edges are oriented clockwise.\n"
     "\n"
     "It will throw an exception if the object is not a polygon.\n"
     "\n"

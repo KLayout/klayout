@@ -95,7 +95,7 @@ public:
    *  @brief Invalidate the bounding boxes
    *
    *  This method is supposed to be called by shape containers for example if 
-   *  some event has occured that changed the bounding boxes.
+   *  some event has occurred that changed the bounding boxes.
    *
    *  If the index is std::numeric_limits<unsigned int>::max, this method
    *  applies to all layers.

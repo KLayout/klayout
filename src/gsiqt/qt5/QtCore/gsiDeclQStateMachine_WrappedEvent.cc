@@ -121,8 +121,8 @@ static void _call_ctor_QStateMachine_WrappedEvent_Adaptor_2411 (const qt_gsi::Ge
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
   ret.write<QStateMachine_WrappedEvent_Adaptor *> (new QStateMachine_WrappedEvent_Adaptor (arg1, arg2));
 }
 

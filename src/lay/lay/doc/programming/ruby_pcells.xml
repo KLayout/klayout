@@ -226,7 +226,7 @@ end</pre>
   having to write "RBA::" in front of the class names.
   </p>
   
-  <p>The initialization of the object is alreay a very important step. First, it 
+  <p>The initialization of the object is already a very important step. First, it 
   must initialize the super class. Then it has to declare the PCell parameters.
   Each PCell has a set of parameters that define the appearance of the PCell.
   Parameters have a symbolic name, a type, a description and optionally a default
@@ -283,7 +283,7 @@ end</pre>
   The parameter declaration will create accessor methods for each parameter. These accessor methods can be
   used to get and set the current value of the parameter inside the production method and other methods.
   For that, it will use the symbolic name of the parameter. The setter is called "set_x" (where x is the parameter
-  name). Although Ruby would allow to use "x=" to mimic an assignment, this option leads to some confusion
+  name). Although Ruby would allow using "x=" to mimic an assignment, this option leads to some confusion
   with definition of local variables and was not considered here. The following methods are created in the sample:
   </p>
 

@@ -94,7 +94,7 @@ static void _call_f_isObscuredBy_c2614 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QGraphicsItem *arg1 = args.read<const QGraphicsItem * > (heap);
+  const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
   ret.write<bool > ((bool)((QAbstractGraphicsShapeItem *)cls)->isObscuredBy (arg1));
 }
 
@@ -143,7 +143,7 @@ static void _call_f_setBrush_1910 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QBrush &arg1 = args.read<const QBrush & > (heap);
+  const QBrush &arg1 = gsi::arg_reader<const QBrush & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractGraphicsShapeItem *)cls)->setBrush (arg1);
 }
@@ -163,7 +163,7 @@ static void _call_f_setPen_1685 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QPen &arg1 = args.read<const QPen & > (heap);
+  const QPen &arg1 = gsi::arg_reader<const QPen & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractGraphicsShapeItem *)cls)->setPen (arg1);
 }
@@ -815,8 +815,8 @@ static void _call_ctor_QAbstractGraphicsShapeItem_Adaptor_3825 (const qt_gsi::Ge
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? args.read<QGraphicsItem * > (heap) : (QGraphicsItem *)(0);
-  QGraphicsScene *arg2 = args ? args.read<QGraphicsScene * > (heap) : (QGraphicsScene *)(0);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsScene *arg2 = args ? gsi::arg_reader<QGraphicsScene * >() (args, heap) : gsi::arg_maker<QGraphicsScene * >() (0, heap);
   ret.write<QAbstractGraphicsShapeItem_Adaptor *> (new QAbstractGraphicsShapeItem_Adaptor (arg1, arg2));
 }
 

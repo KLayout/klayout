@@ -65,7 +65,7 @@ static void _call_ctor_QAudioFormat_2509 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioFormat &arg1 = args.read<const QAudioFormat & > (heap);
+  const QAudioFormat &arg1 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
   ret.write<QAudioFormat *> (new QAudioFormat (arg1));
 }
 
@@ -99,7 +99,7 @@ static void _call_f_bytesForDuration_c986 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<qint32 > ((qint32)((QAudioFormat *)cls)->bytesForDuration (arg1));
 }
 
@@ -118,7 +118,7 @@ static void _call_f_bytesForFrames_c981 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint32 arg1 = args.read<qint32 > (heap);
+  qint32 arg1 = gsi::arg_reader<qint32 >() (args, heap);
   ret.write<qint32 > ((qint32)((QAudioFormat *)cls)->bytesForFrames (arg1));
 }
 
@@ -182,7 +182,7 @@ static void _call_f_durationForBytes_c981 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint32 arg1 = args.read<qint32 > (heap);
+  qint32 arg1 = gsi::arg_reader<qint32 >() (args, heap);
   ret.write<qint64 > ((qint64)((QAudioFormat *)cls)->durationForBytes (arg1));
 }
 
@@ -201,7 +201,7 @@ static void _call_f_durationForFrames_c981 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint32 arg1 = args.read<qint32 > (heap);
+  qint32 arg1 = gsi::arg_reader<qint32 >() (args, heap);
   ret.write<qint64 > ((qint64)((QAudioFormat *)cls)->durationForFrames (arg1));
 }
 
@@ -220,7 +220,7 @@ static void _call_f_framesForBytes_c981 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint32 arg1 = args.read<qint32 > (heap);
+  qint32 arg1 = gsi::arg_reader<qint32 >() (args, heap);
   ret.write<qint32 > ((qint32)((QAudioFormat *)cls)->framesForBytes (arg1));
 }
 
@@ -239,7 +239,7 @@ static void _call_f_framesForDuration_c986 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<qint32 > ((qint32)((QAudioFormat *)cls)->framesForDuration (arg1));
 }
 
@@ -273,7 +273,7 @@ static void _call_f_operator_excl__eq__c2509 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioFormat &arg1 = args.read<const QAudioFormat & > (heap);
+  const QAudioFormat &arg1 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
   ret.write<bool > ((bool)((QAudioFormat *)cls)->operator!= (arg1));
 }
 
@@ -292,7 +292,7 @@ static void _call_f_operator_eq__2509 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioFormat &arg1 = args.read<const QAudioFormat & > (heap);
+  const QAudioFormat &arg1 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
   ret.write<QAudioFormat & > ((QAudioFormat &)((QAudioFormat *)cls)->operator= (arg1));
 }
 
@@ -311,7 +311,7 @@ static void _call_f_operator_eq__eq__c2509 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QAudioFormat &arg1 = args.read<const QAudioFormat & > (heap);
+  const QAudioFormat &arg1 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
   ret.write<bool > ((bool)((QAudioFormat *)cls)->operator== (arg1));
 }
 
@@ -375,7 +375,7 @@ static void _call_f_setByteOrder_2339 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAudioFormat::Endian>::target_type & arg1 = args.read<const qt_gsi::Converter<QAudioFormat::Endian>::target_type & > (heap);
+  const qt_gsi::Converter<QAudioFormat::Endian>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudioFormat::Endian>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioFormat *)cls)->setByteOrder (qt_gsi::QtToCppAdaptor<QAudioFormat::Endian>(arg1).cref());
 }
@@ -395,7 +395,7 @@ static void _call_f_setChannelCount_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioFormat *)cls)->setChannelCount (arg1);
 }
@@ -415,7 +415,7 @@ static void _call_f_setCodec_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioFormat *)cls)->setCodec (arg1);
 }
@@ -435,7 +435,7 @@ static void _call_f_setSampleRate_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioFormat *)cls)->setSampleRate (arg1);
 }
@@ -455,7 +455,7 @@ static void _call_f_setSampleSize_767 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioFormat *)cls)->setSampleSize (arg1);
 }
@@ -475,7 +475,7 @@ static void _call_f_setSampleType_2776 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QAudioFormat::SampleType>::target_type & arg1 = args.read<const qt_gsi::Converter<QAudioFormat::SampleType>::target_type & > (heap);
+  const qt_gsi::Converter<QAudioFormat::SampleType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudioFormat::SampleType>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAudioFormat *)cls)->setSampleType (qt_gsi::QtToCppAdaptor<QAudioFormat::SampleType>(arg1).cref());
 }

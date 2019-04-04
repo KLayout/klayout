@@ -360,7 +360,7 @@ Class<BrowserDialog_Stub> decl_BrowserDialog (QT_EXTERNAL_BASE (QDialog) "lay", 
     "@brief Reloads the current page"
   ) +
   gsi::method ("home=|#set_home", &BrowserDialog_Stub::set_home, 
-    "@brief Sets the browser's initial and current URL which is selected if the \"home\" location is choosen\n"
+    "@brief Sets the browser's initial and current URL which is selected if the \"home\" location is chosen\n"
     "@args home_url\n"
     "The home URL is the one shown initially and the one which is selected when the \"home\" button is pressed. "
     "The default location is \"int:/index.html\".\n"
@@ -435,7 +435,7 @@ Class<BrowserSource_Stub> decl_BrowserSourceStub ("lay", "BrowserSource",
     "@args url\n"
     "\n"
     "If this method returns an empty string, the browser will not be set to \n"
-    "a new location. This allows to implement any functionality behind such links.\n"
+    "a new location. This allows implementing any functionality behind such links.\n"
     "If the method returns a string, the content of this string is displayed in the HTML\n"
     "browser page."
   ),
@@ -513,7 +513,7 @@ Class<lay::BrowserPanel> decl_BrowserPanel (QT_EXTERNAL_BASE (QWidget) "lay", "B
     "@brief Reloads the current page"
   ) +
   gsi::method ("home=", &lay::BrowserPanel::set_home, 
-    "@brief Sets the browser widget's initial and current URL which is selected if the \"home\" location is choosen\n"
+    "@brief Sets the browser widget's initial and current URL which is selected if the \"home\" location is chosen\n"
     "@args home_url\n"
     "The home URL is the one shown initially and the one which is selected when the \"home\" button is pressed. "
     "The default location is \"int:/index.html\".\n"
@@ -726,7 +726,7 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param items The list of items to show in the selection element\n"
-    "@param selection The initial selection (index of the element selected intially)\n"
+    "@param selection The initial selection (index of the element selected initially)\n"
     "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +

@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionGroupBox_3378 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionGroupBox &arg1 = args.read<const QStyleOptionGroupBox & > (heap);
+  const QStyleOptionGroupBox &arg1 = gsi::arg_reader<const QStyleOptionGroupBox & >() (args, heap);
   ret.write<QStyleOptionGroupBox *> (new QStyleOptionGroupBox (arg1));
 }
 

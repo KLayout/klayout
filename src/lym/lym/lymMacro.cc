@@ -954,7 +954,7 @@ void Macro::install_doc () const
       } else if (ex.test ("@method") || (st = ex.test ("@static_method")) == true) {
 
         if (cls == 0) {
-          tl::error << tl::to_string (QObject::tr ("Reading class doc from ")) << path () << ": " << tl::to_string (QObject::tr ("@method without preceeding @class"));
+          tl::error << tl::to_string (QObject::tr ("Reading class doc from ")) << path () << ": " << tl::to_string (QObject::tr ("@method without preceding @class"));
         } else {
 
           std::string n;

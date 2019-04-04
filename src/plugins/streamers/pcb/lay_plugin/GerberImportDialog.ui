@@ -112,7 +112,7 @@
        <item>
         <widget class="QCheckBox" name="free_mapping_cb" >
          <property name="text" >
-          <string>Free layer mapping (allows to specify arbitrary mapping between PCB files and layout layers)</string>
+          <string>Free layer mapping (allows one to specify arbitrary mapping between PCB files and layout layers)</string>
          </property>
         </widget>
        </item>
@@ -1076,7 +1076,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
             <property name="text" >
              <string>Leave fields empty to specify less reference points. One point is used to derive the displacement, further points are used to derive the orientation. Currently, no magnification is implied and only simple rotations are derived from the mapping points.
 
-Alternatively the transformation (imported to existing layout) can be specified using the explicit transformation below. This allows to specify an arbitary transformation. Use the common notation (i.e. "*2 r90 10,-100").</string>
+Alternatively the transformation (imported to existing layout) can be specified using the explicit transformation below. This allows one to specify an arbitrary transformation. Use the common notation (i.e. "*2 r90 10,-100").</string>
             </property>
             <property name="wordWrap" >
              <bool>true</bool>

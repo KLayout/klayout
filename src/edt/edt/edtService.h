@@ -185,7 +185,7 @@ public:
   /** 
    *  @brief "transform" operation with a transformation vector
    *
-   *  This version of the transformation operation allows to specify a transformation per selected object.
+   *  This version of the transformation operation allows one to specify a transformation per selected object.
    *  The transformations in the vector must be ordered in the order the selection is delivered by 
    *  the selection iterator.
    *  Either global or per-object transformations can be specified. If a per-object transformation is

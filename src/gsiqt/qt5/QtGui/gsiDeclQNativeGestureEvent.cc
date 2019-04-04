@@ -65,13 +65,13 @@ static void _call_ctor_QNativeGestureEvent_12349 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<Qt::NativeGestureType>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::NativeGestureType>::target_type & > (heap);
-  const QPointF &arg2 = args.read<const QPointF & > (heap);
-  const QPointF &arg3 = args.read<const QPointF & > (heap);
-  const QPointF &arg4 = args.read<const QPointF & > (heap);
-  double arg5 = args.read<double > (heap);
-  unsigned long int arg6 = args.read<unsigned long int > (heap);
-  quint64 arg7 = args.read<quint64 > (heap);
+  const qt_gsi::Converter<Qt::NativeGestureType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::NativeGestureType>::target_type & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg4 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
+  unsigned long int arg6 = gsi::arg_reader<unsigned long int >() (args, heap);
+  quint64 arg7 = gsi::arg_reader<quint64 >() (args, heap);
   ret.write<QNativeGestureEvent *> (new QNativeGestureEvent (qt_gsi::QtToCppAdaptor<Qt::NativeGestureType>(arg1).cref(), arg2, arg3, arg4, arg5, arg6, arg7));
 }
 

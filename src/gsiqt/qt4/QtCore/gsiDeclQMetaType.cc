@@ -68,8 +68,8 @@ static void _call_f_construct_2410 (const qt_gsi::GenericStaticMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const void *arg2 = args ? args.read<const void * > (heap) : (const void *)(0);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const void *arg2 = args ? gsi::arg_reader<const void * >() (args, heap) : gsi::arg_maker<const void * >() (0, heap);
   ret.write<void * > ((void *)QMetaType::construct (arg1, arg2));
 }
 
@@ -90,8 +90,8 @@ static void _call_f_destroy_1715 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  void *arg2 = args.read<void * > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  void *arg2 = gsi::arg_reader<void * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QMetaType::destroy (arg1, arg2);
 }
@@ -111,7 +111,7 @@ static void _call_f_isRegistered_767 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)QMetaType::isRegistered (arg1));
 }
 
@@ -134,9 +134,9 @@ static void _call_f_load_3304 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
-  int arg2 = args.read<int > (heap);
-  void *arg3 = args.read<void * > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  void *arg3 = gsi::arg_reader<void * >() (args, heap);
   ret.write<bool > ((bool)QMetaType::load (arg1, arg2, arg3));
 }
 
@@ -159,9 +159,9 @@ static void _call_f_save_3999 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QDataStream &arg1 = args.read<QDataStream & > (heap);
-  int arg2 = args.read<int > (heap);
-  const void *arg3 = args.read<const void * > (heap);
+  QDataStream &arg1 = gsi::arg_reader<QDataStream & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const void *arg3 = gsi::arg_reader<const void * >() (args, heap);
   ret.write<bool > ((bool)QMetaType::save (arg1, arg2, arg3));
 }
 
@@ -180,7 +180,7 @@ static void _call_f_type_1731 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)QMetaType::type (arg1));
 }
 
@@ -199,7 +199,7 @@ static void _call_f_typeName_767 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<const char * > ((const char *)QMetaType::typeName (arg1));
 }
 
@@ -218,7 +218,7 @@ static void _call_f_unregisterType_1731 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QMetaType::unregisterType (arg1);
 }

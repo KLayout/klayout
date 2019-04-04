@@ -51,7 +51,7 @@ static void _call_ctor_QFontInfo_1801 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFont &arg1 = args.read<const QFont & > (heap);
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
   ret.write<QFontInfo *> (new QFontInfo (arg1));
 }
 
@@ -70,7 +70,7 @@ static void _call_ctor_QFontInfo_2197 (const qt_gsi::GenericStaticMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFontInfo &arg1 = args.read<const QFontInfo & > (heap);
+  const QFontInfo &arg1 = gsi::arg_reader<const QFontInfo & >() (args, heap);
   ret.write<QFontInfo *> (new QFontInfo (arg1));
 }
 
@@ -164,7 +164,7 @@ static void _call_f_operator_eq__2197 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QFontInfo &arg1 = args.read<const QFontInfo & > (heap);
+  const QFontInfo &arg1 = gsi::arg_reader<const QFontInfo & >() (args, heap);
   ret.write<QFontInfo & > ((QFontInfo &)((QFontInfo *)cls)->operator= (arg1));
 }
 
@@ -318,7 +318,7 @@ static void _call_f_swap_1502 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFontInfo &arg1 = args.read<QFontInfo & > (heap);
+  QFontInfo &arg1 = gsi::arg_reader<QFontInfo & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFontInfo *)cls)->swap (arg1);
 }

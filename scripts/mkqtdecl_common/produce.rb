@@ -1693,7 +1693,7 @@ END
 
       if ia < n_min_args || !t.init
 
-        ofile.puts("  #{tn} = args.read<#{ta} > (heap);")
+        ofile.puts("  #{tn} = gsi::arg_reader<#{ta} >() (args, heap);")
 
       else
 
@@ -1704,7 +1704,7 @@ END
           init_expr = init_expr.gsub("%HEAP%", "heap")
         end
 
-        ofile.puts("  #{tn} = args ? args.read<#{ta} > (heap) : (#{ta})(#{init_expr});")
+        ofile.puts("  #{tn} = args ? gsi::arg_reader<#{ta} >() (args, heap) : gsi::arg_maker<#{ta} >() (#{init_expr}, heap);")
 
       end
 

@@ -74,7 +74,7 @@ static void _call_f_addMedia_2605 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   ret.write<bool > ((bool)((QMediaPlaylist *)cls)->addMedia (arg1));
 }
 
@@ -93,7 +93,7 @@ static void _call_f_addMedia_3220 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QList<QMediaContent> &arg1 = args.read<const QList<QMediaContent> & > (heap);
+  const QList<QMediaContent> &arg1 = gsi::arg_reader<const QList<QMediaContent> & >() (args, heap);
   ret.write<bool > ((bool)((QMediaPlaylist *)cls)->addMedia (arg1));
 }
 
@@ -189,8 +189,8 @@ static void _call_f_insertMedia_3264 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QMediaContent &arg2 = args.read<const QMediaContent & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QMediaContent &arg2 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   ret.write<bool > ((bool)((QMediaPlaylist *)cls)->insertMedia (arg1, arg2));
 }
 
@@ -211,8 +211,8 @@ static void _call_f_insertMedia_3879 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QList<QMediaContent> &arg2 = args.read<const QList<QMediaContent> & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QList<QMediaContent> &arg2 = gsi::arg_reader<const QList<QMediaContent> & >() (args, heap);
   ret.write<bool > ((bool)((QMediaPlaylist *)cls)->insertMedia (arg1, arg2));
 }
 
@@ -263,8 +263,8 @@ static void _call_f_load_4508 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QNetworkRequest &arg1 = args.read<const QNetworkRequest & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const QNetworkRequest &arg1 = gsi::arg_reader<const QNetworkRequest & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlaylist *)cls)->load (arg1, arg2);
 }
@@ -286,8 +286,8 @@ static void _call_f_load_3324 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlaylist *)cls)->load (arg1, arg2);
 }
@@ -309,8 +309,8 @@ static void _call_f_load_3070 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlaylist *)cls)->load (arg1, arg2);
 }
@@ -330,7 +330,7 @@ static void _call_f_media_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QMediaContent > ((QMediaContent)((QMediaPlaylist *)cls)->media (arg1));
 }
 
@@ -395,7 +395,7 @@ static void _call_f_nextIndex_c767 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   ret.write<int > ((int)((QMediaPlaylist *)cls)->nextIndex (arg1));
 }
 
@@ -445,7 +445,7 @@ static void _call_f_previousIndex_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args ? args.read<int > (heap) : (int)(1);
+  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   ret.write<int > ((int)((QMediaPlaylist *)cls)->previousIndex (arg1));
 }
 
@@ -464,7 +464,7 @@ static void _call_f_removeMedia_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QMediaPlaylist *)cls)->removeMedia (arg1));
 }
 
@@ -485,8 +485,8 @@ static void _call_f_removeMedia_1426 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QMediaPlaylist *)cls)->removeMedia (arg1, arg2));
 }
 
@@ -507,8 +507,8 @@ static void _call_f_save_3324 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QUrl &arg1 = args.read<const QUrl & > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(0);
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
   ret.write<bool > ((bool)((QMediaPlaylist *)cls)->save (arg1, arg2));
 }
 
@@ -529,8 +529,8 @@ static void _call_f_save_3070 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QIODevice *arg1 = args.read<QIODevice * > (heap);
-  const char *arg2 = args.read<const char * > (heap);
+  QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
+  const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<bool > ((bool)((QMediaPlaylist *)cls)->save (arg1, arg2));
 }
 
@@ -549,7 +549,7 @@ static void _call_f_setCurrentIndex_767 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlaylist *)cls)->setCurrentIndex (arg1);
 }
@@ -569,7 +569,7 @@ static void _call_f_setPlaybackMode_3159 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMediaPlaylist::PlaybackMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QMediaPlaylist::PlaybackMode>::target_type & > (heap);
+  const qt_gsi::Converter<QMediaPlaylist::PlaybackMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlaylist::PlaybackMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlaylist *)cls)->setPlaybackMode (qt_gsi::QtToCppAdaptor<QMediaPlaylist::PlaybackMode>(arg1).cref());
 }
@@ -609,9 +609,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMediaPlaylist::tr (arg1, arg2, arg3));
 }
 
@@ -634,9 +634,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMediaPlaylist::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1001,7 +1001,7 @@ static void _call_ctor_QMediaPlaylist_Adaptor_1302 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ret.write<QMediaPlaylist_Adaptor *> (new QMediaPlaylist_Adaptor (arg1));
 }
 
@@ -1043,7 +1043,7 @@ static void _call_emitter_currentIndexChanged_767 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QMediaPlaylist_Adaptor *)cls)->emitter_QMediaPlaylist_currentIndexChanged_767 (arg1);
 }
 
@@ -1061,7 +1061,7 @@ static void _call_emitter_currentMediaChanged_2605 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   ((QMediaPlaylist_Adaptor *)cls)->emitter_QMediaPlaylist_currentMediaChanged_2605 (arg1);
 }
 
@@ -1103,7 +1103,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QMediaPlaylist_Adaptor *)cls)->emitter_QMediaPlaylist_destroyed_1302 (arg1);
 }
 
@@ -1194,7 +1194,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QMediaPlaylist_Adaptor *)cls)->fp_QMediaPlaylist_isSignalConnected_c2394 (arg1));
 }
 
@@ -1242,8 +1242,8 @@ static void _call_emitter_mediaAboutToBeInserted_1426 (const qt_gsi::GenericMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QMediaPlaylist_Adaptor *)cls)->emitter_QMediaPlaylist_mediaAboutToBeInserted_1426 (arg1, arg2);
 }
 
@@ -1263,8 +1263,8 @@ static void _call_emitter_mediaAboutToBeRemoved_1426 (const qt_gsi::GenericMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QMediaPlaylist_Adaptor *)cls)->emitter_QMediaPlaylist_mediaAboutToBeRemoved_1426 (arg1, arg2);
 }
 
@@ -1284,8 +1284,8 @@ static void _call_emitter_mediaChanged_1426 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QMediaPlaylist_Adaptor *)cls)->emitter_QMediaPlaylist_mediaChanged_1426 (arg1, arg2);
 }
 
@@ -1305,8 +1305,8 @@ static void _call_emitter_mediaInserted_1426 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QMediaPlaylist_Adaptor *)cls)->emitter_QMediaPlaylist_mediaInserted_1426 (arg1, arg2);
 }
 
@@ -1345,8 +1345,8 @@ static void _call_emitter_mediaRemoved_1426 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  int arg2 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
   ((QMediaPlaylist_Adaptor *)cls)->emitter_QMediaPlaylist_mediaRemoved_1426 (arg1, arg2);
 }
 
@@ -1364,7 +1364,7 @@ static void _call_emitter_playbackModeChanged_3159 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMediaPlaylist::PlaybackMode>::target_type & arg1 = args.read<const qt_gsi::Converter<QMediaPlaylist::PlaybackMode>::target_type & > (heap);
+  const qt_gsi::Converter<QMediaPlaylist::PlaybackMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlaylist::PlaybackMode>::target_type & >() (args, heap);
   ((QMediaPlaylist_Adaptor *)cls)->emitter_QMediaPlaylist_playbackModeChanged_3159 (arg1);
 }
 
@@ -1382,7 +1382,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QMediaPlaylist_Adaptor *)cls)->fp_QMediaPlaylist_receivers_c1731 (arg1));
 }
 

@@ -306,7 +306,7 @@ public:
    *  @brief Conversion to a string.
    *
    *  If dbu is set, it determines the factor by which the coordinates are multiplied to render
-   *  micron units. In addition, a micron format is choosen for output of these coordinates.
+   *  micron units. In addition, a micron format is chosen for output of these coordinates.
    */
   std::string to_string (double dbu) const
   {

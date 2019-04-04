@@ -51,7 +51,7 @@ static void _call_f_atomicValue_2119 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlReceiver *)cls)->atomicValue (arg1);
 }
@@ -73,8 +73,8 @@ static void _call_f_attribute_4286 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
-  const QStringRef &arg2 = args.read<const QStringRef & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
+  const QStringRef &arg2 = gsi::arg_reader<const QStringRef & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlReceiver *)cls)->attribute (arg1, arg2);
 }
@@ -94,7 +94,7 @@ static void _call_f_characters_2310 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlReceiver *)cls)->characters (arg1);
 }
@@ -114,7 +114,7 @@ static void _call_f_comment_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args.read<const QString & > (heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlReceiver *)cls)->comment (arg1);
 }
@@ -182,7 +182,7 @@ static void _call_f_namespaceBinding_2084 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlReceiver *)cls)->namespaceBinding (arg1);
 }
@@ -204,8 +204,8 @@ static void _call_f_processingInstruction_4001 (const qt_gsi::GenericMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlReceiver *)cls)->processingInstruction (arg1, arg2);
 }
@@ -241,7 +241,7 @@ static void _call_f_startElement_2084 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlName &arg1 = args.read<const QXmlName & > (heap);
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlReceiver *)cls)->startElement (arg1);
 }
@@ -277,7 +277,7 @@ static void _call_f_whitespaceOnly_2310 (const qt_gsi::GenericMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStringRef &arg1 = args.read<const QStringRef & > (heap);
+  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractXmlReceiver *)cls)->whitespaceOnly (arg1);
 }

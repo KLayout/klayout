@@ -286,8 +286,8 @@ static void _call_f_setMedia_3944 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
-  QIODevice *arg2 = args.read<QIODevice * > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
+  QIODevice *arg2 = gsi::arg_reader<QIODevice * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlayerControl *)cls)->setMedia (arg1, arg2);
 }
@@ -307,7 +307,7 @@ static void _call_f_setMuted_864 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlayerControl *)cls)->setMuted (arg1);
 }
@@ -327,7 +327,7 @@ static void _call_f_setPlaybackRate_1071 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlayerControl *)cls)->setPlaybackRate (arg1);
 }
@@ -347,7 +347,7 @@ static void _call_f_setPosition_986 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlayerControl *)cls)->setPosition (arg1);
 }
@@ -367,7 +367,7 @@ static void _call_f_setVolume_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlayerControl *)cls)->setVolume (arg1);
 }
@@ -437,9 +437,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMediaPlayerControl::tr (arg1, arg2, arg3));
 }
 
@@ -462,9 +462,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMediaPlayerControl::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -1135,7 +1135,7 @@ static void _call_emitter_audioAvailableChanged_864 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_audioAvailableChanged_864 (arg1);
 }
 
@@ -1172,7 +1172,7 @@ static void _call_emitter_availablePlaybackRangesChanged_2766 (const qt_gsi::Gen
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaTimeRange &arg1 = args.read<const QMediaTimeRange & > (heap);
+  const QMediaTimeRange &arg1 = gsi::arg_reader<const QMediaTimeRange & >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_availablePlaybackRangesChanged_2766 (arg1);
 }
 
@@ -1209,7 +1209,7 @@ static void _call_emitter_bufferStatusChanged_767 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_bufferStatusChanged_767 (arg1);
 }
 
@@ -1275,7 +1275,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_destroyed_1302 (arg1);
 }
 
@@ -1336,7 +1336,7 @@ static void _call_emitter_durationChanged_986 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_durationChanged_986 (arg1);
 }
 
@@ -1356,8 +1356,8 @@ static void _call_emitter_error_2684 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
-  const QString &arg2 = args.read<const QString & > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_error_2684 (arg1, arg2);
 }
 
@@ -1481,7 +1481,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QMediaPlayerControl_Adaptor *)cls)->fp_QMediaPlayerControl_isSignalConnected_c2394 (arg1));
 }
 
@@ -1537,7 +1537,7 @@ static void _call_emitter_mediaChanged_2605 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_mediaChanged_2605 (arg1);
 }
 
@@ -1574,7 +1574,7 @@ static void _call_emitter_mediaStatusChanged_2858 (const qt_gsi::GenericMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & arg1 = args.read<const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & > (heap);
+  const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_mediaStatusChanged_2858 (arg1);
 }
 
@@ -1611,7 +1611,7 @@ static void _call_emitter_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_mutedChanged_864 (arg1);
 }
 
@@ -1688,7 +1688,7 @@ static void _call_emitter_playbackRateChanged_1071 (const qt_gsi::GenericMethod 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_playbackRateChanged_1071 (arg1);
 }
 
@@ -1725,7 +1725,7 @@ static void _call_emitter_positionChanged_986 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_positionChanged_986 (arg1);
 }
 
@@ -1743,7 +1743,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QMediaPlayerControl_Adaptor *)cls)->fp_QMediaPlayerControl_receivers_c1731 (arg1));
 }
 
@@ -1761,7 +1761,7 @@ static void _call_emitter_seekableChanged_864 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_seekableChanged_864 (arg1);
 }
 
@@ -1949,7 +1949,7 @@ static void _call_emitter_stateChanged_2247 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const qt_gsi::Converter<QMediaPlayer::State>::target_type & arg1 = args.read<const qt_gsi::Converter<QMediaPlayer::State>::target_type & > (heap);
+  const qt_gsi::Converter<QMediaPlayer::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlayer::State>::target_type & >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_stateChanged_2247 (arg1);
 }
 
@@ -2011,7 +2011,7 @@ static void _call_emitter_videoAvailableChanged_864 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_videoAvailableChanged_864 (arg1);
 }
 
@@ -2048,7 +2048,7 @@ static void _call_emitter_volumeChanged_767 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ((QMediaPlayerControl_Adaptor *)cls)->emitter_QMediaPlayerControl_volumeChanged_767 (arg1);
 }
 

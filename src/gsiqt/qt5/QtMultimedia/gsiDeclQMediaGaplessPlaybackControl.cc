@@ -115,7 +115,7 @@ static void _call_f_setCrossfadeTime_1071 (const qt_gsi::GenericMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaGaplessPlaybackControl *)cls)->setCrossfadeTime (arg1);
 }
@@ -135,7 +135,7 @@ static void _call_f_setNextMedia_2605 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaGaplessPlaybackControl *)cls)->setNextMedia (arg1);
 }
@@ -159,9 +159,9 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMediaGaplessPlaybackControl::tr (arg1, arg2, arg3));
 }
 
@@ -184,9 +184,9 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
-  const char *arg2 = args ? args.read<const char * > (heap) : (const char *)(__null);
-  int arg3 = args ? args.read<int > (heap) : (int)(-1);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QMediaGaplessPlaybackControl::trUtf8 (arg1, arg2, arg3));
 }
 
@@ -544,7 +544,7 @@ static void _call_emitter_crossfadeTimeChanged_1071 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  double arg1 = args.read<double > (heap);
+  double arg1 = gsi::arg_reader<double >() (args, heap);
   ((QMediaGaplessPlaybackControl_Adaptor *)cls)->emitter_QMediaGaplessPlaybackControl_crossfadeTimeChanged_1071 (arg1);
 }
 
@@ -586,7 +586,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? args.read<QObject * > (heap) : (QObject *)(0);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
   ((QMediaGaplessPlaybackControl_Adaptor *)cls)->emitter_QMediaGaplessPlaybackControl_destroyed_1302 (arg1);
 }
 
@@ -696,7 +696,7 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMetaMethod &arg1 = args.read<const QMetaMethod & > (heap);
+  const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QMediaGaplessPlaybackControl_Adaptor *)cls)->fp_QMediaGaplessPlaybackControl_isSignalConnected_c2394 (arg1));
 }
 
@@ -733,7 +733,7 @@ static void _call_emitter_nextMediaChanged_2605 (const qt_gsi::GenericMethod * /
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QMediaContent &arg1 = args.read<const QMediaContent & > (heap);
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
   ((QMediaGaplessPlaybackControl_Adaptor *)cls)->emitter_QMediaGaplessPlaybackControl_nextMediaChanged_2605 (arg1);
 }
 
@@ -751,7 +751,7 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const char *arg1 = args.read<const char * > (heap);
+  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QMediaGaplessPlaybackControl_Adaptor *)cls)->fp_QMediaGaplessPlaybackControl_receivers_c1731 (arg1));
 }
 

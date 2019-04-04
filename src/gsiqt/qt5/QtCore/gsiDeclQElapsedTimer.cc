@@ -80,7 +80,7 @@ static void _call_f_hasExpired_c986 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = args.read<qint64 > (heap);
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<bool > ((bool)((QElapsedTimer *)cls)->hasExpired (arg1));
 }
 
@@ -145,7 +145,7 @@ static void _call_f_msecsTo_c2609 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QElapsedTimer &arg1 = args.read<const QElapsedTimer & > (heap);
+  const QElapsedTimer &arg1 = gsi::arg_reader<const QElapsedTimer & >() (args, heap);
   ret.write<qint64 > ((qint64)((QElapsedTimer *)cls)->msecsTo (arg1));
 }
 
@@ -179,7 +179,7 @@ static void _call_f_operator_excl__eq__c2609 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QElapsedTimer &arg1 = args.read<const QElapsedTimer & > (heap);
+  const QElapsedTimer &arg1 = gsi::arg_reader<const QElapsedTimer & >() (args, heap);
   ret.write<bool > ((bool)((QElapsedTimer *)cls)->operator!= (arg1));
 }
 
@@ -198,7 +198,7 @@ static void _call_f_operator_eq__eq__c2609 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QElapsedTimer &arg1 = args.read<const QElapsedTimer & > (heap);
+  const QElapsedTimer &arg1 = gsi::arg_reader<const QElapsedTimer & >() (args, heap);
   ret.write<bool > ((bool)((QElapsedTimer *)cls)->operator== (arg1));
 }
 
@@ -232,7 +232,7 @@ static void _call_f_secsTo_c2609 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QElapsedTimer &arg1 = args.read<const QElapsedTimer & > (heap);
+  const QElapsedTimer &arg1 = gsi::arg_reader<const QElapsedTimer & >() (args, heap);
   ret.write<qint64 > ((qint64)((QElapsedTimer *)cls)->secsTo (arg1));
 }
 

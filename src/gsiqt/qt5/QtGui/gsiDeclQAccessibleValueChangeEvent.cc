@@ -52,7 +52,7 @@ static void _call_f_setValue_2119 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QVariant &arg1 = args.read<const QVariant & > (heap);
+  const QVariant &arg1 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAccessibleValueChangeEvent *)cls)->setValue (arg1);
 }
@@ -147,8 +147,8 @@ static void _call_ctor_QAccessibleValueChangeEvent_Adaptor_3313 (const qt_gsi::G
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   ret.write<QAccessibleValueChangeEvent_Adaptor *> (new QAccessibleValueChangeEvent_Adaptor (arg1, arg2));
 }
 
@@ -168,8 +168,8 @@ static void _call_ctor_QAccessibleValueChangeEvent_Adaptor_4633 (const qt_gsi::G
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QAccessibleInterface *arg1 = args.read<QAccessibleInterface * > (heap);
-  const QVariant &arg2 = args.read<const QVariant & > (heap);
+  QAccessibleInterface *arg1 = gsi::arg_reader<QAccessibleInterface * >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   ret.write<QAccessibleValueChangeEvent_Adaptor *> (new QAccessibleValueChangeEvent_Adaptor (arg1, arg2));
 }
 

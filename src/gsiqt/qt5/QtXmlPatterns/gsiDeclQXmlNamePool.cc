@@ -65,7 +65,7 @@ static void _call_ctor_QXmlNamePool_2494 (const qt_gsi::GenericStaticMethod * /*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNamePool &arg1 = args.read<const QXmlNamePool & > (heap);
+  const QXmlNamePool &arg1 = gsi::arg_reader<const QXmlNamePool & >() (args, heap);
   ret.write<QXmlNamePool *> (new QXmlNamePool (arg1));
 }
 
@@ -84,7 +84,7 @@ static void _call_f_operator_eq__2494 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QXmlNamePool &arg1 = args.read<const QXmlNamePool & > (heap);
+  const QXmlNamePool &arg1 = gsi::arg_reader<const QXmlNamePool & >() (args, heap);
   ret.write<QXmlNamePool & > ((QXmlNamePool &)((QXmlNamePool *)cls)->operator= (arg1));
 }
 

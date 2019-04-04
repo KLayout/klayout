@@ -501,7 +501,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
 
         }
 
-        //  Apply some heuristic criterion that allows to determine whether it's worth doing the compression 
+        //  Apply some heuristic criterion that allows the algorithm to determine whether it's worth doing the compression
 
         //  Try to compact these repetitions further, y direction first, then x direction
         for (int xypass2 = 1; xypass2 >= 0; --xypass2) {

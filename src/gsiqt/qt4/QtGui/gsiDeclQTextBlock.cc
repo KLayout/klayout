@@ -71,7 +71,7 @@ static void _call_ctor_QTextBlock_2306 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<QTextBlock *> (new QTextBlock (arg1));
 }
 
@@ -196,7 +196,7 @@ static void _call_f_contains_c767 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<bool > ((bool)((QTextBlock *)cls)->contains (arg1));
 }
 
@@ -365,7 +365,7 @@ static void _call_f_operator_excl__eq__c2306 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<bool > ((bool)((QTextBlock *)cls)->operator!= (arg1));
 }
 
@@ -384,7 +384,7 @@ static void _call_f_operator_lt__c2306 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<bool > ((bool)((QTextBlock *)cls)->operator< (arg1));
 }
 
@@ -403,7 +403,7 @@ static void _call_f_operator_eq__2306 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<QTextBlock & > ((QTextBlock &)((QTextBlock *)cls)->operator= (arg1));
 }
 
@@ -422,7 +422,7 @@ static void _call_f_operator_eq__eq__c2306 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QTextBlock &arg1 = args.read<const QTextBlock & > (heap);
+  const QTextBlock &arg1 = gsi::arg_reader<const QTextBlock & >() (args, heap);
   ret.write<bool > ((bool)((QTextBlock *)cls)->operator== (arg1));
 }
 
@@ -486,7 +486,7 @@ static void _call_f_setLineCount_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlock *)cls)->setLineCount (arg1);
 }
@@ -506,7 +506,7 @@ static void _call_f_setRevision_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlock *)cls)->setRevision (arg1);
 }
@@ -526,7 +526,7 @@ static void _call_f_setUserData_2408 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QTextBlockUserData *arg1 = args.read<QTextBlockUserData * > (heap);
+  QTextBlockUserData *arg1 = gsi::arg_reader<QTextBlockUserData * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlock *)cls)->setUserData (arg1);
 }
@@ -546,7 +546,7 @@ static void _call_f_setUserState_767 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int arg1 = args.read<int > (heap);
+  int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlock *)cls)->setUserState (arg1);
 }
@@ -566,7 +566,7 @@ static void _call_f_setVisible_864 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = args.read<bool > (heap);
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlock *)cls)->setVisible (arg1);
 }

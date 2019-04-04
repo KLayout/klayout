@@ -60,7 +60,7 @@ class ImportLayerMapping;
  *  @brief The cell object
  * 
  *  A cell object consists of a set of shape containers (called layers),
- *  a set of child cell instances and auxiliary informations such as
+ *  a set of child cell instances and auxiliary information such as
  *  the parent instance list.
  *  A cell is identified through an index given to the cell upon instantiation.
  *  The cell index is valid in the context of a cell graph object which
@@ -126,7 +126,7 @@ public:
   /**
    *  @brief Return the const shapes list of the given layer
    *
-   *  This method allows to access the shapes list on a certain layer.
+   *  This method allows one to access the shapes list on a certain layer.
    *  If the layer does not exist yet, a reference to an empty list is
    *  returned.
    *
@@ -139,7 +139,7 @@ public:
   /**
    *  @brief Return the shapes list of the given layer
    *
-   *  This method allows to access the shapes list on a certain layer.
+   *  This method allows one to access the shapes list on a certain layer.
    *  If the layer does not exist yet, it is created.
    *
    *  @param index The layer index of the shapes list to retrieve
@@ -601,7 +601,7 @@ public:
   /**
    *  @brief The parent instance list begin iterator
    *
-   *  The begin_parent_insts() allows to access to the parent instance list.
+   *  The begin_parent_insts() allows one to access to the parent instance list.
    */
   parent_inst_iterator begin_parent_insts () const;
 
@@ -725,7 +725,7 @@ public:
    *  call this cell to the set given. It is assumed that the if the set contains a cell, it
    *  will also contain all called cells, so it may act as a cache.
    *
-   *  This version allows to restrict the search to a cone of the hierarchy tree, that is 
+   *  This version allows one to restrict the search to a cone of the hierarchy tree, that is
    *  a set of cells which are collected from another call of "collect_called_cells" with another initial cell.
    *  
    *  @param callers The set of called cells (used as cache) 
@@ -1007,7 +1007,7 @@ private:
    *  @brief Sort the child instance list
    * 
    *  The child instances are first sorted by cell index, then by raw transformation
-   *  (excluding displacement). This allows to simplify the bbox computation by 
+   *  (excluding displacement). This allows one to simplify the bbox computation by
    *  convolution of the displacements bboxes with the object bboxes.
    */
   void sort_child_insts ();

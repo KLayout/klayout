@@ -67,7 +67,7 @@ static void _call_ctor_QStyleOptionTitleBar_3347 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QStyleOptionTitleBar &arg1 = args.read<const QStyleOptionTitleBar & > (heap);
+  const QStyleOptionTitleBar &arg1 = gsi::arg_reader<const QStyleOptionTitleBar & >() (args, heap);
   ret.write<QStyleOptionTitleBar *> (new QStyleOptionTitleBar (arg1));
 }
 

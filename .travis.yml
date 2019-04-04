@@ -1,11 +1,13 @@
+branches:
+  only:
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
+    - staging
+
 matrix:
   include:
     # python manylinux packages
 
     - name: "cp37-cp37m-manylinux1_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       language: python
@@ -23,9 +25,6 @@ matrix:
         - ccache
 
     - name: "cp37-cp37m-manylinux1_i686.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       services:
@@ -40,9 +39,6 @@ matrix:
         - ccache
 
     - name: "cp36-cp36m-manylinux1_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       language: python
@@ -60,9 +56,6 @@ matrix:
         - ccache
 
     - name: "cp36-cp36m-manylinux1_i686.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       services:
@@ -77,9 +70,6 @@ matrix:
         - ccache
 
     - name: "cp35-cp35m-manylinux1_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       language: python
@@ -97,9 +87,6 @@ matrix:
         - ccache
 
     - name: "cp35-cp35m-manylinux1_i686.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       services:
@@ -114,9 +101,6 @@ matrix:
         - ccache
 
     - name: "cp34-cp34m-manylinux1_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       language: python
@@ -134,9 +118,6 @@ matrix:
         - ccache
 
     - name: "cp34-cp34m-manylinux1_i686.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       services:
@@ -151,9 +132,6 @@ matrix:
         - ccache
 
     - name: "cp27-cp27mu-manylinux1_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       language: python
@@ -171,9 +149,6 @@ matrix:
         - ccache
 
     - name: "cp27-cp27mu-manylinux1_i686.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       services:
@@ -188,9 +163,6 @@ matrix:
         - ccache
 
     - name: "cp27-cp27m-manylinux1_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       language: python
@@ -208,9 +180,6 @@ matrix:
         - ccache
 
     - name: "cp27-cp27m-manylinux1_i686.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: linux
       sudo: true
       services:
@@ -229,9 +198,6 @@ matrix:
     
     # - name: "klayout python2 osx10.13"
     - name: "cp27-cp27m-macosx_10_13_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       cache: ccache
@@ -247,9 +213,6 @@ matrix:
     
     # - name: "klayout python2 osx10.12"
     - name: "cp27-cp27m-macosx_10_12_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: osx
       osx_image: xcode8.3  # macOS 10.12
       cache: ccache
@@ -265,9 +228,6 @@ matrix:
     
     # - name: "klayout python2 osx10.11"
     - name: "cp27-cp27m-macosx_10_11_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: osx
       osx_image: xcode8  # macOS 10.11
       cache: ccache
@@ -285,9 +245,6 @@ matrix:
     
     # - name: "klayout python3 osx10.13"
     - name: "cp37-cp37m-macosx_10_13_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       cache: ccache
@@ -305,9 +262,6 @@ matrix:
 
     # - name: "klayout python3.6.6 osx10.13"
     - name: "cp36-cp36m-macosx_10_13_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       cache: ccache
@@ -323,9 +277,6 @@ matrix:
 
     # - name: "klayout python3.5.6 osx10.13"
     - name: "cp35-cp35m-macosx_10_13_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       cache: ccache
@@ -356,9 +307,6 @@ matrix:
     
     # - name: "klayout python3 osx10.12"
     - name: "cp37-cp37m-macosx_10_12_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: osx
       osx_image: xcode8.3  # macOS 10.12
       cache: ccache
@@ -376,9 +324,6 @@ matrix:
     
     # - name: "klayout python3 osx10.11"
     - name: "cp37-cp37m-macosx_10_11_x86_64.whl"
-      branches:
-        only:
-          - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
       os: osx
       osx_image: xcode8  # macOS 10.11
       cache: ccache
@@ -395,9 +340,7 @@ matrix:
     # KLayout builds for mac
     # Python 3
     - name: "KLayout macOS 10.13 with py3.7"
-      branches:
-        only:
-          - staging
+      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode9.4 # macOS 10.13
       cache: ccache
@@ -415,9 +358,7 @@ matrix:
         - KLAYOUT_BUILD=true
 
     - name: "KLayout macOS 10.12 with py3.7"
-      branches:
-        only:
-          - staging
+      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode8.3 # macOS 10.12
       cache: ccache
@@ -435,9 +376,7 @@ matrix:
         - KLAYOUT_BUILD=true
 
     - name: "KLayout macOS 10.11 with py3.7"
-      branches:
-        only:
-          - staging
+      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode8 # macOS 10.11
       cache: ccache
@@ -454,9 +393,7 @@ matrix:
 
     # Python 2
     - name: "KLayout macOS 10.13 with py2.7"
-      branches:
-        only:
-          - staging
+      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode9.4 # macOS 10.13
       cache: ccache
@@ -473,9 +410,7 @@ matrix:
         - KLAYOUT_BUILD=true
 
     - name: "KLayout macOS 10.12 with py2.7"
-      branches:
-        only:
-          - staging
+      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode8.3 # macOS 10.12
       cache: ccache
@@ -492,9 +427,7 @@ matrix:
         - KLAYOUT_BUILD=true
 
     - name: "KLayout macOS 10.11 with py2.7"
-      branches:
-        only:
-          - staging
+      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode8 # macOS 10.11
       cache: ccache
@@ -571,7 +504,7 @@ after_success:
 
   # uploading to pypi using twine
   # need TWINE_USERNAME, TWINE_PASSWORD and TWINE_REPOSITORY_URL env variable
-  - if [ "$PYTHON_BUILD" = true ] || [ "$DOCKER_BUILD" = true ]; then
+  - if [ ! -z "$TRAVIS_TAG" ] &&  [ ! -z "$TWINE_PASSWORD" ] && [[ "$PYTHON_BUILD" = true || "$DOCKER_BUILD" = true ]]; then
       pip install -U twine || sudo pip install -U twine;
       twine upload --skip-existing deploy/dist-pymod/$klayout_version/*;
     fi

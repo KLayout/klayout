@@ -4,6 +4,9 @@ trigger:
     include:
     - master
     - staging
+  tags:
+    include:
+      - '*'
 
 jobs:
 - job: Build

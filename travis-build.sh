@@ -11,6 +11,7 @@ touch build.txt
 # Configure ccache
 mkdir -p ccache;
 export CCACHE_DIR="`pwd`/ccache"
+export QMAKE_CCACHE=1
 
 # Show ccache stats
 echo "Cache stats:"

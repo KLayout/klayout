@@ -231,6 +231,10 @@ while [ "$*" != "" ]; do
     echo "  -libcurl              Use libcurl instead of QtNetwork (for Qt<4.7)"
     echo "  -libexpat             Use libexpat instead of QtXml"
     echo ""
+    echo "Environment Variables:"
+    echo ""
+    echo "  QMAKE_CCACHE=1        Adds CONFIG+=ccache to qmake command (only works if Qt>=5.9.2)"
+    echo ""
     exit 0
     ;;
   *)
@@ -608,6 +612,14 @@ qmake_options=(
   KLAYOUT_VERSION_DATE="$KLAYOUT_VERSION_DATE"
   KLAYOUT_VERSION_REV="$KLAYOUT_VERSION_REV"
 )
+
+# This should speed up build time considerably
+# https://ortogonal.github.io/ccache-and-qmake-qtcreator/
+if [ $QMAKE_CCACHE = 1 ]; then
+  qmake_options+=(
+    CONFIG+="ccache"
+  )
+fi
 
 if [ $BUILD_EXPERT = 1 ]; then
   qmake_options+=(

@@ -2,6 +2,7 @@ branches:
   only:
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # tag format: v0.25(.8)(-dev14)
     - staging
+    - master
 
 matrix:
   include:
@@ -340,7 +341,6 @@ matrix:
     # KLayout builds for mac
     # Python 3
     - name: "KLayout macOS 10.13 with py3.7"
-      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode9.4 # macOS 10.13
       cache: ccache
@@ -358,7 +358,6 @@ matrix:
         - KLAYOUT_BUILD=true
 
     - name: "KLayout macOS 10.12 with py3.7"
-      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode8.3 # macOS 10.12
       cache: ccache
@@ -376,7 +375,6 @@ matrix:
         - KLAYOUT_BUILD=true
 
     - name: "KLayout macOS 10.11 with py3.7"
-      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode8 # macOS 10.11
       cache: ccache
@@ -393,7 +391,6 @@ matrix:
 
     # Python 2
     - name: "KLayout macOS 10.13 with py2.7"
-      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode9.4 # macOS 10.13
       cache: ccache
@@ -410,7 +407,6 @@ matrix:
         - KLAYOUT_BUILD=true
 
     - name: "KLayout macOS 10.12 with py2.7"
-      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode8.3 # macOS 10.12
       cache: ccache
@@ -427,7 +423,6 @@ matrix:
         - KLAYOUT_BUILD=true
 
     - name: "KLayout macOS 10.11 with py2.7"
-      if: branch = staging OR branch = master
       os: osx
       osx_image: xcode8 # macOS 10.11
       cache: ccache

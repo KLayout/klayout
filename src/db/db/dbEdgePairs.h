@@ -312,7 +312,7 @@ public:
   /**
    *  @brief Constructor from a RecursiveShapeIterator
    *
-   *  Creates an edge pair set from a recursive shape iterator. This allows to feed an edge pair set
+   *  Creates an edge pair set from a recursive shape iterator. This allows one to feed an edge pair set
    *  from a hierarchy of cells.
    */
   explicit EdgePairs (const RecursiveShapeIterator &si);
@@ -320,7 +320,7 @@ public:
   /**
    *  @brief Constructor from a RecursiveShapeIterator with a transformation
    *
-   *  Creates an edge pair set from a recursive shape iterator. This allows to feed an edge pair set 
+   *  Creates an edge pair set from a recursive shape iterator. This allows one to feed an edge pair set
    *  from a hierarchy of cells. The transformation is useful to scale to a specific
    *  DBU for example.
    */

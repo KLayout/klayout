@@ -60,7 +60,7 @@
 #include <map>
 
 // --------------------------------------------------------------
-//  A helper class that allows to put a QImage into a tl::Variant
+//  A helper class that allows putting a QImage into a tl::Variant
 
 namespace tl
 {

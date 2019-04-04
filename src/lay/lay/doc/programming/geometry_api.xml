@@ -650,7 +650,7 @@ ly.top_cell.shapes(ly.layer(100, 0)).insert(r11 &amp; r21)
     interacting (overlapping or touching) or not interacting with polygons from another region.</p>
   <p><class_doc href="Region#members_of"/> selects polygons which are contained in the same 
     way in another region.</p>
-  <p><class_doc href="Region#merge"/> and <class_doc href="Region#merged"/> merge the polygons. This feature allows to select overlapping polygons 
+  <p><class_doc href="Region#merge"/> and <class_doc href="Region#merged"/> merge the polygons. This feature allows selecting overlapping polygons
     (minimum wrap count parameter).</p>
   <p><class_doc href="Region#minkowsky_sum"/> computes the Minkowsky sum of the region with other objects (edges, single polygons and other regions).</p>
   <p><class_doc href="Region#move"/>, <class_doc href="Region#moved"/>, <class_doc href="Region#transform"/> and

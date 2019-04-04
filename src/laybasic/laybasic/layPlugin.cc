@@ -120,7 +120,7 @@ PluginDeclaration::init_menu ()
 
   lay::AbstractMenu &menu = *lay::AbstractMenuProvider::instance ()->menu ();
 
-  //  pre-initialize to allow to multiple init_menu calls
+  //  pre-initialize to allow multiple init_menu calls
   m_editable_mode_action = lay::Action ();
   m_mouse_mode_action = lay::Action ();
   m_menu_actions.clear ();

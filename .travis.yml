@@ -555,6 +555,7 @@ script:
             python testdata/pymod/import_db.py;
             python testdata/pymod/import_rdb.py;
             python testdata/pymod/import_tl.py;
+            python testdata/pymod/import_lib.py;
             python testdata/pymod/pya_tests.py;
         fi
     fi 
@@ -565,6 +566,7 @@ script:
         python testdata/pymod/import_db.py;
         python testdata/pymod/import_rdb.py;
         python testdata/pymod/import_tl.py;
+        python testdata/pymod/import_lib.py;
         python testdata/pymod/pya_tests.py;
         klayout_version=$(python -c 'import setup; print(setup.Config().version())');
         mkdir -p deploy/dist-pymod/$klayout_version;

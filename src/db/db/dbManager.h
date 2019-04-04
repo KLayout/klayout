@@ -204,7 +204,7 @@ public:
   /**
    *  @brief Get the last queued db::Op object
    *
-   *  This method allows to fetch and modify the last queued operation for the given object in order
+   *  This method allows one to fetch and modify the last queued operation for the given object in order
    *  to allow some optimisation, i.e. joining two ops. It can be modified but must not
    *  be deleted. The returned object is guaranteed to be inside same transaction.
    *

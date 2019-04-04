@@ -154,7 +154,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
  *  @brief A string repository class 
  *
  *  A string repository holds StringRef objects.
- *  It acts as a factory for StringRef objects and allows to rename strings.
+ *  It acts as a factory for StringRef objects and allows one to rename strings.
  */
 class DB_PUBLIC StringRepository
 {
@@ -987,7 +987,7 @@ struct text_ref
   /**
    *  @brief The translation constructor.
    *  
-   *  This constructor allows to copy a text reference from one
+   *  This constructor allows one to copy a text reference from one
    *  repository to another
    */
   text_ref (const text_ref &ref, repository_type &rep)
@@ -999,7 +999,7 @@ struct text_ref
   /**
    *  @brief The transformation translation constructor
    *  
-   *  This constructor allows to copy a text reference with a certain transformation
+   *  This constructor allows one to copy a text reference with a certain transformation
    *  to one with another transformation
    */
   template <class TransIn>

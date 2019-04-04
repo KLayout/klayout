@@ -112,7 +112,7 @@ public:
    *  placeholders. 
    *  If the rule matches, the end_index will be set to the end of the sequence and output_args 
    *  will contain any arguments matched.
-   *  generationId is a counter that will incremented when a new block is highlighted. This allows to cache 
+   *  generationId is a counter that will incremented when a new block is highlighted. This allows caching
    *  matches in some cases (i.e. regexp matcher).
    */
   virtual bool match (const QString &input, unsigned int generation_id, int index, int &end_index, const QList<QString> &input_args, QList<QString> &output_args) const = 0;

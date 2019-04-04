@@ -902,7 +902,7 @@ public:
   /**
    *  @brief Specifies the layer styles to use
    *
-   *  This allows to specify a layer style file (path) which will be loaded 
+   *  This allows one to specify a layer style file (path) which will be loaded 
    *  after the Gerber files have been imported.
    *
    *  Specify an empty string to disable that feature.

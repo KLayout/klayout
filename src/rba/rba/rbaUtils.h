@@ -180,12 +180,12 @@ inline void rb_protect_init ()
 
 #define RUBY_BEGIN_EXEC \
   try { \
-    rba::RubyInterpreter::instance()->begin_exec ();
+    if (rba::RubyInterpreter::instance ()) { rba::RubyInterpreter::instance ()->begin_exec (); }
 
 #define RUBY_END_EXEC \
-    rba::RubyInterpreter::instance()->end_exec (); \
+    if (rba::RubyInterpreter::instance ()) { rba::RubyInterpreter::instance()->end_exec (); } \
   } catch (...) { \
-    rba::RubyInterpreter::instance()->end_exec (); \
+    if (rba::RubyInterpreter::instance ()) { rba::RubyInterpreter::instance()->end_exec (); } \
     throw; \
   }
 

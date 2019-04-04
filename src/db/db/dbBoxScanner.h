@@ -960,7 +960,7 @@ private:
  *
  *  Whenever the cluster receiver gets noticed of an interaction, it will
  *  create new clusters or extend or join existing clusters. When a cluster
- *  is finished, it's finish method is called. That allows to take any
+ *  is finished, it's finish method is called. That allows one to take some
  *  final actions on the cluster.
  */
 template <class Obj, class Prop, class Cluster>

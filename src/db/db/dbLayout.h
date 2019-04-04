@@ -512,7 +512,7 @@ public:
   Layout (db::Manager *manager = 0);
 
   /**
-   *  @brief Standard constructor which allows to specify the editable mode
+   *  @brief Standard constructor which allows one to specify editable mode
    */
   Layout (bool editable, db::Manager *manager = 0);
 
@@ -1433,7 +1433,7 @@ public:
    *  @brief Forces an update even if the layout is under construction
    *
    *  This method behaves like "update" but forces and update even if the 
-   *  "under_construction" state is active. This allows to do the update
+   *  "under_construction" state is active. This allows one to do the update
    *  in certain stages without triggering the update automatically and
    *  too frequently.
    */

@@ -542,7 +542,7 @@ public:
    *  selection. The set should be empty on enter. Otherwise the results are
    *  not defined.
    *  The return value is true if the ids are to be interpretated inversely (every properties id
-   *  matches that is not in the set). This allows to optimize the computation of the set.
+   *  matches that is not in the set). This allows optimizing the computation of the set.
    */
   bool matching (const db::PropertiesRepository &rep, std::set<db::properties_id_type> &matching) const;
 

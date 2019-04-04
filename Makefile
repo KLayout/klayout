@@ -51,7 +51,7 @@ dropbox-deploy:
 	hdiutil convert macbuild/Resources/klayoutDMGTemplate.dmg -format UDRW -o work-KLayout.dmg; \
 	hdiutil resize -size 500m work-KLayout.dmg; \
 	hdiutil attach work-KLayout.dmg -readwrite -noverify -quiet -mountpoint tempKLayout -noautoopen; \
-	cp -a qt5.pkg.macos-$(MACOS_VERSION)-release/ tempKLayout/; \
+	cp -a qt5.pkg.macos-$(MACOS_VERSION)-release/klayout.app/ tempKLayout/klayout.app/; \
 	hdiutil detach tempKLayout; \
 	hdiutil convert work-KLayout.dmg -format UDZO -imagekey zlib-level=9 -o deploy/$(MACOS_VERSION)/$(PYTHON_VERSION)/$(KLAYOUT_VERSION)/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg; \
 	md5 -q deploy/$(MACOS_VERSION)/$(PYTHON_VERSION)/$(KLAYOUT_VERSION)/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg > deploy/$(MACOS_VERSION)/$(PYTHON_VERSION)/$(KLAYOUT_VERSION)/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg.md5; \

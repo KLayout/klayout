@@ -332,7 +332,7 @@ public:
   /**
    *  @brief Constructor from a RecursiveShapeIterator
    *
-   *  Creates an edge set from a recursive shape iterator. This allows to feed an edge set
+   *  Creates an edge set from a recursive shape iterator. This allows feeding an edge set
    *  from a hierarchy of cells.
    */
   explicit Edges (const RecursiveShapeIterator &si, bool as_edges = true);
@@ -340,7 +340,7 @@ public:
   /**
    *  @brief Constructor from a RecursiveShapeIterator with a transformation
    *
-   *  Creates an edge set from a recursive shape iterator. This allows to feed an edge set 
+   *  Creates an edge set from a recursive shape iterator. This allows feeding an edge set
    *  from a hierarchy of cells. The transformation is useful to scale to a specific
    *  DBU for example.
    */

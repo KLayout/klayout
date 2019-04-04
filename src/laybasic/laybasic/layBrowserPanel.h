@@ -190,7 +190,7 @@ public:
    *  @brief Get the HTML code for a given "int" URL.
    *
    *  If this method returns an empty string, the browser will not be set to 
-   *  a new location. This allows to implement any functionality behind such links.
+   *  a new location. This allows implementing any functionality behind such links.
    */
   virtual std::string get (const std::string &url);
 
@@ -250,7 +250,7 @@ private:
 };
 
 /**
- *  @brief A specialisation of QTextBrowser that allows to load a specific resource through BrowserPanel
+ *  @brief A specialisation of QTextBrowser that allows loading a specific resource through BrowserPanel
  */
 class LAYBASIC_PUBLIC BrowserTextWidget
   : public QTextBrowser
@@ -274,7 +274,7 @@ private:
 };
 
 /**
- *  @brief A specialisation of QWidget around a TextBrowser that allows to load a specific resource
+ *  @brief A specialisation of QWidget around a TextBrowser that allows loading a specific resource
  */
 class LAYBASIC_PUBLIC BrowserPanel
   : public QWidget

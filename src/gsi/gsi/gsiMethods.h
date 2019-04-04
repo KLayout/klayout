@@ -612,7 +612,7 @@ private:
 /**
  *  @brief A collection of methods
  *
- *  The basic purpose of this object is to provide the + operator that allows to concatenate 
+ *  The basic purpose of this object is to provide the + operator that allows concatenation
  *  method declarations in the class declaration.
  */
 class GSI_PUBLIC Methods

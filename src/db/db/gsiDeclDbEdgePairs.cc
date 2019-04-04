@@ -485,7 +485,7 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
     "@args e\n"
     "This method creates polygons from the edge pairs. Each polygon will be a triangle or quadrangle "
     "which connects the start and end points of the edges forming the edge pair. "
-    "This version allows to specify an enlargement which is applied to the edges. The length of the edges is "
+    "This version allows one to specify an enlargement which is applied to the edges. The length of the edges is "
     "modified by applying the enlargement and the edges are shifted by the enlargement. By specifying an "
     "enlargement it is possible to give edge pairs an area which otherwise would not have one (coincident edges, "
     "two point-like edges)."

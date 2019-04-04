@@ -129,7 +129,7 @@ public:
   /**
    *  @brief The copy constructor that converts also
    *
-   *  The copy constructor allows to convert between different
+   *  The copy constructor allows converting between different
    *  coordinate types, if possible.
    *
    *  @param d The source from which to copy

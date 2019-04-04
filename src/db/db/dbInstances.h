@@ -1262,7 +1262,7 @@ private:
  *  The generic iterators are used to access these
  *
  *  Internally, the instance list uses a box tree which treats empty cells as single point boxes when a all-layer search is performed.
- *  That allows to retrieve such instances with a search.
+ *  That allows retrieving such instances with a search.
  */
 
 class DB_PUBLIC Instances 
@@ -1655,7 +1655,7 @@ public:
   /**
    *  @brief The parent instance list begin iterator
    *
-   *  The begin_ParentInsts() allows to access to the parent instance list.
+   *  The begin_parent_insts() method gives access to the parent instance list.
    */
   ParentInstIterator begin_parent_insts (const layout_type *g) const
   {

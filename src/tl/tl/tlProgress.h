@@ -371,7 +371,7 @@ public:
   /**
    *  @brief Set the format unit
    *
-   *  This is the unit used for formatted output. This allows to separate the format value
+   *  This is the unit used for formatted output. This allows separating the format value
    *  from the bar value which is percent.
    */
   void set_format_unit (double unit)

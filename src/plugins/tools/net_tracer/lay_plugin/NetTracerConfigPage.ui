@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>NetTracerConfigPage</class>
- <widget class="QFrame" name="NetTracerConfigPage" >
-  <property name="geometry" >
+ <widget class="QFrame" name="NetTracerConfigPage">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,51 +10,69 @@
     <height>554</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Net Tracer Config Page</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
       <string>Net Appearance</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="leftMargin">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
          <string>By default, the original layer's style is used for the highlighted net. 
 This style can be overridden by specifying a color, stipple, line width etc. 
 Leave those fields empty to use the original style. 
-With "original color", the color intensity adjustment allows to increase or decrease the 
+With &quot;original color&quot;, the color intensity adjustment allows increasing or decreasing the 
 brightness of the color used.</string>
         </property>
-        <property name="wordWrap" >
+        <property name="wordWrap">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
+      <item row="1" column="0">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>556</width>
           <height>16</height>
@@ -61,37 +80,46 @@ brightness of the color used.</string>
         </property>
        </spacer>
       </item>
-      <item row="3" column="0" >
-       <widget class="QFrame" name="frame_2" >
-        <property name="frameShape" >
+      <item row="3" column="0">
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="frameShadow" >
+        <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QGridLayout" >
-         <property name="margin" >
+        <layout class="QGridLayout">
+         <property name="leftMargin">
           <number>0</number>
          </property>
-         <property name="spacing" >
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
           <number>6</number>
          </property>
-         <item row="0" column="0" colspan="6" >
-          <widget class="QLabel" name="label_3" >
-           <property name="text" >
+         <item row="0" column="0" colspan="6">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
             <string>Net highlighting</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0" >
+         <item row="3" column="0">
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeType" >
+           <property name="sizeType">
             <enum>QSizePolicy::Fixed</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>16</width>
              <height>20</height>
@@ -99,15 +127,15 @@ brightness of the color used.</string>
            </property>
           </spacer>
          </item>
-         <item row="1" column="0" >
+         <item row="1" column="0">
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeType" >
+           <property name="sizeType">
             <enum>QSizePolicy::Fixed</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>16</width>
              <height>20</height>
@@ -115,29 +143,29 @@ brightness of the color used.</string>
            </property>
           </spacer>
          </item>
-         <item row="1" column="2" >
-          <widget class="QLabel" name="label_9" >
-           <property name="text" >
+         <item row="1" column="2">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
             <string>or</string>
            </property>
-           <property name="alignment" >
+           <property name="alignment">
             <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
-         <item row="1" column="4" >
-          <widget class="QLabel" name="label_4" >
-           <property name="text" >
+         <item row="1" column="4">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
             <string>% intensity increase</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="5" >
+         <item row="1" column="5">
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>201</width>
              <height>20</height>
@@ -145,83 +173,92 @@ brightness of the color used.</string>
            </property>
           </spacer>
          </item>
-         <item row="3" column="3" colspan="3" >
-          <widget class="QFrame" name="frame_3" >
-           <property name="frameShape" >
+         <item row="3" column="3" colspan="3">
+          <widget class="QFrame" name="frame_3">
+           <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
            </property>
-           <property name="frameShadow" >
+           <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <layout class="QHBoxLayout" >
-            <property name="margin" >
-             <number>0</number>
-            </property>
-            <property name="spacing" >
+           <layout class="QHBoxLayout">
+            <property name="spacing">
              <number>6</number>
             </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
-             <widget class="QToolButton" name="cc0" >
-              <property name="text" >
+             <widget class="QToolButton" name="cc0">
+              <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="cc1" >
-              <property name="text" >
+             <widget class="QToolButton" name="cc1">
+              <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="cc2" >
-              <property name="text" >
+             <widget class="QToolButton" name="cc2">
+              <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="cc3" >
-              <property name="text" >
+             <widget class="QToolButton" name="cc3">
+              <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="cc4" >
-              <property name="text" >
+             <widget class="QToolButton" name="cc4">
+              <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="cc5" >
-              <property name="text" >
+             <widget class="QToolButton" name="cc5">
+              <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="cc6" >
-              <property name="text" >
+             <widget class="QToolButton" name="cc6">
+              <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="cc7" >
-              <property name="text" >
+             <widget class="QToolButton" name="cc7">
+              <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
             <item>
              <spacer>
-              <property name="orientation" >
+              <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
-              <property name="sizeHint" >
+              <property name="sizeHint" stdset="0">
                <size>
                 <width>40</width>
                 <height>20</height>
@@ -232,47 +269,45 @@ brightness of the color used.</string>
            </layout>
           </widget>
          </item>
-         <item row="3" column="1" colspan="2" >
-          <widget class="QCheckBox" name="cycle_colors_cb" >
-           <property name="text" >
+         <item row="3" column="1" colspan="2">
+          <widget class="QCheckBox" name="cycle_colors_cb">
+           <property name="text">
             <string>Auto-color with palette</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0" colspan="6" >
-          <widget class="QLabel" name="label_8" >
-           <property name="text" >
+         <item row="2" column="0" colspan="6">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
             <string>Net coloring</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="3" >
-          <widget class="QSpinBox" name="brightness_sb" >
-           <property name="maximum" >
-            <number>100</number>
-           </property>
-           <property name="minimum" >
+         <item row="1" column="3">
+          <widget class="QSpinBox" name="brightness_sb">
+           <property name="minimum">
             <number>-100</number>
            </property>
-           <property name="singleStep" >
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="singleStep">
             <number>10</number>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" >
-          <widget class="lay::ColorButton" name="color_pb" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>13</hsizetype>
-             <vsizetype>13</vsizetype>
+         <item row="1" column="1">
+          <widget class="lay::ColorButton" name="color_pb">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="toolTip" >
+           <property name="toolTip">
             <string>The color in which the rulers are drawn</string>
            </property>
-           <property name="text" >
+           <property name="text">
             <string/>
            </property>
           </widget>
@@ -280,48 +315,57 @@ brightness of the color used.</string>
         </layout>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QFrame" name="frame" >
-        <property name="frameShape" >
+      <item row="2" column="0">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="frameShadow" >
+        <property name="frameShadow">
          <enum>QFrame::Plain</enum>
         </property>
-        <layout class="QGridLayout" >
-         <property name="margin" >
+        <layout class="QGridLayout">
+         <property name="leftMargin">
           <number>0</number>
          </property>
-         <property name="spacing" >
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
           <number>6</number>
          </property>
-         <item row="2" column="3" >
-          <widget class="QLabel" name="vs_lbl" >
-           <property name="text" >
+         <item row="2" column="3">
+          <widget class="QLabel" name="vs_lbl">
+           <property name="text">
             <string>Vertex size</string>
            </property>
           </widget>
          </item>
-         <item rowspan="2" row="0" column="3" >
-          <widget class="QLabel" name="textLabel1_4" >
-           <property name="text" >
+         <item row="0" column="3" rowspan="2">
+          <widget class="QLabel" name="textLabel1_4">
+           <property name="text">
             <string>Line width</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="5" >
-          <widget class="QLabel" name="label_5" >
-           <property name="text" >
+         <item row="2" column="5">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
             <string>pixel</string>
            </property>
           </widget>
          </item>
-         <item rowspan="3" row="0" column="6" >
+         <item row="0" column="6" rowspan="3">
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>71</width>
              <height>31</height>
@@ -329,39 +373,35 @@ brightness of the color used.</string>
            </property>
           </spacer>
          </item>
-         <item row="2" column="4" >
-          <widget class="QLineEdit" name="vs_le" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>5</hsizetype>
-             <vsizetype>0</vsizetype>
+         <item row="2" column="4">
+          <widget class="QLineEdit" name="vs_le">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
           </widget>
          </item>
-         <item rowspan="2" row="0" column="4" >
-          <widget class="QLineEdit" name="lw_le" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>5</hsizetype>
-             <vsizetype>0</vsizetype>
+         <item row="0" column="4" rowspan="2">
+          <widget class="QLineEdit" name="lw_le">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
           </widget>
          </item>
-         <item row="3" column="0" colspan="7" >
+         <item row="3" column="0" colspan="7">
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
-           <property name="sizeType" >
+           <property name="sizeType">
             <enum>QSizePolicy::Fixed</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>590</width>
              <height>16</height>
@@ -369,61 +409,59 @@ brightness of the color used.</string>
            </property>
           </spacer>
          </item>
-         <item rowspan="2" row="0" column="1" >
-          <widget class="lay::DitherPatternSelectionButton" name="stipple_pb" >
-           <property name="text" >
+         <item row="0" column="1" rowspan="2">
+          <widget class="lay::DitherPatternSelectionButton" name="stipple_pb">
+           <property name="text">
             <string/>
            </property>
           </widget>
          </item>
-         <item rowspan="2" row="0" column="0" >
-          <widget class="QLabel" name="label" >
-           <property name="text" >
+         <item row="0" column="0" rowspan="2">
+          <widget class="QLabel" name="label">
+           <property name="text">
             <string>Stipple </string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1" >
-          <widget class="QCheckBox" name="halo_cb" >
-           <property name="text" >
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="halo_cb">
+           <property name="text">
             <string/>
            </property>
-           <property name="tristate" >
+           <property name="tristate">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="2" column="0" >
-          <widget class="QLabel" name="label_7" >
-           <property name="text" >
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
             <string>Halo</string>
            </property>
           </widget>
          </item>
-         <item rowspan="2" row="0" column="5" >
-          <widget class="QLabel" name="textLabel2_2" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>0</hsizetype>
-             <vsizetype>0</vsizetype>
+         <item row="0" column="5" rowspan="2">
+          <widget class="QLabel" name="textLabel2_2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>pixel</string>
            </property>
           </widget>
          </item>
-         <item rowspan="3" row="0" column="2" >
+         <item row="0" column="2" rowspan="3">
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeType" >
+           <property name="sizeType">
             <enum>QSizePolicy::Fixed</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>16</width>
              <height>20</height>
@@ -438,26 +476,35 @@ brightness of the color used.</string>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Net Browser</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="leftMargin">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="0" column="2" >
+      <item row="0" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Minimum</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>10</width>
           <height>20</height>
@@ -465,77 +512,73 @@ brightness of the color used.</string>
         </property>
        </spacer>
       </item>
-      <item row="0" column="1" >
-       <widget class="QComboBox" name="cbx_window" >
+      <item row="0" column="1">
+       <widget class="QComboBox" name="cbx_window">
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Don't change</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Fit net with margin ..</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Center net</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Center net with size ..</string>
          </property>
         </item>
        </widget>
       </item>
-      <item row="1" column="3" >
-       <widget class="QLineEdit" name="le_max_markers" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="le_max_markers">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="textLabel1_2" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="textLabel1_2">
+        <property name="text">
          <string>Window      </string>
         </property>
        </widget>
       </item>
-      <item row="0" column="4" >
-       <widget class="QLabel" name="textLabel2" >
-        <property name="text" >
+      <item row="0" column="4">
+       <widget class="QLabel" name="textLabel2">
+        <property name="text">
          <string>µm</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3" >
-       <widget class="QLineEdit" name="le_window" >
-        <property name="enabled" >
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="le_window">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item rowspan="2" row="0" column="5" >
+      <item row="0" column="5" rowspan="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -543,9 +586,9 @@ brightness of the color used.</string>
         </property>
        </spacer>
       </item>
-      <item row="1" column="0" colspan="3" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
+      <item row="1" column="0" colspan="3">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
          <string>Maximum number of shapes highlighted</string>
         </property>
        </widget>
@@ -555,7 +598,7 @@ brightness of the color used.</string>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>lay::DitherPatternSelectionButton</class>

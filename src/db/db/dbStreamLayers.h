@@ -99,12 +99,12 @@ struct DB_PUBLIC LDPair
  *
  *  The mapping object provides a lookup for a given input layer
  *  (called "physical layer") to a logical layer specified as
- *  a layer index used inside db::Layout. The object allows to
- *  look up a layer index for a given layer/datatype/name.
+ *  a layer index used inside db::Layout. The object allows
+ *  looking up a layer index for a given layer/datatype/name.
  *
- *  It also allows to specify a target layer per logical layer. That
+ *  It also allows one to specify a target layer per logical layer. That
  *  is the information attached to the layer when it is actually created.
- *  This allows to map an input layer to another layer specification
+ *  This allows mapping an input layer to another layer specification
  *  and effectively rename a layer or add layer name information to
  *  a GDS layer/datatype layer.
  *

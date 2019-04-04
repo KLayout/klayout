@@ -408,7 +408,7 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
     "\n"
-    "This variant allows to specify an additional transformation too. It has been introduced in version 0.23.2.\n"
+    "This variant allows one to specify an additional transformation too. It has been introduced in version 0.23.2.\n"
   ) + 
   method_ext ("input", &tp_input10,
     "@brief Specifies input for the tiling processor\n"
@@ -428,7 +428,7 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
     "\n"
     "The name specifies the variable under which the input can be used in the scripts."
     "\n"
-    "This variant allows to specify an additional transformation too. It has been introduced in version 0.23.2.\n"
+    "This variant allows one to specify an additional transformation too. It has been introduced in version 0.23.2.\n"
     "\n"
   ) + 
   method ("var", &db::TilingProcessor::var,
@@ -651,7 +651,7 @@ Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
   "\n"
   "The tiling processor executes one or several scripts on one or multiple layouts providing "
   "a tiling scheme. In that scheme, the processor divides the original layout into rectangular tiles "
-  "and executes the scripts on each tile separately. The tiling processor allows to specify multiple, "
+  "and executes the scripts on each tile separately. The tiling processor allows one to specify multiple, "
   "independent scripts which are run separately on each tile. It can make use of multi-core CPU's by "
   "supporting multiple threads running the tasks in parallel (with respect to tiles and scripts).\n"
   "\n"

@@ -37,7 +37,7 @@ class PolygonSink;
  *
  *  This filter has two parameters: lmin and lmax.
  *  It will filter all edges for which the length is >= lmin and < lmax.
- *  There is an "invert" flag which allows to select all edges not
+ *  There is an "invert" flag which allows selecting all edges not
  *  matching the criterion.
  */
 
@@ -108,7 +108,7 @@ private:
  *  This filter has two parameters: amin and amax.
  *  It will filter all edges for which the orientation angle is >= amin and < amax.
  *  The orientation angle is measured in degree against the x axis in the mathematical sense.
- *  There is an "invert" flag which allows to select all edges not
+ *  There is an "invert" flag which allows selecting all edges not
  *  matching the criterion.
  */
 

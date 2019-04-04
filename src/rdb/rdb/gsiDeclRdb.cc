@@ -1066,7 +1066,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
   gsi::method ("generator", &rdb::Database::generator, 
     "@brief Gets the databases generator\n"
     "The generator string describes how the database was created, i.e. DRC tool name and tool options.\n"
-    "In a later version this should allow to rerun the tool that created the report.\n"
+    "In a later version this will allow re-running the tool that created the report.\n"
     "@return The generator string\n"
   ) +
   gsi::method ("generator=", &rdb::Database::set_generator, gsi::arg ("generator"),

@@ -29,7 +29,7 @@ namespace gsi
 
 
 // ---------------------------------------------------------------------------------
-//  A generic value wrapper that allows to wrap a plain data type into an object 
+//  A generic value wrapper that allows wrapping a plain data type into an object
 
 static gsi::Value *new_vv (const tl::Variant &v) 
 {

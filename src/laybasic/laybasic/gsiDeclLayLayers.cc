@@ -1266,7 +1266,7 @@ Class<lay::LayerPropertiesNode> decl_LayerPropertiesNode (
   method_ext ("add_child", &add_child0,
     "@brief Add a child entry\n"
     "@return A reference to the node created\n"
-    "This method allows to build a layer properties tree by adding children to node objects. "
+    "This method allows building a layer properties tree by adding children to node objects. "
     "It returns a reference to the node object created which is a freshly initialized one.\n"
     "\n"
     "The parameterless version of this method was introduced in version 0.25."
@@ -1275,7 +1275,7 @@ Class<lay::LayerPropertiesNode> decl_LayerPropertiesNode (
     "@brief Add a child entry\n"
     "@args child\n"
     "@return A reference to the node created\n"
-    "This method allows to build a layer properties tree by adding children to node objects. "
+    "This method allows building a layer properties tree by adding children to node objects. "
     "It returns a reference to the node object created.\n"
     "\n"
     "This method was introduced in version 0.22."

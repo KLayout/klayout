@@ -435,7 +435,7 @@ public:
 /**
  *  @brief The generic factory
  *
- *  This factory allows to create a user object from a given string and class name.
+ *  This factory creates an user object from a given string and class name.
  */
 template <class C>
 class user_object_factory

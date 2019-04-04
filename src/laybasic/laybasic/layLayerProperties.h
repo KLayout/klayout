@@ -1446,7 +1446,7 @@ struct LAYBASIC_PUBLIC CompareLayerIteratorBottomUp
  *  @brief Flat, non-const layer iterator
  *
  *  This iterator provides a flat view for the layers in the layer tree
- *  and allows to change the item pointed to.
+ *  and allows changing the item pointed to.
  */
 class LAYBASIC_PUBLIC LayerPropertiesIterator
   : public LayerPropertiesConstIterator

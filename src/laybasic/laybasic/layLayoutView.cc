@@ -2691,7 +2691,7 @@ LayoutView::save_screenshot (const std::string &fn)
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  //  Unfortunately the PNG writer does not allow to write long strings.
+  //  Unfortunately the PNG writer does not allow writing of long strings.
   //  We separate the description into a set of keys:
 
   for (unsigned int i = 0; i < cellviews (); ++i) {
@@ -2748,7 +2748,7 @@ LayoutView::save_image (const std::string &fn, unsigned int width, unsigned int 
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  //  Unfortunately the PNG writer does not allow to write long strings.
+  //  Unfortunately the PNG writer does not allow writing of long strings.
   //  We separate the description into a set of keys:
 
   for (unsigned int i = 0; i < cellviews (); ++i) {
@@ -2780,7 +2780,7 @@ LayoutView::save_image_with_options (const std::string &fn,
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  //  Unfortunately the PNG writer does not allow to write long strings.
+  //  Unfortunately the PNG writer does not allow writing of long strings.
   //  We separate the description into a set of keys:
 
   for (unsigned int i = 0; i < cellviews (); ++i) {

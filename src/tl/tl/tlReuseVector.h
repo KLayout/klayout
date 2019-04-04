@@ -478,9 +478,9 @@ private:
 };
    
 /**
- *  @brief A vector that maintains the order of elements but allows to reference elements in a stable way
+ *  @brief A vector that maintains the order of elements but allows one to reference elements in a stable way
  *
- *  This container allows to insert and delete elements while references to them (through iterators)
+ *  This container allows inserting and deleting of elements while references to them (through iterators)
  *  remain stable. The insert does not necessarily happen at a certain position. Instead, the vector
  *  keeps a reuseable member list (hence reuse_vector). In addition, the iterators deliver stable references
  *  by using indices and a container pointer. This way, the iterators point to the same element

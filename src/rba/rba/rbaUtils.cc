@@ -514,7 +514,7 @@ VALUE rba_eval_string_in_context (const char *expr, const char *file, int line, 
   int argc;
   VALUE args[4];
   args[0] = rb_str_new (expr, long (strlen (expr)));
-  //  use the current binding if there is one. This allows to eval in the context of a current trace callback
+  //  use the current binding if there is one. This allows using "eval" in the context of a current trace callback
   //  when eval is called from the trace handler.
   if (context < 0) {
     args[1] = rb_const_get (rb_cObject, rb_intern ("TOPLEVEL_BINDING")); // taken from ruby.c

@@ -59,7 +59,7 @@ public:
   /** 
    *  @brief Instantiate a counter object with a reference to the given cell graph
    *
-   *  This version allows to specify a initial (starting) cell where only the cell tree below the 
+   *  This version allows one to specify a initial (starting) cell where only the cell tree below the
    *  staring cell is considered. Multiplicity refers to the number of instances below the
    *  initial cell.
    */
@@ -159,7 +159,7 @@ public:
   /** 
    *  @brief Instantiate a counter object with a reference to the given cell graph
    *
-   *  This version allows to specify a initial (starting) cell where only the cell tree below the 
+   *  This version allows one to specify a initial (starting) cell where only the cell tree below the
    *  staring cell is considered. Multiplicity refers to the number of instances below the
    *  initial cell.
    */

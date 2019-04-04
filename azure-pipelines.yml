@@ -2,7 +2,11 @@
 trigger:
   tags:
     include:
-    - v*
+    - '*'
+  branches:
+    include:
+    - master
+    - staging
 
 jobs:
 - job: Build

@@ -8,6 +8,14 @@ PING_LOOP_PID=$!
 
 touch build.txt
 
+# Configure ccache
+mkdir -p ccache;
+export CCACHE_DIR="`pwd`/ccache"
+
+# Show ccache stats
+echo "Cache stats:"
+ccache -s
+
 echo "build"
 make build >> build.txt 2>&1 || tail -500 build.txt
 echo "deploy"
@@ -16,6 +24,10 @@ echo "test"
 make test >> build.txt 2>&1 || tail -500 build.txt
 echo "dropbox-deploy"
 make dropbox-deploy
+
+# Show ccache stats
+echo "Cache stats:"
+ccache -s
 
 echo "build finished"
 

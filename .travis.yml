@@ -343,7 +343,9 @@ matrix:
     - name: "KLayout macOS 10.13 with py3.7"
       os: osx
       osx_image: xcode9.4 # macOS 10.13
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -360,7 +362,9 @@ matrix:
     - name: "KLayout macOS 10.12 with py3.7"
       os: osx
       osx_image: xcode8.3 # macOS 10.12
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -377,7 +381,9 @@ matrix:
     - name: "KLayout macOS 10.11 with py3.7"
       os: osx
       osx_image: xcode8 # macOS 10.11
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -393,7 +399,9 @@ matrix:
     - name: "KLayout macOS 10.13 with py2.7"
       os: osx
       osx_image: xcode9.4 # macOS 10.13
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -409,7 +417,9 @@ matrix:
     - name: "KLayout macOS 10.12 with py2.7"
       os: osx
       osx_image: xcode8.3 # macOS 10.12
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -425,7 +435,9 @@ matrix:
     - name: "KLayout macOS 10.11 with py2.7"
       os: osx
       osx_image: xcode8 # macOS 10.11
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:

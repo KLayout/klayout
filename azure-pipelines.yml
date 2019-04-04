@@ -166,4 +166,5 @@ jobs:
         TWINE_PASSWORD: $(TWINE_PASSWORD)
         TWINE_REPOSITORY_URL: $(TWINE_REPOSITORY_URL)
       displayName: 'Uploading to PyPI'
+      condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
 

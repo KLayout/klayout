@@ -1,8 +1,5 @@
 # https://aka.ms/yaml
 trigger:
-  tags:
-    include:
-    - '*'
   branches:
     include:
     - master

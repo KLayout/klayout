@@ -390,6 +390,30 @@ sm_assign (const char *name, const gsi::ClassBase *cls)
   return sm;
 }
 
+static const std::set<std::pair<std::string, bool> > &name_map_for_class (const gsi::ClassBase *cls, std::map<const gsi::ClassBase *, std::set<std::pair<std::string, bool> > > &cache)
+{
+  if (! cls) {
+    static std::set<std::pair<std::string, bool> > empty;
+    return empty;
+  }
+
+  std::map<const gsi::ClassBase *, std::set<std::pair<std::string, bool> > >::iterator cc = cache.find (cls);
+  if (cc != cache.end ()) {
+    return cc->second;
+  }
+
+  cc = cache.insert (std::make_pair ((const gsi::ClassBase *) 0, std::set<std::pair<std::string, bool> > ())).first;
+  cc->second = name_map_for_class (cls->base (), cache);
+
+  for (gsi::ClassBase::method_iterator m = cls->begin_methods (); m != cls->end_methods (); ++m) {
+    for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+      cc->second.insert (std::make_pair (syn->name, (*m)->is_static ()));
+    }
+  }
+
+  return cc->second;
+}
+
 void
 ClassBase::merge_declarations ()
 {
@@ -433,6 +457,8 @@ ClassBase::merge_declarations ()
     }
   }
 
+  std::map<const gsi::ClassBase *, std::set<std::pair<std::string, bool> > > name_maps;
+
   //  Add to the classes the special methods and clean up the method table
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
 
@@ -441,12 +467,7 @@ ClassBase::merge_declarations ()
       continue;
     }
 
-    std::set<std::pair<std::string, bool> > name_map;
-    for (gsi::ClassBase::method_iterator m = c->begin_methods (); m != c->end_methods (); ++m) {
-      for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
-        name_map.insert (std::make_pair (syn->name, (*m)->is_static ()));
-      }
-    }
+    const std::set<std::pair<std::string, bool> > &name_map = name_map_for_class (c.operator-> (), name_maps);
 
     //  We don't want the declaration object to be non-const except for this case. So
     //  we const_cast here.

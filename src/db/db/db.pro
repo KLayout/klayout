@@ -175,7 +175,8 @@ SOURCES = \
     dbRegionProcessors.cc \
     dbNetlistCompare.cc \
     dbNetlistReader.cc \
-    dbNetlistSpiceReader.cc
+    dbNetlistSpiceReader.cc \
+    gsiDeclDbNetlistCompare.cc
 
 HEADERS = \
   dbArray.h \

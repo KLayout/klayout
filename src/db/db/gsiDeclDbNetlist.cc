@@ -39,6 +39,10 @@ Class<db::Pin> decl_dbPin ("db", "Pin",
   ) +
   gsi::method ("name", &db::Pin::name,
     "@brief Gets the name of the pin.\n"
+  ) +
+  gsi::method ("expanded_name", &db::Pin::expanded_name,
+    "@brief Gets the expanded name of the pin.\n"
+    "The expanded name is the name or a generic identifier made from the ID if the name is empty."
   ),
   "@brief A pin of a circuit.\n"
   "Pin objects are used to describe the outgoing pins of "
@@ -1009,6 +1013,11 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("to_s", &db::Netlist::to_string,
     "@brief Converts the netlist to a string representation.\n"
     "This method is intended for test purposes mainly."
+  ) +
+  gsi::method ("from_s", &db::Netlist::from_string, gsi::arg ("str"),
+    "@brief Reads the netlist from a string representation.\n"
+    "This method is intended for test purposes mainly. It turns a string returned by \\to_s back into "
+    "a netlist. Note that the device classes must be created before as they are not persisted inside the string."
   ) +
   gsi::method ("combine_devices", &db::Netlist::combine_devices,
     "@brief Combines devices where possible\n"

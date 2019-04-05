@@ -296,11 +296,10 @@ public:
 };
 
 }
-
 namespace gsi
 {
 
-Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_GenericNetlistCompareLogger, "db", "GenericNetlistCompareLogger",
+Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "GenericNetlistCompareLogger",
   gsi::callback ("begin_netlist", &GenericNetlistCompareLogger::begin_netlist, &GenericNetlistCompareLogger::cb_begin_netlist, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called at the beginning of the compare process.\n"
     "This method is called once when the compare run begins.\n"
@@ -401,13 +400,13 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_Generi
   "This class has been introduced in version 0.26.\n"
 );
 
-db::NetlistComparer *make_comparer (db::NetlistCompareLogger *logger)
+static db::NetlistComparer *make_comparer (GenericNetlistCompareLogger *logger)
 {
   return new db::NetlistComparer (logger);
 }
 
 Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
-  gsi::constructor ("new", &make_comparer, gsi::arg ("logger", (db::NetlistCompareLogger *) 0),
+  gsi::constructor ("new", &make_comparer, gsi::arg ("logger", (GenericNetlistCompareLogger *) 0),
     "@brief Creates a new comparer object."
     "The logger is a delegate or event receiver which the comparer will send compare events to. "
     "See the class description for more details."

@@ -455,6 +455,12 @@ matrix:
 before_install:
   - env
   - gem install dropbox-deployment
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+        export PATH="/usr/local/opt/ccache/libexec:$PATH";
+        mkdir -p ccache;
+        export CCACHE_DIR="`pwd`/ccache";
+        ccache -s;
+    fi
   - eval "${MATRIX_EVAL}"
   - if [ "${PIP_UPDATE}" == "1" ]; then
         pip --version;
@@ -463,12 +469,6 @@ before_install:
         pip install --upgrade setuptools wheel || sudo pip install --upgrade setuptools wheel;
     fi
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
-  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-        export PATH="/usr/local/opt/ccache/libexec:$PATH";
-        mkdir -p ccache;
-        export CCACHE_DIR="`pwd`/ccache";
-        ccache -s;
-    fi
 
 install:
   - if [ "$DOCKER_BUILD" = true ]; then

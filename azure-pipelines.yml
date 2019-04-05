@@ -1,4 +1,13 @@
 # https://aka.ms/yaml
+trigger:
+  branches:
+    include:
+    - master
+    - staging
+  tags:
+    include:
+      - '*'
+
 jobs:
 - job: Build
   pool:
@@ -158,4 +167,5 @@ jobs:
         TWINE_PASSWORD: $(TWINE_PASSWORD)
         TWINE_REPOSITORY_URL: $(TWINE_REPOSITORY_URL)
       displayName: 'Uploading to PyPI'
+      condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
 

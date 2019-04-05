@@ -242,6 +242,7 @@ matrix:
         homebrew:
           packages:
             - ccache
+          update: true
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
@@ -333,6 +334,7 @@ matrix:
         homebrew:
           packages:
             - ccache
+          update: true
       env:
         - MATRIX_EVAL="brew update; brew config; brew upgrade python; brew postinstall python; ls -l /usr/local/opt/python/libexec/bin/; shopt -s expand_aliases; alias python='/usr/local/opt/python/libexec/bin/python'; alias pip='/usr/local/opt/python/libexec/bin/pip';"
         - ARCHFLAGS="-std=c++11"

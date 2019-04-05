@@ -3,7 +3,7 @@ set -e
 
 export PING_SLEEP=30s
 
-bash -c "while true; do echo -n '.'; sleep $PING_SLEEP; done" &
+bash -c "while true; do find * | wc -l; sleep $PING_SLEEP; done" &
 PING_LOOP_PID=$!
 
 touch build.txt

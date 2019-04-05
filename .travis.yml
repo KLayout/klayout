@@ -391,6 +391,7 @@ matrix:
         homebrew:
           packages:
             - python3
+            - ccache
           update: true
       env:
         - MATRIX_EVAL="brew update; brew config; brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/56c500b569c724b049be7ab9e12d9693f85522f9/Formula/qt.rb"  # Qt 5.11.2

@@ -208,6 +208,10 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
   throw tl::Exception (tl::to_string (tr ("Invalid terminal name")) + ": '" + name + "'");
 }
 
+//  NOTE: to allow rounding errors for parameter comparison, we use
+//  a default relative tolerance.
+const double relative_tolerance = 1e-6;
+
 bool DeviceClass::less (const db::Device &a, const db::Device &b)
 {
   tl_assert (a.device_class () != 0);
@@ -224,7 +228,7 @@ bool DeviceClass::less (const db::Device &a, const db::Device &b)
 
     const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
     for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, 0.0);
+      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, relative_tolerance);
       if (cmp != 0) {
         return cmp < 0;
       }
@@ -251,7 +255,7 @@ bool DeviceClass::equal (const db::Device &a, const db::Device &b)
 
     const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
     for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, 0.0);
+      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, relative_tolerance);
       if (cmp != 0) {
         return false;
       }

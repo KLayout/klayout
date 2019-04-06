@@ -589,6 +589,15 @@ public:
    */
   void combine_devices ();
 
+  /**
+   *  @brief Flattens the given subcircuit
+   *
+   *  The subcircuit is resolved into the parent circuit and finally removed.
+   *  Net, device and subcircuit names are decorated with the subcircuit's name
+   *  if required.
+   */
+  void flatten_subcircuit (SubCircuit *subcircuit);
+
 private:
   friend class Netlist;
   friend class Net;

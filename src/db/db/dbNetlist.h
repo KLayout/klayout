@@ -139,6 +139,12 @@ public:
   void remove_circuit (Circuit *circuit);
 
   /**
+   *  @brief Flattens the given circuit
+   *  All subcircuit references are replaced by the content of this circuit.
+   */
+  void flatten_circuit (Circuit *circuit);
+
+  /**
    *  @brief Begin iterator for the circuits of the netlist (non-const version)
    */
   circuit_iterator begin_circuits ()

@@ -714,6 +714,66 @@ END
 
   end
 
+  def test_11_FlattenCircuits
+
+    nl = RBA::Netlist::new
+
+    dc = RBA::DeviceClassMOS3Transistor::new
+    dc.name = "NMOS"
+    nl.add(dc)
+
+    dc = RBA::DeviceClassMOS3Transistor::new
+    dc.name = "PMOS"
+    nl.add(dc)
+
+    nl.from_s(<<"END")
+circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
+  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);
+  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);
+  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);
+  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);
+end;
+circuit PTRANS ($1=$1,$2=$2,$3=$3);
+  device PMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);
+end;
+circuit NTRANS ($1=$1,$2=$2,$3=$3);
+  device NMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);
+end;
+END
+
+    nl2 = nl.dup
+    inv2 = nl2.circuit_by_name("INV2")
+    inv2.flatten_subcircuit(inv2.subcircuit_by_name("SC1"))
+
+    assert_equal(nl2.to_s, <<"END")
+circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
+  device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);
+  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);
+  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);
+end;
+circuit PTRANS ($1=$1,$2=$2,$3=$3);
+  device PMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+end;
+circuit NTRANS ($1=$1,$2=$2,$3=$3);
+  device NMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+end;
+END
+
+    nl2.flatten_circuit(nl2.circuit_by_name("PTRANS"))
+    nl2.flatten_circuit(nl2.circuit_by_name("NTRANS"))
+
+    assert_equal(nl2.to_s, <<"END")
+circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
+  device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+  device NMOS $3 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+end;
+END
+
+  end
+
 end
 
 load("test_epilogue.rb")

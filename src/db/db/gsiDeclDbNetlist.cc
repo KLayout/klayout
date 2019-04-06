@@ -956,6 +956,11 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::method ("remove_subcircuit", &db::Circuit::remove_subcircuit, gsi::arg ("subcircuit"),
     "@brief Removes the given subcircuit from the circuit\n"
   ) +
+  gsi::method ("flatten_subcircuit", &db::Circuit::flatten_subcircuit, gsi::arg ("subcircuit"),
+    "@brief Flattens a subcircuit\n"
+    "This method will substitute the given subcircuit by it's contents. The subcircuit is removed "
+    "after this."
+  ) +
   gsi::iterator ("each_subcircuit", (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_subcircuits, (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::end_subcircuits,
     "@brief Iterates over the subcircuits of the circuit"
   ) +
@@ -1083,6 +1088,11 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("remove", &db::Netlist::remove_circuit, gsi::arg ("circuit"),
     "@brief Removes the given circuit object from the netlist\n"
     "After the object has been removed, it becomes invalid and cannot be used further."
+  ) +
+  gsi::method ("flatten_circuit", &db::Netlist::flatten_circuit, gsi::arg ("circuit"),
+    "@brief Flattens a subcircuit\n"
+    "This method will substitute all instances (subcircuits) of the given circuit by it's "
+    "contents. After this, the circuit is removed."
   ) +
   gsi::method ("circuit_by_cell_index", (db::Circuit *(db::Netlist::*) (db::cell_index_type)) &db::Netlist::circuit_by_cell_index, gsi::arg ("cell_index"),
     "@brief Gets the circuit object for a given cell index.\n"

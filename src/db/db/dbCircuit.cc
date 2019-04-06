@@ -317,6 +317,87 @@ void Circuit::unregister_ref (SubCircuit *r)
   m_refs.erase (r);
 }
 
+void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
+{
+  const db::Circuit *c = subcircuit->circuit_ref ();
+
+  //  copy the nets, produce a net map
+
+  std::map<const db::Net *, db::Net *> net2net;
+
+  for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
+
+    //  TODO: cannot join pins through subcircuits currently
+    tl_assert (n->pin_count () <= 1);
+
+    db::Net *outside_net = 0;
+
+    if (n->pin_count () > 0) {
+      size_t pin_id = n->begin_pins ()->pin_id ();
+      outside_net = subcircuit->net_for_pin (pin_id);
+    } else {
+      outside_net = new db::Net ();
+      if (! n->name ().empty ()) {
+        outside_net->set_name (subcircuit->expanded_name () + "." + n->name ());
+      }
+      add_net (outside_net);
+    }
+
+    net2net.insert (std::make_pair (n.operator-> (), outside_net));
+
+  }
+
+  //  copy the devices
+
+  for (db::Circuit::const_device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
+
+    db::Device *device = new db::Device (*d);
+    if (! d->name ().empty ()) {
+      device->set_name (subcircuit->expanded_name () + "." + d->name ());
+    }
+    add_device (device);
+
+    const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
+    for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
+
+      const db::Net *tnet = d->net_for_terminal (t->id ());
+      if (tnet) {
+        std::map<const db::Net *, db::Net *>::const_iterator n2n = net2net.find (tnet);
+        tl_assert (n2n != net2net.end ());
+        device->connect_terminal (t->id (), n2n->second);
+      }
+
+    }
+
+  }
+
+  //  copy the subcircuits
+
+  for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
+
+    db::SubCircuit *new_subcircuit = new db::SubCircuit (*sc);
+    if (! new_subcircuit->name ().empty ()) {
+      new_subcircuit->set_name (subcircuit->expanded_name () + "." + new_subcircuit->name ());
+    }
+    add_subcircuit (new_subcircuit);
+
+    const db::Circuit *cr = sc->circuit_ref ();
+    for (db::Circuit::const_pin_iterator p = cr->begin_pins (); p != cr->end_pins (); ++p) {
+
+      const db::Net *pnet = sc->net_for_pin (p->id ());
+      if (pnet) {
+        std::map<const db::Net *, db::Net *>::const_iterator n2n = net2net.find (pnet);
+        tl_assert (n2n != net2net.end ());
+        new_subcircuit->connect_pin (p->id (), n2n->second);
+      }
+
+    }
+
+  }
+
+  remove_subcircuit (subcircuit);
+}
+
 void Circuit::translate_circuits (const std::map<const Circuit *, Circuit *> &map)
 {
   for (subcircuit_iterator i = m_subcircuits.begin (); i != m_subcircuits.end (); ++i) {

@@ -369,6 +369,20 @@ void Netlist::remove_circuit (Circuit *circuit)
   m_circuits.erase (circuit);
 }
 
+void Netlist::flatten_circuit (Circuit *circuit)
+{
+  std::vector<db::SubCircuit *> refs;
+  for (db::Circuit::refs_iterator sc = circuit->begin_refs (); sc != circuit->end_refs (); ++sc) {
+    refs.push_back (sc.operator-> ());
+  }
+
+  for (std::vector<db::SubCircuit *>::const_iterator r = refs.begin (); r != refs.end (); ++r) {
+    (*r)->circuit ()->flatten_subcircuit (*r);
+  }
+
+  remove_circuit (circuit);
+}
+
 DeviceClass *Netlist::device_class_by_name (const std::string &name)
 {
   for (device_class_iterator d = begin_device_classes (); d != end_device_classes (); ++d) {

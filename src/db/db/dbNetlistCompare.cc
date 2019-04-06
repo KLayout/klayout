@@ -22,10 +22,11 @@
 */
 
 #include "dbNetlistCompare.h"
-#include "dbHash.h"
+#include "dbNetlistDeviceClasses.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
 #include "tlEquivalenceClusters.h"
+#include "tlLog.h"
 
 namespace db
 {
@@ -167,6 +168,40 @@ public:
 private:
   const db::Circuit *mp_other;
   std::map<size_t, size_t> m_pin_map, m_rev_pin_map;
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+//  DeviceFilter definition and implementation
+
+class DeviceFilter
+{
+public:
+  DeviceFilter (double cap_threshold, double res_threshold)
+    : m_cap_threshold (cap_threshold), m_res_threshold (res_threshold)
+  {
+    //  .. nothing yet ..
+  }
+
+  bool filter (const db::Device *device) const
+  {
+    const db::DeviceClassResistor *res = dynamic_cast<const db::DeviceClassResistor *> (device->device_class ());
+    const db::DeviceClassCapacitor *cap = dynamic_cast<const db::DeviceClassCapacitor *> (device->device_class ());
+
+    if (res) {
+      if (m_res_threshold > 0.0 && device->parameter_value (db::DeviceClassResistor::param_id_R) > m_res_threshold) {
+        return false;
+      }
+    } else if (cap) {
+      if (m_cap_threshold > 0.0 && device->parameter_value (db::DeviceClassCapacitor::param_id_C) < m_cap_threshold) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+private:
+  double m_cap_threshold, m_res_threshold;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -418,7 +453,7 @@ public:
 
   typedef std::vector<std::pair<std::vector<EdgeDesc>, std::pair<size_t, const db::Net *> > >::const_iterator edge_iterator;
 
-  NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
+  NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
     : mp_net (net), m_other_net_index (std::numeric_limits<size_t>::max ())
   {
     if (! net) {
@@ -517,6 +552,10 @@ public:
     for (db::Net::const_terminal_iterator i = net->begin_terminals (); i != net->end_terminals (); ++i) {
 
       const db::Device *d = i->device ();
+      if (! device_filter.filter (d)) {
+        continue;
+      }
+
       size_t device_cat = device_categorizer.cat_for_device (d);
       size_t terminal1_id = translate_terminal_id (i->terminal_id (), d);
 
@@ -731,7 +770,7 @@ public:
     //  .. nothing yet ..
   }
 
-  void build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper)
+  void build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper)
   {
     tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Building net graph for circuit: ")) + c->name ());
 
@@ -739,7 +778,7 @@ public:
     m_net_index.clear ();
 
     //  create a dummy node for a null net
-    m_nodes.push_back (NetGraphNode (0, device_categorizer, circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper));
+    m_nodes.push_back (NetGraphNode (0, device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper));
 
     size_t nets = 0;
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
@@ -748,7 +787,7 @@ public:
     m_nodes.reserve (nets);
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-      NetGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper);
+      NetGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper);
       m_nodes.push_back (node);
     }
 
@@ -906,6 +945,21 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
   mp_device_categorizer.reset (new DeviceCategorizer ());
   mp_circuit_categorizer.reset (new CircuitCategorizer ());
   mp_circuit_pin_mapper.reset (new CircuitPinMapper ());
+
+  m_cap_threshold = -1.0;   //  not set
+  m_res_threshold = -1.0;   //  not set
+}
+
+void
+NetlistComparer::exclude_caps (double threshold)
+{
+  m_cap_threshold = threshold;
+}
+
+void
+NetlistComparer::exclude_resistors (double threshold)
+{
+  m_res_threshold = threshold;
 }
 
 void
@@ -1112,12 +1166,14 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGra
 bool
 NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
 {
+  db::DeviceFilter device_filter (m_cap_threshold, m_res_threshold);
+
   db::NetDeviceGraph g1, g2;
 
   //  NOTE: for normalization we map all subcircuits of c1 to c2.
   //  Also, pin swapping will only happen there.
-  g1.build (c1, device_categorizer, circuit_categorizer, &c12_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
-  g2.build (c2, device_categorizer, circuit_categorizer, &c22_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
+  g1.build (c1, device_categorizer, circuit_categorizer, device_filter, &c12_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
+  g2.build (c2, device_categorizer, circuit_categorizer, device_filter, &c22_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
 
   //  Match dummy nodes for null nets
   g1.identify (0, 0);
@@ -1342,6 +1398,10 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::Circuit::const_device_iterator d = c1->begin_devices (); d != c1->end_devices (); ++d) {
 
+    if (! device_filter.filter (d.operator-> ())) {
+      continue;
+    }
+
     std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g1);
 
     bool mapped = true;
@@ -1364,6 +1424,10 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   }
 
   for (db::Circuit::const_device_iterator d = c2->begin_devices (); d != c2->end_devices (); ++d) {
+
+    if (! device_filter.filter (d.operator-> ())) {
+      continue;
+    }
 
     std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g2);
 

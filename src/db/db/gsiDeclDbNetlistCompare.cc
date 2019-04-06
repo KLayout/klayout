@@ -454,6 +454,14 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "This method makes a circuit circuit_a in netlist a identical to the corresponding\n"
     "circuit circuit_b in netlist b (see \\compare). By default circuits with the same name are identical.\n"
   ) +
+  gsi::method ("min_capacitance=", &db::NetlistComparer::exclude_caps, gsi::arg ("threshold"),
+    "@brief Excludes all capacitor devices with a capacitance values less than the given threshold.\n"
+    "To reset this constraint, set this attribute to zero."
+  ) +
+  gsi::method ("max_resistance=", &db::NetlistComparer::exclude_resistors, gsi::arg ("threshold"),
+    "@brief Excludes all resistor devices with a resistance values higher than the given threshold.\n"
+    "To reset this constraint, set this attribute to zero."
+  ) +
   gsi::method ("compare", &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"),
     "@brief Compares two netlists.\n"
     "This method will perform the actual netlist compare. It will return true if both netlists are identical. "

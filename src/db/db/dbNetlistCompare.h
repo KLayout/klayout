@@ -196,6 +196,16 @@ public:
   void same_circuits (const db::Circuit *ca, const db::Circuit *cb);
 
   /**
+   *  @brief Exclude caps with less than the given capacity value
+   */
+  void exclude_caps (double threshold);
+
+  /**
+   *  @brief Exclude resistors with more than the given resistance value
+   */
+  void exclude_resistors (double threshold);
+
+  /**
    *  @brief Actually compares the two netlists
    */
   bool compare (const db::Netlist *a, const db::Netlist *b) const;
@@ -209,6 +219,8 @@ protected:
   std::auto_ptr<CircuitPinMapper> mp_circuit_pin_mapper;
   std::auto_ptr<DeviceCategorizer> mp_device_categorizer;
   std::auto_ptr<CircuitCategorizer> mp_circuit_categorizer;
+  double m_cap_threshold;
+  double m_res_threshold;
 };
 
 }

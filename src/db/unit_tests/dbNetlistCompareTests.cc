@@ -385,6 +385,73 @@ TEST(1_SimpleInverterMatchedDeviceClasses)
   EXPECT_EQ (good, true);
 }
 
+TEST(1_SimpleInverterSkippedDevices)
+{
+  const char *nls1 =
+    "circuit INV ($1=IN,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device CAP $2 (A=OUT,B=IN) (C=1e-12);\n"
+    "  device NMOS $3 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit INV ($1=VDD,$2=IN,$3=VSS,$4=OUT);\n"
+    "  device NMOS $1 (S=OUT,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device CAP $2 (A=OUT,B=IN) (C=1e-13);\n"
+    "  device RES $3 (A=OUT,B=IN) (R=1000);\n"
+    "  device PMOS $4 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+     "begin_circuit INV INV\n"
+     "match_nets VDD VDD\n"
+     "match_nets VSS VSS\n"
+     "match_nets OUT OUT\n"
+     "match_nets IN IN\n"
+     "match_pins $0 $1\n"
+     "match_pins $1 $3\n"
+     "match_pins $2 $0\n"
+     "match_pins $3 $2\n"
+     "match_devices $3 $1\n"
+     "match_devices_with_different_parameters $2 $2\n"
+     "device_mismatch (null) $3\n"
+     "match_devices $1 $4\n"
+     "end_circuit INV INV NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+
+  comp.exclude_caps (1e-11);
+  comp.exclude_resistors (900.0);
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+     "begin_circuit INV INV\n"
+     "match_nets VDD VDD\n"
+     "match_nets VSS VSS\n"
+     "match_nets OUT OUT\n"
+     "match_nets IN IN\n"
+     "match_pins $0 $1\n"
+     "match_pins $1 $3\n"
+     "match_pins $2 $0\n"
+     "match_pins $3 $2\n"
+     "match_devices $3 $1\n"
+     "match_devices $1 $4\n"
+     "end_circuit INV INV MATCH"
+  );
+  EXPECT_EQ (good, true);
+}
+
 TEST(2_SimpleInverterWithForcedNetAssignment)
 {
   const char *nls1 =

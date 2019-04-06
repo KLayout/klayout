@@ -871,6 +871,86 @@ END
 
   end
 
+  def test_10
+
+    nls1 = <<"END"
+circuit INV($1=IN,$2=OUT,$3=VDD,$4=VSS);
+  device PMOS $1(S=VDD,G=IN,D=OUT)(L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+  device CAP $2 (A=OUT,B=IN) (C=1e-12);
+  device NMOS $2(S=VSS,G=IN,D=OUT)(L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+end;
+END
+
+    nls2 = <<"END"
+circuit INV($1=VDD,$2=IN,$3=VSS,$4=OUT);
+  device NMOSB $1(S=OUT,G=IN,D=VSS)(L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+  device CAP $2 (A=OUT,B=IN) (C=1e-13);
+  device RES $3 (A=OUT,B=IN) (R=1000);
+  device PMOSB $2(S=VDD,G=IN,D=OUT)(L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
+end;
+END
+
+    nl1 = RBA::Netlist::new
+    nl2 = RBA::Netlist::new
+    prep_nl(nl1, nls1)
+    prep_nl(nl2, nls2)
+
+    logger = NetlistCompareTestLogger::new
+    comp = RBA::NetlistComparer::new(logger)
+
+    comp.same_device_classes(nl1.device_class_by_name("PMOS"), nl2.device_class_by_name("PMOSB"))
+
+    good = comp.compare(nl1, nl2)
+    assert_equal(good, false)
+
+    logger.clear
+    comp.same_device_classes(nl1.device_class_by_name("NMOS"), nl2.device_class_by_name("NMOSB"))
+    good = comp.compare(nl1, nl2)
+
+    assert_equal(logger.text(), <<"END")
+begin_circuit INV INV
+match_nets VDD VDD
+match_nets VSS VSS
+match_nets OUT OUT
+match_nets IN IN
+match_pins $0 $1
+match_pins $1 $3
+match_pins $2 $0
+match_pins $3 $2
+match_devices $3 $1
+match_devices_with_different_parameters $2 $2
+device_mismatch (null) $3
+match_devices $1 $4
+end_circuit INV INV NOMATCH
+END
+
+    assert_equal(good, false)
+
+    comp.max_resistance = 900.0
+    comp.min_capacitance = 1e-11
+
+    logger.clear
+    good = comp.compare(nl1, nl2)
+
+    assert_equal(logger.text(), <<"END")
+begin_circuit INV INV
+match_nets VDD VDD
+match_nets VSS VSS
+match_nets OUT OUT
+match_nets IN IN
+match_pins $0 $1
+match_pins $1 $3
+match_pins $2 $0
+match_pins $3 $2
+match_devices $3 $1
+match_devices $1 $4
+end_circuit INV INV MATCH
+END
+
+    assert_equal(good, true)
+
+  end
+
 end
 
 load("test_epilogue.rb")

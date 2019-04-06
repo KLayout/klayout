@@ -55,6 +55,7 @@ private:
   db::Circuit *mp_circuit;
   std::auto_ptr<tl::TextInputStream> mp_stream;
   std::vector<std::pair<tl::InputStream *, tl::TextInputStream *> > m_streams;
+  std::auto_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
   std::string m_stored_line;
 
   void push_stream (const std::string &path);

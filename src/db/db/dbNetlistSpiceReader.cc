@@ -49,6 +49,7 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
   mp_stream.reset (new tl::TextInputStream (stream));
   mp_netlist = &netlist;
   mp_circuit = 0;
+  mp_nets_by_name.reset (0);
 
   try {
 
@@ -83,6 +84,7 @@ void NetlistSpiceReader::finish ()
   mp_stream.reset (0);
   mp_netlist = 0;
   mp_circuit = 0;
+  mp_nets_by_name.reset (0);
 }
 
 void NetlistSpiceReader::push_stream (const std::string &path)
@@ -367,12 +369,25 @@ void NetlistSpiceReader::ensure_circuit ()
 
 db::Net *NetlistSpiceReader::make_net (const std::string &name)
 {
-  db::Net *net = mp_circuit->net_by_name (name);
-  if (! net) {
+  if (! mp_nets_by_name.get ()) {
+    mp_nets_by_name.reset (new std::map<std::string, db::Net *> ());
+  }
+
+  std::map<std::string, db::Net *>::const_iterator n2n = mp_nets_by_name->find (name);
+
+  db::Net *net = 0;
+  if (n2n == mp_nets_by_name->end ()) {
+
     net = new db::Net ();
     net->set_name (name);
     mp_circuit->add_net (net);
+
+    mp_nets_by_name->insert (std::make_pair (name, net));
+
+  } else {
+    net = n2n->second;
   }
+
   return net;
 }
 
@@ -477,6 +492,9 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex)
     }
   }
 
+  std::auto_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
+  mp_nets_by_name.reset (0);
+
   std::swap (cc, mp_circuit);
 
   for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
@@ -490,6 +508,7 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex)
     }
   }
 
+  mp_nets_by_name.reset (n2n.release ());
   std::swap (cc, mp_circuit);
 
   ex.expect_end ();

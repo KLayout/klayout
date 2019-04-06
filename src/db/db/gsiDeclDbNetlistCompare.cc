@@ -29,7 +29,7 @@ namespace {
  *  @brief A NetlistDeviceExtractor implementation that allows reimplementation of the virtual methods
  */
 class GenericNetlistCompareLogger
-  : public db::NetlistCompareLogger
+  : public gsi::ObjectBase, public db::NetlistCompareLogger
 {
 public:
   GenericNetlistCompareLogger ()
@@ -296,6 +296,7 @@ public:
 };
 
 }
+
 namespace gsi
 {
 
@@ -340,11 +341,13 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
   gsi::callback ("match_nets", &GenericNetlistCompareLogger::match_nets, &GenericNetlistCompareLogger::cb_match_nets, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called when two nets are identified.\n"
     "If two nets are identified as a corresponding pair, this method will be called with both nets.\n"
-    "If the nets can be paired, but this match is ambiguous, \\match_ambiguous_nets_fb will be called instead.\n"
+    "If the nets can be paired, but this match is ambiguous, \\match_ambiguous_nets will be called instead.\n"
     "If nets can't be matched to a partner, \\net_mismatch will be called.\n"
   ) +
   gsi::callback ("match_ambiguous_nets", &GenericNetlistCompareLogger::match_ambiguous_nets, &GenericNetlistCompareLogger::cb_match_ambiguous_nets, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called when two nets are identified, but this choice is ambiguous.\n"
+    "This choice is a last-resort fallback to allow continuation of the compare procedure. It is likely that this "
+    "compare will fail later. Looking for ambiguous nets allows deduction of the origin of this faulty decision. "
     "See \\match_nets for more details."
   ) +
   gsi::callback ("net_mismatch", &GenericNetlistCompareLogger::net_mismatch, &GenericNetlistCompareLogger::cb_net_mismatch, gsi::arg ("a"), gsi::arg ("b"),
@@ -369,7 +372,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
   ) +
   gsi::callback ("device_mismatch", &GenericNetlistCompareLogger::device_mismatch, &GenericNetlistCompareLogger::cb_device_mismatch, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called when two devices can't be paired.\n"
-    "This will report the device considered in a or b. The other argument is nil."
+    "This will report the device considered in a or b. The other argument is nil. "
     "See \\match_devices for details.\n"
   ) +
   gsi::callback ("match_pins", &GenericNetlistCompareLogger::match_pins, &GenericNetlistCompareLogger::cb_match_pins, gsi::arg ("a"), gsi::arg ("b"),
@@ -379,7 +382,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
   ) +
   gsi::callback ("pin_mismatch", &GenericNetlistCompareLogger::pin_mismatch, &GenericNetlistCompareLogger::cb_pin_mismatch, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called when two pins can't be paired.\n"
-    "This will report the pin considered in a or b. The other argument is nil."
+    "This will report the pin considered in a or b. The other argument is nil. "
     "See \\match_pins for details.\n"
   ) +
   gsi::callback ("match_subcircuits", &GenericNetlistCompareLogger::match_subcircuits, &GenericNetlistCompareLogger::cb_match_subcircuits, gsi::arg ("a"), gsi::arg ("b"),
@@ -389,7 +392,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
   ) +
   gsi::callback ("subcircuit_mismatch", &GenericNetlistCompareLogger::subcircuit_mismatch, &GenericNetlistCompareLogger::cb_subcircuit_mismatch, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called when two subcircuits can't be paired.\n"
-    "This will report the subcircuit considered in a or b. The other argument is nil."
+    "This will report the subcircuit considered in a or b. The other argument is nil. "
     "See \\match_subcircuits for details.\n"
   ),
   "@brief An event receiver for the netlist compare feature.\n"
@@ -400,19 +403,28 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
   "This class has been introduced in version 0.26.\n"
 );
 
-static db::NetlistComparer *make_comparer (GenericNetlistCompareLogger *logger)
+static db::NetlistComparer *make_comparer0 ()
+{
+  return new db::NetlistComparer (0);
+}
+
+static db::NetlistComparer *make_comparer1 (GenericNetlistCompareLogger *logger)
 {
   return new db::NetlistComparer (logger);
 }
 
 Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
-  gsi::constructor ("new", &make_comparer, gsi::arg ("logger", (GenericNetlistCompareLogger *) 0),
-    "@brief Creates a new comparer object."
+  gsi::constructor ("new", &make_comparer0,
+    "@brief Creates a new comparer object.\n"
+    "See the class description for more details."
+  ) +
+  gsi::constructor ("new", &make_comparer1, gsi::arg ("logger"),
+    "@brief Creates a new comparer object.\n"
     "The logger is a delegate or event receiver which the comparer will send compare events to. "
     "See the class description for more details."
   ) +
   gsi::method ("same_nets", &db::NetlistComparer::same_nets, gsi::arg ("net_a"), gsi::arg ("net_b"),
-    "@brief Marks two nets as identical\n"
+    "@brief Marks two nets as identical.\n"
     "This makes a net net_a in netlist a identical to the corresponding\n"
     "net net_b in netlist b (see \\compare).\n"
     "Otherwise, the algorithm will try to identify nets according to their topology. "
@@ -420,43 +432,46 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "these hints to derive further identities."
   ) +
   gsi::method ("equivalent_pins", (void (db::NetlistComparer::*) (const db::Circuit *, size_t, size_t)) &db::NetlistComparer::equivalent_pins, gsi::arg ("circuit_b"), gsi::arg ("pin_id1"), gsi::arg ("pin_id2"),
-    "@brief Marks two pins of the given circuit as equivalent (i.e. they can be swapped)\n"
+    "@brief Marks two pins of the given circuit as equivalent (i.e. they can be swapped).\n"
     "Only circuits from the second input can be given swappable pins. "
     "This will imply the same swappable pins on the equivalent circuit of the first input. "
     "To mark multiple pins as swappable, use the version that takes a list of pins."
   ) +
   gsi::method ("equivalent_pins", (void (db::NetlistComparer::*) (const db::Circuit *, const std::vector<size_t> &)) &db::NetlistComparer::equivalent_pins, gsi::arg ("circuit_b"), gsi::arg ("pin_ids"),
-    "@brief Marks several pins of the given circuit as equivalent (i.e. they can be swapped)\n"
+    "@brief Marks several pins of the given circuit as equivalent (i.e. they can be swapped).\n"
     "Only circuits from the second input can be given swappable pins. "
     "This will imply the same swappable pins on the equivalent circuit of the first input. "
     "This version is a generic variant of the two-pin version of this method."
   ) +
   gsi::method ("same_device_classes", &db::NetlistComparer::same_device_classes, gsi::arg ("dev_cls_a"), gsi::arg ("dev_cls_b"),
-    "@brief Marks two device classes as identical\n"
+    "@brief Marks two device classes as identical.\n"
     "This makes a device class dev_cls_a in netlist a identical to the corresponding\n"
     "device class dev_cls_b in netlist b (see \\compare).\n"
     "By default device classes with the same name are identical.\n"
   ) +
   gsi::method ("same_circuits", &db::NetlistComparer::same_circuits, gsi::arg ("circuit_a"), gsi::arg ("circuit_b"),
-    "@brief Marks two circuits as identical\n"
-   "This method makes a circuit circuit_a in netlist a identical to the corresponding\n"
-   "circuit circuit_b in netlist b (see \\compare). By default circuits with the same name are identical.\n"
+    "@brief Marks two circuits as identical.\n"
+    "This method makes a circuit circuit_a in netlist a identical to the corresponding\n"
+    "circuit circuit_b in netlist b (see \\compare). By default circuits with the same name are identical.\n"
   ) +
   gsi::method ("compare", &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"),
-    "@brief Compares two netlists\n"
+    "@brief Compares two netlists.\n"
     "This method will perform the actual netlist compare. It will return true if both netlists are identical. "
     "If the comparer has been configured with \\same_nets or similar methods, the objects given there must "
     "be located inside 'circuit_a' and 'circuit_b' respectively."
   ),
   "@brief Compares two netlists\n"
-  "This class performs the actual comparison of two netlists.\n"
-  "It can be used with an event receiver to log the errors and net mismatches. "
+  "This class performs a comparison of two netlists.\n"
+  "It can be used with an event receiver (logger) to track the errors and net mismatches. "
   "Event receivers are derived from class \\GenericNetlistCompareLogger."
   "\n"
-  "The netlist comparer can be configured in different ways. Specifically hints can be given for nets, device classes or circuits. "
-  "Equivalence hints can be given with \\same_nets, \\same_circuits etc.\n"
+  "The netlist comparer can be configured in different ways. Specific hints can be given for nets, device classes or circuits "
+  "to improve efficiency and reliability of the graph equivalence deduction algorithm. "
+  "For example, objects can be marked as equivalent using \\same_nets, \\same_circuits etc. "
+  "The compare algorithm will then use these hints to derive further equivalences. This way, "
+  "ambiguities can be resolved.\n"
   "\n"
-  "Another configuration relates to swappable pins of subcircuits. If pins marked this way, the compare algorithm may swap them to "
+  "Another configuration option relates to swappable pins of subcircuits. If pins are marked this way, the compare algorithm may swap them to "
   "achieve net matching. Swappable pins belong to an 'equivalence group' and can be defined with \\equivalent_pins.\n"
   "\n"
   "This class has been introduced in version 0.26."

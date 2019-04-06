@@ -199,6 +199,106 @@ static void prep_nl (db::Netlist &nl, const char *str)
   nl.from_string (str);
 }
 
+TEST(0_EqualDeviceParameters)
+{
+  db::DeviceClassMOS3Transistor dc;
+
+  db::EqualDeviceParameters *eqp = new db::EqualDeviceParameters ();
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.0);
+  dc.set_parameter_compare_delegate (eqp);
+
+  db::Device d1 (&dc);
+  db::Device d2 (&dc);
+
+  d1.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 40.0);
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 40.0);
+
+  EXPECT_EQ (dc.equal (d1, d2), true);
+  EXPECT_EQ (dc.equal (d2, d1), true);
+  EXPECT_EQ (dc.less (d1, d2), false);
+  EXPECT_EQ (dc.less (d2, d1), false);
+
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 41.0);
+
+  EXPECT_EQ (dc.equal (d1, d2), false);
+  EXPECT_EQ (dc.equal (d2, d1), false);
+  EXPECT_EQ (dc.less (d1, d2), true);
+  EXPECT_EQ (dc.less (d2, d1), false);
+
+  eqp = new db::EqualDeviceParameters ();
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.9, 0.0);
+  dc.set_parameter_compare_delegate (eqp);
+
+  EXPECT_EQ (dc.equal (d1, d2), false);
+  EXPECT_EQ (dc.equal (d2, d1), false);
+  EXPECT_EQ (dc.less (d1, d2), true);
+  EXPECT_EQ (dc.less (d2, d1), false);
+
+  eqp = new db::EqualDeviceParameters ();
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 1.0, 0.0);
+  dc.set_parameter_compare_delegate (eqp);
+
+  EXPECT_EQ (dc.equal (d1, d2), true);
+  EXPECT_EQ (dc.equal (d2, d1), true);
+  EXPECT_EQ (dc.less (d1, d2), false);
+  EXPECT_EQ (dc.less (d2, d1), false);
+
+  eqp = new db::EqualDeviceParameters ();
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 1.1, 0.0);
+  dc.set_parameter_compare_delegate (eqp);
+
+  EXPECT_EQ (dc.equal (d1, d2), true);
+  EXPECT_EQ (dc.equal (d2, d1), true);
+  EXPECT_EQ (dc.less (d1, d2), false);
+  EXPECT_EQ (dc.less (d2, d1), false);
+
+  eqp = new db::EqualDeviceParameters ();
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.5, 0.01);
+  dc.set_parameter_compare_delegate (eqp);
+
+  EXPECT_EQ (dc.equal (d1, d2), false);
+  EXPECT_EQ (dc.equal (d2, d1), false);
+  EXPECT_EQ (dc.less (d1, d2), true);
+  EXPECT_EQ (dc.less (d2, d1), false);
+
+  eqp = new db::EqualDeviceParameters ();
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.5, 0.013);
+  dc.set_parameter_compare_delegate (eqp);
+
+  EXPECT_EQ (dc.equal (d1, d2), true);
+  EXPECT_EQ (dc.equal (d2, d1), true);
+  EXPECT_EQ (dc.less (d1, d2), false);
+  EXPECT_EQ (dc.less (d2, d1), false);
+
+  d1.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.5);
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.2);
+
+  EXPECT_EQ (dc.equal (d1, d2), true);
+  EXPECT_EQ (dc.equal (d2, d1), true);
+  EXPECT_EQ (dc.less (d1, d2), false);
+  EXPECT_EQ (dc.less (d2, d1), false);
+
+  eqp = new db::EqualDeviceParameters ();
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.5, 0.013);
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_W);
+  dc.set_parameter_compare_delegate (eqp);
+
+  EXPECT_EQ (dc.equal (d1, d2), false);
+  EXPECT_EQ (dc.equal (d2, d1), false);
+  EXPECT_EQ (dc.less (d1, d2), false);
+  EXPECT_EQ (dc.less (d2, d1), true);
+
+  eqp = new db::EqualDeviceParameters ();
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.5, 0.013);
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_W, 0.3, 1e-6);
+  dc.set_parameter_compare_delegate (eqp);
+
+  EXPECT_EQ (dc.equal (d1, d2), true);
+  EXPECT_EQ (dc.equal (d2, d1), true);
+  EXPECT_EQ (dc.less (d1, d2), false);
+  EXPECT_EQ (dc.less (d2, d1), false);
+}
+
 TEST(1_SimpleInverter)
 {
   const char *nls1 =
@@ -474,6 +574,164 @@ TEST(5_BufferTwoPathsDifferentParameters)
   comp.same_nets (ca->net_by_name ("VSS"), cb->net_by_name ("VSS"));
 
   bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_ambiguous_nets INT $10\n"
+    "match_nets INT2 $11\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices_with_different_parameters $6 $7\n"
+    "match_devices $8 $8\n"
+    "end_circuit BUF BUF NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+
+  logger.clear ();
+  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 1.5, 0.0));
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_ambiguous_nets INT $10\n"
+    "match_ambiguous_nets INT2 $11\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices $6 $7\n"
+    "match_devices $8 $8\n"
+    "end_circuit BUF BUF MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  logger.clear ();
+  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.0));
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_ambiguous_nets INT $10\n"
+    "match_nets INT2 $11\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices_with_different_parameters $6 $7\n"
+    "match_devices $8 $8\n"
+    "end_circuit BUF BUF NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+
+  logger.clear ();
+  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.2));
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_ambiguous_nets INT $10\n"
+    "match_nets INT2 $11\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices_with_different_parameters $6 $7\n"
+    "match_devices $8 $8\n"
+    "end_circuit BUF BUF NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+
+  logger.clear ();
+  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.4));
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_ambiguous_nets INT $10\n"
+    "match_ambiguous_nets INT2 $11\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices $6 $7\n"
+    "match_devices $8 $8\n"
+    "end_circuit BUF BUF MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  logger.clear ();
+  db::EqualDeviceParameters eq_dp = db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_W) + db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.2, 0.0);
+  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (eq_dp));
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit BUF BUF\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_ambiguous_nets INT $10\n"
+    "match_ambiguous_nets INT2 $11\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_devices $1 $1\n"
+    "match_devices $3 $2\n"
+    "match_devices $5 $3\n"
+    "match_devices $7 $4\n"
+    "match_devices $2 $5\n"
+    "match_devices $4 $6\n"
+    "match_devices $6 $7\n"
+    "match_devices $8 $8\n"
+    "end_circuit BUF BUF MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  logger.clear ();
+  eq_dp = db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_W) + db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L);
+  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (eq_dp));
+  good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"

@@ -40,16 +40,7 @@ struct DeviceCompare
     if (d1.second != d2.second) {
       return d1.second < d2.second;
     }
-
-    const std::vector<db::DeviceParameterDefinition> &dp = d1.first->device_class ()->parameter_definitions ();
-    for (std::vector<db::DeviceParameterDefinition>::const_iterator i = dp.begin (); i != dp.end (); ++i) {
-      double v1 = d1.first->parameter_value (i->id ());
-      double v2 = d2.first->parameter_value (i->id ());
-      if (fabs (v1 - v2) > db::epsilon) {
-        return v1 < v2;
-      }
-    }
-    return false;
+    return db::DeviceClass::less (*d1.first, *d2.first);
   }
 
   bool equals (const std::pair<const db::Device *, size_t> &d1, const std::pair<const db::Device *, size_t> &d2) const
@@ -57,16 +48,7 @@ struct DeviceCompare
     if (d1.second != d2.second) {
       return false;
     }
-
-    const std::vector<db::DeviceParameterDefinition> &dp = d1.first->device_class ()->parameter_definitions ();
-    for (std::vector<db::DeviceParameterDefinition>::const_iterator i = dp.begin (); i != dp.end (); ++i) {
-      double v1 = d1.first->parameter_value (i->id ());
-      double v2 = d2.first->parameter_value (i->id ());
-      if (fabs (v1 - v2) > db::epsilon) {
-        return false;
-      }
-    }
-    return true;
+    return db::DeviceClass::equal (*d1.first, *d2.first);
   }
 };
 
@@ -1419,6 +1401,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
           good = false;
         } else {
           if (mp_logger) {
+dc.equals (dm->second, std::make_pair (d.operator-> (), device_cat)); // @@@
             mp_logger->match_devices_with_different_parameters (dm->second.first, d.operator-> ());
           }
           good = false;

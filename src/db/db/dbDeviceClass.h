@@ -208,6 +208,53 @@ private:
 };
 
 /**
+ *  @brief A device parameter compare delegate
+ *
+ *  Device parameter compare delegates are used to establish
+ *  device equivalence in the context of netlist comparison.
+ */
+class DB_PUBLIC DeviceParameterCompareDelegate
+  : public gsi::ObjectBase, public tl::Object
+{
+public:
+  DeviceParameterCompareDelegate () { }
+  virtual ~DeviceParameterCompareDelegate () { }
+
+  virtual bool less (const db::Device &a, const db::Device &b) const = 0;
+  virtual bool equal (const db::Device &a, const db::Device &b) const = 0;
+};
+
+/**
+ *  @brief A parameter compare delegate that compares several parameters either relative or absolute (or both)
+ *
+ *  The reasoning behind this class is to supply a chainable compare delegate: ab = a + b
+ *  where a and b are compare delegates for two different parameters and ab is the combined compare delegate.
+ */
+class DB_PUBLIC EqualDeviceParameters
+  : public DeviceParameterCompareDelegate
+{
+public:
+  EqualDeviceParameters ();
+  EqualDeviceParameters (size_t parameter_id);
+  EqualDeviceParameters (size_t parameter_id, double relative, double absolute);
+
+  virtual bool less (const db::Device &a, const db::Device &b) const;
+  virtual bool equal (const db::Device &a, const db::Device &b) const;
+
+  EqualDeviceParameters &operator+= (const EqualDeviceParameters &other);
+
+  EqualDeviceParameters operator+ (const EqualDeviceParameters &other) const
+  {
+    EqualDeviceParameters pc (*this);
+    pc += other;
+    return pc;
+  }
+
+private:
+  std::vector<std::pair<size_t, std::pair<double, double> > > m_compare_set;
+};
+
+/**
  *  @brief A device class
  *
  *  A device class describes a type of device.
@@ -228,14 +275,14 @@ public:
   /**
    *  @brief Copy constructor
    *  NOTE: do not use this copy constructor as the device class
-   *  is intended to subclassing.
+   *  is intended for subclassing.
    */
   DeviceClass (const DeviceClass &other);
 
   /**
    *  @brief Assignment
    *  NOTE: do not use this copy constructor as the device class
-   *  is intended to subclassing.
+   *  is intended for subclassing.
    */
   DeviceClass &operator= (const DeviceClass &other);
 
@@ -365,7 +412,7 @@ public:
   size_t terminal_id_for_name (const std::string &name) const;
 
   /**
-   *  @brief Clears the circuit
+   *  @brief Clones the device class
    */
   virtual DeviceClass *clone () const
   {
@@ -414,6 +461,46 @@ public:
     return tid;
   }
 
+  /**
+   *  @brief Compares the parameters of the devices a and b
+   *
+   *  a and b are expected to originate from this or an equivalent device class having
+   *  the same parameters.
+   *  This is the "less" operation. If a parameter compare delegate is registered, this
+   *  compare request will be forwarded to the delegate.
+   *
+   *  If two devices with different device classes are compared and only one of
+   *  the classes features a delegate, the one with the delegate is employed.
+   */
+  static bool less (const db::Device &a, const db::Device &b);
+
+  /**
+   *  @brief Compares the parameters of the devices a and b
+   *
+   *  a and b are expected to originate from this or an equivalent device class having
+   *  the same parameters.
+   *  This is the "equal" operation. If a parameter compare delegate is registered, this
+   *  compare request will be forwarded to the delegate.
+   *
+   *  If two devices with different device classes are compared and only one of
+   *  the classes features a delegate, the one with the delegate is employed.
+   */
+  static bool equal (const db::Device &a, const db::Device &b);
+
+  /**
+   *  @brief Registers a compare delegate
+   *
+   *  The reasoning behind chosing a delegate is that a delegate is efficient
+   *  also in scripts if one of the standard delegates is taken.
+   *
+   *  The device class takes ownership of the delegate.
+   */
+  virtual void set_parameter_compare_delegate (db::DeviceParameterCompareDelegate *delegate)
+  {
+    delegate->keep ();  //  assume transfer of ownership for scripts
+    mp_pc_delegate.reset (delegate);
+  }
+
 private:
   friend class Netlist;
 
@@ -421,6 +508,7 @@ private:
   std::vector<DeviceTerminalDefinition> m_terminal_definitions;
   std::vector<DeviceParameterDefinition> m_parameter_definitions;
   db::Netlist *mp_netlist;
+  tl::shared_ptr<db::DeviceParameterCompareDelegate> mp_pc_delegate;
 
   void set_netlist (db::Netlist *nl)
   {

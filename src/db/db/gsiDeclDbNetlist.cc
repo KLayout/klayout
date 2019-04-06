@@ -473,9 +473,118 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
   "This class has been added in version 0.26."
 );
 
+namespace
+{
+
+/**
+ *  @brief A DeviceParameterCompare implementation that allows reimplementation of the virtual methods
+ */
+class GenericDeviceParameterCompare
+  : public db::EqualDeviceParameters
+{
+public:
+  GenericDeviceParameterCompare ()
+    : db::EqualDeviceParameters ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual bool less (const db::Device &a, const db::Device &b) const
+  {
+    if (cb_less.can_issue ()) {
+      return cb_less.issue<db::EqualDeviceParameters, bool, const db::Device &, const db::Device &> (&db::EqualDeviceParameters::less, a, b);
+    } else {
+      return db::EqualDeviceParameters::less (a, b);
+    }
+  }
+
+  virtual bool equal (const db::Device &a, const db::Device &b) const
+  {
+    if (cb_equal.can_issue ()) {
+      return cb_equal.issue<db::EqualDeviceParameters, bool, const db::Device &, const db::Device &> (&db::EqualDeviceParameters::equal, a, b);
+    } else {
+      return db::EqualDeviceParameters::equal (a, b);
+    }
+  }
+
+  gsi::Callback cb_less, cb_equal;
+};
+
+}
+
+db::EqualDeviceParameters *make_equal_dp (size_t param_id, double absolute, double relative)
+{
+  return new db::EqualDeviceParameters (param_id, absolute, relative);
+}
+
+Class<db::EqualDeviceParameters> decl_dbEqualDeviceParameters ("db", "EqualDeviceParameters",
+  gsi::constructor ("new", &make_equal_dp, gsi::arg ("param_id"), gsi::arg ("absolute", 0.0), gsi::arg ("relative", 0.0),
+    "@brief Creates a device parameter comparer for a single parameter.\n"
+    "'absolute' is the absolute deviation allowed for the parameter values. "
+    "'relative' is the relative deviation allowed for the parameter values (a value between 0 and 1).\n"
+    "\n"
+    "A value of 0 for both absolute and relative deviation means the parameters have to match exactly.\n"
+    "\n"
+    "If 'absolute' and 'relative' are both given, their deviations will add to the allowed difference between "
+    "two parameter values. The relative deviation will be applied to the mean value of both parameter values. "
+    "For example, when comparing parameter values of 40 and 60, a relative deviation of 0.35 means an absolute "
+    "deviation of 17.5 (= 0.35 * average of 40 and 60) which does not make both values match."
+  ) +
+  gsi::method ("+", &db::EqualDeviceParameters::operator+, gsi::arg ("other"),
+    "@brief Combines two parameters for comparison.\n"
+    "The '+' operator will join the parameter comparers and produce one that checks the combined parameters.\n"
+  ) +
+  gsi::method ("+=", &db::EqualDeviceParameters::operator+, gsi::arg ("other"),
+    "@brief Combines two parameters for comparison (in-place).\n"
+    "The '+=' operator will join the parameter comparers and produce one that checks the combined parameters.\n"
+  ),
+  "@brief A device parameter equality comparer.\n"
+  "Attach this object to a device class with \\DeviceClass#equal_parameters= to make the device "
+  "class use this comparer:\n"
+  "\n"
+  "@code\n"
+  "# 20nm tolerance for length:\n"
+  "equal_device_parameters = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS4Transistor::PARAM_L, 0.02, 0.0)\n"
+  "# one percent tolerance for width:\n"
+  "equal_device_parameters += RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS4Transistor::PARAM_W, 0.0, 0.01)\n"
+  "# applies the compare delegate:\n"
+  "netlist.device_class_by_name(\"NMOS\").equal_parameters = equal_device_parameters\n"
+  "@/code\n"
+  "\n"
+  "You can use this class to specify fuzzy equality criteria for the comparison of device parameters in "
+  "netlist verification or to confine the equality of devices to certain parameters only.\n"
+  "\n"
+  "This class has been added in version 0.26."
+);
+
+Class<GenericDeviceParameterCompare> decl_GenericDeviceParameterCompare (decl_dbEqualDeviceParameters, "db", "GenericDeviceParameterCompare",
+  gsi::callback ("equal", &GenericDeviceParameterCompare::equal, &GenericDeviceParameterCompare::cb_equal, gsi::arg ("device_a"), gsi::arg ("device_b"),
+    "@brief Compares the parameters of two devices for equality. "
+    "Returns true, if the parameters of device a and b are considered equal."
+  ) +
+  gsi::callback ("less", &GenericDeviceParameterCompare::less, &GenericDeviceParameterCompare::cb_less, gsi::arg ("device_a"), gsi::arg ("device_b"),
+    "@brief Compares the parameters of two devices for a begin less than b. "
+    "Returns true, if the parameters of device a are considered less than those of device b."
+  ),
+  "@brief A class implementing the comparison of device parameters.\n"
+  "Reimplement this class to provide a custom device parameter compare scheme.\n"
+  "Attach this object to a device class with \\DeviceClass#equal_parameters= to make the device "
+  "class use this comparer.\n"
+  "\n"
+  "This class is intended for special cases. In most scenarios it is easier to use \\EqualDeviceParameters instead of "
+  "implementing a custom comparer class.\n"
+  "\n"
+  "This class has been added in version 0.26."
+);
+
 static tl::id_type id_of_device_class (const db::DeviceClass *cls)
 {
   return tl::id_of (cls);
+}
+
+static void equal_parameters (db::DeviceClass *cls, db::EqualDeviceParameters *comparer)
+{
+  cls->set_parameter_compare_delegate (comparer);
 }
 
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
@@ -533,6 +642,15 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "@brief Returns the terminal ID of the terminal with the given name.\n"
     "An exception is thrown if there is no terminal with the given name. Use \\has_terminal to check "
     "whether the name is a valid terminal name."
+  ) +
+  gsi::method_ext ("equal_parameters=", &equal_parameters, gsi::arg ("comparer"),
+    "@brief Specifies a device parameter comparer for netlist verification.\n"
+    "By default, all devices are compared with all parameters. If you want to select only certain parameters "
+    "for comparison or use a fuzzy compare criterion, use an \\EqualDeviceParameters object and assign it "
+    "to the device class of one netlist. You can also chain multiple \\EqualDeviceParameters objects with the '+' operator "
+    "for specifying multiple parameters in the equality check.\n"
+    "\n"
+    "In special cases, you can even implement a custom compare scheme by deriving your own comparer from the \\GenericDeviceParameterCompare class."
   ),
   "@brief A class describing a specific type of device.\n"
   "Device class objects live in the context of a \\Netlist object. After a "
@@ -1231,14 +1349,14 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "@code\n"
   "writer = RBA::NetlistSpiceWriter::new\n"
   "netlist.write(path, writer)\n"
-  "@endcode\n"
+  "@/code\n"
   "\n"
   "You can give a custom description for the headline:\n"
   "\n"
   "@code\n"
   "writer = RBA::NetlistSpiceWriter::new\n"
   "netlist.write(path, writer, \"A custom description\")\n"
-  "@endcode\n"
+  "@/code\n"
   "\n"
   "To customize the output, you can use a device writer delegate.\n"
   "The delegate is an object of a class derived from \\NetlistSpiceWriterDelegate which "
@@ -1279,7 +1397,7 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "# write the netlist with delegate:\n"
   "writer = RBA::NetlistSpiceWriter::new(MyDelegate::new)\n"
   "netlist.write(path, writer)\n"
-  "@endcode\n"
+  "@/code\n"
   "\n"
   "This class has been introduced in version 0.26."
 );
@@ -1305,7 +1423,7 @@ Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "Ne
   "writer = RBA::NetlistSpiceReader::new\n"
   "netlist = RBA::Netlist::new\n"
   "netlist.read(path, reader)\n"
-  "@endcode\n"
+  "@/code\n"
   "\n"
   "This class has been introduced in version 0.26."
 );

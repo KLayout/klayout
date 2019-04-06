@@ -448,6 +448,92 @@ END
 
     assert_equal(good, false)
 
+    logger.clear
+    eqp = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
+    nl2.device_class_by_name("NMOS").equal_parameters = eqp
+    good = comp.compare(nl1, nl2)
+
+    assert_equal(logger.text, <<"END")
+begin_circuit BUF BUF
+match_nets OUT OUT
+match_nets IN IN
+match_ambiguous_nets INT $10
+match_ambiguous_nets INT2 $11
+match_pins $0 $1
+match_pins $1 $3
+match_pins $2 $0
+match_pins $3 $2
+match_devices $1 $1
+match_devices $3 $2
+match_devices $5 $3
+match_devices $7 $4
+match_devices $2 $5
+match_devices $4 $6
+match_devices $6 $7
+match_devices $8 $8
+end_circuit BUF BUF MATCH
+END
+
+    assert_equal(good, true)
+
+    logger.clear
+    eqp = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_W, 0.01, 0.0)
+    eqp = eqp + RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
+    nl2.device_class_by_name("NMOS").equal_parameters = eqp
+    good = comp.compare(nl1, nl2)
+
+    assert_equal(logger.text, <<"END")
+begin_circuit BUF BUF
+match_nets OUT OUT
+match_nets IN IN
+match_ambiguous_nets INT $10
+match_ambiguous_nets INT2 $11
+match_pins $0 $1
+match_pins $1 $3
+match_pins $2 $0
+match_pins $3 $2
+match_devices $1 $1
+match_devices $3 $2
+match_devices $5 $3
+match_devices $7 $4
+match_devices $2 $5
+match_devices $4 $6
+match_devices $6 $7
+match_devices $8 $8
+end_circuit BUF BUF MATCH
+END
+
+    assert_equal(good, true)
+
+    logger.clear
+    eqp = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_W, 0.01, 0.0)
+    eqp += RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
+    nl2.device_class_by_name("NMOS").equal_parameters = eqp
+    good = comp.compare(nl1, nl2)
+
+    assert_equal(logger.text, <<"END")
+begin_circuit BUF BUF
+match_nets OUT OUT
+match_nets IN IN
+match_ambiguous_nets INT $10
+match_ambiguous_nets INT2 $11
+match_pins $0 $1
+match_pins $1 $3
+match_pins $2 $0
+match_pins $3 $2
+match_devices $1 $1
+match_devices $3 $2
+match_devices $5 $3
+match_devices $7 $4
+match_devices $2 $5
+match_devices $4 $6
+match_devices $6 $7
+match_devices $8 $8
+end_circuit BUF BUF MATCH
+END
+
+    assert_equal(good, true)
+
   end
 
   def test_6
@@ -727,6 +813,50 @@ match_nets VDD VDD
 match_nets IN1 IN1
 match_nets INT INT
 match_nets IN2 IN2
+match_pins $0 $0
+match_pins $1 $1
+match_pins $2 $2
+match_pins $3 $3
+match_pins $4 $4
+match_subcircuits $2 $1
+match_subcircuits $1 $2
+end_circuit TOP TOP MATCH
+END
+
+    assert_equal(good, true)
+
+    logger.clear
+    comp = RBA::NetlistComparer::new(logger)
+
+    comp.equivalent_pins(nl2.circuit_by_name("NAND"), [ 1, 0 ])
+
+    good = comp.compare(nl1, nl2)
+
+    assert_equal(logger.text, <<"END")
+begin_circuit NAND NAND
+match_nets VSS VSS
+match_nets VDD VDD
+match_nets B B
+match_nets OUT OUT
+match_nets A A
+match_nets INT INT
+match_pins $0 $0
+match_pins $1 $1
+match_pins $2 $2
+match_pins $3 $3
+match_pins $4 $4
+match_devices $1 $1
+match_devices $2 $2
+match_devices $3 $3
+match_devices $4 $4
+end_circuit NAND NAND MATCH
+begin_circuit TOP TOP
+match_nets OUT OUT
+match_nets IN2 IN2
+match_nets VSS VSS
+match_nets VDD VDD
+match_nets IN1 IN1
+match_nets INT INT
 match_pins $0 $0
 match_pins $1 $1
 match_pins $2 $2

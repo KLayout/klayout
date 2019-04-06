@@ -21,9 +21,80 @@
 */
 
 #include "dbDeviceClass.h"
+#include "dbDevice.h"
 
 namespace db
 {
+
+// --------------------------------------------------------------------------------
+//  EqualDeviceParameters implementation
+
+static int compare_parameters (double pa, double pb, double absolute, double relative)
+{
+  double pa_min = pa - absolute;
+  double pa_max = pa + absolute;
+
+  double mean = 0.5 * (fabs (pa) + fabs (pb));
+  pa_min -= mean * relative;
+  pa_max += mean * relative;
+
+  //  NOTE: parameter values may be small (e.g. pF for caps) -> no epsilon
+
+  if (pa_max < pb) {
+    return -1;
+  } else if (pa_min > pb) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+EqualDeviceParameters::EqualDeviceParameters ()
+{
+  //  .. nothing yet ..
+}
+
+EqualDeviceParameters::EqualDeviceParameters (size_t parameter_id)
+{
+  m_compare_set.push_back (std::make_pair (parameter_id, std::make_pair (0.0, 0.0)));
+}
+
+EqualDeviceParameters::EqualDeviceParameters (size_t parameter_id, double relative, double absolute)
+{
+  m_compare_set.push_back (std::make_pair (parameter_id, std::make_pair (relative, absolute)));
+}
+
+bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) const
+{
+  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
+    int cmp = compare_parameters (a.parameter_value (c->first), b.parameter_value (c->first), c->second.first, c->second.second);
+    if (cmp != 0) {
+      return cmp < 0;
+    }
+  }
+
+  return false;
+}
+
+bool EqualDeviceParameters::equal (const db::Device &a, const db::Device &b) const
+{
+  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
+    int cmp = compare_parameters (a.parameter_value (c->first), b.parameter_value (c->first), c->second.first, c->second.second);
+    if (cmp != 0) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+EqualDeviceParameters &EqualDeviceParameters::operator+= (const EqualDeviceParameters &other)
+{
+  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = other.m_compare_set.begin (); c != other.m_compare_set.end (); ++c) {
+    m_compare_set.push_back (*c);
+  }
+  return *this;
+}
 
 // --------------------------------------------------------------------------------
 //  DeviceClass class implementation
@@ -135,6 +206,60 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
     }
   }
   throw tl::Exception (tl::to_string (tr ("Invalid terminal name")) + ": '" + name + "'");
+}
+
+bool DeviceClass::less (const db::Device &a, const db::Device &b)
+{
+  tl_assert (a.device_class () != 0);
+  tl_assert (b.device_class () != 0);
+
+  const db::DeviceParameterCompareDelegate *pcd = a.device_class ()->mp_pc_delegate.get ();
+  if (! pcd) {
+    pcd = b.device_class ()->mp_pc_delegate.get ();
+  }
+
+  if (pcd != 0) {
+    return pcd->less (a, b);
+  } else {
+
+    const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
+    for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, 0.0);
+      if (cmp != 0) {
+        return cmp < 0;
+      }
+    }
+
+    return false;
+
+  }
+}
+
+bool DeviceClass::equal (const db::Device &a, const db::Device &b)
+{
+  tl_assert (a.device_class () != 0);
+  tl_assert (b.device_class () != 0);
+
+  const db::DeviceParameterCompareDelegate *pcd = a.device_class ()->mp_pc_delegate.get ();
+  if (! pcd) {
+    pcd = b.device_class ()->mp_pc_delegate.get ();
+  }
+
+  if (pcd != 0) {
+    return pcd->equal (a, b);
+  } else {
+
+    const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
+    for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, 0.0);
+      if (cmp != 0) {
+        return false;
+      }
+    }
+
+    return true;
+
+  }
 }
 
 }

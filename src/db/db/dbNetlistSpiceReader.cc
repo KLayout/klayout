@@ -597,7 +597,15 @@ void NetlistSpiceReader::read_mos4_device (tl::Extractor &ex)
   for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
     std::map<std::string, double>::const_iterator v = pv.find (i->name ());
     if (v != pv.end ()) {
-      dev->set_parameter_value (i->id (), v->second);
+      //  by conventions, dimensions are in micrometer
+      if (i->id () == db::DeviceClassMOS4Transistor::param_id_AD || i->id () == db::DeviceClassMOS4Transistor::param_id_AS) {
+        dev->set_parameter_value (i->id (), v->second * 1e12);
+      } else if (i->id () == db::DeviceClassMOS4Transistor::param_id_W
+                 || i->id () == db::DeviceClassMOS4Transistor::param_id_L
+                 || i->id () == db::DeviceClassMOS4Transistor::param_id_PD
+                 || i->id () == db::DeviceClassMOS4Transistor::param_id_PS) {
+        dev->set_parameter_value (i->id (), v->second * 1e6);
+      }
     }
   }
 

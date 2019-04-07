@@ -1504,7 +1504,6 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
           good = false;
         } else {
           if (mp_logger) {
-dc.equals (dm->second, std::make_pair (d.operator-> (), device_cat)); // @@@
             mp_logger->match_devices_with_different_parameters (dm->second.first, d.operator-> ());
           }
           good = false;

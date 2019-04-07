@@ -371,6 +371,8 @@ void Netlist::remove_circuit (Circuit *circuit)
 
 void Netlist::flatten_circuit (Circuit *circuit)
 {
+  tl_assert (circuit != 0);
+
   std::vector<db::SubCircuit *> refs;
   for (db::Circuit::refs_iterator sc = circuit->begin_refs (); sc != circuit->end_refs (); ++sc) {
     refs.push_back (sc.operator-> ());
@@ -380,7 +382,7 @@ void Netlist::flatten_circuit (Circuit *circuit)
     (*r)->circuit ()->flatten_subcircuit (*r);
   }
 
-  remove_circuit (circuit);
+  delete circuit;
 }
 
 DeviceClass *Netlist::device_class_by_name (const std::string &name)

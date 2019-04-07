@@ -66,6 +66,20 @@ public:
     db::NetlistCompareLogger::end_netlist (a, b);
   }
 
+  virtual void device_class_mismatch (const db::DeviceClass *a, const db::DeviceClass *b)
+  {
+    if (cb_device_class_mismatch.can_issue ()) {
+      cb_device_class_mismatch.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::device_class_mismatch_fb, a, b);
+    } else {
+      db::NetlistCompareLogger::device_class_mismatch (a, b);
+    }
+  }
+
+  void device_class_mismatch_fb (const db::DeviceClass *a, const db::DeviceClass *b)
+  {
+    db::NetlistCompareLogger::device_class_mismatch (a, b);
+  }
+
   virtual void begin_circuit (const db::Circuit *a, const db::Circuit *b)
   {
     if (cb_begin_circuit.can_issue ()) {
@@ -278,6 +292,7 @@ public:
 
   gsi::Callback cb_begin_netlist;
   gsi::Callback cb_end_netlist;
+  gsi::Callback cb_device_class_mismatch;
   gsi::Callback cb_begin_circuit;
   gsi::Callback cb_end_circuit;
   gsi::Callback cb_circuit_skipped;
@@ -308,6 +323,11 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
   gsi::callback ("end_netlist", &GenericNetlistCompareLogger::end_netlist, &GenericNetlistCompareLogger::cb_end_netlist, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called at the end of the compare process.\n"
     "This method is called once when the compare run ended.\n"
+  ) +
+  gsi::callback ("device_class_mismatch", &GenericNetlistCompareLogger::device_class_mismatch, &GenericNetlistCompareLogger::cb_device_class_mismatch, gsi::arg ("a"), gsi::arg ("b"),
+    "@brief This function is called when device classes can't be compared.\n"
+    "This method is called when a device class can't be mapped to a partner in the other netlist. In this case, "
+    "this method is called with the one device class and nil for the other class.\n"
   ) +
   gsi::callback ("begin_circuit", &GenericNetlistCompareLogger::begin_circuit, &GenericNetlistCompareLogger::cb_begin_circuit, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called when a new circuit is compared.\n"

@@ -141,8 +141,8 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_S));
     }
 
-    //  Use "M" + device class name for the model
-    os << " M";
+    //  Use device class name for the model
+    os << " ";
     os << format_name (dev.device_class ()->name ());
 
     os << " L=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_L));

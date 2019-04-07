@@ -58,6 +58,11 @@ public:
     out ("circuit_mismatch " + circuit2str (a) + " " + circuit2str (b));
   }
 
+  virtual void device_class_mismatch (const db::DeviceClass *a, const db::DeviceClass *b)
+  {
+    out ("device_class_mismatch " + dc2str (a) + " " + dc2str (b));
+  }
+
   virtual void match_nets (const db::Net *a, const db::Net *b)
   {
     out ("match_nets " + net2str (a) + " " + net2str (b));
@@ -125,6 +130,11 @@ public:
 
 private:
   std::vector<std::string> m_texts;
+
+  std::string dc2str (const db::DeviceClass *x) const
+  {
+    return x ? x->name () : "(null)";
+  }
 
   std::string circuit2str (const db::Circuit *x) const
   {
@@ -366,6 +376,9 @@ TEST(1_SimpleInverterMatchedDeviceClasses)
 
   logger.clear ();
   comp.same_device_classes (nl1.device_class_by_name ("NMOS"), nl2.device_class_by_name ("NMOSB"));
+  //  avoids device class mismatch errors:
+  comp.same_device_classes (nl1.device_class_by_name ("NMOSB"), nl2.device_class_by_name ("NMOS"));
+  comp.same_device_classes (nl1.device_class_by_name ("PMOSB"), nl2.device_class_by_name ("PMOS"));
   good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),

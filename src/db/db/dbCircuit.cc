@@ -319,6 +319,8 @@ void Circuit::unregister_ref (SubCircuit *r)
 
 void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
 {
+  tl_assert (subcircuit != 0);
+
   const db::Circuit *c = subcircuit->circuit_ref ();
 
   //  copy the nets, produce a net map
@@ -395,7 +397,7 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
 
   }
 
-  remove_subcircuit (subcircuit);
+  delete subcircuit;
 }
 
 void Circuit::translate_circuits (const std::map<const Circuit *, Circuit *> &map)

@@ -230,6 +230,16 @@ public:
       return 0;
     }
 
+    return cat_for_device_class (cls);
+  }
+
+  bool has_cat_for_device_class (const db::DeviceClass *cls)
+  {
+    return m_cat_by_ptr.find (cls) != m_cat_by_ptr.end ();
+  }
+
+  size_t cat_for_device_class (const db::DeviceClass *cls)
+  {
     std::map<const db::DeviceClass *, size_t>::const_iterator cp = m_cat_by_ptr.find (cls);
     if (cp != m_cat_by_ptr.end ()) {
       return cp->second;
@@ -983,12 +993,16 @@ NetlistComparer::equivalent_pins (const db::Circuit *cb, const std::vector<size_
 void
 NetlistComparer::same_device_classes (const db::DeviceClass *ca, const db::DeviceClass *cb)
 {
+  tl_assert (ca != 0);
+  tl_assert (cb != 0);
   mp_device_categorizer->same_class (ca, cb);
 }
 
 void
 NetlistComparer::same_circuits (const db::Circuit *ca, const db::Circuit *cb)
 {
+  tl_assert (ca != 0);
+  tl_assert (cb != 0);
   mp_circuit_categorizer->same_circuit (ca, cb);
 }
 
@@ -1016,6 +1030,31 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
   if (mp_logger) {
     mp_logger->begin_netlist (a, b);
   }
+
+  //  check for device classes that don't match
+
+  std::map<size_t, std::pair<const db::DeviceClass *, const db::DeviceClass *> > cat2dc;
+
+  for (db::Netlist::const_device_class_iterator dc = a->begin_device_classes (); dc != a->end_device_classes (); ++dc) {
+    size_t cat = device_categorizer.cat_for_device_class (dc.operator-> ());
+    cat2dc.insert (std::make_pair (cat, std::make_pair ((const db::DeviceClass *) 0, (const db::DeviceClass *) 0))).first->second.first = dc.operator-> ();
+  }
+
+  for (db::Netlist::const_device_class_iterator dc = b->begin_device_classes (); dc != b->end_device_classes (); ++dc) {
+    size_t cat = device_categorizer.cat_for_device_class (dc.operator-> ());
+    cat2dc.insert (std::make_pair (cat, std::make_pair ((const db::DeviceClass *) 0, (const db::DeviceClass *) 0))).first->second.second = dc.operator-> ();
+  }
+
+  for (std::map<size_t, std::pair<const db::DeviceClass *, const db::DeviceClass *> >::const_iterator i = cat2dc.begin (); i != cat2dc.end (); ++i) {
+    if (! i->second.first || ! i->second.second) {
+      good = false;
+      if (mp_logger) {
+        mp_logger->device_class_mismatch (i->second.first, i->second.second);
+      }
+    }
+  }
+
+  //  check for circuits that don't match
 
   for (std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
     if (! i->second.first || ! i->second.second) {

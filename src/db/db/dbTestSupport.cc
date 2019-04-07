@@ -186,6 +186,11 @@ public:
     m_circuit = circuit2str (a) + " vs. " + circuit2str (b);
   }
 
+  virtual void device_class_mismatch (const db::DeviceClass *a, const db::DeviceClass *b)
+  {
+    out ("device_class_mismatch " + a->name () + " " + b->name ());
+  }
+
   virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b)
   {
     out ("circuit_skipped " + circuit2str (a) + " " + circuit2str (b));

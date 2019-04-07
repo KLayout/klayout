@@ -57,6 +57,12 @@ public:
   virtual void end_netlist (const db::Netlist * /*a*/, const db::Netlist * /*b*/) { }
 
   /**
+   *  @brief There is a device class mismatch
+   *  "a" is null if there is no match for b and vice versa.
+   */
+  virtual void device_class_mismatch (const db::DeviceClass * /*a*/, const db::DeviceClass * /*b*/) { }
+
+  /**
    *  @brief Begin logging for circuit a and b
    */
   virtual void begin_circuit (const db::Circuit * /*a*/, const db::Circuit * /*b*/) { }

@@ -33,6 +33,10 @@ class NetlistCompareTestLogger < RBA::GenericNetlistCompareLogger
     @texts << text
   end
 
+  def device_class_mismatch(a, b)
+    out("device_class_mismatch " + dc2str(a) + " " + dc2str(b))
+  end
+
   def begin_circuit(a, b)
     out("begin_circuit " + circuit2str(a) + " " + circuit2str(b))
   end
@@ -99,6 +103,10 @@ class NetlistCompareTestLogger < RBA::GenericNetlistCompareLogger
 
   def clear
     @texts = []
+  end
+
+  def dc2str(x) 
+    return x ? x.name : "(null)"
   end
 
   def circuit2str(x) 
@@ -173,6 +181,27 @@ class NetlistCompare_TestClass < TestBase
 
   def test_1
 
+    nl1 = RBA::Netlist::new
+    nl2 = RBA::Netlist::new
+    dc = RBA::DeviceClass::new
+    dc.name = "A"
+    nl1.add(dc)
+    dc = RBA::DeviceClass::new
+    dc.name = "B"
+    nl2.add(dc)
+
+    logger = NetlistCompareTestLogger::new
+    comp = RBA::NetlistComparer::new(logger)
+
+    good = comp.compare(nl1, nl2)
+
+    assert_equal(logger.text, <<"END")
+device_class_mismatch A (null)
+device_class_mismatch (null) B
+END
+
+    assert_equal(good, false)
+  
     nls1 = <<"END"
 circuit INV($1=IN,$2=OUT,$3=VDD,$4=VSS);
   device PMOS $1(S=VDD,G=IN,D=OUT)(L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);
@@ -247,6 +276,9 @@ END
 
     logger.clear
     comp.same_device_classes(nl1.device_class_by_name("NMOS"), nl2.device_class_by_name("NMOSB"))
+    # avoids device class mismatch errors
+    comp.same_device_classes(nl1.device_class_by_name("NMOSB"), nl2.device_class_by_name("NMOS"))
+    comp.same_device_classes(nl1.device_class_by_name("PMOSB"), nl2.device_class_by_name("PMOS"))
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text(), <<"END")
@@ -905,6 +937,9 @@ END
 
     logger.clear
     comp.same_device_classes(nl1.device_class_by_name("NMOS"), nl2.device_class_by_name("NMOSB"))
+    # avoids device class mismatch errors
+    comp.same_device_classes(nl1.device_class_by_name("NMOSB"), nl2.device_class_by_name("NMOS"))
+    comp.same_device_classes(nl1.device_class_by_name("PMOSB"), nl2.device_class_by_name("PMOS"))
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text(), <<"END")

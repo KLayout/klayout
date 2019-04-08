@@ -926,7 +926,7 @@ public:
                   } else {
 
                     std::vector<const NetGraphNode *>::const_iterator in_this = std::lower_bound (nodes_with_same_path.begin (), nodes_with_same_path.end (), n, CompareNodePtr ());
-                    if (in_this != nodes_with_same_path.end () && *n == **in_this) {
+                    if (in_this != nodes_with_same_path.end () && *n == **in_this && (in_this + 1 == nodes_with_same_path.end () || ! (*n == **(in_this + 1)))) {
                       other_node_index = i->second.first;
                       node_index = node_index_for_net ((*in_this)->net ());
                       ++count_other;

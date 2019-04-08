@@ -658,8 +658,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
     "match_nets OUT OUT\n"
+    "match_nets INT $10\n"
     "match_nets IN IN\n"
-    "match_ambiguous_nets INT $10\n"
     "match_nets INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
@@ -710,8 +710,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
     "match_nets OUT OUT\n"
+    "match_nets INT $10\n"
     "match_nets IN IN\n"
-    "match_ambiguous_nets INT $10\n"
     "match_nets INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
@@ -736,8 +736,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
     "match_nets OUT OUT\n"
+    "match_nets INT $10\n"
     "match_nets IN IN\n"
-    "match_ambiguous_nets INT $10\n"
     "match_nets INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
@@ -816,8 +816,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
     "match_nets OUT OUT\n"
+    "match_nets INT $10\n"
     "match_nets IN IN\n"
-    "match_ambiguous_nets INT $10\n"
     "match_nets INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"

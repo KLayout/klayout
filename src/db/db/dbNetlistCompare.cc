@@ -770,6 +770,14 @@ namespace std
 namespace db
 {
 
+struct CompareNodePtr
+{
+  bool operator() (const NetGraphNode *a, const NetGraphNode *b) const
+  {
+    return *a < *b;
+  }
+};
+
 class NetDeviceGraph
 {
 public:
@@ -798,7 +806,9 @@ public:
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
       NetGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper);
-      m_nodes.push_back (node);
+      if (! node.empty () || n->pin_count () > 0) {
+        m_nodes.push_back (node);
+      }
     }
 
     std::sort (m_nodes.begin (), m_nodes.end ());
@@ -867,22 +877,25 @@ public:
             ++ee;
           }
 
-          size_t count = 0;
-          NetGraphNode::edge_iterator ec;
+          std::vector<const NetGraphNode *> nodes_with_same_path;
+          nodes_with_same_path.reserve (ee - e);
+
           for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
-            if (! m_nodes[i->second.first].has_other ()) {
-              ec = i;
-              ++count;
+            const NetGraphNode *n = &m_nodes[i->second.first];
+            if (! n->has_other ()) {
+              nodes_with_same_path.push_back (n);
             }
           }
 
-          if (count == 1) {   //  if non-ambiguous, non-assigned
+          std::sort (nodes_with_same_path.begin (), nodes_with_same_path.end (), CompareNodePtr ());
+
+          if (! nodes_with_same_path.empty ()) {   //  if non-ambiguous, non-assigned
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
             tl::log << "considering " << n->net ()->expanded_name () << " to " << ec->second.second->expanded_name ();
 #endif
 
-            NetGraphNode::edge_iterator e_other = nother->find_edge (ec->first);
+            NetGraphNode::edge_iterator e_other = nother->find_edge (e->first);
             if (e_other != nother->end ()) {
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
@@ -896,21 +909,39 @@ public:
               }
 
               size_t count_other = 0;
-              NetGraphNode::edge_iterator ec_other;
-              for (NetGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
-                if (! other.m_nodes[i->second.first].has_other ()) {
-                  ec_other = i;
-                  ++count_other;
+              size_t node_index = 0, other_node_index = 0;
+              for (NetGraphNode::edge_iterator i = e_other; i != ee_other && count_other < 2; ++i) {
+
+                const NetGraphNode *n = &other.m_nodes[i->second.first];
+                if (! n->has_other ()) {
+
+                  if (nodes_with_same_path.size () == 1) {
+
+                    //  a single candiate: just take this one -> this may render
+                    //  inexact matches, but further propagates net pairing
+                    other_node_index = i->second.first;
+                    node_index = node_index_for_net (nodes_with_same_path.front ()->net ());
+                    ++count_other;
+
+                  } else {
+
+                    std::vector<const NetGraphNode *>::const_iterator in_this = std::lower_bound (nodes_with_same_path.begin (), nodes_with_same_path.end (), n, CompareNodePtr ());
+                    if (in_this != nodes_with_same_path.end () && *n == **in_this) {
+                      other_node_index = i->second.first;
+                      node_index = node_index_for_net ((*in_this)->net ());
+                      ++count_other;
+                    }
+
+                  }
+
                 }
+
               }
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-              tl::log << "identity count = " << count_other;
-#endif
               if (count_other == 1) {
-                confirm_identity (*this, begin () + ec->second.first, other, other.begin () + ec_other->second.first, logger);
+                confirm_identity (*this, begin () + node_index, other, other.begin () + other_node_index, logger);
                 ++added;
-                more.push_back (ec->second.first);
+                more.push_back (node_index);
               }
 
             }
@@ -1234,7 +1265,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     size_t new_identities = 0;
     for (db::NetDeviceGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
-      if (i1->has_other ()) {
+      if (i1->has_other () && i1->net ()) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
         tl::log << "deriving new identities from " << i1->net ()->expanded_name ();
 #endif

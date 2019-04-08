@@ -31,6 +31,8 @@
 namespace db
 {
 
+static const char *allowed_name_chars = "_.:,!+$/&\\#[]";
+
 // --------------------------------------------------------------------------------
 
 NetlistSpiceWriterDelegate::NetlistSpiceWriterDelegate ()
@@ -257,7 +259,7 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
         nn += "\\";
       }
       for (const char *cp = n.c_str (); *cp; ++cp) {
-        if (! isalnum (*cp) && strchr (".$!&\\#+:,", *cp) == 0) {
+        if (! isalnum (*cp) && strchr (allowed_name_chars, *cp) == 0) {
           nn += tl::sprintf ("\\x%02x", (unsigned char) *cp);
         } else if (*cp == ',') {
           nn += "|";

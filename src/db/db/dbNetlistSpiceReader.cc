@@ -33,6 +33,8 @@
 namespace db
 {
 
+static const char *allowed_name_chars = "_.:,!+$/&\\#[]|";
+
 NetlistSpiceReader::NetlistSpiceReader ()
   : mp_netlist (0), mp_stream (0)
 {
@@ -140,7 +142,7 @@ std::string NetlistSpiceReader::get_line ()
     if (ex.test_without_case (".include")) {
 
       std::string path;
-      ex.read_word_or_quoted (path, "_.:,!+$/\\");
+      ex.read_word_or_quoted (path, allowed_name_chars);
 
       push_stream (path);
 
@@ -394,7 +396,7 @@ db::Net *NetlistSpiceReader::make_net (const std::string &name)
 void NetlistSpiceReader::read_subcircuit (tl::Extractor &ex)
 {
   std::string sc_name;
-  ex.read_word_or_quoted (sc_name, "_.:,!+$/\\");
+  ex.read_word_or_quoted (sc_name, allowed_name_chars);
 
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
@@ -402,7 +404,7 @@ void NetlistSpiceReader::read_subcircuit (tl::Extractor &ex)
   while (! ex.at_end ()) {
 
     std::string n;
-    ex.read_word_or_quoted (n, "_.:,!+$/\\");
+    ex.read_word_or_quoted (n, allowed_name_chars);
 
     if (ex.test ("=")) {
       //  a parameter
@@ -455,7 +457,7 @@ void NetlistSpiceReader::read_subcircuit (tl::Extractor &ex)
 void NetlistSpiceReader::read_circuit (tl::Extractor &ex)
 {
   std::string nc;
-  ex.read_word_or_quoted (nc, "_.:,!+$/\\");
+  ex.read_word_or_quoted (nc, allowed_name_chars);
 
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
@@ -463,7 +465,7 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex)
   while (! ex.at_end ()) {
 
     std::string n;
-    ex.read_word_or_quoted (n, "_.:,!+$/\\");
+    ex.read_word_or_quoted (n, allowed_name_chars);
 
     if (ex.test ("=")) {
       //  a parameter
@@ -517,13 +519,13 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex)
 void NetlistSpiceReader::read_device (db::DeviceClass *dev_cls, size_t param_id, tl::Extractor &ex)
 {
   std::string dn;
-  ex.read_word_or_quoted (dn, "_.:,!+$/\\");
+  ex.read_word_or_quoted (dn, allowed_name_chars);
 
   std::vector<std::string> nn;
 
   while (! ex.at_end () && nn.size () < 2) {
     nn.push_back (std::string ());
-    ex.read_word_or_quoted (nn.back (), "_.:,!+$/\\");
+    ex.read_word_or_quoted (nn.back (), allowed_name_chars);
   }
 
   if (nn.size () != 2) {
@@ -548,7 +550,7 @@ void NetlistSpiceReader::read_device (db::DeviceClass *dev_cls, size_t param_id,
 void NetlistSpiceReader::read_mos4_device (tl::Extractor &ex)
 {
   std::string dn;
-  ex.read_word_or_quoted (dn, "_.:,!+$/\\");
+  ex.read_word_or_quoted (dn, allowed_name_chars);
 
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
@@ -556,7 +558,7 @@ void NetlistSpiceReader::read_mos4_device (tl::Extractor &ex)
   while (! ex.at_end ()) {
 
     std::string n;
-    ex.read_word_or_quoted (n, "_.:,!+$/\\");
+    ex.read_word_or_quoted (n, allowed_name_chars);
 
     if (ex.test ("=")) {
       //  a parameter

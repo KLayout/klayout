@@ -28,6 +28,9 @@
 #include "tlEquivalenceClusters.h"
 #include "tlLog.h"
 
+//  verbose debug output
+#define PRINT_DEBUG_NETCOMPARE
+
 namespace db
 {
 
@@ -864,6 +867,9 @@ public:
 
         NetGraphNode *n = & m_nodes[*index];
         NetGraphNode *nother = & other.m_nodes[n->other_net_index ()];
+if (n->net()->name() == "decode_instruction_anticipated[23]") {
+  printf("@@@1\n");
+}
 
         //  non-ambiguous paths to non-assigned nodes create a node identity on the
         //  end of this path
@@ -887,20 +893,13 @@ public:
             }
           }
 
-          std::sort (nodes_with_same_path.begin (), nodes_with_same_path.end (), CompareNodePtr ());
-
           if (! nodes_with_same_path.empty ()) {   //  if non-ambiguous, non-assigned
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-            tl::log << "considering " << n->net ()->expanded_name () << " to " << ec->second.second->expanded_name ();
-#endif
+            std::sort (nodes_with_same_path.begin (), nodes_with_same_path.end (), CompareNodePtr ());
 
             NetGraphNode::edge_iterator e_other = nother->find_edge (e->first);
             if (e_other != nother->end ()) {
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-              tl::log << "candidate accepted";
-#endif
               NetGraphNode::edge_iterator ee_other = e_other;
               ++ee_other;
 
@@ -939,6 +938,9 @@ public:
               }
 
               if (count_other == 1) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+                tl::info << "deduction from pair " << n->net ()->expanded_name () << " vs. " << nother->net ()->expanded_name ();
+#endif
                 confirm_identity (*this, begin () + node_index, other, other.begin () + other_node_index, logger);
                 ++added;
                 more.push_back (node_index);
@@ -1256,24 +1258,27 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     g2.identify (ni2, ni1);
   }
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+  int iter = 0;
+#endif
+
   bool good = true;
   while (good) {
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-    tl::log << "new iteration ...";
+    ++iter;
+    tl::info << "new compare iteration #" << iter;
+    tl::info << "deducing from present nodes ...";
 #endif
 
     size_t new_identities = 0;
     for (db::NetDeviceGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
       if (i1->has_other () && i1->net ()) {
-#if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::log << "deriving new identities from " << i1->net ()->expanded_name ();
-#endif
         size_t ni = g1.derive_node_identities (i1 - g1.begin (), g2, mp_logger);
         new_identities += ni;
         if (ni > 0) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::log << ni << " new identities.";
+        tl::info << ni << " new identities.";
 #endif
         }
       }
@@ -1288,78 +1293,76 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       break;
     }
 
-    if (new_identities == 0) {
+    new_identities = 0;
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::log << "checking topological identity ...";
+    tl::info << "checking topological identity ...";
 #endif
 
-      //  first pass: without ambiguities, second pass: match ambiguous nets
-      for (int pass = 0; pass < 2 && new_identities == 0; ++pass) {
+    //  first pass: without ambiguities, second pass: match ambiguous nets
+    for (int pass = 0; pass < 2 && new_identities == 0; ++pass) {
 
-        //  derive new identities through topology
+      //  derive new identities through topology
 
-        bool same_as_prev = false;
+      bool same_as_prev = false;
 
-        db::NetDeviceGraph::node_iterator i1 = g1.begin (), i2 = g2.begin ();
-        for ( ; i1 != g1.end () && i2 != g2.end (); ) {
+      db::NetDeviceGraph::node_iterator i1 = g1.begin (), i2 = g2.begin ();
+      for ( ; i1 != g1.end () && i2 != g2.end (); ) {
 
-          bool same_as_next = false;
+        bool same_as_next = false;
 
-          if (i1->has_other ()) {
-            ++i1;
-          } else if (i2->has_other ()) {
-            ++i2;
-          } else if (*i1 < *i2) {
-            ++i1;
-          } else if (*i2 < *i1) {
-            ++i2;
-          } else {
+        if (i1->has_other ()) {
+          ++i1;
+        } else if (i2->has_other ()) {
+          ++i2;
+        } else if (*i1 < *i2) {
+          ++i1;
+        } else if (*i2 < *i1) {
+          ++i2;
+        } else {
 
-            db::NetDeviceGraph::node_iterator ii1 = i1, ii2 = i2;
+          db::NetDeviceGraph::node_iterator ii1 = i1, ii2 = i2;
 
-            ++i1;
-            ++i2;
+          ++i1;
+          ++i2;
 
-            same_as_next = (i1 != g1.end () && *i1 == *ii1) || (i2 != g2.end () && *i2 == *ii2);
+          same_as_next = (i1 != g1.end () && *i1 == *ii1) || (i2 != g2.end () && *i2 == *ii2);
 
-            //  found a candidate - a single node with the same edges
+          //  found a candidate - a single node with the same edges
 
-            bool ambiguous = (same_as_next || same_as_prev);
-            if (! ambiguous || pass) {
+          bool ambiguous = (same_as_next || same_as_prev);
+          if (! ambiguous || pass) {
 
-              //  For ambiguous nets make the pins exchangable
+            //  For ambiguous nets make the pins exchangable
 
-              if (same_as_next) {
+            if (same_as_next) {
 
-                if (ii1->net () && i1->net ()) {
-                  for (db::Net::const_pin_iterator pp = ii1->net ()->begin_pins (); pp != ii1->net ()->end_pins (); ++pp) {
-                    for (db::Net::const_pin_iterator p = i1->net ()->begin_pins (); p != i1->net ()->end_pins (); ++p) {
-                      mp_circuit_pin_mapper->map_pins (c1, pp->pin_id (), p->pin_id ());
-                    }
+              if (ii1->net () && i1->net ()) {
+                for (db::Net::const_pin_iterator pp = ii1->net ()->begin_pins (); pp != ii1->net ()->end_pins (); ++pp) {
+                  for (db::Net::const_pin_iterator p = i1->net ()->begin_pins (); p != i1->net ()->end_pins (); ++p) {
+                    mp_circuit_pin_mapper->map_pins (c1, pp->pin_id (), p->pin_id ());
                   }
                 }
-
-                if (ii2->net () && i2->net ()) {
-                  for (db::Net::const_pin_iterator pp = ii2->net ()->begin_pins (); pp != ii2->net ()->end_pins (); ++pp) {
-                    for (db::Net::const_pin_iterator p = i2->net ()->begin_pins (); p != i2->net ()->end_pins (); ++p) {
-                      mp_circuit_pin_mapper->map_pins (c2, pp->pin_id (), p->pin_id ());
-                    }
-                  }
-                }
-
               }
 
-              db::NetDeviceGraph::confirm_identity (g1, ii1, g2, ii2, mp_logger, ambiguous);
-              ++new_identities;
+              if (ii2->net () && i2->net ()) {
+                for (db::Net::const_pin_iterator pp = ii2->net ()->begin_pins (); pp != ii2->net ()->end_pins (); ++pp) {
+                  for (db::Net::const_pin_iterator p = i2->net ()->begin_pins (); p != i2->net ()->end_pins (); ++p) {
+                    mp_circuit_pin_mapper->map_pins (c2, pp->pin_id (), p->pin_id ());
+                  }
+                }
+              }
 
             }
 
+            db::NetDeviceGraph::confirm_identity (g1, ii1, g2, ii2, mp_logger, ambiguous);
+            ++new_identities;
+
           }
 
-          same_as_prev = same_as_next;
-
         }
+
+        same_as_prev = same_as_next;
 
       }
 

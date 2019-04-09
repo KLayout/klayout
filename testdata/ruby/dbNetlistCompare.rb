@@ -392,8 +392,8 @@ match_nets OUT OUT
 match_nets VDD VDD
 match_nets IN IN
 match_nets VSS VSS
-match_ambiguous_nets INT $10
-match_ambiguous_nets INT2 $11
+match_nets INT $10
+match_nets INT2 $11
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -460,9 +460,9 @@ END
     assert_equal(logger.text, <<"END")
 begin_circuit BUF BUF
 match_nets OUT OUT
-match_nets IN IN
 match_ambiguous_nets INT $10
 match_nets INT2 $11
+match_nets IN IN
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -489,8 +489,8 @@ END
 begin_circuit BUF BUF
 match_nets OUT OUT
 match_nets IN IN
-match_ambiguous_nets INT $10
-match_ambiguous_nets INT2 $11
+match_nets INT2 $11
+match_nets INT $10
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -518,8 +518,8 @@ END
 begin_circuit BUF BUF
 match_nets OUT OUT
 match_nets IN IN
-match_ambiguous_nets INT $10
-match_ambiguous_nets INT2 $11
+match_nets INT2 $11
+match_nets INT $10
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -547,8 +547,8 @@ END
 begin_circuit BUF BUF
 match_nets OUT OUT
 match_nets IN IN
-match_ambiguous_nets INT $10
-match_ambiguous_nets INT2 $11
+match_nets INT2 $11
+match_nets INT $10
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -614,10 +614,10 @@ END
 
     assert_equal(logger.text, <<"END")
 begin_circuit BUF BUF
-match_nets IN IN
 match_nets INT $10
-match_nets OUT OUT
+match_nets IN IN
 match_nets INT2 $11
+match_nets OUT OUT
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -685,9 +685,9 @@ END
     assert_equal(logger.text, <<"END")
 begin_circuit BUF BUF
 match_nets INT $10
-match_nets OUT OUT
-match_nets INT2 $11
 match_nets IN IN
+match_nets INT2 $11
+match_nets OUT OUT
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -887,8 +887,8 @@ match_nets OUT OUT
 match_nets IN2 IN2
 match_nets VSS VSS
 match_nets VDD VDD
-match_nets INT INT
 match_nets IN1 IN1
+match_nets INT INT
 match_pins $0 $0
 match_pins $1 $1
 match_pins $2 $2

@@ -973,14 +973,14 @@ public:
           other.identify (other_ni, ni);
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-          tl::info << "deduced match: " << nodes_with_same_path.front ()->net ()->expanded_name () << " vs. " << other_nodes_with_same_path.front ()->net ()->expanded_name ();
+          tl::info << "deduced match (singular): " << nodes_with_same_path.front ()->net ()->expanded_name () << " vs. " << other_nodes_with_same_path.front ()->net ()->expanded_name ();
 #endif
           if (logger) {
             logger->match_nets (nodes_with_same_path.front ()->net (), other_nodes_with_same_path.front ()->net ());
           }
 
           //  unconditionally continue here.
-          // @@@ derive_node_identities (ni, other, depth + 1, n_branch, logger, false);
+          derive_node_identities (ni, other, depth + 1, n_branch, logger, false);
 
         }
 
@@ -1063,6 +1063,12 @@ public:
           if (! tentative) {
 
             for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
+
+              if (p->first->has_other () || p->second->has_other ()) {
+                //  this may happen if "derive_node_identities" creates new pairs
+                //  TODO: actually *both* should be paired, not just one.
+                continue;
+              }
 
               size_t ni = node_index_for_net (p->first->net ());
               size_t other_ni = other.node_index_for_net (p->second->net ());
@@ -1419,11 +1425,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     tl::info << "deducing from present nodes ...";
 #endif
 
-    size_t new_identities = 0;
     for (db::NetDeviceGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
       if (i1->has_other () && i1->net ()) {
         size_t ni = g1.derive_node_identities (i1 - g1.begin (), g2, mp_logger);
-        new_identities += ni;
         if (ni > 0 && ni != std::numeric_limits<size_t>::max ()) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
           tl::info << ni << " new identities.";
@@ -1441,7 +1445,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       break;
     }
 
-    new_identities = 0;
+    size_t new_identities = 0;
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
     tl::info << "checking topological identity ...";

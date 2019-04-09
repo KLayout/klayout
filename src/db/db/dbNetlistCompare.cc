@@ -617,6 +617,11 @@ public:
     m_other_net_index = index;
   }
 
+  void unset_other_net ()
+  {
+    m_other_net_index = std::numeric_limits<size_t>::max ();
+  }
+
   bool empty () const
   {
     return m_edges.empty ();
@@ -841,6 +846,11 @@ public:
     m_nodes [net_index].set_other_net (other_net_index);
   }
 
+  void unidentify (size_t net_index)
+  {
+    m_nodes [net_index].unset_other_net ();
+  }
+
   node_iterator begin () const
   {
     return m_nodes.begin ();
@@ -851,114 +861,249 @@ public:
     return m_nodes.end ();
   }
 
-  size_t derive_node_identities (size_t net_index, NetDeviceGraph &other, NetlistCompareLogger *logger)
+  /**
+   *  @brief Implementation of the backtracking algorithm
+   *
+   *  This method derives new node assignments based on the (proposed)
+   *  identity of nodes this->[net_index] and other[node].
+   *  The return value will be:
+   *
+   *   >0    if node identity could be established. The return value
+   *         is the number of new node pairs established. All
+   *         node pairs (including the initial proposed identity)
+   *         are assigned.
+   *   ==0   identity could be established. No more assignments are made.
+   *   max   no decision could be made because the max. complexity
+   *         was exhausted. No assignments were made.
+   *
+   *  (here: max=max of size_t). The complexity is measured in
+   *  backtracking depth (number of graph jumps) and decision tree
+   *  branching complexity N (="n_branch", means: N*N decisions to be made).
+   *
+   *  The limits "depth_max" and "n_branch_max" are attributes of the graph.
+   *
+   *  If tentative is true, assignments will not be retained and just the
+   *  status is reported.
+   */
+  size_t derive_node_identities (size_t net_index, NetDeviceGraph &other, size_t depth, size_t n_branch, NetlistCompareLogger *logger, bool tentative)
   {
-    size_t added = 0;
+    const size_t depth_max = 8;
+    const size_t n_branch_max = 100;
 
-    std::vector<size_t> todo, more;
-    more.push_back (net_index);
+    NetGraphNode *n = & m_nodes[net_index];
+    NetGraphNode *nother = & other.m_nodes[n->other_net_index ()];
 
-    while (! more.empty ()) {
-
-      todo.swap (more);
-      more.clear ();
-
-      for (std::vector<size_t>::const_iterator index = todo.begin (); index != todo.end (); ++index) {
-
-        NetGraphNode *n = & m_nodes[*index];
-        NetGraphNode *nother = & other.m_nodes[n->other_net_index ()];
-if (n->net()->name() == "decode_instruction_anticipated[23]") {
-  printf("@@@1\n");
-}
-
-        //  non-ambiguous paths to non-assigned nodes create a node identity on the
-        //  end of this path
-
-        for (NetGraphNode::edge_iterator e = n->begin (); e != n->end (); ) {
-
-          NetGraphNode::edge_iterator ee = e;
-          ++ee;
-
-          while (ee != n->end () && ee->first == e->first) {
-            ++ee;
-          }
-
-          std::vector<const NetGraphNode *> nodes_with_same_path;
-          nodes_with_same_path.reserve (ee - e);
-
-          for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
-            const NetGraphNode *n = &m_nodes[i->second.first];
-            if (! n->has_other ()) {
-              nodes_with_same_path.push_back (n);
-            }
-          }
-
-          if (! nodes_with_same_path.empty ()) {   //  if non-ambiguous, non-assigned
-
-            std::sort (nodes_with_same_path.begin (), nodes_with_same_path.end (), CompareNodePtr ());
-
-            NetGraphNode::edge_iterator e_other = nother->find_edge (e->first);
-            if (e_other != nother->end ()) {
-
-              NetGraphNode::edge_iterator ee_other = e_other;
-              ++ee_other;
-
-              while (ee_other != nother->end () && ee_other->first == e_other->first) {
-                ++ee_other;
-              }
-
-              size_t count_other = 0;
-              size_t node_index = 0, other_node_index = 0;
-              for (NetGraphNode::edge_iterator i = e_other; i != ee_other && count_other < 2; ++i) {
-
-                const NetGraphNode *n = &other.m_nodes[i->second.first];
-                if (! n->has_other ()) {
-
-                  if (nodes_with_same_path.size () == 1) {
-
-                    //  a single candiate: just take this one -> this may render
-                    //  inexact matches, but further propagates net pairing
-                    other_node_index = i->second.first;
-                    node_index = node_index_for_net (nodes_with_same_path.front ()->net ());
-                    ++count_other;
-
-                  } else {
-
-                    std::vector<const NetGraphNode *>::const_iterator in_this = std::lower_bound (nodes_with_same_path.begin (), nodes_with_same_path.end (), n, CompareNodePtr ());
-                    if (in_this != nodes_with_same_path.end () && *n == **in_this && (in_this + 1 == nodes_with_same_path.end () || ! (*n == **(in_this + 1)))) {
-                      other_node_index = i->second.first;
-                      node_index = node_index_for_net ((*in_this)->net ());
-                      ++count_other;
-                    }
-
-                  }
-
-                }
-
-              }
-
-              if (count_other == 1) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
-                tl::info << "deduction from pair " << n->net ()->expanded_name () << " vs. " << nother->net ()->expanded_name ();
+    if (! tentative) {
+      tl::info << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << nother->net ()->expanded_name ();
+    }
 #endif
-                confirm_identity (*this, begin () + node_index, other, other.begin () + other_node_index, logger);
-                ++added;
-                more.push_back (node_index);
-              }
 
+    size_t new_nodes = 0;
+
+    //  non-ambiguous paths to non-assigned nodes create a node identity on the
+    //  end of this path
+
+    for (NetGraphNode::edge_iterator e = n->begin (); e != n->end (); ) {
+
+      NetGraphNode::edge_iterator ee = e;
+      ++ee;
+
+      while (ee != n->end () && ee->first == e->first) {
+        ++ee;
+      }
+
+      std::vector<const NetGraphNode *> nodes_with_same_path;
+      nodes_with_same_path.reserve (ee - e);
+
+      std::vector<const NetGraphNode *> other_nodes_with_same_path;
+      other_nodes_with_same_path.reserve (ee - e);
+
+      for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
+        const NetGraphNode *n = &m_nodes[i->second.first];
+        if (! n->has_other ()) {
+          nodes_with_same_path.push_back (n);
+        }
+      }
+
+      if (! nodes_with_same_path.empty ()) {   //  if non-ambiguous, non-assigned
+
+        std::sort (nodes_with_same_path.begin (), nodes_with_same_path.end (), CompareNodePtr ());
+
+        NetGraphNode::edge_iterator e_other = nother->find_edge (e->first);
+        if (e_other != nother->end ()) {
+
+          NetGraphNode::edge_iterator ee_other = e_other;
+          ++ee_other;
+
+          while (ee_other != nother->end () && ee_other->first == e_other->first) {
+            ++ee_other;
+          }
+
+          size_t count_other = 0;
+          for (NetGraphNode::edge_iterator i = e_other; i != ee_other && count_other < 2; ++i) {
+
+            const NetGraphNode *n = &other.m_nodes[i->second.first];
+            if (! n->has_other ()) {
+              other_nodes_with_same_path.push_back (n);
             }
 
           }
 
-          e = ee;
+          std::sort (other_nodes_with_same_path.begin (), other_nodes_with_same_path.end (), CompareNodePtr ());
 
         }
 
       }
 
+      if (nodes_with_same_path.size () == 1 && other_nodes_with_same_path.size () == 1) {
+
+        if (depth + 1 == depth_max) {
+          return std::numeric_limits<size_t>::max ();
+        }
+
+        //  a single candiate: just take this one -> this may render
+        //  inexact matches, but further propagates net pairing
+
+        size_t ni = node_index_for_net (nodes_with_same_path.front ()->net ());
+        size_t other_ni = other.node_index_for_net (other_nodes_with_same_path.front ()->net ());
+        if (! tentative) {
+
+          identify (ni, other_ni);
+          other.identify (other_ni, ni);
+
+#if defined(PRINT_DEBUG_NETCOMPARE)
+          tl::info << "deduced match: " << nodes_with_same_path.front ()->net ()->expanded_name () << " vs. " << other_nodes_with_same_path.front ()->net ()->expanded_name ();
+#endif
+          if (logger) {
+            logger->match_nets (nodes_with_same_path.front ()->net (), other_nodes_with_same_path.front ()->net ());
+          }
+
+          //  unconditionally continue here.
+          // @@@ derive_node_identities (ni, other, depth + 1, n_branch, logger, false);
+
+        }
+
+        new_nodes += 1;
+
+      } else if (! nodes_with_same_path.empty () || ! other_nodes_with_same_path.empty ()) {
+
+        if (depth + 1 == depth_max) {
+          return std::numeric_limits<size_t>::max ();
+        }
+
+        if (nodes_with_same_path.size () != other_nodes_with_same_path.size ()) {
+          return std::numeric_limits<size_t>::max ();
+        }
+
+        for (size_t i = 0; i < nodes_with_same_path.size (); ++i) {
+          if (! (*nodes_with_same_path[i] == *other_nodes_with_same_path[i])) {
+            return std::numeric_limits<size_t>::max ();
+          }
+        }
+
+        std::vector<const NetGraphNode *>::iterator n1 = nodes_with_same_path.begin ();
+        std::vector<const NetGraphNode *>::iterator n2 = other_nodes_with_same_path.begin ();
+
+        while (n1 != nodes_with_same_path.end () && n2 != other_nodes_with_same_path.end ()) {
+
+          std::vector<const NetGraphNode *>::iterator nn1 = n1, nn2 = n2;
+
+          ++nn1;
+          ++nn2;
+          while (nn1 != nodes_with_same_path.end () && **nn1 == **n1) {
+            ++nn1;
+            ++nn2;
+          }
+
+          size_t num = nn1 - n1;
+          if (num * n_branch > n_branch_max) {
+            return std::numeric_limits<size_t>::max ();
+          }
+
+          std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> > pairs;
+
+          for (std::vector<const NetGraphNode *>::iterator i1 = n1; i1 != nn1; ++i1) {
+
+            std::vector<const NetGraphNode *>::iterator i2;
+            for (i2 = n2; i2 != nn2; ++i2) {
+
+              if (! *i2) {
+                continue;
+              }
+
+              size_t ni = node_index_for_net ((*i1)->net ());
+              size_t other_ni = other.node_index_for_net ((*i2)->net ());
+
+              identify (ni, other_ni);
+              other.identify (other_ni, ni);
+
+              size_t bt_count = derive_node_identities (ni, other, depth + 1, num * n_branch, logger, true /*tentative*/);
+
+              unidentify (ni);
+              other.unidentify (other_ni);
+
+              if (bt_count != std::numeric_limits<size_t>::max ()) {
+                //  identified a pair
+                new_nodes += bt_count + 1;
+                pairs.push_back (std::make_pair (*i1, *i2));
+                *i2 = 0;
+                break;
+              }
+
+            }
+
+            if (i2 == nn2) {
+              //  a mismatch - stop here.
+              return std::numeric_limits<size_t>::max ();
+            }
+
+          }
+
+          if (! tentative) {
+
+            for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
+
+              size_t ni = node_index_for_net (p->first->net ());
+              size_t other_ni = other.node_index_for_net (p->second->net ());
+
+              identify (ni, other_ni);
+              other.identify (other_ni, ni);
+
+              size_t bt_count = derive_node_identities (ni, other, depth + 1, num * n_branch, logger, false /*not tentative*/);
+              tl_assert (bt_count != std::numeric_limits<size_t>::max ());
+
+#if defined(PRINT_DEBUG_NETCOMPARE)
+              tl::info << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+#endif
+              if (logger) {
+                logger->match_nets (p->first->net (), p->second->net ());
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+      e = ee;
+
     }
 
-    return added;
+#if defined(PRINT_DEBUG_NETCOMPARE)
+    if (! tentative && new_nodes > 0 && new_nodes != std::numeric_limits<size_t>::max ()) {
+      tl::info << "finished pair deduction: " << n->net ()->expanded_name () << " vs. " << nother->net ()->expanded_name () << " with " << new_nodes << " new pairs";
+    }
+#endif
+
+    return new_nodes;
+  }
+
+  size_t derive_node_identities (size_t net_index, NetDeviceGraph &other, NetlistCompareLogger *logger)
+  {
+    return derive_node_identities (net_index, other, 0, 1, logger, false);
   }
 
   static void confirm_identity (db::NetDeviceGraph &g1, db::NetDeviceGraph::node_iterator s1, db::NetDeviceGraph &g2, db::NetDeviceGraph::node_iterator s2, db::NetlistCompareLogger *logger, bool ambiguous = false)
@@ -1122,6 +1267,9 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
       if (all_subcircuits_verified (ca, verified_circuits_a) && all_subcircuits_verified (cb, verified_circuits_b)) {
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+        tl::info << "treating circuit: " << ca->name () << " vs. " << cb->name ();
+#endif
         if (mp_logger) {
           mp_logger->begin_circuit (ca, cb);
         }
@@ -1276,9 +1424,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       if (i1->has_other () && i1->net ()) {
         size_t ni = g1.derive_node_identities (i1 - g1.begin (), g2, mp_logger);
         new_identities += ni;
-        if (ni > 0) {
+        if (ni > 0 && ni != std::numeric_limits<size_t>::max ()) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << ni << " new identities.";
+          tl::info << ni << " new identities.";
 #endif
         }
       }
@@ -1355,6 +1503,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
             }
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+            tl::info << "topological match: " << ii1->net ()->expanded_name () << " vs. " << ii2->net ()->expanded_name ();
+#endif
             db::NetDeviceGraph::confirm_identity (g1, ii1, g2, ii2, mp_logger, ambiguous);
             ++new_identities;
 

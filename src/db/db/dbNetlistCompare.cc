@@ -1010,6 +1010,36 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
     return std::numeric_limits<size_t>::max ();
   }
 
+  if (nodes.size () == 1 && other_nodes.size () == 1) {
+
+    //  a single candiate: just take this one -> this may render
+    //  inexact matches, but further propagates net pairing
+
+    if (! tentative) {
+
+      size_t ni = node_index_for_net (nodes.front ()->net ());
+      size_t other_ni = other.node_index_for_net (other_nodes.front ()->net ());
+
+      identify (ni, other_ni);
+      other.identify (other_ni, ni);
+
+#if defined(PRINT_DEBUG_NETCOMPARE)
+      tl::info << "deduced match (singular): " << nodes.front ()->net ()->expanded_name () << " vs. " << other_nodes.front ()->net ()->expanded_name ();
+#endif
+      if (logger) {
+        logger->match_nets (nodes.front ()->net (), other_nodes.front ()->net ());
+      }
+
+      //  unconditionally continue here.
+      derive_node_identities (ni, other, depth + 1, n_branch, logger, circuit_pin_mapper, false);
+
+    }
+
+    new_nodes += 1;
+    return new_nodes;
+
+  }
+
   if (picky) {
 
     if (nodes.size () != other_nodes.size ()) {
@@ -1029,16 +1059,18 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
 
   while (n1 != nodes.end () && n2 != other_nodes.end ()) {
 
+    if ((*n1)->has_other ()) {
+      ++n1;
+      continue;
+    } else if ((*n2)->has_other ()) {
+      ++n2;
+      continue;
+    }
+
     if (**n1 < **n2) {
       ++n1;
       continue;
     } else if (**n2 < **n1) {
-      ++n2;
-      continue;
-    } else if ((*n1)->has_other ()) {
-      ++n1;
-      continue;
-    } else if ((*n2)->has_other ()) {
       ++n2;
       continue;
     }
@@ -1067,9 +1099,10 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
       //  a single candiate: just take this one -> this may render
       //  inexact matches, but further propagates net pairing
 
-      size_t ni = node_index_for_net ((*n1)->net ());
-      size_t other_ni = other.node_index_for_net ((*n2)->net ());
       if (! tentative) {
+
+        size_t ni = node_index_for_net ((*n1)->net ());
+        size_t other_ni = other.node_index_for_net ((*n2)->net ());
 
         identify (ni, other_ni);
         other.identify (other_ni, ni);
@@ -1584,6 +1617,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       }
       break;
     }
+
+    std::sort (nodes.begin (), nodes.end (), CompareNodePtr ());
+    std::sort (other_nodes.begin (), other_nodes.end (), CompareNodePtr ());
 
     size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, g2, 0, 1, mp_logger, mp_circuit_pin_mapper.get (), false /*not tentative*/, false /*don't require a full match*/);
     if (ni > 0 && ni != std::numeric_limits<size_t>::max ()) {

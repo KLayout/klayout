@@ -188,7 +188,7 @@ public:
 
   virtual void device_class_mismatch (const db::DeviceClass *a, const db::DeviceClass *b)
   {
-    out ("device_class_mismatch " + a->name () + " " + b->name ());
+    out ("device_class_mismatch " + device_class2str (a) + " " + device_class2str (b));
   }
 
   virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b)
@@ -259,6 +259,11 @@ public:
 private:
   bool m_new_circuit;
   std::string m_circuit;
+
+  std::string device_class2str (const db::DeviceClass *x) const
+  {
+    return x ? x->name () : "(null)";
+  }
 
   std::string circuit2str (const db::Circuit *x) const
   {

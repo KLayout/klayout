@@ -29,7 +29,7 @@
 #include "tlLog.h"
 
 //  verbose debug output
-#define PRINT_DEBUG_NETCOMPARE
+// #define PRINT_DEBUG_NETCOMPARE
 
 namespace db
 {
@@ -97,6 +97,16 @@ public:
     tl::equivalence_clusters<size_t> &pm = m_pin_map [circuit];
     for (size_t i = 1; i < pin_ids.size (); ++i) {
       pm.same (pin_ids [0], pin_ids [i]);
+    }
+  }
+
+  size_t is_mapped (const db::Circuit *circuit, size_t pin_id) const
+  {
+    std::map<const db::Circuit *, tl::equivalence_clusters<size_t> >::const_iterator pm = m_pin_map.find (circuit);
+    if (pm != m_pin_map.end ()) {
+      return pm->second.has_attribute (pin_id);
+    } else {
+      return false;
     }
   }
 
@@ -1468,6 +1478,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
   //  we need to create a copy because this method is supposed to be const.
   db::CircuitCategorizer circuit_categorizer = *mp_circuit_categorizer;
   db::DeviceCategorizer device_categorizer = *mp_device_categorizer;
+  db::CircuitPinMapper circuit_pin_mapper = *mp_circuit_pin_mapper;
 
   bool good = true;
 
@@ -1553,7 +1564,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
         }
 
         bool pin_mismatch = false;
-        bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, *net_identity, pin_mismatch, c12_pin_mapping, c22_pin_mapping);
+        bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, circuit_pin_mapper, *net_identity, pin_mismatch, c12_pin_mapping, c22_pin_mapping);
         if (! g) {
           good = false;
         }
@@ -1562,6 +1573,8 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
           verified_circuits_a.insert (ca);
           verified_circuits_b.insert (cb);
         }
+
+        derive_pin_equivalence (ca, cb, &circuit_pin_mapper);
 
         if (mp_logger) {
           mp_logger->end_circuit (ca, cb, g);
@@ -1584,6 +1597,36 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
   }
 
   return good;
+}
+
+static
+std::vector<size_t> collect_pins_with_empty_nets (const db::Circuit *c, CircuitPinMapper *circuit_pin_mapper)
+{
+  std::vector<size_t> pins;
+
+  for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
+    const db::Net *net = n.operator-> ();
+    if (net->pin_count () > 0 && net->terminal_count () == 0 && net->subcircuit_pin_count () == 0) {
+      for (db::Net::const_pin_iterator p = net->begin_pins (); p != net->end_pins (); ++p) {
+        if (! circuit_pin_mapper->is_mapped (c, p->pin_id ())) {
+          pins.push_back (p->pin_id ());
+        }
+      }
+    }
+  }
+
+  return pins;
+}
+
+void
+NetlistComparer::derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinMapper *circuit_pin_mapper)
+{
+  std::vector<size_t> pa, pb;
+  pa = collect_pins_with_empty_nets (ca, circuit_pin_mapper);
+  pb = collect_pins_with_empty_nets (cb, circuit_pin_mapper);
+
+  circuit_pin_mapper->map_pins (ca, pa);
+  circuit_pin_mapper->map_pins (cb, pb);
 }
 
 bool
@@ -1662,7 +1705,7 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetDeviceGra
 }
 
 bool
-NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
+NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
 {
   db::DeviceFilter device_filter (m_cap_threshold, m_res_threshold);
 
@@ -1670,8 +1713,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   //  NOTE: for normalization we map all subcircuits of c1 to c2.
   //  Also, pin swapping will only happen there.
-  g1.build (c1, device_categorizer, circuit_categorizer, device_filter, &c12_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
-  g2.build (c2, device_categorizer, circuit_categorizer, device_filter, &c22_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
+  g1.build (c1, device_categorizer, circuit_categorizer, device_filter, &c12_circuit_and_pin_mapping, &circuit_pin_mapper);
+  g2.build (c2, device_categorizer, circuit_categorizer, device_filter, &c22_circuit_and_pin_mapping, &circuit_pin_mapper);
 
   //  Match dummy nodes for null nets
   g1.identify (0, 0);
@@ -1707,7 +1750,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       for (db::NetDeviceGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
         if (i1->has_other () && i1->net ()) {
-          size_t ni = g1.derive_node_identities (i1 - g1.begin (), g2, 0, 1, mp_logger, mp_circuit_pin_mapper.get (), 0 /*not tentative*/, pass > 0 /*with ambiguities*/);
+          size_t ni = g1.derive_node_identities (i1 - g1.begin (), g2, 0, 1, mp_logger, &circuit_pin_mapper, 0 /*not tentative*/, pass > 0 /*with ambiguities*/);
           if (ni > 0 && ni != std::numeric_limits<size_t>::max ()) {
             new_identities += ni;
   #if defined(PRINT_DEBUG_NETCOMPARE)
@@ -1750,7 +1793,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       std::sort (nodes.begin (), nodes.end (), CompareNodePtr ());
       std::sort (other_nodes.begin (), other_nodes.end (), CompareNodePtr ());
 
-      size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, g2, 0, 1, mp_logger, mp_circuit_pin_mapper.get (), 0 /*not tentative*/, pass > 0 /*with ambiguities*/);
+      size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, g2, 0, 1, mp_logger, &circuit_pin_mapper, 0 /*not tentative*/, pass > 0 /*with ambiguities*/);
       if (ni > 0 && ni != std::numeric_limits<size_t>::max ()) {
         new_identities += ni;
   #if defined(PRINT_DEBUG_NETCOMPARE)
@@ -1960,7 +2003,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::Circuit::const_subcircuit_iterator sc = c1->begin_subcircuits (); sc != c1->end_subcircuits (); ++sc) {
 
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g1, &c12_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper);
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
@@ -1983,7 +2026,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::Circuit::const_subcircuit_iterator sc = c2->begin_subcircuits (); sc != c2->end_subcircuits (); ++sc) {
 
-    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, &c22_circuit_and_pin_mapping, mp_circuit_pin_mapper.get ());
+    std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper);
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {

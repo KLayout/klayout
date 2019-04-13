@@ -616,8 +616,8 @@ END
 begin_circuit BUF BUF
 match_nets INT $10
 match_nets IN IN
-match_nets INT2 $11
 match_nets OUT OUT
+match_nets INT2 $11
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -686,8 +686,8 @@ END
 begin_circuit BUF BUF
 match_nets INT $10
 match_nets IN IN
-match_nets INT2 $11
 match_nets OUT OUT
+match_nets INT2 $11
 match_pins $0 $1
 match_pins $1 $3
 match_pins $2 $0
@@ -840,9 +840,9 @@ match_devices $4 $4
 end_circuit NAND NAND MATCH
 begin_circuit TOP TOP
 match_nets OUT OUT
-match_nets IN1 IN1
-match_nets IN2 IN2
 match_nets INT INT
+match_nets IN2 IN2
+match_nets IN1 IN1
 match_nets VDD VDD
 match_nets VSS VSS
 match_pins $0 $0

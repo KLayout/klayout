@@ -29,7 +29,8 @@
 #include "tlLog.h"
 
 //  verbose debug output
-#define PRINT_DEBUG_NETCOMPARE
+//  TODO: make this a feature?
+// #define PRINT_DEBUG_NETCOMPARE
 
 namespace db
 {
@@ -1230,11 +1231,40 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
     std::stable_sort (node_ranges.begin (), node_ranges.end ());
   }
 
-  for (std::vector<NodeRange>::const_iterator nr = node_ranges.begin (); nr != node_ranges.end (); ++nr) {
+  for (std::vector<NodeRange>::iterator nr = node_ranges.begin (); nr != node_ranges.end (); ++nr) {
 
-    //  @@@ node ranges might have changed - adjust to real count and skip leading pairs assigned already
+    //  node ranges might have changed - adjust to real count and skip leading pairs assigned already
 
-    if (nr->num == 1) {
+    while (nr->n1 != nr->nn1 && nr->n2 != nr->nn2) {
+      if ((*nr->n1)->has_other ()) {
+        ++nr->n1;
+      } else if ((*nr->n2)->has_other ()) {
+        ++nr->n2;
+      } else {
+        break;
+      }
+    }
+
+    nr->num = 0;
+    std::vector<const NetGraphNode *>::const_iterator i1 = nr->n1, i2 = nr->n2;
+
+    while (i1 != nr->nn1 && i2 != nr->nn2) {
+      if ((*i1)->has_other ()) {
+        ++i1;
+      } else if ((*i2)->has_other ()) {
+        ++i2;
+      } else {
+        ++nr->num;
+        ++i1;
+        ++i2;
+      }
+    }
+
+    if (nr->num < 1) {
+
+      //  ignore this - it got obsolete.
+
+    } else if (nr->num == 1) {
 
       if (! (*nr->n1)->has_other () && ! (*nr->n2)->has_other ()) {
 

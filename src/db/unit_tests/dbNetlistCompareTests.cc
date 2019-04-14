@@ -2193,3 +2193,112 @@ TEST(17_InherentlyAmbiguousDecoder)
   EXPECT_EQ (good, true);
 }
 
+TEST(18_ClockTree)
+{
+  const char *nls1 =
+    "circuit INV (IN=IN,OUT=OUT,VDD=VDD,VSS=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TREE ();\n"
+    "  subcircuit INV T (IN=IN,OUT=S,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TR (IN=S,OUT=SR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TL (IN=S,OUT=SL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRR (IN=SR,OUT=SRR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRL (IN=SR,OUT=SRL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLR (IN=SL,OUT=SLR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLL (IN=SL,OUT=SLL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRRR (IN=SRR,OUT=SRRR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRRL (IN=SRR,OUT=SRRL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRLR (IN=SRL,OUT=SRLR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRLL (IN=SRL,OUT=SRLL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLRR (IN=SLR,OUT=SLRR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLRL (IN=SLR,OUT=SLRL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLLR (IN=SLL,OUT=SLLR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLLL (IN=SLL,OUT=SLLL,VDD=VDD,VSS=VSS);\n"
+    "end;\n";
+
+  const char *nls2 =
+    "circuit INV (IN=IN,OUT=OUT,VDD=VDD,VSS=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit TREE ();\n"
+    "  subcircuit INV TLRR (IN=SLR,OUT=SLRR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TR (IN=S,OUT=SR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRRL (IN=SRR,OUT=SRRL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRLR (IN=SRL,OUT=SRLR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLR (IN=SL,OUT=SLR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLL (IN=SL,OUT=SLL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRRR (IN=SRR,OUT=SRRR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLLL (IN=SLL,OUT=SLLL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLRL (IN=SLR,OUT=SLRL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV T (IN=IN,OUT=S,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TLLR (IN=SLL,OUT=SLLR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TL (IN=S,OUT=SL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRR (IN=SR,OUT=SRR,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRLL (IN=SRL,OUT=SRLL,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV TRL (IN=SR,OUT=SRL,VDD=VDD,VSS=VSS);\n"
+    "end;\n";
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_pins IN IN\n"
+    "match_pins OUT OUT\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit TREE TREE\n"
+    "match_nets IN IN\n"
+    "match_nets S S\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
+    "match_ambiguous_nets SL SR\n"
+    "match_ambiguous_nets SR SL\n"
+    "match_ambiguous_nets SLL SRL\n"
+    "match_ambiguous_nets SLR SRR\n"
+    "match_ambiguous_nets SLLL SRLL\n"
+    "match_ambiguous_nets SLLR SRLR\n"
+    "match_ambiguous_nets SLRL SRRL\n"
+    "match_ambiguous_nets SLRR SRRR\n"
+    "match_ambiguous_nets SRL SLL\n"
+    "match_ambiguous_nets SRR SLR\n"
+    "match_ambiguous_nets SRLL SLLR\n"
+    "match_ambiguous_nets SRLR SLLL\n"
+    "match_ambiguous_nets SRRL SLRR\n"
+    "match_ambiguous_nets SRRR SLRL\n"
+    "match_subcircuits TRRL TLRR\n"
+    "match_subcircuits TL TR\n"
+    "match_subcircuits TLRL TRRL\n"
+    "match_subcircuits TLLR TRLR\n"
+    "match_subcircuits TRR TLR\n"
+    "match_subcircuits TRL TLL\n"
+    "match_subcircuits TLRR TRRR\n"
+    "match_subcircuits TRLR TLLL\n"
+    "match_subcircuits TRRR TLRL\n"
+    "match_subcircuits T T\n"
+    "match_subcircuits TRLL TLLR\n"
+    "match_subcircuits TR TL\n"
+    "match_subcircuits TLR TRR\n"
+    "match_subcircuits TLLL TRLL\n"
+    "match_subcircuits TLL TRL\n"
+    "end_circuit TREE TREE MATCH"
+  );
+  EXPECT_EQ (good, true);
+}
+

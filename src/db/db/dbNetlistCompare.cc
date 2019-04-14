@@ -29,7 +29,7 @@
 #include "tlLog.h"
 
 //  verbose debug output
-// #define PRINT_DEBUG_NETCOMPARE
+#define PRINT_DEBUG_NETCOMPARE
 
 namespace db
 {
@@ -874,9 +874,9 @@ public:
    *  If tentative is true, assignments will not be retained and just the
    *  status is reported.
    */
-  size_t derive_node_identities (size_t net_index, NetDeviceGraph &other, size_t depth, size_t n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous);
+  size_t derive_node_identities (size_t net_index, NetDeviceGraph &other, size_t depth, size_t max_depth, size_t n_branch, size_t max_n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous);
 
-  size_t derive_node_identities_from_node_set (const std::vector<const NetGraphNode *> &nodes, const std::vector<const NetGraphNode *> &other_nodes, NetDeviceGraph &other, size_t depth, size_t n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous);
+  size_t derive_node_identities_from_node_set (const std::vector<const NetGraphNode *> &nodes, const std::vector<const NetGraphNode *> &other_nodes, NetDeviceGraph &other, size_t depth, size_t max_depth, size_t n_branch, size_t max_n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous);
 
 private:
   std::vector<NetGraphNode> m_nodes;
@@ -941,10 +941,6 @@ private:
 
 // --------------------------------------------------------------------------------------------------------------------
 
-//  @@@ make attribute
-const size_t depth_max = 8;
-const size_t n_branch_max = 100;
-
 void
 NetDeviceGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper)
 {
@@ -982,7 +978,7 @@ NetDeviceGraph::build (const db::Circuit *c, DeviceCategorizer &device_categoriz
 }
 
 size_t
-NetDeviceGraph::derive_node_identities (size_t net_index, NetDeviceGraph &other, size_t depth, size_t n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous)
+NetDeviceGraph::derive_node_identities (size_t net_index, NetDeviceGraph &other, size_t depth, size_t max_depth, size_t n_branch, size_t max_n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous)
 {
   NetGraphNode *n = & m_nodes[net_index];
   NetGraphNode *nother = & other.m_nodes[n->other_net_index ()];
@@ -1076,7 +1072,7 @@ NetDeviceGraph::derive_node_identities (size_t net_index, NetDeviceGraph &other,
       //  propagate pairing in picky mode: this means we only accept exact a match if the node set
       //  is exactly identical and no ambiguous nodes are present when ambiguous nodes are forbidden
 
-      size_t bt_count = derive_node_identities_from_node_set (nodes, other_nodes, other, depth, n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
+      size_t bt_count = derive_node_identities_from_node_set (nodes, other_nodes, other, depth, max_depth, n_branch, max_n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
 
       if (bt_count == std::numeric_limits<size_t>::max ()) {
         if (tentative) {
@@ -1102,18 +1098,22 @@ NetDeviceGraph::derive_node_identities (size_t net_index, NetDeviceGraph &other,
 }
 
 size_t
-NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const NetGraphNode *> &nodes, const std::vector<const NetGraphNode *> &other_nodes, NetDeviceGraph &other, size_t depth, size_t n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous)
+NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const NetGraphNode *> &nodes, const std::vector<const NetGraphNode *> &other_nodes, NetDeviceGraph &other, size_t depth, size_t max_depth, size_t n_branch, size_t max_n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous)
 {
 #if defined(PRINT_DEBUG_NETCOMPARE)
   std::string indent;
   for (size_t d = 0; d < depth; ++d) {
     indent += " ";
   }
+  indent += "*" + tl::to_string (n_branch) + " ";
 #endif
 
   size_t new_nodes = 0;
 
-  if (depth + 1 == depth_max) {
+  if (depth > max_depth) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+    tl::info << indent << "max. depth exhausted (" << depth + 1 << ">" << max_depth << ")";
+#endif
     return std::numeric_limits<size_t>::max ();
   }
 
@@ -1139,7 +1139,7 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
       }
 
       //  continue here.
-      size_t bt_count = derive_node_identities (ni, other, depth + 1, n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
+      size_t bt_count = derive_node_identities (ni, other, depth + 1, max_depth, n_branch, max_n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
 
       if (bt_count != std::numeric_limits<size_t>::max ()) {
         new_nodes += bt_count;
@@ -1232,6 +1232,8 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
 
   for (std::vector<NodeRange>::const_iterator nr = node_ranges.begin (); nr != node_ranges.end (); ++nr) {
 
+    //  @@@ node ranges might have changed - adjust to real count and skip leading pairs assigned already
+
     if (nr->num == 1) {
 
       if (! (*nr->n1)->has_other () && ! (*nr->n2)->has_other ()) {
@@ -1254,7 +1256,7 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
         }
 
         //  continue here.
-        size_t bt_count = derive_node_identities (ni, other, depth + 1, n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
+        size_t bt_count = derive_node_identities (ni, other, depth + 1, max_depth, n_branch, max_n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
 
         if (bt_count != std::numeric_limits<size_t>::max ()) {
           new_nodes += bt_count;
@@ -1277,12 +1279,18 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
 
       }
 
-    } else if (nr->num * n_branch > n_branch_max) {
+    } else if (nr->num * n_branch > max_n_branch) {
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+      tl::info << indent << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << max_n_branch << ") - mismatch.";
+#endif
       return std::numeric_limits<size_t>::max ();
 
     } else {
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+      tl::info << indent << "analyzing ambiguity group with " << nr->num << " members";
+#endif
       std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> > pairs;
       tl::equivalence_clusters<const NetGraphNode *> equivalent_other_nodes;
       std::set<const NetGraphNode *> seen;
@@ -1316,7 +1324,7 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
 #if defined(PRINT_DEBUG_NETCOMPARE)
           tl::info << indent << "trying in tentative mode: " << (*i1)->net ()->expanded_name () << " vs. " << (*i2)->net ()->expanded_name ();
 #endif
-          size_t bt_count = derive_node_identities (ni, other, depth + 1, nr->num * n_branch, logger, circuit_pin_mapper, &tn, with_ambiguous);
+          size_t bt_count = derive_node_identities (ni, other, depth + 1, max_depth, nr->num * n_branch, max_n_branch, logger, circuit_pin_mapper, &tn, with_ambiguous);
 
           if (bt_count != std::numeric_limits<size_t>::max ()) {
 
@@ -1386,7 +1394,7 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
 
           size_t ni = node_index_for_net (p->first->net ());
 
-          size_t bt_count = derive_node_identities (ni, other, depth + 1, nr->num * n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
+          size_t bt_count = derive_node_identities (ni, other, depth + 1, max_depth, nr->num * n_branch, max_n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
           tl_assert (bt_count != std::numeric_limits<size_t>::max ());
 
         }
@@ -1403,6 +1411,10 @@ NetDeviceGraph::derive_node_identities_from_node_set (const std::vector<const Ne
         }
 
       }
+
+#if defined(PRINT_DEBUG_NETCOMPARE)
+      tl::info << indent << "finished analysis of ambiguity group with " << nr->num << " members";
+#endif
 
     }
 
@@ -1424,6 +1436,9 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
 
   m_cap_threshold = -1.0;   //  not set
   m_res_threshold = -1.0;   //  not set
+
+  m_max_depth = 8;
+  m_max_n_branch = 100;
 }
 
 void
@@ -1737,32 +1752,38 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (int pass = 0; pass < 2; ++pass) {
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+    if (pass > 0) {
+      tl::info << "including ambiguous nodes now.";
+    }
+#endif
+
     good = true;
     while (true) {
 
-  #if defined(PRINT_DEBUG_NETCOMPARE)
+#if defined(PRINT_DEBUG_NETCOMPARE)
       ++iter;
       tl::info << "new compare iteration #" << iter;
       tl::info << "deducing from present nodes ...";
-  #endif
+#endif
 
       size_t new_identities = 0;
 
       for (db::NetDeviceGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
         if (i1->has_other () && i1->net ()) {
-          size_t ni = g1.derive_node_identities (i1 - g1.begin (), g2, 0, 1, mp_logger, &circuit_pin_mapper, 0 /*not tentative*/, pass > 0 /*with ambiguities*/);
+          size_t ni = g1.derive_node_identities (i1 - g1.begin (), g2, 0, m_max_depth, 1, m_max_n_branch, mp_logger, &circuit_pin_mapper, 0 /*not tentative*/, pass > 0 /*with ambiguities*/);
           if (ni > 0 && ni != std::numeric_limits<size_t>::max ()) {
             new_identities += ni;
-  #if defined(PRINT_DEBUG_NETCOMPARE)
+#if defined(PRINT_DEBUG_NETCOMPARE)
             tl::info << ni << " new identities.";
-  #endif
+#endif
           }
         }
       }
 
-  #if defined(PRINT_DEBUG_NETCOMPARE)
+#if defined(PRINT_DEBUG_NETCOMPARE)
       tl::info << "checking topological identity ...";
-  #endif
+#endif
 
       //  derive new identities through topology: first collect all nets with the same topological signature
 
@@ -1793,12 +1814,12 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       std::sort (nodes.begin (), nodes.end (), CompareNodePtr ());
       std::sort (other_nodes.begin (), other_nodes.end (), CompareNodePtr ());
 
-      size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, g2, 0, 1, mp_logger, &circuit_pin_mapper, 0 /*not tentative*/, pass > 0 /*with ambiguities*/);
+      size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, g2, 0, m_max_depth, 1, m_max_n_branch, mp_logger, &circuit_pin_mapper, 0 /*not tentative*/, pass > 0 /*with ambiguities*/);
       if (ni > 0 && ni != std::numeric_limits<size_t>::max ()) {
         new_identities += ni;
-  #if defined(PRINT_DEBUG_NETCOMPARE)
+#if defined(PRINT_DEBUG_NETCOMPARE)
         tl::info << ni << " new identities.";
-  #endif
+#endif
       }
 
       if (new_identities == 0) {

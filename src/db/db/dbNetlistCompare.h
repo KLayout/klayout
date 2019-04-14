@@ -212,6 +212,48 @@ public:
   void exclude_resistors (double threshold);
 
   /**
+   *  @brief Sets the maximum seach depth
+   *
+   *  This value limits the search depth of the backtracking algorithm to the
+   *  given number of jumps.
+   */
+  void set_max_depth (size_t n)
+  {
+    m_max_depth = n;
+  }
+
+  /**
+   *  @brief Gets the maximum search depth
+   */
+  size_t max_depth () const
+  {
+    return m_max_depth;
+  }
+
+  /**
+   *  @brief Sets the maximum branch complexity
+   *
+   *  This value limits the maximum branch complexity of the backtracking algorithm.
+   *  The complexity is the accumulated number of branch options with ambiguous
+   *  net matches. Backtracking will stop when the maximum number of options
+   *  has been exceeded.
+   *  As the computational complexity is the square of the branch count,
+   *  this value should be adjusted carefully.
+   */
+  void set_max_branch_complexity (size_t n)
+  {
+    m_max_n_branch = n;
+  }
+
+  /**
+   *  @brief Gets the maximum branch complexity
+   */
+  size_t max_branch_complexity () const
+  {
+    return m_max_n_branch;
+  }
+
+  /**
    *  @brief Actually compares the two netlists
    */
   bool compare (const db::Netlist *a, const db::Netlist *b) const;
@@ -228,6 +270,8 @@ protected:
   std::auto_ptr<CircuitCategorizer> mp_circuit_categorizer;
   double m_cap_threshold;
   double m_res_threshold;
+  size_t m_max_n_branch;
+  size_t m_max_depth;
 };
 
 }

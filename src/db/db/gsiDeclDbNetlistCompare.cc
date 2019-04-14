@@ -482,6 +482,29 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "@brief Excludes all resistor devices with a resistance values higher than the given threshold.\n"
     "To reset this constraint, set this attribute to zero."
   ) +
+  gsi::method ("max_depth=", &db::NetlistComparer::set_max_depth, gsi::arg ("n"),
+    "@brief Sets the maximum seach depth\n"
+    "This value limits the search depth of the backtracking algorithm to the\n"
+    "given number of jumps.\n"
+  ) +
+  gsi::method ("max_depth", &db::NetlistComparer::max_depth,
+    "@brief Gets the maximum seach depth\n"
+    "See \\max_depth= for details."
+  ) +
+  gsi::method ("max_branch_complexity=", &db::NetlistComparer::set_max_branch_complexity, gsi::arg ("n"),
+    "@brief Sets the maximum branch complexity\n"
+    "This value limits the maximum branch complexity of the backtracking algorithm.\n"
+    "The complexity is the accumulated number of branch options with ambiguous\n"
+    "net matches. Backtracking will stop when the maximum number of options\n"
+    "has been exceeded.\n"
+    "\n"
+    "As the computational complexity is the square of the branch count,\n"
+    "this value should be adjusted carefully.\n"
+  ) +
+  gsi::method ("max_branch_complexity", &db::NetlistComparer::max_branch_complexity,
+    "@brief Gets the maximum branch complexity\n"
+    "See \\max_branch_complexity= for details."
+  ) +
   gsi::method ("compare", &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"),
     "@brief Compares two netlists.\n"
     "This method will perform the actual netlist compare. It will return true if both netlists are identical. "

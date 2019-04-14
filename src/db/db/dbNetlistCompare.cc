@@ -1599,6 +1599,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
         if (mp_logger) {
           mp_logger->circuit_skipped (ca, cb);
+          good = false;
         }
 
       }
@@ -1849,77 +1850,91 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   //  Report pin assignment
   //  This step also does the pin identity mapping.
 
-  std::multimap<size_t, const db::Pin *> net2pin;
-  for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
-    const db::Net *net = c2->net_for_pin (p->id ());
-    if (net) {
-      net2pin.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
-    }
-  }
+  if (c1->pin_count () > 0 && c2->pin_count () > 0) {
 
-  CircuitMapper &c12_pin_mapping = c12_circuit_and_pin_mapping [c1];
-  c12_pin_mapping.set_other (c2);
-
-  //  dummy mapping: we show this circuit is used.
-  CircuitMapper &c22_pin_mapping = c22_circuit_and_pin_mapping [c2];
-  c22_pin_mapping.set_other (c2);
-
-  for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
-
-    const db::Net *net = c1->net_for_pin (p->id ());
-    if (! net) {
-      continue;
-    }
-
-    const db::NetGraphNode &n = *(g1.begin () + g1.node_index_for_net (net));
-
-    if (! n.has_other ()) {
-      if (mp_logger) {
-        mp_logger->pin_mismatch (p.operator-> (), 0);
+    std::multimap<size_t, const db::Pin *> net2pin;
+    for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
+      const db::Net *net = c2->net_for_pin (p->id ());
+      if (net) {
+        net2pin.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
       }
-      pin_mismatch = true;
-      good = false;
-      continue;
     }
 
-    std::multimap<size_t, const db::Pin *>::iterator np = net2pin.find (n.other_net_index ());
-    for (db::Net::const_pin_iterator pi = net->begin_pins (); pi != net->end_pins (); ++pi) {
+    CircuitMapper &c12_pin_mapping = c12_circuit_and_pin_mapping [c1];
+    c12_pin_mapping.set_other (c2);
 
-      if (np != net2pin.end () && np->first == n.other_net_index ()) {
+    //  dummy mapping: we show this circuit is used.
+    CircuitMapper &c22_pin_mapping = c22_circuit_and_pin_mapping [c2];
+    c22_pin_mapping.set_other (c2);
 
+    for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
+
+      const db::Net *net = c1->net_for_pin (p->id ());
+      if (! net) {
+        continue;
+      }
+
+      const db::NetGraphNode &n = *(g1.begin () + g1.node_index_for_net (net));
+
+      if (! n.has_other ()) {
         if (mp_logger) {
-          mp_logger->match_pins (pi->pin (), np->second);
-        }
-        c12_pin_mapping.map_pin (pi->pin ()->id (), np->second->id ());
-        //  dummy mapping: we show this pin is used.
-        c22_pin_mapping.map_pin (np->second->id (), np->second->id ());
-
-        std::multimap<size_t, const db::Pin *>::iterator np_delete = np;
-        ++np;
-        net2pin.erase (np_delete);
-
-      } else {
-
-        if (mp_logger) {
-          mp_logger->pin_mismatch (pi->pin (), 0);
+          mp_logger->pin_mismatch (p.operator-> (), 0);
         }
         pin_mismatch = true;
         good = false;
+        continue;
+      }
+
+      std::multimap<size_t, const db::Pin *>::iterator np = net2pin.find (n.other_net_index ());
+      for (db::Net::const_pin_iterator pi = net->begin_pins (); pi != net->end_pins (); ++pi) {
+
+        if (np != net2pin.end () && np->first == n.other_net_index ()) {
+
+          if (mp_logger) {
+            mp_logger->match_pins (pi->pin (), np->second);
+          }
+          c12_pin_mapping.map_pin (pi->pin ()->id (), np->second->id ());
+          //  dummy mapping: we show this pin is used.
+          c22_pin_mapping.map_pin (np->second->id (), np->second->id ());
+
+          std::multimap<size_t, const db::Pin *>::iterator np_delete = np;
+          ++np;
+          net2pin.erase (np_delete);
+
+        } else {
+
+          if (mp_logger) {
+            mp_logger->pin_mismatch (pi->pin (), 0);
+          }
+          pin_mismatch = true;
+          good = false;
+
+        }
 
       }
 
     }
 
-  }
-
-  for (std::multimap<size_t, const db::Pin *>::iterator np = net2pin.begin (); np != net2pin.end (); ++np) {
-    if (mp_logger) {
-      mp_logger->pin_mismatch (0, np->second);
+    for (std::multimap<size_t, const db::Pin *>::iterator np = net2pin.begin (); np != net2pin.end (); ++np) {
+      if (mp_logger) {
+        mp_logger->pin_mismatch (0, np->second);
+      }
+      pin_mismatch = true;
+      good = false;
     }
-    pin_mismatch = true;
-    good = false;
-  }
 
+  } else {
+
+    //  skip pin mapping in case one circuit does not feature pins
+    //  This is often the case for top-level circuits. We don't necessarily need pins for them.
+    //  We still report those circuits with "pin mismatch" so they don't get considered within
+    //  subcircuits.
+
+    if (c1->pin_count () != c2->pin_count ()) {
+      pin_mismatch = true;
+    }
+
+  }
 
   //  Report device assignment
 

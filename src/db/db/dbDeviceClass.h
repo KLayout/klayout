@@ -124,7 +124,7 @@ public:
    *  @brief Creates an empty device parameter definition
    */
   DeviceParameterDefinition ()
-    : m_name (), m_description (), m_default_value (0.0), m_id (0)
+    : m_name (), m_description (), m_default_value (0.0), m_id (0), m_is_primary (true)
   {
     //  .. nothing yet ..
   }
@@ -132,8 +132,8 @@ public:
   /**
    *  @brief Creates a device parameter definition with the given name and description
    */
-  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0)
-    : m_name (name), m_description (description), m_default_value (default_value), m_id (0)
+  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0, bool is_primary = true)
+    : m_name (name), m_description (description), m_default_value (default_value), m_id (0), m_is_primary (is_primary)
   {
     //  .. nothing yet ..
   }
@@ -187,6 +187,25 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether the parameter is a primary parameter
+   *
+   *  If this flag is set to true (the default), the parameter is considered a primary parameter.
+   *  Only primary parameters are compared by default.
+   */
+  void set_is_primary (bool p)
+  {
+    m_is_primary = p;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the parameter is a primary parameter
+   */
+  bool is_primary () const
+  {
+    return m_is_primary;
+  }
+
+  /**
    *  @brief Gets the parameter ID
    */
   size_t id () const
@@ -200,6 +219,7 @@ private:
   std::string m_name, m_description;
   double m_default_value;
   size_t m_id;
+  bool m_is_primary;
 
   void set_id (size_t id)
   {

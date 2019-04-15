@@ -228,6 +228,17 @@ TEST(0_EqualDeviceParameters)
   EXPECT_EQ (dc.less (d1, d2), false);
   EXPECT_EQ (dc.less (d2, d1), false);
 
+  //  AD, AS, PD and PS aren't a primary parameter, so we don't compare it.
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 1.0);
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 1.0);
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 1.0);
+  d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 1.0);
+
+  EXPECT_EQ (dc.equal (d1, d2), true);
+  EXPECT_EQ (dc.equal (d2, d1), true);
+  EXPECT_EQ (dc.less (d1, d2), false);
+  EXPECT_EQ (dc.less (d2, d1), false);
+
   d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 41.0);
 
   EXPECT_EQ (dc.equal (d1, d2), false);
@@ -1837,10 +1848,10 @@ TEST(15_EmptySubCircuitTest)
     "end_circuit TRANS TRANS MATCH\n"
     "begin_circuit INV2 INV2\n"
     "match_nets $5 $5\n"
-    "match_nets OUT OUT\n"
     "match_nets $2 $2\n"
     "match_nets IN IN\n"
     "match_nets $4 $4\n"
+    "match_nets OUT OUT\n"
     "match_pins IN IN\n"
     "match_pins $1 $1\n"
     "match_pins OUT OUT\n"
@@ -1912,10 +1923,10 @@ TEST(15_EmptySubCircuitWithoutPinNames)
     "end_circuit TRANS TRANS MATCH\n"
     "begin_circuit INV2 INV2\n"
     "match_nets $5 $5\n"
-    "match_nets OUT OUT\n"
     "match_nets $2 $2\n"
     "match_nets IN IN\n"
     "match_nets $4 $4\n"
+    "match_nets OUT OUT\n"
     "match_pins IN IN\n"
     "match_pins $1 $1\n"
     "match_pins OUT OUT\n"
@@ -1988,8 +1999,8 @@ TEST(16_UniqueSubCircuitMatching)
     "match_nets VDD VDD\n"
     "match_nets OUT OUT\n"
     "match_nets $3 $3\n"
-    "match_nets $1 $1\n"
     "match_nets IN IN\n"
+    "match_nets $1 $1\n"
     "match_nets VSS VSS\n"
     "match_nets BULK BULK\n"
     "match_pins $0 $0\n"

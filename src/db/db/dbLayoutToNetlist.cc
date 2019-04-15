@@ -245,7 +245,7 @@ size_t LayoutToNetlist::global_net_id (const std::string &name)
   return m_conn.global_net_id (name);
 }
 
-void LayoutToNetlist::extract_netlist (bool join_nets_by_label)
+void LayoutToNetlist::extract_netlist (const std::string &joined_net_names)
 {
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
@@ -255,7 +255,7 @@ void LayoutToNetlist::extract_netlist (bool join_nets_by_label)
   }
 
   db::NetlistExtractor netex;
-  netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters, join_nets_by_label);
+  netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters, joined_net_names);
 
   m_netlist_extracted = true;
 }

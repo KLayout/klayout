@@ -1769,7 +1769,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
     tl::RelativeProgress progress (tl::to_string (tr ("Computing local clusters")), called.size (), 1);
 
     for (std::set<db::cell_index_type>::const_iterator c = called.begin (); c != called.end (); ++c) {
-      build_local_cluster (layout, layout.cell (*c), shape_flags, conn, attr_equivalence);
+      build_local_cluster (layout, layout.cell (*c), shape_flags, conn, *c == cell.cell_index () ? attr_equivalence : 0);
       ++progress;
     }
   }

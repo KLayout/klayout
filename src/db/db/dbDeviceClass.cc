@@ -118,6 +118,7 @@ DeviceClass &DeviceClass::operator= (const DeviceClass &other)
     m_parameter_definitions = other.m_parameter_definitions;
     m_name = other.m_name;
     m_description = other.m_description;
+    mp_pc_delegate.reset (const_cast<DeviceParameterCompareDelegate *> (other.mp_pc_delegate.get ()));
   }
   return *this;
 }
@@ -228,6 +229,9 @@ bool DeviceClass::less (const db::Device &a, const db::Device &b)
 
     const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
     for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+      if (! p->is_primary ()) {
+        continue;
+      }
       int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, relative_tolerance);
       if (cmp != 0) {
         return cmp < 0;
@@ -255,6 +259,9 @@ bool DeviceClass::equal (const db::Device &a, const db::Device &b)
 
     const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
     for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+      if (! p->is_primary ()) {
+        continue;
+      }
       int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, relative_tolerance);
       if (cmp != 0) {
         return false;

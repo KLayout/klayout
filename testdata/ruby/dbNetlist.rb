@@ -442,6 +442,10 @@ class DBNetlist_TestClass < TestBase
     assert_equal(pd.default_value, 2.0)
     pd.default_value = 1.0
     assert_equal(pd.default_value, 1.0)
+    pd.is_primary = false
+    assert_equal(pd.is_primary?, false)
+    pd.is_primary = true
+    assert_equal(pd.is_primary?, true)
 
     dc.add_parameter(pd)
 

@@ -462,6 +462,15 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
     "@brief Sets the default value of the parameter.\n"
     "The default value is used to initialize parameters of \\Device objects."
   ) +
+  gsi::method ("is_primary?", &db::DeviceParameterDefinition::is_primary,
+    "@brief Gets a value indicating whether the parameter is a primary parameter\n"
+    "See \\is_primary= for details about this predicate."
+  ) +
+  gsi::method ("is_primary=", &db::DeviceParameterDefinition::set_is_primary, gsi::arg ("primary"),
+    "@brief Sets a value indicating whether the parameter is a primary parameter\n"
+    "If this flag is set to true (the default), the parameter is considered a primary parameter.\n"
+    "Only primary parameters are compared by default.\n"
+  ) +
   gsi::method ("id", &db::DeviceParameterDefinition::id,
     "@brief Gets the ID of the parameter.\n"
     "The ID of the parameter is used in some places to refer to a specific parameter (e.g. in "

@@ -214,10 +214,10 @@ DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
 
   add_parameter_definition (db::DeviceParameterDefinition ("L", "Gate length (micrometer)", 0.0));
   add_parameter_definition (db::DeviceParameterDefinition ("W", "Gate width (micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("AS", "Source area (square micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("AD", "Drain area (square micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("PS", "Source perimeter (micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("PD", "Drain perimeter (micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("AS", "Source area (square micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("AD", "Drain area (square micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("PS", "Source perimeter (micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("PD", "Drain perimeter (micrometer)", 0.0, false));
 }
 
 bool DeviceClassMOS3Transistor::combine_devices (Device *a, Device *b) const

@@ -352,11 +352,13 @@ static void compare_netlists (tl::TestBase *_this, const std::string &cir, const
   db::NetlistSpiceReader reader;
 
   {
+    tl::info << "Output: " << cir;
     tl::InputStream is (cir);
     reader.read (is, nl);
   }
 
   {
+    tl::info << "Golden: " << cir_au;
     tl::InputStream is (cir_au);
     reader.read (is, nl_au);
   }
@@ -494,4 +496,40 @@ TEST(11_CustomDevices)
 
   CHECKPOINT ();
   compare_netlists (_this, output_simplified, au_simplified);
+}
+
+TEST(12_NetlistJoinLabels)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_12.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/implicit_nets.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au12a.cir";
+
+  std::string output = this->tmp_file ("tmp.cir");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+        "$drc_test_target_simplified = nil\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  //  verify
+
+  CHECKPOINT ();
+  compare_netlists (_this, output, au);
 }

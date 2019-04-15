@@ -483,7 +483,7 @@ TEST(2_DeviceAndNetExtractionFlat)
   //  extract the nets
 
   //  don't use "join_nets_by_label" because the flattened texts will spoil everything
-  net_ex.extract_nets (dss, 0, conn, nl, cl, false);
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   //  debug layers produced for nets
   //    202/0 -> Active
@@ -716,7 +716,17 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, 0, conn, nl, cl);
+  db::Netlist nl2 = nl;
+  net_ex.extract_nets (dss, 0, conn, nl2, cl, "{VDDZ,VSSZ,NEXT,FB}");
+
+  EXPECT_EQ (all_net_names_unique (nl2), true);
+
+  nl2 = nl;
+  net_ex.extract_nets (dss, 0, conn, nl2, cl, "{VDDZ,VSSZ,NEXT}");
+
+  EXPECT_EQ (all_net_names_unique (nl2), false);
+
+  net_ex.extract_nets (dss, 0, conn, nl, cl, "*");
 
   EXPECT_EQ (all_net_names_unique (nl), true);
 

@@ -1,3 +1,9 @@
+branches:
+  only:
+    - /v\d+\.\d+(\.\d+)?(\S*)?$/  # tag format: *v0.25(.8)(dev14)
+    - staging
+    - master
+
 matrix:
   include:
     # python manylinux packages
@@ -331,97 +337,6 @@ matrix:
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
-    
-    # - name: "klayout python3.7 package"
-    #   os: linux
-    #   dist: trusty # Ubuntu 14.04
-    #   sudo: false
-    #   language: python
-    #   python: '3.7-dev'
-    #   env:
-    #     - MATRIX_EVAL=""
-    #     - PIP_UPDATE="1"
-    #     - PYTHON_BUILD=true
-    #     - CC=clang
-    #     - CXX=clang++
-
-    # - name: "klayout python3.6 package"
-    #   os: linux
-    #   dist: trusty # Ubuntu 14.04
-    #   sudo: false
-    #   language: python
-    #   python: '3.6'
-    #   env:
-    #     - MATRIX_EVAL=""
-    #     - PIP_UPDATE="1"
-    #     - PYTHON_BUILD=true
-    #     - CC=clang
-    #     - CXX=clang++
-    
-    # - name: "klayout python2.7 package"
-    #   os: linux
-    #   dist: trusty # Ubuntu 14.04
-    #   sudo: false
-    #   language: python
-    #   python: '2.7'
-    #   env:
-    #     - MATRIX_EVAL=""
-    #     - PIP_UPDATE="1"
-    #     - PYTHON_BUILD=true
-    #     - CC=clang
-    #     - CXX=clang++
-    
-    # - name: "klayout python2.6 package"
-    #   os: linux
-    #   dist: trusty # Ubuntu 14.04
-    #   sudo: false
-    #   language: python
-    #   python: '2.6'
-    #   env:
-    #     - MATRIX_EVAL=""
-    #     - PIP_UPDATE="0"  # setuptools installed from last pip has syntax error on py 2.6
-    #     - PYTHON_BUILD=true
-    #     - CC=clang
-    #     - CXX=clang++
-    
-    # - name: "klayout python3.3 package"
-    #   os: linux
-    #   dist: trusty # Ubuntu 14.04
-    #   sudo: false
-    #   language: python
-    #   python: '3.3'
-    #   env:
-    #     - MATRIX_EVAL=""
-    #     - PIP_UPDATE="1"
-    #     - PYTHON_BUILD=true
-    #     - CC=clang
-    #     - CXX=clang++
-    
-    # - name: "klayout python3.4 package"
-    #   os: linux
-    #   dist: trusty # Ubuntu 14.04
-    #   sudo: false
-    #   language: python
-    #   python: '3.4'
-    #   env:
-    #     - MATRIX_EVAL=""
-    #     - PIP_UPDATE="1"
-    #     - PYTHON_BUILD=true
-    #     - CC=clang
-    #     - CXX=clang++
-    
-    # - name: "klayout python3.5 package"
-    #   os: linux
-    #   dist: trusty # Ubuntu 14.04
-    #   sudo: false
-    #   language: python
-    #   python: '3.5'
-    #   env:
-    #     - MATRIX_EVAL=""
-    #     - PIP_UPDATE="1"
-    #     - PYTHON_BUILD=true
-    #     - CC=clang
-    #     - CXX=clang++
 
     # KLayout builds for mac
     # Python 3
@@ -586,7 +501,7 @@ after_success:
 
   # uploading to pypi using twine
   # need TWINE_USERNAME, TWINE_PASSWORD and TWINE_REPOSITORY_URL env variable
-  - if [ "$PYTHON_BUILD" = true ] || [ "$DOCKER_BUILD" = true ]; then
+  - if [ ! -z "$TRAVIS_TAG" ] &&  [ ! -z "$TWINE_PASSWORD" ] && [[ "$PYTHON_BUILD" = true || "$DOCKER_BUILD" = true ]]; then
       pip install -U twine || sudo pip install -U twine;
       twine upload --skip-existing deploy/dist-pymod/$klayout_version/*;
     fi

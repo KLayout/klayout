@@ -834,10 +834,12 @@ add_collections_to_file_watcher (const lym::MacroCollection &collection, tl::Fil
 void
 MacroController::sync_file_watcher ()
 {
-  m_file_watcher->clear ();
-  m_file_watcher->enable (false);
-  add_collections_to_file_watcher (lym::MacroCollection::root (), m_file_watcher);
-  m_file_watcher->enable (true);
+  if (m_file_watcher) {
+    m_file_watcher->clear ();
+    m_file_watcher->enable (false);
+    add_collections_to_file_watcher (lym::MacroCollection::root (), m_file_watcher);
+    m_file_watcher->enable (true);
+  }
 }
 
 void

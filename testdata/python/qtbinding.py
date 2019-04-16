@@ -146,8 +146,8 @@ class QtBindingTest(unittest.TestCase):
 
     # destroying a will also destroy aa
     a.destroy()
-    self.assertEqual(a.destroyed(), True)
-    self.assertEqual(aa.destroyed(), True)
+    self.assertEqual(a._destroyed(), True)
+    self.assertEqual(aa._destroyed(), True)
 
   def test_12(self):
 
@@ -158,7 +158,7 @@ class QtBindingTest(unittest.TestCase):
     # destroying a will also destroy aa
     a = None
 
-    self.assertEqual(aa.destroyed(), True)
+    self.assertEqual(aa._destroyed(), True)
 
   def test_13(self):
 
@@ -182,7 +182,7 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(aa != None, True)
     self.assertEqual(type(aa), pya.QAction)
     self.assertEqual(aa.text, "aatext")
-    self.assertEqual(aa.destroyed(), False)
+    self.assertEqual(aa._destroyed(), False)
 
   def test_20(self):
 

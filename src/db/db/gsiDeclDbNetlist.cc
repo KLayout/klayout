@@ -24,6 +24,8 @@
 #include "dbNetlist.h"
 #include "dbNetlistWriter.h"
 #include "dbNetlistSpiceWriter.h"
+#include "dbNetlistReader.h"
+#include "dbNetlistSpiceReader.h"
 #include "tlException.h"
 #include "tlInternational.h"
 #include "tlStream.h"
@@ -37,6 +39,10 @@ Class<db::Pin> decl_dbPin ("db", "Pin",
   ) +
   gsi::method ("name", &db::Pin::name,
     "@brief Gets the name of the pin.\n"
+  ) +
+  gsi::method ("expanded_name", &db::Pin::expanded_name,
+    "@brief Gets the expanded name of the pin.\n"
+    "The expanded name is the name or a generic identifier made from the ID if the name is empty."
   ),
   "@brief A pin of a circuit.\n"
   "Pin objects are used to describe the outgoing pins of "
@@ -456,6 +462,15 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
     "@brief Sets the default value of the parameter.\n"
     "The default value is used to initialize parameters of \\Device objects."
   ) +
+  gsi::method ("is_primary?", &db::DeviceParameterDefinition::is_primary,
+    "@brief Gets a value indicating whether the parameter is a primary parameter\n"
+    "See \\is_primary= for details about this predicate."
+  ) +
+  gsi::method ("is_primary=", &db::DeviceParameterDefinition::set_is_primary, gsi::arg ("primary"),
+    "@brief Sets a value indicating whether the parameter is a primary parameter\n"
+    "If this flag is set to true (the default), the parameter is considered a primary parameter.\n"
+    "Only primary parameters are compared by default.\n"
+  ) +
   gsi::method ("id", &db::DeviceParameterDefinition::id,
     "@brief Gets the ID of the parameter.\n"
     "The ID of the parameter is used in some places to refer to a specific parameter (e.g. in "
@@ -467,9 +482,118 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
   "This class has been added in version 0.26."
 );
 
+namespace
+{
+
+/**
+ *  @brief A DeviceParameterCompare implementation that allows reimplementation of the virtual methods
+ */
+class GenericDeviceParameterCompare
+  : public db::EqualDeviceParameters
+{
+public:
+  GenericDeviceParameterCompare ()
+    : db::EqualDeviceParameters ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual bool less (const db::Device &a, const db::Device &b) const
+  {
+    if (cb_less.can_issue ()) {
+      return cb_less.issue<db::EqualDeviceParameters, bool, const db::Device &, const db::Device &> (&db::EqualDeviceParameters::less, a, b);
+    } else {
+      return db::EqualDeviceParameters::less (a, b);
+    }
+  }
+
+  virtual bool equal (const db::Device &a, const db::Device &b) const
+  {
+    if (cb_equal.can_issue ()) {
+      return cb_equal.issue<db::EqualDeviceParameters, bool, const db::Device &, const db::Device &> (&db::EqualDeviceParameters::equal, a, b);
+    } else {
+      return db::EqualDeviceParameters::equal (a, b);
+    }
+  }
+
+  gsi::Callback cb_less, cb_equal;
+};
+
+}
+
+db::EqualDeviceParameters *make_equal_dp (size_t param_id, double absolute, double relative)
+{
+  return new db::EqualDeviceParameters (param_id, absolute, relative);
+}
+
+Class<db::EqualDeviceParameters> decl_dbEqualDeviceParameters ("db", "EqualDeviceParameters",
+  gsi::constructor ("new", &make_equal_dp, gsi::arg ("param_id"), gsi::arg ("absolute", 0.0), gsi::arg ("relative", 0.0),
+    "@brief Creates a device parameter comparer for a single parameter.\n"
+    "'absolute' is the absolute deviation allowed for the parameter values. "
+    "'relative' is the relative deviation allowed for the parameter values (a value between 0 and 1).\n"
+    "\n"
+    "A value of 0 for both absolute and relative deviation means the parameters have to match exactly.\n"
+    "\n"
+    "If 'absolute' and 'relative' are both given, their deviations will add to the allowed difference between "
+    "two parameter values. The relative deviation will be applied to the mean value of both parameter values. "
+    "For example, when comparing parameter values of 40 and 60, a relative deviation of 0.35 means an absolute "
+    "deviation of 17.5 (= 0.35 * average of 40 and 60) which does not make both values match."
+  ) +
+  gsi::method ("+", &db::EqualDeviceParameters::operator+, gsi::arg ("other"),
+    "@brief Combines two parameters for comparison.\n"
+    "The '+' operator will join the parameter comparers and produce one that checks the combined parameters.\n"
+  ) +
+  gsi::method ("+=", &db::EqualDeviceParameters::operator+, gsi::arg ("other"),
+    "@brief Combines two parameters for comparison (in-place).\n"
+    "The '+=' operator will join the parameter comparers and produce one that checks the combined parameters.\n"
+  ),
+  "@brief A device parameter equality comparer.\n"
+  "Attach this object to a device class with \\DeviceClass#equal_parameters= to make the device "
+  "class use this comparer:\n"
+  "\n"
+  "@code\n"
+  "# 20nm tolerance for length:\n"
+  "equal_device_parameters = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS4Transistor::PARAM_L, 0.02, 0.0)\n"
+  "# one percent tolerance for width:\n"
+  "equal_device_parameters += RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS4Transistor::PARAM_W, 0.0, 0.01)\n"
+  "# applies the compare delegate:\n"
+  "netlist.device_class_by_name(\"NMOS\").equal_parameters = equal_device_parameters\n"
+  "@/code\n"
+  "\n"
+  "You can use this class to specify fuzzy equality criteria for the comparison of device parameters in "
+  "netlist verification or to confine the equality of devices to certain parameters only.\n"
+  "\n"
+  "This class has been added in version 0.26."
+);
+
+Class<GenericDeviceParameterCompare> decl_GenericDeviceParameterCompare (decl_dbEqualDeviceParameters, "db", "GenericDeviceParameterCompare",
+  gsi::callback ("equal", &GenericDeviceParameterCompare::equal, &GenericDeviceParameterCompare::cb_equal, gsi::arg ("device_a"), gsi::arg ("device_b"),
+    "@brief Compares the parameters of two devices for equality. "
+    "Returns true, if the parameters of device a and b are considered equal."
+  ) +
+  gsi::callback ("less", &GenericDeviceParameterCompare::less, &GenericDeviceParameterCompare::cb_less, gsi::arg ("device_a"), gsi::arg ("device_b"),
+    "@brief Compares the parameters of two devices for a begin less than b. "
+    "Returns true, if the parameters of device a are considered less than those of device b."
+  ),
+  "@brief A class implementing the comparison of device parameters.\n"
+  "Reimplement this class to provide a custom device parameter compare scheme.\n"
+  "Attach this object to a device class with \\DeviceClass#equal_parameters= to make the device "
+  "class use this comparer.\n"
+  "\n"
+  "This class is intended for special cases. In most scenarios it is easier to use \\EqualDeviceParameters instead of "
+  "implementing a custom comparer class.\n"
+  "\n"
+  "This class has been added in version 0.26."
+);
+
 static tl::id_type id_of_device_class (const db::DeviceClass *cls)
 {
   return tl::id_of (cls);
+}
+
+static void equal_parameters (db::DeviceClass *cls, db::EqualDeviceParameters *comparer)
+{
+  cls->set_parameter_compare_delegate (comparer);
 }
 
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
@@ -527,6 +651,15 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "@brief Returns the terminal ID of the terminal with the given name.\n"
     "An exception is thrown if there is no terminal with the given name. Use \\has_terminal to check "
     "whether the name is a valid terminal name."
+  ) +
+  gsi::method_ext ("equal_parameters=", &equal_parameters, gsi::arg ("comparer"),
+    "@brief Specifies a device parameter comparer for netlist verification.\n"
+    "By default, all devices are compared with all parameters. If you want to select only certain parameters "
+    "for comparison or use a fuzzy compare criterion, use an \\EqualDeviceParameters object and assign it "
+    "to the device class of one netlist. You can also chain multiple \\EqualDeviceParameters objects with the '+' operator "
+    "for specifying multiple parameters in the equality check.\n"
+    "\n"
+    "In special cases, you can even implement a custom compare scheme by deriving your own comparer from the \\GenericDeviceParameterCompare class."
   ),
   "@brief A class describing a specific type of device.\n"
   "Device class objects live in the context of a \\Netlist object. After a "
@@ -586,11 +719,27 @@ public:
     m_supports_serial_combination = f;
   }
 
+  void equivalent_terminal_id (size_t tid, size_t equiv_tid)
+  {
+    m_equivalent_terminal_ids.insert (std::make_pair (tid, equiv_tid));
+  }
+
+  virtual size_t normalize_terminal_id (size_t tid) const
+  {
+    std::map<size_t, size_t>::const_iterator ntid = m_equivalent_terminal_ids.find (tid);
+    if (ntid != m_equivalent_terminal_ids.end ()) {
+      return ntid->second;
+    } else {
+      return tid;
+    }
+  }
+
   gsi::Callback cb_combine_devices;
 
 private:
   bool m_supports_parallel_combination;
   bool m_supports_serial_combination;
+  std::map<size_t, size_t> m_equivalent_terminal_ids;
 };
 
 }
@@ -655,6 +804,11 @@ Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "Ge
     "Serial device combination means that the devices are connected by internal nodes. "
     "If the device does not support this combination mode, this predicate can be set to false. This will make the device "
     "extractor skip the combination test in serial mode and improve performance somewhat."
+  ) +
+  gsi::method ("equivalent_terminal_id", &GenericDeviceClass::equivalent_terminal_id, gsi::arg ("original_id"), gsi::arg ("equivalent_id"),
+    "@brief Specifies a terminal to be equivalent to another.\n"
+    "Use this method to specify two terminals to be exchangeable. For example to make S and D of a MOS transistor equivalent, "
+    "call this method with S and D terminal IDs. In netlist matching, S will be translated to D and thus made equivalent to D."
   ),
   "@brief A generic device class\n"
   "This class allows building generic device classes. Specificially, terminals can be defined "
@@ -811,6 +965,11 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::method ("remove_subcircuit", &db::Circuit::remove_subcircuit, gsi::arg ("subcircuit"),
     "@brief Removes the given subcircuit from the circuit\n"
   ) +
+  gsi::method ("flatten_subcircuit", &db::Circuit::flatten_subcircuit, gsi::arg ("subcircuit"),
+    "@brief Flattens a subcircuit\n"
+    "This method will substitute the given subcircuit by it's contents. The subcircuit is removed "
+    "after this."
+  ) +
   gsi::iterator ("each_subcircuit", (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_subcircuits, (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::end_subcircuits,
     "@brief Iterates over the subcircuits of the circuit"
   ) +
@@ -922,6 +1081,13 @@ static void write_netlist (const db::Netlist *nl, const std::string &file, db::N
   writer->write (os, *nl, description);
 }
 
+static void read_netlist (db::Netlist *nl, const std::string &file, db::NetlistReader *reader)
+{
+  tl_assert (reader != 0);
+  tl::InputStream os (file);
+  reader->read (os, *nl);
+}
+
 Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method_ext ("add", &gsi::add_circuit, gsi::arg ("circuit"),
     "@brief Adds the circuit to the netlist\n"
@@ -932,13 +1098,18 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Removes the given circuit object from the netlist\n"
     "After the object has been removed, it becomes invalid and cannot be used further."
   ) +
+  gsi::method ("flatten_circuit", &db::Netlist::flatten_circuit, gsi::arg ("circuit"),
+    "@brief Flattens a subcircuit\n"
+    "This method will substitute all instances (subcircuits) of the given circuit by it's "
+    "contents. After this, the circuit is removed."
+  ) +
   gsi::method ("circuit_by_cell_index", (db::Circuit *(db::Netlist::*) (db::cell_index_type)) &db::Netlist::circuit_by_cell_index, gsi::arg ("cell_index"),
     "@brief Gets the circuit object for a given cell index.\n"
     "If the cell index is not valid or no circuit is registered with this index, nil is returned."
   ) +
   gsi::method ("circuit_by_name", (db::Circuit *(db::Netlist::*) (const std::string &)) &db::Netlist::circuit_by_name, gsi::arg ("name"),
     "@brief Gets the circuit object for a given name.\n"
-    "If the ID is not a valid circuit name, nil is returned."
+    "If the name is not a valid circuit name, nil is returned."
   ) +
   gsi::iterator ("each_circuit_top_down", (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_top_down, (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_top_down,
     "@brief Iterates over the circuits top-down\n"
@@ -969,12 +1140,21 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "Use this method with care as it may corrupt the internal structure of the netlist. "
     "Only use this method when device refers to this device class."
   ) +
+  gsi::method ("device_class_by_name", (db::DeviceClass *(db::Netlist::*) (const std::string &)) &db::Netlist::device_class_by_name, gsi::arg ("name"),
+    "@brief Gets the device class for a given name.\n"
+    "If the name is not a valid device class name, nil is returned."
+  ) +
   gsi::iterator ("each_device_class", (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::begin_device_classes, (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::end_device_classes,
     "@brief Iterates over the device classes of the netlist"
   ) +
   gsi::method ("to_s", &db::Netlist::to_string,
     "@brief Converts the netlist to a string representation.\n"
     "This method is intended for test purposes mainly."
+  ) +
+  gsi::method ("from_s", &db::Netlist::from_string, gsi::arg ("str"),
+    "@brief Reads the netlist from a string representation.\n"
+    "This method is intended for test purposes mainly. It turns a string returned by \\to_s back into "
+    "a netlist. Note that the device classes must be created before as they are not persisted inside the string."
   ) +
   gsi::method ("combine_devices", &db::Netlist::combine_devices,
     "@brief Combines devices where possible\n"
@@ -998,6 +1178,10 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Purges floating nets.\n"
     "Floating nets can be created as effect of reconnections of devices or pins. "
     "This method will eliminate all nets that make less than two connections."
+  ) +
+  gsi::method_ext ("read", &read_netlist, gsi::arg ("file"), gsi::arg ("reader"),
+    "@brief Writes the netlist to the given file using the given reader object to parse the file\n"
+    "See \\NetlistSpiceReader for an example for a parser. "
   ) +
   gsi::method_ext ("write", &write_netlist, gsi::arg ("file"), gsi::arg ("writer"), gsi::arg ("description", std::string ()),
     "@brief Writes the netlist to the given file using the given writer object to format the file\n"
@@ -1184,14 +1368,14 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "@code\n"
   "writer = RBA::NetlistSpiceWriter::new\n"
   "netlist.write(path, writer)\n"
-  "@endcode\n"
+  "@/code\n"
   "\n"
   "You can give a custom description for the headline:\n"
   "\n"
   "@code\n"
   "writer = RBA::NetlistSpiceWriter::new\n"
   "netlist.write(path, writer, \"A custom description\")\n"
-  "@endcode\n"
+  "@/code\n"
   "\n"
   "To customize the output, you can use a device writer delegate.\n"
   "The delegate is an object of a class derived from \\NetlistSpiceWriterDelegate which "
@@ -1232,9 +1416,36 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "# write the netlist with delegate:\n"
   "writer = RBA::NetlistSpiceWriter::new(MyDelegate::new)\n"
   "netlist.write(path, writer)\n"
-  "@endcode\n"
+  "@/code\n"
   "\n"
   "This class has been introduced in version 0.26."
 );
+
+Class<db::NetlistReader> db_NetlistReader ("db", "NetlistReader",
+  gsi::Methods (),
+  "@hide\n"
+);
+
+db::NetlistSpiceReader *new_spice_reader ()
+{
+  return new db::NetlistSpiceReader ();
+}
+
+Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "NetlistSpiceReader",
+  gsi::constructor ("new", &new_spice_reader,
+    "@brief Creates a new reader.\n"
+  ),
+  "@brief Implements a netlist Reader for the SPICE format.\n"
+  "Use the SPICE reader like this:\n"
+  "\n"
+  "@code\n"
+  "writer = RBA::NetlistSpiceReader::new\n"
+  "netlist = RBA::Netlist::new\n"
+  "netlist.read(path, reader)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
 
 }

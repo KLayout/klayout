@@ -23,6 +23,7 @@
 #include "dbNetlistExtractor.h"
 #include "dbDeepShapeStore.h"
 #include "dbNetlistDeviceExtractor.h"
+#include "tlGlobPattern.h"
 
 namespace db
 {
@@ -34,15 +35,18 @@ NetlistExtractor::NetlistExtractor ()
 }
 
 static void
-build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type net_name_id, tl::equivalence_clusters<unsigned int> &eq)
+build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type net_name_id, const std::string &joined_net_names, tl::equivalence_clusters<unsigned int> &eq)
 {
   std::map<std::string, std::set<unsigned int> > prop_by_name;
+  tl::GlobPattern jn_pattern (joined_net_names);
 
   for (db::PropertiesRepository::iterator i = layout->properties_repository ().begin (); i != layout->properties_repository ().end (); ++i) {
     for (db::PropertiesRepository::properties_set::const_iterator p = i->second.begin (); p != i->second.end (); ++p) {
       if (p->first == net_name_id) {
         std::string nn = p->second.to_string ();
-        prop_by_name [nn].insert (i->first);
+        if (jn_pattern.match (nn)) {
+          prop_by_name [nn].insert (i->first);
+        }
       }
     }
   }
@@ -58,7 +62,7 @@ build_net_name_equivalence (const db::Layout *layout, db::property_names_id_type
 }
 
 void
-NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layout_index, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters, bool join_nets_by_label)
+NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layout_index, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters, const std::string &joined_net_names)
 {
   mp_clusters = &clusters;
   mp_layout = &dss.const_layout (layout_index);
@@ -77,8 +81,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
   //  the big part: actually extract the nets
 
   tl::equivalence_clusters<unsigned int> net_name_equivalence;
-  if (m_text_annot_name_id.first && join_nets_by_label) {
-    build_net_name_equivalence (mp_layout, m_text_annot_name_id.second, net_name_equivalence);
+  if (m_text_annot_name_id.first && ! joined_net_names.empty ()) {
+    build_net_name_equivalence (mp_layout, m_text_annot_name_id.second, joined_net_names, net_name_equivalence);
   }
   mp_clusters->build (*mp_layout, *mp_cell, db::ShapeIterator::Polygons, conn, &net_name_equivalence);
 
@@ -127,11 +131,18 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     for (connected_clusters_type::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
 
+      const db::local_cluster<db::PolygonRef> &lc = clusters.cluster_by_id (*c);
+      if (clusters.connections_for_cluster (*c).empty () && lc.empty ()) {
+        //  this is an entirely empty cluster so we skip it.
+        //  Such clusters are left over when joining clusters.
+        continue;
+      }
+
       db::Net *net = new db::Net ();
       net->set_cluster_id (*c);
       circuit->add_net (net);
 
-      const db::local_cluster<db::PolygonRef>::global_nets &gn = clusters.cluster_by_id (*c).get_global_nets ();
+      const db::local_cluster<db::PolygonRef>::global_nets &gn = lc.get_global_nets ();
       for (db::local_cluster<db::PolygonRef>::global_nets::const_iterator g = gn.begin (); g != gn.end (); ++g) {
         assign_net_name (conn.global_net_name (*g), net);
       }

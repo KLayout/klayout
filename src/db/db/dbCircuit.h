@@ -235,10 +235,14 @@ public:
   }
 
   /**
-   *  @brief Adds a pin to this circuit
-   *  The circuit takes over ownership of the object.
+   *  @brief Clears the pins
    */
-  const Pin &add_pin(const std::string &name);
+  void clear_pins ();
+
+  /**
+   *  @brief Adds a pin to this circuit
+   */
+  const Pin &add_pin (const std::string &name);
 
   /**
    *  @brief Begin iterator for the pins of the circuit (non-const version)
@@ -584,6 +588,15 @@ public:
    *  to their device classes "combine_devices" method.
    */
   void combine_devices ();
+
+  /**
+   *  @brief Flattens the given subcircuit
+   *
+   *  The subcircuit is resolved into the parent circuit and finally removed.
+   *  Net, device and subcircuit names are decorated with the subcircuit's name
+   *  if required.
+   */
+  void flatten_subcircuit (SubCircuit *subcircuit);
 
 private:
   friend class Netlist;

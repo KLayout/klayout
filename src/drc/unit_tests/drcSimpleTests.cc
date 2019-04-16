@@ -23,6 +23,8 @@
 #include "tlUnitTest.h"
 #include "dbReader.h"
 #include "dbTestSupport.h"
+#include "dbNetlist.h"
+#include "dbNetlistSpiceReader.h"
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
@@ -343,6 +345,27 @@ TEST(8_TextsAndPolygons)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
+static void compare_netlists (tl::TestBase *_this, const std::string &cir, const std::string &cir_au)
+{
+  db::Netlist nl, nl_au;
+
+  db::NetlistSpiceReader reader;
+
+  {
+    tl::info << "Output: " << cir;
+    tl::InputStream is (cir);
+    reader.read (is, nl);
+  }
+
+  {
+    tl::info << "Golden: " << cir_au;
+    tl::InputStream is (cir_au);
+    reader.read (is, nl_au);
+  }
+
+  db::compare_netlist (_this, nl, nl_au);
+}
+
 TEST(9_NetlistExtraction)
 {
   std::string rs = tl::testsrc ();
@@ -380,27 +403,11 @@ TEST(9_NetlistExtraction)
 
   //  verify
 
-  {
-    tl::InputStream is (output);
-    tl::InputStream is_au (au);
+  CHECKPOINT ();
+  compare_netlists (_this, output, au);
 
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output),
-                                 tl::absolute_file_path (au)));
-    }
-  }
-
-  {
-    tl::InputStream is (output_simplified);
-    tl::InputStream is_au (au_simplified);
-
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed (simplified netlist) - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output_simplified),
-                                 tl::absolute_file_path (au_simplified)));
-    }
-  }
+  CHECKPOINT ();
+  compare_netlists (_this, output_simplified, au_simplified);
 }
 
 TEST(10_NetlistExtractionFlat)
@@ -440,27 +447,11 @@ TEST(10_NetlistExtractionFlat)
 
   //  verify
 
-  {
-    tl::InputStream is (output);
-    tl::InputStream is_au (au);
+  CHECKPOINT ();
+  compare_netlists (_this, output, au);
 
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output),
-                                 tl::absolute_file_path (au)));
-    }
-  }
-
-  {
-    tl::InputStream is (output_simplified);
-    tl::InputStream is_au (au_simplified);
-
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed (simplified netlist) - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output_simplified),
-                                 tl::absolute_file_path (au_simplified)));
-    }
-  }
+  CHECKPOINT ();
+  compare_netlists (_this, output_simplified, au_simplified);
 }
 
 TEST(11_CustomDevices)
@@ -500,25 +491,45 @@ TEST(11_CustomDevices)
 
   //  verify
 
-  {
-    tl::InputStream is (output);
-    tl::InputStream is_au (au);
+  CHECKPOINT ();
+  compare_netlists (_this, output, au);
 
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output),
-                                 tl::absolute_file_path (au)));
-    }
+  CHECKPOINT ();
+  compare_netlists (_this, output_simplified, au_simplified);
+}
+
+TEST(12_NetlistJoinLabels)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_12.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/implicit_nets.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au12a.cir";
+
+  std::string output = this->tmp_file ("tmp.cir");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+        "$drc_test_target_simplified = nil\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
   }
 
-  {
-    tl::InputStream is (output_simplified);
-    tl::InputStream is_au (au_simplified);
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
 
-    if (is.read_all () != is_au.read_all ()) {
-      _this->raise (tl::sprintf ("Compare failed (simplified netlist) - see\n  actual: %s\n  golden: %s",
-                                 tl::absolute_file_path (output_simplified),
-                                 tl::absolute_file_path (au_simplified)));
-    }
-  }
+  //  verify
+
+  CHECKPOINT ();
+  compare_netlists (_this, output, au);
 }

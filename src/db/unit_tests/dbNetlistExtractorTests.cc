@@ -35,6 +35,7 @@
 #include "dbCommonReader.h"
 #include "dbTestSupport.h"
 #include "dbCellMapping.h"
+#include "dbTestSupport.h"
 
 #include "tlUnitTest.h"
 #include "tlString.h"
@@ -280,29 +281,41 @@ TEST(1_DeviceAndNetExtraction)
   dump_nets_to_layout (nl, cl, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_string (),
-    "Circuit RINGO ():\n"
-    "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
-    "  XINV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD)\n"
-    "  XINV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD)\n"
-    "  XINV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD)\n"
-    "  XINV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD)\n"
-    "  XINV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD)\n"
-    "  XINV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD)\n"
-    "  XINV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD)\n"
-    "  XINV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD)\n"
-    "  XINV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD)\n"
-    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  XTRANS $1 ($1=$2,$2=$4,$3=IN)\n"
-    "  XTRANS $2 ($1=$2,$2=$5,$3=IN)\n"
-    "  XTRANS $3 ($1=$5,$2=OUT,$3=$2)\n"
-    "  XTRANS $4 ($1=$4,$2=OUT,$3=$2)\n"
-    "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl,
+    "circuit RINGO ();\n"
+    "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
   );
+
+  //  use this opportunity to test serialization to and from string
+  db::Netlist nldup;
+  for (db::Netlist::device_class_iterator i = nl.begin_device_classes (); i != nl.end_device_classes (); ++i) {
+    nldup.add_device_class (i->clone ());
+  }
+  nldup.from_string (nl.to_string ());
+  EXPECT_EQ (nldup.to_string (), nl.to_string ());
 
   // doesn't do anything here, but we test that this does not destroy anything:
   nl.combine_devices ();
@@ -310,25 +323,29 @@ TEST(1_DeviceAndNetExtraction)
   //  make pins for named nets of top-level circuits - this way they are not purged
   nl.make_top_level_pins ();
   nl.purge ();
+  nl.purge_nets ();
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_string (),
-    "Circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD):\n"
-    "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
-    "  XINV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD)\n"
-    "  XINV2 $3 (IN=$I19,$2=(null),OUT=$I1,$4=VSS,$5=VDD)\n"
-    "  XINV2 $4 (IN=$I1,$2=(null),OUT=$I2,$4=VSS,$5=VDD)\n"
-    "  XINV2 $5 (IN=$I2,$2=(null),OUT=$I3,$4=VSS,$5=VDD)\n"
-    "  XINV2 $6 (IN=$I3,$2=(null),OUT=$I4,$4=VSS,$5=VDD)\n"
-    "  XINV2 $7 (IN=$I4,$2=(null),OUT=$I5,$4=VSS,$5=VDD)\n"
-    "  XINV2 $8 (IN=$I5,$2=(null),OUT=$I6,$4=VSS,$5=VDD)\n"
-    "  XINV2 $9 (IN=$I6,$2=(null),OUT=$I7,$4=VSS,$5=VDD)\n"
-    "  XINV2 $10 (IN=$I7,$2=(null),OUT=$I8,$4=VSS,$5=VDD)\n"
-    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl,
+    "circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $3 (IN=$I19,$2=(null),OUT=$I1,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $4 (IN=$I1,$2=(null),OUT=$I2,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $5 (IN=$I2,$2=(null),OUT=$I3,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $6 (IN=$I3,$2=(null),OUT=$I4,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $7 (IN=$I4,$2=(null),OUT=$I5,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $8 (IN=$I5,$2=(null),OUT=$I6,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $9 (IN=$I6,$2=(null),OUT=$I7,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $10 (IN=$I7,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n"
   );
 
   //  compare the collected test data
@@ -466,7 +483,7 @@ TEST(2_DeviceAndNetExtractionFlat)
   //  extract the nets
 
   //  don't use "join_nets_by_label" because the flattened texts will spoil everything
-  net_ex.extract_nets (dss, 0, conn, nl, cl, false);
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
 
   //  debug layers produced for nets
   //    202/0 -> Active
@@ -493,50 +510,50 @@ TEST(2_DeviceAndNetExtractionFlat)
   dump_nets_to_layout (nl, cl, ly, dump_map, cm);
 
   //  compare netlist as string
-  //  NOTE: some of the nets are called IN,OUT but are different ones. They
-  //  happen to be the same because they share the same label.
-  EXPECT_EQ (nl.to_string (),
-    "Circuit RINGO ():\n"
-    "  DPMOS $1 (S=$16,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=VDD,G=$16,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DPMOS $3 (S=$14,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $4 (S=VDD,G=$14,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DPMOS $5 (S=$12,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $6 (S=VDD,G=$12,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DPMOS $7 (S='IN,FB',G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $8 (S=VDD,G='IN,FB',D='OUT,OSC') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DPMOS $9 (S=$4,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $10 (S=VDD,G=$4,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DPMOS $11 (S=$8,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $12 (S=VDD,G=$8,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DPMOS $13 (S=$2,G='IN,FB',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $14 (S=VDD,G=$2,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DPMOS $15 (S=$6,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $16 (S=VDD,G=$6,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DPMOS $17 (S=$18,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $18 (S=VDD,G=$18,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DPMOS $19 (S=$10,G='IN,OUT',D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $20 (S=VDD,G=$10,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $21 (S='IN,FB',G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $22 (S=VSS,G='IN,FB',D='OUT,OSC') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $23 (S=$18,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $24 (S=VSS,G=$18,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $25 (S=$14,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $26 (S=VSS,G=$14,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $27 (S=$12,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $28 (S=VSS,G=$12,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $29 (S=$4,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $30 (S=VSS,G=$4,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $31 (S=$2,G='IN,FB',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $32 (S=VSS,G=$2,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $33 (S=$8,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $34 (S=VSS,G=$8,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $35 (S=$6,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $36 (S=VSS,G=$6,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $37 (S=$16,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $38 (S=VSS,G=$16,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $39 (S=$10,G='IN,OUT',D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $40 (S=VSS,G=$10,D='IN,OUT') [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl,
+    "circuit RINGO ();\n"
+    "  device PMOS $1 (S=$16,G='IN,OUT$6',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$16,D='IN,OUT$7') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device PMOS $3 (S=$14,G='IN,OUT$5',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $4 (S=VDD,G=$14,D='IN,OUT$6') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device PMOS $5 (S=$12,G='IN,OUT$4',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $6 (S=VDD,G=$12,D='IN,OUT$5') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device PMOS $7 (S='IN,FB',G='IN,OUT$8',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $8 (S=VDD,G='IN,FB',D='OUT,OSC') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device PMOS $9 (S=$4,G='IN,OUT',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $10 (S=VDD,G=$4,D='IN,OUT$1') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device PMOS $11 (S=$8,G='IN,OUT$2',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $12 (S=VDD,G=$8,D='IN,OUT$3') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device PMOS $13 (S=$2,G='IN,FB',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $14 (S=VDD,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device PMOS $15 (S=$6,G='IN,OUT$1',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $16 (S=VDD,G=$6,D='IN,OUT$2') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device PMOS $17 (S=$18,G='IN,OUT$7',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $18 (S=VDD,G=$18,D='IN,OUT$8') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device PMOS $19 (S=$10,G='IN,OUT$3',D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $20 (S=VDD,G=$10,D='IN,OUT$4') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $21 (S='IN,FB',G='IN,OUT$8',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $22 (S=VSS,G='IN,FB',D='OUT,OSC') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $23 (S=$18,G='IN,OUT$7',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $24 (S=VSS,G=$18,D='IN,OUT$8') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $25 (S=$14,G='IN,OUT$5',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $26 (S=VSS,G=$14,D='IN,OUT$6') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $27 (S=$12,G='IN,OUT$4',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $28 (S=VSS,G=$12,D='IN,OUT$5') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $29 (S=$4,G='IN,OUT',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $30 (S=VSS,G=$4,D='IN,OUT$1') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $31 (S=$2,G='IN,FB',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $32 (S=VSS,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $33 (S=$8,G='IN,OUT$2',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $34 (S=VSS,G=$8,D='IN,OUT$3') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $35 (S=$6,G='IN,OUT$1',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $36 (S=VSS,G=$6,D='IN,OUT$2') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $37 (S=$16,G='IN,OUT$6',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $38 (S=VSS,G=$16,D='IN,OUT$7') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $39 (S=$10,G='IN,OUT$3',D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $40 (S=VSS,G=$10,D='IN,OUT$4') (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n"
   );
 
   //  compare the collected test data
@@ -699,7 +716,17 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
 
   //  extract the nets
 
-  net_ex.extract_nets (dss, 0, conn, nl, cl);
+  db::Netlist nl2 = nl;
+  net_ex.extract_nets (dss, 0, conn, nl2, cl, "{VDDZ,VSSZ,NEXT,FB}");
+
+  EXPECT_EQ (all_net_names_unique (nl2), true);
+
+  nl2 = nl;
+  net_ex.extract_nets (dss, 0, conn, nl2, cl, "{VDDZ,VSSZ,NEXT}");
+
+  EXPECT_EQ (all_net_names_unique (nl2), false);
+
+  net_ex.extract_nets (dss, 0, conn, nl, cl, "*");
 
   EXPECT_EQ (all_net_names_unique (nl), true);
 
@@ -728,28 +755,32 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
   dump_nets_to_layout (nl, cl, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_string (),
-    "Circuit RINGO ():\n"
-    "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $3 (IN=NEXT,$2=$I43,OUT=$I5,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $4 (IN=$I3,$2=$I42,OUT=NEXT,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $5 (IN=$I5,$2=$I44,OUT=$I6,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $6 (IN=$I6,$2=$I45,OUT=$I7,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $7 (IN=$I7,$2=$I46,OUT=$I8,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $8 (IN=$I19,$2=$I39,OUT=$I1,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $9 (IN=$I1,$2=$I40,OUT=$I2,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $10 (IN=$I2,$2=$I41,OUT=$I3,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  XTRANS $1 ($1=$2,$2=$4,$3=IN)\n"
-    "  XTRANS $2 ($1=$2,$2=$5,$3=IN)\n"
-    "  XTRANS $3 ($1=$5,$2=OUT,$3=$2)\n"
-    "  XTRANS $4 ($1=$4,$2=OUT,$3=$2)\n"
-    "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl,
+    "circuit RINGO ();\n"
+    "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $3 (IN=NEXT,$2=$I43,OUT=$I5,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $4 (IN=$I3,$2=$I42,OUT=NEXT,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $5 (IN=$I5,$2=$I44,OUT=$I6,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $6 (IN=$I6,$2=$I45,OUT=$I7,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $7 (IN=$I7,$2=$I46,OUT=$I8,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $8 (IN=$I19,$2=$I39,OUT=$I1,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $9 (IN=$I1,$2=$I40,OUT=$I2,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $10 (IN=$I2,$2=$I41,OUT=$I3,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
   );
 
   // doesn't do anything here, but we test that this does not destroy anything:
@@ -760,23 +791,26 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
   nl.purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (nl.to_string (),
-    "Circuit RINGO (FB=FB,OSC=OSC,NEXT=NEXT,'VSSZ,VSS'='VSSZ,VSS','VDDZ,VDD'='VDDZ,VDD'):\n"
-    "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $2 (IN=FB,$2=(null),OUT=$I19,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $3 (IN=NEXT,$2=(null),OUT=$I5,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $4 (IN=$I3,$2=(null),OUT=NEXT,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $5 (IN=$I5,$2=(null),OUT=$I6,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $6 (IN=$I6,$2=(null),OUT=$I7,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $7 (IN=$I7,$2=(null),OUT=$I8,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $8 (IN=$I19,$2=(null),OUT=$I1,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $9 (IN=$I1,$2=(null),OUT=$I2,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "  XINV2 $10 (IN=$I2,$2=(null),OUT=$I3,$4='VSSZ,VSS',$5='VDDZ,VDD')\n"
-    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl,
+    "circuit RINGO (FB=FB,OSC=OSC,NEXT=NEXT,'VSSZ,VSS'='VSSZ,VSS','VDDZ,VDD'='VDDZ,VDD');\n"
+    "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=(null),OUT=$I19,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $3 (IN=NEXT,$2=(null),OUT=$I5,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $4 (IN=$I3,$2=(null),OUT=NEXT,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $5 (IN=$I5,$2=(null),OUT=$I6,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $6 (IN=$I6,$2=(null),OUT=$I7,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $7 (IN=$I7,$2=(null),OUT=$I8,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $8 (IN=$I19,$2=(null),OUT=$I1,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $9 (IN=$I1,$2=(null),OUT=$I2,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "  subcircuit INV2 $10 (IN=$I2,$2=(null),OUT=$I3,$4='VSSZ,VSS',$5='VDDZ,VDD');\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n"
   );
 
   //  compare the collected test data

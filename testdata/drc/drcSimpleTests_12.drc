@@ -1,0 +1,66 @@
+# Flat extraction
+
+source($drc_test_source)
+
+deep
+
+# Drawing layers
+
+nwell       = input(1, 0)
+active      = input(2, 0)
+poly        = input(3, 0)
+poly_lbl    = input(3, 1)
+diff_cont   = input(4, 0)
+poly_cont   = input(5, 0)
+metal1      = input(6, 0)
+metal1_lbl  = input(6, 1)
+via1        = input(7, 0)
+metal2      = input(8, 0)
+metal2_lbl  = input(8, 1)
+
+# Computed layers
+
+pactive     = active & nwell
+pgate       = active & poly
+psd         = active - pgate
+
+nactive     = active - nwell
+ngate       = nactive & poly
+nsd         = nactive - ngate
+
+# PMOS transistor device extraction
+
+pmos_ex = RBA::DeviceExtractorMOS3Transistor::new("PMOS")
+extract_devices(pmos_ex, { "SD" => psd, "G" => pgate, "P" => poly })
+
+# NMOS transistor device extraction
+
+nmos_ex = RBA::DeviceExtractorMOS3Transistor::new("NMOS")
+extract_devices(nmos_ex, { "SD" => nsd, "G" => ngate, "P" => poly })
+
+# Define connectivity for netlist extraction
+
+# Inter-layer
+connect(psd,       diff_cont)
+connect(nsd,       diff_cont)
+connect(poly,      poly_cont)
+connect(poly_cont, metal1)
+connect(diff_cont, metal1)
+connect(metal1,    via1)
+connect(via1,      metal2)
+connect(poly,      poly_lbl)
+connect(metal1,    metal1_lbl)
+connect(metal2,    metal2_lbl)
+
+# Actually performs the extraction
+
+join_nets("{VDDZ,VSSZ,NEXT,FB}")
+
+netlist = l2n_data.netlist
+
+# Writes the netlist 
+
+writer = RBA::NetlistSpiceWriter::new
+
+netlist.write($drc_test_target, writer, "RINGO netlist")
+

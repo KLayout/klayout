@@ -22,6 +22,7 @@
 
 
 #include "dbNetlist.h"
+#include "dbNetlistDeviceClasses.h"
 
 #include "tlUnitTest.h"
 #include "tlString.h"
@@ -258,11 +259,13 @@ TEST(1_DeviceTerminalDefinition)
   dc.clear_terminal_definitions ();
   EXPECT_EQ (dc.terminal_definitions ().empty (), true);
 
-  db::DeviceParameterDefinition ppd ("P1", "Parameter 1", 1.0);
+  db::DeviceParameterDefinition ppd ("P1", "Parameter 1", 1.0, false);
   dc.add_parameter_definition (ppd);
+  EXPECT_EQ (ppd.is_primary (), false);
 
   db::DeviceParameterDefinition ppd2 ("P2", "Parameter 2");
   dc.add_parameter_definition (ppd2);
+  EXPECT_EQ (ppd2.is_primary (), true);
 
   EXPECT_EQ (pd2string (dc.parameter_definitions ()[0]), "P1(Parameter 1)=1 #0");
   EXPECT_EQ (pd2string (dc.parameter_definitions ()[1]), "P2(Parameter 2)=0 #1");
@@ -501,6 +504,9 @@ TEST(4_NetlistSubcircuits)
   dc->add_terminal_definition (db::DeviceTerminalDefinition ("B", ""));
   nl->add_device_class (dc);
 
+  std::auto_ptr<db::Netlist> nldup (new db::Netlist ());
+  nldup->add_device_class (dc->clone ());
+
   db::DeviceAbstract *dm = new db::DeviceAbstract ();
   dm->set_device_class (dc);
   EXPECT_EQ (dm->device_class () == dc, true);
@@ -607,6 +613,28 @@ TEST(4_NetlistSubcircuits)
     "[c2]\n"
     "D:A,+c2p1\n"
     "D:B,+c2p2\n"
+  );
+
+  EXPECT_EQ (nl->to_string (),
+    "circuit c1 (c1p1=n1a,c1p2=n1c);\n"
+    "  subcircuit c2 sc1 (c2p1=n1a,c2p2=n1b);\n"
+    "  subcircuit c2 sc2 (c2p1=n1b,c2p2=n1c);\n"
+    "end;\n"
+    "circuit c2 (c2p1=n2a,c2p2=n2b);\n"
+    "  device dc2 D (A=n2a,B=n2b) ();\n"
+    "end;\n"
+  );
+
+  nldup->from_string (nl->to_string ());
+
+  EXPECT_EQ (nldup->to_string (),
+    "circuit c1 (c1p1=n1a,c1p2=n1c);\n"
+    "  subcircuit c2 sc1 (c2p1=n1a,c2p2=n1b);\n"
+    "  subcircuit c2 sc2 (c2p1=n1b,c2p2=n1c);\n"
+    "end;\n"
+    "circuit c2 (c2p1=n2a,c2p2=n2b);\n"
+    "  device dc2 D (A=n2a,B=n2b) ();\n"
+    "end;\n"
   );
 
   EXPECT_EQ (netlist2 (*nl),
@@ -1079,3 +1107,176 @@ TEST(13_DeviceAbstract)
   EXPECT_EQ (nl.begin_device_abstracts () == nl.end_device_abstracts (), true);
 }
 
+TEST(20_FlattenSubCircuit)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *dc;
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("NMOS");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("PMOS");
+  nl.add_device_class (dc);
+
+  nl.from_string (
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+  );
+
+  db::Netlist nl2;
+
+  nl2 = nl;
+  db::Circuit *inv2 = nl2.circuit_by_name ("INV2");
+  inv2->flatten_subcircuit (inv2->subcircuit_by_name ("SC1"));
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.flatten_circuit (nl2.circuit_by_name ("PTRANS"));
+  nl2.flatten_circuit (nl2.circuit_by_name ("NTRANS"));
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(21_FlattenSubCircuit2)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *dc;
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("NMOS");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("PMOS");
+  nl.add_device_class (dc);
+
+  nl.from_string (
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+  );
+
+  db::Netlist nl2;
+
+  nl2 = nl;
+  db::Circuit *inv2 = nl2.circuit_by_name ("RINGO");
+  inv2->flatten_subcircuit (inv2->subcircuit_by_name ("INV2_SC1"));
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "  subcircuit PTRANS INV2_SC1.SC1 ($1=VDD,$2=FB,$3=$I8);\n"
+    "  subcircuit NTRANS INV2_SC1.SC2 ($1=VSS,$2=FB,$3=$I8);\n"
+    "  subcircuit PTRANS INV2_SC1.SC3 ($1=VDD,$2=OSC,$3=FB);\n"
+    "  subcircuit NTRANS INV2_SC1.SC4 ($1=VSS,$2=OSC,$3=FB);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  inv2->flatten_subcircuit (inv2->subcircuit_by_name ("INV2_SC2"));
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit PTRANS INV2_SC1.SC1 ($1=VDD,$2=FB,$3=$I8);\n"
+    "  subcircuit NTRANS INV2_SC1.SC2 ($1=VSS,$2=FB,$3=$I8);\n"
+    "  subcircuit PTRANS INV2_SC1.SC3 ($1=VDD,$2=OSC,$3=FB);\n"
+    "  subcircuit NTRANS INV2_SC1.SC4 ($1=VSS,$2=OSC,$3=FB);\n"
+    "  subcircuit PTRANS INV2_SC2.SC1 ($1=VDD,$2=(null),$3=FB);\n"
+    "  subcircuit NTRANS INV2_SC2.SC2 ($1=VSS,$2=(null),$3=FB);\n"
+    "  subcircuit PTRANS INV2_SC2.SC3 ($1=VDD,$2=$I8,$3=(null));\n"
+    "  subcircuit NTRANS INV2_SC2.SC4 ($1=VSS,$2=$I8,$3=(null));\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2 = nl;
+  nl2.flatten_circuit (nl2.circuit_by_name ("INV2"));
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit PTRANS INV2_SC1.SC1 ($1=VDD,$2=FB,$3=$I8);\n"
+    "  subcircuit NTRANS INV2_SC1.SC2 ($1=VSS,$2=FB,$3=$I8);\n"
+    "  subcircuit PTRANS INV2_SC1.SC3 ($1=VDD,$2=OSC,$3=FB);\n"
+    "  subcircuit NTRANS INV2_SC1.SC4 ($1=VSS,$2=OSC,$3=FB);\n"
+    "  subcircuit PTRANS INV2_SC2.SC1 ($1=VDD,$2=(null),$3=FB);\n"
+    "  subcircuit NTRANS INV2_SC2.SC2 ($1=VSS,$2=(null),$3=FB);\n"
+    "  subcircuit PTRANS INV2_SC2.SC3 ($1=VDD,$2=$I8,$3=(null));\n"
+    "  subcircuit NTRANS INV2_SC2.SC4 ($1=VSS,$2=$I8,$3=(null));\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}

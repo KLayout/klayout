@@ -42,7 +42,7 @@ namespace tl
 static std::locale c_locale ("C");
 
 // -------------------------------------------------------------------------
-//  lower and upper case for wchar_t
+//  lower and upper case for wchar_t and uint32_t
 
 #include "utf_casefolding.h"
 
@@ -66,8 +66,43 @@ wchar_t wupcase (wchar_t c)
   }
 }
 
+uint32_t utf32_downcase (uint32_t c32)
+{
+  if (sizeof (wchar_t) == 2 && c32 >= 0x10000) {
+    return c32;
+  } else {
+    return uint32_t (wdowncase (wchar_t (c32)));
+  }
+}
+
+uint32_t utf32_upcase (uint32_t c32)
+{
+  if (sizeof (wchar_t) == 2 && c32 >= 0x10000) {
+    return c32;
+  } else {
+    return uint32_t (wupcase (wchar_t (c32)));
+  }
+}
+
 // -------------------------------------------------------------------------
 //  Conversion of UTF8 to wchar_t
+
+uint32_t utf32_from_utf8 (const char *&cp, const char *cpe = 0)
+{
+  uint32_t c32 = (unsigned char) *cp++;
+  if (c32 >= 0xf0 && ((cpe && cp + 2 < cpe) || (! cpe && cp [0] && cp [1] && cp [2]))) {
+    c32 = ((c32 & 0x7) << 18) | ((uint32_t (cp [0]) & 0x3f) << 12) | ((uint32_t (cp [1]) & 0x3f) << 6) | (uint32_t (cp [2]) & 0x3f);
+    cp += 3;
+  } else if (c32 >= 0xe0 && ((cpe && cp + 1 < cpe) || (! cpe && cp [0] && cp [1]))) {
+    c32 = ((c32 & 0xf) << 12) | ((uint32_t (cp [0]) & 0x3f) << 6) | (uint32_t (cp [1]) & 0x3f);
+    cp += 2;
+  } else if (c32 >= 0xc0 && ((cpe && cp < cpe) || (! cpe && cp [0]))) {
+    c32 = ((c32 & 0x1f) << 6) | (uint32_t (*cp) & 0x3f);
+    ++cp;
+  }
+
+  return c32;
+}
 
 std::wstring to_wstring (const std::string &s)
 {
@@ -76,17 +111,7 @@ std::wstring to_wstring (const std::string &s)
   const char *cpe = s.c_str () + s.size ();
   for (const char *cp = s.c_str (); cp < cpe; ) {
 
-    uint32_t c32 = (unsigned char) *cp++;
-    if (c32 >= 0xf0 && cp + 2 < cpe) {
-      c32 = ((c32 & 0x7) << 18) | ((uint32_t (cp [0]) & 0x3f) << 12) | ((uint32_t (cp [1]) & 0x3f) << 6) | (uint32_t (cp [2]) & 0x3f);
-      cp += 3;
-    } else if (c32 >= 0xe0 && cp + 1 < cpe) {
-      c32 = ((c32 & 0xf) << 12) | ((uint32_t (cp [0]) & 0x3f) << 6) | (uint32_t (cp [1]) & 0x3f);
-      cp += 2;
-    } else if (c32 >= 0xc0 && cp < cpe) {
-      c32 = ((c32 & 0x1f) << 6) | (uint32_t (*cp) & 0x3f);
-      ++cp;
-    }
+    uint32_t c32 = utf32_from_utf8 (cp, cpe);
 
     if (sizeof (wchar_t) == 2 && c32 >= 0x10000) {
       c32 -= 0x10000;
@@ -1314,6 +1339,28 @@ Extractor::test (const char *token)
     }
     ++cp;
     ++token;
+  }
+
+  if (! *token) {
+    m_cp = cp;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool
+Extractor::test_without_case (const char *token)
+{
+  skip ();
+
+  const char *cp = m_cp;
+  while (*cp && *token) {
+    uint32_t c = utf32_downcase (utf32_from_utf8 (cp));
+    uint32_t ct = utf32_downcase (utf32_from_utf8 (token));
+    if (c != ct) {
+      return false;
+    }
   }
 
   if (! *token) {

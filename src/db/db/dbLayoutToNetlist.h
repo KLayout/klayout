@@ -296,7 +296,7 @@ public:
    *  @brief Runs the netlist extraction
    *  See the class description for more details.
    */
-  void extract_netlist (bool join_nets_by_label = true);
+  void extract_netlist (const std::string &joined_net_names = std::string ());
 
   /**
    *  @brief Marks the netlist as extracted

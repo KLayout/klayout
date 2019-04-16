@@ -101,6 +101,7 @@ struct PYAIteratorObject
   static PYAIteratorObject *create (PyObject *origin, gsi::IterAdaptorAbstractBase *iter, const gsi::ArgType *value_type);
 
   PyObject *origin;
+  bool first;
   gsi::IterAdaptorAbstractBase *iter;
   const gsi::ArgType *value_type;
 

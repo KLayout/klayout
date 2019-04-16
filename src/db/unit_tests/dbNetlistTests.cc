@@ -265,7 +265,7 @@ TEST(1_DeviceTerminalDefinition)
 
   db::DeviceParameterDefinition ppd2 ("P2", "Parameter 2");
   dc.add_parameter_definition (ppd2);
-  EXPECT_EQ (ppd.is_primary (), true);
+  EXPECT_EQ (ppd2.is_primary (), true);
 
   EXPECT_EQ (pd2string (dc.parameter_definitions ()[0]), "P1(Parameter 1)=1 #0");
   EXPECT_EQ (pd2string (dc.parameter_definitions ()[1]), "P2(Parameter 2)=0 #1");

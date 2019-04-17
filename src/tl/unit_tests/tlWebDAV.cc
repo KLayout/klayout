@@ -58,7 +58,14 @@ TEST(1)
   EXPECT_EQ (collection.is_collection (), true);
   EXPECT_EQ (collection.url (), "http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/");
 
-  EXPECT_EQ (collection2string (collection),
+  std::string s = collection2string (collection);
+
+  //  normalize
+  std::vector<std::string> sl = tl::split (s, "\n");
+  std::sort (sl.begin (), sl.end ());
+  s = tl::join (sl, "\n");
+
+  EXPECT_EQ (s,
     "[dir] dir1 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1/\n"
     "[dir] dir2 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir2/\n"
     "text http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text\n"

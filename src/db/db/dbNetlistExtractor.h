@@ -82,7 +82,7 @@ public:
    *  @brief Extract the nets
    *  See the class description for more details.
    */
-  void extract_nets (const db::DeepShapeStore &dss, unsigned int layout_index, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters, bool join_nets_by_label = true);
+  void extract_nets (const db::DeepShapeStore &dss, unsigned int layout_index, const db::Connectivity &conn, db::Netlist &nl, hier_clusters_type &clusters, const std::string &joined_net_names = std::string ());
 
 private:
   hier_clusters_type *mp_clusters;

@@ -388,6 +388,33 @@ TEST(8)
   EXPECT_EQ (x.try_read_quoted (s), true);
   EXPECT_EQ (s, "a_word\'!");
   EXPECT_EQ (x.at_end (), true);
+
+  x = Extractor (" foobar");
+  EXPECT_EQ (x.test ("foo"), true);
+  EXPECT_EQ (x.test ("bar"), true);
+
+  x = Extractor (" foo bar");
+  EXPECT_EQ (x.test ("foo"), true);
+  EXPECT_EQ (x.test ("bar"), true);
+
+  x = Extractor (" FOObar");
+  EXPECT_EQ (x.test ("foo"), false);
+  EXPECT_EQ (x.test ("BAR"), false);
+
+  x = Extractor (" FOObar");
+  EXPECT_EQ (x.test_without_case ("foo"), true);
+  EXPECT_EQ (x.test_without_case ("BAR"), true);
+
+  x = Extractor (" µm");
+  EXPECT_EQ (x.test ("µm"), true);
+
+  x = Extractor (" µM");
+  EXPECT_EQ (x.test ("µm"), false);
+  EXPECT_EQ (x.test_without_case ("µm"), true);
+
+  x = Extractor (" µm");
+  EXPECT_EQ (x.test ("µM"), false);
+  EXPECT_EQ (x.test_without_case ("µM"), true);
 }
 
 TEST(9)

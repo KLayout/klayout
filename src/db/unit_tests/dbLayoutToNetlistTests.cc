@@ -337,28 +337,32 @@ TEST(1_BasicExtraction)
   db::compare_layouts (_this, ly, au);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO ():\n"
-    "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
-    "  XINV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD)\n"
-    "  XINV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD)\n"
-    "  XINV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD)\n"
-    "  XINV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD)\n"
-    "  XINV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD)\n"
-    "  XINV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD)\n"
-    "  XINV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD)\n"
-    "  XINV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD)\n"
-    "  XINV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD)\n"
-    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  XTRANS $1 ($1=$2,$2=$4,$3=IN)\n"
-    "  XTRANS $2 ($1=$2,$2=$5,$3=IN)\n"
-    "  XTRANS $3 ($1=$5,$2=OUT,$3=$2)\n"
-    "  XTRANS $4 ($1=$4,$2=OUT,$3=$2)\n"
-    "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO ();\n"
+    "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
   );
 
   //  do some probing before purging
@@ -492,23 +496,26 @@ TEST(1_BasicExtraction)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD):\n"
-    "  XINV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD)\n"
-    "  XINV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD)\n"
-    "  XINV2 $3 (IN=$I19,$2=(null),OUT=$I1,$4=VSS,$5=VDD)\n"
-    "  XINV2 $4 (IN=$I1,$2=(null),OUT=$I2,$4=VSS,$5=VDD)\n"
-    "  XINV2 $5 (IN=$I2,$2=(null),OUT=$I3,$4=VSS,$5=VDD)\n"
-    "  XINV2 $6 (IN=$I3,$2=(null),OUT=$I4,$4=VSS,$5=VDD)\n"
-    "  XINV2 $7 (IN=$I4,$2=(null),OUT=$I5,$4=VSS,$5=VDD)\n"
-    "  XINV2 $8 (IN=$I5,$2=(null),OUT=$I6,$4=VSS,$5=VDD)\n"
-    "  XINV2 $9 (IN=$I6,$2=(null),OUT=$I7,$4=VSS,$5=VDD)\n"
-    "  XINV2 $10 (IN=$I7,$2=(null),OUT=$I8,$4=VSS,$5=VDD)\n"
-    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $3 (IN=$I19,$2=(null),OUT=$I1,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $4 (IN=$I1,$2=(null),OUT=$I2,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $5 (IN=$I2,$2=(null),OUT=$I3,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $6 (IN=$I3,$2=(null),OUT=$I4,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $7 (IN=$I4,$2=(null),OUT=$I5,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $8 (IN=$I5,$2=(null),OUT=$I6,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $9 (IN=$I6,$2=(null),OUT=$I7,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $10 (IN=$I7,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n"
   );
 
   //  do some probing after purging
@@ -684,26 +691,31 @@ TEST(2_Probing)
   dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO ():\n"
-    "  XINV2PAIR $1 ($1=FB,$2=VDD,$3=VSS,$4=$I3,$5=OSC)\n"
-    "  XINV2PAIR $2 ($1=$I18,$2=VDD,$3=VSS,$4=FB,$5=$I9)\n"
-    "  XINV2PAIR $3 ($1=$I19,$2=VDD,$3=VSS,$4=$I9,$5=$I1)\n"
-    "  XINV2PAIR $4 ($1=$I20,$2=VDD,$3=VSS,$4=$I1,$5=$I2)\n"
-    "  XINV2PAIR $5 ($1=$I21,$2=VDD,$3=VSS,$4=$I2,$5=$I3)\n"
-    "Circuit INV2PAIR ($1=$I7,$2=$I5,$3=$I4,$4=$I2,$5=$I1):\n"
-    "  XINV2 $1 (IN=$I3,$2=$I7,OUT=$I1,$4=$I4,$5=$I5)\n"
-    "  XINV2 $2 (IN=$I2,$2=$I6,OUT=$I3,$4=$I4,$5=$I5)\n"
-    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  XTRANS $1 ($1=$2,$2=$4,$3=IN)\n"
-    "  XTRANS $2 ($1=$2,$2=$5,$3=IN)\n"
-    "  XTRANS $3 ($1=$5,$2=OUT,$3=$2)\n"
-    "  XTRANS $4 ($1=$4,$2=OUT,$3=$2)\n"
-    "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO ();\n"
+    "  subcircuit INV2PAIR $1 ($1=FB,$2=VDD,$3=VSS,$4=$I3,$5=OSC);\n"
+    "  subcircuit INV2PAIR $2 ($1=$I18,$2=VDD,$3=VSS,$4=FB,$5=$I9);\n"
+    "  subcircuit INV2PAIR $3 ($1=$I19,$2=VDD,$3=VSS,$4=$I9,$5=$I1);\n"
+    "  subcircuit INV2PAIR $4 ($1=$I20,$2=VDD,$3=VSS,$4=$I1,$5=$I2);\n"
+    "  subcircuit INV2PAIR $5 ($1=$I21,$2=VDD,$3=VSS,$4=$I2,$5=$I3);\n"
+    "end;\n"
+    "circuit INV2PAIR ($1=$I7,$2=$I5,$3=$I4,$4=$I2,$5=$I1);\n"
+    "  subcircuit INV2 $1 (IN=$I3,$2=$I7,OUT=$I1,$4=$I4,$5=$I5);\n"
+    "  subcircuit INV2 $2 (IN=$I2,$2=$I6,OUT=$I3,$4=$I4,$5=$I5);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
   );
 
   //  compare the collected test data
@@ -736,21 +748,25 @@ TEST(2_Probing)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD):\n"
-    "  XINV2PAIR $1 ($1=FB,$2=VDD,$3=VSS,$4=$I3,$5=OSC)\n"
-    "  XINV2PAIR $2 ($1=(null),$2=VDD,$3=VSS,$4=FB,$5=$I9)\n"
-    "  XINV2PAIR $3 ($1=(null),$2=VDD,$3=VSS,$4=$I9,$5=$I1)\n"
-    "  XINV2PAIR $4 ($1=(null),$2=VDD,$3=VSS,$4=$I1,$5=$I2)\n"
-    "  XINV2PAIR $5 ($1=(null),$2=VDD,$3=VSS,$4=$I2,$5=$I3)\n"
-    "Circuit INV2PAIR ($1=$I7,$2=$I5,$3=$I4,$4=$I2,$5=$I1):\n"
-    "  XINV2 $1 (IN=$I3,$2=$I7,OUT=$I1,$4=$I4,$5=$I5)\n"
-    "  XINV2 $2 (IN=$I2,$2=(null),OUT=$I3,$4=$I4,$5=$I5)\n"
-    "Circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5):\n"
-    "  DPMOS $1 (S=$2,G=IN,D=$5) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=$5,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$2,G=IN,D=$4) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=$4,G=$2,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2PAIR $1 ($1=FB,$2=VDD,$3=VSS,$4=$I3,$5=OSC);\n"
+    "  subcircuit INV2PAIR $2 ($1=(null),$2=VDD,$3=VSS,$4=FB,$5=$I9);\n"
+    "  subcircuit INV2PAIR $3 ($1=(null),$2=VDD,$3=VSS,$4=$I9,$5=$I1);\n"
+    "  subcircuit INV2PAIR $4 ($1=(null),$2=VDD,$3=VSS,$4=$I1,$5=$I2);\n"
+    "  subcircuit INV2PAIR $5 ($1=(null),$2=VDD,$3=VSS,$4=$I2,$5=$I3);\n"
+    "end;\n"
+    "circuit INV2PAIR ($1=$I7,$2=$I5,$3=$I4,$4=$I2,$5=$I1);\n"
+    "  subcircuit INV2 $1 (IN=$I3,$2=$I7,OUT=$I1,$4=$I4,$5=$I5);\n"
+    "  subcircuit INV2 $2 (IN=$I2,$2=(null),OUT=$I3,$4=$I4,$5=$I5);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n"
   );
 
   //  do some probing after purging
@@ -956,26 +972,31 @@ TEST(3_GlobalNetConnections)
   dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO ():\n"
-    "  XINV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD)\n"
-    "  XINV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD)\n"
-    "  XINV2PAIR $3 (BULK='BULK,VSS',$2=$I23,$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD)\n"
-    "  XINV2PAIR $4 (BULK='BULK,VSS',$2=$I24,$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD)\n"
-    "  XINV2PAIR $5 (BULK='BULK,VSS',$2=$I25,$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD)\n"
-    "Circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1):\n"
-    "  XINV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "  XINV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "Circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK):\n"
-    "  DPMOS $1 (S=$3,G=IN,D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=VDD,G=$3,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$3,G=IN,D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=VSS,G=$3,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  XTRANS $1 ($1=$3,$2=VSS,$3=IN)\n"
-    "  XTRANS $2 ($1=$3,$2=VDD,$3=IN)\n"
-    "  XTRANS $3 ($1=VDD,$2=OUT,$3=$3)\n"
-    "  XTRANS $4 ($1=VSS,$2=OUT,$3=$3)\n"
-    "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO ();\n"
+    "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=$I23,$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=$I24,$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=$I25,$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);\n"
+    "end;\n"
+    "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "end;\n"
+    "circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$3,$2=VSS,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$3,$2=VDD,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=VDD,$2=OUT,$3=$3);\n"
+    "  subcircuit TRANS $4 ($1=VSS,$2=OUT,$3=$3);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
   );
 
   //  compare the collected test data
@@ -1008,21 +1029,25 @@ TEST(3_GlobalNetConnections)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS'):\n"
-    "  XINV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD)\n"
-    "  XINV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD)\n"
-    "  XINV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD)\n"
-    "  XINV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD)\n"
-    "  XINV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD)\n"
-    "Circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1):\n"
-    "  XINV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "  XINV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "Circuit INV2 ($1=(null),IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=(null)):\n"
-    "  DPMOS $1 (S=$3,G=IN,D=VDD) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=VDD,G=$3,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$3,G=IN,D=VSS) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=VSS,G=$3,D=OUT) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');\n"
+    "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);\n"
+    "end;\n"
+    "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "end;\n"
+    "circuit INV2 ($1=(null),IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=(null));\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n"
   );
 
   //  do some probing after purging
@@ -1234,26 +1259,31 @@ TEST(4_GlobalNetDeviceExtraction)
   dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO ():\n"
-    "  XINV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD)\n"
-    "  XINV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD)\n"
-    "  XINV2PAIR $3 (BULK='BULK,VSS',$2=$I23,$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD)\n"
-    "  XINV2PAIR $4 (BULK='BULK,VSS',$2=$I24,$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD)\n"
-    "  XINV2PAIR $5 (BULK='BULK,VSS',$2=$I25,$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD)\n"
-    "Circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1):\n"
-    "  XINV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "  XINV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "Circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK):\n"
-    "  DPMOS $1 (S=$3,G=IN,D=VDD,B=$1) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=VDD,G=$3,D=OUT,B=$1) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$3,G=IN,D=VSS,B=BULK) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  XTRANS $1 ($1=$3,$2=VSS,$3=IN)\n"
-    "  XTRANS $2 ($1=$3,$2=VDD,$3=IN)\n"
-    "  XTRANS $3 ($1=VDD,$2=OUT,$3=$3)\n"
-    "  XTRANS $4 ($1=VSS,$2=OUT,$3=$3)\n"
-    "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO ();\n"
+    "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=$I23,$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=$I24,$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=$I25,$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);\n"
+    "end;\n"
+    "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "end;\n"
+    "circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD,B=$1) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT,B=$1) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS,B=BULK) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$3,$2=VSS,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$3,$2=VDD,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=VDD,$2=OUT,$3=$3);\n"
+    "  subcircuit TRANS $4 ($1=VSS,$2=OUT,$3=$3);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
   );
 
   //  compare the collected test data
@@ -1286,21 +1316,25 @@ TEST(4_GlobalNetDeviceExtraction)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS'):\n"
-    "  XINV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD)\n"
-    "  XINV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD)\n"
-    "  XINV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD)\n"
-    "  XINV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD)\n"
-    "  XINV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD)\n"
-    "Circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1):\n"
-    "  XINV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "  XINV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "Circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK):\n"
-    "  DPMOS $1 (S=$3,G=IN,D=VDD,B=$1) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DPMOS $2 (S=VDD,G=$3,D=OUT,B=$1) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
-    "  DNMOS $3 (S=$3,G=IN,D=VSS,B=BULK) [L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5]\n"
-    "  DNMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) [L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');\n"
+    "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);\n"
+    "end;\n"
+    "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "end;\n"
+    "circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device PMOS $1 (S=$3,G=IN,D=VDD,B=$1) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=VDD,G=$3,D=OUT,B=$1) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$3,G=IN,D=VSS,B=BULK) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=VSS,G=$3,D=OUT,B=BULK) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "end;\n"
   );
 
   //  do some probing after purging
@@ -1512,26 +1546,31 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO ():\n"
-    "  XINV2PAIR $1 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=FB,$5=$I7,$6=OSC,$7=VDD)\n"
-    "  XINV2PAIR $2 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=$I22,$5=FB,$6=$I13,$7=VDD)\n"
-    "  XINV2PAIR $3 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=$I23,$5=$I13,$6=$I5,$7=VDD)\n"
-    "  XINV2PAIR $4 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=$I24,$5=$I5,$6=$I6,$7=VDD)\n"
-    "  XINV2PAIR $5 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=$I25,$5=$I6,$6=$I7,$7=VDD)\n"
-    "Circuit INV2PAIR (BULK=BULK,$2=$I6,$3=$I5,$4=$I4,$5=$I3,$6=$I2,$7=$I1):\n"
-    "  XINV2 $1 ($1=$I1,IN=$I3,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "  XINV2 $2 ($1=$I1,IN=$I4,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "Circuit INV2 ($1=$1,IN=IN,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK):\n"
-    "  DPMOS $1 (S=OUT,G=IN,D=VDD,B=$1) [L=0.25,W=1.75,AS=0.91875,AD=0.48125,PS=4.55,PD=2.3]\n"
-    "  DPMOS $2 (S=VDD,G=IN,D=OUT,B=$1) [L=0.25,W=1.75,AS=0.48125,AD=0.91875,PS=2.3,PD=4.55]\n"
-    "  DNMOS $3 (S=OUT,G=IN,D=VSS,B=BULK) [L=0.25,W=1.75,AS=0.91875,AD=0.48125,PS=4.55,PD=2.3]\n"
-    "  DNMOS $4 (S=VSS,G=IN,D=OUT,B=BULK) [L=0.25,W=1.75,AS=0.48125,AD=0.91875,PS=2.3,PD=4.55]\n"
-    "  XTRANS $1 ($1=OUT,$2=VSS,$3=IN)\n"
-    "  XTRANS $2 ($1=OUT,$2=VDD,$3=IN)\n"
-    "  XTRANS $3 ($1=OUT,$2=VSS,$3=IN)\n"
-    "  XTRANS $4 ($1=OUT,$2=VDD,$3=IN)\n"
-    "Circuit TRANS ($1=$1,$2=$2,$3=$3):\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO ();\n"
+    "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=FB,$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=$I22,$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=$I23,$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=$I24,$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=$I25,$5=$I6,$6=$I7,$7=VDD);\n"
+    "end;\n"
+    "circuit INV2PAIR (BULK=BULK,$2=$I6,$3=$I5,$4=$I4,$5=$I3,$6=$I2,$7=$I1);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $2 ($1=$I1,IN=$I4,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "end;\n"
+    "circuit INV2 ($1=$1,IN=IN,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device PMOS $1 (S=OUT,G=IN,D=VDD,B=$1) (L=0.25,W=1.75,AS=0.91875,AD=0.48125,PS=4.55,PD=2.3);\n"
+    "  device PMOS $2 (S=VDD,G=IN,D=OUT,B=$1) (L=0.25,W=1.75,AS=0.48125,AD=0.91875,PS=2.3,PD=4.55);\n"
+    "  device NMOS $3 (S=OUT,G=IN,D=VSS,B=BULK) (L=0.25,W=1.75,AS=0.91875,AD=0.48125,PS=4.55,PD=2.3);\n"
+    "  device NMOS $4 (S=VSS,G=IN,D=OUT,B=BULK) (L=0.25,W=1.75,AS=0.48125,AD=0.91875,PS=2.3,PD=4.55);\n"
+    "  subcircuit TRANS $1 ($1=OUT,$2=VSS,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=OUT,$2=VDD,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=OUT,$2=VSS,$3=IN);\n"
+    "  subcircuit TRANS $4 ($1=OUT,$2=VDD,$3=IN);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
   );
 
   //  compare the collected test data
@@ -1561,19 +1600,23 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   l2n.netlist ()->purge ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS'):\n"
-    "  XINV2PAIR $1 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=FB,$5=$I7,$6=OSC,$7=VDD)\n"
-    "  XINV2PAIR $2 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=FB,$6=$I13,$7=VDD)\n"
-    "  XINV2PAIR $3 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=$I13,$6=$I5,$7=VDD)\n"
-    "  XINV2PAIR $4 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=$I5,$6=$I6,$7=VDD)\n"
-    "  XINV2PAIR $5 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=$I6,$6=$I7,$7=VDD)\n"
-    "Circuit INV2PAIR (BULK=BULK,$2=$I6,$3=$I5,$4=$I4,$5=$I3,$6=$I2,$7=$I1):\n"
-    "  XINV2 $1 ($1=$I1,IN=$I3,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "  XINV2 $2 ($1=$I1,IN=$I4,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK)\n"
-    "Circuit INV2 ($1=$1,IN=IN,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK):\n"
-    "  DPMOS $1 (S=OUT,G=IN,D=VDD,B=$1) [L=0.25,W=3.5,AS=1.4,AD=1.4,PS=6.85,PD=6.85]\n"
-    "  DNMOS $3 (S=OUT,G=IN,D=VSS,B=BULK) [L=0.25,W=3.5,AS=1.4,AD=1.4,PS=6.85,PD=6.85]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');\n"
+    "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=FB,$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=$I6,$6=$I7,$7=VDD);\n"
+    "end;\n"
+    "circuit INV2PAIR (BULK=BULK,$2=$I6,$3=$I5,$4=$I4,$5=$I3,$6=$I2,$7=$I1);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $2 ($1=$I1,IN=$I4,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "end;\n"
+    "circuit INV2 ($1=$1,IN=IN,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device PMOS $1 (S=OUT,G=IN,D=VDD,B=$1) (L=0.25,W=3.5,AS=1.4,AD=1.4,PS=6.85,PD=6.85);\n"
+    "  device NMOS $3 (S=OUT,G=IN,D=VSS,B=BULK) (L=0.25,W=3.5,AS=1.4,AD=1.4,PS=6.85,PD=6.85);\n"
+    "end;\n"
   );
 
   //  do some probing after purging
@@ -1732,14 +1775,16 @@ TEST(6_MoreDeviceTypes)
   l2n.extract_netlist ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit TOP ():\n"
-    "  DHVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) [L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4]\n"
-    "  DHVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) [L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8]\n"
-    "  DLVPMOS $3 (S=$10,G=A,D=$6,B=$9) [L=1.5,W=2.475,AS=1.11375,AD=3.155625,PS=5.85,PD=7.5]\n"
-    "  DHVNMOS $4 (S=Z,G=$6,D=VSS,B=BULK) [L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6]\n"
-    "  DHVNMOS $5 (S=VSS,G=A,D=$5,B=BULK) [L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2]\n"
-    "  DLVNMOS $6 (S=VSS,G=A,D=$6,B=BULK) [L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit TOP ();\n"
+    "  device HVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) (L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4);\n"
+    "  device HVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) (L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8);\n"
+    "  device LVPMOS $3 (S=$10,G=A,D=$6,B=$9) (L=1.5,W=2.475,AS=4.77675,AD=3.155625,PS=8.81,PD=7.5);\n"
+    "  device HVNMOS $4 (S=Z,G=$6,D=VSS,B=BULK) (L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6);\n"
+    "  device HVNMOS $5 (S=VSS,G=A,D=$5,B=BULK) (L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2);\n"
+    "  device LVNMOS $6 (S=VSS,G=A,D=$6,B=BULK) (L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89);\n"
+    "end;\n"
   );
 }
 
@@ -1887,14 +1932,16 @@ TEST(7_MoreByEmptyDeviceTypes)
   l2n.extract_netlist ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit TOP ():\n"
-    "  DLVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) [L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4]\n"
-    "  DLVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) [L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8]\n"
-    "  DLVPMOS $3 (S=$10,G=A,D=$6,B=$9) [L=1.5,W=2.475,AS=1.11375,AD=3.155625,PS=5.85,PD=7.5]\n"
-    "  DLVNMOS $4 (S=VSS,G=A,D=$6,B=BULK) [L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89]\n"
-    "  DLVNMOS $5 (S=Z,G=$6,D=VSS,B=BULK) [L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6]\n"
-    "  DLVNMOS $6 (S=VSS,G=A,D=$5,B=BULK) [L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit TOP ();\n"
+    "  device LVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) (L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4);\n"
+    "  device LVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) (L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8);\n"
+    "  device LVPMOS $3 (S=$10,G=A,D=$6,B=$9) (L=1.5,W=2.475,AS=4.77675,AD=3.155625,PS=8.81,PD=7.5);\n"
+    "  device LVNMOS $4 (S=VSS,G=A,D=$6,B=BULK) (L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89);\n"
+    "  device LVNMOS $5 (S=Z,G=$6,D=VSS,B=BULK) (L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6);\n"
+    "  device LVNMOS $6 (S=VSS,G=A,D=$5,B=BULK) (L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2);\n"
+    "end;\n"
   );
 }
 
@@ -2064,14 +2111,16 @@ TEST(8_FlatExtraction)
   l2n.extract_netlist ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit TOP ():\n"
-    "  DHVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) [L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4]\n"
-    "  DHVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) [L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8]\n"
-    "  DLVPMOS $3 (S=$10,G=A,D=$6,B=$9) [L=1.5,W=2.475,AS=1.11375,AD=3.155625,PS=5.85,PD=7.5]\n"
-    "  DHVNMOS $4 (S=Z,G=$6,D=VSS,B=BULK) [L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6]\n"
-    "  DHVNMOS $5 (S=VSS,G=A,D=$5,B=BULK) [L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2]\n"
-    "  DLVNMOS $6 (S=VSS,G=A,D=$6,B=BULK) [L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit TOP ();\n"
+    "  device HVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) (L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4);\n"
+    "  device HVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) (L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8);\n"
+    "  device LVPMOS $3 (S=$10,G=A,D=$6,B=$9) (L=1.5,W=2.475,AS=4.77675,AD=3.155625,PS=8.81,PD=7.5);\n"
+    "  device HVNMOS $4 (S=Z,G=$6,D=VSS,B=BULK) (L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6);\n"
+    "  device HVNMOS $5 (S=VSS,G=A,D=$5,B=BULK) (L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2);\n"
+    "  device LVNMOS $6 (S=VSS,G=A,D=$6,B=BULK) (L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89);\n"
+    "end;\n"
   );
 }
 
@@ -2246,14 +2295,16 @@ TEST(9_FlatExtractionWithExternalDSS)
   l2n.extract_netlist ();
 
   //  compare netlist as string
-  EXPECT_EQ (l2n.netlist ()->to_string (),
-    "Circuit TOP ():\n"
-    "  DLVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) [L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4]\n"
-    "  DLVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) [L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8]\n"
-    "  DLVPMOS $3 (S=$10,G=A,D=$6,B=$9) [L=1.5,W=2.475,AS=1.11375,AD=3.155625,PS=5.85,PD=7.5]\n"
-    "  DLVNMOS $4 (S=VSS,G=A,D=$6,B=BULK) [L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89]\n"
-    "  DLVNMOS $5 (S=Z,G=$6,D=VSS,B=BULK) [L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6]\n"
-    "  DLVNMOS $6 (S=VSS,G=A,D=$5,B=BULK) [L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2]\n"
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit TOP ();\n"
+    "  device LVPMOS $1 (S=Z,G=$5,D=VDD2,B=$8) (L=1.5,W=4.05,AS=5.4675,AD=2.73375,PS=10.8,PD=5.4);\n"
+    "  device LVPMOS $2 (S=VDD2,G=Z,D=$5,B=$8) (L=1.5,W=4.05,AS=2.73375,AD=5.4675,PS=5.4,PD=10.8);\n"
+    "  device LVPMOS $3 (S=$10,G=A,D=$6,B=$9) (L=1.5,W=2.475,AS=4.77675,AD=3.155625,PS=8.81,PD=7.5);\n"
+    "  device LVNMOS $4 (S=VSS,G=A,D=$6,B=BULK) (L=1.2,W=1.7,AS=2.346,AD=2.1165,PS=6.16,PD=5.89);\n"
+    "  device LVNMOS $5 (S=Z,G=$6,D=VSS,B=BULK) (L=1.5,W=5.25,AS=7.0875,AD=3.54375,PS=13.2,PD=6.6);\n"
+    "  device LVNMOS $6 (S=VSS,G=A,D=$5,B=BULK) (L=1.5,W=5.25,AS=3.54375,AD=7.0875,PS=6.6,PD=13.2);\n"
+    "end;\n"
   );
 }
 

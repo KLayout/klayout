@@ -56,17 +56,19 @@ class DBNetlistDeviceClasses_TestClass < TestBase
     circuit.connect_pin(pin_b, n3)
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n3):
-  D r1 (A=n1,B=n2) [R=1]
-  D r2 (A=n2,B=n3) [R=3]
+circuit '' (A=n1,B=n3);
+  device '' r1 (A=n1,B=n2) (R=1);
+  device '' r2 (A=n2,B=n3) (R=3);
+end;
 END
 
     nl.combine_devices
     nl.purge
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n3):
-  D r1 (A=n1,B=n3) [R=4]
+circuit '' (A=n1,B=n3);
+  device '' r1 (A=n1,B=n3) (R=4);
+end;
 END
 
   end
@@ -102,17 +104,19 @@ END
     circuit.connect_pin(pin_b, n3)
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n3):
-  D c1 (A=n1,B=n2) [C=2]
-  D c2 (A=n2,B=n3) [C=3]
+circuit '' (A=n1,B=n3);
+  device '' c1 (A=n1,B=n2) (C=2);
+  device '' c2 (A=n2,B=n3) (C=3);
+end;
 END
 
     nl.combine_devices
     nl.purge
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n3):
-  D c1 (A=n1,B=n3) [C=1.2]
+circuit '' (A=n1,B=n3);
+  device '' c1 (A=n1,B=n3) (C=1.2);
+end;
 END
 
   end
@@ -148,17 +152,19 @@ END
     circuit.connect_pin(pin_b, n3)
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n3):
-  D l1 (A=n1,B=n2) [L=1]
-  D l2 (A=n2,B=n3) [L=3]
+circuit '' (A=n1,B=n3);
+  device '' l1 (A=n1,B=n2) (L=1);
+  device '' l2 (A=n2,B=n3) (L=3);
+end;
 END
 
     nl.combine_devices
     nl.purge
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n3):
-  D l1 (A=n1,B=n3) [L=4]
+circuit '' (A=n1,B=n3);
+  device '' l1 (A=n1,B=n3) (L=4);
+end;
 END
 
   end
@@ -192,17 +198,19 @@ END
     circuit.connect_pin(pin_b, n2)
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n2):
-  D d1 (A=n1,C=n2) [A=1]
-  D d2 (A=n1,C=n2) [A=3]
+circuit '' (A=n1,B=n2);
+  device '' d1 (A=n1,C=n2) (A=1);
+  device '' d2 (A=n1,C=n2) (A=3);
+end;
 END
 
     nl.combine_devices
     nl.purge
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n2):
-  D d1 (A=n1,C=n2) [A=4]
+circuit '' (A=n1,B=n2);
+  device '' d1 (A=n1,C=n2) (A=4);
+end;
 END
 
   end
@@ -252,17 +260,19 @@ END
     d2.connect_terminal(RBA::DeviceClassMOS3Transistor::TERMINAL_G, n3)
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n2,C=n3):
-  D d1 (S=n1,G=n3,D=n2) [L=1,W=2,AS=3,AD=4,PS=13,PD=14]
-  D d2 (S=n1,G=n3,D=n2) [L=1,W=3,AS=4,AD=5,PS=14,PD=15]
+circuit '' (A=n1,B=n2,C=n3);
+  device '' d1 (S=n1,G=n3,D=n2) (L=1,W=2,AS=3,AD=4,PS=13,PD=14);
+  device '' d2 (S=n1,G=n3,D=n2) (L=1,W=3,AS=4,AD=5,PS=14,PD=15);
+end;
 END
 
     nl.combine_devices
     nl.purge
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n2,C=n3):
-  D d1 (S=n1,G=n3,D=n2) [L=1,W=5,AS=7,AD=9,PS=27,PD=29]
+circuit '' (A=n1,B=n2,C=n3);
+  device '' d1 (S=n1,G=n3,D=n2) (L=1,W=5,AS=7,AD=9,PS=27,PD=29);
+end;
 END
 
   end
@@ -318,17 +328,19 @@ END
     d2.connect_terminal(RBA::DeviceClassMOS4Transistor::TERMINAL_B, n4)
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n2,C=n3,D=n4):
-  D d1 (S=n1,G=n3,D=n2,B=n4) [L=1,W=2,AS=3,AD=4,PS=13,PD=14]
-  D d2 (S=n1,G=n3,D=n2,B=n4) [L=1,W=3,AS=4,AD=5,PS=14,PD=15]
+circuit '' (A=n1,B=n2,C=n3,D=n4);
+  device '' d1 (S=n1,G=n3,D=n2,B=n4) (L=1,W=2,AS=3,AD=4,PS=13,PD=14);
+  device '' d2 (S=n1,G=n3,D=n2,B=n4) (L=1,W=3,AS=4,AD=5,PS=14,PD=15);
+end;
 END
 
     nl.combine_devices
     nl.purge
 
     assert_equal(nl.to_s, <<END)
-Circuit  (A=n1,B=n2,C=n3,D=n4):
-  D d1 (S=n1,G=n3,D=n2,B=n4) [L=1,W=5,AS=7,AD=9,PS=27,PD=29]
+circuit '' (A=n1,B=n2,C=n3,D=n4);
+  device '' d1 (S=n1,G=n3,D=n2,B=n4) (L=1,W=5,AS=7,AD=9,PS=27,PD=29);
+end;
 END
 
   end

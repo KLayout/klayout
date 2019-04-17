@@ -39,6 +39,7 @@ namespace db
 class Layout;
 class Cell;
 class LayerMap;
+class Netlist;
 
 /**
  *  @brief Specifies the normalization mode for compare_layouts
@@ -72,6 +73,16 @@ void DB_PUBLIC compare_layouts (tl::TestBase *_this, const db::Layout &layout, c
  *  The layout is normalized by writing to a file and reading back
  */
 void DB_PUBLIC compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::string &au_file, const db::LayerMap &lmap, bool read_all_others, NormalizationMode norm = WriteGDS2, db::Coord tolerance = 0);
+
+/**
+ *  @brief Compares a netlist against a string
+ */
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string);
+
+/**
+ *  @brief Compares a netlist against another netlist
+ */
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au);
 
 }
 

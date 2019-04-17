@@ -124,7 +124,7 @@ public:
    *  @brief Creates an empty device parameter definition
    */
   DeviceParameterDefinition ()
-    : m_name (), m_description (), m_default_value (0.0), m_id (0)
+    : m_name (), m_description (), m_default_value (0.0), m_id (0), m_is_primary (true)
   {
     //  .. nothing yet ..
   }
@@ -132,8 +132,8 @@ public:
   /**
    *  @brief Creates a device parameter definition with the given name and description
    */
-  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0)
-    : m_name (name), m_description (description), m_default_value (default_value), m_id (0)
+  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0, bool is_primary = true)
+    : m_name (name), m_description (description), m_default_value (default_value), m_id (0), m_is_primary (is_primary)
   {
     //  .. nothing yet ..
   }
@@ -187,6 +187,25 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether the parameter is a primary parameter
+   *
+   *  If this flag is set to true (the default), the parameter is considered a primary parameter.
+   *  Only primary parameters are compared by default.
+   */
+  void set_is_primary (bool p)
+  {
+    m_is_primary = p;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the parameter is a primary parameter
+   */
+  bool is_primary () const
+  {
+    return m_is_primary;
+  }
+
+  /**
    *  @brief Gets the parameter ID
    */
   size_t id () const
@@ -200,11 +219,59 @@ private:
   std::string m_name, m_description;
   double m_default_value;
   size_t m_id;
+  bool m_is_primary;
 
   void set_id (size_t id)
   {
     m_id = id;
   }
+};
+
+/**
+ *  @brief A device parameter compare delegate
+ *
+ *  Device parameter compare delegates are used to establish
+ *  device equivalence in the context of netlist comparison.
+ */
+class DB_PUBLIC DeviceParameterCompareDelegate
+  : public gsi::ObjectBase, public tl::Object
+{
+public:
+  DeviceParameterCompareDelegate () { }
+  virtual ~DeviceParameterCompareDelegate () { }
+
+  virtual bool less (const db::Device &a, const db::Device &b) const = 0;
+  virtual bool equal (const db::Device &a, const db::Device &b) const = 0;
+};
+
+/**
+ *  @brief A parameter compare delegate that compares several parameters either relative or absolute (or both)
+ *
+ *  The reasoning behind this class is to supply a chainable compare delegate: ab = a + b
+ *  where a and b are compare delegates for two different parameters and ab is the combined compare delegate.
+ */
+class DB_PUBLIC EqualDeviceParameters
+  : public DeviceParameterCompareDelegate
+{
+public:
+  EqualDeviceParameters ();
+  EqualDeviceParameters (size_t parameter_id);
+  EqualDeviceParameters (size_t parameter_id, double relative, double absolute);
+
+  virtual bool less (const db::Device &a, const db::Device &b) const;
+  virtual bool equal (const db::Device &a, const db::Device &b) const;
+
+  EqualDeviceParameters &operator+= (const EqualDeviceParameters &other);
+
+  EqualDeviceParameters operator+ (const EqualDeviceParameters &other) const
+  {
+    EqualDeviceParameters pc (*this);
+    pc += other;
+    return pc;
+  }
+
+private:
+  std::vector<std::pair<size_t, std::pair<double, double> > > m_compare_set;
 };
 
 /**
@@ -228,14 +295,14 @@ public:
   /**
    *  @brief Copy constructor
    *  NOTE: do not use this copy constructor as the device class
-   *  is intended to subclassing.
+   *  is intended for subclassing.
    */
   DeviceClass (const DeviceClass &other);
 
   /**
    *  @brief Assignment
    *  NOTE: do not use this copy constructor as the device class
-   *  is intended to subclassing.
+   *  is intended for subclassing.
    */
   DeviceClass &operator= (const DeviceClass &other);
 
@@ -365,7 +432,7 @@ public:
   size_t terminal_id_for_name (const std::string &name) const;
 
   /**
-   *  @brief Clears the circuit
+   *  @brief Clones the device class
    */
   virtual DeviceClass *clone () const
   {
@@ -403,6 +470,57 @@ public:
     return false;
   }
 
+  /**
+   *  @brief Normalizes the terminal IDs to indicate terminal swapping
+   *
+   *  This method returns a "normalized" terminal ID. For example, for MOS
+   *  transistors where S and D can be exchanged, D will be mapped to S.
+   */
+  virtual size_t normalize_terminal_id (size_t tid) const
+  {
+    return tid;
+  }
+
+  /**
+   *  @brief Compares the parameters of the devices a and b
+   *
+   *  a and b are expected to originate from this or an equivalent device class having
+   *  the same parameters.
+   *  This is the "less" operation. If a parameter compare delegate is registered, this
+   *  compare request will be forwarded to the delegate.
+   *
+   *  If two devices with different device classes are compared and only one of
+   *  the classes features a delegate, the one with the delegate is employed.
+   */
+  static bool less (const db::Device &a, const db::Device &b);
+
+  /**
+   *  @brief Compares the parameters of the devices a and b
+   *
+   *  a and b are expected to originate from this or an equivalent device class having
+   *  the same parameters.
+   *  This is the "equal" operation. If a parameter compare delegate is registered, this
+   *  compare request will be forwarded to the delegate.
+   *
+   *  If two devices with different device classes are compared and only one of
+   *  the classes features a delegate, the one with the delegate is employed.
+   */
+  static bool equal (const db::Device &a, const db::Device &b);
+
+  /**
+   *  @brief Registers a compare delegate
+   *
+   *  The reasoning behind chosing a delegate is that a delegate is efficient
+   *  also in scripts if one of the standard delegates is taken.
+   *
+   *  The device class takes ownership of the delegate.
+   */
+  virtual void set_parameter_compare_delegate (db::DeviceParameterCompareDelegate *delegate)
+  {
+    delegate->keep ();  //  assume transfer of ownership for scripts
+    mp_pc_delegate.reset (delegate);
+  }
+
 private:
   friend class Netlist;
 
@@ -410,6 +528,7 @@ private:
   std::vector<DeviceTerminalDefinition> m_terminal_definitions;
   std::vector<DeviceParameterDefinition> m_parameter_definitions;
   db::Netlist *mp_netlist;
+  tl::shared_ptr<db::DeviceParameterCompareDelegate> mp_pc_delegate;
 
   void set_netlist (db::Netlist *nl)
   {

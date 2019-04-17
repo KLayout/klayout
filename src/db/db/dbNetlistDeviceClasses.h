@@ -67,6 +67,11 @@ public:
 
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
+
+  virtual size_t normalize_terminal_id (size_t) const
+  {
+    return terminal_id_A;
+  }
 };
 
 /**
@@ -92,6 +97,11 @@ public:
 
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
+
+  virtual size_t normalize_terminal_id (size_t) const
+  {
+    return terminal_id_A;
+  }
 };
 
 /**
@@ -117,6 +127,11 @@ public:
 
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
+
+  virtual size_t normalize_terminal_id (size_t) const
+  {
+    return terminal_id_A;
+  }
 };
 
 /**
@@ -176,6 +191,11 @@ public:
   virtual bool combine_devices (Device *a, Device *b) const;
   virtual bool supports_parallel_combination () const { return true; }
 
+  virtual size_t normalize_terminal_id (size_t tid) const
+  {
+    return tid == terminal_id_D ? terminal_id_S : tid;
+  }
+
 protected:
   void combine_parameters (Device *a, Device *b) const;
 };
@@ -196,6 +216,11 @@ public:
   virtual db::DeviceClass *clone () const
   {
     return new DeviceClassMOS4Transistor (*this);
+  }
+
+  virtual size_t normalize_terminal_id (size_t tid) const
+  {
+    return tid == terminal_id_D ? terminal_id_S : tid;
   }
 
   virtual bool combine_devices (Device *a, Device *b) const;

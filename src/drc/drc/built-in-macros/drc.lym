@@ -2367,7 +2367,7 @@ CODE
     # to a flat collection of polygons, edges or edge pairs.
     
     def flatten
-      @engine._cmd(@data, :flatten)
+      DRC::DRCLayer::new(@engine, @engine._cmd(@data, :flatten))
     end
     
     # %DRC%
@@ -3804,9 +3804,36 @@ CODE
       @connections = []
       @global_connections = []
       @layers = {}
+      @join_nets = ""
       modified
     end
     
+    # %DRC%
+    # @name join_nets
+    # @brief Specifies a search pattern for labels which create implicit net connections
+    # @synopsis join_nets(label_pattern)
+    # Use this method to supply a glob pattern for labels which create implicit net connections
+    # on the top level circuit. This feature is useful to connect identically labelled nets
+    # while a component isn't integrated yet. If the component is integrated, net may be connected
+    # on a higher hierarchy level - e.g. by a power mesh. Inside the component this net consists
+    # of individual islands. To properly perform netlist extraction and comparison, these islands
+    # need to be connected even though there isn't a physical connection. "join_nets" can
+    # achive this if these islands are labelled with the same text on the top level of the
+    # component.
+    #
+    # Glob pattern are used which resemble shell file pattern: "*" is for all labels, "VDD"
+    # for all "VDD" labels (pattern act case sensitive). "VDD*" is for all labels beginning
+    # with "VDD" (still different labels will be connected to different nets!). "{VDD,VSS}"
+    # is either "VDD" or "VSS".
+    #
+    # The search pattern is applied on the next net extraction. The search pattern is cleared
+    # on "clear_connections".
+
+    def join_nets(arg)
+      @join_nets = arg
+      modified
+    end
+
     # %DRC%
     # @brief Performs an antenna check
     # @name antenna_check
@@ -3957,7 +3984,7 @@ CODE
       @global_connections.each { |l,n| @l2n.connect_global(@layers[l], n) }
 
       # run extraction in a timed environment
-      @engine._cmd(@l2n, :extract_netlist)
+      @engine._cmd(@l2n, :extract_netlist, @join_nets)
       @l2n
 
     end
@@ -4923,6 +4950,12 @@ CODE
     # See \Netter#clear_connections for a description of that function
 
     # %DRC%
+    # @name join_nets
+    # @brief Specifies a label pattern for implicit net connections
+    # @synopsis join_nets(label_pattern)
+    # See \Netter#join_nets for a description of that function
+
+    # %DRC%
     # @name antenna_check
     # @brief Performs an antenna check
     # @synopsis antenna_check(gate, metal, ratio, [ diode_specs ... ])
@@ -4940,7 +4973,7 @@ CODE
     # @synopsis extract_devices(extractor, layer_hash)
     # See \Netter#extract_devices for a description of that function
  
-    %w(connect connect_global clear_connections antenna_check l2n_data extract_devices).each do |f|
+    %w(connect connect_global clear_connections join_nets antenna_check l2n_data extract_devices).each do |f|
       eval &lt;&lt;"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

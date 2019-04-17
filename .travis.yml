@@ -201,7 +201,9 @@ matrix:
     - name: "cp27-cp27m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -216,7 +218,9 @@ matrix:
     - name: "cp27-cp27m-macosx_10_12_x86_64.whl"
       os: osx
       osx_image: xcode8.3  # macOS 10.12
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -231,11 +235,14 @@ matrix:
     - name: "cp27-cp27m-macosx_10_11_x86_64.whl"
       os: osx
       osx_image: xcode8  # macOS 10.11
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
             - ccache
+          update: true
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
@@ -248,7 +255,9 @@ matrix:
     - name: "cp37-cp37m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -265,7 +274,9 @@ matrix:
     - name: "cp36-cp36m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -280,7 +291,9 @@ matrix:
     - name: "cp35-cp35m-macosx_10_13_x86_64.whl"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -290,27 +303,14 @@ matrix:
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
-
-    # # - name: "klayout python3.4.9 osx10.13"
-    # - name: "cp34-cp34m-macosx_10_13_x86_64.whl"
-    #   os: osx
-    #   osx_image: xcode9.4  # macOS 10.13
-    #   cache: ccache
-    #   addons:
-    #     homebrew:
-    #       packages:
-    #         - ccache
-    #   env:
-    #     - MATRIX_EVAL="brew update; brew tap sashkab/python; brew install sashkab/python/python34; brew link --force --overwrite python34; shopt -s expand_aliases; alias python='/usr/local/opt/python34/bin/python3.4'; alias pip='/usr/local/opt/python34/bin/pip3.4';"
-    #     - ARCHFLAGS="-std=c++11"
-    #     - PIP_UPDATE="1"
-    #     - PYTHON_BUILD=true
     
     # - name: "klayout python3 osx10.12"
     - name: "cp37-cp37m-macosx_10_12_x86_64.whl"
       os: osx
       osx_image: xcode8.3  # macOS 10.12
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -327,11 +327,14 @@ matrix:
     - name: "cp37-cp37m-macosx_10_11_x86_64.whl"
       os: osx
       osx_image: xcode8  # macOS 10.11
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
             - ccache
+          update: true
       env:
         - MATRIX_EVAL="brew update; brew config; brew upgrade python; brew postinstall python; ls -l /usr/local/opt/python/libexec/bin/; shopt -s expand_aliases; alias python='/usr/local/opt/python/libexec/bin/python'; alias pip='/usr/local/opt/python/libexec/bin/pip';"
         - ARCHFLAGS="-std=c++11"
@@ -343,7 +346,9 @@ matrix:
     - name: "KLayout macOS 10.13 with py3.7"
       os: osx
       osx_image: xcode9.4 # macOS 10.13
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -360,7 +365,9 @@ matrix:
     - name: "KLayout macOS 10.12 with py3.7"
       os: osx
       osx_image: xcode8.3 # macOS 10.12
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -377,11 +384,14 @@ matrix:
     - name: "KLayout macOS 10.11 with py3.7"
       os: osx
       osx_image: xcode8 # macOS 10.11
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
             - python3
+            - ccache
           update: true
       env:
         - MATRIX_EVAL="brew update; brew config; brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/56c500b569c724b049be7ab9e12d9693f85522f9/Formula/qt.rb"  # Qt 5.11.2
@@ -393,7 +403,9 @@ matrix:
     - name: "KLayout macOS 10.13 with py2.7"
       os: osx
       osx_image: xcode9.4 # macOS 10.13
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -409,7 +421,9 @@ matrix:
     - name: "KLayout macOS 10.12 with py2.7"
       os: osx
       osx_image: xcode8.3 # macOS 10.12
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -425,7 +439,9 @@ matrix:
     - name: "KLayout macOS 10.11 with py2.7"
       os: osx
       osx_image: xcode8 # macOS 10.11
-      cache: ccache
+      cache:
+        directories:
+        - ccache
       addons:
         homebrew:
           packages:
@@ -440,6 +456,12 @@ matrix:
 before_install:
   - env
   - gem install dropbox-deployment
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+        export PATH="/usr/local/opt/ccache/libexec:$PATH";
+        mkdir -p ccache;
+        export CCACHE_DIR="`pwd`/ccache";
+        ccache -s;
+    fi
   - eval "${MATRIX_EVAL}"
   - if [ "${PIP_UPDATE}" == "1" ]; then
         pip --version;
@@ -448,9 +470,6 @@ before_install:
         pip install --upgrade setuptools wheel || sudo pip install --upgrade setuptools wheel;
     fi
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
-  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-        export PATH="/usr/local/opt/ccache/libexec:$PATH";
-    fi
 
 install:
   - if [ "$DOCKER_BUILD" = true ]; then
@@ -492,6 +511,11 @@ script:
     fi
   - if [ "$KLAYOUT_BUILD" = true ]; then
         ./travis-build.sh;
+    fi
+
+before_cache:
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+        ccache -s;
     fi
 
 after_success:

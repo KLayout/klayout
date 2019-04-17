@@ -374,6 +374,10 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
     "@brief This function is called when a net can't be paired.\n"
     "This method will be called, if a net cannot be identified as identical with another net. The corresponding argument "
     "will identify the net and source netlist. The other argument will be nil.\n"
+    "\n"
+    "In some cases, a mismatch is reported with two nets given. This means,\n"
+    "nets are known not to match. Still the compare algorithm will proceed as\n"
+    "if these nets were equivalent to derive further matches.\n"
   ) +
   gsi::callback ("match_devices", &GenericNetlistCompareLogger::match_devices, &GenericNetlistCompareLogger::cb_match_devices, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called when two devices are identified.\n"

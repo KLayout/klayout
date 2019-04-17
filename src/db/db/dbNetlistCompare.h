@@ -99,6 +99,9 @@ public:
   /**
    *  @brief Net a or b doesn't match
    *  "a" is null if there is no match for b and vice versa.
+   *  In some cases, a mismatch is reported with two nets given. This means,
+   *  nets are known not to match. Still the compare algorithm will proceed as
+   *  if these nets were equivalent to derive further matches.
    */
   virtual void net_mismatch (const db::Net * /*a*/, const db::Net * /*b*/) { }
 

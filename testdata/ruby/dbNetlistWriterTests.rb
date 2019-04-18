@@ -102,7 +102,13 @@ class DBLayoutToNetlist_TestClass < TestBase
     tmp = File::join($ut_testtmp, "tmp1.txt")
     nl.write(tmp, writer)
 
-    assert_equal(File.open(tmp, "r").read, File.open(input, "r").read)
+    a = File.open(tmp, "r").read
+    a = a.gsub(/e-00/, "e-0").gsub(/e-0/, "e-")
+
+    b = File.open(input, "r").read
+    b = a.gsub(/e-00/, "e-0").gsub(/e-0/, "e-")
+
+    assert_equal(a, b)
 
     # verify against the input with delegate
 

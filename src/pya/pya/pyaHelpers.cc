@@ -357,7 +357,18 @@ pya_plain_iterator_next (PyObject *self)
 {
   PYAIteratorObject *iter = (PYAIteratorObject *) self;
 
-  if (! iter->iter || iter->iter->at_end ()) {
+  if (! iter->iter) {
+    PyErr_SetNone (PyExc_StopIteration);
+    return NULL;
+  }
+
+  //  increment on first visit
+  if (! iter->first) {
+    iter->iter->inc ();
+  }
+  iter->first = false;
+
+  if (iter->iter->at_end ()) {
     PyErr_SetNone (PyExc_StopIteration);
     return NULL;
   }
@@ -368,8 +379,6 @@ pya_plain_iterator_next (PyObject *self)
   gsi::SerialArgs args (iter->iter->serial_size ());
   iter->iter->get (args);
   PythonRef obj = pop_arg (*iter->value_type, args, 0, heap);
-
-  iter->iter->inc ();
 
   return obj.release ();
 }
@@ -426,6 +435,7 @@ PYAIteratorObject::create (PyObject *origin, gsi::IterAdaptorAbstractBase *iter,
     iter_obj->origin = origin;
     iter_obj->iter = iter;
     iter_obj->value_type = value_type;
+    iter_obj->first = true;
   }
   return iter_obj;
 }

@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>MarkerBrowserConfigPage2</class>
- <widget class="QFrame" name="MarkerBrowserConfigPage2" >
+ <class>NetlistBrowserConfigPage2</class>
+ <widget class="QFrame" name="NetlistBrowserConfigPage2" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Marker Database Browser</string>
+   <string>Netlist Browser</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
@@ -22,7 +22,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="title" >
-      <string>Marker Appearance</string>
+      <string>Net Appearance</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -115,7 +115,7 @@
       <item row="0" column="1" >
        <widget class="lay::ColorButton" name="color_pb" >
         <property name="toolTip" >
-         <string>The color in which the markers are drawn</string>
+         <string>The color in which the nets are drawn</string>
         </property>
         <property name="text" >
          <string/>
@@ -125,7 +125,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="textLabel3_2" >
         <property name="text" >
-         <string>Marker color</string>
+         <string>Net color</string>
         </property>
        </widget>
       </item>

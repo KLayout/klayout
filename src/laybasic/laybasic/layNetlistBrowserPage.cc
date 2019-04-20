@@ -26,7 +26,7 @@
 namespace lay
 {
 
-extern std::string cfg_l2n_show_all;
+extern std::string cfg_l2ndb_show_all;
 
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserPage implementation
@@ -122,7 +122,7 @@ void
 NetlistBrowserPage::show_all_clicked ()
 {
   if (mp_plugin_root) {
-    mp_plugin_root->config_set (cfg_l2n_show_all, tl::to_string (m_show_all_action->isChecked ()));
+    mp_plugin_root->config_set (cfg_l2ndb_show_all, tl::to_string (m_show_all_action->isChecked ()));
   }
 }
 
@@ -165,6 +165,69 @@ NetlistBrowserPage::update_highlights ()
     throw;
   }
   m_recursion_sentinel = false;
+#endif
+}
+
+void
+NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
+{
+#if 0 // @@@
+  if (database != mp_database) {
+
+    release_markers ();
+
+    mp_database = database;
+
+    QAbstractItemModel *tree_model = directory_tree->model ();
+
+    MarkerBrowserTreeViewModel *new_model = new MarkerBrowserTreeViewModel ();
+    new_model->set_show_empty_ones (true);
+    new_model->set_database (database);
+    directory_tree->setModel (new_model);
+    connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (directory_selection_changed (const QItemSelection &, const QItemSelection &)));
+
+    directory_tree->header ()->setSortIndicatorShown (true);
+
+    cat_filter->setText (QString ());
+    cell_filter->setText (QString ());
+    set_hidden_rec (new_model, directory_tree, QModelIndex (), m_show_all, QString (), QString ());
+
+    if (tree_model) {
+      delete tree_model;
+    }
+
+    QAbstractItemModel *list_model = markers_list->model ();
+
+    MarkerBrowserListViewModel *new_list_model = new MarkerBrowserListViewModel ();
+    new_list_model->set_database (database);
+    markers_list->setModel (new_list_model);
+    connect (markers_list->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (markers_selection_changed (const QItemSelection &, const QItemSelection &)));
+    connect (markers_list->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (markers_current_changed (const QModelIndex &, const QModelIndex &)));
+
+    if (list_model) {
+      delete list_model;
+    }
+
+  }
+#endif
+}
+
+void
+NetlistBrowserPage::enable_updates (bool f)
+{
+#if 0 // @@@
+  if (f != m_enable_updates) {
+
+    m_enable_updates = f;
+
+    if (f && m_update_needed) {
+      update_markers ();
+      update_info_text ();
+    }
+
+    m_update_needed = false;
+
+  }
 #endif
 }
 

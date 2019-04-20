@@ -26,6 +26,8 @@
 #include "dbDeepRegion.h"
 #include "dbShapeRepository.h"
 #include "dbCellMapping.h"
+#include "dbLayoutToNetlistWriter.h"
+#include "dbLayoutToNetlistReader.h"
 
 namespace db
 {
@@ -155,7 +157,9 @@ db::Region *LayoutToNetlist::make_text_layer (unsigned int layer_index, const st
   si.shape_flags (db::ShapeIterator::Texts);
 
   std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
-  register_layer (*region, n);
+  if (! n.empty ()) {
+    register_layer (*region, n);
+  }
   return region.release ();
 }
 
@@ -166,7 +170,9 @@ db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const
   si.shape_flags (db::ShapeIterator::Paths | db::ShapeIterator::Polygons | db::ShapeIterator::Boxes);
 
   std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
-  register_layer (*region, n);
+  if (! n.empty ()) {
+    register_layer (*region, n);
+  }
   return region.release ();
 }
 
@@ -188,7 +194,7 @@ void LayoutToNetlist::connect (const db::Region &l)
   }
 
   if (! is_persisted (l)) {
-    throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in intra-layer connectivity for netlist extraction"))));
+    register_layer (l, make_new_name ());
   }
 
   //  we need to keep a reference, so we can safely delete the region
@@ -204,10 +210,10 @@ void LayoutToNetlist::connect (const db::Region &a, const db::Region &b)
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
   if (! is_persisted (a)) {
-    throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in inter-layer connectivity (first layer) for netlist extraction"))));
+    register_layer (a, make_new_name ());
   }
   if (! is_persisted (b)) {
-    throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in inter-layer connectivity (second layer) for netlist extraction"))));
+    register_layer (b, make_new_name ());
   }
 
   //  we need to keep a reference, so we can safely delete the region
@@ -225,7 +231,7 @@ size_t LayoutToNetlist::connect_global (const db::Region &l, const std::string &
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
   if (! is_persisted (l)) {
-    throw (tl::Exception (tl::to_string (tr ("Only named layers can be used in global connectivity for netlist extraction"))));
+    register_layer (l, make_new_name ());
   }
 
   //  we need to keep a reference, so we can safely delete the region
@@ -341,6 +347,29 @@ void LayoutToNetlist::register_layer (const db::Region &region, const std::strin
 
   m_named_regions [n] = dl;
   m_name_of_layer [dl.layer ()] = n;
+}
+
+std::string LayoutToNetlist::make_new_name (const std::string &stem)
+{
+  int m = std::numeric_limits<int>::max () / 2 + 1;
+  int n = m;
+
+  std::string name;
+  while (m > 0) {
+
+    m /= 2;
+
+    name = stem;
+    name += std::string ("$");
+    name += tl::to_string (n - m);
+
+    if (m_named_regions.find (name) == m_named_regions.end ()) {
+      n -= m;
+    }
+
+  }
+
+  return name;
 }
 
 std::string LayoutToNetlist::name (const db::Region &region) const
@@ -937,6 +966,24 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, const db::Reg
   }
 
   return db::Region (new db::DeepRegion (dl));
+}
+
+
+void db::LayoutToNetlist::save (const std::string &path, bool short_format)
+{
+  tl::OutputStream stream (path);
+  db::LayoutToNetlistStandardWriter writer (stream, short_format);
+  set_filename (path);
+  writer.write (this);
+}
+
+void db::LayoutToNetlist::load (const std::string &path)
+{
+  tl::InputStream stream (path);
+  db::LayoutToNetlistStandardReader reader (stream);
+  set_filename (path);
+  set_name (stream.filename ());
+  reader.read (this);
 }
 
 }

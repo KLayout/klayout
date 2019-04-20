@@ -28,6 +28,7 @@
 #include "layDitherPattern.h"
 #include "layLineStyles.h"
 #include "dbSaveLayoutOptions.h"
+#include "dbLayoutToNetlist.h"
 #include "tlStream.h"
 
 #if defined(HAVE_QTBINDINGS)
@@ -194,6 +195,13 @@ static unsigned int create_rdb (lay::LayoutView *view, const std::string &name)
   rdb::Database *db = new rdb::Database ();
   db->set_name (name);
   return view->add_rdb (db);
+}
+
+static unsigned int create_l2ndb (lay::LayoutView *view, const std::string &name)
+{
+  db::LayoutToNetlist *db = new db::LayoutToNetlist ();
+  db->set_name (name);
+  return view->add_l2ndb (db);
 }
 
 //  this binding returns a const pointer which is not converted into a copy by RBA
@@ -1426,6 +1434,48 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Shows a report database in the marker browser on a certain layout\n"
     "The marker browser is opened showing the report database with the index given by \"rdb_index\".\n"
     "It will be attached (i.e. navigate to) the layout with the given cellview index in \"cv_index\".\n"
+  ) +
+  gsi::event ("on_l2ndb_list_changed", &lay::LayoutView::l2ndb_list_changed_event,
+    "@brief An event that is triggered the list of netlist databases is changed\n"
+    "\n"
+    "If a netlist database is added or removed, this event is triggered.\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method ("num_l2ndbs", &lay::LayoutView::num_l2ndbs,
+    "@brief Gets the number of netlist databases loaded into this view\n"
+    "@return The number of \\LayoutToNetlist objects present in this view\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method ("remove_l2ndb", &lay::LayoutView::remove_l2ndb, gsi::arg ("index"),
+    "@brief Removes a netlist database with the given index\n"
+    "@param The index of the netlist database to remove from this view"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method ("l2ndb", (db::LayoutToNetlist *(lay::LayoutView::*) (int index)) &lay::LayoutView::get_l2ndb, gsi::arg ("index"),
+    "@brief Gets the netlist database with the given index\n"
+    "@return The \\LayoutToNetlist object or nil if the index is not valid"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method_ext ("create_l2ndb", &create_l2ndb, gsi::arg ("name"),
+    "@brief Creates a new netlist database and returns the index of the new database\n"
+    "@param name The name of the new netlist database\n"
+    "@return The index of the new database\n"
+    "This method returns an index of the new netlist database. Use \\l2ndb to get the actual object. "
+    "If a netlist database with the given name already exists, a unique name will be created.\n"
+    "The name will be replaced by the file name when a file is loaded into the netlist database.\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method ("show_l2ndb", &lay::LayoutView::open_l2ndb_browser, gsi::arg ("l2ndb_index"), gsi::arg ("cv_index"),
+    "@brief Shows a netlist database in the marker browser on a certain layout\n"
+    "The netlist browser is opened showing the netlist database with the index given by \"l2ndb_index\".\n"
+    "It will be attached (i.e. navigate to) the layout with the given cellview index in \"cv_index\".\n"
+    "\n"
+    "This method has been added in version 0.26."
   ) +
   //  HINT: the cast is important to direct GSI to the LayoutView method rather than the
   //  Plugin method (in which case we get a segmentation violation ..)

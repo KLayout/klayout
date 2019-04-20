@@ -80,7 +80,7 @@ private:
   int m_marker_dither_pattern;
   std::string m_layout_name;
   int m_cv_index;
-  std::string m_lay_name;
+  std::string m_l2ndb_name;
   int m_l2n_index;
   std::string m_open_filename;
   QAction *m_open_action;

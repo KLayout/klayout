@@ -22,8 +22,6 @@
 
 #include "gsiDecl.h"
 #include "dbLayoutToNetlist.h"
-#include "dbLayoutToNetlistWriter.h"
-#include "dbLayoutToNetlistReader.h"
 #include "tlStream.h"
 #include "tlVariant.h"
 
@@ -80,20 +78,6 @@ static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMappin
   std::string np = net_cell_name_prefix.to_string ();
   std::string dp = device_cell_name_prefix.to_string ();
   l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
-}
-
-static void write_l2n (const db::LayoutToNetlist *l2n, const std::string &path, bool short_format)
-{
-  tl::OutputStream stream (path);
-  db::LayoutToNetlistStandardWriter writer (stream, short_format);
-  writer.write (l2n);
-}
-
-static void read_l2n (db::LayoutToNetlist *l2n, const std::string &path)
-{
-  tl::InputStream stream (path);
-  db::LayoutToNetlistStandardReader reader (stream);
-  reader.read (l2n);
 }
 
 static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
@@ -197,11 +181,34 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("max_vertex_count", &db::LayoutToNetlist::max_vertex_count,
     "See \\max_vertex_count= for details about this attribute."
   ) +
+  gsi::method ("name", (const std::string &(db::LayoutToNetlist::*) () const) &db::LayoutToNetlist::name,
+    "@brief Gets the name of the database\n"
+  ) +
+  gsi::method ("name=", &db::LayoutToNetlist::set_name,
+    "@brief Sets the name of the database\n"
+  ) +
+  gsi::method ("description", (const std::string &(db::LayoutToNetlist::*) () const) &db::LayoutToNetlist::name,
+    "@brief Gets the description of the database\n"
+  ) +
+  gsi::method ("description=", &db::LayoutToNetlist::set_name,
+    "@brief Sets the description of the database\n"
+  ) +
+  gsi::method ("filename", &db::LayoutToNetlist::filename,
+    "@brief Gets the file name of the database\n"
+    "The filename is the name under which the database is stored or empty if it is not associated with a file."
+  ) +
+  gsi::method ("original_file", &db::LayoutToNetlist::original_file,
+    "@brief Gets the original file name of the database\n"
+    "The original filename is the layout file from which the netlist DB was created."
+  ) +
+  gsi::method ("original_file=", &db::LayoutToNetlist::set_original_file,
+    "@brief Sets the original file name of the database\n"
+  ) +
   gsi::method ("name", (std::string (db::LayoutToNetlist::*) (const db::Region &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
-    "@brief Get the name of the given layer\n"
+    "@brief Gets the name of the given layer\n"
   ) +
   gsi::method ("name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
-    "@brief Get the name of the given layer (by index)\n"
+    "@brief Gets the name of the given layer (by index)\n"
   ) +
   gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::Region &region, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),
     "@brief Names the given layer\n"
@@ -210,8 +217,9 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "Naming a layer allows the system to indicate the layer in various contexts, i.e. "
     "when writing the data to a file. Named layers are also persisted inside the LayoutToNetlist object. "
-    "They are not discarded when the Region object is destroyed. Only named layers can be put into "
-    "\\connect.\n"
+    "They are not discarded when the Region object is destroyed.\n"
+    "\n"
+    "If required, the system will assign a name automatically."
   ) +
   gsi::method_ext ("layer_names", &l2n_layer_names,
     "@brief Returns a list of names of the layer kept inside the LayoutToNetlist object."
@@ -425,11 +433,11 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "This variant accepts a database-unit location. The location is given in the\n"
     "coordinate space of the initial cell.\n"
   ) +
-  gsi::method_ext ("write", &write_l2n, gsi::arg ("path"), gsi::arg ("short_format", false),
+  gsi::method ("write", &db::LayoutToNetlist::save, gsi::arg ("path"), gsi::arg ("short_format", false),
     "@brief Writes the extracted netlist to a file.\n"
     "This method employs the native format of KLayout.\n"
   ) +
-  gsi::method_ext ("read", &read_l2n, gsi::arg ("path"),
+  gsi::method ("read", &db::LayoutToNetlist::load, gsi::arg ("path"),
     "@brief Reads the extracted netlist from the file.\n"
     "This method employs the native format of KLayout.\n"
   ) +

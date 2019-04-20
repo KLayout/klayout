@@ -115,6 +115,73 @@ public:
   ~LayoutToNetlist ();
 
   /**
+   *  @brief Gets the database description
+   */
+  const std::string &description () const
+  {
+    return m_description;
+  }
+
+  /**
+   *  @brief Sets the database description
+   */
+  void set_description (const std::string &description)
+  {
+    m_description = description;
+  }
+
+  /**
+   *  @brief Gets the original file
+   *
+   *  The original file describes what original file the netlist database
+   *  was derived from.
+   */
+  const std::string &original_file () const
+  {
+    return m_original_file;
+  }
+
+  /**
+   *  @brief Sets the database original file
+   */
+  void set_original_file (const std::string &original_file)
+  {
+    m_original_file = original_file;
+  }
+
+  /**
+   *  @brief Gets the database name
+   */
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  /**
+   *  @brief Sets the database name
+   */
+  void set_name (const std::string &name)
+  {
+    m_name = name;
+  }
+
+  /**
+   *  @brief Gets the file name
+   */
+  const std::string &filename () const
+  {
+    return m_filename;
+  }
+
+  /**
+   *  @brief Sets the file name
+   */
+  void set_filename (const std::string &filename)
+  {
+    m_filename = filename;
+  }
+
+  /**
    *  @brief Sets the number of threads to use for operations which support multiple threads
    */
   void set_threads (int n);
@@ -154,8 +221,7 @@ public:
    *  (see below) enhances readability of backannotated information
    *  if layers are involved. Use this method to attach a name to a region
    *  derived by boolean operations for example.
-   *  Named regions are persisted inside the LayoutToNetlist object. Only
-   *  named regions can be put into "connect".
+   *  Named regions are persisted inside the LayoutToNetlist object.
    */
   void register_layer (const db::Region &region, const std::string &name);
 
@@ -264,21 +330,18 @@ public:
    *  a derived layer. Certain limitations apply. It's safe to use
    *  boolean operations for deriving layers. Other operations are applicable as long as they are
    *  capable of delivering hierarchical layers.
-   *  Regions put into "connect" need to be named.
    */
   void connect (const db::Region &l);
 
   /**
    *  @brief Defines an inter-layer connection for the given layers.
    *  The conditions mentioned with intra-layer "connect" apply for this method too.
-   *  Regions put into "connect" need to be named.
    */
   void connect (const db::Region &a, const db::Region &b);
 
   /**
    *  @brief Connects the given layer with a global net with the given name
    *  Returns the global net ID
-   *  Regions put into "connect" need to be named.
    */
   size_t connect_global (const db::Region &l, const std::string &gn);
 
@@ -531,11 +594,32 @@ public:
    */
   db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ());
 
+  /**
+   *  @brief Saves the database to the given path
+   *
+   *  Currently, the internal format will be used. If "short_format" is true, the short version
+   *  of the format is used.
+   *
+   *  This is a convenience method. The low-level functionality is the LayoutToNetlistWriter.
+   */
+  void save (const std::string &path, bool short_format);
+
+  /**
+   *  @brief Loads the database from the given path
+   *
+   *  This is a convenience method. The low-level functionality is the LayoutToNetlistReader.
+   */
+  void load (const std::string &path);
+
 private:
   //  no copying
   LayoutToNetlist (const db::LayoutToNetlist &other);
   LayoutToNetlist &operator= (const db::LayoutToNetlist &other);
 
+  std::string m_description;
+  std::string m_name;
+  std::string m_original_file;
+  std::string m_filename;
   db::RecursiveShapeIterator m_iter;
   std::auto_ptr<db::DeepShapeStore> mp_internal_dss;
   tl::weak_ptr<db::DeepShapeStore> mp_dss;
@@ -556,6 +640,7 @@ private:
   void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
   db::DeepLayer deep_layer_of (const db::Region &region) const;
   void ensure_layout () const;
+  std::string make_new_name (const std::string &stem = std::string ());
 };
 
 }

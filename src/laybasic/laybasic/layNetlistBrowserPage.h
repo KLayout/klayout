@@ -32,17 +32,16 @@
 
 class QAction;
 
-namespace lay
+namespace db
 {
-  class LayoutView;
-  class DMarker;
-  class PluginRoot;
+  class LayoutToNetlist;
 }
 
 namespace lay
 {
 
-class Database;
+class LayoutView;
+class PluginRoot;
 
 /**
  *  @brief A marker browser page
@@ -77,6 +76,14 @@ public:
    *  the view and provide highlights for the selected markers inside the given cellview.
    */
   void set_view (lay::LayoutView *view, unsigned int cv_index);
+
+  /**
+   *  @brief Attach the page to a L2N DB
+   *
+   *  To detach the page from any L2N DB, pass 0 for the pointer.
+   */
+  void set_l2ndb (db::LayoutToNetlist *database);
+
 
   /**
    *  @brief Set the window type and window dimensions
@@ -121,6 +128,11 @@ public:
    *  If this property is set to false, only cross-reference entries with error are shown.
    */
   void show_all (bool f);
+
+  /**
+   *  @brief Enable or disable updates
+   */
+  void enable_updates (bool f);
 
 private slots:
   void show_all_clicked ();

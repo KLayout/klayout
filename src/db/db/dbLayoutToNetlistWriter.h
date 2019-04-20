@@ -37,10 +37,16 @@ class LayoutToNetlist;
 class DB_PUBLIC LayoutToNetlistWriterBase
 {
 public:
-  LayoutToNetlistWriterBase () { }
-  virtual ~LayoutToNetlistWriterBase () { }
+  LayoutToNetlistWriterBase ();
+  virtual ~LayoutToNetlistWriterBase ();
 
-  virtual void write (const db::LayoutToNetlist *l2n) = 0;
+  void write (const db::LayoutToNetlist *l2n);
+
+protected:
+  virtual void do_write (const db::LayoutToNetlist *l2n) = 0;
+
+private:
+  std::string m_filename;
 };
 
 /**
@@ -52,7 +58,8 @@ class DB_PUBLIC LayoutToNetlistStandardWriter
 public:
   LayoutToNetlistStandardWriter (tl::OutputStream &stream, bool short_version);
 
-  void write (const db::LayoutToNetlist *l2n);
+protected:
+  void do_write (const db::LayoutToNetlist *l2n);
 
 private:
   tl::OutputStream *mp_stream;

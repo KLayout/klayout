@@ -27,6 +27,26 @@
 namespace db
 {
 
+// -------------------------------------------------------------------------------------------
+//  LayoutToNetlistWriterBase implementation
+
+LayoutToNetlistWriterBase::LayoutToNetlistWriterBase ()
+{
+  //  .. nothing yet ..
+}
+
+LayoutToNetlistWriterBase::~LayoutToNetlistWriterBase ()
+{
+  //  .. nothing yet ..
+}
+
+void LayoutToNetlistWriterBase::write (const db::LayoutToNetlist *l2n)
+{
+  do_write (l2n);
+}
+
+// -------------------------------------------------------------------------------------------
+
 namespace l2n_std_format
 {
 
@@ -464,7 +484,7 @@ LayoutToNetlistStandardWriter::LayoutToNetlistStandardWriter (tl::OutputStream &
   //  .. nothing yet ..
 }
 
-void LayoutToNetlistStandardWriter::write (const db::LayoutToNetlist *l2n)
+void LayoutToNetlistStandardWriter::do_write (const db::LayoutToNetlist *l2n)
 {
   if (m_short_version) {
     l2n_std_format::std_writer_impl<l2n_std_format::keys<true> > writer (*mp_stream);

@@ -139,6 +139,14 @@ public:
   void remove_circuit (Circuit *circuit);
 
   /**
+   *  @brief Gets the number of circuits
+   */
+  size_t circuit_count () const
+  {
+    return m_circuits.size ();
+  }
+
+  /**
    *  @brief Flattens the given circuit
    *  All subcircuit references are replaced by the content of this circuit.
    */

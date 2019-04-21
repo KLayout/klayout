@@ -230,8 +230,7 @@
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>Choose &quot;Open&quot; from the &quot;File ...&quot; menu 
-to load a netlist, a net database
-or a LVS cross-reference</string>
+to load a netlist or a netlist/LVS database</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

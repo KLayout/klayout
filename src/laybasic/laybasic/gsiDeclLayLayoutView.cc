@@ -1422,6 +1422,16 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Gets the report database with the given index\n"
     "@return The \\ReportDatabase object or nil if the index is not valid"
   ) +
+  gsi::method ("add_rdb", &lay::LayoutView::add_rdb, gsi::arg ("db"),
+    "@brief Adds the given database to the view\n"
+    "\n"
+    "This method will add an existing database to the view. It will then appear in the marker database browser.\n"
+    "A similar method is \\create_rdb which will create a new database within the view.\n"
+    "\n"
+    "@return The index of the database within the view (see \\rdb)\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
   gsi::method_ext ("create_rdb", &create_rdb, gsi::arg ("name"),
     "@brief Creates a new report database and returns the index of the new database\n"
     "@param name The name of the new report database\n"
@@ -1457,6 +1467,16 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   gsi::method ("l2ndb", (db::LayoutToNetlist *(lay::LayoutView::*) (int index)) &lay::LayoutView::get_l2ndb, gsi::arg ("index"),
     "@brief Gets the netlist database with the given index\n"
     "@return The \\LayoutToNetlist object or nil if the index is not valid"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method ("add_l2ndb", &lay::LayoutView::add_l2ndb, gsi::arg ("db"),
+    "@brief Adds the given database to the view\n"
+    "\n"
+    "This method will add an existing database to the view. It will then appear in the netlist database browser.\n"
+    "A similar method is \\create_l2ndb which will create a new database within the view.\n"
+    "\n"
+    "@return The index of the database within the view (see \\l2ndb)\n"
     "\n"
     "This method has been added in version 0.26."
   ) +

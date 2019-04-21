@@ -310,6 +310,14 @@ public:
   void remove_net (Net *net);
 
   /**
+   *  @brief Gets the number of nets
+   */
+  size_t net_count () const
+  {
+    return m_nets.size ();
+  }
+
+  /**
    *  @brief Begin iterator for the nets of the circuit (non-const version)
    */
   net_iterator begin_nets ()
@@ -394,6 +402,14 @@ public:
   void remove_device (Device *device);
 
   /**
+   *  @brief Gets the number of devices
+   */
+  size_t device_count () const
+  {
+    return m_nets.size ();
+  }
+
+  /**
    *  @brief Gets the device from a given ID (const version)
    *
    *  If the ID is not valid, null is returned.
@@ -476,6 +492,14 @@ public:
    *  @brief Deletes a subcircuit from the circuit
    */
   void remove_subcircuit (SubCircuit *subcircuit);
+
+  /**
+   *  @brief Gets the number of subcircuits
+   */
+  size_t subcircuit_count () const
+  {
+    return m_subcircuits.size ();
+  }
 
   /**
    *  @brief Gets the subcircuit from a given ID (const version)

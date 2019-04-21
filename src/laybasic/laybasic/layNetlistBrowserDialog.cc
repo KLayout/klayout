@@ -562,7 +562,7 @@ NetlistBrowserDialog::deactivated ()
 void
 NetlistBrowserDialog::menu_activated (const std::string &symbol)
 {
-  if (symbol == "marker_browser::show") {
+  if (symbol == "netlist_browser::show") {
     view ()->deactivate_all_browsers ();
     activate ();
   } else {

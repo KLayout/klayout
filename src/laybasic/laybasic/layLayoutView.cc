@@ -7090,7 +7090,7 @@ static void make_unique_name (T *object, Iter from, Iter to)
 
   do {
 
-    bool found = false;
+    bool found = n.empty ();
     for (Iter i = from; i != to && !found; ++i) {
       if ((*i)->name () == n) {
         found = true;
@@ -7113,6 +7113,9 @@ LayoutView::add_l2ndb (db::LayoutToNetlist *l2ndb)
 {
   make_unique_name (l2ndb, m_l2ndbs.begin (), m_l2ndbs.end ());
   m_l2ndbs.push_back (l2ndb);
+
+  //  Mark this object as owned by us (for GSI)
+  l2ndb->keep ();
 
   l2ndb_list_changed_event ();
 
@@ -7163,6 +7166,9 @@ LayoutView::add_rdb (rdb::Database *rdb)
 {
   make_unique_name (rdb, m_l2ndbs.begin (), m_l2ndbs.end ());
   m_rdbs.push_back (rdb);
+
+  //  Mark this object as owned by us (for GSI)
+  rdb->keep ();
 
   rdb_list_changed_event ();
 

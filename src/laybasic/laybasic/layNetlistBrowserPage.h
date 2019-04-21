@@ -153,6 +153,7 @@ private:
   lay::LayoutView *mp_view;
   unsigned int m_cv_index;
   lay::PluginRoot *mp_plugin_root;
+  tl::weak_ptr<db::LayoutToNetlist> mp_database;
 };
 
 } // namespace lay

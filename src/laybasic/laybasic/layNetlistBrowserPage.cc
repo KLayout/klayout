@@ -65,6 +65,8 @@ public:
   virtual QModelIndex parent (const QModelIndex &index) const;
   virtual int rowCount (const QModelIndex &parent) const;
 
+  void self_test (const QModelIndex &index = QModelIndex ());
+
 private:
 
   static inline void *make_id (size_t i1)
@@ -381,181 +383,13 @@ private:
     return reinterpret_cast<size_t> (id) - 1;
   }
 
-  db::Circuit *circuit_from_id (void *id) const
-  {
-    size_t index = circuit_index_from_id (id);
-
-    std::map<size_t, db::Circuit *>::iterator c = m_circuit_by_index.find (index);
-    if (c == m_circuit_by_index.end ()) {
-
-      c = m_circuit_by_index.insert (std::make_pair (index, (db::Circuit *) 0)).first;
-      for (db::Netlist::circuit_iterator i = netlist ()->begin_circuits (); i != netlist ()->end_circuits (); ++i) {
-        if (index-- == 0) {
-          c->second = i.operator-> ();
-          break;
-        }
-      }
-
-    }
-
-    return c->second;
-  }
-
-  db::Net *net_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    size_t index = circuit_net_index_from_id (id);
-
-    std::map<db::Circuit *, std::map<size_t, db::Net *> >::iterator cc = m_net_by_circuit_and_index.find (circuit);
-    if (cc != m_net_by_circuit_and_index.end ()) {
-      cc = m_net_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Net *> ())).first;
-    }
-
-    std::map<size_t, db::Net *>::iterator c = cc->second.find (index);
-    if (c == cc->second.end ()) {
-
-      c = cc->second.insert (std::make_pair (index, (db::Net *) 0)).first;
-      for (db::Circuit::net_iterator i = circuit->begin_nets (); i != circuit->end_nets (); ++i) {
-        if (index-- == 0) {
-          c->second = i.operator-> ();
-          break;
-        }
-      }
-
-    }
-
-    return c->second;
-  }
-
-  const db::NetSubcircuitPinRef *net_pinref_from_id (void *id) const
-  {
-    db::Net *net = net_from_id (id);
-    size_t index = circuit_net_subcircuit_pin_index_from_id (id);
-
-    std::map<db::Net *, std::map<size_t, db::NetSubcircuitPinRef *> >::iterator cc = m_pinref_by_net_and_index.find (net);
-    if (cc != m_pinref_by_net_and_index.end ()) {
-      cc = m_pinref_by_net_and_index.insert (std::make_pair (net, std::map<size_t, db::NetSubcircuitPinRef *> ())).first;
-    }
-
-    std::map<size_t, db::NetSubcircuitPinRef *>::iterator c = cc->second.find (index);
-    if (c == cc->second.end ()) {
-
-      c = cc->second.insert (std::make_pair (index, (db::NetSubcircuitPinRef *) 0)).first;
-      for (db::Net::subcircuit_pin_iterator i = net->begin_subcircuit_pins (); i != net->end_subcircuit_pins (); ++i) {
-        if (index-- == 0) {
-          c->second = i.operator-> ();
-          break;
-        }
-      }
-
-    }
-
-    return c->second;
-  }
-
-  const db::NetTerminalRef *net_terminalref_from_id (void *id) const
-  {
-    db::Net *net = net_from_id (id);
-    size_t index = circuit_net_device_terminal_index_from_id (id);
-
-    std::map<db::Net *, std::map<size_t, db::NetTerminalRef *> >::iterator cc = m_terminalref_by_net_and_index.find (net);
-    if (cc != m_terminalref_by_net_and_index.end ()) {
-      cc = m_terminalref_by_net_and_index.insert (std::make_pair (net, std::map<size_t, db::NetTerminalRef *> ())).first;
-    }
-
-    std::map<size_t, db::NetTerminalRef *>::iterator c = cc->second.find (index);
-    if (c == cc->second.end ()) {
-
-      c = cc->second.insert (std::make_pair (index, (db::NetTerminalRef *) 0)).first;
-      for (db::Net::terminal_iterator i = net->begin_terminals (); i != net->end_terminals (); ++i) {
-        if (index-- == 0) {
-          c->second = i.operator-> ();
-          break;
-        }
-      }
-
-    }
-
-    return c->second;
-  }
-
-  db::Device *device_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    size_t index = circuit_device_index_from_id (id);
-
-    std::map<db::Circuit *, std::map<size_t, db::Device *> >::iterator cc = m_device_by_circuit_and_index.find (circuit);
-    if (cc != m_device_by_circuit_and_index.end ()) {
-      cc = m_device_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Device *> ())).first;
-    }
-
-    std::map<size_t, db::Device *>::iterator c = cc->second.find (index);
-    if (c == cc->second.end ()) {
-
-      c = cc->second.insert (std::make_pair (index, (db::Device *) 0)).first;
-      for (db::Circuit::device_iterator i = circuit->begin_devices (); i != circuit->end_devices (); ++i) {
-        if (index-- == 0) {
-          c->second = i.operator-> ();
-          break;
-        }
-      }
-
-    }
-
-    return c->second;
-  }
-
-  db::Pin *pin_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    size_t index = circuit_pin_index_from_id (id);
-
-    std::map<db::Circuit *, std::map<size_t, db::Pin *> >::iterator cc = m_pin_by_circuit_and_index.find (circuit);
-    if (cc != m_pin_by_circuit_and_index.end ()) {
-      cc = m_pin_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Pin *> ())).first;
-    }
-
-    std::map<size_t, db::Pin *>::iterator c = cc->second.find (index);
-    if (c == cc->second.end ()) {
-
-      c = cc->second.insert (std::make_pair (index, (db::Pin *) 0)).first;
-      for (db::Circuit::pin_iterator i = circuit->begin_pins (); i != circuit->end_pins (); ++i) {
-        if (index-- == 0) {
-          c->second = i.operator-> ();
-          break;
-        }
-      }
-
-    }
-
-    return c->second;
-  }
-
-  db::SubCircuit *subcircuit_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    size_t index = circuit_subcircuit_index_from_id (id);
-
-    std::map<db::Circuit *, std::map<size_t, db::SubCircuit *> >::iterator cc = m_subcircuit_by_circuit_and_index.find (circuit);
-    if (cc != m_subcircuit_by_circuit_and_index.end ()) {
-      cc = m_subcircuit_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::SubCircuit *> ())).first;
-    }
-
-    std::map<size_t, db::SubCircuit *>::iterator c = cc->second.find (index);
-    if (c == cc->second.end ()) {
-
-      c = cc->second.insert (std::make_pair (index, (db::SubCircuit *) 0)).first;
-      for (db::Circuit::subcircuit_iterator i = circuit->begin_subcircuits (); i != circuit->end_subcircuits (); ++i) {
-        if (index-- == 0) {
-          c->second = i.operator-> ();
-          break;
-        }
-      }
-
-    }
-
-    return c->second;
-  }
+  db::Circuit *circuit_from_id (void *id) const;
+  db::Net *net_from_id (void *id) const;
+  const db::NetSubcircuitPinRef *net_pinref_from_id (void *id) const;
+  const db::NetTerminalRef *net_terminalref_from_id (void *id) const;
+  db::Device *device_from_id (void *id) const;
+  db::Pin *pin_from_id (void *id) const;
+  db::SubCircuit *subcircuit_from_id (void *id) const;
 
   db::Netlist *netlist () const
   {
@@ -577,6 +411,44 @@ NetlistBrowserModel::NetlistBrowserModel (db::LayoutToNetlist *l2ndb)
 {
   //  .. nothing yet ..
 }
+
+void
+NetlistBrowserModel::self_test (const QModelIndex &p)
+{
+  int rows = rowCount (p);
+  for (int r = 0; r != rows; ++r) {
+
+    QModelIndex c, pp;
+
+    c = index (r, 0, p);
+    if (c.column () != 0) {
+      tl_assert (false);
+    }
+    pp = parent (c);
+    if (pp.column () != 0) {
+      tl_assert (false);
+    }
+    if (pp.row () != r) {
+      tl_assert (false);
+    }
+    if (pp.internalId () != p.internalId ()) {
+      tl_assert (false);
+    }
+
+    c = index (r, 1, p);
+    if (c.column () != 1) {
+      tl_assert (false);
+    }
+    pp = parent (c);
+    if (pp.column () != 1) {
+      tl_assert (false);
+    }
+
+    self_test (c);
+
+  }
+}
+
 
 int
 NetlistBrowserModel::columnCount (const QModelIndex & /*parent*/) const
@@ -941,6 +813,189 @@ NetlistBrowserModel::rowCount (const QModelIndex &parent) const
   return 0;
 }
 
+db::Circuit *
+NetlistBrowserModel::circuit_from_id (void *id) const
+{
+  size_t index = circuit_index_from_id (id);
+
+  std::map<size_t, db::Circuit *>::iterator c = m_circuit_by_index.find (index);
+  if (c == m_circuit_by_index.end ()) {
+
+    c = m_circuit_by_index.insert (std::make_pair (index, (db::Circuit *) 0)).first;
+    for (db::Netlist::circuit_iterator i = netlist ()->begin_circuits (); i != netlist ()->end_circuits (); ++i) {
+      if (index-- == 0) {
+        c->second = i.operator-> ();
+        break;
+      }
+    }
+
+  }
+
+  return c->second;
+}
+
+db::Net *
+NetlistBrowserModel::net_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  size_t index = circuit_net_index_from_id (id);
+
+  std::map<db::Circuit *, std::map<size_t, db::Net *> >::iterator cc = m_net_by_circuit_and_index.find (circuit);
+  if (cc != m_net_by_circuit_and_index.end ()) {
+    cc = m_net_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Net *> ())).first;
+  }
+
+  std::map<size_t, db::Net *>::iterator c = cc->second.find (index);
+  if (c == cc->second.end ()) {
+
+    c = cc->second.insert (std::make_pair (index, (db::Net *) 0)).first;
+    for (db::Circuit::net_iterator i = circuit->begin_nets (); i != circuit->end_nets (); ++i) {
+      if (index-- == 0) {
+        c->second = i.operator-> ();
+        break;
+      }
+    }
+
+  }
+
+  return c->second;
+}
+
+const db::NetSubcircuitPinRef *
+NetlistBrowserModel::net_pinref_from_id (void *id) const
+{
+  db::Net *net = net_from_id (id);
+  size_t index = circuit_net_subcircuit_pin_index_from_id (id);
+
+  std::map<db::Net *, std::map<size_t, db::NetSubcircuitPinRef *> >::iterator cc = m_pinref_by_net_and_index.find (net);
+  if (cc != m_pinref_by_net_and_index.end ()) {
+    cc = m_pinref_by_net_and_index.insert (std::make_pair (net, std::map<size_t, db::NetSubcircuitPinRef *> ())).first;
+  }
+
+  std::map<size_t, db::NetSubcircuitPinRef *>::iterator c = cc->second.find (index);
+  if (c == cc->second.end ()) {
+
+    c = cc->second.insert (std::make_pair (index, (db::NetSubcircuitPinRef *) 0)).first;
+    for (db::Net::subcircuit_pin_iterator i = net->begin_subcircuit_pins (); i != net->end_subcircuit_pins (); ++i) {
+      if (index-- == 0) {
+        c->second = i.operator-> ();
+        break;
+      }
+    }
+
+  }
+
+  return c->second;
+}
+
+const db::NetTerminalRef *
+NetlistBrowserModel::net_terminalref_from_id (void *id) const
+{
+  db::Net *net = net_from_id (id);
+  size_t index = circuit_net_device_terminal_index_from_id (id);
+
+  std::map<db::Net *, std::map<size_t, db::NetTerminalRef *> >::iterator cc = m_terminalref_by_net_and_index.find (net);
+  if (cc != m_terminalref_by_net_and_index.end ()) {
+    cc = m_terminalref_by_net_and_index.insert (std::make_pair (net, std::map<size_t, db::NetTerminalRef *> ())).first;
+  }
+
+  std::map<size_t, db::NetTerminalRef *>::iterator c = cc->second.find (index);
+  if (c == cc->second.end ()) {
+
+    c = cc->second.insert (std::make_pair (index, (db::NetTerminalRef *) 0)).first;
+    for (db::Net::terminal_iterator i = net->begin_terminals (); i != net->end_terminals (); ++i) {
+      if (index-- == 0) {
+        c->second = i.operator-> ();
+        break;
+      }
+    }
+
+  }
+
+  return c->second;
+}
+
+db::Device *
+NetlistBrowserModel::device_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  size_t index = circuit_device_index_from_id (id);
+
+  std::map<db::Circuit *, std::map<size_t, db::Device *> >::iterator cc = m_device_by_circuit_and_index.find (circuit);
+  if (cc != m_device_by_circuit_and_index.end ()) {
+    cc = m_device_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Device *> ())).first;
+  }
+
+  std::map<size_t, db::Device *>::iterator c = cc->second.find (index);
+  if (c == cc->second.end ()) {
+
+    c = cc->second.insert (std::make_pair (index, (db::Device *) 0)).first;
+    for (db::Circuit::device_iterator i = circuit->begin_devices (); i != circuit->end_devices (); ++i) {
+      if (index-- == 0) {
+        c->second = i.operator-> ();
+        break;
+      }
+    }
+
+  }
+
+  return c->second;
+}
+
+db::Pin *
+NetlistBrowserModel::pin_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  size_t index = circuit_pin_index_from_id (id);
+
+  std::map<db::Circuit *, std::map<size_t, db::Pin *> >::iterator cc = m_pin_by_circuit_and_index.find (circuit);
+  if (cc != m_pin_by_circuit_and_index.end ()) {
+    cc = m_pin_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Pin *> ())).first;
+  }
+
+  std::map<size_t, db::Pin *>::iterator c = cc->second.find (index);
+  if (c == cc->second.end ()) {
+
+    c = cc->second.insert (std::make_pair (index, (db::Pin *) 0)).first;
+    for (db::Circuit::pin_iterator i = circuit->begin_pins (); i != circuit->end_pins (); ++i) {
+      if (index-- == 0) {
+        c->second = i.operator-> ();
+        break;
+      }
+    }
+
+  }
+
+  return c->second;
+}
+
+db::SubCircuit *
+NetlistBrowserModel::subcircuit_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  size_t index = circuit_subcircuit_index_from_id (id);
+
+  std::map<db::Circuit *, std::map<size_t, db::SubCircuit *> >::iterator cc = m_subcircuit_by_circuit_and_index.find (circuit);
+  if (cc != m_subcircuit_by_circuit_and_index.end ()) {
+    cc = m_subcircuit_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::SubCircuit *> ())).first;
+  }
+
+  std::map<size_t, db::SubCircuit *>::iterator c = cc->second.find (index);
+  if (c == cc->second.end ()) {
+
+    c = cc->second.insert (std::make_pair (index, (db::SubCircuit *) 0)).first;
+    for (db::Circuit::subcircuit_iterator i = circuit->begin_subcircuits (); i != circuit->end_subcircuits (); ++i) {
+      if (index-- == 0) {
+        c->second = i.operator-> ();
+        break;
+      }
+    }
+
+  }
+
+  return c->second;
+}
+
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserPage implementation
 
@@ -1084,45 +1139,31 @@ NetlistBrowserPage::update_highlights ()
 void
 NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 {
-#if 0 // @@@
-  if (database != mp_database) {
+  if (database != mp_database.get ()) {
 
-    release_markers ();
+    //  @@@ release_markers ();
 
-    mp_database = database;
+    mp_database.reset (database);
 
     QAbstractItemModel *tree_model = directory_tree->model ();
 
-    MarkerBrowserTreeViewModel *new_model = new MarkerBrowserTreeViewModel ();
-    new_model->set_show_empty_ones (true);
-    new_model->set_database (database);
+    NetlistBrowserModel *new_model = new NetlistBrowserModel (database);
+#if !defined(NDEBUG)
+    new_model->self_test ();
+#endif
+
     directory_tree->setModel (new_model);
-    connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (directory_selection_changed (const QItemSelection &, const QItemSelection &)));
+    // @@@ connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (directory_selection_changed (const QItemSelection &, const QItemSelection &)));
 
     directory_tree->header ()->setSortIndicatorShown (true);
 
-    cat_filter->setText (QString ());
-    cell_filter->setText (QString ());
-    set_hidden_rec (new_model, directory_tree, QModelIndex (), m_show_all, QString (), QString ());
+    filter->setText (QString ());
 
     if (tree_model) {
       delete tree_model;
     }
 
-    QAbstractItemModel *list_model = markers_list->model ();
-
-    MarkerBrowserListViewModel *new_list_model = new MarkerBrowserListViewModel ();
-    new_list_model->set_database (database);
-    markers_list->setModel (new_list_model);
-    connect (markers_list->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (markers_selection_changed (const QItemSelection &, const QItemSelection &)));
-    connect (markers_list->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (markers_current_changed (const QModelIndex &, const QModelIndex &)));
-
-    if (list_model) {
-      delete list_model;
-    }
-
   }
-#endif
 }
 
 void

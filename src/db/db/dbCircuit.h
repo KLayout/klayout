@@ -406,7 +406,7 @@ public:
    */
   size_t device_count () const
   {
-    return m_nets.size ();
+    return m_devices.size ();
   }
 
   /**

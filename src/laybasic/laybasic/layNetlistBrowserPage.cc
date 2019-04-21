@@ -30,386 +30,379 @@ namespace lay
 extern std::string cfg_l2ndb_show_all;
 
 // ----------------------------------------------------------------------------------
-//  NetlistBrowserModel definition and implementation
+//  NetlistBrowserModel implementation
 
-/**
- *  @brief The NetlistBrowserModel
- *
- *  The model hierarchy is the following
- *  - circuits
- *    - 0..#pins: pins
- *      - net (1x)
- *    - #pins..#pins+#nets: nets
- *      - 0..#devices: terminals
- *        - other terminals and nets
- *      - #devices..#devices+#pins: pins
- *      - #devices+#pins..: subcircuit pins
- *        - other pins and nets
- *    - #pins+#nets..#pins+#nets+#subcircuits: subcircuits
- *      - pins and nets
- *    - #pins+#nets+#subcircuits..: devices
- *      - terminals and nets
- */
-class NetlistBrowserModel
-  : public QAbstractItemModel
+static inline void *make_id (size_t i1)
 {
-public:
-  NetlistBrowserModel (db::LayoutToNetlist *l2ndb);
+  return reinterpret_cast<void *> (i1);
+}
 
-  virtual int columnCount (const QModelIndex &parent) const;
-  virtual QVariant data (const QModelIndex &index, int role) const;
-  virtual Qt::ItemFlags flags (const QModelIndex &index) const;
-  virtual bool hasChildren (const QModelIndex &parent) const;
-  virtual QVariant headerData (int section, Qt::Orientation orientation, int role) const;
-  virtual QModelIndex index (int row, int column, const QModelIndex &parent) const;
-  virtual QModelIndex parent (const QModelIndex &index) const;
-  virtual int rowCount (const QModelIndex &parent) const;
+static inline void *make_id (size_t i1, size_t n1, size_t i2)
+{
+  return reinterpret_cast<void *> (i1 + n1 * i2);
+}
 
-  void self_test (const QModelIndex &index = QModelIndex ());
+static inline void *make_id (size_t i1, size_t n1, size_t i2, size_t n2, size_t i3)
+{
+  return reinterpret_cast<void *> (i1 + n1 * (i2 + n2 * i3));
+}
 
-private:
+static inline void *make_id (size_t i1, size_t n1, size_t i2, size_t n2, size_t i3, size_t n3, size_t i4)
+{
+  return reinterpret_cast<void *> (i1 + n1 * (i2 + n2 * (i3 + n3 * i4)));
+}
 
-  static inline void *make_id (size_t i1)
-  {
-    return reinterpret_cast<void *> (i1);
-  }
+static inline void *make_id (size_t i1, size_t n1, size_t i2, size_t n2, size_t i3, size_t n3, size_t i4, size_t n4, size_t i5)
+{
+  return reinterpret_cast<void *> (i1 + n1 * (i2 + n2 * (i3 + n3 * (i4 + n4 * i5))));
+}
 
-  static inline void *make_id (size_t i1, size_t n1, size_t i2)
-  {
-    return reinterpret_cast<void *> (i1 + n1 * i2);
-  }
+static inline void *make_id (size_t i1, size_t n1, size_t i2, size_t n2, size_t i3, size_t n3, size_t i4, size_t n4, size_t i5, size_t n5, size_t i6)
+{
+  return reinterpret_cast<void *> (i1 + n1 * (i2 + n2 * (i3 + n3 * (i4 + n4 * (i5 + n5 * i6)))));
+}
 
-  static inline void *make_id (size_t i1, size_t n1, size_t i2, size_t n2, size_t i3)
-  {
-    return reinterpret_cast<void *> (i1 + n1 * (i2 + n2 * i3));
-  }
+static inline size_t pop (void *&idp, size_t n)
+{
+  size_t id = reinterpret_cast<size_t> (idp);
+  size_t i = id % n;
+  id /= n;
+  idp = reinterpret_cast<void *> (id);
+  return i;
+}
 
-  static inline void *make_id (size_t i1, size_t n1, size_t i2, size_t n2, size_t i3, size_t n3, size_t i4)
-  {
-    return reinterpret_cast<void *> (i1 + n1 * (i2 + n2 * (i3 + n3 * i4)));
-  }
+static inline bool always (bool)
+{
+  return true;
+}
 
-  static inline void *make_id (size_t i1, size_t n1, size_t i2, size_t n2, size_t i3, size_t n3, size_t i4, size_t n4, size_t i5)
-  {
-    return reinterpret_cast<void *> (i1 + n1 * (i2 + n2 * (i3 + n3 * (i4 + n4 * i5))));
-  }
-
-  static inline void *make_id (size_t i1, size_t n1, size_t i2, size_t n2, size_t i3, size_t n3, size_t i4, size_t n4, size_t i5, size_t n5, size_t i6)
-  {
-    return reinterpret_cast<void *> (i1 + n1 * (i2 + n2 * (i3 + n3 * (i4 + n4 * (i5 + n5 * i6)))));
-  }
-
-  static inline size_t pop (void *&idp, size_t n)
-  {
-    size_t id = reinterpret_cast<size_t> (idp);
-    size_t i = id % n;
-    id /= n;
-    idp = reinterpret_cast<void *> (id);
-    return i;
-  }
-
-  static inline bool always (bool)
-  {
-    return true;
-  }
-
-  virtual void *make_id_circuit (size_t circuit_index) const
-  {
-    return make_id (circuit_index);
-  }
-
-  virtual void *make_id_circuit_pin (size_t circuit_index, size_t pin_index) const
-  {
-    return make_id (circuit_index, netlist ()->circuit_count (), 1, 8, pin_index);
-  }
-
-  void *make_id_circuit_pin_net (size_t circuit_index, size_t pin_index, size_t net_index) const
-  {
-    db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
-    return make_id (circuit_index, netlist ()->circuit_count (), 1, 8, pin_index, circuit->pin_count (), net_index);
-  }
-
-  void *make_id_circuit_net (size_t circuit_index, size_t net_index) const
-  {
-    return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index);
-  }
-
-  void *make_id_circuit_net_device_terminal (size_t circuit_index, size_t net_index, size_t terminal_ref_index) const
-  {
-    db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
-    return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 1, 4, terminal_ref_index);
-  }
-
-  void *make_id_circuit_net_device_terminal_others (size_t circuit_index, size_t net_index, size_t terminal_ref_index, size_t other_index) const
-  {
-    db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
-    db::Net *net = net_from_id (make_id_circuit_net (circuit_index, net_index));
-    return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 1, 4, terminal_ref_index, net->terminal_count (), other_index + 1);
-  }
-
-  void *make_id_circuit_net_pin (size_t circuit_index, size_t net_index, size_t pin_index) const
-  {
-    db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
-    return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 2, 4, pin_index);
-  }
-
-  void *make_id_circuit_net_subcircuit_pin (size_t circuit_index, size_t net_index, size_t pin_ref_index) const
-  {
-    db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
-    return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 3, 4, pin_ref_index);
-  }
-
-  void *make_id_circuit_net_subcircuit_pin_others (size_t circuit_index, size_t net_index, size_t pin_ref_index, size_t other_index) const
-  {
-    db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
-    db::Net *net = net_from_id (make_id_circuit_net (circuit_index, net_index));
-    return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 3, 4, pin_ref_index, net->subcircuit_pin_count (), other_index + 1);
-  }
-
-  void *make_id_circuit_subcircuit (size_t circuit_index, size_t subcircuit_index) const
-  {
-    return make_id (circuit_index, netlist ()->circuit_count (), 3, 8, subcircuit_index);
-  }
-
-  void *make_id_circuit_subcircuit_pin (size_t circuit_index, size_t subcircuit_index, size_t pin_index) const
-  {
-    db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
-    return make_id (circuit_index, netlist ()->circuit_count (), 3, 8, subcircuit_index, circuit->subcircuit_count (), pin_index + 1);
-  }
-
-  void *make_id_circuit_device (size_t circuit_index, size_t device_index) const
-  {
-    return make_id (circuit_index, netlist ()->circuit_count (), 4, 8, device_index);
-  }
-
-  void *make_id_circuit_device_terminal (size_t circuit_index, size_t device_index, size_t terminal_index) const
-  {
-    db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
-    return make_id (circuit_index, netlist ()->circuit_count (), 4, 8, device_index, circuit->device_count (), terminal_index + 1);
-  }
-
-  bool is_id_circuit (void *id) const
-  {
-    pop (id, netlist ()->circuit_count ());
-    return id == 0;
-  }
-
-  bool is_id_circuit_pin (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 1 && always (pop (id, circuit->pin_count ())) && id == 0);
-  }
-
-  bool is_id_circuit_pin_net (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 1 && always (pop (id, circuit->pin_count ())) && id != 0);
-  }
-
-  bool is_id_circuit_net (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && id == 0);
-  }
-
-  bool is_id_circuit_net_device_terminal (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    db::Net *net = net_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 1 && always (pop (id, net->terminal_count ())) && id == 0);
-  }
-
-  bool is_id_circuit_net_device_terminal_others (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    db::Net *net = net_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 1 && always (pop (id, net->terminal_count ())) && id != 0);
-  }
-
-  bool is_id_circuit_net_pin (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 2);
-  }
-
-  bool is_id_circuit_net_subcircuit_pin (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    db::Net *net = net_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 3 && always (pop (id, net->subcircuit_pin_count ())) && id == 0);
-  }
-
-  bool is_id_circuit_net_subcircuit_pin_others (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    db::Net *net = net_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 3 && always (pop (id, net->subcircuit_pin_count ())) && id != 0);
-  }
-
-  bool is_id_circuit_subcircuit (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 3 && always (pop (id, circuit->subcircuit_count ())) && id == 0);
-  }
-
-  bool is_id_circuit_subcircuit_pin (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 3 && always (pop (id, circuit->subcircuit_count ())) && id != 0);
-  }
-
-  bool is_id_circuit_device (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 4 && always (pop (id, circuit->device_count ())) && id == 0);
-  }
-
-  bool is_id_circuit_device_terminal (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    return (pop (id, 8) == 4 && always (pop (id, circuit->device_count ())) && id != 0);
-  }
-
-  size_t circuit_index_from_id (void *id) const
-  {
-    return pop (id, netlist ()->circuit_count ());
-  }
-
-  size_t circuit_pin_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    return pop (id, circuit->pin_count ());
-  }
-
-  size_t circuit_device_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    return pop (id, circuit->device_count ());
-  }
-
-  size_t circuit_device_terminal_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    pop (id, circuit->device_count ());
-    return reinterpret_cast<size_t> (id) - 1;
-  }
-
-  size_t circuit_subcircuit_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    return pop (id, circuit->subcircuit_count ());
-  }
-
-  size_t circuit_subcircuit_pin_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    pop (id, circuit->subcircuit_count ());
-    return reinterpret_cast<size_t> (id) - 1;
-  }
-
-  size_t circuit_net_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    return pop (id, circuit->net_count ());
-  }
-
-  size_t circuit_net_subcircuit_pin_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    db::Net *net = net_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    pop (id, circuit->net_count ());
-    pop (id, 4);
-    return pop (id, net->subcircuit_pin_count ());
-  }
-
-  size_t circuit_net_subcircuit_pin_other_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    db::Net *net = net_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    pop (id, circuit->net_count ());
-    pop (id, 4);
-    pop (id, net->subcircuit_pin_count ());
-    return reinterpret_cast<size_t> (id) - 1;
-  }
-
-  size_t circuit_net_device_terminal_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    db::Net *net = net_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    pop (id, circuit->net_count ());
-    pop (id, 4);
-    return pop (id, net->terminal_count ());
-  }
-
-  size_t circuit_net_device_terminal_other_index_from_id (void *id) const
-  {
-    db::Circuit *circuit = circuit_from_id (id);
-    db::Net *net = net_from_id (id);
-    pop (id, netlist ()->circuit_count ());
-    pop (id, 8);
-    pop (id, circuit->net_count ());
-    pop (id, 4);
-    pop (id, net->terminal_count ());
-    return reinterpret_cast<size_t> (id) - 1;
-  }
-
-  db::Circuit *circuit_from_id (void *id) const;
-  db::Net *net_from_id (void *id) const;
-  const db::NetSubcircuitPinRef *net_pinref_from_id (void *id) const;
-  const db::NetTerminalRef *net_terminalref_from_id (void *id) const;
-  db::Device *device_from_id (void *id) const;
-  db::Pin *pin_from_id (void *id) const;
-  db::SubCircuit *subcircuit_from_id (void *id) const;
-
-  db::Netlist *netlist () const
-  {
-    return const_cast<db::Netlist *> (mp_l2ndb->netlist ());
-  }
-
-  db::LayoutToNetlist *mp_l2ndb;
-  mutable std::map<size_t, db::Circuit *> m_circuit_by_index;
-  mutable std::map<db::Circuit *, std::map<size_t, db::Net *> > m_net_by_circuit_and_index;
-  mutable std::map<db::Net *, std::map<size_t, db::NetSubcircuitPinRef *> > m_pinref_by_net_and_index;
-  mutable std::map<db::Net *, std::map<size_t, db::NetTerminalRef *> > m_terminalref_by_net_and_index;
-  mutable std::map<db::Circuit *, std::map<size_t, db::Device *> > m_device_by_circuit_and_index;
-  mutable std::map<db::Circuit *, std::map<size_t, db::Pin *> > m_pin_by_circuit_and_index;
-  mutable std::map<db::Circuit *, std::map<size_t, db::SubCircuit *> > m_subcircuit_by_circuit_and_index;
-};
-
-NetlistBrowserModel::NetlistBrowserModel (db::LayoutToNetlist *l2ndb)
-  : mp_l2ndb (l2ndb)
+NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb)
+  : QAbstractItemModel (parent), mp_l2ndb (l2ndb)
 {
   //  .. nothing yet ..
+}
+
+NetlistBrowserModel::~NetlistBrowserModel ()
+{
+  //  .. nothing yet ..
+}
+
+void *
+NetlistBrowserModel::make_id_circuit (size_t circuit_index) const
+{
+  return make_id (circuit_index);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_pin (size_t circuit_index, size_t pin_index) const
+{
+  return make_id (circuit_index, netlist ()->circuit_count (), 1, 8, pin_index);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_pin_net (size_t circuit_index, size_t pin_index, size_t net_index) const
+{
+  db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
+  return make_id (circuit_index, netlist ()->circuit_count (), 1, 8, pin_index, circuit->pin_count (), net_index + 1);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_net (size_t circuit_index, size_t net_index) const
+{
+  return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_net_device_terminal (size_t circuit_index, size_t net_index, size_t terminal_ref_index) const
+{
+  db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
+  return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 1, 4, terminal_ref_index);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_net_device_terminal_others (size_t circuit_index, size_t net_index, size_t terminal_ref_index, size_t other_index) const
+{
+  db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
+  db::Net *net = net_from_id (make_id_circuit_net (circuit_index, net_index));
+  return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 1, 4, terminal_ref_index, net->terminal_count (), other_index + 1);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_net_pin (size_t circuit_index, size_t net_index, size_t pin_index) const
+{
+  db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
+  return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 2, 4, pin_index);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_net_subcircuit_pin (size_t circuit_index, size_t net_index, size_t pin_ref_index) const
+{
+  db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
+  return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 3, 4, pin_ref_index);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_net_subcircuit_pin_others (size_t circuit_index, size_t net_index, size_t pin_ref_index, size_t other_index) const
+{
+  db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
+  db::Net *net = net_from_id (make_id_circuit_net (circuit_index, net_index));
+  return make_id (circuit_index, netlist ()->circuit_count (), 2, 8, net_index, circuit->net_count (), 3, 4, pin_ref_index, net->subcircuit_pin_count (), other_index + 1);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_subcircuit (size_t circuit_index, size_t subcircuit_index) const
+{
+  return make_id (circuit_index, netlist ()->circuit_count (), 3, 8, subcircuit_index);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_subcircuit_pin (size_t circuit_index, size_t subcircuit_index, size_t pin_index) const
+{
+  db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
+  return make_id (circuit_index, netlist ()->circuit_count (), 3, 8, subcircuit_index, circuit->subcircuit_count (), pin_index + 1);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_device (size_t circuit_index, size_t device_index) const
+{
+  return make_id (circuit_index, netlist ()->circuit_count (), 4, 8, device_index);
+}
+
+void *
+NetlistBrowserModel::make_id_circuit_device_terminal (size_t circuit_index, size_t device_index, size_t terminal_index) const
+{
+  db::Circuit *circuit = circuit_from_id (make_id_circuit (circuit_index));
+  return make_id (circuit_index, netlist ()->circuit_count (), 4, 8, device_index, circuit->device_count (), terminal_index + 1);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit (void *id) const
+{
+  pop (id, netlist ()->circuit_count ());
+  return id == 0;
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_pin (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 1 && always (pop (id, circuit->pin_count ())) && id == 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_pin_net (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 1 && always (pop (id, circuit->pin_count ())) && id != 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_net (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && id == 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_net_device_terminal (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  db::Net *net = net_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 1 && always (pop (id, net->terminal_count ())) && id == 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_net_device_terminal_others (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  db::Net *net = net_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 1 && always (pop (id, net->terminal_count ())) && id != 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_net_pin (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 2);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_net_subcircuit_pin (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  db::Net *net = net_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 3 && always (pop (id, net->subcircuit_pin_count ())) && id == 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_net_subcircuit_pin_others (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  db::Net *net = net_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 2 && always (pop (id, circuit->net_count ())) && pop (id, 4) == 3 && always (pop (id, net->subcircuit_pin_count ())) && id != 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_subcircuit (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 3 && always (pop (id, circuit->subcircuit_count ())) && id == 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_subcircuit_pin (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 3 && always (pop (id, circuit->subcircuit_count ())) && id != 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_device (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 4 && always (pop (id, circuit->device_count ())) && id == 0);
+}
+
+bool
+NetlistBrowserModel::is_id_circuit_device_terminal (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  return (pop (id, 8) == 4 && always (pop (id, circuit->device_count ())) && id != 0);
+}
+
+size_t
+NetlistBrowserModel::circuit_index_from_id (void *id) const
+{
+  return pop (id, netlist ()->circuit_count ());
+}
+
+size_t
+NetlistBrowserModel::circuit_pin_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  return pop (id, circuit->pin_count ());
+}
+
+size_t
+NetlistBrowserModel::circuit_device_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  return pop (id, circuit->device_count ());
+}
+
+size_t
+NetlistBrowserModel::circuit_device_terminal_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  pop (id, circuit->device_count ());
+  return reinterpret_cast<size_t> (id) - 1;
+}
+
+size_t
+NetlistBrowserModel::circuit_subcircuit_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  return pop (id, circuit->subcircuit_count ());
+}
+
+size_t
+NetlistBrowserModel::circuit_subcircuit_pin_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  pop (id, circuit->subcircuit_count ());
+  return reinterpret_cast<size_t> (id) - 1;
+}
+
+size_t
+NetlistBrowserModel::circuit_net_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  return pop (id, circuit->net_count ());
+}
+
+size_t
+NetlistBrowserModel::circuit_net_pin_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  pop (id, circuit->net_count ());
+  pop (id, 4);
+  return reinterpret_cast<size_t> (id);
+}
+
+size_t
+NetlistBrowserModel::circuit_net_subcircuit_pin_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  db::Net *net = net_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  pop (id, circuit->net_count ());
+  pop (id, 4);
+  return pop (id, net->subcircuit_pin_count ());
+}
+
+size_t
+NetlistBrowserModel::circuit_net_subcircuit_pin_other_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  db::Net *net = net_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  pop (id, circuit->net_count ());
+  pop (id, 4);
+  pop (id, net->subcircuit_pin_count ());
+  return reinterpret_cast<size_t> (id) - 1;
+}
+
+size_t
+NetlistBrowserModel::circuit_net_device_terminal_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  db::Net *net = net_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  pop (id, circuit->net_count ());
+  pop (id, 4);
+  return pop (id, net->terminal_count ());
+}
+
+size_t
+NetlistBrowserModel::circuit_net_device_terminal_other_index_from_id (void *id) const
+{
+  db::Circuit *circuit = circuit_from_id (id);
+  db::Net *net = net_from_id (id);
+  pop (id, netlist ()->circuit_count ());
+  pop (id, 8);
+  pop (id, circuit->net_count ());
+  pop (id, 4);
+  pop (id, net->terminal_count ());
+  return reinterpret_cast<size_t> (id) - 1;
 }
 
 void
@@ -425,13 +418,13 @@ NetlistBrowserModel::self_test (const QModelIndex &p)
       tl_assert (false);
     }
     pp = parent (c);
-    if (pp.column () != 0) {
+    if (pp.isValid () && pp.column () != 0) {
       tl_assert (false);
     }
-    if (pp.row () != r) {
+    if (pp.isValid () && pp.row () != r) {
       tl_assert (false);
     }
-    if (pp.internalId () != p.internalId ()) {
+    if (pp.isValid () && pp.internalId () != p.internalId ()) {
       tl_assert (false);
     }
 
@@ -440,7 +433,7 @@ NetlistBrowserModel::self_test (const QModelIndex &p)
       tl_assert (false);
     }
     pp = parent (c);
-    if (pp.column () != 1) {
+    if (pp.isValid () && pp.column () != 1) {
       tl_assert (false);
     }
 
@@ -466,22 +459,6 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
 
   void *id = index.internalPointer ();
 
-  /*
-   *  - circuits
-   *    - 0..#pins: pins
-   *      - net (1x)
-   *    - #pins..#pins+#nets: nets
-   *      - 0..#devices: terminals
-   *        - other terminals and nets
-   *      - #devices..#devices+#pins: pins
-   *      - #devices+#pins..: subcircuit pins
-   *        - other pins and nets
-   *    - #pins+#nets..#pins+#nets+#subcircuits: subcircuits
-   *      - pins and nets
-   *    - #pins+#nets+#subcircuits..: devices
-   *      - terminals and nets
-   */
-
   if (is_id_circuit (id)) {
 
     db::Circuit *circuit = circuit_from_id (id);
@@ -489,11 +466,22 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
       return tl::to_qstring (circuit->name ());
     }
 
-  } else if (is_id_circuit_pin (id) || is_id_circuit_net_subcircuit_pin_others (id)) {
+  } else if (is_id_circuit_pin (id) || is_id_circuit_net_pin (id)) {
 
     db::Pin *pin = pin_from_id (id);
     if (pin) {
       return tl::to_qstring (pin->expanded_name ());
+    }
+
+  } else if (is_id_circuit_pin_net (id)) {
+
+    db::Circuit *circuit = circuit_from_id (id);
+    db::Pin *pin = pin_from_id (id);
+    if (pin) {
+      db::Net *net = circuit->net_for_pin (pin->id ());
+      if (net) {
+        return tl::to_qstring (net->expanded_name ());
+      }
     }
 
   } else if (is_id_circuit_device (id)) {
@@ -522,6 +510,17 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
     const db::NetSubcircuitPinRef *ref = net_pinref_from_id (id);
     if (ref && ref->pin ()) {
       return tl::to_qstring (ref->pin ()->expanded_name ());
+    }
+
+  } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
+
+    const db::NetSubcircuitPinRef *ref = net_pinref_from_id (id);
+    size_t other_index = circuit_net_device_terminal_other_index_from_id (id);
+
+    if (ref && ref->pin () && ref->subcircuit () && ref->subcircuit ()->circuit_ref () && ref->subcircuit ()->circuit_ref ()->pin_by_id (other_index)) {
+
+      const db::Pin *pin = ref->subcircuit ()->circuit_ref ()->pin_by_id (other_index);
+      return tl::to_qstring (pin->expanded_name ());
     }
 
   } else if (is_id_circuit_net_device_terminal (id)) {
@@ -599,89 +598,80 @@ NetlistBrowserModel::headerData (int /*section*/, Qt::Orientation /*orientation*
 QModelIndex
 NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) const
 {
+  void *new_id = 0;
+
   if (! parent.isValid ()) {
 
-    return createIndex (row, column, make_id_circuit (row));
+    new_id = make_id_circuit (row);
 
   } else {
 
     void *id = parent.internalPointer ();
 
-    /*
-     *  - circuits
-     *    - 0..#pins: pins
-     *      - net (1x)
-     *    - #pins..#pins+#nets: nets
-     *      - 0..#devices: terminals
-     *        - other terminals and nets
-     *      - #devices..#devices+#pins: pins
-     *      - #devices+#pins..: subcircuit pins
-     *        - other pins and nets
-     *    - #pins+#nets..#pins+#nets+#subcircuits: subcircuits
-     *      - pins and nets
-     *    - #pins+#nets+#subcircuits..: devices
-     *      - terminals and nets
-     */
-
     if (is_id_circuit (id)) {
 
       db::Circuit *circuit = circuit_from_id (id);
-      if (size_t (row) < circuit->pin_count ()) {
-        return createIndex (row, column, make_id_circuit_pin (circuit_index_from_id (id), row));
-      }
-      row -= int (circuit->pin_count ());
-      if (size_t (row) < circuit->net_count ()) {
-        return createIndex (row, column, make_id_circuit_net (circuit_index_from_id (id), row));
-      }
-      row -= int (circuit->net_count ());
-      if (size_t (row) < circuit->subcircuit_count ()) {
-        return createIndex (row, column, make_id_circuit_subcircuit (circuit_index_from_id (id), row));
-      }
-      row -= int (circuit->subcircuit_count ());
-      if (size_t (row) < circuit->device_count ()) {
-        return createIndex (row, column, make_id_circuit_device (circuit_index_from_id (id), row));
+      if (row < int (circuit->pin_count ())) {
+        new_id = make_id_circuit_pin (circuit_index_from_id (id), row);
+      } else {
+        row -= int (circuit->pin_count ());
+        if (row < int (circuit->net_count ())) {
+          new_id = make_id_circuit_net (circuit_index_from_id (id), row);
+        } else {
+          row -= int (circuit->net_count ());
+          if (row < int (circuit->subcircuit_count ())) {
+            new_id = make_id_circuit_subcircuit (circuit_index_from_id (id), row);
+          } else {
+            row -= int (circuit->subcircuit_count ());
+            if (row < int (circuit->device_count ())) {
+              new_id = make_id_circuit_device (circuit_index_from_id (id), row);
+            }
+          }
+        }
       }
 
     } else if (is_id_circuit_pin (id)) {
 
-      return createIndex (row, column, make_id_circuit_pin_net (circuit_index_from_id (id), circuit_pin_index_from_id (id), row));
+      new_id = make_id_circuit_pin_net (circuit_index_from_id (id), circuit_pin_index_from_id (id), row);
 
     } else if (is_id_circuit_device (id)) {
 
-      return createIndex (row, column, make_id_circuit_device_terminal (circuit_index_from_id (id), circuit_device_index_from_id (id), row));
+      new_id = make_id_circuit_device_terminal (circuit_index_from_id (id), circuit_device_index_from_id (id), row);
 
     } else if (is_id_circuit_subcircuit (id)) {
 
-      return createIndex (row, column, make_id_circuit_subcircuit_pin (circuit_index_from_id (id), circuit_subcircuit_index_from_id (id), row));
+      new_id = make_id_circuit_subcircuit_pin (circuit_index_from_id (id), circuit_subcircuit_index_from_id (id), row);
 
     } else if (is_id_circuit_net (id)) {
 
       db::Net *net = net_from_id (id);
-      if (size_t (row) < net->terminal_count ()) {
-        return createIndex (row, column, make_id_circuit_net_device_terminal (circuit_index_from_id (id), circuit_net_index_from_id (id), row));
-      }
-      row -= int (net->terminal_count ());
-      if (size_t (row) < net->pin_count ()) {
-        return createIndex (row, column, make_id_circuit_net_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), row));
-      }
-      row -= int (net->pin_count ());
-      if (size_t (row) < net->subcircuit_pin_count ()) {
-        return createIndex (row, column, make_id_circuit_net_subcircuit_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), row));
+      if (row < int (net->terminal_count ())) {
+        new_id = make_id_circuit_net_device_terminal (circuit_index_from_id (id), circuit_net_index_from_id (id), row);
+      } else {
+        row -= int (net->terminal_count ());
+        if (row < int (net->pin_count ())) {
+          new_id = make_id_circuit_net_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), row);
+        } else {
+          row -= int (net->pin_count ());
+          if (row < int (net->subcircuit_pin_count ())) {
+            new_id = make_id_circuit_net_subcircuit_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), row);
+          }
+        }
       }
 
     } else if (is_id_circuit_net_subcircuit_pin (id)) {
 
-      return createIndex (row, column, make_id_circuit_net_subcircuit_pin_others (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_subcircuit_pin_index_from_id (id), row));
+      new_id = make_id_circuit_net_subcircuit_pin_others (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_subcircuit_pin_index_from_id (id), row);
 
     } else if (is_id_circuit_net_device_terminal (id)) {
 
-      return createIndex (row, column, make_id_circuit_net_device_terminal_others (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_device_terminal_index_from_id (id), row));
+      new_id = make_id_circuit_net_device_terminal_others (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_device_terminal_index_from_id (id), row);
 
     }
 
   }
 
-  return QModelIndex ();
+  return createIndex (row, column, new_id);
 }
 
 QModelIndex
@@ -695,22 +685,6 @@ NetlistBrowserModel::parent (const QModelIndex &index) const
 
     void *id = index.internalPointer ();
     int column = index.column ();
-
-    /*
-     *  - circuits
-     *    - 0..#pins: pins
-     *      - net (1x)
-     *    - #pins..#pins+#nets: nets
-     *      - 0..#devices: terminals
-     *        - other terminals and nets
-     *      - #devices..#devices+#pins: pins
-     *      - #devices+#pins..: subcircuit pins
-     *        - other pins and nets
-     *    - #pins+#nets..#pins+#nets+#subcircuits: subcircuits
-     *      - pins and nets
-     *    - #pins+#nets+#subcircuits..: devices
-     *      - terminals and nets
-     */
 
     if (is_id_circuit (id)) {
 
@@ -765,22 +739,6 @@ NetlistBrowserModel::rowCount (const QModelIndex &parent) const
   } else {
 
     void *id = parent.internalPointer ();
-
-    /*
-     *  - circuits
-     *    - 0..#pins: pins
-     *      - net (1x)
-     *    - #pins..#pins+#nets: nets
-     *      - 0..#devices: terminals
-     *        - other terminals and nets
-     *      - #devices..#devices+#pins: pins
-     *      - #devices+#pins..: subcircuit pins
-     *        - other pins and nets
-     *    - #pins+#nets..#pins+#nets+#subcircuits: subcircuits
-     *      - pins and nets
-     *    - #pins+#nets+#subcircuits..: devices
-     *      - terminals and nets
-     */
 
     if (is_id_circuit (id)) {
 
@@ -841,7 +799,7 @@ NetlistBrowserModel::net_from_id (void *id) const
   size_t index = circuit_net_index_from_id (id);
 
   std::map<db::Circuit *, std::map<size_t, db::Net *> >::iterator cc = m_net_by_circuit_and_index.find (circuit);
-  if (cc != m_net_by_circuit_and_index.end ()) {
+  if (cc == m_net_by_circuit_and_index.end ()) {
     cc = m_net_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Net *> ())).first;
   }
 
@@ -868,7 +826,7 @@ NetlistBrowserModel::net_pinref_from_id (void *id) const
   size_t index = circuit_net_subcircuit_pin_index_from_id (id);
 
   std::map<db::Net *, std::map<size_t, db::NetSubcircuitPinRef *> >::iterator cc = m_pinref_by_net_and_index.find (net);
-  if (cc != m_pinref_by_net_and_index.end ()) {
+  if (cc == m_pinref_by_net_and_index.end ()) {
     cc = m_pinref_by_net_and_index.insert (std::make_pair (net, std::map<size_t, db::NetSubcircuitPinRef *> ())).first;
   }
 
@@ -895,7 +853,7 @@ NetlistBrowserModel::net_terminalref_from_id (void *id) const
   size_t index = circuit_net_device_terminal_index_from_id (id);
 
   std::map<db::Net *, std::map<size_t, db::NetTerminalRef *> >::iterator cc = m_terminalref_by_net_and_index.find (net);
-  if (cc != m_terminalref_by_net_and_index.end ()) {
+  if (cc == m_terminalref_by_net_and_index.end ()) {
     cc = m_terminalref_by_net_and_index.insert (std::make_pair (net, std::map<size_t, db::NetTerminalRef *> ())).first;
   }
 
@@ -922,7 +880,7 @@ NetlistBrowserModel::device_from_id (void *id) const
   size_t index = circuit_device_index_from_id (id);
 
   std::map<db::Circuit *, std::map<size_t, db::Device *> >::iterator cc = m_device_by_circuit_and_index.find (circuit);
-  if (cc != m_device_by_circuit_and_index.end ()) {
+  if (cc == m_device_by_circuit_and_index.end ()) {
     cc = m_device_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Device *> ())).first;
   }
 
@@ -945,28 +903,57 @@ NetlistBrowserModel::device_from_id (void *id) const
 db::Pin *
 NetlistBrowserModel::pin_from_id (void *id) const
 {
-  db::Circuit *circuit = circuit_from_id (id);
-  size_t index = circuit_pin_index_from_id (id);
+  if (is_id_circuit_net_pin (id)) {
 
-  std::map<db::Circuit *, std::map<size_t, db::Pin *> >::iterator cc = m_pin_by_circuit_and_index.find (circuit);
-  if (cc != m_pin_by_circuit_and_index.end ()) {
-    cc = m_pin_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Pin *> ())).first;
-  }
+    db::Net *net = net_from_id (id);
+    size_t index = circuit_net_pin_index_from_id (id);
 
-  std::map<size_t, db::Pin *>::iterator c = cc->second.find (index);
-  if (c == cc->second.end ()) {
-
-    c = cc->second.insert (std::make_pair (index, (db::Pin *) 0)).first;
-    for (db::Circuit::pin_iterator i = circuit->begin_pins (); i != circuit->end_pins (); ++i) {
-      if (index-- == 0) {
-        c->second = i.operator-> ();
-        break;
-      }
+    std::map<db::Net *, std::map<size_t, db::Pin *> >::iterator cc = m_pin_by_net_and_index.find (net);
+    if (cc == m_pin_by_net_and_index.end ()) {
+      cc = m_pin_by_net_and_index.insert (std::make_pair (net, std::map<size_t, db::Pin *> ())).first;
     }
 
-  }
+    std::map<size_t, db::Pin *>::iterator c = cc->second.find (index);
+    if (c == cc->second.end ()) {
 
-  return c->second;
+      c = cc->second.insert (std::make_pair (index, (db::Pin *) 0)).first;
+      for (db::Net::pin_iterator i = net->begin_pins (); i != net->end_pins (); ++i) {
+        if (index-- == 0) {
+          c->second = const_cast<db::Pin *> (i->pin ());
+          break;
+        }
+      }
+
+    }
+
+    return c->second;
+
+  } else {
+
+    db::Circuit *circuit = circuit_from_id (id);
+    size_t index = circuit_pin_index_from_id (id);
+
+    std::map<db::Circuit *, std::map<size_t, db::Pin *> >::iterator cc = m_pin_by_circuit_and_index.find (circuit);
+    if (cc == m_pin_by_circuit_and_index.end ()) {
+      cc = m_pin_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::Pin *> ())).first;
+    }
+
+    std::map<size_t, db::Pin *>::iterator c = cc->second.find (index);
+    if (c == cc->second.end ()) {
+
+      c = cc->second.insert (std::make_pair (index, (db::Pin *) 0)).first;
+      for (db::Circuit::pin_iterator i = circuit->begin_pins (); i != circuit->end_pins (); ++i) {
+        if (index-- == 0) {
+          c->second = i.operator-> ();
+          break;
+        }
+      }
+
+    }
+
+    return c->second;
+
+  }
 }
 
 db::SubCircuit *
@@ -976,7 +963,7 @@ NetlistBrowserModel::subcircuit_from_id (void *id) const
   size_t index = circuit_subcircuit_index_from_id (id);
 
   std::map<db::Circuit *, std::map<size_t, db::SubCircuit *> >::iterator cc = m_subcircuit_by_circuit_and_index.find (circuit);
-  if (cc != m_subcircuit_by_circuit_and_index.end ()) {
+  if (cc == m_subcircuit_by_circuit_and_index.end ()) {
     cc = m_subcircuit_by_circuit_and_index.insert (std::make_pair (circuit, std::map<size_t, db::SubCircuit *> ())).first;
   }
 
@@ -1141,15 +1128,21 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 {
   if (database != mp_database.get ()) {
 
-    //  @@@ release_markers ();
-
     mp_database.reset (database);
+
+    //  @@@ release_markers ();
 
     QAbstractItemModel *tree_model = directory_tree->model ();
 
-    NetlistBrowserModel *new_model = new NetlistBrowserModel (database);
+    NetlistBrowserModel *new_model = new NetlistBrowserModel (this, database);
 #if !defined(NDEBUG)
-    new_model->self_test ();
+    try {
+      new_model->self_test (); //  might throw an exception!
+    } catch (...) {
+      delete new_model;
+      mp_database.reset (0);
+      throw;
+    }
 #endif
 
     directory_tree->setModel (new_model);

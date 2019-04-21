@@ -26,22 +26,123 @@
 
 #include "ui_NetlistBrowserPage.h"
 #include "layNetlistBrowser.h"
+#include "laybasicCommon.h"
 #include "dbBox.h"
+#include "dbLayoutToNetlist.h"
 
 #include <QFrame>
+#include <QAbstractItemModel>
 
 class QAction;
-
-namespace db
-{
-  class LayoutToNetlist;
-}
 
 namespace lay
 {
 
 class LayoutView;
 class PluginRoot;
+
+// ----------------------------------------------------------------------------------
+//  NetlistBrowserModel definition
+
+/**
+ *  @brief The NetlistBrowserModel
+ *
+ *  The model hierarchy is the following
+ *  - circuits
+ *    - 0..#pins: pins
+ *      - net (1x)
+ *    - #pins..#pins+#nets: nets
+ *      - 0..#devices: terminals
+ *        - other terminals and nets
+ *      - #devices..#devices+#pins: pins
+ *      - #devices+#pins..: subcircuit pins
+ *        - other pins and nets
+ *    - #pins+#nets..#pins+#nets+#subcircuits: subcircuits
+ *      - pins and nets
+ *    - #pins+#nets+#subcircuits..: devices
+ *      - terminals and nets
+ */
+class LAYBASIC_PUBLIC NetlistBrowserModel
+  : public QAbstractItemModel
+{
+public:
+  NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb);
+  ~NetlistBrowserModel ();
+
+  virtual int columnCount (const QModelIndex &parent) const;
+  virtual QVariant data (const QModelIndex &index, int role) const;
+  virtual Qt::ItemFlags flags (const QModelIndex &index) const;
+  virtual bool hasChildren (const QModelIndex &parent) const;
+  virtual QVariant headerData (int section, Qt::Orientation orientation, int role) const;
+  virtual QModelIndex index (int row, int column, const QModelIndex &parent) const;
+  virtual QModelIndex parent (const QModelIndex &index) const;
+  virtual int rowCount (const QModelIndex &parent) const;
+
+  void self_test (const QModelIndex &index = QModelIndex ());
+
+private:
+
+  void *make_id_circuit (size_t circuit_index) const;
+  void *make_id_circuit_pin (size_t circuit_index, size_t pin_index) const;
+  void *make_id_circuit_pin_net (size_t circuit_index, size_t pin_index, size_t net_index) const;
+  void *make_id_circuit_net (size_t circuit_index, size_t net_index) const;
+  void *make_id_circuit_net_device_terminal (size_t circuit_index, size_t net_index, size_t terminal_ref_index) const;
+  void *make_id_circuit_net_device_terminal_others (size_t circuit_index, size_t net_index, size_t terminal_ref_index, size_t other_index) const;
+  void *make_id_circuit_net_pin (size_t circuit_index, size_t net_index, size_t pin_index) const;
+  void *make_id_circuit_net_subcircuit_pin (size_t circuit_index, size_t net_index, size_t pin_ref_index) const;
+  void *make_id_circuit_net_subcircuit_pin_others (size_t circuit_index, size_t net_index, size_t pin_ref_index, size_t other_index) const;
+  void *make_id_circuit_subcircuit (size_t circuit_index, size_t subcircuit_index) const;
+  void *make_id_circuit_subcircuit_pin (size_t circuit_index, size_t subcircuit_index, size_t pin_index) const;
+  void *make_id_circuit_device (size_t circuit_index, size_t device_index) const;
+  void *make_id_circuit_device_terminal (size_t circuit_index, size_t device_index, size_t terminal_index) const;
+  bool is_id_circuit (void *id) const;
+  bool is_id_circuit_pin (void *id) const;
+  bool is_id_circuit_pin_net (void *id) const;
+  bool is_id_circuit_net (void *id) const;
+  bool is_id_circuit_net_device_terminal (void *id) const;
+  bool is_id_circuit_net_device_terminal_others (void *id) const;
+  bool is_id_circuit_net_pin (void *id) const;
+  bool is_id_circuit_net_subcircuit_pin (void *id) const;
+  bool is_id_circuit_net_subcircuit_pin_others (void *id) const;
+  bool is_id_circuit_subcircuit (void *id) const;
+  bool is_id_circuit_subcircuit_pin (void *id) const;
+  bool is_id_circuit_device (void *id) const;
+  bool is_id_circuit_device_terminal (void *id) const;
+  size_t circuit_index_from_id (void *id) const;
+  size_t circuit_pin_index_from_id (void *id) const;
+  size_t circuit_device_index_from_id (void *id) const;
+  size_t circuit_device_terminal_index_from_id (void *id) const;
+  size_t circuit_subcircuit_index_from_id (void *id) const;
+  size_t circuit_subcircuit_pin_index_from_id (void *id) const;
+  size_t circuit_net_index_from_id (void *id) const;
+  size_t circuit_net_pin_index_from_id (void *id) const;
+  size_t circuit_net_subcircuit_pin_index_from_id (void *id) const;
+  size_t circuit_net_subcircuit_pin_other_index_from_id (void *id) const;
+  size_t circuit_net_device_terminal_index_from_id (void *id) const;
+  size_t circuit_net_device_terminal_other_index_from_id (void *id) const;
+  db::Circuit *circuit_from_id (void *id) const;
+  db::Net *net_from_id (void *id) const;
+  const db::NetSubcircuitPinRef *net_pinref_from_id (void *id) const;
+  const db::NetTerminalRef *net_terminalref_from_id (void *id) const;
+  db::Device *device_from_id (void *id) const;
+  db::Pin *pin_from_id (void *id) const;
+  db::SubCircuit *subcircuit_from_id (void *id) const;
+
+  db::Netlist *netlist () const
+  {
+    return const_cast<db::Netlist *> (mp_l2ndb->netlist ());
+  }
+
+  db::LayoutToNetlist *mp_l2ndb;
+  mutable std::map<size_t, db::Circuit *> m_circuit_by_index;
+  mutable std::map<db::Circuit *, std::map<size_t, db::Net *> > m_net_by_circuit_and_index;
+  mutable std::map<db::Net *, std::map<size_t, db::NetSubcircuitPinRef *> > m_pinref_by_net_and_index;
+  mutable std::map<db::Net *, std::map<size_t, db::NetTerminalRef *> > m_terminalref_by_net_and_index;
+  mutable std::map<db::Net *, std::map<size_t, db::Pin *> > m_pin_by_net_and_index;
+  mutable std::map<db::Circuit *, std::map<size_t, db::Device *> > m_device_by_circuit_and_index;
+  mutable std::map<db::Circuit *, std::map<size_t, db::Pin *> > m_pin_by_circuit_and_index;
+  mutable std::map<db::Circuit *, std::map<size_t, db::SubCircuit *> > m_subcircuit_by_circuit_and_index;
+};
 
 /**
  *  @brief A marker browser page

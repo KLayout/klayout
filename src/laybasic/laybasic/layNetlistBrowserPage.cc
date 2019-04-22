@@ -626,21 +626,22 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
 
     if (is_id_circuit (id)) {
 
+      int r = row;
       db::Circuit *circuit = circuit_from_id (id);
-      if (row < int (circuit->pin_count ())) {
-        new_id = make_id_circuit_pin (circuit_index_from_id (id), row);
+      if (r < int (circuit->pin_count ())) {
+        new_id = make_id_circuit_pin (circuit_index_from_id (id), size_t (r));
       } else {
-        row -= int (circuit->pin_count ());
-        if (row < int (circuit->net_count ())) {
-          new_id = make_id_circuit_net (circuit_index_from_id (id), row);
+        r -= int (circuit->pin_count ());
+        if (r < int (circuit->net_count ())) {
+          new_id = make_id_circuit_net (circuit_index_from_id (id), size_t (r));
         } else {
-          row -= int (circuit->net_count ());
-          if (row < int (circuit->subcircuit_count ())) {
-            new_id = make_id_circuit_subcircuit (circuit_index_from_id (id), row);
+          r -= int (circuit->net_count ());
+          if (r < int (circuit->subcircuit_count ())) {
+            new_id = make_id_circuit_subcircuit (circuit_index_from_id (id), size_t (r));
           } else {
-            row -= int (circuit->subcircuit_count ());
-            if (row < int (circuit->device_count ())) {
-              new_id = make_id_circuit_device (circuit_index_from_id (id), row);
+            r -= int (circuit->subcircuit_count ());
+            if (r < int (circuit->device_count ())) {
+              new_id = make_id_circuit_device (circuit_index_from_id (id), size_t (r));
             }
           }
         }
@@ -648,40 +649,41 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
 
     } else if (is_id_circuit_pin (id)) {
 
-      new_id = make_id_circuit_pin_net (circuit_index_from_id (id), circuit_pin_index_from_id (id), row);
+      new_id = make_id_circuit_pin_net (circuit_index_from_id (id), circuit_pin_index_from_id (id), size_t (row));
 
     } else if (is_id_circuit_device (id)) {
 
-      new_id = make_id_circuit_device_terminal (circuit_index_from_id (id), circuit_device_index_from_id (id), row);
+      new_id = make_id_circuit_device_terminal (circuit_index_from_id (id), circuit_device_index_from_id (id), size_t (row));
 
     } else if (is_id_circuit_subcircuit (id)) {
 
-      new_id = make_id_circuit_subcircuit_pin (circuit_index_from_id (id), circuit_subcircuit_index_from_id (id), row);
+      new_id = make_id_circuit_subcircuit_pin (circuit_index_from_id (id), circuit_subcircuit_index_from_id (id), size_t (row));
 
     } else if (is_id_circuit_net (id)) {
 
+      int r = row;
       db::Net *net = net_from_id (id);
-      if (row < int (net->terminal_count ())) {
-        new_id = make_id_circuit_net_device_terminal (circuit_index_from_id (id), circuit_net_index_from_id (id), row);
+      if (r < int (net->terminal_count ())) {
+        new_id = make_id_circuit_net_device_terminal (circuit_index_from_id (id), circuit_net_index_from_id (id), size_t (r));
       } else {
-        row -= int (net->terminal_count ());
-        if (row < int (net->pin_count ())) {
-          new_id = make_id_circuit_net_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), row);
+        r -= int (net->terminal_count ());
+        if (r < int (net->pin_count ())) {
+          new_id = make_id_circuit_net_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), size_t (r));
         } else {
-          row -= int (net->pin_count ());
-          if (row < int (net->subcircuit_pin_count ())) {
-            new_id = make_id_circuit_net_subcircuit_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), row);
+          r -= int (net->pin_count ());
+          if (r < int (net->subcircuit_pin_count ())) {
+            new_id = make_id_circuit_net_subcircuit_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), size_t (r));
           }
         }
       }
 
     } else if (is_id_circuit_net_subcircuit_pin (id)) {
 
-      new_id = make_id_circuit_net_subcircuit_pin_others (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_subcircuit_pin_index_from_id (id), row);
+      new_id = make_id_circuit_net_subcircuit_pin_others (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_subcircuit_pin_index_from_id (id), size_t (row));
 
     } else if (is_id_circuit_net_device_terminal (id)) {
 
-      new_id = make_id_circuit_net_device_terminal_others (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_device_terminal_index_from_id (id), row);
+      new_id = make_id_circuit_net_device_terminal_others (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_device_terminal_index_from_id (id), size_t (row));
 
     }
 
@@ -727,7 +729,7 @@ NetlistBrowserModel::parent (const QModelIndex &index) const
     } else if (is_id_circuit_device_terminal (id)) {
 
       db::Circuit *circuit = circuit_from_id (id);
-      return createIndex (int (circuit->pin_count () + circuit->net_count () + circuit->subcircuit_count () + circuit_device_terminal_index_from_id (id)), column, make_id_circuit_device (circuit_index_from_id (id), circuit_device_index_from_id (id)));
+      return createIndex (int (circuit->pin_count () + circuit->net_count () + circuit->subcircuit_count () + circuit_device_index_from_id (id)), column, make_id_circuit_device (circuit_index_from_id (id), circuit_device_index_from_id (id)));
 
     } else if (is_id_circuit_net_device_terminal_others (id)) {
 

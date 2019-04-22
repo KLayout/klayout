@@ -405,44 +405,6 @@ NetlistBrowserModel::circuit_net_device_terminal_other_index_from_id (void *id) 
   return reinterpret_cast<size_t> (id) - 1;
 }
 
-void
-NetlistBrowserModel::self_test (const QModelIndex &p)
-{
-  int rows = rowCount (p);
-  for (int r = 0; r != rows; ++r) {
-
-    QModelIndex c, pp;
-
-    c = index (r, 0, p);
-    if (c.column () != 0) {
-      tl_assert (false);
-    }
-    pp = parent (c);
-    if (pp.isValid () && pp.column () != 0) {
-      tl_assert (false);
-    }
-    if (pp.isValid () && pp.row () != r) {
-      tl_assert (false);
-    }
-    if (pp.isValid () && pp.internalId () != p.internalId ()) {
-      tl_assert (false);
-    }
-
-    c = index (r, 1, p);
-    if (c.column () != 1) {
-      tl_assert (false);
-    }
-    pp = parent (c);
-    if (pp.isValid () && pp.column () != 1) {
-      tl_assert (false);
-    }
-
-    self_test (c);
-
-  }
-}
-
-
 int
 NetlistBrowserModel::columnCount (const QModelIndex & /*parent*/) const
 {
@@ -1061,15 +1023,6 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
     QAbstractItemModel *tree_model = directory_tree->model ();
 
     NetlistBrowserModel *new_model = new NetlistBrowserModel (this, database);
-#if !defined(NDEBUG)
-    try {
-      new_model->self_test (); //  might throw an exception!
-    } catch (...) {
-      delete new_model;
-      mp_database.reset (0);
-      throw;
-    }
-#endif
 
     directory_tree->setModel (new_model);
     // @@@ connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (directory_selection_changed (const QItemSelection &, const QItemSelection &)));

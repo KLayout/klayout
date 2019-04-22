@@ -78,8 +78,6 @@ public:
   virtual QModelIndex parent (const QModelIndex &index) const;
   virtual int rowCount (const QModelIndex &parent) const;
 
-  void self_test (const QModelIndex &index = QModelIndex ());
-
 private:
 
   void *make_id_circuit (size_t circuit_index) const;

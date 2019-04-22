@@ -86,7 +86,7 @@ TEST (1)
   EXPECT_EQ (model->hasChildren (inv2PinOutIndexNet), false);
   EXPECT_EQ (model->rowCount (inv2PinOutIndexNet), 0);
 
-  //  NOUT net has 1 pin, 2 devices
+  //  NOUT net has 1 pin, 2 devices, 0 subcircuits
   QModelIndex inv2NOutIndex = model->index (7, 0, inv2Index);
   EXPECT_EQ (model->hasChildren (inv2NOutIndex), true);
   EXPECT_EQ (model->rowCount (inv2NOutIndex), 3);
@@ -105,7 +105,58 @@ TEST (1)
   EXPECT_EQ (model->hasChildren (inv2NOutDeviceIndex), true);
   EXPECT_EQ (model->rowCount (inv2NOutDeviceIndex), 3);
 
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2NOutDeviceIndex), Qt::DisplayRole).toString ()), "S");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2NOutDeviceIndex), Qt::DisplayRole).toString ()), "G");
+  EXPECT_EQ (tl::to_string (model->data (model->index (2, 0, inv2NOutDeviceIndex), Qt::DisplayRole).toString ()), "D");
 
+  QModelIndex inv2NOutDeviceGateIndex = model->index (1, 0, inv2NOutDeviceIndex);
+  EXPECT_EQ (model->hasChildren (inv2NOutDeviceGateIndex), false);
+  EXPECT_EQ (model->rowCount (inv2NOutDeviceGateIndex), 0);
 
+  //  FB net has 0 pin, 0 devices, 2 subcircuits
+  QModelIndex ringoFbIndex = model->index (0, 0, ringoIndex);
+  EXPECT_EQ (model->hasChildren (ringoFbIndex), true);
+  EXPECT_EQ (model->rowCount (ringoFbIndex), 2);
+
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoFbIndex), Qt::DisplayRole).toString ()), "$1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, ringoFbIndex), Qt::DisplayRole).toString ()), "IN");
+
+  QModelIndex ringoFbSubcircuit2Index = model->index (1, 0, ringoFbIndex);
+  EXPECT_EQ (model->hasChildren (ringoFbSubcircuit2Index), true);
+  EXPECT_EQ (model->rowCount (ringoFbSubcircuit2Index), 5);
+
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoFbSubcircuit2Index), Qt::DisplayRole).toString ()), "IN");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, ringoFbSubcircuit2Index), Qt::DisplayRole).toString ()), "$1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (2, 0, ringoFbSubcircuit2Index), Qt::DisplayRole).toString ()), "OUT");
+  EXPECT_EQ (tl::to_string (model->data (model->index (3, 0, ringoFbSubcircuit2Index), Qt::DisplayRole).toString ()), "$3");
+  EXPECT_EQ (tl::to_string (model->data (model->index (4, 0, ringoFbSubcircuit2Index), Qt::DisplayRole).toString ()), "$4");
+
+  QModelIndex ringoFbSubcircuit2InPinIndex = model->index (1, 0, ringoFbSubcircuit2Index);
+  EXPECT_EQ (model->hasChildren (ringoFbSubcircuit2InPinIndex), false);
+  EXPECT_EQ (model->rowCount (ringoFbSubcircuit2InPinIndex), 0);
+
+  //  Subcircuit 1 of RINGO has 5 pins
+
+  QModelIndex ringoSubcircuit1Index = model->index (12, 0, ringoIndex);
+  EXPECT_EQ (model->hasChildren (ringoSubcircuit1Index), true);
+  EXPECT_EQ (model->rowCount (ringoSubcircuit1Index), 5);
+
+  EXPECT_EQ (tl::to_string (model->data (model->index (2, 0, ringoSubcircuit1Index), Qt::DisplayRole).toString ()), "OUT");
+
+  QModelIndex ringoSubcircuit1OutPinIndex = model->index (2, 0, ringoSubcircuit1Index);
+  EXPECT_EQ (model->hasChildren (ringoSubcircuit1OutPinIndex), false);
+  EXPECT_EQ (model->rowCount (ringoSubcircuit1OutPinIndex), 0);
+
+  //  Device 1 of INV2 has 3 pins
+
+  QModelIndex inv2Device1Index = model->index (10, 0, inv2Index);
+  EXPECT_EQ (model->hasChildren (inv2Device1Index), true);
+  EXPECT_EQ (model->rowCount (inv2Device1Index), 3);
+
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2Device1Index), Qt::DisplayRole).toString ()), "G");
+
+  QModelIndex inv2Device1GateIndex = model->index (1, 0, inv2Device1Index);
+  EXPECT_EQ (model->hasChildren (inv2Device1GateIndex), false);
+  EXPECT_EQ (model->rowCount (inv2Device1GateIndex), 0);
 }
 

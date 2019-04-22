@@ -466,7 +466,7 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
       return tl::to_qstring (circuit->name ());
     }
 
-  } else if (is_id_circuit_pin (id) || is_id_circuit_net_pin (id)) {
+  } else if (is_id_circuit_pin (id) || is_id_circuit_net_pin (id) || is_id_circuit_subcircuit_pin (id)) {
 
     db::Pin *pin = pin_from_id (id);
     if (pin) {
@@ -489,6 +489,16 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
     db::Device *device = device_from_id (id);
     if (device) {
       return tl::to_qstring (device->expanded_name ());
+    }
+
+  } else if (is_id_circuit_device_terminal (id)) {
+
+    db::Device *device = device_from_id (id);
+    if (device && device->device_class ()) {
+      size_t terminal = circuit_device_terminal_index_from_id (id);
+      if (device->device_class ()->terminal_definitions ().size () > terminal) {
+        return tl::to_qstring (device->device_class ()->terminal_definitions () [terminal].name ());
+      }
     }
 
   } else if (is_id_circuit_subcircuit (id)) {
@@ -515,7 +525,7 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
   } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
 
     const db::NetSubcircuitPinRef *ref = net_pinref_from_id (id);
-    size_t other_index = circuit_net_device_terminal_other_index_from_id (id);
+    size_t other_index = circuit_net_subcircuit_pin_other_index_from_id (id);
 
     if (ref && ref->pin () && ref->subcircuit () && ref->subcircuit ()->circuit_ref () && ref->subcircuit ()->circuit_ref ()->pin_by_id (other_index)) {
 
@@ -930,8 +940,17 @@ NetlistBrowserModel::pin_from_id (void *id) const
 
   } else {
 
-    db::Circuit *circuit = circuit_from_id (id);
-    size_t index = circuit_pin_index_from_id (id);
+    db::Circuit *circuit;
+    size_t index;
+
+    if (is_id_circuit_subcircuit_pin (id)) {
+      db::SubCircuit *subcircuit = subcircuit_from_id (id);
+      circuit = subcircuit->circuit_ref ();
+      index = circuit_subcircuit_pin_index_from_id (id);
+    } else {
+      circuit = circuit_from_id (id);
+      index = circuit_pin_index_from_id (id);
+    }
 
     std::map<db::Circuit *, std::map<size_t, db::Pin *> >::iterator cc = m_pin_by_circuit_and_index.find (circuit);
     if (cc == m_pin_by_circuit_and_index.end ()) {

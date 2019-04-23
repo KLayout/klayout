@@ -1018,11 +1018,15 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 
     mp_database.reset (database);
 
+    if (! database) {
+      directory_tree->setModel (0);
+      return;
+    }
+
     //  @@@ release_markers ();
 
-    QAbstractItemModel *tree_model = directory_tree->model ();
-
-    NetlistBrowserModel *new_model = new NetlistBrowserModel (this, database);
+    //  NOTE: with the tree as the parent, the tree will take over ownership of the model
+    NetlistBrowserModel *new_model = new NetlistBrowserModel (directory_tree, database);
 
     directory_tree->setModel (new_model);
     // @@@ connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (directory_selection_changed (const QItemSelection &, const QItemSelection &)));
@@ -1030,10 +1034,6 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
     directory_tree->header ()->setSortIndicatorShown (true);
 
     filter->setText (QString ());
-
-    if (tree_model) {
-      delete tree_model;
-    }
 
   }
 }

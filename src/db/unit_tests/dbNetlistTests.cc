@@ -234,6 +234,23 @@ static std::string bu2string (const db::Netlist *nl)
 
 // ----------------------------------------------------------------------------------------
 
+TEST(0_DeviceClassTemplates)
+{
+  db::DeviceClassMOS3Transistor mos3;
+  db::DeviceClass generic;
+
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("MOS3") != 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("RES") != 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("DOESNTEXIST") == 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("MOS3")->is_of (&mos3), true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("RES")->is_of (&mos3), false);
+  EXPECT_EQ (db::DeviceClassTemplateBase::is_a (&mos3) != 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::is_a (&generic) == 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::is_a (&mos3)->name (), "MOS3");
+}
+
+// ----------------------------------------------------------------------------------------
+
 TEST(1_DeviceTerminalDefinition)
 {
   db::DeviceTerminalDefinition pd;

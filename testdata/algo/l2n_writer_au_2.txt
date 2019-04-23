@@ -45,6 +45,10 @@ connect(nsd diff_cont nsd)
 global(rbulk BULK)
 global(ptie BULK)
 
+# Device class section
+class(PMOS MOS4)
+class(NMOS MOS4)
+
 # Device abstracts section
 # Device abstracts list the pin shapes of the devices.
 device(D$PMOS PMOS

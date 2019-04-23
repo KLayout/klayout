@@ -58,6 +58,7 @@ namespace db
  *                                  - connects the shapes of the layer with the given global
  *                                    nets [short key: G]
  *    circuit(<name> [circuit-def]) - circuit (cell) [short key: X]
+ *    class(<name> <template>)      - a device class definition (template: RES,CAP,...) [short key: K]
  *    device(<name> <class> [device-abstract-def])
  *                                  - device abstract [short key: D]
  *
@@ -73,7 +74,7 @@ namespace db
  *    circuit(<name> [circuit-def]) - subcircuit with connections [short key: X]
  *
  *  [net-name]:
- *    name(<net-name>)              - specify net name [short key:
+ *    name(<net-name>)              - specify net name [short key: I]
  *
  *  [geometry-def]:
  *
@@ -115,6 +116,7 @@ namespace l2n_std_format
     static const std::string top_key;
     static const std::string unit_key;
     static const std::string layer_key;
+    static const std::string class_key;
     static const std::string connect_key;
     static const std::string global_key;
     static const std::string circuit_key;

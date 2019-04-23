@@ -32,6 +32,7 @@ namespace l2n_std_format
   template<> DB_PUBLIC const std::string keys<false>::top_key ("top");
   template<> DB_PUBLIC const std::string keys<false>::unit_key ("unit");
   template<> DB_PUBLIC const std::string keys<false>::layer_key ("layer");
+  template<> DB_PUBLIC const std::string keys<false>::class_key ("class");
   template<> DB_PUBLIC const std::string keys<false>::connect_key ("connect");
   template<> DB_PUBLIC const std::string keys<false>::global_key ("global");
   template<> DB_PUBLIC const std::string keys<false>::circuit_key ("circuit");
@@ -54,6 +55,7 @@ namespace l2n_std_format
   template<> DB_PUBLIC const std::string keys<true>::top_key ("W");
   template<> DB_PUBLIC const std::string keys<true>::unit_key ("U");
   template<> DB_PUBLIC const std::string keys<true>::layer_key ("L");
+  template<> DB_PUBLIC const std::string keys<true>::class_key ("K");
   template<> DB_PUBLIC const std::string keys<true>::connect_key ("C");
   template<> DB_PUBLIC const std::string keys<true>::global_key ("G");
   template<> DB_PUBLIC const std::string keys<true>::circuit_key ("X");

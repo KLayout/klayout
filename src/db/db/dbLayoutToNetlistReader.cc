@@ -206,6 +206,27 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       delete l2n->make_layer (layer);
       br.done ();
 
+    } else if (test (skeys::class_key) || test (lkeys::class_key)) {
+
+      Brace br (this);
+      std::string class_name, templ_name;
+      read_word_or_quoted (class_name);
+      read_word_or_quoted (templ_name);
+      br.done ();
+
+      if (l2n->netlist ()->device_class_by_name (class_name) != 0) {
+        throw tl::Exception (tl::to_string (tr ("Device class must be defined before being used in device")));
+      }
+
+      db::DeviceClassTemplateBase *dct = db::DeviceClassTemplateBase::template_by_name (templ_name);
+      if (! dct) {
+        throw tl::Exception (tl::to_string (tr ("Invalid device class template: ")) + templ_name);
+      }
+
+      db::DeviceClass *dc = dct->create ();
+      dc->set_name (class_name);
+      l2n->netlist ()->add_device_class (dc);
+
     } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
 
       Brace br (this);
@@ -298,12 +319,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
       std::string cls;
       read_word_or_quoted (cls);
 
-      db::DeviceClass *dc = 0;
-      for (db::Netlist::device_class_iterator i = l2n->netlist ()->begin_device_classes (); i != l2n->netlist ()->end_device_classes (); ++i) {
-        if (i->name () == cls) {
-          dc = i.operator-> ();
-        }
-      }
+      db::DeviceClass *dc = l2n->netlist ()->device_class_by_name (cls);
 
       //  use a generic device class unless the right one is registered already.
       bool gen_dc = (dc == 0);

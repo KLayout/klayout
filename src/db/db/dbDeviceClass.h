@@ -536,6 +536,74 @@ private:
   }
 };
 
+/**
+ *  @brief A device class template
+ *
+ *  This is a registered class which provides a device class template.
+ *  The built-in classes serve as templates and registering a template
+ *  allows regenerating the class from an abstract description (template
+ *  name).
+ *
+ *  NOTE: device classes derived from one of the built-in classes
+ *  cannot be distinguished from pure built-in classes. Entirely
+ *  customized classes are treated as "non-template based" (i.e.
+ *  "is_a" returns 0).
+ */
+class DB_PUBLIC DeviceClassTemplateBase
+{
+public:
+  DeviceClassTemplateBase (const std::string &name)
+    : m_name (name)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual ~DeviceClassTemplateBase () { }
+
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  virtual bool is_of (const db::DeviceClass *) const = 0;
+  virtual DeviceClass *create () const = 0;
+
+  static DeviceClassTemplateBase *template_by_name (const std::string &name);
+  static DeviceClassTemplateBase *is_a (const db::DeviceClass *dc);
+
+private:
+  std::string m_name;
+
+  DeviceClassTemplateBase (const DeviceClassTemplateBase &);
+  DeviceClassTemplateBase &operator= (const DeviceClassTemplateBase &);
+};
+
+template <class T>
+class DB_PUBLIC_TEMPLATE device_class_template
+  : public DeviceClassTemplateBase
+{
+public:
+  device_class_template (const std::string &name)
+    : DeviceClassTemplateBase (name)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual bool is_of (const db::DeviceClass *dc) const
+  {
+    return dynamic_cast<const T *> (dc) != 0;
+  }
+
+  virtual DeviceClass *create () const
+  {
+    return new T ();
+  }
+
+private:
+  device_class_template (const device_class_template &);
+  device_class_template &operator= (const device_class_template &);
+};
+
 }
 
 #endif

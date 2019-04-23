@@ -164,6 +164,16 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
 
   }
 
+  if (nl->begin_device_classes () != nl->end_device_classes () && ! Keys::is_short ()) {
+    *mp_stream << endl << "# Device class section" << endl;
+    for (db::Netlist::const_device_class_iterator c = nl->begin_device_classes (); c != nl->end_device_classes (); ++c) {
+      db::DeviceClassTemplateBase *temp = db::DeviceClassTemplateBase::is_a (c.operator-> ());
+      if (temp) {
+        *mp_stream << Keys::class_key << "(" << tl::to_word_or_quoted_string (c->name ()) << " " << tl::to_word_or_quoted_string (temp->name ()) << ")" << endl;
+      }
+    }
+  }
+
   if (nl->begin_device_abstracts () != nl->end_device_abstracts () && ! Keys::is_short ()) {
     *mp_stream << endl << "# Device abstracts section" << endl;
     *mp_stream << "# Device abstracts list the pin shapes of the devices." << endl;

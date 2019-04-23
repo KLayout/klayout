@@ -34,6 +34,10 @@ connect(metal2_lbl metal2)
 connect(psd diff_cont psd)
 connect(nsd diff_cont nsd)
 
+# Device class section
+class(PMOS MOS3)
+class(NMOS MOS3)
+
 # Device abstracts section
 # Device abstracts list the pin shapes of the devices.
 device(D$PMOS PMOS

@@ -23,6 +23,7 @@
 
 #include "layNetlistBrowserPage.h"
 #include "dbLayoutToNetlist.h"
+#include "dbNetlistDeviceClasses.h"
 
 namespace lay
 {
@@ -415,10 +416,22 @@ NetlistBrowserModel::columnCount (const QModelIndex & /*parent*/) const
 QVariant
 NetlistBrowserModel::data (const QModelIndex &index, int role) const
 {
-  if (role != Qt::DisplayRole || ! index.isValid ()) {
+  if (! index.isValid ()) {
     return QVariant ();
   }
 
+  if (role == Qt::DecorationRole && index.column () == 0) {
+    return QVariant (icon (index));
+  } else if (role == Qt::DisplayRole) {
+    return QVariant (text (index));
+  } else {
+    return QVariant ();
+  }
+}
+
+QString
+NetlistBrowserModel::text (const QModelIndex &index) const
+{
   void *id = index.internalPointer ();
 
   if (is_id_circuit (id)) {
@@ -520,7 +533,102 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
 
   }
 
-  return QVariant ();
+  return QString ();
+}
+
+static QIcon icon_for_net ()
+{
+  QIcon icon;
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_48.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_32.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_24.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_16.png")));
+  return icon;
+}
+
+static QIcon icon_for_pin ()
+{
+  QIcon icon;
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_48.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_32.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_24.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_pin_16.png")));
+  return icon;
+}
+
+static QIcon icon_for_device (const db::DeviceClass *dc)
+{
+  QIcon icon;
+  //  TODO: diode, inductor, generic device ...
+  if (dynamic_cast<const db::DeviceClassResistor *> (dc)) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_16.png")));
+  } else if (dynamic_cast<const db::DeviceClassCapacitor *> (dc)) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_16.png")));
+  } else {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_16.png")));
+  }
+  return icon;
+}
+
+static QIcon icon_for_circuit ()
+{
+  QIcon icon;
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_48.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_32.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_24.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_circuit_16.png")));
+  return icon;
+}
+
+QIcon
+NetlistBrowserModel::icon (const QModelIndex &index) const
+{
+  void *id = index.internalPointer ();
+
+  if (is_id_circuit (id)) {
+    return icon_for_circuit ();
+  } else if (is_id_circuit_pin (id) || is_id_circuit_subcircuit_pin (id)) {
+    return icon_for_pin ();
+  } else if (is_id_circuit_pin_net (id)) {
+    return icon_for_net ();
+  } else if (is_id_circuit_device (id)) {
+
+    db::Device *device = device_from_id (id);
+    if (device) {
+      return icon_for_device (device->device_class ());
+    }
+
+  } else if (is_id_circuit_device_terminal (id)) {
+    return icon_for_net ();
+  } else if (is_id_circuit_subcircuit (id)) {
+    return icon_for_circuit ();
+  } else if (is_id_circuit_net (id)) {
+    return icon_for_net ();
+  } else if (is_id_circuit_net_pin (id) || is_id_circuit_net_subcircuit_pin_others (id)) {
+    return icon_for_pin ();
+  } else if (is_id_circuit_net_subcircuit_pin (id)) {
+    return icon_for_circuit ();
+  } else if (is_id_circuit_net_device_terminal (id)) {
+
+    const db::NetTerminalRef *ref = net_terminalref_from_id (id);
+    if (ref && ref->device ()) {
+      return icon_for_device (ref->device ()->device_class ());
+    }
+
+  } else if (is_id_circuit_net_device_terminal_others (id)) {
+    return icon_for_net ();
+  }
+
+  return QIcon ();
 }
 
 Qt::ItemFlags
@@ -664,7 +772,7 @@ NetlistBrowserModel::parent (const QModelIndex &index) const
   } else {
 
     void *id = index.internalPointer ();
-    int column = index.column ();
+    int column = 0;
 
     if (is_id_circuit (id)) {
 

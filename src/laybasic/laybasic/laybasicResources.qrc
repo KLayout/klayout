@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/icon_device_cap_16.png</file>
+        <file>images/icon_device_cap_24.png</file>
+        <file>images/icon_device_cap_32.png</file>
+        <file>images/icon_device_cap_48.png</file>
+        <file>images/icon_device_res_16.png</file>
+        <file>images/icon_device_res_24.png</file>
+        <file>images/icon_device_res_32.png</file>
+        <file>images/icon_device_res_48.png</file>
+        <file>images/icon_device_mos_16.png</file>
+        <file>images/icon_device_mos_24.png</file>
+        <file>images/icon_device_mos_32.png</file>
+        <file>images/icon_device_mos_48.png</file>
+        <file>images/icon_net_48.png</file>
+        <file>images/icon_net_16.png</file>
+        <file>images/icon_net_24.png</file>
+        <file>images/icon_net_32.png</file>
+        <file>images/icon_pin_16.png</file>
+        <file>images/icon_pin_24.png</file>
+        <file>images/icon_pin_32.png</file>
+        <file>images/icon_pin_48.png</file>
+        <file>images/icon_circuit_16.png</file>
+        <file>images/icon_circuit_24.png</file>
+        <file>images/icon_circuit_32.png</file>
+        <file>images/icon_circuit_48.png</file>
+    </qresource>
+</RCC>

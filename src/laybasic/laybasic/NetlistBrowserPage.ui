@@ -117,6 +117,9 @@
          <property name="allColumnsShowFocus">
           <bool>true</bool>
          </property>
+         <attribute name="headerVisible">
+          <bool>true</bool>
+         </attribute>
         </widget>
        </item>
        <item row="0" column="0" colspan="4">

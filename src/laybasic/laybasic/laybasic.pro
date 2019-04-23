@@ -72,6 +72,7 @@ FORMS = \
     NetlistBrowserDialog.ui
 
 RESOURCES = \
+    laybasicResources.qrc
 
 SOURCES = \
   gtf.cc \

@@ -126,6 +126,8 @@ private:
   db::Device *device_from_id (void *id) const;
   db::Pin *pin_from_id (void *id) const;
   db::SubCircuit *subcircuit_from_id (void *id) const;
+  QString text (const QModelIndex &index) const;
+  QIcon icon (const QModelIndex &index) const;
 
   db::Netlist *netlist () const
   {

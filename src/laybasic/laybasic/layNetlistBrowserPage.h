@@ -78,8 +78,9 @@ public:
   virtual QModelIndex parent (const QModelIndex &index) const;
   virtual int rowCount (const QModelIndex &parent) const;
 
-private:
+  QModelIndex index_from_id (void *id, int column) const;
 
+private:
   void *make_id_circuit (size_t circuit_index) const;
   void *make_id_circuit_pin (size_t circuit_index, size_t pin_index) const;
   void *make_id_circuit_pin_net (size_t circuit_index, size_t pin_index, size_t net_index) const;
@@ -128,6 +129,9 @@ private:
   db::SubCircuit *subcircuit_from_id (void *id) const;
   QString text (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;
+  size_t circuit_index (const db::Circuit *attr) const;
+  size_t net_index (const db::Net *attr) const;
+  QString make_link_to (const db::Net *net) const;
 
   db::Netlist *netlist () const
   {
@@ -143,6 +147,8 @@ private:
   mutable std::map<db::Circuit *, std::map<size_t, db::Device *> > m_device_by_circuit_and_index;
   mutable std::map<db::Circuit *, std::map<size_t, db::Pin *> > m_pin_by_circuit_and_index;
   mutable std::map<db::Circuit *, std::map<size_t, db::SubCircuit *> > m_subcircuit_by_circuit_and_index;
+  mutable std::map<const db::Circuit *, size_t> m_circuit_index_by_object;
+  mutable std::map<const db::Net *, size_t> m_net_index_by_object;
 };
 
 /**
@@ -239,6 +245,10 @@ public:
 private slots:
   void show_all_clicked ();
   void filter_changed ();
+  void anchor_clicked (const QString &url);
+  void navigate_back ();
+  void navigate_forward ();
+  void current_index_changed (const QModelIndex &index);
 
 private:
   bool m_show_all;
@@ -256,6 +266,11 @@ private:
   unsigned int m_cv_index;
   lay::PluginRoot *mp_plugin_root;
   tl::weak_ptr<db::LayoutToNetlist> mp_database;
+  std::vector<void *> m_history;
+  size_t m_history_ptr;
+
+  void add_to_history (void *id, bool fwd);
+  void navigate_to (void *id, bool forward = true);
 };
 
 } // namespace lay

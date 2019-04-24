@@ -196,21 +196,6 @@ public:
   void create_ordered_list ();
 };
 
-// --------------------------------------------------------------------------------------
-
-/**
- *  @brief A delegate displaying the summary of a grain
- */
-class SaltItemDelegate
-  : public QStyledItemDelegate
-{
-public:
-  SaltItemDelegate (QObject *parent);
-
-  void paint (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const;
-};
-
 }
 
 #endif

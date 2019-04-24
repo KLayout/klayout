@@ -22,8 +22,11 @@
 
 
 #include "layNetlistBrowserPage.h"
+#include "layItemDelegates.h"
 #include "dbLayoutToNetlist.h"
 #include "dbNetlistDeviceClasses.h"
+
+#include <QUrl>
 
 namespace lay
 {
@@ -430,105 +433,197 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
 }
 
 QString
+NetlistBrowserModel::make_link_to (const db::Net *net) const
+{
+  if (! net) {
+    return QString ();
+  } else {
+    void *id = make_id_circuit_net (circuit_index (net->circuit ()), net_index (net));
+    return tl::to_qstring (tl::sprintf ("<a href='int:net?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), net->expanded_name ()));
+  }
+}
+
+static
+std::string device_string (const db::Device *device)
+{
+  if (! device || ! device->device_class ()) {
+    return std::string ();
+  }
+
+  std::string s = device->device_class ()->name ();
+  bool first = true;
+  const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+    if (p->is_primary ()) {
+      if (first) {
+        s += " [";
+        first = false;
+      } else {
+        s += ", ";
+      }
+      s += p->name ();
+      s += "=";
+      double v = device->parameter_value (p->id ());
+      s += tl::to_string (v);
+    }
+  }
+  s += "]";
+  return s;
+}
+
+QString
 NetlistBrowserModel::text (const QModelIndex &index) const
 {
   void *id = index.internalPointer ();
 
   if (is_id_circuit (id)) {
 
-    db::Circuit *circuit = circuit_from_id (id);
-    if (circuit) {
-      return tl::to_qstring (circuit->name ());
+    //  circuit: header column = name, other columns empty
+    if (index.column () == 0) {
+      db::Circuit *circuit = circuit_from_id (id);
+      if (circuit) {
+        return tl::to_qstring (circuit->name ());
+      }
     }
 
   } else if (is_id_circuit_pin (id) || is_id_circuit_subcircuit_pin (id)) {
 
-    db::Pin *pin = pin_from_id (id);
-    if (pin) {
-      return tl::to_qstring (pin->expanded_name ());
+    //  circuit/pin: header column = name, other columns empty
+    if (index.column () == 0) {
+      db::Pin *pin = pin_from_id (id);
+      if (pin) {
+        return tl::to_qstring (pin->expanded_name ());
+      }
     }
 
   } else if (is_id_circuit_pin_net (id)) {
 
+    //  circuit/pin/net: header column = name, second column link to net
     db::Circuit *circuit = circuit_from_id (id);
     db::Pin *pin = pin_from_id (id);
     if (pin) {
       db::Net *net = circuit->net_for_pin (pin->id ());
       if (net) {
-        return tl::to_qstring (net->expanded_name ());
+        if (index.column () == 0) {
+          return tl::to_qstring (net->expanded_name ());
+        } else {
+          return make_link_to (net);
+        }
       }
     }
 
   } else if (is_id_circuit_device (id)) {
 
+    //  circuit/device: header column = class + parameters, second column device name
     db::Device *device = device_from_id (id);
-    if (device) {
-      return tl::to_qstring (device->expanded_name ());
+    if (device && device->device_class ()) {
+
+      if (index.column () == 0) {
+        return tl::to_qstring (device_string (device));
+      } else {
+        return tl::to_qstring (device->expanded_name ());
+      }
+
     }
 
   } else if (is_id_circuit_device_terminal (id)) {
 
+    //  circuit/device/terminal: header column = terminal name, second column link to net
     db::Device *device = device_from_id (id);
     if (device && device->device_class ()) {
       size_t terminal = circuit_device_terminal_index_from_id (id);
       if (device->device_class ()->terminal_definitions ().size () > terminal) {
-        return tl::to_qstring (device->device_class ()->terminal_definitions () [terminal].name ());
+        const db::DeviceTerminalDefinition &td = device->device_class ()->terminal_definitions () [terminal];
+        if (index.column () == 0) {
+          return tl::to_qstring (td.name ());
+        } else {
+          return make_link_to (device->net_for_terminal (td.id ()));
+        }
       }
     }
 
   } else if (is_id_circuit_subcircuit (id)) {
 
+    //  circuit/subcircuit: header column = circuit name, second column subcircuit name
     db::SubCircuit *subcircuit = subcircuit_from_id (id);
     if (subcircuit) {
-      return tl::to_qstring (subcircuit->expanded_name ());
+      if (index.column () == 0) {
+        return tl::to_qstring (subcircuit->circuit_ref ()->name ());
+      } else {
+        return tl::to_qstring (subcircuit->expanded_name ());
+      }
     }
 
   } else if (is_id_circuit_net (id)) {
 
+    //  circuit/net: header column = node count, second column net name
     db::Net *net = net_from_id (id);
     if (net) {
-      return tl::to_qstring (net->expanded_name ());
+      if (index.column () == 0) {
+        return tl::to_qstring ("(" + tl::to_string (net->pin_count () + net->terminal_count () + net->subcircuit_pin_count ()) + ")");
+      } else {
+        return tl::to_qstring (net->expanded_name ());
+      }
     }
 
   } else if (is_id_circuit_net_pin (id)) {
 
+    //  circuit/net/pin: header column = pin name, second column empty (for now)
     const db::NetPinRef *ref = net_pinref_from_id (id);
     if (ref && ref->pin ()) {
-      return tl::to_qstring (ref->pin ()->expanded_name ());
+      if (index.column () == 0) {
+        //  TODO: make link to pin
+        return tl::to_qstring (ref->pin ()->expanded_name ());
+      }
+      //  TODO: in case of compare use second and third column
     }
 
   } else if (is_id_circuit_net_subcircuit_pin (id)) {
 
+    //  TODO: enhance
     const db::NetSubcircuitPinRef *ref = net_subcircuit_pinref_from_id (id);
     if (ref && ref->pin ()) {
+     //  TODO: make link to circuit
       return tl::to_qstring (ref->pin ()->expanded_name ());
     }
 
   } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
 
+    //  TODO: enhance
     const db::NetSubcircuitPinRef *ref = net_subcircuit_pinref_from_id (id);
     size_t other_index = circuit_net_subcircuit_pin_other_index_from_id (id);
 
     if (ref && ref->pin () && ref->subcircuit () && ref->subcircuit ()->circuit_ref () && ref->subcircuit ()->circuit_ref ()->pin_by_id (other_index)) {
       const db::Pin *pin = ref->subcircuit ()->circuit_ref ()->pin_by_id (other_index);
+      //  TODO: make link to pin inside circuit
       return tl::to_qstring (pin->expanded_name ());
     }
 
   } else if (is_id_circuit_net_device_terminal (id)) {
 
+    //  circuit/net/device terminal: header column = terminal and device string, second column = device name
     const db::NetTerminalRef *ref = net_terminalref_from_id (id);
     if (ref && ref->terminal_def ()) {
-      return tl::to_qstring (ref->terminal_def ()->name ());
+      if (index.column () == 0) {
+        return tl::to_qstring (ref->terminal_def ()->name () + " - " + device_string (ref->device ()));
+      } else {
+        return tl::to_qstring (ref->device ()->expanded_name ());
+      }
     }
 
   } else if (is_id_circuit_net_device_terminal_others (id)) {
 
+    //  circuit/net/device terminal/more: header column = terminal name, second column = net link
     const db::NetTerminalRef *ref = net_terminalref_from_id (id);
     size_t other_index = circuit_net_device_terminal_other_index_from_id (id);
 
     if (ref && ref->device_class () && ref->device_class ()->terminal_definitions ().size () > other_index) {
       const db::DeviceTerminalDefinition &def = ref->device_class ()->terminal_definitions ()[other_index];
-      return tl::to_qstring (def.name ());
+      if (index.column () == 0) {
+        return tl::to_qstring (def.name ());
+      } else {
+        return make_link_to (ref->device ()->net_for_terminal (def.id ()));
+      }
     }
 
   }
@@ -763,6 +858,20 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
 }
 
 QModelIndex
+NetlistBrowserModel::index_from_id (void *id, int column) const
+{
+  if (is_id_circuit_net (id)) {
+    db::Circuit *circuit = circuit_from_id (id);
+    return createIndex (int (circuit->pin_count () + circuit_net_index_from_id (id)), column, make_id_circuit_net (circuit_index_from_id (id), circuit_net_index_from_id (id)));
+  }
+
+  //  TODO: more ...
+
+  return QModelIndex ();
+}
+
+
+QModelIndex
 NetlistBrowserModel::parent (const QModelIndex &index) const
 {
   if (! index.isValid ()) {
@@ -979,6 +1088,38 @@ NetlistBrowserModel::subcircuit_from_id (void *id) const
   return attr_by_object_and_index (circuit, index, circuit->begin_subcircuits (), circuit->end_subcircuits (), m_subcircuit_by_circuit_and_index);
 }
 
+template <class Attr, class Iter>
+static size_t index_from_attr (const Attr *attr, const Iter &begin, const Iter &end, std::map<const Attr *, size_t> &cache)
+{
+  typename std::map<const Attr *, size_t>::iterator cc = cache.find (attr);
+  if (cc != cache.end ()) {
+    return cc->second;
+  }
+
+  size_t index = 0;
+  for (Iter i = begin; i != end; ++i, ++index) {
+    if (i.operator-> () == attr) {
+      cache.insert (std::make_pair (i.operator-> (), index));
+      return index;
+    }
+  }
+
+  tl_assert (false);
+}
+
+size_t
+NetlistBrowserModel::circuit_index (const db::Circuit *circuit) const
+{
+  return index_from_attr (circuit, netlist ()->begin_circuits (), netlist ()->end_circuits (), m_circuit_index_by_object);
+}
+
+size_t
+NetlistBrowserModel::net_index (const db::Net *net) const
+{
+  const db::Circuit *circuit = net->circuit ();
+  return index_from_attr (net, circuit->begin_nets (), circuit->end_nets (), m_net_index_by_object);
+}
+
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserPage implementation
 
@@ -994,7 +1135,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     m_marker_dither_pattern (-1),
     mp_view (0),
     m_cv_index (0),
-    mp_plugin_root (0)
+    mp_plugin_root (0),
+    m_history_ptr (0)
 {
   Ui::NetlistBrowserPage::setupUi (this);
 
@@ -1002,8 +1144,26 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   m_show_all_action->setCheckable (true);
   m_show_all_action->setChecked (m_show_all);
 
+  lay::HTMLItemDelegate *delegate;
+
+  delegate = new lay::HTMLItemDelegate (this);
+  delegate->set_text_margin (2);
+  delegate->set_anchors_clickable (true);
+  connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
+  directory_tree->setItemDelegateForColumn (1, delegate);
+
+  delegate = new lay::HTMLItemDelegate (this);
+  delegate->set_text_margin (2);
+  delegate->set_plain_text (true);
+  directory_tree->setItemDelegateForColumn (0, delegate);
+
   connect (m_show_all_action, SIGNAL (triggered ()), this, SLOT (show_all_clicked ()));
   connect (filter, SIGNAL (textEdited (const QString &)), this, SLOT (filter_changed ()));
+  connect (forward, SIGNAL (clicked ()), this, SLOT (navigate_forward ()));
+  connect (backward, SIGNAL (clicked ()), this, SLOT (navigate_back ()));
+
+  forward->setEnabled (false);
+  backward->setEnabled (false);
 }
 
 NetlistBrowserPage::~NetlistBrowserPage ()
@@ -1054,6 +1214,85 @@ NetlistBrowserPage::set_max_shape_count (size_t max_shape_count)
 #if 0 // @@@
     update_marker_list (1 /*select first*/);
 #endif
+  }
+}
+
+void
+NetlistBrowserPage::anchor_clicked (const QString &a)
+{
+  QUrl url (a);
+  QString ids = url.queryItemValue (QString::fromUtf8 ("id"));
+  if (ids.isEmpty ()) {
+    return;
+  }
+
+  void *id = reinterpret_cast<void *> (ids.toULongLong ());
+  navigate_to (id, true);
+}
+
+void
+NetlistBrowserPage::navigate_to (void *id, bool fwd)
+{
+  NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  if (! model) {
+    return;
+  }
+
+  QModelIndex index = model->index_from_id (id, 0);
+  if (! index.isValid ()) {
+    return;
+  }
+
+  directory_tree->setCurrentIndex (index);
+
+  add_to_history (id, fwd);
+}
+
+void
+NetlistBrowserPage::current_index_changed (const QModelIndex &index)
+{
+  if (index.isValid ()) {
+    printf("@@@1\n"); fflush(stdout);
+    add_to_history (index.internalPointer (), true);
+  }
+}
+
+void
+NetlistBrowserPage::add_to_history (void *id, bool fwd)
+{
+  if (! fwd) {
+    if (m_history_ptr > 1) {
+      --m_history_ptr;
+      m_history [m_history_ptr - 1] = id;
+    }
+  } else if (m_history_ptr >= m_history.size ()) {
+    m_history.push_back (id);
+    m_history_ptr = m_history.size ();
+  } else {
+    if (m_history [m_history_ptr] != id) {
+      m_history.erase (m_history.begin () + m_history_ptr + 1, m_history.end ());
+    }
+    m_history [m_history_ptr] = id;
+    ++m_history_ptr;
+  }
+
+  backward->setEnabled (m_history_ptr > 1);
+  forward->setEnabled (m_history_ptr < m_history.size ());
+}
+
+void
+NetlistBrowserPage::navigate_back ()
+{
+  if (m_history_ptr > 1) {
+    navigate_to (m_history [m_history_ptr - 2], false);
+  }
+}
+
+void
+NetlistBrowserPage::navigate_forward ()
+{
+  if (m_history_ptr < m_history.size ()) {
+    navigate_to (m_history [m_history_ptr]);
   }
 }
 
@@ -1137,6 +1376,7 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
     NetlistBrowserModel *new_model = new NetlistBrowserModel (directory_tree, database);
 
     directory_tree->setModel (new_model);
+    connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
     // @@@ connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (directory_selection_changed (const QItemSelection &, const QItemSelection &)));
 
     directory_tree->header ()->setSortIndicatorShown (true);

@@ -26,6 +26,7 @@
 #include "laySaltDownloadManager.h"
 #include "laySalt.h"
 #include "layVersion.h"
+#include "layItemDelegates.h"
 #include "ui_SaltGrainTemplateSelectionDialog.h"
 #include "tlString.h"
 #include "tlExceptions.h"
@@ -59,7 +60,7 @@ public:
 
     m_salt_templates.add_location (":/salt_templates");
     salt_view->setModel (new SaltModel (this, &m_salt_templates));
-    salt_view->setItemDelegate (new SaltItemDelegate (this));
+    salt_view->setItemDelegate (new lay::HTMLItemDelegate (this));
     salt_view->setCurrentIndex (salt_view->model ()->index (0, 0, QModelIndex ()));
   }
 
@@ -130,7 +131,7 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   SaltModel *model = new SaltModel (this, mp_salt);
   model->set_empty_explanation (tr ("No packages are present on this system"));
   salt_view->setModel (model);
-  salt_view->setItemDelegate (new SaltItemDelegate (this));
+  salt_view->setItemDelegate (new lay::HTMLItemDelegate (this));
 
   SaltModel *mine_model;
 
@@ -138,13 +139,13 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   mine_model = new SaltModel (this, &m_salt_mine, mp_salt, true);
   mine_model->set_empty_explanation (tr ("All available packages are installed"));
   salt_mine_view_new->setModel (mine_model);
-  salt_mine_view_new->setItemDelegate (new SaltItemDelegate (this));
+  salt_mine_view_new->setItemDelegate (new lay::HTMLItemDelegate (this));
 
   //  This model will show only the grains of mp_salt_mine which are present in mp_salt already.
   mine_model = new SaltModel (this, &m_salt_mine, mp_salt, false);
   mine_model->set_empty_explanation (tr ("No packages are installed"));
   salt_mine_view_update->setModel (mine_model);
-  salt_mine_view_update->setItemDelegate (new SaltItemDelegate (this));
+  salt_mine_view_update->setItemDelegate (new lay::HTMLItemDelegate (this));
 
   mode_tab->setCurrentIndex (0);
 

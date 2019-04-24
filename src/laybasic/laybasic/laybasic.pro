@@ -166,7 +166,8 @@ SOURCES = \
   layBackgroundAwareTreeStyle.cc \
     layNetlistBrowser.cc \
     layNetlistBrowserDialog.cc \
-    layNetlistBrowserPage.cc
+    layNetlistBrowserPage.cc \
+    layItemDelegates.cc
 
 HEADERS = \
   gtf.h \
@@ -255,7 +256,8 @@ HEADERS = \
   layBackgroundAwareTreeStyle.h \
     layNetlistBrowser.h \
     layNetlistBrowserDialog.h \
-    layNetlistBrowserPage.h
+    layNetlistBrowserPage.h \
+    layItemDelegates.h
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC

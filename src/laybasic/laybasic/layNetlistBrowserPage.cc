@@ -860,12 +860,64 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
 QModelIndex
 NetlistBrowserModel::index_from_id (void *id, int column) const
 {
-  if (is_id_circuit_net (id)) {
-    db::Circuit *circuit = circuit_from_id (id);
-    return createIndex (int (circuit->pin_count () + circuit_net_index_from_id (id)), column, make_id_circuit_net (circuit_index_from_id (id), circuit_net_index_from_id (id)));
-  }
+  if (is_id_circuit (id)) {
 
-  //  TODO: more ...
+    return createIndex (circuit_index_from_id (id), column, id);
+
+  } else if (is_id_circuit_pin (id)) {
+
+    return createIndex (int (circuit_pin_index_from_id (id)), column, id);
+
+  } else if (is_id_circuit_pin_net (id)) {
+
+    return createIndex (0, column, id);
+
+  } else if (is_id_circuit_net (id)) {
+
+    db::Circuit *circuit = circuit_from_id (id);
+    return createIndex (int (circuit->pin_count () + circuit_net_index_from_id (id)), column, id);
+
+  } else if (is_id_circuit_net_device_terminal (id)) {
+
+    return createIndex (circuit_net_device_terminal_index_from_id (id), column, id);
+
+  } else if (is_id_circuit_net_device_terminal_others (id)) {
+
+    return createIndex (circuit_net_device_terminal_other_index_from_id (id), column, id);
+
+  } else if (is_id_circuit_net_pin (id)) {
+
+    db::Net *net = net_from_id (id);
+    return createIndex (net->terminal_count () + circuit_net_pin_index_from_id (id), column, id);
+
+  } else if (is_id_circuit_net_subcircuit_pin (id)) {
+
+    db::Net *net = net_from_id (id);
+    return createIndex (net->terminal_count () + net->pin_count () + circuit_net_subcircuit_pin_index_from_id (id), column, id);
+
+  } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
+
+    return createIndex (circuit_net_subcircuit_pin_other_index_from_id (id), column, id);
+
+  } else if (is_id_circuit_subcircuit (id)) {
+
+    db::Circuit *circuit = circuit_from_id (id);
+    return createIndex (int (circuit->pin_count () + circuit->net_count () + circuit_subcircuit_index_from_id (id)), column, id);
+
+  } else if (is_id_circuit_subcircuit_pin (id)) {
+
+    return createIndex (int (circuit_subcircuit_pin_index_from_id (id)), column, id);
+
+  } else if (is_id_circuit_device (id)) {
+
+    db::Circuit *circuit = circuit_from_id (id);
+    return createIndex (int (circuit->pin_count () + circuit->net_count () + circuit->subcircuit_count () + circuit_device_index_from_id (id)), column, id);
+
+  } else if (is_id_circuit_device_terminal (id)) {
+
+    return createIndex (int (circuit_device_terminal_index_from_id (id)), column, id);
+
+  }
 
   return QModelIndex ();
 }
@@ -1136,7 +1188,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     mp_view (0),
     m_cv_index (0),
     mp_plugin_root (0),
-    m_history_ptr (0)
+    m_history_ptr (0),
+    m_signals_enabled (true)
 {
   Ui::NetlistBrowserPage::setupUi (this);
 
@@ -1243,7 +1296,12 @@ NetlistBrowserPage::navigate_to (void *id, bool fwd)
     return;
   }
 
-  directory_tree->setCurrentIndex (index);
+  m_signals_enabled = false;
+  try {
+    directory_tree->setCurrentIndex (index);
+  } catch (...) {
+  }
+  m_signals_enabled = true;
 
   add_to_history (id, fwd);
 }
@@ -1251,8 +1309,7 @@ NetlistBrowserPage::navigate_to (void *id, bool fwd)
 void
 NetlistBrowserPage::current_index_changed (const QModelIndex &index)
 {
-  if (index.isValid ()) {
-    printf("@@@1\n"); fflush(stdout);
+  if (index.isValid () && m_signals_enabled) {
     add_to_history (index.internalPointer (), true);
   }
 }

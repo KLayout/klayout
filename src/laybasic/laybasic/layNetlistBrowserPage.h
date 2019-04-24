@@ -268,6 +268,7 @@ private:
   tl::weak_ptr<db::LayoutToNetlist> mp_database;
   std::vector<void *> m_history;
   size_t m_history_ptr;
+  bool m_signals_enabled;
 
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);

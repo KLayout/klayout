@@ -291,6 +291,16 @@
     </widget>
    </item>
   </layout>
+  <action name="actionCollapseAll">
+   <property name="text">
+    <string>Collapse All</string>
+   </property>
+  </action>
+  <action name="actionExpandAll">
+   <property name="text">
+    <string>Expand All</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>directory_tree</tabstop>
@@ -298,5 +308,38 @@
  <resources>
   <include location="../../lay/lay/layResources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionCollapseAll</sender>
+   <signal>triggered()</signal>
+   <receiver>directory_tree</receiver>
+   <slot>collapseAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>281</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExpandAll</sender>
+   <signal>triggered()</signal>
+   <receiver>directory_tree</receiver>
+   <slot>expandAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>281</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

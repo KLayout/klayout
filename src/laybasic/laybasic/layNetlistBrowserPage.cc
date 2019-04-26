@@ -1285,6 +1285,9 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   m_show_all_action->setCheckable (true);
   m_show_all_action->setChecked (m_show_all);
 
+  directory_tree->addAction (actionCollapseAll);
+  directory_tree->addAction (actionExpandAll);
+
   lay::HTMLItemDelegate *delegate;
 
   delegate = new lay::HTMLItemDelegate (this);

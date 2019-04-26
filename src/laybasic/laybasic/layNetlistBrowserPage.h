@@ -119,14 +119,14 @@ private:
   size_t circuit_net_subcircuit_pin_other_index_from_id (void *id) const;
   size_t circuit_net_device_terminal_index_from_id (void *id) const;
   size_t circuit_net_device_terminal_other_index_from_id (void *id) const;
-  db::Circuit *circuit_from_id (void *id) const;
-  db::Net *net_from_id (void *id) const;
+  const db::Circuit *circuit_from_id (void *id) const;
+  const db::Net *net_from_id (void *id) const;
   const db::NetSubcircuitPinRef *net_subcircuit_pinref_from_id (void *id) const;
   const db::NetTerminalRef *net_terminalref_from_id (void *id) const;
   const db::NetPinRef *net_pinref_from_id (void *id) const;
-  db::Device *device_from_id (void *id) const;
-  db::Pin *pin_from_id (void *id) const;
-  db::SubCircuit *subcircuit_from_id (void *id) const;
+  const db::Device *device_from_id (void *id) const;
+  const db::Pin *pin_from_id (void *id) const;
+  const db::SubCircuit *subcircuit_from_id (void *id) const;
   QString text (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;
   size_t circuit_index (const db::Circuit *circuit) const;
@@ -144,14 +144,14 @@ private:
   }
 
   db::LayoutToNetlist *mp_l2ndb;
-  mutable std::map<size_t, db::Circuit *> m_circuit_by_index;
-  mutable std::map<db::Circuit *, std::map<size_t, db::Net *> > m_net_by_circuit_and_index;
-  mutable std::map<db::Net *, std::map<size_t, db::NetSubcircuitPinRef *> > m_subcircuit_pinref_by_net_and_index;
-  mutable std::map<db::Net *, std::map<size_t, db::NetTerminalRef *> > m_terminalref_by_net_and_index;
-  mutable std::map<db::Net *, std::map<size_t, db::NetPinRef *> > m_pinref_by_net_and_index;
-  mutable std::map<db::Circuit *, std::map<size_t, db::Device *> > m_device_by_circuit_and_index;
-  mutable std::map<db::Circuit *, std::map<size_t, db::Pin *> > m_pin_by_circuit_and_index;
-  mutable std::map<db::Circuit *, std::map<size_t, db::SubCircuit *> > m_subcircuit_by_circuit_and_index;
+  mutable std::map<size_t, const db::Circuit *> m_circuit_by_index;
+  mutable std::map<const db::Circuit *, std::map<size_t, const db::Net *> > m_net_by_circuit_and_index;
+  mutable std::map<const db::Net *, std::map<size_t, const db::NetSubcircuitPinRef *> > m_subcircuit_pinref_by_net_and_index;
+  mutable std::map<const db::Net *, std::map<size_t, const db::NetTerminalRef *> > m_terminalref_by_net_and_index;
+  mutable std::map<const db::Net *, std::map<size_t, const db::NetPinRef *> > m_pinref_by_net_and_index;
+  mutable std::map<const db::Circuit *, std::map<size_t, const db::Device *> > m_device_by_circuit_and_index;
+  mutable std::map<const db::Circuit *, std::map<size_t, const db::Pin *> > m_pin_by_circuit_and_index;
+  mutable std::map<const db::Circuit *, std::map<size_t, const db::SubCircuit *> > m_subcircuit_by_circuit_and_index;
   mutable std::map<const db::Circuit *, size_t> m_circuit_index_by_object;
   mutable std::map<const db::Net *, size_t> m_net_index_by_object;
   mutable std::map<const db::Pin *, size_t> m_pin_index_by_object;

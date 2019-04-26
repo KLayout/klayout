@@ -40,29 +40,32 @@
 namespace lay
 {
 
-extern std::string cfg_l2ndb_context_mode;
-extern std::string cfg_l2ndb_show_all;
-extern std::string cfg_l2ndb_window_state;
-extern std::string cfg_l2ndb_window_mode;
-extern std::string cfg_l2ndb_window_dim;
-extern std::string cfg_l2ndb_max_marker_count;
-extern std::string cfg_l2ndb_highlight_color;
-extern std::string cfg_l2ndb_highlight_line_width;
-extern std::string cfg_l2ndb_highlight_vertex_size;
-extern std::string cfg_l2ndb_highlight_halo;
-extern std::string cfg_l2ndb_highlight_dither_pattern;
+extern const std::string cfg_l2ndb_marker_color;
+extern const std::string cfg_l2ndb_marker_cycle_colors;
+extern const std::string cfg_l2ndb_marker_cycle_colors_enabled;
+extern const std::string cfg_l2ndb_marker_dither_pattern;
+extern const std::string cfg_l2ndb_marker_line_width;
+extern const std::string cfg_l2ndb_marker_vertex_size;
+extern const std::string cfg_l2ndb_marker_halo;
+extern const std::string cfg_l2ndb_marker_intensity;
+extern const std::string cfg_l2ndb_window_mode;
+extern const std::string cfg_l2ndb_window_dim;
+extern const std::string cfg_l2ndb_max_shapes_highlighted;
+extern const std::string cfg_l2ndb_show_all;
+extern const std::string cfg_l2ndb_window_state;
 
 NetlistBrowserDialog::NetlistBrowserDialog (lay::PluginRoot *root, lay::LayoutView *vw)
   : lay::Browser (root, vw),
     Ui::NetlistBrowserDialog (),
-    m_context (lay::NetlistBrowserConfig::AnyCell),
     m_window (lay::NetlistBrowserConfig::FitNet),
     m_window_dim (0.0),
     m_max_shape_count (0),
+    m_auto_color_enabled (false),
     m_marker_line_width (-1),
     m_marker_vertex_size (-1),
     m_marker_halo (-1),
     m_marker_dither_pattern (-1),
+    m_marker_intensity (0),
     m_cv_index (-1),
     m_l2n_index (-1)
 {
@@ -288,13 +291,7 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
   bool taken = true;
   bool show_all = browser_frame->show_all ();
 
-  if (name == cfg_l2ndb_context_mode) {
-
-    NetlistBrowserConfig::net_context_mode_type context = m_context;
-    NetlistBrowserContextModeConverter ().from_string (value, context);
-    need_update = lay::test_and_set (m_context, context);
-
-  } else if (name == cfg_l2ndb_show_all) {
+  if (name == cfg_l2ndb_show_all) {
 
     tl::from_string (value, show_all);
 
@@ -313,63 +310,69 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
       need_update = true;
     }
 
-  } else if (name == cfg_l2ndb_max_marker_count) {
+  } else if (name == cfg_l2ndb_max_shapes_highlighted) {
 
     unsigned int mc = 0;
     tl::from_string (value, mc);
     need_update = lay::test_and_set (m_max_shape_count, mc);
 
-  } else if (name == cfg_l2ndb_highlight_color) {
+  } else if (name == cfg_l2ndb_marker_color) {
 
     QColor color;
     if (! value.empty ()) {
       lay::ColorConverter ().from_string (value, color);
     }
 
-    if (color != m_marker_color) {
-      m_marker_color = color;
-      need_update = true;
-    }
+    need_update = lay::test_and_set (m_marker_color, color);
 
-  } else if (name == cfg_l2ndb_highlight_line_width) {
+  } else if (name == cfg_l2ndb_marker_cycle_colors) {
+
+    lay::ColorPalette colors;
+    colors.from_string (value, true);
+
+    need_update = lay::test_and_set (m_auto_colors, colors);
+
+  } else if (name == cfg_l2ndb_marker_cycle_colors) {
+
+    bool f = false;
+    tl::from_string (value, f);
+
+    need_update = lay::test_and_set (m_auto_color_enabled, f);
+
+  } else if (name == cfg_l2ndb_marker_line_width) {
 
     int lw = 0;
     tl::from_string (value, lw);
 
-    if (lw != m_marker_line_width) {
-      m_marker_line_width = lw;
-      need_update = true;
-    }
+    need_update = lay::test_and_set (m_marker_line_width, lw);
 
-  } else if (name == cfg_l2ndb_highlight_vertex_size) {
+  } else if (name == cfg_l2ndb_marker_vertex_size) {
 
     int vs = 0;
     tl::from_string (value, vs);
 
-    if (vs != m_marker_vertex_size) {
-      m_marker_vertex_size = vs;
-      need_update = true;
-    }
+    need_update = lay::test_and_set (m_marker_vertex_size, vs);
 
-  } else if (name == cfg_l2ndb_highlight_halo) {
+  } else if (name == cfg_l2ndb_marker_halo) {
 
     int halo = 0;
     tl::from_string (value, halo);
 
-    if (halo != m_marker_halo) {
-      m_marker_halo = halo;
-      need_update = true;
-    }
+    need_update = lay::test_and_set (m_marker_halo, halo);
 
-  } else if (name == cfg_l2ndb_highlight_dither_pattern) {
+  } else if (name == cfg_l2ndb_marker_dither_pattern) {
 
     int dp = 0;
     tl::from_string (value, dp);
 
-    if (dp != m_marker_dither_pattern) {
-      m_marker_dither_pattern = dp;
-      need_update = true;
-    }
+    need_update = lay::test_and_set (m_marker_dither_pattern, dp);
+
+  } else if (name == cfg_l2ndb_marker_intensity) {
+
+    int bo = 0;
+    tl::from_string (value, bo);
+
+    need_update = lay::test_and_set (m_marker_intensity, bo);
 
   } else {
     taken = false;
@@ -377,8 +380,8 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
 
   if (active () && need_update) {
     browser_frame->set_max_shape_count (m_max_shape_count);
-    browser_frame->set_window (m_window, m_window_dim, m_context);
-    browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern);
+    browser_frame->set_window (m_window, m_window_dim);
+    browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_auto_color_enabled ? &m_auto_colors : 0);
   }
 
   browser_frame->show_all (show_all);
@@ -522,8 +525,8 @@ NetlistBrowserDialog::update_content ()
   browser_frame->enable_updates (false);  //  Avoid building the internal lists several times ...
   browser_frame->set_l2ndb (l2ndb);
   browser_frame->set_max_shape_count (m_max_shape_count);
-  browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern);
-  browser_frame->set_window (m_window, m_window_dim, m_context);
+  browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_auto_color_enabled ? &m_auto_colors : 0);
+  browser_frame->set_window (m_window, m_window_dim);
   browser_frame->set_view (view (), m_cv_index);
   browser_frame->enable_updates (true);
 

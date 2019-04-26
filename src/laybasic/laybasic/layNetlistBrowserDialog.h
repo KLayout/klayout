@@ -27,6 +27,7 @@
 #include "ui_NetlistBrowserDialog.h"
 #include "layBrowser.h"
 #include "layNetlistBrowser.h"
+#include "layColorPalette.h"
 
 namespace lay
 {
@@ -69,15 +70,17 @@ public slots:
   void configure_clicked ();
 
 private:
-  lay::NetlistBrowserConfig::net_context_mode_type m_context;
   lay::NetlistBrowserConfig::net_window_type m_window;
   double m_window_dim;
   unsigned int m_max_shape_count;
   QColor m_marker_color;
+  lay::ColorPalette m_auto_colors;
+  bool m_auto_color_enabled;
   int m_marker_line_width;
   int m_marker_vertex_size;
   int m_marker_halo;
   int m_marker_dither_pattern;
+  int m_marker_intensity;
   std::string m_layout_name;
   int m_cv_index;
   std::string m_l2ndb_name;

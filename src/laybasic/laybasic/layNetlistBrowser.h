@@ -25,6 +25,7 @@
 #define HDR_layNetlistBrowser
 
 #include "layPlugin.h"
+#include "layColorPalette.h"
 #include "ui_NetlistBrowserConfigPage.h"
 #include "ui_NetlistBrowserConfigPage2.h"
 
@@ -37,8 +38,7 @@ namespace lay
 
 struct NetlistBrowserConfig
 {
-  enum net_context_mode_type { AnyCell = 0, NetlistTop, Current, CurrentOrAny, Local };
-  enum net_window_type { DontChange = 0, FitCell, FitNet, Center, CenterSize };
+  enum net_window_type { DontChange = 0, FitNet, Center, CenterSize };
 };
 
 class NetlistBrowserConfigPage
@@ -68,13 +68,14 @@ public:
 
   virtual void setup (lay::PluginRoot *root);
   virtual void commit (lay::PluginRoot *root);
-};
 
-class NetlistBrowserContextModeConverter
-{
-public:
-  void from_string (const std::string &value, lay::NetlistBrowserConfig::net_context_mode_type &mode);
-  std::string to_string (lay::NetlistBrowserConfig::net_context_mode_type mode);
+public slots:
+  void color_button_clicked ();
+
+private:
+  void update_colors ();
+
+  lay::ColorPalette m_palette;
 };
 
 class NetlistBrowserWindowModeConverter

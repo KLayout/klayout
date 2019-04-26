@@ -28,60 +28,28 @@
 
 #include <set>
 
+#include <QColorDialog>
+#include <QPainter>
+
 namespace lay
 {
 
 // ------------------------------------------------------------
 //  Declaration of the configuration options
 
-std::string cfg_l2ndb_context_mode ("l2n-context-mode");
-std::string cfg_l2ndb_show_all ("l2n-show-all");
-std::string cfg_l2ndb_window_state ("l2n-window-state");
-std::string cfg_l2ndb_window_mode ("l2n-window-mode");
-std::string cfg_l2ndb_window_dim ("l2n-window-dim");
-std::string cfg_l2ndb_max_marker_count ("l2n-max-marker-count");
-std::string cfg_l2ndb_highlight_color ("l2n-highlight-color");
-std::string cfg_l2ndb_highlight_line_width ("l2n-highlight-line-width");
-std::string cfg_l2ndb_highlight_vertex_size ("l2n-highlight-vertex-size");
-std::string cfg_l2ndb_highlight_halo ("l2n-highlight-halo");
-std::string cfg_l2ndb_highlight_dither_pattern ("l2n-highlight-dither-pattern");
-
-// ------------------------------------------------------------
-
-static struct {
-  lay::NetlistBrowserConfig::net_context_mode_type mode;
-  const char *string;
-} context_modes [] = {
-  { lay::NetlistBrowserConfig::AnyCell,       "any-cell"     },
-  { lay::NetlistBrowserConfig::NetlistTop,    "netlist-top" },
-  { lay::NetlistBrowserConfig::Current,       "current-cell" },
-  { lay::NetlistBrowserConfig::CurrentOrAny,  "current-or-any-cell" },
-  { lay::NetlistBrowserConfig::Local,         "local-cell"   },
-};
-
-void
-NetlistBrowserContextModeConverter::from_string (const std::string &value, lay::NetlistBrowserConfig::net_context_mode_type &mode)
-{
-  for (unsigned int i = 0; i < sizeof (context_modes) / sizeof (context_modes [0]); ++i) {
-    if (value == context_modes [i].string) {
-      mode = context_modes [i].mode;
-      return;
-    }
-  }
-  throw tl::Exception (tl::to_string (QObject::tr ("Invalid marker database browser context mode: ")) + value);
-}
-
-std::string
-NetlistBrowserContextModeConverter::to_string (lay::NetlistBrowserConfig::net_context_mode_type mode)
-{
-  for (unsigned int i = 0; i < sizeof (context_modes) / sizeof (context_modes [0]); ++i) {
-    if (mode == context_modes [i].mode) {
-      return context_modes [i].string;
-    }
-  }
-  return "";
-}
-
+extern const std::string cfg_l2ndb_marker_color ("l2ndb-marker-color");
+extern const std::string cfg_l2ndb_marker_cycle_colors ("l2ndb-marker-cycle-colors");
+extern const std::string cfg_l2ndb_marker_cycle_colors_enabled ("l2ndb-marker-cycle-colors-enabled");
+extern const std::string cfg_l2ndb_marker_dither_pattern ("l2ndb-marker-dither-pattern");
+extern const std::string cfg_l2ndb_marker_line_width ("l2ndb-marker-line-width");
+extern const std::string cfg_l2ndb_marker_vertex_size ("l2ndb-marker-vertex-size");
+extern const std::string cfg_l2ndb_marker_halo ("l2ndb-marker-halo");
+extern const std::string cfg_l2ndb_marker_intensity ("l2ndb-marker-intensity");
+extern const std::string cfg_l2ndb_window_mode ("l2ndb-window-mode");
+extern const std::string cfg_l2ndb_window_dim ("l2ndb-window-dim");
+extern const std::string cfg_l2ndb_max_shapes_highlighted ("l2ndb-max-shapes-highlighted");
+extern const std::string cfg_l2ndb_show_all ("l2ndb-show-all");
+extern const std::string cfg_l2ndb_window_state ("l2ndb-window-state");
 
 // ------------------------------------------------------------
 
@@ -90,8 +58,7 @@ static struct {
   const char *string;
 } window_modes [] = {
   { lay::NetlistBrowserConfig::DontChange,    "dont-change" },
-  { lay::NetlistBrowserConfig::FitCell,       "fit-cell"    },
-  { lay::NetlistBrowserConfig::FitNet,        "fit-net"  },
+  { lay::NetlistBrowserConfig::FitNet,        "fit-net"     },
   { lay::NetlistBrowserConfig::Center,        "center"      },
   { lay::NetlistBrowserConfig::CenterSize,    "center-size" }
 };
@@ -105,7 +72,7 @@ NetlistBrowserWindowModeConverter::from_string (const std::string &value, lay::N
       return;
     }
   }
-  throw tl::Exception (tl::to_string (QObject::tr ("Invalid marker database browser window mode: ")) + value);
+  throw tl::Exception (tl::to_string (QObject::tr ("Invalid net tracer window mode: ")) + value);
 }
 
 std::string
@@ -119,9 +86,7 @@ NetlistBrowserWindowModeConverter::to_string (lay::NetlistBrowserConfig::net_win
   return "";
 }
 
-
 // ------------------------------------------------------------
-//  Implementation of NetlistBrowserConfigPage
 
 NetlistBrowserConfigPage::NetlistBrowserConfigPage (QWidget *parent)
   : lay::ConfigPage (parent)
@@ -134,11 +99,6 @@ NetlistBrowserConfigPage::NetlistBrowserConfigPage (QWidget *parent)
 void
 NetlistBrowserConfigPage::setup (lay::PluginRoot *root)
 {
-  //  context mode
-  lay::NetlistBrowserConfig::net_context_mode_type cmode = lay::NetlistBrowserConfig::NetlistTop;
-  root->config_get (cfg_l2ndb_context_mode, cmode, NetlistBrowserContextModeConverter ());
-  cbx_context->setCurrentIndex (int (cmode));
-
   //  window mode
   lay::NetlistBrowserConfig::net_window_type wmode = lay::NetlistBrowserConfig::FitNet;
   root->config_get (cfg_l2ndb_window_mode, wmode, NetlistBrowserWindowModeConverter ());
@@ -149,9 +109,9 @@ NetlistBrowserConfigPage::setup (lay::PluginRoot *root)
   root->config_get (cfg_l2ndb_window_dim, wdim);
   le_window->setText (tl::to_qstring (tl::to_string (wdim)));
 
-  //  max. marker count
-  unsigned int max_marker_count = 1000;
-  root->config_get (cfg_l2ndb_max_marker_count, max_marker_count);
+  //  max. shapes highlighted
+  unsigned int max_marker_count = 10000;
+  root->config_get (cfg_l2ndb_max_shapes_highlighted, max_marker_count);
   le_max_markers->setText (tl::to_qstring (tl::to_string (max_marker_count)));
 
   //  enable controls
@@ -170,35 +130,95 @@ NetlistBrowserConfigPage::commit (lay::PluginRoot *root)
   double dim = 1.0;
   tl::from_string (tl::to_string (le_window->text ()), dim);
 
-  unsigned int max_markers_count = 1000;
-  tl::from_string (tl::to_string (le_max_markers->text ()), max_markers_count);
+  unsigned int max_shapes_highlighted = 10000;
+  tl::from_string (tl::to_string (le_max_markers->text ()), max_shapes_highlighted);
 
-  root->config_set (cfg_l2ndb_context_mode, lay::NetlistBrowserConfig::net_context_mode_type (cbx_context->currentIndex ()), NetlistBrowserContextModeConverter ());
   root->config_set (cfg_l2ndb_window_mode, lay::NetlistBrowserConfig::net_window_type (cbx_window->currentIndex ()), NetlistBrowserWindowModeConverter ());
   root->config_set (cfg_l2ndb_window_dim, dim);
-  root->config_set (cfg_l2ndb_max_marker_count, max_markers_count);
+  root->config_set (cfg_l2ndb_max_shapes_highlighted, max_shapes_highlighted);
 }
 
 // ------------------------------------------------------------
-//  Implementation of NetlistBrowserConfigPage2
+
+static QToolButton * (Ui::NetlistBrowserConfigPage2::*cc_buttons []) = {
+  &Ui::NetlistBrowserConfigPage2::cc0,
+  &Ui::NetlistBrowserConfigPage2::cc1,
+  &Ui::NetlistBrowserConfigPage2::cc2,
+  &Ui::NetlistBrowserConfigPage2::cc3,
+  &Ui::NetlistBrowserConfigPage2::cc4,
+  &Ui::NetlistBrowserConfigPage2::cc5,
+  &Ui::NetlistBrowserConfigPage2::cc6,
+  &Ui::NetlistBrowserConfigPage2::cc7
+};
 
 NetlistBrowserConfigPage2::NetlistBrowserConfigPage2 (QWidget *parent)
   : lay::ConfigPage (parent)
 {
   Ui::NetlistBrowserConfigPage2::setupUi (this);
+
+  for (unsigned int i = 0; i < sizeof (cc_buttons) / sizeof (cc_buttons [0]); ++i) {
+    connect (this->*(cc_buttons [i]), SIGNAL (clicked ()), this, SLOT (color_button_clicked ()));
+  }
+}
+
+void
+NetlistBrowserConfigPage2::color_button_clicked ()
+{
+  for (unsigned int i = 0; i < sizeof (cc_buttons) / sizeof (cc_buttons [0]); ++i) {
+
+    if (sender () == this->*(cc_buttons [i])) {
+
+      QColor c;
+      if (m_palette.colors () > i) {
+        c = QColorDialog::getColor (m_palette.color_by_index (i));
+      } else {
+        c = QColorDialog::getColor ();
+      }
+      if (c.isValid ()) {
+        m_palette.set_color (i, c.rgb ());
+        update_colors ();
+      }
+
+      break;
+
+    }
+
+  }
 }
 
 void
 NetlistBrowserConfigPage2::setup (lay::PluginRoot *root)
 {
+  bool cycle_enabled = false;
+  root->config_get (cfg_l2ndb_marker_cycle_colors_enabled, cycle_enabled);
+  cycle_colors_cb->setChecked (cycle_enabled);
+
+  std::string cc;
+  root->config_get (cfg_l2ndb_marker_cycle_colors, cc);
+  try {
+    m_palette.from_string (cc, true);
+  } catch (...) {
+  }
+
+  while (m_palette.colors () < sizeof (cc_buttons) / sizeof (cc_buttons [0])) {
+    m_palette.set_color (int (m_palette.colors ()), 0);
+  }
+
+  update_colors ();
+
   //  marker color
   QColor color;
-  root->config_get (cfg_l2ndb_highlight_color, color, lay::ColorConverter ());
+  root->config_get (cfg_l2ndb_marker_color, color, lay::ColorConverter ());
   color_pb->set_color (color);
+
+  //  brightness offset
+  int brightness = 0;
+  root->config_get (cfg_l2ndb_marker_intensity, brightness);
+  brightness_sb->setValue (brightness);
 
   //  marker line width
   int lw = 0;
-  root->config_get (cfg_l2ndb_highlight_line_width, lw);
+  root->config_get (cfg_l2ndb_marker_line_width, lw);
   if (lw < 0) {
     lw_le->setText (QString ());
   } else {
@@ -207,7 +227,7 @@ NetlistBrowserConfigPage2::setup (lay::PluginRoot *root)
 
   //  marker vertex size
   int vs = 0;
-  root->config_get (cfg_l2ndb_highlight_vertex_size, vs);
+  root->config_get (cfg_l2ndb_marker_vertex_size, vs);
   if (vs < 0) {
     vs_le->setText (QString ());
   } else {
@@ -216,50 +236,81 @@ NetlistBrowserConfigPage2::setup (lay::PluginRoot *root)
 
   //  stipple pattern
   int dp = 0;
-  root->config_get (cfg_l2ndb_highlight_dither_pattern, dp);
+  root->config_get (cfg_l2ndb_marker_dither_pattern, dp);
   stipple_pb->set_dither_pattern (dp);
 
   //  halo
   int halo = 0;
-  root->config_get (cfg_l2ndb_highlight_halo, halo);
+  root->config_get (cfg_l2ndb_marker_halo, halo);
   halo_cb->setCheckState (halo < 0 ? Qt::PartiallyChecked : (halo ? Qt::Checked : Qt::Unchecked));
+}
+
+void
+NetlistBrowserConfigPage2::update_colors ()
+{
+  for (unsigned int i = 0; i < sizeof (cc_buttons) / sizeof (cc_buttons [0]); ++i) {
+
+    QColor color;
+    if (i < m_palette.colors ()) {
+      color = QColor (m_palette.color_by_index (i));
+    }
+
+    QFontMetrics fm (font (), this);
+    QRect rt (fm.boundingRect (QString::fromUtf8 ("AA")));
+    QPixmap pxmp (rt.width () + 10, rt.height () + 10);
+
+    QPainter pxpainter (&pxmp);
+    pxpainter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text)));
+    pxpainter.setBrush (QBrush (color));
+    QRect r (0, 0, pxmp.width () - 1, pxmp.height () - 1);
+    pxpainter.drawRect (r);
+
+    (this->*(cc_buttons [i]))->setIconSize (pxmp.size ());
+    (this->*(cc_buttons [i]))->setIcon (QIcon (pxmp));
+
+  }
 }
 
 void
 NetlistBrowserConfigPage2::commit (lay::PluginRoot *root)
 {
-  QColor color (color_pb->get_color ());
-  root->config_set (cfg_l2ndb_highlight_color, color, lay::ColorConverter ());
+  root->config_set (cfg_l2ndb_marker_cycle_colors_enabled, cycle_colors_cb->isChecked ());
+  root->config_set (cfg_l2ndb_marker_cycle_colors, m_palette.to_string ());
+
+  QColor color = color_pb->get_color ();
+  root->config_set (cfg_l2ndb_marker_color, color, lay::ColorConverter ());
 
   if (lw_le->text ().isEmpty ()) {
-    root->config_set (cfg_l2ndb_highlight_line_width, -1);
+    root->config_set (cfg_l2ndb_marker_line_width, -1);
   } else {
     try {
       int s;
       tl::from_string (tl::to_string (lw_le->text ()), s);
-      root->config_set (cfg_l2ndb_highlight_line_width, s);
+      root->config_set (cfg_l2ndb_marker_line_width, s);
     } catch (...) { }
   }
 
   if (vs_le->text ().isEmpty ()) {
-    root->config_set (cfg_l2ndb_highlight_vertex_size, -1);
+    root->config_set (cfg_l2ndb_marker_vertex_size, -1);
   } else {
     try {
       int s;
       tl::from_string (tl::to_string (vs_le->text ()), s);
-      root->config_set (cfg_l2ndb_highlight_vertex_size, s);
+      root->config_set (cfg_l2ndb_marker_vertex_size, s);
     } catch (...) { }
   }
 
-  root->config_set (cfg_l2ndb_highlight_dither_pattern, stipple_pb->dither_pattern ());
+  root->config_set (cfg_l2ndb_marker_dither_pattern, stipple_pb->dither_pattern ());
 
   if (halo_cb->checkState () == Qt::PartiallyChecked) {
-    root->config_set (cfg_l2ndb_highlight_halo, -1);
+    root->config_set (cfg_l2ndb_marker_halo, -1);
   } else if (halo_cb->checkState () == Qt::Unchecked) {
-    root->config_set (cfg_l2ndb_highlight_halo, 0);
+    root->config_set (cfg_l2ndb_marker_halo, 0);
   } else if (halo_cb->checkState () == Qt::Checked) {
-    root->config_set (cfg_l2ndb_highlight_halo, 1);
+    root->config_set (cfg_l2ndb_marker_halo, 1);
   }
+
+  root->config_set (cfg_l2ndb_marker_intensity, brightness_sb->value ());
 }
 
 // ------------------------------------------------------------
@@ -271,16 +322,19 @@ class NetlistBrowserPluginDeclaration
 public:
   virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
   {
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_context_mode, "netlist-top"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_window_mode, "fit-net"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_window_state, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_window_dim, "1.0"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_max_marker_count, "1000"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_highlight_color, lay::ColorConverter ().to_string (QColor ())));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_highlight_line_width, "-1"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_highlight_vertex_size, "-1"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_highlight_halo, "-1"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_highlight_dither_pattern, "-1"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_max_shapes_highlighted, "10000"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_color, lay::ColorConverter ().to_string (QColor ())));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_cycle_colors_enabled, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_cycle_colors, "255,0,0 0,255,0 0,0,255 255,255,0 255,0,255 0,255,255 160,80,255 255,160,0"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_line_width, "-1"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_vertex_size, "-1"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_halo, "-1"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_dither_pattern, "-1"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_intensity, "50"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_show_all, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_window_state, ""));
   }
 
   virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const

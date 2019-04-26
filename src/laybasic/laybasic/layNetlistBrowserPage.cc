@@ -1265,7 +1265,6 @@ NetlistBrowserModel::subcircuit_index (const db::SubCircuit *sub_circuit) const
 
 NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   : m_show_all (true),
-    m_context (lay::NetlistBrowserConfig::NetlistTop),
     m_window (lay::NetlistBrowserConfig::FitNet),
     m_window_dim (0.0),
     m_max_shape_count (1000),
@@ -1273,6 +1272,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     m_marker_vertex_size (-1),
     m_marker_halo (-1),
     m_marker_dither_pattern (-1),
+    m_marker_intensity (0),
+    m_auto_colors_enabled (false),
     mp_view (0),
     m_cv_index (0),
     mp_plugin_root (0),
@@ -1313,7 +1314,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 
 NetlistBrowserPage::~NetlistBrowserPage ()
 {
-  // @@@
+  //  .. nothing yet ..
 }
 
 void
@@ -1323,13 +1324,18 @@ NetlistBrowserPage::set_plugin_root (lay::PluginRoot *pr)
 }
 
 void
-NetlistBrowserPage::set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern)
+NetlistBrowserPage::set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, const lay::ColorPalette *auto_colors)
 {
   m_marker_color = color;
   m_marker_line_width = line_width;
   m_marker_vertex_size = vertex_size;
   m_marker_halo = halo;
   m_marker_dither_pattern = dither_pattern;
+  m_marker_intensity = marker_intensity;
+  m_auto_colors_enabled = (auto_colors != 0);
+  if (auto_colors) {
+    m_auto_colors = *auto_colors;
+  }
   update_highlights ();
 }
 
@@ -1342,12 +1348,11 @@ NetlistBrowserPage::set_view (lay::LayoutView *view, unsigned int cv_index)
 }
 
 void
-NetlistBrowserPage::set_window (lay::NetlistBrowserConfig::net_window_type window, double window_dim, lay::NetlistBrowserConfig::net_context_mode_type context)
+NetlistBrowserPage::set_window (lay::NetlistBrowserConfig::net_window_type window, double window_dim)
 {
-  if (window != m_window || window_dim != m_window_dim || context != m_context) {
+  if (window != m_window || window_dim != m_window_dim) {
     m_window = window;
     m_window_dim = window_dim;
-    m_context = context;
   }
 }
 

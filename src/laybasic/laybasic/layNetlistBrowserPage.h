@@ -26,6 +26,7 @@
 
 #include "ui_NetlistBrowserPage.h"
 #include "layNetlistBrowser.h"
+#include "layColorPalette.h"
 #include "laybasicCommon.h"
 #include "dbBox.h"
 #include "dbLayoutToNetlist.h"
@@ -203,7 +204,7 @@ public:
   /**
    *  @brief Set the window type and window dimensions
    */
-  void set_window (lay::NetlistBrowserConfig::net_window_type window_type, double window_dim, lay::NetlistBrowserConfig::net_context_mode_type context);
+  void set_window (lay::NetlistBrowserConfig::net_window_type window_type, double window_dim);
 
   /**
    *  @brief Update the net highlights
@@ -227,7 +228,7 @@ public:
    *  @param halo The halo flag or -1 for default
    *  @param dither_pattern The dither pattern index of -1 to take the default
    */
-  void set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern);
+  void set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, const lay::ColorPalette *auto_colors);
 
   /**
    *  @brief Gets a value indicating whether all items in the netlist tree are shown (specifically for cross-reference DBs)
@@ -260,7 +261,6 @@ private slots:
 private:
   bool m_show_all;
   QAction *m_show_all_action;
-  NetlistBrowserConfig::net_context_mode_type m_context;
   NetlistBrowserConfig::net_window_type m_window;
   double m_window_dim;
   size_t m_max_shape_count;
@@ -269,6 +269,9 @@ private:
   int m_marker_vertex_size;
   int m_marker_halo;
   int m_marker_dither_pattern;
+  int m_marker_intensity;
+  lay::ColorPalette m_auto_colors;
+  bool m_auto_colors_enabled;
   lay::LayoutView *mp_view;
   unsigned int m_cv_index;
   lay::PluginRoot *mp_plugin_root;

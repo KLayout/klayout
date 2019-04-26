@@ -443,6 +443,39 @@ NetlistBrowserModel::make_link_to (const db::Net *net) const
   }
 }
 
+QString
+NetlistBrowserModel::make_link_to (const db::Pin *pin, const db::Circuit *circuit) const
+{
+  if (! pin) {
+    return QString ();
+  } else {
+    void *id = make_id_circuit_pin (circuit_index (circuit), pin_index (pin, circuit));
+    return tl::to_qstring (tl::sprintf ("<a href='int:pin?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), pin->expanded_name ()));
+  }
+}
+
+QString
+NetlistBrowserModel::make_link_to (const db::Circuit *circuit) const
+{
+  if (! circuit) {
+    return QString ();
+  } else {
+    void *id = make_id_circuit (circuit_index (circuit));
+    return tl::to_qstring (tl::sprintf ("<a href='int:circuit?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), circuit->name ()));
+  }
+}
+
+QString
+NetlistBrowserModel::make_link_to (const db::SubCircuit *sub_circuit) const
+{
+  if (! sub_circuit) {
+    return QString ();
+  } else {
+    void *id = make_id_circuit_subcircuit (circuit_index (sub_circuit->circuit ()), subcircuit_index (sub_circuit));
+    return tl::to_qstring (tl::sprintf ("<a href='int:subcircuit?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), sub_circuit->expanded_name ()));
+  }
+}
+
 static
 std::string device_string (const db::Device *device)
 {
@@ -486,15 +519,14 @@ NetlistBrowserModel::text (const QModelIndex &index) const
       }
     }
 
-  } else if (is_id_circuit_pin (id) || is_id_circuit_subcircuit_pin (id)) {
+  } else if (is_id_circuit_pin (id)) {
 
-    //  circuit/pin: header column = name, other columns empty
-    if (index.column () == 0) {
-      db::Pin *pin = pin_from_id (id);
-      if (pin) {
-        return tl::to_qstring (pin->expanded_name ());
-      }
+    //  circuit/pin: header column = pin name, other columns pin name
+    db::Pin *pin = pin_from_id (id);
+    if (pin) {
+      return tl::to_qstring (pin->expanded_name ());
     }
+    //  TODO: in case of compare, column 1 is name(a):name(b), 2 is name(a) and 3 is name(b)
 
   } else if (is_id_circuit_pin_net (id)) {
 
@@ -511,6 +543,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
         }
       }
     }
+    //  TODO: in case of compare, column 1 is name(a):name(b), 2 is link name(a) and 3 is link name(b)
 
   } else if (is_id_circuit_device (id)) {
 
@@ -525,6 +558,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
       }
 
     }
+    //  TODO: in case of compare, column 1 is name(a):name(b) [param], 2 is name(a) and 3 is name(b)
 
   } else if (is_id_circuit_device_terminal (id)) {
 
@@ -541,6 +575,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
         }
       }
     }
+    //  TODO: in case of compare, column 1 is terminal, 2 is linke net(a) and 3 is link net(b)
 
   } else if (is_id_circuit_subcircuit (id)) {
 
@@ -548,11 +583,28 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     db::SubCircuit *subcircuit = subcircuit_from_id (id);
     if (subcircuit) {
       if (index.column () == 0) {
-        return tl::to_qstring (subcircuit->circuit_ref ()->name ());
+        return make_link_to (subcircuit->circuit_ref ());
       } else {
         return tl::to_qstring (subcircuit->expanded_name ());
       }
     }
+    //  TODO: in case of compare, column 1 is circuit name(a):circuit name(b), 2 is subcircuit name(a) and 3 is subcircuit name(b)
+
+  } else if (is_id_circuit_subcircuit_pin (id)) {
+
+    //  circuit/pin: header column = pin name, other columns net name
+    db::SubCircuit *subcircuit = subcircuit_from_id (id);
+    if (subcircuit && subcircuit->circuit () && subcircuit->circuit_ref ()) {
+      db::Pin *pin = pin_from_id (id);
+      if (pin) {
+        if (index.column () == 0) {
+          return make_link_to (pin, subcircuit->circuit_ref ());
+        } else {
+          return make_link_to (subcircuit->net_for_pin (pin->id ()));
+        }
+      }
+    }
+    //  TODO: in case of compare, column 1 is name(a):name(b), 2 is link net(a) and 3 is link net(b)
 
   } else if (is_id_circuit_net (id)) {
 
@@ -565,6 +617,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
         return tl::to_qstring (net->expanded_name ());
       }
     }
+    //  TODO: in case of compare, column 1 is (size), 2 is net name(a) and 3 is net name(b)
 
   } else if (is_id_circuit_net_pin (id)) {
 
@@ -572,31 +625,44 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     const db::NetPinRef *ref = net_pinref_from_id (id);
     if (ref && ref->pin ()) {
       if (index.column () == 0) {
-        //  TODO: make link to pin
-        return tl::to_qstring (ref->pin ()->expanded_name ());
+        return make_link_to (ref->pin (), circuit_from_id (id));
       }
       //  TODO: in case of compare use second and third column
     }
 
   } else if (is_id_circuit_net_subcircuit_pin (id)) {
 
-    //  TODO: enhance
+    //  circuit/net/subcircuit pin: header column = pin name - circuit name, second column link to subcircuit
     const db::NetSubcircuitPinRef *ref = net_subcircuit_pinref_from_id (id);
-    if (ref && ref->pin ()) {
-     //  TODO: make link to circuit
-      return tl::to_qstring (ref->pin ()->expanded_name ());
+    if (ref && ref->pin () && ref->subcircuit ()) {
+      const db::Circuit *circuit = ref->subcircuit ()->circuit_ref ();
+      if (circuit) {
+        if (index.column () == 0) {
+          return make_link_to (ref->pin (), circuit) + tl::to_qstring (" - ") + make_link_to (circuit);
+        } else {
+          return make_link_to (ref->subcircuit ());
+        }
+      }
     }
+    //  TODO: in case of compare, column 1 is pin link(a):pin link(b) - circuit link(a):circuit link(b),
+    //  columns 2 is subcircuit link(a), columns (3) is subcircuit link(b)
 
   } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
 
-    //  TODO: enhance
+    //  circuit/net/device terminal/more: header column = pin name, second column = net link
     const db::NetSubcircuitPinRef *ref = net_subcircuit_pinref_from_id (id);
     size_t other_index = circuit_net_subcircuit_pin_other_index_from_id (id);
 
-    if (ref && ref->pin () && ref->subcircuit () && ref->subcircuit ()->circuit_ref () && ref->subcircuit ()->circuit_ref ()->pin_by_id (other_index)) {
-      const db::Pin *pin = ref->subcircuit ()->circuit_ref ()->pin_by_id (other_index);
-      //  TODO: make link to pin inside circuit
-      return tl::to_qstring (pin->expanded_name ());
+    if (ref && ref->pin () && ref->subcircuit ()) {
+      const db::Circuit *circuit = ref->subcircuit ()->circuit_ref ();
+      if (circuit && circuit->pin_by_id (other_index)) {
+        const db::Pin *pin = circuit->pin_by_id (other_index);
+        if (index.column () == 0) {
+          return tl::to_qstring (pin->expanded_name ());
+        } else {
+          return make_link_to (ref->subcircuit ()->net_for_pin (pin->id ()));
+        }
+      }
     }
 
   } else if (is_id_circuit_net_device_terminal (id)) {
@@ -1172,6 +1238,19 @@ NetlistBrowserModel::net_index (const db::Net *net) const
   return index_from_attr (net, circuit->begin_nets (), circuit->end_nets (), m_net_index_by_object);
 }
 
+size_t
+NetlistBrowserModel::pin_index (const db::Pin *pin, const db::Circuit *circuit) const
+{
+  return index_from_attr (pin, circuit->begin_pins (), circuit->end_pins (), m_pin_index_by_object);
+}
+
+size_t
+NetlistBrowserModel::subcircuit_index (const db::SubCircuit *sub_circuit) const
+{
+  const db::Circuit *circuit = sub_circuit->circuit ();
+  return index_from_attr (sub_circuit, circuit->begin_subcircuits (), circuit->end_subcircuits (), m_subcircuit_index_by_object);
+}
+
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserPage implementation
 
@@ -1207,7 +1286,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 
   delegate = new lay::HTMLItemDelegate (this);
   delegate->set_text_margin (2);
-  delegate->set_plain_text (true);
+  delegate->set_anchors_clickable (true);
+  connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
   directory_tree->setItemDelegateForColumn (0, delegate);
 
   connect (m_show_all_action, SIGNAL (triggered ()), this, SLOT (show_all_clicked ()));

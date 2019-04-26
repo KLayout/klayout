@@ -182,7 +182,6 @@ HTMLItemDelegate::editorEvent (QEvent *event, QAbstractItemModel * /*model*/, co
       if (event->type () == QEvent::MouseButtonRelease) {
         emit anchor_clicked (a);
       }
-      return true;
     }
 
   }

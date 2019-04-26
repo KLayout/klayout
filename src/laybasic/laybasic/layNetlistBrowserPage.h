@@ -129,9 +129,14 @@ private:
   db::SubCircuit *subcircuit_from_id (void *id) const;
   QString text (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;
-  size_t circuit_index (const db::Circuit *attr) const;
-  size_t net_index (const db::Net *attr) const;
+  size_t circuit_index (const db::Circuit *circuit) const;
+  size_t net_index (const db::Net *net) const;
+  size_t pin_index (const db::Pin *pin, const db::Circuit *circuit) const;
+  size_t subcircuit_index (const db::SubCircuit *subcircuit) const;
   QString make_link_to (const db::Net *net) const;
+  QString make_link_to (const db::Pin *pin, const db::Circuit *circuit) const;
+  QString make_link_to (const db::Circuit *circuit) const;
+  QString make_link_to (const db::SubCircuit *sub_circuit) const;
 
   db::Netlist *netlist () const
   {
@@ -149,6 +154,8 @@ private:
   mutable std::map<db::Circuit *, std::map<size_t, db::SubCircuit *> > m_subcircuit_by_circuit_and_index;
   mutable std::map<const db::Circuit *, size_t> m_circuit_index_by_object;
   mutable std::map<const db::Net *, size_t> m_net_index_by_object;
+  mutable std::map<const db::Pin *, size_t> m_pin_index_by_object;
+  mutable std::map<const db::SubCircuit *, size_t> m_subcircuit_index_by_object;
 };
 
 /**

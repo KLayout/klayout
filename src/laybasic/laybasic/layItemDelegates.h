@@ -23,6 +23,8 @@
 #ifndef HDR_layItemDelegates
 #define HDR_layItemDelegates
 
+#include "laybasicCommon.h"
+
 #include <QStyledItemDelegate>
 
 namespace lay
@@ -33,7 +35,7 @@ namespace lay
 /**
  *  @brief A delegate displaying the display text as HTML formatted text
  */
-class HTMLItemDelegate
+class LAYBASIC_PUBLIC HTMLItemDelegate
   : public QStyledItemDelegate
 {
 Q_OBJECT

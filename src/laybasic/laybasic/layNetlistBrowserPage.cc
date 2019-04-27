@@ -23,15 +23,126 @@
 
 #include "layNetlistBrowserPage.h"
 #include "layItemDelegates.h"
+#include "layCellView.h"
+#include "layLayoutView.h"
+#include "layMarker.h"
 #include "dbLayoutToNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 
 #include <QUrl>
+#include <QPainter>
 
 namespace lay
 {
 
 extern std::string cfg_l2ndb_show_all;
+
+// ----------------------------------------------------------------------------------
+//  Utilities
+
+template <class Obj, class Attr, class Iter>
+static const Attr *attr_by_object_and_index (const Obj *obj, size_t index, const Iter &begin, const Iter &end, std::map<const Obj *, std::map<size_t, const Attr *> > &cache)
+{
+  typename std::map<const Obj *, std::map<size_t, const Attr *> >::iterator cc = cache.find (obj);
+  if (cc == cache.end ()) {
+    cc = cache.insert (std::make_pair (obj, std::map<size_t, const Attr *> ())).first;
+  }
+
+  typename std::map<size_t, const Attr *>::iterator c = cc->second.find (index);
+  if (c == cc->second.end ()) {
+
+    c = cc->second.insert (std::make_pair (index, (const Attr *) 0)).first;
+    for (Iter i = begin; i != end; ++i) {
+      if (index-- == 0) {
+        c->second = i.operator-> ();
+        break;
+      }
+    }
+
+  }
+
+  return c->second;
+}
+
+template <class Attr, class Iter>
+static size_t index_from_attr (const Attr *attr, const Iter &begin, const Iter &end, std::map<const Attr *, size_t> &cache)
+{
+  typename std::map<const Attr *, size_t>::iterator cc = cache.find (attr);
+  if (cc != cache.end ()) {
+    return cc->second;
+  }
+
+  size_t index = 0;
+  for (Iter i = begin; i != end; ++i, ++index) {
+    if (i.operator-> () == attr) {
+      cache.insert (std::make_pair (i.operator-> (), index));
+      return index;
+    }
+  }
+
+  tl_assert (false);
+}
+
+// ----------------------------------------------------------------------------------
+//  NetColorizer implementation
+
+NetColorizer::NetColorizer ()
+{
+  m_auto_colors_enabled = false;
+}
+
+void
+NetColorizer::configure (const QColor &marker_color, const lay::ColorPalette *auto_colors)
+{
+  m_marker_color = marker_color;
+  if (auto_colors) {
+    m_auto_colors = *auto_colors;
+    m_auto_colors_enabled = true;
+  } else {
+    m_auto_colors_enabled = false;
+  }
+
+  emit colors_changed ();
+}
+
+void
+NetColorizer::set_color_of_net (const db::Net *net, const QColor &color)
+{
+  m_custom_color[net] = color;
+  emit colors_changed ();
+}
+
+void
+NetColorizer::reset_color_of_net (const db::Net *net)
+{
+  m_custom_color.erase (net);
+  emit colors_changed ();
+}
+
+void
+NetColorizer::clear ()
+{
+  m_net_index_by_object.clear ();
+  m_custom_color.clear ();
+  emit colors_changed ();
+}
+
+QColor
+NetColorizer::color_of_net (const db::Net *net) const
+{
+  std::map<const db::Net *, QColor>::const_iterator c = m_custom_color.find (net);
+  if (c != m_custom_color.end ()) {
+    return c->second;
+  }
+
+  if (m_auto_colors_enabled) {
+    const db::Circuit *circuit = net->circuit ();
+    size_t index = index_from_attr (net, circuit->begin_nets (), circuit->end_nets (), m_net_index_by_object);
+    return m_auto_colors.color_by_index ((unsigned int) index);
+  } else {
+    return m_marker_color;
+  }
+}
 
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserModel implementation
@@ -80,10 +191,10 @@ static inline bool always (bool)
   return true;
 }
 
-NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb)
-  : QAbstractItemModel (parent), mp_l2ndb (l2ndb)
+NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb, NetColorizer *colorizer)
+  : QAbstractItemModel (parent), mp_l2ndb (l2ndb), mp_colorizer (colorizer)
 {
-  //  .. nothing yet ..
+  connect (mp_colorizer, SIGNAL (colors_changed ()), this, SLOT (colors_changed ()));
 }
 
 NetlistBrowserModel::~NetlistBrowserModel ()
@@ -658,7 +769,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
       if (circuit && circuit->pin_by_id (other_index)) {
         const db::Pin *pin = circuit->pin_by_id (other_index);
         if (index.column () == 0) {
-          return tl::to_qstring (pin->expanded_name ());
+          return make_link_to (pin, circuit);
         } else {
           return make_link_to (ref->subcircuit ()->net_for_pin (pin->id ()));
         }
@@ -707,6 +818,16 @@ static QIcon icon_for_net ()
   return icon;
 }
 
+static QIcon light_icon_for_net ()
+{
+  QIcon icon;
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_48.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_32.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_24.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_net_light_16.png")));
+  return icon;
+}
+
 static QIcon icon_for_pin ()
 {
   QIcon icon;
@@ -750,17 +871,73 @@ static QIcon icon_for_circuit ()
   return icon;
 }
 
+static QIcon net_icon_with_color (const QColor &color)
+{
+  if (! color.isValid ()) {
+    return icon_for_net ();
+  }
+
+  QIcon colored_icon;
+  QIcon original_icon = light_icon_for_net ();
+
+  QList<QSize> sizes = original_icon.availableSizes ();
+  for (QList<QSize>::const_iterator i = sizes.begin (); i != sizes.end (); ++i) {
+
+    QImage image (*i, QImage::Format_ARGB32);
+    image.fill (Qt::transparent);
+    QPainter painter (&image);
+    original_icon.paint (&painter, 0, 0, i->width (), i->height ());
+
+    for (int x = 0; x < i->width (); ++x) {
+      for (int y = 0; y < i->height (); ++y) {
+        QRgb pixel = image.pixel (x, y);
+        pixel = (pixel & ~RGB_MASK) | (color.rgb () & RGB_MASK);
+        image.setPixel (x, y, pixel);
+      }
+
+    }
+
+    colored_icon.addPixmap (QPixmap::fromImage (image));
+
+  }
+
+  return colored_icon;
+}
+
+QIcon
+NetlistBrowserModel::icon_for_net (const db::Net *net) const
+{
+  if (mp_colorizer) {
+
+    QColor color = mp_colorizer->color_of_net (net);
+
+    lay::color_t rgb = lay::color_t (color.rgb ());
+    std::map<lay::color_t, QIcon>::const_iterator c = m_net_icon_per_color.find (rgb);
+    if (c == m_net_icon_per_color.end ()) {
+      c = m_net_icon_per_color.insert (std::make_pair (rgb, net_icon_with_color (color))).first;
+    }
+
+    return c->second;
+
+  } else {
+    return lay::icon_for_net ();
+  }
+}
+
 QIcon
 NetlistBrowserModel::icon (const QModelIndex &index) const
 {
   void *id = index.internalPointer ();
 
+  const db::Net *net = net_from_index (index);
+  if (net) {
+    return icon_for_net (net);
+  }
+
   if (is_id_circuit (id)) {
     return icon_for_circuit ();
-  } else if (is_id_circuit_pin (id) || is_id_circuit_subcircuit_pin (id)) {
+  } else if (is_id_circuit_pin (id)) {
     return icon_for_pin ();
-  } else if (is_id_circuit_pin_net (id)) {
-    return icon_for_net ();
   } else if (is_id_circuit_device (id)) {
 
     const db::Device *device = device_from_id (id);
@@ -768,12 +945,8 @@ NetlistBrowserModel::icon (const QModelIndex &index) const
       return icon_for_device (device->device_class ());
     }
 
-  } else if (is_id_circuit_device_terminal (id)) {
-    return icon_for_net ();
   } else if (is_id_circuit_subcircuit (id)) {
     return icon_for_circuit ();
-  } else if (is_id_circuit_net (id)) {
-    return icon_for_net ();
   } else if (is_id_circuit_net_pin (id) || is_id_circuit_net_subcircuit_pin_others (id)) {
     return icon_for_pin ();
   } else if (is_id_circuit_net_subcircuit_pin (id)) {
@@ -785,8 +958,6 @@ NetlistBrowserModel::icon (const QModelIndex &index) const
       return icon_for_device (ref->device ()->device_class ());
     }
 
-  } else if (is_id_circuit_net_device_terminal_others (id)) {
-    return icon_for_net ();
   }
 
   return QIcon ();
@@ -921,6 +1092,76 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
   }
 
   return createIndex (row, column, new_id);
+}
+
+void
+NetlistBrowserModel::colors_changed ()
+{
+  // @@@ TODO: refresh colors of nets
+}
+
+const db::Net *
+NetlistBrowserModel::net_from_index (const QModelIndex &index) const
+{
+  void *id = index.internalPointer ();
+  if (is_id_circuit_net (id)) {
+
+    return net_from_id (id);
+
+  } else if (is_id_circuit_device_terminal (id)) {
+
+    const db::Device *device = device_from_id (id);
+    if (device && device->device_class ()) {
+      size_t terminal = circuit_device_terminal_index_from_id (id);
+      if (device->device_class ()->terminal_definitions ().size () > terminal) {
+        return device->net_for_terminal (device->device_class ()->terminal_definitions () [terminal].id ());
+      }
+    }
+
+  } else if (is_id_circuit_pin_net (id)) {
+
+    const db::Circuit *circuit = circuit_from_id (id);
+    const db::Pin *pin = pin_from_id (id);
+    if (pin) {
+      return circuit->net_for_pin (pin->id ());
+    }
+
+  } else if (is_id_circuit_subcircuit_pin (id)) {
+
+    const db::SubCircuit *subcircuit = subcircuit_from_id (id);
+    if (subcircuit && subcircuit->circuit () && subcircuit->circuit_ref ()) {
+      const db::Pin *pin = pin_from_id (id);
+      if (pin) {
+        return subcircuit->net_for_pin (pin->id ());
+      }
+    }
+
+  } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
+
+    const db::NetSubcircuitPinRef *ref = net_subcircuit_pinref_from_id (id);
+    size_t other_index = circuit_net_subcircuit_pin_other_index_from_id (id);
+
+    if (ref && ref->pin () && ref->subcircuit ()) {
+      const db::Circuit *circuit = ref->subcircuit ()->circuit_ref ();
+      if (circuit && circuit->pin_by_id (other_index)) {
+        const db::Pin *pin = circuit->pin_by_id (other_index);
+        return ref->subcircuit ()->net_for_pin (pin->id ());
+      }
+    }
+
+  } else if (is_id_circuit_net_device_terminal_others (id)) {
+
+    const db::NetTerminalRef *ref = net_terminalref_from_id (id);
+    size_t other_index = circuit_net_device_terminal_other_index_from_id (id);
+
+    if (ref && ref->device_class () && ref->device_class ()->terminal_definitions ().size () > other_index) {
+      const db::DeviceTerminalDefinition &def = ref->device_class ()->terminal_definitions ()[other_index];
+      return ref->device ()->net_for_terminal (def.id ());
+    }
+
+  }
+
+  return 0;
 }
 
 QModelIndex
@@ -1107,30 +1348,6 @@ NetlistBrowserModel::circuit_from_id (void *id) const
   return c->second;
 }
 
-template <class Obj, class Attr, class Iter>
-static const Attr *attr_by_object_and_index (const Obj *obj, size_t index, const Iter &begin, const Iter &end, std::map<const Obj *, std::map<size_t, const Attr *> > &cache)
-{
-  typename std::map<const Obj *, std::map<size_t, const Attr *> >::iterator cc = cache.find (obj);
-  if (cc == cache.end ()) {
-    cc = cache.insert (std::make_pair (obj, std::map<size_t, const Attr *> ())).first;
-  }
-
-  typename std::map<size_t, const Attr *>::iterator c = cc->second.find (index);
-  if (c == cc->second.end ()) {
-
-    c = cc->second.insert (std::make_pair (index, (const Attr *) 0)).first;
-    for (Iter i = begin; i != end; ++i) {
-      if (index-- == 0) {
-        c->second = i.operator-> ();
-        break;
-      }
-    }
-
-  }
-
-  return c->second;
-}
-
 const db::Net *
 NetlistBrowserModel::net_from_id (void *id) const
 {
@@ -1215,25 +1432,6 @@ NetlistBrowserModel::subcircuit_from_id (void *id) const
   }
 }
 
-template <class Attr, class Iter>
-static size_t index_from_attr (const Attr *attr, const Iter &begin, const Iter &end, std::map<const Attr *, size_t> &cache)
-{
-  typename std::map<const Attr *, size_t>::iterator cc = cache.find (attr);
-  if (cc != cache.end ()) {
-    return cc->second;
-  }
-
-  size_t index = 0;
-  for (Iter i = begin; i != end; ++i, ++index) {
-    if (i.operator-> () == attr) {
-      cache.insert (std::make_pair (i.operator-> (), index));
-      return index;
-    }
-  }
-
-  tl_assert (false);
-}
-
 size_t
 NetlistBrowserModel::circuit_index (const db::Circuit *circuit) const
 {
@@ -1273,12 +1471,13 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     m_marker_halo (-1),
     m_marker_dither_pattern (-1),
     m_marker_intensity (0),
-    m_auto_colors_enabled (false),
     mp_view (0),
     m_cv_index (0),
     mp_plugin_root (0),
     m_history_ptr (0),
-    m_signals_enabled (true)
+    m_signals_enabled (true),
+    m_enable_updates (true),
+    m_update_needed (true)
 {
   Ui::NetlistBrowserPage::setupUi (this);
 
@@ -1314,7 +1513,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 
 NetlistBrowserPage::~NetlistBrowserPage ()
 {
-  //  .. nothing yet ..
+  clear_markers ();
 }
 
 void
@@ -1326,16 +1525,12 @@ NetlistBrowserPage::set_plugin_root (lay::PluginRoot *pr)
 void
 NetlistBrowserPage::set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, const lay::ColorPalette *auto_colors)
 {
-  m_marker_color = color;
+  m_colorizer.configure (color, auto_colors);
   m_marker_line_width = line_width;
   m_marker_vertex_size = vertex_size;
   m_marker_halo = halo;
   m_marker_dither_pattern = dither_pattern;
   m_marker_intensity = marker_intensity;
-  m_auto_colors_enabled = (auto_colors != 0);
-  if (auto_colors) {
-    m_auto_colors = *auto_colors;
-  }
   update_highlights ();
 }
 
@@ -1361,9 +1556,7 @@ NetlistBrowserPage::set_max_shape_count (size_t max_shape_count)
 {
   if (m_max_shape_count != max_shape_count) {
     m_max_shape_count = max_shape_count;
-#if 0 // @@@
-    update_marker_list (1 /*select first*/);
-#endif
+    update_highlights ();
   }
 }
 
@@ -1378,6 +1571,21 @@ NetlistBrowserPage::anchor_clicked (const QString &a)
 
   void *id = reinterpret_cast<void *> (ids.toULongLong ());
   navigate_to (id, true);
+}
+
+void
+NetlistBrowserPage::current_index_changed (const QModelIndex &index)
+{
+  if (index.isValid () && m_signals_enabled) {
+
+    void *id = index.internalPointer ();
+    add_to_history (id, true);
+
+    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    tl_assert (model != 0);
+    show_net (model->net_from_index (index));
+
+  }
 }
 
 void
@@ -1401,14 +1609,8 @@ NetlistBrowserPage::navigate_to (void *id, bool fwd)
   m_signals_enabled = true;
 
   add_to_history (id, fwd);
-}
 
-void
-NetlistBrowserPage::current_index_changed (const QModelIndex &index)
-{
-  if (index.isValid () && m_signals_enabled) {
-    add_to_history (index.internalPointer (), true);
-  }
+  show_net (model->net_from_index (index));
 }
 
 void
@@ -1489,49 +1691,24 @@ NetlistBrowserPage::show_all (bool f)
 }
 
 void
-NetlistBrowserPage::update_highlights ()
-{
-#if 0
-  if (! m_enable_updates) {
-    m_update_needed = true;
-    return;
-  }
-
-  if (m_recursion_sentinel) {
-    return;
-  }
-
-  m_recursion_sentinel = true;
-  try {
-    do_update_markers ();
-  } catch (...) {
-    m_recursion_sentinel = false;
-    throw;
-  }
-  m_recursion_sentinel = false;
-#endif
-}
-
-void
 NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 {
   if (database != mp_database.get ()) {
 
     mp_database.reset (database);
+    clear_markers ();
+    show_net (0);
 
     if (! database) {
       directory_tree->setModel (0);
       return;
     }
 
-    //  @@@ release_markers ();
-
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model
-    NetlistBrowserModel *new_model = new NetlistBrowserModel (directory_tree, database);
+    NetlistBrowserModel *new_model = new NetlistBrowserModel (directory_tree, database, &m_colorizer);
 
     directory_tree->setModel (new_model);
     connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
-    // @@@ connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (directory_selection_changed (const QItemSelection &, const QItemSelection &)));
 
     directory_tree->header ()->setSortIndicatorShown (true);
 
@@ -1541,22 +1718,199 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 }
 
 void
+NetlistBrowserPage::show_net (const db::Net *net)
+{
+  if (net != mp_current_net) {
+
+    mp_current_net = net;
+    clear_markers ();
+
+    if (net) {
+      adjust_view ();
+      update_highlights ();
+    }
+
+  }
+}
+
+void
 NetlistBrowserPage::enable_updates (bool f)
 {
-#if 0 // @@@
   if (f != m_enable_updates) {
 
     m_enable_updates = f;
 
     if (f && m_update_needed) {
-      update_markers ();
-      update_info_text ();
+      update_highlights ();
+      // @@@ update_info_text ();
     }
 
     m_update_needed = false;
 
   }
+}
+
+void
+NetlistBrowserPage::adjust_view ()
+{
+  if (! mp_database.get () || ! mp_view || ! mp_current_net || ! mp_current_net->circuit ()) {
+    return;
+  }
+
+  const lay::CellView &cv = mp_view->cellview (m_cv_index);
+  if (! cv.is_valid ()) {
+    return;
+  }
+
+  if (m_window != lay::NetlistBrowserConfig::FitNet && m_window != lay::NetlistBrowserConfig::Center && m_window != lay::NetlistBrowserConfig::CenterSize) {
+    return;
+  }
+
+  const db::Layout *layout = mp_database->internal_layout ();
+  if (! layout) {
+    return;
+  }
+
+  db::cell_index_type cell_index = mp_current_net->circuit ()->cell_index ();
+  size_t cluster_id = mp_current_net->cluster_id ();
+
+  db::DBox bbox;
+
+  // @@@std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = mp_view->cv_transform_variants_by_layer (m_cv_index);
+  std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
+
+  const db::Connectivity &conn = mp_database->connectivity ();
+  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+
+    //  @@@ TODO: how to get the original layer?
+
+    db::Box layer_bbox;
+    db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+    while (! shapes.at_end ()) {
+      layer_bbox += shapes.trans () * shapes->box ();
+      ++shapes;
+    }
+
+    for (std::vector<db::DCplxTrans>::const_iterator t = tv.begin (); t != tv.end (); ++t) {
+      bbox += *t * db::CplxTrans (layout->dbu ()) * layer_bbox;
+    }
+
+  }
+
+  if (! bbox.empty ()) {
+
+    if (m_window == lay::NetlistBrowserConfig::FitNet) {
+
+      mp_view->zoom_box (bbox.enlarged (db::DVector (m_window_dim, m_window_dim)));
+
+    } else if (m_window == lay::NetlistBrowserConfig::Center) {
+
+      mp_view->pan_center (bbox.p1 () + (bbox.p2 () - bbox.p1 ()) * 0.5);
+
+    } else if (m_window == lay::NetlistBrowserConfig::CenterSize) {
+
+      double w = std::max (bbox.width (), m_window_dim);
+      double h = std::max (bbox.height (), m_window_dim);
+      db::DPoint center (bbox.p1() + (bbox.p2 () - bbox.p1 ()) * 0.5);
+      db::DVector d (w * 0.5, h * 0.5);
+      mp_view->zoom_box (db::DBox (center - d, center + d));
+
+    }
+
+  }
+}
+
+void
+NetlistBrowserPage::update_highlights ()
+{
+  if (! m_enable_updates) {
+    m_update_needed = true;
+    return;
+  }
+
+  clear_markers ();
+
+  if (! mp_database.get () || ! mp_view || ! mp_current_net || ! mp_current_net->circuit ()) {
+    return;
+  }
+
+  const db::Layout *layout = mp_database->internal_layout ();
+  if (! layout) {
+    return;
+  }
+
+  db::cell_index_type cell_index = mp_current_net->circuit ()->cell_index ();
+  size_t cluster_id = mp_current_net->cluster_id ();
+
+  // @@@std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = mp_view->cv_transform_variants_by_layer (m_cv_index);
+  std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
+
+  size_t n_markers = 0;
+  QColor net_color = m_colorizer.color_of_net (mp_current_net);
+
+  const db::Connectivity &conn = mp_database->connectivity ();
+  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+
+    //  @@@ TODO: how to get the original layer?
+
+    db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+    while (! shapes.at_end () && n_markers < m_max_shape_count) {
+
+      mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
+      mp_markers.back ()->set (*shapes, shapes.trans (), tv);
+
+#if 0
+// @@@
+      if (! original.at_end ()) {
+        mp_markers.back ()->set_line_width (original->width (true));
+        mp_markers.back ()->set_vertex_size (1);
+        mp_markers.back ()->set_dither_pattern (original->dither_pattern (true));
+        if (view ()->background_color ().green () < 128) {
+          mp_markers.back ()->set_color (original->eff_fill_color_brighter (true, (m_marker_intensity * 255) / 100));
+          mp_markers.back ()->set_frame_color (original->eff_frame_color_brighter (true, (m_marker_intensity * 255) / 100));
+        } else {
+          mp_markers.back ()->set_color (original->eff_fill_color_brighter (true, (-m_marker_intensity * 255) / 100));
+          mp_markers.back ()->set_frame_color (original->eff_frame_color_brighter (true, (-m_marker_intensity * 255) / 100));
+        }
+      }
 #endif
+      // @@@
+      mp_markers.back ()->set_color (net_color);
+      mp_markers.back ()->set_frame_color (net_color);
+      // @@@
+
+      if (m_marker_line_width >= 0) {
+        mp_markers.back ()->set_line_width (m_marker_line_width);
+      }
+
+      if (m_marker_vertex_size >= 0) {
+        mp_markers.back ()->set_vertex_size (m_marker_vertex_size);
+      }
+
+      if (m_marker_halo >= 0) {
+        mp_markers.back ()->set_halo (m_marker_halo);
+      }
+
+      if (m_marker_dither_pattern >= 0) {
+        mp_markers.back ()->set_dither_pattern (m_marker_dither_pattern);
+      }
+
+      ++shapes;
+      ++n_markers;
+
+    }
+
+  }
+}
+
+void
+NetlistBrowserPage::clear_markers ()
+{
+  for (std::vector <lay::Marker *>::iterator m = mp_markers.begin (); m != mp_markers.end (); ++m) {
+    delete *m;
+  }
+
+  mp_markers.clear ();
 }
 
 }

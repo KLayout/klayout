@@ -28,7 +28,8 @@ TEST (1)
   db::LayoutToNetlist l2n;
   l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
 
-  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n));
+  lay::NetColorizer colorizer;
+  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
 
   EXPECT_EQ (model->hasChildren (QModelIndex ()), true);
   //  two circuits

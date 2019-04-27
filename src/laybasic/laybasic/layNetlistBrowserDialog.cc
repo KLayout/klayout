@@ -332,7 +332,7 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
 
     need_update = lay::test_and_set (m_auto_colors, colors);
 
-  } else if (name == cfg_l2ndb_marker_cycle_colors) {
+  } else if (name == cfg_l2ndb_marker_cycle_colors_enabled) {
 
     bool f = false;
     tl::from_string (value, f);

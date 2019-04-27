@@ -41,6 +41,36 @@ namespace lay
 
 class LayoutView;
 class PluginRoot;
+class Marker;
+
+// ----------------------------------------------------------------------------------
+//  NetColorizer definition
+
+class LAYBASIC_PUBLIC NetColorizer
+  : public QObject
+{
+Q_OBJECT
+
+public:
+  NetColorizer ();
+
+  void configure (const QColor &marker_color, const lay::ColorPalette *auto_colors);
+  void set_color_of_net (const db::Net *net, const QColor &color);
+  void reset_color_of_net (const db::Net *net);
+  void clear ();
+
+  QColor color_of_net (const db::Net *net) const;
+
+signals:
+  void colors_changed ();
+
+private:
+  QColor m_marker_color;
+  lay::ColorPalette m_auto_colors;
+  bool m_auto_colors_enabled;
+  std::map<const db::Net *, QColor> m_custom_color;
+  mutable std::map<const db::Net *, size_t> m_net_index_by_object;
+};
 
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserModel definition
@@ -66,8 +96,10 @@ class PluginRoot;
 class LAYBASIC_PUBLIC NetlistBrowserModel
   : public QAbstractItemModel
 {
+Q_OBJECT
+
 public:
-  NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb);
+  NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb, NetColorizer *colorizer);
   ~NetlistBrowserModel ();
 
   virtual int columnCount (const QModelIndex &parent) const;
@@ -80,6 +112,11 @@ public:
   virtual int rowCount (const QModelIndex &parent) const;
 
   QModelIndex index_from_id (void *id, int column) const;
+
+  const db::Net *net_from_index (const QModelIndex &index) const;
+
+private slots:
+  void colors_changed ();
 
 private:
   void *make_id_circuit (size_t circuit_index) const;
@@ -144,7 +181,10 @@ private:
     return const_cast<db::Netlist *> (mp_l2ndb->netlist ());
   }
 
+  QIcon icon_for_net (const db::Net *net) const;
+
   db::LayoutToNetlist *mp_l2ndb;
+  NetColorizer *mp_colorizer;
   mutable std::map<size_t, const db::Circuit *> m_circuit_by_index;
   mutable std::map<const db::Circuit *, std::map<size_t, const db::Net *> > m_net_by_circuit_and_index;
   mutable std::map<const db::Net *, std::map<size_t, const db::NetSubcircuitPinRef *> > m_subcircuit_pinref_by_net_and_index;
@@ -157,6 +197,7 @@ private:
   mutable std::map<const db::Net *, size_t> m_net_index_by_object;
   mutable std::map<const db::Pin *, size_t> m_pin_index_by_object;
   mutable std::map<const db::SubCircuit *, size_t> m_subcircuit_index_by_object;
+  mutable std::map<lay::color_t, QIcon> m_net_icon_per_color;
 };
 
 /**
@@ -207,14 +248,6 @@ public:
   void set_window (lay::NetlistBrowserConfig::net_window_type window_type, double window_dim);
 
   /**
-   *  @brief Update the net highlights
-   *
-   *  This method should be called if the cellview has changed so the highlights can
-   *  be recomputed and shown in the new cell context.
-   */
-  void update_highlights ();
-
-  /**
    *  @brief Set the maximum number of shapes highlighted for a net
    */
   void set_max_shape_count (size_t max_shape_count);
@@ -250,6 +283,11 @@ public:
    */
   void enable_updates (bool f);
 
+  /**
+   *  @brief Updates net highlights
+   */
+  void update_highlights ();
+
 private slots:
   void show_all_clicked ();
   void filter_changed ();
@@ -261,17 +299,15 @@ private slots:
 private:
   bool m_show_all;
   QAction *m_show_all_action;
+  NetColorizer m_colorizer;
   NetlistBrowserConfig::net_window_type m_window;
   double m_window_dim;
   size_t m_max_shape_count;
-  QColor m_marker_color;
   int m_marker_line_width;
   int m_marker_vertex_size;
   int m_marker_halo;
   int m_marker_dither_pattern;
   int m_marker_intensity;
-  lay::ColorPalette m_auto_colors;
-  bool m_auto_colors_enabled;
   lay::LayoutView *mp_view;
   unsigned int m_cv_index;
   lay::PluginRoot *mp_plugin_root;
@@ -279,9 +315,16 @@ private:
   std::vector<void *> m_history;
   size_t m_history_ptr;
   bool m_signals_enabled;
+  std::vector <lay::Marker *> mp_markers;
+  bool m_enable_updates;
+  bool m_update_needed;
+  const db::Net *mp_current_net;
 
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);
+  void adjust_view ();
+  void clear_markers ();
+  void show_net (const db::Net *net);
 };
 
 } // namespace lay

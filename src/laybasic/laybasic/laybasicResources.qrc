@@ -24,5 +24,9 @@
         <file>images/icon_circuit_24.png</file>
         <file>images/icon_circuit_32.png</file>
         <file>images/icon_circuit_48.png</file>
+        <file>images/icon_net_light_16.png</file>
+        <file>images/icon_net_light_24.png</file>
+        <file>images/icon_net_light_32.png</file>
+        <file>images/icon_net_light_48.png</file>
     </qresource>
 </RCC>

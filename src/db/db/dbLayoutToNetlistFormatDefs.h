@@ -52,7 +52,7 @@ namespace db
  *    description(<text>)           - an arbitrary description text [short key: B]
  *    unit(<unit>)                  - specifies the database unit [short key: U]
  *    top(<circuit>)                - specifies the name of the top circuit [short key: W]
- *    layer(<name>)                 - define a layer [short key: L]
+ *    layer(<name> <source-spec>?)  - define a layer [short key: L]
  *    connect(<layer1> <name> ...)  - connects layer1 with the following layers [short key: C]
  *    global(<layer> <net-name> ...)
  *                                  - connects the shapes of the layer with the given global

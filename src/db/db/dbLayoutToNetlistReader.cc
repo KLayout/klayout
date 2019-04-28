@@ -201,9 +201,21 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
     } else if (test (skeys::layer_key) || test (lkeys::layer_key)) {
 
       Brace br (this);
-      std::string layer;
+      std::string layer, lspec;
       read_word_or_quoted (layer);
-      delete l2n->make_layer (layer);
+      if (br) {
+        read_word_or_quoted (lspec);
+      }
+
+      std::auto_ptr<db::Region> region (l2n->make_layer (layer));
+      if (! lspec.empty ()) {
+        unsigned int layer_index = l2n->layer_of (*region);
+        tl::Extractor ex (lspec.c_str ());
+        db::LayerProperties lp;
+        lp.read (ex);
+        l2n->internal_layout ()->set_properties (layer_index, lp);
+      }
+
       br.done ();
 
     } else if (test (skeys::class_key) || test (lkeys::class_key)) {

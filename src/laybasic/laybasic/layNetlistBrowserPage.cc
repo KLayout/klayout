@@ -1754,8 +1754,17 @@ NetlistBrowserPage::set_highlight_style (QColor color, int line_width, int verte
 void
 NetlistBrowserPage::set_view (lay::LayoutView *view, unsigned int cv_index)
 {
+  if (mp_view) {
+    mp_view->layer_list_changed_event.remove (this, &NetlistBrowserPage::layer_list_changed);
+  }
+
   mp_view = view;
   m_cv_index = cv_index;
+
+  if (mp_view) {
+    mp_view->layer_list_changed_event.add (this, &NetlistBrowserPage::layer_list_changed);
+  }
+
   update_highlights ();
 }
 
@@ -1775,6 +1784,12 @@ NetlistBrowserPage::set_max_shape_count (size_t max_shape_count)
     m_max_shape_count = max_shape_count;
     update_highlights ();
   }
+}
+
+void
+NetlistBrowserPage::layer_list_changed (int)
+{
+  update_highlights ();
 }
 
 void
@@ -2052,29 +2067,26 @@ NetlistBrowserPage::show_all (bool f)
 void
 NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 {
-  if (database != mp_database.get ()) {
+  mp_database.reset (database);
+  clear_markers ();
+  highlight_nets (std::vector<const db::Net *> ());
 
-    mp_database.reset (database);
-    clear_markers ();
-    highlight_nets (std::vector<const db::Net *> ());
-
-    if (! database) {
-      directory_tree->setModel (0);
-      return;
-    }
-
-    //  NOTE: with the tree as the parent, the tree will take over ownership of the model
-    NetlistBrowserModel *new_model = new NetlistBrowserModel (directory_tree, database, &m_colorizer);
-
-    directory_tree->setModel (new_model);
-    connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
-    connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (net_selection_changed ()));
-
-    directory_tree->header ()->setSortIndicatorShown (true);
-
-    find_text->setText (QString ());
-
+  if (! database) {
+    delete directory_tree->model ();
+    directory_tree->setModel (0);
+    return;
   }
+
+  //  NOTE: with the tree as the parent, the tree will take over ownership of the model
+  NetlistBrowserModel *new_model = new NetlistBrowserModel (directory_tree, database, &m_colorizer);
+
+  directory_tree->setModel (new_model);
+  connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
+  connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (net_selection_changed ()));
+
+  directory_tree->header ()->setSortIndicatorShown (true);
+
+  find_text->setText (QString ());
 }
 
 void
@@ -2203,9 +2215,20 @@ NetlistBrowserPage::update_highlights ()
     return;
   }
 
+  const db::Layout &original_layout = mp_view->cellview (m_cv_index)->layout ();
+
   const db::Layout *layout = mp_database->internal_layout ();
   if (! layout) {
     return;
+  }
+
+  //  a map of display properties vs. layer properties
+
+  std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> display_by_lp;
+  for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
+    if (! lp->has_children () && lp->cellview_index () == int (m_cv_index) && lp->layer_index () >= 0 && (unsigned int) lp->layer_index () < original_layout.layers ()) {
+      display_by_lp.insert (std::make_pair (original_layout.get_properties (lp->layer_index ()), lp));
+    }
   }
 
   // @@@std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = mp_view->cv_transform_variants_by_layer (m_cv_index);
@@ -2228,7 +2251,8 @@ NetlistBrowserPage::update_highlights ()
     const db::Connectivity &conn = mp_database->connectivity ();
     for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
 
-      //  @@@ TODO: how to get the original layer?
+      db::LayerProperties lp = layout->get_properties (*layer);
+      std::map<db::LayerProperties, lay::LayerPropertiesConstIterator>::const_iterator display = display_by_lp.find (lp);
 
       db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
       while (! shapes.at_end ()) {
@@ -2241,25 +2265,32 @@ NetlistBrowserPage::update_highlights ()
         mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
         mp_markers.back ()->set (*shapes, shapes.trans (), tv);
 
-  #if 0
-  // @@@
-        if (! original.at_end ()) {
-          mp_markers.back ()->set_line_width (original->width (true));
+        if (net_color.isValid ()) {
+
+          mp_markers.back ()->set_color (net_color);
+          mp_markers.back ()->set_frame_color (net_color);
+
+        } else if (display != display_by_lp.end ()) {
+
+          mp_markers.back ()->set_line_width (display->second->width (true));
           mp_markers.back ()->set_vertex_size (1);
-          mp_markers.back ()->set_dither_pattern (original->dither_pattern (true));
-          if (view ()->background_color ().green () < 128) {
-            mp_markers.back ()->set_color (original->eff_fill_color_brighter (true, (m_marker_intensity * 255) / 100));
-            mp_markers.back ()->set_frame_color (original->eff_frame_color_brighter (true, (m_marker_intensity * 255) / 100));
+          mp_markers.back ()->set_dither_pattern (display->second->dither_pattern (true));
+          if (mp_view->background_color ().green () < 128) {
+            mp_markers.back ()->set_color (display->second->eff_fill_color_brighter (true, (m_marker_intensity * 255) / 100));
+            mp_markers.back ()->set_frame_color (display->second->eff_frame_color_brighter (true, (m_marker_intensity * 255) / 100));
           } else {
-            mp_markers.back ()->set_color (original->eff_fill_color_brighter (true, (-m_marker_intensity * 255) / 100));
-            mp_markers.back ()->set_frame_color (original->eff_frame_color_brighter (true, (-m_marker_intensity * 255) / 100));
+            mp_markers.back ()->set_color (display->second->eff_fill_color_brighter (true, (-m_marker_intensity * 255) / 100));
+            mp_markers.back ()->set_frame_color (display->second->eff_frame_color_brighter (true, (-m_marker_intensity * 255) / 100));
           }
+
+        } else {
+
+          //  fallback color
+          QColor net_color = mp_view->background_color ().green () < 128 ? QColor (Qt::white) : QColor (Qt::black);
+          mp_markers.back ()->set_color (net_color);
+          mp_markers.back ()->set_frame_color (net_color);
+
         }
-  #endif
-        // @@@
-        mp_markers.back ()->set_color (net_color);
-        mp_markers.back ()->set_frame_color (net_color);
-        // @@@
 
         if (m_marker_line_width >= 0) {
           mp_markers.back ()->set_line_width (m_marker_line_width);

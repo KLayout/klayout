@@ -514,6 +514,18 @@ void DeepShapeStore::make_layout (unsigned int layout_index, const db::Recursive
   m_layout_map[std::make_pair (si, trans)] = layout_index;
 }
 
+static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIterator &si)
+{
+  unsigned int layer_index = layout.insert_layer ();
+
+  if (si.layout () && si.layer () < si.layout ()->layers ()) {
+    //  try to preserve the layer properties
+    layout.set_properties (layer_index, si.layout ()->get_properties (si.layer ()));
+  }
+
+  return layer_index;
+}
+
 DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)
 {
   if (max_area_ratio == 0.0) {
@@ -528,7 +540,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
 
-  unsigned int layer_index = layout.insert_layer ();
+  unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing clipped and reduced polygon references
@@ -571,7 +583,7 @@ DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator 
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
 
-  unsigned int layer_index = layout.insert_layer ();
+  unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
 
   //  Build the working hierarchy from the recursive shape iterator
@@ -624,7 +636,7 @@ DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &s
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
 
-  unsigned int layer_index = layout.insert_layer ();
+  unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing edges
@@ -654,7 +666,7 @@ DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterat
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
 
-  unsigned int layer_index = layout.insert_layer ();
+  unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing the edge pairs

@@ -123,7 +123,12 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n)
     *mp_stream << endl << "# Mask layers" << endl;
   }
   for (db::Connectivity::layer_iterator l = l2n->connectivity ().begin_layers (); l != l2n->connectivity ().end_layers (); ++l) {
-    *mp_stream << Keys::layer_key << "(" << name_for_layer (l2n, *l) << ")" << endl;
+    *mp_stream << Keys::layer_key << "(" << name_for_layer (l2n, *l);
+    db::LayerProperties lp = ly->get_properties (*l);
+    if (! lp.is_null ()) {
+      *mp_stream << " " << tl::to_word_or_quoted_string (lp.to_string ());
+    }
+    *mp_stream << ")" << endl;
   }
 
   if (! Keys::is_short ()) {

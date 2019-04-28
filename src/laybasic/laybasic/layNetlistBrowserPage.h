@@ -214,7 +214,8 @@ private:
  */
 class NetlistBrowserPage
   : public QFrame,
-    public Ui::NetlistBrowserPage
+    public Ui::NetlistBrowserPage,
+    public tl::Object
 {
 Q_OBJECT
 
@@ -340,6 +341,7 @@ private:
   void highlight_nets (const std::vector<const db::Net *> &nets);
   std::vector<const db::Net *> selected_nets ();
   void set_color_for_selected_nets (const QColor &color);
+  void layer_list_changed (int);
 };
 
 } // namespace lay

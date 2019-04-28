@@ -174,6 +174,7 @@ private:
   const db::Pin *pin_from_id (void *id) const;
   const db::SubCircuit *subcircuit_from_id (void *id) const;
   QString text (const QModelIndex &index) const;
+  QString search_text (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;
   size_t circuit_index (const db::Circuit *circuit) const;
   size_t net_index (const db::Net *net) const;
@@ -298,7 +299,8 @@ public:
 
 private slots:
   void show_all_clicked ();
-  void filter_changed ();
+  void info_button_pressed ();
+  void find_button_pressed ();
   void anchor_clicked (const QString &url);
   void navigate_back ();
   void navigate_forward ();

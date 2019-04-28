@@ -32,6 +32,7 @@
 #include <QUrl>
 #include <QPainter>
 #include <QColorDialog>
+#include <QRegExp>
 
 namespace lay
 {
@@ -578,6 +579,8 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
     return QVariant (icon (index));
   } else if (role == Qt::DisplayRole) {
     return QVariant (text (index));
+  } else if (role == Qt::UserRole) {
+    return QVariant (search_text (index));
   } else {
     return QVariant ();
   }
@@ -842,6 +845,155 @@ NetlistBrowserModel::text (const QModelIndex &index) const
         return make_link_to (ref->device ()->net_for_terminal (def.id ()));
       }
     }
+
+  }
+
+  return QString ();
+}
+
+QString
+NetlistBrowserModel::search_text (const QModelIndex &index) const
+{
+  void *id = index.internalPointer ();
+
+  if (is_id_circuit (id)) {
+
+    const db::Circuit *circuit = circuit_from_id (id);
+    if (circuit) {
+      return tl::to_qstring (circuit->name ());
+    }
+    //  TODO: in case of compare, use circuit_name(a)|circuit_name(b)
+
+  } else if (is_id_circuit_pin (id)) {
+
+    const db::Pin *pin = pin_from_id (id);
+    if (pin) {
+      return tl::to_qstring (pin->expanded_name ());
+    }
+    //  TODO: in case of compare, use pin_name(a)|pin_name(b)
+
+  } else if (is_id_circuit_pin_net (id)) {
+
+    const db::Circuit *circuit = circuit_from_id (id);
+    const db::Pin *pin = pin_from_id (id);
+    if (pin) {
+      const db::Net *net = circuit->net_for_pin (pin->id ());
+      if (net) {
+        return tl::to_qstring (net->expanded_name ());
+      }
+    }
+    //  TODO: in case of compare, use net_name(a)|net_name(b)
+
+  } else if (is_id_circuit_device (id)) {
+
+    const db::Device *device = device_from_id (id);
+    if (device && device->device_class ()) {
+      return tl::to_qstring (device->device_class ()->name () + "|" + device->expanded_name ());
+    }
+    //  TODO: in case of compare, use class(a)|device_name(a)|class(b)|device_name(b)
+
+  } else if (is_id_circuit_device_terminal (id)) {
+
+    const db::Device *device = device_from_id (id);
+    if (device && device->device_class ()) {
+      size_t terminal = circuit_device_terminal_index_from_id (id);
+      if (device->device_class ()->terminal_definitions ().size () > terminal) {
+        const db::DeviceTerminalDefinition &td = device->device_class ()->terminal_definitions () [terminal];
+        const db::Net *net = device->net_for_terminal (td.id ());
+        if (net) {
+          return tl::to_qstring (td.name () + "|" + net->expanded_name ());
+        }
+      }
+    }
+    //  TODO: in case of compare, use terminal_name(a)|net_name(a)|terminal_name(b)|net_name(b)
+
+  } else if (is_id_circuit_subcircuit (id)) {
+
+    const db::SubCircuit *subcircuit = subcircuit_from_id (id);
+    if (subcircuit && subcircuit->circuit_ref ()) {
+      return tl::to_qstring (subcircuit->circuit_ref ()->name () + "|" + subcircuit->expanded_name ());
+    }
+    //  TODO: in case of compare, use circuit_name(a)|subcircuit_name(a)|circuit_name(b)|subcircuit_name(b)
+
+  } else if (is_id_circuit_subcircuit_pin (id)) {
+
+    const db::SubCircuit *subcircuit = subcircuit_from_id (id);
+    if (subcircuit && subcircuit->circuit () && subcircuit->circuit_ref ()) {
+      const db::Pin *pin = pin_from_id (id);
+      if (pin) {
+        const db::Net *net = subcircuit->net_for_pin (pin->id ());
+        if (net) {
+          return tl::to_qstring (pin->name () + "|" + net->expanded_name ());
+        }
+      }
+    }
+    //  TODO: in case of compare, use pin_name(a)|net_name(a)|pin_name(b)|net_name(b)
+
+  } else if (is_id_circuit_net (id)) {
+
+    const db::Net *net = net_from_id (id);
+    if (net) {
+      return tl::to_qstring (net->expanded_name ());
+    }
+    //  TODO: in case of compare, use name(a)|name(b)
+
+  } else if (is_id_circuit_net_pin (id)) {
+
+    const db::NetPinRef *ref = net_pinref_from_id (id);
+    if (ref && ref->pin ()) {
+      return tl::to_qstring (ref->pin ()->name ());
+    }
+    //  TODO: in case of compare, use pin_name(a)|pin_name(b)
+
+  } else if (is_id_circuit_net_subcircuit_pin (id)) {
+
+    const db::NetSubcircuitPinRef *ref = net_subcircuit_pinref_from_id (id);
+    if (ref && ref->pin () && ref->subcircuit ()) {
+      const db::Circuit *circuit = ref->subcircuit ()->circuit_ref ();
+      if (circuit) {
+        return tl::to_qstring (ref->pin ()->name () + "|" + circuit->name () + "|" + ref->subcircuit ()->name ());
+      }
+    }
+    //  TODO: in case of compare, use pin_name(a)|circuit_name(a)|subcircuit_name(a)|pin_name(b)|circuit_name(b)|subcircuit_name(b)
+
+  } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
+
+    const db::NetSubcircuitPinRef *ref = net_subcircuit_pinref_from_id (id);
+    size_t other_index = circuit_net_subcircuit_pin_other_index_from_id (id);
+
+    if (ref && ref->pin () && ref->subcircuit ()) {
+      const db::Circuit *circuit = ref->subcircuit ()->circuit_ref ();
+      if (circuit && circuit->pin_by_id (other_index)) {
+        const db::Pin *pin = circuit->pin_by_id (other_index);
+        const db::Net *net = ref->subcircuit ()->net_for_pin (pin->id ());
+        if (net) {
+          return tl::to_qstring (pin->name () + "|" + net->expanded_name ());
+        }
+      }
+    }
+    //  TODO: in case of compare, use pin_name(a)|net_name(a)|pin_name(b)|net_name(b)
+
+  } else if (is_id_circuit_net_device_terminal (id)) {
+
+    const db::NetTerminalRef *ref = net_terminalref_from_id (id);
+    if (ref && ref->terminal_def () && ref->device () && ref->device ()->device_class ()) {
+      return tl::to_qstring (ref->terminal_def ()->name () + "|" + ref->device ()->device_class ()->name () + "|" + ref->device ()->expanded_name ());
+    }
+    //  TODO: in case of compare, use terminal_name(a)|device_class(a)|device_name(a)|terminal_name(b)|device_class(b)|device_name(b)
+
+  } else if (is_id_circuit_net_device_terminal_others (id)) {
+
+    const db::NetTerminalRef *ref = net_terminalref_from_id (id);
+    size_t other_index = circuit_net_device_terminal_other_index_from_id (id);
+
+    if (ref && ref->device_class () && ref->device_class ()->terminal_definitions ().size () > other_index) {
+      const db::DeviceTerminalDefinition &def = ref->device_class ()->terminal_definitions ()[other_index];
+      const db::Net *net = ref->device ()->net_for_terminal (def.id ());
+      if (net) {
+        return tl::to_qstring (def.name () + "|" + net->expanded_name ());
+      }
+    }
+    //  TODO: in case of compare, use terminal_name(a)|net_name(a)|terminal_name(b)|net_name(b)
 
   }
 
@@ -1553,8 +1705,20 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
   directory_tree->setItemDelegateForColumn (0, delegate);
 
+  QMenu *find_edit_menu = new QMenu (find_text);
+  find_edit_menu->addAction (actionUseRegularExpressions);
+  find_edit_menu->addAction (actionCaseSensitive);
+
+  find_text->set_clear_button_enabled (true);
+  find_text->set_options_button_enabled (true);
+  find_text->set_options_menu (find_edit_menu);
+#if QT_VERSION >= 0x40700
+  find_text->setPlaceholderText (tr ("Find text ..."));
+#endif
+
   connect (m_show_all_action, SIGNAL (triggered ()), this, SLOT (show_all_clicked ()));
-  connect (filter, SIGNAL (textEdited (const QString &)), this, SLOT (filter_changed ()));
+  connect (info_button, SIGNAL (pressed ()), this, SLOT (info_button_pressed ()));
+  connect (find_button, SIGNAL (pressed ()), this, SLOT (find_button_pressed ()));
   connect (forward, SIGNAL (clicked ()), this, SLOT (navigate_forward ()));
   connect (backward, SIGNAL (clicked ()), this, SLOT (navigate_back ()));
 
@@ -1761,15 +1925,100 @@ NetlistBrowserPage::navigate_forward ()
 }
 
 void
-NetlistBrowserPage::filter_changed ()
+NetlistBrowserPage::info_button_pressed ()
 {
-#if 0 // @@@
-  MarkerBrowserTreeViewModel *tree_model = dynamic_cast<MarkerBrowserTreeViewModel *> (directory_tree->model ());
-  if (tree_model) {
-    set_hidden_rec (tree_model, directory_tree, QModelIndex (), m_show_all, cat_filter->text (), cell_filter->text ());
+  //  @@@
+}
+
+static QModelIndex find_next (QAbstractItemModel *model, const QRegExp &to_find, const QModelIndex &from)
+{
+  if (! from.isValid ()) {
+    return from;
   }
-  update_highlights (2 /*select all*/);
-#endif
+
+  std::vector<QModelIndex> parent_stack;
+  std::vector<std::pair<int, int> > rows_stack;
+
+  QModelIndex index = from;
+
+  while (index.isValid ()) {
+
+    parent_stack.push_back (model->parent (index));
+    rows_stack.push_back (std::make_pair (index.row (), model->rowCount (parent_stack.back ())));
+
+    index = parent_stack.back ();
+
+  }
+
+  std::reverse (parent_stack.begin (), parent_stack.end ());
+  std::reverse (rows_stack.begin (), rows_stack.end ());
+
+  QModelIndex current = from;
+
+  do {
+
+    bool has_next = false;
+
+    if (model->hasChildren (current)) {
+
+      int row_count = model->rowCount (current);
+      if (row_count > 0) {
+
+        parent_stack.push_back (current);
+        rows_stack.push_back (std::make_pair (0, row_count));
+
+        current = model->index (0, 0, current);
+        has_next = true;
+
+      }
+
+    }
+
+    while (! has_next && ! rows_stack.empty ()) {
+
+      ++rows_stack.back ().first;
+
+      if (rows_stack.back ().first == rows_stack.back ().second) {
+
+        //  up
+        current = parent_stack.back ();
+        rows_stack.pop_back ();
+        parent_stack.pop_back ();
+
+      } else {
+
+        current = model->index (rows_stack.back ().first, 0, parent_stack.back ());
+        has_next = true;
+
+      }
+
+    }
+
+    if (has_next) {
+
+      QString text = model->data (current, Qt::UserRole).toString ();
+      if (text.indexOf (to_find) >= 0) {
+        return current;
+      }
+
+    }
+
+  } while (current != from);
+
+  return QModelIndex ();
+}
+
+void
+NetlistBrowserPage::find_button_pressed ()
+{
+  QRegExp re (find_text->text (),
+              actionCaseSensitive->isChecked () ? Qt::CaseSensitive : Qt::CaseInsensitive,
+              actionUseRegularExpressions->isChecked () ? QRegExp::RegExp : QRegExp::FixedString);
+
+  QModelIndex next = find_next (directory_tree->model (), re, directory_tree->currentIndex ());
+  if (next.isValid ()) {
+    navigate_to (next.internalPointer ());
+  }
 }
 
 void
@@ -1821,7 +2070,7 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 
     directory_tree->header ()->setSortIndicatorShown (true);
 
-    filter->setText (QString ());
+    find_text->setText (QString ());
 
   }
 }

@@ -113,11 +113,17 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Netlist</string>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-           </widget>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="lay::DecoratedLineEdit" name="find_text">
@@ -236,13 +242,6 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="info_label">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QToolButton" name="info_button">
             <property name="toolTip">
              <string>Show more information about nets</string>
@@ -256,6 +255,13 @@
             </property>
             <property name="autoRaise">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="info_label">
+            <property name="text">
+             <string>TextLabel</string>
             </property>
            </widget>
           </item>

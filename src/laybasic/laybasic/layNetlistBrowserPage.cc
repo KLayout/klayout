@@ -193,10 +193,12 @@ static inline void *make_id (size_t i1)
   return reinterpret_cast<void *> (i1);
 }
 
+/* not used yet:
 static inline void *make_id (size_t i1, size_t n1, size_t i2)
 {
   return reinterpret_cast<void *> (i1 + n1 * i2);
 }
+*/
 
 static inline void *make_id (size_t i1, size_t n1, size_t i2, size_t n2, size_t i3)
 {
@@ -2195,6 +2197,7 @@ NetlistBrowserPage::update_highlights ()
   }
 
   clear_markers ();
+  info_label->setText (QString ());
 
   if (! mp_database.get () || ! mp_view) {
     return;
@@ -2209,6 +2212,7 @@ NetlistBrowserPage::update_highlights ()
   std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
 
   size_t n_markers = 0;
+  bool not_all_shapes_are_shown = false;
 
   for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end (); ++net) {
 
@@ -2227,7 +2231,12 @@ NetlistBrowserPage::update_highlights ()
       //  @@@ TODO: how to get the original layer?
 
       db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
-      while (! shapes.at_end () && n_markers < m_max_shape_count) {
+      while (! shapes.at_end ()) {
+
+        if (n_markers == m_max_shape_count) {
+          not_all_shapes_are_shown = true;
+          break;
+        }
 
         mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
         mp_markers.back ()->set (*shapes, shapes.trans (), tv);
@@ -2275,6 +2284,12 @@ NetlistBrowserPage::update_highlights ()
 
     }
 
+  }
+
+  if (not_all_shapes_are_shown) {
+    info_label->setText (tl::to_qstring ("<html><p style=\"color:red; font-weight: bold\">" +
+        tl::to_string (QObject::tr ("Not all shapes are highlighted")) +
+        "</p></html>"));
   }
 }
 

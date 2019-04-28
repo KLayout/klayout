@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>571</width>
-    <height>331</height>
+    <width>649</width>
+    <height>333</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -89,76 +89,120 @@ brightness of the color used.</string>
          <property name="spacing">
           <number>6</number>
          </property>
-         <item row="0" column="0" colspan="6">
+         <item row="3" column="0" colspan="4">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Net coloring</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="4">
+          <widget class="QFrame" name="frame_4">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>16</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="lay::ColorButton" name="color_pb">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>The color in which the rulers are drawn</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_9">
+              <property name="text">
+               <string>or</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="brightness_sb">
+              <property name="minimum">
+               <number>-100</number>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="singleStep">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>% intensity increase</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>201</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="4">
           <widget class="QLabel" name="label_3">
            <property name="text">
             <string>Net highlighting</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>16</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="0">
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>16</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="2">
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>or</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="4">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>% intensity increase</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="5">
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>201</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="3" column="3" colspan="3">
+         <item row="5" column="1" colspan="3">
           <widget class="QFrame" name="frame_3">
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -182,6 +226,53 @@ brightness of the color used.</string>
             <property name="bottomMargin">
              <number>0</number>
             </property>
+           </layout>
+          </widget>
+         </item>
+         <item row="4" column="0" colspan="4">
+          <widget class="QFrame" name="frame_5">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>16</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="cycle_colors_cb">
+              <property name="text">
+               <string>Auto-color with palette</string>
+              </property>
+             </widget>
+            </item>
             <item>
              <widget class="QToolButton" name="cc0">
               <property name="text">
@@ -191,27 +282,6 @@ brightness of the color used.</string>
             </item>
             <item>
              <widget class="QToolButton" name="cc1">
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="cc2">
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="cc3">
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="cc4">
               <property name="text">
                <string>...</string>
               </property>
@@ -232,7 +302,28 @@ brightness of the color used.</string>
              </widget>
             </item>
             <item>
+             <widget class="QToolButton" name="cc3">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QToolButton" name="cc7">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="cc4">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="cc2">
               <property name="text">
                <string>...</string>
               </property>
@@ -252,49 +343,6 @@ brightness of the color used.</string>
              </spacer>
             </item>
            </layout>
-          </widget>
-         </item>
-         <item row="3" column="1" colspan="2">
-          <widget class="QCheckBox" name="cycle_colors_cb">
-           <property name="text">
-            <string>Auto-color with palette</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="6">
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Net coloring</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QSpinBox" name="brightness_sb">
-           <property name="minimum">
-            <number>-100</number>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="singleStep">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="lay::ColorButton" name="color_pb">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>The color in which the rulers are drawn</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
           </widget>
          </item>
         </layout>

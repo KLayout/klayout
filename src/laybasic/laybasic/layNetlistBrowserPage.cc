@@ -31,6 +31,7 @@
 
 #include <QUrl>
 #include <QPainter>
+#include <QColorDialog>
 
 namespace lay
 {
@@ -89,6 +90,8 @@ static size_t index_from_attr (const Attr *attr, const Iter &begin, const Iter &
 NetColorizer::NetColorizer ()
 {
   m_auto_colors_enabled = false;
+  m_update_needed = false;
+  m_signals_enabled = true;
 }
 
 void
@@ -102,21 +105,27 @@ NetColorizer::configure (const QColor &marker_color, const lay::ColorPalette *au
     m_auto_colors_enabled = false;
   }
 
-  emit colors_changed ();
+  emit_colors_changed ();
+}
+
+bool
+NetColorizer::has_color_for_net (const db::Net *net)
+{
+  return m_auto_colors_enabled || m_custom_color.find (net) != m_custom_color.end ();
 }
 
 void
 NetColorizer::set_color_of_net (const db::Net *net, const QColor &color)
 {
   m_custom_color[net] = color;
-  emit colors_changed ();
+  emit_colors_changed ();
 }
 
 void
 NetColorizer::reset_color_of_net (const db::Net *net)
 {
   m_custom_color.erase (net);
-  emit colors_changed ();
+  emit_colors_changed ();
 }
 
 void
@@ -124,7 +133,38 @@ NetColorizer::clear ()
 {
   m_net_index_by_object.clear ();
   m_custom_color.clear ();
-  emit colors_changed ();
+  emit_colors_changed ();
+}
+
+void
+NetColorizer::begin_changes ()
+{
+  if (m_signals_enabled) {
+    m_update_needed = false;
+    m_signals_enabled = false;
+  }
+}
+
+void
+NetColorizer::end_changes ()
+{
+  if (! m_signals_enabled) {
+    m_signals_enabled = true;
+    if (m_update_needed) {
+      emit colors_changed ();
+    }
+    m_update_needed = false;
+  }
+}
+
+void
+NetColorizer::emit_colors_changed ()
+{
+  if (! m_signals_enabled) {
+    m_update_needed = true;
+  } else {
+    emit colors_changed ();
+  }
 }
 
 QColor
@@ -907,7 +947,7 @@ static QIcon net_icon_with_color (const QColor &color)
 QIcon
 NetlistBrowserModel::icon_for_net (const db::Net *net) const
 {
-  if (mp_colorizer) {
+  if (mp_colorizer && mp_colorizer->has_color_for_net (net)) {
 
     QColor color = mp_colorizer->color_of_net (net);
 
@@ -1097,7 +1137,7 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
 void
 NetlistBrowserModel::colors_changed ()
 {
-  // @@@ TODO: refresh colors of nets
+  emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex()) - 1, 0, QModelIndex ()));
 }
 
 const db::Net *
@@ -1481,12 +1521,23 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 {
   Ui::NetlistBrowserPage::setupUi (this);
 
+  //  @@@ insert into menu
   m_show_all_action = new QAction (QObject::tr ("Show All"), this);
   m_show_all_action->setCheckable (true);
   m_show_all_action->setChecked (m_show_all);
 
+  QAction *color_action = new QAction (QObject::tr ("Colorize Nets"), directory_tree);
+  QMenu *menu = new QMenu (directory_tree);
+  lay::ColorButton::build_color_menu (menu, this, SLOT (browse_color_for_net ()), SLOT (select_color_for_net ()));
+  color_action->setMenu (menu);
+
   directory_tree->addAction (actionCollapseAll);
   directory_tree->addAction (actionExpandAll);
+  QAction *sep;
+  sep = new QAction (directory_tree);
+  sep->setSeparator (true);
+  directory_tree->addAction (sep);
+  directory_tree->addAction (color_action);
 
   lay::HTMLItemDelegate *delegate;
 
@@ -1581,10 +1632,67 @@ NetlistBrowserPage::current_index_changed (const QModelIndex &index)
     void *id = index.internalPointer ();
     add_to_history (id, true);
 
-    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
-    tl_assert (model != 0);
-    show_net (model->net_from_index (index));
+  }
+}
 
+std::vector<const db::Net *>
+NetlistBrowserPage::selected_nets ()
+{
+  NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  tl_assert (model != 0);
+
+  std::vector<const db::Net *> nets;
+
+  QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
+  for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
+    const db::Net *net = model->net_from_index (*i);
+    if (net) {
+      nets.push_back (net);
+    }
+  }
+
+  return nets;
+}
+
+void
+NetlistBrowserPage::net_selection_changed ()
+{
+  highlight_nets (selected_nets ());
+}
+
+void
+NetlistBrowserPage::set_color_for_selected_nets (const QColor &color)
+{
+  std::vector<const db::Net *> nets = selected_nets ();
+
+  m_colorizer.begin_changes ();
+  for (std::vector<const db::Net *>::const_iterator n = nets.begin (); n != nets.end (); ++n) {
+    if (color.isValid ()) {
+      m_colorizer.set_color_of_net (*n, color);
+    } else {
+      m_colorizer.reset_color_of_net (*n);
+    }
+  }
+  m_colorizer.end_changes ();
+
+  update_highlights ();
+}
+
+void
+NetlistBrowserPage::browse_color_for_net ()
+{
+  QColor c = QColorDialog::getColor (QColor (), this);
+  if (c.isValid ()) {
+    set_color_for_selected_nets (c);
+  }
+}
+
+void
+NetlistBrowserPage::select_color_for_net ()
+{
+  QAction *action = dynamic_cast<QAction *> (sender ());
+  if (action) {
+    set_color_for_selected_nets (action->data ().value<QColor> ());
   }
 }
 
@@ -1610,7 +1718,7 @@ NetlistBrowserPage::navigate_to (void *id, bool fwd)
 
   add_to_history (id, fwd);
 
-  show_net (model->net_from_index (index));
+  net_selection_changed ();
 }
 
 void
@@ -1697,7 +1805,7 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 
     mp_database.reset (database);
     clear_markers ();
-    show_net (0);
+    highlight_nets (std::vector<const db::Net *> ());
 
     if (! database) {
       directory_tree->setModel (0);
@@ -1709,6 +1817,7 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 
     directory_tree->setModel (new_model);
     connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
+    connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (net_selection_changed ()));
 
     directory_tree->header ()->setSortIndicatorShown (true);
 
@@ -1718,14 +1827,14 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 }
 
 void
-NetlistBrowserPage::show_net (const db::Net *net)
+NetlistBrowserPage::highlight_nets (const std::vector<const db::Net *> &nets)
 {
-  if (net != mp_current_net) {
+  if (nets != m_current_nets) {
 
-    mp_current_net = net;
+    m_current_nets = nets;
     clear_markers ();
 
-    if (net) {
+    if (! nets.empty ()) {
       adjust_view ();
       update_highlights ();
     }
@@ -1753,7 +1862,7 @@ NetlistBrowserPage::enable_updates (bool f)
 void
 NetlistBrowserPage::adjust_view ()
 {
-  if (! mp_database.get () || ! mp_view || ! mp_current_net || ! mp_current_net->circuit ()) {
+  if (! mp_database.get () || ! mp_view) {
     return;
   }
 
@@ -1771,28 +1880,36 @@ NetlistBrowserPage::adjust_view ()
     return;
   }
 
-  db::cell_index_type cell_index = mp_current_net->circuit ()->cell_index ();
-  size_t cluster_id = mp_current_net->cluster_id ();
-
   db::DBox bbox;
 
-  // @@@std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = mp_view->cv_transform_variants_by_layer (m_cv_index);
-  std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
+  for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end (); ++net) {
 
-  const db::Connectivity &conn = mp_database->connectivity ();
-  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
-
-    //  @@@ TODO: how to get the original layer?
-
-    db::Box layer_bbox;
-    db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
-    while (! shapes.at_end ()) {
-      layer_bbox += shapes.trans () * shapes->box ();
-      ++shapes;
+    if (! (*net)->circuit ()) {
+      continue;
     }
 
-    for (std::vector<db::DCplxTrans>::const_iterator t = tv.begin (); t != tv.end (); ++t) {
-      bbox += *t * db::CplxTrans (layout->dbu ()) * layer_bbox;
+    db::cell_index_type cell_index = (*net)->circuit ()->cell_index ();
+    size_t cluster_id = (*net)->cluster_id ();
+
+    // @@@std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = mp_view->cv_transform_variants_by_layer (m_cv_index);
+    std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
+
+    const db::Connectivity &conn = mp_database->connectivity ();
+    for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+
+      //  @@@ TODO: how to get the original layer?
+
+      db::Box layer_bbox;
+      db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+      while (! shapes.at_end ()) {
+        layer_bbox += shapes.trans () * shapes->box ();
+        ++shapes;
+      }
+
+      for (std::vector<db::DCplxTrans>::const_iterator t = tv.begin (); t != tv.end (); ++t) {
+        bbox += *t * db::CplxTrans (layout->dbu ()) * layer_bbox;
+      }
+
     }
 
   }
@@ -1830,7 +1947,7 @@ NetlistBrowserPage::update_highlights ()
 
   clear_markers ();
 
-  if (! mp_database.get () || ! mp_view || ! mp_current_net || ! mp_current_net->circuit ()) {
+  if (! mp_database.get () || ! mp_view) {
     return;
   }
 
@@ -1839,64 +1956,73 @@ NetlistBrowserPage::update_highlights ()
     return;
   }
 
-  db::cell_index_type cell_index = mp_current_net->circuit ()->cell_index ();
-  size_t cluster_id = mp_current_net->cluster_id ();
-
   // @@@std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = mp_view->cv_transform_variants_by_layer (m_cv_index);
   std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
 
   size_t n_markers = 0;
-  QColor net_color = m_colorizer.color_of_net (mp_current_net);
 
-  const db::Connectivity &conn = mp_database->connectivity ();
-  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+  for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end (); ++net) {
 
-    //  @@@ TODO: how to get the original layer?
+    if (! (*net)->circuit ()) {
+      continue;
+    }
 
-    db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
-    while (! shapes.at_end () && n_markers < m_max_shape_count) {
+    db::cell_index_type cell_index = (*net)->circuit ()->cell_index ();
+    size_t cluster_id = (*net)->cluster_id ();
 
-      mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-      mp_markers.back ()->set (*shapes, shapes.trans (), tv);
+    QColor net_color = m_colorizer.color_of_net (*net);
 
-#if 0
-// @@@
-      if (! original.at_end ()) {
-        mp_markers.back ()->set_line_width (original->width (true));
-        mp_markers.back ()->set_vertex_size (1);
-        mp_markers.back ()->set_dither_pattern (original->dither_pattern (true));
-        if (view ()->background_color ().green () < 128) {
-          mp_markers.back ()->set_color (original->eff_fill_color_brighter (true, (m_marker_intensity * 255) / 100));
-          mp_markers.back ()->set_frame_color (original->eff_frame_color_brighter (true, (m_marker_intensity * 255) / 100));
-        } else {
-          mp_markers.back ()->set_color (original->eff_fill_color_brighter (true, (-m_marker_intensity * 255) / 100));
-          mp_markers.back ()->set_frame_color (original->eff_frame_color_brighter (true, (-m_marker_intensity * 255) / 100));
+    const db::Connectivity &conn = mp_database->connectivity ();
+    for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+
+      //  @@@ TODO: how to get the original layer?
+
+      db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+      while (! shapes.at_end () && n_markers < m_max_shape_count) {
+
+        mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
+        mp_markers.back ()->set (*shapes, shapes.trans (), tv);
+
+  #if 0
+  // @@@
+        if (! original.at_end ()) {
+          mp_markers.back ()->set_line_width (original->width (true));
+          mp_markers.back ()->set_vertex_size (1);
+          mp_markers.back ()->set_dither_pattern (original->dither_pattern (true));
+          if (view ()->background_color ().green () < 128) {
+            mp_markers.back ()->set_color (original->eff_fill_color_brighter (true, (m_marker_intensity * 255) / 100));
+            mp_markers.back ()->set_frame_color (original->eff_frame_color_brighter (true, (m_marker_intensity * 255) / 100));
+          } else {
+            mp_markers.back ()->set_color (original->eff_fill_color_brighter (true, (-m_marker_intensity * 255) / 100));
+            mp_markers.back ()->set_frame_color (original->eff_frame_color_brighter (true, (-m_marker_intensity * 255) / 100));
+          }
         }
-      }
-#endif
-      // @@@
-      mp_markers.back ()->set_color (net_color);
-      mp_markers.back ()->set_frame_color (net_color);
-      // @@@
+  #endif
+        // @@@
+        mp_markers.back ()->set_color (net_color);
+        mp_markers.back ()->set_frame_color (net_color);
+        // @@@
 
-      if (m_marker_line_width >= 0) {
-        mp_markers.back ()->set_line_width (m_marker_line_width);
-      }
+        if (m_marker_line_width >= 0) {
+          mp_markers.back ()->set_line_width (m_marker_line_width);
+        }
 
-      if (m_marker_vertex_size >= 0) {
-        mp_markers.back ()->set_vertex_size (m_marker_vertex_size);
-      }
+        if (m_marker_vertex_size >= 0) {
+          mp_markers.back ()->set_vertex_size (m_marker_vertex_size);
+        }
 
-      if (m_marker_halo >= 0) {
-        mp_markers.back ()->set_halo (m_marker_halo);
-      }
+        if (m_marker_halo >= 0) {
+          mp_markers.back ()->set_halo (m_marker_halo);
+        }
 
-      if (m_marker_dither_pattern >= 0) {
-        mp_markers.back ()->set_dither_pattern (m_marker_dither_pattern);
-      }
+        if (m_marker_dither_pattern >= 0) {
+          mp_markers.back ()->set_dither_pattern (m_marker_dither_pattern);
+        }
 
-      ++shapes;
-      ++n_markers;
+        ++shapes;
+        ++n_markers;
+
+      }
 
     }
 

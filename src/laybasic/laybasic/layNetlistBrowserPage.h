@@ -55,11 +55,15 @@ public:
   NetColorizer ();
 
   void configure (const QColor &marker_color, const lay::ColorPalette *auto_colors);
+  bool has_color_for_net (const db::Net *net);
   void set_color_of_net (const db::Net *net, const QColor &color);
   void reset_color_of_net (const db::Net *net);
   void clear ();
 
   QColor color_of_net (const db::Net *net) const;
+
+  void begin_changes ();
+  void end_changes ();
 
 signals:
   void colors_changed ();
@@ -69,7 +73,11 @@ private:
   lay::ColorPalette m_auto_colors;
   bool m_auto_colors_enabled;
   std::map<const db::Net *, QColor> m_custom_color;
+  bool m_update_needed;
+  bool m_signals_enabled;
   mutable std::map<const db::Net *, size_t> m_net_index_by_object;
+
+  void emit_colors_changed ();
 };
 
 // ----------------------------------------------------------------------------------
@@ -295,6 +303,9 @@ private slots:
   void navigate_back ();
   void navigate_forward ();
   void current_index_changed (const QModelIndex &index);
+  void net_selection_changed ();
+  void browse_color_for_net ();
+  void select_color_for_net ();
 
 private:
   bool m_show_all;
@@ -318,13 +329,15 @@ private:
   std::vector <lay::Marker *> mp_markers;
   bool m_enable_updates;
   bool m_update_needed;
-  const db::Net *mp_current_net;
+  std::vector<const db::Net *> m_current_nets;
 
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);
   void adjust_view ();
   void clear_markers ();
-  void show_net (const db::Net *net);
+  void highlight_nets (const std::vector<const db::Net *> &nets);
+  std::vector<const db::Net *> selected_nets ();
+  void set_color_for_selected_nets (const QColor &color);
 };
 
 } // namespace lay

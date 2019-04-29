@@ -26,6 +26,7 @@
 #include "layCellView.h"
 #include "layLayoutView.h"
 #include "layMarker.h"
+#include "layNetInfoDialog.h"
 #include "dbLayoutToNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 
@@ -1671,7 +1672,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     m_history_ptr (0),
     m_signals_enabled (true),
     m_enable_updates (true),
-    m_update_needed (true)
+    m_update_needed (true),
+    mp_info_dialog (0)
 {
   Ui::NetlistBrowserPage::setupUi (this);
 
@@ -1826,9 +1828,11 @@ NetlistBrowserPage::selected_nets ()
 
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
-    const db::Net *net = model->net_from_index (*i);
-    if (net) {
-      nets.push_back (net);
+    if (i->column () == 0) {
+      const db::Net *net = model->net_from_index (*i);
+      if (net) {
+        nets.push_back (net);
+      }
     }
   }
 
@@ -1838,7 +1842,11 @@ NetlistBrowserPage::selected_nets ()
 void
 NetlistBrowserPage::net_selection_changed ()
 {
-  highlight_nets (selected_nets ());
+  std::vector<const db::Net *> nets = selected_nets ();
+  if (mp_info_dialog) {
+    mp_info_dialog->set_nets (mp_database.get (), nets);
+  }
+  highlight_nets (nets);
 }
 
 void
@@ -1944,7 +1952,12 @@ NetlistBrowserPage::navigate_forward ()
 void
 NetlistBrowserPage::info_button_pressed ()
 {
-  //  @@@
+  if (! mp_info_dialog) {
+    mp_info_dialog = new lay::NetInfoDialog (this);
+  }
+
+  mp_info_dialog->set_nets (mp_database.get (), selected_nets ());
+  mp_info_dialog->show ();
 }
 
 static QModelIndex find_next (QAbstractItemModel *model, const QRegExp &to_find, const QModelIndex &from)
@@ -2067,6 +2080,11 @@ NetlistBrowserPage::show_all (bool f)
 void
 NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
 {
+  if (mp_info_dialog) {
+    delete mp_info_dialog;
+    mp_info_dialog = 0;
+  }
+
   mp_database.reset (database);
   clear_markers ();
   highlight_nets (std::vector<const db::Net *> ());
@@ -2209,8 +2227,6 @@ NetlistBrowserPage::update_highlights ()
   }
 
   clear_markers ();
-  info_label->setText (QString ());
-
   if (! mp_database.get () || ! mp_view) {
     return;
   }
@@ -2321,6 +2337,9 @@ NetlistBrowserPage::update_highlights ()
     info_label->setText (tl::to_qstring ("<html><p style=\"color:red; font-weight: bold\">" +
         tl::to_string (QObject::tr ("Not all shapes are highlighted")) +
         "</p></html>"));
+    info_label->show ();
+  } else {
+    info_label->hide ();
   }
 }
 

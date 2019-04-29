@@ -42,6 +42,7 @@ namespace lay
 class LayoutView;
 class PluginRoot;
 class Marker;
+class NetInfoDialog;
 
 // ----------------------------------------------------------------------------------
 //  NetColorizer definition
@@ -333,6 +334,7 @@ private:
   bool m_enable_updates;
   bool m_update_needed;
   std::vector<const db::Net *> m_current_nets;
+  lay::NetInfoDialog *mp_info_dialog;
 
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);

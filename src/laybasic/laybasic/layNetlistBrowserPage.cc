@@ -27,6 +27,7 @@
 #include "layLayoutView.h"
 #include "layMarker.h"
 #include "layNetInfoDialog.h"
+#include "tlProgress.h"
 #include "dbLayoutToNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 
@@ -1203,8 +1204,16 @@ NetlistBrowserModel::hasChildren (const QModelIndex &parent) const
 }
 
 QVariant
-NetlistBrowserModel::headerData (int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
+NetlistBrowserModel::headerData (int section, Qt::Orientation /*orientation*/, int role) const
 {
+  if (role == Qt::DisplayRole) {
+    if (section == 0) {
+      return tr ("Object");
+    } else if (section == 1) {
+      return tr ("Attribute");
+    }
+  }
+
   return QVariant ();
 }
 
@@ -1293,6 +1302,13 @@ void
 NetlistBrowserModel::colors_changed ()
 {
   emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex()) - 1, 0, QModelIndex ()));
+}
+
+QModelIndex
+NetlistBrowserModel::index_from_net (const db::Net *net) const
+{
+  void *id = make_id_circuit_net (circuit_index (net->circuit ()), net_index (net));
+  return index_from_id (id, 0);
 }
 
 const db::Net *
@@ -1818,6 +1834,18 @@ NetlistBrowserPage::current_index_changed (const QModelIndex &index)
   }
 }
 
+void
+NetlistBrowserPage::select_net (const db::Net *net)
+{
+  if (! net || ! net->circuit ()) {
+    directory_tree->clearSelection ();
+  } else {
+    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    tl_assert (model != 0);
+    directory_tree->setCurrentIndex (model->index_from_net (net));
+  }
+}
+
 std::vector<const db::Net *>
 NetlistBrowserPage::selected_nets ()
 {
@@ -1962,14 +1990,20 @@ NetlistBrowserPage::info_button_pressed ()
 
 static QModelIndex find_next (QAbstractItemModel *model, const QRegExp &to_find, const QModelIndex &from)
 {
-  if (! from.isValid ()) {
-    return from;
+  QModelIndex index = from;
+
+  if (! index.isValid () && model->hasChildren (index)) {
+    index = model->index (0, 0, index);
   }
+
+  if (! index.isValid ()) {
+    return index;
+  }
+
+  QModelIndex current = index;
 
   std::vector<QModelIndex> parent_stack;
   std::vector<std::pair<int, int> > rows_stack;
-
-  QModelIndex index = from;
 
   while (index.isValid ()) {
 
@@ -1983,13 +2017,15 @@ static QModelIndex find_next (QAbstractItemModel *model, const QRegExp &to_find,
   std::reverse (parent_stack.begin (), parent_stack.end ());
   std::reverse (rows_stack.begin (), rows_stack.end ());
 
-  QModelIndex current = from;
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Searching ...")));
 
   do {
 
+    ++progress;
+
     bool has_next = false;
 
-    if (model->hasChildren (current)) {
+    if (model->hasChildren (current) && rows_stack.size () < 2) {
 
       int row_count = model->rowCount (current);
       if (row_count > 0) {
@@ -2008,7 +2044,7 @@ static QModelIndex find_next (QAbstractItemModel *model, const QRegExp &to_find,
 
       ++rows_stack.back ().first;
 
-      if (rows_stack.back ().first == rows_stack.back ().second) {
+      if (rows_stack.back ().first >= rows_stack.back ().second) {
 
         //  up
         current = parent_stack.back ();
@@ -2033,7 +2069,7 @@ static QModelIndex find_next (QAbstractItemModel *model, const QRegExp &to_find,
 
     }
 
-  } while (current != from);
+  } while (current.internalPointer () != from.internalPointer () || current.row () != from.row ());
 
   return QModelIndex ();
 }
@@ -2098,6 +2134,7 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
   //  NOTE: with the tree as the parent, the tree will take over ownership of the model
   NetlistBrowserModel *new_model = new NetlistBrowserModel (directory_tree, database, &m_colorizer);
 
+  delete directory_tree->model ();
   directory_tree->setModel (new_model);
   connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
   connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (net_selection_changed ()));

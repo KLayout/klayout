@@ -200,13 +200,6 @@
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="QPushButton" name="probe_button">
-            <property name="text">
-             <string>Probe</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
@@ -243,7 +236,7 @@
           <bool>true</bool>
          </property>
          <attribute name="headerVisible">
-          <bool>false</bool>
+          <bool>true</bool>
          </attribute>
         </widget>
        </item>

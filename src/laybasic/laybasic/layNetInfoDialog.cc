@@ -154,6 +154,9 @@ void NetInfoDialog::update_info_text ()
     info.cdata (tl::to_string (tr ("Net")));
     info.end_element ("th");
     info.start_element ("th");
+    info.cdata (tl::to_string (tr ("Circuit")));
+    info.end_element ("th");
+    info.start_element ("th");
     info.cdata (tl::to_string (tr ("Shapes")));
     info.end_element ("th");
     info.start_element ("th");
@@ -175,6 +178,12 @@ void NetInfoDialog::update_info_text ()
 
       info.start_element ("td");
       info.cdata (net->expanded_name ());
+      info.end_element ("td");
+
+      info.start_element ("td");
+      if (net->circuit ()) {
+        info.cdata (net->circuit ()->name ());
+      }
       info.end_element ("td");
 
       size_t n;
@@ -252,23 +261,6 @@ void NetInfoDialog::update_info_text ()
 
       info.start_element ("hr");
       info.end_element ("hr");
-
-      info.start_element ("h3");
-      info.cdata (tl::to_string (QObject::tr ("Details:")));
-      info.end_element ("h3");
-
-      info.start_element ("p");
-      info.start_element ("b");
-      info.cdata (tl::to_string (QObject::tr ("Net name: ")));
-      info.end_element ("b");
-      info.cdata (net->expanded_name ());
-      info.start_element ("br");
-      info.end_element ("br");
-      info.start_element ("b");
-      info.cdata (tl::to_string (QObject::tr ("Circuit: ")));
-      info.end_element ("b");
-      info.cdata (net->circuit () ? net->circuit ()->name () : "(null)");
-      info.end_element ("p");
 
       std::map<std::string, std::set<std::string> > shapes;
 

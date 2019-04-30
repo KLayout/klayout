@@ -123,6 +123,7 @@ public:
   QModelIndex index_from_id (void *id, int column) const;
 
   const db::Net *net_from_index (const QModelIndex &index) const;
+  QModelIndex index_from_net (const db::Net *net) const;
 
 private slots:
   void colors_changed ();
@@ -252,6 +253,10 @@ public:
    */
   void set_l2ndb (db::LayoutToNetlist *database);
 
+  /**
+   *  @brief Selects a net or clears the selection if net == 0
+   */
+  void select_net (const db::Net *net);
 
   /**
    *  @brief Set the window type and window dimensions

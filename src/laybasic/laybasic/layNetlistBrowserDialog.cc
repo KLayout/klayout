@@ -23,8 +23,9 @@
 
 #include "layNetlistBrowserDialog.h"
 #include "tlProgress.h"
-#include "layLayoutView.h"
 #include "tlExceptions.h"
+#include "layLayoutView.h"
+#include "layFinder.h"
 #include "layFileDialog.h"
 #include "layConverters.h"
 #include "layQtTools.h"
@@ -56,6 +57,7 @@ extern const std::string cfg_l2ndb_window_state;
 
 NetlistBrowserDialog::NetlistBrowserDialog (lay::PluginRoot *root, lay::LayoutView *vw)
   : lay::Browser (root, vw),
+    lay::ViewService (vw->view_object_widget ()),
     Ui::NetlistBrowserDialog (),
     m_window (lay::NetlistBrowserConfig::FitNet),
     m_window_dim (0.0),
@@ -67,7 +69,8 @@ NetlistBrowserDialog::NetlistBrowserDialog (lay::PluginRoot *root, lay::LayoutVi
     m_marker_dither_pattern (-1),
     m_marker_intensity (0),
     m_cv_index (-1),
-    m_l2n_index (-1)
+    m_l2n_index (-1),
+    m_mouse_state (0)
 {
   Ui::NetlistBrowserDialog::setupUi (this);
 
@@ -111,6 +114,8 @@ NetlistBrowserDialog::NetlistBrowserDialog (lay::PluginRoot *root, lay::LayoutVi
   connect (layout_cb, SIGNAL (activated (int)), this, SLOT (cv_index_changed (int)));
   connect (l2ndb_cb, SIGNAL (activated (int)), this, SLOT (l2ndb_index_changed (int)));
   connect (configure_pb, SIGNAL (clicked ()), this, SLOT (configure_clicked ()));
+  connect (probe_pb, SIGNAL (clicked ()), this, SLOT (probe_button_pressed ()));
+  connect (sticky_cbx, SIGNAL (clicked ()), this, SLOT (sticky_mode_clicked ()));
 
   cellviews_changed ();
 }
@@ -123,8 +128,186 @@ NetlistBrowserDialog::~NetlistBrowserDialog ()
 void
 NetlistBrowserDialog::configure_clicked ()
 {
+  release_mouse ();
+
   lay::ConfigurationDialog config_dialog (this, lay::PluginRoot::instance (), "NetlistBrowserPlugin");
   config_dialog.exec ();
+}
+
+bool
+NetlistBrowserDialog::mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool prio)
+{
+  if (prio && m_mouse_state != 0) {
+    set_cursor (lay::Cursor::cross);
+  }
+
+  return false;
+}
+
+void
+NetlistBrowserDialog::sticky_mode_clicked ()
+{
+BEGIN_PROTECTED
+  if (! sticky_cbx->isChecked ()) {
+    release_mouse ();
+  } else {
+    probe_button_pressed ();
+  }
+END_PROTECTED
+}
+
+bool
+NetlistBrowserDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+{
+  if (prio && (buttons & lay::LeftButton) != 0 && m_mouse_state != 0) {
+
+    //  TODO: not used yet, borrowed from net tracer ... TODO: implement short locator!
+    if (m_mouse_state == 2) {
+
+      m_mouse_first_point = p;
+      m_mouse_state = 3;
+
+      view ()->message (tl::to_string (QObject::tr ("Click on the second point in the net")));
+
+    } else {
+
+      bool trace_path = (m_mouse_state == 3);
+
+      if (trace_path || ! sticky_cbx->isChecked ()) {
+        release_mouse ();
+      }
+
+      probe_net (p, trace_path);
+
+    }
+
+  }
+
+  return true;
+}
+
+void
+NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
+{
+  //  prepare for the net tracing
+  double l = double (lay::search_range) / widget ()->mouse_event_trans ().mag ();
+
+  db::DBox start_search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
+
+  //  @@@ not used yet ..
+  db::DBox stop_search_box;
+  if (trace_path) {
+    stop_search_box = db::DBox (m_mouse_first_point, m_mouse_first_point).enlarged (db::DVector (l, l));
+  }
+
+  unsigned int start_layer = 0;
+  db::Point start_point;
+  unsigned int cv_index;
+
+  //  locate the seed shape to figure out the cv index and layer
+  {
+
+    lay::ShapeFinder finder (true /*point mode*/, false /*all levels*/, db::ShapeIterator::All);
+
+    //  go through all visible layers of all cellviews and find a seed shape
+    for (lay::LayerPropertiesConstIterator lprop = view ()->begin_layers (); ! lprop.at_end (); ++lprop) {
+      if (lprop->is_visual ()) {
+        finder.find (view (), *lprop, start_search_box);
+      }
+    }
+
+    //  return, if no shape was found
+    lay::ShapeFinder::iterator r = finder.begin ();
+    if (r == finder.end ()) {
+      return;
+    }
+
+    cv_index = r->cv_index ();
+    start_layer = r->layer ();
+
+  }
+
+  //  if the cv index is not corresponding to the one of the current netlist, ignore this event
+  if (int (cv_index) != m_cv_index) {
+    return;
+  }
+
+  //  determine the cellview
+  lay::CellView cv = view ()->cellview (cv_index);
+  if (! cv.is_valid ()) {
+    return;
+  }
+
+  //  determine the start point
+  {
+
+    std::vector<db::DCplxTrans> tv = view ()->cv_transform_variants (m_cv_index, start_layer);
+    if (tv.empty ()) {
+      return;
+    }
+
+    db::CplxTrans tt = tv.front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ();
+
+    start_point = tt.inverted ().trans (start_search_box.center ());
+
+  }
+
+  const db::Net *net = 0;
+
+  db::LayoutToNetlist *l2ndb = view ()->get_l2ndb (m_l2n_index);
+  if (l2ndb) {
+
+    //  determines the corresponding layer inside the database and probe the net from this region and the
+    //  start point.
+
+    db::Region *region = 0;
+
+    const db::Connectivity &conn = l2ndb->connectivity ();
+    for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+      db::LayerProperties lp = l2ndb->internal_layout ()->get_properties (*layer);
+      if (! lp.is_null () && lp == cv->layout ().get_properties (start_layer)) {
+        region = l2ndb->layer_by_index (*layer);
+        break;
+      }
+    }
+
+    //  probe the net
+
+    if (region) {
+      net = l2ndb->probe_net (*region, start_point);
+    }
+
+  }
+
+  //  select the net if one was found
+  browser_frame->select_net (net);
+}
+
+void
+NetlistBrowserDialog::release_mouse ()
+{
+  m_mouse_state = 0;
+  view ()->message ();
+  widget ()->ungrab_mouse (this);
+}
+
+lay::ViewService *
+NetlistBrowserDialog::view_service_interface ()
+{
+  return this;
+}
+
+void
+NetlistBrowserDialog::probe_button_pressed ()
+{
+BEGIN_PROTECTED
+
+  m_mouse_state = 1;
+
+  view ()->message (tl::to_string (QObject::tr ("Click on a point in the net")));
+  widget ()->grab_mouse (this, false);
+
+END_PROTECTED
 }
 
 void
@@ -510,7 +693,12 @@ NetlistBrowserDialog::activated ()
 void
 NetlistBrowserDialog::update_content ()
 {
+  release_mouse ();
+
   db::LayoutToNetlist *l2ndb = view ()->get_l2ndb (m_l2n_index);
+
+  probe_pb->setEnabled (l2ndb != 0);
+  release_mouse ();
 
   if (! l2ndb) {
     central_stack->setCurrentIndex (1);
@@ -554,6 +742,8 @@ NetlistBrowserDialog::update_content ()
 void
 NetlistBrowserDialog::deactivated ()
 {
+  release_mouse ();
+
   if (lay::PluginRoot::instance ()) {
     lay::PluginRoot::instance ()->config_set (cfg_l2ndb_window_state, lay::save_dialog_state (this).c_str ());
   }

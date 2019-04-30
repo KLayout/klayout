@@ -27,6 +27,7 @@
 #include "ui_NetlistBrowserDialog.h"
 #include "layBrowser.h"
 #include "layNetlistBrowser.h"
+#include "layViewObject.h"
 #include "layColorPalette.h"
 
 namespace lay
@@ -34,6 +35,7 @@ namespace lay
 
 class NetlistBrowserDialog
   : public lay::Browser,
+    public lay::ViewService,
     private Ui::NetlistBrowserDialog
 {
   Q_OBJECT
@@ -49,7 +51,11 @@ private:
   virtual void activated ();
   virtual void deactivated ();
 
-  bool configure (const std::string &name, const std::string &value);
+  virtual bool configure (const std::string &name, const std::string &value);
+
+  virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
+  virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
+  virtual lay::ViewService *view_service_interface ();
 
   //  implementation of the lay::Plugin interface
   virtual void menu_activated (const std::string &symbol);
@@ -68,6 +74,8 @@ public slots:
   void unload_clicked ();
   void unload_all_clicked ();
   void configure_clicked ();
+  void probe_button_pressed ();
+  void sticky_mode_clicked ();
 
 private:
   lay::NetlistBrowserConfig::net_window_type m_window;
@@ -86,6 +94,8 @@ private:
   std::string m_l2ndb_name;
   int m_l2n_index;
   std::string m_open_filename;
+  db::DPoint m_mouse_first_point;
+  int m_mouse_state;
   QAction *m_open_action;
   QAction *m_saveas_action;
   QAction *m_export_action;
@@ -94,8 +104,8 @@ private:
   QAction *m_reload_action;
 
   void update_content ();
-  void scan_layer ();
-  void scan_layer_flat ();
+  void release_mouse ();
+  void probe_net (const db::DPoint &p, bool trace_path);
 };
 
 }

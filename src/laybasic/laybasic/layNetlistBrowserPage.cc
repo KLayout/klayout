@@ -2206,6 +2206,8 @@ NetlistBrowserPage::adjust_view ()
       continue;
     }
 
+    db::ICplxTrans net_trans = trans_for_net (*net);
+
     db::cell_index_type cell_index = (*net)->circuit ()->cell_index ();
     size_t cluster_id = (*net)->cluster_id ();
 
@@ -2225,7 +2227,7 @@ NetlistBrowserPage::adjust_view ()
       }
 
       for (std::vector<db::DCplxTrans>::const_iterator t = tv.begin (); t != tv.end (); ++t) {
-        bbox += *t * db::CplxTrans (layout->dbu ()) * layer_bbox;
+        bbox += *t * db::CplxTrans (layout->dbu ()) * net_trans * layer_bbox;
       }
 
     }
@@ -2253,6 +2255,108 @@ NetlistBrowserPage::adjust_view ()
     }
 
   }
+}
+
+bool
+NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv)
+{
+  db::ICplxTrans net_trans = trans_for_net (net);
+  const db::Layout *layout = mp_database->internal_layout ();
+
+  db::cell_index_type cell_index = net->circuit ()->cell_index ();
+  size_t cluster_id = net->cluster_id ();
+
+  QColor net_color = m_colorizer.color_of_net (net);
+
+  const db::Connectivity &conn = mp_database->connectivity ();
+  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+
+    db::LayerProperties lp = layout->get_properties (*layer);
+    std::map<db::LayerProperties, lay::LayerPropertiesConstIterator>::const_iterator display = display_by_lp.find (lp);
+
+    db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
+    while (! shapes.at_end ()) {
+
+      if (n_markers == m_max_shape_count) {
+        return true;
+      }
+
+      mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
+      mp_markers.back ()->set (*shapes, net_trans * shapes.trans (), tv);
+
+      if (net_color.isValid ()) {
+
+        mp_markers.back ()->set_color (net_color);
+        mp_markers.back ()->set_frame_color (net_color);
+
+      } else if (display != display_by_lp.end ()) {
+
+        mp_markers.back ()->set_line_width (display->second->width (true));
+        mp_markers.back ()->set_vertex_size (1);
+        mp_markers.back ()->set_dither_pattern (display->second->dither_pattern (true));
+        if (mp_view->background_color ().green () < 128) {
+          mp_markers.back ()->set_color (display->second->eff_fill_color_brighter (true, (m_marker_intensity * 255) / 100));
+          mp_markers.back ()->set_frame_color (display->second->eff_frame_color_brighter (true, (m_marker_intensity * 255) / 100));
+        } else {
+          mp_markers.back ()->set_color (display->second->eff_fill_color_brighter (true, (-m_marker_intensity * 255) / 100));
+          mp_markers.back ()->set_frame_color (display->second->eff_frame_color_brighter (true, (-m_marker_intensity * 255) / 100));
+        }
+
+      } else {
+
+        //  fallback color
+        QColor net_color = mp_view->background_color ().green () < 128 ? QColor (Qt::white) : QColor (Qt::black);
+        mp_markers.back ()->set_color (net_color);
+        mp_markers.back ()->set_frame_color (net_color);
+
+      }
+
+      if (m_marker_line_width >= 0) {
+        mp_markers.back ()->set_line_width (m_marker_line_width);
+      }
+
+      if (m_marker_vertex_size >= 0) {
+        mp_markers.back ()->set_vertex_size (m_marker_vertex_size);
+      }
+
+      if (m_marker_halo >= 0) {
+        mp_markers.back ()->set_halo (m_marker_halo);
+      }
+
+      if (m_marker_dither_pattern >= 0) {
+        mp_markers.back ()->set_dither_pattern (m_marker_dither_pattern);
+      }
+
+      ++shapes;
+      ++n_markers;
+
+    }
+
+  }
+
+  return false;
+}
+
+db::ICplxTrans
+NetlistBrowserPage::trans_for_net (const db::Net *net)
+{
+  db::DCplxTrans t;
+
+  const db::Circuit *circuit = net->circuit ();
+  while (circuit) {
+    if (circuit->begin_refs () != circuit->end_refs ()) {
+      const db::SubCircuit &ref = *circuit->begin_refs ();
+      t = ref.trans () * t;
+      circuit = ref.circuit ();
+    } else {
+      break;
+    }
+  }
+
+  double dbu = mp_database->internal_layout ()->dbu ();
+  db::CplxTrans dbu_trans (dbu);
+
+  return dbu_trans.inverted () * t * dbu_trans;
 }
 
 void
@@ -2290,84 +2394,10 @@ NetlistBrowserPage::update_highlights ()
   size_t n_markers = 0;
   bool not_all_shapes_are_shown = false;
 
-  for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end (); ++net) {
-
-    if (! (*net)->circuit ()) {
-      continue;
+  for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end () && ! not_all_shapes_are_shown; ++net) {
+    if ((*net)->circuit ()) {
+      not_all_shapes_are_shown = produce_highlights_for_net (*net, n_markers, display_by_lp, tv);
     }
-
-    db::cell_index_type cell_index = (*net)->circuit ()->cell_index ();
-    size_t cluster_id = (*net)->cluster_id ();
-
-    QColor net_color = m_colorizer.color_of_net (*net);
-
-    const db::Connectivity &conn = mp_database->connectivity ();
-    for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
-
-      db::LayerProperties lp = layout->get_properties (*layer);
-      std::map<db::LayerProperties, lay::LayerPropertiesConstIterator>::const_iterator display = display_by_lp.find (lp);
-
-      db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
-      while (! shapes.at_end ()) {
-
-        if (n_markers == m_max_shape_count) {
-          not_all_shapes_are_shown = true;
-          break;
-        }
-
-        mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-        mp_markers.back ()->set (*shapes, shapes.trans (), tv);
-
-        if (net_color.isValid ()) {
-
-          mp_markers.back ()->set_color (net_color);
-          mp_markers.back ()->set_frame_color (net_color);
-
-        } else if (display != display_by_lp.end ()) {
-
-          mp_markers.back ()->set_line_width (display->second->width (true));
-          mp_markers.back ()->set_vertex_size (1);
-          mp_markers.back ()->set_dither_pattern (display->second->dither_pattern (true));
-          if (mp_view->background_color ().green () < 128) {
-            mp_markers.back ()->set_color (display->second->eff_fill_color_brighter (true, (m_marker_intensity * 255) / 100));
-            mp_markers.back ()->set_frame_color (display->second->eff_frame_color_brighter (true, (m_marker_intensity * 255) / 100));
-          } else {
-            mp_markers.back ()->set_color (display->second->eff_fill_color_brighter (true, (-m_marker_intensity * 255) / 100));
-            mp_markers.back ()->set_frame_color (display->second->eff_frame_color_brighter (true, (-m_marker_intensity * 255) / 100));
-          }
-
-        } else {
-
-          //  fallback color
-          QColor net_color = mp_view->background_color ().green () < 128 ? QColor (Qt::white) : QColor (Qt::black);
-          mp_markers.back ()->set_color (net_color);
-          mp_markers.back ()->set_frame_color (net_color);
-
-        }
-
-        if (m_marker_line_width >= 0) {
-          mp_markers.back ()->set_line_width (m_marker_line_width);
-        }
-
-        if (m_marker_vertex_size >= 0) {
-          mp_markers.back ()->set_vertex_size (m_marker_vertex_size);
-        }
-
-        if (m_marker_halo >= 0) {
-          mp_markers.back ()->set_halo (m_marker_halo);
-        }
-
-        if (m_marker_dither_pattern >= 0) {
-          mp_markers.back ()->set_dither_pattern (m_marker_dither_pattern);
-        }
-
-        ++shapes;
-        ++n_markers;
-
-      }
-
-    }
-
   }
 
   if (not_all_shapes_are_shown) {

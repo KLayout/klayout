@@ -43,6 +43,7 @@ class LayoutView;
 class PluginRoot;
 class Marker;
 class NetInfoDialog;
+class LayerPropertiesConstIterator;
 
 // ----------------------------------------------------------------------------------
 //  NetColorizer definition
@@ -349,6 +350,8 @@ private:
   std::vector<const db::Net *> selected_nets ();
   void set_color_for_selected_nets (const QColor &color);
   void layer_list_changed (int);
+  bool produce_highlights_for_net(const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv);
+  db::ICplxTrans trans_for_net (const db::Net *net);
 };
 
 } // namespace lay

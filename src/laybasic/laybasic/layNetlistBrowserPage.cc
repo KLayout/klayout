@@ -2447,6 +2447,11 @@ NetlistBrowserPage::update_highlights ()
   // @@@std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = mp_view->cv_transform_variants_by_layer (m_cv_index);
   std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
 
+  //  correct DBU differences between the storage layout and the original layout
+  for (std::vector<db::DCplxTrans>::iterator t = tv.begin (); t != tv.end (); ++t) {
+    *t = *t * db::DCplxTrans (layout->dbu () / original_layout.dbu ());
+  }
+
   size_t n_markers = 0;
   bool not_all_shapes_are_shown = false;
 

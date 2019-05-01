@@ -114,7 +114,7 @@ NetColorizer::configure (const QColor &marker_color, const lay::ColorPalette *au
 bool
 NetColorizer::has_color_for_net (const db::Net *net)
 {
-  return m_auto_colors_enabled || m_custom_color.find (net) != m_custom_color.end ();
+  return net != 0 && (m_auto_colors_enabled || m_custom_color.find (net) != m_custom_color.end ());
 }
 
 void
@@ -1024,6 +1024,26 @@ static QIcon light_icon_for_net ()
   return icon;
 }
 
+static QIcon icon_for_connection ()
+{
+  QIcon icon;
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_48.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_32.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_24.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_16.png")));
+  return icon;
+}
+
+static QIcon light_icon_for_connection ()
+{
+  QIcon icon;
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_48.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_32.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_24.png")));
+  icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_conn_light_16.png")));
+  return icon;
+}
+
 static QIcon icon_for_pin ()
 {
   QIcon icon;
@@ -1067,14 +1087,13 @@ static QIcon icon_for_circuit ()
   return icon;
 }
 
-static QIcon net_icon_with_color (const QColor &color)
+static QIcon colored_icon (const QColor &color, const QIcon &original_icon)
 {
   if (! color.isValid ()) {
     return icon_for_net ();
   }
 
   QIcon colored_icon;
-  QIcon original_icon = light_icon_for_net ();
 
   QList<QSize> sizes = original_icon.availableSizes ();
   for (QList<QSize>::const_iterator i = sizes.begin (); i != sizes.end (); ++i) {
@@ -1087,8 +1106,10 @@ static QIcon net_icon_with_color (const QColor &color)
     for (int x = 0; x < i->width (); ++x) {
       for (int y = 0; y < i->height (); ++y) {
         QRgb pixel = image.pixel (x, y);
-        pixel = (pixel & ~RGB_MASK) | (color.rgb () & RGB_MASK);
-        image.setPixel (x, y, pixel);
+        if (pixel != 0xffffffff) {
+          pixel = (pixel & ~RGB_MASK) | (color.rgb () & RGB_MASK);
+          image.setPixel (x, y, pixel);
+        }
       }
 
     }
@@ -1098,6 +1119,16 @@ static QIcon net_icon_with_color (const QColor &color)
   }
 
   return colored_icon;
+}
+
+static QIcon net_icon_with_color (const QColor &color)
+{
+  return colored_icon (color, light_icon_for_net ());
+}
+
+static QIcon connection_icon_with_color (const QColor &color)
+{
+  return colored_icon (color, light_icon_for_connection ());
 }
 
 QIcon
@@ -1121,25 +1152,50 @@ NetlistBrowserModel::icon_for_net (const db::Net *net) const
 }
 
 QIcon
+NetlistBrowserModel::icon_for_connection (const db::Net *net) const
+{
+  if (mp_colorizer && mp_colorizer->has_color_for_net (net)) {
+
+    QColor color = mp_colorizer->color_of_net (net);
+
+    lay::color_t rgb = lay::color_t (color.rgb ());
+    std::map<lay::color_t, QIcon>::const_iterator c = m_connection_icon_per_color.find (rgb);
+    if (c == m_connection_icon_per_color.end ()) {
+      c = m_connection_icon_per_color.insert (std::make_pair (rgb, connection_icon_with_color (color))).first;
+    }
+
+    return c->second;
+
+  } else {
+    return lay::icon_for_connection ();
+  }
+}
+
+QIcon
 NetlistBrowserModel::icon (const QModelIndex &index) const
 {
   void *id = index.internalPointer ();
-
-  const db::Net *net = net_from_index (index);
-  if (net) {
-    return icon_for_net (net);
-  }
 
   if (is_id_circuit (id)) {
     return icon_for_circuit ();
   } else if (is_id_circuit_pin (id)) {
     return icon_for_pin ();
+  } else if (is_id_circuit_net (id)) {
+
+    const db::Net *net = net_from_index (index);
+    return icon_for_net (net);
+
   } else if (is_id_circuit_device (id)) {
 
     const db::Device *device = device_from_id (id);
     if (device) {
       return icon_for_device (device->device_class ());
     }
+
+  } else if (is_id_circuit_net_device_terminal_others (id) || is_id_circuit_net_subcircuit_pin_others (id)) {
+
+    const db::Net *net = net_from_index (index);
+    return icon_for_connection (net);
 
   } else if (is_id_circuit_subcircuit (id)) {
     return icon_for_circuit ();

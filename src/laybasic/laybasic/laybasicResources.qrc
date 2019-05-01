@@ -28,5 +28,13 @@
         <file>images/icon_net_light_24.png</file>
         <file>images/icon_net_light_32.png</file>
         <file>images/icon_net_light_48.png</file>
+        <file>images/icon_conn_16.png</file>
+        <file>images/icon_conn_24.png</file>
+        <file>images/icon_conn_32.png</file>
+        <file>images/icon_conn_48.png</file>
+        <file>images/icon_conn_light_16.png</file>
+        <file>images/icon_conn_light_24.png</file>
+        <file>images/icon_conn_light_32.png</file>
+        <file>images/icon_conn_light_48.png</file>
     </qresource>
 </RCC>

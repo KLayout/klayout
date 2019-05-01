@@ -194,6 +194,7 @@ private:
   }
 
   QIcon icon_for_net (const db::Net *net) const;
+  QIcon icon_for_connection (const db::Net *net) const;
 
   db::LayoutToNetlist *mp_l2ndb;
   NetColorizer *mp_colorizer;
@@ -210,6 +211,7 @@ private:
   mutable std::map<const db::Pin *, size_t> m_pin_index_by_object;
   mutable std::map<const db::SubCircuit *, size_t> m_subcircuit_index_by_object;
   mutable std::map<lay::color_t, QIcon> m_net_icon_per_color;
+  mutable std::map<lay::color_t, QIcon> m_connection_icon_per_color;
 };
 
 /**

@@ -67,6 +67,7 @@ def run_demo(gen, cmd, out)
   gen.produce(cell.shapes(l1), cell.shapes(l2))
 
   view.zoom_box(RBA::DBox::new(-2.0, -1.0, 8.0, 9.0))
+  view.max_hier
 
   t = RBA::Text::new(cmd, -1500, 8500)
   t.valign = 0

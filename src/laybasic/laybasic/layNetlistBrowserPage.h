@@ -307,6 +307,10 @@ public:
    */
   void update_highlights ();
 
+public slots:
+  void export_all ();
+  void export_selected ();
+
 private slots:
   void show_all_clicked ();
   void info_button_pressed ();

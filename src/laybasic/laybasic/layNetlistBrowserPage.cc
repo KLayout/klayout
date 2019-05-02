@@ -27,6 +27,7 @@
 #include "layLayoutView.h"
 #include "layMarker.h"
 #include "layNetInfoDialog.h"
+#include "layNetExportDialog.h"
 #include "tlProgress.h"
 #include "dbLayoutToNetlist.h"
 #include "dbNetlistDeviceClasses.h"
@@ -1766,6 +1767,11 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   sep->setSeparator (true);
   directory_tree->addAction (sep);
   directory_tree->addAction (color_action);
+  sep = new QAction (directory_tree);
+  sep->setSeparator (true);
+  directory_tree->addAction (sep);
+  directory_tree->addAction (actionExportSelected);
+  directory_tree->addAction (actionExportAll);
 
   lay::HTMLItemDelegate *delegate;
 
@@ -1797,6 +1803,9 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   connect (find_button, SIGNAL (pressed ()), this, SLOT (find_button_pressed ()));
   connect (forward, SIGNAL (clicked ()), this, SLOT (navigate_forward ()));
   connect (backward, SIGNAL (clicked ()), this, SLOT (navigate_back ()));
+
+  connect (actionExportAll, SIGNAL (triggered ()), this, SLOT (export_all ()));
+  connect (actionExportSelected, SIGNAL (triggered ()), this, SLOT (export_selected ()));
 
   forward->setEnabled (false);
   backward->setEnabled (false);
@@ -2479,6 +2488,24 @@ NetlistBrowserPage::clear_markers ()
   }
 
   mp_markers.clear ();
+}
+
+void
+NetlistBrowserPage::export_all ()
+{
+  std::auto_ptr<lay::NetExportDialog> dialog (new lay::NetExportDialog (this));
+  if (dialog->exec (mp_plugin_root)) {
+    // @@@
+  }
+}
+
+void
+NetlistBrowserPage::export_selected ()
+{
+  std::auto_ptr<lay::NetExportDialog> dialog (new lay::NetExportDialog (this));
+  if (dialog->exec (mp_plugin_root)) {
+    // @@@
+  }
 }
 
 }

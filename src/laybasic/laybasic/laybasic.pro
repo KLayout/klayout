@@ -70,7 +70,8 @@ FORMS = \
     NetlistBrowserConfigPage.ui \
     NetlistBrowserConfigPage2.ui \
     NetlistBrowserDialog.ui \
-    NetInfoDialog.ui
+    NetInfoDialog.ui \
+    NetExportDialog.ui
 
 RESOURCES = \
     laybasicResources.qrc
@@ -169,7 +170,8 @@ SOURCES = \
     layNetlistBrowserDialog.cc \
     layNetlistBrowserPage.cc \
     layItemDelegates.cc \
-    layNetInfoDialog.cc
+    layNetInfoDialog.cc \
+    layNetExportDialog.cc
 
 HEADERS = \
   gtf.h \
@@ -260,7 +262,8 @@ HEADERS = \
     layNetlistBrowserDialog.h \
     layNetlistBrowserPage.h \
     layItemDelegates.h \
-    layNetInfoDialog.h
+    layNetInfoDialog.h \
+    layNetExportDialog.h
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC

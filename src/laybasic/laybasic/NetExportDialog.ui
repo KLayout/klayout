@@ -6,94 +6,45 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>531</width>
-    <height>321</height>
+    <width>508</width>
+    <height>454</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Export Net Options</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="7" column="2">
-    <widget class="QLineEdit" name="device_cell_prefix"/>
-   </item>
-   <item row="6" column="0" colspan="3">
-    <widget class="QCheckBox" name="produce_device_cells_cb">
-     <property name="text">
-      <string>Produce cells for devices</string>
+   <item row="11" column="0" colspan="4">
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-    </widget>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
    </item>
-   <item row="2" column="0" colspan="3">
+   <item row="4" column="0" colspan="4">
     <widget class="QCheckBox" name="produce_circuit_cells_cb">
      <property name="text">
       <string>Produce cells for circuits</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="QLineEdit" name="circuit_cell_prefix"/>
-   </item>
-   <item row="3" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="7" column="0">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QLabel" name="label_5">
+   <item row="5" column="1">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Net cell name prefix</string>
+      <string>Cell name prefix</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QLineEdit" name="net_cell_prefix"/>
-   </item>
-   <item row="8" column="1" colspan="2">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>If this options is selected, each device will be represented by one cell made from the device name and the given prefix. Otherwise, device parts are exported as shapes inside the net.</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0" colspan="3">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0" colspan="3">
+   <item row="13" column="0" colspan="4">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -106,21 +57,34 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="1">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Cell name prefix</string>
+   <item row="14" column="0" colspan="4">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QLabel" name="label_3">
+   <item row="5" column="2" colspan="2">
+    <widget class="QLineEdit" name="circuit_cell_prefix"/>
+   </item>
+   <item row="8" column="0" colspan="4">
+    <widget class="QCheckBox" name="produce_device_cells_cb">
      <property name="text">
-      <string>Cell name prefix</string>
+      <string>Produce cells for devices</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3">
+   <item row="6" column="1" colspan="3">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>If this option is selected, the subcircuits on a net are represented by individual cells. Otherwise the net is exported as a whole into a single cell (flattened).</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="4">
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -136,17 +100,96 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="1" colspan="2">
-    <widget class="QLabel" name="label">
+   <item row="0" column="0" colspan="4">
+    <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>If this option is selected, the subcircuits on a net are represented by individual cells. Otherwise the net is exported as a whole into a single cell (flattened).</string>
+      <string>This feature will export the nets to a new layout. This layout will contain the original hierarchy as far as required. Within each cell, that corresponds to a circuit, a cell is generated for each net. Each net has it's own hierarchy which can be tailored with the options below.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="3">
+   <item row="9" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Cell name prefix</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" colspan="2">
+    <widget class="QLineEdit" name="net_cell_prefix"/>
+   </item>
+   <item row="12" column="0" colspan="3">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Starting layer number for unknown layers</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="10" column="1" colspan="3">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>If this options is selected, each device will be represented by one cell made from the device name and the given prefix. Otherwise, device parts are exported as shapes inside the net.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="2" colspan="2">
+    <widget class="QLineEdit" name="device_cell_prefix"/>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Net cell name prefix</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="12" column="3">
+    <widget class="QLineEdit" name="layernum">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="4">
     <spacer name="verticalSpacer_3">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -162,8 +205,58 @@
      </property>
     </spacer>
    </item>
+   <item row="2" column="2" colspan="2">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLineEdit" name="net_propname"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="help_label">
+        <property name="text">
+         <string>&lt;html&gt;&lt;body&gt;(&lt;a href=&quot;int:/about/variant_notation.xml&quot;&gt;See here for the name notation&lt;/a&gt;)&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Net property name</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>net_cell_prefix</tabstop>
+  <tabstop>net_propname</tabstop>
+  <tabstop>produce_circuit_cells_cb</tabstop>
+  <tabstop>circuit_cell_prefix</tabstop>
+  <tabstop>produce_device_cells_cb</tabstop>
+  <tabstop>device_cell_prefix</tabstop>
+  <tabstop>layernum</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

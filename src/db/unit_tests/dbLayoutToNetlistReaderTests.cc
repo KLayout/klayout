@@ -81,7 +81,7 @@ TEST(1_ReaderBasic)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", 0, "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
@@ -177,7 +177,7 @@ TEST(2_ReaderWithGlobalNets)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", "CIRCUIT_", "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");

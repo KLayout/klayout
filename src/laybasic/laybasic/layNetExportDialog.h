@@ -56,6 +56,9 @@ public:
   void set_net_prefix (const std::string &net_prefix);
   std::string net_prefix ();
 
+  void set_net_propname (const tl::Variant &net_propname);
+  tl::Variant net_propname ();
+
   void set_produce_circuit_cells (bool f);
   bool produce_circuit_cells ();
 
@@ -68,7 +71,13 @@ public:
   void set_device_cell_prefix (const std::string &net_prefix);
   std::string device_cell_prefix ();
 
+  void set_start_layer_number (int ln);
+  int start_layer_number ();
+
   int exec (lay::PluginRoot *mp_plugin_root);
+
+protected:
+  void accept ();
 
 private:
   Ui::NetExportDialog *ui;

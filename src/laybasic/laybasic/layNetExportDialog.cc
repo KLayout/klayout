@@ -22,6 +22,9 @@
 
 #include "layNetExportDialog.h"
 #include "layPlugin.h"
+#include "layQtTools.h"
+
+#include "tlExceptions.h"
 
 #include "ui_NetExportDialog.h"
 
@@ -31,10 +34,12 @@ namespace lay
 {
 
 extern std::string cfg_l2ndb_net_cell_prefix;
+extern std::string cfg_l2ndb_net_propname;
 extern std::string cfg_l2ndb_circuit_cell_prefix;
 extern std::string cfg_l2ndb_produce_circuit_cells;
 extern std::string cfg_l2ndb_device_cell_prefix;
 extern std::string cfg_l2ndb_produce_device_cells;
+extern std::string cfg_l2ndb_start_layer_number;
 
 
 NetExportDialog::NetExportDialog (QWidget *parent)
@@ -42,6 +47,8 @@ NetExportDialog::NetExportDialog (QWidget *parent)
 {
   ui = new Ui::NetExportDialog ();
   ui->setupUi (this);
+
+  lay::activate_modal_help_links (ui->help_label);
 }
 
 NetExportDialog::~NetExportDialog ()
@@ -60,6 +67,29 @@ std::string
 NetExportDialog::net_prefix ()
 {
   return tl::to_string (ui->net_cell_prefix->text ());
+}
+
+void
+NetExportDialog::set_net_propname (const tl::Variant &net_propname)
+{
+  if (net_propname.is_nil ()) {
+    ui->net_propname->setText (QString ());
+  } else {
+    ui->net_propname->setText (tl::to_qstring (net_propname.to_parsable_string ()));
+  }
+}
+
+tl::Variant
+NetExportDialog::net_propname ()
+{
+  std::string np = tl::to_string (ui->net_propname->text ());
+  tl::Extractor ex (np.c_str ());
+  tl::Variant v;
+  if (! ex.at_end ()) {
+    ex.read (v);
+    ex.expect_end ();
+  }
+  return v;
 }
 
 void
@@ -112,12 +142,40 @@ NetExportDialog::device_cell_prefix ()
   return tl::to_string (ui->device_cell_prefix->text ());
 }
 
+void
+NetExportDialog::set_start_layer_number (int ln)
+{
+  ui->layernum->setText (tl::to_qstring (tl::to_string (ln)));
+}
+
+int
+NetExportDialog::start_layer_number ()
+{
+  int ln = 0;
+  tl::from_string (tl::to_string (ui->layernum->text ()), ln);
+  return ln;
+}
+
+void
+NetExportDialog::accept ()
+{
+BEGIN_PROTECTED
+  start_layer_number ();
+  net_propname ();
+  QDialog::accept ();
+END_PROTECTED
+}
+
 int
 NetExportDialog::exec (lay::PluginRoot *plugin_root)
 {
   std::string v;
   plugin_root->config_get (cfg_l2ndb_net_cell_prefix, v);
   set_net_prefix (v);
+
+  tl::Variant var;
+  plugin_root->config_get (cfg_l2ndb_net_propname, var);
+  set_net_propname (var);
 
   bool f = false;
   plugin_root->config_get (cfg_l2ndb_produce_circuit_cells, f);
@@ -135,10 +193,16 @@ NetExportDialog::exec (lay::PluginRoot *plugin_root)
   plugin_root->config_get (cfg_l2ndb_device_cell_prefix, v);
   set_device_cell_prefix (v);
 
+  int ln = 0;
+  plugin_root->config_get (cfg_l2ndb_start_layer_number, ln);
+  set_start_layer_number (ln);
+
   int ret = QDialog::exec ();
   if (ret) {
 
     plugin_root->config_set (cfg_l2ndb_net_cell_prefix, net_prefix ());
+    plugin_root->config_set (cfg_l2ndb_net_propname, net_propname ());
+    plugin_root->config_set (cfg_l2ndb_start_layer_number, tl::to_string (start_layer_number ()));
     plugin_root->config_set (cfg_l2ndb_produce_circuit_cells, tl::to_string (produce_circuit_cells ()));
     plugin_root->config_set (cfg_l2ndb_circuit_cell_prefix, circuit_cell_prefix ());
     plugin_root->config_set (cfg_l2ndb_produce_device_cells, tl::to_string (produce_device_cells ()));

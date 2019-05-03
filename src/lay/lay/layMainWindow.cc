@@ -466,7 +466,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
 
   init_menu ();
 
-  lay::register_help_handler (this, SLOT (show_help (const QString &)));
+  lay::register_help_handler (this, SLOT (show_help (const QString &)), SLOT (show_modal_help (const QString &)));
 
   mp_assistant = new lay::HelpDialog (this);
 
@@ -697,7 +697,7 @@ MainWindow::~MainWindow ()
   }
   tl::DeferredMethodScheduler::instance ()->enable (false);
 
-  lay::register_help_handler (0, 0);
+  lay::register_help_handler (0, 0, 0);
 
   //  since the configuration actions unregister themselves, we need to do this before the main
   //  window is gone:
@@ -4781,6 +4781,12 @@ void
 MainWindow::show_help (const QString &url)
 {
   show_assistant_url (tl::to_string (url), false);
+}
+
+void
+MainWindow::show_modal_help (const QString &url)
+{
+  show_assistant_url (tl::to_string (url), true);
 }
 
 void

@@ -65,19 +65,34 @@ static db::Cell *l2n_internal_top_cell (db::LayoutToNetlist *l2n)
   return const_cast<db::Cell *> (l2n->internal_top_cell ());
 }
 
-static void build_net (const db::LayoutToNetlist *l2n, const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
+static int bnh_flatten ()
+{
+  return int (db::LayoutToNetlist::BNH_Flatten);
+}
+
+static int bnh_disconnected ()
+{
+  return int (db::LayoutToNetlist::BNH_Disconnected);
+}
+
+static int bnh_subcircuit_cells ()
+{
+  return int (db::LayoutToNetlist::BNH_SubcircuitCells);
+}
+
+static void build_net (const db::LayoutToNetlist *l2n, const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &netname_prop, int hier_mode, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
 {
   std::string p = circuit_cell_name_prefix.to_string ();
   std::string dp = device_cell_name_prefix.to_string ();
-  l2n->build_net (net, target, target_cell, lmap, circuit_cell_name_prefix.is_nil () ? 0 : p.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
+  l2n->build_net (net, target, target_cell, lmap, netname_prop, (db::LayoutToNetlist::BuildNetHierarchyMode) hier_mode, circuit_cell_name_prefix.is_nil () ? 0 : p.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
 }
 
-static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &net_cell_name_prefix, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
+static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &net_cell_name_prefix, const tl::Variant &netname_prop, int hier_mode, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
 {
   std::string cp = circuit_cell_name_prefix.to_string ();
   std::string np = net_cell_name_prefix.to_string ();
   std::string dp = device_cell_name_prefix.to_string ();
-  l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
+  l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), netname_prop, (db::LayoutToNetlist::BuildNetHierarchyMode) hier_mode, circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
 }
 
 static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
@@ -349,66 +364,91 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "If 'recursive'' is true, the returned region will contain the shapes of\n"
     "all subcircuits too.\n"
   ) +
-  gsi::method ("shapes_of_net", (void (db::LayoutToNetlist::*) (const db::Net &, const db::Region &, bool, db::Shapes &) const) &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive"), gsi::arg ("to"),
+  gsi::method ("shapes_of_net", (void (db::LayoutToNetlist::*) (const db::Net &, const db::Region &, bool, db::Shapes &, db::properties_id_type) const) &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive"), gsi::arg ("to"), gsi::arg ("propid", db::properties_id_type (0), "0"),
     "@brief Sends all shapes of a specific net and layer to the given Shapes container.\n"
     "If 'recursive'' is true, the returned region will contain the shapes of\n"
     "all subcircuits too.\n"
+    "\"prop_id\" is an optional properties ID. If given, this property set will be attached to the shapes."
   ) +
-  gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
+  gsi::constant ("BNH_Flatten", &bnh_flatten,
+    "@brief This constant tells \\build_net and \\build_all_nets to flatten the nets (used for the \"hier_mode\" parameter)."
+  ) +
+  gsi::constant ("BNH_Disconnected", &bnh_disconnected,
+    "@brief This constant tells \\build_net and \\build_all_nets to produce local nets without connections to subcircuits (used for the \"hier_mode\" parameter)."
+  ) +
+  gsi::constant ("BNH_SubcircuitCells", &bnh_subcircuit_cells,
+    "@brief This constant tells \\build_net and \\build_all_nets to produce a hierarchy of subcircuit cells per net (used for the \"hier_mode\" parameter)."
+  ) +
+  gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", int (db::LayoutToNetlist::BNH_Flatten), "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a net representation in the given layout and cell\n"
     "\n"
-    "This method has two modes: recursive and top-level mode. In recursive mode,\n"
-    "it will create a proper hierarchy below the given target cell to hold all subcircuits the\n"
-    "net connects to. It will copy the net's parts from this subcircuits into these cells.\n"
+    "This method puts the shapes of a net into the given target cell using a variety of options\n"
+    "to represent the net name and the hierarchy of the net.\n"
     "\n"
-    "In top-level mode, only the shapes from the net inside it's circuit are copied to\n"
-    "the given target cell. No other cells are created.\n"
+    "If the netname_prop name is not nil, a property with the given name is created and assigned\n"
+    "the net name.\n"
     "\n"
-    "Recursive mode is picked when a circuit cell name prefix is given. The new cells will be\n"
-    "named like circuit_cell_name_prefix + circuit name.\n"
-    "\n"
-    "If a device cell name prefix is given, device shapes will be output on device cells named\n"
-    "like device_cell_name_prefix + device name.\n"
+    "Net hierarchy is covered in three ways:\n"
+    "@ul\n"
+    " @li No connection indicated (hier_mode == \\BNH_Disconnected: the net shapes are simply put into their\n"
+    "     respective circuits. The connections are not indicated. @/li\n"
+    " @li Subnet hierarchy (hier_mode == \\BNH_SubcircuitCells): for each root net, a full hierarchy is built\n"
+    "     to accommodate the subnets (see build_net in recursive mode). @/li\n"
+    " @li Flat (hier_mode == \\BNH_Flatten): each net is flattened and put into the circuit it\n"
+    "     belongs to. @/li\n"
+    "@/ul\n"
+    "If a device cell name prefix is given, cells will be produced for each device abstract\n"
+    "using a name like device_cell_name_prefix + device name. Otherwise the device shapes are\n"
+    "treated as part of the net.\n"
     "\n"
     "@param target The target layout\n"
     "@param target_cell The target cell\n"
     "@param lmap Target layer indexes (keys) and net regions (values)\n"
-    "@param circuit_cell_name_prefix Chooses recursive mode if non-nil\n"
-    "@param device_cell_name_prefix If given, devices will be output as separate cells\n"
+    "@param hier_mode See description of this method\n"
+    "@param netname_prop An (optional) property name to which to attach the net name\n"
+    "@param cell_name_prefix Chooses recursive mode if non-null\n"
+    "@param device_cell_name_prefix See above\n"
   ) +
-  gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
+  gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", int (db::LayoutToNetlist::BNH_Flatten), "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a full hierarchical representation of the nets\n"
     "\n"
     "This method copies all nets into cells corresponding to the circuits. It uses the cmap\n"
-    "object to determine the target cell (create them with \\cell_mapping_into or \\const_cell_mapping_into.\n"
+    "object to determine the target cell (create them with \"cell_mapping_into\" or \"const_cell_mapping_into\").\n"
     "If no mapping is requested, the specific circuit it skipped.\n"
     "\n"
-    "The method has two net annotation modes:\n"
-    "\n"
+    "The method has three net annotation modes:\n"
     "@ul\n"
-    "@li 'No annotation'' (net_cell_name_prefix == 0): the shapes will be put into the target cell simply @/li\n"
-    "@li Individual subcells per net (net_cell_name_prefix != 0): for each net, a subcell is created\n"
-    "    and the net shapes will be put there (name of the subcell = net_cell_name_prefix + net name). @/li\n"
+    " @li No annotation (net_cell_name_prefix == nil and netname_prop == nil): the shapes will be put\n"
+    "     into the target cell simply. @/li\n"
+    " @li Net name property (net_cell_name_prefix == nil and netname_prop != nil): the shapes will be\n"
+    "     annotated with a property named with netname_prop and containing the net name string. @/li\n"
+    " @li Individual subcells per net (net_cell_name_prefix != 0): for each net, a subcell is created\n"
+    "     and the net shapes will be put there (name of the subcell = net_cell_name_prefix + net name).\n"
+    "     (this mode can be combined with netname_prop too). @/li\n"
     "@/ul\n"
     "\n"
-    "In addition, net hierarchy is covered in two ways:\n"
-    "\n"
+    "In addition, net hierarchy is covered in three ways:\n"
     "@ul\n"
-    "@li No connection indicated (circuit_cell_name_prefix == 0: the net shapes are simply put into their\n"
-    "   respective circuits. The connections are not indicated. @/li\n"
-    "@li Subnet hierarchy (circuit_cell_name_prefix != 0): for each root net, a full hierarchy is built\n"
-    "   to accommodate the subnets (see build_net in recursive mode). @/li\n"
+    " @li No connection indicated (hier_mode == \\BNH_Disconnected: the net shapes are simply put into their\n"
+    "     respective circuits. The connections are not indicated. @/li\n"
+    " @li Subnet hierarchy (hier_mode == \\BNH_SubcircuitCells): for each root net, a full hierarchy is built\n"
+    "     to accommodate the subnets (see build_net in recursive mode). @/li\n"
+    " @li Flat (hier_mode == \\BNH_Flatten): each net is flattened and put into the circuit it\n"
+    "     belongs to. @/li\n"
     "@/ul\n"
     "\n"
-    "If a device name prefix is given, device shapes will be output on device cells named\n"
-    "like device_name_prefix + device name.\n"
+    "If a device cell name prefix is given, cells will be produced for each device abstract\n"
+    "using a name like device_cell_name_prefix + device name. Otherwise the device shapes are\n"
+    "treated as part of the net.\n"
     "\n"
     "@param cmap The mapping of internal layout to target layout for the circuit mapping\n"
     "@param target The target layout\n"
     "@param lmap Target layer indexes (keys) and net regions (values)\n"
-    "@param net_cell_name_prefix See method description\n"
+    "@param hier_mode See description of this method\n"
+    "@param netname_prop An (optional) property name to which to attach the net name\n"
     "@param circuit_cell_name_prefix See method description\n"
-    "@param device_cell_name_prefix If given, devices will be output as separate cells\n"
+    "@param net_cell_name_prefix See method description\n"
+    "@param device_cell_name_prefix See above\n"
   ) +
   gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::DPoint &)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"),
     "@brief Finds the net by probing a specific location on the given layer\n"

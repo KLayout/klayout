@@ -51,6 +51,8 @@ extern const std::string cfg_l2ndb_max_shapes_highlighted ("l2ndb-max-shapes-hig
 extern const std::string cfg_l2ndb_show_all ("l2ndb-show-all");
 extern const std::string cfg_l2ndb_window_state ("l2ndb-window-state");
 extern const std::string cfg_l2ndb_net_cell_prefix ("l2ndb-net-cell-prefix");
+extern const std::string cfg_l2ndb_net_propname ("l2ndb-net-propname");
+extern const std::string cfg_l2ndb_start_layer_number ("l2ndb-start-layer-number");
 extern const std::string cfg_l2ndb_circuit_cell_prefix ("l2ndb-circuit-cell-prefix");
 extern const std::string cfg_l2ndb_produce_circuit_cells ("l2ndb-produce-circuit-cells");
 extern const std::string cfg_l2ndb_device_cell_prefix ("l2ndb-device-cell-prefix");
@@ -340,7 +342,9 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_intensity, "50"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_show_all, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_window_state, ""));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_net_propname, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_net_cell_prefix, "NET_"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_start_layer_number, "1000"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_produce_circuit_cells, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_circuit_cell_prefix, "CIRCUIT_"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_produce_device_cells, "false"));

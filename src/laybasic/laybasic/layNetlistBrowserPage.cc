@@ -31,6 +31,8 @@
 #include "tlProgress.h"
 #include "dbLayoutToNetlist.h"
 #include "dbNetlistDeviceClasses.h"
+#include "dbCellMapping.h"
+#include "dbLayerMapping.h"
 
 #include <QUrl>
 #include <QPainter>
@@ -2491,7 +2493,7 @@ NetlistBrowserPage::clear_markers ()
 }
 
 void
-NetlistBrowserPage::export_all ()
+NetlistBrowserPage::export_selected ()
 {
   std::auto_ptr<lay::NetExportDialog> dialog (new lay::NetExportDialog (this));
   if (dialog->exec (mp_plugin_root)) {
@@ -2500,11 +2502,70 @@ NetlistBrowserPage::export_all ()
 }
 
 void
-NetlistBrowserPage::export_selected ()
+NetlistBrowserPage::export_all ()
 {
+  if (! mp_view || ! mp_database.get () || ! mp_database->internal_layout ()) {
+    return;
+  }
+
+  const db::Layout &source_layout = *mp_database->internal_layout ();
+  if (source_layout.begin_top_down () == source_layout.end_top_cells ()) {
+    //  nothing to export
+    return;
+  }
+
+  const db::Cell &source_top = source_layout.cell (*source_layout.begin_top_down ());
+
   std::auto_ptr<lay::NetExportDialog> dialog (new lay::NetExportDialog (this));
   if (dialog->exec (mp_plugin_root)) {
-    // @@@
+
+    //  NOTE: mp_view and database might get reset to 0 in create_layout
+    lay::LayoutView *view = mp_view;
+    db::LayoutToNetlist *database = mp_database.get ();
+
+    unsigned int cv_index = view->create_layout (true);
+    db::Layout &target_layout = view->cellview (cv_index)->layout ();
+
+    db::cell_index_type target_top_index = target_layout.add_cell (source_layout.cell_name (source_top.cell_index ()));
+
+    db::CellMapping cm = database->cell_mapping_into (target_layout, target_layout.cell (target_top_index));
+
+    std::map<unsigned int, const db::Region *> lm;
+    {
+      //  create a layer mapping
+
+      std::set<unsigned int> layers_to_copy;
+      const db::Connectivity &conn = database->connectivity ();
+      for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+        layers_to_copy.insert (*layer);
+      }
+
+      int ln = dialog->start_layer_number ();
+
+      for (std::set<unsigned int>::const_iterator l = layers_to_copy.begin (); l != layers_to_copy.end (); ++l) {
+        const db::LayerProperties &lp = source_layout.get_properties (*l);
+        unsigned int tl;
+        if (! lp.is_null ()) {
+          tl = target_layout.insert_layer (lp);
+        } else {
+          tl = target_layout.insert_layer (db::LayerProperties (ln++, 0, database->name (*l)));
+        }
+        lm.insert (std::make_pair (tl, database->layer_by_index (*l)));
+      }
+    }
+
+    database->build_all_nets (cm, target_layout, lm,
+                              dialog->net_prefix ().empty () ? 0 : dialog->net_prefix ().c_str (),
+                              dialog->net_propname (),
+                              dialog->produce_circuit_cells () ? db::LayoutToNetlist::BNH_SubcircuitCells : db::LayoutToNetlist::BNH_Flatten,
+                              dialog->produce_circuit_cells () ? dialog->circuit_cell_prefix ().c_str () : 0,
+                              dialog->produce_device_cells () ? dialog->device_cell_prefix ().c_str () : 0);
+
+    view->zoom_fit ();
+    view->max_hier ();
+    view->add_missing_layers ();
+    view->select_cell (target_top_index, cv_index);
+
   }
 }
 

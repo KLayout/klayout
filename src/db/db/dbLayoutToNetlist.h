@@ -491,32 +491,64 @@ public:
    *
    *  This methods returns a new'd Region. It's the responsibility of the caller
    *  to delete this object.
+   *
+   *  propid is an optional properties ID which is attached to the shapes if not 0.
    */
-  void shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to) const;
+  void shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to, properties_id_type propid = 0) const;
+
+  /**
+   *  @brief An enum describing the way the net hierarchy is mapped
+   */
+  enum BuildNetHierarchyMode
+  {
+    /**
+     *  @brief Flatten the net
+     *  Collects all shapes of a net and puts that into the net cell or circuit cell
+     */
+    BNH_Flatten = 0,
+    /**
+     *  @brief Build a net hierarchy adding cells for each subcircuit on the net
+     *  Uses the circuit_cell_prefix to build the subcircuit cell names
+     */
+    BNH_SubcircuitCells = 1,
+    /**
+     *  @brief No hierarchy
+     *  Just output the shapes of the net belonging to the circuit cell.
+     *  Connections are not indicated!
+     */
+    BNH_Disconnected = 2
+  };
 
   /**
    *  @brief Builds a net representation in the given layout and cell
    *
-   *  This method has two modes: recursive and top-level mode. In recursive mode,
-   *  it will create a proper hierarchy below the given target cell to hold all subcircuits the
-   *  net connects to. It will copy the net's parts from this subcircuits into these cells.
+   *  This method puts the shapes of a net into the given target cell using a variety of options
+   *  to represent the net name and the hierarchy of the net.
    *
-   *  In top-level mode, only the shapes from the net inside it's circuit are copied to
-   *  the given target cell. No other cells are created.
+   *  If the netname_prop name is not nil, a property with the given name is created and assigned
+   *  the net name.
    *
-   *  Recursive mode is picked when a cell name prefix is given. The new cells will be
-   *  named like cell_name_prefix + circuit name.
+   *  Net hierarchy is covered in three ways:
+   *   * No connection indicated (hier_mode == BNH_Disconnected: the net shapes are simply put into their
+   *     respective circuits. The connections are not indicated.
+   *   * Subnet hierarchy (hier_mode == BNH_SubcircuitCells): for each root net, a full hierarchy is built
+   *     to accommodate the subnets (see build_net in recursive mode).
+   *   * Flat (hier_mode == BNH_Flatten): each net is flattened and put into the circuit it
+   *     belongs to.
    *
    *  If a device cell name prefix is given, cells will be produced for each device abstract
-   *  using a name like device_cell_name_prefix + device name.
+   *  using a name like device_cell_name_prefix + device name. Otherwise the device shapes are
+   *  treated as part of the net.
    *
    *  @param target The target layout
    *  @param target_cell The target cell
    *  @param lmap Target layer indexes (keys) and net regions (values)
+   *  @param hier_mode See description of this method
+   *  @param netname_prop An (optional) property name to which to attach the net name
    *  @param cell_name_prefix Chooses recursive mode if non-null
    *  @param device_cell_name_prefix See above
    */
-  void build_net (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *cell_name_prefix, const char *device_cell_name_prefix) const;
+  void build_net (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix) const;
 
   /**
    *  @brief Builds a full hierarchical representation of the nets
@@ -525,28 +557,37 @@ public:
    *  object to determine the target cell (create them with "cell_mapping_into" or "const_cell_mapping_into").
    *  If no mapping is requested, the specific circuit it skipped.
    *
-   *  The method has two net annotation modes:
-   *   * No annotation (net_cell_name_prefix == 0): the shapes will be put into the target cell simply
+   *  The method has three net annotation modes:
+   *   * No annotation (net_cell_name_prefix == 0 and netname_prop == nil): the shapes will be put
+   *     into the target cell simply
+   *   * Net name property (net_cell_name_prefix == 0 and netname_prop != nil): the shapes will be
+   *     annotated with a property named with netname_prop and containing the net name string.
    *   * Individual subcells per net (net_cell_name_prefix != 0): for each net, a subcell is created
    *     and the net shapes will be put there (name of the subcell = net_cell_name_prefix + net name).
+   *     (this mode can be combined with netname_prop too).
    *
-   *  In addition, net hierarchy is covered in two ways:
-   *   * No connection indicated (circuit_cell_name_prefix == 0: the net shapes are simply put into their
+   *  In addition, net hierarchy is covered in three ways:
+   *   * No connection indicated (hier_mode == BNH_Disconnected: the net shapes are simply put into their
    *     respective circuits. The connections are not indicated.
-   *   * Subnet hierarchy (circuit_cell_name_prefix != 0): for each root net, a full hierarchy is built
+   *   * Subnet hierarchy (hier_mode == BNH_SubcircuitCells): for each root net, a full hierarchy is built
    *     to accommodate the subnets (see build_net in recursive mode).
+   *   * Flat (hier_mode == BNH_Flatten): each net is flattened and put into the circuit it
+   *     belongs to.
    *
    *  If a device cell name prefix is given, cells will be produced for each device abstract
-   *  using a name like device_cell_name_prefix + device name.
+   *  using a name like device_cell_name_prefix + device name. Otherwise the device shapes are
+   *  treated as part of the net.
    *
    *  @param cmap The mapping of internal layout to target layout for the circuit mapping
    *  @param target The target layout
    *  @param lmap Target layer indexes (keys) and net regions (values)
+   *  @param hier_mode See description of this method
+   *  @param netname_prop An (optional) property name to which to attach the net name
    *  @param circuit_cell_name_prefix See method description
    *  @param net_cell_name_prefix See method description
    *  @param device_cell_name_prefix See above
    */
-  void build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const;
+  void build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const;
 
   /**
    *  @brief Finds the net by probing a specific location on the given layer
@@ -636,11 +677,12 @@ private:
 
   void init ();
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
-  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
-  void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
+  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
+  void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
   db::DeepLayer deep_layer_of (const db::Region &region) const;
   void ensure_layout () const;
   std::string make_new_name (const std::string &stem = std::string ());
+  db::properties_id_type make_netname_propid (db::Layout &ly, const tl::Variant &netname_prop, const db::Net &net) const;
 };
 
 }

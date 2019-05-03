@@ -42,6 +42,7 @@ namespace lay
 
 QObject *s_help_handler = 0;
 const char *s_help_slot = 0;
+const char *s_modal_help_slot = 0;
 
 void activate_help_links (QLabel *label)
 {
@@ -50,10 +51,18 @@ void activate_help_links (QLabel *label)
   }
 }
 
-void register_help_handler (QObject *object, const char *slot)
+void activate_modal_help_links (QLabel *label)
+{
+  if (s_help_handler) {
+    QObject::connect (label, SIGNAL (linkActivated (const QString &)), s_help_handler, s_modal_help_slot);
+  }
+}
+
+void register_help_handler (QObject *object, const char *slot, const char *modal_slot)
 {
   s_help_handler = object;
   s_help_slot = slot;
+  s_modal_help_slot = modal_slot;
 }
 
 // --------------------------------------------------------------------------------

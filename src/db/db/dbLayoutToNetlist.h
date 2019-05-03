@@ -675,10 +675,39 @@ private:
   bool m_is_flat;
   db::DeepLayer m_dummy_layer;
 
+  struct CellReuseTableKey
+  {
+    CellReuseTableKey (db::cell_index_type _cell_index, db::properties_id_type _netname_propid, size_t _cluster_id)
+      : cell_index (_cell_index), netname_propid (_netname_propid), cluster_id (_cluster_id)
+    {
+      //  .. nothing yet ..
+    }
+
+    bool operator< (const CellReuseTableKey &other) const
+    {
+      if (cell_index != other.cell_index) {
+        return cell_index < other.cell_index;
+      }
+      if (netname_propid != other.netname_propid) {
+        return netname_propid < other.netname_propid;
+      }
+      if (cluster_id != other.cluster_id) {
+        return cluster_id < other.cluster_id;
+      }
+      return false;
+    }
+
+    db::cell_index_type cell_index;
+    db::properties_id_type netname_propid;
+    size_t cluster_id;
+  };
+
+  typedef std::map<CellReuseTableKey, db::cell_index_type> cell_reuse_table_type;
+
   void init ();
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
-  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
-  void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const ICplxTrans &tr) const;
+  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
+  void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
   db::DeepLayer deep_layer_of (const db::Region &region) const;
   void ensure_layout () const;
   std::string make_new_name (const std::string &stem = std::string ());

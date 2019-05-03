@@ -194,7 +194,7 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
 
   db::DBox start_search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
 
-  //  @@@ not used yet ..
+  //  TODO: not used yet ..
   db::DBox stop_search_box;
   if (trace_path) {
     stop_search_box = db::DBox (m_mouse_first_point, m_mouse_first_point).enlarged (db::DVector (l, l));

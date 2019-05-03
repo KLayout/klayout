@@ -608,16 +608,16 @@ db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region
 }
 
 void
-LayoutToNetlist::build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const db::ICplxTrans &tr) const
+LayoutToNetlist::build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const db::ICplxTrans &tr) const
 {
   const db::Circuit *circuit = net.circuit ();
   tl_assert (circuit != 0);
 
-  build_net_rec (circuit->cell_index (), net.cluster_id (), target, target_cell, lmap, &net, net_cell_name_prefix, netname_propid, hier_mode, cell_name_prefix, device_cell_name_prefix, cmap, tr);
+  build_net_rec (circuit->cell_index (), net.cluster_id (), target, target_cell, lmap, &net, net_cell_name_prefix, netname_propid, hier_mode, cell_name_prefix, device_cell_name_prefix, reuse_table, tr);
 }
 
 void
-LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &tc, const std::map<unsigned int, const db::Region *> &lmap, const db::Net *net, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix, std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> &cmap, const db::ICplxTrans &tr) const
+LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &tc, const std::map<unsigned int, const db::Region *> &lmap, const db::Net *net, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const db::ICplxTrans &tr) const
 {
   db::Cell *target_cell = &tc;
 
@@ -673,8 +673,10 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
     db::cell_index_type subci = c->inst_cell_index ();
     size_t subcid = c->id ();
 
-    std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type>::const_iterator cm = cmap.find (std::make_pair (subci, subcid));
-    if (cm == cmap.end ()) {
+    CellReuseTableKey cmap_key (subci, netname_propid, subcid);
+
+    cell_reuse_table_type::const_iterator cm = reuse_table.find (cmap_key);
+    if (cm == reuse_table.end ()) {
 
       const char *name_prefix = 0;
       if (mp_netlist->device_abstract_by_cell_index (subci)) {
@@ -688,12 +690,12 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
         std::string cell_name = internal_layout ()->cell_name (subci);
 
         db::cell_index_type target_ci = target.add_cell ((std::string (name_prefix) + cell_name).c_str ());
-        cm = cmap.insert (std::make_pair (std::make_pair (subci, subcid), target_ci)).first;
+        cm = reuse_table.insert (std::make_pair (cmap_key, target_ci)).first;
 
-        build_net_rec (subci, subcid, target, target.cell (target_ci), lmap, 0, 0, netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cmap, tr_mag);
+        build_net_rec (subci, subcid, target, target.cell (target_ci), lmap, 0, 0, netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, reuse_table, tr_mag);
 
       } else {
-        cm = cmap.insert (std::make_pair (std::make_pair (subci, subcid), std::numeric_limits<db::cell_index_type>::max ())).first;
+        cm = reuse_table.insert (std::make_pair (cmap_key, std::numeric_limits<db::cell_index_type>::max ())).first;
       }
 
     }
@@ -730,12 +732,12 @@ LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &ta
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
   }
 
-  std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> cell_map;
+  cell_reuse_table_type cell_reuse_table;
 
   double mag = internal_layout ()->dbu () / target.dbu ();
 
   db::properties_id_type netname_propid = make_netname_propid (target, netname_prop, net);
-  build_net_rec (net, target, target_cell, lmap, 0, netname_propid, hier_mode, cell_name_prefix, device_cell_name_prefix, cell_map, db::ICplxTrans (mag));
+  build_net_rec (net, target, target_cell, lmap, 0, netname_propid, hier_mode, cell_name_prefix, device_cell_name_prefix, cell_reuse_table, db::ICplxTrans (mag));
 }
 
 void
@@ -745,7 +747,7 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
   }
 
-  std::map<std::pair<db::cell_index_type, size_t>, db::cell_index_type> cell_map;
+  cell_reuse_table_type cell_reuse_table;
   double mag = internal_layout ()->dbu () / target.dbu ();
 
   const db::Netlist *netlist = mp_netlist.get ();
@@ -767,7 +769,7 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
       }
 
       db::properties_id_type netname_propid = make_netname_propid (target, netname_prop, *n);
-      build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cell_map, db::ICplxTrans (mag));
+      build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cell_reuse_table, db::ICplxTrans (mag));
 
     }
 
@@ -796,9 +798,9 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
 
               if (net_cell_name_prefix) {
                 std::string ncn = std::string (net_cell_name_prefix) + subcircuit.expanded_name () + ":";
-                build_net_rec (*n, target, target.cell (target_ci), lmap, ncn.c_str (), netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cell_map, tr);
+                build_net_rec (*n, target, target.cell (target_ci), lmap, ncn.c_str (), netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cell_reuse_table, tr);
               } else {
-                build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cell_map, tr);
+                build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cell_reuse_table, tr);
               }
 
             }

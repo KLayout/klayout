@@ -505,6 +505,33 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
+    l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (42), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "device_extract_au1_rebuild_pr.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+
+  {
+    db::Layout ly2;
+    ly2.dbu (ly.dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = &rnsd;
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = rpoly.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = rdiff_cont.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = rpoly_cont.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = rmetal1.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
+
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testsrc ();

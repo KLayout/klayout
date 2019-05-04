@@ -181,9 +181,11 @@ private:
   QIcon icon (const QModelIndex &index) const;
   size_t circuit_index (const db::Circuit *circuit) const;
   size_t net_index (const db::Net *net) const;
+  size_t device_index (const db::Device *device) const;
   size_t pin_index (const db::Pin *pin, const db::Circuit *circuit) const;
   size_t subcircuit_index (const db::SubCircuit *subcircuit) const;
   QString make_link_to (const db::Net *net) const;
+  QString make_link_to (const db::Device *device) const;
   QString make_link_to (const db::Pin *pin, const db::Circuit *circuit) const;
   QString make_link_to (const db::Circuit *circuit) const;
   QString make_link_to (const db::SubCircuit *sub_circuit) const;
@@ -210,6 +212,7 @@ private:
   mutable std::map<const db::Net *, size_t> m_net_index_by_object;
   mutable std::map<const db::Pin *, size_t> m_pin_index_by_object;
   mutable std::map<const db::SubCircuit *, size_t> m_subcircuit_index_by_object;
+  mutable std::map<const db::Device *, size_t> m_device_index_by_object;
   mutable std::map<lay::color_t, QIcon> m_net_icon_per_color;
   mutable std::map<lay::color_t, QIcon> m_connection_icon_per_color;
 };

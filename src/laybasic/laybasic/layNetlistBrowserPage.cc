@@ -605,6 +605,17 @@ NetlistBrowserModel::make_link_to (const db::Net *net) const
 }
 
 QString
+NetlistBrowserModel::make_link_to (const db::Device *device) const
+{
+  if (! device) {
+    return QString ();
+  } else {
+    void *id = make_id_circuit_device (circuit_index (device->circuit ()), device_index (device));
+    return tl::to_qstring (tl::sprintf ("<a href='int:device?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), device->expanded_name ()));
+  }
+}
+
+QString
 NetlistBrowserModel::make_link_to (const db::Pin *pin, const db::Circuit *circuit) const
 {
   if (! pin) {
@@ -834,7 +845,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
       if (index.column () == 0) {
         return tl::to_qstring (ref->terminal_def ()->name () + " - " + device_string (ref->device ()));
       } else {
-        return tl::to_qstring (ref->device ()->expanded_name ());
+        return make_link_to (ref->device ());
       }
     }
 
@@ -1269,7 +1280,7 @@ NetlistBrowserModel::headerData (int section, Qt::Orientation /*orientation*/, i
     if (section == 0) {
       return tr ("Object");
     } else if (section == 1) {
-      return tr ("Attribute");
+      return tr ("Name (Items)");
     }
   }
 
@@ -1726,6 +1737,13 @@ NetlistBrowserModel::subcircuit_index (const db::SubCircuit *sub_circuit) const
 {
   const db::Circuit *circuit = sub_circuit->circuit ();
   return index_from_attr (sub_circuit, circuit->begin_subcircuits (), circuit->end_subcircuits (), m_subcircuit_index_by_object);
+}
+
+size_t
+NetlistBrowserModel::device_index (const db::Device *device) const
+{
+  const db::Circuit *circuit = device->circuit ();
+  return index_from_attr (device, circuit->begin_devices (), circuit->end_devices (), m_device_index_by_object);
 }
 
 // ----------------------------------------------------------------------------------
@@ -2201,6 +2219,7 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
   connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
   connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (net_selection_changed ()));
 
+  directory_tree->header ()->show ();
   directory_tree->header ()->setSortIndicatorShown (true);
 
   find_text->setText (QString ());

@@ -2313,6 +2313,10 @@ LayoutView::erase_cellview (unsigned int index)
 
   m_cellviews.erase (cellview_iter (int (index)));
 
+  if (m_hidden_cells.size () > index) {
+    m_hidden_cells.erase (m_hidden_cells.begin () + index);
+  }
+
   for (unsigned int lindex = 0; lindex < layer_lists (); ++lindex) {
 
     //  remove all references to the cellview

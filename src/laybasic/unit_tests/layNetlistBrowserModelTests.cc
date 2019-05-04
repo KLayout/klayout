@@ -20,7 +20,7 @@
 
 */
 
-#include "layNetlistBrowserPage.h"
+#include "layNetlistBrowserModel.h"
 #include "tlUnitTest.h"
 
 TEST (1)
@@ -52,16 +52,16 @@ TEST (1)
   EXPECT_EQ (tl::to_string (model->data (model->index (3, 0, inv2Index), Qt::DisplayRole).toString ()), "$3");
   EXPECT_EQ (tl::to_string (model->data (model->index (4, 0, inv2Index), Qt::DisplayRole).toString ()), "$4");
   //  Nets
-  EXPECT_EQ (tl::to_string (model->data (model->index (5, 0, inv2Index), Qt::DisplayRole).toString ()), "(3)");
-  EXPECT_EQ (tl::to_string (model->data (model->index (5, 1, inv2Index), Qt::DisplayRole).toString ()), "NIN");
-  EXPECT_EQ (tl::to_string (model->data (model->index (6, 0, inv2Index), Qt::DisplayRole).toString ()), "(5)");
-  EXPECT_EQ (tl::to_string (model->data (model->index (6, 1, inv2Index), Qt::DisplayRole).toString ()), "$2");
-  EXPECT_EQ (tl::to_string (model->data (model->index (7, 0, inv2Index), Qt::DisplayRole).toString ()), "(3)");
-  EXPECT_EQ (tl::to_string (model->data (model->index (7, 1, inv2Index), Qt::DisplayRole).toString ()), "NOUT");
-  EXPECT_EQ (tl::to_string (model->data (model->index (8, 0, inv2Index), Qt::DisplayRole).toString ()), "(3)");
-  EXPECT_EQ (tl::to_string (model->data (model->index (8, 1, inv2Index), Qt::DisplayRole).toString ()), "$4");
-  EXPECT_EQ (tl::to_string (model->data (model->index (9, 0, inv2Index), Qt::DisplayRole).toString ()), "(3)");
-  EXPECT_EQ (tl::to_string (model->data (model->index (9, 1, inv2Index), Qt::DisplayRole).toString ()), "$5");
+  EXPECT_EQ (tl::to_string (model->data (model->index (5, 0, inv2Index), Qt::DisplayRole).toString ()), "NIN");
+  EXPECT_EQ (tl::to_string (model->data (model->index (5, 1, inv2Index), Qt::DisplayRole).toString ()), "NIN (3)");
+  EXPECT_EQ (tl::to_string (model->data (model->index (6, 0, inv2Index), Qt::DisplayRole).toString ()), "$2");
+  EXPECT_EQ (tl::to_string (model->data (model->index (6, 1, inv2Index), Qt::DisplayRole).toString ()), "$2 (5)");
+  EXPECT_EQ (tl::to_string (model->data (model->index (7, 0, inv2Index), Qt::DisplayRole).toString ()), "NOUT");
+  EXPECT_EQ (tl::to_string (model->data (model->index (7, 1, inv2Index), Qt::DisplayRole).toString ()), "NOUT (3)");
+  EXPECT_EQ (tl::to_string (model->data (model->index (8, 0, inv2Index), Qt::DisplayRole).toString ()), "$4");
+  EXPECT_EQ (tl::to_string (model->data (model->index (8, 1, inv2Index), Qt::DisplayRole).toString ()), "$4 (3)");
+  EXPECT_EQ (tl::to_string (model->data (model->index (9, 0, inv2Index), Qt::DisplayRole).toString ()), "$5");
+  EXPECT_EQ (tl::to_string (model->data (model->index (9, 1, inv2Index), Qt::DisplayRole).toString ()), "$5 (3)");
   //  No Subcircuits
   //  Devices
   EXPECT_EQ (tl::to_string (model->data (model->index (10, 0, inv2Index), Qt::DisplayRole).toString ()), "PMOS [L=0.25, W=0.95, AS=0.49875, AD=0.26125, PS=2.95, PD=1.5]");
@@ -78,9 +78,9 @@ TEST (1)
   EXPECT_EQ (model->rowCount (ringoIndex), 22);
   //  Pins
   //  Nets
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, ringoIndex), Qt::DisplayRole).toString ()), "FB");
-  EXPECT_EQ (tl::to_string (model->data (model->index (1, 1, ringoIndex), Qt::DisplayRole).toString ()), "VSS");
-  EXPECT_EQ (tl::to_string (model->data (model->index (2, 1, ringoIndex), Qt::DisplayRole).toString ()), "VDD");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, ringoIndex), Qt::DisplayRole).toString ()), "FB (2)");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 1, ringoIndex), Qt::DisplayRole).toString ()), "VSS (10)");
+  EXPECT_EQ (tl::to_string (model->data (model->index (2, 1, ringoIndex), Qt::DisplayRole).toString ()), "VDD (10)");
   //  Subcircuits
   EXPECT_EQ (tl::to_string (model->data (model->index (12, 0, ringoIndex), Qt::DisplayRole).toString ()), "<a href='int:circuit?id=0'>INV2</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (12, 1, ringoIndex), Qt::DisplayRole).toString ()), "$1");
@@ -107,9 +107,9 @@ TEST (1)
   EXPECT_EQ (model->rowCount (inv2NOutIndex), 3);
 
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2NOutIndex), Qt::DisplayRole).toString ()), "D - PMOS [L=0.25, W=0.95, AS=0.26125, AD=0.49875, PS=1.5, PD=2.95]");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, inv2NOutIndex), Qt::DisplayRole).toString ()), "$2");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, inv2NOutIndex), Qt::DisplayRole).toString ()), "<a href='int:device?id=24'>$2</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2NOutIndex), Qt::DisplayRole).toString ()), "D - NMOS [L=0.25, W=0.95, AS=0.26125, AD=0.49875, PS=1.5, PD=2.95]");
-  EXPECT_EQ (tl::to_string (model->data (model->index (1, 1, inv2NOutIndex), Qt::DisplayRole).toString ()), "$4");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 1, inv2NOutIndex), Qt::DisplayRole).toString ()), "<a href='int:device?id=56'>$4</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (2, 0, inv2NOutIndex), Qt::DisplayRole).toString ()), "<a href='int:pin?id=34'>OUT</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (2, 1, inv2NOutIndex), Qt::DisplayRole).toString ()), "");
 

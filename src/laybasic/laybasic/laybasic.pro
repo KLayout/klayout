@@ -171,7 +171,8 @@ SOURCES = \
     layNetlistBrowserPage.cc \
     layItemDelegates.cc \
     layNetInfoDialog.cc \
-    layNetExportDialog.cc
+    layNetExportDialog.cc \
+    layNetlistBrowserModel.cc
 
 HEADERS = \
   gtf.h \
@@ -263,7 +264,8 @@ HEADERS = \
     layNetlistBrowserPage.h \
     layItemDelegates.h \
     layNetInfoDialog.h \
-    layNetExportDialog.h
+    layNetExportDialog.h \
+    layNetlistBrowserModel.h
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC

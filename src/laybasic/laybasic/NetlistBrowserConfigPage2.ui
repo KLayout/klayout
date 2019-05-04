@@ -160,6 +160,13 @@ brightness of the color used.</string>
              </widget>
             </item>
             <item>
+             <widget class="QCheckBox" name="brightness_cb">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QSpinBox" name="brightness_sb">
               <property name="minimum">
                <number>-100</number>
@@ -173,7 +180,7 @@ brightness of the color used.</string>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_4">
+             <widget class="QLabel" name="brightness_label">
               <property name="text">
                <string>% intensity increase</string>
               </property>
@@ -524,5 +531,38 @@ brightness of the color used.</string>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>brightness_cb</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>brightness_sb</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>114</x>
+     <y>246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>140</x>
+     <y>248</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>brightness_cb</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>brightness_label</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>119</x>
+     <y>251</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

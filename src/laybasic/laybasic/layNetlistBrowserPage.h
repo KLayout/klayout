@@ -280,7 +280,7 @@ public:
    *  @param halo The halo flag or -1 for default
    *  @param dither_pattern The dither pattern index of -1 to take the default
    */
-  void set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, const lay::ColorPalette *auto_colors);
+  void set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors);
 
   /**
    *  @brief Gets a value indicating whether all items in the netlist tree are shown (specifically for cross-reference DBs)
@@ -335,6 +335,7 @@ private:
   int m_marker_halo;
   int m_marker_dither_pattern;
   int m_marker_intensity;
+  bool m_use_original_colors;
   lay::LayoutView *mp_view;
   unsigned int m_cv_index;
   lay::PluginRoot *mp_plugin_root;

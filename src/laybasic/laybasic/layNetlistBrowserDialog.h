@@ -60,6 +60,9 @@ private:
   //  implementation of the lay::Plugin interface
   virtual void menu_activated (const std::string &symbol);
 
+  //  QWidget
+  virtual void hideEvent (QHideEvent *);
+
   void cellviews_changed ();
   void cellview_changed (int index);
   void l2ndbs_changed ();
@@ -89,6 +92,7 @@ private:
   int m_marker_halo;
   int m_marker_dither_pattern;
   int m_marker_intensity;
+  bool m_use_original_colors;
   std::string m_layout_name;
   int m_cv_index;
   std::string m_l2ndb_name;

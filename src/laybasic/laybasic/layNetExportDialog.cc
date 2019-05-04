@@ -33,13 +33,13 @@
 namespace lay
 {
 
-extern std::string cfg_l2ndb_net_cell_prefix;
-extern std::string cfg_l2ndb_net_propname;
-extern std::string cfg_l2ndb_circuit_cell_prefix;
-extern std::string cfg_l2ndb_produce_circuit_cells;
-extern std::string cfg_l2ndb_device_cell_prefix;
-extern std::string cfg_l2ndb_produce_device_cells;
-extern std::string cfg_l2ndb_start_layer_number;
+extern std::string cfg_l2ndb_export_net_cell_prefix;
+extern std::string cfg_l2ndb_export_net_propname;
+extern std::string cfg_l2ndb_export_circuit_cell_prefix;
+extern std::string cfg_l2ndb_export_produce_circuit_cells;
+extern std::string cfg_l2ndb_export_device_cell_prefix;
+extern std::string cfg_l2ndb_export_produce_device_cells;
+extern std::string cfg_l2ndb_export_start_layer_number;
 
 
 NetExportDialog::NetExportDialog (QWidget *parent)
@@ -168,43 +168,43 @@ int
 NetExportDialog::exec (lay::PluginRoot *plugin_root)
 {
   std::string v;
-  plugin_root->config_get (cfg_l2ndb_net_cell_prefix, v);
+  plugin_root->config_get (cfg_l2ndb_export_net_cell_prefix, v);
   set_net_prefix (v);
 
   tl::Variant var;
-  plugin_root->config_get (cfg_l2ndb_net_propname, var);
+  plugin_root->config_get (cfg_l2ndb_export_net_propname, var);
   set_net_propname (var);
 
   bool f = false;
-  plugin_root->config_get (cfg_l2ndb_produce_circuit_cells, f);
+  plugin_root->config_get (cfg_l2ndb_export_produce_circuit_cells, f);
   set_produce_circuit_cells (f);
 
   v.clear ();
-  plugin_root->config_get (cfg_l2ndb_circuit_cell_prefix, v);
+  plugin_root->config_get (cfg_l2ndb_export_circuit_cell_prefix, v);
   set_circuit_cell_prefix (v);
 
   f = false;
-  plugin_root->config_get (cfg_l2ndb_produce_device_cells, f);
+  plugin_root->config_get (cfg_l2ndb_export_produce_device_cells, f);
   set_produce_device_cells (f);
 
   v.clear ();
-  plugin_root->config_get (cfg_l2ndb_device_cell_prefix, v);
+  plugin_root->config_get (cfg_l2ndb_export_device_cell_prefix, v);
   set_device_cell_prefix (v);
 
   int ln = 0;
-  plugin_root->config_get (cfg_l2ndb_start_layer_number, ln);
+  plugin_root->config_get (cfg_l2ndb_export_start_layer_number, ln);
   set_start_layer_number (ln);
 
   int ret = QDialog::exec ();
   if (ret) {
 
-    plugin_root->config_set (cfg_l2ndb_net_cell_prefix, net_prefix ());
-    plugin_root->config_set (cfg_l2ndb_net_propname, net_propname ());
-    plugin_root->config_set (cfg_l2ndb_start_layer_number, tl::to_string (start_layer_number ()));
-    plugin_root->config_set (cfg_l2ndb_produce_circuit_cells, tl::to_string (produce_circuit_cells ()));
-    plugin_root->config_set (cfg_l2ndb_circuit_cell_prefix, circuit_cell_prefix ());
-    plugin_root->config_set (cfg_l2ndb_produce_device_cells, tl::to_string (produce_device_cells ()));
-    plugin_root->config_set (cfg_l2ndb_device_cell_prefix, device_cell_prefix ());
+    plugin_root->config_set (cfg_l2ndb_export_net_cell_prefix, net_prefix ());
+    plugin_root->config_set (cfg_l2ndb_export_net_propname, net_propname ());
+    plugin_root->config_set (cfg_l2ndb_export_start_layer_number, tl::to_string (start_layer_number ()));
+    plugin_root->config_set (cfg_l2ndb_export_produce_circuit_cells, tl::to_string (produce_circuit_cells ()));
+    plugin_root->config_set (cfg_l2ndb_export_circuit_cell_prefix, circuit_cell_prefix ());
+    plugin_root->config_set (cfg_l2ndb_export_produce_device_cells, tl::to_string (produce_device_cells ()));
+    plugin_root->config_set (cfg_l2ndb_export_device_cell_prefix, device_cell_prefix ());
 
   }
 

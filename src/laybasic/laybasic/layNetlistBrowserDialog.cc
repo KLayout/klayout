@@ -49,6 +49,7 @@ extern const std::string cfg_l2ndb_marker_line_width;
 extern const std::string cfg_l2ndb_marker_vertex_size;
 extern const std::string cfg_l2ndb_marker_halo;
 extern const std::string cfg_l2ndb_marker_intensity;
+extern const std::string cfg_l2ndb_marker_use_original_colors;
 extern const std::string cfg_l2ndb_window_mode;
 extern const std::string cfg_l2ndb_window_dim;
 extern const std::string cfg_l2ndb_max_shapes_highlighted;
@@ -68,6 +69,7 @@ NetlistBrowserDialog::NetlistBrowserDialog (lay::PluginRoot *root, lay::LayoutVi
     m_marker_halo (-1),
     m_marker_dither_pattern (-1),
     m_marker_intensity (0),
+    m_use_original_colors (false),
     m_cv_index (-1),
     m_l2n_index (-1),
     m_mouse_state (0)
@@ -557,6 +559,13 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
 
     need_update = lay::test_and_set (m_marker_intensity, bo);
 
+  } else if (name == cfg_l2ndb_marker_use_original_colors) {
+
+    bool oc = false;
+    tl::from_string (value, oc);
+
+    need_update = lay::test_and_set (m_use_original_colors, oc);
+
   } else {
     taken = false;
   }
@@ -564,7 +573,7 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
   if (active () && need_update) {
     browser_frame->set_max_shape_count (m_max_shape_count);
     browser_frame->set_window (m_window, m_window_dim);
-    browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_auto_color_enabled ? &m_auto_colors : 0);
+    browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_use_original_colors, m_auto_color_enabled ? &m_auto_colors : 0);
   }
 
   browser_frame->show_all (show_all);
@@ -713,7 +722,7 @@ NetlistBrowserDialog::update_content ()
   browser_frame->enable_updates (false);  //  Avoid building the internal lists several times ...
   browser_frame->set_l2ndb (l2ndb);
   browser_frame->set_max_shape_count (m_max_shape_count);
-  browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_auto_color_enabled ? &m_auto_colors : 0);
+  browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_use_original_colors, m_auto_color_enabled ? &m_auto_colors : 0);
   browser_frame->set_window (m_window, m_window_dim);
   browser_frame->set_view (view (), m_cv_index);
   browser_frame->enable_updates (true);
@@ -737,6 +746,12 @@ NetlistBrowserDialog::update_content ()
   if (l2ndb_cb->currentIndex () != m_l2n_index) {
     l2ndb_cb->setCurrentIndex (m_l2n_index);
   }
+}
+
+void
+NetlistBrowserDialog::hideEvent (QHideEvent *)
+{
+  deactivated ();
 }
 
 void

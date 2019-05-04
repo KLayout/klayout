@@ -45,18 +45,19 @@ extern const std::string cfg_l2ndb_marker_line_width ("l2ndb-marker-line-width")
 extern const std::string cfg_l2ndb_marker_vertex_size ("l2ndb-marker-vertex-size");
 extern const std::string cfg_l2ndb_marker_halo ("l2ndb-marker-halo");
 extern const std::string cfg_l2ndb_marker_intensity ("l2ndb-marker-intensity");
+extern const std::string cfg_l2ndb_marker_use_original_colors ("l2ndb-marker-use-original-colors");
 extern const std::string cfg_l2ndb_window_mode ("l2ndb-window-mode");
 extern const std::string cfg_l2ndb_window_dim ("l2ndb-window-dim");
 extern const std::string cfg_l2ndb_max_shapes_highlighted ("l2ndb-max-shapes-highlighted");
 extern const std::string cfg_l2ndb_show_all ("l2ndb-show-all");
 extern const std::string cfg_l2ndb_window_state ("l2ndb-window-state");
-extern const std::string cfg_l2ndb_net_cell_prefix ("l2ndb-net-cell-prefix");
-extern const std::string cfg_l2ndb_net_propname ("l2ndb-net-propname");
-extern const std::string cfg_l2ndb_start_layer_number ("l2ndb-start-layer-number");
-extern const std::string cfg_l2ndb_circuit_cell_prefix ("l2ndb-circuit-cell-prefix");
-extern const std::string cfg_l2ndb_produce_circuit_cells ("l2ndb-produce-circuit-cells");
-extern const std::string cfg_l2ndb_device_cell_prefix ("l2ndb-device-cell-prefix");
-extern const std::string cfg_l2ndb_produce_device_cells ("l2ndb-produce-device-cells");
+extern const std::string cfg_l2ndb_export_net_cell_prefix ("l2ndb-export-net-cell-prefix");
+extern const std::string cfg_l2ndb_export_net_propname ("l2ndb-export-net-propname");
+extern const std::string cfg_l2ndb_export_start_layer_number ("l2ndb-export-start-layer-number");
+extern const std::string cfg_l2ndb_export_circuit_cell_prefix ("l2ndb-export-circuit-cell-prefix");
+extern const std::string cfg_l2ndb_export_produce_circuit_cells ("l2ndb-export-produce-circuit-cells");
+extern const std::string cfg_l2ndb_export_device_cell_prefix ("l2ndb-export-device-cell-prefix");
+extern const std::string cfg_l2ndb_export_produce_device_cells ("l2ndb-export-produce-device-cells");
 
 // ------------------------------------------------------------
 
@@ -218,6 +219,13 @@ NetlistBrowserConfigPage2::setup (lay::PluginRoot *root)
   root->config_get (cfg_l2ndb_marker_color, color, lay::ColorConverter ());
   color_pb->set_color (color);
 
+  //  use original color
+  bool original_colors = false;
+  root->config_get (cfg_l2ndb_marker_use_original_colors, original_colors);
+  brightness_cb->setChecked (original_colors);
+  brightness_sb->setEnabled (original_colors);
+  brightness_label->setEnabled (original_colors);
+
   //  brightness offset
   int brightness = 0;
   root->config_get (cfg_l2ndb_marker_intensity, brightness);
@@ -318,6 +326,8 @@ NetlistBrowserConfigPage2::commit (lay::PluginRoot *root)
   }
 
   root->config_set (cfg_l2ndb_marker_intensity, brightness_sb->value ());
+
+  root->config_set (cfg_l2ndb_marker_use_original_colors, brightness_cb->isChecked ());
 }
 
 // ------------------------------------------------------------
@@ -338,17 +348,18 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_line_width, "-1"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_vertex_size, "-1"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_halo, "-1"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_use_original_colors, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_dither_pattern, "-1"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_marker_intensity, "50"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_show_all, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_window_state, ""));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_net_propname, ""));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_net_cell_prefix, "NET_"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_start_layer_number, "1000"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_produce_circuit_cells, "false"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_circuit_cell_prefix, "CIRCUIT_"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_produce_device_cells, "false"));
-    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_device_cell_prefix, "DEVICE_"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_export_net_propname, ""));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_export_net_cell_prefix, "NET_"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_export_start_layer_number, "1000"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_export_produce_circuit_cells, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_export_circuit_cell_prefix, "CIRCUIT_"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_export_produce_device_cells, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_l2ndb_export_device_cell_prefix, "DEVICE_"));
   }
 
   virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const

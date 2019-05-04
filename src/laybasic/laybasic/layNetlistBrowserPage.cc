@@ -773,12 +773,12 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     const db::Net *net = net_from_id (id);
     if (net) {
       if (index.column () == 0) {
-        return tl::to_qstring ("(" + tl::to_string (net->pin_count () + net->terminal_count () + net->subcircuit_pin_count ()) + ")");
-      } else {
         return tl::to_qstring (net->expanded_name ());
+      } else {
+        return tl::to_qstring (net->expanded_name () + " (" + tl::to_string (net->pin_count () + net->terminal_count () + net->subcircuit_pin_count ()) + ")");
       }
     }
-    //  TODO: in case of compare, column 1 is (size), 2 is net name(a) and 3 is net name(b)
+    //  TODO: in case of compare, column 1 is name(a):name(b), 2 is name(a)(size(a)) and 3 is name(b)(size(b))
 
   } else if (is_id_circuit_net_pin (id)) {
 
@@ -1741,6 +1741,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     m_marker_halo (-1),
     m_marker_dither_pattern (-1),
     m_marker_intensity (0),
+    m_use_original_colors (false),
     mp_view (0),
     m_cv_index (0),
     mp_plugin_root (0),
@@ -1752,7 +1753,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 {
   Ui::NetlistBrowserPage::setupUi (this);
 
-  //  @@@ insert into menu
+  //  TODO: insert into menu
   m_show_all_action = new QAction (QObject::tr ("Show All"), this);
   m_show_all_action->setCheckable (true);
   m_show_all_action->setChecked (m_show_all);
@@ -1825,7 +1826,7 @@ NetlistBrowserPage::set_plugin_root (lay::PluginRoot *pr)
 }
 
 void
-NetlistBrowserPage::set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, const lay::ColorPalette *auto_colors)
+NetlistBrowserPage::set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors)
 {
   m_colorizer.configure (color, auto_colors);
   m_marker_line_width = line_width;
@@ -1833,6 +1834,7 @@ NetlistBrowserPage::set_highlight_style (QColor color, int line_width, int verte
   m_marker_halo = halo;
   m_marker_dither_pattern = dither_pattern;
   m_marker_intensity = marker_intensity;
+  m_use_original_colors = use_original_colors;
   update_highlights ();
 }
 
@@ -2170,13 +2172,6 @@ NetlistBrowserPage::show_all (bool f)
     m_show_all = f;
     m_show_all_action->setChecked (f);
 
-#if 0 // @@@
-    MarkerBrowserTreeViewModel *tree_model = dynamic_cast<MarkerBrowserTreeViewModel *> (directory_tree->model ());
-    if (tree_model) {
-      set_hidden_rec (tree_model, directory_tree, QModelIndex (), m_show_all, cat_filter->text (), cell_filter->text ());
-    }
-#endif
-
   }
 }
 
@@ -2236,7 +2231,6 @@ NetlistBrowserPage::enable_updates (bool f)
 
     if (f && m_update_needed) {
       update_highlights ();
-      // @@@ update_info_text ();
     }
 
     m_update_needed = false;
@@ -2278,13 +2272,10 @@ NetlistBrowserPage::adjust_view ()
     db::cell_index_type cell_index = (*net)->circuit ()->cell_index ();
     size_t cluster_id = (*net)->cluster_id ();
 
-    // @@@std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = mp_view->cv_transform_variants_by_layer (m_cv_index);
     std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
 
     const db::Connectivity &conn = mp_database->connectivity ();
     for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
-
-      //  @@@ TODO: how to get the original layer?
 
       db::Box layer_bbox;
       db::recursive_cluster_shape_iterator<db::PolygonRef> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
@@ -2334,6 +2325,10 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
   size_t cluster_id = net->cluster_id ();
 
   QColor net_color = m_colorizer.color_of_net (net);
+  if (! net_color.isValid ()) {
+    //  fallback color
+    net_color = mp_view->background_color ().green () < 128 ? QColor (Qt::white) : QColor (Qt::black);
+  }
 
   const db::Connectivity &conn = mp_database->connectivity ();
   for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
@@ -2351,7 +2346,7 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
       mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
       mp_markers.back ()->set (*shapes, net_trans * shapes.trans (), tv);
 
-      if (net_color.isValid ()) {
+      if (! m_use_original_colors || display == display_by_lp.end ()) {
 
         mp_markers.back ()->set_color (net_color);
         mp_markers.back ()->set_frame_color (net_color);
@@ -2368,13 +2363,6 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
           mp_markers.back ()->set_color (display->second->eff_fill_color_brighter (true, (-m_marker_intensity * 255) / 100));
           mp_markers.back ()->set_frame_color (display->second->eff_frame_color_brighter (true, (-m_marker_intensity * 255) / 100));
         }
-
-      } else {
-
-        //  fallback color
-        QColor net_color = mp_view->background_color ().green () < 128 ? QColor (Qt::white) : QColor (Qt::black);
-        mp_markers.back ()->set_color (net_color);
-        mp_markers.back ()->set_frame_color (net_color);
 
       }
 
@@ -2455,7 +2443,6 @@ NetlistBrowserPage::update_highlights ()
     }
   }
 
-  // @@@std::map<unsigned int, std::vector<db::DCplxTrans> > tv_by_layer = mp_view->cv_transform_variants_by_layer (m_cv_index);
   std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
 
   //  correct DBU differences between the storage layout and the original layout

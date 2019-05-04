@@ -26,6 +26,7 @@
 #include "dbCommon.h"
 #include "dbPolygon.h"
 #include "dbCell.h"
+#include "dbLayoutToNetlist.h"
 #include "tlStream.h"
 
 namespace db {
@@ -84,6 +85,7 @@ private:
   std::string m_path;
   std::string m_line;
   tl::Extractor m_ex;
+  db::Point m_ref;
 
   void do_read (db::LayoutToNetlist *l2n);
 
@@ -102,6 +104,8 @@ private:
   db::CellInstArray read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, db::Net *> &id2net);
   void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc);
   std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n);
+  void read_geometries (Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell);
+  db::Point read_point ();
 };
 
 }

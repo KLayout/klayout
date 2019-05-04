@@ -78,10 +78,14 @@ namespace db
  *
  *  [geometry-def]:
  *
- *    polygon(<layer> <x> <y> ...)  - defines a polygon [short key: Q]
+ *    polygon(<layer> [coord] ...)  - defines a polygon [short key: Q]
  *                                    "*" for <x> or <y> means take previous
- *    rect(<layer> <left> <bottom> <right> <top>)
- *                                  - defines a rectangle [short key: R]
+ *    rect(<layer> [coord] [coord]) - defines a rectangle [short key: R]
+ *                                    coordinates are bottom/left and top/right
+ *  [coord]
+ *    <x> <y>                       - absolute coordinates
+ *    (<x> <y>)                     - relative coordinates (reference is reset to 0,0
+ *                                    for each net or terminal in device abstract)
  *
  *  [device-abstract-def]:
  *

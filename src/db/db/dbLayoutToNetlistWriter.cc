@@ -63,13 +63,15 @@ public:
 
 private:
   tl::OutputStream *mp_stream;
+  db::Point m_ref;
 
   void write (const db::LayoutToNetlist *l2n, const db::Circuit &circuit);
   void write (const db::LayoutToNetlist *l2n, const db::Net &net, unsigned int id);
   void write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit, std::map<const Net *, unsigned int> &net2id);
   void write (const db::LayoutToNetlist *l2n, const db::Device &device, std::map<const Net *, unsigned int> &net2id);
   void write (const db::LayoutToNetlist *l2n, const db::DeviceAbstract &device_abstract);
-  void write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname);
+  void write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname, bool relative);
+  void reset_geometry_ref ();
 };
 
 static const std::string endl ("\n");
@@ -254,39 +256,56 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Cir
   }
 }
 
-template <class T, class Tr>
-void write_points (tl::OutputStream &stream, const T &poly, const Tr &tr)
+void write_point (tl::OutputStream &stream, const db::Point &pt, db::Point &ref, bool relative)
 {
-  db::Coord x = 0, y = 0;
-  bool first = true;
-  for (typename T::polygon_contour_iterator c = poly.begin_hull (); c != poly.end_hull (); ++c) {
+  if (relative) {
 
-    typename T::point_type pt = tr * *c;
-
+    stream << "(";
+    stream << pt.x () - ref.x ();
     stream << " ";
+    stream << pt.y () - ref.y ();
+    stream << ")";
 
-    if (first || pt.x () != x) {
+  } else {
+
+    if (pt.x () == 0 || pt.x () != ref.x ()) {
       stream << pt.x ();
     } else {
       stream << "*";
     }
 
-    stream << " ";
-
-    if (first || pt.y () != y) {
+    if (pt.y () == 0 || pt.y () != ref.y ()) {
       stream << pt.y ();
     } else {
       stream << "*";
     }
 
-    first = false;
-    x = pt.x (); y = pt.y ();
+  }
+
+  ref = pt;
+}
+
+template <class T, class Tr>
+void write_points (tl::OutputStream &stream, const T &poly, const Tr &tr, db::Point &ref, bool relative)
+{
+  for (typename T::polygon_contour_iterator c = poly.begin_hull (); c != poly.end_hull (); ++c) {
+
+    typename T::point_type pt = tr * *c;
+
+    stream << " ";
+    write_point (stream, pt, ref, relative);
 
   }
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname)
+void std_writer_impl<Keys>::reset_geometry_ref ()
+{
+  m_ref = db::Point ();
+}
+
+template <class Keys>
+void std_writer_impl<Keys>::write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname, bool relative)
 {
   db::ICplxTrans t = tr * db::ICplxTrans (s->trans ());
 
@@ -295,8 +314,10 @@ void std_writer_impl<Keys>::write (const db::PolygonRef *s, const db::ICplxTrans
 
     db::Box box = t * poly.box ();
     *mp_stream << Keys::rect_key << "(" << lname;
-    *mp_stream << " " << box.left () << " " << box.bottom ();
-    *mp_stream << " " << box.right () << " " << box.top ();
+    *mp_stream << " ";
+    write_point (*mp_stream, box.p1 (), m_ref, relative);
+    *mp_stream << " ";
+    write_point (*mp_stream, box.p2 (), m_ref, relative);
     *mp_stream << ")";
 
   } else {
@@ -304,9 +325,9 @@ void std_writer_impl<Keys>::write (const db::PolygonRef *s, const db::ICplxTrans
     *mp_stream << Keys::polygon_key << "(" << lname;
     if (poly.holes () > 0) {
       db::SimplePolygon sp (poly);
-      write_points (*mp_stream, sp, t);
+      write_points (*mp_stream, sp, t, m_ref, relative);
     } else {
-      write_points (*mp_stream, poly, t);
+      write_points (*mp_stream, poly, t, m_ref, relative);
     }
     *mp_stream << ")";
 
@@ -325,6 +346,8 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
   const db::Connectivity &conn = l2n->connectivity ();
 
   bool any = false;
+
+  reset_geometry_ref ();
 
   for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
 
@@ -353,7 +376,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Net
         }
 
         *mp_stream << indent2;
-        write (si.operator-> (), si.trans (), name_for_layer (l2n, *l));
+        write (si.operator-> (), si.trans (), name_for_layer (l2n, *l), true);
         *mp_stream << endl;
 
         prev_ci = ci;
@@ -441,13 +464,15 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
 
     *mp_stream << indent1 << Keys::terminal_key << "(" << t->name () << endl;
 
+    reset_geometry_ref ();
+
     for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
 
       const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (device_abstract.cell_index ()).cluster_by_id (device_abstract.cluster_id_for_terminal (t->id ()));
       for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
 
         *mp_stream << indent2;
-        write (s.operator-> (), db::ICplxTrans (), name_for_layer (l2n, *l));
+        write (s.operator-> (), db::ICplxTrans (), name_for_layer (l2n, *l), true);
         *mp_stream << endl;
 
       }

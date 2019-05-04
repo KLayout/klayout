@@ -22,7 +22,6 @@
 
 #include "dbLayoutToNetlistReader.h"
 #include "dbLayoutToNetlistFormatDefs.h"
-#include "dbLayoutToNetlist.h"
 
 namespace db
 {
@@ -362,6 +361,28 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
   l2n->set_netlist_extracted ();
 }
 
+db::Point
+LayoutToNetlistStandardReader::read_point ()
+{
+  db::Coord x = m_ref.x (), y = m_ref.y ();
+
+  if (test ("(")) {
+    x += read_coord ();
+    y += read_coord ();
+    expect (")");
+  } else {
+    if (! test ("*")) {
+      x = read_coord ();
+    }
+    if (! test ("*")) {
+      y = read_coord ();
+    }
+  }
+
+  m_ref = db::Point (x, y);
+  return m_ref;
+}
+
 std::pair<unsigned int, db::PolygonRef>
 LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
 {
@@ -374,11 +395,9 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
     read_word_or_quoted (lname);
     unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
 
-    db::Coord l = read_coord ();
-    db::Coord b = read_coord ();
-    db::Coord r = read_coord ();
-    db::Coord t = read_coord ();
-    db::Box box (l, b, r, t);
+    db::Point lb = read_point ();
+    db::Point rt = read_point ();
+    db::Box box (lb, rt);
 
     br.done ();
 
@@ -392,18 +411,9 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
     unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
 
     std::vector<db::Point> pt;
-
-    db::Coord x = 0, y = 0;
     while (br) {
-      if (! test ("*")) {
-        x = read_coord ();
-      }
-      if (! test ("*")) {
-        y = read_coord ();
-      }
-      pt.push_back (db::Point (x, y));
+      pt.push_back (read_point ());
     }
-
     br.done ();
 
     db::Polygon poly;
@@ -412,6 +422,18 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
 
   } else {
     throw tl::Exception (tl::to_string (tr ("Invalid keyword inside net or terminal definition (polygon or rect expected)")));
+  }
+}
+
+void
+LayoutToNetlistStandardReader::read_geometries (Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell)
+{
+  m_ref = db::Point ();
+
+  while (br) {
+    std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n);
+    lc.add (pr.second, pr.first);
+    cell.shapes (pr.first).insert (pr.second);
   }
 }
 
@@ -440,12 +462,7 @@ LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *
   net->set_cluster_id (lc.id ());
 
   db::Cell &cell = l2n->internal_layout ()->cell (circuit->cell_index ());
-
-  while (br) {
-    std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n);
-    lc.add (pr.second, pr.first);
-    cell.shapes (pr.first).insert (pr.second);
-  }
+  read_geometries (br, l2n, lc, cell);
 
   br.done ();
 }
@@ -723,12 +740,7 @@ LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n,
   dm->set_cluster_id_for_terminal (tid, lc.id ());
 
   db::Cell &cell = l2n->internal_layout ()->cell (dm->cell_index ());
-
-  while (br) {
-    std::pair<unsigned int, db::PolygonRef> pr = read_geometry (l2n);
-    lc.add (pr.second, pr.first);
-    cell.shapes (pr.first).insert (pr.second);
-  }
+  read_geometries (br, l2n, lc, cell);
 
   br.done ();
 }

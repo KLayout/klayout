@@ -126,6 +126,9 @@ public:
   const db::Net *net_from_index (const QModelIndex &index) const;
   QModelIndex index_from_net (const db::Net *net) const;
 
+  const db::SubCircuit *subcircuit_from_index (const QModelIndex &index) const;
+  const db::Device *device_from_index (const QModelIndex &index) const;
+
 private slots:
   void colors_changed ();
 
@@ -322,7 +325,7 @@ private slots:
   void navigate_back ();
   void navigate_forward ();
   void current_index_changed (const QModelIndex &index);
-  void net_selection_changed ();
+  void selection_changed ();
   void browse_color_for_net ();
   void select_color_for_net ();
 
@@ -350,18 +353,25 @@ private:
   bool m_enable_updates;
   bool m_update_needed;
   std::vector<const db::Net *> m_current_nets;
+  std::vector<const db::Device *> m_current_devices;
+  std::vector<const db::SubCircuit *> m_current_subcircuits;
   lay::NetInfoDialog *mp_info_dialog;
 
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);
   void adjust_view ();
   void clear_markers ();
-  void highlight_nets (const std::vector<const db::Net *> &nets);
+  void highlight (const std::vector<const db::Net *> &nets, const std::vector<const db::Device *> &devices, const std::vector<const db::SubCircuit *> &subcircuits);
   std::vector<const db::Net *> selected_nets ();
+  std::vector<const db::Device *> selected_devices ();
+  std::vector<const db::SubCircuit *> selected_subcircuits ();
   void set_color_for_selected_nets (const QColor &color);
   void layer_list_changed (int);
+  QColor make_valid_color (const QColor &color);
   bool produce_highlights_for_net(const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv);
-  db::ICplxTrans trans_for_net (const db::Net *net);
+  bool produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
+  bool produce_highlights_for_subcircuit (const db::SubCircuit *subcircuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
+
   void export_nets (const std::vector<const db::Net *> *nets);
 };
 

@@ -39,6 +39,7 @@
 #include <QPainter>
 #include <QColorDialog>
 #include <QRegExp>
+#include <QKeyEvent>
 
 namespace lay
 {
@@ -101,9 +102,13 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   lay::ColorButton::build_color_menu (menu, this, SLOT (browse_color_for_net ()), SLOT (select_color_for_net ()));
   color_action->setMenu (menu);
 
+  QAction *sep;
   directory_tree->addAction (actionCollapseAll);
   directory_tree->addAction (actionExpandAll);
-  QAction *sep;
+  sep = new QAction (directory_tree);
+  sep->setSeparator (true);
+  directory_tree->addAction (sep);
+  directory_tree->addAction (actionUnselectAll);
   sep = new QAction (directory_tree);
   sep->setSeparator (true);
   directory_tree->addAction (sep);
@@ -150,6 +155,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 
   forward->setEnabled (false);
   backward->setEnabled (false);
+
+  directory_tree->installEventFilter (this);
 }
 
 NetlistBrowserPage::~NetlistBrowserPage ()
@@ -208,6 +215,26 @@ NetlistBrowserPage::set_max_shape_count (size_t max_shape_count)
   if (m_max_shape_count != max_shape_count) {
     m_max_shape_count = max_shape_count;
     update_highlights ();
+  }
+}
+
+bool
+NetlistBrowserPage::eventFilter (QObject *watched, QEvent *event)
+{
+  if (watched != directory_tree) {
+    return false;
+  }
+
+  QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
+  if (! ke || event->type () != QEvent::KeyPress) {
+    return false;
+  }
+
+  if (ke->key () == Qt::Key_Escape) {
+    directory_tree->clearSelection ();
+    return true;
+  } else {
+    return false;
   }
 }
 

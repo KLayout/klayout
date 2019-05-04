@@ -154,6 +154,9 @@ private slots:
   void browse_color_for_net ();
   void select_color_for_net ();
 
+protected:
+  bool eventFilter (QObject *watched, QEvent *event);
+
 private:
   bool m_show_all;
   QAction *m_show_all_action;

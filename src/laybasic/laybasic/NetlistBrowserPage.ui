@@ -312,6 +312,14 @@
     <string>Export Selected Nets</string>
    </property>
   </action>
+  <action name="actionUnselectAll">
+   <property name="text">
+    <string>Unselect All</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -356,6 +364,22 @@
     <hint type="destinationlabel">
      <x>324</x>
      <y>281</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionUnselectAll</sender>
+   <signal>triggered()</signal>
+   <receiver>directory_tree</receiver>
+   <slot>clearSelection()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>289</y>
     </hint>
    </hints>
   </connection>

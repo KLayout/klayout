@@ -95,7 +95,6 @@ NetExportDialog::net_propname ()
 void
 NetExportDialog::set_produce_circuit_cells (bool f)
 {
-  ui->circuit_cell_prefix->setEnabled (f);
   ui->produce_circuit_cells_cb->setChecked (f);
 }
 
@@ -120,7 +119,6 @@ NetExportDialog::circuit_cell_prefix ()
 void
 NetExportDialog::set_produce_device_cells (bool f)
 {
-  ui->device_cell_prefix->setEnabled (f);
   ui->produce_device_cells_cb->setChecked (f);
 }
 

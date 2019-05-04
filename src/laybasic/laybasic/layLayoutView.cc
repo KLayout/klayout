@@ -2975,7 +2975,7 @@ LayoutView::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, boo
 
     m_active_cellview_changed_event_enabled = false;
 
-    stop ();
+    stop_redraw ();
 
     bool set_max_hier = (m_full_hier_new_cell || has_max_hier ());
 

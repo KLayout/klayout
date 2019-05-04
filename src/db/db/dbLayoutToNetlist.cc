@@ -743,6 +743,12 @@ LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &ta
 void
 LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
 {
+  build_nets (0, cmap, target, lmap, net_cell_name_prefix, netname_prop, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix);
+}
+
+void
+LayoutToNetlist::build_nets (const std::set<const db::Net *> *nets, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
+{
   if (! m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
   }
@@ -763,22 +769,26 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
 
-      //  exlude local nets in recursive mode
-      if (hier_mode != BNH_Disconnected && ! is_top_circuit && n->pin_count () > 0) {
+      //  exlude local nets in recursive mode except if they are explicitly selected
+      if (! nets && hier_mode != BNH_Disconnected && ! is_top_circuit && n->pin_count () > 0) {
         continue;
       }
 
-      db::properties_id_type netname_propid = make_netname_propid (target, netname_prop, *n);
-      build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cell_reuse_table, db::ICplxTrans (mag));
+      if (! nets || nets->find (n.operator-> ()) != nets->end ()) {
+        db::properties_id_type netname_propid = make_netname_propid (target, netname_prop, *n);
+        build_net_rec (*n, target, target.cell (target_ci), lmap, net_cell_name_prefix, netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cell_reuse_table, db::ICplxTrans (mag));
+      }
 
     }
 
-    if (hier_mode != BNH_Disconnected) {
+    if (hier_mode != BNH_Disconnected && ! nets) {
 
-      //  with recursive nets we skip nets in subcircuits which are connected upwards. This means, nets will
+      //  With recursive nets we skip nets in subcircuits which are connected upwards. This means, nets will
       //  get lost if there is no connection to this pin from the outside. Hence we need to deliver nets from
       //  subcircuits as part of the circuit which calls the subcircuit - but NOT in a subcircuit cell, because
       //  this will just apply to nets from certain instances. But the net cell name will be formed as "subcircuit:net"
+      //
+      //  In explicit selection mode we don't care about this as nets are explicitly taken or not.
 
       const db::Circuit &circuit = *c;
       for (db::Circuit::const_subcircuit_iterator sc = circuit.begin_subcircuits (); sc != circuit.end_subcircuits (); ++sc) {

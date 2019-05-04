@@ -2492,17 +2492,52 @@ NetlistBrowserPage::clear_markers ()
   mp_markers.clear ();
 }
 
+static std::map<unsigned int, const db::Region *>
+create_layermap (const db::LayoutToNetlist *database, db::Layout &target_layout, int ln)
+{
+  std::map<unsigned int, const db::Region *> lm;
+
+  const db::Layout &source_layout = *database->internal_layout ();
+
+  std::set<unsigned int> layers_to_copy;
+  const db::Connectivity &conn = database->connectivity ();
+  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+    layers_to_copy.insert (*layer);
+  }
+
+  for (std::set<unsigned int>::const_iterator l = layers_to_copy.begin (); l != layers_to_copy.end (); ++l) {
+    const db::LayerProperties &lp = source_layout.get_properties (*l);
+    unsigned int tl;
+    if (! lp.is_null ()) {
+      tl = target_layout.insert_layer (lp);
+    } else {
+      tl = target_layout.insert_layer (db::LayerProperties (ln++, 0, database->name (*l)));
+    }
+    lm.insert (std::make_pair (tl, (const_cast<db::LayoutToNetlist *> (database))->layer_by_index (*l)));
+  }
+
+  return lm;
+}
+
 void
 NetlistBrowserPage::export_selected ()
 {
-  std::auto_ptr<lay::NetExportDialog> dialog (new lay::NetExportDialog (this));
-  if (dialog->exec (mp_plugin_root)) {
-    // @@@
+  std::vector<const db::Net *> nets = selected_nets ();
+  if (nets.empty ()) {
+    return;
   }
+
+  export_nets (&nets);
 }
 
 void
 NetlistBrowserPage::export_all ()
+{
+  export_nets (0);
+}
+
+void
+NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
 {
   if (! mp_view || ! mp_database.get () || ! mp_database->internal_layout ()) {
     return;
@@ -2529,37 +2564,19 @@ NetlistBrowserPage::export_all ()
     db::cell_index_type target_top_index = target_layout.add_cell (source_layout.cell_name (source_top.cell_index ()));
 
     db::CellMapping cm = database->cell_mapping_into (target_layout, target_layout.cell (target_top_index));
+    std::map<unsigned int, const db::Region *> lm = create_layermap (database, target_layout, dialog->start_layer_number ());
 
-    std::map<unsigned int, const db::Region *> lm;
-    {
-      //  create a layer mapping
-
-      std::set<unsigned int> layers_to_copy;
-      const db::Connectivity &conn = database->connectivity ();
-      for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
-        layers_to_copy.insert (*layer);
-      }
-
-      int ln = dialog->start_layer_number ();
-
-      for (std::set<unsigned int>::const_iterator l = layers_to_copy.begin (); l != layers_to_copy.end (); ++l) {
-        const db::LayerProperties &lp = source_layout.get_properties (*l);
-        unsigned int tl;
-        if (! lp.is_null ()) {
-          tl = target_layout.insert_layer (lp);
-        } else {
-          tl = target_layout.insert_layer (db::LayerProperties (ln++, 0, database->name (*l)));
-        }
-        lm.insert (std::make_pair (tl, database->layer_by_index (*l)));
-      }
+    std::set<const db::Net *> net_set;
+    if (nets) {
+      net_set.insert (nets->begin (), nets->end ());
     }
 
-    database->build_all_nets (cm, target_layout, lm,
-                              dialog->net_prefix ().empty () ? 0 : dialog->net_prefix ().c_str (),
-                              dialog->net_propname (),
-                              dialog->produce_circuit_cells () ? db::LayoutToNetlist::BNH_SubcircuitCells : db::LayoutToNetlist::BNH_Flatten,
-                              dialog->produce_circuit_cells () ? dialog->circuit_cell_prefix ().c_str () : 0,
-                              dialog->produce_device_cells () ? dialog->device_cell_prefix ().c_str () : 0);
+    database->build_nets (nets ? &net_set : 0, cm, target_layout, lm,
+                          dialog->net_prefix ().empty () ? 0 : dialog->net_prefix ().c_str (),
+                          dialog->net_propname (),
+                          dialog->produce_circuit_cells () ? db::LayoutToNetlist::BNH_SubcircuitCells : db::LayoutToNetlist::BNH_Flatten,
+                          dialog->produce_circuit_cells () ? dialog->circuit_cell_prefix ().c_str () : 0,
+                          dialog->produce_device_cells () ? dialog->device_cell_prefix ().c_str () : 0);
 
     view->zoom_fit ();
     view->max_hier ();

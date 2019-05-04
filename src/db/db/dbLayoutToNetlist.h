@@ -590,6 +590,11 @@ public:
   void build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const;
 
   /**
+   *  @brief Like build_all_nets, but with the ability to select some nets
+   */
+  void build_nets (const std::set<const db::Net *> *nets, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const;
+
+  /**
    *  @brief Finds the net by probing a specific location on the given layer
    *
    *  This method will find a net looking at the given layer at the specific position.

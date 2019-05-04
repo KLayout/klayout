@@ -358,6 +358,7 @@ private:
   void layer_list_changed (int);
   bool produce_highlights_for_net(const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv);
   db::ICplxTrans trans_for_net (const db::Net *net);
+  void export_nets (const std::vector<const db::Net *> *nets);
 };
 
 } // namespace lay

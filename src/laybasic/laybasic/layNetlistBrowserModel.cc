@@ -164,7 +164,7 @@ QColor
 NetColorizer::color_of_net (const db::Net *net) const
 {
   if (! net) {
-    return m_marker_color;
+    return QColor ();
   }
 
   std::map<const db::Net *, QColor>::const_iterator c = m_custom_color.find (net);
@@ -177,7 +177,7 @@ NetColorizer::color_of_net (const db::Net *net) const
     size_t index = index_from_attr (net, circuit->begin_nets (), circuit->end_nets (), m_net_index_by_object);
     return m_auto_colors.color_by_index ((unsigned int) index);
   } else {
-    return m_marker_color;
+    return QColor ();
   }
 }
 
@@ -1650,9 +1650,9 @@ NetlistBrowserModel::circuit_from_id (void *id) const
   if (c == m_circuit_by_index.end ()) {
 
     c = m_circuit_by_index.insert (std::make_pair (index, (db::Circuit *) 0)).first;
-    for (db::Netlist::circuit_iterator i = netlist ()->begin_circuits (); i != netlist ()->end_circuits (); ++i) {
+    for (db::Netlist::top_down_circuit_iterator i = netlist ()->begin_top_down (); i != netlist ()->end_top_down (); ++i) {
       if (index-- == 0) {
-        c->second = i.operator-> ();
+        c->second = *i;
         break;
       }
     }

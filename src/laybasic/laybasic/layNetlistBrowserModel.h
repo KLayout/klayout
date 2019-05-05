@@ -56,6 +56,11 @@ public:
 
   QColor color_of_net (const db::Net *net) const;
 
+  const QColor &marker_color () const
+  {
+    return m_marker_color;
+  }
+
   void begin_changes ();
   void end_changes ();
 

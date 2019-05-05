@@ -88,7 +88,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     m_signals_enabled (true),
     m_enable_updates (true),
     m_update_needed (true),
-    mp_info_dialog (0)
+    mp_info_dialog (0),
+    dm_update_highlights (this, &NetlistBrowserPage::update_highlights)
 {
   Ui::NetlistBrowserPage::setupUi (this);
 
@@ -241,7 +242,7 @@ NetlistBrowserPage::eventFilter (QObject *watched, QEvent *event)
 void
 NetlistBrowserPage::layer_list_changed (int)
 {
-  update_highlights ();
+  dm_update_highlights ();
 }
 
 void
@@ -775,7 +776,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
   const db::Layout *layout = mp_database->internal_layout ();
   db::ICplxTrans device_trans = trans_for (device, layout->dbu (), db::DCplxTrans (device->position () - db::DPoint ()));
 
-  QColor color = make_valid_color (m_colorizer.color_of_net (0));
+  QColor color = make_valid_color (m_colorizer.marker_color ());
   db::Box device_bbox = bbox_for_device (layout, device);
   if (device_bbox.empty ()) {
     return false;
@@ -801,7 +802,7 @@ NetlistBrowserPage::produce_highlights_for_subcircuit (const db::SubCircuit *sub
   const db::Layout *layout = mp_database->internal_layout ();
   db::ICplxTrans subcircuit_trans = trans_for (subcircuit, layout->dbu (), subcircuit->trans ());
 
-  QColor color = make_valid_color (m_colorizer.color_of_net (0));
+  QColor color = make_valid_color (m_colorizer.marker_color ());
   db::Box circuit_bbox = bbox_for_subcircuit (layout, subcircuit);
   if (circuit_bbox.empty ()) {
     return false;
@@ -830,7 +831,8 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
   db::cell_index_type cell_index = net->circuit ()->cell_index ();
   size_t cluster_id = net->cluster_id ();
 
-  QColor net_color = make_valid_color (m_colorizer.color_of_net (net));
+  QColor net_color = m_colorizer.color_of_net (net);
+  QColor fallback_color = make_valid_color (m_colorizer.marker_color ());
 
   const db::Connectivity &conn = mp_database->connectivity ();
   for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
@@ -848,10 +850,15 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
       mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
       mp_markers.back ()->set (*shapes, net_trans * shapes.trans (), tv);
 
-      if (! m_use_original_colors || display == display_by_lp.end ()) {
+      if (net_color.isValid ()) {
 
         mp_markers.back ()->set_color (net_color);
         mp_markers.back ()->set_frame_color (net_color);
+
+      } else if (! m_use_original_colors || display == display_by_lp.end ()) {
+
+        mp_markers.back ()->set_color (fallback_color);
+        mp_markers.back ()->set_frame_color (fallback_color);
 
       } else if (display != display_by_lp.end ()) {
 

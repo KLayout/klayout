@@ -184,6 +184,7 @@ private:
   std::vector<const db::Device *> m_current_devices;
   std::vector<const db::SubCircuit *> m_current_subcircuits;
   lay::NetInfoDialog *mp_info_dialog;
+  tl::DeferredMethod<NetlistBrowserPage> dm_update_highlights;
 
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);

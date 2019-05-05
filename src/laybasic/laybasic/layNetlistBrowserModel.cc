@@ -1650,9 +1650,9 @@ NetlistBrowserModel::circuit_from_id (void *id) const
   if (c == m_circuit_by_index.end ()) {
 
     c = m_circuit_by_index.insert (std::make_pair (index, (db::Circuit *) 0)).first;
-    for (db::Netlist::top_down_circuit_iterator i = netlist ()->begin_top_down (); i != netlist ()->end_top_down (); ++i) {
+    for (db::Netlist::circuit_iterator i = netlist ()->begin_circuits (); i != netlist ()->end_circuits (); ++i) {
       if (index-- == 0) {
-        c->second = *i;
+        c->second = i.operator-> ();
         break;
       }
     }

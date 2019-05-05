@@ -34,6 +34,7 @@
 #include "dbNetlistDeviceClasses.h"
 #include "dbCellMapping.h"
 #include "dbLayerMapping.h"
+#include "dbCell.h"
 
 #include <QUrl>
 #include <QPainter>
@@ -49,15 +50,56 @@ extern std::string cfg_l2ndb_show_all;
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserPage implementation
 
+//  TODO: move this to Cell
+static std::pair<bool, db::ICplxTrans>
+trans_to (const db::Cell *cell, const db::Cell *parent, std::set<db::cell_index_type> &visited, const db::ICplxTrans &trans)
+{
+  for (db::Cell::parent_inst_iterator r = cell->begin_parent_insts (); ! r.at_end (); ++r) {
+
+    if (r->parent_cell_index () == parent->cell_index ()) {
+
+      return std::make_pair (true, r->child_inst ().complex_trans () * trans);
+
+    } else if (visited.find (r->parent_cell_index ()) == visited.end ()) {
+
+      visited.insert (r->parent_cell_index ());
+
+      const db::Cell &rc = cell->layout ()->cell (r->parent_cell_index ());
+      std::pair<bool, db::ICplxTrans> path = trans_to (&rc, parent, visited, r->child_inst ().complex_trans () * trans);
+      if (path.first) {
+        return path;
+      }
+
+    }
+
+  }
+
+  return std::pair<bool, db::ICplxTrans> (false, db::ICplxTrans ());
+}
+
+static std::pair<bool, db::ICplxTrans>
+trans_to (const db::Cell *cell, const db::Cell *parent)
+{
+  if (cell == parent || ! cell->layout () || parent->layout () != cell->layout ()) {
+    return std::make_pair (true, db::ICplxTrans ());
+  } else {
+    std::set <db::cell_index_type> v;
+    return trans_to (cell, parent, v, db::ICplxTrans ());
+  }
+}
+
 template <class Obj>
 static db::ICplxTrans
-trans_for (const Obj *objs, double dbu, const db::DCplxTrans &initial = db::DCplxTrans ())
+trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, const db::DCplxTrans &initial = db::DCplxTrans ())
 {
   db::DCplxTrans t = initial;
 
   const db::Circuit *circuit = objs->circuit ();
   while (circuit) {
-    if (circuit->begin_refs () != circuit->end_refs ()) {
+    if (circuit->cell_index () == cell.cell_index ()) {
+      circuit = 0;
+      break;
+    } else if (circuit->begin_refs () != circuit->end_refs ()) {
       const db::SubCircuit &ref = *circuit->begin_refs ();
       t = ref.trans () * t;
       circuit = ref.circuit ();
@@ -66,8 +108,22 @@ trans_for (const Obj *objs, double dbu, const db::DCplxTrans &initial = db::DCpl
     }
   }
 
-  db::CplxTrans dbu_trans (dbu);
-  return dbu_trans.inverted () * t * dbu_trans;
+  db::CplxTrans dbu_trans (ly.dbu ());
+  db::ICplxTrans it = dbu_trans.inverted () * t * dbu_trans;
+
+  //  The circuit may not be instantiated and still not be the top cell.
+  //  This happens if the subcell does not have connections. In this case
+  //  we look up one instantiation path
+
+  if (circuit && ly.is_valid_cell_index (circuit->cell_index ())) {
+    const db::Cell &cc = ly.cell (circuit->cell_index ());
+    std::pair<bool, db::ICplxTrans> tc = trans_to (&cc, &cell);
+    if (tc.first) {
+      it = tc.second * it;
+    }
+  }
+
+  return it;
 }
 
 NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
@@ -700,7 +756,7 @@ NetlistBrowserPage::adjust_view ()
 
   for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end (); ++net) {
 
-    db::ICplxTrans net_trans = trans_for (*net, mp_database->internal_layout ()->dbu ());
+    db::ICplxTrans net_trans = trans_for (*net, *mp_database->internal_layout (), *mp_database->internal_top_cell ());
 
     db::cell_index_type cell_index = (*net)->circuit ()->cell_index ();
     size_t cluster_id = (*net)->cluster_id ();
@@ -722,11 +778,11 @@ NetlistBrowserPage::adjust_view ()
   }
 
   for (std::vector<const db::Device *>::const_iterator device = m_current_devices.begin (); device != m_current_devices.end (); ++device) {
-    bbox += trans_for (*device, mp_database->internal_layout ()->dbu ()) * bbox_for_device (layout, *device);
+    bbox += trans_for (*device, *mp_database->internal_layout (), *mp_database->internal_top_cell ()) * bbox_for_device (layout, *device);
   }
 
   for (std::vector<const db::SubCircuit *>::const_iterator subcircuit = m_current_subcircuits.begin (); subcircuit != m_current_subcircuits.end (); ++subcircuit) {
-    bbox += trans_for (*subcircuit, mp_database->internal_layout ()->dbu ()) * bbox_for_subcircuit (layout, *subcircuit);
+    bbox += trans_for (*subcircuit, *mp_database->internal_layout (), *mp_database->internal_top_cell ()) * bbox_for_subcircuit (layout, *subcircuit);
   }
 
   if (! bbox.empty ()) {
@@ -774,7 +830,8 @@ bool
 NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
-  db::ICplxTrans device_trans = trans_for (device, layout->dbu (), db::DCplxTrans (device->position () - db::DPoint ()));
+  const db::Cell *cell = mp_database->internal_top_cell ();
+  db::ICplxTrans device_trans = trans_for (device, *layout, *cell, db::DCplxTrans (device->position () - db::DPoint ()));
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
   db::Box device_bbox = bbox_for_device (layout, device);
@@ -800,7 +857,8 @@ bool
 NetlistBrowserPage::produce_highlights_for_subcircuit (const db::SubCircuit *subcircuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
-  db::ICplxTrans subcircuit_trans = trans_for (subcircuit, layout->dbu (), subcircuit->trans ());
+  const db::Cell *cell = mp_database->internal_top_cell ();
+  db::ICplxTrans subcircuit_trans = trans_for (subcircuit, *layout, *cell, subcircuit->trans ());
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
   db::Box circuit_bbox = bbox_for_subcircuit (layout, subcircuit);
@@ -826,7 +884,8 @@ bool
 NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv)
 {
   const db::Layout *layout = mp_database->internal_layout ();
-  db::ICplxTrans net_trans = trans_for (net, layout->dbu ());
+  const db::Cell *cell = mp_database->internal_top_cell ();
+  db::ICplxTrans net_trans = trans_for (net, *layout, *cell);
 
   db::cell_index_type cell_index = net->circuit ()->cell_index ();
   size_t cluster_id = net->cluster_id ();

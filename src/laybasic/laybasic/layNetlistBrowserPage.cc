@@ -50,47 +50,9 @@ extern std::string cfg_l2ndb_show_all;
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserPage implementation
 
-//  TODO: move this to Cell
-static std::pair<bool, db::ICplxTrans>
-trans_to (const db::Cell *cell, const db::Cell *parent, std::set<db::cell_index_type> &visited, const db::ICplxTrans &trans)
-{
-  for (db::Cell::parent_inst_iterator r = cell->begin_parent_insts (); ! r.at_end (); ++r) {
-
-    if (r->parent_cell_index () == parent->cell_index ()) {
-
-      return std::make_pair (true, r->child_inst ().complex_trans () * trans);
-
-    } else if (visited.find (r->parent_cell_index ()) == visited.end ()) {
-
-      visited.insert (r->parent_cell_index ());
-
-      const db::Cell &rc = cell->layout ()->cell (r->parent_cell_index ());
-      std::pair<bool, db::ICplxTrans> path = trans_to (&rc, parent, visited, r->child_inst ().complex_trans () * trans);
-      if (path.first) {
-        return path;
-      }
-
-    }
-
-  }
-
-  return std::pair<bool, db::ICplxTrans> (false, db::ICplxTrans ());
-}
-
-static std::pair<bool, db::ICplxTrans>
-trans_to (const db::Cell *cell, const db::Cell *parent)
-{
-  if (cell == parent || ! cell->layout () || parent->layout () != cell->layout ()) {
-    return std::make_pair (true, db::ICplxTrans ());
-  } else {
-    std::set <db::cell_index_type> v;
-    return trans_to (cell, parent, v, db::ICplxTrans ());
-  }
-}
-
 template <class Obj>
 static db::ICplxTrans
-trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, const db::DCplxTrans &initial = db::DCplxTrans ())
+trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, db::ContextCache &cc, const db::DCplxTrans &initial = db::DCplxTrans ())
 {
   db::DCplxTrans t = initial;
 
@@ -116,8 +78,7 @@ trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, const db
   //  we look up one instantiation path
 
   if (circuit && ly.is_valid_cell_index (circuit->cell_index ())) {
-    const db::Cell &cc = ly.cell (circuit->cell_index ());
-    std::pair<bool, db::ICplxTrans> tc = trans_to (&cc, &cell);
+    std::pair<bool, db::ICplxTrans> tc = cc.find_layout_context (circuit->cell_index (), cell.cell_index ());
     if (tc.first) {
       it = tc.second * it;
     }
@@ -145,7 +106,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     m_enable_updates (true),
     m_update_needed (true),
     mp_info_dialog (0),
-    dm_update_highlights (this, &NetlistBrowserPage::update_highlights)
+    dm_update_highlights (this, &NetlistBrowserPage::update_highlights),
+    m_cell_context_cache (0)
 {
   Ui::NetlistBrowserPage::setupUi (this);
 
@@ -653,6 +615,7 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
   }
 
   mp_database.reset (database);
+
   clear_markers ();
   highlight (std::vector<const db::Net *> (), std::vector<const db::Device *> (), std::vector<const db::SubCircuit *> ());
 
@@ -661,6 +624,8 @@ NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
     directory_tree->setModel (0);
     return;
   }
+
+  m_cell_context_cache = db::ContextCache (database->internal_layout ());
 
   //  NOTE: with the tree as the parent, the tree will take over ownership of the model
   NetlistBrowserModel *new_model = new NetlistBrowserModel (directory_tree, database, &m_colorizer);
@@ -756,7 +721,7 @@ NetlistBrowserPage::adjust_view ()
 
   for (std::vector<const db::Net *>::const_iterator net = m_current_nets.begin (); net != m_current_nets.end (); ++net) {
 
-    db::ICplxTrans net_trans = trans_for (*net, *mp_database->internal_layout (), *mp_database->internal_top_cell ());
+    db::ICplxTrans net_trans = trans_for (*net, *mp_database->internal_layout (), *mp_database->internal_top_cell (), m_cell_context_cache);
 
     db::cell_index_type cell_index = (*net)->circuit ()->cell_index ();
     size_t cluster_id = (*net)->cluster_id ();
@@ -778,11 +743,11 @@ NetlistBrowserPage::adjust_view ()
   }
 
   for (std::vector<const db::Device *>::const_iterator device = m_current_devices.begin (); device != m_current_devices.end (); ++device) {
-    bbox += trans_for (*device, *mp_database->internal_layout (), *mp_database->internal_top_cell ()) * bbox_for_device (layout, *device);
+    bbox += trans_for (*device, *mp_database->internal_layout (), *mp_database->internal_top_cell (), m_cell_context_cache) * bbox_for_device (layout, *device);
   }
 
   for (std::vector<const db::SubCircuit *>::const_iterator subcircuit = m_current_subcircuits.begin (); subcircuit != m_current_subcircuits.end (); ++subcircuit) {
-    bbox += trans_for (*subcircuit, *mp_database->internal_layout (), *mp_database->internal_top_cell ()) * bbox_for_subcircuit (layout, *subcircuit);
+    bbox += trans_for (*subcircuit, *mp_database->internal_layout (), *mp_database->internal_top_cell (), m_cell_context_cache) * bbox_for_subcircuit (layout, *subcircuit);
   }
 
   if (! bbox.empty ()) {
@@ -831,7 +796,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
 {
   const db::Layout *layout = mp_database->internal_layout ();
   const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans device_trans = trans_for (device, *layout, *cell, db::DCplxTrans (device->position () - db::DPoint ()));
+  db::ICplxTrans device_trans = trans_for (device, *layout, *cell, m_cell_context_cache, db::DCplxTrans (device->position () - db::DPoint ()));
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
   db::Box device_bbox = bbox_for_device (layout, device);
@@ -858,7 +823,7 @@ NetlistBrowserPage::produce_highlights_for_subcircuit (const db::SubCircuit *sub
 {
   const db::Layout *layout = mp_database->internal_layout ();
   const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans subcircuit_trans = trans_for (subcircuit, *layout, *cell, subcircuit->trans ());
+  db::ICplxTrans subcircuit_trans = trans_for (subcircuit, *layout, *cell, m_cell_context_cache, subcircuit->trans ());
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
   db::Box circuit_bbox = bbox_for_subcircuit (layout, subcircuit);
@@ -885,7 +850,7 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
 {
   const db::Layout *layout = mp_database->internal_layout ();
   const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans net_trans = trans_for (net, *layout, *cell);
+  db::ICplxTrans net_trans = trans_for (net, *layout, *cell, m_cell_context_cache);
 
   db::cell_index_type cell_index = net->circuit ()->cell_index ();
   size_t cluster_id = net->cluster_id ();

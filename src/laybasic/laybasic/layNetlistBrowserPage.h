@@ -29,6 +29,7 @@
 #include "layNetlistBrowser.h"
 #include "laybasicCommon.h"
 #include "dbLayoutToNetlist.h"
+#include "dbLayoutUtils.h"
 
 #include "tlObject.h"
 
@@ -185,6 +186,7 @@ private:
   std::vector<const db::SubCircuit *> m_current_subcircuits;
   lay::NetInfoDialog *mp_info_dialog;
   tl::DeferredMethod<NetlistBrowserPage> dm_update_highlights;
+  db::ContextCache m_cell_context_cache;
 
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);

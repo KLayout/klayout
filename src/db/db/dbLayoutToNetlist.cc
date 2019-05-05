@@ -465,6 +465,36 @@ db::CellMapping LayoutToNetlist::const_cell_mapping_into (const db::Layout &layo
   return cm;
 }
 
+std::map<unsigned int, const db::Region *>
+LayoutToNetlist::create_layermap (db::Layout &target_layout, int ln) const
+{
+  std::map<unsigned int, const db::Region *> lm;
+  if (! internal_layout ()) {
+    return lm;
+  }
+
+  const db::Layout &source_layout = *internal_layout ();
+
+  std::set<unsigned int> layers_to_copy;
+  const db::Connectivity &conn = connectivity ();
+  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+    layers_to_copy.insert (*layer);
+  }
+
+  for (std::set<unsigned int>::const_iterator l = layers_to_copy.begin (); l != layers_to_copy.end (); ++l) {
+    const db::LayerProperties &lp = source_layout.get_properties (*l);
+    unsigned int tl;
+    if (! lp.is_null ()) {
+      tl = target_layout.insert_layer (lp);
+    } else {
+      tl = target_layout.insert_layer (db::LayerProperties (ln++, 0, name (*l)));
+    }
+    lm.insert (std::make_pair (tl, const_cast<LayoutToNetlist *> (this)->layer_by_index (*l)));
+  }
+
+  return lm;
+}
+
 db::Netlist *LayoutToNetlist::netlist () const
 {
   return mp_netlist.get ();

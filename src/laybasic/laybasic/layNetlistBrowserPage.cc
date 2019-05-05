@@ -972,33 +972,6 @@ NetlistBrowserPage::clear_markers ()
   mp_markers.clear ();
 }
 
-static std::map<unsigned int, const db::Region *>
-create_layermap (const db::LayoutToNetlist *database, db::Layout &target_layout, int ln)
-{
-  std::map<unsigned int, const db::Region *> lm;
-
-  const db::Layout &source_layout = *database->internal_layout ();
-
-  std::set<unsigned int> layers_to_copy;
-  const db::Connectivity &conn = database->connectivity ();
-  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
-    layers_to_copy.insert (*layer);
-  }
-
-  for (std::set<unsigned int>::const_iterator l = layers_to_copy.begin (); l != layers_to_copy.end (); ++l) {
-    const db::LayerProperties &lp = source_layout.get_properties (*l);
-    unsigned int tl;
-    if (! lp.is_null ()) {
-      tl = target_layout.insert_layer (lp);
-    } else {
-      tl = target_layout.insert_layer (db::LayerProperties (ln++, 0, database->name (*l)));
-    }
-    lm.insert (std::make_pair (tl, (const_cast<db::LayoutToNetlist *> (database))->layer_by_index (*l)));
-  }
-
-  return lm;
-}
-
 void
 NetlistBrowserPage::export_selected ()
 {
@@ -1044,7 +1017,7 @@ NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
     db::cell_index_type target_top_index = target_layout.add_cell (source_layout.cell_name (source_top.cell_index ()));
 
     db::CellMapping cm = database->cell_mapping_into (target_layout, target_layout.cell (target_top_index));
-    std::map<unsigned int, const db::Region *> lm = create_layermap (database, target_layout, dialog->start_layer_number ());
+    std::map<unsigned int, const db::Region *> lm = database->create_layermap (target_layout, dialog->start_layer_number ());
 
     std::set<const db::Net *> net_set;
     if (nets) {

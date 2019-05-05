@@ -443,6 +443,15 @@ public:
   db::CellMapping const_cell_mapping_into (const db::Layout &layout, const db::Cell &cell);
 
   /**
+   *  @brief Creates a layer mapping for build_nets etc.
+   *  This method will create new layers inside the target layout corresponding to the
+   *  original layers as kept inside the LayoutToNetlist database.
+   *  It will return a layer mapping table suitable for use with build_all_nets, build_nets etc.
+   *  Layers without original layer information will be given layer numbers ln, ln+1 etc.
+   */
+  std::map<unsigned int, const db::Region *> create_layermap (db::Layout &target_layout, int ln) const;
+
+  /**
    *  @brief gets the netlist extracted (0 if no extraction happened yet)
    */
   db::Netlist *netlist () const;

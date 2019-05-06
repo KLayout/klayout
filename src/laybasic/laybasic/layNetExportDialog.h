@@ -74,7 +74,7 @@ public:
   void set_start_layer_number (int ln);
   int start_layer_number ();
 
-  int exec (lay::PluginRoot *mp_plugin_root);
+  int exec_dialog (lay::PluginRoot *mp_plugin_root);
 
 protected:
   void accept ();

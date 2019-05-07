@@ -687,13 +687,13 @@ NetlistBrowserPage::enable_updates (bool f)
 }
 
 static db::Box
-bbox_for_device (const db::Layout *layout, const db::Device *device)
+bbox_for_device_abstract (const db::Layout *layout, const db::DeviceAbstract *device_abstract, const db::DVector &offset)
 {
-  if (! device->device_abstract () || ! layout->is_valid_cell_index (device->device_abstract ()->cell_index ())) {
+  if (! device_abstract || ! layout->is_valid_cell_index (device_abstract->cell_index ())) {
     return db::Box ();
   }
 
-  return layout->cell (device->device_abstract ()->cell_index ()).bbox ();
+  return layout->cell (device_abstract->cell_index ()).bbox ().moved (db::VCplxTrans (1.0 / layout->dbu ()) * offset);
 }
 
 static db::Box
@@ -753,7 +753,16 @@ NetlistBrowserPage::adjust_view ()
   }
 
   for (std::vector<const db::Device *>::const_iterator device = m_current_devices.begin (); device != m_current_devices.end (); ++device) {
-    bbox += trans_for (*device, *mp_database->internal_layout (), *mp_database->internal_top_cell (), m_cell_context_cache) * bbox_for_device (layout, *device);
+
+    db::ICplxTrans trans = trans_for (*device, *mp_database->internal_layout (), *mp_database->internal_top_cell (), m_cell_context_cache);
+
+    bbox += trans * bbox_for_device_abstract (layout, (*device)->device_abstract (), db::DVector ());
+
+    const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &oda = (*device)->other_abstracts ();
+    for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator a = oda.begin (); a != oda.end (); ++a) {
+      bbox += trans * bbox_for_device_abstract (layout, a->first, a->second);
+    }
+
   }
 
   for (std::vector<const db::SubCircuit *>::const_iterator subcircuit = m_current_subcircuits.begin (); subcircuit != m_current_subcircuits.end (); ++subcircuit) {
@@ -809,21 +818,43 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
   db::ICplxTrans device_trans = trans_for (device, *layout, *cell, m_cell_context_cache, db::DCplxTrans (device->position () - db::DPoint ()));
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
-  db::Box device_bbox = bbox_for_device (layout, device);
-  if (device_bbox.empty ()) {
-    return false;
+
+  db::Box device_bbox = bbox_for_device_abstract (layout, device->device_abstract (), db::DVector ());
+  if (! device_bbox.empty ()) {
+
+    if (n_markers == m_max_shape_count) {
+      return true;
+    }
+
+    ++n_markers;
+
+    mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
+    mp_markers.back ()->set (device_bbox, device_trans, tv);
+    mp_markers.back ()->set_color (color);
+    mp_markers.back ()->set_frame_color (color);
+
   }
 
-  if (n_markers == m_max_shape_count) {
-    return true;
+  const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &oda = device->other_abstracts ();
+  for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator a = oda.begin (); a != oda.end (); ++a) {
+
+    db::Box da_box = bbox_for_device_abstract (layout, a->first, a->second);
+    if (! da_box.empty ()) {
+
+      if (n_markers == m_max_shape_count) {
+        return true;
+      }
+
+      ++n_markers;
+
+      mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
+      mp_markers.back ()->set (da_box, device_trans, tv);
+      mp_markers.back ()->set_color (color);
+      mp_markers.back ()->set_frame_color (color);
+
+    }
+
   }
-
-  ++n_markers;
-
-  mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
-  mp_markers.back ()->set (device_bbox, device_trans, tv);
-  mp_markers.back ()->set_color (color);
-  mp_markers.back ()->set_frame_color (color);
 
   return false;
 }

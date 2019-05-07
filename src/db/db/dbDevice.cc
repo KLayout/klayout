@@ -187,4 +187,96 @@ void Device::set_parameter_value (const std::string &name, double v)
   }
 }
 
+void Device::add_others_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal)
+{
+  std::map<unsigned int, std::vector<OtherTerminalRef> >::const_iterator ot = other->m_reconnected_terminals.find (other_terminal);
+  if (ot == other->m_reconnected_terminals.end ()) {
+    return;
+  }
+
+  if (other->m_reconnected_terminals.empty ()) {
+    m_reconnected_terminals.insert (std::make_pair (this_terminal, ot->second));
+  } else {
+
+    std::vector<OtherTerminalRef> &terminals = m_reconnected_terminals [this_terminal];
+
+    size_t n = terminals.size ();
+    terminals.insert (terminals.end (), ot->second.begin (), ot->second.end ());
+
+    db::DVector d = other->position () - position ();
+    while (n < terminals.size ()) {
+      terminals [n].offset += d;
+      ++n;
+    }
+
+  }
+}
+
+void Device::join_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal)
+{
+  if (m_reconnected_terminals.empty ()) {
+    m_reconnected_terminals [this_terminal].push_back (OtherTerminalRef (device_abstract (), db::DVector (), this_terminal));
+  }
+
+  other->connect_terminal (other_terminal, 0);
+
+  add_others_terminals (this_terminal, other, other_terminal);
+}
+
+void Device::reroute_terminal (unsigned int this_terminal, db::Device *other, unsigned int from_other_terminal, unsigned int other_terminal)
+{
+  //  TODO: the internal connection is not represented currently ...
+
+  if (! m_reconnected_terminals.empty ()) {
+    m_reconnected_terminals.erase (this_terminal);
+  }
+
+  add_others_terminals (this_terminal, other, other_terminal);
+
+  connect_terminal (this_terminal, other->net_for_terminal (other_terminal));
+
+  other->connect_terminal (from_other_terminal, 0);
+  other->connect_terminal (other_terminal, 0);
+}
+
+void Device::join_device (db::Device *other)
+{
+  db::DVector d = other->position () - position ();
+
+  m_other_abstracts.reserve (m_other_abstracts.size () + 1 + other->m_other_abstracts.size ());
+
+  m_other_abstracts.push_back (std::make_pair (other->device_abstract (), d));
+
+  for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator a = other->m_other_abstracts.begin (); a != other->m_other_abstracts.end (); ++a) {
+    m_other_abstracts.push_back (*a);
+    m_other_abstracts.back ().second += d;
+  }
+}
+
+static db::DeviceAbstract *map_da (const std::map<const DeviceAbstract *, DeviceAbstract *> &map, const db::DeviceAbstract *da)
+{
+  if (! da) {
+    return 0;
+  } else {
+    std::map<const DeviceAbstract *, DeviceAbstract *>::const_iterator m = map.find (da);
+    tl_assert (m != map.end ());
+    return m->second;
+  }
+}
+
+void Device::translate_device_abstracts (const std::map<const DeviceAbstract *, DeviceAbstract *> &map)
+{
+  set_device_abstract (map_da (map, device_abstract ()));
+
+  for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::iterator a = m_other_abstracts.begin (); a != m_other_abstracts.end (); ++a) {
+    a->first = map_da (map, a->first);
+  }
+
+  for (std::map<unsigned int, std::vector<OtherTerminalRef> >::iterator t = m_reconnected_terminals.begin (); t != m_reconnected_terminals.end (); ++t) {
+    for (std::vector<OtherTerminalRef>::iterator r = t->second.begin (); r != t->second.end (); ++r) {
+      r->device_abstract = map_da (map, r->device_abstract);
+    }
+  }
+}
+
 }

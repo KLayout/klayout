@@ -422,11 +422,7 @@ void Circuit::translate_device_classes (const std::map<const DeviceClass *, Devi
 void Circuit::translate_device_abstracts (const std::map<const DeviceAbstract *, DeviceAbstract *> &map)
 {
   for (device_iterator i = m_devices.begin (); i != m_devices.end (); ++i) {
-    if (i->device_abstract ()) {
-      std::map<const DeviceAbstract *, DeviceAbstract *>::const_iterator m = map.find (i->device_abstract ());
-      tl_assert (m != map.end ());
-      i->set_device_abstract (m->second);
-    }
+    i->translate_device_abstracts (map);
   }
 }
 
@@ -534,6 +530,7 @@ bool Circuit::combine_parallel_devices (const db::DeviceClass &cls)
     for (size_t i = 0; i < cl.size () - 1; ++i) {
       for (size_t j = i + 1; j < cl.size (); ) {
         if (cls.combine_devices (cl [i], cl [j])) {
+          cl [i]->join_device (cl [j]);
           check_device_before_remove (this, cl [j]);  //  sanity check
           delete cl [j];
           cl.erase (cl.begin () + j);
@@ -623,6 +620,7 @@ bool Circuit::combine_serial_devices(const db::DeviceClass &cls)
 
       //  found a combination candidate
       if (cls.combine_devices (dd.first, dd.second)) {
+        dd.first->join_device (dd.second);
         check_device_before_remove (this, dd.second);  //  sanity check
         delete dd.second;
         any = true;

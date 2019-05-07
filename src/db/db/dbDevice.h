@@ -26,6 +26,7 @@
 #include "dbCommon.h"
 #include "dbNet.h"
 #include "dbPoint.h"
+#include "dbVector.h"
 
 #include "tlObject.h"
 
@@ -53,6 +54,22 @@ class DB_PUBLIC Device
 public:
   typedef std::vector<std::pair<size_t, size_t> > global_connections;
   typedef global_connections::const_iterator global_connections_iterator;
+
+  /**
+   *  @brief A structure describing a terminal reference into another device abstract
+   */
+  struct OtherTerminalRef
+  {
+    OtherTerminalRef (const db::DeviceAbstract *_device_abstract, const db::DVector &_offset, unsigned int _other_terminal_id)
+      : device_abstract (_device_abstract), offset (_offset), other_terminal_id (_other_terminal_id)
+    {
+      //  .. nothing yet ..
+    }
+
+    const db::DeviceAbstract *device_abstract;
+    db::DVector offset;
+    unsigned int other_terminal_id;
+  };
 
   /**
    *  @brief Default constructor
@@ -228,6 +245,52 @@ public:
    */
   void set_parameter_value (const std::string &name, double v);
 
+  /**
+   *  @brief Used for device combination: join terminals with other device
+   */
+  void join_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal);
+
+  /**
+   *  @brief Used for device combination: reroute terminal to other device
+   *
+   *  This will disconnect "this_terminal" from the device and make a connection to
+   *  "other_terminal" of the "other" device instead.
+   *
+   *  An internal connection between "this_terminal" and "from_other_terminal" is
+   *  implied.
+   */
+  void reroute_terminal (unsigned int this_terminal, db::Device *other, unsigned int from_other_terminal, unsigned int other_terminal);
+
+  /**
+   *  @brief Gets the set of other terminal references
+   *
+   *  This method will return 0 if the device isn't a combined device or the given terminal
+   *  is not connector to a different abstract.
+   *
+   *  The returned vector (if any) is a complete list of terminals connected to the given
+   *  logical device terminal.
+   */
+  const std::vector<OtherTerminalRef> *reconnected_terminals_for (unsigned int this_terminal) const
+  {
+    std::map<unsigned int, std::vector<OtherTerminalRef> >::const_iterator t = m_reconnected_terminals.find (this_terminal);
+    if (t != m_reconnected_terminals.end ()) {
+      return & t->second;
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   *  @brief Gets the set of other device abstracts
+   *
+   *  This list does not include the intrinsic original abstract of the device.
+   *  This vector is non-empty if this device is a combined one.
+   */
+  const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_abstracts () const
+  {
+    return m_other_abstracts;
+  }
+
 private:
   friend class Circuit;
   friend class Net;
@@ -240,6 +303,18 @@ private:
   std::vector<double> m_parameters;
   size_t m_id;
   Circuit *mp_circuit;
+  std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > m_other_abstracts;
+  std::map<unsigned int, std::vector<OtherTerminalRef> > m_reconnected_terminals;
+
+  /**
+   * @brief Translates the device abstracts
+   */
+  void translate_device_abstracts (const std::map<const DeviceAbstract *, DeviceAbstract *> &map);
+
+  /**
+   *  @brief Joins this device with another
+   */
+  void join_device (db::Device *other);
 
   /**
    *  @brief Sets the terminal reference for a specific terminal
@@ -258,6 +333,8 @@ private:
    *  @brief Sets the circuit
    */
   void set_circuit (Circuit *circuit);
+
+  void add_others_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal);
 };
 
 }

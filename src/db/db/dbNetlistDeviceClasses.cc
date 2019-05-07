@@ -46,30 +46,46 @@ bool DeviceClassTwoTerminalDevice::combine_devices (Device *a, Device *b) const
   db::Net *nb1 = b->net_for_terminal (0);
   db::Net *nb2 = b->net_for_terminal (1);
 
-  bool res = true;
-
   if ((na1 == nb1 && na2 == nb2) || (na1 == nb2 && na2 == nb1)) {
 
     parallel (a, b);
+
+    if (na1 == nb1 && na2 == nb2) {
+      a->join_terminals (0, b, 0);
+      a->join_terminals (1, b, 1);
+    } else {
+      a->join_terminals (0, b, 1);
+      a->join_terminals (1, b, 0);
+    }
+
+    return true;
 
   } else if ((na2 == nb1 || na2 == nb2) && na2->is_internal ()) {
 
     //  serial a(B) to b(A or B)
     serial (a, b);
-    a->connect_terminal (1, (na2 == nb1 ? nb2 : nb1));
+
+    if (na2 == nb1) {
+      a->reroute_terminal (1, b, 0, 1);
+    } else {
+      a->reroute_terminal (1, b, 1, 0);
+    }
+
+    return true;
 
   } else if ((na1 == nb1 || na1 == nb2) && na1->is_internal ()) {
 
     //  serial a(A) to b(A or B)
     serial (a, b);
-    a->connect_terminal (0, (na1 == nb1 ? nb2 : nb1));
 
-  }
+    if (na1 == nb1) {
+      a->reroute_terminal (0, b, 0, 1);
+    } else {
+      a->reroute_terminal (0, b, 1, 0);
+    }
 
-  if (res) {
-    b->connect_terminal (0, 0);
-    b->connect_terminal (1, 0);
     return true;
+
   } else {
     return false;
   }
@@ -193,8 +209,9 @@ bool DeviceClassDiode::combine_devices (Device *a, Device *b) const
   if (na1 == nb1 && na2 == nb2) {
 
     a->set_parameter_value (0, a->parameter_value (0) + b->parameter_value (0));
-    b->connect_terminal (0, 0);
-    b->connect_terminal (1, 0);
+
+    a->join_terminals (0, b, 0);
+    a->join_terminals (1, b, 1);
 
     return true;
 
@@ -248,9 +265,15 @@ bool DeviceClassMOS3Transistor::combine_devices (Device *a, Device *b) const
 
       combine_parameters (a, b);
 
-      b->connect_terminal (0, 0);
-      b->connect_terminal (1, 0);
-      b->connect_terminal (2, 0);
+      if (nas == nbs && nad == nbd) {
+        a->join_terminals (0, b, 0);
+        a->join_terminals (2, b, 2);
+      } else {
+        a->join_terminals (0, b, 2);
+        a->join_terminals (2, b, 0);
+      }
+
+      a->join_terminals (1, b, 1);
 
       return true;
 
@@ -299,10 +322,16 @@ bool DeviceClassMOS4Transistor::combine_devices (Device *a, Device *b) const
 
       combine_parameters (a, b);
 
-      b->connect_terminal (0, 0);
-      b->connect_terminal (1, 0);
-      b->connect_terminal (2, 0);
-      b->connect_terminal (3, 0);
+      if (nas == nbs && nad == nbd) {
+        a->join_terminals (0, b, 0);
+        a->join_terminals (2, b, 2);
+      } else {
+        a->join_terminals (0, b, 2);
+        a->join_terminals (2, b, 0);
+      }
+
+      a->join_terminals (1, b, 1);
+      a->join_terminals (3, b, 3);
 
       return true;
 

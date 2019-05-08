@@ -74,11 +74,12 @@ private:
 
   struct Connections
   {
-    Connections (size_t _from_cluster, size_t _to_cluster)
-      : from_cluster (_from_cluster), to_cluster (_to_cluster)
+    Connections (size_t _from_cluster, size_t _to_cluster, const db::Vector &_offset)
+      : from_cluster (_from_cluster), to_cluster (_to_cluster), offset (_offset)
     { }
 
     size_t from_cluster, to_cluster;
+    db::Vector offset;
   };
 
   tl::TextInputStream m_stream;

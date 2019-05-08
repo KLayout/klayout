@@ -281,12 +281,40 @@ public:
   }
 
   /**
+   *  @brief Gets the map of reconnected terminals
+   */
+  const std::map<unsigned int, std::vector<OtherTerminalRef> > &reconnected_terminals () const
+  {
+    return m_reconnected_terminals;
+  }
+
+  /**
    *  @brief Gets the set of other device abstracts
    *
    *  This list does not include the intrinsic original abstract of the device.
    *  This vector is non-empty if this device is a combined one.
    */
   const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_abstracts () const
+  {
+    return m_other_abstracts;
+  }
+
+  /**
+   *  @brief Gets the map of reconnected terminals (non-const version)
+   *
+   *  NOTE: don't use this method to modify this container! It's provided for persistence implementation only.
+   */
+  std::map<unsigned int, std::vector<OtherTerminalRef> > &reconnected_terminals ()
+  {
+    return m_reconnected_terminals;
+  }
+
+  /**
+   *  @brief Gets the set of other device abstracts (non-const version)
+   *
+   *  NOTE: don't use this method to modify this container! It's provided for persistence implementation only.
+   */
+  std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_abstracts ()
   {
     return m_other_abstracts;
   }
@@ -335,6 +363,7 @@ private:
   void set_circuit (Circuit *circuit);
 
   void add_others_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal);
+  void init_terminal_routes ();
 };
 
 }

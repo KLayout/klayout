@@ -309,7 +309,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
         std::map<db::CellInstArray, std::list<Connections> >::const_iterator c = connections.find (i->cell_inst ());
         if (c != connections.end ()) {
           for (std::list<Connections>::const_iterator j = c->second.begin (); j != c->second.end (); ++j) {
-            l2n->net_clusters ().clusters_per_cell (ci).add_connection (j->from_cluster, db::ClusterInstance (j->to_cluster, i->cell_index (), i->complex_trans (), i->prop_id ()));
+            l2n->net_clusters ().clusters_per_cell (ci).add_connection (j->from_cluster, db::ClusterInstance (j->to_cluster, i->cell_index (), i->complex_trans () * db::ICplxTrans (j->offset), i->prop_id ()));
           }
         }
       }
@@ -486,6 +486,31 @@ LayoutToNetlistStandardReader::read_pin (db::LayoutToNetlist * /*l2n*/, db::Circ
   circuit->connect_pin (pin.id (), net);
 }
 
+static size_t
+terminal_id (const db::DeviceClass *device_class, const std::string &tname)
+{
+  const std::vector<db::DeviceTerminalDefinition> &td = device_class->terminal_definitions ();
+  for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
+    if (t->name () == tname) {
+      return t->id ();
+    }
+  }
+
+  throw tl::Exception (tl::to_string (tr ("Not a valid terminal name: ")) + tname + tl::to_string (tr (" for device class: ")) + device_class->name ());
+}
+
+static db::DeviceAbstract *
+device_model_by_name (db::Netlist *netlist, const std::string &dmname)
+{
+  for (db::Netlist::device_abstract_iterator i = netlist->begin_device_abstracts (); i != netlist->end_device_abstracts (); ++i) {
+    if (i->name () == dmname) {
+      return i.operator-> ();
+    }
+  }
+
+  throw tl::Exception (tl::to_string (tr ("Not a valid device abstract name: ")) + dmname);
+}
+
 db::CellInstArray
 LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, Net *> &id2net)
 {
@@ -497,16 +522,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
   std::string dmname;
   read_word_or_quoted (dmname);
 
-  db::DeviceAbstract *dm = 0;
-  for (db::Netlist::device_abstract_iterator i = l2n->netlist ()->begin_device_abstracts (); i != l2n->netlist ()->end_device_abstracts (); ++i) {
-    if (i->name () == dmname) {
-      dm = i.operator-> ();
-    }
-  }
-
-  if (! dm) {
-    throw tl::Exception (tl::to_string (tr ("Not a valid device abstract name: ")) + dmname);
-  }
+  db::DeviceAbstract *dm = device_model_by_name (l2n->netlist (), dmname);
 
   db::Device *device = new db::Device ();
   device->set_device_class (const_cast<db::DeviceClass *> (dm->device_class ()));
@@ -515,6 +531,8 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
   circuit->add_device (device);
 
   db::Coord x = 0, y = 0;
+  double dbu = l2n->internal_layout ()->dbu ();
+  db::VCplxTrans dbu_inv (1.0 / dbu);
 
   while (br) {
 
@@ -525,6 +543,44 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       y = read_coord ();
       br2.done ();
 
+    } else if (test (skeys::device_key) || test (lkeys::device_key)) {
+
+      std::string n;
+
+      Brace br2 (this);
+
+      read_word_or_quoted (n);
+
+      db::Coord dx = read_coord ();
+      db::Coord dy = read_coord ();
+
+      br2.done ();
+
+      device->other_abstracts ().push_back (std::make_pair (device_model_by_name (l2n->netlist (), n), db::DVector (dbu * dx, dbu * dy)));
+
+    } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
+
+      Brace br2 (this);
+
+      int device_comp_index = read_int ();
+
+      std::string touter, tinner;
+      read_word_or_quoted (touter);
+      read_word_or_quoted (tinner);
+
+      br2.done ();
+
+      if (device_comp_index < 0 || device_comp_index > int (device->other_abstracts ().size ())) {
+        throw tl::Exception (tl::to_string (tr ("Not a valid device component index: ")) + tl::to_string (device_comp_index));
+      }
+
+      size_t touter_id = terminal_id (dm->device_class (), touter);
+      size_t tinner_id = terminal_id (dm->device_class (), tinner);
+
+      const db::DeviceAbstract *da = device_comp_index > 0 ? device->other_abstracts () [device_comp_index - 1].first  : dm;
+      db::DVector da_offset        = device_comp_index > 0 ? device->other_abstracts () [device_comp_index - 1].second : db::DVector ();
+      device->reconnected_terminals () [touter_id].push_back (db::Device::OtherTerminalRef (da, da_offset, tinner_id));
+
     } else if (test (skeys::terminal_key) || test (lkeys::terminal_key)) {
 
       Brace br2 (this);
@@ -533,18 +589,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       unsigned int netid = (unsigned int) read_int ();
       br2.done ();
 
-      size_t tid = std::numeric_limits<size_t>::max ();
-      const std::vector<db::DeviceTerminalDefinition> &td = dm->device_class ()->terminal_definitions ();
-      for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
-        if (t->name () == tname) {
-          tid = t->id ();
-          break;
-        }
-      }
-
-      if (tid == std::numeric_limits<size_t>::max ()) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid terminal name: ")) + tname + tl::to_string (tr (" for device class: ")) + dm->device_class ()->name ());
-      }
+      size_t tid = terminal_id (dm->device_class (), tname);
 
       db::Net *net = id2net [netid];
       if (!net) {
@@ -552,7 +597,15 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       }
 
       device->connect_terminal (tid, net);
-      refs.push_back (Connections (net->cluster_id (), dm->cluster_id_for_terminal (tid)));
+
+      const std::vector<db::Device::OtherTerminalRef> *tr = device->reconnected_terminals_for (tid);
+      if (tr) {
+        for (std::vector<db::Device::OtherTerminalRef>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
+          refs.push_back (Connections (net->cluster_id (), i->device_abstract->cluster_id_for_terminal (i->other_terminal_id), dbu_inv * i->offset));
+        }
+      } else {
+        refs.push_back (Connections (net->cluster_id (), dm->cluster_id_for_terminal (tid), db::Vector ()));
+      }
 
     } else if (test (skeys::param_key) || test (lkeys::param_key)) {
 
@@ -586,15 +639,23 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 
   }
 
-  double dbu = l2n->internal_layout ()->dbu ();
   device->set_position (db::DPoint (dbu * x, dbu * y));
 
   br.done ();
 
-  //  make device cell instance
-  db::CellInstArray inst (db::CellInst (dm->cell_index ()), db::Trans (db::Vector (x, y)));
   db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());
+
+  //  make device cell instances
+  db::CellInstArray inst (db::CellInst (dm->cell_index ()), db::Trans (db::Vector (x, y)));
   ccell.insert (inst);
+
+  const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_devices = device->other_abstracts ();
+  for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator i = other_devices.begin (); i != other_devices.end (); ++i) {
+
+    db::CellInstArray other_inst (db::CellInst (i->first->cell_index ()), db::Trans (db::Vector (x, y) + dbu_inv * i->second));
+    ccell.insert (other_inst);
+
+  }
 
   return inst;
 }
@@ -688,7 +749,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Ci
       subcircuit->connect_pin (sc_pin->id (), net);
       db::Net *sc_net = circuit_ref->net_for_pin (sc_pin->id ());
       if (sc_net) {
-        refs.push_back (Connections (net->cluster_id (), sc_net->cluster_id ()));
+        refs.push_back (Connections (net->cluster_id (), sc_net->cluster_id (), db::Vector ()));
       }
 
     } else {

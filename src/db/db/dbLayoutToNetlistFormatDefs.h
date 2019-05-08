@@ -69,11 +69,26 @@ namespace db
  *                                    A net declaration shall be there also if no geometry
  *                                    is present. The ID is a numerical shortcut for the net.
  *    pin(<name> <net-id>)          - outgoing pin connection [short key: P]
- *    device(<name> <abstract> [device-def])
+ *    device(<name> <abstract> [combined-device]* [terminal-route]* [device-def])
  *                                  - device with connections [short key: D]
  *    circuit(<name> [circuit-def]) - subcircuit with connections [short key: X]
  *
+ *  [combined-device]:
+ *
+ *    device(<abstract> <dx> <dy>)  - specifies an additional device component
+ *                                    (for combined devices) with abstract <abstract>
+ *                                    and offset dx, dy.
+ *
+ *  [terminal-route]:
+ *
+ *    connect(<device-index> <outer-terminal-name> <inner-terminal-name>)
+ *                                  - connects the outer terminal with the terminal
+ *                                    of the device component with <device-index>:
+ *                                    0 is the basic device, 1 the first combined
+ *                                    device etc.
+ *
  *  [net-name]:
+ *
  *    name(<net-name>)              - specify net name [short key: I]
  *
  *  [geometry-def]:
@@ -82,7 +97,9 @@ namespace db
  *                                    "*" for <x> or <y> means take previous
  *    rect(<layer> [coord] [coord]) - defines a rectangle [short key: R]
  *                                    coordinates are bottom/left and top/right
+ *
  *  [coord]
+ *
  *    <x> <y>                       - absolute coordinates
  *    (<x> <y>)                     - relative coordinates (reference is reset to 0,0
  *                                    for each net or terminal in device abstract)

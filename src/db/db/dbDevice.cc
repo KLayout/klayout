@@ -189,16 +189,14 @@ void Device::set_parameter_value (const std::string &name, double v)
 
 void Device::add_others_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal)
 {
+  std::vector<OtherTerminalRef> &terminals = m_reconnected_terminals [this_terminal];
+
   std::map<unsigned int, std::vector<OtherTerminalRef> >::const_iterator ot = other->m_reconnected_terminals.find (other_terminal);
   if (ot == other->m_reconnected_terminals.end ()) {
-    return;
-  }
 
-  if (other->m_reconnected_terminals.empty ()) {
-    m_reconnected_terminals.insert (std::make_pair (this_terminal, ot->second));
+    terminals.push_back (OtherTerminalRef (other->device_abstract (), other->position () - position (), other_terminal));
+
   } else {
-
-    std::vector<OtherTerminalRef> &terminals = m_reconnected_terminals [this_terminal];
 
     size_t n = terminals.size ();
     terminals.insert (terminals.end (), ot->second.begin (), ot->second.end ());
@@ -212,10 +210,22 @@ void Device::add_others_terminals (unsigned int this_terminal, db::Device *other
   }
 }
 
+void Device::init_terminal_routes ()
+{
+  if (! device_class ()) {
+    return;
+  }
+
+  size_t n = device_class ()->terminal_definitions ().size ();
+  for (size_t i = 0; i < n; ++i) {
+    m_reconnected_terminals [i].push_back (OtherTerminalRef (device_abstract (), db::DVector (), i));
+  }
+}
+
 void Device::join_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal)
 {
   if (m_reconnected_terminals.empty ()) {
-    m_reconnected_terminals [this_terminal].push_back (OtherTerminalRef (device_abstract (), db::DVector (), this_terminal));
+    init_terminal_routes ();
   }
 
   other->connect_terminal (other_terminal, 0);
@@ -226,6 +236,10 @@ void Device::join_terminals (unsigned int this_terminal, db::Device *other, unsi
 void Device::reroute_terminal (unsigned int this_terminal, db::Device *other, unsigned int from_other_terminal, unsigned int other_terminal)
 {
   //  TODO: the internal connection is not represented currently ...
+
+  if (m_reconnected_terminals.empty ()) {
+    init_terminal_routes ();
+  }
 
   if (! m_reconnected_terminals.empty ()) {
     m_reconnected_terminals.erase (this_terminal);

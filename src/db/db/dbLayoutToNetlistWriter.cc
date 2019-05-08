@@ -489,20 +489,53 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
 {
   const db::Layout *ly = l2n->internal_layout ();
   double dbu = ly->dbu ();
+  db::VCplxTrans dbu_inv (1.0 / dbu);
+
+  tl_assert (device.device_class () != 0);
+  const std::vector<DeviceTerminalDefinition> &td = device.device_class ()->terminal_definitions ();
+  const std::vector<DeviceParameterDefinition> &pd = device.device_class ()->parameter_definitions ();
 
   *mp_stream << indent1 << Keys::device_key << "(" << tl::to_word_or_quoted_string (device.expanded_name ());
 
   tl_assert (device.device_abstract () != 0);
   *mp_stream << " " << tl::to_word_or_quoted_string (device.device_abstract ()->name ()) << endl;
 
-  *mp_stream << indent2 << Keys::location_key << "(" << device.position ().x () / dbu << " " << device.position ().y () / dbu << ")" << endl;
+  std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t> abstracts;
+  abstracts.insert (std::make_pair (std::make_pair (device.device_abstract (), db::Vector ()), 0));
 
-  const std::vector<DeviceParameterDefinition> &pd = device.device_class ()->parameter_definitions ();
+  const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_abstracts = device.other_abstracts ();
+  for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator a = other_abstracts.begin (); a != other_abstracts.end (); ++a) {
+
+    db::Vector pos = dbu_inv * a->second;
+    abstracts.insert (std::make_pair (std::make_pair (a->first, pos), a - other_abstracts.begin () + 1));
+
+    *mp_stream << "  " << Keys::device_key << "(" << tl::to_word_or_quoted_string (a->first->name ()) << " " << pos.x () << " " << pos.y () << ")" << endl;
+
+  }
+
+  const std::map<unsigned int, std::vector<db::Device::OtherTerminalRef> > &reconnected_terminals = device.reconnected_terminals ();
+  for (std::map<unsigned int, std::vector<db::Device::OtherTerminalRef> >::const_iterator t = reconnected_terminals.begin (); t != reconnected_terminals.end (); ++t) {
+
+    for (std::vector<db::Device::OtherTerminalRef>::const_iterator c = t->second.begin (); c != t->second.end (); ++c) {
+
+      db::Vector pos = dbu_inv * c->offset;
+      std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t>::const_iterator a = abstracts.find (std::make_pair (c->device_abstract, pos));
+      tl_assert (a != abstracts.end ());
+
+      *mp_stream << "  " << Keys::connect_key << "(" << a->second << " " << tl::to_word_or_quoted_string (td [t->first].name ()) << " " << tl::to_word_or_quoted_string (td [c->other_terminal_id].name ()) << ")" << endl;
+
+    }
+
+  }
+
+  db::Point pos = dbu_inv * device.position ();
+
+  *mp_stream << indent2 << Keys::location_key << "(" << pos.x () << " " << pos.y () << ")" << endl;
+
   for (std::vector<DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
     *mp_stream << indent2 << Keys::param_key << "(" << tl::to_word_or_quoted_string (i->name ()) << " " << device.parameter_value (i->id ()) << ")" << endl;
   }
 
-  const std::vector<DeviceTerminalDefinition> &td = device.device_class ()->terminal_definitions ();
   for (std::vector<DeviceTerminalDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {
     const db::Net *net = device.net_for_terminal (i->id ());
     if (net) {

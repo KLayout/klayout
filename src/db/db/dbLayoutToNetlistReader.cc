@@ -678,7 +678,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 
           std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t>::const_iterator a = abstracts.find (std::make_pair (i->device_abstract, offset));
           if (a != abstracts.end () && a->second < insts.size ()) {
-            Connections ref (net->cluster_id (), i->device_abstract->cluster_id_for_terminal (i->other_terminal_id), dbu_inv * i->offset);
+            Connections ref (net->cluster_id (), i->device_abstract->cluster_id_for_terminal (i->other_terminal_id));
             connections [insts [a->second]].push_back (ref);
           }
 
@@ -690,7 +690,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 
       std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t>::const_iterator a = abstracts.find (std::make_pair (dm, db::Vector ()));
       if (a != abstracts.end () && a->second < insts.size ()) {
-        Connections ref (net->cluster_id (), dm->cluster_id_for_terminal (tid), db::Vector ());
+        Connections ref (net->cluster_id (), dm->cluster_id_for_terminal (tid));
         connections [insts [a->second]].push_back (ref);
       }
 
@@ -790,7 +790,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Ci
       subcircuit->connect_pin (sc_pin->id (), net);
       db::Net *sc_net = circuit_ref->net_for_pin (sc_pin->id ());
       if (sc_net) {
-        refs.push_back (Connections (net->cluster_id (), sc_net->cluster_id (), db::Vector ()));
+        refs.push_back (Connections (net->cluster_id (), sc_net->cluster_id ()));
       }
 
     } else {

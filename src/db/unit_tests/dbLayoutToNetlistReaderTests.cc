@@ -252,3 +252,57 @@ TEST(3_ReaderAbsoluteCoordinates)
   }
 }
 
+TEST(4_ReaderCombinedDevices)
+{
+  db::LayoutToNetlist l2n;
+
+  //  build from: testdata/algo/l2n_reader_4.gds
+
+  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_4.l2n");
+  tl::InputStream is_in (in_path);
+
+  db::LayoutToNetlistStandardReader reader (is_in);
+  reader.read (&l2n);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp_l2nreader_4.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, false);
+    writer.write (&l2n);
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_au_4.l2n");
+
+  tl::InputStream is (path);
+  tl::InputStream is_au (au_path);
+
+  if (is.read_all () != is_au.read_all ()) {
+    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
+                               tl::absolute_file_path (path),
+                               tl::absolute_file_path (au_path)));
+  }
+
+  //  test build_all_nets from read l2n
+
+  {
+    db::Layout ly2;
+    ly2.dbu (l2n.internal_layout ()->dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
+
+    std::map<unsigned int, const db::Region *> lmap = l2n.create_layermap (ly2, 1000);
+
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "l2n_reader_au_4.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+}
+

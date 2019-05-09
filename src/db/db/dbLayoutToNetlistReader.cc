@@ -287,13 +287,9 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
         } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
           read_pin (l2n, circuit, id2net);
         } else if (test (skeys::device_key) || test (lkeys::device_key)) {
-          std::list<Connections> conn;
-          db::CellInstArray ia = read_device (l2n, circuit, conn, id2net);
-          connections[ia] = conn;
+          read_device (l2n, circuit, id2net, connections);
         } else if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
-          std::list<Connections> conn;
-          db::CellInstArray ia = read_subcircuit (l2n, circuit, conn, id2net);
-          connections[ia] = conn;
+          read_subcircuit (l2n, circuit, id2net, connections);
         } else {
           throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (net, pin, device or circuit expected)")));
         }
@@ -309,7 +305,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
         std::map<db::CellInstArray, std::list<Connections> >::const_iterator c = connections.find (i->cell_inst ());
         if (c != connections.end ()) {
           for (std::list<Connections>::const_iterator j = c->second.begin (); j != c->second.end (); ++j) {
-            l2n->net_clusters ().clusters_per_cell (ci).add_connection (j->from_cluster, db::ClusterInstance (j->to_cluster, i->cell_index (), i->complex_trans () * db::ICplxTrans (j->offset), i->prop_id ()));
+            l2n->net_clusters ().clusters_per_cell (ci).add_connection (j->from_cluster, db::ClusterInstance (j->to_cluster, i->cell_index (), i->complex_trans (), i->prop_id ()));
           }
         }
       }
@@ -511,8 +507,8 @@ device_model_by_name (db::Netlist *netlist, const std::string &dmname)
   throw tl::Exception (tl::to_string (tr ("Not a valid device abstract name: ")) + dmname);
 }
 
-db::CellInstArray
-LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, Net *> &id2net)
+void
+LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections)
 {
   Brace br (this);
 
@@ -533,6 +529,11 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
   db::Coord x = 0, y = 0;
   double dbu = l2n->internal_layout ()->dbu ();
   db::VCplxTrans dbu_inv (1.0 / dbu);
+
+  std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t> abstracts;
+  abstracts [std::make_pair (dm, db::Vector ())] = 0;
+
+  size_t max_tid = 0;
 
   while (br) {
 
@@ -556,7 +557,10 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 
       br2.done ();
 
-      device->other_abstracts ().push_back (std::make_pair (device_model_by_name (l2n->netlist (), n), db::DVector (dbu * dx, dbu * dy)));
+      db::DeviceAbstract *da = device_model_by_name (l2n->netlist (), n);
+
+      abstracts [std::make_pair (da, db::Vector (dx, dy))] = device->other_abstracts ().size () + 1;
+      device->other_abstracts ().push_back (std::make_pair (da, db::DVector (dbu * dx, dbu * dy)));
 
     } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
 
@@ -578,7 +582,8 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       size_t tinner_id = terminal_id (dm->device_class (), tinner);
 
       const db::DeviceAbstract *da = device_comp_index > 0 ? device->other_abstracts () [device_comp_index - 1].first  : dm;
-      db::DVector da_offset        = device_comp_index > 0 ? device->other_abstracts () [device_comp_index - 1].second : db::DVector ();
+      db::DVector da_offset = device_comp_index > 0 ? device->other_abstracts () [device_comp_index - 1].second : db::DVector ();
+
       device->reconnected_terminals () [touter_id].push_back (db::Device::OtherTerminalRef (da, da_offset, tinner_id));
 
     } else if (test (skeys::terminal_key) || test (lkeys::terminal_key)) {
@@ -590,6 +595,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       br2.done ();
 
       size_t tid = terminal_id (dm->device_class (), tname);
+      max_tid = std::max (max_tid, tid + 1);
 
       db::Net *net = id2net [netid];
       if (!net) {
@@ -597,15 +603,6 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       }
 
       device->connect_terminal (tid, net);
-
-      const std::vector<db::Device::OtherTerminalRef> *tr = device->reconnected_terminals_for (tid);
-      if (tr) {
-        for (std::vector<db::Device::OtherTerminalRef>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
-          refs.push_back (Connections (net->cluster_id (), i->device_abstract->cluster_id_for_terminal (i->other_terminal_id), dbu_inv * i->offset));
-        }
-      } else {
-        refs.push_back (Connections (net->cluster_id (), dm->cluster_id_for_terminal (tid), db::Vector ()));
-      }
 
     } else if (test (skeys::param_key) || test (lkeys::param_key)) {
 
@@ -646,24 +643,68 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
   db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());
 
   //  make device cell instances
+  std::vector<db::CellInstArray> insts;
+
   db::CellInstArray inst (db::CellInst (dm->cell_index ()), db::Trans (db::Vector (x, y)));
   ccell.insert (inst);
+  insts.push_back (inst);
 
   const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_devices = device->other_abstracts ();
   for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator i = other_devices.begin (); i != other_devices.end (); ++i) {
 
     db::CellInstArray other_inst (db::CellInst (i->first->cell_index ()), db::Trans (db::Vector (x, y) + dbu_inv * i->second));
     ccell.insert (other_inst);
+    insts.push_back (other_inst);
 
   }
 
-  return inst;
+  //  register cluster collections to be made later
+
+  for (size_t tid = 0; tid < max_tid; ++tid) {
+
+    const db::Net *net = device->net_for_terminal (tid);
+    if (! net) {
+      continue;
+    }
+
+    if (! device->reconnected_terminals ().empty ()) {
+
+      const std::vector<db::Device::OtherTerminalRef> *tr = device->reconnected_terminals_for (tid);
+      if (tr) {
+
+        for (std::vector<db::Device::OtherTerminalRef>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
+
+          db::Vector offset = dbu_inv * i->offset;
+
+          std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t>::const_iterator a = abstracts.find (std::make_pair (i->device_abstract, offset));
+          if (a != abstracts.end () && a->second < insts.size ()) {
+            Connections ref (net->cluster_id (), i->device_abstract->cluster_id_for_terminal (i->other_terminal_id), dbu_inv * i->offset);
+            connections [insts [a->second]].push_back (ref);
+          }
+
+        }
+
+      }
+
+    } else {
+
+      std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t>::const_iterator a = abstracts.find (std::make_pair (dm, db::Vector ()));
+      if (a != abstracts.end () && a->second < insts.size ()) {
+        Connections ref (net->cluster_id (), dm->cluster_id_for_terminal (tid), db::Vector ());
+        connections [insts [a->second]].push_back (ref);
+      }
+
+    }
+
+  }
 }
 
-db::CellInstArray
-LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, Net *> &id2net)
+void
+LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections)
 {
   Brace br (this);
+
+  std::list<Connections> refs;
 
   std::string name;
   read_word_or_quoted (name);
@@ -767,7 +808,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Ci
   db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());
   ccell.insert (inst);
 
-  return inst;
+  connections [inst] = refs;
 }
 
 void

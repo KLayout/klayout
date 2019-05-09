@@ -233,6 +233,10 @@ void Netlist::validate_topology ()
       throw tl::Exception (tl::to_string (tr ("Recursive hierarchy detected in netlist")));
     }
 
+    //  doing this reverse will mean we preserve bottom-up order. This is useful for
+    //  netlists where subcircuits have to be defined before they are used.
+    std::reverse (m_top_down_circuits.begin () + n_top_down_circuits, m_top_down_circuits.end ());
+
   }
 
   //  Determine the number of top cells

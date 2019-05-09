@@ -60,14 +60,13 @@ public:
    */
   struct OtherTerminalRef
   {
-    OtherTerminalRef (const db::DeviceAbstract *_device_abstract, const db::DVector &_offset, unsigned int _other_terminal_id)
-      : device_abstract (_device_abstract), offset (_offset), other_terminal_id (_other_terminal_id)
+    OtherTerminalRef (size_t _device_index, unsigned int _other_terminal_id)
+      : device_index (_device_index), other_terminal_id (_other_terminal_id)
     {
       //  .. nothing yet ..
     }
 
-    const db::DeviceAbstract *device_abstract;
-    db::DVector offset;
+    size_t device_index;
     unsigned int other_terminal_id;
   };
 

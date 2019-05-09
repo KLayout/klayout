@@ -530,9 +530,6 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
   double dbu = l2n->internal_layout ()->dbu ();
   db::VCplxTrans dbu_inv (1.0 / dbu);
 
-  std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t> abstracts;
-  abstracts [std::make_pair (dm, db::Vector ())] = 0;
-
   size_t max_tid = 0;
 
   while (br) {
@@ -559,7 +556,6 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 
       db::DeviceAbstract *da = device_model_by_name (l2n->netlist (), n);
 
-      abstracts [std::make_pair (da, db::Vector (dx, dy))] = device->other_abstracts ().size () + 1;
       device->other_abstracts ().push_back (std::make_pair (da, db::DVector (dbu * dx, dbu * dy)));
 
     } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
@@ -581,10 +577,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       size_t touter_id = terminal_id (dm->device_class (), touter);
       size_t tinner_id = terminal_id (dm->device_class (), tinner);
 
-      const db::DeviceAbstract *da = device_comp_index > 0 ? device->other_abstracts () [device_comp_index - 1].first  : dm;
-      db::DVector da_offset = device_comp_index > 0 ? device->other_abstracts () [device_comp_index - 1].second : db::DVector ();
-
-      device->reconnected_terminals () [touter_id].push_back (db::Device::OtherTerminalRef (da, da_offset, tinner_id));
+      device->reconnected_terminals () [touter_id].push_back (db::Device::OtherTerminalRef (size_t (device_comp_index), tinner_id));
 
     } else if (test (skeys::terminal_key) || test (lkeys::terminal_key)) {
 
@@ -673,26 +666,20 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       if (tr) {
 
         for (std::vector<db::Device::OtherTerminalRef>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
-
-          db::Vector offset = dbu_inv * i->offset;
-
-          std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t>::const_iterator a = abstracts.find (std::make_pair (i->device_abstract, offset));
-          if (a != abstracts.end () && a->second < insts.size ()) {
-            Connections ref (net->cluster_id (), i->device_abstract->cluster_id_for_terminal (i->other_terminal_id));
-            connections [insts [a->second]].push_back (ref);
+          const db::DeviceAbstract *da = dm;
+          if (i->device_index > 0) {
+            da = device->other_abstracts () [i->device_index - 1].first;
           }
-
+          Connections ref (net->cluster_id (), da->cluster_id_for_terminal (i->other_terminal_id));
+          connections [insts [i->device_index]].push_back (ref);
         }
 
       }
 
     } else {
 
-      std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t>::const_iterator a = abstracts.find (std::make_pair (dm, db::Vector ()));
-      if (a != abstracts.end () && a->second < insts.size ()) {
-        Connections ref (net->cluster_id (), dm->cluster_id_for_terminal (tid));
-        connections [insts [a->second]].push_back (ref);
-      }
+      Connections ref (net->cluster_id (), dm->cluster_id_for_terminal (tid));
+      connections [insts [0]].push_back (ref);
 
     }
 

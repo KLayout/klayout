@@ -194,16 +194,15 @@ void Device::add_others_terminals (unsigned int this_terminal, db::Device *other
   std::map<unsigned int, std::vector<OtherTerminalRef> >::const_iterator ot = other->m_reconnected_terminals.find (other_terminal);
   if (ot == other->m_reconnected_terminals.end ()) {
 
-    terminals.push_back (OtherTerminalRef (other->device_abstract (), other->position () - position (), other_terminal));
+    terminals.push_back (OtherTerminalRef (other_abstracts ().size (), other_terminal));
 
   } else {
 
     size_t n = terminals.size ();
     terminals.insert (terminals.end (), ot->second.begin (), ot->second.end ());
 
-    db::DVector d = other->position () - position ();
     while (n < terminals.size ()) {
-      terminals [n].offset += d;
+      terminals [n].device_index += other_abstracts ().size ();
       ++n;
     }
 
@@ -218,7 +217,7 @@ void Device::init_terminal_routes ()
 
   size_t n = device_class ()->terminal_definitions ().size ();
   for (size_t i = 0; i < n; ++i) {
-    m_reconnected_terminals [i].push_back (OtherTerminalRef (device_abstract (), db::DVector (), i));
+    m_reconnected_terminals [i].push_back (OtherTerminalRef (0, i));
   }
 }
 
@@ -284,12 +283,6 @@ void Device::translate_device_abstracts (const std::map<const DeviceAbstract *, 
 
   for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::iterator a = m_other_abstracts.begin (); a != m_other_abstracts.end (); ++a) {
     a->first = map_da (map, a->first);
-  }
-
-  for (std::map<unsigned int, std::vector<OtherTerminalRef> >::iterator t = m_reconnected_terminals.begin (); t != m_reconnected_terminals.end (); ++t) {
-    for (std::vector<OtherTerminalRef>::iterator r = t->second.begin (); r != t->second.end (); ++r) {
-      r->device_abstract = map_da (map, r->device_abstract);
-    }
   }
 }
 

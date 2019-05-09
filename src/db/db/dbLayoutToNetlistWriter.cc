@@ -500,14 +500,10 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
   tl_assert (device.device_abstract () != 0);
   *mp_stream << " " << tl::to_word_or_quoted_string (device.device_abstract ()->name ()) << endl;
 
-  std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t> abstracts;
-  abstracts.insert (std::make_pair (std::make_pair (device.device_abstract (), db::Vector ()), 0));
-
   const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_abstracts = device.other_abstracts ();
   for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator a = other_abstracts.begin (); a != other_abstracts.end (); ++a) {
 
     db::Vector pos = dbu_inv * a->second;
-    abstracts.insert (std::make_pair (std::make_pair (a->first, pos), a - other_abstracts.begin () + 1));
 
     *mp_stream << "  " << Keys::device_key << "(" << tl::to_word_or_quoted_string (a->first->name ()) << " " << pos.x () << " " << pos.y () << ")" << endl;
 
@@ -517,13 +513,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
   for (std::map<unsigned int, std::vector<db::Device::OtherTerminalRef> >::const_iterator t = reconnected_terminals.begin (); t != reconnected_terminals.end (); ++t) {
 
     for (std::vector<db::Device::OtherTerminalRef>::const_iterator c = t->second.begin (); c != t->second.end (); ++c) {
-
-      db::Vector pos = dbu_inv * c->offset;
-      std::map<std::pair<const db::DeviceAbstract *, db::Vector>, size_t>::const_iterator a = abstracts.find (std::make_pair (c->device_abstract, pos));
-      tl_assert (a != abstracts.end ());
-
-      *mp_stream << "  " << Keys::connect_key << "(" << a->second << " " << tl::to_word_or_quoted_string (td [t->first].name ()) << " " << tl::to_word_or_quoted_string (td [c->other_terminal_id].name ()) << ")" << endl;
-
+      *mp_stream << "  " << Keys::connect_key << "(" << c->device_index << " " << tl::to_word_or_quoted_string (td [t->first].name ()) << " " << tl::to_word_or_quoted_string (td [c->other_terminal_id].name ()) << ")" << endl;
     }
 
   }

@@ -48,7 +48,7 @@
 namespace lay
 {
 
-extern std::string cfg_l2ndb_show_all;
+extern const std::string cfg_l2ndb_show_all;
 
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserPage implementation

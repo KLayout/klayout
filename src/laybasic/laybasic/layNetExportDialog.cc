@@ -33,13 +33,13 @@
 namespace lay
 {
 
-extern std::string cfg_l2ndb_export_net_cell_prefix;
-extern std::string cfg_l2ndb_export_net_propname;
-extern std::string cfg_l2ndb_export_circuit_cell_prefix;
-extern std::string cfg_l2ndb_export_produce_circuit_cells;
-extern std::string cfg_l2ndb_export_device_cell_prefix;
-extern std::string cfg_l2ndb_export_produce_device_cells;
-extern std::string cfg_l2ndb_export_start_layer_number;
+extern const std::string cfg_l2ndb_export_net_cell_prefix;
+extern const std::string cfg_l2ndb_export_net_propname;
+extern const std::string cfg_l2ndb_export_circuit_cell_prefix;
+extern const std::string cfg_l2ndb_export_produce_circuit_cells;
+extern const std::string cfg_l2ndb_export_device_cell_prefix;
+extern const std::string cfg_l2ndb_export_produce_device_cells;
+extern const std::string cfg_l2ndb_export_start_layer_number;
 
 
 NetExportDialog::NetExportDialog (QWidget *parent)

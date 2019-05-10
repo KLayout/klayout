@@ -1023,8 +1023,8 @@ TEST(12_NetlistTopology)
   c2->set_name ("c2");
   nl->add_circuit (c2);
   EXPECT_EQ (nl->top_circuit_count (), size_t (2));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c2");
-  EXPECT_EQ (bu2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (bu2string (nl.get ()), "c1,c2");
 
   std::auto_ptr<db::NetlistLocker> locker (new db::NetlistLocker (nl.get ()));
 
@@ -1034,14 +1034,14 @@ TEST(12_NetlistTopology)
 
   //  because we locked, it did not get updated:
   EXPECT_EQ (nl->top_circuit_count (), size_t (2));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c2");
-  EXPECT_EQ (bu2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (bu2string (nl.get ()), "c1,c2");
   locker.reset (0);
 
   //  after removing the lock, it's updated
   EXPECT_EQ (nl->top_circuit_count (), size_t (3));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c2,c3");
-  EXPECT_EQ (bu2string (nl.get ()), "c3,c2,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c3,c2,c1");
+  EXPECT_EQ (bu2string (nl.get ()), "c1,c2,c3");
 
   db::SubCircuit *sc1 = new db::SubCircuit (c2);
   sc1->set_name ("sc1");
@@ -1049,8 +1049,8 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (children2string (c1), "c2");
   EXPECT_EQ (parents2string (c2), "c1");
   EXPECT_EQ (nl->top_circuit_count (), size_t (2));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
-  EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c3,c1,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c1,c3");
 
   db::SubCircuit *sc2 = new db::SubCircuit (c2);
   sc2->set_name ("sc2");
@@ -1058,8 +1058,8 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (children2string (c1), "c2");
   EXPECT_EQ (parents2string (c2), "c1");
   EXPECT_EQ (nl->top_circuit_count (), size_t (2));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
-  EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c3,c1,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c1,c3");
 
   db::SubCircuit *sc3 = new db::SubCircuit (c3);
   sc3->set_name ("sc3");
@@ -1070,8 +1070,8 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (parents2string (c2), "c1");
   EXPECT_EQ (parents2string (c3), "c1");
   EXPECT_EQ (nl->top_circuit_count (), size_t (1));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c2,c3");
-  EXPECT_EQ (bu2string (nl.get ()), "c3,c2,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
 
   db::SubCircuit *sc4 = new db::SubCircuit (*sc2);
   sc4->set_name ("sc4");

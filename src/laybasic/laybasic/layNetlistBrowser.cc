@@ -21,7 +21,7 @@
 */
 
 
-
+#include "laybasicCommon.h"
 #include "layNetlistBrowserDialog.h"
 
 #include "layConverters.h"

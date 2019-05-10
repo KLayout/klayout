@@ -91,6 +91,11 @@ std::string TL_PUBLIC basename (const std::string &s);
 std::string TL_PUBLIC extension (const std::string &s);
 
 /**
+ *  @brief Gets the last extension for a given file path
+ */
+std::string TL_PUBLIC extension_last (const std::string &s);
+
+/**
  *  @brief Returns true, if the given path exists
  *  If the path is a directory, file_exists will return true, if the directory exists.
  */

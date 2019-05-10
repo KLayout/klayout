@@ -34,6 +34,7 @@
 #include "gsiExpression.h"
 #include "libForceLink.h"
 #include "rdbForceLink.h"
+#include "lymMacro.h"
 
 struct RunnerData
 {
@@ -92,14 +93,7 @@ BD_PUBLIC int strmrun (int argc, char *argv[])
 
   std::string script = tl::absolute_file_path (data.script);
 
-  std::string ext = tl::extension (data.script);
-  if (ext == "py") {
-    python.load_file (script);
-  } else if (ext == "rb") {
-    ruby.load_file (script);
-  } else {
-    throw tl::Exception (tl::to_string (tr ("Unknown suffix \"%s\" - must be either .rb or .py")), ext);
-  }
-
-  return 0;
+  lym::Macro macro;
+  macro.load_from (script);
+  return macro.run ();
 }

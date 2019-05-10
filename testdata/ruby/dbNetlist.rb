@@ -262,7 +262,72 @@ class DBNetlist_TestClass < TestBase
 
     d2.connect_terminal(0, net)
     assert_equal(net.terminal_count, 1)
+
+    assert_equal(d1.is_combined_device?, false)
+
+    da = RBA::DeviceAbstract::new
+    da.name = "xyz"
+    d1.device_abstract = da
+
+    a = []
+    d1.each_combined_abstract { |i| a << i }
+    assert_equal(a.size, 0)
+
+    t = RBA::DeviceAbstractRef::new
+    t.device_abstract = d1.device_abstract
+    t.offset = RBA::DVector::new(1, 2)
+    d1.add_combined_abstract(t)
+
+    a = []
+    d1.each_combined_abstract { |i| a << i }
+    assert_equal(a.size, 1)
+    assert_equal(a.collect { |i| i.device_abstract.name }.join(","), "xyz")
+    assert_equal(a.collect { |i| i.offset.to_s }.join(","), "1,2")
     
+    d1.clear_combined_abstracts
+
+    a = []
+    d1.each_combined_abstract { |i| a << i }
+    assert_equal(a.size, 0)
+
+    a = []
+    d1.each_reconnected_terminal_for(0) { |i| a << i }
+    assert_equal(a.size, 0)
+
+    a = []
+    d1.each_reconnected_terminal_for(1) { |i| a << i }
+    assert_equal(a.size, 0)
+
+    t = RBA::DeviceReconnectedTerminal::new
+    t.device_index = 0
+    t.other_terminal_id = 2
+    d1.add_reconnected_terminal_for(1, t)
+
+    t = RBA::DeviceReconnectedTerminal::new
+    t.device_index = 1
+    t.other_terminal_id = 1
+    d1.add_reconnected_terminal_for(1, t)
+    
+    a = []
+    d1.each_reconnected_terminal_for(0) { |i| a << i }
+    assert_equal(a.size, 0)
+
+    a = []
+    d1.each_reconnected_terminal_for(1) { |i| a << i }
+    assert_equal(a.size, 2)
+    assert_equal(a.collect { |i| i.device_index.to_s }.join(","), "0,1")
+    assert_equal(a.collect { |i| i.other_terminal_id.to_s }.join(","), "2,1")
+    
+    d1.clear_reconnected_terminals
+
+    a = []
+    d1.each_reconnected_terminal_for(0) { |i| a << i }
+    assert_equal(a.size, 0)
+
+    a = []
+    d1.each_reconnected_terminal_for(1) { |i| a << i }
+    assert_equal(a.size, 0)
+
   end
 
   def test_5_SubCircuit
@@ -648,11 +713,11 @@ END
 
     names = []
     nl.each_circuit_top_down { |c| names << c.name }
-    assert_equal(names.join(","), "C1,C2,C3")
+    assert_equal(names.join(","), "C3,C2,C1")
 
     names = []
     nl.each_circuit_bottom_up { |c| names << c.name }
-    assert_equal(names.join(","), "C3,C2,C1")
+    assert_equal(names.join(","), "C1,C2,C3")
 
     names = []
     c1.each_child { |c| names << c.name }
@@ -691,11 +756,11 @@ END
 
     names = []
     nl.each_circuit_top_down { |c| names << c.name }
-    assert_equal(names.join(","), "C1,C2,C3")
+    assert_equal(names.join(","), "C1,C3,C2")
 
     names = []
     nl.each_circuit_bottom_up { |c| names << c.name }
-    assert_equal(names.join(","), "C3,C2,C1")
+    assert_equal(names.join(","), "C2,C3,C1")
 
     c3.create_subcircuit(c2)
     assert_equal(nl.top_circuit_count, 1)

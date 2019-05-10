@@ -189,12 +189,12 @@ void Device::set_parameter_value (const std::string &name, double v)
 
 void Device::add_others_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal)
 {
-  std::vector<OtherTerminalRef> &terminals = m_reconnected_terminals [this_terminal];
+  std::vector<DeviceReconnectedTerminal> &terminals = m_reconnected_terminals [this_terminal];
 
-  std::map<unsigned int, std::vector<OtherTerminalRef> >::const_iterator ot = other->m_reconnected_terminals.find (other_terminal);
+  std::map<unsigned int, std::vector<DeviceReconnectedTerminal> >::const_iterator ot = other->m_reconnected_terminals.find (other_terminal);
   if (ot == other->m_reconnected_terminals.end ()) {
 
-    terminals.push_back (OtherTerminalRef (other_abstracts ().size (), other_terminal));
+    terminals.push_back (DeviceReconnectedTerminal (other_abstracts ().size (), other_terminal));
 
   } else {
 
@@ -217,7 +217,7 @@ void Device::init_terminal_routes ()
 
   size_t n = device_class ()->terminal_definitions ().size ();
   for (size_t i = 0; i < n; ++i) {
-    m_reconnected_terminals [i].push_back (OtherTerminalRef (0, i));
+    m_reconnected_terminals [i].push_back (DeviceReconnectedTerminal (0, i));
   }
 }
 
@@ -258,11 +258,11 @@ void Device::join_device (db::Device *other)
 
   m_other_abstracts.reserve (m_other_abstracts.size () + 1 + other->m_other_abstracts.size ());
 
-  m_other_abstracts.push_back (std::make_pair (other->device_abstract (), d));
+  m_other_abstracts.push_back (db::DeviceAbstractRef (other->device_abstract (), d));
 
-  for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator a = other->m_other_abstracts.begin (); a != other->m_other_abstracts.end (); ++a) {
+  for (std::vector<db::DeviceAbstractRef>::const_iterator a = other->m_other_abstracts.begin (); a != other->m_other_abstracts.end (); ++a) {
     m_other_abstracts.push_back (*a);
-    m_other_abstracts.back ().second += d;
+    m_other_abstracts.back ().offset += d;
   }
 }
 
@@ -281,8 +281,8 @@ void Device::translate_device_abstracts (const std::map<const DeviceAbstract *, 
 {
   set_device_abstract (map_da (map, device_abstract ()));
 
-  for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::iterator a = m_other_abstracts.begin (); a != m_other_abstracts.end (); ++a) {
-    a->first = map_da (map, a->first);
+  for (std::vector<db::DeviceAbstractRef>::iterator a = m_other_abstracts.begin (); a != m_other_abstracts.end (); ++a) {
+    a->device_abstract = map_da (map, a->device_abstract);
   }
 }
 

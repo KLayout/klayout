@@ -70,6 +70,160 @@ static void device_disconnect_terminal_by_name (db::Device *device, const std::s
   device_connect_terminal_by_name (device, terminal_name, 0);
 }
 
+static size_t get_device_index (const db::DeviceReconnectedTerminal *obj)
+{
+  return obj->device_index;
+}
+
+static void set_device_index (db::DeviceReconnectedTerminal *obj, size_t device_index)
+{
+  obj->device_index = device_index;
+}
+
+static size_t get_other_terminal_id (const db::DeviceReconnectedTerminal *obj)
+{
+  return obj->other_terminal_id;
+}
+
+static void set_other_terminal_id (db::DeviceReconnectedTerminal *obj, size_t other_terminal_id)
+{
+  obj->other_terminal_id = other_terminal_id;
+}
+
+Class<db::DeviceReconnectedTerminal> decl_dbDeviceReconnectedTerminal ("db", "DeviceReconnectedTerminal",
+  gsi::method_ext ("device_index=", &set_device_index, gsi::arg ("device_index"),
+    "@brief The device abstract index setter.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("device_index", &get_device_index,
+    "@brief The device abstract index getter.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("other_terminal_id=", &set_other_terminal_id, gsi::arg ("other_terminal_id"),
+    "@brief The setter for the abstract's connected terminal.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("other_terminal_id", &get_other_terminal_id,
+    "@brief The getter for the abstract's connected terminal.\n"
+    "See the class description for details."
+  ),
+  "@brief Describes a terminal rerouting in combined devices.\n"
+  "Combined devices are implemented as a generalization of the device abstract concept in \\Device. For "
+  "combined devices, multiple \\DeviceAbstract references are present. To support different combination schemes, "
+  "device-to-abstract routing is supported. Parallel combinations will route all outer terminals to corresponding "
+  "terminals of all device abstracts (because of terminal swapping these may be different ones).\n"
+  "\n"
+  "This object describes one route to an abstract's terminal. The device index is 0 for the main device abstract and "
+  "1 for the first combined device abstract.\n"
+  "\n"
+  "This class has been introduced in version 0.26.\n"
+);
+
+static const db::DeviceAbstract *get_device_abstract (const db::DeviceAbstractRef *obj)
+{
+  return obj->device_abstract;
+}
+
+static void set_device_abstract (db::DeviceAbstractRef *obj, const db::DeviceAbstract *device_abstract)
+{
+  obj->device_abstract = device_abstract;
+}
+
+static db::DVector get_offset (const db::DeviceAbstractRef *obj)
+{
+  return obj->offset;
+}
+
+static void set_offset (db::DeviceAbstractRef *obj, const db::DVector &offset)
+{
+  obj->offset = offset;
+}
+
+Class<db::DeviceAbstractRef> decl_dbDeviceAbstractRef ("db", "DeviceAbstractRef",
+  gsi::method_ext ("device_abstract=", &set_device_abstract, gsi::arg ("device_abstract"),
+    "@brief The setter for the device abstract reference.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("device_abstract", &get_device_abstract,
+    "@brief The getter for the device abstract reference.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("offset=", &set_offset, gsi::arg ("offset"),
+    "@brief The setter for the offset.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("offset", &get_offset,
+    "@brief The getter for the offset.\n"
+    "See the class description for details."
+  ),
+  "@brief Describes an additional device abstract reference for combined devices.\n"
+  "Combined devices are implemented as a generalization of the device abstract concept in \\Device. For "
+  "combined devices, multiple \\DeviceAbstract references are present. This class describes such an "
+  "additional reference. A reference is a pointer to an abstract plus an offset by which the abstract "
+  "is shifted geometrically as compared to the first (initial) abstract.\n"
+  "\n"
+  "This class has been introduced in version 0.26.\n"
+);
+
+static bool is_combined_device (const db::Device *device)
+{
+  return ! device->reconnected_terminals ().empty ();
+}
+
+static std::vector<db::DeviceReconnectedTerminal>::const_iterator begin_reconnected_terminals_for (const db::Device *device, size_t terminal_id)
+{
+  static std::vector<db::DeviceReconnectedTerminal> empty;
+
+  const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for (terminal_id);
+  if (! ti) {
+    return empty.begin ();
+  } else {
+    return ti->begin ();
+  }
+}
+
+static std::vector<db::DeviceReconnectedTerminal>::const_iterator end_reconnected_terminals_for (const db::Device *device, size_t terminal_id)
+{
+  static std::vector<db::DeviceReconnectedTerminal> empty;
+
+  const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for (terminal_id);
+  if (! ti) {
+    return empty.end ();
+  } else {
+    return ti->end ();
+  }
+}
+
+static void clear_reconnected_terminals (db::Device *device)
+{
+  device->reconnected_terminals ().clear ();
+}
+
+static void add_reconnected_terminals (db::Device *device, size_t outer_terminal, const db::DeviceReconnectedTerminal &t)
+{
+  device->reconnected_terminals () [outer_terminal].push_back (t);
+}
+
+static std::vector<db::DeviceAbstractRef>::const_iterator begin_other_abstracts (const db::Device *device)
+{
+  return device->other_abstracts ().begin ();
+}
+
+static std::vector<db::DeviceAbstractRef>::const_iterator end_other_abstracts (const db::Device *device)
+{
+  return device->other_abstracts ().end ();
+}
+
+static void clear_other_abstracts (db::Device *device)
+{
+  device->other_abstracts ().clear ();
+}
+
+static void add_other_abstracts (db::Device *device, const db::DeviceAbstractRef &ref)
+{
+  device->other_abstracts ().push_back (ref);
+}
+
 Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
@@ -77,6 +231,39 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("device_abstract", &db::Device::device_abstract,
     "@brief Gets the device abstract for this device instance.\n"
     "See \\DeviceAbstract for more details.\n"
+  ) +
+  gsi::method ("device_abstract=", &db::Device::set_device_abstract,
+    "@hide\n"
+    "Provided for test purposes mainly. Be careful with pointers!"
+  ) +
+  gsi::method_ext ("is_combined_device?", &is_combined_device,
+    "@brief Returns true, if the device is a combined device.\n"
+    "Combined devices feature multiple device abstracts and device-to-abstract terminal connections.\n"
+    "See \\each_reconnected_terminal and \\each_combined_abstract for more details.\n"
+  ) +
+  gsi::iterator_ext ("each_reconnected_terminal_for", &begin_reconnected_terminals_for, &end_reconnected_terminals_for, gsi::arg ("terminal_id"),
+    "@brief Iterates over the reconnected terminal specifications for a given outer terminal.\n"
+    "This feature applies to combined devices. This iterator will deliver all device-to-abstract terminal reroutings.\n"
+  ) +
+  gsi::method_ext ("clear_reconnected_terminals", &clear_reconnected_terminals,
+    "@hide\n"
+    "Provided for test purposes mainly."
+  ) +
+  gsi::method_ext ("add_reconnected_terminal_for", &add_reconnected_terminals, gsi::arg ("outer_terminal"), gsi::arg ("descriptor"),
+    "@hide\n"
+    "Provided for test purposes mainly."
+  ) +
+  gsi::iterator_ext ("each_combined_abstract", &begin_other_abstracts, &end_other_abstracts,
+    "@brief Iterates over the combined device specifications.\n"
+    "This feature applies to combined devices. This iterator will deliver all device abstracts present in addition to the default device abstract.\n"
+  ) +
+  gsi::method_ext ("clear_combined_abstracts", &clear_other_abstracts,
+    "@hide\n"
+    "Provided for test purposes mainly."
+  ) +
+  gsi::method_ext ("add_combined_abstract", &add_other_abstracts, gsi::arg ("ref"),
+    "@hide\n"
+    "Provided for test purposes mainly."
   ) +
   gsi::method ("circuit", (db::Circuit *(db::Device::*) ()) &db::Device::circuit,
     "@brief Gets the circuit the device lives in."

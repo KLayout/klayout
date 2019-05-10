@@ -758,9 +758,9 @@ NetlistBrowserPage::adjust_view ()
 
     bbox += trans * bbox_for_device_abstract (layout, (*device)->device_abstract (), db::DVector ());
 
-    const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &oda = (*device)->other_abstracts ();
-    for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator a = oda.begin (); a != oda.end (); ++a) {
-      bbox += trans * bbox_for_device_abstract (layout, a->first, a->second);
+    const std::vector<db::DeviceAbstractRef> &oda = (*device)->other_abstracts ();
+    for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
+      bbox += trans * bbox_for_device_abstract (layout, a->device_abstract, a->offset);
     }
 
   }
@@ -835,10 +835,10 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
 
   }
 
-  const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &oda = device->other_abstracts ();
-  for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator a = oda.begin (); a != oda.end (); ++a) {
+  const std::vector<db::DeviceAbstractRef> &oda = device->other_abstracts ();
+  for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
 
-    db::Box da_box = bbox_for_device_abstract (layout, a->first, a->second);
+    db::Box da_box = bbox_for_device_abstract (layout, a->device_abstract, a->offset);
     if (! da_box.empty ()) {
 
       if (n_markers == m_max_shape_count) {

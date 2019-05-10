@@ -556,7 +556,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 
       db::DeviceAbstract *da = device_model_by_name (l2n->netlist (), n);
 
-      device->other_abstracts ().push_back (std::make_pair (da, db::DVector (dbu * dx, dbu * dy)));
+      device->other_abstracts ().push_back (db::DeviceAbstractRef (da, db::DVector (dbu * dx, dbu * dy)));
 
     } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
 
@@ -577,7 +577,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
       size_t touter_id = terminal_id (dm->device_class (), touter);
       size_t tinner_id = terminal_id (dm->device_class (), tinner);
 
-      device->reconnected_terminals () [touter_id].push_back (db::Device::OtherTerminalRef (size_t (device_comp_index), tinner_id));
+      device->reconnected_terminals () [touter_id].push_back (db::DeviceReconnectedTerminal (size_t (device_comp_index), tinner_id));
 
     } else if (test (skeys::terminal_key) || test (lkeys::terminal_key)) {
 
@@ -642,10 +642,10 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
   ccell.insert (inst);
   insts.push_back (inst);
 
-  const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_devices = device->other_abstracts ();
-  for (std::vector<std::pair<const db::DeviceAbstract *, db::DVector> >::const_iterator i = other_devices.begin (); i != other_devices.end (); ++i) {
+  const std::vector<db::DeviceAbstractRef> &other_devices = device->other_abstracts ();
+  for (std::vector<db::DeviceAbstractRef>::const_iterator i = other_devices.begin (); i != other_devices.end (); ++i) {
 
-    db::CellInstArray other_inst (db::CellInst (i->first->cell_index ()), db::Trans (db::Vector (x, y) + dbu_inv * i->second));
+    db::CellInstArray other_inst (db::CellInst (i->device_abstract->cell_index ()), db::Trans (db::Vector (x, y) + dbu_inv * i->offset));
     ccell.insert (other_inst);
     insts.push_back (other_inst);
 
@@ -662,13 +662,13 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 
     if (! device->reconnected_terminals ().empty ()) {
 
-      const std::vector<db::Device::OtherTerminalRef> *tr = device->reconnected_terminals_for (tid);
+      const std::vector<db::DeviceReconnectedTerminal> *tr = device->reconnected_terminals_for (tid);
       if (tr) {
 
-        for (std::vector<db::Device::OtherTerminalRef>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
+        for (std::vector<db::DeviceReconnectedTerminal>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
           const db::DeviceAbstract *da = dm;
           if (i->device_index > 0) {
-            da = device->other_abstracts () [i->device_index - 1].first;
+            da = device->other_abstracts () [i->device_index - 1].device_abstract;
           }
           Connections ref (net->cluster_id (), da->cluster_id_for_terminal (i->other_terminal_id));
           connections [insts [i->device_index]].push_back (ref);

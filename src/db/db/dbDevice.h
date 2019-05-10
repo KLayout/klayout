@@ -40,6 +40,51 @@ class DeviceClass;
 class DeviceAbstract;
 
 /**
+ *  @brief A structure describing a terminal reference into another device abstract
+ */
+struct DeviceReconnectedTerminal
+{
+  DeviceReconnectedTerminal (size_t _device_index, unsigned int _other_terminal_id)
+    : device_index (_device_index), other_terminal_id (_other_terminal_id)
+  {
+    //  .. nothing yet ..
+  }
+
+  DeviceReconnectedTerminal ()
+    : device_index (0), other_terminal_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  size_t device_index;
+  unsigned int other_terminal_id;
+};
+
+/**
+ *  @brief A structure describing a reference to another device abstract
+ *
+ *  This structure is used within Device to reference more than the standard
+ *  device abstract.
+ */
+struct DeviceAbstractRef
+{
+  DeviceAbstractRef (const db::DeviceAbstract *_device_abstract, const db::DVector &_offset)
+    : device_abstract (_device_abstract), offset (_offset)
+  {
+    //  .. nothing yet ..
+  }
+
+  DeviceAbstractRef ()
+    : device_abstract (0), offset ()
+  {
+    //  .. nothing yet ..
+  }
+
+  const db::DeviceAbstract *device_abstract;
+  db::DVector offset;
+};
+
+/**
  *  @brief An actual device
  *
  *  This class represents the incarnation of a specific device.
@@ -54,21 +99,6 @@ class DB_PUBLIC Device
 public:
   typedef std::vector<std::pair<size_t, size_t> > global_connections;
   typedef global_connections::const_iterator global_connections_iterator;
-
-  /**
-   *  @brief A structure describing a terminal reference into another device abstract
-   */
-  struct OtherTerminalRef
-  {
-    OtherTerminalRef (size_t _device_index, unsigned int _other_terminal_id)
-      : device_index (_device_index), other_terminal_id (_other_terminal_id)
-    {
-      //  .. nothing yet ..
-    }
-
-    size_t device_index;
-    unsigned int other_terminal_id;
-  };
 
   /**
    *  @brief Default constructor
@@ -269,9 +299,9 @@ public:
    *  The returned vector (if any) is a complete list of terminals connected to the given
    *  logical device terminal.
    */
-  const std::vector<OtherTerminalRef> *reconnected_terminals_for (unsigned int this_terminal) const
+  const std::vector<DeviceReconnectedTerminal> *reconnected_terminals_for (unsigned int this_terminal) const
   {
-    std::map<unsigned int, std::vector<OtherTerminalRef> >::const_iterator t = m_reconnected_terminals.find (this_terminal);
+    std::map<unsigned int, std::vector<DeviceReconnectedTerminal> >::const_iterator t = m_reconnected_terminals.find (this_terminal);
     if (t != m_reconnected_terminals.end ()) {
       return & t->second;
     } else {
@@ -282,7 +312,17 @@ public:
   /**
    *  @brief Gets the map of reconnected terminals
    */
-  const std::map<unsigned int, std::vector<OtherTerminalRef> > &reconnected_terminals () const
+  const std::map<unsigned int, std::vector<DeviceReconnectedTerminal> > &reconnected_terminals () const
+  {
+    return m_reconnected_terminals;
+  }
+
+  /**
+   *  @brief Gets the map of reconnected terminals (non-const version)
+   *
+   *  NOTE: don't use this method to modify this container! It's provided for persistence implementation only.
+   */
+  std::map<unsigned int, std::vector<DeviceReconnectedTerminal> > &reconnected_terminals ()
   {
     return m_reconnected_terminals;
   }
@@ -293,19 +333,9 @@ public:
    *  This list does not include the intrinsic original abstract of the device.
    *  This vector is non-empty if this device is a combined one.
    */
-  const std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_abstracts () const
+  const std::vector<DeviceAbstractRef> &other_abstracts () const
   {
     return m_other_abstracts;
-  }
-
-  /**
-   *  @brief Gets the map of reconnected terminals (non-const version)
-   *
-   *  NOTE: don't use this method to modify this container! It's provided for persistence implementation only.
-   */
-  std::map<unsigned int, std::vector<OtherTerminalRef> > &reconnected_terminals ()
-  {
-    return m_reconnected_terminals;
   }
 
   /**
@@ -313,7 +343,7 @@ public:
    *
    *  NOTE: don't use this method to modify this container! It's provided for persistence implementation only.
    */
-  std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > &other_abstracts ()
+  std::vector<DeviceAbstractRef> &other_abstracts ()
   {
     return m_other_abstracts;
   }
@@ -330,8 +360,8 @@ private:
   std::vector<double> m_parameters;
   size_t m_id;
   Circuit *mp_circuit;
-  std::vector<std::pair<const db::DeviceAbstract *, db::DVector> > m_other_abstracts;
-  std::map<unsigned int, std::vector<OtherTerminalRef> > m_reconnected_terminals;
+  std::vector<DeviceAbstractRef> m_other_abstracts;
+  std::map<unsigned int, std::vector<DeviceReconnectedTerminal> > m_reconnected_terminals;
 
   /**
    * @brief Translates the device abstracts

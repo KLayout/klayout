@@ -166,7 +166,7 @@ public:
   }
 };
 
-static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new DXFFormatDeclaration (), 100, "DXF");
+static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new DXFFormatDeclaration (), 2000, "DXF");
 
 //  provide a symbol to force linking against
 int force_link_DXF = 0;

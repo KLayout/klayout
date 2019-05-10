@@ -185,7 +185,9 @@ public:
   }
 };
 
-static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new CIFFormatDeclaration (), 100, "CIF");
+//  NOTE: Because CIF has such a high degree of syntactic freedom, the detection is somewhat
+//  fuzzy: do CIF at the very end of the detection chain
+static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new CIFFormatDeclaration (), 2100, "CIF");
 
 //  provide a symbol to force linking against
 int force_link_CIF = 0;

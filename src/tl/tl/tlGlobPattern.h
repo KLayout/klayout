@@ -139,6 +139,7 @@ private:
   bool m_needs_compile;
 
   void do_compile ();
+  void needs_compile ();
   GlobPatternOp *op () const;
 };
 

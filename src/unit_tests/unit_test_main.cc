@@ -386,11 +386,9 @@ main_cont (int &argc, char **argv)
     std::vector<std::string> inst_modules = tl::dir_entries (inst_dir, true, false);
     std::sort (inst_modules.begin (), inst_modules.end ());
 
-    tl::GlobPattern pat ("*.ut");
-
     for (std::vector<std::string>::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
 
-      if (! pat.match (*im)) {
+      if (tl::extension_last (*im) != "ut") {
         continue;
       }
 

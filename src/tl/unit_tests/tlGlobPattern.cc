@@ -51,6 +51,16 @@ TEST(2)
   EXPECT_EQ (a.match ("bad"), true);
   EXPECT_EQ (a.match ("dba"), true);
 
+  //  copy works too ...
+  tl::GlobPattern aa = a;
+
+  EXPECT_EQ (aa.match ("abc"), true);
+  EXPECT_EQ (aa.match ("a"), true);
+  EXPECT_EQ (aa.match (""), false);
+  EXPECT_EQ (aa.match ("bcd"), false);
+  EXPECT_EQ (aa.match ("bad"), true);
+  EXPECT_EQ (aa.match ("dba"), true);
+
   EXPECT_EQ (b.match ("abc"), false);
   EXPECT_EQ (b.match ("a"), false);
   EXPECT_EQ (b.match (""), false);
@@ -72,6 +82,14 @@ TEST(3)
   EXPECT_EQ (a.match ("had"), true);
   EXPECT_EQ (a.match ("hax"), false);
 
+  //  copy works too ...
+  tl::GlobPattern aa = a;
+
+  EXPECT_EQ (aa.match ("ab"), true);
+  EXPECT_EQ (aa.match ("a"), false);
+  EXPECT_EQ (aa.match ("had"), true);
+  EXPECT_EQ (aa.match ("hax"), false);
+
   tl::GlobPattern b ("a[0-9\\abcdef]");
 
   EXPECT_EQ (b.match ("a0"), true);
@@ -89,6 +107,14 @@ TEST(4)
   EXPECT_EQ (a.match ("a"), false);
   EXPECT_EQ (a.match ("had"), false);
   EXPECT_EQ (a.match ("hax"), true);
+
+  //  copy works too ...
+  tl::GlobPattern aa = a;
+
+  EXPECT_EQ (aa.match ("ab"), false);
+  EXPECT_EQ (aa.match ("a"), false);
+  EXPECT_EQ (aa.match ("had"), false);
+  EXPECT_EQ (aa.match ("hax"), true);
 }
 
 TEST(5) 
@@ -102,6 +128,17 @@ TEST(5)
   EXPECT_EQ (a.match ("abx"), true);
   EXPECT_EQ (a.match ("ax"), false);
   EXPECT_EQ (a.match ("hadx"), true);
+
+  //  copy works too ...
+  tl::GlobPattern aa = a;
+
+  EXPECT_EQ (aa.match ("ab"), true);
+  EXPECT_EQ (aa.match ("a"), false);
+  EXPECT_EQ (aa.match ("had"), true);
+
+  EXPECT_EQ (aa.match ("abx"), true);
+  EXPECT_EQ (aa.match ("ax"), false);
+  EXPECT_EQ (aa.match ("hadx"), true);
 }
 
 TEST(6) 
@@ -114,14 +151,64 @@ TEST(6)
   EXPECT_EQ (a.match ("abch"), false);
   EXPECT_EQ (a.match ("adh"), false);
   EXPECT_EQ (a.match ("ah"), false);
+
+  //  copy works too ...
+  tl::GlobPattern aa = a;
+
+  EXPECT_EQ (aa.match ("abcg"), true);
+  EXPECT_EQ (aa.match ("adg"), true);
+  EXPECT_EQ (aa.match ("ag"), false);
+  EXPECT_EQ (aa.match ("abch"), false);
+  EXPECT_EQ (aa.match ("adh"), false);
+  EXPECT_EQ (aa.match ("ah"), false);
+
 }
 
 TEST(7)
+{
+  tl::GlobPattern a ("a{bc*,d?}g");
+
+  EXPECT_EQ (a.match ("abcg"), true);
+  EXPECT_EQ (a.match ("adg"), false);
+  EXPECT_EQ (a.match ("adxg"), true);
+  EXPECT_EQ (a.match ("adxyg"), false);
+  EXPECT_EQ (a.match ("ag"), false);
+  EXPECT_EQ (a.match ("abch"), false);
+  EXPECT_EQ (a.match ("abcg"), true);
+  EXPECT_EQ (a.match ("abchg"), true);
+  EXPECT_EQ (a.match ("abchhg"), true);
+  EXPECT_EQ (a.match ("adh"), false);
+  EXPECT_EQ (a.match ("ah"), false);
+
+  //  copy works too ...
+  tl::GlobPattern aa = a;
+
+  EXPECT_EQ (aa.match ("abcg"), true);
+  EXPECT_EQ (aa.match ("adg"), false);
+  EXPECT_EQ (aa.match ("adxg"), true);
+  EXPECT_EQ (aa.match ("adxyg"), false);
+  EXPECT_EQ (aa.match ("ag"), false);
+  EXPECT_EQ (aa.match ("abch"), false);
+  EXPECT_EQ (aa.match ("abcg"), true);
+  EXPECT_EQ (aa.match ("abchg"), true);
+  EXPECT_EQ (aa.match ("abchhg"), true);
+  EXPECT_EQ (aa.match ("adh"), false);
+  EXPECT_EQ (aa.match ("ah"), false);
+}
+
+TEST(8)
 {
   tl::GlobPattern a ("(*({bc,d}))(*)");
 
   std::vector <std::string> v;
   EXPECT_EQ (a.match ("abcg", v), true);
+  EXPECT_EQ (v.size (), size_t (3));
+  EXPECT_EQ (v[0], "abc");
+  EXPECT_EQ (v[1], "bc");
+  EXPECT_EQ (v[2], "g");
+
+  //  copy works too ...
+  EXPECT_EQ (tl::GlobPattern (a).match ("abcg", v), true);
   EXPECT_EQ (v.size (), size_t (3));
   EXPECT_EQ (v[0], "abc");
   EXPECT_EQ (v[1], "bc");
@@ -134,7 +221,7 @@ TEST(7)
   EXPECT_EQ (v[2], "");
 }
 
-TEST(8)
+TEST(9)
 {
   //  case insensitive
 
@@ -152,6 +239,13 @@ TEST(8)
   EXPECT_EQ (v[1], "Bc");
   EXPECT_EQ (v[2], "G");
 
+  //  copy works too ...
+  EXPECT_EQ (tl::GlobPattern (a).match ("aBcG", v), true);
+  EXPECT_EQ (v.size (), size_t (3));
+  EXPECT_EQ (v[0], "aBc");
+  EXPECT_EQ (v[1], "Bc");
+  EXPECT_EQ (v[2], "G");
+
   tl::GlobPattern b ("*a[bcd]");
 
   EXPECT_EQ (b.match ("ab"), true);
@@ -164,7 +258,7 @@ TEST(8)
   EXPECT_EQ (b.match ("aB"), true);
 }
 
-TEST(9)
+TEST(10)
 {
   //  exact match
 
@@ -182,7 +276,7 @@ TEST(9)
   EXPECT_EQ (a.match ("(*({bc,D}))(*)"), true);
 }
 
-TEST(10)
+TEST(11)
 {
   //  header match
 

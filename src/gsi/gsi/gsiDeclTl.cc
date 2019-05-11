@@ -640,5 +640,3 @@ Class<tl::GlobPattern> decl_GlobPattern ("tl", "GlobPattern",
 );
 
 }
-
-

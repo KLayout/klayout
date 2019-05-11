@@ -215,6 +215,48 @@ class Tl_TestClass < TestBase
 
   end
 
+  # Glob pattern
+  def test_3_GlobPattern
+
+    pat = RBA::GlobPattern::new("a*b")
+
+    assert_equal(pat.case_sensitive, true)
+    assert_equal(pat.head_match, false)
+
+    assert_equal(pat.match("ab") != nil, true)
+    assert_equal(pat.match("axb") != nil, true)
+    assert_equal(pat.match("Axb") != nil, false)
+    assert_equal(pat.match("abx") != nil, false)
+    assert_equal(pat.match("xab") != nil, false)
+
+    pat.case_sensitive = false
+    assert_equal(pat.case_sensitive, false)
+
+    assert_equal(pat.match("ab") != nil, true)
+    assert_equal(pat.match("axb") != nil, true)
+    assert_equal(pat.match("Axb") != nil, true)
+    assert_equal(pat.match("abx") != nil, false)
+    assert_equal(pat.match("xab") != nil, false)
+
+    pat.head_match = true
+    assert_equal(pat.head_match, true)
+
+    assert_equal(pat.match("ab") != nil, true)
+    assert_equal(pat.match("axb") != nil, true)
+    assert_equal(pat.match("Axb") != nil, true)
+    assert_equal(pat.match("abx") != nil, true)
+    assert_equal(pat.match("abx") == [], true)
+    assert_equal(pat.match("xab") != nil, false)
+
+    pat = RBA::GlobPattern::new("(*)a(*)")
+
+    assert_equal(pat.match("xb") != nil, false)
+    res = pat.match("xab")
+    assert_equal(res != nil, true)
+    assert_equal(res.join("/"), "x/b")
+
+  end
+
 end
 
 load("test_epilogue.rb")

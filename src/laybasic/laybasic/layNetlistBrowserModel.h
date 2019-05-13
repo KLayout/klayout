@@ -123,11 +123,13 @@ public:
 
   QModelIndex index_from_id (void *id, int column) const;
 
-  const db::Net *net_from_index (const QModelIndex &index) const;
+  std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index) const;
+  QModelIndex index_from_net (const std::pair<const db::Net *, const db::Net *> &net) const;
   QModelIndex index_from_net (const db::Net *net) const;
 
-  const db::SubCircuit *subcircuit_from_index (const QModelIndex &index) const;
-  const db::Device *device_from_index (const QModelIndex &index) const;
+  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_from_index (const QModelIndex &index) const;
+
+  std::pair<const db::Device *, const db::Device *> device_from_index (const QModelIndex &index) const;
 
 private slots:
   void colors_changed ();
@@ -174,30 +176,30 @@ private:
   size_t circuit_net_subcircuit_pin_other_index_from_id (void *id) const;
   size_t circuit_net_device_terminal_index_from_id (void *id) const;
   size_t circuit_net_device_terminal_other_index_from_id (void *id) const;
-  const db::Circuit *circuit_from_id (void *id) const;
-  const db::Net *net_from_id (void *id) const;
-  const db::NetSubcircuitPinRef *net_subcircuit_pinref_from_id (void *id) const;
-  const db::NetTerminalRef *net_terminalref_from_id (void *id) const;
-  const db::NetPinRef *net_pinref_from_id (void *id) const;
-  const db::Device *device_from_id (void *id) const;
-  const db::Pin *pin_from_id (void *id) const;
-  const db::SubCircuit *subcircuit_from_id (void *id) const;
+  std::pair<const db::Circuit *, const db::Circuit *> circuits_from_id (void *id) const;
+  std::pair<const db::Net *, const db::Net *> nets_from_id (void *id) const;
+  std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> net_subcircuit_pinrefs_from_id (void *id) const;
+  std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *> net_terminalrefs_from_id (void *id) const;
+  std::pair<const db::NetPinRef *, const db::NetPinRef *> net_pinrefs_from_id (void *id) const;
+  std::pair<const db::Device *, const db::Device *> devices_from_id (void *id) const;
+  std::pair<const db::Pin *, const db::Pin *> pins_from_id (void *id) const;
+  std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits_from_id (void *id) const;
   QString text (const QModelIndex &index) const;
   QString search_text (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;
-  QString make_link_to (const db::Net *net) const;
-  QString make_link_to (const db::Device *device) const;
-  QString make_link_to (const db::Pin *pin, const db::Circuit *circuit) const;
-  QString make_link_to (const db::Circuit *circuit) const;
-  QString make_link_to (const db::SubCircuit *sub_circuit) const;
+  QString make_link_to (const std::pair<const db::Net *, const db::Net *> &nets) const;
+  QString make_link_to (const std::pair<const db::Device *, const db::Device *> &devices) const;
+  QString make_link_to (const std::pair<const db::Pin *, const db::Pin *> &pins, const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const;
+  QString make_link_to (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const;
+  QString make_link_to (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sub_circuits) const;
 
-  db::Netlist *netlist () const
+  std::pair<const db::Netlist *, const db::Netlist *> netlists () const
   {
-    return const_cast<db::Netlist *> (mp_l2ndb->netlist ());
+    return std::pair<const db::Netlist *, const db::Netlist *> (mp_l2ndb->netlist (), 0);
   }
 
-  QIcon icon_for_net (const db::Net *net) const;
-  QIcon icon_for_connection (const db::Net *net) const;
+  QIcon icon_for_nets (const std::pair<const db::Net *, const db::Net *> &net) const;
+  QIcon icon_for_connection (const std::pair<const db::Net *, const db::Net *> &net) const;
 
   db::LayoutToNetlist *mp_l2ndb;
   NetColorizer *mp_colorizer;

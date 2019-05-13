@@ -320,7 +320,7 @@ NetlistBrowserPage::selected_nets ()
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
     if (i->column () == 0) {
-      const db::Net *net = model->net_from_index (*i);
+      const db::Net *net = model->net_from_index (*i).first;
       if (net) {
         nets.push_back (net);
       }
@@ -341,7 +341,7 @@ NetlistBrowserPage::selected_subcircuits ()
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
     if (i->column () == 0) {
-      const db::SubCircuit *subcircuit = model->subcircuit_from_index (*i);
+      const db::SubCircuit *subcircuit = model->subcircuit_from_index (*i).first;
       if (subcircuit) {
         subcircuits.push_back (subcircuit);
       }
@@ -362,7 +362,7 @@ NetlistBrowserPage::selected_devices ()
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
     if (i->column () == 0) {
-      const db::Device *device = model->device_from_index (*i);
+      const db::Device *device = model->device_from_index (*i).first;
       if (device) {
         devices.push_back (device);
       }

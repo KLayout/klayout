@@ -947,7 +947,7 @@ int
 NetlistBrowserModel::columnCount (const QModelIndex & /*parent*/) const
 {
   //  Item type & icon, link or description
-  return 2;
+  return mp_indexer->is_single () ? 2 : 3;
 }
 
 QVariant
@@ -1286,23 +1286,27 @@ NetlistBrowserModel::text (const QModelIndex &index) const
 
   if (is_id_circuit (id)) {
 
-    //  circuit: header column = name, other columns empty
+    //  circuit:
+    //  + single mode:     name              | <empty>  | <empty>
+    //  + dual mode:       name(a)/name(b)   | name(a)  | name(b)
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
     if (index.column () == 0) {
-      IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-      if (circuits.first) {
-        return tl::to_qstring (circuits.first->name ());
-      }
+      return tl::to_qstring (str_from_names (circuits, mp_indexer->is_single ()));
+    } else if (!mp_indexer->is_single ()) {
+      return tl::to_qstring (str_from_name (index.column () == 2 ? circuits.first : circuits.second));
     }
-    //  TODO: in case of compare use different scheme
 
   } else if (is_id_circuit_pin (id)) {
 
-    //  circuit/pin: header column = pin name, other columns pin name
+    //  pin:
+    //  + single mode:     xname             | <empty>  | <empty>
+    //  + dual mode:       xname(a)/xname(b) | xname(a) | xname(b)
     IndexedNetlistModel::pin_pair pins = pins_from_id (id);
-    if (pins.first) {
-      return tl::to_qstring (pins.first->expanded_name ());
+    if (index.column () == 0) {
+      return tl::to_qstring (str_from_expanded_names (pins, mp_indexer->is_single ()));
+    } else if (!mp_indexer->is_single ()) {
+      return tl::to_qstring (str_from_expanded_name (index.column () == 2 ? pins.first : pins.second));
     }
-    //  TODO: in case of compare, column 1 is name(a):name(b), 2 is name(a) and 3 is name(b)
 
   } else if (is_id_circuit_pin_net (id)) {
 

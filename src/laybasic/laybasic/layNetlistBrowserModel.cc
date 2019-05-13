@@ -137,12 +137,14 @@ NetColorizer::color_of_net (const db::Net *net) const
 
       size_t i = 0;
       for (db::Circuit::const_net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n, ++i) {
+        m_net_index_by_object.insert (std::make_pair (n.operator-> (), i));
         if (n.operator-> () == net) {
-          m_net_index_by_object.insert (std::make_pair (n.operator-> (), i));
           index = i;
         }
       }
 
+    } else {
+      index = cc->second;
     }
 
     return m_auto_colors.color_by_index ((unsigned int) index);

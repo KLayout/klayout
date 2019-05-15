@@ -26,8 +26,8 @@
 namespace lay
 {
 
-NetlistCrossReferenceModel::NetlistCrossReferenceModel (db::NetlistCrossReference *cross_ref)
-  : mp_cross_ref (cross_ref)
+NetlistCrossReferenceModel::NetlistCrossReferenceModel (const db::NetlistCrossReference *cross_ref)
+  : mp_cross_ref (const_cast<db::NetlistCrossReference *> (cross_ref))
 {
   //  .. nothing yet ..
 }
@@ -79,7 +79,7 @@ template <class Obj> struct DataGetter;
 template <>
 struct DataGetter<const db::Net *>
 {
-  typedef typename std::vector<std::pair<const db::Net *, const db::Net *> >::const_iterator iterator_type;
+  typedef typename std::vector<db::NetlistCrossReference::NetPairData>::const_iterator iterator_type;
   iterator_type begin (const db::NetlistCrossReference::PerCircuitData &data) const { return data.nets.begin (); }
   iterator_type end (const db::NetlistCrossReference::PerCircuitData &data) const { return data.nets.end (); }
 };
@@ -87,7 +87,7 @@ struct DataGetter<const db::Net *>
 template <>
 struct DataGetter<const db::Device *>
 {
-  typedef typename std::vector<std::pair<const db::Device *, const db::Device *> >::const_iterator iterator_type;
+  typedef typename std::vector<db::NetlistCrossReference::DevicePairData>::const_iterator iterator_type;
   iterator_type begin (const db::NetlistCrossReference::PerCircuitData &data) const { return data.devices.begin (); }
   iterator_type end (const db::NetlistCrossReference::PerCircuitData &data) const { return data.devices.end (); }
 };
@@ -95,7 +95,7 @@ struct DataGetter<const db::Device *>
 template <>
 struct DataGetter<const db::SubCircuit *>
 {
-  typedef typename std::vector<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator iterator_type;
+  typedef typename std::vector<db::NetlistCrossReference::SubCircuitPairData>::const_iterator iterator_type;
   iterator_type begin (const db::NetlistCrossReference::PerCircuitData &data) const { return data.subcircuits.begin (); }
   iterator_type end (const db::NetlistCrossReference::PerCircuitData &data) const { return data.subcircuits.end (); }
 };
@@ -114,7 +114,7 @@ static IndexedNetlistModel::circuit_pair get_parent_of (const Pair &pair, const 
       iterator_type b = getter_type ().begin (c->second);
       iterator_type e = getter_type ().end (c->second);
       for (iterator_type j = b; j != e; ++j) {
-        cache.insert (std::make_pair (*j, c->first));
+        cache.insert (std::make_pair (j->pair, c->first));
       }
     }
 
@@ -149,7 +149,7 @@ IndexedNetlistModel::net_pair NetlistCrossReferenceModel::net_from_index (const 
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return data->nets [index];
+  return data->nets [index].pair;
 }
 
 const db::Net *NetlistCrossReferenceModel::second_net_for (const db::Net *first) const
@@ -182,21 +182,21 @@ IndexedNetlistModel::device_pair NetlistCrossReferenceModel::device_from_index (
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return data->devices [index];
+  return data->devices [index].pair;
 }
 
 IndexedNetlistModel::pin_pair NetlistCrossReferenceModel::pin_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return data->pins [index];
+  return data->pins [index].pair;
 }
 
 IndexedNetlistModel::subcircuit_pair NetlistCrossReferenceModel::subcircuit_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return data->subcircuits [index];
+  return data->subcircuits [index].pair;
 }
 
 template <class Pair, class Iter>
@@ -207,7 +207,7 @@ static size_t get_index_of (const Pair &pair, Iter begin, Iter end, std::map<Pai
 
     size_t index = 0;
     for (Iter j = begin; j != end; ++j, ++index) {
-      cache.insert (std::make_pair (*j, index));
+      cache.insert (std::make_pair (j->pair, index));
     }
 
     i = cache.find (pair);
@@ -220,7 +220,19 @@ static size_t get_index_of (const Pair &pair, Iter begin, Iter end, std::map<Pai
 
 size_t NetlistCrossReferenceModel::circuit_index (const circuit_pair &circuits) const
 {
-  return get_index_of (circuits, mp_cross_ref->begin_circuits (), mp_cross_ref->end_circuits (), m_index_of_circuits);
+  typename std::map<circuit_pair, size_t>::iterator i = m_index_of_circuits.find (circuits);
+  if (i != m_index_of_circuits.end ()) {
+
+    size_t index = 0;
+    for (db::NetlistCrossReference::circuits_iterator j = mp_cross_ref->begin_circuits (); j != mp_cross_ref->end_circuits (); ++j, ++index) {
+      m_index_of_circuits.insert (std::make_pair (*j, index));
+    }
+
+    i = m_index_of_circuits.find (circuits);
+    tl_assert (i != m_index_of_circuits.end ());
+  }
+
+  return i->second;
 }
 
 size_t NetlistCrossReferenceModel::net_index (const net_pair &nets) const

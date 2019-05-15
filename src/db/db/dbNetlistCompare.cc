@@ -1772,7 +1772,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
   }
 
   if (mp_logger) {
-    mp_logger->begin_netlist (a, b);
+    mp_logger->end_netlist (a, b);
   }
 
   return good;

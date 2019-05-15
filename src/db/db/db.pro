@@ -176,7 +176,8 @@ SOURCES = \
     dbNetlistCompare.cc \
     dbNetlistReader.cc \
     dbNetlistSpiceReader.cc \
-    gsiDeclDbNetlistCompare.cc
+    gsiDeclDbNetlistCompare.cc \
+    dbNetlistCrossReference.cc
 
 HEADERS = \
   dbArray.h \
@@ -317,7 +318,8 @@ HEADERS = \
     gsiDeclDbHelpers.h \
     dbNetlistCompare.h \
     dbNetlistReader.h \
-    dbNetlistSpiceReader.h
+    dbNetlistSpiceReader.h \
+    dbNetlistCrossReference.h
 
 !equals(HAVE_QT, "0") {
 

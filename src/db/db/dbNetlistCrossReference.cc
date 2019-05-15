@@ -1,0 +1,471 @@
+
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2019 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+
+#include "dbNetlistCrossReference.h"
+
+namespace db
+{
+
+NetlistCrossReference::NetlistCrossReference ()
+{
+  //  .. nothing yet ..
+}
+
+NetlistCrossReference::~NetlistCrossReference ()
+{
+  //  .. nothing yet ..
+}
+
+const NetlistCrossReference::PerCircuitData *
+NetlistCrossReference::per_circuit_data_for (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const
+{
+  per_circuit_data_iterator i = m_per_circuit_data.find (circuits);
+  if (i == m_per_circuit_data.end ()) {
+    return 0;
+  } else {
+    return & i->second;
+  }
+}
+
+const db::Net *
+NetlistCrossReference::other_net_for (const db::Net *net) const
+{
+  std::map<const db::Net *, const db::Net *>::const_iterator i = m_other_net.find (net);
+  if (i != m_other_net.end ()) {
+    return i->second;
+  } else {
+    return 0;
+  }
+}
+
+const NetlistCrossReference::PerNetData *
+NetlistCrossReference::per_net_data_for (const std::pair<const db::Net *, const db::Net *> &nets) const
+{
+  std::map<std::pair<const db::Net *, const db::Net *>, PerNetData>::iterator i = m_per_net_data.find (nets);
+  if (i == m_per_net_data.end ()) {
+    i = m_per_net_data.insert (std::make_pair (nets, PerNetData ())).first;
+    build_per_net_info (nets, i->second);
+  }
+
+  return &i->second;
+}
+
+void
+NetlistCrossReference::begin_netlist (const db::Netlist *a, const db::Netlist *b)
+{
+  mp_netlist_a.reset (const_cast <db::Netlist *> (a));
+  mp_netlist_b.reset (const_cast <db::Netlist *> (b));
+  m_current_circuits = std::pair<const db::Circuit *, const db::Circuit *> (0, 0);
+}
+
+namespace {
+
+struct CircuitsCompareByName
+{
+  bool operator() (const std::pair<const db::Circuit *, const db::Circuit *> &a, const std::pair<const db::Circuit *, const db::Circuit *> &b)
+  {
+    if ((a.first == 0) != (b.first == 0)) {
+      return (a.first == 0) > (b.first == 0);
+    }
+    if (a.first != 0 && a.first->name () != b.first->name ()) {
+      return a.first->name () < b.first->name ();
+    }
+    if ((a.second == 0) != (b.second == 0)) {
+      return (a.second == 0) > (b.second == 0);
+    }
+    if (a.second != 0 && a.second->name () != b.second->name ()) {
+      return a.second->name () < b.second->name ();
+    }
+    return false;
+  }
+};
+
+}
+
+void
+NetlistCrossReference::end_netlist (const db::Netlist *, const db::Netlist *)
+{
+  m_circuits.reserve (m_per_circuit_data.size ());
+  for (per_circuit_data_iterator i = begin_per_circuit_data (); i != end_per_circuit_data (); ++i) {
+    m_circuits.push_back (i->first);
+  }
+
+  std::sort (m_circuits.begin (), m_circuits.end (), CircuitsCompareByName ());
+}
+
+void
+NetlistCrossReference::device_class_mismatch (const db::DeviceClass *, const db::DeviceClass *)
+{
+  //  .. nothing yet ..
+}
+
+void
+NetlistCrossReference::establish_pair (const db::Circuit *a, const db::Circuit *b)
+{
+  mp_per_circuit_data = & m_per_circuit_data [std::make_pair (a, b)];
+
+  if (a) {
+    m_other_circuit [a] = b;
+  }
+  if (b) {
+    m_other_circuit [b] = a;
+  }
+}
+
+void
+NetlistCrossReference::establish_pair (const db::Net *a, const db::Net *b, Status status)
+{
+  mp_per_circuit_data->nets.push_back (NetPairData (a, b, status));
+  if (a) {
+    m_other_net [a] = b;
+  }
+  if (b) {
+    m_other_net [b] = a;
+  }
+}
+
+void
+NetlistCrossReference::establish_pair (const db::Device *a, const db::Device *b, Status status)
+{
+  mp_per_circuit_data->devices.push_back (DevicePairData (a, b, status));
+  if (a) {
+    m_other_device [a] = b;
+  }
+  if (b) {
+    m_other_device [b] = a;
+  }
+}
+
+void
+NetlistCrossReference::establish_pair (const db::Pin *a, const db::Pin *b, Status status)
+{
+  mp_per_circuit_data->pins.push_back (PinPairData (a, b, status));
+  if (a) {
+    m_other_pin [a] = b;
+  }
+  if (b) {
+    m_other_pin [b] = a;
+  }
+}
+
+void
+NetlistCrossReference::establish_pair (const db::SubCircuit *a, const db::SubCircuit *b, Status status)
+{
+  mp_per_circuit_data->subcircuits.push_back (SubCircuitPairData (a, b, status));
+  if (a) {
+    m_other_subcircuit [a] = b;
+  }
+  if (b) {
+    m_other_subcircuit [b] = a;
+  }
+}
+
+void
+NetlistCrossReference::begin_circuit (const db::Circuit *a, const db::Circuit *b)
+{
+  m_current_circuits = std::pair<const db::Circuit *, const db::Circuit *> (a, b);
+  establish_pair (a, b);
+}
+
+void
+NetlistCrossReference::end_circuit (const db::Circuit *, const db::Circuit *, bool matching)
+{
+  mp_per_circuit_data->status = matching ? Match : NoMatch;
+
+  //  @@@ TODO: sort per-circuit data vectors by name?
+
+  m_current_circuits = std::pair<const db::Circuit *, const db::Circuit *> (0, 0);
+  mp_per_circuit_data = 0;
+}
+
+void
+NetlistCrossReference::circuit_skipped (const db::Circuit *a, const db::Circuit *b)
+{
+  establish_pair (a, b);
+  mp_per_circuit_data->status = Skipped;
+}
+
+void
+NetlistCrossReference::circuit_mismatch (const db::Circuit *a, const db::Circuit *b)
+{
+  establish_pair (a, b);
+  mp_per_circuit_data->status = Mismatch;
+}
+
+void
+NetlistCrossReference::match_nets (const db::Net *a, const db::Net *b)
+{
+  establish_pair (a, b, Match);
+}
+
+void
+NetlistCrossReference::match_ambiguous_nets (const db::Net *a, const db::Net *b)
+{
+  establish_pair (a, b, MatchWithWarning);
+}
+
+void
+NetlistCrossReference::net_mismatch (const db::Net *a, const db::Net *b)
+{
+  establish_pair (a, b, Mismatch);
+}
+
+void
+NetlistCrossReference::match_devices (const db::Device *a, const db::Device *b)
+{
+  establish_pair (a, b, Match);
+}
+
+void
+NetlistCrossReference::match_devices_with_different_parameters (const db::Device *a, const db::Device *b)
+{
+  establish_pair (a, b, MatchWithWarning);
+}
+
+void
+NetlistCrossReference::match_devices_with_different_device_classes (const db::Device *a, const db::Device *b)
+{
+  establish_pair (a, b, MatchWithWarning);
+}
+
+void
+NetlistCrossReference::device_mismatch (const db::Device *a, const db::Device *b)
+{
+  establish_pair (a, b, Mismatch);
+}
+
+void
+NetlistCrossReference::match_pins (const db::Pin *a, const db::Pin *b)
+{
+  establish_pair (a, b, Match);
+}
+
+void
+NetlistCrossReference::pin_mismatch (const db::Pin *a, const db::Pin *b)
+{
+  establish_pair (a, b, Mismatch);
+}
+
+void
+NetlistCrossReference::match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b)
+{
+  establish_pair (a, b, Match);
+}
+
+void
+NetlistCrossReference::subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b)
+{
+  establish_pair (a, b, Mismatch);
+}
+
+static void init_data_from_single (const db::Net *net, NetlistCrossReference::PerNetData &data, bool first)
+{
+  data.pins.reserve (net->pin_count ());
+  for (db::Net::const_pin_iterator i = net->begin_pins (); i != net->end_pins (); ++i) {
+    if (! first) {
+      data.pins.push_back (std::make_pair ((const db::NetPinRef *) 0, i.operator-> ()));
+    } else {
+      data.pins.push_back (std::make_pair (i.operator-> (), (const db::NetPinRef *) 0));
+    }
+  }
+
+  data.subcircuit_pins.reserve (net->subcircuit_pin_count ());
+  for (db::Net::const_subcircuit_pin_iterator i = net->begin_subcircuit_pins (); i != net->end_subcircuit_pins (); ++i) {
+    if (! first) {
+      data.subcircuit_pins.push_back (std::make_pair ((const db::NetSubcircuitPinRef *) 0, i.operator-> ()));
+    } else {
+      data.subcircuit_pins.push_back (std::make_pair (i.operator-> (), (const db::NetSubcircuitPinRef *) 0));
+    }
+  }
+
+  data.terminals.reserve (net->terminal_count ());
+  for (db::Net::const_terminal_iterator i = net->begin_terminals (); i != net->end_terminals (); ++i) {
+    if (! first) {
+      data.terminals.push_back (std::make_pair ((const db::NetTerminalRef *) 0, i.operator-> ()));
+    } else {
+      data.terminals.push_back (std::make_pair (i.operator-> (), (const db::NetTerminalRef *) 0));
+    }
+  }
+}
+
+void
+NetlistCrossReference::build_terminal_refs (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const
+{
+  std::map<std::pair<const db::Device *, size_t>, const db::NetTerminalRef *> d2t_a, d2t_b;
+
+  for (db::Net::const_terminal_iterator i = nets.first->begin_terminals (); i != nets.first->end_terminals (); ++i) {
+    d2t_a.insert (std::make_pair (std::make_pair (i->device (), i->terminal_id ()), i.operator-> ()));
+  }
+
+  for (db::Net::const_terminal_iterator i = nets.second->begin_terminals (); i != nets.second->end_terminals (); ++i) {
+    d2t_b.insert (std::make_pair (std::make_pair (i->device (), i->terminal_id ()), i.operator-> ()));
+  }
+
+  for (std::map<std::pair<const db::Device *, size_t>, const db::NetTerminalRef *>::const_iterator a = d2t_a.begin (); a != d2t_a.end (); ++a) {
+
+    const db::Device *da = a->first.first;
+
+    const db::NetTerminalRef *pb = 0;
+
+    std::map<const db::Device *, const db::Device *>::const_iterator idb = m_other_device.find (da);
+    if (idb != m_other_device.end ()) {
+
+      const db::Device *db = idb->second;
+
+      //  we have a device pair - now we need to match the terminals: we do so on the basis
+      //  of normalized terminal ID's
+
+      size_t atid = da->device_class ()->normalize_terminal_id (a->first.second);
+      const std::vector<db::DeviceTerminalDefinition> &termdefs_b = db->device_class ()->terminal_definitions ();
+
+      for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = termdefs_b.begin (); t != termdefs_b.end (); ++t) {
+        if (atid == db->device_class ()->normalize_terminal_id (t->id ())) {
+          std::map<std::pair<const db::Device *, size_t>, const db::NetTerminalRef *>::iterator b = d2t_b.find (std::make_pair (db, t->id ()));
+          if (b != d2t_b.end ()) {
+            pb = b->second;
+            //  remove the entry so we won't find it again
+            d2t_b.erase (b);
+            break;
+          }
+        }
+      }
+
+    }
+
+    data.terminals.push_back (std::make_pair (a->second, pb));
+
+  }
+
+  for (std::map<std::pair<const db::Device *, size_t>, const db::NetTerminalRef *>::const_iterator b = d2t_b.begin (); b != d2t_b.end (); ++b) {
+    data.terminals.push_back (std::make_pair ((const db::NetTerminalRef *) 0, b->second));
+  }
+}
+
+void
+NetlistCrossReference::build_pin_refs (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const
+{
+  std::map<const db::Pin *, const db::NetPinRef *> p2r_a, p2r_b;
+
+  for (db::Net::const_pin_iterator i = nets.first->begin_pins (); i != nets.first->end_pins (); ++i) {
+    p2r_a.insert (std::make_pair (i->pin (), i.operator-> ()));
+  }
+
+  for (db::Net::const_pin_iterator i = nets.second->begin_pins (); i != nets.second->end_pins (); ++i) {
+    p2r_b.insert (std::make_pair (i->pin (), i.operator-> ()));
+  }
+
+  for (std::map<const Pin *, const db::NetPinRef *>::const_iterator a = p2r_a.begin (); a != p2r_a.end (); ++a) {
+
+    const db::Pin *pa = a->first;
+
+    const db::NetPinRef *prb = 0;
+
+    std::map<const db::Pin *, const db::Pin *>::const_iterator ipb = m_other_pin.find (pa);
+    if (ipb != m_other_pin.end ()) {
+
+      const db::Pin *pb = ipb->second;
+      std::map<const Pin *, const db::NetPinRef *>::iterator b = p2r_b.find (pb);
+      if (b != p2r_b.end ()) {
+        prb = b->second;
+        //  remove the entry so we won't find it again
+        p2r_b.erase (b);
+        break;
+      }
+
+    }
+
+    data.pins.push_back (std::make_pair (a->second, prb));
+
+  }
+
+  for (std::map<const Pin *, const db::NetPinRef *>::const_iterator b = p2r_b.begin (); b != p2r_b.end (); ++b) {
+    data.pins.push_back (std::make_pair ((const db::NetPinRef *) 0, b->second));
+  }
+}
+
+void
+NetlistCrossReference::build_subcircuit_pin_refs (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const
+{
+  std::map<std::pair<const db::SubCircuit *, size_t>, const db::NetSubcircuitPinRef *> s2t_a, s2t_b;
+
+  for (db::Net::const_subcircuit_pin_iterator i = nets.first->begin_subcircuit_pins (); i != nets.first->begin_subcircuit_pins (); ++i) {
+    s2t_a.insert (std::make_pair (std::make_pair (i->subcircuit (), i->pin_id ()), i.operator-> ()));
+  }
+
+  for (db::Net::const_subcircuit_pin_iterator i = nets.second->begin_subcircuit_pins (); i != nets.second->begin_subcircuit_pins (); ++i) {
+    s2t_b.insert (std::make_pair (std::make_pair (i->subcircuit (), i->pin_id ()), i.operator-> ()));
+  }
+
+  for (std::map<std::pair<const db::SubCircuit *, size_t>, const db::NetSubcircuitPinRef *>::const_iterator a = s2t_a.begin (); a != s2t_a.end (); ++a) {
+
+    const db::SubCircuit *sa = a->first.first;
+
+    const db::NetSubcircuitPinRef *pb = 0;
+
+    std::map<const db::SubCircuit *, const db::SubCircuit *>::const_iterator isb = m_other_subcircuit.find (sa);
+    if (isb != m_other_subcircuit.end ()) {
+
+      const db::SubCircuit *sb = isb->second;
+
+      //  we have a subcircuit pair - now we need to match the pins: we do so on the basis
+      //  pin matching
+
+      const db::Pin *pa = sa->circuit_ref ()->pin_by_id (a->first.second);
+      std::map<const db::Pin *, const db::Pin *>::const_iterator ipb = m_other_pin.find (pa);
+      if (ipb != m_other_pin.end ()) {
+
+        std::map<std::pair<const db::SubCircuit *, size_t>, const db::NetSubcircuitPinRef *>::iterator b = s2t_b.find (std::make_pair (sb, ipb->second->id ()));
+        if (b != s2t_b.end ()) {
+          pb = b->second;
+          //  remove the entry so we won't find it again
+          s2t_b.erase (b);
+        }
+
+      }
+
+    }
+
+    data.subcircuit_pins.push_back (std::make_pair (a->second, pb));
+
+  }
+
+  for (std::map<std::pair<const db::SubCircuit *, size_t>, const db::NetSubcircuitPinRef *>::const_iterator b = s2t_b.begin (); b != s2t_b.end (); ++b) {
+    data.subcircuit_pins.push_back (std::make_pair ((const db::NetSubcircuitPinRef *) 0, b->second));
+  }
+}
+
+void
+NetlistCrossReference::build_per_net_info (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const
+{
+  if (! nets.second) {
+    init_data_from_single (nets.first, data, true);
+  } else if (! nets.first) {
+    init_data_from_single (nets.second, data, false);
+  } else if (nets.first) {
+    build_terminal_refs (nets, data);
+    build_pin_refs (nets, data);
+    build_subcircuit_pin_refs (nets, data);
+  }
+}
+
+}

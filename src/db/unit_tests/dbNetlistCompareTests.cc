@@ -23,6 +23,7 @@
 #include "tlUnitTest.h"
 #include "dbNetlistDeviceClasses.h"
 #include "dbNetlistCompare.h"
+#include "dbNetlistCrossReference.h"
 
 class NetlistCompareTestLogger
   : public db::NetlistCompareLogger
@@ -161,6 +162,53 @@ private:
     return x ? x->expanded_name () : "(null)";
   }
 };
+
+std::string xref_status2s (db::NetlistCrossReference::Status status)
+{
+  if (status == db::NetlistCrossReference::Match) {
+    return "Match";
+  } else if (status == db::NetlistCrossReference::Mismatch) {
+    return "Mismatch";
+  } else if (status == db::NetlistCrossReference::NoMatch) {
+    return "NoMatch";
+  } else if (status == db::NetlistCrossReference::MatchWithWarning) {
+    return "MatchWithWarning";
+  } else if (status == db::NetlistCrossReference::Skipped) {
+    return "Skipped";
+  } else {
+    return "None";
+  }
+}
+
+template <class Obj>
+std::string name_of (const Obj *obj)
+{
+  return obj ? obj->name () : std::string ("(null)");
+}
+
+template <class Obj>
+std::string expanded_name_of (const Obj *obj)
+{
+  return obj ? obj->expanded_name () : std::string ("(null)");
+}
+
+std::string xref2s (const db::NetlistCrossReference &xref)
+{
+  std::string s;
+
+  for (db::NetlistCrossReference::circuits_iterator c = xref.begin_circuits (); c != xref.end_circuits (); ++c) {
+
+    const db::NetlistCrossReference::PerCircuitData *pcd = xref.per_circuit_data_for (*c);
+    tl_assert (pcd != 0);
+
+    s += name_of (c->first) + ":" + name_of (c->second) + " [" + xref_status2s (pcd->status) + "]:\n";
+
+    //@@@
+
+  }
+
+  return s;
+}
 
 static void prep_nl (db::Netlist &nl, const char *str)
 {
@@ -356,6 +404,16 @@ TEST(1_SimpleInverter)
      "match_devices $2 $1\n"
      "match_devices $1 $2\n"
      "end_circuit INV INV MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  db::NetlistCrossReference xref;
+  db::NetlistComparer comp_xref (&xref);
+
+  good = comp_xref.compare (&nl1, &nl2);
+
+  EXPECT_EQ (xref2s (xref),
+    "INV:INV [Match]:\n"
   );
   EXPECT_EQ (good, true);
 }

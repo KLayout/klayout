@@ -97,15 +97,31 @@ public:
   {
     PerCircuitData () : status (None) { }
 
+    typedef std::vector<NetPairData> net_pairs_type;
+    typedef net_pairs_type::const_iterator net_pairs_const_iterator;
+    typedef std::vector<DevicePairData> device_pairs_type;
+    typedef device_pairs_type::const_iterator device_pairs_const_iterator;
+    typedef std::vector<PinPairData> pin_pairs_type;
+    typedef pin_pairs_type::const_iterator pin_pairs_const_iterator;
+    typedef std::vector<SubCircuitPairData> subcircuit_pairs_type;
+    typedef subcircuit_pairs_type::const_iterator subcircuit_pairs_const_iterator;
+
     Status status;
-    std::vector<NetPairData> nets;
-    std::vector<DevicePairData> devices;
-    std::vector<PinPairData> pins;
-    std::vector<SubCircuitPairData> subcircuits;
+    net_pairs_type nets;
+    device_pairs_type devices;
+    pin_pairs_type pins;
+    subcircuit_pairs_type subcircuits;
   };
 
   struct PerNetData
   {
+    typedef std::vector<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *> > terminal_pairs_type;
+    typedef terminal_pairs_type::const_iterator terminal_pairs_const_iterator;
+    typedef std::vector<std::pair<const db::NetPinRef *, const db::NetPinRef *> > pin_pairs_type;
+    typedef pin_pairs_type::const_iterator pin_pairs_const_iterator;
+    typedef std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> > subcircuit_pin_pairs_type;
+    typedef subcircuit_pin_pairs_type::const_iterator subcircuit_pin_pairs_const_iterator;
+
     std::vector<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *> > terminals;
     std::vector<std::pair<const db::NetPinRef *, const db::NetPinRef *> > pins;
     std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> > subcircuit_pins;
@@ -129,6 +145,8 @@ public:
   virtual void pin_mismatch (const db::Pin *a, const db::Pin *b);
   virtual void match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b);
   virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b);
+
+  void clear ();
 
   size_t circuit_count () const
   {

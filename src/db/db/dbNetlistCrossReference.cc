@@ -98,86 +98,129 @@ NetlistCrossReference::begin_netlist (const db::Netlist *a, const db::Netlist *b
 
 namespace {
 
+static int string_value_compare (const std::string &a, const std::string &b)
+{
+  return a == b ? 0 : (a < b ? -1 : 1);
+}
+
+template <class Obj>
+struct by_name_value_compare
+{
+  int operator() (const Obj &a, const Obj &b) const
+  {
+    return string_value_compare (a.name (), b.name ());
+  }
+};
+
+template <class Obj>
+struct by_expanded_name_value_compare
+{
+  int operator() (const Obj &a, const Obj &b) const
+  {
+    return string_value_compare (a.expanded_name (), b.expanded_name ());
+  }
+};
+
+template <class Obj>
+struct net_object_compare;
+
+template <>
+struct net_object_compare<db::NetTerminalRef>
+{
+  int operator() (const db::NetTerminalRef &a, const db::NetTerminalRef &b) const
+  {
+    int ct = by_expanded_name_value_compare<db::Device> () (*a.device (), *b.device ());
+    if (ct == 0) {
+      return (a.terminal_id () != b.terminal_id () ? (a.terminal_id () < b.terminal_id () ? -1 : 1) : 0);
+    } else {
+      return ct;
+    }
+  }
+};
+
+template <>
+struct net_object_compare<db::NetSubcircuitPinRef>
+{
+  int operator() (const db::NetSubcircuitPinRef &a, const db::NetSubcircuitPinRef &b) const
+  {
+    int ct = by_expanded_name_value_compare<db::SubCircuit> () (*a.subcircuit (), *b.subcircuit ());
+    if (ct == 0) {
+      return by_expanded_name_value_compare<db::Pin> () (*a.pin (), *b.pin ());
+    } else {
+      return ct;
+    }
+  }
+};
+
+template <>
+struct net_object_compare<db::NetPinRef>
+{
+  int operator() (const db::NetPinRef &a, const db::NetPinRef &b) const
+  {
+    return by_expanded_name_value_compare<db::Pin> () (*a.pin (), *b.pin ());
+  }
+};
+
+template <class Obj, class ValueCompare>
+struct two_pointer_compare
+{
+  int operator() (const Obj *a, const Obj *b) const
+  {
+    if ((a == 0) != (b == 0)) {
+      return (a == 0) > (b == 0) ? -1 : 1;
+    }
+    if (a != 0) {
+      return ValueCompare () (*a, *b);
+    } else {
+      return 0;
+    }
+  }
+};
+
+template <class Obj, class ValueCompare>
+struct two_pair_compare
+{
+  bool operator() (const std::pair<const Obj *, const Obj *> &a, const std::pair<const Obj *, const Obj *> &b)
+  {
+    int ct = two_pointer_compare<Obj, ValueCompare> () (a.first, b.first);
+    if (ct != 0) {
+      return ct < 0;
+    }
+    return two_pointer_compare<Obj, ValueCompare> () (a.second, b.second) < 0;
+  }
+};
+
+template <class PairData, class ValueCompare>
+struct pair_data_compare
+{
+  bool operator () (const PairData &a, const PairData &b) const
+  {
+    return two_pair_compare<typename PairData::object_type, ValueCompare> () (a.pair, b.pair);
+  }
+};
+
 struct CircuitsCompareByName
+  : public two_pair_compare<db::Circuit, by_name_value_compare<db::Circuit> >
 {
-  bool operator() (const std::pair<const db::Circuit *, const db::Circuit *> &a, const std::pair<const db::Circuit *, const db::Circuit *> &b)
-  {
-    if ((a.first == 0) != (b.first == 0)) {
-      return (a.first == 0) > (b.first == 0);
-    }
-    if (a.first != 0 && a.first->name () != b.first->name ()) {
-      return a.first->name () < b.first->name ();
-    }
-    if ((a.second == 0) != (b.second == 0)) {
-      return (a.second == 0) > (b.second == 0);
-    }
-    if (a.second != 0 && a.second->name () != b.second->name ()) {
-      return a.second->name () < b.second->name ();
-    }
-    return false;
-  }
+  //  .. nothing yet ..
 };
 
-struct SortNetTerminalsByTerminalId
+struct SortNetTerminals
+  : public two_pair_compare<db::NetTerminalRef, net_object_compare<db::NetTerminalRef> >
 {
-  bool operator() (const std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *> &a, const std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *> &b)
-  {
-    if ((a.first == 0) != (b.first == 0)) {
-      return (a.first == 0) > (b.first == 0);
-    }
-    if (a.first != 0 && a.first->terminal_id () != b.first->terminal_id ()) {
-      return a.first->terminal_id () < b.first->terminal_id ();
-    }
-    if ((a.second == 0) != (b.second == 0)) {
-      return (a.second == 0) > (b.second == 0);
-    }
-    if (a.second != 0 && a.second->terminal_id () != b.second->terminal_id ()) {
-      return a.second->terminal_id () < b.second->terminal_id ();
-    }
-    return false;
-  }
+  //  .. nothing yet ..
 };
 
-template <class Data>
-struct sort_data_pairs_by_pin_name
+struct SortNetPins
+  : public two_pair_compare<db::NetPinRef, net_object_compare<db::NetPinRef> >
 {
-  bool operator() (const std::pair<const Data *, const Data *> &a, const std::pair<const Data *, const Data *> &b)
-  {
-    if ((a.first == 0) != (b.first == 0)) {
-      return (a.first == 0) > (b.first == 0);
-    }
-    if (a.first != 0 && a.first->pin ()->expanded_name () != b.first->pin ()->expanded_name ()) {
-      return a.first->pin ()->expanded_name () < b.first->pin ()->expanded_name ();
-    }
-    if ((a.second == 0) != (b.second == 0)) {
-      return (a.second == 0) > (b.second == 0);
-    }
-    if (a.second != 0 && a.second->pin ()->expanded_name () != b.second->pin ()->expanded_name ()) {
-      return a.second->pin ()->expanded_name () < b.second->pin ()->expanded_name ();
-    }
-    return false;
-  }
+  //  .. nothing yet ..
 };
 
-template <class PairData>
-struct sort_pair_data_by_expanded_name
+struct SortNetSubCircuitPins
+  : public two_pair_compare<db::NetSubcircuitPinRef, net_object_compare<db::NetSubcircuitPinRef> >
 {
-  bool operator() (const PairData &a, const PairData &b) const
-  {
-    if ((a.pair.first == 0) != (b.pair.first == 0)) {
-      return (a.pair.first == 0) > (b.pair.first == 0);
-    }
-    if (a.pair.first != 0 && a.pair.first->expanded_name () != b.pair.first->expanded_name ()) {
-      return a.pair.first->expanded_name () < b.pair.first->expanded_name ();
-    }
-    if ((a.pair.second == 0) != (b.pair.second == 0)) {
-      return (a.pair.second == 0) > (b.pair.second == 0);
-    }
-    if (a.pair.second != 0 && a.pair.second->expanded_name () != b.pair.second->expanded_name ()) {
-      return a.pair.second->expanded_name () < b.pair.second->expanded_name ();
-    }
-    return false;
-  }
+  //  .. nothing yet ..
 };
 
 }
@@ -272,10 +315,10 @@ NetlistCrossReference::end_circuit (const db::Circuit *, const db::Circuit *, bo
 {
   mp_per_circuit_data->status = matching ? Match : NoMatch;
 
-  std::sort (mp_per_circuit_data->devices.begin (), mp_per_circuit_data->devices.end (), sort_pair_data_by_expanded_name<DevicePairData> ());
-  std::sort (mp_per_circuit_data->pins.begin (), mp_per_circuit_data->pins.end (), sort_pair_data_by_expanded_name<PinPairData> ());
-  std::sort (mp_per_circuit_data->subcircuits.begin (), mp_per_circuit_data->subcircuits.end (), sort_pair_data_by_expanded_name<SubCircuitPairData> ());
-  std::sort (mp_per_circuit_data->nets.begin (), mp_per_circuit_data->nets.end (), sort_pair_data_by_expanded_name<NetPairData> ());
+  std::sort (mp_per_circuit_data->devices.begin (), mp_per_circuit_data->devices.end (), pair_data_compare<DevicePairData, by_expanded_name_value_compare<db::Device> > ());
+  std::sort (mp_per_circuit_data->pins.begin (), mp_per_circuit_data->pins.end (), pair_data_compare<PinPairData, by_expanded_name_value_compare<db::Pin> > ());
+  std::sort (mp_per_circuit_data->subcircuits.begin (), mp_per_circuit_data->subcircuits.end (), pair_data_compare<SubCircuitPairData, by_expanded_name_value_compare<db::SubCircuit> > ());
+  std::sort (mp_per_circuit_data->nets.begin (), mp_per_circuit_data->nets.end (), pair_data_compare<NetPairData, by_expanded_name_value_compare<db::Net> > ());
 
   m_current_circuits = std::pair<const db::Circuit *, const db::Circuit *> (0, 0);
   mp_per_circuit_data = 0;
@@ -442,7 +485,7 @@ NetlistCrossReference::build_terminal_refs (const std::pair<const db::Net *, con
     data.terminals.push_back (std::make_pair ((const db::NetTerminalRef *) 0, b->second));
   }
 
-  std::sort (data.terminals.begin (), data.terminals.end (), SortNetTerminalsByTerminalId ());
+  std::sort (data.terminals.begin (), data.terminals.end (), SortNetTerminals ());
 }
 
 void
@@ -486,7 +529,7 @@ NetlistCrossReference::build_pin_refs (const std::pair<const db::Net *, const db
     data.pins.push_back (std::make_pair ((const db::NetPinRef *) 0, b->second));
   }
 
-  std::sort (data.pins.begin (), data.pins.end (), sort_data_pairs_by_pin_name<db::NetPinRef> ());
+  std::sort (data.pins.begin (), data.pins.end (), SortNetPins ());
 }
 
 void
@@ -539,7 +582,7 @@ NetlistCrossReference::build_subcircuit_pin_refs (const std::pair<const db::Net 
     data.subcircuit_pins.push_back (std::make_pair ((const db::NetSubcircuitPinRef *) 0, b->second));
   }
 
-  std::sort (data.subcircuit_pins.begin (), data.subcircuit_pins.end (), sort_data_pairs_by_pin_name<db::NetSubcircuitPinRef> ());
+  std::sort (data.subcircuit_pins.begin (), data.subcircuit_pins.end (), SortNetSubCircuitPins ());
 }
 
 void

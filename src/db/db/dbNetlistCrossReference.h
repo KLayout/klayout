@@ -59,6 +59,8 @@ public:
 
   struct NetPairData
   {
+    typedef db::Net object_type;
+
     NetPairData (const db::Net *a, const db::Net *b, Status s) : pair (a, b), status (s) { }
     NetPairData () : pair (0, 0), status (None) { }
 
@@ -68,6 +70,8 @@ public:
 
   struct DevicePairData
   {
+    typedef db::Device object_type;
+
     DevicePairData (const db::Device *a, const db::Device *b, Status s) : pair (a, b), status (s) { }
     DevicePairData () : pair (0, 0), status (None) { }
 
@@ -77,6 +81,8 @@ public:
 
   struct PinPairData
   {
+    typedef db::Pin object_type;
+
     PinPairData (const db::Pin *a, const db::Pin *b, Status s) : pair (a, b), status (s) { }
     PinPairData () : pair (0, 0), status (None) { }
 
@@ -86,6 +92,8 @@ public:
 
   struct SubCircuitPairData
   {
+    typedef db::SubCircuit object_type;
+
     SubCircuitPairData (const db::SubCircuit *a, const db::SubCircuit *b, Status s) : pair (a, b), status (s) { }
     SubCircuitPairData () : pair (0, 0), status (None) { }
 

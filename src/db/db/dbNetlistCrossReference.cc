@@ -89,7 +89,7 @@ NetlistCrossReference::clear ()
 }
 
 void
-NetlistCrossReference::begin_netlist (const db::Netlist *a, const db::Netlist *b)
+NetlistCrossReference::gen_begin_netlist (const db::Netlist *a, const db::Netlist *b)
 {
   mp_netlist_a.reset (const_cast <db::Netlist *> (a));
   mp_netlist_b.reset (const_cast <db::Netlist *> (b));
@@ -226,7 +226,7 @@ struct SortNetSubCircuitPins
 }
 
 void
-NetlistCrossReference::end_netlist (const db::Netlist *, const db::Netlist *)
+NetlistCrossReference::gen_end_netlist (const db::Netlist *, const db::Netlist *)
 {
   m_circuits.reserve (m_per_circuit_data.size ());
   for (per_circuit_data_iterator i = begin_per_circuit_data (); i != end_per_circuit_data (); ++i) {
@@ -234,12 +234,6 @@ NetlistCrossReference::end_netlist (const db::Netlist *, const db::Netlist *)
   }
 
   std::sort (m_circuits.begin (), m_circuits.end (), CircuitsCompareByName ());
-}
-
-void
-NetlistCrossReference::device_class_mismatch (const db::DeviceClass *, const db::DeviceClass *)
-{
-  //  .. nothing yet ..
 }
 
 void
@@ -304,16 +298,16 @@ NetlistCrossReference::establish_pair (const db::SubCircuit *a, const db::SubCir
 }
 
 void
-NetlistCrossReference::begin_circuit (const db::Circuit *a, const db::Circuit *b)
+NetlistCrossReference::gen_begin_circuit (const db::Circuit *a, const db::Circuit *b)
 {
   m_current_circuits = std::pair<const db::Circuit *, const db::Circuit *> (a, b);
   establish_pair (a, b);
 }
 
 void
-NetlistCrossReference::end_circuit (const db::Circuit *, const db::Circuit *, bool matching)
+NetlistCrossReference::gen_end_circuit (const db::Circuit *, const db::Circuit *, Status status)
 {
-  mp_per_circuit_data->status = matching ? Match : NoMatch;
+  mp_per_circuit_data->status = status;
 
   std::sort (mp_per_circuit_data->devices.begin (), mp_per_circuit_data->devices.end (), pair_data_compare<DevicePairData, by_expanded_name_value_compare<db::Device> > ());
   std::sort (mp_per_circuit_data->pins.begin (), mp_per_circuit_data->pins.end (), pair_data_compare<PinPairData, by_expanded_name_value_compare<db::Pin> > ());
@@ -325,83 +319,27 @@ NetlistCrossReference::end_circuit (const db::Circuit *, const db::Circuit *, bo
 }
 
 void
-NetlistCrossReference::circuit_skipped (const db::Circuit *a, const db::Circuit *b)
+NetlistCrossReference::gen_nets (const db::Net *a, const db::Net *b, Status status)
 {
-  establish_pair (a, b);
-  mp_per_circuit_data->status = Skipped;
+  establish_pair (a, b, status);
 }
 
 void
-NetlistCrossReference::circuit_mismatch (const db::Circuit *a, const db::Circuit *b)
+NetlistCrossReference::gen_devices (const db::Device *a, const db::Device *b, Status status)
 {
-  establish_pair (a, b);
-  mp_per_circuit_data->status = Mismatch;
+  establish_pair (a, b, status);
 }
 
 void
-NetlistCrossReference::match_nets (const db::Net *a, const db::Net *b)
+NetlistCrossReference::gen_pins (const db::Pin *a, const db::Pin *b, Status status)
 {
-  establish_pair (a, b, Match);
+  establish_pair (a, b, status);
 }
 
 void
-NetlistCrossReference::match_ambiguous_nets (const db::Net *a, const db::Net *b)
+NetlistCrossReference::gen_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b, Status status)
 {
-  establish_pair (a, b, MatchWithWarning);
-}
-
-void
-NetlistCrossReference::net_mismatch (const db::Net *a, const db::Net *b)
-{
-  establish_pair (a, b, Mismatch);
-}
-
-void
-NetlistCrossReference::match_devices (const db::Device *a, const db::Device *b)
-{
-  establish_pair (a, b, Match);
-}
-
-void
-NetlistCrossReference::match_devices_with_different_parameters (const db::Device *a, const db::Device *b)
-{
-  establish_pair (a, b, MatchWithWarning);
-}
-
-void
-NetlistCrossReference::match_devices_with_different_device_classes (const db::Device *a, const db::Device *b)
-{
-  establish_pair (a, b, MatchWithWarning);
-}
-
-void
-NetlistCrossReference::device_mismatch (const db::Device *a, const db::Device *b)
-{
-  establish_pair (a, b, Mismatch);
-}
-
-void
-NetlistCrossReference::match_pins (const db::Pin *a, const db::Pin *b)
-{
-  establish_pair (a, b, Match);
-}
-
-void
-NetlistCrossReference::pin_mismatch (const db::Pin *a, const db::Pin *b)
-{
-  establish_pair (a, b, Mismatch);
-}
-
-void
-NetlistCrossReference::match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b)
-{
-  establish_pair (a, b, Match);
-}
-
-void
-NetlistCrossReference::subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b)
-{
-  establish_pair (a, b, Mismatch);
+  establish_pair (a, b, status);
 }
 
 static void init_data_from_single (const db::Net *net, NetlistCrossReference::PerNetData &data, bool first)

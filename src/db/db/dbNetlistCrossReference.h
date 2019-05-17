@@ -135,24 +135,103 @@ public:
     std::vector<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *> > subcircuit_pins;
   };
 
-  virtual void begin_netlist (const db::Netlist *a, const db::Netlist *b);
-  virtual void end_netlist (const db::Netlist *a, const db::Netlist *b);
-  virtual void device_class_mismatch (const db::DeviceClass *a, const db::DeviceClass *b);
-  virtual void begin_circuit (const db::Circuit *a, const db::Circuit *b);
-  virtual void end_circuit (const db::Circuit *a, const db::Circuit *b, bool matching);
-  virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b);
-  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b);
-  virtual void match_nets (const db::Net *a, const db::Net *b);
-  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b);
-  virtual void net_mismatch (const db::Net *a, const db::Net *b);
-  virtual void match_devices (const db::Device *a, const db::Device *b);
-  virtual void match_devices_with_different_parameters (const db::Device *a, const db::Device *b);
-  virtual void match_devices_with_different_device_classes (const db::Device *a, const db::Device *b);
-  virtual void device_mismatch (const db::Device *a, const db::Device *b);
-  virtual void match_pins (const db::Pin *a, const db::Pin *b);
-  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b);
-  virtual void match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b);
-  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b);
+  //  Generic events - thew NetlistCompareLogger events are mapped to these
+  void gen_begin_netlist (const db::Netlist *a, const db::Netlist *b);
+  void gen_end_netlist (const db::Netlist *a, const db::Netlist *b);
+  void gen_begin_circuit (const db::Circuit *a, const db::Circuit *b);
+  void gen_end_circuit (const db::Circuit *a, const db::Circuit *b, Status status);
+  void gen_nets (const db::Net *a, const db::Net *b, Status status);
+  void gen_devices (const db::Device *a, const db::Device *b, Status status);
+  void gen_pins (const db::Pin *a, const db::Pin *b, Status status);
+  void gen_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b, Status status);
+
+  //  db::NetlistCompareLogger interface
+  virtual void begin_netlist (const db::Netlist *a, const db::Netlist *b)
+  {
+    gen_begin_netlist (a, b);
+  }
+
+  virtual void end_netlist (const db::Netlist *a, const db::Netlist *b)
+  {
+    gen_end_netlist (a, b);
+  }
+
+  virtual void begin_circuit (const db::Circuit *a, const db::Circuit *b)
+  {
+    gen_begin_circuit (a, b);
+  }
+
+  virtual void end_circuit (const db::Circuit *a, const db::Circuit *b, bool matching)
+  {
+    gen_end_circuit (a, b, matching ? Match : NoMatch);
+  }
+
+  virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b)
+  {
+    gen_begin_circuit (a, b);
+    gen_end_circuit (a, b, Skipped);
+  }
+
+  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b)
+  {
+    gen_begin_circuit (a, b);
+    gen_end_circuit (a, b, Mismatch);
+  }
+
+  virtual void match_nets (const db::Net *a, const db::Net *b)
+  {
+    gen_nets (a, b, Match);
+  }
+
+  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b)
+  {
+    gen_nets (a, b, MatchWithWarning);
+  }
+
+  virtual void net_mismatch (const db::Net *a, const db::Net *b)
+  {
+    gen_nets (a, b, Mismatch);
+  }
+
+  virtual void match_devices (const db::Device *a, const db::Device *b)
+  {
+    gen_devices (a, b, Match);
+  }
+
+  virtual void match_devices_with_different_parameters (const db::Device *a, const db::Device *b)
+  {
+    gen_devices (a, b, MatchWithWarning);
+  }
+
+  virtual void match_devices_with_different_device_classes (const db::Device *a, const db::Device *b)
+  {
+    gen_devices (a, b, MatchWithWarning);
+  }
+
+  virtual void device_mismatch (const db::Device *a, const db::Device *b)
+  {
+    gen_devices (a, b, Mismatch);
+  }
+
+  virtual void match_pins (const db::Pin *a, const db::Pin *b)
+  {
+    gen_pins (a, b, Match);
+  }
+
+  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b)
+  {
+    gen_pins (a, b, Mismatch);
+  }
+
+  virtual void match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b)
+  {
+    gen_subcircuits (a, b, Match);
+  }
+
+  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b)
+  {
+    gen_subcircuits (a, b, Mismatch);
+  }
 
   void clear ();
 

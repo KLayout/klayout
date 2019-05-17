@@ -238,7 +238,7 @@ echo "Making .zip file $zipname.zip .."
 
 rm -rf $zipname $zipname.zip
 mkdir $zipname
-cp -Rv *.dll .*-paths.txt $plugins lib $zipname | sed -u 's/.*/echo -n ./' | sh
+cp -Rv *.dll .*-paths.txt db_plugins lay_plugins $plugins lib $zipname | sed -u 's/.*/echo -n ./' | sh
 cp klayout.exe $zipname/klayout_app.exe
 cp klayout.exe $zipname/klayout_vo_app.exe
 echo ""

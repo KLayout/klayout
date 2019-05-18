@@ -50,6 +50,7 @@ namespace l2n_std_format
   template<> DB_PUBLIC const std::string keys<false>::scale_key ("scale");
   template<> DB_PUBLIC const std::string keys<false>::pin_key ("pin");
 
+  //  A, B, C, D, E, G, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y
   template<> DB_PUBLIC const std::string keys<true>::version_key ("V");
   template<> DB_PUBLIC const std::string keys<true>::description_key ("B");
   template<> DB_PUBLIC const std::string keys<true>::top_key ("W");

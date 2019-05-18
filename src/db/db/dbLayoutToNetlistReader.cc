@@ -28,15 +28,12 @@ namespace db
 
 namespace l2n_std_reader {
 
-class Brace
-{
-public:
-  Brace (LayoutToNetlistStandardReader *reader) : mp_reader (reader), m_checked (false)
+  Brace::Brace (db::LayoutToNetlistStandardReader *reader) : mp_reader (reader), m_checked (false)
   {
     m_has_brace = reader->test ("(");
   }
 
-  operator bool ()
+  Brace::operator bool ()
   {
     if (! m_has_brace) {
       m_checked = true;
@@ -49,19 +46,13 @@ public:
     }
   }
 
-  void done ()
+  void Brace::done ()
   {
     if (m_has_brace && ! m_checked) {
       mp_reader->expect (")");
       m_checked = true;
     }
   }
-
-private:
-  LayoutToNetlistStandardReader *mp_reader;
-  bool m_checked;
-  bool m_has_brace;
-};
 
 }
 
@@ -153,7 +144,7 @@ static db::Region &layer_by_name (db::LayoutToNetlist *l2n, const std::string &n
   return *l;
 }
 
-void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
+void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nested)
 {
   int version = 0;
   std::string description;
@@ -350,6 +341,10 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
 
       br.done ();
 
+    } else if (nested) {
+      break;
+    } else {
+      throw tl::Exception (tl::to_string (tr ("Invalid keyword")));
     }
 
   }
@@ -482,8 +477,8 @@ LayoutToNetlistStandardReader::read_pin (db::LayoutToNetlist * /*l2n*/, db::Circ
   circuit->connect_pin (pin.id (), net);
 }
 
-static size_t
-terminal_id (const db::DeviceClass *device_class, const std::string &tname)
+size_t
+LayoutToNetlistStandardReader::terminal_id (const db::DeviceClass *device_class, const std::string &tname)
 {
   const std::vector<db::DeviceTerminalDefinition> &td = device_class->terminal_definitions ();
   for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
@@ -495,8 +490,8 @@ terminal_id (const db::DeviceClass *device_class, const std::string &tname)
   throw tl::Exception (tl::to_string (tr ("Not a valid terminal name: ")) + tname + tl::to_string (tr (" for device class: ")) + device_class->name ());
 }
 
-static db::DeviceAbstract *
-device_model_by_name (db::Netlist *netlist, const std::string &dmname)
+db::DeviceAbstract *
+LayoutToNetlistStandardReader::device_model_by_name (db::Netlist *netlist, const std::string &dmname)
 {
   for (db::Netlist::device_abstract_iterator i = netlist->begin_device_abstracts (); i != netlist->end_device_abstracts (); ++i) {
     if (i->name () == dmname) {

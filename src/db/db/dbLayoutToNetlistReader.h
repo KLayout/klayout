@@ -31,9 +31,24 @@
 
 namespace db {
 
+class LayoutToNetlistStandardReader;
+
 namespace l2n_std_reader {
-  class Layers;
-  class Brace;
+
+  class Brace
+  {
+  public:
+    Brace (db::LayoutToNetlistStandardReader *reader);
+
+    operator bool ();
+    void done ();
+
+  private:
+    db::LayoutToNetlistStandardReader *mp_reader;
+    bool m_checked;
+    bool m_has_brace;
+  };
+
 }
 
 class LayoutToNetlist;
@@ -67,10 +82,15 @@ public:
 
   void read (db::LayoutToNetlist *l2n);
 
-private:
+protected:
   friend class l2n_std_reader::Brace;
   typedef l2n_std_reader::Brace Brace;
-  typedef l2n_std_reader::Layers Layers;
+
+  void do_read (db::LayoutToNetlist *l2n, bool nested = false);
+  static size_t terminal_id (const db::DeviceClass *device_class, const std::string &tname);
+  static db::DeviceAbstract *device_model_by_name (db::Netlist *netlist, const std::string &dmname);
+  tl::TextInputStream &stream ();
+  const std::string &path () const;
 
   struct Connections
   {
@@ -80,14 +100,6 @@ private:
 
     size_t from_cluster, to_cluster;
   };
-
-  tl::TextInputStream m_stream;
-  std::string m_path;
-  std::string m_line;
-  tl::Extractor m_ex;
-  db::Point m_ref;
-
-  void do_read (db::LayoutToNetlist *l2n);
 
   bool test (const std::string &token);
   void expect (const std::string &token);
@@ -106,6 +118,13 @@ private:
   std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n);
   void read_geometries (Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell);
   db::Point read_point ();
+
+private:
+  tl::TextInputStream m_stream;
+  std::string m_path;
+  std::string m_line;
+  tl::Extractor m_ex;
+  db::Point m_ref;
 };
 
 }

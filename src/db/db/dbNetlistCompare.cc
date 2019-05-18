@@ -1651,6 +1651,24 @@ NetlistComparer::same_circuits (const db::Circuit *ca, const db::Circuit *cb)
 }
 
 bool
+NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b, NetlistCompareLogger *logger) const
+{
+  db::NetlistCompareLogger *org_logger = mp_logger;
+  mp_logger = logger;
+  bool res = false;
+
+  try {
+    res = compare (a, b);
+  } catch (...) {
+    mp_logger = org_logger;
+    throw;
+  }
+
+  mp_logger = org_logger;
+  return res;
+}
+
+bool
 NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 {
   //  we need to create a copy because this method is supposed to be const.

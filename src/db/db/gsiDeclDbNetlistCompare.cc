@@ -429,7 +429,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
 
 static db::NetlistComparer *make_comparer0 ()
 {
-  return new db::NetlistComparer (0);
+  return new db::NetlistComparer ();
 }
 
 static db::NetlistComparer *make_comparer1 (GenericNetlistCompareLogger *logger)
@@ -509,9 +509,15 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "@brief Gets the maximum branch complexity\n"
     "See \\max_branch_complexity= for details."
   ) +
-  gsi::method ("compare", &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"),
+  gsi::method ("compare", (bool (db::NetlistComparer::*) (const db::Netlist *, const db::Netlist *) const) &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"),
     "@brief Compares two netlists.\n"
     "This method will perform the actual netlist compare. It will return true if both netlists are identical. "
+    "If the comparer has been configured with \\same_nets or similar methods, the objects given there must "
+    "be located inside 'circuit_a' and 'circuit_b' respectively."
+  ) +
+  gsi::method ("compare", (bool (db::NetlistComparer::*) (const db::Netlist *, const db::Netlist *, db::NetlistCompareLogger *) const) &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"), gsi::arg ("logger"),
+    "@brief Compares two netlists.\n"
+    "This method will perform the actual netlist compare using the given logger. It will return true if both netlists are identical. "
     "If the comparer has been configured with \\same_nets or similar methods, the objects given there must "
     "be located inside 'circuit_a' and 'circuit_b' respectively."
   ),

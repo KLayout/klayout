@@ -269,6 +269,16 @@ public:
   const db::Net *other_net_for (const db::Net *net) const;
   const PerNetData *per_net_data_for (const std::pair<const db::Net *, const db::Net *> &nets) const;
 
+  const db::Netlist *netlist_a () const
+  {
+    return mp_netlist_a.get ();
+  }
+
+  const db::Netlist *netlist_b () const
+  {
+    return mp_netlist_b.get ();
+  }
+
 private:
   tl::weak_ptr<db::Netlist> mp_netlist_a, mp_netlist_b;
   std::vector<std::pair<const db::Circuit *, const db::Circuit *> > m_circuits;

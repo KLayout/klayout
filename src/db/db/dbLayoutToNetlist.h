@@ -20,8 +20,8 @@
 
 */
 
-#ifndef _HDR_dbLayout2Netlist
-#define _HDR_dbLayout2Netlist
+#ifndef _HDR_dbLayoutToNetlist
+#define _HDR_dbLayoutToNetlist
 
 #include "dbCommon.h"
 #include "dbCellMapping.h"

@@ -111,6 +111,7 @@ LayoutToNetlistStandardReader::read_double ()
 bool
 LayoutToNetlistStandardReader::at_end ()
 {
+  skip ();
   return (m_ex.at_end () && m_stream.at_end ());
 }
 
@@ -129,7 +130,7 @@ LayoutToNetlistStandardReader::skip ()
 void LayoutToNetlistStandardReader::read (db::LayoutToNetlist *l2n)
 {
   try {
-    do_read (l2n);
+    do_read (0, l2n);
   } catch (tl::Exception &ex) {
     throw tl::Exception (tl::sprintf (tl::to_string (tr ("%s in line: %d of %s")), ex.msg (), m_stream.line_number (), m_path));
   }
@@ -144,20 +145,28 @@ static db::Region &layer_by_name (db::LayoutToNetlist *l2n, const std::string &n
   return *l;
 }
 
-void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nested)
+void LayoutToNetlistStandardReader::do_read (db::Netlist *netlist, db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, std::map<unsigned int, Net *> > *id2net_per_circuit)
 {
   int version = 0;
   std::string description;
 
-  tl_assert (l2n->internal_layout ());
-  l2n->internal_layout ()->dbu (1.0); //  mainly for testing
+  if (l2n) {
 
-  if (l2n->internal_layout ()->cells () == 0) {
-    l2n->internal_layout ()->add_cell ("TOP");
+    tl_assert (netlist == 0);
+
+    tl_assert (l2n->internal_layout ());
+    l2n->internal_layout ()->dbu (1.0); //  mainly for testing
+
+    if (l2n->internal_layout ()->cells () == 0) {
+      l2n->internal_layout ()->add_cell ("TOP");
+    }
+    tl_assert (l2n->internal_top_cell () != 0);
+
+    netlist = l2n->make_netlist ();
+
+  } else {
+    tl_assert (netlist != 0);
   }
-  tl_assert (l2n->internal_top_cell () != 0);
-
-  l2n->make_netlist ();
 
   while (! at_end ()) {
 
@@ -173,14 +182,14 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nest
       read_word_or_quoted (description);
       br.done ();
 
-    } else if (test (skeys::unit_key) || test (lkeys::unit_key)) {
+    } else if (l2n && (test (skeys::unit_key) || test (lkeys::unit_key))) {
 
       Brace br (this);
       double dbu = read_double ();
       l2n->internal_layout ()->dbu (dbu);
       br.done ();
 
-    } else if (test (skeys::top_key) || test (lkeys::top_key)) {
+    } else if (l2n && (test (skeys::top_key) || test (lkeys::top_key))) {
 
       Brace br (this);
       std::string top;
@@ -188,7 +197,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nest
       l2n->internal_layout ()->rename_cell (l2n->internal_top_cell ()->cell_index (), top.c_str ());
       br.done ();
 
-    } else if (test (skeys::layer_key) || test (lkeys::layer_key)) {
+    } else if (l2n && (test (skeys::layer_key) || test (lkeys::layer_key))) {
 
       Brace br (this);
       std::string layer, lspec;
@@ -216,7 +225,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nest
       read_word_or_quoted (templ_name);
       br.done ();
 
-      if (l2n->netlist ()->device_class_by_name (class_name) != 0) {
+      if (netlist->device_class_by_name (class_name) != 0) {
         throw tl::Exception (tl::to_string (tr ("Device class must be defined before being used in device")));
       }
 
@@ -227,9 +236,9 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nest
 
       db::DeviceClass *dc = dct->create ();
       dc->set_name (class_name);
-      l2n->netlist ()->add_device_class (dc);
+      netlist->add_device_class (dc);
 
-    } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
+    } else if (l2n && (test (skeys::connect_key) || test (lkeys::connect_key))) {
 
       Brace br (this);
       std::string l1;
@@ -241,7 +250,7 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nest
       }
       br.done ();
 
-    } else if (test (skeys::global_key) || test (lkeys::global_key)) {
+    } else if (l2n && (test (skeys::global_key) || test (lkeys::global_key))) {
 
       Brace br (this);
       std::string l1;
@@ -261,26 +270,36 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nest
 
       db::Circuit *circuit = new db::Circuit ();
       circuit->set_name (name);
-      l2n->netlist ()->add_circuit (circuit);
+      netlist->add_circuit (circuit);
 
-      db::Layout *ly = l2n->internal_layout ();
-      std::pair<bool, db::cell_index_type> ci_old = ly->cell_by_name (name.c_str ());
-      db::cell_index_type ci = ci_old.first ? ci_old.second : ly->add_cell (name.c_str ());
-      circuit->set_cell_index (ci);
+      db::cell_index_type device_cell_index = 0;
+
+      if (l2n) {
+
+        db::Layout *ly = l2n->internal_layout ();
+        std::pair<bool, db::cell_index_type> ci_old = ly->cell_by_name (name.c_str ());
+        device_cell_index = ci_old.first ? ci_old.second : ly->add_cell (name.c_str ());
+        circuit->set_cell_index (device_cell_index);
+
+      }
 
       std::map<db::CellInstArray, std::list<Connections> > connections;
-      std::map<unsigned int, Net *> id2net;
+      std::map<unsigned int, Net *> id2net_local;
+      std::map<unsigned int, Net *> *id2net = &id2net_local;
+      if (id2net_per_circuit) {
+        id2net = &(*id2net_per_circuit)[circuit];
+      }
 
       while (br) {
 
         if (test (skeys::net_key) || test (lkeys::net_key)) {
-          read_net (l2n, circuit, id2net);
+          read_net (netlist, l2n, circuit, *id2net);
         } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
-          read_pin (l2n, circuit, id2net);
+          read_pin (netlist, l2n, circuit, *id2net);
         } else if (test (skeys::device_key) || test (lkeys::device_key)) {
-          read_device (l2n, circuit, id2net, connections);
+          read_device (netlist, l2n, circuit, *id2net, connections);
         } else if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
-          read_subcircuit (l2n, circuit, id2net, connections);
+          read_subcircuit (netlist, l2n, circuit, *id2net, connections);
         } else {
           throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (net, pin, device or circuit expected)")));
         }
@@ -288,17 +307,22 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nest
       }
       br.done ();
 
-      db::Cell &ccell = ly->cell (ci);
+      if (l2n) {
 
-      //  connections needs to be made after the instances (because in a readonly Instances container
-      //  the Instance pointers will invalidate when new instances are added)
-      for (db::Cell::const_iterator i = ccell.begin (); ! i.at_end (); ++i) {
-        std::map<db::CellInstArray, std::list<Connections> >::const_iterator c = connections.find (i->cell_inst ());
-        if (c != connections.end ()) {
-          for (std::list<Connections>::const_iterator j = c->second.begin (); j != c->second.end (); ++j) {
-            l2n->net_clusters ().clusters_per_cell (ci).add_connection (j->from_cluster, db::ClusterInstance (j->to_cluster, i->cell_index (), i->complex_trans (), i->prop_id ()));
+        db::Layout *ly = l2n->internal_layout ();
+        db::Cell &ccell = ly->cell (device_cell_index);
+
+        //  connections needs to be made after the instances (because in a readonly Instances container
+        //  the Instance pointers will invalidate when new instances are added)
+        for (db::Cell::const_iterator i = ccell.begin (); ! i.at_end (); ++i) {
+          std::map<db::CellInstArray, std::list<Connections> >::const_iterator c = connections.find (i->cell_inst ());
+          if (c != connections.end ()) {
+            for (std::list<Connections>::const_iterator j = c->second.begin (); j != c->second.end (); ++j) {
+              l2n->net_clusters ().clusters_per_cell (device_cell_index).add_connection (j->from_cluster, db::ClusterInstance (j->to_cluster, i->cell_index (), i->complex_trans (), i->prop_id ()));
+            }
           }
         }
+
       }
 
     } else if (test (skeys::device_key) || test (lkeys::device_key)) {
@@ -309,22 +333,24 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nest
 
       db::DeviceAbstract *dm = new db::DeviceAbstract ();
       dm->set_name (name);
-      l2n->netlist ()->add_device_abstract (dm);
+      netlist->add_device_abstract (dm);
 
-      db::cell_index_type ci = l2n->internal_layout ()->add_cell (name.c_str ());
-      dm->set_cell_index (ci);
+      if (l2n) {
+        db::cell_index_type ci = l2n->internal_layout ()->add_cell (name.c_str ());
+        dm->set_cell_index (ci);
+      }
 
       std::string cls;
       read_word_or_quoted (cls);
 
-      db::DeviceClass *dc = l2n->netlist ()->device_class_by_name (cls);
+      db::DeviceClass *dc = netlist->device_class_by_name (cls);
 
       //  use a generic device class unless the right one is registered already.
       bool gen_dc = (dc == 0);
       if (gen_dc) {
         dc = new db::DeviceClass ();
         dc->set_name (cls);
-        l2n->netlist ()->add_device_class (dc);
+        netlist->add_device_class (dc);
       }
 
       dm->set_device_class (dc);
@@ -349,7 +375,9 @@ void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n, bool nest
 
   }
 
-  l2n->set_netlist_extracted ();
+  if (l2n) {
+    l2n->set_netlist_extracted ();
+  }
 }
 
 db::Point
@@ -429,7 +457,7 @@ LayoutToNetlistStandardReader::read_geometries (Brace &br, db::LayoutToNetlist *
 }
 
 void
-LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
+LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
 {
   Brace br (this);
 
@@ -448,18 +476,22 @@ LayoutToNetlistStandardReader::read_net (db::LayoutToNetlist *l2n, db::Circuit *
 
   id2net.insert (std::make_pair (id, net));
 
-  db::connected_clusters<db::PolygonRef> &cc = l2n->net_clusters ().clusters_per_cell (circuit->cell_index ());
-  db::local_cluster<db::PolygonRef> &lc = *cc.insert ();
-  net->set_cluster_id (lc.id ());
+  if (l2n) {
 
-  db::Cell &cell = l2n->internal_layout ()->cell (circuit->cell_index ());
-  read_geometries (br, l2n, lc, cell);
+    db::connected_clusters<db::PolygonRef> &cc = l2n->net_clusters ().clusters_per_cell (circuit->cell_index ());
+    db::local_cluster<db::PolygonRef> &lc = *cc.insert ();
+    net->set_cluster_id (lc.id ());
+
+    db::Cell &cell = l2n->internal_layout ()->cell (circuit->cell_index ());
+    read_geometries (br, l2n, lc, cell);
+
+  }
 
   br.done ();
 }
 
 void
-LayoutToNetlistStandardReader::read_pin (db::LayoutToNetlist * /*l2n*/, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
+LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutToNetlist * /*l2n*/, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
 {
   Brace br (this);
   std::string name;
@@ -503,7 +535,7 @@ LayoutToNetlistStandardReader::device_model_by_name (db::Netlist *netlist, const
 }
 
 void
-LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections)
+LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections)
 {
   Brace br (this);
 
@@ -513,7 +545,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
   std::string dmname;
   read_word_or_quoted (dmname);
 
-  db::DeviceAbstract *dm = device_model_by_name (l2n->netlist (), dmname);
+  db::DeviceAbstract *dm = device_model_by_name (netlist, dmname);
 
   db::Device *device = new db::Device ();
   device->set_device_class (const_cast<db::DeviceClass *> (dm->device_class ()));
@@ -549,7 +581,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 
       br2.done ();
 
-      db::DeviceAbstract *da = device_model_by_name (l2n->netlist (), n);
+      db::DeviceAbstract *da = device_model_by_name (netlist, n);
 
       device->other_abstracts ().push_back (db::DeviceAbstractRef (da, db::DVector (dbu * dx, dbu * dy)));
 
@@ -628,53 +660,57 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 
   br.done ();
 
-  db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());
+  if (l2n) {
 
-  //  make device cell instances
-  std::vector<db::CellInstArray> insts;
+    db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());
 
-  db::CellInstArray inst (db::CellInst (dm->cell_index ()), db::Trans (db::Vector (x, y)));
-  ccell.insert (inst);
-  insts.push_back (inst);
+    //  make device cell instances
+    std::vector<db::CellInstArray> insts;
 
-  const std::vector<db::DeviceAbstractRef> &other_devices = device->other_abstracts ();
-  for (std::vector<db::DeviceAbstractRef>::const_iterator i = other_devices.begin (); i != other_devices.end (); ++i) {
+    db::CellInstArray inst (db::CellInst (dm->cell_index ()), db::Trans (db::Vector (x, y)));
+    ccell.insert (inst);
+    insts.push_back (inst);
 
-    db::CellInstArray other_inst (db::CellInst (i->device_abstract->cell_index ()), db::Trans (db::Vector (x, y) + dbu_inv * i->offset));
-    ccell.insert (other_inst);
-    insts.push_back (other_inst);
+    const std::vector<db::DeviceAbstractRef> &other_devices = device->other_abstracts ();
+    for (std::vector<db::DeviceAbstractRef>::const_iterator i = other_devices.begin (); i != other_devices.end (); ++i) {
 
-  }
+      db::CellInstArray other_inst (db::CellInst (i->device_abstract->cell_index ()), db::Trans (db::Vector (x, y) + dbu_inv * i->offset));
+      ccell.insert (other_inst);
+      insts.push_back (other_inst);
 
-  //  register cluster collections to be made later
-
-  for (size_t tid = 0; tid < max_tid; ++tid) {
-
-    const db::Net *net = device->net_for_terminal (tid);
-    if (! net) {
-      continue;
     }
 
-    if (! device->reconnected_terminals ().empty ()) {
+    //  register cluster collections to be made later
 
-      const std::vector<db::DeviceReconnectedTerminal> *tr = device->reconnected_terminals_for (tid);
-      if (tr) {
+    for (size_t tid = 0; tid < max_tid; ++tid) {
 
-        for (std::vector<db::DeviceReconnectedTerminal>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
-          const db::DeviceAbstract *da = dm;
-          if (i->device_index > 0) {
-            da = device->other_abstracts () [i->device_index - 1].device_abstract;
-          }
-          Connections ref (net->cluster_id (), da->cluster_id_for_terminal (i->other_terminal_id));
-          connections [insts [i->device_index]].push_back (ref);
-        }
-
+      const db::Net *net = device->net_for_terminal (tid);
+      if (! net) {
+        continue;
       }
 
-    } else {
+      if (! device->reconnected_terminals ().empty ()) {
 
-      Connections ref (net->cluster_id (), dm->cluster_id_for_terminal (tid));
-      connections [insts [0]].push_back (ref);
+        const std::vector<db::DeviceReconnectedTerminal> *tr = device->reconnected_terminals_for (tid);
+        if (tr) {
+
+          for (std::vector<db::DeviceReconnectedTerminal>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
+            const db::DeviceAbstract *da = dm;
+            if (i->device_index > 0) {
+              da = device->other_abstracts () [i->device_index - 1].device_abstract;
+            }
+            Connections ref (net->cluster_id (), da->cluster_id_for_terminal (i->other_terminal_id));
+            connections [insts [i->device_index]].push_back (ref);
+          }
+
+        }
+
+      } else {
+
+        Connections ref (net->cluster_id (), dm->cluster_id_for_terminal (tid));
+        connections [insts [0]].push_back (ref);
+
+      }
 
     }
 
@@ -682,7 +718,7 @@ LayoutToNetlistStandardReader::read_device (db::LayoutToNetlist *l2n, db::Circui
 }
 
 void
-LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections)
+LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections)
 {
   Brace br (this);
 
@@ -694,7 +730,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Ci
   std::string xname;
   read_word_or_quoted (xname);
 
-  db::Circuit *circuit_ref = l2n->netlist ()->circuit_by_name (xname);
+  db::Circuit *circuit_ref = netlist->circuit_by_name (xname);
   if (! circuit_ref) {
     throw tl::Exception (tl::to_string (tr ("Not a valid device circuit name: ")) + xname);
   }
@@ -783,14 +819,18 @@ LayoutToNetlistStandardReader::read_subcircuit (db::LayoutToNetlist *l2n, db::Ci
 
   br.done ();
 
-  double dbu = l2n->internal_layout ()->dbu ();
-  subcircuit->set_trans (db::DCplxTrans (mag, angle, mirror, db::DVector (dbu * x, dbu * y)));
+  if (l2n) {
 
-  db::CellInstArray inst (db::CellInst (circuit_ref->cell_index ()), db::ICplxTrans (mag, angle, mirror, db::Vector (x, y)));
-  db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());
-  ccell.insert (inst);
+    double dbu = l2n->internal_layout ()->dbu ();
+    subcircuit->set_trans (db::DCplxTrans (mag, angle, mirror, db::DVector (dbu * x, dbu * y)));
 
-  connections [inst] = refs;
+    db::CellInstArray inst (db::CellInst (circuit_ref->cell_index ()), db::ICplxTrans (mag, angle, mirror, db::Vector (x, y)));
+    db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());
+    ccell.insert (inst);
+
+    connections [inst] = refs;
+
+  }
 }
 
 void
@@ -819,12 +859,16 @@ LayoutToNetlistStandardReader::read_abstract_terminal (db::LayoutToNetlist *l2n,
     tid = dc->add_terminal_definition (new_td).id ();
   }
 
-  db::connected_clusters<db::PolygonRef> &cc = l2n->net_clusters ().clusters_per_cell (dm->cell_index ());
-  db::local_cluster<db::PolygonRef> &lc = *cc.insert ();
-  dm->set_cluster_id_for_terminal (tid, lc.id ());
+  if (l2n) {
 
-  db::Cell &cell = l2n->internal_layout ()->cell (dm->cell_index ());
-  read_geometries (br, l2n, lc, cell);
+    db::connected_clusters<db::PolygonRef> &cc = l2n->net_clusters ().clusters_per_cell (dm->cell_index ());
+    db::local_cluster<db::PolygonRef> &lc = *cc.insert ();
+    dm->set_cluster_id_for_terminal (tid, lc.id ());
+
+    db::Cell &cell = l2n->internal_layout ()->cell (dm->cell_index ());
+    read_geometries (br, l2n, lc, cell);
+
+  }
 
   br.done ();
 }

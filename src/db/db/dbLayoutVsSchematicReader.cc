@@ -48,6 +48,8 @@ void LayoutVsSchematicStandardReader::do_read (db::LayoutVsSchematic *lvs)
 {
   int version = 0;
   std::string description;
+  m_id2net_per_circuit_a.clear ();
+  m_id2net_per_circuit_b.clear ();
 
   tl_assert (lvs->internal_layout ());
   lvs->internal_layout ()->dbu (1.0); //  mainly for testing
@@ -76,14 +78,14 @@ void LayoutVsSchematicStandardReader::do_read (db::LayoutVsSchematic *lvs)
     } else if (test (skeys::layout_key) || test (lkeys::layout_key)) {
 
       Brace br (this);
-      LayoutToNetlistStandardReader::do_read (lvs, true /*nested*/);
+      LayoutToNetlistStandardReader::do_read (0, lvs, true /*nested*/, &m_id2net_per_circuit_a);
       br.done ();
 
     } else if (test (skeys::reference_key) || test (lkeys::reference_key)) {
 
       Brace br (this);
       std::auto_ptr<db::Netlist> netlist (new db::Netlist ());
-      read_netlist (netlist.get ());
+      LayoutToNetlistStandardReader::do_read (netlist.get (), 0, true /*nested*/, &m_id2net_per_circuit_b);
       lvs->set_reference_netlist (netlist.release ());
       br.done ();
 
@@ -103,216 +105,6 @@ void LayoutVsSchematicStandardReader::do_read (db::LayoutVsSchematic *lvs)
     }
 
   }
-}
-
-void LayoutVsSchematicStandardReader::read_netlist (db::Netlist *netlist)
-{
-  Brace br (this);
-  while (br) {
-
-    if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
-
-      Brace br (this);
-      std::string name;
-      read_word_or_quoted (name);
-
-      db::Circuit *circuit = new db::Circuit ();
-      circuit->set_name (name);
-      netlist->add_circuit (circuit);
-
-      std::map<unsigned int, Net *> id2net;
-
-      while (br) {
-
-        if (test (skeys::net_key) || test (lkeys::net_key)) {
-          read_net (netlist, circuit, id2net);
-        } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
-          read_pin (netlist, circuit, id2net);
-        } else if (test (skeys::device_key) || test (lkeys::device_key)) {
-          read_device (netlist, circuit, id2net);
-        } else if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
-          read_subcircuit (netlist, circuit, id2net);
-        } else {
-          throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (net, pin, device or circuit expected)")));
-        }
-
-      }
-      br.done ();
-
-    }
-
-  }
-  br.done ();
-}
-
-void
-LayoutVsSchematicStandardReader::read_net (db::Netlist * /*netlist*/, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
-{
-  Brace br (this);
-
-  unsigned int id = (unsigned int) read_int ();
-  std::string name;
-
-  if (test (skeys::name_key) || test (lkeys::name_key)) {
-    Brace br_name (this);
-    read_word_or_quoted (name);
-    br_name.done ();
-  }
-
-  db::Net *net = new db::Net ();
-  net->set_name (name);
-  circuit->add_net (net);
-
-  id2net.insert (std::make_pair (id, net));
-
-  br.done ();
-}
-
-void
-LayoutVsSchematicStandardReader::read_pin (db::Netlist * /*netlist*/, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
-{
-  Brace br (this);
-  std::string name;
-  read_word_or_quoted (name);
-  unsigned int netid = (unsigned int) read_int ();
-  br.done ();
-
-  const db::Pin &pin = circuit->add_pin (name);
-
-  db::Net *net = id2net [netid];
-  if (!net) {
-    throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
-  }
-
-  circuit->connect_pin (pin.id (), net);
-}
-
-
-void
-LayoutVsSchematicStandardReader::read_device (db::Netlist *netlist, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
-{
-  Brace br (this);
-
-  std::string name;
-  read_word_or_quoted (name);
-
-  std::string dmname;
-  read_word_or_quoted (dmname);
-
-  db::DeviceAbstract *dm = device_model_by_name (netlist, dmname);
-
-  db::Device *device = new db::Device ();
-  device->set_device_class (const_cast<db::DeviceClass *> (dm->device_class ()));
-  device->set_device_abstract (dm);
-  device->set_name (name);
-  circuit->add_device (device);
-
-  size_t max_tid = 0;
-
-  while (br) {
-
-    if (test (skeys::terminal_key) || test (lkeys::terminal_key)) {
-
-      Brace br2 (this);
-      std::string tname;
-      read_word_or_quoted (tname);
-      unsigned int netid = (unsigned int) read_int ();
-      br2.done ();
-
-      size_t tid = terminal_id (dm->device_class (), tname);
-      max_tid = std::max (max_tid, tid + 1);
-
-      db::Net *net = id2net [netid];
-      if (!net) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
-      }
-
-      device->connect_terminal (tid, net);
-
-    } else if (test (skeys::param_key) || test (lkeys::param_key)) {
-
-      Brace br2 (this);
-      std::string pname;
-      read_word_or_quoted (pname);
-      double value = read_double ();
-      br2.done ();
-
-      size_t pid = std::numeric_limits<size_t>::max ();
-      const std::vector<db::DeviceParameterDefinition> &pd = dm->device_class ()->parameter_definitions ();
-      for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-        if (p->name () == pname) {
-          pid = p->id ();
-          break;
-        }
-      }
-
-      //  if no parameter with this name exists, create one
-      if (pid == std::numeric_limits<size_t>::max ()) {
-        //  TODO: this should only happen for generic devices
-        db::DeviceClass *dc = const_cast<db::DeviceClass *> (dm->device_class ());
-        pid = dc->add_parameter_definition (db::DeviceParameterDefinition (pname, std::string ())).id ();
-      }
-
-      device->set_parameter_value (pid, value);
-
-    } else {
-      throw tl::Exception (tl::to_string (tr ("Invalid keyword inside device definition (location, param or terminal expected)")));
-    }
-
-  }
-
-  br.done ();
-}
-
-void
-LayoutVsSchematicStandardReader::read_subcircuit (db::Netlist *netlist, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
-{
-  Brace br (this);
-
-  std::string name;
-  read_word_or_quoted (name);
-
-  std::string xname;
-  read_word_or_quoted (xname);
-
-  db::Circuit *circuit_ref = netlist->circuit_by_name (xname);
-  if (! circuit_ref) {
-    throw tl::Exception (tl::to_string (tr ("Not a valid device circuit name: ")) + xname);
-  }
-
-  db::SubCircuit *subcircuit = new db::SubCircuit (circuit_ref);
-  subcircuit->set_name (name);
-  circuit->add_subcircuit (subcircuit);
-
-  while (br) {
-
-    if (test (skeys::pin_key) || test (lkeys::pin_key)) {
-
-      Brace br2 (this);
-      std::string pname;
-      read_word_or_quoted (pname);
-      unsigned int netid = (unsigned int) read_int ();
-      br2.done ();
-
-      const db::Pin *sc_pin = circuit_ref->pin_by_name (pname);
-      if (! sc_pin) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid pin name: ")) + pname + tl::to_string (tr (" for circuit: ")) + circuit_ref->name ());
-      }
-
-      db::Net *net = id2net [netid];
-      if (!net) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
-      }
-
-      subcircuit->connect_pin (sc_pin->id (), net);
-
-    } else {
-      throw tl::Exception (tl::to_string (tr ("Invalid keyword inside subcircuit definition (location, rotation, mirror, scale or pin expected)")));
-    }
-
-  }
-
-  br.done ();
 }
 
 bool LayoutVsSchematicStandardReader::read_status (db::NetlistCrossReference::Status &status)
@@ -429,17 +221,26 @@ std::pair<unsigned int, bool> LayoutVsSchematicStandardReader::read_non_numerica
   }
 }
 
-static const db::Net *net_by_numerical_id (const db::Circuit *circuit, const std::pair<unsigned int, bool> &non)
+
+static const db::Net *net_by_numerical_id (const db::Circuit *circuit, const std::pair<unsigned int, bool> &non, std::map<const db::Circuit *, std::map<unsigned int, Net *> > &id2net_per_circuit)
 {
   if (non.second && circuit) {
-    const db::Net *net = 0; // @@@ circuit->net_by_numerical_id (non.first);
-    if (! net) {
-      throw tl::Exception (tl::to_string (tr ("Not a valid net id: ")) + tl::to_string (non.first));
+
+    std::map<const db::Circuit *, std::map<unsigned int, Net *> >::const_iterator i = id2net_per_circuit.find (circuit);
+    if (i != id2net_per_circuit.end ()) {
+
+      std::map<unsigned int, Net *>::const_iterator j = i->second.find (non.first);
+      if (j != i->second.end ()) {
+        return j->second;
+      }
+
     }
-    return net;
-  } else {
-    return 0;
+
+    throw tl::Exception (tl::to_string (tr ("Not a valid net id: ")) + tl::to_string (non.first));
+
   }
+
+  return 0;
 }
 
 void LayoutVsSchematicStandardReader::read_net_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b)
@@ -455,7 +256,7 @@ void LayoutVsSchematicStandardReader::read_net_pair (db::NetlistCrossReference *
 
   br.done ();
 
-  xref->gen_nets (net_by_numerical_id (circuit_a, non_a), net_by_numerical_id (circuit_b, non_b), status);
+  xref->gen_nets (net_by_numerical_id (circuit_a, non_a, m_id2net_per_circuit_a), net_by_numerical_id (circuit_b, non_b, m_id2net_per_circuit_b), status);
 }
 
 static const db::Pin *pin_by_name (const db::Circuit *circuit, const std::pair<std::string, bool> &non)

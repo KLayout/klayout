@@ -53,7 +53,7 @@ LayoutVsSchematic::LayoutVsSchematic ()
   //  .. nothing yet ..
 }
 
-~LayoutVsSchematic ()
+LayoutVsSchematic::~LayoutVsSchematic ()
 {
   //  .. nothing yet ..
 }
@@ -100,7 +100,7 @@ void db::LayoutVsSchematic::load (const std::string &path)
   db::LayoutVsSchematicStandardReader reader (stream);
   set_filename (path);
   set_name (stream.filename ());
-  reader.read (this);
+  reader.read_lvs (this);
 }
 
 }

@@ -66,12 +66,7 @@ public:
 private:
   void do_read (db::LayoutVsSchematic *lvs);
 
-  void read_netlist (db::Netlist *netlist);
   bool read_status (db::NetlistCrossReference::Status &status);
-  void read_net (db::Netlist *netlist, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net);
-  void read_subcircuit (db::Netlist *netlist, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net);
-  void read_device (db::Netlist *netlist, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net);
-  void read_pin (db::Netlist *netlist, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net);
   void read_xref (db::NetlistCrossReference *xref);
   void read_xrefs_for_circuits (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b);
   void read_net_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b);
@@ -80,6 +75,8 @@ private:
   void read_subcircuit_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b);
   std::pair<std::string, bool> read_non_string ();
   std::pair<unsigned int, bool> read_non_numerical ();
+
+  std::map<const db::Circuit *, std::map<unsigned int, Net *> > m_id2net_per_circuit_a, m_id2net_per_circuit_b;
 };
 
 }

@@ -45,6 +45,7 @@ void LayoutVsSchematicWriterBase::write (const db::LayoutVsSchematic *l2n)
   do_write (l2n);
 }
 
+#if 0
 // -------------------------------------------------------------------------------------------
 
 namespace l2n_std_format
@@ -537,6 +538,7 @@ void std_writer_impl<Keys>::write (const db::LayoutVsSchematic *l2n, const db::D
 }
 
 }
+#endif
 
 // -------------------------------------------------------------------------------------------
 //  LayoutVsSchematicStandardWriter implementation
@@ -547,8 +549,9 @@ LayoutVsSchematicStandardWriter::LayoutVsSchematicStandardWriter (tl::OutputStre
   //  .. nothing yet ..
 }
 
-void LayoutVsSchematicStandardWriter::do_write (const db::LayoutVsSchematic *l2n)
+void LayoutVsSchematicStandardWriter::do_write (const db::LayoutVsSchematic * /*lvs*/)
 {
+#if 0
   if (m_short_version) {
     l2n_std_format::std_writer_impl<l2n_std_format::keys<true> > writer (*mp_stream);
     writer.write (l2n);
@@ -556,6 +559,7 @@ void LayoutVsSchematicStandardWriter::do_write (const db::LayoutVsSchematic *l2n
     l2n_std_format::std_writer_impl<l2n_std_format::keys<false> > writer (*mp_stream);
     writer.write (l2n);
   }
+#endif
 }
 
 }

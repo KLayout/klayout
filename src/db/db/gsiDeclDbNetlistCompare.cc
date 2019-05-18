@@ -315,7 +315,13 @@ public:
 namespace gsi
 {
 
-Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "GenericNetlistCompareLogger",
+Class<db::NetlistCompareLogger> decl_dbNetlistCompareLogger ("db", "NetlistCompareLogger",
+  gsi::Methods (),
+  "@brief A base class for netlist comparer event receivers\n"
+  "See \\GenericNetlistCompareLogger for custom implementations of such receivers."
+);
+
+Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetlistCompareLogger, "db", "GenericNetlistCompareLogger",
   gsi::callback ("begin_netlist", &GenericNetlistCompareLogger::begin_netlist, &GenericNetlistCompareLogger::cb_begin_netlist, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called at the beginning of the compare process.\n"
     "This method is called once when the compare run begins.\n"

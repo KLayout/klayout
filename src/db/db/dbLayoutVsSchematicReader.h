@@ -49,7 +49,13 @@ public:
   LayoutVsSchematicReaderBase () { }
   virtual ~LayoutVsSchematicReaderBase () { }
 
-  virtual void read_lvs (db::LayoutVsSchematic *lvs) = 0;
+  void read (db::LayoutVsSchematic *lvs)
+  {
+    do_read_lvs (lvs);
+  }
+
+protected:
+  virtual void do_read_lvs (db::LayoutVsSchematic *lvs) = 0;
 };
 
 /**
@@ -61,10 +67,15 @@ class DB_PUBLIC LayoutVsSchematicStandardReader
 public:
   LayoutVsSchematicStandardReader (tl::InputStream &stream);
 
-  void read_lvs (db::LayoutVsSchematic *lvs);
+  void read (db::LayoutVsSchematic *lvs)
+  {
+    do_read_lvs (lvs);
+  }
+
+  virtual void do_read_lvs (db::LayoutVsSchematic *lvs);
 
 private:
-  void do_read (db::LayoutVsSchematic *lvs);
+  void read_netlist (db::LayoutVsSchematic *lvs);
 
   bool read_status (db::NetlistCrossReference::Status &status);
   void read_xref (db::NetlistCrossReference *xref);

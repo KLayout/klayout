@@ -68,7 +68,13 @@ public:
   LayoutToNetlistReaderBase () { }
   virtual ~LayoutToNetlistReaderBase () { }
 
-  virtual void read (db::LayoutToNetlist *l2n) = 0;
+  void read (db::LayoutToNetlist *l2n)
+  {
+    do_read (l2n);
+  }
+
+private:
+  virtual void do_read (db::LayoutToNetlist *l2n) = 0;
 };
 
 /**
@@ -80,13 +86,13 @@ class DB_PUBLIC LayoutToNetlistStandardReader
 public:
   LayoutToNetlistStandardReader (tl::InputStream &stream);
 
-  void read (db::LayoutToNetlist *l2n);
+  void do_read (db::LayoutToNetlist *l2n);
 
 protected:
   friend class l2n_std_reader::Brace;
   typedef l2n_std_reader::Brace Brace;
 
-  void do_read (Netlist *netlist, db::LayoutToNetlist *l2n, bool nested = false, std::map<const db::Circuit *, std::map<unsigned int, Net *> > *id2net_per_circuit = 0);
+  void read_netlist (Netlist *netlist, db::LayoutToNetlist *l2n, bool nested = false, std::map<const db::Circuit *, std::map<unsigned int, Net *> > *id2net_per_circuit = 0);
   static size_t terminal_id (const db::DeviceClass *device_class, const std::string &tname);
   static db::DeviceAbstract *device_model_by_name (db::Netlist *netlist, const std::string &dmname);
   tl::TextInputStream &stream ();

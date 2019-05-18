@@ -29,22 +29,25 @@ namespace db
 typedef lvs_std_format::keys<true> skeys;
 typedef lvs_std_format::keys<false> lkeys;
 
+// -------------------------------------------------------------------------------------------------
+//  LayoutVsSchematicStandardReader implementation
+
 LayoutVsSchematicStandardReader::LayoutVsSchematicStandardReader (tl::InputStream &stream)
   : LayoutToNetlistStandardReader (stream)
 {
   //  .. nothing yet ..
 }
 
-void LayoutVsSchematicStandardReader::read_lvs (db::LayoutVsSchematic *l2n)
+void LayoutVsSchematicStandardReader::do_read_lvs (db::LayoutVsSchematic *l2n)
 {
   try {
-    do_read (l2n);
+    read_netlist (l2n);
   } catch (tl::Exception &ex) {
     throw tl::Exception (tl::sprintf (tl::to_string (tr ("%s in line: %d of %s")), ex.msg (), stream ().line_number (), path ()));
   }
 }
 
-void LayoutVsSchematicStandardReader::do_read (db::LayoutVsSchematic *lvs)
+void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
 {
   int version = 0;
   std::string description;
@@ -78,14 +81,14 @@ void LayoutVsSchematicStandardReader::do_read (db::LayoutVsSchematic *lvs)
     } else if (test (skeys::layout_key) || test (lkeys::layout_key)) {
 
       Brace br (this);
-      LayoutToNetlistStandardReader::do_read (0, lvs, true /*nested*/, &m_id2net_per_circuit_a);
+      LayoutToNetlistStandardReader::read_netlist (0, lvs, true /*nested*/, &m_id2net_per_circuit_a);
       br.done ();
 
     } else if (test (skeys::reference_key) || test (lkeys::reference_key)) {
 
       Brace br (this);
       std::auto_ptr<db::Netlist> netlist (new db::Netlist ());
-      LayoutToNetlistStandardReader::do_read (netlist.get (), 0, true /*nested*/, &m_id2net_per_circuit_b);
+      LayoutToNetlistStandardReader::read_netlist (netlist.get (), 0, true /*nested*/, &m_id2net_per_circuit_b);
       lvs->set_reference_netlist (netlist.release ());
       br.done ();
 

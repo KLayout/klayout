@@ -127,10 +127,10 @@ LayoutToNetlistStandardReader::skip ()
   }
 }
 
-void LayoutToNetlistStandardReader::read (db::LayoutToNetlist *l2n)
+void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
 {
   try {
-    do_read (0, l2n);
+    read_netlist (0, l2n);
   } catch (tl::Exception &ex) {
     throw tl::Exception (tl::sprintf (tl::to_string (tr ("%s in line: %d of %s")), ex.msg (), m_stream.line_number (), m_path));
   }
@@ -145,7 +145,7 @@ static db::Region &layer_by_name (db::LayoutToNetlist *l2n, const std::string &n
   return *l;
 }
 
-void LayoutToNetlistStandardReader::do_read (db::Netlist *netlist, db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, std::map<unsigned int, Net *> > *id2net_per_circuit)
+void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, std::map<unsigned int, Net *> > *id2net_per_circuit)
 {
   int version = 0;
   std::string description;

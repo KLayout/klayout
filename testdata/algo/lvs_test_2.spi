@@ -1,0 +1,70 @@
+* Test netlist
+
+* cell RINGO
+* pin FB
+* pin OSC
+* pin VDD
+* pin BULK,VSS
+.SUBCKT RINGO 1 2 3 4
+* net 1 FB
+* net 2 OSC
+* net 3 VDD
+* net 4 BULK,VSS
+* cell instance $1 r0 *1 19.42,-0.8
+X$1 4 3 4 1 6 2 3 INV2PAIR
+* cell instance $2 r0 *1 -1.7,-0.8
+X$2 4 3 4 1 1 5 3 INV2PAIR
+* cell instance $3 r0 *1 3.58,-0.8
+X$3 4 3 4 101 5 8 3 INV2PAIR
+* cell instance $4 r0 *1 8.86,-0.8
+X$4 4 3 4 102 8 7 3 INV2PAIR
+* cell instance $5 r0 *1 14.14,-0.8
+X$5 4 3 4 103 7 6 3 INV2PAIR
+.ENDS RINGO
+
+* cell INV2PAIR
+* pin BULK
+* pin 
+* pin 
+* pin 
+* pin 
+* pin 
+* pin 
+.SUBCKT INV2PAIR 1 2 3 4 5 6 7
+* net 1 BULK
+* cell instance $2 r0 *1 4.34,0.8
+X$2 7 4 6 3 2 1 INV2
+.ENDS INV2PAIR
+
+* cell INV2PAIRX
+* pin BULK
+* pin 
+* pin 
+* pin 
+* pin 
+* pin 
+* pin 
+.SUBCKT INV2PAIRX 1 2 3 4 5 6 7
+* net 1 BULK
+* cell instance $2 r0 *1 4.34,0.8
+X$2 7 4 6 3 2 1 INV2
+.ENDS INV2PAIR
+
+* cell INV2
+* pin 
+* pin IN
+* pin OUT
+* pin VSS
+* pin VDD
+* pin BULK
+.SUBCKT INV2 1 2 3 4 5 6
+* net 2 IN
+* net 3 OUT
+* net 4 VSS
+* net 5 VDD
+* net 6 BULK
+* device instance $1 -0.4,3.2 PMOS
+M$1 3 2 5 1 PMOS L=0.25U W=3.5U AS=1.4P AD=1.4P PS=6.85U PD=6.85U
+* device instance $3 -0.4,-0.4 NMOS
+M$3 3 2 4 6 NMOS L=0.25U W=3.5U AS=1.4P AD=1.4P PS=6.85U PD=6.85U
+.ENDS INV2

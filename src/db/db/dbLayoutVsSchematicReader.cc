@@ -162,18 +162,24 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
 
       Brace br (this);
 
-      std::string name_a, name_b;
-      read_word_or_quoted (name_a);
-      read_word_or_quoted (name_b);
+      std::pair<std::string, bool> non_a, non_b;
+      non_a = read_non_string ();
+      non_b = read_non_string ();
 
-      const db::Circuit *circuit_a = xref->netlist_a ()->circuit_by_name (name_a);
-      if (! circuit_a) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid circuit name: ")) + name_a);
+      const db::Circuit *circuit_a = 0;
+      if (non_a.second) {
+        circuit_a = xref->netlist_a ()->circuit_by_name (non_a.first);
+        if (! circuit_a) {
+          throw tl::Exception (tl::to_string (tr ("Not a valid circuit name: ")) + non_a.first);
+        }
       }
 
-      const db::Circuit *circuit_b = xref->netlist_b ()->circuit_by_name (name_b);
-      if (! circuit_b) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid circuit name: ")) + name_b);
+      const db::Circuit *circuit_b = 0;
+      if (non_b.second) {
+        circuit_b = xref->netlist_b ()->circuit_by_name (non_b.first);
+        if (! circuit_b) {
+          throw tl::Exception (tl::to_string (tr ("Not a valid circuit name: ")) + non_b.first);
+        }
       }
 
       xref->gen_begin_circuit (circuit_a, circuit_b);

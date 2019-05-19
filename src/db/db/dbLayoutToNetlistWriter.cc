@@ -226,6 +226,8 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
       const db::Net *net = circuit.net_for_pin (p->id ());
       if (net) {
         *mp_stream << indent << indent1 << Keys::pin_key << "(" << tl::to_word_or_quoted_string (p->expanded_name ()) << " " << (*net2id) [net] << ")" << endl;
+      } else {
+        *mp_stream << indent << indent1 << Keys::pin_key << "(" << tl::to_word_or_quoted_string (p->expanded_name ()) << ")" << endl;
       }
     }
   }
@@ -530,6 +532,8 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db
     const db::Net *net = device.net_for_terminal (i->id ());
     if (net) {
       *mp_stream << indent << indent2 << Keys::terminal_key << "(" << tl::to_word_or_quoted_string (i->name ()) << " " << net2id [net] << ")" << endl;
+    } else {
+      *mp_stream << indent << indent2 << Keys::terminal_key << "(" << tl::to_word_or_quoted_string (i->name ()) << ")" << endl;
     }
   }
 

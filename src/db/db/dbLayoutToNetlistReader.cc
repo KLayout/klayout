@@ -495,19 +495,25 @@ void
 LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutToNetlist * /*l2n*/, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
 {
   Brace br (this);
+
   std::string name;
   read_word_or_quoted (name);
-  unsigned int netid = (unsigned int) read_int ();
-  br.done ();
-
   const db::Pin &pin = circuit->add_pin (name);
 
-  db::Net *net = id2net [netid];
-  if (!net) {
-    throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
+  if (br) {
+
+    unsigned int netid = (unsigned int) read_int ();
+    db::Net *net = id2net [netid];
+    if (!net) {
+      throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
+    }
+
+    circuit->connect_pin (pin.id (), net);
+
   }
 
-  circuit->connect_pin (pin.id (), net);
+  br.done ();
+
 }
 
 size_t
@@ -616,18 +622,23 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       Brace br2 (this);
       std::string tname;
       read_word_or_quoted (tname);
-      unsigned int netid = (unsigned int) read_int ();
-      br2.done ();
 
       size_t tid = terminal_id (dm.second, tname);
       max_tid = std::max (max_tid, tid + 1);
 
-      db::Net *net = id2net [netid];
-      if (!net) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
+      if (br2) {
+
+        unsigned int netid = (unsigned int) read_int ();
+        db::Net *net = id2net [netid];
+        if (!net) {
+          throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
+        }
+
+        device->connect_terminal (tid, net);
+
       }
 
-      device->connect_terminal (tid, net);
+      br2.done ();
 
     } else if (test (skeys::param_key) || test (lkeys::param_key)) {
 

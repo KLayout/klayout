@@ -91,11 +91,7 @@ void std_writer_impl<Keys>::write (const db::LayoutVsSchematic *lvs)
 {
   const int version = 0;
 
-  stream () << "#%lvs-klayout" << endl;
-
-  if (! Keys::is_short ()) {
-    stream () << endl << "# General section" << endl << endl;
-  }
+  stream () << "#%lvsdb-klayout" << endl;
 
   if (version > 0) {
     stream () << Keys::version_key << "(" << version << ")" << endl;
@@ -126,10 +122,6 @@ void std_writer_impl<Keys>::write (const db::LayoutVsSchematic *lvs)
     stream () << Keys::xref_key << "(" << endl;
     write (lvs->cross_ref ());
     stream () << ")" << endl;
-  }
-
-  if (! Keys::is_short ()) {
-    stream () << endl;
   }
 }
 
@@ -191,7 +183,7 @@ void std_writer_impl<Keys>::write (const db::NetlistCrossReference *xref)
     tl_assert (pcd != 0);
 
     stream () << indent1 << Keys::circuit_key << "(" << name_to_s (c->first) << " " << name_to_s (c->second) << status_to_s (pcd->status) << endl;
-    stream () << indent2 << Keys::xref_key << endl;
+    stream () << indent2 << Keys::xref_key << "(" << endl;
 
     for (db::NetlistCrossReference::PerCircuitData::net_pairs_const_iterator n = pcd->nets.begin (); n != pcd->nets.end (); ++n) {
       stream () << indent1 << indent2 << Keys::net_key << "(" << net_id_to_s (n->pair.first, m_net2id_per_circuit_a [c->first]) << " " << net_id_to_s (n->pair.second, m_net2id_per_circuit_b [c->second]) << status_to_s (n->status) << ")" << endl;

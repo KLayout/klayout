@@ -60,7 +60,7 @@ typedef l2n_std_format::keys<true> skeys;
 typedef l2n_std_format::keys<false> lkeys;
 
 LayoutToNetlistStandardReader::LayoutToNetlistStandardReader (tl::InputStream &stream)
-  : m_stream (stream), m_path (stream.absolute_path ())
+  : m_stream (stream), m_path (stream.absolute_path ()), m_dbu (0.0)
 {
   skip ();
 }
@@ -147,6 +147,7 @@ static db::Region &layer_by_name (db::LayoutToNetlist *l2n, const std::string &n
 
 void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, std::map<unsigned int, Net *> > *id2net_per_circuit)
 {
+  m_dbu = 0.001;
   int version = 0;
   std::string description;
 
@@ -182,11 +183,13 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
       read_word_or_quoted (description);
       br.done ();
 
-    } else if (l2n && (test (skeys::unit_key) || test (lkeys::unit_key))) {
+    } else if (test (skeys::unit_key) || test (lkeys::unit_key)) {
 
       Brace br (this);
-      double dbu = read_double ();
-      l2n->internal_layout ()->dbu (dbu);
+      m_dbu = read_double ();
+      if (l2n) {
+        l2n->internal_layout ()->dbu (m_dbu);
+      }
       br.done ();
 
     } else if (l2n && (test (skeys::top_key) || test (lkeys::top_key))) {
@@ -557,8 +560,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
   circuit->add_device (device);
 
   db::Coord x = 0, y = 0;
-  double dbu = l2n->internal_layout ()->dbu ();
-  db::VCplxTrans dbu_inv (1.0 / dbu);
+  db::VCplxTrans dbu_inv (1.0 / m_dbu);
 
   size_t max_tid = 0;
 
@@ -586,7 +588,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
       db::DeviceAbstract *da = device_model_by_name (netlist, n).first;
 
-      device->other_abstracts ().push_back (db::DeviceAbstractRef (da, db::DVector (dbu * dx, dbu * dy)));
+      device->other_abstracts ().push_back (db::DeviceAbstractRef (da, db::DVector (m_dbu * dx, m_dbu * dy)));
 
     } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
 
@@ -659,7 +661,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
   }
 
-  device->set_position (db::DPoint (dbu * x, dbu * y));
+  device->set_position (db::DPoint (m_dbu * x, m_dbu * y));
 
   br.done ();
 
@@ -824,8 +826,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
 
   if (l2n) {
 
-    double dbu = l2n->internal_layout ()->dbu ();
-    subcircuit->set_trans (db::DCplxTrans (mag, angle, mirror, db::DVector (dbu * x, dbu * y)));
+    subcircuit->set_trans (db::DCplxTrans (mag, angle, mirror, db::DVector (m_dbu * x, m_dbu * y)));
 
     db::CellInstArray inst (db::CellInst (circuit_ref->cell_index ()), db::ICplxTrans (mag, angle, mirror, db::Vector (x, y)));
     db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());

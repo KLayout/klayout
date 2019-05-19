@@ -32,6 +32,7 @@ namespace db
 {
 
 static const char *allowed_name_chars = "_.:,!+$/&\\#[]";
+static const char *not_connect_prefix = "nc_";
 
 // --------------------------------------------------------------------------------
 
@@ -196,7 +197,7 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev) co
 // --------------------------------------------------------------------------------
 
 NetlistSpiceWriter::NetlistSpiceWriter (NetlistSpiceWriterDelegate *delegate)
-  : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_use_net_names (false)
+  : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_use_net_names (false), m_next_net_id (0)
 {
   static NetlistSpiceWriterDelegate std_delegate;
   if (! delegate) {
@@ -244,7 +245,7 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
 
     if (! net) {
 
-      return "0";
+      return std::string (not_connect_prefix) + tl::to_string (++m_next_net_id);
 
     } else {
 
@@ -276,8 +277,7 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
 
     std::map<const db::Net *, size_t>::const_iterator n = m_net_to_spice_id.find (net);
     if (! net || n == m_net_to_spice_id.end ()) {
-      //  TODO: this should assert or similar
-      return "0";
+      return tl::to_string (++m_next_net_id);
     } else {
       return tl::to_string (n->second);
     }
@@ -364,9 +364,27 @@ void NetlistSpiceWriter::do_write (const std::string &description)
 
     //  assign internal node numbers to the nets
     m_net_to_spice_id.clear ();
-    size_t nid = 0;
-    for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
-      m_net_to_spice_id.insert (std::make_pair (n.operator-> (), ++nid));
+    m_next_net_id = 0;
+    if (! m_use_net_names) {
+
+      for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
+        m_net_to_spice_id.insert (std::make_pair (n.operator-> (), ++m_next_net_id));
+      }
+
+    } else {
+
+      //  determine the next net id for non-connected nets such that there is no clash with
+      //  existing names
+      size_t prefix_len = strlen (not_connect_prefix);
+
+      for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
+        if (n->name ().find (not_connect_prefix) == 0 && n->name ().size () > prefix_len) {
+          size_t num = 0;
+          tl::from_string (n->name ().c_str () + prefix_len, num);
+          m_next_net_id = std::max (m_next_net_id, num);
+        }
+      }
+
     }
 
     write_circuit_header (circuit);

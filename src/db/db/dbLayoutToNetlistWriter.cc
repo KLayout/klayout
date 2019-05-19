@@ -90,10 +90,6 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
     *mp_stream << "#%l2n-klayout" << endl;
   }
 
-  if (! Keys::is_short ()) {
-    *mp_stream << endl << indent << "# General section" << endl << endl;
-  }
-
   if (version > 0) {
     *mp_stream << indent << Keys::version_key << "(" << version << ")" << endl;
   }
@@ -116,9 +112,9 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
       *mp_stream << indent << Keys::layer_key << "(" << name_for_layer (l2n, *l);
       db::LayerProperties lp = ly->get_properties (*l);
       if (! lp.is_null ()) {
-        *mp_stream << indent << " " << tl::to_word_or_quoted_string (lp.to_string ());
+        *mp_stream << " " << tl::to_word_or_quoted_string (lp.to_string ());
       }
-      *mp_stream << indent << ")" << endl;
+      *mp_stream << ")" << endl;
     }
 
     if (! Keys::is_short ()) {
@@ -131,9 +127,9 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
       if (cb != ce) {
         *mp_stream << indent << Keys::connect_key << "(" << name_for_layer (l2n, *l);
         for (db::Connectivity::layer_iterator c = l2n->connectivity ().begin_connected (*l); c != ce; ++c) {
-          *mp_stream << indent << " " << name_for_layer (l2n, *c);
+          *mp_stream << " " << name_for_layer (l2n, *c);
         }
-        *mp_stream << indent << ")" << endl;
+        *mp_stream << ")" << endl;
       }
 
     }
@@ -146,15 +142,15 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
       if (gb != ge) {
         if (! any) {
           if (! Keys::is_short ()) {
-            *mp_stream << endl << "# Global nets and connectivity" << endl;
+            *mp_stream << endl << indent << "# Global nets and connectivity" << endl;
           }
           any = true;
         }
         *mp_stream << indent << Keys::global_key << "(" << name_for_layer (l2n, *l);
         for (db::Connectivity::global_nets_iterator g = gb; g != ge; ++g) {
-          *mp_stream << indent << " " << tl::to_word_or_quoted_string (l2n->connectivity ().global_net_name (*g));
+          *mp_stream << " " << tl::to_word_or_quoted_string (l2n->connectivity ().global_net_name (*g));
         }
-        *mp_stream << indent << ")" << endl;
+        *mp_stream << ")" << endl;
       }
 
     }
@@ -209,9 +205,13 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
     net2id->insert (std::make_pair (n.operator-> (), ++id));
   }
 
-  if (l2n && circuit.begin_nets () != circuit.end_nets ()) {
+  if (circuit.begin_nets () != circuit.end_nets ()) {
     if (! Keys::is_short ()) {
-      *mp_stream << endl << indent << indent1 << "# Nets with their geometries" << endl;
+      if (l2n) {
+        *mp_stream << endl << indent << indent1 << "# Nets with their geometries" << endl;
+      } else {
+        *mp_stream << endl << indent << indent1 << "# Nets" << endl;
+      }
     }
     for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
       write (netlist, l2n, *n, (*net2id) [n.operator-> ()], indent);
@@ -340,41 +340,45 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
 
   bool any = false;
 
-  reset_geometry_ref ();
+  if (l2n) {
 
-  for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+    reset_geometry_ref ();
 
-    db::cell_index_type cci = circuit->cell_index ();
-    db::cell_index_type prev_ci = cci;
+    for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
 
-    for (db::recursive_cluster_shape_iterator<db::PolygonRef> si (clusters, *l, cci, net.cluster_id ()); ! si.at_end (); ) {
+      db::cell_index_type cci = circuit->cell_index ();
+      db::cell_index_type prev_ci = cci;
 
-      //  NOTE: we don't recursive into circuits which will later be output. However, as circuits may
-      //  vanish in "purge" but the clusters will still be there we need to recursive into clusters from
-      //  unknown cells.
-      db::cell_index_type ci = si.cell_index ();
-      if (ci != prev_ci && ci != cci && (netlist->circuit_by_cell_index (ci) || netlist->device_abstract_by_cell_index (ci))) {
+      for (db::recursive_cluster_shape_iterator<db::PolygonRef> si (clusters, *l, cci, net.cluster_id ()); ! si.at_end (); ) {
 
-        si.skip_cell ();
+        //  NOTE: we don't recursive into circuits which will later be output. However, as circuits may
+        //  vanish in "purge" but the clusters will still be there we need to recursive into clusters from
+        //  unknown cells.
+        db::cell_index_type ci = si.cell_index ();
+        if (ci != prev_ci && ci != cci && (netlist->circuit_by_cell_index (ci) || netlist->device_abstract_by_cell_index (ci))) {
 
-      } else {
+          si.skip_cell ();
 
-        if (! any) {
-          *mp_stream << indent << indent1 << Keys::net_key << "(" << id;
-          if (! net.name ().empty ()) {
-            *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (net.name ()) << ")";
+        } else {
+
+          if (! any) {
+            *mp_stream << indent << indent1 << Keys::net_key << "(" << id;
+            if (! net.name ().empty ()) {
+              *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (net.name ()) << ")";
+            }
+            *mp_stream << endl;
+            any = true;
           }
+
+          *mp_stream << indent << indent2;
+          write (si.operator-> (), si.trans (), name_for_layer (l2n, *l), true);
           *mp_stream << endl;
-          any = true;
+
+          prev_ci = ci;
+
+          ++si;
+
         }
-
-        *mp_stream << indent << indent2;
-        write (si.operator-> (), si.trans (), name_for_layer (l2n, *l), true);
-        *mp_stream << endl;
-
-        prev_ci = ci;
-
-        ++si;
 
       }
 

@@ -47,6 +47,21 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
   return lid;
 }
 
+static void compare_lvsdbs (tl::TestBase *_this, const std::string &path, const std::string &au_path)
+{
+  tl::InputStream is (path);
+  tl::InputStream is_au (au_path);
+
+  std::string netlist = is.read_all ();
+  std::string netlist_au = is_au.read_all ();
+
+  if (netlist != netlist_au) {
+    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
+                               tl::absolute_file_path (path),
+                               tl::absolute_file_path (au_path)));
+  }
+}
+
 TEST(1_BasicFlow)
 {
   db::Layout ly;
@@ -222,10 +237,23 @@ TEST(1_BasicFlow)
     lvs.compare_netlists (&comparer);
   }
 
-  //  produce the output
-  {
-    // @@@
-    lvs.save ("lvs_test_1.lvsdb", false);
-  }
+  //  save and compare
+
+  std::string path = tmp_file ("tmp_lvstest1.lvsdb");
+  lvs.save (path, false);
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test1_au.lvsdb");
+
+  compare_lvsdbs (_this, path, au_path);
+
+  //  load, save and compare
+
+  db::LayoutVsSchematic lvs2;
+
+  std::string path2 = tmp_file ("tmp_lvstest1b.lvsdb");
+  lvs2.load (path);
+  lvs2.save (path2, false);
+
+  compare_lvsdbs (_this, path2, au_path);
 }
 

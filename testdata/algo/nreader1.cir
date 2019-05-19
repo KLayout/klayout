@@ -1,7 +1,7 @@
 * VDIV netlist before simplification
 
 * cell TOP
-.SUBCKT TOP
+.SUBCKT TOP 1 2 4 7
 * net 1 OUT
 * net 2 GND
 * net 4 IN

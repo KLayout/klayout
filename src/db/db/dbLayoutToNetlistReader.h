@@ -95,8 +95,16 @@ protected:
   void read_netlist (Netlist *netlist, db::LayoutToNetlist *l2n, bool nested = false, std::map<const db::Circuit *, std::map<unsigned int, Net *> > *id2net_per_circuit = 0);
   static size_t terminal_id (const db::DeviceClass *device_class, const std::string &tname);
   static std::pair<db::DeviceAbstract *, const db::DeviceClass *> device_model_by_name (db::Netlist *netlist, const std::string &dmname);
-  tl::TextInputStream &stream ();
-  const std::string &path () const;
+
+  const std::string &path () const
+  {
+    return m_path;
+  }
+
+  tl::TextInputStream &stream ()
+  {
+    return m_stream;
+  }
 
   struct Connections
   {
@@ -129,6 +137,7 @@ private:
   tl::TextInputStream m_stream;
   std::string m_path;
   std::string m_line;
+  double m_dbu;
   tl::Extractor m_ex;
   db::Point m_ref;
 };

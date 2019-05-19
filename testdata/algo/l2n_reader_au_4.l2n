@@ -1,7 +1,4 @@
 #%l2n-klayout
-
-# General section
-
 top(RINGO)
 unit(0.001)
 

@@ -335,10 +335,8 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
       dm->set_name (name);
       netlist->add_device_abstract (dm);
 
-      if (l2n) {
-        db::cell_index_type ci = l2n->internal_layout ()->add_cell (name.c_str ());
-        dm->set_cell_index (ci);
-      }
+      db::cell_index_type ci = l2n->internal_layout ()->add_cell (name.c_str ());
+      dm->set_cell_index (ci);
 
       std::string cls;
       read_word_or_quoted (cls);
@@ -522,16 +520,21 @@ LayoutToNetlistStandardReader::terminal_id (const db::DeviceClass *device_class,
   throw tl::Exception (tl::to_string (tr ("Not a valid terminal name: ")) + tname + tl::to_string (tr (" for device class: ")) + device_class->name ());
 }
 
-db::DeviceAbstract *
+std::pair<db::DeviceAbstract *, const db::DeviceClass *>
 LayoutToNetlistStandardReader::device_model_by_name (db::Netlist *netlist, const std::string &dmname)
 {
   for (db::Netlist::device_abstract_iterator i = netlist->begin_device_abstracts (); i != netlist->end_device_abstracts (); ++i) {
     if (i->name () == dmname) {
-      return i.operator-> ();
+      return std::make_pair (i.operator-> (), i->device_class ());
     }
   }
 
-  throw tl::Exception (tl::to_string (tr ("Not a valid device abstract name: ")) + dmname);
+  db::DeviceClass *cls = netlist->device_class_by_name (dmname);
+  if (! cls) {
+    throw tl::Exception (tl::to_string (tr ("Not a valid device abstract name: ")) + dmname);
+  }
+
+  return std::make_pair ((db::DeviceAbstract *) 0, cls);
 }
 
 void
@@ -545,11 +548,11 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
   std::string dmname;
   read_word_or_quoted (dmname);
 
-  db::DeviceAbstract *dm = device_model_by_name (netlist, dmname);
+  std::pair<db::DeviceAbstract *, const db::DeviceClass *> dm = device_model_by_name (netlist, dmname);
 
   db::Device *device = new db::Device ();
-  device->set_device_class (const_cast<db::DeviceClass *> (dm->device_class ()));
-  device->set_device_abstract (dm);
+  device->set_device_class (const_cast<db::DeviceClass *> (dm.second));
+  device->set_device_abstract (dm.first);
   device->set_name (name);
   circuit->add_device (device);
 
@@ -581,7 +584,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
       br2.done ();
 
-      db::DeviceAbstract *da = device_model_by_name (netlist, n);
+      db::DeviceAbstract *da = device_model_by_name (netlist, n).first;
 
       device->other_abstracts ().push_back (db::DeviceAbstractRef (da, db::DVector (dbu * dx, dbu * dy)));
 
@@ -601,8 +604,8 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
         throw tl::Exception (tl::to_string (tr ("Not a valid device component index: ")) + tl::to_string (device_comp_index));
       }
 
-      size_t touter_id = terminal_id (dm->device_class (), touter);
-      size_t tinner_id = terminal_id (dm->device_class (), tinner);
+      size_t touter_id = terminal_id (dm.second, touter);
+      size_t tinner_id = terminal_id (dm.second, tinner);
 
       device->reconnected_terminals () [touter_id].push_back (db::DeviceReconnectedTerminal (size_t (device_comp_index), tinner_id));
 
@@ -614,7 +617,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       unsigned int netid = (unsigned int) read_int ();
       br2.done ();
 
-      size_t tid = terminal_id (dm->device_class (), tname);
+      size_t tid = terminal_id (dm.second, tname);
       max_tid = std::max (max_tid, tid + 1);
 
       db::Net *net = id2net [netid];
@@ -633,7 +636,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       br2.done ();
 
       size_t pid = std::numeric_limits<size_t>::max ();
-      const std::vector<db::DeviceParameterDefinition> &pd = dm->device_class ()->parameter_definitions ();
+      const std::vector<db::DeviceParameterDefinition> &pd = dm.second->parameter_definitions ();
       for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
         if (p->name () == pname) {
           pid = p->id ();
@@ -644,7 +647,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       //  if no parameter with this name exists, create one
       if (pid == std::numeric_limits<size_t>::max ()) {
         //  TODO: this should only happen for generic devices
-        db::DeviceClass *dc = const_cast<db::DeviceClass *> (dm->device_class ());
+        db::DeviceClass *dc = const_cast<db::DeviceClass *> (dm.second);
         pid = dc->add_parameter_definition (db::DeviceParameterDefinition (pname, std::string ())).id ();
       }
 
@@ -660,14 +663,14 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
   br.done ();
 
-  if (l2n) {
+  if (l2n && dm.first) {
 
     db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());
 
     //  make device cell instances
     std::vector<db::CellInstArray> insts;
 
-    db::CellInstArray inst (db::CellInst (dm->cell_index ()), db::Trans (db::Vector (x, y)));
+    db::CellInstArray inst (db::CellInst (dm.first->cell_index ()), db::Trans (db::Vector (x, y)));
     ccell.insert (inst);
     insts.push_back (inst);
 
@@ -695,7 +698,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
         if (tr) {
 
           for (std::vector<db::DeviceReconnectedTerminal>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
-            const db::DeviceAbstract *da = dm;
+            const db::DeviceAbstract *da = dm.first;
             if (i->device_index > 0) {
               da = device->other_abstracts () [i->device_index - 1].device_abstract;
             }
@@ -707,7 +710,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
       } else {
 
-        Connections ref (net->cluster_id (), dm->cluster_id_for_terminal (tid));
+        Connections ref (net->cluster_id (), dm.first->cluster_id_for_terminal (tid));
         connections [insts [0]].push_back (ref);
 
       }

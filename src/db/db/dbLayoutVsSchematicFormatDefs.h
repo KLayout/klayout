@@ -120,6 +120,8 @@ namespace lvs_std_format
   struct DB_PUBLIC keys
     : public l2n_std_format::keys<Short>
   {
+    typedef l2n_std_format::keys<Short> l2n_keys;
+
     static const std::string reference_key;
     static const std::string layout_key;
     static const std::string xref_key;

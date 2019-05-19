@@ -56,17 +56,17 @@ namespace lvs_std_format
 
 template <class Keys>
 class std_writer_impl
-  : public l2n_std_format::std_writer_impl<Keys>
+  : public l2n_std_format::std_writer_impl<typename Keys::l2n_keys>
 {
 public:
-  std_writer_impl (tl::OutputStream &stream);
+  std_writer_impl (tl::OutputStream &stream, double dbu);
 
   void write (const db::LayoutVsSchematic *l2n);
 
 private:
   tl::OutputStream &stream ()
   {
-    return l2n_std_format::std_writer_impl<Keys>::stream ();
+    return l2n_std_format::std_writer_impl<typename Keys::l2n_keys>::stream ();
   }
 
   std::string status_to_s (const db::NetlistCrossReference::Status status);
@@ -80,8 +80,8 @@ static const std::string indent1 (" ");
 static const std::string indent2 ("  ");
 
 template <class Keys>
-std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream)
-  : l2n_std_format::std_writer_impl<Keys> (stream)
+std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream, double dbu)
+  : l2n_std_format::std_writer_impl<typename Keys::l2n_keys> (stream, dbu)
 {
   //  .. nothing yet ..
 }
@@ -101,26 +101,32 @@ void std_writer_impl<Keys>::write (const db::LayoutVsSchematic *lvs)
     stream () << Keys::version_key << "(" << version << ")" << endl;
   }
 
-  if (! Keys::is_short ()) {
-    stream () << endl << "# Layout" << endl;
+  if (lvs->netlist ()) {
+    if (! Keys::is_short ()) {
+      stream () << endl << "# Layout" << endl;
+    }
+    stream () << Keys::layout_key << "(" << endl;
+    l2n_std_format::std_writer_impl<typename Keys::l2n_keys>::write (lvs->netlist (), lvs, true, &m_net2id_per_circuit_a);
+    stream () << ")" << endl;
   }
-  stream () << Keys::layout_key << "(" << endl;
-  l2n_std_format::std_writer_impl<Keys>::write (0, lvs, true, &m_net2id_per_circuit_a);
-  stream () << ")" << endl;
 
-  if (! Keys::is_short ()) {
-    stream () << endl << "# Reference netlist" << endl;
+  if (lvs->reference_netlist ()) {
+    if (! Keys::is_short ()) {
+      stream () << endl << "# Reference netlist" << endl;
+    }
+    stream () << Keys::reference_key << "(" << endl;
+    l2n_std_format::std_writer_impl<typename Keys::l2n_keys>::write (lvs->reference_netlist (), 0, true, &m_net2id_per_circuit_b);
+    stream () << ")" << endl;
   }
-  stream () << Keys::reference_key << "(" << endl;
-  l2n_std_format::std_writer_impl<Keys>::write (lvs->reference_netlist (), 0, true, &m_net2id_per_circuit_b);
-  stream () << ")" << endl;
 
-  if (! Keys::is_short ()) {
-    stream () << endl << "# Cross reference" << endl;
+  if (lvs->cross_ref ()) {
+    if (! Keys::is_short ()) {
+      stream () << endl << "# Cross reference" << endl;
+    }
+    stream () << Keys::xref_key << "(" << endl;
+    write (lvs->cross_ref ());
+    stream () << ")" << endl;
   }
-  stream () << Keys::xref_key << "(" << endl;
-  write (lvs->cross_ref ());
-  stream () << ")" << endl;
 
   if (! Keys::is_short ()) {
     stream () << endl;
@@ -222,11 +228,20 @@ LayoutVsSchematicStandardWriter::LayoutVsSchematicStandardWriter (tl::OutputStre
 
 void LayoutVsSchematicStandardWriter::do_write_lvs (const db::LayoutVsSchematic *lvs)
 {
+  if (! lvs->netlist ()) {
+    throw tl::Exception (tl::to_string (tr ("Can't write LVS DB before the netlist has been created")));
+  }
+  if (! lvs->internal_layout ()) {
+    throw tl::Exception (tl::to_string (tr ("Can't write LVS DB before the layout has been loaded")));
+  }
+
+  double dbu = lvs->internal_layout ()->dbu ();
+
   if (m_short_version) {
-    lvs_std_format::std_writer_impl<lvs_std_format::keys<true> > writer (*mp_stream);
+    lvs_std_format::std_writer_impl<lvs_std_format::keys<true> > writer (*mp_stream, dbu);
     writer.write (lvs);
   } else {
-    lvs_std_format::std_writer_impl<lvs_std_format::keys<false> > writer (*mp_stream);
+    lvs_std_format::std_writer_impl<lvs_std_format::keys<false> > writer (*mp_stream, dbu);
     writer.write (lvs);
   }
 }

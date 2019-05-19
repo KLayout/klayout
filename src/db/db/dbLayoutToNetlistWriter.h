@@ -47,14 +47,14 @@ template <class Keys>
 class std_writer_impl
 {
 public:
-  std_writer_impl (tl::OutputStream &stream);
+  std_writer_impl (tl::OutputStream &stream, double dbu);
 
   void write (const db::LayoutToNetlist *l2n);
 
 protected:
   void write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit);
-  void write (const db::LayoutToNetlist *l2n, const db::Circuit &circuit, const std::string &indent, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit);
-  void write (const db::LayoutToNetlist *l2n, const db::Net &net, unsigned int id, const std::string &indent);
+  void write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, const db::Circuit &circuit, const std::string &indent, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit);
+  void write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, const db::Net &net, unsigned int id, const std::string &indent);
   void write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit, std::map<const Net *, unsigned int> &net2id, const std::string &indent);
   void write (const db::LayoutToNetlist *l2n, const db::Device &device, std::map<const Net *, unsigned int> &net2id, const std::string &indent);
   void write (const db::LayoutToNetlist *l2n, const db::DeviceAbstract &device_abstract, const std::string &indent);
@@ -69,6 +69,7 @@ protected:
 private:
   tl::OutputStream *mp_stream;
   db::Point m_ref;
+  double m_dbu;
 };
 
 }

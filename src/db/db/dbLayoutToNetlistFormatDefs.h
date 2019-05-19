@@ -69,7 +69,7 @@ namespace db
  *                                    A net declaration shall be there also if no geometry
  *                                    is present. The ID is a numerical shortcut for the net.
  *    pin(<name> <net-id>)          - outgoing pin connection [short key: P]
- *    device(<name> <abstract> [combined-device]* [terminal-route]* [device-def])
+ *    device(<name> <abstract-or-class> [combined-device]* [terminal-route]* [device-def])
  *                                  - device with connections [short key: D]
  *    circuit(<name> [subcircuit-def])
  *                                  - subcircuit with connections [short key: X]

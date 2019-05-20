@@ -308,6 +308,16 @@ std::string extension (const std::string &s)
   return tl::join (fnp, ".");
 }
 
+std::string extension_last (const std::string &s)
+{
+  std::vector<std::string> fnp = split_filename (filename (s));
+  if (fnp.size () > 1) {
+    return fnp.back ();
+  } else {
+    return std::string ();
+  }
+}
+
 bool
 is_parent_path (const std::string &parent, const std::string &path)
 {

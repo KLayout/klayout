@@ -391,6 +391,13 @@ TEST (10)
     EXPECT_EQ (tl::extension ("\\hello\\.world.gz"), "gz");
     EXPECT_EQ (tl::extension ("/hello//world/"), "");
 
+    EXPECT_EQ (tl::extension_last ("/hello/world"), "");
+    EXPECT_EQ (tl::extension_last ("/hello/world.tar"), "tar");
+    EXPECT_EQ (tl::extension_last ("/hello/world.tar.gz"), "gz");
+    EXPECT_EQ (tl::extension_last ("\\hello\\.world"), "");
+    EXPECT_EQ (tl::extension_last ("\\hello\\.world.gz"), "gz");
+    EXPECT_EQ (tl::extension_last ("/hello//world/"), "");
+
     EXPECT_EQ (tl::is_absolute ("world"), false);
     EXPECT_EQ (tl::is_absolute ("world/"), false);
     EXPECT_EQ (tl::is_absolute ("hello//world/"), false);

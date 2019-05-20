@@ -157,7 +157,7 @@ TEST (1)
   EXPECT_EQ (model->hasChildren (ringoFbIndex), true);
   EXPECT_EQ (model->rowCount (ringoFbIndex), 2);
 
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoFbIndex), Qt::UserRole).toString ()), "$1|INV2|$1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoFbIndex), Qt::UserRole).toString ()), "INV2|$1");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoFbIndex), Qt::DisplayRole).toString ()), "<a href='int:pin?id=2'>$1</a> - <a href='int:circuit?id=0'>INV2</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, ringoFbIndex), Qt::DisplayRole).toString ()), "<a href='int:subcircuit?id=7'>$1</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, ringoFbIndex), Qt::DisplayRole).toString ()), "<a href='int:pin?id=50'>IN</a> - <a href='int:circuit?id=0'>INV2</a>");
@@ -168,7 +168,7 @@ TEST (1)
   EXPECT_EQ (model->hasChildren (ringoFbSubcircuit2Index), true);
   EXPECT_EQ (model->rowCount (ringoFbSubcircuit2Index), 5);
 
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoFbSubcircuit2Index), Qt::UserRole).toString ()), "$1|$2");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoFbSubcircuit2Index), Qt::UserRole).toString ()), "$2");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoFbSubcircuit2Index), Qt::DisplayRole).toString ()), "<a href='int:pin?id=2'>$1</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, ringoFbSubcircuit2Index), Qt::DisplayRole).toString ()), "");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, ringoFbSubcircuit2Index), Qt::DisplayRole).toString ()), "<a href='int:pin?id=18'>$3</a>");

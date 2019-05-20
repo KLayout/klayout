@@ -233,7 +233,7 @@ layout(
    terminal(D 5)
    terminal(B 1)
   )
-  device(3 D$NMOS
+  device(2 D$NMOS
    device(D$NMOS$1 800 0)
    connect(0 S S)
    connect(1 S D)
@@ -831,23 +831,32 @@ reference(
   net(2 name('2'))
   net(3 name('3'))
   net(4 name('4'))
-  net(5 name('6'))
-  net(6 name('7'))
+  net(5 name('5'))
+  net(6 name('6'))
+  net(7 name('7'))
 
   # Outgoing pins and their connections to nets
   pin(1)
   pin(2)
   pin(3)
   pin(4)
-  pin()
   pin(5)
   pin(6)
+  pin(7)
 
   # Subcircuits and their connections
-  circuit(1 INV2 name($2)
-   pin(0 6)
+  circuit(1 INV2 name($1)
+   pin(0 7)
+   pin(1 5)
+   pin(2 4)
+   pin(3 3)
+   pin(4 2)
+   pin(5 1)
+  )
+  circuit(2 INV2 name($2)
+   pin(0 7)
    pin(1 4)
-   pin(2 5)
+   pin(2 6)
    pin(3 3)
    pin(4 2)
    pin(5 1)
@@ -886,7 +895,6 @@ reference(
    pin(0 4)
    pin(1 3)
    pin(2 4)
-   pin(3 1)
    pin(4 1)
    pin(5 6)
    pin(6 3)
@@ -917,44 +925,10 @@ reference(
   )
 
  )
- circuit(INV2PAIRX
-
-  # Nets
-  net(1 name('1'))
-  net(2 name('2'))
-  net(3 name('3'))
-  net(4 name('4'))
-  net(5 name('6'))
-  net(6 name('7'))
-
-  # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin()
-  pin(5)
-  pin(6)
-
-  # Subcircuits and their connections
-  circuit(1 INV2 name($2)
-   pin(0 6)
-   pin(1 4)
-   pin(2 5)
-   pin(3 3)
-   pin(4 2)
-   pin(5 1)
-  )
-
- )
 )
 
 # Cross reference
 xref(
- circuit(() INV2PAIRX mismatch
-  xref(
-  )
- )
  circuit(INV2 INV2 match
   xref(
    net(1 1 match)
@@ -970,33 +944,48 @@ xref(
    pin(4 4 match)
    pin(3 3 match)
    device(1 1 match)
-   device(3 2 match)
+   device(2 2 match)
   )
  )
- circuit(INV2PAIR INV2PAIR nomatch
+ circuit(INV2PAIR INV2PAIR match
   xref(
-   net(4 () mismatch)
-   net(2 2 mismatch)
-   net(3 3 mismatch)
-   net(5 4 match)
-   net(6 5 match)
-   net(7 6 mismatch)
-   net(1 1 mismatch)
-   pin(() 4 mismatch)
-   pin(3 () mismatch)
+   net(2 2 match)
+   net(3 3 match)
+   net(4 4 match)
+   net(5 5 match)
+   net(6 6 match)
+   net(7 7 match)
+   net(1 1 match)
    pin(1 1 match)
    pin(2 2 match)
-   pin(4 3 match)
+   pin(3 3 match)
+   pin(4 4 match)
    pin(5 5 match)
    pin(6 6 match)
    pin(0 0 match)
-   circuit(() 1 mismatch)
-   circuit(1 () mismatch)
-   circuit(2 () mismatch)
+   circuit(1 1 match)
+   circuit(2 2 match)
   )
  )
- circuit(RINGO RINGO skipped
+ circuit(RINGO RINGO match
   xref(
+   net(5 6 match)
+   net(6 5 match)
+   net(7 8 match)
+   net(8 7 match)
+   net(4 4 match)
+   net(1 1 match)
+   net(2 2 match)
+   net(3 3 match)
+   pin(3 3 match)
+   pin(0 0 match)
+   pin(1 1 match)
+   pin(2 2 match)
+   circuit(1 1 match)
+   circuit(2 2 match)
+   circuit(3 3 match)
+   circuit(4 4 match)
+   circuit(5 5 match)
   )
  )
 )

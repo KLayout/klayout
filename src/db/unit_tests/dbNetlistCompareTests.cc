@@ -489,8 +489,8 @@ TEST(1_SimpleInverter)
     "  terminal $1[S]:$2[S]\n"
     " net VSS:VSS [Match]\n"
     "  terminal $2[S]:$1[D]\n"
-    " device $1:$2 [Match]\n"
     " device $2:$1 [Match]\n"
+    " device $1:$2 [Match]\n"
   );
   EXPECT_EQ (good, true);
 }
@@ -614,9 +614,9 @@ TEST(1_SimpleInverterSkippedDevices)
     " net VSS:VSS [Match]\n"
     "  terminal $3[S]:$1[D]\n"
     " device (null):$3 [Mismatch]\n"
-    " device $1:$4 [Match]\n"
-    " device $2:$2 [MatchWithWarning]\n"
     " device $3:$1 [Match]\n"
+    " device $2:$2 [MatchWithWarning]\n"
+    " device $1:$4 [Match]\n"
   );
   EXPECT_EQ (good, false);
 
@@ -671,8 +671,8 @@ TEST(1_SimpleInverterSkippedDevices)
     "  terminal $1[S]:$4[S]\n"
     " net VSS:VSS [Match]\n"
     "  terminal $3[S]:$1[D]\n"
-    " device $1:$4 [Match]\n"
     " device $3:$1 [Match]\n"
+    " device $1:$4 [Match]\n"
   );
   EXPECT_EQ (good, true);
 }
@@ -1687,8 +1687,8 @@ TEST(11_MismatchingSubcircuits)
     " net VSS:VSS [Match]\n"
     "  subcircuit_pin $1[$3]:$2[$2]\n"
     "  subcircuit_pin $2[$3]:$1[$2]\n"
-    " subcircuit $1:$2 [Match]\n"
     " subcircuit $2:$1 [Match]\n"
+    " subcircuit $1:$2 [Match]\n"
   );
   EXPECT_EQ (good, false);
 }

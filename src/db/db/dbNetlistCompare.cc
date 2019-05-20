@@ -1801,14 +1801,10 @@ std::vector<size_t> collect_pins_with_empty_nets (const db::Circuit *c, CircuitP
 {
   std::vector<size_t> pins;
 
-  for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-    const db::Net *net = n.operator-> ();
-    if (net->pin_count () > 0 && net->terminal_count () == 0 && net->subcircuit_pin_count () == 0) {
-      for (db::Net::const_pin_iterator p = net->begin_pins (); p != net->end_pins (); ++p) {
-        if (! circuit_pin_mapper->is_mapped (c, p->pin_id ())) {
-          pins.push_back (p->pin_id ());
-        }
-      }
+  for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p) {
+    const db::Net *net = c->net_for_pin (p->id ());
+    if ((! net || net->is_floating ()) && ! circuit_pin_mapper->is_mapped (c, p->id ())) {
+      pins.push_back (p->id ());
     }
   }
 
@@ -2033,13 +2029,18 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   if (c1->pin_count () > 0 && c2->pin_count () > 0) {
 
+    std::vector<const db::Pin *> floating_pins;
     std::multimap<size_t, const db::Pin *> net2pin;
     for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
       const db::Net *net = c2->net_for_pin (p->id ());
       if (net) {
         net2pin.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
+      } else {
+        floating_pins.push_back (p.operator-> ());
       }
     }
+
+    std::vector<const db::Pin *>::iterator next_float = floating_pins.begin ();
 
     CircuitMapper &c12_pin_mapping = c12_circuit_and_pin_mapping [c1];
     c12_pin_mapping.set_other (c2);
@@ -2052,18 +2053,47 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       const db::Net *net = c1->net_for_pin (p->id ());
       if (! net) {
+
+        if (next_float != floating_pins.end ()) {
+
+          //  assign a floating pin
+          if (mp_logger) {
+            mp_logger->match_pins (p.operator-> (), *next_float);
+          }
+          c12_pin_mapping.map_pin (p->id (), (*next_float)->id ());
+          c22_pin_mapping.map_pin ((*next_float)->id (), p->id ());
+
+          ++next_float;
+
+        } else {
+
+          //  otherwise this is an error
+          if (mp_logger) {
+            mp_logger->pin_mismatch (p.operator-> (), 0);
+          }
+
+          pin_mismatch = true;
+          good = false;
+
+        }
+
         continue;
+
       }
 
       const db::NetGraphNode &n = *(g1.begin () + g1.node_index_for_net (net));
 
       if (! n.has_other ()) {
+
         if (mp_logger) {
           mp_logger->pin_mismatch (p.operator-> (), 0);
         }
+
         pin_mismatch = true;
         good = false;
+
         continue;
+
       }
 
       std::multimap<size_t, const db::Pin *>::iterator np = net2pin.find (n.other_net_index ());
@@ -2102,6 +2132,15 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       }
       pin_mismatch = true;
       good = false;
+    }
+
+    while (next_float != floating_pins.end ()) {
+      if (mp_logger) {
+        mp_logger->pin_mismatch (0, *next_float);
+      }
+      pin_mismatch = true;
+      good = false;
+      ++next_float;
     }
 
   } else {

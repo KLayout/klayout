@@ -145,7 +145,7 @@ static db::Region &layer_by_name (db::LayoutToNetlist *l2n, const std::string &n
   return *l;
 }
 
-void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, std::map<unsigned int, Net *> > *id2net_per_circuit)
+void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, ObjectMap> *map_per_circuit)
 {
   m_dbu = 0.001;
   int version = 0;
@@ -287,22 +287,22 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
       }
 
       std::map<db::CellInstArray, std::list<Connections> > connections;
-      std::map<unsigned int, Net *> id2net_local;
-      std::map<unsigned int, Net *> *id2net = &id2net_local;
-      if (id2net_per_circuit) {
-        id2net = &(*id2net_per_circuit)[circuit];
+      ObjectMap map_local;
+      ObjectMap *map = &map_local;
+      if (map_per_circuit) {
+        map = &(*map_per_circuit)[circuit];
       }
 
       while (br) {
 
         if (test (skeys::net_key) || test (lkeys::net_key)) {
-          read_net (netlist, l2n, circuit, *id2net);
+          read_net (netlist, l2n, circuit, *map);
         } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
-          read_pin (netlist, l2n, circuit, *id2net);
+          read_pin (netlist, l2n, circuit, *map);
         } else if (test (skeys::device_key) || test (lkeys::device_key)) {
-          read_device (netlist, l2n, circuit, *id2net, connections);
+          read_device (netlist, l2n, circuit, *map, connections);
         } else if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
-          read_subcircuit (netlist, l2n, circuit, *id2net, connections);
+          read_subcircuit (netlist, l2n, circuit, *map, connections);
         } else {
           throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (net, pin, device or circuit expected)")));
         }
@@ -458,7 +458,7 @@ LayoutToNetlistStandardReader::read_geometries (Brace &br, db::LayoutToNetlist *
 }
 
 void
-LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
+LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map)
 {
   Brace br (this);
 
@@ -475,7 +475,7 @@ LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutTo
   net->set_name (name);
   circuit->add_net (net);
 
-  id2net.insert (std::make_pair (id, net));
+  map.id2net.insert (std::make_pair (id, net));
 
   if (l2n) {
 
@@ -492,28 +492,47 @@ LayoutToNetlistStandardReader::read_net (db::Netlist * /*netlist*/, db::LayoutTo
 }
 
 void
-LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutToNetlist * /*l2n*/, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net)
+LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutToNetlist * /*l2n*/, db::Circuit *circuit, ObjectMap &map)
 {
   Brace br (this);
 
   std::string name;
-  read_word_or_quoted (name);
-  const db::Pin &pin = circuit->add_pin (name);
+  db::Net *net = 0;
 
-  if (br) {
+  while (br) {
 
-    unsigned int netid = (unsigned int) read_int ();
-    db::Net *net = id2net [netid];
-    if (!net) {
-      throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
+    if (test (skeys::name_key) || test (lkeys::name_key)) {
+
+      if (!name.empty ()) {
+        throw tl::Exception (tl::to_string (tr ("Duplicate pin name")));
+      }
+
+      Brace br_name (this);
+      read_word_or_quoted (name);
+      br_name.done ();
+
+    } else {
+
+      if (net) {
+        throw tl::Exception (tl::to_string (tr ("Duplicate net ID")));
+      }
+
+      unsigned int netid = (unsigned int) read_int ();
+      net = map.id2net [netid];
+      if (!net) {
+        throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
+      }
+
     }
-
-    circuit->connect_pin (pin.id (), net);
 
   }
 
-  br.done ();
+  const db::Pin &pin = circuit->add_pin (name);
+  if (net) {
+    circuit->connect_pin (pin.id (), net);
+  }
 
+  br.done ();
 }
 
 size_t
@@ -547,23 +566,22 @@ LayoutToNetlistStandardReader::device_model_by_name (db::Netlist *netlist, const
 }
 
 void
-LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections)
+LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections)
 {
   Brace br (this);
 
+  size_t id = size_t (read_int ());
+
   std::string name;
-  read_word_or_quoted (name);
 
   std::string dmname;
   read_word_or_quoted (dmname);
 
   std::pair<db::DeviceAbstract *, const db::DeviceClass *> dm = device_model_by_name (netlist, dmname);
 
-  db::Device *device = new db::Device ();
+  std::auto_ptr<db::Device> device (new db::Device ());
   device->set_device_class (const_cast<db::DeviceClass *> (dm.second));
   device->set_device_abstract (dm.first);
-  device->set_name (name);
-  circuit->add_device (device);
 
   db::Coord x = 0, y = 0;
   db::VCplxTrans dbu_inv (1.0 / m_dbu);
@@ -572,7 +590,13 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
   while (br) {
 
-    if (test (skeys::location_key) || test (lkeys::location_key)) {
+    if (test (skeys::name_key) || test (lkeys::name_key)) {
+
+      Brace br_name (this);
+      read_word_or_quoted (name);
+      br_name.done ();
+
+    } else if (test (skeys::location_key) || test (lkeys::location_key)) {
 
       Brace br2 (this);
       x = read_coord ();
@@ -629,7 +653,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       if (br2) {
 
         unsigned int netid = (unsigned int) read_int ();
-        db::Net *net = id2net [netid];
+        db::Net *net = map.id2net [netid];
         if (!net) {
           throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
         }
@@ -672,9 +696,14 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
   }
 
-  device->set_position (db::DPoint (m_dbu * x, m_dbu * y));
-
   br.done ();
+
+  if (id > 0) {
+    map.id2device.insert (std::make_pair (id, device.get ()));
+  }
+
+  device->set_position (db::DPoint (m_dbu * x, m_dbu * y));
+  device->set_name (name);
 
   if (l2n && dm.first) {
 
@@ -731,17 +760,20 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
     }
 
   }
+
+  circuit->add_device (device.release ());
 }
 
 void
-LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections)
+LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections)
 {
   Brace br (this);
 
   std::list<Connections> refs;
 
+  size_t id = size_t (read_int ());
+
   std::string name;
-  read_word_or_quoted (name);
 
   std::string xname;
   read_word_or_quoted (xname);
@@ -751,21 +783,24 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
     throw tl::Exception (tl::to_string (tr ("Not a valid device circuit name: ")) + xname);
   }
 
-  db::SubCircuit *subcircuit = new db::SubCircuit (circuit_ref);
-  subcircuit->set_name (name);
-  circuit->add_subcircuit (subcircuit);
+  std::auto_ptr<db::SubCircuit> subcircuit (new db::SubCircuit (circuit_ref));
 
   db::Coord x = 0, y = 0;
   bool mirror = false;
   double angle = 0;
   double mag = 1.0;
 
-  db::InstElement ie;
   bool inst_made = false;
 
   while (br) {
 
-    if (test (skeys::location_key) || test (lkeys::location_key)) {
+    if (test (skeys::name_key) || test (lkeys::name_key)) {
+
+      Brace br_name (this);
+      read_word_or_quoted (name);
+      br_name.done ();
+
+    } else if (test (skeys::location_key) || test (lkeys::location_key)) {
 
       Brace br2 (this);
       x = read_coord ();
@@ -806,17 +841,18 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
     } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
 
       Brace br2 (this);
-      std::string pname;
-      read_word_or_quoted (pname);
+
+      size_t pin_id = size_t (read_int ());
+
       unsigned int netid = (unsigned int) read_int ();
       br2.done ();
 
-      const db::Pin *sc_pin = circuit_ref->pin_by_name (pname);
+      const db::Pin *sc_pin = circuit_ref->pin_by_id (pin_id);
       if (! sc_pin) {
-        throw tl::Exception (tl::to_string (tr ("Not a valid pin name: ")) + pname + tl::to_string (tr (" for circuit: ")) + circuit_ref->name ());
+        throw tl::Exception (tl::to_string (tr ("Not a valid pin ID: ")) + tl::to_string (pin_id) + tl::to_string (tr (" for circuit: ")) + circuit_ref->name ());
       }
 
-      db::Net *net = id2net [netid];
+      db::Net *net = map.id2net [netid];
       if (!net) {
         throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
       }
@@ -835,6 +871,12 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
 
   br.done ();
 
+  if (id > 0) {
+    map.id2subcircuit.insert (std::make_pair (id, subcircuit.get ()));
+  }
+
+  subcircuit->set_name (name);
+
   if (l2n) {
 
     subcircuit->set_trans (db::DCplxTrans (mag, angle, mirror, db::DVector (m_dbu * x, m_dbu * y)));
@@ -846,6 +888,8 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
     connections [inst] = refs;
 
   }
+
+  circuit->add_subcircuit (subcircuit.release ());
 }
 
 void

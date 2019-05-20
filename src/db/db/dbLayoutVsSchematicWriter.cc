@@ -136,10 +136,10 @@ std::string name_to_s (const Obj *obj)
 }
 
 template <class Obj>
-std::string expanded_name_to_s (const Obj *obj)
+std::string ion_to_s (const Obj *obj)
 {
   if (obj) {
-    return tl::to_word_or_quoted_string (obj->expanded_name ());
+    return tl::to_string (obj->id ());
   } else {
     return "()";
   }
@@ -190,15 +190,15 @@ void std_writer_impl<Keys>::write (const db::NetlistCrossReference *xref)
     }
 
     for (db::NetlistCrossReference::PerCircuitData::pin_pairs_const_iterator n = pcd->pins.begin (); n != pcd->pins.end (); ++n) {
-      stream () << indent1 << indent2 << Keys::pin_key << "(" << expanded_name_to_s (n->pair.first) << " " << expanded_name_to_s (n->pair.second) << status_to_s (n->status) << ")" << endl;
+      stream () << indent1 << indent2 << Keys::pin_key << "(" << ion_to_s (n->pair.first) << " " << ion_to_s (n->pair.second) << status_to_s (n->status) << ")" << endl;
     }
 
     for (db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator n = pcd->devices.begin (); n != pcd->devices.end (); ++n) {
-      stream () << indent1 << indent2 << Keys::device_key << "(" << expanded_name_to_s (n->pair.first) << " " << expanded_name_to_s (n->pair.second) << status_to_s (n->status) << ")" << endl;
+      stream () << indent1 << indent2 << Keys::device_key << "(" << ion_to_s (n->pair.first) << " " << ion_to_s (n->pair.second) << status_to_s (n->status) << ")" << endl;
     }
 
     for (db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator n = pcd->subcircuits.begin (); n != pcd->subcircuits.end (); ++n) {
-      stream () << indent1 << indent2 << Keys::circuit_key << "(" << expanded_name_to_s (n->pair.first) << " " << expanded_name_to_s (n->pair.second) << status_to_s (n->status) << ")" << endl;
+      stream () << indent1 << indent2 << Keys::circuit_key << "(" << ion_to_s (n->pair.first) << " " << ion_to_s (n->pair.second) << status_to_s (n->status) << ")" << endl;
     }
 
     stream () << indent2 << ")" << endl;

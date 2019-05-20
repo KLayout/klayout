@@ -194,7 +194,7 @@ void Device::add_others_terminals (unsigned int this_terminal, db::Device *other
   std::map<unsigned int, std::vector<DeviceReconnectedTerminal> >::const_iterator ot = other->m_reconnected_terminals.find (other_terminal);
   if (ot == other->m_reconnected_terminals.end ()) {
 
-    terminals.push_back (DeviceReconnectedTerminal (other_abstracts ().size (), other_terminal));
+    terminals.push_back (DeviceReconnectedTerminal (other_abstracts ().size () + 1, other_terminal));
 
   } else {
 
@@ -202,7 +202,7 @@ void Device::add_others_terminals (unsigned int this_terminal, db::Device *other
     terminals.insert (terminals.end (), ot->second.begin (), ot->second.end ());
 
     while (n < terminals.size ()) {
-      terminals [n].device_index += other_abstracts ().size ();
+      terminals [n].device_index += other_abstracts ().size () + 1;
       ++n;
     }
 

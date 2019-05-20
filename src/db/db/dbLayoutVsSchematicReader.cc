@@ -51,8 +51,8 @@ void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
 {
   int version = 0;
   std::string description;
-  m_id2net_per_circuit_a.clear ();
-  m_id2net_per_circuit_b.clear ();
+  m_map_per_circuit_a.clear ();
+  m_map_per_circuit_b.clear ();
 
   tl_assert (lvs->internal_layout ());
   lvs->internal_layout ()->dbu (1.0); //  mainly for testing
@@ -81,14 +81,14 @@ void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
     } else if (test (skeys::layout_key) || test (lkeys::layout_key)) {
 
       Brace br (this);
-      LayoutToNetlistStandardReader::read_netlist (0, lvs, true /*nested*/, &m_id2net_per_circuit_a);
+      LayoutToNetlistStandardReader::read_netlist (0, lvs, true /*nested*/, &m_map_per_circuit_a);
       br.done ();
 
     } else if (test (skeys::reference_key) || test (lkeys::reference_key)) {
 
       Brace br (this);
       std::auto_ptr<db::Netlist> netlist (new db::Netlist ());
-      LayoutToNetlistStandardReader::read_netlist (netlist.get (), 0, true /*nested*/, &m_id2net_per_circuit_b);
+      LayoutToNetlistStandardReader::read_netlist (netlist.get (), 0, true /*nested*/, &m_map_per_circuit_b);
       lvs->set_reference_netlist (netlist.release ());
       br.done ();
 
@@ -163,8 +163,8 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
       Brace br (this);
 
       std::pair<std::string, bool> non_a, non_b;
-      non_a = read_non_string ();
-      non_b = read_non_string ();
+      non_a = read_non ();
+      non_b = read_non ();
 
       const db::Circuit *circuit_a = 0;
       if (non_a.second) {
@@ -208,7 +208,7 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
   br.done ();
 }
 
-std::pair<std::string, bool> LayoutVsSchematicStandardReader::read_non_string ()
+std::pair<std::string, bool> LayoutVsSchematicStandardReader::read_non ()
 {
   if (test ("(")) {
     expect (")");
@@ -220,7 +220,7 @@ std::pair<std::string, bool> LayoutVsSchematicStandardReader::read_non_string ()
   }
 }
 
-std::pair<unsigned int, bool> LayoutVsSchematicStandardReader::read_non_numerical ()
+std::pair<unsigned int, bool> LayoutVsSchematicStandardReader::read_ion ()
 {
   if (test ("(")) {
     expect (")");
@@ -231,128 +231,147 @@ std::pair<unsigned int, bool> LayoutVsSchematicStandardReader::read_non_numerica
 }
 
 
-static const db::Net *net_by_numerical_id (const db::Circuit *circuit, const std::pair<unsigned int, bool> &non, std::map<const db::Circuit *, std::map<unsigned int, Net *> > &id2net_per_circuit)
+static const db::Net *net_by_numerical_id (const db::Circuit *circuit, const std::pair<unsigned int, bool> &ion, std::map<const db::Circuit *, db::LayoutToNetlistStandardReader::ObjectMap> &map_per_circuit)
 {
-  if (non.second && circuit) {
+  if (ion.second && circuit) {
 
-    std::map<const db::Circuit *, std::map<unsigned int, Net *> >::const_iterator i = id2net_per_circuit.find (circuit);
-    if (i != id2net_per_circuit.end ()) {
+    std::map<const db::Circuit *, db::LayoutToNetlistStandardReader::ObjectMap>::const_iterator i = map_per_circuit.find (circuit);
+    if (i != map_per_circuit.end ()) {
 
-      std::map<unsigned int, Net *>::const_iterator j = i->second.find (non.first);
-      if (j != i->second.end ()) {
+      std::map<unsigned int, Net *>::const_iterator j = i->second.id2net.find (ion.first);
+      if (j != i->second.id2net.end ()) {
         return j->second;
       }
 
     }
 
-    throw tl::Exception (tl::to_string (tr ("Not a valid net id: ")) + tl::to_string (non.first));
+    throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (ion.first));
 
   }
 
   return 0;
 }
 
+static const db::Device *device_by_numerical_id (const db::Circuit *circuit, const std::pair<unsigned int, bool> &ion, std::map<const db::Circuit *, db::LayoutToNetlistStandardReader::ObjectMap> &map_per_circuit)
+{
+  if (ion.second && circuit) {
+
+    std::map<const db::Circuit *, db::LayoutToNetlistStandardReader::ObjectMap>::const_iterator i = map_per_circuit.find (circuit);
+    if (i != map_per_circuit.end ()) {
+
+      std::map<unsigned int, Device *>::const_iterator j = i->second.id2device.find (ion.first);
+      if (j != i->second.id2device.end ()) {
+        return j->second;
+      }
+
+    }
+
+    throw tl::Exception (tl::to_string (tr ("Not a valid device ID: ")) + tl::to_string (ion.first));
+
+  }
+
+  return 0;
+}
+
+static const db::SubCircuit *subcircuit_by_numerical_id (const db::Circuit *circuit, const std::pair<unsigned int, bool> &ion, std::map<const db::Circuit *, db::LayoutToNetlistStandardReader::ObjectMap> &map_per_circuit)
+{
+  if (ion.second && circuit) {
+
+    std::map<const db::Circuit *, db::LayoutToNetlistStandardReader::ObjectMap>::const_iterator i = map_per_circuit.find (circuit);
+    if (i != map_per_circuit.end ()) {
+
+      std::map<unsigned int, SubCircuit *>::const_iterator j = i->second.id2subcircuit.find (ion.first);
+      if (j != i->second.id2subcircuit.end ()) {
+        return j->second;
+      }
+
+    }
+
+    throw tl::Exception (tl::to_string (tr ("Not a subcircuit device ID: ")) + tl::to_string (ion.first));
+
+  }
+
+  return 0;
+}
+
+static const db::Pin *pin_by_numerical_id (const db::Circuit *circuit, const std::pair<unsigned int, bool> &ion)
+{
+  if (ion.second && circuit) {
+
+    const db::Pin *pin = circuit->pin_by_id (ion.first);
+    if (! pin) {
+      throw tl::Exception (tl::to_string (tr ("Not a valid pin ID: ")) + tl::to_string (ion.first));
+    }
+
+    return pin;
+
+  } else {
+    return 0;
+  }
+}
+
 void LayoutVsSchematicStandardReader::read_net_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b)
 {
   Brace br (this);
 
-  std::pair<unsigned int, bool> non_a, non_b;
-  non_a = read_non_numerical ();
-  non_b = read_non_numerical ();
+  std::pair<unsigned int, bool> ion_a, ion_b;
+  ion_a = read_ion ();
+  ion_b = read_ion ();
 
   db::NetlistCrossReference::Status status = db::NetlistCrossReference::None;
   read_status (status);
 
   br.done ();
 
-  xref->gen_nets (net_by_numerical_id (circuit_a, non_a, m_id2net_per_circuit_a), net_by_numerical_id (circuit_b, non_b, m_id2net_per_circuit_b), status);
-}
-
-static const db::Pin *pin_by_name (const db::Circuit *circuit, const std::pair<std::string, bool> &non)
-{
-  if (non.second && circuit) {
-    const db::Pin *pin = circuit->pin_by_name (non.first);
-    if (! pin) {
-      throw tl::Exception (tl::to_string (tr ("Not a valid pin name: ")) + non.first);
-    }
-    return pin;
-  } else {
-    return 0;
-  }
+  xref->gen_nets (net_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), net_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status);
 }
 
 void LayoutVsSchematicStandardReader::read_pin_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b)
 {
   Brace br (this);
 
-  std::pair<std::string, bool> non_a, non_b;
-  non_a = read_non_string ();
-  non_b = read_non_string ();
+  std::pair<unsigned int, bool> ion_a, ion_b;
+  ion_a = read_ion ();
+  ion_b = read_ion ();
 
   db::NetlistCrossReference::Status status = db::NetlistCrossReference::None;
   read_status (status);
 
   br.done ();
 
-  xref->gen_pins (pin_by_name (circuit_a, non_a), pin_by_name (circuit_b, non_b), status);
-}
-
-static const db::Device *device_by_name (const db::Circuit *circuit, const std::pair<std::string, bool> &non)
-{
-  if (non.second && circuit) {
-    const db::Device *device = circuit->device_by_name (non.first);
-    if (! device) {
-      throw tl::Exception (tl::to_string (tr ("Not a valid device name: ")) + non.first);
-    }
-    return device;
-  } else {
-    return 0;
-  }
+  xref->gen_pins (pin_by_numerical_id (circuit_a, ion_a), pin_by_numerical_id (circuit_b, ion_b), status);
 }
 
 void LayoutVsSchematicStandardReader::read_device_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b)
 {
   Brace br (this);
 
-  std::pair<std::string, bool> non_a, non_b;
-  non_a = read_non_string ();
-  non_b = read_non_string ();
+  std::pair<unsigned int, bool> ion_a, ion_b;
+  ion_a = read_ion ();
+  ion_b = read_ion ();
 
   db::NetlistCrossReference::Status status = db::NetlistCrossReference::None;
   read_status (status);
 
   br.done ();
 
-  xref->gen_devices (device_by_name (circuit_a, non_a), device_by_name (circuit_b, non_b), status);
-}
-
-static const db::SubCircuit *subcircuit_by_name (const db::Circuit *circuit, const std::pair<std::string, bool> &non)
-{
-  if (non.second && circuit) {
-    const db::SubCircuit *subcircuit = circuit->subcircuit_by_name (non.first);
-    if (! subcircuit) {
-      throw tl::Exception (tl::to_string (tr ("Not a valid subcircuit name: ")) + non.first);
-    }
-    return subcircuit;
-  } else {
-    return 0;
-  }
+  xref->gen_devices (device_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), device_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status);
 }
 
 void LayoutVsSchematicStandardReader::read_subcircuit_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b)
 {
   Brace br (this);
 
-  std::pair<std::string, bool> non_a, non_b;
-  non_a = read_non_string ();
-  non_b = read_non_string ();
+  std::pair<unsigned int, bool> ion_a, ion_b;
+  ion_a = read_ion ();
+  ion_b = read_ion ();
 
   db::NetlistCrossReference::Status status = db::NetlistCrossReference::None;
   read_status (status);
 
   br.done ();
 
-  xref->gen_subcircuits (subcircuit_by_name (circuit_a, non_a), subcircuit_by_name (circuit_b, non_b), status);
+  xref->gen_subcircuits (subcircuit_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), subcircuit_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status);
 }
 
 }

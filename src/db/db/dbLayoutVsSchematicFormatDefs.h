@@ -96,14 +96,18 @@ namespace db
  *
  *  [pair]
  *
- *    pin([non] [non] [status]?)       - a pin pair [short key: P]
- *    device([non] [non] [status]?)    - a device pair [short key: D]
- *    circuit([non] [non] [status]?)   - a subcircuit pair [short key: X]
- *    net([non] [non] [status]?)       - a net pair [short key: N]
+ *    pin([ion] [ion] [status]?)       - a pin pair [short key: P]
+ *    device([ion] [ion] [status]?)    - a device pair [short key: D]
+ *    circuit([ion] [ion] [status]?)   - a subcircuit pair [short key: X]
+ *    net([ion] [ion] [status]?)       - a net pair [short key: N]
  *
  *  [non]
  *
  *    <name> | ()
+ *
+ *  [ion]
+ *
+ *    <id> | ()
  *
  *  [status]
  *

@@ -223,12 +223,18 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
       *mp_stream << endl << indent << indent1 << "# Outgoing pins and their connections to nets" << endl;
     }
     for (db::Circuit::const_pin_iterator p = circuit.begin_pins (); p != circuit.end_pins (); ++p) {
+      *mp_stream << indent << indent1 << Keys::pin_key << "(";
       const db::Net *net = circuit.net_for_pin (p->id ());
       if (net) {
-        *mp_stream << indent << indent1 << Keys::pin_key << "(" << tl::to_word_or_quoted_string (p->expanded_name ()) << " " << (*net2id) [net] << ")" << endl;
-      } else {
-        *mp_stream << indent << indent1 << Keys::pin_key << "(" << tl::to_word_or_quoted_string (p->expanded_name ()) << ")" << endl;
+        *mp_stream << (*net2id) [net];
       }
+      if (! p->name ().empty ()) {
+        if (net) {
+          *mp_stream << " ";
+        }
+        *mp_stream << Keys::name_key << "(" << tl::to_word_or_quoted_string (p->name ()) << ")";
+      }
+      *mp_stream << ")" << endl;
     }
   }
 
@@ -402,10 +408,14 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
 }
 
 template <class Keys>
-void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit, std::map<const Net *, unsigned int> &net2id, const std::string &indent)
+void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit, std::map<const db::Net *, unsigned int> &net2id, const std::string &indent)
 {
-  *mp_stream << indent << indent1 << Keys::circuit_key << "(" << tl::to_word_or_quoted_string (subcircuit.expanded_name ());
+  *mp_stream << indent << indent1 << Keys::circuit_key << "(" << tl::to_string (subcircuit.id ());
   *mp_stream << " " << tl::to_word_or_quoted_string (subcircuit.circuit_ref ()->name ());
+
+  if (! subcircuit.name ().empty ()) {
+    *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (subcircuit.name ()) << ")";
+  }
 
   if (l2n) {
 
@@ -438,7 +448,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Sub
       } else {
         *mp_stream << " ";
       }
-      *mp_stream << Keys::pin_key << "(" << tl::to_word_or_quoted_string (p->expanded_name ()) << " " << net2id [net] << ")";
+      *mp_stream << Keys::pin_key << "(" << tl::to_string (p->id ()) << " " << net2id [net] << ")";
       if (separate_lines) {
         *mp_stream << endl;
       }
@@ -493,7 +503,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db
   const std::vector<DeviceTerminalDefinition> &td = device.device_class ()->terminal_definitions ();
   const std::vector<DeviceParameterDefinition> &pd = device.device_class ()->parameter_definitions ();
 
-  *mp_stream << indent << indent1 << Keys::device_key << "(" << tl::to_word_or_quoted_string (device.expanded_name ());
+  *mp_stream << indent << indent1 << Keys::device_key << "(" << tl::to_string (device.id ());
 
   if (device.device_abstract ()) {
 
@@ -522,6 +532,10 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db
 
   } else {
     *mp_stream << " " << tl::to_word_or_quoted_string (device.device_class ()->name ()) << endl;
+  }
+
+  if (! device.name ().empty ()) {
+    *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (device.name ()) << ")";
   }
 
   for (std::vector<DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {

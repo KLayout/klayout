@@ -62,7 +62,7 @@ protected:
  *  @brief The standard writer
  */
 class DB_PUBLIC LayoutVsSchematicStandardReader
-  : public LayoutVsSchematicReaderBase, private LayoutToNetlistStandardReader
+  : public LayoutVsSchematicReaderBase, protected LayoutToNetlistStandardReader
 {
 public:
   LayoutVsSchematicStandardReader (tl::InputStream &stream);
@@ -84,10 +84,10 @@ private:
   void read_pin_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b);
   void read_device_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b);
   void read_subcircuit_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b);
-  std::pair<std::string, bool> read_non_string ();
-  std::pair<unsigned int, bool> read_non_numerical ();
+  std::pair<std::string, bool> read_non ();
+  std::pair<unsigned int, bool> read_ion ();
 
-  std::map<const db::Circuit *, std::map<unsigned int, Net *> > m_id2net_per_circuit_a, m_id2net_per_circuit_b;
+  std::map<const db::Circuit *, LayoutToNetlistStandardReader::ObjectMap> m_map_per_circuit_a, m_map_per_circuit_b;
 };
 
 }

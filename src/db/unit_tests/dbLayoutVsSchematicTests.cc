@@ -254,7 +254,9 @@ TEST(1_BasicFlow)
   lvs2.load (path);
   lvs2.save (path2, false);
 
-  compare_lvsdbs (_this, path2, au_path);
+  std::string au_path2 = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test1b_au.lvsdb");
+
+  compare_lvsdbs (_this, path2, au_path2);
 }
 
 
@@ -450,6 +452,8 @@ TEST(2_FlowWithErrors)
   lvs2.load (path);
   lvs2.save (path2, false);
 
-  compare_lvsdbs (_this, path2, au_path);
+  std::string au_path2 = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test2b_au.lvsdb");
+
+  compare_lvsdbs (_this, path2, au_path2);
 }
 

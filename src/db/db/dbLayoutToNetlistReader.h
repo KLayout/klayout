@@ -84,6 +84,14 @@ class DB_PUBLIC LayoutToNetlistStandardReader
   : public LayoutToNetlistReaderBase
 {
 public:
+
+  struct ObjectMap
+  {
+    std::map<unsigned int, db::Net *> id2net;
+    std::map<unsigned int, db::Device *> id2device;
+    std::map<unsigned int, db::SubCircuit *> id2subcircuit;
+  };
+
   LayoutToNetlistStandardReader (tl::InputStream &stream);
 
   void do_read (db::LayoutToNetlist *l2n);
@@ -92,7 +100,7 @@ protected:
   friend class l2n_std_reader::Brace;
   typedef l2n_std_reader::Brace Brace;
 
-  void read_netlist (Netlist *netlist, db::LayoutToNetlist *l2n, bool nested = false, std::map<const db::Circuit *, std::map<unsigned int, Net *> > *id2net_per_circuit = 0);
+  void read_netlist (Netlist *netlist, db::LayoutToNetlist *l2n, bool nested = false, std::map<const db::Circuit *, ObjectMap> *map_per_circuit = 0);
   static size_t terminal_id (const db::DeviceClass *device_class, const std::string &tname);
   static std::pair<db::DeviceAbstract *, const db::DeviceClass *> device_model_by_name (db::Netlist *netlist, const std::string &dmname);
 
@@ -124,10 +132,10 @@ protected:
   bool at_end ();
   void skip ();
 
-  void read_net (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, db::Net *> &id2net);
-  void read_pin (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, db::Net *> &id2net);
-  void read_device (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, db::Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections);
-  void read_subcircuit (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, db::Net *> &id2net, std::map<db::CellInstArray, std::list<Connections> > &connections);
+  void read_net (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map);
+  void read_pin (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map);
+  void read_device (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections);
+  void read_subcircuit (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections);
   void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc);
   std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n);
   void read_geometries (Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell);

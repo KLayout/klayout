@@ -64,14 +64,15 @@ namespace db
  *
  *  [circuit-def]:
  *
- *    net(<id> [net-name]? [geometry-def]*)
+ *    net(<id> [name]? [geometry-def]*)
  *                                  - net geometry [short key: N]
  *                                    A net declaration shall be there also if no geometry
  *                                    is present. The ID is a numerical shortcut for the net.
- *    pin(<name> <net-id>)          - outgoing pin connection [short key: P]
- *    device(<name> <abstract-or-class> [combined-device]* [terminal-route]* [device-def])
+ *    pin(<net-id> [name]?)         - outgoing pin connection [short key: P]
+ *                                    Statement order specifies pin order.
+ *    device(<id> <abstract-or-class> [name]? [combined-device]* [terminal-route]* [device-def])
  *                                  - device with connections [short key: D]
- *    circuit(<name> [subcircuit-def])
+ *    circuit(<id> [name]? [subcircuit-def])
  *                                  - subcircuit with connections [short key: X]
  *
  *  [combined-device]:
@@ -88,9 +89,9 @@ namespace db
  *                                    0 is the basic device, 1 the first combined
  *                                    device etc.
  *
- *  [net-name]:
+ *  [name]:
  *
- *    name(<net-name>)              - specify net name [short key: I]
+ *    name(<name>)                  - specify net name [short key: I]
  *
  *  [geometry-def]:
  *
@@ -125,7 +126,7 @@ namespace db
  *    rotation(<angle>)             - rotation angle (in degree, default is 0) [short key O]
  *    mirror                        - if specified, the instance is mirrored before rotation [short key M]
  *    scale(<mag>)                  - magnification (default is 1) [short key S]
- *    pin(<pin-name> <net-id>)      - specifies connection of the pin with a net [short key: P]
+ *    pin(<pin-id> <net-id>)        - specifies connection of the pin with a net [short key: P]
  */
 
 namespace l2n_std_format

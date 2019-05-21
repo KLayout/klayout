@@ -217,3 +217,34 @@ TEST (1)
   EXPECT_EQ (model->rowCount (inv2Device1GateIndex), 0);
 }
 
+TEST (2)
+{
+  db::LayoutVsSchematic lvs;
+  lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
+
+  lay::NetColorizer colorizer;
+  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
+
+  EXPECT_EQ (model->hasChildren (QModelIndex ()), true);
+  //  two circuits
+  EXPECT_EQ (model->rowCount (QModelIndex ()), 4);
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, QModelIndex ()), Qt::UserRole).toString ()), "INV2PAIRX");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, QModelIndex ()), Qt::DisplayRole).toString ()), "-/INV2PAIRX");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, QModelIndex ()), Qt::DisplayRole).toString ()), "");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, QModelIndex ()), Qt::DisplayRole).toString ()), "INV2PAIRX");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, QModelIndex ()), Qt::DisplayRole).toString ()), "INV2/INV2");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 1, QModelIndex ()), Qt::DisplayRole).toString ()), "INV2");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 2, QModelIndex ()), Qt::DisplayRole).toString ()), "INV2");
+  EXPECT_EQ (model->parent (model->index (0, 0, QModelIndex ())).isValid (), false);
+  EXPECT_EQ (model->parent (model->index (1, 0, QModelIndex ())).isValid (), false);
+
+  EXPECT_EQ (model->hasChildren (model->index (0, 0, QModelIndex ())), false);
+  EXPECT_EQ (model->rowCount (model->index (0, 0, QModelIndex ())), 0);
+
+  QModelIndex inv2Index = model->index (1, 0, QModelIndex ());
+
+  EXPECT_EQ (model->hasChildren (inv2Index), true);
+  EXPECT_EQ (model->rowCount (inv2Index), 14);
+
+  // ...
+}

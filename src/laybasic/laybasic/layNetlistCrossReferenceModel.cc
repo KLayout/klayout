@@ -39,37 +39,44 @@ size_t NetlistCrossReferenceModel::circuit_count () const
 
 size_t NetlistCrossReferenceModel::net_count (const circuit_pair &circuits) const
 {
-  return std::max (circuits.first ? circuits.first->net_count () : 0, circuits.second ? circuits.second->net_count () : 0);
+  const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
+  return data ? data->nets.size () : 0;
 }
 
 size_t NetlistCrossReferenceModel::net_terminal_count (const net_pair &nets) const
 {
-  return std::max (nets.first ? nets.first->terminal_count () : 0, nets.second ? nets.second->terminal_count () : 0);
+  const db::NetlistCrossReference::PerNetData *data = mp_cross_ref->per_net_data_for (nets);
+  return data ? data->terminals.size () : 0;
 }
 
 size_t NetlistCrossReferenceModel::net_subcircuit_pin_count (const net_pair &nets) const
 {
-  return std::max (nets.first ? nets.first->subcircuit_pin_count () : 0, nets.second ? nets.second->subcircuit_pin_count () : 0);
+  const db::NetlistCrossReference::PerNetData *data = mp_cross_ref->per_net_data_for (nets);
+  return data ? data->subcircuit_pins.size () : 0;
 }
 
 size_t NetlistCrossReferenceModel::net_pin_count (const net_pair &nets) const
 {
-  return std::max (nets.first ? nets.first->pin_count () : 0, nets.second ? nets.second->pin_count () : 0);
+  const db::NetlistCrossReference::PerNetData *data = mp_cross_ref->per_net_data_for (nets);
+  return data ? data->pins.size () : 0;
 }
 
 size_t NetlistCrossReferenceModel::device_count (const circuit_pair &circuits) const
 {
-  return std::max (circuits.first ? circuits.first->device_count () : 0, circuits.second ? circuits.second->device_count () : 0);
+  const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
+  return data ? data->devices.size () : 0;
 }
 
 size_t NetlistCrossReferenceModel::pin_count (const circuit_pair &circuits) const
 {
-  return std::max (circuits.first ? circuits.first->pin_count () : 0, circuits.second ? circuits.second->pin_count () : 0);
+  const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
+  return data ? data->pins.size () : 0;
 }
 
 size_t NetlistCrossReferenceModel::subcircuit_count (const circuit_pair &circuits) const
 {
-  return std::max (circuits.first ? circuits.first->subcircuit_count () : 0, circuits.second ? circuits.second->subcircuit_count () : 0);
+  const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
+  return data ? data->subcircuits.size () : 0;
 }
 
 namespace {

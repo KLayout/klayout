@@ -27,6 +27,10 @@ namespace db
 
 namespace lvs_std_format
 {
+  const char *lvs_magic_string_cstr = "#%lvsdb-klayout";
+  template<> DB_PUBLIC const std::string keys<false>::lvs_magic_string (lvs_magic_string_cstr);
+  template<> DB_PUBLIC const std::string keys<true>::lvs_magic_string (lvs_magic_string_cstr);
+
   template<> DB_PUBLIC const std::string keys<false>::reference_key ("reference");
   template<> DB_PUBLIC const std::string keys<false>::layout_key ("layout");
   template<> DB_PUBLIC const std::string keys<false>::xref_key ("xref");

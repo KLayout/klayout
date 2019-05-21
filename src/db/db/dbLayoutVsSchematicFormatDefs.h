@@ -49,6 +49,7 @@ namespace db
  *
  *  Global statements:
  *
+ *    #%lvsdb-klayout                  - header line identifies format
  *    version(<number>)                - file format version [short key: V]
  *    description(<text>)              - an arbitrary description text [short key: B]
  *    layout([layout])                 - layout part [short key: J]
@@ -125,6 +126,8 @@ namespace lvs_std_format
     : public l2n_std_format::keys<Short>
   {
     typedef l2n_std_format::keys<Short> l2n_keys;
+
+    static const std::string lvs_magic_string;
 
     static const std::string reference_key;
     static const std::string layout_key;

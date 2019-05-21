@@ -27,6 +27,10 @@ namespace db
 
 namespace l2n_std_format
 {
+  const char *l2n_magic_string_cstr = "#%l2n-klayout";
+  template<> DB_PUBLIC const std::string keys<false>::l2n_magic_string (l2n_magic_string_cstr);
+  template<> DB_PUBLIC const std::string keys<true>::l2n_magic_string (l2n_magic_string_cstr);
+
   template<> DB_PUBLIC const std::string keys<false>::version_key ("version");
   template<> DB_PUBLIC const std::string keys<false>::description_key ("description");
   template<> DB_PUBLIC const std::string keys<false>::top_key ("top");

@@ -87,7 +87,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
   const std::string indent (nested ? indent1 : "");
 
   if (! nested) {
-    *mp_stream << "#%l2n-klayout" << endl;
+    *mp_stream << Keys::l2n_magic_string << endl;
   }
 
   if (version > 0) {

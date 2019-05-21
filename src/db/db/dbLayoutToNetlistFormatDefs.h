@@ -134,6 +134,8 @@ namespace l2n_std_format
   template <bool Short>
   struct DB_PUBLIC keys
   {
+    static const std::string l2n_magic_string;
+
     static const std::string version_key;
     static const std::string description_key;
     static const std::string top_key;

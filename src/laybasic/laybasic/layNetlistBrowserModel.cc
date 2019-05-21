@@ -23,6 +23,7 @@
 
 #include "layNetlistBrowserModel.h"
 #include "layIndexedNetlistModel.h"
+#include "layNetlistCrossReferenceModel.h"
 #include "dbNetlistDeviceClasses.h"
 
 #include <QPainter>
@@ -205,9 +206,16 @@ static inline bool always (bool)
 }
 
 NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb, NetColorizer *colorizer)
-  : QAbstractItemModel (parent), mp_l2ndb (l2ndb), mp_colorizer (colorizer)
+  : QAbstractItemModel (parent), mp_l2ndb (l2ndb), mp_lvsdb (0), mp_colorizer (colorizer)
 {
   mp_indexer.reset (new SingleIndexedNetlistModel (l2ndb->netlist ()));
+  connect (mp_colorizer, SIGNAL (colors_changed ()), this, SLOT (colors_changed ()));
+}
+
+NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutVsSchematic *lvsdb, NetColorizer *colorizer)
+  : QAbstractItemModel (parent), mp_l2ndb (0), mp_lvsdb (lvsdb), mp_colorizer (colorizer)
+{
+  mp_indexer.reset (new NetlistCrossReferenceModel (lvsdb->cross_ref ()));
   connect (mp_colorizer, SIGNAL (colors_changed ()), this, SLOT (colors_changed ()));
 }
 
@@ -307,6 +315,10 @@ NetlistBrowserModel::make_id_circuit_device_terminal (size_t circuit_index, size
 bool
 NetlistBrowserModel::is_id_circuit (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
   pop (id, mp_indexer->circuit_count ());
   return id == 0;
 }
@@ -314,6 +326,10 @@ NetlistBrowserModel::is_id_circuit (void *id) const
 bool
 NetlistBrowserModel::is_id_circuit_pin (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   pop (id, mp_indexer->circuit_count ());
   return (pop (id, 8) == 1 && always (pop (id, mp_indexer->pin_count (circuits))) && id == 0);
@@ -322,6 +338,10 @@ NetlistBrowserModel::is_id_circuit_pin (void *id) const
 bool
 NetlistBrowserModel::is_id_circuit_pin_net (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   pop (id, mp_indexer->circuit_count ());
   return (pop (id, 8) == 1 && always (pop (id, mp_indexer->pin_count (circuits))) && id != 0);
@@ -330,6 +350,10 @@ NetlistBrowserModel::is_id_circuit_pin_net (void *id) const
 bool
 NetlistBrowserModel::is_id_circuit_net (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   pop (id, mp_indexer->circuit_count ());
   return (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && id == 0);
@@ -338,24 +362,50 @@ NetlistBrowserModel::is_id_circuit_net (void *id) const
 bool
 NetlistBrowserModel::is_id_circuit_net_device_terminal (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
+  void *org_id = id;
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-  IndexedNetlistModel::net_pair nets = nets_from_id (id);
   pop (id, mp_indexer->circuit_count ());
-  return (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && pop (id, 4) == 1 && always (pop (id, mp_indexer->net_terminal_count (nets))) && id == 0);
+  if (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && pop (id, 4) == 1) {
+    IndexedNetlistModel::net_pair nets = nets_from_id (org_id);
+    pop (id, mp_indexer->net_terminal_count (nets));
+    return id == 0;
+  }
+
+  return false;
 }
 
 bool
 NetlistBrowserModel::is_id_circuit_net_device_terminal_others (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
+  void *org_id = id;
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-  IndexedNetlistModel::net_pair nets = nets_from_id (id);
   pop (id, mp_indexer->circuit_count ());
-  return (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && pop (id, 4) == 1 && always (pop (id, mp_indexer->net_terminal_count (nets))) && id != 0);
+  if (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && pop (id, 4) == 1) {
+    IndexedNetlistModel::net_pair nets = nets_from_id (org_id);
+    pop (id, mp_indexer->net_terminal_count (nets));
+    return id != 0;
+  }
+
+  return false;
 }
 
 bool
 NetlistBrowserModel::is_id_circuit_net_pin (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   pop (id, mp_indexer->circuit_count ());
   return (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && pop (id, 4) == 2);
@@ -364,24 +414,50 @@ NetlistBrowserModel::is_id_circuit_net_pin (void *id) const
 bool
 NetlistBrowserModel::is_id_circuit_net_subcircuit_pin (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
+  void *org_id = id;
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-  IndexedNetlistModel::net_pair nets = nets_from_id (id);
   pop (id, mp_indexer->circuit_count ());
-  return (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && pop (id, 4) == 3 && always (pop (id, mp_indexer->net_subcircuit_pin_count (nets))) && id == 0);
+  if (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && pop (id, 4) == 3) {
+    IndexedNetlistModel::net_pair nets = nets_from_id (org_id);
+    pop (id, mp_indexer->net_subcircuit_pin_count (nets));
+    return id == 0;
+  }
+
+  return false;
 }
 
 bool
 NetlistBrowserModel::is_id_circuit_net_subcircuit_pin_others (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
+  void *org_id = id;
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-  IndexedNetlistModel::net_pair nets = nets_from_id (id);
   pop (id, mp_indexer->circuit_count ());
-  return (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && pop (id, 4) == 3 && always (pop (id, mp_indexer->net_subcircuit_pin_count (nets))) && id != 0);
+  if (pop (id, 8) == 2 && always (pop (id, mp_indexer->net_count (circuits))) && pop (id, 4) == 3) {
+    IndexedNetlistModel::net_pair nets = nets_from_id (org_id);
+    pop (id, mp_indexer->net_subcircuit_pin_count (nets));
+    return id != 0;
+  }
+
+  return false;
 }
 
 bool
 NetlistBrowserModel::is_id_circuit_subcircuit (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   pop (id, mp_indexer->circuit_count ());
   return (pop (id, 8) == 3 && always (pop (id, mp_indexer->subcircuit_count (circuits))) && id == 0);
@@ -390,6 +466,10 @@ NetlistBrowserModel::is_id_circuit_subcircuit (void *id) const
 bool
 NetlistBrowserModel::is_id_circuit_subcircuit_pin (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   pop (id, mp_indexer->circuit_count ());
   return (pop (id, 8) == 3 && always (pop (id, mp_indexer->subcircuit_count (circuits))) && id != 0);
@@ -398,6 +478,10 @@ NetlistBrowserModel::is_id_circuit_subcircuit_pin (void *id) const
 bool
 NetlistBrowserModel::is_id_circuit_device (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   pop (id, mp_indexer->circuit_count ());
   return (pop (id, 8) == 4 && always (pop (id, mp_indexer->device_count (circuits))) && id == 0);
@@ -406,6 +490,10 @@ NetlistBrowserModel::is_id_circuit_device (void *id) const
 bool
 NetlistBrowserModel::is_id_circuit_device_terminal (void *id) const
 {
+  if (mp_indexer->circuit_count () == 0) {
+    return false;
+  }
+
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   pop (id, mp_indexer->circuit_count ());
   return (pop (id, 8) == 4 && always (pop (id, mp_indexer->device_count (circuits))) && id != 0);
@@ -884,7 +972,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     if (index.column () == 0) {
       return tl::to_qstring (str_from_names (circuits, mp_indexer->is_single ()));
     } else if (!mp_indexer->is_single ()) {
-      return tl::to_qstring (str_from_name (index.column () == 2 ? circuits.first : circuits.second));
+      return tl::to_qstring (str_from_name (index.column () == 1 ? circuits.first : circuits.second));
     }
 
   } else if (is_id_circuit_pin (id)) {
@@ -896,7 +984,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     if (index.column () == 0) {
       return tl::to_qstring (str_from_expanded_names (pins, mp_indexer->is_single ()));
     } else if (!mp_indexer->is_single ()) {
-      return tl::to_qstring (str_from_expanded_name (index.column () == 2 ? pins.first : pins.second));
+      return tl::to_qstring (str_from_expanded_name (index.column () == 1 ? pins.first : pins.second));
     }
 
   } else if (is_id_circuit_pin_net (id)) {
@@ -1468,104 +1556,6 @@ NetlistBrowserModel::flags (const QModelIndex & /*index*/) const
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-static size_t device_rows_for (const db::Circuit *circuit)
-{
-  if (! circuit) {
-    return 0;
-  } else {
-    return circuit->device_count ();
-  }
-}
-
-static size_t device_rows_for (const IndexedNetlistModel::circuit_pair &circuits)
-{
-  return std::max (device_rows_for (circuits.first), device_rows_for (circuits.second));
-}
-
-static size_t pin_rows_for (const db::Circuit *circuit)
-{
-  if (! circuit) {
-    return 0;
-  } else {
-    return circuit->pin_count ();
-  }
-}
-
-static size_t pin_rows_for (const IndexedNetlistModel::circuit_pair &circuits)
-{
-  return std::max (pin_rows_for (circuits.first), pin_rows_for (circuits.second));
-}
-
-static size_t net_rows_for (const db::Circuit *circuit)
-{
-  if (! circuit) {
-    return 0;
-  } else {
-    return circuit->net_count ();
-  }
-}
-
-static size_t net_rows_for (const IndexedNetlistModel::circuit_pair &circuits)
-{
-  return std::max (net_rows_for (circuits.first), net_rows_for (circuits.second));
-}
-
-static size_t subcircuit_rows_for (const db::Circuit *circuit)
-{
-  if (! circuit) {
-    return 0;
-  } else {
-    return circuit->subcircuit_count ();
-  }
-}
-
-static size_t subcircuit_rows_for (const IndexedNetlistModel::circuit_pair &circuits)
-{
-  return std::max (subcircuit_rows_for (circuits.first), subcircuit_rows_for (circuits.second));
-}
-
-static size_t pin_rows_for (const db::Net *net)
-{
-  if (! net) {
-    return 0;
-  } else {
-    return net->pin_count ();
-  }
-}
-
-static size_t pin_rows_for (const IndexedNetlistModel::net_pair &nets)
-{
-  return std::max (pin_rows_for (nets.first), pin_rows_for (nets.second));
-}
-
-static size_t subcircuit_rows_for (const db::Net *net)
-{
-  if (! net) {
-    return 0;
-  } else {
-    return net->subcircuit_pin_count ();
-  }
-}
-
-static size_t subcircuit_rows_for (const IndexedNetlistModel::net_pair &nets)
-{
-  return std::max (subcircuit_rows_for (nets.first), subcircuit_rows_for (nets.second));
-}
-
-static size_t terminal_rows_for (const db::Net *net)
-{
-  if (! net) {
-    return 0;
-  } else {
-    return net->terminal_count ();
-  }
-}
-
-static size_t terminal_rows_for (const IndexedNetlistModel::net_pair &nets)
-{
-  return std::max (terminal_rows_for (nets.first), terminal_rows_for (nets.second));
-}
-
 static size_t rows_for (const db::Device *device)
 {
   if (! device || ! device->device_class ()) {
@@ -1607,7 +1597,7 @@ NetlistBrowserModel::hasChildren (const QModelIndex &parent) const
 {
   if (! parent.isValid ()) {
 
-    return mp_l2ndb->netlist () && mp_l2ndb->netlist ()->circuit_count () > 0;
+    return mp_indexer.get () && mp_indexer->circuit_count () > 0;
 
   } else {
 
@@ -1616,10 +1606,10 @@ NetlistBrowserModel::hasChildren (const QModelIndex &parent) const
     if (is_id_circuit (id)) {
 
       IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-      return device_rows_for (circuits.first) > 0 || device_rows_for (circuits.second) > 0 ||
-             subcircuit_rows_for (circuits.first) > 0 || subcircuit_rows_for (circuits.second) > 0 ||
-             pin_rows_for (circuits.first) > 0 || pin_rows_for (circuits.second) > 0 ||
-             net_rows_for (circuits.first) > 0 || net_rows_for (circuits.second) > 0;
+      return mp_indexer->device_count (circuits) > 0 ||
+             mp_indexer->subcircuit_count (circuits) > 0 ||
+             mp_indexer->pin_count (circuits) > 0 ||
+             mp_indexer->net_count (circuits) > 0;
 
     } else if (is_id_circuit_pin (id)) {
 
@@ -1638,9 +1628,9 @@ NetlistBrowserModel::hasChildren (const QModelIndex &parent) const
     } else if (is_id_circuit_net (id)) {
 
       IndexedNetlistModel::net_pair nets = nets_from_id (id);
-      return pin_rows_for (nets.first) > 0 || pin_rows_for (nets.second) > 0 ||
-             terminal_rows_for (nets.first) > 0 || terminal_rows_for (nets.second) > 0 ||
-             subcircuit_rows_for (nets.first) > 0 || subcircuit_rows_for (nets.second) > 0;
+      return mp_indexer->net_pin_count (nets) > 0 ||
+             mp_indexer->net_terminal_count (nets) > 0 ||
+             mp_indexer->net_subcircuit_pin_count (nets) > 0;
 
     } else if (is_id_circuit_net_subcircuit_pin (id)) {
 
@@ -1691,22 +1681,22 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
 
       int r = row;
       IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-      int rpins = int (pin_rows_for (circuits));
+      int rpins = int (mp_indexer->pin_count (circuits));
       if (r < rpins) {
         new_id = make_id_circuit_pin (circuit_index_from_id (id), size_t (r));
       } else {
         r -= rpins;
-        int rnets = int (net_rows_for (circuits));
+        int rnets = int (mp_indexer->net_count (circuits));
         if (r < int (rnets)) {
           new_id = make_id_circuit_net (circuit_index_from_id (id), size_t (r));
         } else {
           r -= int (rnets);
-          int rsubcircuits = int (subcircuit_rows_for (circuits));
+          int rsubcircuits = int (mp_indexer->subcircuit_count (circuits));
           if (r < rsubcircuits) {
             new_id = make_id_circuit_subcircuit (circuit_index_from_id (id), size_t (r));
           } else {
             r -= rsubcircuits;
-            if (r < int (device_rows_for (circuits))) {
+            if (r < int (mp_indexer->device_count (circuits))) {
               new_id = make_id_circuit_device (circuit_index_from_id (id), size_t (r));
             }
           }
@@ -1729,17 +1719,17 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
 
       int r = row;
       IndexedNetlistModel::net_pair nets = nets_from_id (id);
-      int rterminals = int (terminal_rows_for (nets));
+      int rterminals = int (mp_indexer->net_terminal_count (nets));
       if (r < rterminals){
         new_id = make_id_circuit_net_device_terminal (circuit_index_from_id (id), circuit_net_index_from_id (id), size_t (r));
       } else {
         r -= rterminals;
-        int rpins = int (pin_rows_for (nets));
+        int rpins = int (mp_indexer->net_pin_count (nets));
         if (r < rpins) {
           new_id = make_id_circuit_net_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), size_t (r));
         } else {
           r -= rpins;
-          if (r < int (subcircuit_rows_for (nets))) {
+          if (r < int (mp_indexer->net_subcircuit_pin_count (nets))) {
             new_id = make_id_circuit_net_subcircuit_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), size_t (r));
           }
         }
@@ -1893,7 +1883,7 @@ NetlistBrowserModel::index_from_id (void *id, int column) const
   } else if (is_id_circuit_net (id)) {
 
     IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-    return createIndex (int (pin_rows_for (circuits) + circuit_net_index_from_id (id)), column, id);
+    return createIndex (int (mp_indexer->pin_count (circuits) + circuit_net_index_from_id (id)), column, id);
 
   } else if (is_id_circuit_net_device_terminal (id)) {
 
@@ -1906,12 +1896,12 @@ NetlistBrowserModel::index_from_id (void *id, int column) const
   } else if (is_id_circuit_net_pin (id)) {
 
     IndexedNetlistModel::net_pair nets = nets_from_id (id);
-    return createIndex (int (terminal_rows_for (nets) + circuit_net_pin_index_from_id (id)), column, id);
+    return createIndex (int (mp_indexer->net_terminal_count (nets) + circuit_net_pin_index_from_id (id)), column, id);
 
   } else if (is_id_circuit_net_subcircuit_pin (id)) {
 
     IndexedNetlistModel::net_pair nets = nets_from_id (id);
-    return createIndex (int (terminal_rows_for (nets) + pin_rows_for (nets) + circuit_net_subcircuit_pin_index_from_id (id)), column, id);
+    return createIndex (int (mp_indexer->net_terminal_count (nets) + mp_indexer->net_pin_count (nets) + circuit_net_subcircuit_pin_index_from_id (id)), column, id);
 
   } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
 
@@ -1920,7 +1910,7 @@ NetlistBrowserModel::index_from_id (void *id, int column) const
   } else if (is_id_circuit_subcircuit (id)) {
 
     IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-    return createIndex (int (pin_rows_for (circuits) + net_rows_for (circuits) + circuit_subcircuit_index_from_id (id)), column, id);
+    return createIndex (int (mp_indexer->pin_count (circuits) + mp_indexer->net_count (circuits) + circuit_subcircuit_index_from_id (id)), column, id);
 
   } else if (is_id_circuit_subcircuit_pin (id)) {
 
@@ -1929,7 +1919,7 @@ NetlistBrowserModel::index_from_id (void *id, int column) const
   } else if (is_id_circuit_device (id)) {
 
     IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-    return createIndex (int (pin_rows_for (circuits) + net_rows_for (circuits) + subcircuit_rows_for (circuits) + circuit_device_index_from_id (id)), column, id);
+    return createIndex (int (mp_indexer->pin_count (circuits) + mp_indexer->net_count (circuits) + mp_indexer->subcircuit_count (circuits) + circuit_device_index_from_id (id)), column, id);
 
   } else if (is_id_circuit_device_terminal (id)) {
 
@@ -1967,17 +1957,17 @@ NetlistBrowserModel::parent (const QModelIndex &index) const
     } else if (is_id_circuit_net_device_terminal (id) || is_id_circuit_net_pin (id) || is_id_circuit_net_subcircuit_pin (id)) {
 
       IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-      return createIndex (int (pin_rows_for (circuits) + circuit_net_index_from_id (id)), column, make_id_circuit_net (circuit_index_from_id (id), circuit_net_index_from_id (id)));
+      return createIndex (int (mp_indexer->pin_count (circuits) + circuit_net_index_from_id (id)), column, make_id_circuit_net (circuit_index_from_id (id), circuit_net_index_from_id (id)));
 
     } else if (is_id_circuit_subcircuit_pin (id)) {
 
       IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-      return createIndex (int (pin_rows_for (circuits) + net_rows_for (circuits) + circuit_subcircuit_index_from_id (id)), column, make_id_circuit_subcircuit (circuit_index_from_id (id), circuit_subcircuit_index_from_id (id)));
+      return createIndex (int (mp_indexer->pin_count (circuits) + mp_indexer->net_count (circuits) + circuit_subcircuit_index_from_id (id)), column, make_id_circuit_subcircuit (circuit_index_from_id (id), circuit_subcircuit_index_from_id (id)));
 
     } else if (is_id_circuit_device_terminal (id)) {
 
       IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-      return createIndex (int (pin_rows_for (circuits) + net_rows_for (circuits) + subcircuit_rows_for (circuits) + circuit_device_index_from_id (id)), column, make_id_circuit_device (circuit_index_from_id (id), circuit_device_index_from_id (id)));
+      return createIndex (int (mp_indexer->pin_count (circuits) + mp_indexer->net_count (circuits) + mp_indexer->subcircuit_count (circuits) + circuit_device_index_from_id (id)), column, make_id_circuit_device (circuit_index_from_id (id), circuit_device_index_from_id (id)));
 
     } else if (is_id_circuit_net_device_terminal_others (id)) {
 
@@ -1986,7 +1976,7 @@ NetlistBrowserModel::parent (const QModelIndex &index) const
     } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
 
       IndexedNetlistModel::net_pair nets = nets_from_id (id);
-      return createIndex (size_t (terminal_rows_for (nets) + pin_rows_for (nets) + circuit_net_subcircuit_pin_index_from_id (id)), column, make_id_circuit_net_subcircuit_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_subcircuit_pin_index_from_id (id)));
+      return createIndex (size_t (mp_indexer->net_terminal_count (nets) + mp_indexer->net_pin_count (nets) + circuit_net_subcircuit_pin_index_from_id (id)), column, make_id_circuit_net_subcircuit_pin (circuit_index_from_id (id), circuit_net_index_from_id (id), circuit_net_subcircuit_pin_index_from_id (id)));
 
     }
 
@@ -2000,7 +1990,7 @@ NetlistBrowserModel::rowCount (const QModelIndex &parent) const
 {
   if (! parent.isValid ()) {
 
-    return int (mp_l2ndb->netlist ()->circuit_count ());
+    return int (mp_indexer.get () ? mp_indexer->circuit_count () : 0);
 
   } else {
 
@@ -2009,7 +1999,7 @@ NetlistBrowserModel::rowCount (const QModelIndex &parent) const
     if (is_id_circuit (id)) {
 
       IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-      return int (pin_rows_for (circuits) + net_rows_for (circuits) + subcircuit_rows_for (circuits) + device_rows_for (circuits));
+      return int (mp_indexer->pin_count (circuits) + mp_indexer->net_count (circuits) + mp_indexer->subcircuit_count (circuits) + mp_indexer->device_count (circuits));
 
     } else if (is_id_circuit_pin (id)) {
 
@@ -2038,7 +2028,7 @@ NetlistBrowserModel::rowCount (const QModelIndex &parent) const
     } else if (is_id_circuit_net (id)) {
 
       IndexedNetlistModel::net_pair nets = nets_from_id (id);
-      return int (terminal_rows_for (nets) + pin_rows_for (nets) + subcircuit_rows_for (nets));
+      return int (mp_indexer->net_terminal_count (nets) + mp_indexer->net_pin_count (nets) + mp_indexer->net_subcircuit_pin_count (nets));
 
     }
 

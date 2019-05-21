@@ -32,6 +32,8 @@
 #include "layConfigurationDialog.h"
 #include "dbLayoutToNetlist.h"
 #include "dbRecursiveShapeIterator.h"
+#include "dbLayoutToNetlistFormatDefs.h"
+#include "dbLayoutVsSchematicFormatDefs.h"
 
 #include <QMessageBox>
 #include <QInputDialog>
@@ -442,22 +444,38 @@ NetlistBrowserDialog::open_clicked ()
 BEGIN_PROTECTED
 
   std::string fmts = tl::to_string (QObject::tr ("All files (*)"));
-#if 0 //  @@@ would be good to have this:
+#if 0 //  TODO: would be good to have this:
   //  collect the formats available ...
   for (tl::Registrar<rdb::FormatDeclaration>::iterator rdr = tl::Registrar<rdb::FormatDeclaration>::begin (); rdr != tl::Registrar<rdb::FormatDeclaration>::end (); ++rdr) {
     fmts += ";;" + rdr->file_format ();
   }
 #else
-  fmts += ";;L2N DB files (*.l2n)";
-  //  @@@ TODO: add plain spice
+  fmts += ";;L2N DB files (*.l2n);;LVS DB files (*.lvsdb)";
+  //  TODO: add plain spice
 #endif
 
   //  prepare and open the file dialog
-  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Netlist Database File")), fmts);
+  lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Netlist/LVS Database File")), fmts);
   if (open_dialog.get_open (m_open_filename)) {
 
-    std::auto_ptr <db::LayoutToNetlist> db (new db::LayoutToNetlist ());
-    db->load (m_open_filename);
+    std::auto_ptr <db::LayoutToNetlist> db;
+
+    //  TODO: generic concept to detect format
+    std::string first_line;
+    {
+      tl::InputStream stream (m_open_filename);
+      tl::TextInputStream text_stream (stream);
+      first_line = text_stream.get_line ();
+    }
+
+    if (first_line.find (db::lvs_std_format::keys<false>::lvs_magic_string) == 0) {
+      db::LayoutVsSchematic *lvs_db = new db::LayoutVsSchematic ();
+      db.reset (lvs_db);
+      lvs_db->load (m_open_filename);
+    } else {
+      db.reset (new db::LayoutToNetlist ());
+      db->load (m_open_filename);
+    }
 
     int l2n_index = view ()->add_l2ndb (db.release ());
     l2ndb_cb->setCurrentIndex (l2n_index);

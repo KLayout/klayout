@@ -91,7 +91,7 @@ void std_writer_impl<Keys>::write (const db::LayoutVsSchematic *lvs)
 {
   const int version = 0;
 
-  stream () << "#%lvsdb-klayout" << endl;
+  stream () << Keys::lvs_magic_string << endl;
 
   if (version > 0) {
     stream () << Keys::version_key << "(" << version << ")" << endl;

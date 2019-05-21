@@ -29,6 +29,7 @@
 #include "layNetlistBrowser.h"
 #include "laybasicCommon.h"
 #include "dbLayoutToNetlist.h"
+#include "dbLayoutVsSchematic.h"
 #include "dbLayoutUtils.h"
 
 #include "tlObject.h"
@@ -82,11 +83,28 @@ public:
   void set_view (lay::LayoutView *view, unsigned int cv_index);
 
   /**
-   *  @brief Attach the page to a L2N DB
-   *
-   *  To detach the page from any L2N DB, pass 0 for the pointer.
+   *  @brief Attaches the page to a L2N DB
    */
-  void set_l2ndb (db::LayoutToNetlist *database);
+  void set_l2ndb (db::LayoutToNetlist *database)
+  {
+    set_db (database);
+  }
+
+  /**
+   *  @brief Attaches the page to a LVS DB
+   */
+  void set_lvsdb (db::LayoutVsSchematic *database)
+  {
+    set_db (database);
+  }
+
+  /**
+   *  @brief Detaches the page from any DB
+   */
+  void reset_db ()
+  {
+    set_db (0);
+  }
 
   /**
    *  @brief Selects a net or clears the selection if net == 0
@@ -188,6 +206,7 @@ private:
   tl::DeferredMethod<NetlistBrowserPage> dm_update_highlights;
   db::ContextCache m_cell_context_cache;
 
+  void set_db (db::LayoutToNetlist *l2ndb);
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);
   void adjust_view ();

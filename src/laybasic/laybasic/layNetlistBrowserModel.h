@@ -28,6 +28,7 @@
 #include "laybasicCommon.h"
 
 #include "dbLayoutToNetlist.h"
+#include "dbLayoutVsSchematic.h"
 
 #include <QAbstractItemModel>
 #include <QColor>
@@ -110,6 +111,7 @@ Q_OBJECT
 
 public:
   NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb, NetColorizer *colorizer);
+  NetlistBrowserModel (QWidget *parent, db::LayoutVsSchematic *lvsdb, NetColorizer *colorizer);
   ~NetlistBrowserModel ();
 
   virtual int columnCount (const QModelIndex &parent) const;
@@ -202,6 +204,7 @@ private:
   QIcon icon_for_connection (const std::pair<const db::Net *, const db::Net *> &net) const;
 
   db::LayoutToNetlist *mp_l2ndb;
+  db::LayoutVsSchematic *mp_lvsdb;
   NetColorizer *mp_colorizer;
   std::auto_ptr<IndexedNetlistModel> mp_indexer;
   mutable std::map<lay::color_t, QIcon> m_net_icon_per_color;

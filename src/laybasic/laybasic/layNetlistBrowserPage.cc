@@ -617,28 +617,34 @@ NetlistBrowserPage::show_all (bool f)
 }
 
 void
-NetlistBrowserPage::set_l2ndb (db::LayoutToNetlist *database)
+NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 {
   if (mp_info_dialog) {
     delete mp_info_dialog;
     mp_info_dialog = 0;
   }
 
-  mp_database.reset (database);
+  db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
+  mp_database.reset (l2ndb);
 
   clear_markers ();
   highlight (std::vector<const db::Net *> (), std::vector<const db::Device *> (), std::vector<const db::SubCircuit *> ());
 
-  if (! database) {
+  if (! mp_database.get ()) {
     delete directory_tree->model ();
     directory_tree->setModel (0);
     return;
   }
 
-  m_cell_context_cache = db::ContextCache (database->internal_layout ());
+  m_cell_context_cache = db::ContextCache (mp_database->internal_layout ());
 
   //  NOTE: with the tree as the parent, the tree will take over ownership of the model
-  NetlistBrowserModel *new_model = new NetlistBrowserModel (directory_tree, database, &m_colorizer);
+  NetlistBrowserModel *new_model = 0;
+  if (lvsdb) {
+    new_model = new NetlistBrowserModel (directory_tree, lvsdb, &m_colorizer);
+  } else {
+    new_model = new NetlistBrowserModel (directory_tree, l2ndb, &m_colorizer);
+  }
 
   delete directory_tree->model ();
   directory_tree->setModel (new_model);

@@ -58,8 +58,8 @@ db.depends += gsi
 rdb.depends += db
 lib.depends += db
 
+plugins.depends += lib rdb lym db
 buddies.depends += plugins $$LANG_DEPENDS
-plugins.depends += lib rdb db
 
 !equals(HAVE_QT, "0") {
 

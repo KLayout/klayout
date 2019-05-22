@@ -243,8 +243,145 @@ TEST (2)
 
   QModelIndex inv2Index = model->index (1, 0, QModelIndex ());
 
+  //  INV2 circuit node
   EXPECT_EQ (model->hasChildren (inv2Index), true);
   EXPECT_EQ (model->rowCount (inv2Index), 14);
 
-  // ...
+  //  first of pins in INV2 circuit
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Index), Qt::UserRole).toString ()), "$0|$0");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Index), Qt::DisplayRole).toString ()), "$0/$0");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, inv2Index), Qt::DisplayRole).toString ()), "$0");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2Index), Qt::DisplayRole).toString ()), "$0");
+
+  //  INV2, pin 0 node
+  QModelIndex inv2Pin0Index = model->index (0, 0, inv2Index);
+  EXPECT_EQ (model->hasChildren (inv2Pin0Index), true);
+  EXPECT_EQ (model->rowCount (inv2Pin0Index), 1);
+
+  //  INV2, pin 0 has one net node
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Pin0Index), Qt::UserRole).toString ()), "$1|1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Pin0Index), Qt::DisplayRole).toString ()), "$1/1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, inv2Pin0Index), Qt::DisplayRole).toString ()), "<a href='int:net?id=9'>$1/1</a>");
+  std::pair<const db::Net *, const db::Net *> nets = model->net_from_index (model->index_from_id ((void *) 9, 0));
+  EXPECT_EQ (nets.first != 0, true);
+  if (nets.first != 0) {
+    EXPECT_EQ (nets.first->expanded_name (), "$1");
+  }
+  EXPECT_EQ (nets.second != 0, true);
+  if (nets.second != 0) {
+    EXPECT_EQ (nets.second->expanded_name (), "1");
+  }
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2Pin0Index), Qt::DisplayRole).toString ()), "<a href='int:net?id=9'>$1/1</a>");
+
+  //  first of nets in INV2 circuit
+  EXPECT_EQ (tl::to_string (model->data (model->index (6, 0, inv2Index), Qt::UserRole).toString ()), "$1|1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (6, 0, inv2Index), Qt::DisplayRole).toString ()), "$1/1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (6, 1, inv2Index), Qt::DisplayRole).toString ()), "$1 (2)");
+  EXPECT_EQ (tl::to_string (model->data (model->index (6, 2, inv2Index), Qt::DisplayRole).toString ()), "1 (2)");
+
+  //  INV2, net 1 node
+  QModelIndex inv2Net0Index = model->index (6, 0, inv2Index);
+  EXPECT_EQ (model->hasChildren (inv2Net0Index), true);
+  EXPECT_EQ (model->rowCount (inv2Net0Index), 2);
+
+  //  INV2, net 1 has one pin and one terminal at BULK
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Net0Index), Qt::UserRole).toString ()), "B|B|PMOS|PMOS|$1|$1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Net0Index), Qt::DisplayRole).toString ()), "B/B - PMOS/PMOS");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, inv2Net0Index), Qt::DisplayRole).toString ()), "<a href='int:device?id=17'>$1/$1</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2Net0Index), Qt::DisplayRole).toString ()), "<a href='int:device?id=17'>$1/$1</a>");
+
+  //  This terminal connects to a device with four other terminals ..
+  QModelIndex inv2Net0TerminalIndex = model->index (0, 0, inv2Net0Index);
+  EXPECT_EQ (model->hasChildren (inv2Net0TerminalIndex), true);
+  EXPECT_EQ (model->rowCount (inv2Net0TerminalIndex), 4);
+  //  .. whose second terminal is gate
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2Net0TerminalIndex), Qt::UserRole).toString ()), "G|G|IN|2");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2Net0TerminalIndex), Qt::DisplayRole).toString ()), "G/G");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 1, inv2Net0TerminalIndex), Qt::DisplayRole).toString ()), "<a href='int:net?id=73'>IN/2</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 2, inv2Net0TerminalIndex), Qt::DisplayRole).toString ()), "<a href='int:net?id=73'>IN/2</a>");
+
+  //  The Pin
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2Net0Index), Qt::UserRole).toString ()), "");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2Net0Index), Qt::DisplayRole).toString ()), "<a href='int:pin?id=5'>$0/$0</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 1, inv2Net0Index), Qt::DisplayRole).toString ()), "");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 2, inv2Net0Index), Qt::DisplayRole).toString ()), "");
+
+  //  This pin does not have children
+  QModelIndex inv2Net0PinIndex = model->index (1, 0, inv2Net0Index);
+  EXPECT_EQ (model->hasChildren (inv2Net0PinIndex), false);
+  EXPECT_EQ (model->rowCount (inv2Net0PinIndex), 0);
+
+  //  second of nets in INV2 circuit
+  EXPECT_EQ (tl::to_string (model->data (model->index (7, 0, inv2Index), Qt::UserRole).toString ()), "BULK|6");
+  EXPECT_EQ (tl::to_string (model->data (model->index (7, 0, inv2Index), Qt::DisplayRole).toString ()), "BULK/6");
+  EXPECT_EQ (tl::to_string (model->data (model->index (7, 1, inv2Index), Qt::DisplayRole).toString ()), "BULK (2)");
+  EXPECT_EQ (tl::to_string (model->data (model->index (7, 2, inv2Index), Qt::DisplayRole).toString ()), "6 (2)");
+
+  //  first of devices in INV2 circuit
+  EXPECT_EQ (tl::to_string (model->data (model->index (12, 0, inv2Index), Qt::UserRole).toString ()), "$1|$1|PMOS|PMOS");
+  EXPECT_EQ (tl::to_string (model->data (model->index (12, 0, inv2Index), Qt::DisplayRole).toString ()), "PMOS/PMOS");
+  EXPECT_EQ (tl::to_string (model->data (model->index (12, 1, inv2Index), Qt::DisplayRole).toString ()), "$1 - PMOS [L=0.25, W=3.5]");
+  EXPECT_EQ (tl::to_string (model->data (model->index (12, 2, inv2Index), Qt::DisplayRole).toString ()), "$1 - PMOS [L=0.25, W=3.5]");
+
+  QModelIndex inv2PairIndex = model->index (2, 0, QModelIndex ());
+
+  //  INV2PAIR circuit node
+  EXPECT_EQ (model->hasChildren (inv2PairIndex), true);
+  EXPECT_EQ (model->rowCount (inv2PairIndex), 18);
+
+  //  first of pins in INV2 circuit
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairIndex), Qt::UserRole).toString ()), "$4");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairIndex), Qt::DisplayRole).toString ()), "-/$4");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, inv2PairIndex), Qt::DisplayRole).toString ()), "");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2PairIndex), Qt::DisplayRole).toString ()), "$4");
+
+  //  INV2, pin 0 node
+  QModelIndex inv2PairPin0Index = model->index (0, 0, inv2PairIndex);
+  EXPECT_EQ (model->hasChildren (inv2PairPin0Index), true);
+  EXPECT_EQ (model->rowCount (inv2PairPin0Index), 1);
+
+  //  INV2, pin 0 has one net node
+  //  The pin isnt't connected to any net, left side because there is no match, right side because the pin isn't connected
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairPin0Index), Qt::UserRole).toString ()), "");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairPin0Index), Qt::DisplayRole).toString ()), "-/-");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, inv2PairPin0Index), Qt::DisplayRole).toString ()), "");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2PairPin0Index), Qt::DisplayRole).toString ()), "");
+
+  //  first of nets in INV2 circuit
+  EXPECT_EQ (tl::to_string (model->data (model->index (8, 0, inv2PairIndex), Qt::UserRole).toString ()), "$4");
+  EXPECT_EQ (tl::to_string (model->data (model->index (8, 0, inv2PairIndex), Qt::DisplayRole).toString ()), "$4/-");
+  EXPECT_EQ (tl::to_string (model->data (model->index (8, 1, inv2PairIndex), Qt::DisplayRole).toString ()), "$4 (3)");
+  EXPECT_EQ (tl::to_string (model->data (model->index (8, 2, inv2PairIndex), Qt::DisplayRole).toString ()), "");
+
+  //  This net has only left side which has one pin and two subcircuits
+  QModelIndex inv2PairNet0Index = model->index (8, 0, inv2PairIndex);
+  EXPECT_EQ (model->hasChildren (inv2PairNet0Index), true);
+  EXPECT_EQ (model->rowCount (inv2PairNet0Index), 3);
+
+  //  The pin
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairNet0Index), Qt::UserRole).toString ()), "");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairNet0Index), Qt::DisplayRole).toString ()), "<a href='int:pin?id=38'>$3/-</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, inv2PairNet0Index), Qt::DisplayRole).toString ()), "");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2PairNet0Index), Qt::DisplayRole).toString ()), "");
+
+  //  This pin does not have children
+  QModelIndex inv2PairNet0Pin0Index = model->index (0, 0, inv2PairNet0Index);
+  EXPECT_EQ (model->hasChildren (inv2PairNet0Pin0Index), false);
+  EXPECT_EQ (model->rowCount (inv2PairNet0Pin0Index), 0);
+
+  //  The first subcircuit
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2PairNet0Index), Qt::UserRole).toString ()), "OUT|INV2|$1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2PairNet0Index), Qt::DisplayRole).toString ()), "<a href='int:pin?id=101'>OUT/-</a> - <a href='int:circuit?id=1'>INV2/-</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 1, inv2PairNet0Index), Qt::DisplayRole).toString ()), "<a href='int:subcircuit?id=46'>$1/-</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 2, inv2PairNet0Index), Qt::DisplayRole).toString ()), "");
+
+  //  This subcircuit has 6 other pins
+  QModelIndex inv2PairNet0SubCircuit0Index = model->index (1, 0, inv2PairNet0Index);
+  EXPECT_EQ (model->hasChildren (inv2PairNet0SubCircuit0Index), true);
+  EXPECT_EQ (model->rowCount (inv2PairNet0SubCircuit0Index), 6);
+
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairNet0SubCircuit0Index), Qt::UserRole).toString ()), "$1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairNet0SubCircuit0Index), Qt::DisplayRole).toString ()), "<a href='int:pin?id=5'>$0/$0</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 1, inv2PairNet0SubCircuit0Index), Qt::DisplayRole).toString ()), "<a href='int:net?id=170'>$7/-</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2PairNet0SubCircuit0Index), Qt::DisplayRole).toString ()), "<a href='int:net?id=170'>$7/-</a>");
 }

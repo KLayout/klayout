@@ -237,19 +237,7 @@ public:
 
   size_t circuit_count () const
   {
-    return m_per_circuit_data.size ();
-  }
-
-  typedef std::map<std::pair<const db::Circuit *, const db::Circuit *>, PerCircuitData>::const_iterator per_circuit_data_iterator;
-
-  per_circuit_data_iterator begin_per_circuit_data () const
-  {
-    return m_per_circuit_data.begin ();
-  }
-
-  per_circuit_data_iterator end_per_circuit_data () const
-  {
-    return m_per_circuit_data.end ();
+    return m_circuits.size ();
   }
 
   const PerCircuitData *per_circuit_data_for (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const;
@@ -282,7 +270,8 @@ public:
 private:
   tl::weak_ptr<db::Netlist> mp_netlist_a, mp_netlist_b;
   std::vector<std::pair<const db::Circuit *, const db::Circuit *> > m_circuits;
-  std::map<std::pair<const db::Circuit *, const db::Circuit *>, PerCircuitData> m_per_circuit_data;
+  std::list<PerCircuitData> m_per_circuit_data;
+  std::map<const db::Circuit *, PerCircuitData *> m_data_refs;
   mutable std::map<std::pair<const db::Net *, const db::Net *>, PerNetData> m_per_net_data;
   std::map<const db::Circuit *, const db::Circuit *> m_other_circuit;
   std::map<const db::Net *, const db::Net *> m_other_net;

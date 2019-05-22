@@ -115,13 +115,20 @@ static IndexedNetlistModel::circuit_pair get_parent_of (const Pair &pair, const 
   typename std::map<Pair, IndexedNetlistModel::circuit_pair>::iterator i = cache.find (pair);
   if (i == cache.end ()) {
 
-    for (db::NetlistCrossReference::per_circuit_data_iterator c = cross_ref->begin_per_circuit_data (); c != cross_ref->end_per_circuit_data (); ++c) {
+    for (db::NetlistCrossReference::circuits_iterator c = cross_ref->begin_circuits (); c != cross_ref->end_circuits (); ++c) {
+      const db::NetlistCrossReference::PerCircuitData *data = cross_ref->per_circuit_data_for (*c);
       typedef DataGetter<typename Pair::first_type> getter_type;
       typedef typename getter_type::iterator_type iterator_type;
-      iterator_type b = getter_type ().begin (c->second);
-      iterator_type e = getter_type ().end (c->second);
+      iterator_type b = getter_type ().begin (*data);
+      iterator_type e = getter_type ().end (*data);
       for (iterator_type j = b; j != e; ++j) {
-        cache.insert (std::make_pair (j->pair, c->first));
+        cache.insert (std::make_pair (j->pair, *c));
+        if (j->pair.first) {
+          cache.insert (std::make_pair (Pair (j->pair.first, 0), *c));
+        }
+        if (j->pair.second) {
+          cache.insert (std::make_pair (Pair (0, j->pair.second), *c));
+        }
       }
     }
 
@@ -210,15 +217,22 @@ template <class Pair, class Iter>
 static size_t get_index_of (const Pair &pair, Iter begin, Iter end, std::map<Pair, size_t> &cache)
 {
   typename std::map<Pair, size_t>::iterator i = cache.find (pair);
-  if (i != cache.end ()) {
+  if (i == cache.end ()) {
 
     size_t index = 0;
     for (Iter j = begin; j != end; ++j, ++index) {
       cache.insert (std::make_pair (j->pair, index));
+      if (j->pair.first) {
+        cache.insert (std::make_pair (Pair (j->pair.first, 0), index));
+      }
+      if (j->pair.second) {
+        cache.insert (std::make_pair (Pair (0, j->pair.second), index));
+      }
     }
 
     i = cache.find (pair);
     tl_assert (i != cache.end ());
+
   }
 
   return i->second;
@@ -228,15 +242,22 @@ static size_t get_index_of (const Pair &pair, Iter begin, Iter end, std::map<Pai
 size_t NetlistCrossReferenceModel::circuit_index (const circuit_pair &circuits) const
 {
   typename std::map<circuit_pair, size_t>::iterator i = m_index_of_circuits.find (circuits);
-  if (i != m_index_of_circuits.end ()) {
+  if (i == m_index_of_circuits.end ()) {
 
     size_t index = 0;
     for (db::NetlistCrossReference::circuits_iterator j = mp_cross_ref->begin_circuits (); j != mp_cross_ref->end_circuits (); ++j, ++index) {
       m_index_of_circuits.insert (std::make_pair (*j, index));
+      if (j->first) {
+        m_index_of_circuits.insert (std::make_pair (circuit_pair (j->first, 0), index));
+      }
+      if (j->second) {
+        m_index_of_circuits.insert (std::make_pair (circuit_pair (0, j->second), index));
+      }
     }
 
     i = m_index_of_circuits.find (circuits);
     tl_assert (i != m_index_of_circuits.end ());
+
   }
 
   return i->second;

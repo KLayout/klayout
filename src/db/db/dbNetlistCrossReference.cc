@@ -39,13 +39,18 @@ NetlistCrossReference::~NetlistCrossReference ()
 const NetlistCrossReference::PerCircuitData *
 NetlistCrossReference::per_circuit_data_for (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const
 {
-  std::map<const db::Circuit *, PerCircuitData *>::const_iterator i = m_data_refs.find (circuits.first);
-  if (i != m_data_refs.end ()) {
-    return i->second;
+  std::map<const db::Circuit *, PerCircuitData *>::const_iterator i;
+  if (circuits.first) {
+    i = m_data_refs.find (circuits.first);
+    if (i != m_data_refs.end ()) {
+      return i->second;
+    }
   }
-  i = m_data_refs.find (circuits.second);
-  if (i != m_data_refs.end ()) {
-    return i->second;
+  if (circuits.second) {
+    i = m_data_refs.find (circuits.second);
+    if (i != m_data_refs.end ()) {
+      return i->second;
+    }
   }
   return 0;
 }

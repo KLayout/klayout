@@ -22,234 +22,748 @@
 
 
 #include "tlGlobPattern.h"
+#include "tlString.h"
+
+#include <cstring>
 
 namespace tl
 {
 
-static bool 
-do_match (const char *p, const char *s, bool cs, bool exact, bool hm, std::vector<std::string> *o, std::vector<std::pair<unsigned int, const char *> > &bstart)
+// ---------------------------------------------------------------------------------
+//  TODO: take from tlString.h
+
+static inline uint32_t utf32_from_utf8 (const char *&cp, const char *cpe = 0)
 {
-  while (*p) {
+  uint32_t c32 = (unsigned char) *cp++;
+  if (c32 >= 0xf0 && ((cpe && cp + 2 < cpe) || (! cpe && cp [0] && cp [1] && cp [2]))) {
+    c32 = ((c32 & 0x7) << 18) | ((uint32_t (cp [0]) & 0x3f) << 12) | ((uint32_t (cp [1]) & 0x3f) << 6) | (uint32_t (cp [2]) & 0x3f);
+    cp += 3;
+  } else if (c32 >= 0xe0 && ((cpe && cp + 1 < cpe) || (! cpe && cp [0] && cp [1]))) {
+    c32 = ((c32 & 0xf) << 12) | ((uint32_t (cp [0]) & 0x3f) << 6) | (uint32_t (cp [1]) & 0x3f);
+    cp += 2;
+  } else if (c32 >= 0xc0 && ((cpe && cp < cpe) || (! cpe && cp [0]))) {
+    c32 = ((c32 & 0x1f) << 6) | (uint32_t (*cp) & 0x3f);
+    ++cp;
+  }
 
-    if (!exact && *p == '\\') {
+  return c32;
+}
 
-      ++p;
-      if (!*s || *s != *p) {
-        return false;
-      }
-      if (*p) {
-        ++p;
-      }
-      ++s;
+#include "utf_casefolding.h"
 
-    } else if (!exact && *p == '?') {
+static inline wchar_t wdowncase (wchar_t c)
+{
+  int ch = c >> 8;
+  if (ch >= 0 && ch < int (sizeof (uc_tab) / sizeof (uc_tab[0])) && uc_tab[ch]) {
+    return uc_tab[ch][c & 0xff];
+  } else {
+    return c;
+  }
+}
 
-      ++p;
-      if (! *s) {
-        return false;
-      }
-      ++s;
+static inline uint32_t utf32_downcase (uint32_t c32)
+{
+  if (sizeof (wchar_t) == 2 && c32 >= 0x10000) {
+    return c32;
+  } else {
+    return uint32_t (wdowncase (wchar_t (c32)));
+  }
+}
 
-    } else if (!exact && *p == '*') {
+// ---------------------------------------------------------------------------------
 
-      ++p;
+class GlobPatternOpBase
+{
+public:
+  GlobPatternOpBase () { }
+  virtual ~GlobPatternOpBase () { }
 
-      //  a trailing '*' always matches
-      if (!*p) {
-        return true;
-      }
+  virtual GlobPatternOpBase *clone () const = 0;
+  virtual bool match (const char *s, std::vector<std::string> *e) const = 0;
 
-      std::vector<std::pair<unsigned int, const char *> > bs = bstart;
-      size_t no = o ? o->size () : 0;
+  virtual GlobPatternOpBase *next () { return 0; }
+  virtual const GlobPatternOpBase *next () const { return 0; }
+  virtual void set_next (GlobPatternOpBase * /*next*/, bool /*owned*/) { tl_assert (false); }
 
-      while (*s) {
-        if (do_match (p, s, cs, exact, hm, o, bstart)) {
-          return true;
+private:
+  GlobPatternOpBase (const GlobPatternOpBase &);
+  GlobPatternOpBase &operator= (const GlobPatternOpBase &);
+};
+
+class GlobPatternOp
+  : public GlobPatternOpBase
+{
+public:
+  GlobPatternOp () : m_next_owned (false), mp_next (0) { }
+
+  virtual ~GlobPatternOp ()
+  {
+    set_next (0, false);
+  }
+
+  virtual GlobPatternOp *clone () const
+  {
+    GlobPatternOp *op = new GlobPatternOp ();
+    init_clone (op);
+    return op;
+  }
+
+  virtual bool match (const char *s, std::vector<std::string> *e) const
+  {
+    size_t n = e ? e->size () : 0;
+    if (mp_next && mp_next->match (s, e)) {
+      return true;
+    } else if (! mp_next && ! *s) {
+      return true;
+    } else if (e) {
+      e->erase (e->begin () + n, e->end ());
+      return false;
+    } else {
+      return false;
+    }
+  }
+
+  virtual void set_next (GlobPatternOpBase *next, bool owned)
+  {
+    if (mp_next && m_next_owned) {
+      delete mp_next;
+    }
+
+    m_next_owned = owned;
+    mp_next = next;
+  }
+
+  GlobPatternOpBase *next ()
+  {
+    return mp_next;
+  }
+
+  const GlobPatternOpBase *next () const
+  {
+    return mp_next;
+  }
+
+  void set_tail (GlobPatternOpBase *op)
+  {
+    GlobPatternOpBase *n = this;
+    while (n->next ()) {
+      n = n->next ();
+    }
+
+    n->set_next (op, false);
+  }
+
+protected:
+  void init_clone (GlobPatternOp *op) const
+  {
+    if (mp_next && m_next_owned) {
+      op->set_next (mp_next->clone (), true);
+    }
+  }
+
+private:
+  bool m_next_owned;
+  GlobPatternOpBase *mp_next;
+
+  GlobPatternOp (const GlobPatternOp &);
+  GlobPatternOp &operator= (const GlobPatternOp &);
+};
+
+class GlobPatternString
+  : public GlobPatternOp
+{
+public:
+  GlobPatternString (const std::string &s, bool cs)
+    : GlobPatternOp (), m_s (s), m_cs (cs)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual GlobPatternOp *clone () const
+  {
+    GlobPatternString *op = new GlobPatternString (m_s, m_cs);
+    init_clone (op);
+    return op;
+  }
+
+  virtual bool match (const char *s, std::vector<std::string> *e) const
+  {
+    if (! m_cs) {
+
+      const char *sr = m_s.c_str ();
+      while (*sr) {
+        if (! *s) {
+          return false;
         }
-        bstart = bs;
-        if (o && o->begin () + no < o->end ()) {
-          o->erase (o->begin () + no, o->end ());
+        uint32_t cr = utf32_from_utf8 (sr);
+        uint32_t c = utf32_from_utf8 (s);
+        if (utf32_downcase (cr) != utf32_downcase (c)) {
+          return false;
         }
-        ++s;
       }
 
-    } else if (!exact && *p == '[') {
+      return GlobPatternOp::match (s, e);
 
-      if (! *s) {
-        return false;
-      }
+    } else if (m_cs && strncmp (s, m_s.c_str (), m_s.size ()) == 0) {
 
-      bool negate = false;
-      ++p;
-      if (*p && *p == '^') {
-        ++p;
-        negate = true;
-      }
-
-      bool hit = false;
-
-      while (*p != ']' && *p) {
-
-        char c1 = *p;
-        if (c1 == '\\') {
-          c1 = *++p;
-        } 
-        if (*p) {
-          ++p;
-        }
-
-        char c2 = c1;
-        if (*p == '-') {
-          ++p;
-          c2 = *p;
-          if (c2 == '\\') {
-            c2 = *++p;
-          }
-          if (*p) {
-            ++p;
-          }
-        }
-
-        if (! hit) {
-          if (cs && *s >= c1 && *s <= c2) {
-            hit = true;
-          //  TODO: implement UTF-8 support
-          } else if (!cs && tolower (*s) >= tolower (c1) && tolower (*s) <= tolower (c2)) {
-            hit = true;
-          }
-        }
-
-      }
-
-      if (negate == hit) {
-        return false;
-      }
-
-      ++s;
-      if (*p) {
-        ++p;
-      }
-
-    } else if (!exact && *p == '{') {
-
-      ++p;
-
-      bool hit = false;
-      const char *s0 = s;
-
-      while (*p) {
-
-        if (hit) {
-
-          while (*p && *p != ',' && *p != '}') {
-            if (*p == '\\') {
-              ++p;
-            }
-            if (*p) {
-              ++p;
-            }
-          }
-
-        } else {
-
-          s = s0;
-          hit = true;
-          while (*p && *p != ',' && *p != '}') {
-            if (*p == '\\') {
-              ++p;
-            }
-            if (hit) {
-              if (! *s) {
-                hit = false;
-              } else if (cs && *p != *s) {
-                hit = false;
-              //  TODO: implement UTF-8 support
-              } else if (!cs && tolower (*p) != tolower (*s)) {
-                hit = false;
-              } else {
-                ++s;
-              }
-            }
-            if (*p) {
-              ++p;
-            }
-          }
-
-        }
-
-        if (*p == ',') {
-          ++p;
-        } else if (*p == '}') {
-          ++p;
-          break;
-        }
-
-      }
-
-      if (! hit) {
-        return false;
-      }
-
-    } else if (!exact && *p == ')') {
-
-      ++p;
-
-      if (! bstart.empty ()) {
-        if (o) {
-          (*o)[bstart.back ().first] = std::string (bstart.back ().second, s - bstart.back ().second);
-        }
-        bstart.pop_back ();
-      }
-
-    } else if (!exact && *p == '(') {
-
-      ++p;
-      if (o) {
-        bstart.push_back (std::make_pair ((unsigned int) o->size (), s));
-        o->push_back (std::string ());
-      }
+      return GlobPatternOp::match (s + m_s.size (), e);
 
     } else {
 
-      if (cs) {
-        if (*s != *p) {
+      return false;
+
+    }
+  }
+
+private:
+  std::string m_s;
+  bool m_cs;
+
+  GlobPatternString (const GlobPatternString &);
+  GlobPatternString &operator= (const GlobPatternString &);
+};
+
+class GlobPatternPass
+  : public GlobPatternOp
+{
+public:
+  GlobPatternPass ()
+    : GlobPatternOp ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual GlobPatternOp *clone () const
+  {
+    GlobPatternPass *op = new GlobPatternPass ();
+    init_clone (op);
+    return op;
+  }
+
+  virtual bool match (const char *, std::vector<std::string> *) const
+  {
+    return true;
+  }
+
+  GlobPatternPass (const GlobPatternPass &);
+  GlobPatternPass &operator= (const GlobPatternPass &);
+};
+
+class GlobPatternAny
+  : public GlobPatternOp
+{
+public:
+  GlobPatternAny (size_t min, size_t max)
+    : GlobPatternOp (), m_min (min), m_max (max)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual GlobPatternOp *clone () const
+  {
+    GlobPatternAny *op = new GlobPatternAny (m_min, m_max);
+    init_clone (op);
+    return op;
+  }
+
+  virtual bool match (const char *s, std::vector<std::string> *e) const
+  {
+    size_t i = 0;
+    while (i <= m_max) {
+      if (i >= m_min && GlobPatternOp::match (s, e)) {
+        return true;
+      } else if (! *s) {
+        return false;
+      }
+      utf32_from_utf8 (s);
+      ++i;
+    }
+
+    return false;
+  }
+
+private:
+  size_t m_min, m_max;
+
+  GlobPatternAny (const GlobPatternAny &);
+  GlobPatternAny &operator= (const GlobPatternAny &);
+};
+
+class GlobPatternCharClass
+  : public GlobPatternOp
+{
+public:
+  GlobPatternCharClass (bool negate, bool cs)
+    : m_negate (negate), m_cs (cs)
+  {
+    //  .. nothing yet ..
+  }
+
+  GlobPatternCharClass (const std::vector<std::pair<uint32_t, uint32_t> > &intervals, bool negate, bool cs)
+    : m_negate (negate), m_cs (cs), m_intervals (intervals)
+  {
+    //  .. nothing yet ..
+  }
+
+  void add_interval (uint32_t c1, uint32_t c2)
+  {
+    if (m_cs) {
+      m_intervals.push_back (std::make_pair (c1, c2));
+    } else {
+      m_intervals.push_back (std::make_pair (utf32_downcase (c1), utf32_downcase (c2)));
+    }
+  }
+
+  virtual GlobPatternOp *clone () const
+  {
+    GlobPatternCharClass *op = new GlobPatternCharClass (m_intervals, m_negate, m_cs);
+    init_clone (op);
+    return op;
+  }
+
+  virtual bool match (const char *s, std::vector<std::string> *e) const
+  {
+    uint32_t c = utf32_from_utf8 (s);
+    if (! m_cs) {
+      c = utf32_downcase (c);
+    }
+
+    for (std::vector<std::pair<uint32_t, uint32_t> >::const_iterator i = m_intervals.begin (); i != m_intervals.end (); ++i) {
+      if (c >= i->first && c <= i->second) {
+        if (m_negate) {
           return false;
         } else {
-          ++s;
-          ++p;
-        }
-      } else {
-        //  TODO: implement UTF-8 support
-        if (tolower (*s) != tolower (*p)) {
-          return false;
-        } else {
-          ++s;
-          ++p;
+          return GlobPatternOp::match (s, e);
         }
       }
+    }
+
+    if (! m_negate) {
+      return false;
+    } else {
+      return GlobPatternOp::match (s, e);
+    }
+  }
+
+private:
+  bool m_negate, m_cs;
+  std::vector<std::pair<uint32_t, uint32_t> > m_intervals;
+
+  GlobPatternCharClass (const GlobPatternCharClass &);
+  GlobPatternCharClass &operator= (const GlobPatternCharClass &);
+};
+
+template <class T>
+class GlobPatternContinuator
+  : public GlobPatternOpBase
+{
+public:
+  GlobPatternContinuator (T *br)
+    : mp_br (br)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual GlobPatternOp *clone () const { return 0; }
+
+  virtual bool match (const char *s, std::vector<std::string> *e) const
+  {
+    return mp_br->continue_match (s, e);
+  }
+
+private:
+  T *mp_br;
+
+  GlobPatternContinuator (const GlobPatternContinuator &);
+  GlobPatternContinuator &operator= (const GlobPatternContinuator &);
+};
+
+class GlobPatternBranch
+  : public GlobPatternOp
+{
+public:
+  GlobPatternBranch ()
+    : GlobPatternOp (), m_cont (this)
+  {
+    //  .. nothing yet ..
+  }
+
+  ~GlobPatternBranch ()
+  {
+    for (std::vector<GlobPatternOp *>::const_iterator i = m_choices.begin (); i != m_choices.end (); ++i) {
+      delete *i;
+    }
+    m_choices.clear ();
+  }
+
+  void add_choice (GlobPatternOp *op)
+  {
+    op->set_tail (&m_cont);
+    m_choices.push_back (op);
+  }
+
+  virtual GlobPatternOp *clone () const
+  {
+    GlobPatternBranch *br = new GlobPatternBranch ();
+    for (std::vector<GlobPatternOp *>::const_iterator i = m_choices.begin (); i != m_choices.end (); ++i) {
+      br->add_choice ((*i)->clone ());
+    }
+    init_clone (br);
+    return br;
+  }
+
+  virtual bool match (const char *s, std::vector<std::string> *e) const
+  {
+    for (std::vector<GlobPatternOp *>::const_iterator i = m_choices.begin (); i != m_choices.end (); ++i) {
+      if ((*i)->match (s, e)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  virtual bool continue_match (const char *s, std::vector<std::string> *e) const
+  {
+    return GlobPatternOp::match (s, e);
+  }
+
+private:
+  std::vector<GlobPatternOp *> m_choices;
+  GlobPatternContinuator<GlobPatternBranch> m_cont;
+
+  GlobPatternBranch (const GlobPatternBranch &);
+  GlobPatternBranch &operator= (const GlobPatternBranch &);
+};
+
+class GlobPatternBracket
+  : public GlobPatternOp
+{
+public:
+  GlobPatternBracket ()
+    : GlobPatternOp (), mp_inner (0), mp_s0 (0), m_index (0), m_cont (this)
+  {
+    //  .. nothing yet ..
+  }
+
+  ~GlobPatternBracket ()
+  {
+    delete mp_inner;
+    mp_inner = 0;
+  }
+
+  void set_inner (GlobPatternOp *op)
+  {
+    delete mp_inner;
+    op->set_tail (& m_cont);
+    mp_inner = op;
+  }
+
+  virtual GlobPatternOp *clone () const
+  {
+    GlobPatternBracket *br = new GlobPatternBracket ();
+    if (mp_inner) {
+      br->set_inner (mp_inner->clone ());
+    }
+    init_clone (br);
+    return br;
+  }
+
+  virtual bool match (const char *s, std::vector<std::string> *e) const
+  {
+    if (mp_inner) {
+
+      if (e) {
+        mp_s0 = s;
+        m_index = e->size ();
+        e->push_back (std::string ());
+      } else {
+        mp_s0 = 0;
+      }
+
+      bool res = mp_inner->match (s, e);
+
+      mp_s0 = 0;
+      return res;
+
+    }
+    return false;
+  }
+
+  virtual bool continue_match (const char *s, std::vector<std::string> *e) const
+  {
+    if (mp_s0 && e) {
+      (*e) [m_index] = std::string (mp_s0, 0, s - mp_s0);
+    }
+    return GlobPatternOp::match (s, e);
+  }
+
+private:
+  GlobPatternOp *mp_inner;
+  //  NOTE: this isn't thread-safe unless GlobPattern objects live in different threads
+  mutable const char *mp_s0;
+  mutable size_t m_index;
+  GlobPatternContinuator<GlobPatternBracket> m_cont;
+
+  GlobPatternBracket (const GlobPatternBracket &);
+  GlobPatternBracket &operator= (const GlobPatternBracket &);
+};
+
+static
+GlobPatternOp *compile (const char *&p, bool exact, bool cs, bool hm, bool for_brace);
+
+void
+compile_emit_op (GlobPatternOp *&op_head, GlobPatternOp *&op, GlobPatternOp *no)
+{
+  if (op) {
+    op->set_next (no, true);
+  } else {
+    op_head = no;
+  }
+  op = no;
+}
+
+void
+compile_emit_string (std::string &str, GlobPatternOp *&op_head, GlobPatternOp *&op, bool cs)
+{
+  if (! str.empty ()) {
+    compile_emit_op (op_head, op, new GlobPatternString (str, cs));
+    str.clear ();
+  }
+}
+
+void
+compile_emit_char_class (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, bool cs)
+{
+  bool negate = false;
+  if (*p && *p == '^') {
+    ++p;
+    negate = true;
+  }
+
+  GlobPatternCharClass *cc = new GlobPatternCharClass (negate, cs);
+
+  while (*p) {
+
+    if (*p == ']') {
+      ++p;
+      break;
+    }
+
+    uint32_t c1 = utf32_from_utf8 (p);
+    if (c1 == '\\') {
+      c1 = utf32_from_utf8 (p);
+    }
+
+    uint32_t c2 = c1;
+    if (*p == '-') {
+      ++p;
+      c2 = utf32_from_utf8 (p);
+      if (c2 == '\\') {
+        c2 = utf32_from_utf8 (p);
+      }
+    }
+
+    cc->add_interval (c1, c2);
+
+  }
+
+  compile_emit_op (op_head, op, cc);
+}
+
+void
+compile_emit_alt (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, bool cs)
+{
+  GlobPatternBranch *alt_op = new GlobPatternBranch ();
+  while (*p) {
+    GlobPatternOp *alt = compile (p, false, cs, false, true);
+    if (alt) {
+      alt_op->add_choice (alt);
+    }
+    if (*p == ',') {
+      ++p;
+    } else if (*p == '}') {
+      ++p;
+      break;
+    }
+  }
+
+  compile_emit_op (op_head, op, alt_op);
+}
+
+void
+compile_emit_bracket (GlobPatternOp *&op_head, GlobPatternOp *&op, const char *&p, bool cs)
+{
+  GlobPatternBracket *br_op = new GlobPatternBracket ();
+  GlobPatternOp *inner = compile (p, false, cs, false, true);
+  if (inner) {
+    br_op->set_inner (inner);
+  }
+  if (*p == ')') {
+    ++p;
+  }
+
+  compile_emit_op (op_head, op, br_op);
+}
+
+static
+GlobPatternOp *compile (const char *&p, bool exact, bool cs, bool hm, bool for_brace)
+{
+  std::string str;
+  GlobPatternOp *op = 0, *op_head = 0;
+
+  while (*p) {
+
+    if (exact) {
+
+      str += *p++;
+
+    } else if (*p == '\\') {
+
+      ++p;
+      if (*p) {
+        str += *p++;
+      }
+
+    } else if (*p == '?') {
+
+      compile_emit_string (str, op_head, op, cs);
+      compile_emit_op (op_head, op, new GlobPatternAny (1, 1));
+
+      ++p;
+
+    } else if (*p == '*') {
+
+      compile_emit_string (str, op_head, op, cs);
+      if (p[1]) {
+        compile_emit_op (op_head, op, new GlobPatternAny (0, std::numeric_limits<size_t>::max ()));
+      } else {
+        compile_emit_op (op_head, op, new GlobPatternPass ());
+      }
+
+      ++p;
+
+    } else if (*p == '[') {
+
+      compile_emit_string (str, op_head, op, cs);
+      ++p;
+      compile_emit_char_class (op_head, op, p, cs);
+
+    } else if (*p == '{') {
+
+      compile_emit_string (str, op_head, op, cs);
+      ++p;
+      compile_emit_alt (op_head, op, p, cs);
+
+    } else if (*p == '(') {
+
+      compile_emit_string (str, op_head, op, cs);
+      ++p;
+      compile_emit_bracket (op_head, op, p, cs);
+
+    } else if (for_brace && (*p == ',' || *p == '}' || *p == ')')) {
+
+      break;
+
+    } else {
+
+      str += *p++;
 
     }
 
-  } 
+  }
 
-  return (hm || *s == 0);
+  compile_emit_string (str, op_head, op, cs);
+
+  if (hm) {
+    compile_emit_op (op_head, op, new GlobPatternPass ());
+  }
+
+  return op_head;
 }
 
 GlobPattern::GlobPattern ()
   : m_case_sensitive (true), m_exact (false), m_header_match (false)
 {
-  //  .. nothing yet ..
+  mp_op = 0;
+  m_needs_compile = true;
 }
 
 GlobPattern::GlobPattern (const std::string &p)
   : m_p (p), m_case_sensitive (true), m_exact (false), m_header_match (false)
 {
-  //  .. nothing yet ..
+  mp_op = 0;
+  m_needs_compile = true;
+}
+
+GlobPattern::GlobPattern (const GlobPattern &other)
+  : m_case_sensitive (true), m_exact (false), m_header_match (false)
+{
+  mp_op = 0;
+  m_needs_compile = true;
+
+  operator= (other);
+}
+
+GlobPattern &
+GlobPattern::operator= (const GlobPattern &other)
+{
+  if (this != &other) {
+
+    m_case_sensitive = other.m_case_sensitive;
+    m_exact = other.m_exact;
+    m_header_match = other.m_header_match;
+    m_p = other.m_p;
+    mp_op = other.mp_op ? other.mp_op->clone () : 0;
+    m_needs_compile = other.m_needs_compile;
+
+  }
+  return *this;
+}
+
+void
+GlobPattern::do_compile ()
+{
+  delete mp_op;
+
+  const char *p = m_p.c_str ();
+  mp_op = compile (p, m_exact, m_case_sensitive, m_header_match, false);
+
+  if (! mp_op) {
+    mp_op = new GlobPatternOp ();
+  }
+
+  m_needs_compile = false;
+}
+
+void
+GlobPattern::needs_compile ()
+{
+  if (! m_needs_compile) {
+
+    m_needs_compile = true;
+
+    delete mp_op;
+    mp_op = 0;
+
+  }
+}
+
+GlobPattern &GlobPattern::operator= (const std::string &p)
+{
+  if (m_p != p) {
+    m_p = p;
+    needs_compile ();
+  }
+
+  return *this;
 }
 
 void GlobPattern::set_case_sensitive (bool f)
 {
-  m_case_sensitive = f;
+  if (f != m_case_sensitive) {
+    m_case_sensitive = f;
+    needs_compile ();
+  }
 }
 
 bool GlobPattern::case_sensitive () const
@@ -259,7 +773,10 @@ bool GlobPattern::case_sensitive () const
 
 void GlobPattern::set_exact (bool f)
 {
-  m_exact = f;
+  if (f != m_exact) {
+    m_exact = f;
+    needs_compile ();
+  }
 }
 
 bool GlobPattern::exact () const
@@ -269,7 +786,10 @@ bool GlobPattern::exact () const
 
 void GlobPattern::set_header_match (bool f)
 {
-  m_header_match = f;
+  if (f != m_header_match) {
+    m_header_match = f;
+    needs_compile ();
+  }
 }
 
 bool GlobPattern::header_match () const
@@ -277,10 +797,19 @@ bool GlobPattern::header_match () const
   return m_header_match;
 }
 
+GlobPatternOp *GlobPattern::op () const
+{
+  if (m_needs_compile) {
+    GlobPattern *non_const_this = const_cast<GlobPattern *> (this);
+    non_const_this->do_compile ();
+  }
+
+  return mp_op;
+}
+
 bool GlobPattern::match (const char *s) const
 {
-  std::vector<std::pair<unsigned int, const char *> > bstart;
-  return do_match (m_p.c_str (), s, m_case_sensitive, m_exact, m_header_match, 0, bstart);
+  return op ()->match (s, 0);
 }
 
 bool GlobPattern::match (const char *s, std::vector<std::string> &e) const
@@ -288,14 +817,13 @@ bool GlobPattern::match (const char *s, std::vector<std::string> &e) const
   if (! e.empty ()) {
     e.clear ();
   }
-  std::vector<std::pair<unsigned int, const char *> > bstart;
-  return do_match (m_p.c_str (), s, m_case_sensitive, m_exact, m_header_match, &e, bstart);
+
+  return op ()->match (s, &e);
 }
 
 bool GlobPattern::match (const std::string &s) const
 {
-  std::vector<std::pair<unsigned int, const char *> > bstart;
-  return do_match (m_p.c_str (), s.c_str (), m_case_sensitive, m_exact, m_header_match, 0, bstart);
+  return op ()->match (s.c_str (), 0);
 }
 
 bool GlobPattern::match (const std::string &s, std::vector<std::string> &e) const
@@ -303,8 +831,8 @@ bool GlobPattern::match (const std::string &s, std::vector<std::string> &e) cons
   if (! e.empty ()) {
     e.clear ();
   }
-  std::vector<std::pair<unsigned int, const char *> > bstart;
-  return do_match (m_p.c_str (), s.c_str (), m_case_sensitive, m_exact, m_header_match, &e, bstart);
+
+  return op ()->match (s.c_str (), &e);
 }
 
 }

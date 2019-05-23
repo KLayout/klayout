@@ -26,6 +26,7 @@
 #include "tlTimer.h"
 #include "tlProgress.h"
 #include "tlExpression.h"
+#include "tlGlobPattern.h"
 
 // ----------------------------------------------------------------
 //  Logger binding
@@ -557,6 +558,85 @@ Class<ExpressionWrapper> decl_ExpressionWrapper ("tl", "Expression",
   "This class has been introduced in version 0.25.\n"
 );
 
+
+static tl::GlobPattern *new_glob_pattern (const std::string &s)
+{
+  return new tl::GlobPattern (s);
 }
 
+namespace {
 
+template <class Iter>
+struct to_var_iterator
+  : public Iter
+{
+  typedef typename Iter::value_type original_value_type;
+  typedef typename tl::Variant *pointer;
+  typedef typename tl::Variant &reference;
+  typedef typename Iter::difference_type difference_type;
+
+  to_var_iterator (const Iter &iter)
+    : Iter (iter)
+  { }
+
+  pointer operator-> ()
+  {
+    m_var = tl::Variant (Iter::operator* ());
+    return &m_var;
+  }
+
+  reference operator* ()
+  {
+    m_var = tl::Variant (Iter::operator* ());
+    return m_var;
+  }
+
+private:
+  tl::Variant m_var;
+};
+
+}
+
+static tl::Variant match (const tl::GlobPattern *pattern, const std::string &s)
+{
+  std::vector<std::string> brackets;
+  if (pattern->match (s, brackets)) {
+    return tl::Variant (to_var_iterator<std::vector<std::string>::const_iterator> (brackets.begin ()), to_var_iterator<std::vector<std::string>::const_iterator> (brackets.end ()));
+  } else {
+    return tl::Variant ();
+  }
+}
+
+Class<tl::GlobPattern> decl_GlobPattern ("tl", "GlobPattern",
+  gsi::constructor ("new", &new_glob_pattern, gsi::arg ("pattern"),
+    "@brief Creates a new glob pattern match object\n"
+  ) +
+  gsi::method ("case_sensitive=", &tl::GlobPattern::set_case_sensitive, gsi::arg ("case_sensitive"),
+    "@brief Sets a value indicating whether the glob pattern match is case sensitive."
+  ) +
+  gsi::method ("case_sensitive", &tl::GlobPattern::case_sensitive,
+    "@brief Gets a value indicating whether the glob pattern match is case sensitive."
+  ) +
+  gsi::method ("head_match=", &tl::GlobPattern::set_header_match, gsi::arg ("head_match"),
+    "@brief Sets a value indicating whether trailing characters are allowed.\n"
+    "If this predicate is false, the glob pattern needs to match the full subject string. "
+    "If true, the match function will ignore trailing characters and return true if the "
+    "front part of the subject string matches."
+  ) +
+  gsi::method ("head_match", &tl::GlobPattern::header_match,
+    "@brief Gets a value indicating whether trailing characters are allowed.\n"
+  ) +
+  gsi::method_ext ("match", &match, gsi::arg ("subject"),
+    "@brief Matches the subject string against the pattern.\n"
+    "Returns nil if the subject string does not match the pattern. Otherwise returns a list "
+    "with the substrings captured in round brackets."
+  ),
+  "@brief A glob pattern matcher\n"
+  "This class is provided to make KLayout's glob pattern matching available to scripts too. "
+  "The intention is to provide an implementation which is compatible with KLayout's pattern "
+  "syntax.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+}

@@ -67,6 +67,8 @@ public:
   typedef std::pair<const db::Pin *, const db::Pin *> pin_pair;
   typedef std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_pair;
 
+  virtual std::string column_title (int section) const = 0;
+
   virtual size_t circuit_count () const = 0;
   virtual size_t net_count (const circuit_pair &circuits) const = 0;
   virtual size_t net_terminal_count (const net_pair &nets) const = 0;
@@ -120,6 +122,8 @@ public:
   {
     return true;
   }
+
+  virtual std::string column_title (int section) const;
 
   virtual size_t circuit_count () const;
   virtual size_t net_count (const circuit_pair &circuits) const;

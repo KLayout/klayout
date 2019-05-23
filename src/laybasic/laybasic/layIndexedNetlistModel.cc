@@ -191,6 +191,16 @@ static size_t index_from_attr (const std::pair<const Attr *, const Attr *> &attr
   return cc->second;
 }
 
+std::string
+SingleIndexedNetlistModel::column_title (int section) const
+{
+  if (section == 0) {
+    return tl::to_string (tr ("Object"));
+  } else if (section == 1) {
+    return tl::to_string (tr ("Connections"));
+  }
+}
+
 size_t
 SingleIndexedNetlistModel::circuit_count () const
 {

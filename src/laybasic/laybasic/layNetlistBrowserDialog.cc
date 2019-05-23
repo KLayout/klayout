@@ -699,7 +699,7 @@ NetlistBrowserDialog::activated ()
   if (lay::PluginRoot::instance ()) {
     lay::PluginRoot::instance ()->config_get (cfg_l2ndb_window_state, state);
   }
-  lay::restore_dialog_state (this, state);
+  lay::restore_dialog_state (this, state, false /*don't adjust the section sizes*/);
 
   //  Switch to the active cellview index when no valid one is set.
   lay::CellView cv = view ()->cellview (m_cv_index);
@@ -778,7 +778,7 @@ NetlistBrowserDialog::deactivated ()
   release_mouse ();
 
   if (lay::PluginRoot::instance ()) {
-    lay::PluginRoot::instance ()->config_set (cfg_l2ndb_window_state, lay::save_dialog_state (this).c_str ());
+    lay::PluginRoot::instance ()->config_set (cfg_l2ndb_window_state, lay::save_dialog_state (this, false /*don't store the section sizes*/).c_str ());
   }
 
   browser_frame->set_l2ndb (0);

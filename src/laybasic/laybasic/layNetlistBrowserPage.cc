@@ -141,7 +141,15 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   directory_tree->addAction (actionExportSelected);
   directory_tree->addAction (actionExportAll);
 
+  directory_tree->header ()->setDefaultSectionSize (150);
+
   lay::HTMLItemDelegate *delegate;
+
+  delegate = new lay::HTMLItemDelegate (this);
+  delegate->set_text_margin (2);
+  delegate->set_anchors_clickable (true);
+  connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
+  directory_tree->setItemDelegateForColumn (2, delegate);
 
   delegate = new lay::HTMLItemDelegate (this);
   delegate->set_text_margin (2);
@@ -646,13 +654,22 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
     new_model = new NetlistBrowserModel (directory_tree, l2ndb, &m_colorizer);
   }
 
+  int columns = directory_tree->model () ? directory_tree->model ()->columnCount (QModelIndex ()) : 0;
+  int new_columns = new_model->columnCount (QModelIndex ());
+
   delete directory_tree->model ();
   directory_tree->setModel (new_model);
   connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
   connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (selection_changed ()));
 
   directory_tree->header ()->show ();
-  directory_tree->header ()->setSortIndicatorShown (true);
+  directory_tree->header ()->setStretchLastSection (true);
+  if (columns < new_columns) {
+    //  makes sure new columns are properly size-adjusted
+    for (int i = std::max (0, columns - 1); i < new_columns; ++i) {
+      directory_tree->header ()->resizeSection (i, directory_tree->header ()->defaultSectionSize ());
+    }
+  }
 
   find_text->setText (QString ());
 }

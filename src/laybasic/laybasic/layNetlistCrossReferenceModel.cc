@@ -32,6 +32,18 @@ NetlistCrossReferenceModel::NetlistCrossReferenceModel (const db::NetlistCrossRe
   //  .. nothing yet ..
 }
 
+std::string
+NetlistCrossReferenceModel::column_title (int section) const
+{
+  if (section == 0) {
+    return tl::to_string (tr ("Objects"));
+  } else if (section == 1) {
+    return tl::to_string (tr ("Layout"));
+  } else if (section == 2) {
+    return tl::to_string (tr ("Reference"));
+  }
+}
+
 size_t NetlistCrossReferenceModel::circuit_count () const
 {
   return mp_cross_ref->circuit_count ();

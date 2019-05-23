@@ -189,11 +189,11 @@ private:
   QString text (const QModelIndex &index) const;
   QString search_text (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;
-  QString make_link_to (const std::pair<const db::Net *, const db::Net *> &nets) const;
-  QString make_link_to (const std::pair<const db::Device *, const db::Device *> &devices) const;
-  QString make_link_to (const std::pair<const db::Pin *, const db::Pin *> &pins, const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const;
-  QString make_link_to (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const;
-  QString make_link_to (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sub_circuits) const;
+  QString make_link_to (const std::pair<const db::Net *, const db::Net *> &nets, int column = 0) const;
+  QString make_link_to (const std::pair<const db::Device *, const db::Device *> &devices, int column = 0) const;
+  QString make_link_to (const std::pair<const db::Pin *, const db::Pin *> &pins, const std::pair<const db::Circuit *, const db::Circuit *> &circuits, int column = 0) const;
+  QString make_link_to (const std::pair<const db::Circuit *, const db::Circuit *> &circuits, int column = 0) const;
+  QString make_link_to (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &sub_circuits, int column = 0) const;
 
   std::pair<const db::Netlist *, const db::Netlist *> netlists () const
   {

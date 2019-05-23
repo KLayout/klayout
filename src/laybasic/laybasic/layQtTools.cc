@@ -68,7 +68,7 @@ void register_help_handler (QObject *object, const char *slot, const char *modal
 // --------------------------------------------------------------------------------
 
 std::string 
-save_dialog_state (QWidget *w)
+save_dialog_state (QWidget *w, bool with_section_sizes)
 {
   std::string s;
 
@@ -86,7 +86,7 @@ save_dialog_state (QWidget *w)
     s += (dynamic_cast<QSplitter *> (w))->saveState ().toBase64 ().constData ();
     s += "\";";
 
-  } else if (dynamic_cast<QTreeView *> (w)) {
+  } else if (with_section_sizes && dynamic_cast<QTreeView *> (w)) {
 
     s += tl::to_string (w->objectName ());
     s += "=\"";
@@ -112,7 +112,7 @@ save_dialog_state (QWidget *w)
 }
 
 void 
-restore_dialog_state (QWidget *dialog, const std::string &s)
+restore_dialog_state (QWidget *dialog, const std::string &s, bool with_section_sizes)
 {
   if (! dialog) {
     return;
@@ -145,7 +145,7 @@ restore_dialog_state (QWidget *dialog, const std::string &s)
 
         (dynamic_cast<QSplitter *> (widgets.front ()))->restoreState (QByteArray::fromBase64 (value.c_str ()));
 
-      } else if (dynamic_cast<QTreeView *> (widgets.front ())) {
+      } else if (with_section_sizes && dynamic_cast<QTreeView *> (widgets.front ())) {
 
 #if QT_VERSION >= 0x040500
         (dynamic_cast<QTreeView *> (widgets.front ()))->header ()->restoreState (QByteArray::fromBase64 (value.c_str ()));

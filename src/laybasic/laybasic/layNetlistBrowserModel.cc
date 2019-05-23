@@ -648,68 +648,56 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
 }
 
 template <class Obj>
-static std::string str_from_expanded_name (const Obj *obj)
+static std::string str_from_expanded_name (const Obj *obj, bool dash_for_empty = false)
 {
   if (obj) {
     return obj->expanded_name ();
+  } else if (dash_for_empty) {
+    return std::string ("-");
   } else {
     return std::string ();
   }
 }
 
 template <class Obj>
-static std::string str_from_name (const Obj *obj)
+static std::string str_from_name (const Obj *obj, bool dash_for_empty = false)
 {
   if (obj) {
     return obj->name ();
+  } else if (dash_for_empty) {
+    return std::string ("-");
   } else {
     return std::string ();
   }
 }
+
+const std::string var_sep (" ⇔ ");
 
 template <class Obj>
 static std::string str_from_expanded_names (const std::pair<const Obj *, const Obj *> &objs, bool is_single)
 {
-  std::string s;
-
-  if (objs.first) {
-    s += objs.first->expanded_name ();
-  } else if (! is_single) {
-    s += "-";
-  }
-
+  std::string s = str_from_expanded_name (objs.first, ! is_single);
   if (! is_single) {
-    s += "/";
-    if (objs.second) {
-      s += objs.second->expanded_name ();
-    } else {
-      s += "-";
+    std::string t = str_from_expanded_name (objs.second, ! is_single);
+    if (t != s) {
+      s += var_sep;
+      s += t;
     }
   }
-
   return s;
 }
 
 template <class Obj>
 static std::string str_from_names (const std::pair<const Obj *, const Obj *> &objs, bool is_single)
 {
-  std::string s;
-
-  if (objs.first) {
-    s += objs.first->name ();
-  } else if (! is_single) {
-    s += "-";
-  }
-
+  std::string s = str_from_name (objs.first, ! is_single);
   if (! is_single) {
-    s += "/";
-    if (objs.second) {
-      s += objs.second->name ();
-    } else {
-      s += "-";
+    std::string t = str_from_name (objs.second, ! is_single);
+    if (t != s) {
+      s += var_sep;
+      s += t;
     }
   }
-
   return s;
 }
 
@@ -742,23 +730,28 @@ std::string device_string (const db::Device *device)
 }
 
 static
+std::string device_class_string (const db::Device *device, bool dash_for_empty = false)
+{
+  std::string s;
+  if (device && device->device_class ()) {
+    s = device->device_class ()->name ();
+  } else if (dash_for_empty) {
+    s = "-";
+  }
+  return s;
+}
+
+static
 std::string devices_string (const std::pair<const db::Device *, const db::Device *> &devices, bool is_single)
 {
   if (devices.first || devices.second) {
 
-    std::string s;
-    if (devices.first && devices.first->device_class ()) {
-      s += devices.first->device_class ()->name ();
-    } else if (! is_single) {
-      s += "-";
-    }
-
+    std::string s = device_class_string (devices.first, ! is_single);
     if (! is_single) {
-      s += "/";
-      if (devices.second && devices.second->device_class ()) {
-        s += devices.second->device_class ()->name ();
-      } else {
-        s += "-";
+      std::string t = device_class_string (devices.second, ! is_single);
+      if (t != s) {
+        s += var_sep;
+        s += t;
       }
     }
 
@@ -769,58 +762,103 @@ std::string devices_string (const std::pair<const db::Device *, const db::Device
   }
 }
 
-QString
-NetlistBrowserModel::make_link_to (const std::pair<const db::Net *, const db::Net *> &nets) const
+static QString build_url (void *id, const std::string &tag, const std::string &title)
 {
-  if (! nets.first && ! nets.second) {
+  std::string s = std::string ("<a href='int:");
+  s += tag;
+  s += "?id=";
+  s += tl::to_string (reinterpret_cast<size_t> (id));
+  s += "'>";
+
+  s += tl::escaped_to_html (title);
+
+  s += "</a>";
+
+  return tl::to_qstring (s);
+}
+
+QString
+NetlistBrowserModel::make_link_to (const std::pair<const db::Net *, const db::Net *> &nets, int column) const
+{
+  if ((! nets.first || column == 2) && (! nets.second || column == 1)) {
     return QString ();
   } else {
     void *id = make_id_circuit_net (mp_indexer->circuit_index (mp_indexer->parent_of (nets)), mp_indexer->net_index (nets));
-    return tl::to_qstring (tl::sprintf ("<a href='int:net?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), str_from_expanded_names (nets, mp_indexer->is_single ())));
+    if (mp_indexer->is_single () || column == 1) {
+      return build_url (id, "net", str_from_expanded_name (nets.first));
+    } else if (column == 2) {
+      return build_url (id, "net", str_from_expanded_name (nets.second));
+    } else {
+      return build_url (id, "net", str_from_expanded_names (nets, mp_indexer->is_single ()));
+    }
   }
 }
 
 QString
-NetlistBrowserModel::make_link_to (const std::pair<const db::Device *, const db::Device *> &devices) const
+NetlistBrowserModel::make_link_to (const std::pair<const db::Device *, const db::Device *> &devices, int column) const
 {
-  if (! devices.first && ! devices.second) {
+  if ((! devices.first || column == 2) && (! devices.second || column == 1)) {
     return QString ();
   } else {
     void *id = make_id_circuit_device (mp_indexer->circuit_index (mp_indexer->parent_of (devices)), mp_indexer->device_index (devices));
-    return tl::to_qstring (tl::sprintf ("<a href='int:device?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), str_from_expanded_names (devices, mp_indexer->is_single ())));
+    if (mp_indexer->is_single () || column == 1) {
+      return build_url (id, "device", str_from_expanded_name (devices.first));
+    } else if (column == 2) {
+      return build_url (id, "device", str_from_expanded_name (devices.second));
+    } else {
+      return build_url (id, "device", str_from_expanded_names (devices, mp_indexer->is_single ()));
+    }
   }
 }
 
 QString
-NetlistBrowserModel::make_link_to (const std::pair<const db::Pin *, const db::Pin *> &pins, const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const
+NetlistBrowserModel::make_link_to (const std::pair<const db::Pin *, const db::Pin *> &pins, const std::pair<const db::Circuit *, const db::Circuit *> &circuits, int column) const
 {
-  if (! pins.first && ! pins.second) {
+  if ((! pins.first || column == 2) && (! pins.second || column == 1)) {
     return QString ();
   } else {
     void *id = make_id_circuit_pin (mp_indexer->circuit_index (circuits), mp_indexer->pin_index (pins, circuits));
-    return tl::to_qstring (tl::sprintf ("<a href='int:pin?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), str_from_expanded_names (pins, mp_indexer->is_single ())));
+    if (mp_indexer->is_single () || column == 1) {
+      return build_url (id, "pin", str_from_expanded_name (pins.first));
+    } else if (column == 2) {
+      return build_url (id, "pin", str_from_expanded_name (pins.second));
+    } else {
+      return build_url (id, "pin", str_from_expanded_names (pins, mp_indexer->is_single ()));
+    }
   }
 }
 
 QString
-NetlistBrowserModel::make_link_to (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const
+NetlistBrowserModel::make_link_to (const std::pair<const db::Circuit *, const db::Circuit *> &circuits, int column) const
 {
-  if (! circuits.first && ! circuits.second) {
+  if ((! circuits.first || column == 2) && (! circuits.second || column == 1)) {
     return QString ();
   } else {
     void *id = make_id_circuit (mp_indexer->circuit_index (circuits));
-    return tl::to_qstring (tl::sprintf ("<a href='int:circuit?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), str_from_names (circuits, mp_indexer->is_single ())));
+    if (mp_indexer->is_single () || column == 1) {
+      return build_url (id, "circuit", str_from_name (circuits.first));
+    } else if (column == 2) {
+      return build_url (id, "circuit", str_from_name (circuits.second));
+    } else {
+      return build_url (id, "circuit", str_from_names (circuits, mp_indexer->is_single ()));
+    }
   }
 }
 
 QString
-NetlistBrowserModel::make_link_to (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &subcircuits) const
+NetlistBrowserModel::make_link_to (const std::pair<const db::SubCircuit *, const db::SubCircuit *> &subcircuits, int column) const
 {
-  if (! subcircuits.first && ! subcircuits.second) {
+  if ((! subcircuits.first || column == 2) && (! subcircuits.second || column == 1)) {
     return QString ();
   } else {
     void *id = make_id_circuit_subcircuit (mp_indexer->circuit_index (mp_indexer->parent_of (subcircuits)), mp_indexer->subcircuit_index (subcircuits));
-    return tl::to_qstring (tl::sprintf ("<a href='int:subcircuit?id=%s'>%s</a>", tl::to_string (reinterpret_cast<size_t> (id)), str_from_expanded_names (subcircuits, mp_indexer->is_single ())));
+    if (mp_indexer->is_single () || column == 1) {
+      return build_url (id, "subcircuit", str_from_expanded_name (subcircuits.first));
+    } else if (column == 2) {
+      return build_url (id, "subcircuit", str_from_expanded_name (subcircuits.second));
+    } else {
+      return build_url (id, "subcircuit", str_from_expanded_names (subcircuits, mp_indexer->is_single ()));
+    }
   }
 }
 
@@ -957,6 +995,7 @@ IndexedNetlistModel::net_pair nets_from_device_terminals (const IndexedNetlistMo
   return std::make_pair (net1, net2);
 }
 
+const std::string field_sep (" / ");
 
 QString
 NetlistBrowserModel::text (const QModelIndex &index) const
@@ -997,9 +1036,8 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     if (index.column () == 0) {
       return tl::to_qstring (str_from_expanded_names (nets, mp_indexer->is_single ()));
     } else {
-      return make_link_to (nets);
+      return make_link_to (nets, index.column ());
     }
-    //  TODO: in case of compare, column 1 is name(a):name(b), 2 is link name(a) and 3 is link name(b)
 
   } else if (is_id_circuit_device (id)) {
 
@@ -1019,9 +1057,9 @@ NetlistBrowserModel::text (const QModelIndex &index) const
       if (index.column () == 0) {
         return tl::to_qstring (devices_string (devices, mp_indexer->is_single ()));
       } else if (index.column () == 1) {
-        return tl::to_qstring (str_from_expanded_name (devices.first) + " - " + device_string (devices.first));
+        return tl::to_qstring (str_from_expanded_name (devices.first) + field_sep + device_string (devices.first));
       } else if (index.column () == 2) {
-        return tl::to_qstring (str_from_expanded_name (devices.second) + " - " + device_string (devices.second));
+        return tl::to_qstring (str_from_expanded_name (devices.second) + field_sep + device_string (devices.second));
       }
 
     }
@@ -1042,10 +1080,9 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     } else {
 
       IndexedNetlistModel::net_pair nets = nets_from_device_terminals (devices, termdefs);
-      return make_link_to (nets);
+      return make_link_to (nets, index.column ());
 
     }
-    //  TODO: in case of compare, column 1 is terminal, 2 is linke net(a) and 3 is link net(b)
 
   } else if (is_id_circuit_subcircuit (id)) {
 
@@ -1054,10 +1091,11 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
     if (index.column () == 0) {
       return make_link_to (circuit_refs);
-    } else {
-      return tl::to_qstring (str_from_expanded_names (subcircuits, mp_indexer->is_single ()));
+    } else if (mp_indexer->is_single () || index.column () == 1) {
+      return tl::to_qstring (str_from_expanded_name (subcircuits.first));
+    } else if (index.column () == 2) {
+      return tl::to_qstring (str_from_expanded_name (subcircuits.second));
     }
-    //  TODO: in case of compare, column 1 is circuit name(a):circuit name(b), 2 is subcircuit name(a) and 3 is subcircuit name(b)
 
   } else if (is_id_circuit_subcircuit_pin (id)) {
 
@@ -1069,9 +1107,8 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     if (index.column () == 0) {
       return make_link_to (pins, circuit_refs);
     } else {
-      return make_link_to (nets_from_subcircuit_pins (subcircuits, pins));
+      return make_link_to (nets_from_subcircuit_pins (subcircuits, pins), index.column ());
     }
-    //  TODO: in case of compare, column 1 is name(a):name(b), 2 is link net(a) and 3 is link net(b)
 
   } else if (is_id_circuit_net (id)) {
 
@@ -1090,12 +1127,11 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     //  circuit/net/pin: header column = pin name, second column empty (for now)
     IndexedNetlistModel::net_pin_pair pinrefs = net_pinrefs_from_id (id);
     IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
-    if (index.column () == 0) {
-
+    if (mp_indexer->is_single () && index.column () == 0) {
       return make_link_to (pins_from_pinrefs (pinrefs), circuits);
-
+    } else if (! mp_indexer->is_single ()) {
+      return make_link_to (pins_from_pinrefs (pinrefs), circuits, index.column ());
     }
-    //  TODO: in case of compare use second and third column
 
   } else if (is_id_circuit_net_subcircuit_pin (id)) {
 
@@ -1105,16 +1141,10 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
 
     if (index.column () == 0) {
-
-      return make_link_to (pins_from_pinrefs (pinrefs), circuit_refs) + tl::to_qstring (" - ") + make_link_to (circuit_refs);
-
-    } else if (index.column () == 1) {
-
-      return make_link_to (subcircuits_from_pinrefs (pinrefs));
-
+      return make_link_to (pins_from_pinrefs (pinrefs), circuit_refs) + tl::to_qstring (field_sep) + make_link_to (circuit_refs);
+    } else {
+      return make_link_to (subcircuits_from_pinrefs (pinrefs), index.column ());
     }
-    //  TODO: in case of compare, column 1 is pin link(a):pin link(b) - circuit link(a):circuit link(b),
-    //  columns 2 is subcircuit link(a), columns (3) is subcircuit link(b)
 
   } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
 
@@ -1129,9 +1159,8 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     if (index.column () == 0) {
       return make_link_to (pins, circuit_refs);
     } else {
-      return make_link_to (nets_from_subcircuit_pins (subcircuits, pins));
+      return make_link_to (nets_from_subcircuit_pins (subcircuits, pins), index.column ());
     }
-    //  TODO: columns 2 and 3
 
   } else if (is_id_circuit_net_device_terminal (id)) {
 
@@ -1144,15 +1173,14 @@ NetlistBrowserModel::text (const QModelIndex &index) const
       std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> termdefs = terminal_defs_from_terminal_refs (refs);
 
       if (mp_indexer->is_single ()) {
-        return tl::to_qstring (str_from_name (termdefs.first) + " - " + device_string (devices.first));
+        return tl::to_qstring (str_from_name (termdefs.first) + field_sep + device_string (devices.first));
       } else {
-        return tl::to_qstring (str_from_names (termdefs, mp_indexer->is_single ()) + " - " + devices_string (devices, mp_indexer->is_single ()));
+        return tl::to_qstring (str_from_names (termdefs, mp_indexer->is_single ()) + field_sep + devices_string (devices, mp_indexer->is_single ()));
       }
 
     } else {
-      return make_link_to (devices);
+      return make_link_to (devices, index.column ());
     }
-    //  TODO: columns 2 and 3
 
   } else if (is_id_circuit_net_device_terminal_others (id)) {
 
@@ -1171,10 +1199,9 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     } else {
 
       IndexedNetlistModel::net_pair nets = nets_from_device_terminals (devices, termdefs);
-      return make_link_to (nets);
+      return make_link_to (nets, index.column ());
 
     }
-    //  TODO: other columns
 
   }
 
@@ -1526,7 +1553,7 @@ NetlistBrowserModel::icon (const QModelIndex &index) const
 
     return icon_for_devices (device_classes);
 
-  } else if (is_id_circuit_net_device_terminal_others (id) || is_id_circuit_net_subcircuit_pin_others (id)) {
+  } else if (is_id_circuit_pin_net (id) || is_id_circuit_device_terminal (id) || is_id_circuit_net_device_terminal_others (id) || is_id_circuit_net_subcircuit_pin_others (id)) {
 
     IndexedNetlistModel::net_pair nets = net_from_index (index);
     return icon_for_connection (nets);
@@ -1653,15 +1680,10 @@ QVariant
 NetlistBrowserModel::headerData (int section, Qt::Orientation /*orientation*/, int role) const
 {
   if (role == Qt::DisplayRole) {
-    if (section == 0) {
-      return tr ("Object");
-    } else if (section == 1) {
-      //  TODO: 2 and 3 columns
-      return tr ("Name (Items)");
-    }
+    return tl::to_qstring (mp_indexer->column_title (section));
+  } else {
+    return QVariant ();
   }
-
-  return QVariant ();
 }
 
 QModelIndex

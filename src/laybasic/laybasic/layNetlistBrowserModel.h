@@ -125,6 +125,11 @@ public:
 
   QModelIndex index_from_id (void *id, int column) const;
 
+  int status_column () const
+  {
+    return m_status_column;
+  }
+
   std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index) const;
   QModelIndex index_from_net (const std::pair<const db::Net *, const db::Net *> &net) const;
   QModelIndex index_from_net (const db::Net *net) const;
@@ -210,6 +215,10 @@ private:
   std::auto_ptr<IndexedNetlistModel> mp_indexer;
   mutable std::map<lay::color_t, QIcon> m_net_icon_per_color;
   mutable std::map<lay::color_t, QIcon> m_connection_icon_per_color;
+  int m_object_column;
+  int m_status_column;
+  int m_first_column;
+  int m_second_column;
 };
 
 } // namespace lay

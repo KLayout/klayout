@@ -43,8 +43,6 @@ public:
 
   virtual bool is_single () const { return false; }
 
-  virtual std::string column_title (int section) const;
-
   virtual size_t circuit_count () const;
   virtual size_t net_count (const circuit_pair &circuits) const;
   virtual size_t net_terminal_count (const net_pair &nets) const;

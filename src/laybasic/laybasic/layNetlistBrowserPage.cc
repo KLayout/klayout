@@ -145,23 +145,13 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 
   lay::HTMLItemDelegate *delegate;
 
-  delegate = new lay::HTMLItemDelegate (this);
-  delegate->set_text_margin (2);
-  delegate->set_anchors_clickable (true);
-  connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
-  directory_tree->setItemDelegateForColumn (2, delegate);
-
-  delegate = new lay::HTMLItemDelegate (this);
-  delegate->set_text_margin (2);
-  delegate->set_anchors_clickable (true);
-  connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
-  directory_tree->setItemDelegateForColumn (1, delegate);
-
-  delegate = new lay::HTMLItemDelegate (this);
-  delegate->set_text_margin (2);
-  delegate->set_anchors_clickable (true);
-  connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
-  directory_tree->setItemDelegateForColumn (0, delegate);
+  for (int i = 0; i < 4; ++i) {
+    delegate = new lay::HTMLItemDelegate (this);
+    delegate->set_text_margin (2);
+    delegate->set_anchors_clickable (true);
+    connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
+    directory_tree->setItemDelegateForColumn (i, delegate);
+  }
 
   QMenu *find_edit_menu = new QMenu (find_text);
   find_edit_menu->addAction (actionUseRegularExpressions);
@@ -664,12 +654,17 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 
   directory_tree->header ()->show ();
   directory_tree->header ()->setStretchLastSection (true);
+  directory_tree->header ()->setMinimumSectionSize (25);
+
   if (columns < new_columns) {
     //  makes sure new columns are properly size-adjusted
     for (int i = std::max (0, columns - 1); i < new_columns; ++i) {
-      directory_tree->header ()->resizeSection (i, directory_tree->header ()->defaultSectionSize ());
+      directory_tree->header ()->resizeSection (i, i == 1 ? directory_tree->header ()->minimumSectionSize () : directory_tree->header ()->defaultSectionSize ());
     }
   }
+
+  //  hide the status column if not needed
+  directory_tree->header ()->setSectionHidden (1, new_model->status_column () < 0);
 
   find_text->setText (QString ());
 }

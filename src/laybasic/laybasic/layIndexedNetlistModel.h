@@ -25,6 +25,7 @@
 #define HDR_layIndexedNetlistModel
 
 #include "laybasicCommon.h"
+#include "dbNetlistCrossReference.h"  //  for Status enum
 
 #include <map>
 #include <vector>
@@ -53,6 +54,8 @@ namespace lay
 class LAYBASIC_PUBLIC IndexedNetlistModel
 {
 public:
+  typedef db::NetlistCrossReference::Status Status;
+
   IndexedNetlistModel () { }
   virtual ~IndexedNetlistModel () { }
 
@@ -82,15 +85,15 @@ public:
   virtual circuit_pair parent_of (const device_pair &device_pair) const = 0;
   virtual circuit_pair parent_of (const subcircuit_pair &subcircuit_pair) const = 0;
 
-  virtual circuit_pair circuit_from_index (size_t index) const = 0;
-  virtual net_pair net_from_index (const circuit_pair &circuits, size_t index) const = 0;
+  virtual std::pair<circuit_pair, Status> circuit_from_index (size_t index) const = 0;
+  virtual std::pair<net_pair, Status> net_from_index (const circuit_pair &circuits, size_t index) const = 0;
   virtual const db::Net *second_net_for (const db::Net *first) const = 0;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const = 0;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const = 0;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const = 0;
-  virtual device_pair device_from_index (const circuit_pair &circuits, size_t index) const = 0;
-  virtual pin_pair pin_from_index (const circuit_pair &circuits, size_t index) const = 0;
-  virtual subcircuit_pair subcircuit_from_index (const circuit_pair &circuits, size_t index) const = 0;
+  virtual std::pair<device_pair, Status> device_from_index (const circuit_pair &circuits, size_t index) const = 0;
+  virtual std::pair<pin_pair, Status> pin_from_index (const circuit_pair &circuits, size_t index) const = 0;
+  virtual std::pair<subcircuit_pair, Status> subcircuit_from_index (const circuit_pair &circuits, size_t index) const = 0;
 
   virtual size_t circuit_index (const circuit_pair &circuits) const = 0;
   virtual size_t net_index (const net_pair &nets) const = 0;
@@ -137,16 +140,16 @@ public:
   virtual circuit_pair parent_of (const net_pair &nets) const;
   virtual circuit_pair parent_of (const device_pair &devices) const;
   virtual circuit_pair parent_of (const subcircuit_pair &subcircuits) const;
-  virtual circuit_pair circuit_from_index (size_t index) const;
+  virtual std::pair<circuit_pair, Status> circuit_from_index (size_t index) const;
 
-  virtual net_pair net_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<net_pair, Status> net_from_index (const circuit_pair &circuits, size_t index) const;
   virtual const db::Net *second_net_for (const db::Net * /*first*/) const;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const;
-  virtual device_pair device_from_index (const circuit_pair &circuits, size_t index) const;
-  virtual pin_pair pin_from_index (const circuit_pair &circuits, size_t index) const;
-  virtual subcircuit_pair subcircuit_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<device_pair, Status> device_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<pin_pair, Status> pin_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<subcircuit_pair, Status> subcircuit_from_index (const circuit_pair &circuits, size_t index) const;
 
   virtual size_t circuit_index (const circuit_pair &circuits) const;
   virtual size_t net_index (const net_pair &nets) const;

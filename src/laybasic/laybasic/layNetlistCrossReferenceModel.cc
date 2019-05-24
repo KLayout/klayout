@@ -166,16 +166,19 @@ IndexedNetlistModel::circuit_pair NetlistCrossReferenceModel::parent_of (const I
   return get_parent_of (subcircuit_pair, mp_cross_ref.get (), m_parents_of_subcircuits);
 }
 
-IndexedNetlistModel::circuit_pair NetlistCrossReferenceModel::circuit_from_index (size_t index) const
+std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::circuit_from_index (size_t index) const
 {
-  return mp_cross_ref->begin_circuits () [index];
+  IndexedNetlistModel::circuit_pair cp = mp_cross_ref->begin_circuits () [index];
+  const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (cp);
+  tl_assert (data != 0);
+  return std::make_pair (cp, data->status);
 }
 
-IndexedNetlistModel::net_pair NetlistCrossReferenceModel::net_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::net_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::net_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return data->nets [index].pair;
+  return std::make_pair (data->nets [index].pair, data->nets [index].status);
 }
 
 const db::Net *NetlistCrossReferenceModel::second_net_for (const db::Net *first) const
@@ -204,25 +207,25 @@ IndexedNetlistModel::net_pin_pair NetlistCrossReferenceModel::net_pinref_from_in
   return data->pins [index];
 }
 
-IndexedNetlistModel::device_pair NetlistCrossReferenceModel::device_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::device_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::device_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return data->devices [index].pair;
+  return std::make_pair (data->devices [index].pair, data->devices [index].status);
 }
 
-IndexedNetlistModel::pin_pair NetlistCrossReferenceModel::pin_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::pin_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::pin_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return data->pins [index].pair;
+  return std::make_pair (data->pins [index].pair, data->pins [index].status);
 }
 
-IndexedNetlistModel::subcircuit_pair NetlistCrossReferenceModel::subcircuit_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::subcircuit_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::subcircuit_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return data->subcircuits [index].pair;
+  return std::make_pair (data->subcircuits [index].pair, data->subcircuits [index].status);
 }
 
 template <class Pair, class Iter>

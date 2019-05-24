@@ -267,18 +267,18 @@ SingleIndexedNetlistModel::parent_of (const subcircuit_pair &subcircuits) const
   return std::make_pair (subcircuits.first->circuit (), (const db::Circuit *) 0);
 }
 
-IndexedNetlistModel::circuit_pair
+std::pair<IndexedNetlistModel::circuit_pair, IndexedNetlistModel::Status>
 SingleIndexedNetlistModel::circuit_from_index (size_t index) const
 {
   db::Netlist::const_circuit_iterator none;
-  return attr_by_object_and_index (std::make_pair (mp_netlist, (const db::Netlist *) 0), index, mp_netlist->begin_circuits (), mp_netlist->end_circuits (), none, none, m_circuit_by_index, sort_by_name<db::Circuit> ());
+  return std::make_pair (attr_by_object_and_index (std::make_pair (mp_netlist, (const db::Netlist *) 0), index, mp_netlist->begin_circuits (), mp_netlist->end_circuits (), none, none, m_circuit_by_index, sort_by_name<db::Circuit> ()), db::NetlistCrossReference::None);
 }
 
-IndexedNetlistModel::net_pair
+std::pair<IndexedNetlistModel::net_pair, IndexedNetlistModel::Status>
 SingleIndexedNetlistModel::net_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_net_iterator none;
-  return attr_by_object_and_index (circuits, index, circuits.first->begin_nets (), circuits.first->end_nets (), none, none, m_net_by_circuit_and_index, sort_by_expanded_name<db::Net> ());
+  return std::make_pair (attr_by_object_and_index (circuits, index, circuits.first->begin_nets (), circuits.first->end_nets (), none, none, m_net_by_circuit_and_index, sort_by_expanded_name<db::Net> ()), db::NetlistCrossReference::None);
 }
 
 const db::Net *
@@ -308,25 +308,25 @@ SingleIndexedNetlistModel::net_pinref_from_index (const net_pair &nets, size_t i
   return attr_by_object_and_index (nets, index, nets.first->begin_pins (), nets.first->end_pins (), none, none, m_pinref_by_net_and_index, sort_by_pin_name<db::NetPinRef> ());
 }
 
-IndexedNetlistModel::device_pair
+std::pair<IndexedNetlistModel::device_pair, IndexedNetlistModel::Status>
 SingleIndexedNetlistModel::device_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_device_iterator none;
-  return attr_by_object_and_index (circuits, index, circuits.first->begin_devices (), circuits.first->end_devices (), none, none, m_device_by_circuit_and_index, sort_by_expanded_name<db::Device> ());
+  return std::make_pair (attr_by_object_and_index (circuits, index, circuits.first->begin_devices (), circuits.first->end_devices (), none, none, m_device_by_circuit_and_index, sort_by_expanded_name<db::Device> ()), db::NetlistCrossReference::None);
 }
 
-IndexedNetlistModel::pin_pair
+std::pair<IndexedNetlistModel::pin_pair, IndexedNetlistModel::Status>
 SingleIndexedNetlistModel::pin_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_pin_iterator none;
-  return attr_by_object_and_index (circuits, index, circuits.first->begin_pins (), circuits.first->end_pins (), none, none, m_pin_by_circuit_and_index, sort_by_expanded_name<db::Pin> ());
+  return std::make_pair (attr_by_object_and_index (circuits, index, circuits.first->begin_pins (), circuits.first->end_pins (), none, none, m_pin_by_circuit_and_index, sort_by_expanded_name<db::Pin> ()), db::NetlistCrossReference::None);
 }
 
-IndexedNetlistModel::subcircuit_pair
+std::pair<IndexedNetlistModel::subcircuit_pair, IndexedNetlistModel::Status>
 SingleIndexedNetlistModel::subcircuit_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_subcircuit_iterator none;
-  return attr_by_object_and_index (circuits, index, circuits.first->begin_subcircuits (), circuits.first->end_subcircuits (), none, none, m_subcircuit_by_circuit_and_index, sort_by_expanded_name<db::SubCircuit> ());
+  return std::make_pair (attr_by_object_and_index (circuits, index, circuits.first->begin_subcircuits (), circuits.first->end_subcircuits (), none, none, m_subcircuit_by_circuit_and_index, sort_by_expanded_name<db::SubCircuit> ()), db::NetlistCrossReference::None);
 }
 
 size_t

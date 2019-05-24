@@ -188,6 +188,7 @@ private:
   std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits_from_id (void *id) const;
   QString text (const QModelIndex &index) const;
   QString search_text (const QModelIndex &index) const;
+  db::NetlistCrossReference::Status status (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;
   QString make_link_to (const std::pair<const db::Net *, const db::Net *> &nets, int column = 0) const;
   QString make_link_to (const std::pair<const db::Device *, const db::Device *> &devices, int column = 0) const;

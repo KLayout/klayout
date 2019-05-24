@@ -642,9 +642,21 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
     return QVariant (text (index));
   } else if (role == Qt::UserRole) {
     return QVariant (search_text (index));
-  } else {
-    return QVariant ();
+  } else if (role == Qt::FontRole) {
+    db::NetlistCrossReference::Status st = status (index);
+    if (st == db::NetlistCrossReference::NoMatch || st == db::NetlistCrossReference::Mismatch || st == db::NetlistCrossReference::Skipped) {
+      QFont font;
+      font.setWeight (QFont::Bold);
+      return QVariant (font);
+    }
+  } else if (role == Qt::ForegroundRole) {
+    db::NetlistCrossReference::Status st = status (index);
+    if (st == db::NetlistCrossReference::Match || st == db::NetlistCrossReference::MatchWithWarning) {
+      //  taken from marker browser:
+      return QVariant (QColor (0, 192, 0));
+    }
   }
+  return QVariant ();
 }
 
 template <class Obj>
@@ -1154,7 +1166,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     size_t other_index = circuit_net_subcircuit_pin_other_index_from_id (id);
 
     IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
-    IndexedNetlistModel::pin_pair pins = mp_indexer->pin_from_index (circuit_refs, other_index);
+    IndexedNetlistModel::pin_pair pins = mp_indexer->pin_from_index (circuit_refs, other_index).first;
 
     if (index.column () == 0) {
       return make_link_to (pins, circuit_refs);
@@ -1247,6 +1259,45 @@ static std::string search_string_from_names (const std::pair<const Obj *, const 
   }
 }
 
+db::NetlistCrossReference::Status
+NetlistBrowserModel::status (const QModelIndex &index) const
+{
+  void *id = index.internalPointer ();
+
+  if (is_id_circuit (id)) {
+
+    size_t index = circuit_index_from_id (id);
+    return mp_indexer->circuit_from_index (index).second;
+
+  } else if (is_id_circuit_pin (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    size_t index = circuit_pin_index_from_id (id);
+    return mp_indexer->pin_from_index (circuits, index).second;
+
+  } else if (is_id_circuit_device (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    size_t index = circuit_device_index_from_id (id);
+    return mp_indexer->device_from_index (circuits, index).second;
+
+  } else if (is_id_circuit_subcircuit (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    size_t index = circuit_subcircuit_index_from_id (id);
+    return mp_indexer->subcircuit_from_index (circuits, index).second;
+
+  } else if (is_id_circuit_net (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    size_t index = circuit_net_index_from_id (id);
+    return mp_indexer->net_from_index (circuits, index).second;
+
+  }
+
+  return db::NetlistCrossReference::None;
+}
+
 QString
 NetlistBrowserModel::search_text (const QModelIndex &index) const
 {
@@ -1324,7 +1375,7 @@ NetlistBrowserModel::search_text (const QModelIndex &index) const
     IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (pinrefs);
     IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
 
-    IndexedNetlistModel::pin_pair pins = mp_indexer->pin_from_index (circuit_refs, other_index);
+    IndexedNetlistModel::pin_pair pins = mp_indexer->pin_from_index (circuit_refs, other_index).first;
     IndexedNetlistModel::net_pair nets = nets_from_circuit_pins (circuit_refs, pins);
 
     return tl::to_qstring (combine_search_strings (search_string_from_names (pins), search_string_from_expanded_names (nets)));
@@ -1829,7 +1880,7 @@ NetlistBrowserModel::net_from_index (const QModelIndex &index) const
 
     IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (pinrefs);
     IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
-    IndexedNetlistModel::pin_pair pins = mp_indexer->pin_from_index (circuit_refs, other_index);
+    IndexedNetlistModel::pin_pair pins = mp_indexer->pin_from_index (circuit_refs, other_index).first;
 
     return nets_from_subcircuit_pins (subcircuits, pins);
 
@@ -2063,7 +2114,7 @@ std::pair<const db::Circuit *, const db::Circuit *>
 NetlistBrowserModel::circuits_from_id (void *id) const
 {
   size_t index = circuit_index_from_id (id);
-  return mp_indexer->circuit_from_index (index);
+  return mp_indexer->circuit_from_index (index).first;
 }
 
 std::pair<const db::Net *, const db::Net *>
@@ -2072,7 +2123,7 @@ NetlistBrowserModel::nets_from_id (void *id) const
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   size_t index = circuit_net_index_from_id (id);
 
-  return mp_indexer->net_from_index (circuits, index);
+  return mp_indexer->net_from_index (circuits, index).first;
 }
 
 std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *>
@@ -2108,7 +2159,7 @@ NetlistBrowserModel::devices_from_id (void *id) const
   IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
   size_t index = circuit_device_index_from_id (id);
 
-  return mp_indexer->device_from_index (circuits, index);
+  return mp_indexer->device_from_index (circuits, index).first;
 }
 
 std::pair<const db::Pin *, const db::Pin *>
@@ -2121,7 +2172,7 @@ NetlistBrowserModel::pins_from_id (void *id) const
 
     size_t index = circuit_subcircuit_pin_index_from_id (id);
 
-    return mp_indexer->pin_from_index (circuit_refs, index);
+    return mp_indexer->pin_from_index (circuit_refs, index).first;
 
   } else {
 
@@ -2129,7 +2180,7 @@ NetlistBrowserModel::pins_from_id (void *id) const
 
     size_t index = circuit_pin_index_from_id (id);
 
-    return mp_indexer->pin_from_index (circuits, index);
+    return mp_indexer->pin_from_index (circuits, index).first;
 
   }
 }
@@ -2142,7 +2193,7 @@ NetlistBrowserModel::subcircuits_from_id (void *id) const
     IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
     size_t index = circuit_subcircuit_index_from_id (id);
 
-    return mp_indexer->subcircuit_from_index (circuits, index);
+    return mp_indexer->subcircuit_from_index (circuits, index).first;
 
   } else {
 

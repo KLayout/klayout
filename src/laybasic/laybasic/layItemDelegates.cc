@@ -113,6 +113,7 @@ HTMLItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, 
   }
   doc.setTextWidth (m_text_width);
   doc.setDocumentMargin (m_text_margin);
+  doc.setDefaultFont (option_v4.font);
 
   option_v4.text = QString ();
   style->drawControl (QStyle::CE_ItemViewItem, &option_v4, painter);
@@ -123,6 +124,8 @@ HTMLItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, 
     ctx.palette.setColor (QPalette::Text, option_v4.palette.color (QPalette::Active, QPalette::HighlightedText));
   } else if (! is_enabled) {
     ctx.palette.setColor (QPalette::Text, option_v4.palette.color (QPalette::Disabled, QPalette::Text));
+  } else {
+    ctx.palette.setColor (QPalette::Text, option_v4.palette.color (QPalette::Text));
   }
 
   QRect text_rect = style->subElementRect (QStyle::SE_ItemViewItemText, &option_v4);

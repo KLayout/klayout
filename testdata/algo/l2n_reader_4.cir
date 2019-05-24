@@ -1,0 +1,50 @@
+* Netlist before simplification
+
+* cell TRANS
+.SUBCKT TRANS
+.ENDS TRANS
+
+* cell RINGO
+.SUBCKT RINGO
+* cell instance $1 r0 *1 11.1,0
+X$1 \$I1 \$1 BULK INV2ALT
+* cell instance $2 r0 *1 3,0
+X$2 \$I1 BULK INV2X
+* cell instance $3 r0 *1 0,0
+X$3 \$I1 BULK INV2X
+* cell instance $4 r0 *1 -3,0
+X$4 \$I1 BULK NAND1X
+* cell instance $5 r0 *1 6,0
+X$5 \$I1 BULK INV2X
+* cell instance $6 r0 *1 16.3,0
+X$6 \$I1 BULK INV2X
+* cell instance $7 r0 *1 19.3,0
+X$7 \$I1 BULK INV2X
+* cell instance $8 r0 *1 22.3,0
+X$8 \$I1 BULK INV2X
+* cell instance $9 r0 *1 25.3,0
+X$9 \$I1 BULK INV2X
+* cell instance $10 r0 *1 28.3,0
+X$10 \$I1 BULK INV2X
+* cell instance $11 r0 *1 31.3,0
+X$11 \$I1 BULK INV2X
+.ENDS RINGO
+
+* cell INV2ALT
+* pin 
+* pin 
+* pin BULK
+.SUBCKT INV2ALT \$1 \$3 BULK
+.ENDS INV2ALT
+
+* cell NAND1X
+* pin 
+* pin BULK
+.SUBCKT NAND1X \$1 BULK
+.ENDS NAND1X
+
+* cell INV2X
+* pin 
+* pin BULK
+.SUBCKT INV2X \$1 BULK
+.ENDS INV2X

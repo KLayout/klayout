@@ -181,7 +181,9 @@ SOURCES = \
     dbLayoutVsSchematicWriter.cc \
     dbLayoutVsSchematicReader.cc \
     dbLayoutVsSchematicFormatDefs.cc \
-    dbLayoutVsSchematic.cc
+    dbLayoutVsSchematic.cc \
+    gsiDeclDbNetlistCrossReference.cc \
+    gsiDeclDbLayoutVsSchematic.cc
 
 HEADERS = \
   dbArray.h \

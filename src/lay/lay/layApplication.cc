@@ -1095,9 +1095,7 @@ ApplicationBase::run ()
         }
 
         if (mw->current_view () != 0) {
-          std::auto_ptr <db::LayoutToNetlist> db (new db::LayoutToNetlist ());
-          db->load (f->second.first);
-          int l2ndb_index = mw->current_view ()->add_l2ndb (db.release ());
+          int l2ndb_index = mw->current_view ()->add_l2ndb (db::LayoutToNetlist::create_from_file (f->second.first));
           mw->current_view ()->open_l2ndb_browser (l2ndb_index, mw->current_view ()->active_cellview_index ());
         }
 

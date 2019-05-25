@@ -32,8 +32,6 @@
 #include "layConfigurationDialog.h"
 #include "dbLayoutToNetlist.h"
 #include "dbRecursiveShapeIterator.h"
-#include "dbLayoutToNetlistFormatDefs.h"
-#include "dbLayoutVsSchematicFormatDefs.h"
 
 #include <QMessageBox>
 #include <QInputDialog>
@@ -458,26 +456,7 @@ BEGIN_PROTECTED
   lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Netlist/LVS Database File")), fmts);
   if (open_dialog.get_open (m_open_filename)) {
 
-    std::auto_ptr <db::LayoutToNetlist> db;
-
-    //  TODO: generic concept to detect format
-    std::string first_line;
-    {
-      tl::InputStream stream (m_open_filename);
-      tl::TextInputStream text_stream (stream);
-      first_line = text_stream.get_line ();
-    }
-
-    if (first_line.find (db::lvs_std_format::keys<false>::lvs_magic_string) == 0) {
-      db::LayoutVsSchematic *lvs_db = new db::LayoutVsSchematic ();
-      db.reset (lvs_db);
-      lvs_db->load (m_open_filename);
-    } else {
-      db.reset (new db::LayoutToNetlist ());
-      db->load (m_open_filename);
-    }
-
-    int l2n_index = view ()->add_l2ndb (db.release ());
+    int l2n_index = view ()->add_l2ndb (db::LayoutToNetlist::create_from_file (m_open_filename));
     l2ndb_cb->setCurrentIndex (l2n_index);
     //  it looks like the setCurrentIndex does not issue this signal:
     l2ndb_index_changed (l2n_index);

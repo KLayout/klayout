@@ -29,6 +29,7 @@
 #include "layLineStyles.h"
 #include "dbSaveLayoutOptions.h"
 #include "dbLayoutToNetlist.h"
+#include "dbLayoutVsSchematic.h"
 #include "tlStream.h"
 
 #if defined(HAVE_QTBINDINGS)
@@ -202,6 +203,24 @@ static unsigned int create_l2ndb (lay::LayoutView *view, const std::string &name
   db::LayoutToNetlist *db = new db::LayoutToNetlist ();
   db->set_name (name);
   return view->add_l2ndb (db);
+}
+
+static unsigned int create_lvsdb (lay::LayoutView *view, const std::string &name)
+{
+  db::LayoutVsSchematic *db = new db::LayoutVsSchematic ();
+  db->set_name (name);
+  return view->add_l2ndb (db);
+}
+
+static db::LayoutVsSchematic *get_lvsdb (lay::LayoutView *view, unsigned int index)
+{
+  db::LayoutToNetlist *db = view->get_l2ndb (index);
+  return dynamic_cast<db::LayoutVsSchematic *> (db);
+}
+
+static void add_lvsdb (lay::LayoutView *view, db::LayoutVsSchematic *lvsdb)
+{
+  view->add_l2ndb (lvsdb);
 }
 
 //  this binding returns a const pointer which is not converted into a copy by RBA
@@ -1493,6 +1512,39 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   gsi::method ("show_l2ndb", &lay::LayoutView::open_l2ndb_browser, gsi::arg ("l2ndb_index"), gsi::arg ("cv_index"),
     "@brief Shows a netlist database in the marker browser on a certain layout\n"
     "The netlist browser is opened showing the netlist database with the index given by \"l2ndb_index\".\n"
+    "It will be attached (i.e. navigate to) the layout with the given cellview index in \"cv_index\".\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method_ext ("lvsdb", &get_lvsdb, gsi::arg ("index"),
+    "@brief Gets the netlist database with the given index\n"
+    "@return The \\LayoutVsSchematic object or nil if the index is not valid"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method_ext ("add_lvsdb", &add_lvsdb, gsi::arg ("db"),
+    "@brief Adds the given database to the view\n"
+    "\n"
+    "This method will add an existing database to the view. It will then appear in the netlist database browser.\n"
+    "A similar method is \\create_lvsdb which will create a new database within the view.\n"
+    "\n"
+    "@return The index of the database within the view (see \\lvsdb)\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method_ext ("create_lvsdb", &create_lvsdb, gsi::arg ("name"),
+    "@brief Creates a new netlist database and returns the index of the new database\n"
+    "@param name The name of the new netlist database\n"
+    "@return The index of the new database\n"
+    "This method returns an index of the new netlist database. Use \\lvsdb to get the actual object. "
+    "If a netlist database with the given name already exists, a unique name will be created.\n"
+    "The name will be replaced by the file name when a file is loaded into the netlist database.\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method ("show_lvsdb", &lay::LayoutView::open_l2ndb_browser, gsi::arg ("lvsdb_index"), gsi::arg ("cv_index"),
+    "@brief Shows a netlist database in the marker browser on a certain layout\n"
+    "The netlist browser is opened showing the netlist database with the index given by \"lvsdb_index\".\n"
     "It will be attached (i.e. navigate to) the layout with the given cellview index in \"cv_index\".\n"
     "\n"
     "This method has been added in version 0.26."

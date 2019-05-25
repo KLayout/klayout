@@ -666,6 +666,16 @@ public:
    */
   void load (const std::string &path);
 
+  /**
+   *  @brief Creates a LayoutToNetlist object from a file
+   *
+   *  This method analyses the file and will create a LayoutToNetlist object
+   *  or one of a derived class (specifically LayoutVsSchematic).
+   *
+   *  The returned object is new'd one and must be deleted by the caller.
+   */
+  static db::LayoutToNetlist *create_from_file (const std::string &path);
+
 private:
   //  no copying
   LayoutToNetlist (const db::LayoutToNetlist &other);

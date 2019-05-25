@@ -28,6 +28,9 @@
 #include "dbCellMapping.h"
 #include "dbLayoutToNetlistWriter.h"
 #include "dbLayoutToNetlistReader.h"
+#include "dbLayoutVsSchematic.h"
+#include "dbLayoutToNetlistFormatDefs.h"
+#include "dbLayoutVsSchematicFormatDefs.h"
 
 namespace db
 {
@@ -1064,6 +1067,30 @@ void db::LayoutToNetlist::load (const std::string &path)
   set_filename (path);
   set_name (stream.filename ());
   reader.read (this);
+}
+
+db::LayoutToNetlist *db::LayoutToNetlist::create_from_file (const std::string &path)
+{
+  std::auto_ptr<db::LayoutToNetlist> db;
+
+  //  TODO: generic concept to detect format
+  std::string first_line;
+  {
+    tl::InputStream stream (path);
+    tl::TextInputStream text_stream (stream);
+    first_line = text_stream.get_line ();
+  }
+
+  if (first_line.find (db::lvs_std_format::keys<false>::lvs_magic_string) == 0) {
+    db::LayoutVsSchematic *lvs_db = new db::LayoutVsSchematic ();
+    db.reset (lvs_db);
+    lvs_db->load (path);
+  } else {
+    db.reset (new db::LayoutToNetlist ());
+    db->load (path);
+  }
+
+  return db.release ();
 }
 
 }

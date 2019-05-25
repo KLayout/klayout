@@ -34,7 +34,7 @@ NetlistCrossReferenceModel::NetlistCrossReferenceModel (const db::NetlistCrossRe
 
 size_t NetlistCrossReferenceModel::circuit_count () const
 {
-  return mp_cross_ref->circuit_count ();
+  return mp_cross_ref.get () ? mp_cross_ref->circuit_count () : 0;
 }
 
 size_t NetlistCrossReferenceModel::net_count (const circuit_pair &circuits) const

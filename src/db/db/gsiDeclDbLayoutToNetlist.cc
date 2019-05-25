@@ -260,7 +260,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
   ) +
   gsi::factory ("make_layer", (db::Region *(db::LayoutToNetlist::*) (unsigned int, const std::string &)) &db::LayoutToNetlist::make_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
-    "@brief Creates a new hierarchical region representing an original layer\n"
+    "@brief Creates a new hierarchical region reprfesenting an original layer\n"
     "'layer_index' is the layer index of the desired layer in the original layout.\n"
     "This variant produces polygons and takes texts for net name annotation.\n"
     "A variant not taking texts is \\make_polygon_layer. A Variant only taking\n"

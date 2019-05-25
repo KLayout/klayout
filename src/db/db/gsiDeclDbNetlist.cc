@@ -33,6 +33,66 @@
 namespace gsi
 {
 
+// ------------------------------------------------------------
+// @@@@
+
+template <class X, class I, class Transfer>
+class ConstMethodBiIterWithTransfer
+  : public MethodSpecificBase <X>
+{
+public:
+  typedef IterAdaptorAbstractBase iter_adaptor_base_type;
+  typedef IterAdaptor<I> iter_adaptor_type;
+
+  ConstMethodBiIterWithTransfer (const std::string &name, I (X::*b) () const, I (X::*e) () const, const std::string &doc)
+    : MethodSpecificBase <X> (name, doc, true, false, 0), m_b (b), m_e (e)
+  {
+  }
+
+  ConstMethodBiIterWithTransfer *add_args ()
+  {
+    return this;
+  }
+
+  void initialize ()
+  {
+    this->clear ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
+  }
+
+  virtual MethodBase *clone () const
+  {
+    return new ConstMethodBiIterWithTransfer (*this);
+  }
+
+  virtual void call (void *cls, SerialArgs &, SerialArgs &ret) const
+  {
+    this->mark_called ();
+    ret.write<iter_adaptor_base_type *> (static_cast<iter_adaptor_base_type *> (new iter_adaptor_type ((((const X *)cls)->*m_b) (), (((const X *)cls)->*m_e) ())));
+  }
+
+private:
+  I (X::*m_b) () const;
+  I (X::*m_e) () const;
+};
+
+template <class X, class I, class Transfer>
+ConstMethodBiIterWithTransfer <X, I, Transfer> *
+_iterator_with_transfer (const std::string &name, I (X::*b) () const, I (X::*e) () const, const std::string &doc)
+{
+  return new ConstMethodBiIterWithTransfer <X, I, Transfer> (name, b, e, doc);
+}
+
+template <class X, class I, class Transfer>
+Methods
+iterator_with_transfer (const std::string &name, I (X::*b) () const, I (X::*e) () const, const std::string &doc = std::string ())
+{
+  return Methods (_iterator_with_transfer<X, I, Transfer> (name, b, e, doc));
+}
+
+// @@@@
+// ------------------------------------------------------------
+
 Class<db::Pin> decl_dbPin ("db", "Pin",
   gsi::method ("id", &db::Pin::id,
     "@brief Gets the ID of the pin.\n"
@@ -265,7 +325,7 @@ Class<db::Device> decl_dbDevice ("db", "Device",
     "@hide\n"
     "Provided for test purposes mainly."
   ) +
-  gsi::method ("circuit", (db::Circuit *(db::Device::*) ()) &db::Device::circuit,
+  gsi::method ("circuit", (const db::Circuit *(db::Device::*) () const) &db::Device::circuit,
     "@brief Gets the circuit the device lives in."
   ) +
   gsi::method ("id", &db::Device::id,
@@ -286,7 +346,7 @@ Class<db::Device> decl_dbDevice ("db", "Device",
     "@brief Gets the expanded name of the device.\n"
     "The expanded name takes the name of the device. If the name is empty, the numeric ID will be used to build a name. "
   ) +
-  gsi::method ("net_for_terminal", (db::Net *(db::Device::*) (size_t)) &db::Device::net_for_terminal, gsi::arg ("terminal_id"),
+  gsi::method ("net_for_terminal", (const db::Net *(db::Device::*) (size_t) const) &db::Device::net_for_terminal, gsi::arg ("terminal_id"),
     "@brief Gets the net connected to the specified terminal.\n"
     "If the terminal is not connected, nil is returned for the net."
   ) +
@@ -339,7 +399,7 @@ Class<db::Device> decl_dbDevice ("db", "Device",
 );
 
 Class<db::DeviceAbstract> decl_dbDeviceAbstract ("db", "DeviceAbstract",
-  gsi::method ("netlist", (db::Netlist *(db::DeviceAbstract::*) ()) &db::DeviceAbstract::netlist,
+  gsi::method ("netlist", (const db::Netlist *(db::DeviceAbstract::*) () const) &db::DeviceAbstract::netlist,
     "@brief Gets the netlist the device abstract lives in."
   ) +
   gsi::method ("device_class", &db::DeviceAbstract::device_class,
@@ -388,10 +448,10 @@ static void subcircuit_disconnect_pin1 (db::SubCircuit *subcircuit, const db::Pi
 }
 
 Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
-  gsi::method ("circuit_ref", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit_ref,
+  gsi::method ("circuit_ref", (const db::Circuit *(db::SubCircuit::*) () const) &db::SubCircuit::circuit_ref,
     "@brief Gets the circuit referenced by the subcircuit.\n"
   ) +
-  gsi::method ("circuit", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit,
+  gsi::method ("circuit", (const db::Circuit *(db::SubCircuit::*) () const) &db::SubCircuit::circuit,
     "@brief Gets the circuit the subcircuit lives in.\n"
     "This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \\circuit_ref."
   ) +
@@ -413,7 +473,7 @@ Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
     "@brief Gets the expanded name of the subcircuit.\n"
     "The expanded name takes the name of the subcircuit. If the name is empty, the numeric ID will be used to build a name. "
   ) +
-  gsi::method ("net_for_pin", (db::Net *(db::SubCircuit::*) (size_t)) &db::SubCircuit::net_for_pin, gsi::arg ("pin_id"),
+  gsi::method ("net_for_pin", (const db::Net *(db::SubCircuit::*) (size_t) const) &db::SubCircuit::net_for_pin, gsi::arg ("pin_id"),
     "@brief Gets the net connected to the specified pin of the subcircuit.\n"
     "If the pin is not connected, nil is returned for the net."
   ) +
@@ -450,17 +510,17 @@ Class<db::NetTerminalRef> decl_dbNetTerminalRef ("db", "NetTerminalRef",
   gsi::method ("terminal_id", &db::NetTerminalRef::terminal_id,
     "@brief Gets the ID of the terminal of the device the connection is made to."
   ) +
-  gsi::method ("device", (db::Device *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::device,
+  gsi::method ("device", (const db::Device *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::device,
     "@brief Gets the device reference.\n"
     "Gets the device object that this connection is made to."
   ) +
-  gsi::method ("net", (db::Net *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::net,
+  gsi::method ("net", (const db::Net *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::net,
     "@brief Gets the net this terminal reference is attached to"
   ) +
-  gsi::method ("device_class", (db::DeviceClass *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::device_class,
+  gsi::method ("device_class", (const db::DeviceClass *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::device_class,
     "@brief Gets the class of the device which is addressed."
   ) +
-  gsi::method ("terminal_def", (db::DeviceTerminalDefinition *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::terminal_def,
+  gsi::method ("terminal_def", (const db::DeviceTerminalDefinition *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::terminal_def,
     "@brief Gets the terminal definition of the terminal that is connected"
   ),
   "@brief A connection to a terminal of a device.\n"
@@ -476,7 +536,7 @@ Class<db::NetPinRef> decl_dbNetPinRef ("db", "NetPinRef",
   gsi::method ("pin", &db::NetPinRef::pin,
     "@brief Gets the \\Pin object of the pin the connection is made to."
   ) +
-  gsi::method ("net", (db::Net *(db::NetPinRef::*) ()) &db::NetPinRef::net,
+  gsi::method ("net", (const db::Net *(db::NetPinRef::*) () const) &db::NetPinRef::net,
     "@brief Gets the net this pin reference is attached to"
   ),
   "@brief A connection to an outgoing pin of the circuit.\n"
@@ -492,12 +552,12 @@ Class<db::NetSubcircuitPinRef> decl_dbNetSubcircuitPinRef ("db", "NetSubcircuitP
   gsi::method ("pin", &db::NetSubcircuitPinRef::pin,
     "@brief Gets the \\Pin object of the pin the connection is made to."
   ) +
-  gsi::method ("subcircuit", (db::SubCircuit *(db::NetSubcircuitPinRef::*) ()) &db::NetSubcircuitPinRef::subcircuit,
+  gsi::method ("subcircuit", (const db::SubCircuit *(db::NetSubcircuitPinRef::*) () const) &db::NetSubcircuitPinRef::subcircuit,
     "@brief Gets the subcircuit reference.\n"
     "This attribute indicates the subcircuit the net attaches to. The "
     "subcircuit lives in the same circuit than the net. "
   ) +
-  gsi::method ("net", (db::Net *(db::NetSubcircuitPinRef::*) ()) &db::NetSubcircuitPinRef::net,
+  gsi::method ("net", (const db::Net *(db::NetSubcircuitPinRef::*) () const) &db::NetSubcircuitPinRef::net,
     "@brief Gets the net this pin reference is attached to"
   ),
   "@brief A connection to a pin of a subcircuit.\n"
@@ -540,21 +600,27 @@ Class<db::Net> decl_dbNet ("db", "Net",
     "@brief Gets the cluster ID of the net.\n"
     "See \\cluster_id= for details about the cluster ID."
   ) +
-  gsi::iterator ("each_pin", (db::Net::pin_iterator (db::Net::*) ()) &db::Net::begin_pins, (db::Net::pin_iterator (db::Net::*) ()) &db::Net::end_pins,
+  // @@@
+  gsi::iterator_with_transfer<db::Net, db::Net::const_pin_iterator, gsi::arg_make_reference> ("each_pin", (db::Net::const_pin_iterator (db::Net::*) () const) &db::Net::begin_pins, (db::Net::const_pin_iterator (db::Net::*) () const) &db::Net::end_pins,
     "@brief Iterates over all outgoing pins the net connects.\n"
     "Pin connections are described by \\NetPinRef objects. Pin connections "
     "are connections to outgoing pins of the circuit the net lives in."
   ) +
-  gsi::iterator ("each_subcircuit_pin", (db::Net::subcircuit_pin_iterator (db::Net::*) ()) &db::Net::begin_subcircuit_pins, (db::Net::subcircuit_pin_iterator (db::Net::*) ()) &db::Net::end_subcircuit_pins,
+  // @@@
+  // @@@
+  gsi::iterator_with_transfer<db::Net, db::Net::const_subcircuit_pin_iterator, gsi::arg_make_reference> ("each_subcircuit_pin", (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::begin_subcircuit_pins, (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::end_subcircuit_pins,
     "@brief Iterates over all subcircuit pins the net connects.\n"
     "Subcircuit pin connections are described by \\NetSubcircuitPinRef objects. These are "
     "connections to specific pins of subcircuits."
   ) +
-  gsi::iterator ("each_terminal", (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::begin_terminals, (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::end_terminals,
+  // @@@
+  // @@@
+  gsi::iterator_with_transfer<db::Net, db::Net::const_terminal_iterator, gsi::arg_make_reference> ("each_terminal", (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::begin_terminals, (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::end_terminals,
     "@brief Iterates over all terminals the net connects.\n"
     "Terminals connect devices. Terminal connections are described by \\NetTerminalRef "
     "objects."
   ) +
+  // @@@
   gsi::method ("is_floating?", &db::Net::is_floating,
     "@brief Returns true, if the net is floating.\n"
     "Floating nets are those who don't have any or only a single connection (pin_count + terminal_count < 2)."
@@ -1032,7 +1098,7 @@ static db::SubCircuit *create_subcircuit1 (db::Circuit *c, db::Circuit *cc, cons
   return sc;
 }
 
-static db::Net *circuit_net_for_pin (db::Circuit *c, const db::Pin *pin)
+static const db::Net *circuit_net_for_pin (const db::Circuit *c, const db::Pin *pin)
 {
   return pin ? c->net_for_pin (pin->id ()) : 0;
 }

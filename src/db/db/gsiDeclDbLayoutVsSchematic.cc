@@ -55,12 +55,17 @@ static db::LayoutVsSchematic *make_lvs_flat (const std::string &topcell_name, do
   return new db::LayoutVsSchematic (topcell_name, dbu);
 }
 
-static db::LayoutToNetlist *l2n_from_lvs (db::LayoutVsSchematic *lvs)
+static void save_l2n (db::LayoutVsSchematic *lvs, const std::string &path, bool short_format)
 {
-  return lvs;
+  lvs->db::LayoutToNetlist::save (path, short_format);
 }
 
-Class<db::LayoutVsSchematic> decl_dbLayoutVsSchematic ("db", "LayoutVsSchematic",
+static void load_l2n (db::LayoutVsSchematic *lvs, const std::string &path)
+{
+  lvs->db::LayoutToNetlist::load (path);
+}
+
+Class<db::LayoutVsSchematic> decl_dbLayoutVsSchematic (decl_dbLayoutToNetlist, "db", "LayoutVsSchematic",
   gsi::constructor ("new", &make_lvs, gsi::arg ("iter"),
     "@brief Creates a new LVS object with the extractor connected to an original layout\n"
     "This constructor will attach the extractor of the LVS object to an original layout through the "
@@ -105,18 +110,13 @@ Class<db::LayoutVsSchematic> decl_dbLayoutVsSchematic ("db", "LayoutVsSchematic"
     "\n"
     "See \\NetlistCrossReference for more details.\n"
   ) +
-  gsi::method_ext ("l2n", &l2n_from_lvs,
-    "@brief Gets the \\LayoutToNetlist interface of this object.\n"
-    "This method renders the \\LayoutToNetlist part of self. It is useful to access \\read and \\write from this "
-    "interface instead of the versions from \\LayoutVsSchematic:\n"
-    "\n"
-    "@code\n"
-    "lvs = ... # an LVS object\n"
-    "# writes the LayoutToNetlist data:\n"
-    "lvs.l2n.write(\"data.l2n\")\n"
-    "# writes the LayoutVsSchematic data:\n"
-    "lvs.lvs.write(\"data.l2n\")\n"
-    "@/code\n"
+  gsi::method_ext ("write_l2n", &save_l2n, gsi::arg ("path"), gsi::arg ("short_format", false),
+    "@brief Writes the \\LayoutToNetlist part of the object to a file.\n"
+    "This method employs the native format of KLayout.\n"
+  ) +
+  gsi::method_ext ("read_l2n", &load_l2n, gsi::arg ("path"),
+    "@brief Reads the \\LayoutToNetlist part of the object from a file.\n"
+    "This method employs the native format of KLayout.\n"
   ) +
   gsi::method ("write", &db::LayoutVsSchematic::save, gsi::arg ("path"), gsi::arg ("short_format", false),
     "@brief Writes the LVS object to a file.\n"

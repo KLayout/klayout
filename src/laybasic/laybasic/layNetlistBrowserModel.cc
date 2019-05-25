@@ -29,6 +29,7 @@
 #include <QPainter>
 #include <QIcon>
 #include <QWidget>
+#include <QTreeView>
 
 namespace lay
 {
@@ -1771,6 +1772,8 @@ NetlistBrowserModel::headerData (int section, Qt::Orientation /*orientation*/, i
       }
     }
 
+  } else if (role == Qt::DecorationRole && section == m_status_column) {
+    return QIcon (":/info_16.png");
   }
 
   return QVariant ();
@@ -2240,6 +2243,32 @@ NetlistBrowserModel::subcircuits_from_id (void *id) const
     return subcircuits_from_pinrefs (pinrefs);
 
   }
+}
+
+void
+NetlistBrowserModel::show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, bool with_children)
+{
+  int n = rowCount (parent);
+  for (int i = 0; i < n; ++i) {
+
+    QModelIndex idx = index (i, 0, parent);
+
+    IndexedNetlistModel::Status st = status (idx);
+    bool visible = (show_all || (st != db::NetlistCrossReference::Match && (with_warnings || st != db::NetlistCrossReference::MatchWithWarning)));
+    view->setRowHidden (int (i), parent, ! visible);
+
+    if (visible && with_children) {
+      show_or_hide_items (view, idx, show_all, with_warnings, false /*just two levels of recursion*/);
+    }
+
+  }
+}
+
+void
+NetlistBrowserModel::set_item_visibility (QTreeView *view, bool show_all, bool with_warnings)
+{
+  //  TODO: this implementation is based on the model but is fairly inefficient
+  show_or_hide_items (view, QModelIndex (), show_all, with_warnings, true);
 }
 
 }

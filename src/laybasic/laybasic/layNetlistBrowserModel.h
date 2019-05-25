@@ -36,6 +36,8 @@
 #include <map>
 #include <memory>
 
+class QTreeView;
+
 namespace lay
 {
 
@@ -138,6 +140,8 @@ public:
 
   std::pair<const db::Device *, const db::Device *> device_from_index (const QModelIndex &index) const;
 
+  void set_item_visibility (QTreeView *view, bool show_all, bool with_warnings);
+
 private slots:
   void colors_changed ();
 
@@ -208,6 +212,8 @@ private:
 
   QIcon icon_for_nets (const std::pair<const db::Net *, const db::Net *> &net) const;
   QIcon icon_for_connection (const std::pair<const db::Net *, const db::Net *> &net) const;
+
+  void show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, bool with_children);
 
   db::LayoutToNetlist *mp_l2ndb;
   db::LayoutVsSchematic *mp_lvsdb;

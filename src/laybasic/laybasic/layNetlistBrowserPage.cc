@@ -114,7 +114,6 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 {
   Ui::NetlistBrowserPage::setupUi (this);
 
-  //  TODO: insert into menu
   m_show_all_action = new QAction (QObject::tr ("Show All"), this);
   m_show_all_action->setCheckable (true);
   m_show_all_action->setChecked (m_show_all);
@@ -125,6 +124,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   color_action->setMenu (menu);
 
   QAction *sep;
+  directory_tree->addAction (m_show_all_action);
   directory_tree->addAction (actionCollapseAll);
   directory_tree->addAction (actionExpandAll);
   sep = new QAction (directory_tree);
@@ -496,7 +496,7 @@ NetlistBrowserPage::info_button_pressed ()
   mp_info_dialog->show ();
 }
 
-static QModelIndex find_next (QAbstractItemModel *model, const QRegExp &to_find, const QModelIndex &from)
+static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const QRegExp &to_find, const QModelIndex &from)
 {
   QModelIndex index = from;
 
@@ -571,7 +571,7 @@ static QModelIndex find_next (QAbstractItemModel *model, const QRegExp &to_find,
     if (has_next) {
 
       QString text = model->data (current, Qt::UserRole).toString ();
-      if (text.indexOf (to_find) >= 0) {
+      if (text.indexOf (to_find) >= 0 && ! view->isRowHidden (rows_stack.back ().first, parent_stack.back ())) {
         return current;
       }
 
@@ -589,7 +589,7 @@ NetlistBrowserPage::find_button_pressed ()
               actionCaseSensitive->isChecked () ? Qt::CaseSensitive : Qt::CaseInsensitive,
               actionUseRegularExpressions->isChecked () ? QRegExp::RegExp : QRegExp::FixedString);
 
-  QModelIndex next = find_next (directory_tree->model (), re, directory_tree->currentIndex ());
+  QModelIndex next = find_next (directory_tree, directory_tree->model (), re, directory_tree->currentIndex ());
   if (next.isValid ()) {
     navigate_to (next.internalPointer ());
   }
@@ -610,6 +610,11 @@ NetlistBrowserPage::show_all (bool f)
 
     m_show_all = f;
     m_show_all_action->setChecked (f);
+
+    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    if (model) {
+      model->set_item_visibility (directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
+    }
 
   }
 }
@@ -665,6 +670,9 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 
   //  hide the status column if not needed
   directory_tree->header ()->setSectionHidden (1, new_model->status_column () < 0);
+
+  //  establish visibility according to "show all"
+  new_model->set_item_visibility (directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
 
   find_text->setText (QString ());
 }

@@ -270,11 +270,13 @@ public:
 
 static CircuitPairIterator each_circuit_pair (db::NetlistCrossReference *xref)
 {
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   return CircuitPairIterator (xref);
 }
 
 static pair_data_iterator<db::NetlistCrossReference::NetPairData, db::NetlistCrossReference::PerCircuitData::net_pairs_const_iterator> each_net_pair (db::NetlistCrossReference *xref, const CircuitPairData &circuit_pair)
 {
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<db::NetlistCrossReference::NetPairData, db::NetlistCrossReference::PerCircuitData::net_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (circuit_pair.pair);
@@ -287,6 +289,7 @@ static pair_data_iterator<db::NetlistCrossReference::NetPairData, db::NetlistCro
 
 static pair_data_iterator<db::NetlistCrossReference::DevicePairData, db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator> each_device_pair (db::NetlistCrossReference *xref, const CircuitPairData &circuit_pair)
 {
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<db::NetlistCrossReference::DevicePairData, db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (circuit_pair.pair);
@@ -299,6 +302,7 @@ static pair_data_iterator<db::NetlistCrossReference::DevicePairData, db::Netlist
 
 static pair_data_iterator<db::NetlistCrossReference::PinPairData, db::NetlistCrossReference::PerCircuitData::pin_pairs_const_iterator> each_pin_pair (db::NetlistCrossReference *xref, const CircuitPairData &circuit_pair)
 {
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<db::NetlistCrossReference::PinPairData, db::NetlistCrossReference::PerCircuitData::pin_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (circuit_pair.pair);
@@ -311,6 +315,7 @@ static pair_data_iterator<db::NetlistCrossReference::PinPairData, db::NetlistCro
 
 static pair_data_iterator<db::NetlistCrossReference::SubCircuitPairData, db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator> each_subcircuit_pair (db::NetlistCrossReference *xref, const CircuitPairData &circuit_pair)
 {
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<db::NetlistCrossReference::SubCircuitPairData, db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (circuit_pair.pair);
@@ -323,6 +328,7 @@ static pair_data_iterator<db::NetlistCrossReference::SubCircuitPairData, db::Net
 
 static pair_data_iterator<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *>, db::NetlistCrossReference::PerNetData::terminal_pairs_const_iterator> each_net_terminal_pair (db::NetlistCrossReference *xref, const db::NetlistCrossReference::NetPairData &net_pair)
 {
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *>, db::NetlistCrossReference::PerNetData::terminal_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerNetData *data = xref->per_net_data_for (net_pair.pair);
@@ -335,6 +341,7 @@ static pair_data_iterator<std::pair<const db::NetTerminalRef *, const db::NetTer
 
 static pair_data_iterator<std::pair<const db::NetPinRef *, const db::NetPinRef *>, db::NetlistCrossReference::PerNetData::pin_pairs_const_iterator> each_net_pin_pair (db::NetlistCrossReference *xref, const db::NetlistCrossReference::NetPairData &net_pair)
 {
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<std::pair<const db::NetPinRef *, const db::NetPinRef *>, db::NetlistCrossReference::PerNetData::pin_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerNetData *data = xref->per_net_data_for (net_pair.pair);
@@ -347,6 +354,7 @@ static pair_data_iterator<std::pair<const db::NetPinRef *, const db::NetPinRef *
 
 static pair_data_iterator<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *>, db::NetlistCrossReference::PerNetData::subcircuit_pin_pairs_const_iterator> each_net_subcircuit_pin_pair (db::NetlistCrossReference *xref, const db::NetlistCrossReference::NetPairData &net_pair)
 {
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *>, db::NetlistCrossReference::PerNetData::subcircuit_pin_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerNetData *data = xref->per_net_data_for (net_pair.pair);
@@ -363,7 +371,7 @@ Class<db::NetlistCrossReference> decl_dbNetlistCrossReference (decl_dbNetlistCom
     "See the class description for details."
   ) +
   gsi::iterator_ext ("each_net_pair", &each_net_pair, gsi::arg ("circuit_pair"),
-    "@brief Delivers the nets pairs and their status for the given circuit pair.\n"
+    "@brief Delivers the net pairs and their status for the given circuit pair.\n"
     "See the class description for details."
   ) +
   gsi::iterator_ext ("each_device_pair", &each_device_pair, gsi::arg ("circuit_pair"),
@@ -379,20 +387,21 @@ Class<db::NetlistCrossReference> decl_dbNetlistCrossReference (decl_dbNetlistCom
     "See the class description for details."
   ) +
   gsi::iterator_ext ("each_net_terminal_pair", &each_net_terminal_pair, gsi::arg ("net_pair"),
-    "@brief Delivers the device terminal pairs for the given net.\n"
-    "For a given net pair, lists the device terminal pairs identified on this net."
+    "@brief Delivers the device terminal pairs for the given net pair.\n"
+    "For the net pair, lists the device terminal pairs identified on this net."
   ) +
   gsi::iterator_ext ("each_net_pin_pair", &each_net_pin_pair, gsi::arg ("net_pair"),
-    "@brief Delivers the pin pairs for the given net.\n"
-    "For a given net pair, lists the pin pairs identified on this net."
+    "@brief Delivers the pin pairs for the given net pair.\n"
+    "For the net pair, lists the pin pairs identified on this net."
   ) +
   gsi::iterator_ext ("each_net_subcircuit_pin_pair", &each_net_subcircuit_pin_pair, gsi::arg ("net_pair"),
-    "@brief Delivers the subcircuit pin pairs for the given net.\n"
-    "For a given net pair, lists the subcircuit pin pairs identified on this net."
+    "@brief Delivers the subcircuit pin pairs for the given net pair.\n"
+    "For the net pair, lists the subcircuit pin pairs identified on this net."
   ) +
   gsi::method ("other_net_for", &db::NetlistCrossReference::other_net_for, gsi::arg ("net"),
-    "@brief Gets the matching net for a given net.\n"
-    "The return value will be nil if no match is found."
+    "@brief Gets the matching other net for a given primary net.\n"
+    "The return value will be nil if no match is found. "
+    "Otherwise it is the 'b' net for nets from the 'a' netlist and vice versa."
   ) +
   gsi::method ("clear", &db::NetlistCrossReference::clear,
     "@hide\n"
@@ -401,10 +410,14 @@ Class<db::NetlistCrossReference> decl_dbNetlistCrossReference (decl_dbNetlistCom
     "@brief Gets the number of circuit pairs in the cross-reference object."
   ) +
   gsi::method ("netlist_a", &db::NetlistCrossReference::netlist_a,
-    "@brief Gets the first netlist in the compare.\n"
+    "@brief Gets the first netlist which participated in the compare.\n"
+    "This member may be nil, if the respective netlist is no longer valid. "
+    "In this case, the netlist cross-reference object cannot be used."
   ) +
   gsi::method ("netlist_b", &db::NetlistCrossReference::netlist_b,
-    "@brief Gets the second netlist in the compare.\n"
+    "@brief Gets the second netlist which participated in the compare.\n"
+    "This member may be nil, if the respective netlist is no longer valid."
+    "In this case, the netlist cross-reference object cannot be used."
   ),
   "@brief Represents the identity mapping between the objects of two netlists.\n"
   "\n"
@@ -428,14 +441,14 @@ Class<db::NetlistCrossReference> decl_dbNetlistCrossReference (decl_dbNetlistCom
 );
 
 //  TODO: there is no "enum as child class" currently, so we have to define that on top level too
-static gsi::Enum<db::NetlistCrossReference::Status> decl_NetlistCrossReference_Status ("db", "NetlistCrossReference_Status",
+gsi::Enum<db::NetlistCrossReference::Status> decl_dbNetlistCrossReference_Status ("db", "NetlistCrossReference_Status",
   gsi::enum_const ("None", db::NetlistCrossReference::None,
     "@brief Enum constant NetlistCrossReference::None\n"
-    "No specific status is stored if this code is present."
+    "No specific status is implied if this code is present."
   ) +
   gsi::enum_const ("Match", db::NetlistCrossReference::Match,
     "@brief Enum constant NetlistCrossReference::Match\n"
-    "If this code is present, an exact match is present.\n"
+    "An exact match exists if this code is present.\n"
   ) +
   gsi::enum_const ("NoMatch", db::NetlistCrossReference::NoMatch,
     "@brief Enum constant NetlistCrossReference::NoMatch\n"
@@ -445,29 +458,29 @@ static gsi::Enum<db::NetlistCrossReference::Status> decl_NetlistCrossReference_S
   ) +
   gsi::enum_const ("Skipped", db::NetlistCrossReference::Skipped,
     "@brief Enum constant NetlistCrossReference::Skipped\n"
-    "This code on circuits means that a match has not been attempted because "
+    "On circuits this code means that a match has not been attempted because "
     "subcircuits of this circuits were not matched. As circuit matching happens "
     "bottom-up, all subcircuits must match at least with respect to their pins "
     "to allow any parent circuit to be matched."
   ) +
   gsi::enum_const ("MatchWithWarning", db::NetlistCrossReference::MatchWithWarning,
     "@brief Enum constant NetlistCrossReference::MatchWithWarning\n"
-    "If this code is present, a match was found but a warning is issued. For nets this "
-    "means that the choice of matches is ambiguous and an unspecific candidate has been chosen. "
+    "If this code is present, a match was found but a warning is issued. For nets, this "
+    "means that the choice is ambiguous and one, unspecific candidate has been chosen. "
     "For devices, this means a device match was established, but parameters or the device class "
     "are not matching exactly."
   ) +
   gsi::enum_const ("Mismatch", db::NetlistCrossReference::Mismatch,
     "@brief Enum constant NetlistCrossReference::Mismatch\n"
-    "There code means there is a match candidate, but exact identity could not be confirmed."
+    "This code means there is a match candidate, but exact identity could not be confirmed."
   ),
   "@brief This class represents the NetlistCrossReference::Status enum"
 );
 
 //  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
 //  Inject constants:
-static gsi::ClassExt<db::NetlistCrossReference> inject_NetlistCrossReference_Status_in_parent (decl_NetlistCrossReference_Status.defs ());
+gsi::ClassExt<db::NetlistCrossReference> inject_NetlistCrossReference_Status_in_parent (decl_dbNetlistCrossReference_Status.defs ());
 //  Inject class:
-static gsi::ClassExt<db::NetlistCrossReference> decl_NetlistCrossReference_Status_as_child (decl_dbNetlistCrossReference, "Status");
+gsi::ClassExt<db::NetlistCrossReference> decl_NetlistCrossReference_Status_as_child (decl_dbNetlistCrossReference_Status, "Status");
 
 }

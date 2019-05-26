@@ -156,7 +156,20 @@ class DBNetlistCrossReference_TestClass < TestBase
       info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
     end
     assert_equal(info.join(","), "(nil)/$2:Mismatch,/(nil):Mismatch,/(nil):Mismatch")
-      
+
+  end
+
+  def test_3_StatusEnums
+
+    st = RBA::NetlistCrossReference::Status::new
+    assert_equal(st.to_i, 0)
+    assert_equal(st.to_s, "None")
+  
+    st = RBA::NetlistCrossReference::Status::Match
+    assert_equal(st.to_s, "Match")
+
+    st = RBA::NetlistCrossReference::Skipped
+    assert_equal(st.to_s, "Skipped")
 
   end
 

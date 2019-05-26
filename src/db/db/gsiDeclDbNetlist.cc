@@ -33,66 +33,6 @@
 namespace gsi
 {
 
-// ------------------------------------------------------------
-// @@@@
-
-template <class X, class I, class Transfer>
-class ConstMethodBiIterWithTransfer
-  : public MethodSpecificBase <X>
-{
-public:
-  typedef IterAdaptorAbstractBase iter_adaptor_base_type;
-  typedef IterAdaptor<I> iter_adaptor_type;
-
-  ConstMethodBiIterWithTransfer (const std::string &name, I (X::*b) () const, I (X::*e) () const, const std::string &doc)
-    : MethodSpecificBase <X> (name, doc, true, false, 0), m_b (b), m_e (e)
-  {
-  }
-
-  ConstMethodBiIterWithTransfer *add_args ()
-  {
-    return this;
-  }
-
-  void initialize ()
-  {
-    this->clear ();
-    this->template set_return<iter_adaptor_type, Transfer> ();
-  }
-
-  virtual MethodBase *clone () const
-  {
-    return new ConstMethodBiIterWithTransfer (*this);
-  }
-
-  virtual void call (void *cls, SerialArgs &, SerialArgs &ret) const
-  {
-    this->mark_called ();
-    ret.write<iter_adaptor_base_type *> (static_cast<iter_adaptor_base_type *> (new iter_adaptor_type ((((const X *)cls)->*m_b) (), (((const X *)cls)->*m_e) ())));
-  }
-
-private:
-  I (X::*m_b) () const;
-  I (X::*m_e) () const;
-};
-
-template <class X, class I, class Transfer>
-ConstMethodBiIterWithTransfer <X, I, Transfer> *
-_iterator_with_transfer (const std::string &name, I (X::*b) () const, I (X::*e) () const, const std::string &doc)
-{
-  return new ConstMethodBiIterWithTransfer <X, I, Transfer> (name, b, e, doc);
-}
-
-template <class X, class I, class Transfer>
-Methods
-iterator_with_transfer (const std::string &name, I (X::*b) () const, I (X::*e) () const, const std::string &doc = std::string ())
-{
-  return Methods (_iterator_with_transfer<X, I, Transfer> (name, b, e, doc));
-}
-
-// @@@@
-// ------------------------------------------------------------
-
 Class<db::Pin> decl_dbPin ("db", "Pin",
   gsi::method ("id", &db::Pin::id,
     "@brief Gets the ID of the pin.\n"
@@ -600,27 +540,21 @@ Class<db::Net> decl_dbNet ("db", "Net",
     "@brief Gets the cluster ID of the net.\n"
     "See \\cluster_id= for details about the cluster ID."
   ) +
-  // @@@
-  gsi::iterator_with_transfer<db::Net, db::Net::const_pin_iterator, gsi::arg_make_reference> ("each_pin", (db::Net::const_pin_iterator (db::Net::*) () const) &db::Net::begin_pins, (db::Net::const_pin_iterator (db::Net::*) () const) &db::Net::end_pins,
+  gsi::iterator ("each_pin", gsi::return_reference (), (db::Net::const_pin_iterator (db::Net::*) () const) &db::Net::begin_pins, (db::Net::const_pin_iterator (db::Net::*) () const) &db::Net::end_pins,
     "@brief Iterates over all outgoing pins the net connects.\n"
     "Pin connections are described by \\NetPinRef objects. Pin connections "
     "are connections to outgoing pins of the circuit the net lives in."
   ) +
-  // @@@
-  // @@@
-  gsi::iterator_with_transfer<db::Net, db::Net::const_subcircuit_pin_iterator, gsi::arg_make_reference> ("each_subcircuit_pin", (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::begin_subcircuit_pins, (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::end_subcircuit_pins,
+  gsi::iterator ("each_subcircuit_pin", gsi::return_reference (), (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::begin_subcircuit_pins, (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::end_subcircuit_pins,
     "@brief Iterates over all subcircuit pins the net connects.\n"
     "Subcircuit pin connections are described by \\NetSubcircuitPinRef objects. These are "
     "connections to specific pins of subcircuits."
   ) +
-  // @@@
-  // @@@
-  gsi::iterator_with_transfer<db::Net, db::Net::const_terminal_iterator, gsi::arg_make_reference> ("each_terminal", (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::begin_terminals, (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::end_terminals,
+  gsi::iterator ("each_terminal", gsi::return_reference (), (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::begin_terminals, (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::end_terminals,
     "@brief Iterates over all terminals the net connects.\n"
     "Terminals connect devices. Terminal connections are described by \\NetTerminalRef "
     "objects."
   ) +
-  // @@@
   gsi::method ("is_floating?", &db::Net::is_floating,
     "@brief Returns true, if the net is floating.\n"
     "Floating nets are those who don't have any or only a single connection (pin_count + terminal_count < 2)."

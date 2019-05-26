@@ -1074,17 +1074,17 @@ static gsi::Class<C_P> decl_c ("", "C",
   gsi::method ("call_vfunc", &C_P::call_vfunc) +
   gsi::method ("pass_cd_direct", &C_P::pass_cd_direct) +
   gsi::method ("pass_cd_cref", &C_P::pass_cd_cref) +
-  gsi::method<C_P, const CopyDetector &, const CopyDetector &, gsi::arg_make_copy> ("pass_cd_cref_as_copy", &C_P::pass_cd_cref) +
-  gsi::method<C_P, const CopyDetector &, const CopyDetector &, gsi::arg_make_reference> ("pass_cd_cref_as_ref", &C_P::pass_cd_cref) +
+  gsi::method ("pass_cd_cref_as_copy", gsi::return_copy (), &C_P::pass_cd_cref) +
+  gsi::method ("pass_cd_cref_as_ref", gsi::return_reference (), &C_P::pass_cd_cref) +
   gsi::method ("pass_cd_cptr", &C_P::pass_cd_cptr) +
-  gsi::method<C_P, const CopyDetector *, const CopyDetector &, gsi::arg_make_copy> ("pass_cd_cptr_as_copy", &C_P::pass_cd_cptr) +
-  gsi::method<C_P, const CopyDetector *, const CopyDetector &, gsi::arg_make_reference> ("pass_cd_cptr_as_ref", &C_P::pass_cd_cptr) +
+  gsi::method ("pass_cd_cptr_as_copy", gsi::return_copy (), &C_P::pass_cd_cptr) +
+  gsi::method ("pass_cd_cptr_as_ref", gsi::return_reference (), &C_P::pass_cd_cptr) +
   gsi::method ("pass_cd_ref", &C_P::pass_cd_ref) +
-  gsi::method<C_P, CopyDetector &, const CopyDetector &, gsi::arg_make_copy> ("pass_cd_ref_as_copy", &C_P::pass_cd_ref) +
-  gsi::method<C_P, CopyDetector &, const CopyDetector &, gsi::arg_make_reference> ("pass_cd_ref_as_ref", &C_P::pass_cd_ref) +
+  gsi::method ("pass_cd_ref_as_copy", gsi::return_copy (), &C_P::pass_cd_ref) +
+  gsi::method ("pass_cd_ref_as_ref", gsi::return_reference (), &C_P::pass_cd_ref) +
   gsi::method ("pass_cd_ptr", &C_P::pass_cd_ptr) +
-  gsi::method<C_P, CopyDetector *, const CopyDetector &, gsi::arg_make_copy> ("pass_cd_ptr_as_copy", &C_P::pass_cd_ptr) +
-  gsi::method<C_P, CopyDetector *, const CopyDetector &, gsi::arg_make_reference> ("pass_cd_ptr_as_ref", &C_P::pass_cd_ptr) +
+  gsi::method ("pass_cd_ptr_as_copy", gsi::return_copy (), &C_P::pass_cd_ptr) +
+  gsi::method ("pass_cd_ptr_as_ref", gsi::return_reference (), &C_P::pass_cd_ptr) +
   gsi::method ("g", &C_P::g) +
   gsi::method ("s1", &C::s1) +
   gsi::method ("s2", &C::s2) +

@@ -1410,6 +1410,13 @@ struct arg_make_reference { };
  */
 struct arg_default_return_value_preference { };
 
+//  All of these modes can be used for arguments (in callbacks) or for
+//  return values. So we provide aliases to make their names clearer.
+
+typedef arg_pass_ownership return_new_object;
+typedef arg_make_copy return_copy;
+typedef arg_make_reference return_reference;
+
 /**
  *  @brief A function computing the "prefer_copy" value
  */

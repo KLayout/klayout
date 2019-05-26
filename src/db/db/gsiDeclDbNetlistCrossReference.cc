@@ -440,8 +440,7 @@ Class<db::NetlistCrossReference> decl_dbNetlistCrossReference (decl_dbNetlistCom
   "This class has been introduced in version 0.26."
 );
 
-//  TODO: there is no "enum as child class" currently, so we have to define that on top level too
-gsi::Enum<db::NetlistCrossReference::Status> decl_dbNetlistCrossReference_Status ("db", "NetlistCrossReference_Status",
+gsi::EnumIn<db::NetlistCrossReference, db::NetlistCrossReference::Status> decl_dbNetlistCrossReference_Status ("db", "Status",
   gsi::enum_const ("None", db::NetlistCrossReference::None,
     "@brief Enum constant NetlistCrossReference::None\n"
     "No specific status is implied if this code is present."
@@ -478,9 +477,6 @@ gsi::Enum<db::NetlistCrossReference::Status> decl_dbNetlistCrossReference_Status
 );
 
 //  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
-//  Inject constants:
 gsi::ClassExt<db::NetlistCrossReference> inject_NetlistCrossReference_Status_in_parent (decl_dbNetlistCrossReference_Status.defs ());
-//  Inject class:
-gsi::ClassExt<db::NetlistCrossReference> decl_NetlistCrossReference_Status_as_child (decl_dbNetlistCrossReference_Status, "Status");
 
 }

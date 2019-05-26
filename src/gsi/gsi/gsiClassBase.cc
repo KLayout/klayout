@@ -558,6 +558,85 @@ ClassBase::merge_declarations ()
   }
 }
 
+static void collect_classes (const gsi::ClassBase *cls, std::list<const gsi::ClassBase *> &unsorted_classes)
+{
+  unsorted_classes.push_back (cls);
+
+  for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
+    tl_assert (cc->declaration () != 0);
+    collect_classes (cc.operator-> (), unsorted_classes);
+  }
+}
+
+std::list<const gsi::ClassBase *>
+ClassBase::classes_in_definition_order (const char *mod_name)
+{
+  std::set<const gsi::ClassBase *> taken;
+  std::list<const gsi::ClassBase *> sorted_classes;
+
+  std::list<const gsi::ClassBase *> unsorted_classes;
+  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+    if (! mod_name || c->module () == mod_name) {
+      //  only handle top-level classed from the requested modules
+      //  (children or base classes from outside the module may be part of the returned list!)
+      collect_classes (c.operator-> (), unsorted_classes);
+    }
+  }
+
+  while (! unsorted_classes.empty ()) {
+
+    std::string reason_for_more;
+    bool any = false;
+
+    std::list<const gsi::ClassBase *> more_classes;
+
+    for (std::list<const gsi::ClassBase *>::const_iterator c = unsorted_classes.begin (); c != unsorted_classes.end (); ++c) {
+
+      //  don't handle classes twice
+      if (taken.find (*c) != taken.end ()) {
+        continue;
+      }
+
+      bool all_children_available = true;
+      for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = (*c)->begin_child_classes (); cc != (*c)->end_child_classes (); ++cc) {
+        tl_assert (cc->declaration () != 0);
+        if (taken.find (cc.operator-> ()) == taken.end ()) {
+          reason_for_more = tl::sprintf ("child of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), cc->module (), cc->name ());
+          all_children_available = false;
+          break;
+        }
+      }
+      if (! all_children_available) {
+        //  can't produce this class yet - the children are not available yet.
+        more_classes.push_back (*c);
+        continue;
+      }
+
+      if ((*c)->base () != 0 && taken.find ((*c)->base ()) == taken.end ()) {
+        //  can't produce this class yet. The base class needs to be handled first.
+        reason_for_more = tl::sprintf ("base of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), (*c)->base ()->module (), (*c)->base ()->name ());
+        more_classes.push_back (*c);
+        continue;
+      }
+
+      sorted_classes.push_back (*c);
+      taken.insert (*c);
+      any = true;
+
+    }
+
+    if (! any && ! more_classes.empty ()) {
+      //  prevent infinite recursion
+      throw tl::Exception ("Internal error: infinite recursion on class building. Reason is: " + reason_for_more);
+    }
+
+    unsorted_classes.swap (more_classes);
+
+  }
+
+  return sorted_classes;
+}
+
 void
 ClassBase::initialize ()
 {

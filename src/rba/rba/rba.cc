@@ -1476,7 +1476,15 @@ rba_init (RubyInterpreterPrivateData *d)
     //  there should be only main declarations since we merged
     tl_assert ((*c)->declaration () == *c);
 
-    VALUE klass = rb_define_class_under (module, (*c)->name ().c_str (), super);
+    VALUE klass;
+    if ((*c)->parent ()) {
+      tl_assert (is_registered ((*c)->parent ()));
+      VALUE parent_class = ruby_cls ((*c)->parent ());
+      klass = rb_define_class_under (parent_class, (*c)->name ().c_str (), super);
+    } else {
+      klass = rb_define_class_under (module, (*c)->name ().c_str (), super);
+    }
+
     register_class (klass, *c);
 
     rb_define_alloc_func (klass, alloc_proxy);
@@ -1612,7 +1620,7 @@ rba_init (RubyInterpreterPrivateData *d)
         //    x = object with signal "signal"
         //    x.signal = proc
         //  this will basically map to
-        //    x.signal(proc)
+       //    x.signal(proc)
         //  which will make proc the only receiver for the signal
         rb_define_alias (klass, (mt->name (mid) + "=").c_str (), mt->name (mid).c_str ());
       }
@@ -1626,13 +1634,6 @@ rba_init (RubyInterpreterPrivateData *d)
         rb_define_alias (klass, "eql?", "==");
       }
 
-    }
-
-
-    //  produce the child classes as constants
-    for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = (*c)->begin_child_classes (); cc != (*c)->end_child_classes (); ++cc) {
-      tl_assert (is_registered (cc.operator-> ()));
-      rb_define_const (ruby_cls (*c), cc->name ().c_str (), ruby_cls (cc->declaration ()));
     }
 
   }

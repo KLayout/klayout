@@ -597,17 +597,9 @@ ClassBase::classes_in_definition_order (const char *mod_name)
         continue;
       }
 
-      bool all_children_available = true;
-      for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = (*c)->begin_child_classes (); cc != (*c)->end_child_classes (); ++cc) {
-        tl_assert (cc->declaration () != 0);
-        if (taken.find (cc.operator-> ()) == taken.end ()) {
-          reason_for_more = tl::sprintf ("child of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), cc->module (), cc->name ());
-          all_children_available = false;
-          break;
-        }
-      }
-      if (! all_children_available) {
-        //  can't produce this class yet - the children are not available yet.
+      if ((*c)->parent () != 0 && taken.find ((*c)->parent ()) == taken.end ()) {
+        //  can't produce this class yet - it's a child of a parent that is not produced yet.
+        reason_for_more = tl::sprintf ("parent of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), (*c)->parent ()->module (), (*c)->parent ()->name ());
         more_classes.push_back (*c);
         continue;
       }

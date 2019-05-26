@@ -2427,14 +2427,16 @@ PythonModule::make_classes (const char *mod_name)
     tl_assert (cls_for_type (type) == *c);
 
     PyList_Append (all_list.get (), PythonRef (c2python ((*c)->name ())).get ());
-    PyModule_AddObject (module, (*c)->name ().c_str (), (PyObject *) type);
 
-    //  Create the sub-class attributes
+    //  Add to the parent class as child class or add to module
 
-    for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = (*c)->begin_child_classes (); cc != (*c)->end_child_classes (); ++cc) {
-      tl_assert (cc->declaration () != 0);
-      PythonRef cc_obj ((PyObject *) PythonClassClientData::py_type (*cc->declaration ()), false);
-      set_type_attr (type, cc->name ().c_str (), cc_obj);
+    if ((*c)->parent ()) {
+      tl_assert ((*c)->parent ()->declaration () != 0);
+      PyTypeObject *parent_type = PythonClassClientData::py_type (*(*c)->parent ()->declaration ());
+      PythonRef attr ((PyObject *) type);
+      set_type_attr (parent_type, (*c)->name ().c_str (), attr);
+    } else {
+      PyModule_AddObject (module, (*c)->name ().c_str (), (PyObject *) type);
     }
 
     //  Build the attributes now ...

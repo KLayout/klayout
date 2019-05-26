@@ -249,7 +249,7 @@ public:
    *  Definition order is:
    *  - No duplicate class entries
    *  - Base classes before their derived classes
-   *  - Child classes before their parent classes
+   *  - Child classes after their parent classes
    *
    *  If a module name is given, only top-level classes from this
    *  module will be considered. However, the list may also include

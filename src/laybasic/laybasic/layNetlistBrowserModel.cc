@@ -822,7 +822,7 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Net *, const db::Ne
     void *id = make_id_circuit_net (mp_indexer->circuit_index (mp_indexer->parent_of (nets)), mp_indexer->net_index (nets));
     if (mp_indexer->is_single () || column == m_first_column) {
       return build_url (id, "net", str_from_expanded_name (nets.first));
-    } else if (column == m_first_column) {
+    } else if (column == m_second_column) {
       return build_url (id, "net", str_from_expanded_name (nets.second));
     } else {
       return build_url (id, "net", str_from_expanded_names (nets, mp_indexer->is_single ()));
@@ -839,7 +839,7 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Device *, const db:
     void *id = make_id_circuit_device (mp_indexer->circuit_index (mp_indexer->parent_of (devices)), mp_indexer->device_index (devices));
     if (mp_indexer->is_single () || column == m_first_column) {
       return build_url (id, "device", str_from_expanded_name (devices.first));
-    } else if (column == m_first_column) {
+    } else if (column == m_second_column) {
       return build_url (id, "device", str_from_expanded_name (devices.second));
     } else {
       return build_url (id, "device", str_from_expanded_names (devices, mp_indexer->is_single ()));

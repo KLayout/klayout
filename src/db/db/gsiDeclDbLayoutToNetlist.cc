@@ -205,10 +205,10 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("original_file=", &db::LayoutToNetlist::set_original_file,
     "@brief Sets the original file name of the database\n"
   ) +
-  gsi::method ("name", (std::string (db::LayoutToNetlist::*) (const db::Region &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
+  gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (const db::Region &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer\n"
   ) +
-  gsi::method ("name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
+  gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer (by index)\n"
   ) +
   gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::Region &region, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),

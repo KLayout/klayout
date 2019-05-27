@@ -580,12 +580,14 @@ ClassBase::classes_in_definition_order (const char *mod_name)
       //  only handle top-level classed from the requested modules
       //  (children or base classes from outside the module may be part of the returned list!)
       collect_classes (c.operator-> (), unsorted_classes);
+    } else {
+      //  we assume that these classes are taken by another run (i.e. "import x" in Python)
+      taken.insert (c.operator-> ());
     }
   }
 
   while (! unsorted_classes.empty ()) {
 
-    std::string reason_for_more;
     bool any = false;
 
     std::list<const gsi::ClassBase *> more_classes;
@@ -598,23 +600,20 @@ ClassBase::classes_in_definition_order (const char *mod_name)
       }
 
       if ((*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
-        //  can't produce this class yet - it's a child of a parent that is not produced yet.
+        //  can't produce this class yet - it's a reference to another class which is not produced yet.
         tl_assert ((*c)->declaration () != 0);
-        reason_for_more = tl::sprintf ("class %s.%s refers to another class (%s.%s) which is not available", (*c)->module (), (*c)->name (), (*c)->declaration ()->module (), (*c)->declaration ()->name ());
         more_classes.push_back (*c);
         continue;
       }
 
       if ((*c)->parent () != 0 && taken.find ((*c)->parent ()) == taken.end ()) {
         //  can't produce this class yet - it's a child of a parent that is not produced yet.
-        reason_for_more = tl::sprintf ("parent of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), (*c)->parent ()->module (), (*c)->parent ()->name ());
         more_classes.push_back (*c);
         continue;
       }
 
       if ((*c)->base () != 0 && taken.find ((*c)->base ()) == taken.end ()) {
         //  can't produce this class yet. The base class needs to be handled first.
-        reason_for_more = tl::sprintf ("base of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), (*c)->base ()->module (), (*c)->base ()->name ());
         more_classes.push_back (*c);
         continue;
       }
@@ -626,8 +625,28 @@ ClassBase::classes_in_definition_order (const char *mod_name)
     }
 
     if (! any && ! more_classes.empty ()) {
+
+      for (std::list<const gsi::ClassBase *>::const_iterator c = more_classes.begin (); c != more_classes.end (); ++c) {
+
+        //  don't handle classes twice
+        if (taken.find (*c) != taken.end ()) {
+          //  not considered.
+        } else if ((*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
+          //  can't produce this class yet - it's a child of a parent that is not produced yet.
+          tl::error << tl::sprintf ("class %s.%s refers to another class (%s.%s) which is not available", (*c)->module (), (*c)->name (), (*c)->declaration ()->module (), (*c)->declaration ()->name ());
+        } else if ((*c)->parent () != 0 && taken.find ((*c)->parent ()) == taken.end ()) {
+          //  can't produce this class yet - it's a child of a parent that is not produced yet.
+          tl::error << tl::sprintf ("parent of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), (*c)->parent ()->module (), (*c)->parent ()->name ());
+        } else if ((*c)->base () != 0 && taken.find ((*c)->base ()) == taken.end ()) {
+          //  can't produce this class yet. The base class needs to be handled first.
+          tl::error << tl::sprintf ("base of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), (*c)->base ()->module (), (*c)->base ()->name ());
+        }
+
+      }
+
       //  prevent infinite recursion
-      throw tl::Exception ("Internal error: infinite recursion on class building. Reason is: " + reason_for_more);
+      throw tl::Exception ("Internal error: infinite recursion on class building. See error log for analysis");
+
     }
 
     unsorted_classes.swap (more_classes);

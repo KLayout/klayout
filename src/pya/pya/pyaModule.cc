@@ -2366,7 +2366,7 @@ PythonModule::make_classes (const char *mod_name)
   //  Build a class for signals
   PYASignal::make_class (module);
 
-  std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order ();
+  std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order (mod_name);
   for (std::list<const gsi::ClassBase *>::const_iterator c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
 
     if (mod_name && (*c)->module () != mod_name) {

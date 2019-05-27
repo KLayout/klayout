@@ -72,7 +72,7 @@ static void run_test_int (tl::TestBase *_this, I1 a, I2 b)
   EXPECT_EQ (to_i (ae + be), a + b);
   r = ae;
   r += be;
-  EXPECT_EQ (I1 (to_i (r)), a + I1 (b));
+  EXPECT_EQ (to_i (r), a + b);
   EXPECT_EQ (to_i (ae + basic_type (2)), a + basic_type (2));
   r = ae;
   r += basic_type (2);
@@ -81,7 +81,7 @@ static void run_test_int (tl::TestBase *_this, I1 a, I2 b)
   EXPECT_EQ (to_i (ae - be), a - b);
   r = ae;
   r -= be;
-  EXPECT_EQ (I1 (to_i (r)), a - I1 (b));
+  EXPECT_EQ (to_i (r), a - b);
   EXPECT_EQ (to_i (ae - basic_type (2)), a - basic_type (2));
   r = ae;
   r -= basic_type (2);
@@ -98,17 +98,17 @@ static void run_test_int (tl::TestBase *_this, I1 a, I2 b)
   EXPECT_EQ (to_i (ae * be), a * b);
   r = ae;
   r *= be;
-  EXPECT_EQ (I1 (to_i (r)), a * I1 (b));
+  EXPECT_EQ (to_i (r), a * b);
 
   if (b != 0) {
     EXPECT_EQ (to_i (ae / be), a / b);
     r = ae;
     r /= be;
-    EXPECT_EQ (I1 (to_i (r)), a / I1 (b));
+    EXPECT_EQ (to_i (r), a / b);
     EXPECT_EQ (to_i (ae % be), a % b);
     r = ae;
     r %= be;
-    EXPECT_EQ (I1 (to_i (r)), a % I1 (b));
+    EXPECT_EQ (to_i (r), a % b);
   }
 }
 

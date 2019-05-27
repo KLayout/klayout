@@ -21,6 +21,7 @@
 */
 
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 #include "dbLayoutToNetlist.h"
 #include "tlStream.h"
 #include "tlVariant.h"
@@ -65,34 +66,19 @@ static db::Cell *l2n_internal_top_cell (db::LayoutToNetlist *l2n)
   return const_cast<db::Cell *> (l2n->internal_top_cell ());
 }
 
-static int bnh_flatten ()
-{
-  return int (db::LayoutToNetlist::BNH_Flatten);
-}
-
-static int bnh_disconnected ()
-{
-  return int (db::LayoutToNetlist::BNH_Disconnected);
-}
-
-static int bnh_subcircuit_cells ()
-{
-  return int (db::LayoutToNetlist::BNH_SubcircuitCells);
-}
-
-static void build_net (const db::LayoutToNetlist *l2n, const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &netname_prop, int hier_mode, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
+static void build_net (const db::LayoutToNetlist *l2n, const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &netname_prop, db::LayoutToNetlist::BuildNetHierarchyMode hier_mode, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
 {
   std::string p = circuit_cell_name_prefix.to_string ();
   std::string dp = device_cell_name_prefix.to_string ();
-  l2n->build_net (net, target, target_cell, lmap, netname_prop, (db::LayoutToNetlist::BuildNetHierarchyMode) hier_mode, circuit_cell_name_prefix.is_nil () ? 0 : p.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
+  l2n->build_net (net, target, target_cell, lmap, netname_prop, hier_mode, circuit_cell_name_prefix.is_nil () ? 0 : p.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
 }
 
-static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &net_cell_name_prefix, const tl::Variant &netname_prop, int hier_mode, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
+static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &net_cell_name_prefix, const tl::Variant &netname_prop, db::LayoutToNetlist::BuildNetHierarchyMode hier_mode, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
 {
   std::string cp = circuit_cell_name_prefix.to_string ();
   std::string np = net_cell_name_prefix.to_string ();
   std::string dp = device_cell_name_prefix.to_string ();
-  l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), netname_prop, (db::LayoutToNetlist::BuildNetHierarchyMode) hier_mode, circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
+  l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), netname_prop, hier_mode, circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
 }
 
 static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
@@ -370,16 +356,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "all subcircuits too.\n"
     "\"prop_id\" is an optional properties ID. If given, this property set will be attached to the shapes."
   ) +
-  gsi::constant ("BNH_Flatten", &bnh_flatten,
-    "@brief This constant tells \\build_net and \\build_all_nets to flatten the nets (used for the \"hier_mode\" parameter)."
-  ) +
-  gsi::constant ("BNH_Disconnected", &bnh_disconnected,
-    "@brief This constant tells \\build_net and \\build_all_nets to produce local nets without connections to subcircuits (used for the \"hier_mode\" parameter)."
-  ) +
-  gsi::constant ("BNH_SubcircuitCells", &bnh_subcircuit_cells,
-    "@brief This constant tells \\build_net and \\build_all_nets to produce a hierarchy of subcircuit cells per net (used for the \"hier_mode\" parameter)."
-  ) +
-  gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", int (db::LayoutToNetlist::BNH_Flatten), "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
+  gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::LayoutToNetlist::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a net representation in the given layout and cell\n"
     "\n"
     "This method puts the shapes of a net into the given target cell using a variety of options\n"
@@ -409,7 +386,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@param cell_name_prefix Chooses recursive mode if non-null\n"
     "@param device_cell_name_prefix See above\n"
   ) +
-  gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", int (db::LayoutToNetlist::BNH_Flatten), "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
+  gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::LayoutToNetlist::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a full hierarchical representation of the nets\n"
     "\n"
     "This method copies all nets into cells corresponding to the circuits. It uses the cmap\n"
@@ -570,5 +547,22 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   "\n"
   "This class has been introduced in version 0.26."
 );
+
+gsi::EnumIn<db::LayoutToNetlist, db::LayoutToNetlist::BuildNetHierarchyMode> decl_dbLayoutToNetlist_BuildNetHierarchyMode ("db", "BuildNetHierarchyMode",
+  gsi::enum_const ("BNH_Flatten", db::LayoutToNetlist::BNH_Flatten,
+    "@brief This constant tells \\build_net and \\build_all_nets to flatten the nets (used for the \"hier_mode\" parameter)."
+  ) +
+  gsi::enum_const ("BNH_Disconnected", db::LayoutToNetlist::BNH_Disconnected,
+    "@brief This constant tells \\build_net and \\build_all_nets to produce local nets without connections to subcircuits (used for the \"hier_mode\" parameter)."
+  ) +
+  gsi::enum_const ("BNH_SubcircuitCells", db::LayoutToNetlist::BNH_SubcircuitCells,
+    "@brief This constant tells \\build_net and \\build_all_nets to produce a hierarchy of subcircuit cells per net (used for the \"hier_mode\" parameter)."
+  ),
+  "@brief This class represents the LayoutToNetlist::BuildNetHierarchyMode enum\n"
+  "This enum is used for \\LayoutToNetlist#build_all_nets and \\LayoutToNetlist#build_net."
+);
+
+//  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
+gsi::ClassExt<db::LayoutToNetlist> inject_dbLayoutToNetlist_BuildNetHierarchyMode_in_parent (decl_dbLayoutToNetlist_BuildNetHierarchyMode.defs ());
 
 }

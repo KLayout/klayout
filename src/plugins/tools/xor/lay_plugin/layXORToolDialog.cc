@@ -1331,33 +1331,33 @@ XORToolDialog::run_xor ()
       }
 
       //  create the XOR tasks
-      for (db::Coord nw = 0; nw < db::Coord (ntiles_w); ++nw) {
+      for (size_t nw = 0; nw < ntiles_w; ++nw) {
 
-        for (db::Coord nh = 0; nh < db::Coord (ntiles_h); ++nh) {
+        for (size_t nh = 0; nh < ntiles_h; ++nh) {
 
-          db::Box clip_box (box_out.left () + nw * box_width_out, 
-                            box_out.bottom () + nh * box_height_out,
-                            (nw == ntiles_w - 1) ? box_out.right () : box_out.left () + (nw + 1) * box_width_out,
-                            (nh == ntiles_h - 1) ? box_out.top () : box_out.bottom () + (nh + 1) * box_height_out);
+          db::Box clip_box (box_out.left () + db::Coord (nw * box_width_out),
+                            box_out.bottom () + db::Coord (nh * box_height_out),
+                            (nw == ntiles_w - 1) ? box_out.right () : box_out.left () + db::Coord ((nw + 1) * box_width_out),
+                            (nh == ntiles_h - 1) ? box_out.top () : box_out.bottom () + db::Coord ((nh + 1) * box_height_out));
 
-          db::Box region_a (box_a.left () + nw * box_width_a, 
-                            box_a.bottom () + nh * box_height_a,
-                            (nw == ntiles_w - 1) ? box_a.right () : box_a.left () + (nw + 1) * box_width_a,
-                            (nh == ntiles_h - 1) ? box_a.top () : box_a.bottom () + (nh + 1) * box_height_a);
+          db::Box region_a (box_a.left () + db::Coord (nw * box_width_a),
+                            box_a.bottom () + db::Coord (nh * box_height_a),
+                            (nw == ntiles_w - 1) ? box_a.right () : box_a.left () + db::Coord ((nw + 1) * box_width_a),
+                            (nh == ntiles_h - 1) ? box_a.top () : box_a.bottom () + db::Coord ((nh + 1) * box_height_a));
 
-          db::Box region_b (box_b.left () + nw * box_width_b, 
-                            box_b.bottom () + nh * box_height_b,
-                            (nw == ntiles_w - 1) ? box_b.right () : box_b.left () + (nw + 1) * box_width_b,
-                            (nh == ntiles_h - 1) ? box_b.top () : box_b.bottom () + (nh + 1) * box_height_b);
+          db::Box region_b (box_b.left () + db::Coord (nw * box_width_b),
+                            box_b.bottom () + db::Coord (nh * box_height_b),
+                            (nw == ntiles_w - 1) ? box_b.right () : box_b.left () + db::Coord ((nw + 1) * box_width_b),
+                            (nh == ntiles_h - 1) ? box_b.top () : box_b.bottom () + db::Coord ((nh + 1) * box_height_b));
 
           region_a.enlarge (db::Vector (tile_enlargement_a, tile_enlargement_a));
           region_b.enlarge (db::Vector (tile_enlargement_b, tile_enlargement_b));
 
-          std::string tile_desc = tl::sprintf ("%d/%d,%d/%d", nw + 1, ntiles_w, nh + 1, ntiles_h);
+          std::string tile_desc = tl::sprintf ("%d/%d,%d/%d", int (nw + 1), ntiles_w, int (nh + 1), ntiles_h);
 
           unsigned int layer_index = 0;
           for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int> >, db::LPLogicalLessFunc>::const_iterator l = layers.begin (); l != layers.end (); ++l, ++layer_index) {
-            job.schedule (new XORTask (tile_desc, clip_box, region_a, region_b, layer_index, l->first, l->second.first, l->second.second, nw, nh));
+            job.schedule (new XORTask (tile_desc, clip_box, region_a, region_b, layer_index, l->first, l->second.first, l->second.second, int (nw), int (nh)));
           }
 
         }

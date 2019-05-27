@@ -197,7 +197,7 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev) co
 // --------------------------------------------------------------------------------
 
 NetlistSpiceWriter::NetlistSpiceWriter (NetlistSpiceWriterDelegate *delegate)
-  : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_use_net_names (false), m_next_net_id (0)
+  : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_next_net_id (0), m_use_net_names (false)
 {
   static NetlistSpiceWriterDelegate std_delegate;
   if (! delegate) {

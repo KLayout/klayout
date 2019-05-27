@@ -1467,19 +1467,25 @@ rba_init (RubyInterpreterPrivateData *d)
   std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order ();
   for (std::list<const gsi::ClassBase *>::const_iterator c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
 
+    //  we might encounter a child class which is a reference to a top-level class (e.g.
+    //  duplication of enums into child classes). In this case we create a constant inside the
+    //  target class.
+    if ((*c)->declaration () != *c) {
+      tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
+      rb_define_const (ruby_cls ((*c)->parent ()->declaration ()), (*c)->name ().c_str (), ruby_cls ((*c)->declaration ()));
+      continue;
+    }
+
     VALUE super = rb_cObject;
     if ((*c)->base () != 0) {
       tl_assert (is_registered ((*c)->base ()));
       super = ruby_cls ((*c)->base ());
     }
 
-    //  there should be only main declarations since we merged
-    tl_assert ((*c)->declaration () == *c);
-
     VALUE klass;
     if ((*c)->parent ()) {
-      tl_assert (is_registered ((*c)->parent ()));
-      VALUE parent_class = ruby_cls ((*c)->parent ());
+      tl_assert (is_registered ((*c)->parent ()->declaration ()));
+      VALUE parent_class = ruby_cls ((*c)->parent ()->declaration ());
       klass = rb_define_class_under (parent_class, (*c)->name ().c_str (), super);
     } else {
       klass = rb_define_class_under (module, (*c)->name ().c_str (), super);

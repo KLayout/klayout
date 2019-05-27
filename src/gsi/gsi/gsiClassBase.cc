@@ -597,6 +597,14 @@ ClassBase::classes_in_definition_order (const char *mod_name)
         continue;
       }
 
+      if ((*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
+        //  can't produce this class yet - it's a child of a parent that is not produced yet.
+        tl_assert ((*c)->declaration () != 0);
+        reason_for_more = tl::sprintf ("class %s.%s refers to another class (%s.%s) which is not available", (*c)->module (), (*c)->name (), (*c)->declaration ()->module (), (*c)->declaration ()->name ());
+        more_classes.push_back (*c);
+        continue;
+      }
+
       if ((*c)->parent () != 0 && taken.find ((*c)->parent ()) == taken.end ()) {
         //  can't produce this class yet - it's a child of a parent that is not produced yet.
         reason_for_more = tl::sprintf ("parent of class %s.%s not available (%s.%s)", (*c)->module (), (*c)->name (), (*c)->parent ()->module (), (*c)->parent ()->name ());

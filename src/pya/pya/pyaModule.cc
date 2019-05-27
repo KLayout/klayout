@@ -2377,8 +2377,18 @@ PythonModule::make_classes (const char *mod_name)
       continue;
     }
 
-    //  there should be only main declarations since we merged
-    tl_assert ((*c)->declaration () == *c);
+    //  we might encounter a child class which is a reference to a top-level class (e.g.
+    //  duplication of enums into child classes). In this case we create a constant inside the
+    //  target class.
+    if ((*c)->declaration () != *c) {
+      tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
+      PyTypeObject *parent_type = PythonClassClientData::py_type (*(*c)->parent ()->declaration ());
+      PyTypeObject *type = PythonClassClientData::py_type (*(*c)->declaration ());
+      tl_assert (type != 0);
+      PythonRef attr ((PyObject *) type, false /*borrowed*/);
+      set_type_attr (parent_type, (*c)->name ().c_str (), attr);
+      continue;
+    }
 
     //  NOTE: we create the class as a heap object, since that way we can dynamically extend the objects
 
@@ -2426,8 +2436,6 @@ PythonModule::make_classes (const char *mod_name)
 
     tl_assert (cls_for_type (type) == *c);
 
-    PyList_Append (all_list.get (), PythonRef (c2python ((*c)->name ())).get ());
-
     //  Add to the parent class as child class or add to module
 
     if ((*c)->parent ()) {
@@ -2436,6 +2444,7 @@ PythonModule::make_classes (const char *mod_name)
       PythonRef attr ((PyObject *) type);
       set_type_attr (parent_type, (*c)->name ().c_str (), attr);
     } else {
+      PyList_Append (all_list.get (), PythonRef (c2python ((*c)->name ())).get ());
       PyModule_AddObject (module, (*c)->name ().c_str (), (PyObject *) type);
     }
 

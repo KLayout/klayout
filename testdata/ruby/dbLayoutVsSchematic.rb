@@ -155,8 +155,8 @@ class DBLayoutVsSchematic_TestClass < TestBase
     assert_equal(File.open(tmp, "r").read, File.open(input, "r").read)
 
     assert_equal(lvs.layer_names.join(","), "bulk,nwell,poly,poly_lbl,diff_cont,poly_cont,metal1,metal1_lbl,via1,metal2,metal2_lbl,ntie,psd,ptie,nsd")
-    assert_equal(lvs.name(lvs.layer_by_name("metal1")), "metal1")
-    assert_equal(lvs.name(lvs.layer_by_index(lvs.layer_of(lvs.layer_by_name("metal1")))), "metal1")
+    assert_equal(lvs.layer_name(lvs.layer_by_name("metal1")), "metal1")
+    assert_equal(lvs.layer_name(lvs.layer_by_index(lvs.layer_of(lvs.layer_by_name("metal1")))), "metal1")
 
     tmp = File::join($ut_testtmp, "tmp.l2n")
     lvs.write_l2n(tmp)

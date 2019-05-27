@@ -456,8 +456,8 @@ END
     assert_equal(File.open(tmp, "r").read, File.open(input, "r").read)
 
     assert_equal(l2n.layer_names.join(","), "poly,poly_lbl,diff_cont,poly_cont,metal1,metal1_lbl,via1,metal2,metal2_lbl,psd,nsd")
-    assert_equal(l2n.name(l2n.layer_by_name("metal1")), "metal1")
-    assert_equal(l2n.name(l2n.layer_by_index(l2n.layer_of(l2n.layer_by_name("metal1")))), "metal1")
+    assert_equal(l2n.layer_name(l2n.layer_by_name("metal1")), "metal1")
+    assert_equal(l2n.layer_name(l2n.layer_by_index(l2n.layer_of(l2n.layer_by_name("metal1")))), "metal1")
 
   end
 

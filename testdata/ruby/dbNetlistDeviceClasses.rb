@@ -57,8 +57,8 @@ class DBNetlistDeviceClasses_TestClass < TestBase
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n3);
-  device '' r1 (A=n1,B=n2) (R=1);
-  device '' r2 (A=n2,B=n3) (R=3);
+  device '' r1 (A=n1,B=n2) (R=1,A=0,P=0);
+  device '' r2 (A=n2,B=n3) (R=3,A=0,P=0);
 end;
 END
 
@@ -67,7 +67,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n3);
-  device '' r1 (A=n1,B=n3) (R=4);
+  device '' r1 (A=n1,B=n3) (R=4,A=0,P=0);
 end;
 END
 
@@ -105,8 +105,8 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n3);
-  device '' c1 (A=n1,B=n2) (C=2);
-  device '' c2 (A=n2,B=n3) (C=3);
+  device '' c1 (A=n1,B=n2) (C=2,A=0,P=0);
+  device '' c2 (A=n2,B=n3) (C=3,A=0,P=0);
 end;
 END
 
@@ -115,7 +115,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n3);
-  device '' c1 (A=n1,B=n3) (C=1.2);
+  device '' c1 (A=n1,B=n3) (C=1.2,A=0,P=0);
 end;
 END
 

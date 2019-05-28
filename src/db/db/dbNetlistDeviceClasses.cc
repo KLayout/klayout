@@ -108,8 +108,8 @@ DeviceClassResistor::DeviceClassResistor ()
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Terminal B"));
 
   add_parameter_definition (db::DeviceParameterDefinition ("R", "Resistance (Ohm)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false));
 }
 
 void DeviceClassResistor::parallel (Device *a, Device *b) const
@@ -160,8 +160,8 @@ DeviceClassCapacitor::DeviceClassCapacitor ()
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Terminal B"));
 
   add_parameter_definition (db::DeviceParameterDefinition ("C", "Capacitance (Farad)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false));
 }
 
 void DeviceClassCapacitor::serial (Device *a, Device *b) const

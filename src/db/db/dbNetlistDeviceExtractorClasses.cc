@@ -41,10 +41,10 @@ void NetlistDeviceExtractorMOS3Transistor::setup ()
   define_layer ("SD", "Source/drain diffusion");                        // #0
   define_layer ("G", "Gate input");                                     // #1
   //  for backward compatibility
-  define_layer ("P", 1, "Gate terminal output");                        // #2
+  define_layer ("P", 1, "Gate terminal output");                        // #2 -> G
 
   //  terminal output
-  define_layer ("tG", 2, "Gate terminal output");                       // #3
+  define_layer ("tG", 2, "Gate terminal output");                       // #3 -> P -> G
   define_layer ("tS", 0, "Source terminal output (default is SD)");     // #4
   define_layer ("tD", 0, "Drain terminal output (default is SD)");      // #5
 
@@ -158,24 +158,24 @@ void NetlistDeviceExtractorMOS4Transistor::setup ()
   define_layer ("SD", "Source/drain diffusion");                      // #0
   define_layer ("G", "Gate input");                                   // #1
   //  for backward compatibility
-  define_layer ("P", 1, "Gate terminal output");                      // #2
+  define_layer ("P", 1, "Gate terminal output");                      // #2 -> G
 
   //  terminal output
-  define_layer ("tG", 1, "Gate terminal output");                     // #3
+  define_layer ("tG", 2, "Gate terminal output");                     // #3 -> P -> G
   define_layer ("tS", 0, "Source terminal output (default is SD)");   // #4
   define_layer ("tD", 0, "Drain terminal output (default is SD)");    // #5
 
   //  for backward compatibility
   define_layer ("W", "Well (bulk) terminal output");                  // #6
 
-  define_layer ("tB", 6, "Well (bulk) terminal output");              // #7
+  define_layer ("tB", 6, "Well (bulk) terminal output");              // #7 -> W
 
   register_device_class (new db::DeviceClassMOS4Transistor ());
 }
 
 void NetlistDeviceExtractorMOS4Transistor::modify_device (const db::Polygon &rgate, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device)
 {
-  unsigned int bulk_terminal_geometry_index = 4;
+  unsigned int bulk_terminal_geometry_index = 7;
   define_terminal (device, db::DeviceClassMOS4Transistor::terminal_id_B, bulk_terminal_geometry_index, rgate);
 }
 
@@ -190,10 +190,10 @@ NetlistDeviceExtractorResistor::NetlistDeviceExtractorResistor (const std::strin
 
 void NetlistDeviceExtractorResistor::setup ()
 {
-  define_layer ("R", "Resistor");
-  define_layer ("C", "Contacts");
-  define_layer ("tA", 1, "A terminal output");
-  define_layer ("tB", 1, "B terminal output");
+  define_layer ("R", "Resistor");                 // #0
+  define_layer ("C", "Contacts");                 // #1
+  define_layer ("tA", 1, "A terminal output");    // #2 -> C
+  define_layer ("tB", 1, "B terminal output");    // #3 -> C
 
   register_device_class (new db::DeviceClassResistor ());
 }
@@ -291,10 +291,10 @@ NetlistDeviceExtractorCapacitor::NetlistDeviceExtractorCapacitor (const std::str
 
 void NetlistDeviceExtractorCapacitor::setup ()
 {
-  define_layer ("P1", "Plate 1");
-  define_layer ("P2", "Plate 2");
-  define_layer ("tA", 0, "A terminal output");
-  define_layer ("tB", 1, "B terminal output");
+  define_layer ("P1", "Plate 1");                   // #0
+  define_layer ("P2", "Plate 2");                   // #1
+  define_layer ("tA", 0, "A terminal output");      // #2 -> P1
+  define_layer ("tB", 1, "B terminal output");      // #3 -> P2
 
   register_device_class (new db::DeviceClassCapacitor ());
 }

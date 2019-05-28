@@ -275,14 +275,14 @@ class DBNetlist_TestClass < TestBase
 
     t = RBA::DeviceAbstractRef::new
     t.device_abstract = d1.device_abstract
-    t.offset = RBA::DVector::new(1, 2)
+    t.trans = RBA::DCplxTrans::new(RBA::DVector::new(1, 2))
     d1.add_combined_abstract(t)
 
     a = []
     d1.each_combined_abstract { |i| a << i }
     assert_equal(a.size, 1)
     assert_equal(a.collect { |i| i.device_abstract.name }.join(","), "xyz")
-    assert_equal(a.collect { |i| i.offset.to_s }.join(","), "1,2")
+    assert_equal(a.collect { |i| i.trans.to_s }.join(","), "r0 *1 1,2")
     
     d1.clear_combined_abstracts
 

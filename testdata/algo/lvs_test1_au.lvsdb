@@ -212,7 +212,7 @@ layout(
 
   # Devices and their connections
   device(1 D$PMOS
-   device(D$PMOS$1 800 0)
+   device(D$PMOS$1 location(800 0))
    connect(0 S S)
    connect(1 S D)
    connect(0 G G)
@@ -234,7 +234,7 @@ layout(
    terminal(B 1)
   )
   device(3 D$NMOS
-   device(D$NMOS$1 800 0)
+   device(D$NMOS$1 location(800 0))
    connect(0 S S)
    connect(1 S D)
    connect(0 G G)

@@ -61,6 +61,8 @@ public:
   }
 
   static size_t param_id_R;
+  static size_t param_id_A;
+  static size_t param_id_P;
 
   static size_t terminal_id_A;
   static size_t terminal_id_B;
@@ -91,6 +93,8 @@ public:
   }
 
   static size_t param_id_C;
+  static size_t param_id_A;
+  static size_t param_id_P;
 
   static size_t terminal_id_A;
   static size_t terminal_id_B;

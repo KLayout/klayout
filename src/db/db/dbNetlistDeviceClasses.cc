@@ -96,6 +96,8 @@ bool DeviceClassTwoTerminalDevice::combine_devices (Device *a, Device *b) const
 //  DeviceClassResistor implementation
 
 DB_PUBLIC size_t DeviceClassResistor::param_id_R = 0;
+DB_PUBLIC size_t DeviceClassResistor::param_id_A = 1;
+DB_PUBLIC size_t DeviceClassResistor::param_id_P = 2;
 
 DB_PUBLIC size_t DeviceClassResistor::terminal_id_A = 0;
 DB_PUBLIC size_t DeviceClassResistor::terminal_id_B = 1;
@@ -106,6 +108,8 @@ DeviceClassResistor::DeviceClassResistor ()
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Terminal B"));
 
   add_parameter_definition (db::DeviceParameterDefinition ("R", "Resistance (Ohm)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0));
 }
 
 void DeviceClassResistor::parallel (Device *a, Device *b) const
@@ -113,6 +117,16 @@ void DeviceClassResistor::parallel (Device *a, Device *b) const
   double va = a->parameter_value (0);
   double vb = b->parameter_value (0);
   a->set_parameter_value (0, va + vb < 1e-10 ? 0.0 : va * vb / (va + vb));
+
+  //  TODO: does this implementation make sense?
+  double aa = a->parameter_value (1);
+  double ab = b->parameter_value (1);
+  a->set_parameter_value (1, aa + ab);
+
+  //  TODO: does this implementation make sense?
+  double pa = a->parameter_value (2);
+  double pb = b->parameter_value (2);
+  a->set_parameter_value (2, pa + pb);
 }
 
 void DeviceClassResistor::serial (Device *a, Device *b) const
@@ -120,12 +134,22 @@ void DeviceClassResistor::serial (Device *a, Device *b) const
   double va = a->parameter_value (0);
   double vb = b->parameter_value (0);
   a->set_parameter_value (0, va + vb);
+
+  double aa = a->parameter_value (1);
+  double ab = b->parameter_value (1);
+  a->set_parameter_value (1, aa + ab);
+
+  double pa = a->parameter_value (2);
+  double pb = b->parameter_value (2);
+  a->set_parameter_value (2, pa + pb);
 }
 
 // ------------------------------------------------------------------------------------
 //  DeviceClassCapacitor implementation
 
 DB_PUBLIC size_t DeviceClassCapacitor::param_id_C = 0;
+DB_PUBLIC size_t DeviceClassCapacitor::param_id_A = 1;
+DB_PUBLIC size_t DeviceClassCapacitor::param_id_P = 2;
 
 DB_PUBLIC size_t DeviceClassCapacitor::terminal_id_A = 0;
 DB_PUBLIC size_t DeviceClassCapacitor::terminal_id_B = 1;
@@ -136,6 +160,8 @@ DeviceClassCapacitor::DeviceClassCapacitor ()
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Terminal B"));
 
   add_parameter_definition (db::DeviceParameterDefinition ("C", "Capacitance (Farad)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0));
 }
 
 void DeviceClassCapacitor::serial (Device *a, Device *b) const
@@ -143,6 +169,16 @@ void DeviceClassCapacitor::serial (Device *a, Device *b) const
   double va = a->parameter_value (0);
   double vb = b->parameter_value (0);
   a->set_parameter_value (0, va + vb < 1e-10 ? 0.0 : va * vb / (va + vb));
+
+  //  TODO: does this implementation make sense?
+  double aa = a->parameter_value (1);
+  double ab = b->parameter_value (1);
+  a->set_parameter_value (1, aa + ab);
+
+  //  TODO: does this implementation make sense?
+  double pa = a->parameter_value (2);
+  double pb = b->parameter_value (2);
+  a->set_parameter_value (2, pa + pb);
 }
 
 void DeviceClassCapacitor::parallel (Device *a, Device *b) const
@@ -150,6 +186,14 @@ void DeviceClassCapacitor::parallel (Device *a, Device *b) const
   double va = a->parameter_value (0);
   double vb = b->parameter_value (0);
   a->set_parameter_value (0, va + vb);
+
+  double aa = a->parameter_value (1);
+  double ab = b->parameter_value (1);
+  a->set_parameter_value (1, aa + ab);
+
+  double pa = a->parameter_value (2);
+  double pb = b->parameter_value (2);
+  a->set_parameter_value (2, pa + pb);
 }
 
 // ------------------------------------------------------------------------------------

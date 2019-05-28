@@ -27,6 +27,7 @@
 #include "dbNet.h"
 #include "dbPoint.h"
 #include "dbVector.h"
+#include "dbTrans.h"
 
 #include "tlObject.h"
 
@@ -68,20 +69,20 @@ struct DeviceReconnectedTerminal
  */
 struct DeviceAbstractRef
 {
-  DeviceAbstractRef (const db::DeviceAbstract *_device_abstract, const db::DVector &_offset)
-    : device_abstract (_device_abstract), offset (_offset)
+  DeviceAbstractRef (const db::DeviceAbstract *_device_abstract, const db::DCplxTrans &_trans)
+    : device_abstract (_device_abstract), trans (_trans)
   {
     //  .. nothing yet ..
   }
 
   DeviceAbstractRef ()
-    : device_abstract (0), offset ()
+    : device_abstract (0), trans ()
   {
     //  .. nothing yet ..
   }
 
   const db::DeviceAbstract *device_abstract;
-  db::DVector offset;
+  db::DCplxTrans trans;
 };
 
 /**
@@ -212,19 +213,19 @@ public:
 
   /**
    *  @brief Sets the device position
-   *  The device position should be the center of the recognition shape or something similar.
+   *  The device position should be the center and orientation of the recognition shape or something similar.
    *  Giving the device a position allows combining multiple devices with the same
    *  relative geometry into a single cell.
-   *  The position has to be given in micrometer units.
+   *  The transformation has to be given in micrometer units.
    */
-  void set_position (const db::DPoint &pos);
+  void set_trans (const db::DCplxTrans &tr);
 
   /**
    *  @brief Gets the device position
    */
-  const db::DPoint &position () const
+  const db::DCplxTrans &trans () const
   {
-    return m_position;
+    return m_trans;
   }
 
   /**
@@ -355,7 +356,7 @@ private:
   DeviceClass *mp_device_class;
   DeviceAbstract *mp_device_abstract;
   std::string m_name;
-  db::DPoint m_position;
+  db::DCplxTrans m_trans;
   std::vector<Net::terminal_iterator> m_terminal_refs;
   std::vector<double> m_parameters;
   size_t m_id;

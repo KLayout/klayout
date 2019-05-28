@@ -183,6 +183,11 @@ static size_t ld_index (const db::NetlistDeviceExtractorLayerDefinition *ld)
   return ld->index;
 }
 
+static size_t ld_fallback_index (const db::NetlistDeviceExtractorLayerDefinition *ld)
+{
+  return ld->fallback_index;
+}
+
 Class<db::NetlistDeviceExtractorLayerDefinition> decl_dbNetlistDeviceExtractorLayerDefinition ("db", "NetlistDeviceExtractorLayerDefinition",
   gsi::method_ext ("name", &ld_name,
     "@brief Gets the name of the layer.\n"
@@ -192,6 +197,10 @@ Class<db::NetlistDeviceExtractorLayerDefinition> decl_dbNetlistDeviceExtractorLa
   ) +
   gsi::method_ext ("index", &ld_index,
     "@brief Gets the index of the layer.\n"
+  ) +
+  gsi::method_ext ("fallback_index", &ld_fallback_index,
+    "@brief Gets the index of the fallback layer.\n"
+    "This is the index of the layer to be used when this layer isn't specified for input or (more important) output.\n"
   ),
   "@brief Describes a layer used in the device extraction\n"
   "This read-only structure is used to describe a layer in the device extraction.\n"
@@ -267,12 +276,20 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
    "This method shall be used inside the implementation of \\setup to register\n"
    "the device classes.\n"
   ) +
-  gsi::method ("define_layer", &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("description"),
+  gsi::method ("define_layer", (const db::NetlistDeviceExtractorLayerDefinition &(GenericDeviceExtractor::*) (const std::string &name, const std::string &)) &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("description"),
    "@brief Defines a layer.\n"
+   "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
    "Each call will define one more layer for the device extraction.\n"
    "This method shall be used inside the implementation of \\setup to define\n"
    "the device layers. The actual geometries are later available to \\extract_devices\n"
    "in the order the layers are defined.\n"
+  ) +
+  gsi::method ("define_layer", (const db::NetlistDeviceExtractorLayerDefinition &(GenericDeviceExtractor::*) (const std::string &name, const std::string &)) &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("description"),
+   "@brief Defines a layer with a fallback layer.\n"
+   "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
+   "This version of 'define_layer' allows specification of a fallback layer. If this particular layer is not given "
+   "when the device is extracted, the fallback layer will be used. The fallback layer is given by it's "
+   "index and must be defined before the layer using the fallback layer is defined."
   ) +
   gsi::method ("create_device", &GenericDeviceExtractor::create_device,
    "@brief Creates a device.\n"
@@ -431,6 +448,57 @@ Class<db::NetlistDeviceExtractorMOS4Transistor> decl_NetlistDeviceExtractorMOS4T
   "\n"
   "The diffusion area is distributed on the number of gates connecting to\n"
   "the particular source or drain area.\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorResistor *make_res_extractor (const std::string &name, double sheet_rho)
+{
+  return new db::NetlistDeviceExtractorResistor (name, sheet_rho);
+}
+
+Class<db::NetlistDeviceExtractorResistor> decl_NetlistDeviceExtractorResistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorResistor",
+  gsi::constructor ("new", &make_res_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a two-terminal resistor\n"
+  "\n"
+  "This class supplies the generic extractor for a resistor device.\n"
+  "The device is defined by two geometry layers: the resistor 'wire' and "
+  "two contacts per wire. The contacts should be attached to the ends "
+  "of the wire. The wire length and width is computed from the "
+  "edge lengths between the contacts and along the contacts respectively.\n"
+  "\n"
+  "This simple computation is precise only when the resistor shape is "
+  "a rectangle.\n"
+  "\n"
+  "Using the given sheet resistance, the resistance value is computed by "
+  "'R = L / W * sheet_rho'.\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorCapacitor *make_cap_extractor (const std::string &name, double area_cap)
+{
+  return new db::NetlistDeviceExtractorCapacitor (name, area_cap);
+}
+
+Class<db::NetlistDeviceExtractorCapacitor> decl_NetlistDeviceExtractorCapacitor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorCapacitor",
+  gsi::constructor ("new", &make_cap_extractor, gsi::arg ("name"), gsi::arg ("area_cap"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a two-terminal capacitor\n"
+  "\n"
+  "This class supplies the generic extractor for a capacitor device.\n"
+  "The device is defined by two geometry layers forming the 'plates' of the capacitor.\n"
+  "The capacitance is computed from the overlapping area of the plates "
+  "using 'C = A * area_cap' (area_cap is the capacitance per square micrometer area).\n"
   "\n"
   "This class is a closed one and methods cannot be reimplemented. To reimplement "
   "specific methods, see \\DeviceExtractor.\n"

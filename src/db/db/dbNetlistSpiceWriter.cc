@@ -396,7 +396,7 @@ void NetlistSpiceWriter::do_write (const std::string &description)
     for (db::Circuit::const_device_iterator i = circuit.begin_devices (); i != circuit.end_devices (); ++i) {
 
       //  TODO: make this configurable?
-      std::string comment = "device instance " + i->expanded_name () + " " + i->position ().to_string () + " " + i->device_class ()->name ();
+      std::string comment = "device instance " + i->expanded_name () + " " + i->trans ().to_string () + " " + i->device_class ()->name ();
       emit_comment (comment);
 
       mp_delegate->write_device (*i);

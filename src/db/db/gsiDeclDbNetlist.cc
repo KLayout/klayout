@@ -129,14 +129,14 @@ static void set_device_abstract (db::DeviceAbstractRef *obj, const db::DeviceAbs
   obj->device_abstract = device_abstract;
 }
 
-static db::DVector get_offset (const db::DeviceAbstractRef *obj)
+static db::DCplxTrans get_trans (const db::DeviceAbstractRef *obj)
 {
-  return obj->offset;
+  return obj->trans;
 }
 
-static void set_offset (db::DeviceAbstractRef *obj, const db::DVector &offset)
+static void set_trans (db::DeviceAbstractRef *obj, const db::DCplxTrans &trans)
 {
-  obj->offset = offset;
+  obj->trans = trans;
 }
 
 Class<db::DeviceAbstractRef> decl_dbDeviceAbstractRef ("db", "DeviceAbstractRef",
@@ -148,19 +148,19 @@ Class<db::DeviceAbstractRef> decl_dbDeviceAbstractRef ("db", "DeviceAbstractRef"
     "@brief The getter for the device abstract reference.\n"
     "See the class description for details."
   ) +
-  gsi::method_ext ("offset=", &set_offset, gsi::arg ("offset"),
-    "@brief The setter for the offset.\n"
+  gsi::method_ext ("trans=", &set_trans, gsi::arg ("tr"),
+    "@brief The setter for the relative transformation of the instance.\n"
     "See the class description for details."
   ) +
-  gsi::method_ext ("offset", &get_offset,
-    "@brief The getter for the offset.\n"
+  gsi::method_ext ("trans", &get_trans,
+    "@brief The getter for the relative transformation of the instance.\n"
     "See the class description for details."
   ),
   "@brief Describes an additional device abstract reference for combined devices.\n"
   "Combined devices are implemented as a generalization of the device abstract concept in \\Device. For "
   "combined devices, multiple \\DeviceAbstract references are present. This class describes such an "
-  "additional reference. A reference is a pointer to an abstract plus an offset by which the abstract "
-  "is shifted geometrically as compared to the first (initial) abstract.\n"
+  "additional reference. A reference is a pointer to an abstract plus a transformation by which the abstract "
+  "is transformed geometrically as compared to the first (initial) abstract.\n"
   "\n"
   "This class has been introduced in version 0.26.\n"
 );

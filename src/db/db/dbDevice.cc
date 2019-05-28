@@ -67,7 +67,7 @@ Device &Device::operator= (const Device &other)
 {
   if (this != &other) {
     m_name = other.m_name;
-    m_position = other.m_position;
+    m_trans = other.m_trans;
     m_parameters = other.m_parameters;
     mp_device_class = other.mp_device_class;
     mp_device_abstract = other.mp_device_abstract;
@@ -97,9 +97,9 @@ void Device::set_name (const std::string &n)
   }
 }
 
-void Device::set_position (const db::DPoint &pt)
+void Device::set_trans (const db::DCplxTrans &tr)
 {
-  m_position = pt;
+  m_trans = tr;
 }
 
 void Device::set_terminal_ref_for_terminal (size_t terminal_id, Net::terminal_iterator iter)
@@ -254,7 +254,7 @@ void Device::reroute_terminal (unsigned int this_terminal, db::Device *other, un
 
 void Device::join_device (db::Device *other)
 {
-  db::DVector d = other->position () - position ();
+  db::DCplxTrans d = trans ().inverted () * other->trans ();
 
   m_other_abstracts.reserve (m_other_abstracts.size () + 1 + other->m_other_abstracts.size ());
 
@@ -262,7 +262,7 @@ void Device::join_device (db::Device *other)
 
   for (std::vector<db::DeviceAbstractRef>::const_iterator a = other->m_other_abstracts.begin (); a != other->m_other_abstracts.end (); ++a) {
     m_other_abstracts.push_back (*a);
-    m_other_abstracts.back ().offset += d;
+    m_other_abstracts.back ().trans = d * m_other_abstracts.back ().trans;
   }
 }
 

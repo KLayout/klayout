@@ -583,7 +583,8 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
   device->set_device_class (const_cast<db::DeviceClass *> (dm.second));
   device->set_device_abstract (dm.first);
 
-  db::Coord x = 0, y = 0;
+  db::DCplxTrans trans;
+  db::CplxTrans dbu (m_dbu);
   db::VCplxTrans dbu_inv (1.0 / m_dbu);
 
   size_t max_tid = 0;
@@ -596,29 +597,30 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       read_word_or_quoted (name);
       br_name.done ();
 
-    } else if (test (skeys::location_key) || test (lkeys::location_key)) {
+    } else if (read_trans_part (trans)) {
 
-      Brace br2 (this);
-      x = read_coord ();
-      y = read_coord ();
-      br2.done ();
+      //  .. nothing yet ..
 
     } else if (test (skeys::device_key) || test (lkeys::device_key)) {
 
       std::string n;
+      db::DCplxTrans dm_trans;
 
       Brace br2 (this);
 
       read_word_or_quoted (n);
 
-      db::Coord dx = read_coord ();
-      db::Coord dy = read_coord ();
+      while (br2) {
+        if (! read_trans_part (dm_trans)) {
+          throw tl::Exception (tl::to_string (tr ("Invalid keyword inside device definition (location, scale, rotation or mirror expected)")));
+        }
+      }
 
       br2.done ();
 
       db::DeviceAbstract *da = device_model_by_name (netlist, n).first;
 
-      device->other_abstracts ().push_back (db::DeviceAbstractRef (da, db::DVector (m_dbu * dx, m_dbu * dy)));
+      device->other_abstracts ().push_back (db::DeviceAbstractRef (da, dm_trans));
 
     } else if (test (skeys::connect_key) || test (lkeys::connect_key)) {
 
@@ -691,7 +693,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       device->set_parameter_value (pid, value);
 
     } else {
-      throw tl::Exception (tl::to_string (tr ("Invalid keyword inside device definition (location, param or terminal expected)")));
+      throw tl::Exception (tl::to_string (tr ("Invalid keyword inside device definition (location, scale, mirror, rotation, param or terminal expected)")));
     }
 
   }
@@ -702,7 +704,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
     map.id2device.insert (std::make_pair (id, device.get ()));
   }
 
-  device->set_position (db::DPoint (m_dbu * x, m_dbu * y));
+  device->set_trans (trans);
   device->set_name (name);
 
   if (l2n && dm.first) {
@@ -712,14 +714,14 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
     //  make device cell instances
     std::vector<db::CellInstArray> insts;
 
-    db::CellInstArray inst (db::CellInst (dm.first->cell_index ()), db::Trans (db::Vector (x, y)));
+    db::CellInstArray inst (db::CellInst (dm.first->cell_index ()), dbu_inv * trans * dbu);
     ccell.insert (inst);
     insts.push_back (inst);
 
     const std::vector<db::DeviceAbstractRef> &other_devices = device->other_abstracts ();
     for (std::vector<db::DeviceAbstractRef>::const_iterator i = other_devices.begin (); i != other_devices.end (); ++i) {
 
-      db::CellInstArray other_inst (db::CellInst (i->device_abstract->cell_index ()), db::Trans (db::Vector (x, y) + dbu_inv * i->offset));
+      db::CellInstArray other_inst (db::CellInst (i->device_abstract->cell_index ()), dbu_inv * trans * i->trans * dbu);
       ccell.insert (other_inst);
       insts.push_back (other_inst);
 
@@ -764,6 +766,47 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
   circuit->add_device (device.release ());
 }
 
+bool
+LayoutToNetlistStandardReader::read_trans_part (db::DCplxTrans &tr)
+{
+  if (test (skeys::location_key) || test (lkeys::location_key)) {
+
+    Brace br2 (this);
+    db::Coord x = read_coord ();
+    db::Coord y = read_coord ();
+    br2.done ();
+
+    tr = db::DCplxTrans (tr.mag (), tr.angle (), tr.is_mirror (), db::DVector (m_dbu * x, m_dbu * y));
+    return true;
+
+  } else if (test (skeys::rotation_key) || test (lkeys::rotation_key)) {
+
+    Brace br2 (this);
+    double angle = read_double ();
+    br2.done ();
+
+    tr = db::DCplxTrans (tr.mag (), angle, tr.is_mirror (), tr.disp ());
+    return true;
+
+  } else if (test (skeys::mirror_key) || test (lkeys::mirror_key)) {
+
+    tr = db::DCplxTrans (tr.mag (), tr.angle (), true, tr.disp ());
+    return true;
+
+  } else if (test (skeys::scale_key) || test (lkeys::scale_key)) {
+
+    Brace br2 (this);
+    double mag = read_double ();
+    br2.done ();
+
+    tr = db::DCplxTrans (mag, tr.angle (), tr.is_mirror (), tr.disp ());
+    return true;
+
+  }
+
+  return false;
+}
+
 void
 LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections)
 {
@@ -785,12 +828,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
 
   std::auto_ptr<db::SubCircuit> subcircuit (new db::SubCircuit (circuit_ref));
 
-  db::Coord x = 0, y = 0;
-  bool mirror = false;
-  double angle = 0;
-  double mag = 1.0;
-
-  bool inst_made = false;
+  db::DCplxTrans trans;
 
   while (br) {
 
@@ -800,43 +838,9 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
       read_word_or_quoted (name);
       br_name.done ();
 
-    } else if (test (skeys::location_key) || test (lkeys::location_key)) {
+    } else if (read_trans_part (trans)) {
 
-      Brace br2 (this);
-      x = read_coord ();
-      y = read_coord ();
-      br2.done ();
-
-      if (inst_made) {
-        throw tl::Exception (tl::to_string (tr ("location key must come before pin key in subcircuit definition")));
-      }
-
-    } else if (test (skeys::rotation_key) || test (lkeys::rotation_key)) {
-
-      Brace br2 (this);
-      angle = read_double ();
-      br2.done ();
-
-      if (inst_made) {
-        throw tl::Exception (tl::to_string (tr ("rotation key must come before pin key in subcircuit definition")));
-      }
-
-    } else if (test (skeys::mirror_key) || test (lkeys::mirror_key)) {
-
-      mirror = true;
-      if (inst_made) {
-        throw tl::Exception (tl::to_string (tr ("mirror key must come before pin key in subcircuit definition")));
-      }
-
-    } else if (test (skeys::scale_key) || test (lkeys::scale_key)) {
-
-      Brace br2 (this);
-      mag = read_double ();
-      br2.done ();
-
-      if (inst_made) {
-        throw tl::Exception (tl::to_string (tr ("scale key must come before pin key in subcircuit definition")));
-      }
+      //  .. nothing yet ..
 
     } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
 
@@ -879,9 +883,9 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
 
   if (l2n) {
 
-    subcircuit->set_trans (db::DCplxTrans (mag, angle, mirror, db::DVector (m_dbu * x, m_dbu * y)));
+    subcircuit->set_trans (trans);
 
-    db::CellInstArray inst (db::CellInst (circuit_ref->cell_index ()), db::ICplxTrans (mag, angle, mirror, db::Vector (x, y)));
+    db::CellInstArray inst (db::CellInst (circuit_ref->cell_index ()), db::CplxTrans (m_dbu).inverted () * trans * db::CplxTrans (m_dbu));
     db::Cell &ccell = l2n->internal_layout ()->cell (circuit->cell_index ());
     ccell.insert (inst);
 

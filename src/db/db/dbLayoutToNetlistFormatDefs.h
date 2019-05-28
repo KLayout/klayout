@@ -77,7 +77,8 @@ namespace db
  *
  *  [combined-device]:
  *
- *    device(<abstract> <dx> <dy>)  - specifies an additional device component
+ *    device(<abstract> [trans-def])
+ *                                  - specifies an additional device component
  *                                    (for combined devices) with abstract <abstract>
  *                                    and offset dx, dy.
  *
@@ -113,7 +114,7 @@ namespace db
  *
  *  [device-def]:
  *
- *    location(<x> <y>)             - location of the device [short key Y]
+ *    [trans-def]                   - location of the device [short key Y]
  *                                    must be before terminal
  *    param(<name> <value>)         - defines a parameter [short key E]
  *    terminal(<terminal-name> <net-id>)
@@ -122,11 +123,15 @@ namespace db
  *
  *  [subcircuit-def]:
  *
- *    location(<x> <y>)             - location of the subcircuit [short key Y]
+ *    [trans-def]                   - location of the subcircuit [short key Y]
+ *    pin(<pin-id> <net-id>)        - specifies connection of the pin with a net [short key: P]
+ *
+ *  [trans-def]:
+ *
+ *    location(<x> <y>)             - location of the instance [short key Y]
  *    rotation(<angle>)             - rotation angle (in degree, default is 0) [short key O]
  *    mirror                        - if specified, the instance is mirrored before rotation [short key M]
  *    scale(<mag>)                  - magnification (default is 1) [short key S]
- *    pin(<pin-id> <net-id>)        - specifies connection of the pin with a net [short key: P]
  */
 
 namespace l2n_std_format

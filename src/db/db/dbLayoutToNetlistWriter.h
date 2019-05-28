@@ -59,6 +59,7 @@ protected:
   void write (const db::LayoutToNetlist *l2n, const db::Device &device, std::map<const Net *, unsigned int> &net2id, const std::string &indent);
   void write (const db::LayoutToNetlist *l2n, const db::DeviceAbstract &device_abstract, const std::string &indent);
   void write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname, bool relative);
+  void write (const db::DCplxTrans &trans);
   void reset_geometry_ref ();
 
   tl::OutputStream &stream ()

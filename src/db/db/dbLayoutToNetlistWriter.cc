@@ -418,19 +418,8 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Sub
   }
 
   if (l2n) {
-
-    const db::DCplxTrans &tr = subcircuit.trans ();
-    if (tr.is_mag ()) {
-      *mp_stream << " " << Keys::scale_key << "(" << tr.mag () << ")";
-    }
-    if (tr.is_mirror ()) {
-      *mp_stream << " " << Keys::mirror_key;
-    }
-    if (fabs (tr.angle ()) > 1e-6) {
-      *mp_stream << " " << Keys::rotation_key << "(" << tr.angle () << ")";
-    }
-    *mp_stream << " " << Keys::location_key << "(" << tr.disp ().x () / m_dbu << " " << tr.disp ().y () / m_dbu << ")";
-
+    *mp_stream << " ";
+    write (subcircuit.trans ());
   }
 
   //  each pin in one line for more than a few pins
@@ -478,7 +467,13 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
 
     for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
 
-      const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (device_abstract.cell_index ()).cluster_by_id (device_abstract.cluster_id_for_terminal (t->id ()));
+      size_t cid = device_abstract.cluster_id_for_terminal (t->id ());
+      if (cid == 0) {
+        //  no geometry
+        continue;
+      }
+
+      const db::local_cluster<db::PolygonRef> &lc = clusters.clusters_per_cell (device_abstract.cell_index ()).cluster_by_id (cid);
       for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
 
         *mp_stream << indent << indent2;
@@ -495,10 +490,40 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
 }
 
 template <class Keys>
+void std_writer_impl<Keys>::write (const db::DCplxTrans &tr)
+{
+  bool first = true;
+
+  if (tr.is_mag ()) {
+    *mp_stream << Keys::scale_key << "(" << tr.mag () << ")";
+    first = false;
+  }
+
+  if (tr.is_mirror ()) {
+    if (! first) {
+      *mp_stream << " ";
+    }
+    *mp_stream << Keys::mirror_key;
+    first = false;
+  }
+
+  if (fabs (tr.angle ()) > 1e-6) {
+    if (! first) {
+      *mp_stream << " ";
+    }
+    *mp_stream << Keys::rotation_key << "(" << tr.angle () << ")";
+    first = false;
+  }
+
+  if (! first) {
+    *mp_stream << " ";
+  }
+  *mp_stream << Keys::location_key << "(" << tr.disp ().x () / m_dbu << " " << tr.disp ().y () / m_dbu << ")";
+}
+
+template <class Keys>
 void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db::Device &device, std::map<const Net *, unsigned int> &net2id, const std::string &indent)
 {
-  db::VCplxTrans dbu_inv (1.0 / m_dbu);
-
   tl_assert (device.device_class () != 0);
   const std::vector<DeviceTerminalDefinition> &td = device.device_class ()->terminal_definitions ();
   const std::vector<DeviceParameterDefinition> &pd = device.device_class ()->parameter_definitions ();
@@ -512,9 +537,9 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db
     const std::vector<db::DeviceAbstractRef> &other_abstracts = device.other_abstracts ();
     for (std::vector<db::DeviceAbstractRef>::const_iterator a = other_abstracts.begin (); a != other_abstracts.end (); ++a) {
 
-      db::Vector pos = dbu_inv * a->offset;
-
-      *mp_stream << indent << indent2 << Keys::device_key << "(" << tl::to_word_or_quoted_string (a->device_abstract->name ()) << " " << pos.x () << " " << pos.y () << ")" << endl;
+      *mp_stream << indent << indent2 << Keys::device_key << "(" << tl::to_word_or_quoted_string (a->device_abstract->name ()) << " ";
+      write (a->trans);
+      *mp_stream << ")" << endl;
 
     }
 
@@ -527,8 +552,9 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db
 
     }
 
-    db::Point pos = dbu_inv * device.position ();
-    *mp_stream << indent << indent2 << Keys::location_key << "(" << pos.x () << " " << pos.y () << ")" << endl;
+    *mp_stream << indent << indent2;
+    write (device.trans ());
+    *mp_stream << endl;
 
   } else {
     *mp_stream << " " << tl::to_word_or_quoted_string (device.device_class ()->name ()) << endl;
@@ -539,7 +565,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db
   }
 
   for (std::vector<DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-    *mp_stream << indent << indent2 << Keys::param_key << "(" << tl::to_word_or_quoted_string (i->name ()) << " " << device.parameter_value (i->id ()) << ")" << endl;
+    *mp_stream << indent << indent2 << Keys::param_key << "(" << tl::to_word_or_quoted_string (i->name ()) << " " << tl::sprintf ("%.12g", device.parameter_value (i->id ())) << ")" << endl;
   }
 
   for (std::vector<DeviceTerminalDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {

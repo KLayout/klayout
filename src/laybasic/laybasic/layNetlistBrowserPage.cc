@@ -713,14 +713,13 @@ NetlistBrowserPage::enable_updates (bool f)
 }
 
 static db::Box
-bbox_for_device_abstract (const db::Layout *layout, const db::DeviceAbstract *device_abstract, const db::DVector &offset)
+bbox_for_device_abstract (const db::Layout *layout, const db::DeviceAbstract *device_abstract, const db::DCplxTrans &trans)
 {
   if (! device_abstract || ! layout->is_valid_cell_index (device_abstract->cell_index ())) {
     return db::Box ();
   }
 
-  return layout->cell (device_abstract->cell_index ()).bbox ().moved (db::VCplxTrans (1.0 / layout->dbu ()) * offset);
-}
+  return layout->cell (device_abstract->cell_index ()).bbox ().transformed (db::CplxTrans (layout->dbu ()).inverted () * trans * db::CplxTrans (layout->dbu ()));}
 
 static db::Box
 bbox_for_subcircuit (const db::Layout *layout, const db::SubCircuit *subcircuit)
@@ -782,11 +781,11 @@ NetlistBrowserPage::adjust_view ()
 
     db::ICplxTrans trans = trans_for (*device, *mp_database->internal_layout (), *mp_database->internal_top_cell (), m_cell_context_cache);
 
-    bbox += trans * bbox_for_device_abstract (layout, (*device)->device_abstract (), db::DVector ());
+    bbox += trans * bbox_for_device_abstract (layout, (*device)->device_abstract (), db::DCplxTrans ());
 
     const std::vector<db::DeviceAbstractRef> &oda = (*device)->other_abstracts ();
     for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
-      bbox += trans * bbox_for_device_abstract (layout, a->device_abstract, a->offset);
+      bbox += trans * bbox_for_device_abstract (layout, a->device_abstract, a->trans);
     }
 
   }
@@ -841,11 +840,11 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
 {
   const db::Layout *layout = mp_database->internal_layout ();
   const db::Cell *cell = mp_database->internal_top_cell ();
-  db::ICplxTrans device_trans = trans_for (device, *layout, *cell, m_cell_context_cache, db::DCplxTrans (device->position () - db::DPoint ()));
+  db::ICplxTrans device_trans = trans_for (device, *layout, *cell, m_cell_context_cache, device->trans ());
 
   QColor color = make_valid_color (m_colorizer.marker_color ());
 
-  db::Box device_bbox = bbox_for_device_abstract (layout, device->device_abstract (), db::DVector ());
+  db::Box device_bbox = bbox_for_device_abstract (layout, device->device_abstract (), db::DCplxTrans ());
   if (! device_bbox.empty ()) {
 
     if (n_markers == m_max_shape_count) {
@@ -864,7 +863,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
   const std::vector<db::DeviceAbstractRef> &oda = device->other_abstracts ();
   for (std::vector<db::DeviceAbstractRef>::const_iterator a = oda.begin (); a != oda.end (); ++a) {
 
-    db::Box da_box = bbox_for_device_abstract (layout, a->device_abstract, a->offset);
+    db::Box da_box = bbox_for_device_abstract (layout, a->device_abstract, a->trans);
     if (! da_box.empty ()) {
 
       if (n_markers == m_max_shape_count) {

@@ -136,6 +136,7 @@ protected:
   void read_pin (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map);
   void read_device (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections);
   void read_subcircuit (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections);
+  bool read_trans_part (db::DCplxTrans &tr);
   void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc);
   std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n);
   void read_geometries (Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell);

@@ -738,6 +738,33 @@ static std::string str_from_names (const std::pair<const Obj *, const Obj *> &ob
 }
 
 static
+std::string formatted_value (double v)
+{
+  double va = fabs (v);
+  if (va < 100e-15) {
+    return tl::to_string (v * 1e15) + "f";
+  } else if (va < 100e-12) {
+    return tl::to_string (v * 1e12) + "p";
+  } else if (va < 100e-9) {
+    return tl::to_string (v * 1e9) + "n";
+  } else if (va < 100e-6) {
+    return tl::to_string (v * 1e6) + "µ";
+  } else if (va < 100e-3) {
+    return tl::to_string (v * 1e3) + "m";
+  } else if (va < 100.0) {
+    return tl::to_string (v);
+  } else if (va < 100e3) {
+    return tl::to_string (v * 1e-3) + "k";
+  } else if (va < 100e6) {
+    return tl::to_string (v * 1e-6) + "M";
+  } else if (va < 100e9) {
+    return tl::to_string (v * 1e-9) + "G";
+  } else {
+    return tl::to_string (v);
+  }
+}
+
+static
 std::string device_string (const db::Device *device)
 {
   if (! device || ! device->device_class ()) {
@@ -757,8 +784,7 @@ std::string device_string (const db::Device *device)
       }
       s += p->name ();
       s += "=";
-      double v = device->parameter_value (p->id ());
-      s += tl::to_string (v);
+      s += formatted_value (device->parameter_value (p->id ()));
     }
   }
   s += "]";

@@ -358,6 +358,7 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
     if (! d->name ().empty ()) {
       device->set_name (subcircuit->expanded_name () + "." + d->name ());
     }
+    device->set_trans (subcircuit->trans () * device->trans ());
     add_device (device);
 
     const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
@@ -382,6 +383,7 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
     if (! new_subcircuit->name ().empty ()) {
       new_subcircuit->set_name (subcircuit->expanded_name () + "." + new_subcircuit->name ());
     }
+    new_subcircuit->set_trans (subcircuit->trans () * new_subcircuit->trans ());
     add_subcircuit (new_subcircuit);
 
     const db::Circuit *cr = sc->circuit_ref ();

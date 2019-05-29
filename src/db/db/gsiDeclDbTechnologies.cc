@@ -70,6 +70,11 @@ static void technologies_from_xml (const std::string &s)
   db::Technologies::instance ()->load_from_xml (s);
 }
 
+static void clear_technologies ()
+{
+  db::Technologies::instance ()->clear ();
+}
+
 static db::Technology technology_from_xml (const std::string &s)
 {
   db::Technology tech;
@@ -288,6 +293,11 @@ gsi::Class<db::Technology> technology_decl ("db", "Technology",
     "@brief Returns a XML representation of this technolog\n"
     "\n"
     "\\technology_from_xml can be used to restore the technology definition."
+  ) +
+  gsi::method ("clear_technologies", &clear_technologies,
+    "@brief Clears all technologies\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
   ) +
   gsi::method ("technologies_from_xml", &technologies_from_xml, gsi::arg ("xml"),
     "@brief Loads the technologies from a XML representation\n"

@@ -32,6 +32,8 @@
 namespace tl
 {
 
+class GlobPatternOp;
+
 /** 
  *  @brief A class representing a glob pattern 
  */
@@ -52,13 +54,19 @@ public:
   GlobPattern (const std::string &p);
 
   /**
+   *  @brief Copy constructor
+   */
+  GlobPattern (const GlobPattern &other);
+
+  /**
+   *  @brief Assignment
+   */
+  GlobPattern &operator= (const GlobPattern &other);
+
+  /**
    *  @brief Assignment of a string
    */
-  GlobPattern &operator= (const std::string &p)
-  {
-    m_p = p;
-    return *this;
-  }
+  GlobPattern &operator= (const std::string &s);
 
   /**
    *  @brief Sets a value indicating whether to treat the match case sensitive
@@ -124,9 +132,15 @@ public:
 
 private:
   std::string m_p;
+  GlobPatternOp *mp_op;
   bool m_case_sensitive;
   bool m_exact;
   bool m_header_match;
+  bool m_needs_compile;
+
+  void do_compile ();
+  void needs_compile ();
+  GlobPatternOp *op () const;
 };
 
 } // namespace tl

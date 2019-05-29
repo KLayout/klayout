@@ -46,7 +46,7 @@ static std::locale c_locale ("C");
 
 #include "utf_casefolding.h"
 
-wchar_t wdowncase (wchar_t c)
+static inline wchar_t wdowncase (wchar_t c)
 {
   int ch = c >> 8;
   if (ch >= 0 && ch < int (sizeof (uc_tab) / sizeof (uc_tab[0])) && uc_tab[ch]) {
@@ -56,7 +56,7 @@ wchar_t wdowncase (wchar_t c)
   }
 }
 
-wchar_t wupcase (wchar_t c)
+static inline wchar_t wupcase (wchar_t c)
 {
   int ch = c >> 8;
   if (ch >= 0 && ch < int (sizeof (lc_tab) / sizeof (lc_tab[0])) && lc_tab[ch]) {
@@ -66,7 +66,7 @@ wchar_t wupcase (wchar_t c)
   }
 }
 
-uint32_t utf32_downcase (uint32_t c32)
+static inline uint32_t utf32_downcase (uint32_t c32)
 {
   if (sizeof (wchar_t) == 2 && c32 >= 0x10000) {
     return c32;
@@ -75,7 +75,8 @@ uint32_t utf32_downcase (uint32_t c32)
   }
 }
 
-uint32_t utf32_upcase (uint32_t c32)
+/* Not used yet:
+static inline uint32_t utf32_upcase (uint32_t c32)
 {
   if (sizeof (wchar_t) == 2 && c32 >= 0x10000) {
     return c32;
@@ -83,6 +84,7 @@ uint32_t utf32_upcase (uint32_t c32)
     return uint32_t (wupcase (wchar_t (c32)));
   }
 }
+*/
 
 // -------------------------------------------------------------------------
 //  Conversion of UTF8 to wchar_t

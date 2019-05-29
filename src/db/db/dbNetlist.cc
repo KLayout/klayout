@@ -546,7 +546,7 @@ std::string Netlist::to_string () const
         if (p != pd.begin ()) {
           ps += ",";
         }
-        ps += p->name () + "=" + tl::to_string (d->parameter_value (p->id ()));
+        ps += p->name () + "=" + tl::sprintf ("%.12g", d->parameter_value (p->id ()));
       }
       res += std::string ("  device ") + tl::to_word_or_quoted_string (d->device_class ()->name ()) + " " + device2string (*d) + " (" + ts + ") (" + ps + ");\n";
     }

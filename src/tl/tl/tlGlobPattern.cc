@@ -323,6 +323,10 @@ public:
 
   virtual bool match (const char *s, std::vector<std::string> *e) const
   {
+    if (!*s) {
+      return false;
+    }
+
     uint32_t c = utf32_from_utf8 (s);
     if (! m_cs) {
       c = utf32_downcase (c);

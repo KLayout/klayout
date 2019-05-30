@@ -135,7 +135,7 @@ NetColorizer::color_of_net (const db::Net *net) const
 
     size_t index = 0;
 
-    typename std::map<const db::Net *, size_t>::iterator cc = m_net_index_by_object.find (net);
+    std::map<const db::Net *, size_t>::iterator cc = m_net_index_by_object.find (net);
     if (cc == m_net_index_by_object.end ()) {
 
       size_t i = 0;

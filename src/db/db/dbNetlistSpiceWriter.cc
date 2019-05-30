@@ -31,7 +31,7 @@
 namespace db
 {
 
-static const char *allowed_name_chars = "_.:,!+$/&\\#[]";
+static const char *allowed_name_chars = "_.:,!+$/&\\#[]<>";
 static const char *not_connect_prefix = "nc_";
 
 // --------------------------------------------------------------------------------
@@ -197,7 +197,7 @@ std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev) co
 // --------------------------------------------------------------------------------
 
 NetlistSpiceWriter::NetlistSpiceWriter (NetlistSpiceWriterDelegate *delegate)
-  : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_next_net_id (0), m_use_net_names (false)
+  : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_next_net_id (0), m_use_net_names (false), m_with_comments (true)
 {
   static NetlistSpiceWriterDelegate std_delegate;
   if (! delegate) {
@@ -213,6 +213,11 @@ NetlistSpiceWriter::~NetlistSpiceWriter ()
 void NetlistSpiceWriter::set_use_net_names (bool use_net_names)
 {
   m_use_net_names = use_net_names;
+}
+
+void NetlistSpiceWriter::set_with_comments (bool with_comments)
+{
+  m_with_comments = with_comments;
 }
 
 void NetlistSpiceWriter::write (tl::OutputStream &stream, const db::Netlist &netlist, const std::string &description)
@@ -395,9 +400,10 @@ void NetlistSpiceWriter::do_write (const std::string &description)
 
     for (db::Circuit::const_device_iterator i = circuit.begin_devices (); i != circuit.end_devices (); ++i) {
 
-      //  TODO: make this configurable?
-      std::string comment = "device instance " + i->expanded_name () + " " + i->trans ().to_string () + " " + i->device_class ()->name ();
-      emit_comment (comment);
+      if (m_with_comments) {
+        std::string comment = "device instance " + i->expanded_name () + " " + i->trans ().to_string () + " " + i->device_class ()->name ();
+        emit_comment (comment);
+      }
 
       mp_delegate->write_device (*i);
 
@@ -410,9 +416,10 @@ void NetlistSpiceWriter::do_write (const std::string &description)
 
 void NetlistSpiceWriter::write_subcircuit_call (const db::SubCircuit &subcircuit) const
 {
-  //  TODO: make this configurable?
-  std::string comment = "cell instance " + subcircuit.expanded_name() + " " + subcircuit.trans ().to_string ();
-  emit_comment (comment);
+  if (m_with_comments) {
+    std::string comment = "cell instance " + subcircuit.expanded_name() + " " + subcircuit.trans ().to_string ();
+    emit_comment (comment);
+  }
 
   std::ostringstream os;
   os << "X";
@@ -433,9 +440,11 @@ void NetlistSpiceWriter::write_circuit_header (const db::Circuit &circuit) const
 {
   emit_line ("");
 
-  emit_comment ("cell " + circuit.name ());
-  for (db::Circuit::const_pin_iterator p = circuit.begin_pins (); p != circuit.end_pins (); ++p) {
-    emit_comment ("pin " + p->name ());
+  if (m_with_comments) {
+    emit_comment ("cell " + circuit.name ());
+    for (db::Circuit::const_pin_iterator p = circuit.begin_pins (); p != circuit.end_pins (); ++p) {
+      emit_comment ("pin " + p->name ());
+    }
   }
 
   std::ostringstream os;
@@ -450,7 +459,7 @@ void NetlistSpiceWriter::write_circuit_header (const db::Circuit &circuit) const
 
   emit_line (os.str ());
 
-  if (! m_use_net_names) {
+  if (! m_use_net_names && m_with_comments) {
     for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
       if (! n->name ().empty ()) {
         emit_comment ("net " + net_to_string (n.operator-> ()) + " " + n->name ());

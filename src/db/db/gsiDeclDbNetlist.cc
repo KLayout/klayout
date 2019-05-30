@@ -1544,8 +1544,15 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
     "@brief Sets a value indicating whether to use net names (true) or net numbers (false).\n"
     "The default is to use net numbers."
   ) +
-  gsi::method ("use_net_names", &db::NetlistSpiceWriter::use_net_names,
+  gsi::method ("use_net_names?", &db::NetlistSpiceWriter::use_net_names,
     "@brief Gets a value indicating whether to use net names (true) or net numbers (false).\n"
+  ) +
+  gsi::method ("with_comments=", &db::NetlistSpiceWriter::set_with_comments, gsi::arg ("f"),
+    "@brief Sets a value indicating whether to embed comments for position etc. (true) or not (false).\n"
+    "The default is to embed comments."
+  ) +
+  gsi::method ("with_comments?", &db::NetlistSpiceWriter::with_comments,
+    "@brief Gets a value indicating whether to embed comments for position etc. (true) or not (false).\n"
   ),
   "@brief Implements a netlist writer for the SPICE format.\n"
   "Provide a delegate for customizing the way devices are written.\n"

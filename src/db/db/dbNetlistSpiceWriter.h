@@ -92,6 +92,12 @@ public:
     return m_use_net_names;
   }
 
+  void set_with_comments (bool f);
+  bool with_comments () const
+  {
+    return m_with_comments;
+  }
+
 private:
   friend class NetlistSpiceWriterDelegate;
 
@@ -101,6 +107,7 @@ private:
   std::map<const db::Net *, size_t> m_net_to_spice_id;
   mutable size_t m_next_net_id;
   bool m_use_net_names;
+  bool m_with_comments;
 
   void do_write (const std::string &description);
 

@@ -428,7 +428,7 @@ circuit(RINGO
   rect(metal1 20940 2420 21300 3180)
   rect(metal2_lbl -1 2799 1 2801)
  )
- net(4 name('BULK,VSS')
+ net(4 name(VSS)
   rect(diff_cont 7810 -310 8030 -90)
   rect(diff_cont 7810 90 8030 310)
   rect(diff_cont 7810 90 8030 310)
@@ -530,7 +530,7 @@ circuit(RINGO
  pin(1 name(FB))
  pin(2 name(OSC))
  pin(3 name(VDD))
- pin(4 name('BULK,VSS'))
+ pin(4 name(VSS))
 
  # Subcircuits and their connections
  circuit(1 INV2PAIR location(19420 -800)

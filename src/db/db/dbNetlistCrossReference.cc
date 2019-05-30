@@ -102,7 +102,7 @@ NetlistCrossReference::gen_begin_netlist (const db::Netlist *a, const db::Netlis
 {
   mp_netlist_a.reset (const_cast <db::Netlist *> (a));
   mp_netlist_b.reset (const_cast <db::Netlist *> (b));
-  m_current_circuits = std::pair<const db::Circuit *, const db::Circuit *> (0, 0);
+  m_current_circuits = std::make_pair ((const db::Circuit *)0, (const db::Circuit *)0);
 }
 
 namespace {

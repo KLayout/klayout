@@ -37,7 +37,8 @@ SOURCES = \
   tlLongInt.cc \
   tlUniqueIdTests.cc \
   tlListTests.cc \
-  tlEquivalenceClustersTests.cc
+  tlEquivalenceClustersTests.cc \
+    tlUniqueNameTests.cc
 
 !equals(HAVE_QT, "0") {
 

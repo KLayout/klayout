@@ -24,6 +24,7 @@
 #include "dbNetlistSpiceWriter.h"
 #include "dbNetlist.h"
 #include "dbNetlistDeviceClasses.h"
+#include "dbLayoutToNetlist.h"
 
 #include "tlUnitTest.h"
 #include "tlStream.h"
@@ -1024,7 +1025,37 @@ TEST(11_WriterNonConnectedPins)
   compare_netlists (_this, path, au_path);
 }
 
+TEST(12_UniqueNetNames)
+{
+  db::LayoutToNetlist l2n;
+  std::string l2n_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "same_net_names.l2n");
+  l2n.load (l2n_path);
 
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp_nwriter12.txt");
+  {
+    tl::OutputStream stream (path);
+    db::NetlistSpiceWriter writer;
+    writer.write (stream, *l2n.netlist (), "written by unit test");
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter12_au.txt");
+
+  compare_netlists (_this, path, au_path);
+
+  path = tmp_file ("tmp_nwriter12b.txt");
+  {
+    tl::OutputStream stream (path);
+    db::NetlistSpiceWriter writer;
+    writer.set_use_net_names (true);
+    writer.write (stream, *l2n.netlist (), "written by unit test");
+  }
+
+  au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter12b_au.txt");
+
+  compare_netlists (_this, path, au_path);
+}
 
 namespace {
 

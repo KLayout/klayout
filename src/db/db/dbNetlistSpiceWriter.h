@@ -105,6 +105,7 @@ private:
   tl::OutputStream *mp_stream;
   tl::weak_ptr<NetlistSpiceWriterDelegate> mp_delegate;
   std::map<const db::Net *, size_t> m_net_to_spice_id;
+  std::map<const db::Net *, std::string> m_net_to_spice_name;
   mutable size_t m_next_net_id;
   bool m_use_net_names;
   bool m_with_comments;

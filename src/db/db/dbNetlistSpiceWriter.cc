@@ -25,8 +25,10 @@
 #include "dbNetlistDeviceClasses.h"
 
 #include "tlStream.h"
+#include "tlUniqueName.h"
 
 #include <sstream>
+#include <set>
 
 namespace db
 {
@@ -258,7 +260,10 @@ std::string NetlistSpiceWriter::net_to_string (const db::Net *net) const
       //  It does not like: , ;
       //  We translate , to | for the net separator
 
-      std::string n = net->expanded_name ();
+      std::map<const db::Net *, std::string>::const_iterator ni = m_net_to_spice_name.find (net);
+      tl_assert (ni != m_net_to_spice_name.end ());
+
+      const std::string &n = ni->second;
       std::string nn;
       nn.reserve (n.size () + 1);
       if (!isalnum (*n.c_str ())) {
@@ -369,6 +374,8 @@ void NetlistSpiceWriter::do_write (const std::string &description)
 
     //  assign internal node numbers to the nets
     m_net_to_spice_id.clear ();
+    m_net_to_spice_name.clear ();
+
     m_next_net_id = 0;
     if (! m_use_net_names) {
 
@@ -378,14 +385,22 @@ void NetlistSpiceWriter::do_write (const std::string &description)
 
     } else {
 
+      //  create unique names for those nets with a name
+      std::set<std::string> names;
+      for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
+        std::string nn = tl::unique_name (n->expanded_name (), names);
+        names.insert (nn);
+        m_net_to_spice_name.insert (std::make_pair (n.operator-> (), nn));
+      }
+
       //  determine the next net id for non-connected nets such that there is no clash with
       //  existing names
       size_t prefix_len = strlen (not_connect_prefix);
 
-      for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
-        if (n->name ().find (not_connect_prefix) == 0 && n->name ().size () > prefix_len) {
+      for (std::set<std::string>::const_iterator n = names.begin (); n != names.end (); ++n) {
+        if (n->find (not_connect_prefix) == 0 && n->size () > prefix_len) {
           size_t num = 0;
-          tl::from_string (n->name ().c_str () + prefix_len, num);
+          tl::from_string (n->c_str () + prefix_len, num);
           m_next_net_id = std::max (m_next_net_id, num);
         }
       }

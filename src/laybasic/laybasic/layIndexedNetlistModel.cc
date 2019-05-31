@@ -143,7 +143,7 @@ static void fill_map (std::vector<std::pair<const Attr *, const Attr *> > &map, 
   for (Iter i = begin2; i != end2; ++i) {
     ++n2;
   }
-  map.resize (std::max (n1, n2), typename std::pair<const Attr *, const Attr *> (0, 0));
+  map.resize (std::max (n1, n2), std::make_pair((const Attr *)0, (const Attr *)0);
 
   typename std::vector<std::pair<const Attr *, const Attr *> >::iterator j;
   j = map.begin ();

@@ -35,7 +35,7 @@ struct CircuitPairData
   typedef db::Circuit object_type;
 
   CircuitPairData (const db::Circuit *a, const db::Circuit *b, db::NetlistCrossReference::Status s) : pair (a, b), status (s) { }
-  CircuitPairData () : pair (0, 0), status (db::NetlistCrossReference::None) { }
+  CircuitPairData () : pair ((const db::Circuit *)0, (const db::Circuit *)0), status (db::NetlistCrossReference::None) { }
 
   std::pair<const db::Circuit *, const db::Circuit *> pair;
   db::NetlistCrossReference::Status status;

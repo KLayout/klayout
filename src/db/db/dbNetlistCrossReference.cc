@@ -322,7 +322,7 @@ NetlistCrossReference::gen_end_circuit (const db::Circuit *, const db::Circuit *
   std::stable_sort (mp_per_circuit_data->subcircuits.begin (), mp_per_circuit_data->subcircuits.end (), pair_data_compare<SubCircuitPairData, by_name_value_compare<db::SubCircuit> > ());
   std::stable_sort (mp_per_circuit_data->nets.begin (), mp_per_circuit_data->nets.end (), pair_data_compare<NetPairData, by_name_value_compare<db::Net> > ());
 
-  m_current_circuits = std::pair<const db::Circuit *, const db::Circuit *> (0, 0);
+  m_current_circuits = std::make_pair((const db::Circuit *)0, (const db::Circuit *)0);
   mp_per_circuit_data = 0;
 }
 

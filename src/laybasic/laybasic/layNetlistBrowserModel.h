@@ -207,7 +207,7 @@ private:
 
   std::pair<const db::Netlist *, const db::Netlist *> netlists () const
   {
-    return std::pair<const db::Netlist *, const db::Netlist *> (mp_l2ndb->netlist (), 0);
+    return std::pair<const db::Netlist *, const db::Netlist *> (mp_l2ndb->netlist (), (const db::Netlist *)0);
   }
 
   QIcon icon_for_nets (const std::pair<const db::Net *, const db::Net *> &net) const;

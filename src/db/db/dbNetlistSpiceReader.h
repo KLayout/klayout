@@ -61,12 +61,14 @@ private:
   void push_stream (const std::string &path);
   void pop_stream ();
   bool at_end ();
+  void read_pin_and_parameters (tl::Extractor &ex, std::vector<std::string> &nn, std::map<std::string, double> &pv);
   void read_subcircuit (tl::Extractor &ex);
   void read_circuit (tl::Extractor &ex);
   void read_device (db::DeviceClass *dev_cls, size_t param_id, tl::Extractor &ex);
   void read_mos4_device (tl::Extractor &ex);
   bool read_element ();
   double read_value (tl::Extractor &ex);
+  std::string read_name (tl::Extractor &ex);
   double read_atomic_value (tl::Extractor &ex);
   double read_dot_expr (tl::Extractor &ex);
   double read_bar_expr (tl::Extractor &ex);

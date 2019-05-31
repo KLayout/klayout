@@ -9,7 +9,7 @@
 * pin gnd
 .SUBCKT SUBCKT 1 2 4 5 6 7
 * net 2 A
-* net 4 V42
+* net 4 V42(%)
 * net 5 Z
 * net 6 gnd
 * net 7 gnd

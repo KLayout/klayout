@@ -152,3 +152,29 @@ TEST(4_ReaderWithUnconnectedPins)
     "end;\n"
   );
 }
+
+TEST(5_CircuitParameters)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader5.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit SUBCKT ($1=$1,$2=A,$3='V42(%)',$4=Z,$5=gnd,$6=gnd$1);\n"
+    "  subcircuit HVPMOS D_$1 ($1='V42(%)',$2=$3,$3=Z,$4=$1);\n"
+    "  subcircuit HVPMOS D_$2 ($1='V42(%)',$2=A,$3=$3,$4=$1);\n"
+    "  subcircuit HVNMOS D_$3 ($1=gnd,$2=$3,$3=gnd,$4=gnd$1);\n"
+    "  subcircuit HVNMOS D_$4 ($1=gnd,$2=$3,$3=Z,$4=gnd$1);\n"
+    "  subcircuit HVNMOS D_$5 ($1=gnd,$2=A,$3=$3,$4=gnd$1);\n"
+    "end;\n"
+    "circuit HVPMOS ($1=(null),$2=(null),$3=(null),$4=(null));\n"
+    "end;\n"
+    "circuit HVNMOS ($1=(null),$2=(null),$3=(null),$4=(null));\n"
+    "end;\n"
+  );
+}
+

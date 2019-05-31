@@ -146,8 +146,7 @@ std::string NetlistSpiceReader::get_line ()
     tl::Extractor ex (l.c_str ());
     if (ex.test_without_case (".include")) {
 
-      std::string path;
-      ex.read_word_or_quoted (path, allowed_name_chars);
+      std::string path = read_name (ex);
 
       push_stream (path);
 
@@ -398,27 +397,96 @@ db::Net *NetlistSpiceReader::make_net (const std::string &name)
   return net;
 }
 
-void NetlistSpiceReader::read_subcircuit (tl::Extractor &ex)
+void NetlistSpiceReader::read_pin_and_parameters (tl::Extractor &ex, std::vector<std::string> &nn, std::map<std::string, double> &pv)
 {
-  std::string sc_name;
-  ex.read_word_or_quoted (sc_name, allowed_name_chars);
-
-  std::vector<std::string> nn;
-  std::map<std::string, double> pv;
+  bool in_params = false;
 
   while (! ex.at_end ()) {
 
-    std::string n;
-    ex.read_word_or_quoted (n, allowed_name_chars);
+    if (ex.test_without_case ("params:")) {
 
-    if (ex.test ("=")) {
-      //  a parameter
-      pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex)));
+      in_params = true;
+
     } else {
-      nn.push_back (n);
+
+      std::string n = read_name (ex);
+
+      if (ex.test ("=")) {
+        //  a parameter
+        pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex)));
+      } else {
+        if (in_params) {
+          error (tl::to_string (tr ("Missing '=' in parameter assignment")));
+        }
+        nn.push_back (n);
+      }
+
     }
 
   }
+}
+
+inline static int hex_num (char c)
+{
+  if (c >= '0' && c <= '9') {
+    return (int (c - '0'));
+  } else if (c >= 'a' && c <= 'f') {
+    return (int (c - 'f') + 10);
+  } else {
+    return -1;
+  }
+}
+
+std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
+{
+  std::string n;
+  ex.read_word_or_quoted (n, allowed_name_chars);
+
+  std::string nn;
+  nn.reserve (n.size ());
+  const char *cp = n.c_str ();
+  while (*cp) {
+
+    if (*cp == '\\' && cp[1]) {
+
+      if (tolower (cp[1]) == 'x') {
+
+        cp += 2;
+
+        char c = 0;
+        for (int i = 0; i < 2 && *cp; ++i) {
+          int n = hex_num (*cp);
+          if (n >= 0) {
+            ++cp;
+            c = c * 16 + char (n);
+          } else {
+            break;
+          }
+        }
+
+        nn += c;
+
+      } else {
+        ++cp;
+        nn += *cp++;
+      }
+
+    } else {
+      nn += *cp++;
+    }
+
+  }
+
+  return nn;
+}
+
+void NetlistSpiceReader::read_subcircuit (tl::Extractor &ex)
+{
+  std::string sc_name = read_name (ex);
+
+  std::vector<std::string> nn;
+  std::map<std::string, double> pv;
+  read_pin_and_parameters (ex, nn, pv);
 
   if (nn.empty ()) {
     error (tl::to_string (tr ("No circuit name given for subcircuit call")));
@@ -461,25 +529,11 @@ void NetlistSpiceReader::read_subcircuit (tl::Extractor &ex)
 
 void NetlistSpiceReader::read_circuit (tl::Extractor &ex)
 {
-  std::string nc;
-  ex.read_word_or_quoted (nc, allowed_name_chars);
+  std::string nc = read_name (ex);
 
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
-
-  while (! ex.at_end ()) {
-
-    std::string n;
-    ex.read_word_or_quoted (n, allowed_name_chars);
-
-    if (ex.test ("=")) {
-      //  a parameter
-      pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex)));
-    } else {
-      nn.push_back (n);
-    }
-
-  }
+  read_pin_and_parameters (ex, nn, pv);
 
   if (! pv.empty ()) {
     warn (tl::to_string (tr ("Circuit parameters are not allowed currently")));
@@ -523,14 +577,12 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex)
 
 void NetlistSpiceReader::read_device (db::DeviceClass *dev_cls, size_t param_id, tl::Extractor &ex)
 {
-  std::string dn;
-  ex.read_word_or_quoted (dn, allowed_name_chars);
+  std::string dn = read_name (ex);
 
   std::vector<std::string> nn;
 
   while (! ex.at_end () && nn.size () < 2) {
-    nn.push_back (std::string ());
-    ex.read_word_or_quoted (nn.back (), allowed_name_chars);
+    nn.push_back (read_name (ex));
   }
 
   if (nn.size () != 2) {
@@ -554,16 +606,14 @@ void NetlistSpiceReader::read_device (db::DeviceClass *dev_cls, size_t param_id,
 
 void NetlistSpiceReader::read_mos4_device (tl::Extractor &ex)
 {
-  std::string dn;
-  ex.read_word_or_quoted (dn, allowed_name_chars);
+  std::string dn = read_name (ex);
 
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
 
   while (! ex.at_end ()) {
 
-    std::string n;
-    ex.read_word_or_quoted (n, allowed_name_chars);
+    std::string n = read_name (ex);
 
     if (ex.test ("=")) {
       //  a parameter

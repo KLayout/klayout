@@ -55,6 +55,17 @@ NetlistCrossReference::per_circuit_data_for (const std::pair<const db::Circuit *
   return 0;
 }
 
+const db::Circuit *
+NetlistCrossReference::other_circuit_for (const db::Circuit *circuit) const
+{
+  std::map<const db::Circuit *, const db::Circuit *>::const_iterator i = m_other_circuit.find (circuit);
+  if (i != m_other_circuit.end ()) {
+    return i->second;
+  } else {
+    return 0;
+  }
+}
+
 const db::Net *
 NetlistCrossReference::other_net_for (const db::Net *net) const
 {

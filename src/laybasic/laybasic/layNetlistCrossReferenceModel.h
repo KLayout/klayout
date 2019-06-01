@@ -44,6 +44,7 @@ public:
   virtual bool is_single () const { return false; }
 
   virtual size_t circuit_count () const;
+  virtual size_t top_circuit_count () const;
   virtual size_t net_count (const circuit_pair &circuits) const;
   virtual size_t net_terminal_count (const net_pair &nets) const;
   virtual size_t net_subcircuit_pin_count (const net_pair &nets) const;
@@ -51,12 +52,15 @@ public:
   virtual size_t device_count (const circuit_pair &circuits) const;
   virtual size_t pin_count (const circuit_pair &circuits) const;
   virtual size_t subcircuit_count (const circuit_pair &circuits) const;
+  virtual size_t child_circuit_count (const circuit_pair &circuits) const;
 
   virtual circuit_pair parent_of (const net_pair &net_pair) const;
   virtual circuit_pair parent_of (const device_pair &device_pair) const;
   virtual circuit_pair parent_of (const subcircuit_pair &subcircuit_pair) const;
 
+  virtual std::pair<circuit_pair, Status> top_circuit_from_index (size_t index) const;
   virtual std::pair<circuit_pair, Status> circuit_from_index (size_t index) const;
+  virtual std::pair<circuit_pair, Status> child_circuit_from_index (const circuit_pair &circuits, size_t index) const;
   virtual std::pair<net_pair, Status> net_from_index (const circuit_pair &circuits, size_t index) const;
   virtual const db::Net *second_net_for (const db::Net *first) const;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const;
@@ -86,6 +90,8 @@ public:
   mutable std::map<device_pair, circuit_pair> m_parents_of_devices;
   mutable std::map<pin_pair, circuit_pair> m_parents_of_pins;
   mutable std::map<subcircuit_pair, circuit_pair> m_parents_of_subcircuits;
+  mutable std::map<circuit_pair, std::vector<circuit_pair> > m_child_circuits;
+  mutable std::vector<circuit_pair> m_top_level_circuits;
   mutable std::map<std::pair<const db::Circuit *, const db::Circuit *>, PerCircuitCacheData> m_per_circuit_data;
   mutable std::map<std::pair<const db::Circuit *, const db::Circuit *>, size_t> m_index_of_circuits;
 };

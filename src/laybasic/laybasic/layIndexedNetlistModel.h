@@ -70,6 +70,7 @@ public:
   typedef std::pair<const db::Pin *, const db::Pin *> pin_pair;
   typedef std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_pair;
 
+  virtual size_t top_circuit_count () const = 0;
   virtual size_t circuit_count () const = 0;
   virtual size_t net_count (const circuit_pair &circuits) const = 0;
   virtual size_t net_terminal_count (const net_pair &nets) const = 0;
@@ -78,11 +79,14 @@ public:
   virtual size_t device_count (const circuit_pair &circuits) const = 0;
   virtual size_t pin_count (const circuit_pair &circuits) const = 0;
   virtual size_t subcircuit_count (const circuit_pair &circuits) const = 0;
+  virtual size_t child_circuit_count (const circuit_pair &circuits) const = 0;
 
   virtual circuit_pair parent_of (const net_pair &net_pair) const = 0;
   virtual circuit_pair parent_of (const device_pair &device_pair) const = 0;
   virtual circuit_pair parent_of (const subcircuit_pair &subcircuit_pair) const = 0;
 
+  virtual std::pair<circuit_pair, Status> top_circuit_from_index (size_t index) const = 0;
+  virtual std::pair<circuit_pair, Status> child_circuit_from_index (const circuit_pair &circuits, size_t index) const = 0;
   virtual std::pair<circuit_pair, Status> circuit_from_index (size_t index) const = 0;
   virtual std::pair<net_pair, Status> net_from_index (const circuit_pair &circuits, size_t index) const = 0;
   virtual const db::Net *second_net_for (const db::Net *first) const = 0;
@@ -125,6 +129,7 @@ public:
   }
 
   virtual size_t circuit_count () const;
+  virtual size_t top_circuit_count () const;
   virtual size_t net_count (const circuit_pair &circuits) const;
   virtual size_t net_terminal_count (const net_pair &nets) const;
   virtual size_t net_subcircuit_pin_count (const net_pair &nets) const;
@@ -132,12 +137,15 @@ public:
   virtual size_t device_count (const circuit_pair &circuits) const;
   virtual size_t pin_count (const circuit_pair &circuits) const;
   virtual size_t subcircuit_count (const circuit_pair &circuits) const;
+  virtual size_t child_circuit_count (const circuit_pair &circuits) const;
 
   virtual circuit_pair parent_of (const net_pair &nets) const;
   virtual circuit_pair parent_of (const device_pair &devices) const;
   virtual circuit_pair parent_of (const subcircuit_pair &subcircuits) const;
-  virtual std::pair<circuit_pair, Status> circuit_from_index (size_t index) const;
 
+  virtual std::pair<circuit_pair, Status> top_circuit_from_index (size_t index) const;
+  virtual std::pair<circuit_pair, Status> circuit_from_index (size_t index) const;
+  virtual std::pair<circuit_pair, Status> child_circuit_from_index (const circuit_pair &circuits, size_t index) const;
   virtual std::pair<net_pair, Status> net_from_index (const circuit_pair &circuits, size_t index) const;
   virtual const db::Net *second_net_for (const db::Net * /*first*/) const;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const;

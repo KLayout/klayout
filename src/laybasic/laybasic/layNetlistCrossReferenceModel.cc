@@ -26,6 +26,95 @@
 namespace lay
 {
 
+static void build_top_circuit_list (const db::NetlistCrossReference *cross_ref, std::vector<NetlistCrossReferenceModel::circuit_pair> &top_level_circuits)
+{
+  if (! top_level_circuits.empty ()) {
+    return;
+  }
+
+  for (db::NetlistCrossReference::circuits_iterator c = cross_ref->begin_circuits(); c != cross_ref->end_circuits (); ++c) {
+    const db::Circuit *cfirst = c->first;
+    const db::Circuit *csecond = c->first;
+    if ((! cfirst || cfirst->begin_refs () == cfirst->end_refs ()) && (! csecond || csecond->begin_refs () == csecond->end_refs ())) {
+      top_level_circuits.push_back (*c);
+    }
+  }
+}
+
+static void build_child_circuit_list (const db::NetlistCrossReference *cross_ref, const NetlistCrossReferenceModel::circuit_pair &cp, std::vector<NetlistCrossReferenceModel::circuit_pair> &child_circuits)
+{
+  const db::NetlistCrossReference::PerCircuitData *data = cross_ref->per_circuit_data_for (cp);
+  if (! data) {
+    return;
+  }
+
+  if (data->status == db::NetlistCrossReference::Skipped) {
+
+    //  For skipped circuits there is no subcircuit event list, so we have to create our own
+
+    std::set<const db::Circuit *> seen;
+
+    if (cp.first) {
+
+      for (db::Circuit::const_subcircuit_iterator s = cp.first->begin_subcircuits (); s != cp.first->end_subcircuits (); ++s) {
+
+        const db::Circuit *cr = s->circuit_ref ();
+        if (seen.find (cr) == seen.end ()) {
+          seen.insert (cr);
+          const db::Circuit *cro = cross_ref->other_circuit_for (cr);
+          NetlistCrossReferenceModel::circuit_pair cp (cr, cro);
+          child_circuits.push_back (cp);
+        }
+
+      }
+
+    }
+
+    if (cp.second) {
+
+      for (db::Circuit::const_subcircuit_iterator s = cp.second->begin_subcircuits (); s != cp.second->end_subcircuits (); ++s) {
+
+        const db::Circuit *cr = s->circuit_ref ();
+        if (seen.find (cr) == seen.end ()) {
+          seen.insert (cr);
+          const db::Circuit *cro = cross_ref->other_circuit_for (cr);
+          if (! cro) {
+            NetlistCrossReferenceModel::circuit_pair cp (cro, cr);
+            child_circuits.push_back (cp);
+          }
+        }
+
+      }
+
+    }
+
+  } else {
+
+    std::set<NetlistCrossReferenceModel::circuit_pair> seen;
+    for (db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator s = data->subcircuits.begin (); s != data->subcircuits.end (); ++s) {
+      const db::Circuit *cfirst = s->pair.first ? s->pair.first->circuit_ref () : 0;
+      const db::Circuit *csecond = s->pair.second ? s->pair.second->circuit_ref () : 0;
+      NetlistCrossReferenceModel::circuit_pair cp (cfirst, csecond);
+      if (seen.find (cp) == seen.end ()) {
+        seen.insert (cp);
+        child_circuits.push_back (cp);
+      }
+    }
+
+  }
+}
+
+static void build_child_circuit_map (const db::NetlistCrossReference *cross_ref, std::map<NetlistCrossReferenceModel::circuit_pair, std::vector<NetlistCrossReferenceModel::circuit_pair> > &child_circuit_map)
+{
+  if (! child_circuit_map.empty ()) {
+    return;
+  }
+
+  for (db::NetlistCrossReference::circuits_iterator c = cross_ref->begin_circuits(); c != cross_ref->end_circuits (); ++c) {
+    build_child_circuit_list (cross_ref, *c, child_circuit_map [*c]);
+  }
+}
+
 NetlistCrossReferenceModel::NetlistCrossReferenceModel (const db::NetlistCrossReference *cross_ref)
   : mp_cross_ref (const_cast<db::NetlistCrossReference *> (cross_ref))
 {
@@ -35,6 +124,22 @@ NetlistCrossReferenceModel::NetlistCrossReferenceModel (const db::NetlistCrossRe
 size_t NetlistCrossReferenceModel::circuit_count () const
 {
   return mp_cross_ref.get () ? mp_cross_ref->circuit_count () : 0;
+}
+
+size_t NetlistCrossReferenceModel::top_circuit_count () const
+{
+  if (mp_cross_ref.get ()) {
+    build_top_circuit_list (mp_cross_ref.get (), m_top_level_circuits);
+    return m_top_level_circuits.size ();
+  } else {
+    return 0;
+  }
+}
+
+size_t NetlistCrossReferenceModel::child_circuit_count (const circuit_pair &circuits) const
+{
+  build_child_circuit_map (mp_cross_ref.get (), m_child_circuits);
+  return m_child_circuits [circuits].size ();
 }
 
 size_t NetlistCrossReferenceModel::net_count (const circuit_pair &circuits) const
@@ -152,6 +257,26 @@ IndexedNetlistModel::circuit_pair NetlistCrossReferenceModel::parent_of (const I
 IndexedNetlistModel::circuit_pair NetlistCrossReferenceModel::parent_of (const IndexedNetlistModel::subcircuit_pair &subcircuit_pair) const
 {
   return get_parent_of (subcircuit_pair, mp_cross_ref.get (), m_parents_of_subcircuits);
+}
+
+std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::top_circuit_from_index (size_t index) const
+{
+  build_top_circuit_list (mp_cross_ref.get (), m_top_level_circuits);
+
+  IndexedNetlistModel::circuit_pair cp = m_top_level_circuits [index];
+  const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (cp);
+  tl_assert (data != 0);
+  return std::make_pair (cp, data->status);
+}
+
+std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::child_circuit_from_index (const circuit_pair &circuits, size_t index) const
+{
+  build_child_circuit_map (mp_cross_ref.get (), m_child_circuits);
+
+  IndexedNetlistModel::circuit_pair cp = m_child_circuits [circuits][index];
+  const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (cp);
+  tl_assert (data != 0);
+  return std::make_pair (cp, data->status);
 }
 
 std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::circuit_from_index (size_t index) const

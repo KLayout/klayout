@@ -370,7 +370,7 @@ void NetlistSpiceWriter::do_write (const std::string &description)
 
   for (db::Netlist::const_top_down_circuit_iterator c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
 
-    const db::Circuit &circuit = **c;
+    const db::Circuit &circuit = *c;
 
     //  assign internal node numbers to the nets
     m_net_to_spice_id.clear ();

@@ -169,6 +169,7 @@ private slots:
   void navigate_back ();
   void navigate_forward ();
   void current_index_changed (const QModelIndex &index);
+  void current_tree_index_changed (const QModelIndex &index);
   void selection_changed ();
   void browse_color_for_net ();
   void select_color_for_net ();

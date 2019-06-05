@@ -63,6 +63,7 @@ public:
   virtual std::pair<circuit_pair, Status> child_circuit_from_index (const circuit_pair &circuits, size_t index) const;
   virtual std::pair<net_pair, Status> net_from_index (const circuit_pair &circuits, size_t index) const;
   virtual const db::Net *second_net_for (const db::Net *first) const;
+  virtual const db::Circuit *second_circuit_for (const db::Circuit *first) const;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const;

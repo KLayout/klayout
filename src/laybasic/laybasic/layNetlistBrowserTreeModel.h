@@ -76,6 +76,7 @@ public:
   }
 
   std::pair<const db::Circuit *, const db::Circuit *> circuits_from_index (const QModelIndex &index) const;
+  QModelIndex index_from_circuits (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const;
 
 private:
   NetlistBrowserTreeModel (const NetlistBrowserTreeModel &);
@@ -84,11 +85,13 @@ private:
   QString text (const QModelIndex &index) const;
   QString search_text (const QModelIndex &index) const;
   db::NetlistCrossReference::Status status (const QModelIndex &index) const;
-  std::pair<std::pair<const db::Circuit *, const db::Circuit *>, db::NetlistCrossReference::Status> cp_status_from_index (const QModelIndex &index, size_t &nprod, size_t &nlast) const;
+  std::pair<std::pair<const db::Circuit *, const db::Circuit *>, db::NetlistCrossReference::Status> cp_status_from_index (const QModelIndex &index, size_t &nprod, size_t &nlast, size_t &nnlast) const;
+  void build_circuits_to_index (size_t nprod, const std::pair<const db::Circuit *, const db::Circuit *> &circuits, IndexedNetlistModel *model, const QModelIndex &index, std::map<std::pair<const db::Circuit *, const db::Circuit *>, QModelIndex> &map) const;
 
   db::LayoutToNetlist *mp_l2ndb;
   db::LayoutVsSchematic *mp_lvsdb;
   std::auto_ptr<IndexedNetlistModel> mp_indexer;
+  mutable std::map<std::pair<const db::Circuit *, const db::Circuit *>, QModelIndex> m_circuits_to_index;
   int m_object_column;
   int m_status_column;
 };

@@ -1733,7 +1733,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
   for (db::Netlist::const_bottom_up_circuit_iterator c = a->begin_bottom_up (); c != a->end_bottom_up (); ++c) {
 
-    size_t ccat = circuit_categorizer.cat_for_circuit (*c);
+    size_t ccat = circuit_categorizer.cat_for_circuit (c.operator-> ());
 
     std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = cat2circuits.find (ccat);
     tl_assert (i != cat2circuits.end ());

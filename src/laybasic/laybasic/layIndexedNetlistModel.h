@@ -90,6 +90,7 @@ public:
   virtual std::pair<circuit_pair, Status> circuit_from_index (size_t index) const = 0;
   virtual std::pair<net_pair, Status> net_from_index (const circuit_pair &circuits, size_t index) const = 0;
   virtual const db::Net *second_net_for (const db::Net *first) const = 0;
+  virtual const db::Circuit *second_circuit_for (const db::Circuit *first) const = 0;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const = 0;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const = 0;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const = 0;
@@ -147,7 +148,8 @@ public:
   virtual std::pair<circuit_pair, Status> circuit_from_index (size_t index) const;
   virtual std::pair<circuit_pair, Status> child_circuit_from_index (const circuit_pair &circuits, size_t index) const;
   virtual std::pair<net_pair, Status> net_from_index (const circuit_pair &circuits, size_t index) const;
-  virtual const db::Net *second_net_for (const db::Net * /*first*/) const;
+  virtual const db::Net *second_net_for (const db::Net *first) const;
+  virtual const db::Circuit *second_circuit_for (const db::Circuit *first) const;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const;
@@ -167,6 +169,7 @@ private:
   const db::Netlist *mp_netlist;
 
   mutable std::map<netlist_pair, std::vector<circuit_pair> > m_circuit_by_index;
+  mutable std::map<circuit_pair, std::vector<circuit_pair> > m_child_circuit_by_circuit_and_index;
   mutable std::map<circuit_pair, std::vector<net_pair> > m_net_by_circuit_and_index;
   mutable std::map<net_pair, std::vector<net_subcircuit_pin_pair> > m_subcircuit_pinref_by_net_and_index;
   mutable std::map<net_pair, std::vector<net_terminal_pair> > m_terminalref_by_net_and_index;

@@ -42,6 +42,42 @@ namespace db
 class Netlist;
 
 /**
+ *  @brief An iterator wrapper for the child and parent circuit iterator
+ */
+template <class Iter, class Value>
+struct DB_PUBLIC_TEMPLATE dereferencing_iterator
+  : public Iter
+{
+public:
+  typedef Value *pointer;
+  typedef Value &reference;
+  typedef typename Iter::difference_type difference_type;
+
+  dereferencing_iterator () { }
+  dereferencing_iterator (const dereferencing_iterator &d) : Iter (d) { }
+  dereferencing_iterator (const Iter &d) : Iter (d) { }
+  dereferencing_iterator &operator= (const dereferencing_iterator &d)
+  {
+    Iter::operator= (d);
+    return *this;
+  }
+
+  dereferencing_iterator operator+ (difference_type offset) const
+  {
+    return dereferencing_iterator (Iter::operator+ (offset));
+  }
+
+  dereferencing_iterator &operator+= (difference_type offset)
+  {
+    Iter::operator+= (offset);
+    return *this;
+  }
+
+  pointer operator-> () const { return Iter::operator* (); }
+  reference operator* () const { return *Iter::operator* (); }
+};
+
+/**
  *  @brief A circuit
  *
  *  A circuit is a list of nets, of subcircuit references and actual
@@ -65,10 +101,10 @@ public:
   typedef subcircuit_list::iterator subcircuit_iterator;
   typedef tl::weak_collection<SubCircuit>::const_iterator const_refs_iterator;
   typedef tl::weak_collection<SubCircuit>::iterator refs_iterator;
-  typedef tl::vector<Circuit *>::const_iterator child_circuit_iterator;
-  typedef tl::vector<const Circuit *>::const_iterator const_child_circuit_iterator;
-  typedef tl::vector<Circuit *>::const_iterator parent_circuit_iterator;
-  typedef tl::vector<const Circuit *>::const_iterator const_parent_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<Circuit *>::const_iterator, Circuit> child_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_iterator, const Circuit> const_child_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<Circuit *>::const_iterator, Circuit> parent_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_iterator, const Circuit> const_parent_circuit_iterator;
 
   /**
    *  @brief Constructor

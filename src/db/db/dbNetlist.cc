@@ -435,7 +435,7 @@ void Netlist::make_top_level_pins ()
   size_t ntop = top_circuit_count ();
   for (top_down_circuit_iterator c = begin_top_down (); c != end_top_down () && ntop > 0; ++c, --ntop) {
 
-    Circuit *circuit = *c;
+    Circuit *circuit = c.operator-> ();
 
     if (circuit->pin_count () == 0) {
 
@@ -460,7 +460,7 @@ void Netlist::purge ()
 
   for (bottom_up_circuit_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
 
-    Circuit *circuit = *c;
+    Circuit *circuit = c.operator-> ();
 
     circuit->purge_nets ();
     if (circuit->begin_nets () == circuit->end_nets ()) {

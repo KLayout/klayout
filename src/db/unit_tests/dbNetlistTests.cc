@@ -191,7 +191,7 @@ static std::string children2string (const db::Circuit *c)
     if (!res.empty ()) {
       res += ",";
     }
-    res += (*r)->name ();
+    res += r->name ();
   }
   return res;
 }
@@ -203,7 +203,7 @@ static std::string parents2string (const db::Circuit *c)
     if (!res.empty ()) {
       res += ",";
     }
-    res += (*r)->name ();
+    res += r->name ();
   }
   return res;
 }
@@ -215,7 +215,7 @@ static std::string td2string (const db::Netlist *nl)
     if (!res.empty ()) {
       res += ",";
     }
-    res += (*r)->name ();
+    res += r->name ();
   }
   return res;
 }
@@ -227,7 +227,7 @@ static std::string bu2string (const db::Netlist *nl)
     if (!res.empty ()) {
       res += ",";
     }
-    res += (*r)->name ();
+    res += r->name ();
   }
   return res;
 }

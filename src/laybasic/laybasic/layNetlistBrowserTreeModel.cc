@@ -202,7 +202,7 @@ NetlistBrowserTreeModel::search_text (const QModelIndex &index) const
 }
 
 std::pair<std::pair<const db::Circuit *, const db::Circuit *>, db::NetlistCrossReference::Status>
-NetlistBrowserTreeModel::cp_status_from_index (const QModelIndex &index, size_t &nprod, size_t &nlast) const
+NetlistBrowserTreeModel::cp_status_from_index (const QModelIndex &index, size_t &nprod, size_t &nlast, size_t &nnlast) const
 {
   typedef std::pair<std::pair<const db::Circuit *, const db::Circuit *>, db::NetlistCrossReference::Status> cp_status;
 
@@ -210,6 +210,7 @@ NetlistBrowserTreeModel::cp_status_from_index (const QModelIndex &index, size_t 
   tl_assert (id != 0);
 
   nprod = 1;
+  nnlast = 1;
 
   nlast = mp_indexer->top_circuit_count () + 1;
   size_t i = pop (id, nlast);
@@ -217,6 +218,7 @@ NetlistBrowserTreeModel::cp_status_from_index (const QModelIndex &index, size_t 
   cp_status cps = mp_indexer->top_circuit_from_index (i - 1);
 
   while (id != 0) {
+    nnlast = nlast;
     nlast = mp_indexer->child_circuit_count (cps.first) + 1;
     i = pop (id, nlast);
     nprod *= nlast;
@@ -229,15 +231,58 @@ NetlistBrowserTreeModel::cp_status_from_index (const QModelIndex &index, size_t 
 std::pair<const db::Circuit *, const db::Circuit *>
 NetlistBrowserTreeModel::circuits_from_index (const QModelIndex &index) const
 {
-  size_t nprod = 0, nlast = 0;
-  return cp_status_from_index (index, nprod, nlast).first;
+  size_t nprod = 0, nlast = 0, nnlast = 0;
+  return cp_status_from_index (index, nprod, nlast, nnlast).first;
 }
+
+void
+NetlistBrowserTreeModel::build_circuits_to_index (size_t nprod, const std::pair<const db::Circuit *, const db::Circuit *> &circuits, IndexedNetlistModel *model, const QModelIndex &index, std::map<std::pair<const db::Circuit *, const db::Circuit *>, QModelIndex> &map) const
+{
+  if (map.find (circuits) != map.end ()) {
+    return;
+  }
+
+  map.insert (std::make_pair (circuits, index));
+
+  size_t count = mp_indexer->child_circuit_count (circuits);
+  size_t child_nprod = nprod * (count + 1);
+
+  for (size_t n = count; n > 0; ) {
+    std::pair<std::pair<const db::Circuit *, const db::Circuit *>, IndexedNetlistModel::Status> cp = mp_indexer->child_circuit_from_index (circuits, n - 1);
+    QModelIndex child_index = createIndex (int (n - 1), 0, reinterpret_cast<void *> (size_t (index.internalPointer ()) + nprod * n));
+    build_circuits_to_index (child_nprod, cp.first, model, child_index, map);
+    --n;
+  }
+}
+
+QModelIndex
+NetlistBrowserTreeModel::index_from_circuits (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const
+{
+  if (m_circuits_to_index.empty ()) {
+
+    size_t count = mp_indexer->top_circuit_count ();
+    for (size_t n = count; n > 0; ) {
+      std::pair<std::pair<const db::Circuit *, const db::Circuit *>, IndexedNetlistModel::Status> cp = mp_indexer->top_circuit_from_index (n - 1);
+      build_circuits_to_index (count + 1, cp.first, mp_indexer.get (), createIndex (int (n - 1), 0, reinterpret_cast<void *> (n)), m_circuits_to_index);
+      --n;
+    }
+
+  }
+
+  std::map<std::pair<const db::Circuit *, const db::Circuit *>, QModelIndex>::const_iterator m = m_circuits_to_index.find (circuits);
+  if (m != m_circuits_to_index.end ()) {
+    return m->second;
+  } else {
+    return QModelIndex ();
+  }
+}
+
 
 db::NetlistCrossReference::Status
 NetlistBrowserTreeModel::status (const QModelIndex &index) const
 {
-  size_t nprod = 0, nlast = 0;
-  return cp_status_from_index (index, nprod, nlast).second;
+  size_t nprod = 0, nlast = 0, nnlast = 0;
+  return cp_status_from_index (index, nprod, nlast, nnlast).second;
 }
 
 Qt::ItemFlags
@@ -276,8 +321,8 @@ NetlistBrowserTreeModel::index (int row, int column, const QModelIndex &parent) 
 
   } else {
 
-    size_t nprod = 0, nlast = 0;
-    cp_status_from_index (parent, nprod, nlast);
+    size_t nprod = 0, nlast = 0, nnlast = 0;
+    cp_status_from_index (parent, nprod, nlast, nnlast);
 
     void *id = parent.internalPointer ();
     return createIndex (row, column, reinterpret_cast<void *> (reinterpret_cast<size_t> (id) + size_t (row + 1) * nprod));
@@ -290,8 +335,8 @@ NetlistBrowserTreeModel::parent (const QModelIndex &index) const
 {
   if (index.isValid ()) {
 
-    size_t nprod = 0, nlast = 0;
-    cp_status_from_index (index, nprod, nlast);
+    size_t nprod = 0, nlast = 0, nnlast = 0;
+    cp_status_from_index (index, nprod, nlast, nnlast);
 
     tl_assert (nlast != 0);
 
@@ -302,7 +347,11 @@ NetlistBrowserTreeModel::parent (const QModelIndex &index) const
       void *id = index.internalPointer ();
       size_t ids = reinterpret_cast<size_t> (id);
       tl_assert (ids >= nprod);
-      return createIndex (int (ids / nprod - 1), index.column (), reinterpret_cast<void *> (ids % nprod));
+      ids %= nprod;
+
+      nprod /= nnlast;
+
+      return createIndex (int (ids / nprod - 1), index.column (), reinterpret_cast<void *> (ids));
 
     }
 

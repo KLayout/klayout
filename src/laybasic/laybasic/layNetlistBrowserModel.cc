@@ -1911,6 +1911,25 @@ NetlistBrowserModel::index_from_net (const db::Net *net) const
   return index_from_net (std::make_pair (net, mp_indexer->second_net_for (net)));
 }
 
+QModelIndex
+NetlistBrowserModel::index_from_circuit (const std::pair<const db::Circuit *, const db::Circuit *> &circuits) const
+{
+  void *id = make_id_circuit (mp_indexer->circuit_index (circuits));
+  return index_from_id (id, 0);
+}
+
+QModelIndex
+NetlistBrowserModel::index_from_circuit (const db::Circuit *net) const
+{
+  return index_from_circuit (std::make_pair (net, mp_indexer->second_circuit_for (net)));
+}
+
+std::pair<const db::Circuit *, const db::Circuit *>
+NetlistBrowserModel::circuit_from_index (const QModelIndex &index) const
+{
+  return circuits_from_id (index.internalPointer ());
+}
+
 std::pair<const db::Net *, const db::Net *>
 NetlistBrowserModel::net_from_index (const QModelIndex &index) const
 {

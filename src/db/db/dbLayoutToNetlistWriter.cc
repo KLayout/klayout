@@ -184,7 +184,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
     *mp_stream << indent << "# Circuits are the hierarchical building blocks of the netlist." << endl;
   }
   for (db::Netlist::const_bottom_up_circuit_iterator i = nl->begin_bottom_up (); i != nl->end_bottom_up (); ++i) {
-    const db::Circuit *x = *i;
+    const db::Circuit *x = i.operator-> ();
     *mp_stream << indent << Keys::circuit_key << "(" << tl::to_word_or_quoted_string (x->name ()) << endl;
     write (nl, l2n, *x, indent, net2id_per_circuit);
     *mp_stream << indent << ")" << endl;

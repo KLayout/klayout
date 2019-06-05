@@ -23,6 +23,7 @@
 
 #include "layNetlistBrowserPage.h"
 #include "layNetlistBrowserModel.h"
+#include "layNetlistBrowserTreeModel.h"
 #include "layItemDelegates.h"
 #include "layCellView.h"
 #include "layLayoutView.h"
@@ -151,6 +152,14 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     delegate->set_anchors_clickable (true);
     connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
     directory_tree->setItemDelegateForColumn (i, delegate);
+  }
+
+  for (int i = 0; i < 2; ++i) {
+    delegate = new lay::HTMLItemDelegate (this);
+    delegate->set_text_margin (2);
+    delegate->set_anchors_clickable (true);
+    connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
+    hierarchy_tree->setItemDelegateForColumn (i, delegate);
   }
 
   QMenu *find_edit_menu = new QMenu (find_text);
@@ -285,12 +294,46 @@ NetlistBrowserPage::anchor_clicked (const QString &a)
 }
 
 void
+NetlistBrowserPage::current_tree_index_changed (const QModelIndex &index)
+{
+  if (index.isValid () && m_signals_enabled) {
+
+    NetlistBrowserTreeModel *tree_model = dynamic_cast<NetlistBrowserTreeModel *> (hierarchy_tree->model ());
+    NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    if (! tree_model || ! netlist_model) {
+      return;
+    }
+
+    std::pair<const db::Circuit *, const db::Circuit *> circuits = tree_model->circuits_from_index (index);
+    QModelIndex circuit_index = netlist_model->index_from_circuit (circuits);
+
+    m_signals_enabled = false;
+    directory_tree->setCurrentIndex (circuit_index);
+    m_signals_enabled = true;
+
+  }
+}
+
+void
 NetlistBrowserPage::current_index_changed (const QModelIndex &index)
 {
   if (index.isValid () && m_signals_enabled) {
 
+    NetlistBrowserTreeModel *tree_model = dynamic_cast<NetlistBrowserTreeModel *> (hierarchy_tree->model ());
+    NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    if (! tree_model || ! netlist_model) {
+      return;
+    }
+
     void *id = index.internalPointer ();
     add_to_history (id, true);
+
+    std::pair<const db::Circuit *, const db::Circuit *> circuits = netlist_model->circuit_from_index (index);
+    QModelIndex circuit_index = tree_model->index_from_circuits (circuits);
+
+    m_signals_enabled = false;
+    hierarchy_tree->setCurrentIndex (circuit_index);
+    m_signals_enabled = true;
 
   }
 }
@@ -424,19 +467,26 @@ NetlistBrowserPage::select_color_for_net ()
 void
 NetlistBrowserPage::navigate_to (void *id, bool fwd)
 {
-  NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
-  if (! model) {
+  NetlistBrowserTreeModel *tree_model = dynamic_cast<NetlistBrowserTreeModel *> (hierarchy_tree->model ());
+  NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  if (! tree_model || ! netlist_model) {
     return;
   }
 
-  QModelIndex index = model->index_from_id (id, 0);
+  QModelIndex index = netlist_model->index_from_id (id, 0);
   if (! index.isValid ()) {
     return;
   }
 
   m_signals_enabled = false;
   try {
+
     directory_tree->setCurrentIndex (index);
+
+    std::pair<const db::Circuit *, const db::Circuit *> circuits = netlist_model->circuit_from_index (index);
+    QModelIndex circuit_index = tree_model->index_from_circuits (circuits);
+    hierarchy_tree->setCurrentIndex (circuit_index);
+
   } catch (...) {
   }
   m_signals_enabled = true;
@@ -636,43 +686,78 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   if (! mp_database.get ()) {
     delete directory_tree->model ();
     directory_tree->setModel (0);
+    delete hierarchy_tree->model ();
+    hierarchy_tree->setModel (0);
     return;
   }
 
   m_cell_context_cache = db::ContextCache (mp_database->internal_layout ());
 
-  //  NOTE: with the tree as the parent, the tree will take over ownership of the model
-  NetlistBrowserModel *new_model = 0;
-  if (lvsdb) {
-    new_model = new NetlistBrowserModel (directory_tree, lvsdb, &m_colorizer);
-  } else {
-    new_model = new NetlistBrowserModel (directory_tree, l2ndb, &m_colorizer);
-  }
-
-  int columns = directory_tree->model () ? directory_tree->model ()->columnCount (QModelIndex ()) : 0;
-  int new_columns = new_model->columnCount (QModelIndex ());
-
-  delete directory_tree->model ();
-  directory_tree->setModel (new_model);
-  connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
-  connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (selection_changed ()));
-
-  directory_tree->header ()->show ();
-  directory_tree->header ()->setStretchLastSection (true);
-  directory_tree->header ()->setMinimumSectionSize (25);
-
-  if (columns < new_columns) {
-    //  makes sure new columns are properly size-adjusted
-    for (int i = std::max (0, columns - 1); i < new_columns; ++i) {
-      directory_tree->header ()->resizeSection (i, i == 1 ? directory_tree->header ()->minimumSectionSize () : directory_tree->header ()->defaultSectionSize ());
+  {
+    //  NOTE: with the tree as the parent, the tree will take over ownership of the model
+    NetlistBrowserModel *new_model = 0;
+    if (lvsdb) {
+      new_model = new NetlistBrowserModel (directory_tree, lvsdb, &m_colorizer);
+    } else {
+      new_model = new NetlistBrowserModel (directory_tree, l2ndb, &m_colorizer);
     }
+
+    int columns = directory_tree->model () ? directory_tree->model ()->columnCount (QModelIndex ()) : 0;
+    int new_columns = new_model->columnCount (QModelIndex ());
+
+    delete directory_tree->model ();
+    directory_tree->setModel (new_model);
+    connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
+    connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (selection_changed ()));
+
+    directory_tree->header ()->show ();
+    directory_tree->header ()->setStretchLastSection (true);
+    directory_tree->header ()->setMinimumSectionSize (25);
+
+    if (columns < new_columns) {
+      //  makes sure new columns are properly size-adjusted
+      for (int i = std::max (0, columns - 1); i < new_columns; ++i) {
+        directory_tree->header ()->resizeSection (i, i == 1 ? directory_tree->header ()->minimumSectionSize () : directory_tree->header ()->defaultSectionSize ());
+      }
+    }
+
+    //  hide the status column if not needed
+    directory_tree->header ()->setSectionHidden (1, new_model->status_column () < 0);
+
+    //  establish visibility according to "show all"
+    new_model->set_item_visibility (directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
   }
 
-  //  hide the status column if not needed
-  directory_tree->header ()->setSectionHidden (1, new_model->status_column () < 0);
+  {
+    //  NOTE: with the tree as the parent, the tree will take over ownership of the model
+    NetlistBrowserTreeModel *new_hierarchy_model = 0;
+    if (lvsdb) {
+      new_hierarchy_model = new NetlistBrowserTreeModel (hierarchy_tree, lvsdb);
+    } else {
+      new_hierarchy_model = new NetlistBrowserTreeModel (hierarchy_tree, l2ndb);
+    }
 
-  //  establish visibility according to "show all"
-  new_model->set_item_visibility (directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
+    int columns = hierarchy_tree->model () ? hierarchy_tree->model ()->columnCount (QModelIndex ()) : 0;
+    int new_columns = new_hierarchy_model->columnCount (QModelIndex ());
+
+    delete hierarchy_tree->model ();
+    hierarchy_tree->setModel (new_hierarchy_model);
+    connect (hierarchy_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_tree_index_changed (const QModelIndex &)));
+
+    hierarchy_tree->header ()->show ();
+    hierarchy_tree->header ()->setStretchLastSection (true);
+    hierarchy_tree->header ()->setMinimumSectionSize (25);
+
+    if (columns < new_columns) {
+      //  makes sure new columns are properly size-adjusted
+      for (int i = std::max (0, columns - 1); i < new_columns; ++i) {
+        hierarchy_tree->header ()->resizeSection (i, i == 1 ? hierarchy_tree->header ()->minimumSectionSize () : hierarchy_tree->header ()->defaultSectionSize ());
+      }
+    }
+
+    //  hide the status column if not needed
+    hierarchy_tree->header ()->setSectionHidden (1, new_hierarchy_model->status_column () < 0);
+  }
 
   find_text->setText (QString ());
 }

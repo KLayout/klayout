@@ -135,6 +135,9 @@ public:
   std::pair<const db::Net *, const db::Net *> net_from_index (const QModelIndex &index) const;
   QModelIndex index_from_net (const std::pair<const db::Net *, const db::Net *> &net) const;
   QModelIndex index_from_net (const db::Net *net) const;
+  std::pair<const db::Circuit *, const db::Circuit *> circuit_from_index (const QModelIndex &index) const;
+  QModelIndex index_from_circuit (const std::pair<const db::Circuit *, const db::Circuit *> &circuit) const;
+  QModelIndex index_from_circuit (const db::Circuit *circuit) const;
 
   std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuit_from_index (const QModelIndex &index) const;
 

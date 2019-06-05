@@ -55,10 +55,10 @@ public:
   typedef tl::shared_collection<DeviceAbstract> device_abstract_list;
   typedef device_abstract_list::const_iterator const_abstract_model_iterator;
   typedef device_abstract_list::iterator device_abstract_iterator;
-  typedef tl::vector<Circuit *>::const_iterator top_down_circuit_iterator;
-  typedef tl::vector<const Circuit *>::const_iterator const_top_down_circuit_iterator;
-  typedef tl::vector<Circuit *>::const_reverse_iterator bottom_up_circuit_iterator;
-  typedef tl::vector<const Circuit *>::const_reverse_iterator const_bottom_up_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<Circuit *>::iterator, Circuit> top_down_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_iterator, const Circuit>  const_top_down_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<Circuit *>::reverse_iterator, Circuit> bottom_up_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_reverse_iterator, const Circuit> const_bottom_up_circuit_iterator;
 
   /**
    *  @brief Constructor

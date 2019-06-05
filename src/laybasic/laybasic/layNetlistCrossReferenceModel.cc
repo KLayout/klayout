@@ -299,6 +299,11 @@ const db::Net *NetlistCrossReferenceModel::second_net_for (const db::Net *first)
   return mp_cross_ref->other_net_for (first);
 }
 
+const db::Circuit *NetlistCrossReferenceModel::second_circuit_for (const db::Circuit *first) const
+{
+  return mp_cross_ref->other_circuit_for (first);
+}
+
 IndexedNetlistModel::net_subcircuit_pin_pair NetlistCrossReferenceModel::net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const
 {
   const db::NetlistCrossReference::PerNetData *data = mp_cross_ref->per_net_data_for (nets);

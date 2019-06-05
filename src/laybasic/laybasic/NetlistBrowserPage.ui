@@ -204,49 +204,95 @@
         </widget>
        </item>
        <item>
-        <widget class="QTreeView" name="directory_tree">
+        <widget class="QFrame" name="frame_2">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
+           <verstretch>1</verstretch>
           </sizepolicy>
          </property>
-         <property name="baseSize">
-          <size>
-           <width>0</width>
-           <height>4</height>
-          </size>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
          </property>
-         <property name="contextMenuPolicy">
-          <enum>Qt::ActionsContextMenu</enum>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
          </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::ExtendedSelection</enum>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
-         </property>
-         <property name="uniformRowHeights">
-          <bool>true</bool>
-         </property>
-         <property name="sortingEnabled">
-          <bool>true</bool>
-         </property>
-         <property name="allColumnsShowFocus">
-          <bool>true</bool>
-         </property>
-         <attribute name="headerVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="headerCascadingSectionResizes">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="headerShowSortIndicator" stdset="0">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="headerStretchLastSection">
-          <bool>false</bool>
-         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QSplitter" name="splitter">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <widget class="QTreeView" name="hierarchy_tree">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <attribute name="headerDefaultSectionSize">
+              <number>100</number>
+             </attribute>
+            </widget>
+            <widget class="QTreeView" name="directory_tree">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="baseSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="contextMenuPolicy">
+              <enum>Qt::ActionsContextMenu</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::ExtendedSelection</enum>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <property name="uniformRowHeights">
+              <bool>true</bool>
+             </property>
+             <property name="sortingEnabled">
+              <bool>true</bool>
+             </property>
+             <property name="allColumnsShowFocus">
+              <bool>true</bool>
+             </property>
+             <attribute name="headerVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="headerCascadingSectionResizes">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="headerShowSortIndicator" stdset="0">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="headerStretchLastSection">
+              <bool>false</bool>
+             </attribute>
+            </widget>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
@@ -338,6 +384,12 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>backward</tabstop>
+  <tabstop>forward</tabstop>
+  <tabstop>info_button</tabstop>
+  <tabstop>find_text</tabstop>
+  <tabstop>find_button</tabstop>
+  <tabstop>hierarchy_tree</tabstop>
   <tabstop>directory_tree</tabstop>
  </tabstops>
  <resources>

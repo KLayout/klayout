@@ -28,6 +28,7 @@
 #include "dbCell.h"
 #include "dbLayoutToNetlist.h"
 #include "tlStream.h"
+#include "tlProgress.h"
 
 namespace db {
 
@@ -149,6 +150,7 @@ private:
   double m_dbu;
   tl::Extractor m_ex;
   db::Point m_ref;
+  tl::AbsoluteProgress m_progress;
 };
 
 }

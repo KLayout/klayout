@@ -552,6 +552,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   try {
 
     tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+    db::LayoutLocker ll (&layout, true /*no update*/);
 
     builder.set_shape_receiver (&clip);
     db::RecursiveShapeIterator (si).push (& builder);
@@ -590,6 +591,7 @@ DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator 
   try {
 
     tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+    db::LayoutLocker ll (&layout, true /*no update*/);
 
     builder.set_shape_receiver (pipe);
     db::RecursiveShapeIterator (si).push (& builder);
@@ -646,6 +648,7 @@ DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &s
   try {
 
     tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+    db::LayoutLocker ll (&layout, true /*no update*/);
 
     builder.set_shape_receiver (&refs);
     db::RecursiveShapeIterator (si).push (& builder);
@@ -676,6 +679,7 @@ DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterat
   try {
 
     tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+    db::LayoutLocker ll (&layout, true /*no update*/);
 
     builder.set_shape_receiver (&refs);
     db::RecursiveShapeIterator (si).push (& builder);

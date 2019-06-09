@@ -1563,6 +1563,17 @@ public:
   }
 
   /**
+   *  @brief Cancel the "in changes" state (see "start_changes")
+   *  This version does not force an update
+   */
+  void end_changes_no_update ()
+  {
+    if (m_invalid > 0) {
+      --m_invalid;
+    }
+  }
+
+  /**
    *  @brief Tell if the layout object is under construction
    *
    *  A layout object is either under construction if 
@@ -1763,8 +1774,8 @@ mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const 
 class DB_PUBLIC LayoutLocker
 {
 public:
-  explicit LayoutLocker (db::Layout *layout = 0)
-    : mp_layout (layout)
+  explicit LayoutLocker (db::Layout *layout = 0, bool no_update = false)
+    : mp_layout (layout), m_no_update (no_update)
   {
     if (mp_layout) {
       mp_layout->start_changes ();
@@ -1773,13 +1784,11 @@ public:
 
   ~LayoutLocker ()
   {
-    if (mp_layout) {
-      mp_layout->end_changes ();
-    }
+    set (0, false);
   }
 
   LayoutLocker (const LayoutLocker &other)
-    : mp_layout (other.mp_layout)
+    : mp_layout (other.mp_layout), m_no_update (other.m_no_update)
   {
     if (mp_layout) {
       mp_layout->start_changes ();
@@ -1792,20 +1801,30 @@ public:
       return *this;
     }
 
-    if (mp_layout) {
-      mp_layout->end_changes ();
-    }
-    mp_layout = other.mp_layout;
-    if (mp_layout) {
-      mp_layout->start_changes ();
-    }
-
+    set (other.mp_layout, other.m_no_update);
     return *this;
   }
 
 private:
-
   db::Layout *mp_layout;
+  bool m_no_update;
+
+  void set (db::Layout *layout, bool no_update)
+  {
+    if (mp_layout) {
+      if (m_no_update) {
+        mp_layout->end_changes_no_update ();
+      } else {
+        mp_layout->end_changes ();
+      }
+    }
+    mp_layout = layout;
+    m_no_update = no_update;
+    if (mp_layout) {
+      mp_layout->start_changes ();
+    }
+  }
+
 };
 
 }

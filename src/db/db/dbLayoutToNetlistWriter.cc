@@ -56,9 +56,11 @@ static const std::string indent2 ("  ");
 
 template <class Keys>
 std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream, double dbu)
-  : mp_stream (&stream), m_dbu (dbu)
+  : mp_stream (&stream), m_dbu (dbu),
+    m_progress (tl::to_string (tr ("Writing L2N database")), 10000)
 {
-  //  .. nothing yet ..
+  m_progress.set_format (tl::to_string (tr ("%.0f MB")));
+  m_progress.set_unit (1024 * 1024);
 }
 
 static std::string name_for_layer (const db::LayoutToNetlist *l2n, unsigned int l)
@@ -115,6 +117,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
         *mp_stream << " " << tl::to_word_or_quoted_string (lp.to_string ());
       }
       *mp_stream << ")" << endl;
+      m_progress.set (mp_stream->pos ());
     }
 
     if (! Keys::is_short ()) {
@@ -130,6 +133,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
           *mp_stream << " " << name_for_layer (l2n, *c);
         }
         *mp_stream << ")" << endl;
+        m_progress.set (mp_stream->pos ());
       }
 
     }
@@ -151,6 +155,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
           *mp_stream << " " << tl::to_word_or_quoted_string (l2n->connectivity ().global_net_name (*g));
         }
         *mp_stream << ")" << endl;
+        m_progress.set (mp_stream->pos ());
       }
 
     }
@@ -163,6 +168,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
       db::DeviceClassTemplateBase *temp = db::DeviceClassTemplateBase::is_a (c.operator-> ());
       if (temp) {
         *mp_stream << indent << Keys::class_key << "(" << tl::to_word_or_quoted_string (c->name ()) << " " << tl::to_word_or_quoted_string (temp->name ()) << ")" << endl;
+        m_progress.set (mp_stream->pos ());
       }
     }
   }
@@ -176,6 +182,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
       *mp_stream << indent << Keys::device_key << "(" << tl::to_word_or_quoted_string (m->name ()) << " " << tl::to_word_or_quoted_string (m->device_class ()->name ()) << endl;
       write (l2n, *m, indent);
       *mp_stream << indent << ")" << endl;
+      m_progress.set (mp_stream->pos ());
     }
   }
 
@@ -188,6 +195,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
     *mp_stream << indent << Keys::circuit_key << "(" << tl::to_word_or_quoted_string (x->name ()) << endl;
     write (nl, l2n, *x, indent, net2id_per_circuit);
     *mp_stream << indent << ")" << endl;
+    m_progress.set (mp_stream->pos ());
   }
 }
 
@@ -215,6 +223,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
     }
     for (db::Circuit::const_net_iterator n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
       write (netlist, l2n, *n, (*net2id) [n.operator-> ()], indent);
+      m_progress.set (mp_stream->pos ());
     }
   }
 
@@ -235,6 +244,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
         *mp_stream << Keys::name_key << "(" << tl::to_word_or_quoted_string (p->name ()) << ")";
       }
       *mp_stream << ")" << endl;
+      m_progress.set (mp_stream->pos ());
     }
   }
 
@@ -244,6 +254,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
     }
     for (db::Circuit::const_device_iterator d = circuit.begin_devices (); d != circuit.end_devices (); ++d) {
       write (l2n, *d, *net2id, indent);
+      m_progress.set (mp_stream->pos ());
     }
   }
 
@@ -253,6 +264,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
     }
     for (db::Circuit::const_subcircuit_iterator x = circuit.begin_subcircuits (); x != circuit.end_subcircuits (); ++x) {
       write (l2n, *x, *net2id, indent);
+      m_progress.set (mp_stream->pos ());
     }
   }
 
@@ -381,6 +393,7 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
           *mp_stream << indent << indent2;
           write (si.operator-> (), si.trans (), name_for_layer (l2n, *l), true);
           *mp_stream << endl;
+          m_progress.set (mp_stream->pos ());
 
           prev_ci = ci;
 
@@ -441,6 +454,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Sub
       if (separate_lines) {
         *mp_stream << endl;
       }
+      m_progress.set (mp_stream->pos ());
     }
   }
 
@@ -479,12 +493,14 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist *l2n, const db::Dev
         *mp_stream << indent << indent2;
         write (s.operator-> (), db::ICplxTrans (), name_for_layer (l2n, *l), true);
         *mp_stream << endl;
+        m_progress.set (mp_stream->pos ());
 
       }
 
     }
 
     *mp_stream << indent << indent1 << ")" << endl;
+    m_progress.set (mp_stream->pos ());
 
   }
 }

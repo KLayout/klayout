@@ -60,8 +60,13 @@ typedef l2n_std_format::keys<true> skeys;
 typedef l2n_std_format::keys<false> lkeys;
 
 LayoutToNetlistStandardReader::LayoutToNetlistStandardReader (tl::InputStream &stream)
-  : m_stream (stream), m_path (stream.absolute_path ()), m_dbu (0.0)
+  : m_stream (stream), m_path (stream.absolute_path ()), m_dbu (0.0),
+    m_progress (tl::to_string (tr ("Reading L2N database")), 1000)
 {
+  m_progress.set_format (tl::to_string (tr ("%.0fk lines")));
+  m_progress.set_format_unit (1000.0);
+  m_progress.set_unit (100000.0);
+
   skip ();
 }
 
@@ -122,6 +127,7 @@ LayoutToNetlistStandardReader::skip ()
     if (m_stream.at_end ()) {
       return;
     }
+    m_progress.set (m_stream.line_number ());
     m_line = m_stream.get_line ();
     m_ex = tl::Extractor (m_line.c_str ());
   }
@@ -129,6 +135,8 @@ LayoutToNetlistStandardReader::skip ()
 
 void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (QObject::tr ("File read")));
+
   try {
     read_netlist (0, l2n);
   } catch (tl::Exception &ex) {

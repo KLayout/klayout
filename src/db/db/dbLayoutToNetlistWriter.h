@@ -28,6 +28,7 @@
 #include "dbTrans.h"
 #include "dbPolygon.h"
 #include "tlStream.h"
+#include "tlProgress.h"
 
 namespace db
 {
@@ -71,6 +72,7 @@ private:
   tl::OutputStream *mp_stream;
   db::Point m_ref;
   double m_dbu;
+  tl::AbsoluteProgress m_progress;
 };
 
 }

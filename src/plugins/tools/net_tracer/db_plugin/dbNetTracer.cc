@@ -356,11 +356,14 @@ NetTracerData::configure_l2n (db::LayoutToNetlist &l2n)
 
   std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > regions_per_org_layer;
 
+  tl::RelativeProgress progress (tl::to_string (tr ("Computing input layers")), m_log_layers.size ());
+
   //  first fetch all the alias expressions
   for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
     if (l->second->is_alias ()) {
       tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rh = l->second->make_l2n_region (l2n, regions_per_org_layer, layer_to_symbol [l->first]);
       m_l2n_regions [l->first] = rh;
+      ++progress;
     }
   }
 
@@ -369,6 +372,7 @@ NetTracerData::configure_l2n (db::LayoutToNetlist &l2n)
     if (! l->second->is_alias ()) {
       tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rh = l->second->make_l2n_region (l2n, regions_per_org_layer, layer_to_symbol [l->first]);
       m_l2n_regions [l->first] = rh;
+      ++progress;
     }
   }
 

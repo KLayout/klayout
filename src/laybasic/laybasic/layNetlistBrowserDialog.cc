@@ -404,6 +404,9 @@ BEGIN_PROTECTED
       std::string fn (l2ndb->filename ());
       if (save_dialog.get_save (fn)) {
 
+        tl::log << tl::to_string (QObject::tr ("Saving file: ")) << fn;
+        tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Saving")));
+
         l2ndb->save (fn, true);
 
       }
@@ -424,6 +427,9 @@ BEGIN_PROTECTED
 
     db::LayoutToNetlist *l2ndb = view ()->get_l2ndb (m_l2n_index);
     if (l2ndb && ! l2ndb->filename ().empty ()) {
+
+      tl::log << tl::to_string (QObject::tr ("Loading file: ")) << l2ndb->filename ();
+      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading")));
 
       browser_frame->set_l2ndb (0);
       l2ndb->load (l2ndb->filename ());
@@ -455,6 +461,9 @@ BEGIN_PROTECTED
   //  prepare and open the file dialog
   lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Netlist/LVS Database File")), fmts);
   if (open_dialog.get_open (m_open_filename)) {
+
+    tl::log << tl::to_string (QObject::tr ("Loading file: ")) << m_open_filename;
+    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading")));
 
     int l2n_index = view ()->add_l2ndb (db::LayoutToNetlist::create_from_file (m_open_filename));
     l2ndb_cb->setCurrentIndex (l2n_index);

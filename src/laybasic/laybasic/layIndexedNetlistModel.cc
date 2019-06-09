@@ -46,7 +46,16 @@ namespace {
   {
     inline bool operator() (const Obj *a, const Obj *b) const
     {
-      return a->expanded_name () < b->expanded_name ();
+      //  NOTE: we don't use expanded_name () for performance
+      if (a->name ().empty () != b->name ().empty ()) {
+        //  named ones first
+        return a->name ().empty () < b->name ().empty ();
+      }
+      if (a->name ().empty ()) {
+        return a->id () < b->id ();
+      } else {
+        return a->name () < b->name ();
+      }
     }
   };
 
@@ -55,7 +64,7 @@ namespace {
   {
     inline bool operator() (const Obj *a, const Obj *b) const
     {
-      return a->pin ()->expanded_name () < b->pin ()->expanded_name ();
+      return sort_single_by_expanded_name<db::Pin> () (a->pin (), b->pin ());
     }
   };
 

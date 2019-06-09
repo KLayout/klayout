@@ -142,6 +142,27 @@ namespace {
 
 }
 
+struct Unsorted { };
+
+template <class Iter, class SortBy>
+struct sort_by
+{
+  void operator() (const Iter &begin, const Iter &end, const SortBy &sorter)
+  {
+    std::sort (begin, end, sorter);
+  }
+};
+
+template <class Iter>
+struct sort_by<Iter, Unsorted>
+{
+  void operator() (const Iter &, const Iter &, const Unsorted &)
+  {
+    //  don't sort
+  }
+};
+
+
 template <class Attr, class Iter, class SortBy>
 static void fill_map (std::vector<std::pair<const Attr *, const Attr *> > &map, const Iter &begin1, const Iter &end1, const Iter &begin2, const Iter &end2, const SortBy &sorter)
 {
@@ -164,7 +185,7 @@ static void fill_map (std::vector<std::pair<const Attr *, const Attr *> > &map, 
     j->second = i.operator-> ();
   }
 
-  std::sort (map.begin (), map.end (), sorter);
+  sort_by<typename std::vector<std::pair<const Attr *, const Attr *> >::iterator, SortBy> () (map.begin (), map.end (), sorter);
 }
 
 template <class Obj, class Attr, class Iter, class SortBy>
@@ -350,7 +371,7 @@ std::pair<IndexedNetlistModel::pin_pair, IndexedNetlistModel::Status>
 SingleIndexedNetlistModel::pin_from_index (const circuit_pair &circuits, size_t index) const
 {
   db::Circuit::const_pin_iterator none;
-  return std::make_pair (attr_by_object_and_index (circuits, index, circuits.first->begin_pins (), circuits.first->end_pins (), none, none, m_pin_by_circuit_and_index, sort_by_expanded_name<db::Pin> ()), db::NetlistCrossReference::None);
+  return std::make_pair (attr_by_object_and_index (circuits, index, circuits.first->begin_pins (), circuits.first->end_pins (), none, none, m_pin_by_circuit_and_index, Unsorted ()), db::NetlistCrossReference::None);
 }
 
 std::pair<IndexedNetlistModel::subcircuit_pair, IndexedNetlistModel::Status>

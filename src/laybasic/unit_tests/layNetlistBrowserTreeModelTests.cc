@@ -41,6 +41,7 @@ TEST (1)
 
   EXPECT_EQ (model->hasChildren (ringoIndex), true);
   EXPECT_EQ (model->rowCount (ringoIndex), 1);
+  EXPECT_EQ (model->parent (ringoIndex).isValid (), false);
 
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoIndex), Qt::UserRole).toString ()), "INV2");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, ringoIndex), Qt::DisplayRole).toString ()), "INV2");
@@ -51,6 +52,7 @@ TEST (1)
 
   EXPECT_EQ (model->hasChildren (inv2Index), false);
   EXPECT_EQ (model->rowCount (inv2Index), 0);
+  EXPECT_EQ (model->parent (inv2Index) == ringoIndex, true);
 }
 
 TEST (2)
@@ -76,6 +78,7 @@ TEST (2)
   QModelIndex ringoIndex = model->index (1, 0, QModelIndex ());
   EXPECT_EQ (model->hasChildren (model->index (1, 0, QModelIndex ())), true);
   EXPECT_EQ (model->rowCount (model->index (1, 0, QModelIndex ())), 1);
+  EXPECT_EQ (model->parent (ringoIndex).isValid (), false);
 
   EXPECT_EQ (model->parent (model->index (0, 0, ringoIndex)).isValid (), true);
   EXPECT_EQ (model->parent (model->index (0, 0, ringoIndex)).internalId () == ringoIndex.internalId (), true);
@@ -86,6 +89,7 @@ TEST (2)
   QModelIndex inv2PairIndex = model->index (0, 0, ringoIndex);
   EXPECT_EQ (model->hasChildren (model->index (0, 0, ringoIndex)), true);
   EXPECT_EQ (model->rowCount (model->index (0, 0, ringoIndex)), 2);
+  EXPECT_EQ (model->parent (inv2PairIndex) == ringoIndex, true);
 
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairIndex), Qt::UserRole).toString ()), "INV2");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairIndex), Qt::DisplayRole).toString ()), "- ⇔ INV2");

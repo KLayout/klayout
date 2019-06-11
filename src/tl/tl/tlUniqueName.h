@@ -38,7 +38,7 @@ namespace tl
  *  the separator and an integer disambiguator.
  */
 template <class Set>
-TL_PUBLIC std::string unique_name (const std::string &org_name, const Set &present_names, const std::string &sep = "$")
+TL_PUBLIC_TEMPLATE std::string unique_name (const std::string &org_name, const Set &present_names, const std::string &sep = "$")
 {
   if (present_names.find (org_name) == present_names.end ()) {
     return org_name;

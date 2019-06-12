@@ -172,7 +172,7 @@
       <item>
        <widget class="QStackedWidget" name="central_stack">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="page">
          <layout class="QVBoxLayout">
@@ -192,7 +192,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="lay::NetlistBrowserPage" name="browser_frame">
+           <widget class="lay::NetlistBrowserPage" name="browser_page">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
               <horstretch>0</horstretch>

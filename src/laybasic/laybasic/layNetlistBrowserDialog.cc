@@ -76,7 +76,7 @@ NetlistBrowserDialog::NetlistBrowserDialog (lay::PluginRoot *root, lay::LayoutVi
 {
   Ui::NetlistBrowserDialog::setupUi (this);
 
-  browser_frame->set_plugin_root (root);
+  browser_page->set_plugin_root (root);
 
   if (view ()) {
     view ()->cellviews_changed_event.add (this, &NetlistBrowserDialog::cellviews_changed);
@@ -282,7 +282,7 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
   }
 
   //  select the net if one was found
-  browser_frame->select_net (net);
+  browser_page->select_net (net);
 }
 
 void
@@ -353,40 +353,9 @@ END_PROTECTED
 void
 NetlistBrowserDialog::export_clicked ()
 {
-BEGIN_PROTECTED
-
-#if 0 //  @@@
-  if (m_l2n_index >= int (view ()->num_rdbs ()) || m_l2n_index < 0) {
-    return;
+  if (m_l2n_index < int (view ()->num_l2ndbs ()) && m_l2n_index >= 0) {
+    browser_page->export_all ();
   }
-
-  const rdb::Database *rdb = view ()->get_rdb (m_l2n_index);
-  if (! rdb) {
-    return;
-  }
-
-  const lay::CellView &cv = view ()->cellview (m_cv_index);
-  if (! cv.is_valid ()) {
-    return;
-  }
-
-  try {
-
-    view ()->manager ()->transaction (tl::to_string (QObject::tr ("Export Net")));
-
-    // ....
-
-    view ()->manager ()->commit ();
-    view ()->update_content ();
-
-  } catch (...) {
-    view ()->manager ()->commit ();
-    view ()->update_content ();
-    throw;
-  }
-#endif
-
-END_PROTECTED
 }
 
 void
@@ -431,9 +400,9 @@ BEGIN_PROTECTED
       tl::log << tl::to_string (QObject::tr ("Loading file: ")) << l2ndb->filename ();
       tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading")));
 
-      browser_frame->set_l2ndb (0);
+      browser_page->set_l2ndb (0);
       l2ndb->load (l2ndb->filename ());
-      browser_frame->set_l2ndb (l2ndb);
+      browser_page->set_l2ndb (l2ndb);
 
     }
 
@@ -450,7 +419,7 @@ BEGIN_PROTECTED
   std::string fmts = tl::to_string (QObject::tr ("All files (*)"));
 #if 0 //  TODO: would be good to have this:
   //  collect the formats available ...
-  for (tl::Registrar<rdb::FormatDeclaration>::iterator rdr = tl::Registrar<rdb::FormatDeclaration>::begin (); rdr != tl::Registrar<rdb::FormatDeclaration>::end (); ++rdr) {
+  for (tl::Registrar<db::NetlistFormatDeclaration>::iterator rdr = tl::Registrar<db::NetlistFormatDeclaration>::begin (); rdr != tl::Registrar<db::NetlistFormatDeclaration>::end (); ++rdr) {
     fmts += ";;" + rdr->file_format ();
   }
 #else
@@ -480,7 +449,7 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
 {
   bool need_update = false;
   bool taken = true;
-  bool show_all = browser_frame->show_all ();
+  bool show_all = browser_page->show_all ();
 
   if (name == cfg_l2ndb_show_all) {
 
@@ -577,12 +546,12 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
   }
 
   if (active () && need_update) {
-    browser_frame->set_max_shape_count (m_max_shape_count);
-    browser_frame->set_window (m_window, m_window_dim);
-    browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_use_original_colors, m_auto_color_enabled ? &m_auto_colors : 0);
+    browser_page->set_max_shape_count (m_max_shape_count);
+    browser_page->set_window (m_window, m_window_dim);
+    browser_page->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_use_original_colors, m_auto_color_enabled ? &m_auto_colors : 0);
   }
 
-  browser_frame->show_all (show_all);
+  browser_page->show_all (show_all);
 
   return taken;
 }
@@ -636,7 +605,7 @@ NetlistBrowserDialog::l2ndbs_changed ()
 void
 NetlistBrowserDialog::cellview_changed (int)
 {
-  browser_frame->update_highlights ();
+  browser_page->update_highlights ();
 }
 
 void
@@ -725,13 +694,13 @@ NetlistBrowserDialog::update_content ()
   m_unload_all_action->setEnabled (l2ndb != 0);
   m_reload_action->setEnabled (l2ndb != 0);
 
-  browser_frame->enable_updates (false);  //  Avoid building the internal lists several times ...
-  browser_frame->set_l2ndb (l2ndb);
-  browser_frame->set_max_shape_count (m_max_shape_count);
-  browser_frame->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_use_original_colors, m_auto_color_enabled ? &m_auto_colors : 0);
-  browser_frame->set_window (m_window, m_window_dim);
-  browser_frame->set_view (view (), m_cv_index);
-  browser_frame->enable_updates (true);
+  browser_page->enable_updates (false);  //  Avoid building the internal lists several times ...
+  browser_page->set_l2ndb (l2ndb);
+  browser_page->set_max_shape_count (m_max_shape_count);
+  browser_page->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_use_original_colors, m_auto_color_enabled ? &m_auto_colors : 0);
+  browser_page->set_window (m_window, m_window_dim);
+  browser_page->set_view (view (), m_cv_index);
+  browser_page->enable_updates (true);
 
   if (l2ndb) {
     //  Note: it appears to be required to show the browser page after it has been configured.
@@ -769,8 +738,8 @@ NetlistBrowserDialog::deactivated ()
     lay::PluginRoot::instance ()->config_set (cfg_l2ndb_window_state, lay::save_dialog_state (this, false /*don't store the section sizes*/).c_str ());
   }
 
-  browser_frame->set_l2ndb (0);
-  browser_frame->set_view (0, 0);
+  browser_page->set_l2ndb (0);
+  browser_page->set_view (0, 0);
 }
 
 void

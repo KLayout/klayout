@@ -713,7 +713,7 @@ DeepShapeStore::issue_variants (unsigned int layout_index, const std::map<db::ce
 }
 
 const db::CellMapping &
-DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells)
+DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells, const std::set<db::cell_index_type> *included_cells)
 {
   const db::Layout *source_layout = &m_layouts [layout_index]->layout;
   if (source_layout->begin_top_down () == source_layout->end_top_cells ()) {
@@ -774,7 +774,7 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
     //  Add new cells for the variants and (possible) devices which are cells added during the device
     //  extraction process
-    cm->second.create_missing_mapping (*into_layout, into_cell, *source_layout, source_top, excluded_cells);
+    cm->second.create_missing_mapping (*into_layout, into_cell, *source_layout, source_top, excluded_cells, included_cells);
 
   }
 

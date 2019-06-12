@@ -31,6 +31,7 @@
 #include "layNetInfoDialog.h"
 #include "layNetExportDialog.h"
 #include "tlProgress.h"
+#include "tlExceptions.h"
 #include "dbLayoutToNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 #include "dbCellMapping.h"
@@ -1157,18 +1158,24 @@ NetlistBrowserPage::clear_markers ()
 void
 NetlistBrowserPage::export_selected ()
 {
+BEGIN_PROTECTED
+
   std::vector<const db::Net *> nets = selected_nets ();
   if (nets.empty ()) {
     return;
   }
 
   export_nets (&nets);
+
+END_PROTECTED
 }
 
 void
 NetlistBrowserPage::export_all ()
 {
+BEGIN_PROTECTED
   export_nets (0);
+END_PROTECTED
 }
 
 void
@@ -1198,15 +1205,16 @@ NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
 
     db::cell_index_type target_top_index = target_layout.add_cell (source_layout.cell_name (source_top.cell_index ()));
 
-    db::CellMapping cm = database->cell_mapping_into (target_layout, target_layout.cell (target_top_index));
-    std::map<unsigned int, const db::Region *> lm = database->create_layermap (target_layout, dialog->start_layer_number ());
-
-    std::set<const db::Net *> net_set;
-    if (nets) {
-      net_set.insert (nets->begin (), nets->end ());
+    db::CellMapping cm;
+    if (! nets) {
+      cm = database->cell_mapping_into (target_layout, target_layout.cell (target_top_index));
+    } else {
+      cm = database->cell_mapping_into (target_layout, target_layout.cell (target_top_index), *nets);
     }
 
-    database->build_nets (nets ? &net_set : 0, cm, target_layout, lm,
+    std::map<unsigned int, const db::Region *> lm = database->create_layermap (target_layout, dialog->start_layer_number ());
+
+    database->build_nets (nets, cm, target_layout, lm,
                           dialog->net_prefix ().empty () ? 0 : dialog->net_prefix ().c_str (),
                           dialog->net_propname (),
                           dialog->produce_circuit_cells () ? db::LayoutToNetlist::BNH_SubcircuitCells : db::LayoutToNetlist::BNH_Flatten,

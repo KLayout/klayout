@@ -81,6 +81,14 @@ static void build_all_nets (const db::LayoutToNetlist *l2n, const db::CellMappin
   l2n->build_all_nets (cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), netname_prop, hier_mode, circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
 }
 
+static void build_nets (const db::LayoutToNetlist *l2n, const std::vector<const db::Net *> &nets, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &net_cell_name_prefix, const tl::Variant &netname_prop, db::LayoutToNetlist::BuildNetHierarchyMode hier_mode, const tl::Variant &circuit_cell_name_prefix, const tl::Variant &device_cell_name_prefix)
+{
+  std::string cp = circuit_cell_name_prefix.to_string ();
+  std::string np = net_cell_name_prefix.to_string ();
+  std::string dp = device_cell_name_prefix.to_string ();
+  l2n->build_nets (&nets, cmap, target, lmap, net_cell_name_prefix.is_nil () ? 0 : np.c_str (), netname_prop, hier_mode, circuit_cell_name_prefix.is_nil () ? 0 : cp.c_str (), device_cell_name_prefix.is_nil () ? 0 : dp.c_str ());
+}
+
 static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
 {
   std::vector<std::string> ln;
@@ -331,11 +339,21 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "This method is required to derive the internal layer index - for example for\n"
     "investigating the cluster tree.\n"
   ) +
-  gsi::method ("cell_mapping_into", &db::LayoutToNetlist::cell_mapping_into, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("with_device_cells", false),
+  gsi::method ("cell_mapping_into", (db::CellMapping (db::LayoutToNetlist::*) (db::Layout &, db::Cell &, bool)) &db::LayoutToNetlist::cell_mapping_into, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("with_device_cells", false),
     "@brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.\n"
     "If 'with_device_cells' is true, cells will be produced for devices. These are cells not corresponding to circuits, so they are disabled normally.\n"
     "Use this option, if you want to access device terminal shapes per device.\n"
-    "CAUTION: this function may create new cells in 'layout'.\n"
+    "\n"
+    "CAUTION: this function may create new cells in 'layout'. Use \\const_cell_mapping_into if you want to use the target layout's hierarchy and not modify it.\n"
+  ) +
+  gsi::method ("cell_mapping_into", (db::CellMapping (db::LayoutToNetlist::*) (db::Layout &, db::Cell &, const std::vector<const db::Net *> &, bool)) &db::LayoutToNetlist::cell_mapping_into, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("nets"), gsi::arg ("with_device_cells", false),
+    "@brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.\n"
+    "This version will only create cells which are required to represent the nets from the 'nets' argument.\n"
+    "\n"
+    "If 'with_device_cells' is true, cells will be produced for devices. These are cells not corresponding to circuits, so they are disabled normally.\n"
+    "Use this option, if you want to access device terminal shapes per device.\n"
+    "\n"
+    "CAUTION: this function may create new cells in 'layout'. Use \\const_cell_mapping_into if you want to use the target layout's hierarchy and not modify it.\n"
   ) +
   gsi::method ("const_cell_mapping_into", &db::LayoutToNetlist::const_cell_mapping_into, gsi::arg ("layout"), gsi::arg ("cell"),
     "@brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.\n"
@@ -389,9 +407,10 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::LayoutToNetlist::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a full hierarchical representation of the nets\n"
     "\n"
-    "This method copies all nets into cells corresponding to the circuits. It uses the cmap\n"
-    "object to determine the target cell (create them with \"cell_mapping_into\" or \"const_cell_mapping_into\").\n"
-    "If no mapping is requested, the specific circuit it skipped.\n"
+    "This method copies all nets into cells corresponding to the circuits. It uses the 'cmap'\n"
+    "object to determine the target cell (create it with \"cell_mapping_into\" or \"const_cell_mapping_into\").\n"
+    "If no mapping is provided for a specific circuit cell, the nets are copied into the next mapped parent as "
+    "many times as the circuit cell appears there (circuit flattening).\n"
     "\n"
     "The method has three net annotation modes:\n"
     "@ul\n"
@@ -426,6 +445,9 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@param circuit_cell_name_prefix See method description\n"
     "@param net_cell_name_prefix See method description\n"
     "@param device_cell_name_prefix See above\n"
+  ) +
+  gsi::method_ext ("build_nets", &build_nets, gsi::arg ("nets"), gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::LayoutToNetlist::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
+    "@brief Like \\build_all_nets, but with the ability to select some nets."
   ) +
   gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::DPoint &)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"),
     "@brief Finds the net by probing a specific location on the given layer\n"

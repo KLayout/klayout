@@ -436,9 +436,18 @@ public:
   db::CellMapping cell_mapping_into (db::Layout &layout, db::Cell &cell, bool with_device_cells = false);
 
   /**
+   *  @brief Creates a cell mapping for copying shapes from the internal layout to the given target layout for a given list of nets
+   *  This version will only create cells which are required to represent the given nets.
+   *  If 'with_device_cells' is true, cells will be produced for devices. These are cells not corresponding to circuits, so they are disabled normally.
+   *  Use this option, if you want to access device terminal shapes per device.
+   *  CAUTION: This function may create new cells in "layout".
+   */
+  db::CellMapping cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> &nets, bool with_device_cells = false);
+
+  /**
    *  @brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.
    *  This version will not create new cells in the target layout.
-   *  If the required cells do not exist there yet, flatting will happen.
+   *  If the required cells do not exist there yet, flattening will happen.
    */
   db::CellMapping const_cell_mapping_into (const db::Layout &layout, const db::Cell &cell);
 
@@ -601,7 +610,7 @@ public:
   /**
    *  @brief Like build_all_nets, but with the ability to select some nets
    */
-  void build_nets (const std::set<const db::Net *> *nets, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const;
+  void build_nets (const std::vector<const Net *> *nets, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const;
 
   /**
    *  @brief Finds the net by probing a specific location on the given layer
@@ -730,12 +739,14 @@ private:
 
   void init ();
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
+  void build_net_rec (const db::Net &net, db::Layout &target, cell_index_type circuit_cell, const db::CellMapping &cmap, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
   void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
   void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
   db::DeepLayer deep_layer_of (const db::Region &region) const;
   void ensure_layout () const;
   std::string make_new_name (const std::string &stem = std::string ());
   db::properties_id_type make_netname_propid (db::Layout &ly, const tl::Variant &netname_prop, const db::Net &net) const;
+  db::CellMapping make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells);
 };
 
 }

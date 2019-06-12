@@ -86,7 +86,164 @@ TEST(1_ReaderBasic)
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
     au = tl::combine_path (au, "algo");
-    au = tl::combine_path (au, "l2n_reader_au.gds");
+    au = tl::combine_path (au, "l2n_reader_au_1.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+
+  {
+    db::Layout ly2;
+    ly2.dbu (l2n.internal_layout ()->dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+
+    std::vector<const db::Net *> nets;
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VDD"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, nets);
+
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "l2n_reader_au_1b.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+
+  {
+    db::Layout ly2;
+    ly2.dbu (l2n.internal_layout ()->dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+
+    std::vector<const db::Net *> nets;
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VDD"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, nets);
+
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Flatten, 0, "DEVICE_");
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "l2n_reader_au_1c.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+
+  {
+    db::Layout ly2;
+    ly2.dbu (l2n.internal_layout ()->dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+
+    std::vector<const db::Net *> nets;
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VDD"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, nets);
+
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "l2n_reader_au_1d.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+
+  {
+    db::Layout ly2;
+    ly2.dbu (l2n.internal_layout ()->dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+
+    std::vector<const db::Net *> nets;
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VDD"));
+    nets.push_back (l2n.netlist ()->circuit_by_name ("INV2")->net_by_name ("IN"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, nets);
+
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "l2n_reader_au_1e.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+
+  {
+    db::Layout ly2;
+    ly2.dbu (l2n.internal_layout ()->dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+
+    std::vector<const db::Net *> nets;
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
+    nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VDD"));
+    nets.push_back (l2n.netlist ()->circuit_by_name ("INV2")->net_by_name ("IN"));
+
+    db::CellMapping cm = l2n.const_cell_mapping_into (ly2, top2);
+
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "l2n_reader_au_1f.gds");
 
     db::compare_layouts (_this, ly2, au);
   }

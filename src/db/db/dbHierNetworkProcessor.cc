@@ -1270,6 +1270,11 @@ private:
       for (db::CellInstArray::iterator ii2 = i2.begin_touching (ib1.transformed (t2i), mp_layout); ! ii2.at_end (); ++ii2) {
 
         db::ICplxTrans tt2 = t2 * i2.complex_trans (*ii2);
+        if (i1.cell_index () == i2.cell_index () && tt1 == tt2) {
+          //  skip interactions between identical instances (duplicate instance removal)
+          continue;
+        }
+
         box_type ib2 = bb2.transformed (tt2);
 
         box_type common12 = ib1 & ib2 & common;
@@ -1653,6 +1658,8 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
       connected_clusters<T> &child_cc = clusters_per_cell (p->inst_cell_index ());
       if (child_cc.is_root (id)) {
 
+        std::set<ClusterInstance> seen;  //  to avoid duplicate connections
+
         const db::Cell &child_cell = layout.cell (p->inst_cell_index ());
         for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
 
@@ -1662,7 +1669,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
           for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
 
             ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
-            if (cell.cell_index () != pi->parent_cell_index () || ci != ci2) {
+            if ((cell.cell_index () != pi->parent_cell_index () || ci != ci2) && seen.find (ci2) == seen.end ()) {
 
               size_t id_dummy;
 
@@ -1676,6 +1683,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
               }
 
               parent_cc.add_connection (id_dummy, ci2);
+              seen.insert (ci2);
 
             }
 
@@ -1709,6 +1717,8 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
       connected_clusters<T> &child_cc = clusters_per_cell (p->inst_cell_index ());
       if (child_cc.is_root (id)) {
 
+        std::set<ClusterInstance> seen;  //  to avoid duplicate connections
+
         const db::Cell &child_cell = layout.cell (p->inst_cell_index ());
         for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
 
@@ -1717,22 +1727,27 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
           connected_clusters<T> &parent_cc = clusters_per_cell (pi->parent_cell_index ());
           for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
 
-            size_t id_dummy;
-
-            const typename db::local_cluster<T>::global_nets &gn = child_cc.cluster_by_id (id).get_global_nets ();
-            if (gn.empty ()) {
-              id_dummy = parent_cc.insert_dummy ();
-            } else {
-              local_cluster<T> *lc = parent_cc.insert ();
-              lc->set_global_nets (gn);
-              id_dummy = lc->id ();
-            }
-
             ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
-            parent_cc.add_connection (id_dummy, ci2);
+            if (seen.find (ci2) == seen.end ()) {
 
-            if (pci == pi->parent_cell_index () && ci == ci2) {
-              id_new = id_dummy;
+              size_t id_dummy;
+
+              const typename db::local_cluster<T>::global_nets &gn = child_cc.cluster_by_id (id).get_global_nets ();
+              if (gn.empty ()) {
+                id_dummy = parent_cc.insert_dummy ();
+              } else {
+                local_cluster<T> *lc = parent_cc.insert ();
+                lc->set_global_nets (gn);
+                id_dummy = lc->id ();
+              }
+
+              parent_cc.add_connection (id_dummy, ci2);
+              seen.insert (ci2);
+
+              if (pci == pi->parent_cell_index () && ci == ci2) {
+                id_new = id_dummy;
+              }
+
             }
 
           }

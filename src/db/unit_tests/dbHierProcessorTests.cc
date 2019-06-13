@@ -1095,3 +1095,27 @@ TEST(BasicHierarchyVariantsNot2)
   run_test_bool (_this, "hlp14.oas", TMNot, 101);
 }
 
+TEST(RedundantHierarchyAnd1)
+{
+  //  Redundant hierarchy, NOT
+  run_test_bool2 (_this, "hlp15.oas", TMAnd, 100);
+}
+
+TEST(RedundantHierarchyNot1)
+{
+  //  Redundant hierarchy, NOT
+  run_test_bool2 (_this, "hlp15.oas", TMNot, 101);
+}
+
+TEST(RedundantHierarchyAnd2)
+{
+  //  Redundant hierarchy, NOT
+  run_test_bool2 (_this, "hlp16.gds", TMAnd, 100);
+}
+
+TEST(RedundantHierarchyNot2)
+{
+  //  Redundant hierarchy, NOT
+  run_test_bool2 (_this, "hlp16.gds", TMNot, 101);
+}
+

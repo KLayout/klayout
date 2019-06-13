@@ -1658,7 +1658,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
       connected_clusters<T> &child_cc = clusters_per_cell (p->inst_cell_index ());
       if (child_cc.is_root (id)) {
 
-        std::set<ClusterInstance> seen;  //  to avoid duplicate connections
+        std::set<std::pair<db::cell_index_type, ClusterInstance> > seen;  //  to avoid duplicate connections
 
         const db::Cell &child_cell = layout.cell (p->inst_cell_index ());
         for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
@@ -1669,7 +1669,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
           for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
 
             ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
-            if ((cell.cell_index () != pi->parent_cell_index () || ci != ci2) && seen.find (ci2) == seen.end ()) {
+            if ((cell.cell_index () != pi->parent_cell_index () || ci != ci2) && seen.find (std::make_pair (pi->parent_cell_index (), ci2)) == seen.end ()) {
 
               size_t id_dummy;
 
@@ -1683,7 +1683,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
               }
 
               parent_cc.add_connection (id_dummy, ci2);
-              seen.insert (ci2);
+              seen.insert (std::make_pair (pi->parent_cell_index (), ci2));
 
             }
 
@@ -1717,7 +1717,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
       connected_clusters<T> &child_cc = clusters_per_cell (p->inst_cell_index ());
       if (child_cc.is_root (id)) {
 
-        std::set<ClusterInstance> seen;  //  to avoid duplicate connections
+        std::set<std::pair<db::cell_index_type, ClusterInstance> > seen;  //  to avoid duplicate connections
 
         const db::Cell &child_cell = layout.cell (p->inst_cell_index ());
         for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
@@ -1728,7 +1728,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
           for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
 
             ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
-            if (seen.find (ci2) == seen.end ()) {
+            if (seen.find (std::make_pair (pi->parent_cell_index (), ci2)) == seen.end ()) {
 
               size_t id_dummy;
 
@@ -1742,7 +1742,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
               }
 
               parent_cc.add_connection (id_dummy, ci2);
-              seen.insert (ci2);
+              seen.insert (std::make_pair (pi->parent_cell_index (), ci2));
 
               if (pci == pi->parent_cell_index () && ci == ci2) {
                 id_new = id_dummy;

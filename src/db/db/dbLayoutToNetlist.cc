@@ -700,7 +700,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
         }
       }
 
-      bool consider_cell = !deliver_shapes_of_net (hier_mode == BNH_Flatten, mp_netlist.get (), m_net_clusters, ci, cid, sof_lmap, tr, 0);
+      bool consider_cell = ! deliver_shapes_of_net (hier_mode == BNH_Flatten, mp_netlist.get (), m_net_clusters, ci, cid, sof_lmap, tr, 0);
       if (! consider_cell) {
         //  shortcut if cell is empty -> no net cell will be produced
         return;

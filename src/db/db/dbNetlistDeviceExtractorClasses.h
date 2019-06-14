@@ -142,6 +142,22 @@ private:
 };
 
 /**
+ *  @brief A device extractor for a two-terminal resistor with a bulk terminal
+ *
+ *  Extracts a resistor like NetlistDeviceExtractorResistor, but adds one more terminal
+ *  for the bulk or well the resistor is embedded in.
+ */
+class DB_PUBLIC NetlistDeviceExtractorResistorWithBulk
+  : public db::NetlistDeviceExtractorResistor
+{
+public:
+  NetlistDeviceExtractorResistorWithBulk (const std::string &name, double sheet_rho);
+
+  virtual void setup ();
+  virtual void modify_device (const db::Polygon &res, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device);
+};
+
+/**
  *  @brief A device extractor for a planar capacitor
  *
  *  This class supplies the generic extractor for a planar capacitor.
@@ -190,6 +206,73 @@ private:
   double m_area_cap;
 };
 
+/**
+ *  @brief A device extractor for a two-terminal capacitor with a bulk terminal
+ *
+ *  Extracts a resistor like NetlistDeviceExtractorCapacitor, but adds one more terminal
+ *  for the bulk or well the capacitor is embedded in.
+ */
+class DB_PUBLIC NetlistDeviceExtractorCapacitorWithBulk
+  : public db::NetlistDeviceExtractorCapacitor
+{
+public:
+  NetlistDeviceExtractorCapacitorWithBulk (const std::string &name, double cap_area);
+
+  virtual void setup ();
+  virtual void modify_device (const db::Polygon &cap, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device);
+};
+
+/**
+ *  @brief A device extractor for a bipolar transistor
+ *
+ *  This class supplies the generic extractor for a bipolar transistor device.
+ *  Extraction of vertical and lateral transistors is supported through a generic geometry model:
+ *
+ *  The basic area is the base area. A marker shape must be provided for this area.
+ *  The emitter of the transistor is defined by emitter layer shapes inside the base area.
+ *  Multiple emitter shapes can be present. In this case, multiple transistor devices sharing the
+ *  same base and collector are generated.
+ *
+ *  Finally, a collector layer can be given. If non-empty, the parts inside the base region will define
+ *  the collector terminals. If empty, the collector is formed by the substrate. In this case, the base
+ *  region will be output to the 'tC' terminal output layer. This layer then needs to be connected to a global net
+ *  to form the net connection.
+ *
+ *  The device class produced by this extractor is \\DeviceClassBipolarTransistor.
+ *  The extractor extracts the two parameters of this class: AE and PE.
+ *
+ *  The device recognition layer names are 'C' (collector), 'B' (base) and 'E' (emitter).
+ *  The terminal output layer names are 'tC' (collector), 'tB' (base) and 'tE' (emitter).
+ */
+class DB_PUBLIC NetlistDeviceExtractorBipolarTransistor
+  : public db::NetlistDeviceExtractor
+{
+public:
+  NetlistDeviceExtractorBipolarTransistor (const std::string &name);
+
+  virtual void setup ();
+  virtual db::Connectivity get_connectivity (const db::Layout &layout, const std::vector<unsigned int> &layers) const;
+  virtual void extract_devices (const std::vector<db::Region> &layer_geometry);
+
+protected:
+  /**
+   *  @brief A callback when the device is produced
+   *  This callback is provided as a debugging port
+   */
+  virtual void device_out (const db::Device * /*device*/, const db::Region & /*collector*/, const db::Region & /*base*/, const db::Polygon & /*emitter*/)
+  {
+    //  .. no specific implementation ..
+  }
+
+  /**
+   *  @brief Allow derived classes to modify the device
+   */
+  virtual void modify_device (const db::Polygon & /*emitter*/, const std::vector<db::Region> & /*layer_geometry*/, db::Device * /*device*/)
+  {
+    //  .. no specific implementation ..
+  }
+};
+
 }
 
 namespace tl
@@ -213,7 +296,25 @@ template<> struct type_traits<db::NetlistDeviceExtractorCapacitor> : public tl::
   typedef tl::false_tag has_default_constructor;
 };
 
+template<> struct type_traits<db::NetlistDeviceExtractorCapacitorWithBulk> : public tl::type_traits<void>
+{
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+};
+
 template<> struct type_traits<db::NetlistDeviceExtractorResistor> : public tl::type_traits<void>
+{
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+};
+
+template<> struct type_traits<db::NetlistDeviceExtractorResistorWithBulk> : public tl::type_traits<void>
+{
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+};
+
+template<> struct type_traits<db::NetlistDeviceExtractorBipolarTransistor> : public tl::type_traits<void>
 {
   typedef tl::false_tag has_copy_constructor;
   typedef tl::false_tag has_default_constructor;

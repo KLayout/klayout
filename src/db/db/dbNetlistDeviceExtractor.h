@@ -389,6 +389,11 @@ public:
   Device *create_device ();
 
   /**
+   *  @brief Defines a device terminal in the layout (a region)
+   */
+  void define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Region &region);
+
+  /**
    *  @brief Defines a device terminal in the layout (a polygon)
    */
   void define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Polygon &polygon);

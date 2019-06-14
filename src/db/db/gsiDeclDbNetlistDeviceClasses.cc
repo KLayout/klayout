@@ -39,10 +39,30 @@ Class<db::DeviceClassResistor> decl_dbDeviceClassResistor (decl_dbDeviceClass, "
     "@brief A constant giving the parameter ID for parameter R"
   ),
   "@brief A device class for a resistor.\n"
-  "This class can be used to describe resistors. Resistors are defined by their combination behavior and "
+  "This class describes a resistor. Resistors are defined by their combination behavior and "
   "the basic parameter 'R' which is the resistance in Ohm.\n"
   "\n"
   "A resistor has two terminals, A and B.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+Class<db::DeviceClassResistorWithBulk> decl_dbDeviceClassResistorWithBulk (decl_dbDeviceClass, "db", "DeviceClassResistorWithBulk",
+  gsi::constant ("TERMINAL_A", db::DeviceClassResistorWithBulk::terminal_id_A,
+    "@brief A constant giving the terminal ID for terminal A"
+  ) +
+  gsi::constant ("TERMINAL_B", db::DeviceClassResistorWithBulk::terminal_id_B,
+    "@brief A constant giving the terminal ID for terminal B"
+  ) +
+  gsi::constant ("TERMINAL_W", db::DeviceClassResistorWithBulk::terminal_id_W,
+    "@brief A constant giving the terminal ID for terminal W (well, bulk)"
+  ) +
+  gsi::constant ("PARAM_R", db::DeviceClassResistorWithBulk::param_id_R,
+    "@brief A constant giving the parameter ID for parameter R"
+  ),
+  "@brief A device class for a resistor with a bulk terminal (substrate, well).\n"
+  "This class is similar to \\DeviceClassResistor, but provides an additional terminal (BULK) for the "
+  "well or substrate the resistor is embedded in.\n"
   "\n"
   "This class has been introduced in version 0.26."
 );
@@ -58,10 +78,30 @@ Class<db::DeviceClassCapacitor> decl_dbDeviceClassCapacitor (decl_dbDeviceClass,
     "@brief A constant giving the parameter ID for parameter C"
   ),
   "@brief A device class for a capacitor.\n"
-  "This class can be used to describe capacitors. Capacitors are defined by their combination behavior and "
+  "This describes a capacitor. Capacitors are defined by their combination behavior and "
   "the basic parameter 'C' which is the capacitance in Farad.\n"
   "\n"
   "A capacitor has two terminals, A and B.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+Class<db::DeviceClassCapacitorWithBulk> decl_dbDeviceClassCapacitorWithBulk (decl_dbDeviceClass, "db", "DeviceClassCapacitorWithBulk",
+  gsi::constant ("TERMINAL_A", db::DeviceClassCapacitorWithBulk::terminal_id_A,
+    "@brief A constant giving the terminal ID for terminal A"
+  ) +
+  gsi::constant ("TERMINAL_B", db::DeviceClassCapacitorWithBulk::terminal_id_B,
+    "@brief A constant giving the terminal ID for terminal B"
+  ) +
+  gsi::constant ("TERMINAL_W", db::DeviceClassCapacitorWithBulk::terminal_id_W,
+    "@brief A constant giving the terminal ID for terminal W (well, bulk)"
+  ) +
+  gsi::constant ("PARAM_C", db::DeviceClassCapacitorWithBulk::param_id_C,
+    "@brief A constant giving the parameter ID for parameter C"
+  ),
+  "@brief A device class for a capacitor with a bulk terminal (substrate, well).\n"
+  "This class is similar to \\DeviceClassCapacitor, but provides an additional terminal (BULK) for the "
+  "well or substrate the capacitor is embedded in.\n"
   "\n"
   "This class has been introduced in version 0.26."
 );
@@ -77,7 +117,7 @@ Class<db::DeviceClassInductor> decl_dbDeviceClassInductor (decl_dbDeviceClass, "
     "@brief A constant giving the parameter ID for parameter L"
   ),
   "@brief A device class for an inductor.\n"
-  "This class can be used to describe inductors. Inductors are defined by their combination behavior and "
+  "This class describes an inductor. Inductors are defined by their combination behavior and "
   "the basic parameter 'L' which is the inductance in Henry.\n"
   "\n"
   "An inductor has two terminals, A and B.\n"
@@ -96,12 +136,36 @@ Class<db::DeviceClassDiode> decl_dbDeviceClassDiode (decl_dbDeviceClass, "db", "
     "@brief A constant giving the parameter ID for parameter A"
   ),
   "@brief A device class for a diode.\n"
-  "This class can be used to describe diodes. Diodes are defined by their combination behavior and "
+  "This class descibes a diode. Diodes are defined by their combination behavior and "
   "the basic parameter 'A' which is their area in square micrometers.\n"
   "\n"
   "Diodes only combine when parallel and in the same direction. In this case, their areas are added."
   "\n"
   "An inductor has two terminals, A (anode) and C (cathode).\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+Class<db::DeviceClassBipolarTransistor> decl_DeviceClassBipolarTransistor (decl_dbDeviceClass, "db", "DeviceClassBipolarTransistor",
+  gsi::constant ("TERMINAL_C", db::DeviceClassBipolarTransistor::terminal_id_C,
+    "@brief A constant giving the terminal ID for terminal C (collector)"
+  ) +
+  gsi::constant ("TERMINAL_B", db::DeviceClassBipolarTransistor::terminal_id_B,
+    "@brief A constant giving the terminal ID for terminal B (base)"
+  ) +
+  gsi::constant ("TERMINAL_E", db::DeviceClassBipolarTransistor::terminal_id_E,
+    "@brief A constant giving the terminal ID for terminal E (emitter)"
+  ) +
+  gsi::constant ("PARAM_AE", db::DeviceClassBipolarTransistor::param_id_AE,
+    "@brief A constant giving the parameter ID for parameter AE (emitter area)"
+  ) +
+  gsi::constant ("PARAM_PE", db::DeviceClassBipolarTransistor::param_id_PE,
+    "@brief A constant giving the parameter ID for parameter PE (emitter perimeter)"
+  ),
+  "@brief A device class for a bipolar transistor.\n"
+  "This class describes a bipolar transistor. Bipolar transistors have tree terminals: the collector (C), the base (B) and the emitter (E).\n"
+  "Multi-emitter transistors are resolved in individual devices. The basic parameter of a transistor is the emitter area (AE). "
+  "In addition, the emitter perimeter is extracted too (PE)."
   "\n"
   "This class has been introduced in version 0.26."
 );
@@ -135,7 +199,7 @@ Class<db::DeviceClassMOS3Transistor> decl_dbDeviceClassMOS3Transistor (decl_dbDe
     "@brief A constant giving the parameter ID for parameter PD"
   ),
   "@brief A device class for a 3-terminal MOS transistor.\n"
-  "This class can be used to describe MOS transistors without a bulk terminal. "
+  "This class describes a MOS transistor without a bulk terminal. "
   "A device class for a MOS transistor with a bulk terminal is \\DeviceClassMOS4Transistor. "
   "MOS transistors are defined by their combination behavior and the basic parameters.\n"
   "\n"
@@ -183,7 +247,7 @@ Class<db::DeviceClassMOS4Transistor> decl_dbDeviceClassMOS4Transistor (decl_dbDe
     "@brief A constant giving the parameter ID for parameter PD"
   ),
   "@brief A device class for a 4-terminal MOS transistor.\n"
-  "This class can be used to describe MOS transistors with a bulk terminal. "
+  "This class describes a MOS transistor with a bulk terminal. "
   "A device class for a MOS transistor without a bulk terminal is \\DeviceClassMOS3Transistor. "
   "MOS transistors are defined by their combination behavior and the basic parameters.\n"
   "\n"

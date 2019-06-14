@@ -521,6 +521,21 @@ Device *NetlistDeviceExtractor::create_device ()
   return device;
 }
 
+void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Region &region)
+{
+  tl_assert (mp_layout != 0);
+  tl_assert (geometry_index < m_layers.size ());
+  unsigned int layer_index = m_layers [geometry_index];
+
+  std::pair<db::Device *, geometry_per_terminal_type> &dd = m_new_devices[device->id ()];
+  dd.first = device;
+  std::vector<db::PolygonRef> &geo = dd.second[terminal_id][layer_index];
+
+  for (db::Region::const_iterator p = region.begin_merged (); !p.at_end (); ++p) {
+    geo.push_back (db::PolygonRef (*p, mp_layout->shape_repository ()));
+  }
+}
+
 void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t geometry_index, const db::Polygon &polygon)
 {
   tl_assert (mp_layout != 0);

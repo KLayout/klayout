@@ -281,6 +281,33 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
 }
 
 // ---------------------------------------------------------------------------------
+//  NetlistDeviceExtractorResistorWithBulk implementation
+
+NetlistDeviceExtractorResistorWithBulk::NetlistDeviceExtractorResistorWithBulk (const std::string &name, double sheet_rho)
+  : NetlistDeviceExtractorResistor (name, sheet_rho)
+{
+  //  .. nothing yet ..
+}
+
+void NetlistDeviceExtractorResistorWithBulk::setup ()
+{
+  define_layer ("R", "Resistor");                 // #0
+  define_layer ("C", "Contacts");                 // #1
+  define_layer ("W", "Well/Bulk");                // #2
+  define_layer ("tA", 1, "A terminal output");    // #3 -> C
+  define_layer ("tB", 1, "B terminal output");    // #4 -> C
+  define_layer ("tW", 2, "W terminal output");    // #5 -> W
+
+  register_device_class (new db::DeviceClassResistorWithBulk ());
+}
+
+void NetlistDeviceExtractorResistorWithBulk::modify_device (const db::Polygon &res, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device)
+{
+  unsigned int bulk_terminal_geometry_index = 5;
+  define_terminal (device, db::DeviceClassResistorWithBulk::terminal_id_W, bulk_terminal_geometry_index, res);
+}
+
+// ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorCapacitor implementation
 
 NetlistDeviceExtractorCapacitor::NetlistDeviceExtractorCapacitor (const std::string &name, double area_cap)
@@ -351,6 +378,128 @@ void NetlistDeviceExtractorCapacitor::extract_devices (const std::vector<db::Reg
 
     //  output the device for debugging
     device_out (device, db::Region (*p));
+
+  }
+}
+
+// ---------------------------------------------------------------------------------
+//  NetlistDeviceExtractorCapacitorWithBulk implementation
+
+NetlistDeviceExtractorCapacitorWithBulk::NetlistDeviceExtractorCapacitorWithBulk (const std::string &name, double area_cap)
+  : NetlistDeviceExtractorCapacitor (name, area_cap)
+{
+  //  .. nothing yet ..
+}
+
+void NetlistDeviceExtractorCapacitorWithBulk::setup ()
+{
+  define_layer ("P1", "Plate 1");                   // #0
+  define_layer ("P2", "Plate 2");                   // #1
+  define_layer ("W", "Well/Bulk");                  // #2
+  define_layer ("tA", 0, "A terminal output");      // #3 -> P1
+  define_layer ("tB", 1, "B terminal output");      // #4 -> P2
+  define_layer ("tW", 2, "W terminal output");      // #5 -> W
+
+  register_device_class (new db::DeviceClassCapacitorWithBulk ());
+}
+
+void NetlistDeviceExtractorCapacitorWithBulk::modify_device (const db::Polygon &cap, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device)
+{
+  unsigned int bulk_terminal_geometry_index = 5;
+  define_terminal (device, db::DeviceClassCapacitorWithBulk::terminal_id_W, bulk_terminal_geometry_index, cap);
+}
+
+// ---------------------------------------------------------------------------------
+//  NetlistDeviceExtractorBipolarTransistor implementation
+
+NetlistDeviceExtractorBipolarTransistor::NetlistDeviceExtractorBipolarTransistor (const std::string &name)
+  : db::NetlistDeviceExtractor (name)
+{
+  //  .. nothing yet ..
+}
+
+void NetlistDeviceExtractorBipolarTransistor::setup ()
+{
+  define_layer ("C", "Collector");                                      // #0
+  define_layer ("B", "Base");                                           // #1
+  define_layer ("E", "Emitter");                                        // #2
+
+  //  terminal output
+  define_layer ("tC", 0, "Collector terminal output");                  // #3 -> C
+  define_layer ("tB", 1, "Base terminal output");                       // #4 -> B
+  define_layer ("tE", 2, "Emitter terminal output");                    // #5 -> E
+
+  register_device_class (new db::DeviceClassBipolarTransistor ());
+}
+
+db::Connectivity NetlistDeviceExtractorBipolarTransistor::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
+{
+  tl_assert (layers.size () >= 3);
+
+  unsigned int collector = layers [0];
+  unsigned int base = layers [1];
+  unsigned int emitter = layers [2];
+
+  db::Connectivity conn;
+  //  collect all connected base shapes. Join polygons.
+  conn.connect (base, base);
+  //  collect all collector and emitter shapes connected with base
+  conn.connect (base, collector);
+  conn.connect (base, emitter);
+  return conn;
+}
+
+void NetlistDeviceExtractorBipolarTransistor::extract_devices (const std::vector<db::Region> &layer_geometry)
+{
+  unsigned int collector_geometry_index = 0;
+  unsigned int base_geometry_index = 1;
+  unsigned int emitter_geometry_index = 2;
+  unsigned int collector_terminal_geometry_index = 3;
+  unsigned int base_terminal_geometry_index = 4;
+  unsigned int emitter_terminal_geometry_index = 5;
+
+  const db::Region &rbases = layer_geometry [base_geometry_index];
+  const db::Region &rcollectors = layer_geometry [collector_geometry_index];
+  const db::Region &remitters = layer_geometry [emitter_geometry_index];
+
+  for (db::Region::const_iterator p = rbases.begin_merged (); !p.at_end (); ++p) {
+
+    db::Region rbase (*p);
+    rbase.set_base_verbosity (rbases.base_verbosity ());
+
+    db::Region rcollector2base = rbase & rcollectors;
+    if (rcollector2base.empty ()) {
+      rcollector2base = rbase;
+    }
+
+    db::Region remitter2base = rbase & remitters;
+
+    if (remitter2base.empty ()) {
+      error (tl::to_string (tr ("Base shape without emitters - ignored")), *p);
+    } else {
+
+      for (db::Region::const_iterator pe = remitter2base.begin_merged (); !pe.at_end (); ++pe) {
+
+        db::Device *device = create_device ();
+
+        device->set_trans (db::DCplxTrans ((pe->box ().center () - db::Point ()) * dbu ()));
+
+        device->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_AE, dbu () * dbu () * pe->area ());
+        device->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_PE, dbu () * pe->perimeter ());
+
+        define_terminal (device, db::DeviceClassBipolarTransistor::terminal_id_C, collector_terminal_geometry_index, rcollector2base);
+        define_terminal (device, db::DeviceClassBipolarTransistor::terminal_id_B, base_terminal_geometry_index, *p);
+        define_terminal (device, db::DeviceClassBipolarTransistor::terminal_id_E, emitter_terminal_geometry_index, *pe);
+
+        //  allow derived classes to modify the device
+        modify_device (*p, layer_geometry, device);
+
+        //  output the device for debugging
+        device_out (device, rcollector2base, rbase, *pe);
+
+      }
+
+    }
 
   }
 }

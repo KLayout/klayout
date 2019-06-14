@@ -145,6 +145,30 @@ void DeviceClassResistor::serial (Device *a, Device *b) const
 }
 
 // ------------------------------------------------------------------------------------
+//  DeviceClassResistorWithBulk implementation
+
+DB_PUBLIC size_t DeviceClassResistorWithBulk::terminal_id_W = 2;
+
+DeviceClassResistorWithBulk::DeviceClassResistorWithBulk ()
+  : DeviceClassResistor ()
+{
+  add_terminal_definition (db::DeviceTerminalDefinition ("W", "Terminal W (well, bulk)"));
+}
+
+bool DeviceClassResistorWithBulk::combine_devices (Device *a, Device *b) const
+{
+  db::Net *nab = a->net_for_terminal (2);
+  db::Net *nbb = b->net_for_terminal (2);
+
+  if (nab == nbb && DeviceClassResistor::combine_devices (a, b)) {
+    a->join_terminals (2, b, 2);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// ------------------------------------------------------------------------------------
 //  DeviceClassCapacitor implementation
 
 DB_PUBLIC size_t DeviceClassCapacitor::param_id_C = 0;
@@ -194,6 +218,30 @@ void DeviceClassCapacitor::parallel (Device *a, Device *b) const
   double pa = a->parameter_value (2);
   double pb = b->parameter_value (2);
   a->set_parameter_value (2, pa + pb);
+}
+
+// ------------------------------------------------------------------------------------
+//  DeviceClassCapacitorWithBulk implementation
+
+DB_PUBLIC size_t DeviceClassCapacitorWithBulk::terminal_id_W = 2;
+
+DeviceClassCapacitorWithBulk::DeviceClassCapacitorWithBulk ()
+  : DeviceClassCapacitor ()
+{
+  add_terminal_definition (db::DeviceTerminalDefinition ("W", "Terminal W (well, bulk)"));
+}
+
+bool DeviceClassCapacitorWithBulk::combine_devices (Device *a, Device *b) const
+{
+  db::Net *nab = a->net_for_terminal (2);
+  db::Net *nbb = b->net_for_terminal (2);
+
+  if (nab == nbb && DeviceClassCapacitor::combine_devices (a, b)) {
+    a->join_terminals (2, b, 2);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 // ------------------------------------------------------------------------------------
@@ -384,6 +432,57 @@ bool DeviceClassMOS4Transistor::combine_devices (Device *a, Device *b) const
   }
 
   return false;
+}
+
+// ------------------------------------------------------------------------------------
+//  DeviceClassBipolarTransistor implementation
+
+DB_PUBLIC size_t DeviceClassBipolarTransistor::param_id_AE = 0;
+DB_PUBLIC size_t DeviceClassBipolarTransistor::param_id_PE = 1;
+
+DB_PUBLIC size_t DeviceClassBipolarTransistor::terminal_id_C = 0;
+DB_PUBLIC size_t DeviceClassBipolarTransistor::terminal_id_B = 1;
+DB_PUBLIC size_t DeviceClassBipolarTransistor::terminal_id_E = 2;
+
+DeviceClassBipolarTransistor::DeviceClassBipolarTransistor ()
+{
+  add_terminal_definition (db::DeviceTerminalDefinition ("C", "Collector"));
+  add_terminal_definition (db::DeviceTerminalDefinition ("B", "Base"));
+  add_terminal_definition (db::DeviceTerminalDefinition ("E", "Emitter"));
+
+  add_parameter_definition (db::DeviceParameterDefinition ("AE", "Emitter area (square micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("PE", "Emitter perimeter (micrometer)", 0.0, false));
+}
+
+bool DeviceClassBipolarTransistor::combine_devices (Device *a, Device *b) const
+{
+  const db::Net *nac = a->net_for_terminal (0);
+  const db::Net *nab = a->net_for_terminal (1);
+  const db::Net *nae = a->net_for_terminal (2);
+  const db::Net *nbc = b->net_for_terminal (0);
+  const db::Net *nbb = b->net_for_terminal (1);
+  const db::Net *nbe = b->net_for_terminal (2);
+
+  //  parallel transistors can be combined into one
+  if (nac == nbc && nae == nbe && nab == nbb) {
+
+    combine_parameters (a, b);
+
+    a->join_terminals (0, b, 0);
+    a->join_terminals (1, b, 1);
+    a->join_terminals (2, b, 2);
+
+    return true;
+
+  }
+
+  return false;
+}
+
+void DeviceClassBipolarTransistor::combine_parameters (Device *a, Device *b) const
+{
+  a->set_parameter_value (0, a->parameter_value (0) + b->parameter_value (0));
+  a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
 }
 
 }

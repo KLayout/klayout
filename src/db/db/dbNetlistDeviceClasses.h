@@ -77,6 +77,27 @@ public:
 };
 
 /**
+ *  @brief A resistor device class with a bulk terminal (well, bulk)
+ *  In addition to DeviceClassResistor, this class defines a third terminal
+ *  ("W") for the bulk or well connection.
+ */
+class DB_PUBLIC DeviceClassResistorWithBulk
+  : public db::DeviceClassResistor
+{
+public:
+  DeviceClassResistorWithBulk ();
+
+  virtual db::DeviceClass *clone () const
+  {
+    return new DeviceClassResistorWithBulk (*this);
+  }
+
+  static size_t terminal_id_W;
+
+  virtual bool combine_devices (Device *a, Device *b) const;
+};
+
+/**
  *  @brief A basic capacitor device class
  *  A capacitor defines a single parameter, "C", which is the capacitance in Farad.
  *  It defines two terminals, "A" and "B" for the two terminals.
@@ -102,10 +123,31 @@ public:
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
 
-  virtual size_t normalize_terminal_id (size_t) const
+  virtual size_t normalize_terminal_id (size_t id) const
   {
-    return terminal_id_A;
+    return id == terminal_id_B ? terminal_id_A : id;
   }
+};
+
+/**
+ *  @brief A capacitor device class with a bulk terminal (well, bulk)
+ *  In addition to DeviceClassCapacitor, this class defines a third terminal
+ *  ("W") for the bulk or well connection.
+ */
+class DB_PUBLIC DeviceClassCapacitorWithBulk
+  : public db::DeviceClassCapacitor
+{
+public:
+  DeviceClassCapacitorWithBulk ();
+
+  virtual db::DeviceClass *clone () const
+  {
+    return new DeviceClassCapacitorWithBulk (*this);
+  }
+
+  static size_t terminal_id_W;
+
+  virtual bool combine_devices (Device *a, Device *b) const;
 };
 
 /**
@@ -132,9 +174,9 @@ public:
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
 
-  virtual size_t normalize_terminal_id (size_t) const
+  virtual size_t normalize_terminal_id (size_t id) const
   {
-    return terminal_id_A;
+    return id == terminal_id_B ? terminal_id_A : id;
   }
 };
 
@@ -228,6 +270,37 @@ public:
   }
 
   virtual bool combine_devices (Device *a, Device *b) const;
+};
+
+/**
+ *  @brief A bipolar transistor device class with three terminals
+ *  A MOSFET defines two parameters: "AE" for the emitter area in square micrometers and "PE" for the emitter perimeter
+ *  in micrometers.
+ *  The bipolar transistor defines three terminals, "C", "B" and "E" for collector, base and emitter.
+ */
+class DB_PUBLIC DeviceClassBipolarTransistor
+  : public db::DeviceClass
+{
+public:
+  DeviceClassBipolarTransistor ();
+
+  static size_t param_id_AE;
+  static size_t param_id_PE;
+
+  static size_t terminal_id_C;
+  static size_t terminal_id_B;
+  static size_t terminal_id_E;
+
+  virtual db::DeviceClass *clone () const
+  {
+    return new DeviceClassBipolarTransistor (*this);
+  }
+
+  virtual bool combine_devices (Device *a, Device *b) const;
+  virtual bool supports_parallel_combination () const { return true; }
+
+protected:
+  void combine_parameters (Device *a, Device *b) const;
 };
 
 }

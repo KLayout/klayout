@@ -134,14 +134,16 @@ Class<db::DeviceClassDiode> decl_dbDeviceClassDiode (decl_dbDeviceClass, "db", "
   ) +
   gsi::constant ("PARAM_A", db::DeviceClassDiode::param_id_A,
     "@brief A constant giving the parameter ID for parameter A"
+  ) +
+  gsi::constant ("PARAM_P", db::DeviceClassDiode::param_id_P,
+    "@brief A constant giving the parameter ID for parameter P"
   ),
   "@brief A device class for a diode.\n"
-  "This class descibes a diode. Diodes are defined by their combination behavior and "
-  "the basic parameter 'A' which is their area in square micrometers.\n"
+  "This class descibes a diode.\n"
+  "A diode has two terminals, A (anode) and C (cathode).\n"
+  "It has two parameters: The diode area in square micrometers (A) and the diode area perimeter in micrometers (P).\n"
   "\n"
-  "Diodes only combine when parallel and in the same direction. In this case, their areas are added."
-  "\n"
-  "An inductor has two terminals, A (anode) and C (cathode).\n"
+  "Diodes only combine when parallel and in the same direction. In this case, their areas and perimeters are added."
   "\n"
   "This class has been introduced in version 0.26."
 );

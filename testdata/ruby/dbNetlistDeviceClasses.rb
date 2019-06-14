@@ -181,8 +181,10 @@ END
 
     d1 = circuit.create_device(cls, "d1")
     d1.set_parameter(RBA::DeviceClassDiode::PARAM_A, 1.0)
+    d1.set_parameter(RBA::DeviceClassDiode::PARAM_P, 2.0)
     d2 = circuit.create_device(cls, "d2")
     d2.set_parameter("A", 3.0)
+    d2.set_parameter("P", 4.0)
 
     pin_a = circuit.create_pin ("A")
     pin_b = circuit.create_pin ("B")
@@ -199,8 +201,8 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2);
-  device '' d1 (A=n1,C=n2) (A=1);
-  device '' d2 (A=n1,C=n2) (A=3);
+  device '' d1 (A=n1,C=n2) (A=1,P=2);
+  device '' d2 (A=n1,C=n2) (A=3,P=4);
 end;
 END
 
@@ -209,7 +211,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2);
-  device '' d1 (A=n1,C=n2) (A=4);
+  device '' d1 (A=n1,C=n2) (A=4,P=6);
 end;
 END
 

@@ -293,10 +293,10 @@ void NetlistDeviceExtractorResistorWithBulk::setup ()
 {
   define_layer ("R", "Resistor");                 // #0
   define_layer ("C", "Contacts");                 // #1
-  define_layer ("W", "Well/Bulk");                // #2
-  define_layer ("tA", 1, "A terminal output");    // #3 -> C
-  define_layer ("tB", 1, "B terminal output");    // #4 -> C
-  define_layer ("tW", 2, "W terminal output");    // #5 -> W
+  define_layer ("tA", 1, "A terminal output");    // #2 -> C
+  define_layer ("tB", 1, "B terminal output");    // #3 -> C
+  define_layer ("W", "Well/Bulk");                // #4
+  define_layer ("tW", 4, "W terminal output");    // #5 -> W
 
   register_device_class (new db::DeviceClassResistorWithBulk ());
 }
@@ -395,10 +395,10 @@ void NetlistDeviceExtractorCapacitorWithBulk::setup ()
 {
   define_layer ("P1", "Plate 1");                   // #0
   define_layer ("P2", "Plate 2");                   // #1
-  define_layer ("W", "Well/Bulk");                  // #2
-  define_layer ("tA", 0, "A terminal output");      // #3 -> P1
-  define_layer ("tB", 1, "B terminal output");      // #4 -> P2
-  define_layer ("tW", 2, "W terminal output");      // #5 -> W
+  define_layer ("tA", 0, "A terminal output");      // #2 -> P1
+  define_layer ("tB", 1, "B terminal output");      // #3 -> P2
+  define_layer ("W", "Well/Bulk");                  // #4
+  define_layer ("tW", 4, "W terminal output");      // #5 -> W
 
   register_device_class (new db::DeviceClassCapacitorWithBulk ());
 }

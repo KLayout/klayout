@@ -521,7 +521,7 @@ Device *NetlistDeviceExtractor::create_device ()
   return device;
 }
 
-void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Region &region)
+void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t geometry_index, const db::Region &region)
 {
   tl_assert (mp_layout != 0);
   tl_assert (geometry_index < m_layers.size ());

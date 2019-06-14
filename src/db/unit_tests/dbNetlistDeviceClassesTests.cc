@@ -840,12 +840,10 @@ TEST(15_SerialDiodes)
 
   db::Device *d1 = new db::Device (diode, "d1");
   d1->set_parameter_value (db::DeviceClassDiode::param_id_A, 2.0);
-  d1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
-  d1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
+  d1->set_parameter_value (db::DeviceClassDiode::param_id_P, 5.0);
   db::Device *d2 = new db::Device (diode, "d2");
-  d2->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 3.0);
-  d2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
-  d2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
+  d2->set_parameter_value (db::DeviceClassDiode::param_id_A, 3.0);
+  d2->set_parameter_value (db::DeviceClassDiode::param_id_P, 1.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -873,8 +871,8 @@ TEST(15_SerialDiodes)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' d1 (A=n1,C=n2) (A=2);\n"
-    "  device '' d2 (A=n2,C=n3) (A=3);\n"
+    "  device '' d1 (A=n1,C=n2) (A=2,P=5);\n"
+    "  device '' d2 (A=n2,C=n3) (A=3,P=1);\n"
     "end;\n"
   );
 
@@ -885,8 +883,8 @@ TEST(15_SerialDiodes)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' d1 (A=n1,C=n2) (A=2);\n"
-    "  device '' d2 (A=n2,C=n3) (A=3);\n"
+    "  device '' d1 (A=n1,C=n2) (A=2,P=5);\n"
+    "  device '' d2 (A=n2,C=n3) (A=3,P=1);\n"
     "end;\n"
   );
 }
@@ -900,8 +898,10 @@ TEST(16_ParallelDiodes)
 
   db::Device *d1 = new db::Device (diode, "d1");
   d1->set_parameter_value (db::DeviceClassDiode::param_id_A, 1.0);
+  d1->set_parameter_value (db::DeviceClassDiode::param_id_P, 5.0);
   db::Device *d2 = new db::Device (diode, "d2");
   d2->set_parameter_value (db::DeviceClassDiode::param_id_A, 3.0);
+  d2->set_parameter_value (db::DeviceClassDiode::param_id_P, 2.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -926,8 +926,8 @@ TEST(16_ParallelDiodes)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' d1 (A=n1,C=n2) (A=1);\n"
-    "  device '' d2 (A=n1,C=n2) (A=3);\n"
+    "  device '' d1 (A=n1,C=n2) (A=1,P=5);\n"
+    "  device '' d2 (A=n1,C=n2) (A=3,P=2);\n"
     "end;\n"
   );
 
@@ -936,7 +936,7 @@ TEST(16_ParallelDiodes)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' d1 (A=n1,C=n2) (A=4);\n"
+    "  device '' d1 (A=n1,C=n2) (A=4,P=7);\n"
     "end;\n"
   );
 }
@@ -950,8 +950,10 @@ TEST(17_AntiParallelDiodes)
 
   db::Device *d1 = new db::Device (diode, "d1");
   d1->set_parameter_value (db::DeviceClassDiode::param_id_A, 1.0);
+  d1->set_parameter_value (db::DeviceClassDiode::param_id_P, 5.0);
   db::Device *d2 = new db::Device (diode, "d2");
   d2->set_parameter_value (db::DeviceClassDiode::param_id_A, 3.0);
+  d2->set_parameter_value (db::DeviceClassDiode::param_id_P, 2.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -976,8 +978,8 @@ TEST(17_AntiParallelDiodes)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' d1 (A=n1,C=n2) (A=1);\n"
-    "  device '' d2 (A=n2,C=n1) (A=3);\n"
+    "  device '' d1 (A=n1,C=n2) (A=1,P=5);\n"
+    "  device '' d2 (A=n2,C=n1) (A=3,P=2);\n"
     "end;\n"
   );
 
@@ -988,8 +990,8 @@ TEST(17_AntiParallelDiodes)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' d1 (A=n1,C=n2) (A=1);\n"
-    "  device '' d2 (A=n2,C=n1) (A=3);\n"
+    "  device '' d1 (A=n1,C=n2) (A=1,P=5);\n"
+    "  device '' d2 (A=n2,C=n1) (A=3,P=2);\n"
     "end;\n"
   );
 }
@@ -1658,6 +1660,405 @@ TEST(34_ParallelMOS4TransistorsDifferentLength)
     "circuit '' (A=n1,B=n2,C=n3,D=n0);\n"
     "  device '' d1 (S=n1,G=n3,D=n2,B=n0) (L=0.5,W=1,AS=2,AD=3,PS=12,PD=13);\n"
     "  device '' d2 (S=n1,G=n3,D=n2,B=n0) (L=0.75,W=2,AS=3,AD=4,PS=13,PD=14);\n"
+    "end;\n"
+  );
+}
+
+TEST(35_SerialCapacitorsWithBulk)
+{
+  db::DeviceClassCapacitorWithBulk *cap = new db::DeviceClassCapacitorWithBulk ();
+
+  db::Netlist nl;
+  nl.add_device_class (cap);
+
+  db::Device *c1 = new db::Device (cap, "c1");
+  c1->set_parameter_value (db::DeviceClassCapacitorWithBulk::param_id_C, 2.0);
+  c1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
+  c1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
+  db::Device *c2 = new db::Device (cap, "c2");
+  c2->set_parameter_value (db::DeviceClassCapacitorWithBulk::param_id_C, 3.0);
+  c2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
+  c2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
+
+  db::Circuit *circuit = new db::Circuit ();
+  nl.add_circuit (circuit);
+
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_bulk = circuit->add_pin ("BULK");
+
+  circuit->add_device (c1);
+  circuit->add_device (c2);
+
+  db::Net *nb = new db::Net ("nb");
+  circuit->add_net (nb);
+  circuit->connect_pin (pin_bulk.id (), nb);
+  c1->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_W, nb);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+  circuit->connect_pin (pin_a.id (), n1);
+  c1->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_A, n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+  c1->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_B, n2);
+  c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_A, n2);
+  c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_W, n2);
+
+  db::Net *n3 = new db::Net ("n3");
+  circuit->add_net (n3);
+  c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_B, n3);
+  circuit->connect_pin (pin_b.id (), n3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n3,BULK=nb);\n"
+    "  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=5,P=10);\n"
+    "  device '' c2 (A=n2,B=n3,W=n2) (C=3,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  //  no combination because bulk terminals are connected differently
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n3,BULK=nb);\n"
+    "  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=5,P=10);\n"
+    "  device '' c2 (A=n2,B=n3,W=n2) (C=3,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_W, nb);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n3,BULK=nb);\n"
+    "  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=5,P=10);\n"
+    "  device '' c2 (A=n2,B=n3,W=nb) (C=3,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n3,BULK=nb);\n"
+    "  device '' c1 (A=n1,B=n3,W=nb) (C=1.2,A=6,P=12);\n"
+    "end;\n"
+  );
+}
+
+TEST(36_ParallelCapacitorsWithBulk)
+{
+  db::DeviceClassCapacitorWithBulk *cap = new db::DeviceClassCapacitorWithBulk ();
+
+  db::Netlist nl;
+  nl.add_device_class (cap);
+
+  db::Device *c1 = new db::Device (cap, "c1");
+  c1->set_parameter_value (db::DeviceClassCapacitorWithBulk::param_id_C, 1.0);
+  c1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
+  c1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
+  db::Device *c2 = new db::Device (cap, "c2");
+  c2->set_parameter_value (db::DeviceClassCapacitorWithBulk::param_id_C, 3.0);
+  c2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
+  c2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
+
+  db::Circuit *circuit = new db::Circuit ();
+  nl.add_circuit (circuit);
+
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_bulk = circuit->add_pin ("BULK");
+
+  circuit->add_device (c1);
+  circuit->add_device (c2);
+
+  db::Net *nb = new db::Net ("nb");
+  circuit->add_net (nb);
+  circuit->connect_pin (pin_bulk.id (), nb);
+  c1->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_W, nb);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+  circuit->connect_pin (pin_a.id (), n1);
+  c1->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_A, n1);
+  c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_A, n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+  circuit->connect_pin (pin_b.id (), n2);
+  c1->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_B, n2);
+  c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_B, n2);
+  c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_W, n2);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,BULK=nb);\n"
+    "  device '' c1 (A=n1,B=n2,W=nb) (C=1,A=5,P=10);\n"
+    "  device '' c2 (A=n1,B=n2,W=n2) (C=3,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  //  devices are not combined as the bulk terminals are connected differently
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,BULK=nb);\n"
+    "  device '' c1 (A=n1,B=n2,W=nb) (C=1,A=5,P=10);\n"
+    "  device '' c2 (A=n1,B=n2,W=n2) (C=3,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  c2->connect_terminal (db::DeviceClassCapacitorWithBulk::terminal_id_W, nb);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,BULK=nb);\n"
+    "  device '' c1 (A=n1,B=n2,W=nb) (C=1,A=5,P=10);\n"
+    "  device '' c2 (A=n1,B=n2,W=nb) (C=3,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,BULK=nb);\n"
+    "  device '' c1 (A=n1,B=n2,W=nb) (C=4,A=6,P=12);\n"
+    "end;\n"
+  );
+}
+
+TEST(37_SerialResistorsWithBulk)
+{
+  db::DeviceClassResistorWithBulk *cap = new db::DeviceClassResistorWithBulk ();
+
+  db::Netlist nl;
+  nl.add_device_class (cap);
+
+  db::Device *r1 = new db::Device (cap, "r1");
+  r1->set_parameter_value (db::DeviceClassResistorWithBulk::param_id_R, 2.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
+  db::Device *r2 = new db::Device (cap, "r2");
+  r2->set_parameter_value (db::DeviceClassResistorWithBulk::param_id_R, 0.5);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
+
+  db::Circuit *circuit = new db::Circuit ();
+  nl.add_circuit (circuit);
+
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_bulk = circuit->add_pin ("BULK");
+
+  circuit->add_device (r1);
+  circuit->add_device (r2);
+
+  db::Net *nb = new db::Net ("nb");
+  circuit->add_net (nb);
+  circuit->connect_pin (pin_bulk.id (), nb);
+  r1->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_W, nb);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+  circuit->connect_pin (pin_a.id (), n1);
+  r1->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_A, n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+  r1->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_B, n2);
+  r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_A, n2);
+  r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_W, n2);
+
+  db::Net *n3 = new db::Net ("n3");
+  circuit->add_net (n3);
+  r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_B, n3);
+  circuit->connect_pin (pin_b.id (), n3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n3,BULK=nb);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  //  no combination because bulk terminals are connected differently
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n3,BULK=nb);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_W, nb);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n3,BULK=nb);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3,W=nb) (R=0.5,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n3,BULK=nb);\n"
+    "  device '' r1 (A=n1,B=n3,W=nb) (R=2.5,A=6,P=12);\n"
+    "end;\n"
+  );
+}
+
+TEST(38_ParallelResistorsWithBulk)
+{
+  db::DeviceClassResistorWithBulk *cap = new db::DeviceClassResistorWithBulk ();
+
+  db::Netlist nl;
+  nl.add_device_class (cap);
+
+  db::Device *r1 = new db::Device (cap, "r1");
+  r1->set_parameter_value (db::DeviceClassResistorWithBulk::param_id_R, 2.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
+  db::Device *r2 = new db::Device (cap, "r2");
+  r2->set_parameter_value (db::DeviceClassResistorWithBulk::param_id_R, 0.5);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
+
+  db::Circuit *circuit = new db::Circuit ();
+  nl.add_circuit (circuit);
+
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_bulk = circuit->add_pin ("BULK");
+
+  circuit->add_device (r1);
+  circuit->add_device (r2);
+
+  db::Net *nb = new db::Net ("nb");
+  circuit->add_net (nb);
+  circuit->connect_pin (pin_bulk.id (), nb);
+  r1->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_W, nb);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+  circuit->connect_pin (pin_a.id (), n1);
+  r1->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_A, n1);
+  r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_A, n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+  circuit->connect_pin (pin_b.id (), n2);
+  r1->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_B, n2);
+  r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_B, n2);
+  r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_W, n2);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,BULK=nb);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
+    "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  //  devices are not combined as the bulk terminals are connected differently
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,BULK=nb);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
+    "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  r2->connect_terminal (db::DeviceClassResistorWithBulk::terminal_id_W, nb);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,BULK=nb);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
+    "  device '' r2 (A=n1,B=n2,W=nb) (R=0.5,A=1,P=2);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,BULK=nb);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=0.4,A=6,P=12);\n"
+    "end;\n"
+  );
+}
+
+TEST(39_ParallelBipolarTransistors)
+{
+  db::DeviceClassBipolarTransistor *cls = new db::DeviceClassBipolarTransistor ();
+
+  db::Netlist nl;
+  nl.add_device_class (cls);
+
+  db::Device *d1 = new db::Device (cls, "d1");
+  d1->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_AE, 2.0);
+  d1->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_PE, 12.0);
+  db::Device *d2 = new db::Device (cls, "d2");
+  d2->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_AE, 3.0);
+  d2->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_PE, 13.0);
+
+  db::Circuit *circuit = new db::Circuit ();
+  nl.add_circuit (circuit);
+
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
+
+  circuit->add_device (d1);
+  circuit->add_device (d2);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+  circuit->connect_pin (pin_a.id (), n1);
+  d1->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_C, n1);
+  d2->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_C, n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+  circuit->connect_pin (pin_b.id (), n2);
+  d1->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_B, n2);
+  d2->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_B, n2);
+  d2->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_E, n2);
+
+  db::Net *n3 = new db::Net ("n3");
+  circuit->add_net (n3);
+  circuit->connect_pin (pin_c.id (), n3);
+  d1->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_E, n3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  //  no combination as emitters are connected differently
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13);\n"
+    "end;\n"
+  );
+
+  d2->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_E, n3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12);\n"
+    "  device '' d2 (C=n1,B=n2,E=n3) (AE=3,PE=13);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,C=n3);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=5,PE=25);\n"
     "end;\n"
   );
 }

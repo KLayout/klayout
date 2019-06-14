@@ -504,4 +504,78 @@ void NetlistDeviceExtractorBipolarTransistor::extract_devices (const std::vector
   }
 }
 
+// ---------------------------------------------------------------------------------
+//  NetlistDeviceExtractorDiode implementation
+
+NetlistDeviceExtractorDiode::NetlistDeviceExtractorDiode (const std::string &name)
+  : db::NetlistDeviceExtractor (name)
+{
+  //  .. nothing yet ..
+}
+
+void NetlistDeviceExtractorDiode::setup ()
+{
+  define_layer ("P", "P region");                   // #0
+  define_layer ("N", "N region");                   // #1
+  define_layer ("tA", 0, "A terminal output");      // #2 -> P
+  define_layer ("tC", 1, "C terminal output");      // #3 -> N
+
+  register_device_class (new db::DeviceClassDiode ());
+}
+
+db::Connectivity NetlistDeviceExtractorDiode::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
+{
+  tl_assert (layers.size () >= 2);
+
+  unsigned int pregion = layers [0];
+  unsigned int nregion = layers [1];
+
+  //  The layer definition is plate1, plate2
+  db::Connectivity conn;
+  //  collect all connected plate 1 shapes
+  conn.connect (pregion, pregion);
+  //  collect all connected plate 1 shapes
+  conn.connect (nregion, nregion);
+  //  connect the plates (NOTE that this is a logical, not a physical connection)
+  conn.connect (pregion, nregion);
+  return conn;
+}
+
+void NetlistDeviceExtractorDiode::extract_devices (const std::vector<db::Region> &layer_geometry)
+{
+  size_t pregion_geometry_index = 0;
+  size_t nregion_geometry_index = 1;
+  size_t a_terminal_geometry_index = 2;
+  size_t c_terminal_geometry_index = 3;
+
+  const db::Region &pregion = layer_geometry [pregion_geometry_index];
+  const db::Region &nregion = layer_geometry [nregion_geometry_index];
+
+  db::Region overlap (pregion);
+  overlap.set_base_verbosity (pregion.base_verbosity ());
+  overlap &= nregion;
+
+  for (db::Region::const_iterator p = overlap.begin_merged (); !p.at_end (); ++p) {
+
+    db::Device *device = create_device ();
+
+    device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
+
+    double area = p->area () * dbu () * dbu ();
+
+    device->set_parameter_value (db::DeviceClassDiode::param_id_A, area);
+    device->set_parameter_value (db::DeviceClassDiode::param_id_P, dbu () * p->perimeter ());
+
+    define_terminal (device, db::DeviceClassDiode::terminal_id_A, a_terminal_geometry_index, *p);
+    define_terminal (device, db::DeviceClassDiode::terminal_id_C, c_terminal_geometry_index, *p);
+
+    //  allow derived classes to modify the device
+    modify_device (*p, layer_geometry, device);
+
+    //  output the device for debugging
+    device_out (device, db::Region (*p));
+
+  }
+}
+
 }

@@ -622,4 +622,34 @@ Class<db::NetlistDeviceExtractorBipolarTransistor> decl_NetlistDeviceExtractorBi
   "This class has been introduced in version 0.26."
 );
 
+db::NetlistDeviceExtractorDiode *make_diode_extractor (const std::string &name)
+{
+  return new db::NetlistDeviceExtractorDiode (name);
+}
+
+Class<db::NetlistDeviceExtractorDiode> decl_NetlistDeviceExtractorDiode (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorDiode",
+  gsi::constructor ("new", &make_diode_extractor, gsi::arg ("name"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a planar diode\n"
+  "\n"
+  "This class supplies the generic extractor for a planar diode.\n"
+  "The diode is defined by two layers whose overlap area forms\n"
+  "the diode. The p-type layer forms the anode, the n-type layer\n"
+  "the cathode.\n"
+  "\n"
+  "The device class produced by this extractor is DeviceClassDiode.\n"
+  "The extractor extracts the two parameters of this class: A and P.\n"
+  "A is the area of the overlap area and P is the perimeter.\n"
+  "\n"
+  "The layers are \"P\" and \"N\" for the p and n region respectively.\n"
+  "The terminal output layers are \"tA\" and \"tC\" for anode and \n"
+  "cathode respectively.\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
 }

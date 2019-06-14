@@ -108,6 +108,10 @@ private:
  *  The device class produced by this extractor is DeviceClassResistor.
  *  The extractor extracts the three parameters of this class: R, A and P.
  *  A is the area of the wire and P is the perimeter.
+ *
+ *  The layers are R for the "wire" and "C" for the two contacts and the
+ *  end of the wire. "tA" and "tB" are the layers on which the A and B
+ *  terminals are produced.
  */
 class DB_PUBLIC NetlistDeviceExtractorResistor
   : public db::NetlistDeviceExtractor
@@ -171,7 +175,7 @@ public:
  *  The extractor extracts the three parameters of this class: C, A and P.
  *  A is the area of the overlap area and P is the perimeter.
  *
- *  The layers are P1 and P2 for the plates. A and B are layers where
+ *  The layers are P1 and P2 for the plates. tA and tB are layers where
  *  the terminals for A and B are produced respectively.
  */
 class DB_PUBLIC NetlistDeviceExtractorCapacitor
@@ -273,6 +277,51 @@ protected:
   }
 };
 
+/**
+ *  @brief A device extractor for a planar diode
+ *
+ *  This class supplies the generic extractor for a planar diode.
+ *  The diode is defined by two layers whose overlap area forms
+ *  the diode. The p-type layer forms the anode, the n-type layer
+ *  the cathode.
+ *
+ *  The device class produced by this extractor is DeviceClassDiode.
+ *  The extractor extracts the two parameters of this class: A and P.
+ *  A is the area of the overlap area and P is the perimeter.
+ *
+ *  The layers are "P" and "N" for the p and n region respectively.
+ *  The terminal output layers are "tA" and "tC" for anode and
+ *  cathode respectively.
+ */
+class DB_PUBLIC NetlistDeviceExtractorDiode
+  : public db::NetlistDeviceExtractor
+{
+public:
+  NetlistDeviceExtractorDiode (const std::string &name);
+
+  virtual void setup ();
+  virtual db::Connectivity get_connectivity (const db::Layout &layout, const std::vector<unsigned int> &layers) const;
+  virtual void extract_devices (const std::vector<db::Region> &layer_geometry);
+
+protected:
+  /**
+   *  @brief A callback when the device is produced
+   *  This callback is provided as a debugging port
+   */
+  virtual void device_out (const db::Device * /*device*/, const db::Region & /*diode_area*/)
+  {
+    //  .. no specific implementation ..
+  }
+
+  /**
+   *  @brief Allow derived classes to modify the device
+   */
+  virtual void modify_device (const db::Polygon & /*diode_area*/, const std::vector<db::Region> & /*layer_geometry*/, db::Device * /*device*/)
+  {
+    //  .. no specific implementation ..
+  }
+};
+
 }
 
 namespace tl
@@ -315,6 +364,12 @@ template<> struct type_traits<db::NetlistDeviceExtractorResistorWithBulk> : publ
 };
 
 template<> struct type_traits<db::NetlistDeviceExtractorBipolarTransistor> : public tl::type_traits<void>
+{
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+};
+
+template<> struct type_traits<db::NetlistDeviceExtractorDiode> : public tl::type_traits<void>
 {
   typedef tl::false_tag has_copy_constructor;
   typedef tl::false_tag has_default_constructor;

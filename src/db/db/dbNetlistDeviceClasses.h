@@ -193,6 +193,7 @@ public:
   DeviceClassDiode ();
 
   static size_t param_id_A;
+  static size_t param_id_P;
 
   static size_t terminal_id_A;
   static size_t terminal_id_C;

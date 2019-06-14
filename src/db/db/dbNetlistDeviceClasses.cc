@@ -278,6 +278,7 @@ void DeviceClassInductor::serial (Device *a, Device *b) const
 //  DeviceClassInductor implementation
 
 DB_PUBLIC size_t DeviceClassDiode::param_id_A = 0;
+DB_PUBLIC size_t DeviceClassDiode::param_id_P = 1;
 
 DB_PUBLIC size_t DeviceClassDiode::terminal_id_A = 0;
 DB_PUBLIC size_t DeviceClassDiode::terminal_id_C = 1;
@@ -288,6 +289,7 @@ DeviceClassDiode::DeviceClassDiode ()
   add_terminal_definition (db::DeviceTerminalDefinition ("C", "Cathode"));
 
   add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0));
 }
 
 bool DeviceClassDiode::combine_devices (Device *a, Device *b) const
@@ -301,6 +303,7 @@ bool DeviceClassDiode::combine_devices (Device *a, Device *b) const
   if (na1 == nb1 && na2 == nb2) {
 
     a->set_parameter_value (0, a->parameter_value (0) + b->parameter_value (0));
+    a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
 
     a->join_terminals (0, b, 0);
     a->join_terminals (1, b, 1);

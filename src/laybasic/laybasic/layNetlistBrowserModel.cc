@@ -1510,8 +1510,14 @@ static QIcon icon_for_pin ()
 static QIcon icon_for_device (const db::DeviceClass *dc)
 {
   QIcon icon;
-  //  TODO: diode, inductor, generic device ...
+  //  TODO: inductor, generic device ...
   if (dynamic_cast<const db::DeviceClassResistor *> (dc)) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_16.png")));
+  } else if (dynamic_cast<const db::DeviceClassInductor *> (dc)) {
+    //  fake ...
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_48.png")));
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_32.png")));
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_res_24.png")));
@@ -1521,6 +1527,16 @@ static QIcon icon_for_device (const db::DeviceClass *dc)
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_32.png")));
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_24.png")));
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_cap_16.png")));
+  } else if (dynamic_cast<const db::DeviceClassDiode *> (dc)) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_16.png")));
+  } else if (dynamic_cast<const db::DeviceClassBipolarTransistor *> (dc)) {
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_48.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_32.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_24.png")));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_16.png")));
   } else {
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_48.png")));
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_mos_32.png")));

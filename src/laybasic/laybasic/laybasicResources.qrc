@@ -36,5 +36,13 @@
         <file>images/icon_conn_light_24.png</file>
         <file>images/icon_conn_light_32.png</file>
         <file>images/icon_conn_light_48.png</file>
+        <file>images/icon_device_diode_16.png</file>
+        <file>images/icon_device_diode_24.png</file>
+        <file>images/icon_device_diode_32.png</file>
+        <file>images/icon_device_diode_48.png</file>
+        <file>images/icon_device_bjt_48.png</file>
+        <file>images/icon_device_bjt_32.png</file>
+        <file>images/icon_device_bjt_24.png</file>
+        <file>images/icon_device_bjt_16.png</file>
     </qresource>
 </RCC>

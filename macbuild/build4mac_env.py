@@ -76,9 +76,9 @@ RubyElCapitan   = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2
 
 # Bundled with Sierra (10.12)
 # [Key Type Name] = 'Sys'
-RubySierra      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin/ruby' ,
+RubySierra      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/bin/ruby' ,
                     'inc': '/System/Library/Frameworks/Ruby.framework/Headers',
-                    'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/lib/libruby.dylib'
+                    'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/lib/libruby.dylib'
                   }
 
 # Bundled with High Sierra (10.13)

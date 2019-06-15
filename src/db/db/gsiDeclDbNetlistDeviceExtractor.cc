@@ -437,26 +437,15 @@ Class<db::NetlistDeviceExtractorMOS4Transistor> decl_NetlistDeviceExtractorMOS4T
   "@brief A device extractor for a four-terminal MOS transistor\n"
   "\n"
   "This class supplies the generic extractor for a MOS device.\n"
-  "The device is defined by two basic input layers: the diffusion area\n"
-  "(source and drain) and the gate area. It requires a third layer\n"
-  "(poly) to put the gate terminals on and a forth layer to put the bulk\n"
-  "terminal an. The separation between poly\n"
-  "and allows separating the device recognition layer (gate) from the\n"
-  "conductive layer.\n"
+  "It is based on the \\DeviceExtractorMOS3Transistor class with the extension of a bulk terminal "
+  "and corresponding bulk terminal output (annotation) layer.\n"
   "\n"
-  "The bulk terminal layer can be an empty layer representing the substrate.\n"
+  "The bulk terminal layer ('tB') can be an empty layer representing the substrate.\n"
   "In this use mode the bulk terminal shapes will be produced on the 'tB' layer. This\n"
   "layer then needs to be connected to a global net to establish the net connection.\n"
   "\n"
   "The device class produced by this extractor is \\DeviceClassMOS4Transistor.\n"
-  "The extractor extracts the six parameters of this class: L, W, AS, AD, PS and PD.\n"
-  "\n"
-  "The device recognition layer names are 'SD' (source/drain), 'G' (gate) and 'W' (well, bulk).\n"
-  "The terminal output layer names are 'tS' (source), 'tG' (gate), 'tD' (drain) and 'tB' (bulk).\n"
-  "\n"
-  "The diffusion area is distributed on the number of gates connecting to\n"
-  "the particular source or drain area.\n"
-  "\n"
+  "The "
   "This class is a closed one and methods cannot be reimplemented. To reimplement "
   "specific methods, see \\DeviceExtractor.\n"
   "\n"
@@ -588,18 +577,19 @@ Class<db::NetlistDeviceExtractorCapacitorWithBulk> decl_NetlistDeviceExtractorCa
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorBJT3Transistor *make_bjt_extractor (const std::string &name)
+db::NetlistDeviceExtractorBJT3Transistor *make_bjt3_extractor (const std::string &name)
 {
   return new db::NetlistDeviceExtractorBJT3Transistor (name);
 }
 
-Class<db::NetlistDeviceExtractorBJT3Transistor> decl_NetlistDeviceExtractorBJT3Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorBJT3Transistor",
-  gsi::constructor ("new", &make_bjt_extractor, gsi::arg ("name"),
+Class<db::NetlistDeviceExtractorBJT3Transistor> decl_dbNetlistDeviceExtractorBJT3Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorBJT3Transistor",
+  gsi::constructor ("new", &make_bjt3_extractor, gsi::arg ("name"),
     "@brief Creates a new device extractor with the given name."
   ),
-  "@brief A device extractor for a bipolar transistor\n"
+  "@brief A device extractor for a bipolar transistor (BJT)\n"
   "\n"
   "This class supplies the generic extractor for a bipolar transistor device.\n"
+  "\n"
   "Extraction of vertical and lateral transistors is supported through a generic geometry model: "
   "The basic area is the base area. A marker shape must be provided for this area. "
   "The emitter of the transistor is defined by emitter layer shapes inside the base area. "
@@ -616,6 +606,33 @@ Class<db::NetlistDeviceExtractorBJT3Transistor> decl_NetlistDeviceExtractorBJT3T
   "The device recognition layer names are 'C' (collector), 'B' (base) and 'E' (emitter).\n"
   "The terminal output layer names are 'tC' (collector), 'tB' (base) and 'tE' (emitter).\n"
   "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorBJT4Transistor *make_bjt4_extractor (const std::string &name)
+{
+  return new db::NetlistDeviceExtractorBJT4Transistor (name);
+}
+
+Class<db::NetlistDeviceExtractorBJT4Transistor> decl_NetlistDeviceExtractorBJT4Transistor (decl_dbNetlistDeviceExtractorBJT3Transistor, "db", "DeviceExtractorBJT4Transistor",
+  gsi::constructor ("new", &make_bjt4_extractor, gsi::arg ("name"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a four-terminal bipolar transistor (BJT)\n"
+  "\n"
+  "This class supplies the generic extractor for a bipolar transistor device.\n"
+  "It is based on the \\DeviceExtractorBJT3Transistor class with the extension of a substrate terminal "
+  "and corresponding substrate terminal output (annotation) layer.\n"
+  "\n"
+  "The bulk terminal layer ('tS') can be an empty layer representing the wafer substrate.\n"
+  "In this use mode the substrate terminal shapes will be produced on the 'tS' layer. This\n"
+  "layer then needs to be connected to a global net to establish the net connection.\n"
+  "\n"
+  "The device class produced by this extractor is \\DeviceClassBJT4Transistor.\n"
+  "The "
   "This class is a closed one and methods cannot be reimplemented. To reimplement "
   "specific methods, see \\DeviceExtractor.\n"
   "\n"

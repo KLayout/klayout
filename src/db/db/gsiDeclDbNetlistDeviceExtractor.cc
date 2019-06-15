@@ -588,12 +588,12 @@ Class<db::NetlistDeviceExtractorCapacitorWithBulk> decl_NetlistDeviceExtractorCa
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorBipolarTransistor *make_bjt_extractor (const std::string &name)
+db::NetlistDeviceExtractorBJT3Transistor *make_bjt_extractor (const std::string &name)
 {
-  return new db::NetlistDeviceExtractorBipolarTransistor (name);
+  return new db::NetlistDeviceExtractorBJT3Transistor (name);
 }
 
-Class<db::NetlistDeviceExtractorBipolarTransistor> decl_NetlistDeviceExtractorBipolarTransistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorBipolarTransistor",
+Class<db::NetlistDeviceExtractorBJT3Transistor> decl_NetlistDeviceExtractorBJT3Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorBJT3Transistor",
   gsi::constructor ("new", &make_bjt_extractor, gsi::arg ("name"),
     "@brief Creates a new device extractor with the given name."
   ),
@@ -610,7 +610,7 @@ Class<db::NetlistDeviceExtractorBipolarTransistor> decl_NetlistDeviceExtractorBi
   "region will be output to the 'tC' terminal output layer. This layer then needs to be connected to a global net "
   "to form the net connection.\n"
   "\n"
-  "The device class produced by this extractor is \\DeviceClassBipolarTransistor.\n"
+  "The device class produced by this extractor is \\DeviceClassBJT3Transistor.\n"
   "The extractor extracts the two parameters of this class: AE and PE.\n"
   "\n"
   "The device recognition layer names are 'C' (collector), 'B' (base) and 'E' (emitter).\n"

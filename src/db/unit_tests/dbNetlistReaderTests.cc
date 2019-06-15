@@ -40,9 +40,9 @@ TEST(1_BasicReader)
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP ($1='1',$2='2',$3='4',$4='7');\n"
-    "  device RES $1 (A='6',B='1') (R=7650,A=0,P=0);\n"
-    "  device RES $2 (A='3',B='1') (R=7650,A=0,P=0);\n"
-    "  device RES $3 (A='3',B='2') (R=2670,A=0,P=0);\n"
+    "  device RES $1 (A='6',B='1') (R=7650,L=0,W=0,A=0,P=0);\n"
+    "  device RES $2 (A='3',B='1') (R=7650,L=0,W=0,A=0,P=0);\n"
+    "  device RES $3 (A='3',B='2') (R=2670,L=0,W=0,A=0,P=0);\n"
     "  device MHVPMOS $4 (S='6',G='4',D='7',B='7') (L=0.25,W=1.5,AS=0.63,AD=0.63,PS=3.84,PD=3.84);\n"
     "end;\n"
   );
@@ -177,4 +177,3 @@ TEST(5_CircuitParameters)
     "end;\n"
   );
 }
-

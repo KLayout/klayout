@@ -1532,7 +1532,7 @@ static QIcon icon_for_device (const db::DeviceClass *dc)
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_32.png")));
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_24.png")));
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_diode_16.png")));
-  } else if (dynamic_cast<const db::DeviceClassBipolarTransistor *> (dc)) {
+  } else if (dynamic_cast<const db::DeviceClassBJT3Transistor *> (dc)) {
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_48.png")));
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_32.png")));
     icon.addPixmap (QPixmap (QString::fromUtf8 (":/images/icon_device_bjt_24.png")));

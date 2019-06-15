@@ -97,6 +97,8 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
   const db::DeviceClassDiode *diode = dynamic_cast<const db::DeviceClassDiode *> (dc);
   const db::DeviceClassMOS3Transistor *mos3 = dynamic_cast<const db::DeviceClassMOS3Transistor *> (dc);
   const db::DeviceClassMOS4Transistor *mos4 = dynamic_cast<const db::DeviceClassMOS4Transistor *> (dc);
+  const db::DeviceClassBJT3Transistor *bjt3 = dynamic_cast<const db::DeviceClassBJT3Transistor *> (dc);
+  const db::DeviceClassBJT3Transistor *bjt4 = dynamic_cast<const db::DeviceClassBJT4Transistor *> (dc);
 
   std::ostringstream os;
 
@@ -130,9 +132,12 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     os << format_name (dev.expanded_name ());
     os << format_terminals (dev);
 
-    //  Use "D" + device class name for the model
-    os << " D";
+    //  Use device class name for the model
+    os << " ";
     os << format_name (dev.device_class ()->name ());
+
+    os << " A=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassDiode::param_id_A));
+    os << " P=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassDiode::param_id_P));
 
   } else if (mos3 || mos4) {
 
@@ -156,6 +161,23 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     os << " AD=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_AD));
     os << " PS=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_PS));
     os << " PD=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_PD));
+
+  } else if (bjt3 || bjt4) {
+
+    os << "Q";
+    os << format_name (dev.expanded_name ());
+    os << format_terminals (dev);
+
+    //  Use device class name for the model
+    os << " ";
+    os << format_name (dev.device_class ()->name ());
+
+    os << " AE=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_AE));
+    os << " AB=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_AB));
+    os << " AC=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_AC));
+    os << " PE=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_PE));
+    os << " PB=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_PB));
+    os << " PC=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_PC));
 
   } else {
 

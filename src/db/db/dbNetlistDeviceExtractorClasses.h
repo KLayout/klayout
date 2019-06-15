@@ -242,17 +242,17 @@ public:
  *  region will be output to the 'tC' terminal output layer. This layer then needs to be connected to a global net
  *  to form the net connection.
  *
- *  The device class produced by this extractor is \\DeviceClassBipolarTransistor.
+ *  The device class produced by this extractor is \\DeviceClassBJT3Transistor.
  *  The extractor extracts the two parameters of this class: AE and PE.
  *
  *  The device recognition layer names are 'C' (collector), 'B' (base) and 'E' (emitter).
  *  The terminal output layer names are 'tC' (collector), 'tB' (base) and 'tE' (emitter).
  */
-class DB_PUBLIC NetlistDeviceExtractorBipolarTransistor
+class DB_PUBLIC NetlistDeviceExtractorBJT3Transistor
   : public db::NetlistDeviceExtractor
 {
 public:
-  NetlistDeviceExtractorBipolarTransistor (const std::string &name);
+  NetlistDeviceExtractorBJT3Transistor (const std::string &name);
 
   virtual void setup ();
   virtual db::Connectivity get_connectivity (const db::Layout &layout, const std::vector<unsigned int> &layers) const;
@@ -275,6 +275,26 @@ protected:
   {
     //  .. no specific implementation ..
   }
+};
+
+/**
+ *  @brief A device extractor for a four-terminal BJT transistor
+ *
+ *  This class is like the BJT3Transistor extractor, but requires a forth
+ *  input layer (Substrate). This layer will be used to output the substrate terminal.
+ *
+ *  The device class produced by this extractor is DeviceClassBJT4Transistor.
+ */
+class DB_PUBLIC NetlistDeviceExtractorBJT4Transistor
+  : public NetlistDeviceExtractorBJT3Transistor
+{
+public:
+  NetlistDeviceExtractorBJT4Transistor (const std::string &name);
+
+  virtual void setup ();
+
+private:
+  virtual void modify_device (const db::Polygon &emitter, const std::vector<db::Region> &layer_geometry, db::Device *device);
 };
 
 /**
@@ -363,7 +383,7 @@ template<> struct type_traits<db::NetlistDeviceExtractorResistorWithBulk> : publ
   typedef tl::false_tag has_default_constructor;
 };
 
-template<> struct type_traits<db::NetlistDeviceExtractorBipolarTransistor> : public tl::type_traits<void>
+template<> struct type_traits<db::NetlistDeviceExtractorBJT3Transistor> : public tl::type_traits<void>
 {
   typedef tl::false_tag has_copy_constructor;
   typedef tl::false_tag has_default_constructor;

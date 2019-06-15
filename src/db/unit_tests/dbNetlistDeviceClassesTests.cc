@@ -37,10 +37,14 @@ TEST(1_SerialResistors)
 
   db::Device *r1 = new db::Device (res, "r1");
   r1->set_parameter_value (db::DeviceClassResistor::param_id_R, 1.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_L, 6.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_W, 1.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
   db::Device *r2 = new db::Device (res, "r2");
   r2->set_parameter_value (db::DeviceClassResistor::param_id_R, 3.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_L, 12.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_W, 2.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
 
@@ -70,8 +74,8 @@ TEST(1_SerialResistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -80,7 +84,7 @@ TEST(1_SerialResistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n1,B=n3) (R=4,A=6,P=12);\n"
+    "  device '' r1 (A=n1,B=n3) (R=4,L=18,W=1.5,A=6,P=12);\n"
     "end;\n"
   );
 }
@@ -94,10 +98,14 @@ TEST(2_SerialResistors1Swapped)
 
   db::Device *r1 = new db::Device (res, "r1");
   r1->set_parameter_value (db::DeviceClassResistor::param_id_R, 1.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_L, 6.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_W, 1.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
   db::Device *r2 = new db::Device (res, "r2");
   r2->set_parameter_value (db::DeviceClassResistor::param_id_R, 3.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_L, 12.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_W, 2.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
 
@@ -127,8 +135,8 @@ TEST(2_SerialResistors1Swapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,A=5,P=10);\n"
-    "  device '' r2 (A=n3,B=n2) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n3,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -137,7 +145,7 @@ TEST(2_SerialResistors1Swapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n1,B=n3) (R=4,A=6,P=12);\n"
+    "  device '' r1 (A=n1,B=n3) (R=4,L=18,W=1.5,A=6,P=12);\n"
     "end;\n"
   );
 }
@@ -151,10 +159,14 @@ TEST(3_SerialResistors1OtherSwapped)
 
   db::Device *r1 = new db::Device (res, "r1");
   r1->set_parameter_value (db::DeviceClassResistor::param_id_R, 1.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_L, 6.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_W, 1.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
   db::Device *r2 = new db::Device (res, "r2");
   r2->set_parameter_value (db::DeviceClassResistor::param_id_R, 3.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_L, 12.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_W, 2.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
 
@@ -184,8 +196,8 @@ TEST(3_SerialResistors1OtherSwapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n2,B=n1) (R=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n2,B=n1) (R=1,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -194,7 +206,7 @@ TEST(3_SerialResistors1OtherSwapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n3,B=n1) (R=4,A=6,P=12);\n"
+    "  device '' r1 (A=n3,B=n1) (R=4,L=18,W=1.5,A=6,P=12);\n"
     "end;\n"
   );
 }
@@ -208,10 +220,14 @@ TEST(4_SerialResistors2Swapped)
 
   db::Device *r1 = new db::Device (res, "r1");
   r1->set_parameter_value (db::DeviceClassResistor::param_id_R, 1.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_L, 6.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_W, 1.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
   db::Device *r2 = new db::Device (res, "r2");
   r2->set_parameter_value (db::DeviceClassResistor::param_id_R, 3.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_L, 12.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_W, 2.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
 
@@ -241,8 +257,8 @@ TEST(4_SerialResistors2Swapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n2,B=n1) (R=1,A=5,P=10);\n"
-    "  device '' r2 (A=n3,B=n2) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n2,B=n1) (R=1,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n3,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -251,7 +267,7 @@ TEST(4_SerialResistors2Swapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3);\n"
-    "  device '' r1 (A=n3,B=n1) (R=4,A=6,P=12);\n"
+    "  device '' r1 (A=n3,B=n1) (R=4,L=18,W=1.5,A=6,P=12);\n"
     "end;\n"
   );
 }
@@ -265,10 +281,14 @@ TEST(5_SerialResistorsNoCombination)
 
   db::Device *r1 = new db::Device (res, "r1");
   r1->set_parameter_value (db::DeviceClassResistor::param_id_R, 1.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_L, 6.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_W, 1.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
   db::Device *r2 = new db::Device (res, "r2");
   r2->set_parameter_value (db::DeviceClassResistor::param_id_R, 3.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_L, 12.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_W, 2.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
 
@@ -300,8 +320,8 @@ TEST(5_SerialResistorsNoCombination)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3,C=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -310,8 +330,8 @@ TEST(5_SerialResistorsNoCombination)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3,C=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 }
@@ -325,10 +345,14 @@ TEST(6_ParallelResistors)
 
   db::Device *r1 = new db::Device (res, "r1");
   r1->set_parameter_value (db::DeviceClassResistor::param_id_R, 2.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_L, 6.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_W, 1.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
   db::Device *r2 = new db::Device (res, "r2");
   r2->set_parameter_value (db::DeviceClassResistor::param_id_R, 3.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_L, 12.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_W, 2.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
 
@@ -355,8 +379,8 @@ TEST(6_ParallelResistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=2,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n1,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -365,7 +389,7 @@ TEST(6_ParallelResistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1.2,A=6,P=12);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1.2,L=9,W=3,A=6,P=12);\n"
     "end;\n"
   );
 }
@@ -379,10 +403,14 @@ TEST(7_ParallelResistors1Swapped)
 
   db::Device *r1 = new db::Device (res, "r1");
   r1->set_parameter_value (db::DeviceClassResistor::param_id_R, 2.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_L, 6.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_W, 1.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
   db::Device *r2 = new db::Device (res, "r2");
   r2->set_parameter_value (db::DeviceClassResistor::param_id_R, 3.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_L, 12.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_W, 2.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
 
@@ -409,8 +437,8 @@ TEST(7_ParallelResistors1Swapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n2,B=n1) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n2,B=n1) (R=2,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n1,B=n2) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -419,7 +447,7 @@ TEST(7_ParallelResistors1Swapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n2,B=n1) (R=1.2,A=6,P=12);\n"
+    "  device '' r1 (A=n2,B=n1) (R=1.2,L=9,W=3,A=6,P=12);\n"
     "end;\n"
   );
 }
@@ -433,10 +461,14 @@ TEST(8_ParallelResistors1OtherSwapped)
 
   db::Device *r1 = new db::Device (res, "r1");
   r1->set_parameter_value (db::DeviceClassResistor::param_id_R, 2.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_L, 6.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_W, 1.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
   db::Device *r2 = new db::Device (res, "r2");
   r2->set_parameter_value (db::DeviceClassResistor::param_id_R, 3.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_L, 12.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_W, 2.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
 
@@ -463,8 +495,8 @@ TEST(8_ParallelResistors1OtherSwapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n1) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2) (R=2,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n1) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -473,7 +505,7 @@ TEST(8_ParallelResistors1OtherSwapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1.2,A=6,P=12);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1.2,L=9,W=3,A=6,P=12);\n"
     "end;\n"
   );
 }
@@ -487,10 +519,14 @@ TEST(9_ParallelResistors2Swapped)
 
   db::Device *r1 = new db::Device (res, "r1");
   r1->set_parameter_value (db::DeviceClassResistor::param_id_R, 2.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_L, 6.0);
+  r1->set_parameter_value (db::DeviceClassResistor::param_id_W, 1.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
   r1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
   db::Device *r2 = new db::Device (res, "r2");
   r2->set_parameter_value (db::DeviceClassResistor::param_id_R, 3.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_L, 12.0);
+  r2->set_parameter_value (db::DeviceClassResistor::param_id_W, 2.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
   r2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
 
@@ -517,8 +553,8 @@ TEST(9_ParallelResistors2Swapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n2,B=n1) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n1) (R=3,A=1,P=2);\n"
+    "  device '' r1 (A=n2,B=n1) (R=2,L=6,W=1,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n1) (R=3,L=12,W=2,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -527,12 +563,12 @@ TEST(9_ParallelResistors2Swapped)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2);\n"
-    "  device '' r1 (A=n2,B=n1) (R=1.2,A=6,P=12);\n"
+    "  device '' r1 (A=n2,B=n1) (R=1.2,L=9,W=3,A=6,P=12);\n"
     "end;\n"
   );
 }
 
-TEST(10_ComplexRegistorCombination)
+TEST(10_ComplexResistorCombination)
 {
   db::DeviceClassResistor *res = new db::DeviceClassResistor ();
 
@@ -600,10 +636,10 @@ TEST(10_ComplexRegistorCombination)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n4);\n"
-    "  device '' r1 (A=n1,B=n2) (R=1,A=2,P=3);\n"
-    "  device '' r2 (A=n2,B=n3) (R=1,A=4,P=10);\n"
-    "  device '' r3 (A=n1,B=n3) (R=3,A=1,P=1);\n"
-    "  device '' r4 (A=n3,B=n4) (R=0.8,A=1,P=1);\n"
+    "  device '' r1 (A=n1,B=n2) (R=1,L=0,W=0,A=2,P=3);\n"
+    "  device '' r2 (A=n2,B=n3) (R=1,L=0,W=0,A=4,P=10);\n"
+    "  device '' r3 (A=n1,B=n3) (R=3,L=0,W=0,A=1,P=1);\n"
+    "  device '' r4 (A=n3,B=n4) (R=0.8,L=0,W=0,A=1,P=1);\n"
     "end;\n"
   );
 
@@ -612,7 +648,7 @@ TEST(10_ComplexRegistorCombination)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n4);\n"
-    "  device '' r4 (A=n1,B=n4) (R=2,A=8,P=15);\n"
+    "  device '' r4 (A=n1,B=n4) (R=2,L=0,W=0,A=8,P=15);\n"
     "end;\n"
   );
 }
@@ -729,12 +765,12 @@ TEST(13_SerialCapacitors)
 
   db::Device *c1 = new db::Device (cap, "c1");
   c1->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 2.0);
-  c1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
-  c1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_A, 5.0);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_P, 10.0);
   db::Device *c2 = new db::Device (cap, "c2");
   c2->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 3.0);
-  c2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
-  c2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_A, 1.0);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_P, 2.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -786,12 +822,12 @@ TEST(14_ParallelCapacitors)
 
   db::Device *c1 = new db::Device (cap, "c1");
   c1->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 1.0);
-  c1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
-  c1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_A, 5.0);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_P, 10.0);
   db::Device *c2 = new db::Device (cap, "c2");
   c2->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 3.0);
-  c2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
-  c2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_A, 1.0);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_P, 2.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1673,12 +1709,12 @@ TEST(35_SerialCapacitorsWithBulk)
 
   db::Device *c1 = new db::Device (cap, "c1");
   c1->set_parameter_value (db::DeviceClassCapacitorWithBulk::param_id_C, 2.0);
-  c1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
-  c1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_A, 5.0);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_P, 10.0);
   db::Device *c2 = new db::Device (cap, "c2");
   c2->set_parameter_value (db::DeviceClassCapacitorWithBulk::param_id_C, 3.0);
-  c2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
-  c2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_A, 1.0);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_P, 2.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1755,12 +1791,12 @@ TEST(36_ParallelCapacitorsWithBulk)
 
   db::Device *c1 = new db::Device (cap, "c1");
   c1->set_parameter_value (db::DeviceClassCapacitorWithBulk::param_id_C, 1.0);
-  c1->set_parameter_value (db::DeviceClassResistor::param_id_A, 5.0);
-  c1->set_parameter_value (db::DeviceClassResistor::param_id_P, 10.0);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_A, 5.0);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_P, 10.0);
   db::Device *c2 = new db::Device (cap, "c2");
   c2->set_parameter_value (db::DeviceClassCapacitorWithBulk::param_id_C, 3.0);
-  c2->set_parameter_value (db::DeviceClassResistor::param_id_A, 1.0);
-  c2->set_parameter_value (db::DeviceClassResistor::param_id_P, 2.0);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_A, 1.0);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_P, 2.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -1874,8 +1910,8 @@ TEST(37_SerialResistorsWithBulk)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -1884,8 +1920,8 @@ TEST(37_SerialResistorsWithBulk)
   //  no combination because bulk terminals are connected differently
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -1893,8 +1929,8 @@ TEST(37_SerialResistorsWithBulk)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n2,B=n3,W=nb) (R=0.5,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+    "  device '' r2 (A=n2,B=n3,W=nb) (R=0.5,L=0,W=0,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -1902,7 +1938,7 @@ TEST(37_SerialResistorsWithBulk)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n3,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n3,W=nb) (R=2.5,A=6,P=12);\n"
+    "  device '' r1 (A=n1,B=n3,W=nb) (R=2.5,L=0,W=0,A=6,P=12);\n"
     "end;\n"
   );
 }
@@ -1953,8 +1989,8 @@ TEST(38_ParallelResistorsWithBulk)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+    "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -1963,8 +1999,8 @@ TEST(38_ParallelResistorsWithBulk)
   //  devices are not combined as the bulk terminals are connected differently
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+    "  device '' r2 (A=n1,B=n2,W=n2) (R=0.5,L=0,W=0,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -1972,8 +2008,8 @@ TEST(38_ParallelResistorsWithBulk)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,A=5,P=10);\n"
-    "  device '' r2 (A=n1,B=n2,W=nb) (R=0.5,A=1,P=2);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=2,L=0,W=0,A=5,P=10);\n"
+    "  device '' r2 (A=n1,B=n2,W=nb) (R=0.5,L=0,W=0,A=1,P=2);\n"
     "end;\n"
   );
 
@@ -1981,24 +2017,32 @@ TEST(38_ParallelResistorsWithBulk)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,BULK=nb);\n"
-    "  device '' r1 (A=n1,B=n2,W=nb) (R=0.4,A=6,P=12);\n"
+    "  device '' r1 (A=n1,B=n2,W=nb) (R=0.4,L=0,W=0,A=6,P=12);\n"
     "end;\n"
   );
 }
 
-TEST(39_ParallelBipolarTransistors)
+TEST(39_ParallelBJT3Transistors)
 {
-  db::DeviceClassBipolarTransistor *cls = new db::DeviceClassBipolarTransistor ();
+  db::DeviceClassBJT3Transistor *cls = new db::DeviceClassBJT3Transistor ();
 
   db::Netlist nl;
   nl.add_device_class (cls);
 
   db::Device *d1 = new db::Device (cls, "d1");
-  d1->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_AE, 2.0);
-  d1->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_PE, 12.0);
+  d1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AE, 2.0);
+  d1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PE, 12.0);
+  d1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AB, 3.0);
+  d1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PB, 13.0);
+  d1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AC, 4.0);
+  d1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PC, 14.0);
   db::Device *d2 = new db::Device (cls, "d2");
-  d2->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_AE, 3.0);
-  d2->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_PE, 13.0);
+  d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AE, 3.0);
+  d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PE, 13.0);
+  d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AB, 4.0);
+  d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PB, 14.0);
+  d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AC, 5.0);
+  d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PC, 15.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -2013,25 +2057,25 @@ TEST(39_ParallelBipolarTransistors)
   db::Net *n1 = new db::Net ("n1");
   circuit->add_net (n1);
   circuit->connect_pin (pin_a.id (), n1);
-  d1->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_C, n1);
-  d2->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_C, n1);
+  d1->connect_terminal (db::DeviceClassBJT3Transistor::terminal_id_C, n1);
+  d2->connect_terminal (db::DeviceClassBJT3Transistor::terminal_id_C, n1);
 
   db::Net *n2 = new db::Net ("n2");
   circuit->add_net (n2);
   circuit->connect_pin (pin_b.id (), n2);
-  d1->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_B, n2);
-  d2->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_B, n2);
-  d2->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_E, n2);
+  d1->connect_terminal (db::DeviceClassBJT3Transistor::terminal_id_B, n2);
+  d2->connect_terminal (db::DeviceClassBJT3Transistor::terminal_id_B, n2);
+  d2->connect_terminal (db::DeviceClassBJT3Transistor::terminal_id_E, n2);
 
   db::Net *n3 = new db::Net ("n3");
   circuit->add_net (n3);
   circuit->connect_pin (pin_c.id (), n3);
-  d1->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_E, n3);
+  d1->connect_terminal (db::DeviceClassBJT3Transistor::terminal_id_E, n3);
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
     "end;\n"
   );
 
@@ -2040,17 +2084,17 @@ TEST(39_ParallelBipolarTransistors)
   //  no combination as emitters are connected differently
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
     "end;\n"
   );
 
-  d2->connect_terminal (db::DeviceClassBipolarTransistor::terminal_id_E, n3);
+  d2->connect_terminal (db::DeviceClassBJT3Transistor::terminal_id_E, n3);
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12);\n"
-    "  device '' d2 (C=n1,B=n2,E=n3) (AE=3,PE=13);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
+    "  device '' d2 (C=n1,B=n2,E=n3) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
     "end;\n"
   );
 
@@ -2058,7 +2102,7 @@ TEST(39_ParallelBipolarTransistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=5,PE=25);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=5,PE=25,AB=7,PB=27,AC=9,PC=29);\n"
     "end;\n"
   );
 }

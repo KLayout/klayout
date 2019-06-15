@@ -1355,7 +1355,7 @@ TEST(5_ResAndCapWithBulkExtraction)
   db::compare_layouts (_this, ly, au);
 }
 
-TEST(6_BipolarTransistorExtraction)
+TEST(6_BJT3TransistorExtraction)
 {
   db::Layout ly;
   db::LayerMap lmap;
@@ -1454,7 +1454,7 @@ TEST(6_BipolarTransistorExtraction)
 
   db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
   db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
-  db::NetlistDeviceExtractorBipolarTransistor bjt_ex ("PNP");
+  db::NetlistDeviceExtractorBJT3Transistor bjt_ex ("PNP");
 
   db::NetlistDeviceExtractor::input_layers dl;
 

@@ -96,8 +96,10 @@ bool DeviceClassTwoTerminalDevice::combine_devices (Device *a, Device *b) const
 //  DeviceClassResistor implementation
 
 DB_PUBLIC size_t DeviceClassResistor::param_id_R = 0;
-DB_PUBLIC size_t DeviceClassResistor::param_id_A = 1;
-DB_PUBLIC size_t DeviceClassResistor::param_id_P = 2;
+DB_PUBLIC size_t DeviceClassResistor::param_id_L = 1;
+DB_PUBLIC size_t DeviceClassResistor::param_id_W = 2;
+DB_PUBLIC size_t DeviceClassResistor::param_id_A = 3;
+DB_PUBLIC size_t DeviceClassResistor::param_id_P = 4;
 
 DB_PUBLIC size_t DeviceClassResistor::terminal_id_A = 0;
 DB_PUBLIC size_t DeviceClassResistor::terminal_id_B = 1;
@@ -108,6 +110,8 @@ DeviceClassResistor::DeviceClassResistor ()
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Terminal B"));
 
   add_parameter_definition (db::DeviceParameterDefinition ("R", "Resistance (Ohm)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("L", "Length (micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("W", "Width (micrometer)", 0.0, false));
   add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false));
   add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false));
 }
@@ -118,15 +122,31 @@ void DeviceClassResistor::parallel (Device *a, Device *b) const
   double vb = b->parameter_value (0);
   a->set_parameter_value (0, va + vb < 1e-10 ? 0.0 : va * vb / (va + vb));
 
-  //  TODO: does this implementation make sense?
-  double aa = a->parameter_value (1);
-  double ab = b->parameter_value (1);
-  a->set_parameter_value (1, aa + ab);
+  //  parallel width is sum of both, length is the one that gives the same value of resistance
+  //    R = 1/(1/R1 + 1/R2)
+  //    R = L/(W1+W2)
+  //    R1 = L1/W1
+  //    R2 = L2/W2
+  //  -> L = (L1*L2*(W1+W2))/(L2*W1+L1*W2))
+  double l1 = a->parameter_value (1);
+  double w1 = a->parameter_value (2);
+  double l2 = b->parameter_value (1);
+  double w2 = b->parameter_value (2);
+  double dnom = (l2 * w1 + l1 * w2);
+  if (fabs (dnom) > 1e-15) {
+    a->set_parameter_value (1, (l1 * l2 * (w1 + w2)) / dnom);
+  }
+  a->set_parameter_value (2, w1 + w2);
 
-  //  TODO: does this implementation make sense?
-  double pa = a->parameter_value (2);
-  double pb = b->parameter_value (2);
-  a->set_parameter_value (2, pa + pb);
+  //  TODO: does this implementation make sense? (area)
+  double aa = a->parameter_value (3);
+  double ab = b->parameter_value (3);
+  a->set_parameter_value (3, aa + ab);
+
+  //  TODO: does this implementation make sense? (perimeter)
+  double pa = a->parameter_value (4);
+  double pb = b->parameter_value (4);
+  a->set_parameter_value (4, pa + pb);
 }
 
 void DeviceClassResistor::serial (Device *a, Device *b) const
@@ -135,13 +155,30 @@ void DeviceClassResistor::serial (Device *a, Device *b) const
   double vb = b->parameter_value (0);
   a->set_parameter_value (0, va + vb);
 
-  double aa = a->parameter_value (1);
-  double ab = b->parameter_value (1);
-  a->set_parameter_value (1, aa + ab);
+  //  parallel length is sum of both, width is the one that gives the same value of resistance
+  //  assuming same sheet rho
+  //    R = R1+R2
+  //    R = (L1+L2)/W
+  //    R1 = L1/W1
+  //    R2 = L2/W2
+  //  -> W = ((L1+L2)*W1*W2)/(W1*L2+W2*L1)
+  double l1 = a->parameter_value (1);
+  double w1 = a->parameter_value (2);
+  double l2 = b->parameter_value (1);
+  double w2 = b->parameter_value (2);
+  a->set_parameter_value (1, l1 + l2);
+  double dnom = (l2 * w1 + l1 * w2);
+  if (fabs (dnom) > 1e-15) {
+    a->set_parameter_value (2, (w1 * w2 * (l1 + l2)) / dnom);
+  }
 
-  double pa = a->parameter_value (2);
-  double pb = b->parameter_value (2);
-  a->set_parameter_value (2, pa + pb);
+  double aa = a->parameter_value (3);
+  double ab = b->parameter_value (3);
+  a->set_parameter_value (3, aa + ab);
+
+  double pa = a->parameter_value (4);
+  double pb = b->parameter_value (4);
+  a->set_parameter_value (4, pa + pb);
 }
 
 // ------------------------------------------------------------------------------------
@@ -288,8 +325,8 @@ DeviceClassDiode::DeviceClassDiode ()
   add_terminal_definition (db::DeviceTerminalDefinition ("A", "Anode"));
   add_terminal_definition (db::DeviceTerminalDefinition ("C", "Cathode"));
 
-  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false));
 }
 
 bool DeviceClassDiode::combine_devices (Device *a, Device *b) const
@@ -438,16 +475,20 @@ bool DeviceClassMOS4Transistor::combine_devices (Device *a, Device *b) const
 }
 
 // ------------------------------------------------------------------------------------
-//  DeviceClassBipolarTransistor implementation
+//  DeviceClassBJT3Transistor implementation
 
-DB_PUBLIC size_t DeviceClassBipolarTransistor::param_id_AE = 0;
-DB_PUBLIC size_t DeviceClassBipolarTransistor::param_id_PE = 1;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_AE = 0;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_PE = 1;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_AB = 2;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_PB = 3;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_AC = 4;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_PC = 5;
 
-DB_PUBLIC size_t DeviceClassBipolarTransistor::terminal_id_C = 0;
-DB_PUBLIC size_t DeviceClassBipolarTransistor::terminal_id_B = 1;
-DB_PUBLIC size_t DeviceClassBipolarTransistor::terminal_id_E = 2;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::terminal_id_C = 0;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::terminal_id_B = 1;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::terminal_id_E = 2;
 
-DeviceClassBipolarTransistor::DeviceClassBipolarTransistor ()
+DeviceClassBJT3Transistor::DeviceClassBJT3Transistor ()
 {
   add_terminal_definition (db::DeviceTerminalDefinition ("C", "Collector"));
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Base"));
@@ -455,9 +496,13 @@ DeviceClassBipolarTransistor::DeviceClassBipolarTransistor ()
 
   add_parameter_definition (db::DeviceParameterDefinition ("AE", "Emitter area (square micrometer)", 0.0, false));
   add_parameter_definition (db::DeviceParameterDefinition ("PE", "Emitter perimeter (micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("AB", "Base area (square micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("PB", "Base perimeter (micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("AC", "Collector area (square micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("PC", "Collector perimeter (micrometer)", 0.0, false));
 }
 
-bool DeviceClassBipolarTransistor::combine_devices (Device *a, Device *b) const
+bool DeviceClassBJT3Transistor::combine_devices (Device *a, Device *b) const
 {
   const db::Net *nac = a->net_for_terminal (0);
   const db::Net *nab = a->net_for_terminal (1);
@@ -482,10 +527,34 @@ bool DeviceClassBipolarTransistor::combine_devices (Device *a, Device *b) const
   return false;
 }
 
-void DeviceClassBipolarTransistor::combine_parameters (Device *a, Device *b) const
+void DeviceClassBJT3Transistor::combine_parameters (Device *a, Device *b) const
 {
-  a->set_parameter_value (0, a->parameter_value (0) + b->parameter_value (0));
-  a->set_parameter_value (1, a->parameter_value (1) + b->parameter_value (1));
+  for (size_t i = 0; i < 6; ++i) {
+    a->set_parameter_value (i, a->parameter_value (i) + b->parameter_value (i));
+  }
+}
+
+// ------------------------------------------------------------------------------------
+//  DeviceClassBJT4Transistor implementation
+
+DB_PUBLIC size_t DeviceClassBJT4Transistor::terminal_id_S = 3;
+
+DeviceClassBJT4Transistor::DeviceClassBJT4Transistor ()
+{
+  add_terminal_definition (db::DeviceTerminalDefinition ("S", "Substrate"));
+}
+
+bool DeviceClassBJT4Transistor::combine_devices (Device *a, Device *b) const
+{
+  const db::Net *nas = a->net_for_terminal (3);
+  const db::Net *nbs = b->net_for_terminal (3);
+
+  //  combination is possible only if the substrate nets are the same
+  if (nas == nbs) {
+    return combine_devices (a, b);
+  } else {
+    return false;
+  }
 }
 
 }

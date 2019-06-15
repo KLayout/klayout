@@ -61,6 +61,8 @@ public:
   }
 
   static size_t param_id_R;
+  static size_t param_id_L;
+  static size_t param_id_W;
   static size_t param_id_A;
   static size_t param_id_P;
 
@@ -279,14 +281,18 @@ public:
  *  in micrometers.
  *  The bipolar transistor defines three terminals, "C", "B" and "E" for collector, base and emitter.
  */
-class DB_PUBLIC DeviceClassBipolarTransistor
+class DB_PUBLIC DeviceClassBJT3Transistor
   : public db::DeviceClass
 {
 public:
-  DeviceClassBipolarTransistor ();
+  DeviceClassBJT3Transistor ();
 
   static size_t param_id_AE;
   static size_t param_id_PE;
+  static size_t param_id_AB;
+  static size_t param_id_PB;
+  static size_t param_id_AC;
+  static size_t param_id_PC;
 
   static size_t terminal_id_C;
   static size_t terminal_id_B;
@@ -294,7 +300,7 @@ public:
 
   virtual db::DeviceClass *clone () const
   {
-    return new DeviceClassBipolarTransistor (*this);
+    return new DeviceClassBJT3Transistor (*this);
   }
 
   virtual bool combine_devices (Device *a, Device *b) const;
@@ -302,6 +308,27 @@ public:
 
 protected:
   void combine_parameters (Device *a, Device *b) const;
+};
+
+/**
+ *  @brief A basic bipolar transistor class with four terminals
+ *  The four-terminal BJT behaves identical to the three-terminal one but adds one more
+ *  terminal for the substrate.
+ */
+class DB_PUBLIC DeviceClassBJT4Transistor
+  : public DeviceClassBJT3Transistor
+{
+public:
+  DeviceClassBJT4Transistor ();
+
+  static size_t terminal_id_S;
+
+  virtual db::DeviceClass *clone () const
+  {
+    return new DeviceClassBJT4Transistor (*this);
+  }
+
+  virtual bool combine_devices (Device *a, Device *b) const;
 };
 
 }

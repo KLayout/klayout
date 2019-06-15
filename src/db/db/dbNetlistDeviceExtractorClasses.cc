@@ -262,6 +262,8 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     }
 
     device->set_parameter_value (db::DeviceClassResistor::param_id_R, m_sheet_rho * double (length) / double (width));
+    device->set_parameter_value (db::DeviceClassResistor::param_id_L, dbu () * length);
+    device->set_parameter_value (db::DeviceClassResistor::param_id_W, dbu () * width);
     device->set_parameter_value (db::DeviceClassResistor::param_id_A, dbu () * dbu () * p->area ());
     device->set_parameter_value (db::DeviceClassResistor::param_id_P, dbu () * p->perimeter ());
 
@@ -410,15 +412,15 @@ void NetlistDeviceExtractorCapacitorWithBulk::modify_device (const db::Polygon &
 }
 
 // ---------------------------------------------------------------------------------
-//  NetlistDeviceExtractorBipolarTransistor implementation
+//  NetlistDeviceExtractorBJT3Transistor implementation
 
-NetlistDeviceExtractorBipolarTransistor::NetlistDeviceExtractorBipolarTransistor (const std::string &name)
+NetlistDeviceExtractorBJT3Transistor::NetlistDeviceExtractorBJT3Transistor (const std::string &name)
   : db::NetlistDeviceExtractor (name)
 {
   //  .. nothing yet ..
 }
 
-void NetlistDeviceExtractorBipolarTransistor::setup ()
+void NetlistDeviceExtractorBJT3Transistor::setup ()
 {
   define_layer ("C", "Collector");                                      // #0
   define_layer ("B", "Base");                                           // #1
@@ -429,10 +431,10 @@ void NetlistDeviceExtractorBipolarTransistor::setup ()
   define_layer ("tB", 1, "Base terminal output");                       // #4 -> B
   define_layer ("tE", 2, "Emitter terminal output");                    // #5 -> E
 
-  register_device_class (new db::DeviceClassBipolarTransistor ());
+  register_device_class (new db::DeviceClassBJT3Transistor ());
 }
 
-db::Connectivity NetlistDeviceExtractorBipolarTransistor::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
+db::Connectivity NetlistDeviceExtractorBJT3Transistor::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
 {
   tl_assert (layers.size () >= 3);
 
@@ -449,7 +451,7 @@ db::Connectivity NetlistDeviceExtractorBipolarTransistor::get_connectivity (cons
   return conn;
 }
 
-void NetlistDeviceExtractorBipolarTransistor::extract_devices (const std::vector<db::Region> &layer_geometry)
+void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db::Region> &layer_geometry)
 {
   unsigned int collector_geometry_index = 0;
   unsigned int base_geometry_index = 1;
@@ -478,18 +480,30 @@ void NetlistDeviceExtractorBipolarTransistor::extract_devices (const std::vector
       error (tl::to_string (tr ("Base shape without emitters - ignored")), *p);
     } else {
 
+      double ab = dbu () * dbu () * p->area ();
+      double pb = dbu () * p->perimeter ();
+
+      double ac = dbu () * dbu () * rcollector2base.area ();
+      double pc = dbu () * rcollector2base.perimeter ();
+
       for (db::Region::const_iterator pe = remitter2base.begin_merged (); !pe.at_end (); ++pe) {
 
         db::Device *device = create_device ();
 
         device->set_trans (db::DCplxTrans ((pe->box ().center () - db::Point ()) * dbu ()));
 
-        device->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_AE, dbu () * dbu () * pe->area ());
-        device->set_parameter_value (db::DeviceClassBipolarTransistor::param_id_PE, dbu () * pe->perimeter ());
+        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AE, dbu () * dbu () * pe->area ());
+        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PE, dbu () * pe->perimeter ());
 
-        define_terminal (device, db::DeviceClassBipolarTransistor::terminal_id_C, collector_terminal_geometry_index, rcollector2base);
-        define_terminal (device, db::DeviceClassBipolarTransistor::terminal_id_B, base_terminal_geometry_index, *p);
-        define_terminal (device, db::DeviceClassBipolarTransistor::terminal_id_E, emitter_terminal_geometry_index, *pe);
+        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AB, ab);
+        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PB, pb);
+
+        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AC, ac);
+        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PC, pc);
+
+        define_terminal (device, db::DeviceClassBJT3Transistor::terminal_id_C, collector_terminal_geometry_index, rcollector2base);
+        define_terminal (device, db::DeviceClassBJT3Transistor::terminal_id_B, base_terminal_geometry_index, *p);
+        define_terminal (device, db::DeviceClassBJT3Transistor::terminal_id_E, emitter_terminal_geometry_index, *pe);
 
         //  allow derived classes to modify the device
         modify_device (*p, layer_geometry, device);
@@ -502,6 +516,40 @@ void NetlistDeviceExtractorBipolarTransistor::extract_devices (const std::vector
     }
 
   }
+}
+
+// ---------------------------------------------------------------------------------
+//  NetlistDeviceExtractorBJT4Transistor implementation
+
+NetlistDeviceExtractorBJT4Transistor::NetlistDeviceExtractorBJT4Transistor (const std::string &name)
+  : NetlistDeviceExtractorBJT3Transistor (name)
+{
+  //  .. nothing yet ..
+}
+
+void NetlistDeviceExtractorBJT4Transistor::setup ()
+{
+  define_layer ("C", "Collector");                                      // #0
+  define_layer ("B", "Base");                                           // #1
+  define_layer ("E", "Emitter");                                        // #2
+
+  //  terminal output
+  define_layer ("tC", 0, "Collector terminal output");                  // #3 -> C
+  define_layer ("tB", 1, "Base terminal output");                       // #4 -> B
+  define_layer ("tE", 2, "Emitter terminal output");                    // #5 -> E
+
+  //  for convenience and consistency with MOS4
+  define_layer ("S", "Substrate (bulk) terminal output");               // #6
+
+  define_layer ("tS", 6, "Substrate (bulk) terminal output");           // #7 -> S
+
+  register_device_class (new db::DeviceClassBJT4Transistor ());
+}
+
+void NetlistDeviceExtractorBJT4Transistor::modify_device (const db::Polygon &emitter, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device)
+{
+  unsigned int substrate_terminal_geometry_index = 7;
+  define_terminal (device, db::DeviceClassBJT4Transistor::terminal_id_S, substrate_terminal_geometry_index, emitter);
 }
 
 // ---------------------------------------------------------------------------------

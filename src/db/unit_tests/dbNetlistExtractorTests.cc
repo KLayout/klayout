@@ -1597,3 +1597,134 @@ TEST(6_BipolarTransistorExtraction)
   db::compare_layouts (_this, ly, au);
 }
 
+TEST(7_DiodeExtraction)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int nwell      = define_layer (ly, lmap, 1);
+  unsigned int active     = define_layer (ly, lmap, 2);
+  unsigned int diff_cont  = define_layer (ly, lmap, 4);
+  unsigned int metal1     = define_layer (ly, lmap, 6);
+  unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
+  unsigned int pplus      = define_layer (ly, lmap, 9);
+  unsigned int nplus      = define_layer (ly, lmap, 10);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "diode_devices_test.oas");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region rnwell (db::RecursiveShapeIterator (ly, tc, nwell), dss);
+  db::Region ractive (db::RecursiveShapeIterator (ly, tc, active), dss);
+  db::Region rdiff_cont (db::RecursiveShapeIterator (ly, tc, diff_cont), dss);
+  db::Region rmetal1 (db::RecursiveShapeIterator (ly, tc, metal1), dss);
+  db::Region rmetal1_lbl (db::RecursiveShapeIterator (ly, tc, metal1_lbl), dss);
+  db::Region rpplus (db::RecursiveShapeIterator (ly, tc, pplus), dss);
+  db::Region rnplus (db::RecursiveShapeIterator (ly, tc, nplus), dss);
+
+  //  derived regions
+
+  db::Region rn = ractive & rnwell;
+  db::Region rntie     = rnwell & rnplus;
+
+  //  return the computed layers into the original layout and write it for debugging purposes
+
+  unsigned int ln    = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> N layer
+  unsigned int lntie = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> N contact
+  rn.insert_into (&ly, tc.cell_index (), ln);
+  rntie.insert_into (&ly, tc.cell_index (), lntie);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::PolygonRef> cl;
+
+  db::NetlistDeviceExtractorDiode diode_ex ("DIODE");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["N"] = &rn;
+  dl["P"] = &rpplus;
+  dl["tC"] = &rnwell;
+  diode_ex.extract (dss, 0, dl, nl, cl);
+
+
+  //  perform the net extraction
+
+  db::NetlistExtractor net_ex;
+
+  db::Connectivity conn;
+  //  Intra-layer
+  conn.connect (rnwell);
+  conn.connect (rntie);
+  conn.connect (rpplus);
+  conn.connect (rdiff_cont);
+  conn.connect (rmetal1);
+  //  Inter-layer
+  conn.connect (rntie,      rnwell);
+  conn.connect (rntie,      rdiff_cont);
+  conn.connect (rpplus,     rdiff_cont);
+  conn.connect (rdiff_cont, rmetal1);
+  conn.connect (rmetal1,    rmetal1_lbl);   //  attaches labels
+
+  //  extract the nets
+
+  net_ex.extract_nets (dss, 0, conn, nl, cl, "*");
+
+  //  cleanup + completion
+  nl.combine_devices ();
+  nl.make_top_level_pins ();
+  nl.purge ();
+
+  EXPECT_EQ (all_net_names_unique (nl), true);
+
+  //  debug layers produced for nets
+  //    201/0 -> n well
+  //    204/0 -> Diffusion contacts
+  //    206/0 -> Metal1
+  //    210/0 -> N tiedown
+  std::map<unsigned int, unsigned int> dump_map;
+  dump_map [layer_of (rntie)     ] = ly.insert_layer (db::LayerProperties (210, 0));
+  dump_map [layer_of (rnwell)    ] = ly.insert_layer (db::LayerProperties (201, 0));
+  dump_map [layer_of (rdiff_cont)] = ly.insert_layer (db::LayerProperties (204, 0));
+  dump_map [layer_of (rmetal1)   ] = ly.insert_layer (db::LayerProperties (206, 0));
+
+  //  write nets to layout
+  db::CellMapping cm = dss.cell_mapping_to_original (0, &ly, tc.cell_index ());
+  dump_nets_to_layout (nl, cl, ly, dump_map, cm, true /*with device cells*/);
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl,
+    "circuit TOP (A=A,C=C);\n"
+    "  device DIODE $1 (A=A,C=C) (A=9.18,P=21);\n"
+    "end;\n"
+  );
+
+  //  compare the collected test data
+
+  std::string au = tl::testsrc ();
+  au = tl::combine_path (au, "testdata");
+  au = tl::combine_path (au, "algo");
+  au = tl::combine_path (au, "diode_devices_nets.gds");
+
+  db::compare_layouts (_this, ly, au);
+}

@@ -105,6 +105,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     db::DeviceAbstract *dm = nl.device_abstract_by_cell_index (*cid);
     if (dm) {
+      //  This is a device abstract cell:
       //  make the terminal to cluster ID connections for the device abstract from the device cells
       make_device_abstract_connections (dm, clusters);
       continue;
@@ -211,6 +212,14 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, cons
 
     }
 
+  }
+
+  //  check whether all connections have been made
+  const std::vector<db::DeviceTerminalDefinition> &td = dm->device_class ()->terminal_definitions ();
+  for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
+    if (! dm->cluster_id_for_terminal (t->id ())) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Terminal '%s' of a device of class '%s' isn't connected - maybe the terminal annotation layer of this device type isn't part of the connectivity?")), t->name (), dm->device_class ()->name ()));
+    }
   }
 }
 

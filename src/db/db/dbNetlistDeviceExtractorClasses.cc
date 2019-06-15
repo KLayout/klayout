@@ -377,7 +377,7 @@ void NetlistDeviceExtractorCapacitor::extract_devices (const std::vector<db::Reg
     modify_device (*p, layer_geometry, device);
 
     //  output the device for debugging
-    device_out (device, db::Region (*p));
+    device_out (device, *p);
 
   }
 }
@@ -573,7 +573,7 @@ void NetlistDeviceExtractorDiode::extract_devices (const std::vector<db::Region>
     modify_device (*p, layer_geometry, device);
 
     //  output the device for debugging
-    device_out (device, db::Region (*p));
+    device_out (device, *p);
 
   }
 }

@@ -193,7 +193,7 @@ protected:
    *  @brief A callback when the device is produced
    *  This callback is provided as a debugging port
    */
-  virtual void device_out (const db::Device * /*device*/, const db::Region & /*cap_area*/)
+  virtual void device_out (const db::Device * /*device*/, const db::Polygon & /*cap_area*/)
   {
     //  .. no specific implementation ..
   }
@@ -308,7 +308,7 @@ protected:
    *  @brief A callback when the device is produced
    *  This callback is provided as a debugging port
    */
-  virtual void device_out (const db::Device * /*device*/, const db::Region & /*diode_area*/)
+  virtual void device_out (const db::Device * /*device*/, const db::Polygon & /*diode_area*/)
   {
     //  .. no specific implementation ..
   }

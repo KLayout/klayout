@@ -546,15 +546,30 @@ DeviceClassBJT4Transistor::DeviceClassBJT4Transistor ()
 
 bool DeviceClassBJT4Transistor::combine_devices (Device *a, Device *b) const
 {
+  const db::Net *nac = a->net_for_terminal (0);
+  const db::Net *nab = a->net_for_terminal (1);
+  const db::Net *nae = a->net_for_terminal (2);
   const db::Net *nas = a->net_for_terminal (3);
+  const db::Net *nbc = b->net_for_terminal (0);
+  const db::Net *nbb = b->net_for_terminal (1);
+  const db::Net *nbe = b->net_for_terminal (2);
   const db::Net *nbs = b->net_for_terminal (3);
 
-  //  combination is possible only if the substrate nets are the same
-  if (nas == nbs) {
-    return combine_devices (a, b);
-  } else {
-    return false;
+  //  parallel transistors can be combined into one
+  if (nac == nbc && nae == nbe && nab == nbb && nas == nbs) {
+
+    combine_parameters (a, b);
+
+    a->join_terminals (0, b, 0);
+    a->join_terminals (1, b, 1);
+    a->join_terminals (2, b, 2);
+    a->join_terminals (3, b, 3);
+
+    return true;
+
   }
+
+  return false;
 }
 
 }

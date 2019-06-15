@@ -2107,3 +2107,95 @@ TEST(39_ParallelBJT3Transistors)
   );
 }
 
+TEST(40_ParallelBJT4Transistors)
+{
+  db::DeviceClassBJT4Transistor *cls = new db::DeviceClassBJT4Transistor ();
+
+  db::Netlist nl;
+  nl.add_device_class (cls);
+
+  db::Device *d1 = new db::Device (cls, "d1");
+  d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AE, 2.0);
+  d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PE, 12.0);
+  d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AB, 3.0);
+  d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PB, 13.0);
+  d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AC, 4.0);
+  d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PC, 14.0);
+  db::Device *d2 = new db::Device (cls, "d2");
+  d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AE, 3.0);
+  d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PE, 13.0);
+  d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AB, 4.0);
+  d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PB, 14.0);
+  d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AC, 5.0);
+  d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PC, 15.0);
+
+  db::Circuit *circuit = new db::Circuit ();
+  nl.add_circuit (circuit);
+
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_c = circuit->add_pin ("C");
+  db::Pin pin_d = circuit->add_pin ("D");
+
+  circuit->add_device (d1);
+  circuit->add_device (d2);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+  circuit->connect_pin (pin_a.id (), n1);
+  d1->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_C, n1);
+  d2->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_C, n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+  circuit->connect_pin (pin_b.id (), n2);
+  d1->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_B, n2);
+  d2->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_B, n2);
+  d2->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_E, n2);
+
+  db::Net *n3 = new db::Net ("n3");
+  circuit->add_net (n3);
+  circuit->connect_pin (pin_c.id (), n3);
+  d1->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_E, n3);
+
+  db::Net *n4 = new db::Net ("n4");
+  circuit->add_net (n4);
+  circuit->connect_pin (pin_d.id (), n4);
+  d1->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_S, n4);
+  d2->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_S, n4);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  //  no combination as emitters are connected differently
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
+    "end;\n"
+  );
+
+  d2->connect_terminal (db::DeviceClassBJT4Transistor::terminal_id_E, n3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
+    "  device '' d2 (C=n1,B=n2,E=n3,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=5,PE=25,AB=7,PB=27,AC=9,PC=29);\n"
+    "end;\n"
+  );
+}
+

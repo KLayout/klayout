@@ -637,7 +637,10 @@ public:
    */
   void set_name (const std::string &n)
   {
-    m_name = n;
+    if (m_name != n) {
+      m_name = n;
+      need_realize (nr_meta);
+    }
   }
   
   /**
@@ -916,7 +919,8 @@ protected:
   enum {
     nr_visual = 1,
     nr_source = 2,
-    nr_hierarchy = 4
+    nr_meta = 4,
+    nr_hierarchy = 8
   };
 
   mutable bool m_realize_needed_source : 1;
@@ -1407,7 +1411,7 @@ public:
     if (! mp_obj) {
       set_obj ();
     }
-    return mp_obj;
+    return mp_obj.get ();
   }
 
   /**
@@ -1423,7 +1427,7 @@ private:
 
   size_t m_uint;
   tl::weak_ptr<LayerPropertiesList> m_list;
-  mutable const LayerPropertiesNode *mp_obj;
+  mutable tl::weak_ptr<LayerPropertiesNode> mp_obj;
 
   void inc (unsigned int d);
   std::pair <size_t, size_t> factor () const;
@@ -1889,14 +1893,6 @@ public:
   LayerPropertiesNodeRef (LayerPropertiesNode *node);
 
   /**
-   *  @brief Constructor from an iterator
-   *  The iterator is a pointer since the erase implementation requires us to
-   *  modify the iterator. Hence with this version, the original iterator will
-   *  follow up after the erase.
-   */
-  LayerPropertiesNodeRef (LayerPropertiesConstIterator *iter);
-
-  /**
    *  @brief Constructor from an iterator with an iterator copy
    */
   LayerPropertiesNodeRef (const LayerPropertiesConstIterator &iter);
@@ -1919,7 +1915,7 @@ public:
 
   /**
    *  @brief Deletes the current node
-   *  After this operation, the reference will point to the
+   *  After this operation, the reference will point to the next element.
    */
   void erase ();
 
@@ -1947,7 +1943,6 @@ public:
 
 private:
   LayerPropertiesConstIterator m_iter;
-  tl::weak_ptr<LayerPropertiesConstIterator> mp_iter;
   tl::weak_ptr<LayerPropertiesNode> mp_node;
 
   void need_realize (unsigned int flags, bool force);

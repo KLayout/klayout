@@ -1388,9 +1388,9 @@ Class<lay::LayerPropertiesNodeRef> decl_LayerPropertiesNodeRef (
   "This class has been introduced in version 0.25.\n"
 );
 
-static lay::LayerPropertiesNodeRef current (lay::LayerPropertiesConstIterator *iter)
+static lay::LayerPropertiesNodeRef current (const lay::LayerPropertiesConstIterator *iter)
 {
-  return lay::LayerPropertiesNodeRef (iter);
+  return lay::LayerPropertiesNodeRef (*iter);
 }
 
 Class<lay::LayerPropertiesConstIterator> decl_LayerPropertiesIterator (

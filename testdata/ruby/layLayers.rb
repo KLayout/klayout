@@ -703,6 +703,44 @@ class LAYLayers_TestClass < TestBase
     assert_equal( lnodes_str( "", cv.begin_layers ), "*/*@*\n" )
     assert_equal( lnodes_str2(cv), "*/*@*" )
 
+    assert_equal( cv.begin_layers.current.name, "" )
+    assert_equal( cv.begin_layers.current.visible?, true )
+    assert_equal( cv.begin_layers.current.dither_pattern, -1 )
+    assert_equal( cv.begin_layers.current.line_style, -1 )
+    assert_equal( cv.begin_layers.current.valid?, true )
+    assert_equal( cv.begin_layers.current.transparent?, false )
+
+    # test LayerPropertiesNodeRef
+    pos.current.name = "NAME"
+    pos.current.visible = false
+    pos.current.fill_color = 0xff012345
+    pos.current.frame_color = 0xff123456
+    pos.current.fill_brightness = 42
+    pos.current.frame_brightness = 17
+    pos.current.dither_pattern = 4
+    pos.current.line_style = 3
+    pos.current.valid = false
+    pos.current.transparent = true
+    pos.current.marked = false
+    pos.current.xfill = false
+    pos.current.width = 2
+    pos.current.animation = 2
+
+    assert_equal( cv.begin_layers.current.name, "NAME" )
+    assert_equal( cv.begin_layers.current.visible?, false )
+    assert_equal( cv.begin_layers.current.fill_color, 0xff012345 )
+    assert_equal( cv.begin_layers.current.frame_color, 0xff123456 )
+    assert_equal( cv.begin_layers.current.fill_brightness, 42 )
+    assert_equal( cv.begin_layers.current.frame_brightness, 17 )
+    assert_equal( cv.begin_layers.current.dither_pattern, 4 )
+    assert_equal( cv.begin_layers.current.line_style, 3 )
+    assert_equal( cv.begin_layers.current.valid?, false )
+    assert_equal( cv.begin_layers.current.transparent?, true )
+    assert_equal( cv.begin_layers.current.marked?, false )
+    assert_equal( cv.begin_layers.current.xfill?, false )
+    assert_equal( cv.begin_layers.current.width, 2 )
+    assert_equal( cv.begin_layers.current.animation, 2 )
+
     new_p = RBA::LayerProperties::new
     new_p.source = "1/0@1"
     assert_equal( new_p.flat.source, "1/0@1" )

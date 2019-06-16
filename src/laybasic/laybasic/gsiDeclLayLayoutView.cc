@@ -339,7 +339,7 @@ namespace {
 
     reference operator* () const
     {
-      return lay::LayerPropertiesNodeRef (&const_cast<LayerPropertiesConstIteratorWrapper *> (this)->m_iter);
+      return lay::LayerPropertiesNodeRef (m_iter);
     }
 
     bool at_end () const

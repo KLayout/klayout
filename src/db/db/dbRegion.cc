@@ -1825,7 +1825,7 @@ Region::run_check (db::edge_relation_type rel, bool different_polygons, const Re
   }
 
   EdgeRelationFilter check (rel, d, metrics);
-  check.set_include_zero (other != 0);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);
@@ -1847,6 +1847,7 @@ Region::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool 
   EdgePairs result;
 
   EdgeRelationFilter check (rel, d, metrics);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);

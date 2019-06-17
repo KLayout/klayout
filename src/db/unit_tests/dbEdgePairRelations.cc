@@ -346,7 +346,7 @@ TEST(7)
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (-1, 30), db::Point (-1, -20)), &output);
   EXPECT_EQ (res, false);
   f.set_include_zero (false);
-  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (0, 30), db::Point (0, -20)), &output);
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (0, 30), db::Point (0, 11)), &output);
   EXPECT_EQ (res, false);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (1, 30), db::Point (1, -20)), &output);
   EXPECT_EQ (res, true);
@@ -355,3 +355,50 @@ TEST(7)
   EXPECT_EQ (res, false);
 }
 
+TEST(8_KissingCornerProblem)
+{
+  //  The kissing corner problem is solved by allowing distance-0 width and space relations and checking them
+  //  if the projection is >0.
+
+  db::EdgeRelationFilter f (db::WidthRelation, 10);
+  f.set_include_zero (false);
+  db::EdgePair output;
+  bool res;
+
+  f.set_metrics (db::Euclidian);
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 201), db::Point (0, 101)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (1, 0), db::Point (1, 100)), db::Edge (db::Point (0, 201), db::Point (0, 0)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 200), db::Point (0, 100)), &output);
+  EXPECT_EQ (res, true);
+  EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,90;0,100):(0,110;0,100)");
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 200), db::Point (0, 50)), &output);
+  EXPECT_EQ (res, true);
+  EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,40;0,100):(0,110;0,50)");
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 0), db::Point (0, -100)), &output);
+  EXPECT_EQ (res, true);
+  EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(0,0;0,-10)");
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, -1), db::Point (0, -100)), &output);
+  EXPECT_EQ (res, false);
+
+  f = db::EdgeRelationFilter (db::SpaceRelation, 10);
+  f.set_include_zero (false);
+
+  f.set_metrics (db::Euclidian);
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 101), db::Point (0, 201)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (1, 100), db::Point (1, 0)), db::Edge (db::Point (0, 0), db::Point (0, 200)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 100), db::Point (0, 200)), &output);
+  EXPECT_EQ (res, true);
+  EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,100;0,90):(0,100;0,110)");
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 50), db::Point (0, 200)), &output);
+  EXPECT_EQ (res, true);
+  EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,100;0,40):(0,50;0,110)");
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, -100), db::Point (0, 0)), &output);
+  EXPECT_EQ (res, true);
+  EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,10;0,0):(0,-10;0,0)");
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, -100), db::Point (0, -1)), &output);
+  EXPECT_EQ (res, false);
+}

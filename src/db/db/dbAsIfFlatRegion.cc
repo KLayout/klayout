@@ -642,7 +642,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   }
 
   EdgeRelationFilter check (rel, d, metrics);
-  check.set_include_zero (other != 0);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);
@@ -664,6 +664,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   EdgeRelationFilter check (rel, d, metrics);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);

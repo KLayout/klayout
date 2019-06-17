@@ -75,3 +75,6 @@ plugins.depends += lay ext lib
 
 klayout_main.depends += plugins $$MAIN_DEPENDS
 unit_tests.depends += plugins $$MAIN_DEPENDS
+
+RESOURCES += \
+    laybasic/laybasic/layResources.qrc

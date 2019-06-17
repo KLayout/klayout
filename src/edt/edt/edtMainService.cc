@@ -58,11 +58,11 @@ MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Plug
     m_flatten_insts_levels (std::numeric_limits<int>::max ()),
     m_flatten_prune (false),
     m_align_hmode (0), m_align_vmode (0), m_align_visible_layers (false),
+    m_origin_mode_x (-1), m_origin_mode_y (-1), m_origin_visible_layers_for_bbox (false),
     m_array_a (0.0, 1.0), m_array_b (1.0, 0.0),
     m_array_na (1), m_array_nb (1)
-{ 
-  //  collect the options pages and build the options dialog
-  std::vector<edt::Service *> edt_services = mp_view->get_plugins <edt::Service> ();
+{
+  //  .. nothing yet ..
 }
 
 MainService::~MainService ()
@@ -912,7 +912,7 @@ MainService::cm_make_cell ()
 
     const lay::CellView &cv = view ()->cellview (cv_index);
 
-    if (dialog.exec_dialog (cv->layout (), m_make_cell_name)) {
+    if (dialog.exec_dialog (cv->layout (), m_make_cell_name, m_origin_mode_x, m_origin_mode_y)) {
 
       //  Compute the selection's bbox to establish a good origin for the new cell
       db::Box selection_bbox; 
@@ -940,8 +940,13 @@ MainService::cm_make_cell ()
       db::Cell &target_cell = cv->layout ().cell (target_ci);
 
       //  create target cell instance
-      db::Instance target_cell_inst = cv.cell ()->insert (db::CellInstArray (db::CellInst (target_ci), db::Trans (selection_bbox.lower_left () - db::Point ())));
-      db::ICplxTrans to = db::ICplxTrans (db::Trans (db::Point () - selection_bbox.lower_left ()));
+      db::Vector ref;
+      if (m_origin_mode_x >= -1) {
+        ref = db::Vector (selection_bbox.left () + ((m_origin_mode_x + 1) * selection_bbox.width ()) / 2, selection_bbox.bottom () + ((m_origin_mode_y + 1) * selection_bbox.height ()) / 2);
+      }
+
+      db::Instance target_cell_inst = cv.cell ()->insert (db::CellInstArray (db::CellInst (target_ci), db::Trans (ref)));
+      db::ICplxTrans to = db::ICplxTrans (db::Trans (-ref));
 
       for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 

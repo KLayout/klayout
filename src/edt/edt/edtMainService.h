@@ -201,6 +201,8 @@ private:
   int m_align_vmode;
   bool m_align_visible_layers;
   std::string m_make_cell_name;
+  int m_origin_mode_x, m_origin_mode_y;
+  bool m_origin_visible_layers_for_bbox;
   db::DVector m_array_a, m_array_b;
   unsigned int m_array_na, m_array_nb;
 

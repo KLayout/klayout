@@ -78,7 +78,10 @@ void RegionDelegate::set_base_verbosity (int vb)
 
 void RegionDelegate::set_min_coherence (bool f)
 {
-  m_merge_min_coherence = f;
+  if (f != m_merge_min_coherence) {
+    m_merge_min_coherence = f;
+    min_coherence_changed ();
+  }
 }
 
 void RegionDelegate::set_merged_semantics (bool f)

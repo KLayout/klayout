@@ -764,7 +764,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     db::Box b = bbox ().enlarged (db::Vector (dx, dy));
     return region_from_box (b);
 
-  } else if (! merged_semantics ()) {
+  } else if (! merged_semantics () || is_merged ()) {
 
     //  Generic case
     std::auto_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
@@ -801,7 +801,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, dx, dy, mode);
-    db::PolygonGenerator pg (siz, false /*don't resolve holes*/, false /*min. coherence*/);
+    db::PolygonGenerator pg (siz, false /*don't resolve holes*/, min_coherence () /*min. coherence*/);
     db::BooleanOp op (db::BooleanOp::Or);
     ep.process (pg, op);
 

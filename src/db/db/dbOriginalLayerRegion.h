@@ -72,6 +72,7 @@ public:
 
 protected:
   virtual void merged_semantics_changed ();
+  virtual void min_coherence_changed ();
 
 private:
   OriginalLayerRegion &operator= (const OriginalLayerRegion &other);

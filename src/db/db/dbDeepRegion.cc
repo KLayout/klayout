@@ -160,6 +160,11 @@ void DeepRegion::merged_semantics_changed ()
   //  .. nothing yet ..
 }
 
+void DeepRegion::min_coherence_changed ()
+{
+  set_is_merged (false);
+}
+
 RegionIteratorDelegate *
 DeepRegion::begin () const
 {
@@ -1461,6 +1466,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   ensure_merged_polygons_valid ();
 
   EdgeRelationFilter check (rel, d, metrics);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);
@@ -1489,6 +1495,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, b
   ensure_merged_polygons_valid ();
 
   EdgeRelationFilter check (rel, d, metrics);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);

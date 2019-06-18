@@ -1406,3 +1406,30 @@ TEST(101_DeepFlatCollaboration)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au101.gds");
 }
 
+TEST(issue_277)
+{
+  db::Layout ly;
+  db::cell_index_type top_cell_index = ly.add_cell ("TOP");
+  db::Cell &top_cell = ly.cell (top_cell_index);
+  unsigned int l1 = ly.insert_layer ();
+
+  db::Shapes &s = top_cell.shapes (l1);
+  s.insert (db::Box (0, 0, 400, 400));
+  s.insert (db::Box (400, 400, 800, 800));
+
+
+  db::DeepShapeStore dss;
+
+  db::Region r (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "");
+
+  r.set_min_coherence (true);
+  EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "(399,399;399,401;401,401;401,399)");
+
+  r.merge ();
+  EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "(399,399;399,401;401,401;401,399)");
+
+  r.set_min_coherence (false);  //  needs to merge again
+  EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "");
+}

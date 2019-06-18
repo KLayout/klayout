@@ -94,6 +94,13 @@ void FlatRegion::merged_semantics_changed ()
   m_merged_polygons_valid = false;
 }
 
+void FlatRegion::min_coherence_changed ()
+{
+  m_is_merged = false;
+  m_merged_polygons.clear ();
+  m_merged_polygons_valid = false;
+}
+
 void FlatRegion::reserve (size_t n)
 {
   m_polygons.reserve (db::Polygon::tag (), n);

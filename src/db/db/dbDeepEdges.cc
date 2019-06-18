@@ -1404,6 +1404,7 @@ DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord 
   ensure_merged_edges_valid ();
 
   EdgeRelationFilter check (rel, d, metrics);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);

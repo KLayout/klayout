@@ -740,7 +740,7 @@ TEST(20)
     EXPECT_EQ (r1.has_valid_edges (), false);
     db::Edges r2 (db::RecursiveShapeIterator (ly, ly.cell (top), l2), false);
     EXPECT_EQ (r2.has_valid_edges (), false);
-    EXPECT_EQ (r1.separation_check (r2, 20).to_string (), "(50,0;50,30)/(40,40;40,10);(63,30;80,30)/(97,40;80,40);(80,30;80,20)/(80,40;80,50);(50,40;50,57)/(40,40;40,23);(80,70;80,40)/(80,40;80,70);(60,40;50,40)/(30,40;40,40)");
+    EXPECT_EQ (r1.separation_check (r2, 20).to_string (), "(50,0;50,30)/(40,40;40,10);(63,30;80,30)/(97,40;80,40);(50,40;50,57)/(40,40;40,23);(80,70;80,40)/(80,40;80,70)");
     EXPECT_EQ (r1.separation_check (r2, 20, false, db::Projection).to_string (), "(50,10;50,30)/(40,30;40,10);(80,70;80,40)/(80,40;80,70)");
     EXPECT_EQ (r1.separation_check (r2, 20, false, db::Euclidian, 90, 1).to_string (), "(50,0;50,30)/(40,40;40,10);(80,70;80,40)/(80,40;80,70)");
   }

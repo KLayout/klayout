@@ -950,7 +950,7 @@ if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(LAYLayersTest)
 
   # Only runs with Application available
-  if "Application" in pya.__all__ and not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
+  if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)
 
 

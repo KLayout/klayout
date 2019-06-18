@@ -26,6 +26,8 @@
 #include "dbLayoutDiff.h"
 #include "dbWriter.h"
 #include "dbTextWriter.h"
+#include "dbLibraryProxy.h"
+#include "dbTestSupport.h"
 
 #include "tlUnitTest.h"
 
@@ -1258,61 +1260,6 @@ TEST(115)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
-TEST(118)
-{
-  //  1x1 arrays (#902)
-  
-  db::Manager m;
-  db::Layout g (&m);
-
-  db::LayerProperties lp1;
-  lp1.layer = 1;
-  lp1.datatype = 0;
-
-  g.insert_layer (0, lp1);
-
-  db::Cell &c1 (g.cell (g.add_cell ()));
-  c1.shapes (0).insert (db::Box (100, 0, 100, 200));
-
-  db::Cell &c2 (g.cell (g.add_cell ()));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
-  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (17, -42)), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
-
-  std::string tmp_file = tl::TestBase::tmp_file ("tmp.oas");
-
-  {
-    tl::OutputStream out (tmp_file);
-    db::SaveLayoutOptions options;
-    options.set_format ("OASIS");
-    db::Writer writer (options);
-    writer.write (g, out);
-  }
-
-  tl::InputStream in (tmp_file);
-  db::Reader reader (in);
-  db::Layout gg;
-  reader.set_warnings_as_errors (true);
-  reader.read (gg);
-
-  const char *expected = 
-    "begin_lib 0.001\n"
-    "begin_cell {$1}\n"
-    "box 1 0 {100 0} {100 200}\n"
-    "end_cell\n"
-    "begin_cell {$2}\n"
-    "sref {$1} 0 0 1 {0 0}\n"
-    "sref {$1} 0 0 1 {17 -42}\n"
-    "end_cell\n"
-    "end_lib\n"
-    ;
-
-  tl::OutputStringStream os;
-  tl::OutputStream stream (os);
-  db::TextWriter textwriter (stream);
-  textwriter.write (gg);
-  EXPECT_EQ (std::string (os.string ()), std::string (expected))
-}
-
 TEST(116)
 {
   db::Manager m;
@@ -1728,3 +1675,133 @@ TEST(117)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
+TEST(118)
+{
+  //  1x1 arrays (#902)
+
+  db::Manager m;
+  db::Layout g (&m);
+
+  db::LayerProperties lp1;
+  lp1.layer = 1;
+  lp1.datatype = 0;
+
+  g.insert_layer (0, lp1);
+
+  db::Cell &c1 (g.cell (g.add_cell ()));
+  c1.shapes (0).insert (db::Box (100, 0, 100, 200));
+
+  db::Cell &c2 (g.cell (g.add_cell ()));
+  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
+  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (17, -42)), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp.oas");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    db::Writer writer (options);
+    writer.write (g, out);
+  }
+
+  tl::InputStream in (tmp_file);
+  db::Reader reader (in);
+  db::Layout gg;
+  reader.set_warnings_as_errors (true);
+  reader.read (gg);
+
+  const char *expected =
+    "begin_lib 0.001\n"
+    "begin_cell {$1}\n"
+    "box 1 0 {100 0} {100 200}\n"
+    "end_cell\n"
+    "begin_cell {$2}\n"
+    "sref {$1} 0 0 1 {0 0}\n"
+    "sref {$1} 0 0 1 {17 -42}\n"
+    "end_cell\n"
+    "end_lib\n"
+    ;
+
+  tl::OutputStringStream os;
+  tl::OutputStream stream (os);
+  db::TextWriter textwriter (stream);
+  textwriter.write (gg);
+  EXPECT_EQ (std::string (os.string ()), std::string (expected))
+}
+
+TEST(119_WithAndWithoutContext)
+{
+  //  PCells with context and without
+
+  db::Manager m;
+  db::Layout g (&m);
+
+  //  Note: this sample requires the BASIC lib
+
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/oasis/pcell_test.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (g);
+  }
+
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter119a.oas"));
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    db::Writer writer (options);
+    writer.write (g, out);
+  }
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    db::Layout gg;
+    reader.set_warnings_as_errors (true);
+    reader.read (gg);
+
+    std::pair<bool, db::cell_index_type> tc = gg.cell_by_name ("TEXT");
+    tl_assert (tc.first);
+
+    const db::Cell &text_cell = gg.cell (tc.second);
+    EXPECT_EQ (text_cell.is_proxy (), true);
+    EXPECT_EQ (text_cell.get_display_name (), "Basic.TEXT('KLAYOUT RULES')");
+
+    CHECKPOINT ();
+    db::compare_layouts (_this, gg, tl::testsrc () + "/testdata/oasis/dbOASISWriter119_au.gds", db::NoNormalization);
+  }
+
+  tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter119b.oas"));
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_write_context_info (false);
+    options.set_format ("OASIS");
+    db::Writer writer (options);
+    writer.write (g, out);
+  }
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    db::Layout gg;
+    reader.set_warnings_as_errors (true);
+    reader.read (gg);
+
+    std::pair<bool, db::cell_index_type> tc = gg.cell_by_name ("TEXT");
+    tl_assert (tc.first);
+
+    const db::Cell &text_cell = gg.cell (tc.second);
+    EXPECT_EQ (text_cell.is_proxy (), false);
+    EXPECT_EQ (text_cell.get_display_name (), "TEXT");
+
+    CHECKPOINT ();
+    db::compare_layouts (_this, gg, tl::testsrc () + "/testdata/oasis/dbOASISWriter119_au.gds", db::NoNormalization);
+  }
+
+}

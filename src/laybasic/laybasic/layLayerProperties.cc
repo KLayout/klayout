@@ -197,11 +197,14 @@ LayerProperties::operator= (const LayerProperties &d)
       flags += nr_source;
     }
 
+    if (m_name != d.m_name) {
+      m_name = d.m_name;
+      flags += nr_meta;
+    }
+
     if (flags) {
       need_realize (flags, true /*force on children*/);
     }
-
-    m_name = d.m_name;
 
   }
   return *this;
@@ -806,13 +809,13 @@ LayerPropertiesNode::add_child (const LayerPropertiesNode &child)
 //  LayerPropertiesConstIterator implementation
 
 LayerPropertiesConstIterator::LayerPropertiesConstIterator ()
-  : m_uint (0), m_list (), mp_obj (0)
+  : m_uint (0), m_list ()
 {
   //  .. nothing yet ..
 }
 
 LayerPropertiesConstIterator::LayerPropertiesConstIterator (const lay::LayerPropertiesNode *node)
-  : m_uint (0), m_list (), mp_obj (0)
+  : m_uint (0), m_list ()
 {
   if (!node) {
     return;
@@ -874,7 +877,7 @@ LayerPropertiesConstIterator::LayerPropertiesConstIterator (const lay::LayerProp
 
 LayerPropertiesConstIterator::LayerPropertiesConstIterator (const LayerPropertiesList &list, bool last)
     //  NOTE: there should be some "const_weak_ptr"
-  : m_uint (0), m_list (const_cast<LayerPropertiesList *> (&list)), mp_obj (0)
+  : m_uint (0), m_list (const_cast<LayerPropertiesList *> (&list))
 {
   if (last) {
     m_uint = (list.end_const () - list.begin_const ()) + 1;
@@ -885,7 +888,7 @@ LayerPropertiesConstIterator::LayerPropertiesConstIterator (const LayerPropertie
 
 LayerPropertiesConstIterator::LayerPropertiesConstIterator (const LayerPropertiesList &list, size_t uint)
     //  NOTE: there should be some "const_weak_ptr"
-  : m_uint (uint), m_list (const_cast<LayerPropertiesList *> (&list)), mp_obj (0)
+  : m_uint (uint), m_list (const_cast<LayerPropertiesList *> (&list))
 {
   //  .. nothing yet ..
 }
@@ -991,7 +994,7 @@ LayerPropertiesConstIterator &
 LayerPropertiesConstIterator::up ()
 {
   m_uint %= factor ().first;
-  mp_obj = 0;
+  mp_obj.reset (0);
   return *this;
 }
 
@@ -999,7 +1002,7 @@ LayerPropertiesConstIterator &
 LayerPropertiesConstIterator::next_sibling (ptrdiff_t n)
 {
   m_uint += factor ().first * n;
-  mp_obj = 0;
+  mp_obj.reset (0);
   return *this;
 }
 
@@ -1008,7 +1011,7 @@ LayerPropertiesConstIterator::to_sibling (size_t n)
 {
   std::pair <size_t, size_t> f = factor ();
   m_uint = (m_uint % f.first) + (1 + n) * f.first;
-  mp_obj = 0;
+  mp_obj.reset (0);
   return *this;
 }
 
@@ -1024,7 +1027,7 @@ LayerPropertiesConstIterator::down_first_child ()
 {
   std::pair <size_t, size_t> f = factor ();
   m_uint += f.first * f.second;
-  mp_obj = 0;
+  mp_obj.reset (0);
   return *this;
 }
 
@@ -1034,7 +1037,7 @@ LayerPropertiesConstIterator::down_last_child ()
   std::pair <size_t, size_t> f = factor ();
   const LayerPropertiesNode *o = obj ();
   m_uint += f.first * f.second * ((o->end_children () - o->begin_children ()) + 1);
-  mp_obj = 0;
+  mp_obj.reset (0);
   return *this;
 }
 
@@ -1067,8 +1070,8 @@ LayerPropertiesConstIterator::parent_obj () const
 void
 LayerPropertiesConstIterator::invalidate () 
 {
-  mp_obj = 0;
-  
+  mp_obj.reset (0);
+
   //  the iterator may be parked at a position behind the last element.
   //  Move one step further in this case.
   std::pair <size_t, size_t> f = factor ();
@@ -1083,7 +1086,7 @@ LayerPropertiesConstIterator::set_obj () const
 {
   if (is_null () || !m_list) {
 
-    mp_obj = 0;
+    mp_obj.reset (0);
 
   } else {
 
@@ -1104,7 +1107,7 @@ LayerPropertiesConstIterator::set_obj () const
       iter = iter[rem - 1].begin_children ();
     }
 
-    mp_obj = &iter[uint - 1];
+    mp_obj.reset (const_cast<lay::LayerPropertiesNode *> (&iter[uint - 1]));
 
   }
 }
@@ -1122,7 +1125,7 @@ LayerPropertiesConstIterator::inc (unsigned int d)
       while (true) {
         std::pair <size_t, size_t> f = factor ();
         m_uint += f.first;
-        mp_obj = 0;
+        mp_obj.reset (0);
         if (m_uint / f.first < f.second - 1) {
           break;
         } else if (at_top ()) {
@@ -1908,28 +1911,7 @@ LayerPropertiesNodeRef::LayerPropertiesNodeRef (LayerPropertiesNode *node)
     attach_view (node->view (), node->list_index ());
     set_parent (node->parent ());
 
-    mp_iter.reset (&m_iter);
     mp_node.reset (node);
-
-  }
-}
-
-LayerPropertiesNodeRef::LayerPropertiesNodeRef (LayerPropertiesConstIterator *iter)
-{
-  if (iter && !iter->at_end () && !iter->is_null ()) {
-
-    const lay::LayerPropertiesNode *node = (*iter).operator-> ();
-
-    //  NOTE: we do assignment before we set the iterator reference - hence there won't be
-    //  updates triggered.
-    LayerPropertiesNode::operator= (*node);
-
-    //  Makes ourself a perfect copy of the original (including reference into the view)
-    attach_view (node->view (), node->list_index ());
-    set_parent (node->parent ());
-
-    mp_iter.reset (iter);
-    mp_node.reset (const_cast<lay::LayerPropertiesNode *> (node));
 
   }
 }
@@ -1949,7 +1931,6 @@ LayerPropertiesNodeRef::LayerPropertiesNodeRef (const LayerPropertiesConstIterat
     attach_view (node->view (), node->list_index ());
     set_parent (node->parent ());
 
-    mp_iter.reset (&m_iter);
     mp_node.reset (const_cast<lay::LayerPropertiesNode *> (node));
 
   }
@@ -1961,7 +1942,7 @@ LayerPropertiesNodeRef::LayerPropertiesNodeRef ()
 }
 
 LayerPropertiesNodeRef::LayerPropertiesNodeRef (const LayerPropertiesNodeRef &other)
-  : LayerPropertiesNode (other), m_iter (other.m_iter), mp_iter (other.mp_iter), mp_node (other.mp_node)
+  : LayerPropertiesNode (other), m_iter (other.m_iter), mp_node (other.mp_node)
 {
   attach_view (other.view (), other.list_index ());
   set_parent (other.parent ());
@@ -1971,7 +1952,6 @@ LayerPropertiesNodeRef &LayerPropertiesNodeRef::operator= (const LayerProperties
 {
   if (this != &other) {
 
-    mp_iter = other.mp_iter;
     mp_node = other.mp_node;
     m_iter = other.m_iter;
     attach_view (other.view (), other.list_index ());
@@ -1988,25 +1968,20 @@ void
 LayerPropertiesNodeRef::erase ()
 {
   if (is_valid ()) {
-    view ()->delete_layer ((unsigned int) list_index (), *mp_iter);
+    view ()->delete_layer ((unsigned int) list_index (), m_iter);
   }
 }
 
 const lay::LayerPropertiesConstIterator &
 LayerPropertiesNodeRef::iter () const
 {
-  if (mp_iter) {
-    return *mp_iter;
-  } else {
-    static lay::LayerPropertiesConstIterator null_iter;
-    return null_iter;
-  }
+  return m_iter;
 }
 
 bool
 LayerPropertiesNodeRef::is_valid () const
 {
-  return mp_iter && !mp_iter->at_end () && !mp_iter->is_null () && view ();
+  return !m_iter.is_null () && !m_iter.at_end () && view ();
 }
 
 void
@@ -2015,11 +1990,11 @@ LayerPropertiesNodeRef::need_realize (unsigned int flags, bool force)
   LayerPropertiesNode::need_realize (flags, force);
   if (is_valid ()) {
 
-    if ((flags & (nr_visual + nr_source)) != 0) {
-      view ()->set_properties ((unsigned int) list_index (), *mp_iter, *this);
+    if ((flags & (nr_visual + nr_source + nr_meta)) != 0) {
+      view ()->set_properties ((unsigned int) list_index (), m_iter, *this);
     }
     if ((flags & nr_hierarchy) != 0) {
-      view ()->replace_layer_node ((unsigned int) list_index (), *mp_iter, *this);
+      view ()->replace_layer_node ((unsigned int) list_index (), m_iter, *this);
     }
 
   } else if (mp_node) {

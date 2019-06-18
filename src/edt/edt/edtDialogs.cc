@@ -336,26 +336,78 @@ MakeCellOptionsDialog::MakeCellOptionsDialog (QWidget *parent)
   : QDialog (parent)
 { 
   setupUi (this);
+
+  setObjectName (QString::fromUtf8 ("make_cell_options_dialog"));
+
+  QToolButton *buttons[3][3] = { { lb, cb, rb }, { lc, cc, rc }, { lt, ct, rt } };
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      connect (buttons[i][j], SIGNAL (clicked ()), this, SLOT (button_clicked ()));
+    }
+  }
 }
 
 bool 
-MakeCellOptionsDialog::exec_dialog (const db::Layout &layout, std::string &name) 
+MakeCellOptionsDialog::exec_dialog (const db::Layout &layout, std::string &name, int &mode_x, int &mode_y)
 {
   do {
 BEGIN_PROTECTED
+
+    QToolButton *buttons[3][3] = { { lb, cb, rb }, { lc, cc, rc }, { lt, ct, rt } };
+
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+        buttons[i][j]->setChecked (j - 1 == mode_x && i - 1 == mode_y);
+      }
+    }
+
+    origin_groupbox->setChecked (mode_x >= -1);
+
     if (QDialog::exec ()) {
+
+      if (origin_groupbox->isChecked ()) {
+        for (int i = 0; i < 3; ++i) {
+          for (int j = 0; j < 3; ++j) {
+            if (buttons[i][j]->isChecked ()) {
+              mode_x = j - 1;
+              mode_y = i - 1;
+            }
+          }
+        }
+      } else {
+        mode_x = mode_y = -2;
+      }
+
       name = tl::to_string (cell_name_le->text ());
       if (name.empty ()) {
         throw tl::Exception (tl::to_string (QObject::tr ("Cell name must not be empty")));
       } else if (layout.cell_by_name (name.c_str ()).first) {
         throw tl::Exception (tl::to_string (QObject::tr ("A cell with that name already exists: ")) + name);
       }
+
       return true;
+
     } else {
       return false;
     }
+
 END_PROTECTED
   } while (true);
+}
+
+void
+MakeCellOptionsDialog::button_clicked ()
+{
+  QToolButton *buttons[3][3] = { { lb, cb, rb }, { lc, cc, rc }, { lt, ct, rt } };
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      if (buttons [i][j] != sender ()) {
+        buttons [i][j]->setChecked (false);
+      }
+    }
+  }
 }
 
 // --------------------------------------------------------------------------------

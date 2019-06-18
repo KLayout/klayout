@@ -362,7 +362,7 @@ pya_plain_iterator_next (PyObject *self)
     return NULL;
   }
 
-  //  increment on first visit
+  //  increment except on first visit
   if (! iter->first) {
     iter->iter->inc ();
   }

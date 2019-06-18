@@ -160,6 +160,11 @@ void DeepRegion::merged_semantics_changed ()
   //  .. nothing yet ..
 }
 
+void DeepRegion::min_coherence_changed ()
+{
+  set_is_merged (false);
+}
+
 RegionIteratorDelegate *
 DeepRegion::begin () const
 {

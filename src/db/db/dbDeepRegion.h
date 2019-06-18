@@ -220,6 +220,7 @@ public:
 
 protected:
   virtual void merged_semantics_changed ();
+  virtual void min_coherence_changed ();
   void set_is_merged (bool f);
 
 private:

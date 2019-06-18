@@ -379,7 +379,7 @@ class LAYLayersTest(unittest.TestCase):
     new_p.clear_children()
     self.assertEqual(new_p.has_children(), False)
 
-    self.assertEqual(ll.has_children(), False)
+    self.assertEqual(ll.has_children(), True)
 
     cv.transaction("Delete")
     li = cv.begin_layers(0)

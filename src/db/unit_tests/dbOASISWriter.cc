@@ -1717,8 +1717,8 @@ TEST(118)
     "box 1 0 {100 0} {100 200}\n"
     "end_cell\n"
     "begin_cell {$2}\n"
-    "sref {$1} 0 0 1 {0 0}\n"
     "sref {$1} 0 0 1 {17 -42}\n"
+    "sref {$1} 0 0 1 {0 0}\n"
     "end_cell\n"
     "end_lib\n"
     ;

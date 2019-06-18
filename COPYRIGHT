@@ -1,12 +1,12 @@
 klayout is packaged by Peter C.S. Scholtens <peter.scholtens@xs4all.nl>
 and Matthias Köfferlein <matthias@koefferlein.de>
-and was obtained from https://www.klayout.org/downloads/source/klayout-0.25.8.tar.gz
+and was obtained from https://www.klayout.org/downloads/source/klayout-0.25.9.tar.gz
 
 Authors:
 	Matthias Köfferlein
 
 Copyright:
-	Copyright (C) 2006-2018 by Matthias Köfferlein.
+	Copyright (C) 2006-2019 by Matthias Köfferlein.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

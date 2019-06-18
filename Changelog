@@ -1,3 +1,21 @@
+0.25.9          (2019-06-18):
+
+* Bugfix: %GITHUB%/issues/261
+       Issue with iterating Python sequences
+* Bugfix: %GITHUB%/issues/271
+       Chose cell coordinates on "Make Cell"
+* Bugfix: %GITHUB%/issues/272
+       Error message if trying to run macros in unsupported languages
+* Bugfix: %GITHUB%/issues/275
+       "Write without context" did not have an effect with OASIS
+* Bugfix: %GITHUB%/issues/276
+       LayerPropertiesNodeRef was not working as documented
+* Bugfix: %GITHUB%/issues/278
+       Lost reference with ObjectInstPath#shape
+* Bugfix: %GITHUB%/issues/281
+       Width and space violations are reported now also for 
+       the "kissing corners" case
+ 
 0.25.8          (2019-02-23):
 
 * Bugfix: %GITHUB%/issues/234

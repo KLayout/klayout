@@ -66,6 +66,12 @@ bool euclidian_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge
   db::Edge g (other);
   int s1 = e.side_of (g.p1 ());
   int s2 = e.side_of (g.p2 ());
+
+  //  "kissing corner" issue: force include zero if the edges are collinear and overlap.
+  if (! include_zero && s1 == 0 && s2 == 0 && e.intersect (g)) {
+    include_zero = true;
+  }
+
   int thr = include_zero ? 0 : -1;
 
   //  keep only part of other which is on the "inside" side of e
@@ -203,6 +209,12 @@ static bool var_near_part_of_edge (bool include_zero, db::Coord d, db::Coord dd,
   db::Edge g (other);
   int s1 = e.side_of (g.p1 ());
   int s2 = e.side_of (g.p2 ());
+
+  //  "kissing corner" issue: force include zero if the edges are collinear and overlap
+  if (! include_zero && s1 == 0 && s2 == 0 && e.intersect (g)) {
+    include_zero = true;
+  }
+
   int thr = include_zero ? 0 : -1;
 
   //  keep only part of other which is on the "inside" side of e

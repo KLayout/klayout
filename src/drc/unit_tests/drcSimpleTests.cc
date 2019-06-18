@@ -533,3 +533,89 @@ TEST(12_NetlistJoinLabels)
   CHECKPOINT ();
   compare_netlists (_this, output, au);
 }
+
+TEST(13a_KissingCorners)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_13a.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/kissing_corners.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au13a.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  //  verify
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  CHECKPOINT ();
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}
+
+TEST(13b_KissingCornersDeep)
+{
+  std::string rs = tl::testsrc ();
+  rs += "/testdata/drc/drcSimpleTests_13b.drc";
+
+  std::string input = tl::testsrc ();
+  input += "/testdata/drc/kissing_corners.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/drc/drcSimpleTests_au13b.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  //  verify
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  CHECKPOINT ();
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+}

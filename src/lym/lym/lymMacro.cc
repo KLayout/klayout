@@ -1014,7 +1014,7 @@ bool Macro::can_run () const
 int Macro::run () const
 {
   if (tl::verbosity () >= 20) {
-    tl::log << "Running macro " << path ();
+    tl::log << tl::to_string (tr ("Running macro ")) << path ();
   }
 
   try {
@@ -1029,6 +1029,8 @@ int Macro::run () const
       }
     } else if (interpreter () == lym::Macro::DSLInterpreter) {
       lym::MacroInterpreter::execute_macro (this);
+    } else {
+      throw tl::Exception (tl::to_string (tr ("Can't run macro (no interpreter): ")) + path ());
     }
   } catch (tl::ExitException &ex) {
     return ex.status ();
@@ -1843,10 +1845,10 @@ static void autorun_for (lym::MacroCollection &collection, bool early)
   }
 
   for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
-    if (((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ())) && c->second->can_run ()) {
+    if ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ())) {
       BEGIN_PROTECTED_SILENT
-        c->second->install_doc ();
         c->second->run ();
+        c->second->install_doc ();
       END_PROTECTED_SILENT
     }
   }

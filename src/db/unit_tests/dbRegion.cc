@@ -1397,3 +1397,21 @@ TEST(issue_228)
   EXPECT_EQ (r.selected_interacting (rr).to_string (), r.to_string ());
   EXPECT_EQ (rr.selected_interacting (r).to_string (), rr.to_string ());
 }
+
+TEST(issue_277)
+{
+  db::Region r;
+  r.insert (db::Box (0, 0, 400, 400));
+  r.insert (db::Box (400, 400, 800, 800));
+
+  EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "");
+
+  r.set_min_coherence (true);
+  EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "(399,399;399,401;401,401;401,399)");
+
+  r.merge ();
+  EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "(399,399;399,401;401,401;401,399)");
+
+  r.set_min_coherence (false);  //  needs to merge again
+  EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "");
+}

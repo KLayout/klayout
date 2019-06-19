@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>AlignCellOptionsDialog</class>
- <widget class="QDialog" name="AlignCellOptionsDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="AlignCellOptionsDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,52 +10,68 @@
     <height>342</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>Align Cell</string>
+  <property name="windowTitle">
+   <string>Adjust Cell Origin</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QLabel" name="label" >
-     <property name="text" >
+    <widget class="QLabel" name="label">
+     <property name="text">
       <string>Put origin relative to cell's bounding box at ...</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="frame_2" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>0</vsizetype>
+    <widget class="QFrame" name="frame_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
        <number>9</number>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
       </property>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>64</width>
           <height>20</height>
@@ -63,187 +80,205 @@
        </spacer>
       </item>
       <item>
-       <widget class="QFrame" name="frame_3" >
-        <property name="frameShape" >
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>
-        <property name="frameShadow" >
+        <property name="frameShadow">
          <enum>QFrame::Plain</enum>
         </property>
-        <layout class="QGridLayout" >
-         <property name="margin" >
+        <layout class="QGridLayout">
+         <property name="leftMargin">
           <number>15</number>
          </property>
-         <property name="spacing" >
+         <property name="topMargin">
+          <number>15</number>
+         </property>
+         <property name="rightMargin">
+          <number>15</number>
+         </property>
+         <property name="bottomMargin">
+          <number>15</number>
+         </property>
+         <property name="spacing">
           <number>6</number>
          </property>
-         <item row="0" column="2" >
-          <widget class="QToolButton" name="ct" >
-           <property name="text" >
+         <item row="0" column="2">
+          <widget class="QToolButton" name="ct">
+           <property name="text">
             <string>...</string>
            </property>
-           <property name="icon" >
-            <iconset resource="layResources.qrc" >:/ct.png</iconset>
+           <property name="icon">
+            <iconset resource="../../lay/lay/layResources.qrc">
+             <normaloff>:/ct.png</normaloff>:/ct.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>31</width>
              <height>31</height>
             </size>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="0" column="0" >
-          <widget class="QToolButton" name="lt" >
-           <property name="text" >
+         <item row="0" column="0">
+          <widget class="QToolButton" name="lt">
+           <property name="text">
             <string>...</string>
            </property>
-           <property name="icon" >
-            <iconset resource="layResources.qrc" >:/lt.png</iconset>
+           <property name="icon">
+            <iconset resource="../../lay/lay/layResources.qrc">
+             <normaloff>:/lt.png</normaloff>:/lt.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>31</width>
              <height>31</height>
             </size>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="0" column="3" >
-          <widget class="QToolButton" name="rt" >
-           <property name="text" >
+         <item row="0" column="3">
+          <widget class="QToolButton" name="rt">
+           <property name="text">
             <string>...</string>
            </property>
-           <property name="icon" >
-            <iconset resource="layResources.qrc" >:/rt.png</iconset>
+           <property name="icon">
+            <iconset resource="../../lay/lay/layResources.qrc">
+             <normaloff>:/rt.png</normaloff>:/rt.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>31</width>
              <height>31</height>
             </size>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" >
-          <widget class="QToolButton" name="lc" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QToolButton" name="lc">
+           <property name="text">
             <string>...</string>
            </property>
-           <property name="icon" >
-            <iconset resource="layResources.qrc" >:/lc.png</iconset>
+           <property name="icon">
+            <iconset resource="../../lay/lay/layResources.qrc">
+             <normaloff>:/lc.png</normaloff>:/lc.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>31</width>
              <height>31</height>
             </size>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="1" column="2" >
-          <widget class="QToolButton" name="cc" >
-           <property name="text" >
+         <item row="1" column="2">
+          <widget class="QToolButton" name="cc">
+           <property name="text">
             <string>...</string>
            </property>
-           <property name="icon" >
-            <iconset resource="layResources.qrc" >:/cc.png</iconset>
+           <property name="icon">
+            <iconset resource="../../lay/lay/layResources.qrc">
+             <normaloff>:/cc.png</normaloff>:/cc.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>31</width>
              <height>31</height>
             </size>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="1" column="3" >
-          <widget class="QToolButton" name="rc" >
-           <property name="text" >
+         <item row="1" column="3">
+          <widget class="QToolButton" name="rc">
+           <property name="text">
             <string>...</string>
            </property>
-           <property name="icon" >
-            <iconset resource="layResources.qrc" >:/rc.png</iconset>
+           <property name="icon">
+            <iconset resource="../../lay/lay/layResources.qrc">
+             <normaloff>:/rc.png</normaloff>:/rc.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>31</width>
              <height>31</height>
             </size>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="2" column="0" >
-          <widget class="QToolButton" name="lb" >
-           <property name="text" >
+         <item row="2" column="0">
+          <widget class="QToolButton" name="lb">
+           <property name="text">
             <string>...</string>
            </property>
-           <property name="icon" >
-            <iconset resource="layResources.qrc" >:/lb.png</iconset>
+           <property name="icon">
+            <iconset resource="../../lay/lay/layResources.qrc">
+             <normaloff>:/lb.png</normaloff>:/lb.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>31</width>
              <height>31</height>
             </size>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="2" column="2" >
-          <widget class="QToolButton" name="cb" >
-           <property name="text" >
+         <item row="2" column="2">
+          <widget class="QToolButton" name="cb">
+           <property name="text">
             <string>...</string>
            </property>
-           <property name="icon" >
-            <iconset resource="layResources.qrc" >:/cb.png</iconset>
+           <property name="icon">
+            <iconset resource="../../lay/lay/layResources.qrc">
+             <normaloff>:/cb.png</normaloff>:/cb.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>31</width>
              <height>31</height>
             </size>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="2" column="3" >
-          <widget class="QToolButton" name="rb" >
-           <property name="text" >
+         <item row="2" column="3">
+          <widget class="QToolButton" name="rb">
+           <property name="text">
             <string>...</string>
            </property>
-           <property name="icon" >
-            <iconset resource="layResources.qrc" >:/rb.png</iconset>
+           <property name="icon">
+            <iconset resource="../../lay/lay/layResources.qrc">
+             <normaloff>:/rb.png</normaloff>:/rb.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>31</width>
              <height>31</height>
             </size>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
@@ -253,10 +288,10 @@
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>88</width>
           <height>20</height>
@@ -268,28 +303,28 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="vis_only_cbx" >
-     <property name="text" >
+    <widget class="QCheckBox" name="vis_only_cbx">
+     <property name="text">
       <string>Use visible layers only for bounding box</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="adjust_calls_cbx" >
-     <property name="text" >
+    <widget class="QCheckBox" name="adjust_calls_cbx">
+     <property name="text">
       <string>Adjust instances in parents</string>
      </property>
     </widget>
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>8</height>
@@ -298,26 +333,35 @@
     </spacer>
    </item>
    <item>
-    <widget class="QFrame" name="frame" >
-     <property name="frameShape" >
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
        <number>0</number>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
       </property>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>209</width>
           <height>20</height>
@@ -326,18 +370,18 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton" >
-        <property name="text" >
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
          <string>Ok</string>
         </property>
-        <property name="default" >
+        <property name="default">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2" >
-        <property name="text" >
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
          <string>Cancel</string>
         </property>
        </widget>
@@ -362,7 +406,7 @@
   <tabstop>vis_only_cbx</tabstop>
  </tabstops>
  <resources>
-  <include location="layResources.qrc" />
+  <include location="../../lay/lay/layResources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -371,11 +415,11 @@
    <receiver>AlignCellOptionsDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>237</x>
      <y>203</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>147</x>
      <y>81</y>
     </hint>
@@ -387,11 +431,11 @@
    <receiver>AlignCellOptionsDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>325</x>
      <y>202</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>325</x>
      <y>57</y>
     </hint>

@@ -180,6 +180,7 @@ public:
 
 protected:
   virtual void merged_semantics_changed ();
+  virtual void min_coherence_changed ();
   virtual Box compute_bbox () const;
   void invalidate_cache ();
   void set_is_merged (bool m);

@@ -642,7 +642,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   }
 
   EdgeRelationFilter check (rel, d, metrics);
-  check.set_include_zero (other != 0);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);
@@ -664,6 +664,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   EdgeRelationFilter check (rel, d, metrics);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);
@@ -764,7 +765,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     db::Box b = bbox ().enlarged (db::Vector (dx, dy));
     return region_from_box (b);
 
-  } else if (! merged_semantics ()) {
+  } else if (! merged_semantics () || is_merged ()) {
 
     //  Generic case
     std::auto_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
@@ -801,7 +802,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, dx, dy, mode);
-    db::PolygonGenerator pg (siz, false /*don't resolve holes*/, false /*min. coherence*/);
+    db::PolygonGenerator pg (siz, false /*don't resolve holes*/, min_coherence () /*min. coherence*/);
     db::BooleanOp op (db::BooleanOp::Or);
     ep.process (pg, op);
 

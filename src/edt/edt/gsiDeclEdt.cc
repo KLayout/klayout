@@ -229,7 +229,7 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
-  gsi::method ("shape", (db::Shape &(lay::ObjectInstPath::*) ()) &lay::ObjectInstPath::shape, 
+  gsi::method ("shape", (const db::Shape &(lay::ObjectInstPath::*) () const) &lay::ObjectInstPath::shape,
     "@brief Gets the shape object that describes the selected shape geometrically\n"
     "\n"
     "This method delivers valid results only for object selections that represent shapes, i.e for "

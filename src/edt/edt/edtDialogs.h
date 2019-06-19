@@ -134,9 +134,14 @@ class MakeCellOptionsDialog
   : public QDialog, 
     private Ui::MakeCellOptionsDialog
 {
+Q_OBJECT
+
 public:
   MakeCellOptionsDialog (QWidget *parent);
-  bool exec_dialog (const db::Layout &layout, std::string &name);
+  bool exec_dialog (const db::Layout &layout, std::string &name, int &mode_x, int &mode_y);
+
+private slots:
+  void button_clicked ();
 };
 
 /**
@@ -146,6 +151,8 @@ class MakeArrayOptionsDialog
   : public QDialog, 
     private Ui::MakeArrayOptionsDialog
 {
+Q_OBJECT
+
 public:
   MakeArrayOptionsDialog (QWidget *parent);
   bool exec_dialog (db::DVector &a, unsigned int &na, db::DVector &b, unsigned int &nb);
@@ -160,6 +167,8 @@ class RoundCornerOptionsDialog
   : public QDialog, 
     private Ui::RoundCornerOptionsDialog
 {
+Q_OBJECT
+
 public:
   RoundCornerOptionsDialog (QWidget *parent);
   ~RoundCornerOptionsDialog ();

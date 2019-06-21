@@ -203,6 +203,7 @@ private:
   std::vector<const db::Net *> m_current_nets;
   std::vector<const db::Device *> m_current_devices;
   std::vector<const db::SubCircuit *> m_current_subcircuits;
+  std::vector<const db::Circuit *> m_current_circuits;
   lay::NetInfoDialog *mp_info_dialog;
   tl::DeferredMethod<NetlistBrowserPage> dm_update_highlights;
   db::ContextCache m_cell_context_cache;
@@ -212,16 +213,19 @@ private:
   void navigate_to (void *id, bool forward = true);
   void adjust_view ();
   void clear_markers ();
-  void highlight (const std::vector<const db::Net *> &nets, const std::vector<const db::Device *> &devices, const std::vector<const db::SubCircuit *> &subcircuits);
+  void highlight (const std::vector<const db::Net *> &nets, const std::vector<const db::Device *> &devices, const std::vector<const db::SubCircuit *> &subcircuits, const std::vector<const db::Circuit *> &circuits);
   std::vector<const db::Net *> selected_nets ();
   std::vector<const db::Device *> selected_devices ();
   std::vector<const db::SubCircuit *> selected_subcircuits ();
+  std::vector<const db::Circuit *> selected_circuits ();
   void set_color_for_selected_nets (const QColor &color);
   void layer_list_changed (int);
   QColor make_valid_color (const QColor &color);
   bool produce_highlights_for_net(const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_subcircuit (const db::SubCircuit *subcircuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
+  bool produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
+  void configure_marker (lay::Marker *marker, bool with_fill);
 
   void export_nets (const std::vector<const db::Net *> *nets);
 };

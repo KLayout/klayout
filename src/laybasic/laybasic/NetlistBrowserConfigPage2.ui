@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>649</width>
-    <height>333</height>
+    <height>351</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Net Appearance</string>
+      <string>Marker Appearance</string>
      </property>
      <layout class="QGridLayout">
       <property name="leftMargin">
@@ -38,11 +38,10 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>By default, the original layer's style is used for the highlighted net. 
-This style can be overridden by specifying a color, stipple, line width etc. 
-Leave those fields empty to use the original style. 
-With &quot;original color&quot;, the color intensity adjustment allows increasing or decreasing the 
-brightness of the color used.</string>
+         <string>Nets, circuits and devices are highlighted using the given styles.
+Nets can be highlighted using the drawing colors for original layers with a higher or lower
+intensity, drawn with the highlight color or auto-colored with a cycling color from the palette.
+Non-net objects are drawn using the highlight color.</string>
         </property>
         <property name="wordWrap">
          <bool>false</bool>
@@ -92,7 +91,7 @@ brightness of the color used.</string>
          <item row="3" column="0" colspan="4">
           <widget class="QLabel" name="label_8">
            <property name="text">
-            <string>Net coloring</string>
+            <string>Net auto-coloring</string>
            </property>
           </widget>
          </item>
@@ -182,7 +181,7 @@ brightness of the color used.</string>
             <item>
              <widget class="QLabel" name="brightness_label">
               <property name="text">
-               <string>% intensity increase</string>
+               <string>% intensity increase (for net shapes on original layers)</string>
               </property>
              </widget>
             </item>
@@ -205,7 +204,7 @@ brightness of the color used.</string>
          <item row="0" column="0" colspan="4">
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Net highlighting</string>
+            <string>Highlight color</string>
            </property>
           </widget>
          </item>
@@ -469,7 +468,7 @@ brightness of the color used.</string>
             <string/>
            </property>
            <property name="tristate">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>

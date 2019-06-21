@@ -143,6 +143,11 @@ public:
 
   std::pair<const db::Device *, const db::Device *> device_from_index (const QModelIndex &index) const;
 
+  bool is_circuit_index (const QModelIndex &index) const
+  {
+    return is_id_circuit (index.internalPointer ());
+  }
+
   void set_item_visibility (QTreeView *view, bool show_all, bool with_warnings);
 
 private slots:

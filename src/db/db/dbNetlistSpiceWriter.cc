@@ -178,6 +178,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     os << " PE=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_PE));
     os << " PB=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_PB));
     os << " PC=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_PC));
+    os << " NE=" << tl::sprintf ("%.0f", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_NE));
 
   } else {
 

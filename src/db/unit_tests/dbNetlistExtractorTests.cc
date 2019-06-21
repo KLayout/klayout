@@ -1581,8 +1581,8 @@ TEST(6_BJT3TransistorExtraction)
     "  device PMOS $2 (S=VDD,G=$4,D=OUT,B=VDD) (L=0.4,W=2.3,AS=1.38,AD=1.38,PS=5.8,PD=5.8);\n"
     "  device PMOS $3 (S=VDD,G=IN,D=$3,B=VDD) (L=0.4,W=2.3,AS=1.38,AD=1.38,PS=5.8,PD=5.8);\n"
     "  device NMOS $4 (S=VSS,G=$4,D=OUT,B=BULK) (L=0.4,W=4.6,AS=2.185,AD=2.185,PS=8.8,PD=8.8);\n"
-    "  device PNP $6 (C=BULK,B=$3,E=$3) (AE=3.06,PE=7);\n"
-    "  device PNP $7 (C=BULK,B=$3,E=$4) (AE=6.12,PE=14);\n"
+    "  device PNP $6 (C=BULK,B=$3,E=$3) (AE=3.06,PE=7,AB=25.2,PB=21.2,AC=25.2,PC=21.2,NE=1);\n"
+    "  device PNP $7 (C=BULK,B=$3,E=$4) (AE=6.12,PE=14,AB=50.4,PB=42.4,AC=50.4,PC=42.4,NE=2);\n"
     "  device NMOS $9 (S=VSS,G=IN,D=$3,B=BULK) (L=0.4,W=3.1,AS=1.86,AD=1.86,PS=7.4,PD=7.4);\n"
     "end;\n"
   );

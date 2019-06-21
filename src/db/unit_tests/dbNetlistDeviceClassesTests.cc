@@ -2043,6 +2043,7 @@ TEST(39_ParallelBJT3Transistors)
   d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PB, 14.0);
   d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AC, 5.0);
   d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PC, 15.0);
+  d2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_NE, 4.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -2074,8 +2075,8 @@ TEST(39_ParallelBJT3Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=1);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=4);\n"
     "end;\n"
   );
 
@@ -2084,8 +2085,8 @@ TEST(39_ParallelBJT3Transistors)
   //  no combination as emitters are connected differently
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=1);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=4);\n"
     "end;\n"
   );
 
@@ -2093,8 +2094,8 @@ TEST(39_ParallelBJT3Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
-    "  device '' d2 (C=n1,B=n2,E=n3) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=1);\n"
+    "  device '' d2 (C=n1,B=n2,E=n3) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=4);\n"
     "end;\n"
   );
 
@@ -2102,7 +2103,7 @@ TEST(39_ParallelBJT3Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=5,PE=25,AB=7,PB=27,AC=9,PC=29);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=5,PE=25,AB=7,PB=27,AC=9,PC=29,NE=5);\n"
     "end;\n"
   );
 }
@@ -2121,6 +2122,7 @@ TEST(40_ParallelBJT4Transistors)
   d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PB, 13.0);
   d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AC, 4.0);
   d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PC, 14.0);
+  d1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_NE, 2.0);
   db::Device *d2 = new db::Device (cls, "d2");
   d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AE, 3.0);
   d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PE, 13.0);
@@ -2128,6 +2130,7 @@ TEST(40_ParallelBJT4Transistors)
   d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PB, 14.0);
   d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AC, 5.0);
   d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PC, 15.0);
+  d2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_NE, 3.0);
 
   db::Circuit *circuit = new db::Circuit ();
   nl.add_circuit (circuit);
@@ -2166,8 +2169,8 @@ TEST(40_ParallelBJT4Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=2);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=3);\n"
     "end;\n"
   );
 
@@ -2176,8 +2179,8 @@ TEST(40_ParallelBJT4Transistors)
   //  no combination as emitters are connected differently
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
-    "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=2);\n"
+    "  device '' d2 (C=n1,B=n2,E=n2,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=3);\n"
     "end;\n"
   );
 
@@ -2185,8 +2188,8 @@ TEST(40_ParallelBJT4Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14);\n"
-    "  device '' d2 (C=n1,B=n2,E=n3,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=2,PE=12,AB=3,PB=13,AC=4,PC=14,NE=2);\n"
+    "  device '' d2 (C=n1,B=n2,E=n3,S=n4) (AE=3,PE=13,AB=4,PB=14,AC=5,PC=15,NE=3);\n"
     "end;\n"
   );
 
@@ -2194,7 +2197,7 @@ TEST(40_ParallelBJT4Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=5,PE=25,AB=7,PB=27,AC=9,PC=29);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=5,PE=25,AB=7,PB=27,AC=9,PC=29,NE=5);\n"
     "end;\n"
   );
 }

@@ -183,6 +183,9 @@ Class<db::DeviceClassBJT3Transistor> decl_dbDeviceClassBJT3Transistor (decl_dbDe
   ) +
   gsi::constant ("PARAM_PC", db::DeviceClassBJT3Transistor::param_id_PC,
     "@brief A constant giving the parameter ID for parameter PC (collector perimeter)"
+  ) +
+  gsi::constant ("PARAM_NE", db::DeviceClassBJT3Transistor::param_id_NE,
+    "@brief A constant giving the parameter ID for parameter NE (emitter count)"
   ),
   "@brief A device class for a bipolar transistor.\n"
   "This class describes a bipolar transistor. Bipolar transistors have tree terminals: the collector (C), the base (B) and the emitter (E).\n"
@@ -190,6 +193,8 @@ Class<db::DeviceClassBJT3Transistor> decl_dbDeviceClassBJT3Transistor (decl_dbDe
   "\n"
   "The parameters are AE, AB and AC for the emitter, base and collector areas in square micrometers and "
   "PE, PB and PC for the emitter, base and collector perimeters in micrometers.\n"
+  "In addition, the emitter count (NE) is given. The emitter count is 1 always for a transistor extracted initially. "
+  "Upon combination of devices, the emitter counts are added, thus forming multi-emitter devices.\n"
   "\n"
   "This class has been introduced in version 0.26."
 );

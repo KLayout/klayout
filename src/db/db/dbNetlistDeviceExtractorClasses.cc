@@ -492,6 +492,8 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
 
         device->set_trans (db::DCplxTrans ((pe->box ().center () - db::Point ()) * dbu ()));
 
+        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_NE, 1.0);
+
         device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AE, dbu () * dbu () * pe->area ());
         device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PE, dbu () * pe->perimeter ());
 

@@ -787,7 +787,9 @@ std::string device_string (const db::Device *device)
       s += formatted_value (device->parameter_value (p->id ()));
     }
   }
-  s += "]";
+  if (! first) {
+    s += "]";
+  }
   return s;
 }
 

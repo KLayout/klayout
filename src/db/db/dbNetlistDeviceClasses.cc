@@ -483,6 +483,7 @@ DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_AB = 2;
 DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_PB = 3;
 DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_AC = 4;
 DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_PC = 5;
+DB_PUBLIC size_t DeviceClassBJT3Transistor::param_id_NE = 6;
 
 DB_PUBLIC size_t DeviceClassBJT3Transistor::terminal_id_C = 0;
 DB_PUBLIC size_t DeviceClassBJT3Transistor::terminal_id_B = 1;
@@ -494,12 +495,14 @@ DeviceClassBJT3Transistor::DeviceClassBJT3Transistor ()
   add_terminal_definition (db::DeviceTerminalDefinition ("B", "Base"));
   add_terminal_definition (db::DeviceTerminalDefinition ("E", "Emitter"));
 
-  add_parameter_definition (db::DeviceParameterDefinition ("AE", "Emitter area (square micrometer)", 0.0, false));
+  //  NOTE: the emitter area and the emitter count are the primary parameters
+  add_parameter_definition (db::DeviceParameterDefinition ("AE", "Emitter area (square micrometer)", 0.0, true));
   add_parameter_definition (db::DeviceParameterDefinition ("PE", "Emitter perimeter (micrometer)", 0.0, false));
   add_parameter_definition (db::DeviceParameterDefinition ("AB", "Base area (square micrometer)", 0.0, false));
   add_parameter_definition (db::DeviceParameterDefinition ("PB", "Base perimeter (micrometer)", 0.0, false));
   add_parameter_definition (db::DeviceParameterDefinition ("AC", "Collector area (square micrometer)", 0.0, false));
   add_parameter_definition (db::DeviceParameterDefinition ("PC", "Collector perimeter (micrometer)", 0.0, false));
+  add_parameter_definition (db::DeviceParameterDefinition ("NE", "Emitter count", 1.0, true));
 }
 
 bool DeviceClassBJT3Transistor::combine_devices (Device *a, Device *b) const
@@ -529,7 +532,7 @@ bool DeviceClassBJT3Transistor::combine_devices (Device *a, Device *b) const
 
 void DeviceClassBJT3Transistor::combine_parameters (Device *a, Device *b) const
 {
-  for (size_t i = 0; i < 6; ++i) {
+  for (size_t i = 0; i < 7; ++i) {
     a->set_parameter_value (i, a->parameter_value (i) + b->parameter_value (i));
   }
 }

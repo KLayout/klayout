@@ -293,6 +293,7 @@ public:
   static size_t param_id_PB;
   static size_t param_id_AC;
   static size_t param_id_PC;
+  static size_t param_id_NE;
 
   static size_t terminal_id_C;
   static size_t terminal_id_B;

@@ -121,25 +121,48 @@ namespace db
 
 namespace lvs_std_format
 {
-  template <bool Short>
-  struct DB_PUBLIC keys
-    : public l2n_std_format::keys<Short>
+  struct DB_PUBLIC ShortKeys
   {
-    typedef l2n_std_format::keys<Short> l2n_keys;
+    static std::string lvs_magic_string;
 
-    static const std::string lvs_magic_string;
+    static std::string reference_key;
+    static std::string layout_key;
+    static std::string xref_key;
 
-    static const std::string reference_key;
-    static const std::string layout_key;
-    static const std::string xref_key;
+    static std::string mismatch_key;
+    static std::string match_key;
+    static std::string nomatch_key;
+    static std::string warning_key;
+    static std::string skipped_key;
+  };
 
-    static const std::string mismatch_key;
-    static const std::string match_key;
-    static const std::string nomatch_key;
-    static const std::string warning_key;
-    static const std::string skipped_key;
+  struct DB_PUBLIC LongKeys
+  {
+    static std::string lvs_magic_string;
 
-    inline static bool is_short () { return Short; }
+    static std::string reference_key;
+    static std::string layout_key;
+    static std::string xref_key;
+
+    static std::string mismatch_key;
+    static std::string match_key;
+    static std::string nomatch_key;
+    static std::string warning_key;
+    static std::string skipped_key;
+  };
+
+  template <bool Short> struct DB_PUBLIC keys;
+
+  template <> struct DB_PUBLIC keys<true> : public l2n_std_format::keys<true>, public ShortKeys
+  {
+    typedef l2n_std_format::keys<true> l2n_keys;
+    inline static bool is_short () { return true; }
+  };
+
+  template <> struct DB_PUBLIC keys<false> : public l2n_std_format::keys<false>, public LongKeys
+  {
+    typedef l2n_std_format::keys<false> l2n_keys;
+    inline static bool is_short () { return false; }
   };
 }
 

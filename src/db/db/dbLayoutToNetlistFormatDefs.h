@@ -136,38 +136,78 @@ namespace db
 
 namespace l2n_std_format
 {
-  template <bool Short>
-  struct DB_PUBLIC keys
+  struct DB_PUBLIC ShortKeys
   {
-    static const std::string l2n_magic_string;
+    static std::string l2n_magic_string;
 
-    static const std::string version_key;
-    static const std::string description_key;
-    static const std::string top_key;
-    static const std::string unit_key;
-    static const std::string layer_key;
-    static const std::string class_key;
-    static const std::string connect_key;
-    static const std::string global_key;
-    static const std::string circuit_key;
-    static const std::string net_key;
-    static const std::string name_key;
-    static const std::string device_key;
-    static const std::string subcircuit_key;
-    static const std::string polygon_key;
-    static const std::string rect_key;
-    static const std::string terminal_key;
-    static const std::string abstract_key;
-    static const std::string param_key;
-    static const std::string location_key;
-    static const std::string rotation_key;
-    static const std::string mirror_key;
-    static const std::string scale_key;
-    static const std::string pin_key;
-    static const std::string indent1;
-    static const std::string indent2;
+    static std::string version_key;
+    static std::string description_key;
+    static std::string top_key;
+    static std::string unit_key;
+    static std::string layer_key;
+    static std::string class_key;
+    static std::string connect_key;
+    static std::string global_key;
+    static std::string circuit_key;
+    static std::string net_key;
+    static std::string name_key;
+    static std::string device_key;
+    static std::string subcircuit_key;
+    static std::string polygon_key;
+    static std::string rect_key;
+    static std::string terminal_key;
+    static std::string abstract_key;
+    static std::string param_key;
+    static std::string location_key;
+    static std::string rotation_key;
+    static std::string mirror_key;
+    static std::string scale_key;
+    static std::string pin_key;
+    static std::string indent1;
+    static std::string indent2;
+  };
 
-    inline static bool is_short () { return Short; }
+  struct DB_PUBLIC LongKeys
+  {
+    static std::string l2n_magic_string;
+
+    static std::string version_key;
+    static std::string description_key;
+    static std::string top_key;
+    static std::string unit_key;
+    static std::string layer_key;
+    static std::string class_key;
+    static std::string connect_key;
+    static std::string global_key;
+    static std::string circuit_key;
+    static std::string net_key;
+    static std::string name_key;
+    static std::string device_key;
+    static std::string subcircuit_key;
+    static std::string polygon_key;
+    static std::string rect_key;
+    static std::string terminal_key;
+    static std::string abstract_key;
+    static std::string param_key;
+    static std::string location_key;
+    static std::string rotation_key;
+    static std::string mirror_key;
+    static std::string scale_key;
+    static std::string pin_key;
+    static std::string indent1;
+    static std::string indent2;
+  };
+
+  template <bool Short> struct DB_PUBLIC keys;
+
+  template <> struct DB_PUBLIC keys<true> : public ShortKeys
+  {
+    inline static bool is_short () { return true; }
+  };
+
+  template <> struct DB_PUBLIC keys<false> : public LongKeys
+  {
+    inline static bool is_short () { return false; }
   };
 }
 

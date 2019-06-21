@@ -28,28 +28,28 @@ namespace db
 namespace lvs_std_format
 {
   const char *lvs_magic_string_cstr = "#%lvsdb-klayout";
-  template<> DB_PUBLIC const std::string keys<false>::lvs_magic_string (lvs_magic_string_cstr);
-  template<> DB_PUBLIC const std::string keys<true>::lvs_magic_string (lvs_magic_string_cstr);
+  DB_PUBLIC std::string ShortKeys::lvs_magic_string (lvs_magic_string_cstr);
+  DB_PUBLIC std::string LongKeys::lvs_magic_string (lvs_magic_string_cstr);
 
-  template<> DB_PUBLIC const std::string keys<false>::reference_key ("reference");
-  template<> DB_PUBLIC const std::string keys<false>::layout_key ("layout");
-  template<> DB_PUBLIC const std::string keys<false>::xref_key ("xref");
+  DB_PUBLIC std::string ShortKeys::reference_key ("reference");
+  DB_PUBLIC std::string ShortKeys::layout_key ("layout");
+  DB_PUBLIC std::string ShortKeys::xref_key ("xref");
 
-  template<> DB_PUBLIC const std::string keys<false>::mismatch_key ("mismatch");
-  template<> DB_PUBLIC const std::string keys<false>::match_key ("match");
-  template<> DB_PUBLIC const std::string keys<false>::nomatch_key ("nomatch");
-  template<> DB_PUBLIC const std::string keys<false>::warning_key ("warning");
-  template<> DB_PUBLIC const std::string keys<false>::skipped_key ("skipped");
+  DB_PUBLIC std::string ShortKeys::mismatch_key ("mismatch");
+  DB_PUBLIC std::string ShortKeys::match_key ("match");
+  DB_PUBLIC std::string ShortKeys::nomatch_key ("nomatch");
+  DB_PUBLIC std::string ShortKeys::warning_key ("warning");
+  DB_PUBLIC std::string ShortKeys::skipped_key ("skipped");
 
-  template<> DB_PUBLIC const std::string keys<true>::reference_key ("H");
-  template<> DB_PUBLIC const std::string keys<true>::layout_key ("J");
-  template<> DB_PUBLIC const std::string keys<true>::xref_key ("Z");
+  DB_PUBLIC std::string LongKeys::reference_key ("H");
+  DB_PUBLIC std::string LongKeys::layout_key ("J");
+  DB_PUBLIC std::string LongKeys::xref_key ("Z");
 
-  template<> DB_PUBLIC const std::string keys<true>::mismatch_key ("0");
-  template<> DB_PUBLIC const std::string keys<true>::match_key ("1");
-  template<> DB_PUBLIC const std::string keys<true>::nomatch_key ("X");
-  template<> DB_PUBLIC const std::string keys<true>::warning_key ("W");
-  template<> DB_PUBLIC const std::string keys<true>::skipped_key ("S");
+  DB_PUBLIC std::string LongKeys::mismatch_key ("0");
+  DB_PUBLIC std::string LongKeys::match_key ("1");
+  DB_PUBLIC std::string LongKeys::nomatch_key ("X");
+  DB_PUBLIC std::string LongKeys::warning_key ("W");
+  DB_PUBLIC std::string LongKeys::skipped_key ("S");
 }
 
 }

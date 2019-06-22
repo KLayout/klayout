@@ -29,6 +29,7 @@
 #include "tlException.h"
 #include "tlInternational.h"
 #include "tlStream.h"
+#include "tlGlobPattern.h"
 
 namespace gsi
 {
@@ -1275,6 +1276,21 @@ static void read_netlist (db::Netlist *nl, const std::string &file, db::NetlistR
   reader->read (os, *nl);
 }
 
+static void flatten_circuit_by_name (db::Netlist *nl, const std::string &name_pattern)
+{
+  std::list<db::Circuit *> circuits_to_flatten;
+  tl::GlobPattern pat (name_pattern);
+  for (db::Netlist::circuit_iterator c = nl->begin_circuits (); c != nl->end_circuits (); ++c) {
+    if (pat.match (c->name ())) {
+      circuits_to_flatten.push_back (c.operator-> ());
+    }
+  }
+
+  for (std::list<db::Circuit *>::const_iterator c = circuits_to_flatten.begin (); c != circuits_to_flatten.end (); ++c) {
+    nl->flatten_circuit (*c);
+  }
+}
+
 Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method_ext ("add", &gsi::add_circuit, gsi::arg ("circuit"),
     "@brief Adds the circuit to the netlist\n"
@@ -1289,6 +1305,12 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Flattens a subcircuit\n"
     "This method will substitute all instances (subcircuits) of the given circuit by it's "
     "contents. After this, the circuit is removed."
+  ) +
+  gsi::method_ext ("flatten_circuit", &flatten_circuit_by_name, gsi::arg ("pattern"),
+    "@brief Flattens circuits matching a certain pattern\n"
+    "This method will substitute all instances (subcircuits) of all circuits with names matching the given name pattern. "
+    "The name pattern is a glob expression. For example, 'flatten_circuit(\"np*\")' will flatten all circuits witt names "
+    "starting with 'np'."
   ) +
   gsi::method ("circuit_by_cell_index", (db::Circuit *(db::Netlist::*) (db::cell_index_type)) &db::Netlist::circuit_by_cell_index, gsi::arg ("cell_index"),
     "@brief Gets the circuit object for a given cell index.\n"

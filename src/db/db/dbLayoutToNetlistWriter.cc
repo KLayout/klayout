@@ -577,7 +577,7 @@ void std_writer_impl<Keys>::write (const db::LayoutToNetlist * /*l2n*/, const db
   }
 
   if (! device.name ().empty ()) {
-    *mp_stream << " " << Keys::name_key << "(" << tl::to_word_or_quoted_string (device.name ()) << ")";
+    *mp_stream << indent << indent2 << Keys::name_key << "(" << tl::to_word_or_quoted_string (device.name ()) << ")" << endl;
   }
 
   for (std::vector<DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {

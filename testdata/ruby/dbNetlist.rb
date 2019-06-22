@@ -829,6 +829,7 @@ circuit NTRANS ($1=$1,$2=$2,$3=$3);
 end;
 END
 
+    nl3 = nl2.dup
     nl2.flatten_circuit(nl2.circuit_by_name("PTRANS"))
     nl2.flatten_circuit(nl2.circuit_by_name("NTRANS"))
 
@@ -840,6 +841,9 @@ circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
   device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
 end;
 END
+
+    nl3.flatten_circuit("{N,P}TRANS")
+    assert_equal(nl3.to_s, nl2.to_s)
 
   end
 

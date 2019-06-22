@@ -484,6 +484,7 @@ END
     d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_PE, 12.0)
     d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_PB, 13.0)
     d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_PC, 14.0)
+    d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_NE, 2.0)
     d2 = circuit.create_device(cls, "d2")
     d2.set_parameter("AE", 2.0)
     d2.set_parameter("AB", 3.0)
@@ -491,6 +492,7 @@ END
     d2.set_parameter("PE", 13.0)
     d2.set_parameter("PB", 14.0)
     d2.set_parameter("PC", 15.0)
+    d2.set_parameter("NE", 3.0)
 
     pin_a = circuit.create_pin ("A")
     pin_b = circuit.create_pin ("B")
@@ -513,8 +515,8 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2,C=n3);
-  device '' d1 (C=n1,B=n3,E=n2) (AE=1,PE=12,AB=2,PB=13,AC=3,PC=14);
-  device '' d2 (C=n1,B=n3,E=n2) (AE=2,PE=13,AB=3,PB=14,AC=4,PC=15);
+  device '' d1 (C=n1,B=n3,E=n2) (AE=1,PE=12,AB=2,PB=13,AC=3,PC=14,NE=2);
+  device '' d2 (C=n1,B=n3,E=n2) (AE=2,PE=13,AB=3,PB=14,AC=4,PC=15,NE=3);
 end;
 END
 
@@ -523,7 +525,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2,C=n3);
-  device '' d1 (C=n1,B=n3,E=n2) (AE=3,PE=25,AB=5,PB=27,AC=7,PC=29);
+  device '' d1 (C=n1,B=n3,E=n2) (AE=3,PE=25,AB=5,PB=27,AC=7,PC=29,NE=5);
 end;
 END
 
@@ -553,6 +555,7 @@ END
     d2.set_parameter("PE", 13.0)
     d2.set_parameter("PB", 14.0)
     d2.set_parameter("PC", 15.0)
+    d2.set_parameter("NE", 2.0)
 
     pin_a = circuit.create_pin ("A")
     pin_b = circuit.create_pin ("B")
@@ -581,8 +584,8 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2,C=n3,D=n4);
-  device '' d1 (C=n1,B=n3,E=n2,S=n4) (AE=1,PE=12,AB=2,PB=13,AC=3,PC=14);
-  device '' d2 (C=n1,B=n3,E=n2,S=n4) (AE=2,PE=13,AB=3,PB=14,AC=4,PC=15);
+  device '' d1 (C=n1,B=n3,E=n2,S=n4) (AE=1,PE=12,AB=2,PB=13,AC=3,PC=14,NE=1);
+  device '' d2 (C=n1,B=n3,E=n2,S=n4) (AE=2,PE=13,AB=3,PB=14,AC=4,PC=15,NE=2);
 end;
 END
 
@@ -591,7 +594,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2,C=n3,D=n4);
-  device '' d1 (C=n1,B=n3,E=n2,S=n4) (AE=3,PE=25,AB=5,PB=27,AC=7,PC=29);
+  device '' d1 (C=n1,B=n3,E=n2,S=n4) (AE=3,PE=25,AB=5,PB=27,AC=7,PC=29,NE=3);
 end;
 END
 

@@ -33,12 +33,140 @@
 namespace db
 {
 
-static const char *allowed_name_chars = "_.:,!+$/&\\#[]|";
+// ------------------------------------------------------------------------------------------------------
 
-NetlistSpiceReader::NetlistSpiceReader ()
-  : mp_netlist (0), mp_stream (0)
+NetlistSpiceReaderDelegate::NetlistSpiceReaderDelegate ()
 {
   //  .. nothing yet ..
+}
+
+NetlistSpiceReaderDelegate::~NetlistSpiceReaderDelegate ()
+{
+  //  .. nothing yet ..
+}
+
+void NetlistSpiceReaderDelegate::start (db::Netlist * /*netlist*/)
+{
+  //  .. nothing yet ..
+}
+
+void NetlistSpiceReaderDelegate::finish (db::Netlist * /*netlist*/)
+{
+  //  .. nothing yet ..
+}
+
+void NetlistSpiceReaderDelegate::error (const std::string &msg)
+{
+  throw tl::Exception (msg);
+}
+
+bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+{
+  std::string cn = model;
+  db::DeviceClass *cls = circuit->netlist ()->device_class_by_name (cn);
+  db::DeviceClass *new_cls = 0;
+
+  if (cls) {
+    //  use given class
+  } else if (element == "R") {
+    if (cn.empty ()) {
+      cn = "RES";
+    }
+    new_cls = new db::DeviceClassResistor ();
+  } else if (element == "L") {
+    if (cn.empty ()) {
+      cn = "IND";
+    }
+    new_cls = new db::DeviceClassInductor ();
+  } else if (element == "C") {
+    if (cn.empty ()) {
+      cn = "CAP";
+    }
+    new_cls = new db::DeviceClassCapacitor ();
+  } else if (element == "D") {
+    if (cn.empty ()) {
+      cn = "DIODE";
+    }
+    new_cls = new db::DeviceClassDiode ();
+  } else if (element == "Q") {
+    if (nets.size () == 3) {
+      if (cn.empty ()) {
+        cn = "BJT3";
+      }
+      new_cls = new db::DeviceClassBJT3Transistor ();
+    } else if (nets.size () == 4) {
+      if (cn.empty ()) {
+        cn = "BJT4";
+      }
+      new_cls = new db::DeviceClassBJT4Transistor ();
+    }
+  } else if (element == "M") {
+    if (nets.size () == 3) {
+      if (cn.empty ()) {
+        cn = "MOS3";
+      }
+      new_cls = new db::DeviceClassMOS3Transistor ();
+    } else if (nets.size () == 4) {
+      if (cn.empty ()) {
+        cn = "MOS4";
+      }
+      new_cls = new db::DeviceClassMOS4Transistor ();
+    }
+  }
+
+  if (new_cls) {
+    cls = new_cls;
+    cls->set_name (cn);
+    circuit->netlist ()->add_device_class (cls);
+  } else if (! cls) {
+    error (tl::sprintf (tl::to_string (tr ("Not a known element type: '%s'")), element));
+  }
+
+  const std::vector<db::DeviceTerminalDefinition> &td = cls->terminal_definitions ();
+  if (td.size () != nets.size ()) {
+    error (tl::sprintf (tl::to_string (tr ("Wrong number of terminals: class '%s' expects %d, but %d are given")), cn, int (td.size ()), int (nets.size ())));
+  }
+
+  db::Device *device = new db::Device (cls, name);
+  circuit->add_device (device);
+
+  for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
+    device->connect_terminal (t->id (), nets [t - td.begin ()]);
+  }
+
+  size_t defp = std::numeric_limits<size_t>::max ();
+  if (dynamic_cast<db::DeviceClassCapacitor *> (cls)) {
+    defp = db::DeviceClassCapacitor::param_id_C;
+  } else if (dynamic_cast<db::DeviceClassResistor *> (cls)) {
+    defp = db::DeviceClassResistor::param_id_R;
+  } else if (dynamic_cast<db::DeviceClassInductor *> (cls)) {
+    defp = db::DeviceClassInductor::param_id_L;
+  }
+
+  const std::vector<db::DeviceParameterDefinition> &pd = cls->parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+    std::map<std::string, double>::const_iterator v = params.find (i->name ());
+    if (v != params.end ()) {
+      device->set_parameter_value (i->id (), v->second / i->si_scaling ());
+    } else if (i->id () == defp) {
+      device->set_parameter_value (i->id (), value / i->si_scaling ());
+    }
+  }
+
+  return true;
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+static const char *allowed_name_chars = "_.:,!+$/&\\#[]|";
+
+NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate, const std::string &captured_subcircuits)
+  : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_captured (captured_subcircuits)
+{
+  static NetlistSpiceReaderDelegate std_delegate;
+  if (! delegate) {
+    mp_delegate.reset (&std_delegate);
+  }
 }
 
 NetlistSpiceReader::~NetlistSpiceReader ()
@@ -55,10 +183,13 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
 
   try {
 
+    mp_delegate->start (&netlist);
+
     while (! at_end ()) {
-      read_element ();
+      read_card ();
     }
 
+    mp_delegate->finish (&netlist);
     finish ();
 
   } catch (tl::Exception &ex) {
@@ -166,7 +297,7 @@ void NetlistSpiceReader::unget_line (const std::string &l)
   m_stored_line = l;
 }
 
-bool NetlistSpiceReader::read_element ()
+bool NetlistSpiceReader::read_card ()
 {
   std::string l = get_line ();
   if (l.empty ()) {
@@ -175,9 +306,8 @@ bool NetlistSpiceReader::read_element ()
 
   tl::Extractor ex (l.c_str ());
 
-  const char *res_device_class_name = "RES";
-  const char *cap_device_class_name = "CAP";
-  const char *ind_device_class_name = "IND";
+  ex.skip ();
+  char next_char = toupper (*ex);
 
   if (ex.test_without_case (".")) {
 
@@ -207,59 +337,24 @@ bool NetlistSpiceReader::read_element ()
 
     }
 
-  } else if (ex.test_without_case ("r")) {
+  } else if (isalpha (next_char)) {
 
-    db::DeviceClass *dev_cls = mp_netlist->device_class_by_name (res_device_class_name);
-    if (! dev_cls) {
-      dev_cls = new db::DeviceClassResistor ();
-      dev_cls->set_name (res_device_class_name);
-      mp_netlist->add_device_class (dev_cls);
+    ++ex;
+
+    std::string name = read_name (ex);
+    ensure_circuit ();
+
+    std::string es;
+    es.push_back (next_char);
+
+    if (next_char == 'X' && ! m_captured.match (name)) {
+      read_subcircuit (ex, name);
+    } else if (! read_element (ex, es, name)) {
+      warn (tl::sprintf (tl::to_string (tr ("Element type '%c' ignored")), next_char));
     }
-
-    ensure_circuit ();
-    read_device (dev_cls, db::DeviceClassResistor::param_id_R, ex);
-
-  } else if (ex.test_without_case ("c")) {
-
-    db::DeviceClass *dev_cls = mp_netlist->device_class_by_name (cap_device_class_name);
-    if (! dev_cls) {
-      dev_cls = new db::DeviceClassCapacitor ();
-      dev_cls->set_name (cap_device_class_name);
-      mp_netlist->add_device_class (dev_cls);
-    }
-
-    ensure_circuit ();
-    read_device (dev_cls, db::DeviceClassCapacitor::param_id_C, ex);
-
-  } else if (ex.test_without_case ("l")) {
-
-    db::DeviceClass *dev_cls = mp_netlist->device_class_by_name (ind_device_class_name);
-    if (! dev_cls) {
-      dev_cls = new db::DeviceClassInductor ();
-      dev_cls->set_name (ind_device_class_name);
-      mp_netlist->add_device_class (dev_cls);
-    }
-
-    ensure_circuit ();
-    read_device (dev_cls, db::DeviceClassInductor::param_id_L, ex);
-
-  } else if (ex.test_without_case ("m")) {
-
-    ensure_circuit ();
-    read_mos4_device (ex);
-
-  } else if (ex.test_without_case ("x")) {
-
-    ensure_circuit ();
-    read_subcircuit (ex);
 
   } else {
-
-    char c = *ex.skip ();
-    if (c) {
-      warn (tl::sprintf (tl::to_string (tr ("Element type '%c' ignored")), c));
-    }
-
+    warn (tl::to_string (tr ("Line ignored")));
   }
 
   return false;
@@ -480,10 +575,111 @@ std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
   return nn;
 }
 
-void NetlistSpiceReader::read_subcircuit (tl::Extractor &ex)
+bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &element, const std::string &name)
 {
-  std::string sc_name = read_name (ex);
+  //  generic parse
+  std::vector<std::string> nn;
+  std::map<std::string, double> pv;
 
+  std::string model;
+  double value = 0.0;
+
+  //  interpret the parameters according to the code
+  if (element == "X") {
+
+    //  subcircuit call:
+    //  Xname n1 n2 ... nn circuit [params]
+
+    read_pin_and_parameters (ex, nn, pv);
+
+    if (nn.empty ()) {
+      error (tl::to_string (tr ("No circuit name given for subcircuit call")));
+    }
+
+    model = nn.back ();
+    nn.pop_back ();
+
+  } else if (element == "R" || element == "C" || element == "L") {
+
+    //  resistor, cap, inductor: two-terminal devices with a value
+    //  Rname n1 n2 value
+    //  Rname n1 n2 value model [params]
+    //  Rname n1 n2 model [params]
+    //  (same for C, L instead of R)
+
+    while (! ex.at_end () && nn.size () < 2) {
+      nn.push_back (read_name (ex));
+    }
+
+    if (nn.size () != 2) {
+      error (tl::to_string (tr ("Two-terminal device needs two nets")));
+    }
+
+    tl::Extractor ve (ex);
+    double vv = 0.0;
+    if (ve.try_read (vv) || ve.test ("(")) {
+      value = read_value (ex);
+    }
+
+    while (! ex.at_end ()) {
+      std::string n = read_name (ex);
+      if (ex.test ("=")) {
+        pv [tl::to_upper_case (n)] = read_value (ex);
+      } else if (! model.empty ()) {
+        error (tl::sprintf (tl::to_string (tr ("Too many arguments for two-terminal device (additional argumen is '%s')")), n));
+      } else {
+        model = n;
+      }
+    }
+
+  } else {
+
+    //  others: n-terminal devices with a model (last node)
+
+    while (! ex.at_end ()) {
+      std::string n = read_name (ex);
+      if (ex.test ("=")) {
+        pv [tl::to_upper_case (n)] = read_value (ex);
+      } else {
+        nn.push_back (n);
+      }
+    }
+
+    if (nn.empty ()) {
+      error (tl::sprintf (tl::to_string (tr ("No model name given for element '%s'")), element));
+    }
+
+    model = nn.back ();
+    nn.pop_back ();
+
+    if (element == "M") {
+      if (nn.size () != 4) {
+        error (tl::to_string (tr ("'M' element must have four nodes")));
+      }
+    } else if (element == "Q") {
+      if (nn.size () != 3 && nn.size () != 4) {
+        error (tl::to_string (tr ("'Q' element must have three or four nodes")));
+      }
+    } else if (element == "D") {
+      if (nn.size () != 2) {
+        error (tl::to_string (tr ("'D' element must have two nodes")));
+      }
+    }
+
+    //  TODO: other devices?
+
+  }
+
+  std::vector<db::Net *> nets;
+  for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
+    nets.push_back (make_net (*i));
+  }
+
+  return mp_delegate->element (mp_circuit, element, name, tl::to_upper_case (model), value, nets, pv);
+}
+
+void NetlistSpiceReader::read_subcircuit (tl::Extractor &ex, const std::string &sc_name)
+{
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
   read_pin_and_parameters (ex, nn, pv);
@@ -564,107 +760,13 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex)
   }
 
   while (! at_end ()) {
-    if (read_element ()) {
+    if (read_card ()) {
       break;
     }
   }
 
   mp_nets_by_name.reset (n2n.release ());
   std::swap (cc, mp_circuit);
-
-  ex.expect_end ();
-}
-
-void NetlistSpiceReader::read_device (db::DeviceClass *dev_cls, size_t param_id, tl::Extractor &ex)
-{
-  std::string dn = read_name (ex);
-
-  std::vector<std::string> nn;
-
-  while (! ex.at_end () && nn.size () < 2) {
-    nn.push_back (read_name (ex));
-  }
-
-  if (nn.size () != 2) {
-    error (tl::to_string (tr ("Two-terminal device needs two nets")));
-  }
-
-  double v = read_value (ex);
-
-  db::Device *dev = new db::Device (dev_cls, dn);
-  mp_circuit->add_device (dev);
-
-  for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
-    db::Net *net = make_net (*i);
-    dev->connect_terminal (i - nn.begin (), net);
-  }
-
-  dev->set_parameter_value (param_id, v);
-
-  ex.expect_end ();
-}
-
-void NetlistSpiceReader::read_mos4_device (tl::Extractor &ex)
-{
-  std::string dn = read_name (ex);
-
-  std::vector<std::string> nn;
-  std::map<std::string, double> pv;
-
-  while (! ex.at_end ()) {
-
-    std::string n = read_name (ex);
-
-    if (ex.test ("=")) {
-      //  a parameter
-      pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex)));
-    } else {
-      nn.push_back (n);
-    }
-
-  }
-
-  if (nn.empty ()) {
-    error (tl::to_string (tr ("No model name given for MOS transistor element")));
-  }
-
-  std::string mn = nn.back ();
-  nn.pop_back ();
-
-  if (nn.size () != 4) {
-    error (tl::to_string (tr ("A MOS transistor needs four nets")));
-  }
-
-  db::DeviceClass *dev_cls = mp_netlist->device_class_by_name (mn);
-  if (! dev_cls) {
-    dev_cls = new db::DeviceClassMOS4Transistor ();
-    dev_cls->set_name (mn);
-    mp_netlist->add_device_class (dev_cls);
-  }
-
-  db::Device *dev = new db::Device (dev_cls, dn);
-  mp_circuit->add_device (dev);
-
-  for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
-    db::Net *net = make_net (*i);
-    dev->connect_terminal (i - nn.begin (), net);
-  }
-
-  const std::vector<db::DeviceParameterDefinition> &pd = dev_cls->parameter_definitions ();
-  for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-    std::map<std::string, double>::const_iterator v = pv.find (i->name ());
-    if (v != pv.end ()) {
-      //  by conventions, dimensions are in micrometer
-      if (i->id () == db::DeviceClassMOS4Transistor::param_id_AD || i->id () == db::DeviceClassMOS4Transistor::param_id_AS) {
-        dev->set_parameter_value (i->id (), v->second * 1e12);
-      } else if (i->id () == db::DeviceClassMOS4Transistor::param_id_W
-                 || i->id () == db::DeviceClassMOS4Transistor::param_id_L
-                 || i->id () == db::DeviceClassMOS4Transistor::param_id_PD
-                 || i->id () == db::DeviceClassMOS4Transistor::param_id_PS) {
-        dev->set_parameter_value (i->id (), v->second * 1e6);
-      }
-    }
-  }
 
   ex.expect_end ();
 }

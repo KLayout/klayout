@@ -622,14 +622,19 @@ Class<db::DeviceTerminalDefinition> decl_dbDeviceTerminalDefinition ("db", "Devi
   "This class has been added in version 0.26."
 );
 
-static db::DeviceParameterDefinition *new_parameter_definition (const std::string &name, const std::string &description, double default_value)
+static db::DeviceParameterDefinition *new_parameter_definition (const std::string &name, const std::string &description, double default_value, bool is_primary, double si_scaling)
 {
-  return new db::DeviceParameterDefinition (name, description, default_value);
+  return new db::DeviceParameterDefinition (name, description, default_value, is_primary, si_scaling);
 }
 
 Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "DeviceParameterDefinition",
-  gsi::constructor ("new", &gsi::new_parameter_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()), gsi::arg ("default_value", 0.0),
+  gsi::constructor ("new", &gsi::new_parameter_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()), gsi::arg ("default_value", 0.0), gsi::arg ("is_primary", true), gsi::arg ("si_scaling", 1.0),
     "@brief Creates a new parameter definition."
+    "@param name The name of the parameter\n"
+    "@param description The human-readable description\n"
+    "@param default_value The initial value\n"
+    "@param is_primary True, if the parameter is a primary parameter (see \\is_primary=)\n"
+    "@param si_scaling The scaling factor to SI units\n"
   ) +
   gsi::method ("name", &db::DeviceParameterDefinition::name,
     "@brief Gets the name of the parameter."
@@ -658,6 +663,10 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
     "@brief Sets a value indicating whether the parameter is a primary parameter\n"
     "If this flag is set to true (the default), the parameter is considered a primary parameter.\n"
     "Only primary parameters are compared by default.\n"
+  ) +
+  gsi::method ("si_scaling", &db::DeviceParameterDefinition::si_scaling,
+    "@brief Gets the scaling factor to SI units.\n"
+    "For parameters in micrometers for example, this factor will be 1e-6."
   ) +
   gsi::method ("id", &db::DeviceParameterDefinition::id,
     "@brief Gets the ID of the parameter.\n"

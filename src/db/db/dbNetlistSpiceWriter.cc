@@ -135,9 +135,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     //  Use device class name for the model
     os << " ";
     os << format_name (dev.device_class ()->name ());
-
-    os << " A=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassDiode::param_id_A));
-    os << " P=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassDiode::param_id_P));
+    os << format_params (dev);
 
   } else if (mos3 || mos4) {
 
@@ -154,13 +152,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     //  Use device class name for the model
     os << " ";
     os << format_name (dev.device_class ()->name ());
-
-    os << " L=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_L));
-    os << " W=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_W));
-    os << " AS=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_AS));
-    os << " AD=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_AD));
-    os << " PS=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_PS));
-    os << " PD=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassMOS3Transistor::param_id_PD));
+    os << format_params (dev);
 
   } else if (bjt3 || bjt4) {
 
@@ -171,14 +163,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     //  Use device class name for the model
     os << " ";
     os << format_name (dev.device_class ()->name ());
-
-    os << " AE=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_AE));
-    os << " AB=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_AB));
-    os << " AC=" << tl::sprintf ("%.12gP", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_AC));
-    os << " PE=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_PE));
-    os << " PB=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_PB));
-    os << " PC=" << tl::sprintf ("%.12gU", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_PC));
-    os << " NE=" << tl::sprintf ("%.0f", dev.parameter_value (db::DeviceClassBJT3Transistor::param_id_NE));
+    os << format_params (dev);
 
   } else {
 
@@ -207,13 +192,24 @@ std::string NetlistSpiceWriterDelegate::format_terminals (const db::Device &dev)
   return os.str ();
 }
 
-std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev) const
+std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, size_t without_id) const
 {
   std::ostringstream os;
 
   const std::vector<db::DeviceParameterDefinition> &pd = dev.device_class ()->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-    os << " " << i->name () << "=" << tl::to_string (dev.parameter_value (i->id ()));
+    if (i->id () != without_id) {
+      double sis = i->si_scaling ();
+      os << " " << i->name () << "=";
+      //  for compatibility
+      if (fabs (sis * 1e6 - 1.0) < 1e-10) {
+        os << tl::to_string (dev.parameter_value (i->id ())) << "U";
+      } else if (fabs (sis * 1e12 - 1.0) < 1e-10) {
+        os << tl::to_string (dev.parameter_value (i->id ())) << "P";
+      } else {
+        os << tl::to_string (dev.parameter_value (i->id ()) * sis);
+      }
+    }
   }
 
   return os.str ();

@@ -26,6 +26,7 @@
 #include "dbCommon.h"
 #include "dbNetlistReader.h"
 #include "tlStream.h"
+#include "tlGlobPattern.h"
 
 #include <string>
 #include <memory>
@@ -37,6 +38,68 @@ class Netlist;
 class Net;
 class Circuit;
 class DeviceClass;
+class Device;
+
+/**
+ *  @brief A specialized exception class to handle netlist reader delegate errors
+ */
+class DB_PUBLIC NetlistSpiceReaderDelegateError
+  : public tl::Exception
+{
+public:
+  NetlistSpiceReaderDelegateError (const std::string &msg)
+    : tl::Exception (msg)
+  { }
+};
+
+/**
+ *  @brief A delegate to handle various forms of devices and translates them
+ *
+ *  The reader delegate can be configured to recieve subcircuit elements too.
+ *  In this case, parameters are allowed.
+ *  Such subcircuits must be included in the captured_subcircuits glob
+ *  pattern when configuring the SPICE reader with the delegate.
+ */
+class DB_PUBLIC NetlistSpiceReaderDelegate
+  : public tl::Object
+{
+public:
+  NetlistSpiceReaderDelegate ();
+  virtual ~NetlistSpiceReaderDelegate ();
+
+  /**
+   *  @brief Called when the netlist reading starts
+   */
+  virtual void start (db::Netlist *netlist);
+
+  /**
+   *  @brief Called when the netlist reading ends
+   */
+  virtual void finish (db::Netlist *netlist);
+
+  /**
+   *  @brief Makes a device from an element line
+   *
+   *  @param circuit is the circuit that is currently read.
+   *  @param element is the element code ("M", "R", ...).
+   *  @param name is the element's name.
+   *  @param model is the model name (may be empty).
+   *  @param value is the default value (e.g. registance for resistors) and may be zero.
+   *  @param nets are the nets given in the element line.
+   *  @param parameters are the parameters of the element statement.
+   *
+   *  The default implementation will create corresponding devices for
+   *  some known elements using the Spice writer's parameter conventions.
+   *
+   *  This return returns true, if the element was read.
+   */
+  virtual bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params);
+
+  /**
+   *  @brief Produces an error with the given message
+   */
+  void error (const std::string &msg);
+};
 
 /**
  *  @brief A SPICE format reader for netlists
@@ -45,7 +108,7 @@ class DB_PUBLIC NetlistSpiceReader
   : public NetlistReader
 {
 public:
-  NetlistSpiceReader ();
+  NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate = 0, const std::string &captured_subcircuits = std::string ());
   virtual ~NetlistSpiceReader ();
 
   virtual void read (tl::InputStream &stream, db::Netlist &netlist);
@@ -54,19 +117,20 @@ private:
   db::Netlist *mp_netlist;
   db::Circuit *mp_circuit;
   std::auto_ptr<tl::TextInputStream> mp_stream;
+  tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;
   std::vector<std::pair<tl::InputStream *, tl::TextInputStream *> > m_streams;
   std::auto_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
   std::string m_stored_line;
+  tl::GlobPattern m_captured;
 
   void push_stream (const std::string &path);
   void pop_stream ();
   bool at_end ();
   void read_pin_and_parameters (tl::Extractor &ex, std::vector<std::string> &nn, std::map<std::string, double> &pv);
-  void read_subcircuit (tl::Extractor &ex);
+  bool read_element (tl::Extractor &ex, const std::string &element, const std::string &name);
+  void read_subcircuit (tl::Extractor &ex, const std::string &sc_name);
   void read_circuit (tl::Extractor &ex);
-  void read_device (db::DeviceClass *dev_cls, size_t param_id, tl::Extractor &ex);
-  void read_mos4_device (tl::Extractor &ex);
-  bool read_element ();
+  bool read_card ();
   double read_value (tl::Extractor &ex);
   std::string read_name (tl::Extractor &ex);
   double read_atomic_value (tl::Extractor &ex);

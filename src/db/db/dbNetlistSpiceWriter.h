@@ -29,6 +29,7 @@
 
 #include <string>
 #include <map>
+#include <limits>
 
 namespace db
 {
@@ -62,7 +63,7 @@ public:
   void emit_comment (const std::string &comment) const;
   std::string format_name (const std::string &s) const;
   std::string format_terminals (const db::Device &dev) const;
-  std::string format_params (const db::Device &dev) const;
+  std::string format_params (const db::Device &dev, size_t without_id = std::numeric_limits<size_t>::max ()) const;
 
 private:
   friend class NetlistSpiceWriter;

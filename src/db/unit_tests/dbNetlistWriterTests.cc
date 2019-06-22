@@ -308,9 +308,9 @@ TEST(4_WriterDiodeDevices)
   circuit1->add_net (n3);
 
   db::Device *ddev1 = new db::Device (dcls);
-  ddev1->set_parameter_value (db::DeviceClassDiode::param_id_A, 1.7e-10);
+  ddev1->set_parameter_value (db::DeviceClassDiode::param_id_A, 1.7);
   db::Device *ddev2 = new db::Device (dcls);
-  ddev2->set_parameter_value (db::DeviceClassDiode::param_id_A, 42e-9);
+  ddev2->set_parameter_value (db::DeviceClassDiode::param_id_A, 0.42);
   circuit1->add_device (ddev1);
   circuit1->add_device (ddev2);
 

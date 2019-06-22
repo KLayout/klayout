@@ -262,21 +262,26 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
     //  determines the corresponding layer inside the database and probe the net from this region and the
     //  start point.
 
-    db::Region *region = 0;
+    std::vector<db::Region *> regions;
 
     const db::Connectivity &conn = l2ndb->connectivity ();
     for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
       db::LayerProperties lp = l2ndb->internal_layout ()->get_properties (*layer);
-      if (! lp.is_null () && lp == cv->layout ().get_properties (start_layer)) {
-        region = l2ndb->layer_by_index (*layer);
-        break;
+      if (! lp.is_null ()) {
+        db::Region *region = l2ndb->layer_by_index (*layer);
+        if (lp == cv->layout ().get_properties (start_layer)) {
+          //  a matching original layer is looked up with higher prio
+          regions.insert (regions.begin (), region);
+        } else {
+          regions.push_back (region);
+        }
       }
     }
 
     //  probe the net
 
-    if (region) {
-      net = l2ndb->probe_net (*region, start_point);
+    for (std::vector<db::Region *>::const_iterator r = regions.begin (); r != regions.end () && !net; ++r) {
+      net = l2ndb->probe_net (**r, start_point);
     }
 
   }
@@ -721,12 +726,6 @@ NetlistBrowserDialog::update_content ()
   if (l2ndb_cb->currentIndex () != m_l2n_index) {
     l2ndb_cb->setCurrentIndex (m_l2n_index);
   }
-}
-
-void
-NetlistBrowserDialog::hideEvent (QHideEvent *)
-{
-  deactivated ();
 }
 
 void

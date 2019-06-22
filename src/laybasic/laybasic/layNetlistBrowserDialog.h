@@ -60,9 +60,6 @@ private:
   //  implementation of the lay::Plugin interface
   virtual void menu_activated (const std::string &symbol);
 
-  //  QWidget
-  virtual void hideEvent (QHideEvent *);
-
   void cellviews_changed ();
   void cellview_changed (int index);
   void l2ndbs_changed ();

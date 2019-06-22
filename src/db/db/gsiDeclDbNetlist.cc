@@ -1487,7 +1487,25 @@ public:
   gsi::Callback cb_write_device;
 };
 
+static void write_header_fb (const db::NetlistSpiceWriterDelegate *delegate)
+{
+  delegate->write_header ();
+}
+
+static void write_device_intro_fb (const db::NetlistSpiceWriterDelegate *delegate, const db::DeviceClass &ccls)
+{
+  delegate->write_device_intro (ccls);
+}
+
+static void write_device_fb (const db::NetlistSpiceWriterDelegate *delegate, const db::Device &cdev)
+{
+  delegate->write_device (cdev);
+}
+
 Class<NetlistSpiceWriterDelegateImpl> db_NetlistSpiceWriterDelegate ("db", "NetlistSpiceWriterDelegate",
+  gsi::method_ext ("write_header", &write_header_fb, "@hide") +
+  gsi::method_ext ("write_device_intro", &write_device_intro_fb, "@hide") +
+  gsi::method_ext ("write_device", &write_device_fb, "@hide") +
   gsi::callback ("write_header", &NetlistSpiceWriterDelegateImpl::write_header, &NetlistSpiceWriterDelegateImpl::cb_write_header,
     "@brief Writes the text at the beginning of the SPICE netlist\n"
     "Reimplement this method to insert your own text at the beginning of the file"
@@ -1651,14 +1669,212 @@ Class<db::NetlistReader> db_NetlistReader ("db", "NetlistReader",
   "@hide\n"
 );
 
+/**
+ *  @brief A SPICE reader delegate base class for reimplementation
+ */
+class NetlistSpiceReaderDelegateImpl
+  : public db::NetlistSpiceReaderDelegate, public gsi::ObjectBase
+{
+public:
+  NetlistSpiceReaderDelegateImpl ()
+    : db::NetlistSpiceReaderDelegate ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void error (const std::string &msg)
+  {
+    //  doing this avoids passing exceptions through script code which spoils the message
+    //  (the exception will be decorated with a stack trace). TODO: a better solution was
+    //  to define a specific exception type for "raw exception".
+    m_error = msg;
+    db::NetlistSpiceReaderDelegate::error (msg);
+  }
+
+  virtual void start (db::Netlist *netlist)
+  {
+    try {
+      m_error.clear ();
+      if (cb_start.can_issue ()) {
+        cb_start.issue<db::NetlistSpiceReaderDelegate, db::Netlist *> (&db::NetlistSpiceReaderDelegate::start, netlist);
+      } else {
+        db::NetlistSpiceReaderDelegate::start (netlist);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+    }
+  }
+
+  virtual void finish (db::Netlist *netlist)
+  {
+    try {
+      m_error.clear ();
+      if (cb_finish.can_issue ()) {
+        cb_finish.issue<db::NetlistSpiceReaderDelegate, db::Netlist *> (&db::NetlistSpiceReaderDelegate::finish, netlist);
+      } else {
+        db::NetlistSpiceReaderDelegate::finish (netlist);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+    }
+  }
+
+  virtual bool wants_subcircuit (const std::string &circuit_name)
+  {
+    try {
+      m_error.clear ();
+      if (cb_wants_subcircuit.can_issue ()) {
+        return cb_wants_subcircuit.issue<db::NetlistSpiceReaderDelegate, bool, const std::string &> (&db::NetlistSpiceReaderDelegate::wants_subcircuit, circuit_name);
+      } else {
+        return db::NetlistSpiceReaderDelegate::wants_subcircuit (circuit_name);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+      return false;
+    }
+  }
+
+  virtual bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+  {
+    try {
+      m_error.clear ();
+      if (cb_element.can_issue ()) {
+        return cb_element.issue<db::NetlistSpiceReaderDelegate, bool, db::Circuit *, const std::string &, const std::string &, const std::string &, double, const std::vector<db::Net *> &, const std::map<std::string, double> &> (&db::NetlistSpiceReaderDelegate::element, circuit, element, name, model, value, nets, params);
+      } else {
+        return db::NetlistSpiceReaderDelegate::element (circuit, element, name, model, value, nets, params);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+      return false;
+    }
+  }
+
+  gsi::Callback cb_start;
+  gsi::Callback cb_finish;
+  gsi::Callback cb_wants_subcircuit;
+  gsi::Callback cb_element;
+
+private:
+  std::string m_error;
+};
+
+static void start_fb (db::NetlistSpiceReaderDelegate *delegate, db::Netlist *netlist)
+{
+  delegate->db::NetlistSpiceReaderDelegate::start (netlist);
+}
+
+static void finish_fb (db::NetlistSpiceReaderDelegate *delegate, db::Netlist *netlist)
+{
+  delegate->db::NetlistSpiceReaderDelegate::finish (netlist);
+}
+
+static bool wants_subcircuit_fb (db::NetlistSpiceReaderDelegate *delegate, const std::string &model)
+{
+  return delegate->db::NetlistSpiceReaderDelegate::wants_subcircuit (model);
+}
+
+static bool element_fb (db::NetlistSpiceReaderDelegate *delegate, db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+{
+  return delegate->db::NetlistSpiceReaderDelegate::element (circuit, element, name, model, value, nets, params);
+}
+
+Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "NetlistSpiceReaderDelegate",
+  gsi::method_ext ("start", &start_fb, "@hide") +
+  gsi::method_ext ("finish", &finish_fb, "@hide") +
+  gsi::method_ext ("wants_subcircuit", &wants_subcircuit_fb, "@hide") +
+  gsi::method_ext ("element", &element_fb, "@hide") +
+  gsi::callback ("start", &NetlistSpiceReaderDelegateImpl::start, &NetlistSpiceReaderDelegateImpl::cb_start, gsi::arg ("netlist"),
+    "@brief This method is called when the reader starts reading a netlist\n"
+  ) +
+  gsi::callback ("finish", &NetlistSpiceReaderDelegateImpl::finish, &NetlistSpiceReaderDelegateImpl::cb_finish, gsi::arg ("netlist"),
+    "@brief This method is called when the reader is done reading a netlist successfully\n"
+  ) +
+  gsi::callback ("wants_subcircuit", &NetlistSpiceReaderDelegateImpl::wants_subcircuit, &NetlistSpiceReaderDelegateImpl::cb_wants_subcircuit, gsi::arg ("circuit_name"),
+    "@brief Returns true, if the delegate wants subcircuit elements with this name\n"
+    "The name is always upper case.\n"
+  ) +
+  gsi::callback ("element", &NetlistSpiceReaderDelegateImpl::element, &NetlistSpiceReaderDelegateImpl::cb_element,
+    gsi::arg ("circuit"), gsi::arg ("element"), gsi::arg ("name"), gsi::arg ("model"), gsi::arg ("value"), gsi::arg ("nets"), gsi::arg ("parameters"),
+    "@brief Makes a device from an element line\n"
+    "@param circuit The circuit that is currently read.\n"
+    "@param element The upper-case element code (\"M\", \"R\", ...).\n"
+    "@param name The element's name.\n"
+    "@param model The upper-case model name (may be empty).\n"
+    "@param value The default value (e.g. registance for resistors) and may be zero.\n"
+    "@param nets The nets given in the element line.\n"
+    "@param parameters The parameters of the element statement (parameter names are upper case).\n"
+    "\n"
+    "The default implementation will create corresponding devices for\n"
+    "some known elements using the Spice writer's parameter conventions.\n"
+    "\n"
+    "The method must return true, if the element was was understood and false otherwise.\n"
+  ) +
+  gsi::method ("error", &NetlistSpiceReaderDelegateImpl::error, gsi::arg ("msg"),
+    "@brief Issues an error with the given message.\n"
+    "Use this method to generate an error."
+  ),
+  "@brief Provides a delegate for the SPICE reader for translating device statements\n"
+  "Supply a customized class to provide a specialized reading scheme for devices. "
+  "You need a customized class if you want to implement device reading from model subcircuits or to "
+  "translate device parameters.\n"
+  "\n"
+  "See \\NetlistSpiceReader for more details.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+namespace {
+
+class NetlistSpiceReaderWithOwnership
+  : public db::NetlistSpiceReader
+{
+public:
+  NetlistSpiceReaderWithOwnership (NetlistSpiceReaderDelegateImpl *delegate)
+    : db::NetlistSpiceReader (delegate), m_ownership (delegate)
+  {
+    if (delegate) {
+      delegate->keep ();
+    }
+  }
+
+private:
+  tl::shared_ptr<NetlistSpiceReaderDelegateImpl> m_ownership;
+};
+
+}
+
 db::NetlistSpiceReader *new_spice_reader ()
 {
   return new db::NetlistSpiceReader ();
 }
 
+db::NetlistSpiceReader *new_spice_reader2 (NetlistSpiceReaderDelegateImpl *delegate)
+{
+  return new NetlistSpiceReaderWithOwnership (delegate);
+}
+
 Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "NetlistSpiceReader",
   gsi::constructor ("new", &new_spice_reader,
     "@brief Creates a new reader.\n"
+  ) +
+  gsi::constructor ("new", &new_spice_reader2,
+    "@brief Creates a new reader with a delegate.\n"
   ),
   "@brief Implements a netlist Reader for the SPICE format.\n"
   "Use the SPICE reader like this:\n"
@@ -1669,8 +1885,65 @@ Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "Ne
   "netlist.read(path, reader)\n"
   "@/code\n"
   "\n"
+  "The translation of SPICE elements can be tailored by providing a \\NetlistSpiceReaderDelegate class. "
+  "This allows translating of device parameters and mapping of some subcircuits to devices.\n"
+  "\n"
+  "The following example is a delegate that turns subcircuits called HVNMOS and HVPMOS into "
+  "MOS4 devices with the parameters scaled by 1.5:\n"
+  "\n"
+  "@code\n"
+  "class MyDelegate < RBA::NetlistSpiceReaderDelegate\n"
+  "\n"
+  "  # says we want to catch these subcircuits as devices\n"
+  "  def wants_subcircuit(name)\n"
+  "    name == \"HVNMOS\" || name == \"HVPMOS\"\n"
+  "  end\n"
+  "\n"
+  "  # translate the element\n"
+  "  def element(circuit, el, name, model, value, nets, params)\n"
+  "\n"
+  "    if el != \"X\"\n"
+  "      # all other elements are left to the standard implementation\n"
+  "      return super\n"
+  "    end\n"
+  "\n"
+  "    if nets.size != 4\n"
+  "      error(\"Subcircuit #{model} needs four nodes\")\n"
+  "    end\n"
+  "\n"
+  "    # provide a device class\n"
+  "    cls = circuit.netlist.device_class_by_name(model)\n"
+  "    if ! cls\n"
+  "      cls = RBA::DeviceClassMOS4Transistor::new\n"
+  "      cls.name = model\n"
+  "      circuit.netlist.add(cls)\n"
+  "    end\n"
+  "\n"
+  "    # create a device\n"
+  "    device = circuit.create_device(cls, name)\n"
+  "\n"
+  "    # and configure the device\n"
+  "    [ \"S\", \"G\", \"D\", \"B\" ].each_with_index do |t,index|\n"
+  "      device.connect_terminal(t, nets[index])\n"
+  "    end\n"
+  "    params.each do |p,value|\n"
+  "      device.set_parameter(p, value * 1.5)\n"
+  "    end\n"
+  "\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "# usage:\n"
+  "\n"
+  "mydelegate = MyDelegate::new\n"
+  "reader = RBA::NetlistSpiceReader::new(mydelegate)\n"
+  "\n"
+  "nl = RBA::Netlist::new\n"
+  "nl.read(input_file, reader)\n"
+  "@/code\n"
+  "\n"
   "This class has been introduced in version 0.26."
 );
-
 
 }

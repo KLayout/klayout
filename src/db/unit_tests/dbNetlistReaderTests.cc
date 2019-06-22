@@ -248,6 +248,7 @@ TEST(6_ReaderWithDelegate)
     "  device HVNMOS $3 (S=gnd,G=$3,D=gnd,B=gnd$1) (L=1.695,W=3.18,AS=0,AD=0,PS=9,PD=9);\n"
     "  device HVNMOS $4 (S=gnd,G=$3,D=Z,B=gnd$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=1.74,PD=1.74);\n"
     "  device HVNMOS $5 (S=gnd,G=A,D=$3,B=gnd$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=2.64,PD=2.64);\n"
+    "  device RES $1 (A=A,B=Z) (R=100000,L=0,W=0,A=0,P=0);\n"
     "end;\n"
     "circuit .TOP ();\n"
     "  subcircuit SUBCKT SUBCKT ($1=(null),$2=(null),$3=(null),$4=(null),$5=VSS,$6=VSS);\n"

@@ -43,7 +43,7 @@ class MyDelegate < RBA::NetlistSpiceWriterDelegate
 
 end
 
-class DBLayoutToNetlist_TestClass < TestBase
+class DBNetlistWriterTests_TestClass < TestBase
 
   def test_1_Basic
 

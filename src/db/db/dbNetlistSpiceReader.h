@@ -97,14 +97,14 @@ public:
    *  The default implementation will create corresponding devices for
    *  some known elements using the Spice writer's parameter conventions.
    *
-   *  This return returns true, if the element was read.
+   *  This method returns true, if the element was read.
    */
   virtual bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params);
 
   /**
    *  @brief Produces an error with the given message
    */
-  void error (const std::string &msg);
+  virtual void error (const std::string &msg);
 };
 
 /**

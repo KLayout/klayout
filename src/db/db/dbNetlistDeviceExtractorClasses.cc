@@ -469,16 +469,34 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
     db::Region rbase (*p);
     rbase.set_base_verbosity (rbases.base_verbosity ());
 
-    db::Region rcollector2base = rbase & rcollectors;
-    if (rcollector2base.empty ()) {
-      rcollector2base = rbase;
-    }
-
     db::Region remitter2base = rbase & remitters;
 
     if (remitter2base.empty ()) {
       error (tl::to_string (tr ("Base shape without emitters - ignored")), *p);
     } else {
+
+      //  collectors inside base
+      db::Region rcollector2base = rbase & rcollectors;
+
+      db::Region rcollector;
+      if (rcollector2base.empty ()) {
+        //  collector is bulk (vertical)
+        rcollector2base = rbase;
+        rcollector = rbase;
+      } else if ((rbase - rcollector2base).empty ()) {
+        //  vertical transistor: collector entirely covers base -> collector terminal is collector outside base
+        rcollector = rcollector2base - rbase;
+      } else {
+        //  lateral transistor: base is reduced by collector area
+        rcollector = rcollector2base;
+        rbase -= rcollector2base;
+      }
+
+      //  this is what is the true base contact
+      rbase -= remitter2base;
+
+      //  emitter wins over collector for the collector contact
+      rcollector -= remitter2base;
 
       double ab = dbu () * dbu () * p->area ();
       double pb = dbu () * p->perimeter ();
@@ -503,15 +521,15 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
         device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AC, ac);
         device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PC, pc);
 
-        define_terminal (device, db::DeviceClassBJT3Transistor::terminal_id_C, collector_terminal_geometry_index, rcollector2base);
-        define_terminal (device, db::DeviceClassBJT3Transistor::terminal_id_B, base_terminal_geometry_index, *p);
+        define_terminal (device, db::DeviceClassBJT3Transistor::terminal_id_C, collector_terminal_geometry_index, rcollector);
+        define_terminal (device, db::DeviceClassBJT3Transistor::terminal_id_B, base_terminal_geometry_index, rbase);
         define_terminal (device, db::DeviceClassBJT3Transistor::terminal_id_E, emitter_terminal_geometry_index, *pe);
 
         //  allow derived classes to modify the device
         modify_device (*p, layer_geometry, device);
 
         //  output the device for debugging
-        device_out (device, rcollector2base, rbase, *pe);
+        device_out (device, rcollector, rbase, *pe);
 
       }
 

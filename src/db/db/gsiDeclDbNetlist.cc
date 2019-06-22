@@ -1486,34 +1486,23 @@ public:
     db::NetlistSpiceWriterDelegate::write_device (dev);
   }
 
+  void org_write_header () const
+  {
+    db::NetlistSpiceWriterDelegate::write_header ();
+  }
+
   gsi::Callback cb_write_header;
   gsi::Callback cb_write_device_intro;
   gsi::Callback cb_write_device;
 };
 
-static void write_header_fb (const db::NetlistSpiceWriterDelegate *delegate)
-{
-  delegate->write_header ();
-}
-
-static void write_device_intro_fb (const db::NetlistSpiceWriterDelegate *delegate, const db::DeviceClass &ccls)
-{
-  delegate->write_device_intro (ccls);
-}
-
-static void write_device_fb (const db::NetlistSpiceWriterDelegate *delegate, const db::Device &cdev)
-{
-  delegate->write_device (cdev);
-}
-
 Class<NetlistSpiceWriterDelegateImpl> db_NetlistSpiceWriterDelegate ("db", "NetlistSpiceWriterDelegate",
-  gsi::method_ext ("write_header", &write_header_fb, "@hide") +
-  gsi::method_ext ("write_device_intro", &write_device_intro_fb, "@hide") +
-  gsi::method_ext ("write_device", &write_device_fb, "@hide") +
+  gsi::method ("write_header", &NetlistSpiceWriterDelegateImpl::org_write_header, "@hide") +
   gsi::callback ("write_header", &NetlistSpiceWriterDelegateImpl::write_header, &NetlistSpiceWriterDelegateImpl::cb_write_header,
     "@brief Writes the text at the beginning of the SPICE netlist\n"
     "Reimplement this method to insert your own text at the beginning of the file"
   ) +
+  gsi::method ("write_device_intro", &NetlistSpiceWriterDelegateImpl::org_write_device_intro, "@hide") +
   gsi::callback ("write_device_intro", &NetlistSpiceWriterDelegateImpl::reimpl_write_device_intro, &NetlistSpiceWriterDelegateImpl::cb_write_device_intro, gsi::arg ("device_class"),
     "@brief Inserts a text for the given device class\n"
     "Reimplement this method to insert your own text at the beginning of the file for the given device class"

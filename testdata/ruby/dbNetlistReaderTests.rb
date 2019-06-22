@@ -30,7 +30,7 @@ module RBA
   end
 end
 
-class MyDelegate < RBA::NetlistSpiceReaderDelegate
+class MyNetlistSpiceReaderDelegate < RBA::NetlistSpiceReaderDelegate
 
   def start(netlist)
     netlist.description = "Read by MyDelegate"
@@ -82,7 +82,7 @@ class DBNetlistReaderTests_TestClass < TestBase
 
     input = File.join($ut_testsrc, "testdata", "algo", "nreader6.cir")
 
-    mydelegate = MyDelegate::new
+    mydelegate = MyNetlistSpiceReaderDelegate::new
     reader = RBA::NetlistSpiceReader::new(mydelegate)
     # the delegate is kept by the SPICE writer ..
     mydelegate = nil
@@ -113,7 +113,7 @@ END
 
     input = File.join($ut_testsrc, "testdata", "algo", "nreader6.cir")
 
-    mydelegate = MyDelegate::new
+    mydelegate = MyNetlistSpiceReaderDelegate::new
 
     def mydelegate.element(circuit, el, name, model, value, nets, params)
       self.error("Nothing implemented")

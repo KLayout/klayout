@@ -177,3 +177,80 @@ TEST(5_CircuitParameters)
     "end;\n"
   );
 }
+
+class MyNetlistReaderDelegate
+  : public db::NetlistSpiceReaderDelegate
+{
+public:
+  MyNetlistReaderDelegate () : db::NetlistSpiceReaderDelegate () { }
+
+  bool wants_subcircuit (const std::string &circuit_name)
+  {
+    return circuit_name == "HVNMOS" || circuit_name == "HVPMOS";
+  }
+
+  bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+  {
+    if (element == "X") {
+
+      if (nets.size () != 4) {
+        error (tl::sprintf ("Device subcircuit '%s' requires four nets", model));
+      }
+
+      db::DeviceClass *cls = circuit->netlist ()->device_class_by_name (model);
+      if (! cls) {
+        cls = new db::DeviceClassMOS4Transistor ();
+        cls->set_name (model);
+        circuit->netlist ()->add_device_class (cls);
+      }
+
+      db::Device *device = new db::Device (cls);
+      device->set_name (name);
+      circuit->add_device (device);
+
+      device->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_S, nets [0]);
+      device->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_G, nets [1]);
+      device->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_D, nets [2]);
+      device->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, nets [3]);
+
+      const std::vector<db::DeviceParameterDefinition> &td = cls->parameter_definitions ();
+      for (std::vector<db::DeviceParameterDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {
+        std::map<std::string, double>::const_iterator pi = params.find (i->name ());
+        if (pi != params.end ()) {
+          device->set_parameter_value (i->id (), pi->second * 1.5);
+        }
+      }
+
+      return true;
+
+    } else {
+      return db::NetlistSpiceReaderDelegate::element (circuit, element, name, model, value, nets, params);
+    }
+
+  }
+};
+
+TEST(6_ReaderWithDelegate)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader6.cir");
+
+  MyNetlistReaderDelegate delegate;
+  db::NetlistSpiceReader reader (&delegate);
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit SUBCKT ($1=$1,$2=A,$3=VDD,$4=Z,$5=gnd,$6=gnd$1);\n"
+    "  device HVPMOS $1 (S=VDD,G=$3,D=Z,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);\n"
+    "  device HVPMOS $2 (S=VDD,G=A,D=$3,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);\n"
+    "  device HVNMOS $3 (S=gnd,G=$3,D=gnd,B=gnd$1) (L=1.695,W=3.18,AS=0,AD=0,PS=9,PD=9);\n"
+    "  device HVNMOS $4 (S=gnd,G=$3,D=Z,B=gnd$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=1.74,PD=1.74);\n"
+    "  device HVNMOS $5 (S=gnd,G=A,D=$3,B=gnd$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=2.64,PD=2.64);\n"
+    "end;\n"
+    "circuit .TOP ();\n"
+    "  subcircuit SUBCKT SUBCKT ($1=(null),$2=(null),$3=(null),$4=(null),$5=VSS,$6=VSS);\n"
+    "end;\n"
+  );
+}

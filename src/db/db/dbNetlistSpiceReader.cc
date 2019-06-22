@@ -55,6 +55,11 @@ void NetlistSpiceReaderDelegate::finish (db::Netlist * /*netlist*/)
   //  .. nothing yet ..
 }
 
+bool NetlistSpiceReaderDelegate::wants_subcircuit (const std::string & /*circuit_name*/)
+{
+  return false;
+}
+
 void NetlistSpiceReaderDelegate::error (const std::string &msg)
 {
   throw tl::Exception (msg);
@@ -160,8 +165,8 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
 static const char *allowed_name_chars = "_.:,!+$/&\\#[]|";
 
-NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate, const std::string &captured_subcircuits)
-  : mp_netlist (0), mp_stream (0), mp_delegate (delegate), m_captured (captured_subcircuits)
+NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate)
+  : mp_netlist (0), mp_stream (0), mp_delegate (delegate)
 {
   static NetlistSpiceReaderDelegate std_delegate;
   if (! delegate) {
@@ -297,6 +302,18 @@ void NetlistSpiceReader::unget_line (const std::string &l)
   m_stored_line = l;
 }
 
+bool NetlistSpiceReader::subcircuit_captured (const std::string &nc_name)
+{
+  std::map<std::string, bool>::const_iterator c = m_captured.find (nc_name);
+  if (c != m_captured.end ()) {
+    return c->second;
+  } else {
+    bool cap = mp_delegate->wants_subcircuit (nc_name);
+    m_captured.insert (std::make_pair (nc_name, cap));
+    return cap;
+  }
+}
+
 bool NetlistSpiceReader::read_card ()
 {
   std::string l = get_line ();
@@ -318,7 +335,12 @@ bool NetlistSpiceReader::read_card ()
 
     } else if (ex.test_without_case ("subckt")) {
 
-      read_circuit (ex);
+      std::string nc = read_name (ex);
+      if (subcircuit_captured (nc)) {
+        skip_circuit (ex);
+      } else {
+        read_circuit (ex, nc);
+      }
 
     } else if (ex.test_without_case ("ends")) {
 
@@ -347,11 +369,11 @@ bool NetlistSpiceReader::read_card ()
     std::string es;
     es.push_back (next_char);
 
-    if (next_char == 'X' && ! m_captured.match (name)) {
-      read_subcircuit (ex, name);
-    } else if (! read_element (ex, es, name)) {
+    if (! read_element (ex, es, name)) {
       warn (tl::sprintf (tl::to_string (tr ("Element type '%c' ignored")), next_char));
     }
+
+    ex.expect_end ();
 
   } else {
     warn (tl::to_string (tr ("Line ignored")));
@@ -675,58 +697,67 @@ bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &ele
     nets.push_back (make_net (*i));
   }
 
-  return mp_delegate->element (mp_circuit, element, name, tl::to_upper_case (model), value, nets, pv);
+  if (element == "X" && ! subcircuit_captured (model)) {
+    if (! pv.empty ()) {
+      warn (tl::to_string (tr ("Circuit parameters are not allowed currently")));
+    }
+    read_subcircuit (name, tl::to_upper_case (model), nets);
+    return true;
+  } else {
+    return mp_delegate->element (mp_circuit, element, name, tl::to_upper_case (model), value, nets, pv);
+  }
 }
 
-void NetlistSpiceReader::read_subcircuit (tl::Extractor &ex, const std::string &sc_name)
+void NetlistSpiceReader::read_subcircuit (const std::string &sc_name, const std::string &nc_name, const std::vector<db::Net *> &nets)
 {
-  std::vector<std::string> nn;
-  std::map<std::string, double> pv;
-  read_pin_and_parameters (ex, nn, pv);
-
-  if (nn.empty ()) {
-    error (tl::to_string (tr ("No circuit name given for subcircuit call")));
-  }
-  if (! pv.empty ()) {
-    warn (tl::to_string (tr ("Circuit parameters are not allowed currently")));
-  }
-
-  std::string nc = nn.back ();
-  nn.pop_back ();
-
-  if (nn.empty ()) {
+  if (nets.empty ()) {
     error (tl::to_string (tr ("A circuit call needs at least one net")));
   }
 
-  db::Circuit *cc = mp_netlist->circuit_by_name (nc);
+  db::Circuit *cc = mp_netlist->circuit_by_name (nc_name);
   if (! cc) {
     cc = new db::Circuit ();
     mp_netlist->add_circuit (cc);
-    cc->set_name (nc);
-    for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
+    cc->set_name (nc_name);
+    for (std::vector<db::Net *>::const_iterator i = nets.begin (); i != nets.end (); ++i) {
       cc->add_pin (std::string ());
     }
   } else {
-    if (cc->pin_count () != nn.size ()) {
-      error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between circuit definition and circuit call: %d expected, got %d")), int (cc->pin_count ()), int (nn.size ())));
+    if (cc->pin_count () != nets.size ()) {
+      error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between circuit definition and circuit call: %d expected, got %d")), int (cc->pin_count ()), int (nets.size ())));
     }
   }
 
   db::SubCircuit *sc = new db::SubCircuit (cc, sc_name);
   mp_circuit->add_subcircuit (sc);
 
-  for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
-    db::Net *net = make_net (*i);
-    sc->connect_pin (i - nn.begin (), net);
+  for (std::vector<db::Net *>::const_iterator i = nets.begin (); i != nets.end (); ++i) {
+    sc->connect_pin (i - nets.begin (), *i);
   }
-
-  ex.expect_end ();
 }
 
-void NetlistSpiceReader::read_circuit (tl::Extractor &ex)
+void NetlistSpiceReader::skip_circuit (tl::Extractor & /*ex*/)
 {
-  std::string nc = read_name (ex);
+  while (! at_end ()) {
 
+    std::string l = get_line ();
+    tl::Extractor ex (l.c_str ());
+    if (ex.test_without_case (".")) {
+
+      //  control statement
+      if (ex.test_without_case ("subckt")) {
+        skip_circuit (ex);
+      } else if (ex.test_without_case ("ends")) {
+        break;
+      }
+
+    }
+
+  }
+}
+
+void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
+{
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
   read_pin_and_parameters (ex, nn, pv);

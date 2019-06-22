@@ -483,6 +483,14 @@ void Netlist::combine_devices ()
   }
 }
 
+void Netlist::simplify ()
+{
+  make_top_level_pins ();
+  purge ();
+  combine_devices ();
+  purge_nets ();
+}
+
 static std::string net2string (const db::Net *net)
 {
   return net ? tl::to_word_or_quoted_string (net->expanded_name ()) : "(null)";

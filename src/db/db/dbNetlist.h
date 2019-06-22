@@ -453,6 +453,11 @@ public:
   void purge ();
 
   /**
+   *  @brief Convenience method: simplify (purge, combine devices, ...)
+   */
+  void simplify ();
+
+  /**
    *  @brief Combine devices
    *
    *  This method will combine devices that can be combined according

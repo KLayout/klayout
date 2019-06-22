@@ -1397,6 +1397,10 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "Floating nets can be created as effect of reconnections of devices or pins. "
     "This method will eliminate all nets that make less than two connections."
   ) +
+  gsi::method ("simplify", &db::Netlist::simplify,
+    "@brief Convience method that combines the simplification.\n"
+    "This method is a convenience method that runs \\make_top_level_pins, \\purge, \\combine_devices and \\purge_nets."
+  ) +
   gsi::method_ext ("read", &read_netlist, gsi::arg ("file"), gsi::arg ("reader"),
     "@brief Writes the netlist to the given file using the given reader object to parse the file\n"
     "See \\NetlistSpiceReader for an example for a parser. "
@@ -1873,7 +1877,7 @@ Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "Ne
   gsi::constructor ("new", &new_spice_reader,
     "@brief Creates a new reader.\n"
   ) +
-  gsi::constructor ("new", &new_spice_reader2,
+  gsi::constructor ("new", &new_spice_reader2, gsi::arg ("delegate"),
     "@brief Creates a new reader with a delegate.\n"
   ),
   "@brief Implements a netlist Reader for the SPICE format.\n"

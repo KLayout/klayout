@@ -1155,19 +1155,19 @@ void
 NetlistBrowserPage::configure_marker (Marker *marker, bool with_fill)
 {
   if (m_marker_line_width >= 0) {
-    mp_markers.back ()->set_line_width (m_marker_line_width);
+    marker->set_line_width (m_marker_line_width);
   }
 
   if (m_marker_vertex_size >= 0) {
-    mp_markers.back ()->set_vertex_size (m_marker_vertex_size);
+    marker->set_vertex_size (m_marker_vertex_size);
   }
 
   if (m_marker_halo >= 0) {
-    mp_markers.back ()->set_halo (m_marker_halo);
+    marker->set_halo (m_marker_halo);
   }
 
   if (m_marker_dither_pattern >= 0 && with_fill) {
-    mp_markers.back ()->set_dither_pattern (m_marker_dither_pattern);
+    marker->set_dither_pattern (m_marker_dither_pattern);
   }
 }
 

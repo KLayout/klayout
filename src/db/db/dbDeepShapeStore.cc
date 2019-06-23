@@ -222,22 +222,9 @@ DeepLayer::check_dss () const
 struct DeepShapeStore::LayoutHolder
 {
   LayoutHolder (const db::ICplxTrans &trans)
-    : refs (0), layout (false), builder (&layout, trans), m_empty_layer (std::numeric_limits<unsigned int>::max ())
+    : refs (0), layout (false), builder (&layout, trans)
   {
     //  .. nothing yet ..
-  }
-
-  unsigned int empty_layer () const
-  {
-    if (m_empty_layer == std::numeric_limits<unsigned int>::max ()) {
-      const_cast<LayoutHolder *> (this)->make_empty_layer ();
-    }
-    return m_empty_layer;
-  }
-
-  unsigned int new_empty_layer ()
-  {
-    return layout.insert_layer ();
   }
 
   void add_layer_ref (unsigned int layer)
@@ -260,15 +247,6 @@ struct DeepShapeStore::LayoutHolder
   db::Layout layout;
   db::HierarchyBuilder builder;
   std::map<unsigned int, int> layer_refs;
-
-private:
-  unsigned int m_empty_layer;
-
-  void make_empty_layer ()
-  {
-    m_empty_layer = layout.insert_layer ();
-    layer_refs [m_empty_layer] += 1;  //  the empty layer is not deleted
-  }
 };
 
 // ----------------------------------------------------------------------------------
@@ -569,28 +547,6 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   }
 
   return DeepLayer (this, layout_index, layer_index);
-}
-
-DeepLayer DeepShapeStore::empty_layer (unsigned int layout_index) const
-{
-  return DeepLayer (const_cast<DeepShapeStore *> (this), layout_index, m_layouts[layout_index]->empty_layer ());
-}
-
-DeepLayer DeepShapeStore::empty_layer () const
-{
-  require_singular ();
-  return empty_layer (0);
-}
-
-DeepLayer DeepShapeStore::new_empty_layer (unsigned int layout_index) const
-{
-  return DeepLayer (const_cast<DeepShapeStore *> (this), layout_index, m_layouts[layout_index]->new_empty_layer ());
-}
-
-DeepLayer DeepShapeStore::new_empty_layer () const
-{
-  require_singular ();
-  return new_empty_layer (0);
 }
 
 DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator &si, HierarchyBuilderShapeReceiver *pipe, const db::ICplxTrans &trans)

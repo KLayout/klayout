@@ -337,11 +337,7 @@ void LayoutToNetlist::register_layer (const db::Region &region, const std::strin
     db::DeepRegion *delegate = dynamic_cast<db::DeepRegion *> (region.delegate());
     if (! delegate) {
 
-      if (region.empty ()) {
-        dl = dss ().empty_layer (m_layout_index);
-      } else {
-        dl = dss ().create_from_flat (region, true);
-      }
+      dl = dss ().create_from_flat (region, true);
 
     } else {
 
@@ -436,9 +432,6 @@ db::DeepLayer LayoutToNetlist::deep_layer_of (const db::Region &region) const
     std::pair<bool, db::DeepLayer> lff = dss ().layer_for_flat (region);
     if (lff.first) {
       return lff.second;
-    } else if (region.empty ()) {
-      //  provide a substitute empty layer for empty
-      return dss ().empty_layer (m_layout_index);
     } else {
       throw (tl::Exception (tl::to_string (tr ("Non-hierarchical layers cannot be used in netlist extraction"))));
     }

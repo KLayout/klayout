@@ -1136,7 +1136,7 @@ TEST(5_ResAndCapWithBulkExtraction)
   db::Region rmetal2_lbl (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss);
   db::Region rcap (db::RecursiveShapeIterator (ly, tc, cap), dss);
   db::Region rres (db::RecursiveShapeIterator (ly, tc, res), dss);
-  db::Region rbulk (new db::DeepRegion (dss.empty_layer ()));
+  db::Region rbulk;
 
   //  derived regions
 
@@ -1409,7 +1409,7 @@ TEST(6_BJT3TransistorExtraction)
   db::Region rmetal2_lbl (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss);
   db::Region rpplus (db::RecursiveShapeIterator (ly, tc, pplus), dss);
   db::Region rnplus (db::RecursiveShapeIterator (ly, tc, nplus), dss);
-  db::Region rbulk (new db::DeepRegion (dss.empty_layer ()));
+  db::Region rbulk;
 
   //  derived regions
 

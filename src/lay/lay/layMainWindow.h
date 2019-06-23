@@ -739,8 +739,6 @@ public slots:
   void cm_help_about ();
   void cm_help_about_qt ();
   void cm_macro_editor ();
-  void cm_new_drc_script ();
-  void cm_edit_drc_scripts ();
   void cm_packages ();
   void cm_technologies ();
   void cm_open_too ();

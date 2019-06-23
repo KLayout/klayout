@@ -78,6 +78,15 @@ static lay::MacroController::MacroCategory drc_cat ()
   return cat;
 }
 
+static lay::MacroController::MacroCategory lvs_cat ()
+{
+  lay::MacroController::MacroCategory cat;
+  cat.name = "lvs";
+  cat.description = tl::to_string (QObject::tr ("LVS"));
+  cat.folders.push_back ("lvs");
+  return cat;
+}
+
 void
 MacroController::finish ()
 {
@@ -87,13 +96,14 @@ MacroController::finish ()
   lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
   lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
 
-  //  TODO: consider adding "drc" dynamically and allow more dynamic categories
+  //  TODO: consider adding "drc" and "lvs" dynamically and allow more dynamic categories
   //  We can do so if we first load the macros with the initial interpreters, then do autorun (which creates DSL interpreters) and then
   //  register the remaining categories.
 
   m_macro_categories.push_back (ruby_cat ());
   m_macro_categories.push_back (python_cat ());
   m_macro_categories.push_back (drc_cat ());
+  m_macro_categories.push_back (lvs_cat ());
 
   //  scans the macros from techs and packages (this will allow autorun-early on them)
   //  and updates m_external_paths

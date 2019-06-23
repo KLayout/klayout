@@ -955,17 +955,10 @@ MainWindow::init_menu ()
     MenuLayoutEntry::last ()
   };
 
-  MenuLayoutEntry drc_menu [] = {
-    MenuLayoutEntry ("new_script",                      tl::to_string (QObject::tr ("New DRC Script")),                   SLOT (cm_new_drc_script ())),
-    MenuLayoutEntry ("edit_script",                     tl::to_string (QObject::tr ("Edit DRC Script")),                  SLOT (cm_edit_drc_scripts ())),
-    MenuLayoutEntry::last ()
-  };
-
   MenuLayoutEntry tools_menu [] = {
     MenuLayoutEntry ("packages",                        tl::to_string (QObject::tr ("Manage Packages")),                  SLOT (cm_packages ())),
     MenuLayoutEntry ("technologies",                    tl::to_string (QObject::tr ("Manage Technologies")),              SLOT (cm_technologies ())),
     MenuLayoutEntry::separator ("verification_group"),
-    MenuLayoutEntry ("drc",                             tl::to_string (QObject::tr ("DRC")),                              drc_menu),
     MenuLayoutEntry::separator ("post_verification_group"),
     MenuLayoutEntry::last ()
   };
@@ -4742,20 +4735,6 @@ MainWindow::show_macro_editor (const std::string &cat, bool add)
   if (mc) {
     mc->show_editor (cat, add);
   }
-}
-
-void
-MainWindow::cm_edit_drc_scripts ()
-{
-  //  TODO: implement this as generic menu provided by the Interpreter
-  show_macro_editor ("drc", false);
-}
-
-void
-MainWindow::cm_new_drc_script ()
-{
-  //  TODO: implement this as generic menu provided by the Interpreter
-  show_macro_editor ("drc", true);
 }
 
 void

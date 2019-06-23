@@ -92,6 +92,14 @@ LayoutToNetlist::~LayoutToNetlist ()
   m_net_clusters.clear ();
 }
 
+void LayoutToNetlist::keep_dss ()
+{
+  if (mp_dss.get () && ! mp_internal_dss.get ()) {
+    mp_dss->keep ();
+    mp_internal_dss.reset (mp_dss.get ());
+  }
+}
+
 void LayoutToNetlist::init ()
 {
   dss ().set_text_enlargement (1);

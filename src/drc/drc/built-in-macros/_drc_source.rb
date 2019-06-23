@@ -16,10 +16,11 @@ module DRC
   
   class DRCSource
   
-    def initialize(engine, layout, layout_var, cell)
+    def initialize(engine, layout, layout_var, cell, path)
       @engine = engine
       @layout = layout
       @layout_var = layout_var
+      @path = path
       @cell = cell
       @inside = nil
       @box = nil
@@ -354,6 +355,13 @@ CODE
     
     def layers
       @layout.layer_indices.collect { |li| @layout.get_info(li) }
+    end
+
+    # %DRC%
+    # @brief Gets the path of the corresponding layout file or nil if there is no path
+    # @synopsis path
+    def path
+      @path
     end
      
   private

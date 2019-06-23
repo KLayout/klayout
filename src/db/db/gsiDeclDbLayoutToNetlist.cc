@@ -147,7 +147,9 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "add layers (regions) inside the 'dss' object.\n"
     "\n"
     "The make_... methods will not create new layers as there is no particular place "
-    "defined where to create the layers."
+    "defined where to create the layers.\n"
+    "\n"
+    "The extractor will not take ownership of the dss object unless you call \\keep_dss."
   ) +
   gsi::constructor ("new", &make_l2n_from_existing_dss_with_layout, gsi::arg ("dss"), gsi::arg ("layout_index"),
     "@brief Creates a new extractor object reusing an existing \\DeepShapeStore object\n"
@@ -166,6 +168,12 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "The database unit is mandatory because the physical parameter extraction "
     "for devices requires this unit for translation of layout to physical dimensions.\n"
+  ) +
+  gsi::method ("dss", (db::DeepShapeStore &(db::LayoutToNetlist::*) ()) &db::LayoutToNetlist::dss,
+    "@brief Gets a reference to the internal DSS object.\n"
+  ) +
+  gsi::method ("keep_dss", &db::LayoutToNetlist::keep_dss,
+    "@brief Resumes ownership over the DSS object if created with an external one.\n"
   ) +
   gsi::method ("threads=", &db::LayoutToNetlist::set_threads, gsi::arg ("n"),
     "@brief Sets the number of threads to use for operations which support multiple threads\n"

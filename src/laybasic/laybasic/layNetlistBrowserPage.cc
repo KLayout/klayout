@@ -708,6 +708,11 @@ NetlistBrowserPage::show_all (bool f)
 void
 NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 {
+  if (l2ndb == mp_database.get ()) {
+    //  not change
+    return;
+  }
+
   if (mp_info_dialog) {
     delete mp_info_dialog;
     mp_info_dialog = 0;

@@ -20,6 +20,7 @@ module DRC
 
       @def_layout = cv && cv.layout
       @def_cell = cv && cv.cell
+      @def_path = cv && cv.filename
       @def_source = nil
       @dbu_read = false
       use_dbu(@def_layout && @def_layout.dbu)
@@ -27,6 +28,11 @@ module DRC
       @output_rdb = nil
       @output_rdb_file = nil
       @output_rdb_cell = nil
+      @output_l2ndb = nil
+      @output_l2ndb_file = nil
+      @target_netlist_file = nil
+      @target_netlist_format = nil
+      @target_netlist_comment = nil
       @used_output_layers = {}
       @output_layers = []
       @vnum = 1
@@ -109,6 +115,128 @@ module DRC
       DRCAsDots::new(false)
     end
     
+    # %DRC%
+    # @brief Defines SPICE output format (with options) 
+    # @name write_spice
+    # @synopsis write_spice([ use_net_names [, with_comments ] ])
+    # Use this option in \target_netlist for the format parameter to 
+    # specify SPICE format.
+    # "use_net_names" and "with_comments" are boolean parameters indicating
+    # whether to use named nets (numbers if false) and whether to add 
+    # information comments such as instance coordinates or pin names.
+
+    def write_spice(use_net_names = nil, with_comments = nil)
+      writer = RBA::NetlistSpiceWriter::new
+      if use_net_names != nil
+        writer.use_net_names = use_net_names
+      end
+      if with_comments != nil
+        writer.with_comments = with_comments
+      end
+      writer
+    end
+
+    # %DRC%
+    # @brief Supplies the MOS3 transistor extractor class
+    # @name mos3
+    # @synopsis mos3(name)
+    # Use this class with \device_extract to specify extraction of a 
+    # three-terminal MOS transistor
+
+    def mos3(name)
+      RBA::DeviceExtractorMOS3Transistor::new(name)
+    end
+
+    # %DRC%
+    # @brief Supplies the MOS4 transistor extractor class
+    # @name mos4
+    # @synopsis mos4(name)
+    # Use this class with \device_extract to specify extraction of a 
+    # four-terminal MOS transistor
+
+    def mos4(name)
+      RBA::DeviceExtractorMOS4Transistor::new(name)
+    end
+
+    # %DRC%
+    # @brief Supplies the BJT3 transistor extractor class
+    # @name bjt3
+    # @synopsis bjt3(name)
+    # Use this class with \device_extract to specify extraction of a 
+    # bipolar junction transistor
+
+    def bjt3(name)
+      RBA::DeviceExtractorBJT3Transistor::new(name)
+    end
+
+    # %DRC%
+    # @brief Supplies the BJT4 transistor extractor class
+    # @name bjt4
+    # @synopsis bjt4(name)
+    # Use this class with \device_extract to specify extraction of a 
+    # bipolar junction transistor with a substrate terminal
+
+    def bjt4(name)
+      RBA::DeviceExtractorBJT4Transistor::new(name)
+    end
+
+    # %DRC%
+    # @brief Supplies the diode extractor class
+    # @name diode
+    # @synopsis diode(name)
+    # Use this class with \device_extract to specify extraction of a 
+    # planar diode 
+
+    def diode(name)
+      RBA::DeviceExtractorDiode::new(name)
+    end
+
+    # %DRC%
+    # @brief Supplies the resistor extractor class
+    # @name resistor
+    # @synopsis resistor(name, sheet_rho)
+    # Use this class with \device_extract to specify extraction of a resistor.
+    # The sheet_rho value is the sheet resistance in ohms/square.
+
+    def resistor(name, sheet_rho)
+      RBA::DeviceExtractorResistor::new(name, sheet_rho)
+    end
+
+    # %DRC%
+    # @brief Supplies the resistor extractor class that includes a bulk terminal
+    # @name resistor_with_bulk
+    # @synopsis resistor_with_bulk(name)
+    # Use this class with \device_extract to specify extraction of a resistor 
+    # with a bulk terminal.
+    # The sheet_rho value is the sheet resistance in ohms/square.
+
+    def resistor_with_bulk(name, sheet_rho)
+      RBA::DeviceExtractorResistorWithBulk::new(name, sheet_rho)
+    end
+
+    # %DRC%
+    # @brief Supplies the capacitor extractor class
+    # @name capacitor
+    # @synopsis capacitor(name, area_cap)
+    # Use this class with \device_extract to specify extraction of a capacitor.
+    # The area_cap argument is the capacitance in Farad per square micrometer.
+
+    def capacitor(name, area_cap)
+      RBA::DeviceExtractorCapacitor::new(name, area_cap)
+    end
+
+    # %DRC%
+    # @brief Supplies the capacitor extractor class that includes a bulk terminal
+    # @name capacitor_with_bulk
+    # @synopsis capacitor_with_bulk(name)
+    # Use this class with \device_extract to specify extraction of a capacitor 
+    # with a bulk terminal.
+    # The area_cap argument is the capacitance in Farad per square micrometer.
+
+    def capacitor_with_bulk(name, area_cap)
+      RBA::DeviceExtractorCapacitorWithBulk::new(name, area_cap)
+    end
+
     # %DRC%
     # @name verbose?
     # @brief Returns true, if verbose mode is enabled
@@ -451,7 +579,7 @@ module DRC
             (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
             cv = view.cellview(n)
             cv.is_valid? || raise("Invalid layout @#{n + 1}")
-            @def_source = make_source(cv.layout, cv.cell)
+            @def_source = make_source(cv.layout, cv.cell, cv.filename)
           else
             layout = RBA::Layout::new
             info("Reading #{arg} ..")
@@ -462,7 +590,7 @@ module DRC
               cell = layout.cell(arg2)
               cell || raise("Cell name #{arg2} not found in input layout")
             end
-            @def_source = make_source(layout, cell)
+            @def_source = make_source(layout, cell, arg)
           end
           
         elsif arg.is_a?(RBA::Layout)
@@ -484,12 +612,13 @@ module DRC
       
       else
         @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
-        @def_source ||= make_source(@def_layout, @def_cell)
+        @def_source ||= make_source(@def_layout, @def_cell, @def_path)
       end
 
       # make default input also default output if none is set yet.
       @def_layout ||= @def_source.layout
       @def_cell ||= @def_source.cell_obj
+      @def_path ||= @def_source.path
           
       # use the DBU of the new input as DBU reference
       @dbu_read || use_dbu(@def_source.layout.dbu)
@@ -545,7 +674,7 @@ module DRC
             (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
             cv = view.cellview(n)
             cv.is_valid? || raise("Invalid layout @#{n + 1}")
-            return make_source(cv.layout, cv.cell)
+            return make_source(cv.layout, cv.cell, cv.filename)
           else
             layout = RBA::Layout::new
             info("Reading #{arg} ..")
@@ -556,7 +685,7 @@ module DRC
               cell = layout.cell(arg2)
               cell || raise("Cell name #{arg2} not found in input layout")
             end
-            return make_source(layout, cell)
+            return make_source(layout, cell, arg)
           end
           
         elsif arg.is_a?(RBA::Layout)
@@ -569,7 +698,7 @@ module DRC
       
       else
         @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
-        @def_source ||= make_source(@def_layout, @def_cell)
+        @def_source ||= make_source(@def_layout, @def_cell, @def_path)
         @def_source
       end
           
@@ -627,7 +756,53 @@ module DRC
       @output_rdb.description = description
       
     end
+
+    # %DRC%
+    # @name report_netlist
+    # @brief Specifies an extracted netlist report for output
+    # @synopsis report_netlist([ filename ])
+    # This method applies to runsets creating a netlist through
+    # extraction. Extraction happens when connections and/or device
+    # extractions are made. If this statement is used, the extracted
+    # netlist plus the net and device shapes are turned into a 
+    # layout-to-netlist report (L2N database) and shown in the 
+    # netlist browser window. If a file name is given, the report
+    # will also be written to the given file.
     
+    def report_netlist(filename = nil)
+      @output_l2ndb = true
+      if filename
+        filename.is_a?(String) || raise("Argument must be string in report_netlist")
+      end
+      @output_l2ndb_file = filename
+    end
+
+    # %DRC%
+    # @name target_netlist
+    # @brief With this statement, an extracted netlist is finally written to a file
+    # @synopsis target_netlist(filename [, format [, comment ] ])
+    # This method applies to runsets creating a netlist through
+    # extraction. Extraction happens when connections and/or device
+    # extractions are made. If this statement is used, the extracted
+    # netlist is written to the given file.
+    #
+    # The format parameter specifies the writer to use. You can use nil
+    # to use the standard format or produce a SPICE writer with \write_spice.
+    # See \write_spice for more details.
+    
+    def target_netlist(filename, format = nil, comment = nil)
+      filename.is_a?(String) || raise("First argument must be string in target_netlist")
+      @target_netlist_file = filename
+      if format
+        format.is_a?(RBA::NetlistWriter) || raise("Second argument must be netlist writer object in target_netlist")
+      end
+      @target_netlist_format = format
+      if comment
+        comment.is_a?(String) || raise("Third argument must be string in target_netlist")
+      end
+      @target_netlist_comment = comment
+    end
+
     # %DRC%
     # @name output_cell
     # @brief Specifies a target cell, but does not change the target layout
@@ -958,33 +1133,41 @@ CODE
     # @name clear_connections
     # @brief Clears all connections stored so far
     # @synopsis clear_connections
-    # See \Netter#clear_connections for a description of that function
+    # See \Netter#clear_connections for a description of that function.
 
     # %DRC%
-    # @name join_nets
+    # @name connect_implicit
     # @brief Specifies a label pattern for implicit net connections
-    # @synopsis join_nets(label_pattern)
-    # See \Netter#join_nets for a description of that function
+    # @synopsis connect_implicit(label_pattern)
+    # See \Netter#connect_implicit for a description of that function.
 
     # %DRC%
     # @name antenna_check
     # @brief Performs an antenna check
     # @synopsis antenna_check(gate, metal, ratio, [ diode_specs ... ])
-    # See \Netter#antenna_check for a description of that function
+    # See \Netter#antenna_check for a description of that function.
  
     # %DRC%
     # @name l2n_data
     # @brief Gets the internal RBA::LayoutToNetlist object for the default \Netter
     # @synopsis l2n_data
-    # See \Netter#l2n_data for a description of that function
+    # See \Netter#l2n_data for a description of that function.
  
     # %DRC%
     # @name extract_devices
     # @brief Extracts devices for a given device extractor and device layer selection
     # @synopsis extract_devices(extractor, layer_hash)
-    # See \Netter#extract_devices for a description of that function
+    # @synopsis extract_devices(extractor_class, name, layer_hash)
+    # See \Netter#extract_devices for a description of that function.
  
-    %w(connect connect_global clear_connections join_nets antenna_check l2n_data extract_devices).each do |f|
+    # %DRC%
+    # @name netlist
+    # @brief Obtains the extracted netlist from the default \Netter
+    # The netlist is a RBA::Netlist object. If no netlist is extracted 
+    # yet, this method will trigger the extraction process.
+    # See \Netter#netlist for a description of this function.
+ 
+    %w(connect connect_global clear_connections connect_implicit antenna_check l2n_data extract_devices netlist).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)
@@ -1154,8 +1337,9 @@ CODE
 
       # save the report database if requested
       if @output_rdb_file
-        info("Writing #{@output_rdb_file} ..")
-        @output_rdb.save(@output_rdb_file)
+        rdb_file = make_path(@output_rdb_file)
+        info("Writing report database: #{rdb_file} ..")
+        @output_rdb.save(rdb_file)
       end
       if @output_rdb && final && view
         view.show_rdb(@output_rdb_index, view.active_cellview_index)
@@ -1165,7 +1349,7 @@ CODE
       if @output_layout && @output_layout_file
         opt = RBA::SaveLayoutOptions::new
         gzip = opt.set_format_from_filename(@output_layout_file)
-        info("Writing #{@output_layout_file} ..")
+        info("Writing layout file: #{@output_layout_file} ..")
         @output_layout.write(@output_layout_file, gzip, opt)
       end
       
@@ -1213,7 +1397,41 @@ CODE
         end
         
       end
-        
+
+      # save the netlist if required
+      if @target_netlist_file && @netter && @netter.l2n_data
+
+        writer = @target_netlist_format || RBA::NetlistSpiceWriter::new
+
+        netlist_file = make_path(@target_netlist_file)
+        info("Writing netlist: #{netlist_file} ..")
+        self.netlist.write(netlist_file, writer, @target_netlist_comment || "")
+
+      end
+    
+      # save the netlist database if requested
+      if @output_l2ndb && @netter && @netter.l2n_data
+
+        if @output_l2ndb_file
+          l2ndb_file = make_path(@output_l2ndb_file)
+          info("Writing netlist database: #{l2ndb_file} ..")
+          @netter.l2n_data.save(l2ndb_file)
+        end
+        if @output_l2ndb && final && view
+          # NOTE: to prevent the netter destroying the database, we need to take it
+          l2ndb = @netter._take_l2n_data
+          # we also need to make the extractor take over ownership over the DSS
+          # because otherwise we can't free the resources.
+          if l2ndb.dss == @dss
+            l2ndb.keep_dss
+            @dss = nil
+          end
+          l2ndb_index = view.add_l2ndb(l2ndb)
+          view.show_l2ndb(l2ndb_index, view.active_cellview_index)
+        end
+
+      end
+    
       @output_layout = nil
       @output_layout_file = nil
       @output_cell = nil
@@ -1221,6 +1439,8 @@ CODE
       @output_rdb_cell = nil
       @output_rdb = nil
       @output_rdb_index = nil
+      @output_l2ndb = nil
+      @output_l2ndb_file = nil
 
       # clean up temp data
       @dss && @dss._destroy
@@ -1242,6 +1462,16 @@ CODE
     end
 
   private
+
+    def make_path(file)
+      # resolves the file path relative to the source's path
+      sp = self.source.path
+      if sp
+        return File::absolute_path(file, File::dirname(sp))
+      else
+        return file
+      end
+    end
 
     def _make_string(v)
       if v.class.respond_to?(:from_s)
@@ -1399,11 +1629,11 @@ CODE
       end        
     end
     
-    def make_source(layout, cell = nil)
+    def make_source(layout, cell = nil, path = nil)
       name = "layout" + @lnum.to_s
       @lnum += 1
       @dbu ||= layout.dbu
-      src = DRCSource::new(self, layout, layout, cell || layout.top_cell)
+      src = DRCSource::new(self, layout, layout, cell || layout.top_cell, path)
       @layout_sources[name] = src
       src
     end

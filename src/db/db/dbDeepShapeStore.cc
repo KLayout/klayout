@@ -235,6 +235,11 @@ struct DeepShapeStore::LayoutHolder
     return m_empty_layer;
   }
 
+  unsigned int new_empty_layer ()
+  {
+    return layout.insert_layer ();
+  }
+
   void add_layer_ref (unsigned int layer)
   {
     layer_refs [layer] += 1;
@@ -575,6 +580,17 @@ DeepLayer DeepShapeStore::empty_layer () const
 {
   require_singular ();
   return empty_layer (0);
+}
+
+DeepLayer DeepShapeStore::new_empty_layer (unsigned int layout_index) const
+{
+  return DeepLayer (const_cast<DeepShapeStore *> (this), layout_index, m_layouts[layout_index]->new_empty_layer ());
+}
+
+DeepLayer DeepShapeStore::new_empty_layer () const
+{
+  require_singular ();
+  return new_empty_layer (0);
 }
 
 DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator &si, HierarchyBuilderShapeReceiver *pipe, const db::ICplxTrans &trans)

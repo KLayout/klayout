@@ -154,7 +154,8 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
         l = layer_map.find (ln);
       }
 
-      throw tl::Exception (tl::to_string (tr ("Missing input layer for device extraction: ")) + layer_names);
+      //  TODO: maybe use empty layers for optional ones?
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Missing input layer for device extraction (device %s): %s")), name (), layer_names));
 
     }
 
@@ -167,8 +168,9 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
         //  use deep layer alias for a given flat one (if found)
         layers.push_back (alias.second.layer ());
       } else if (l->second->empty ()) {
-        //  provide a substitute empty layer
-        layers.push_back (dss.empty_layer (layout_index).layer ());
+        //  provide a substitute empty layer (CAUTION: we can't use the
+        //  singleton "empty_layer" because this may be used as OUTPUT).
+        layers.push_back (dss.new_empty_layer (layout_index).layer ());
       } else {
         throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid region passed to input layer '%s' for device extraction (device %s): must be of deep region kind")), ld->name, name ()));
       }

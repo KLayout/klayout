@@ -357,6 +357,19 @@ public:
   DeepLayer empty_layer () const;
 
   /**
+   *  @brief Gets a new empty working layer
+   *
+   *  This method will deliver an empty layer for the given layout index. This layer is a fresh one and can be
+   *  modified.
+   */
+  DeepLayer new_empty_layer (unsigned int layout_index) const;
+
+  /**
+   *  @brief Gets a new empty working layer for the singular layout
+   */
+  DeepLayer new_empty_layer () const;
+
+  /**
    *  @brief Inserts the deep layer's shapes into some target layout
    */
   void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);

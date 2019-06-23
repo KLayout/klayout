@@ -119,10 +119,14 @@ module DRC
     # @name extract_devices
     # @brief Extracts devices based on the given extractor class, name and device layer selection
     # @synopsis extract_devices(extractor, layer_hash)
-    # Runs the device extraction for given device extractor class.
+    # @synopsis extract_devices(extractor_class, name, layer_hash)
+    # Runs the device extraction for given device extractor class. In the first
+    # form, the extractor object is given. In the second form, the extractor's
+    # class object and the new extractor's name is given.
     # 
     # The device extractor is either an instance of one of the predefined extractor
-    # classes (e.g. RBA::DeviceExtractorMOS4Transistor) or a custom class. It provides the
+    # classes (e.g. obtained from the utility methods such as \mos4) or a custom class. 
+    # It provides the
     # algorithms for deriving the device parameters from the device geometry. It needs 
     # several device recognition layers which are passed in the layer hash.
     #
@@ -141,17 +145,17 @@ module DRC
     # poly    = input(3, 0)
     # bulk    = make_layer   # renders an empty layer used for putting the terminals on
     #
-    # nactive = active - nwell      # active area of NMOS
-    # nsd     = nactive - poly      # source/drain area
+    # nactive = active - nwell  # active area of NMOS
+    # nsd     = nactive - poly  # source/drain area
     # gate    = nactive & poly  # gate area
     #
-    # mos4_ex = RBA::DeviceExtractorMOS4Transistor::new("NMOS4")
-    # extract_devices(mos4_ex, { :SD => nsd, :G => gate, :P => poly, :W => bulk })
+    # extract_devices(mos4("NMOS4"), { :SD => nsd, :G => gate, :P => poly, :W => bulk })
     # @/code
     
     def extract_devices(devex, layer_selection)
 
-      devex.is_a?(RBA::DeviceExtractorBase) || raise("First argument of Netter#extract_devices must be a device extractor instance")
+      devex.is_a?(RBA::DeviceExtractorBase) || raise("First argument of Netter#extract_devices must be a device extractor instance in the two-arguments form")
+
       layer_selection.is_a?(Hash) || raise("Second argument of Netter#extract_devices must be a hash")
 
       ls = {}
@@ -177,20 +181,20 @@ module DRC
       @connections = []
       @global_connections = []
       @layers = {}
-      @join_nets = ""
+      @connect_implicit = ""
       modified
     end
     
     # %DRC%
-    # @name join_nets
+    # @name connect_implicit
     # @brief Specifies a search pattern for labels which create implicit net connections
-    # @synopsis join_nets(label_pattern)
+    # @synopsis connect_implicit(label_pattern)
     # Use this method to supply a glob pattern for labels which create implicit net connections
     # on the top level circuit. This feature is useful to connect identically labelled nets
     # while a component isn't integrated yet. If the component is integrated, net may be connected
     # on a higher hierarchy level - e.g. by a power mesh. Inside the component this net consists
     # of individual islands. To properly perform netlist extraction and comparison, these islands
-    # need to be connected even though there isn't a physical connection. "join_nets" can
+    # need to be connected even though there isn't a physical connection. "connect_implicit" can
     # achive this if these islands are labelled with the same text on the top level of the
     # component.
     #
@@ -202,8 +206,8 @@ module DRC
     # The search pattern is applied on the next net extraction. The search pattern is cleared
     # on "clear_connections".
 
-    def join_nets(arg)
-      @join_nets = arg
+    def connect_implicit(arg)
+      @connect_implicit = arg
       modified
     end
 
@@ -320,11 +324,29 @@ module DRC
       @l2n || make_l2n
       @l2n
     end
+
+    # %DRC%
+    # @name netlist
+    # @brief Gets the extracted netlist or triggers extraction if not done yet
+    # @synopsis netlist
+    # If no extraction has been performed yet, this method will start the 
+    # layout analysis. Hence, all \connect, \connect_global and \connect_implicit
+    # calls must have been made before this method is used. Further \connect
+    # statements will clear the netlist and re-extract it again.
+    def netlist
+      l2n_data && @l2n.netlist
+    end
     
     def _finish
       clear_connections
       # cleans up the L2N object
       modified
+    end
+
+    def _take_l2n_data
+      l2ndb = self.l2n_data
+      @l2n = nil
+      l2ndb
     end
 
   private
@@ -357,7 +379,7 @@ module DRC
       @global_connections.each { |l,n| @l2n.connect_global(@layers[l], n) }
 
       # run extraction in a timed environment
-      @engine._cmd(@l2n, :extract_netlist, @join_nets)
+      @engine._cmd(@l2n, :extract_netlist, @connect_implicit)
       @l2n
 
     end

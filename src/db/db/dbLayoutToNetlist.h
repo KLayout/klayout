@@ -115,6 +115,11 @@ public:
   ~LayoutToNetlist ();
 
   /**
+   *  @brief Makes the extractor take over ownership over the DSS when it was created with an external DSS
+   */
+  void keep_dss ();
+
+  /**
    *  @brief Gets the database description
    */
   const std::string &description () const

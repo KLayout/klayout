@@ -400,7 +400,7 @@ module DRC
 
       id = data.data_id 
 
-      if @layers[id]
+      if @layers && @layers[id]
         # already registered
         return
       end

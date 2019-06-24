@@ -232,6 +232,13 @@ Region::Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db:
   mp_delegate = new DeepRegion (si, dss, trans, merged_semantics, area_ratio, max_vertex_count);
 }
 
+Region::Region (DeepShapeStore &dss)
+{
+  tl_assert (dss.is_singular ());
+  unsigned int layout_index = 0; // singular layout index
+  mp_delegate = new db::DeepRegion (db::DeepLayer (&dss, layout_index, dss.layout (layout_index).insert_layer ()));
+}
+
 const db::RecursiveShapeIterator &
 Region::iter () const
 {

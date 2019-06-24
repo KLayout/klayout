@@ -23,7 +23,6 @@
 
 #include "dbDeepRegion.h"
 #include "dbDeepShapeStore.h"
-#include "dbEmptyRegion.h"
 #include "dbEmptyEdgePairs.h"
 #include "dbRegion.h"
 #include "dbRegionUtils.h"
@@ -462,10 +461,13 @@ DeepRegion::and_with (const Region &other) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
-  if (empty () || other.empty ()) {
+  if (empty ()) {
 
-    //  Nothing to do
-    return new EmptyRegion ();
+    return clone ();
+
+  } else if (other.empty ()) {
+
+    return other.delegate ()->clone ();
 
   } else if (! other_deep) {
 
@@ -483,14 +485,8 @@ DeepRegion::not_with (const Region &other) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
-  if (empty ()) {
+  if (empty () || other.empty ()) {
 
-    //  Nothing to do
-    return new EmptyRegion ();
-
-  } else if (other.empty ()) {
-
-    //  Nothing to do
     return clone ();
 
   } else if (! other_deep) {
@@ -1231,6 +1227,12 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
 RegionDelegate *
 DeepRegion::sized (coord_type d, unsigned int mode) const
 {
+  if (empty ()) {
+    //  Nothing to do - NOTE: don't return EmptyRegion because we want to
+    //  maintain "deepness"
+    return clone ();
+  }
+
   ensure_merged_polygons_valid ();
 
   db::Layout &layout = m_merged_polygons.layout ();
@@ -1299,6 +1301,12 @@ struct XYAnisotropyAndMagnificationReducer
 RegionDelegate *
 DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 {
+  if (empty ()) {
+    //  Nothing to do - NOTE: don't return EmptyRegion because we want to
+    //  maintain "deepness"
+    return clone ();
+  }
+
   if (dx == dy) {
     return sized (dx, mode);
   }

@@ -68,7 +68,9 @@ module DRC
 
     def initialize(engine)
       @engine = engine
-      clear_connections
+      @netlisted = false
+      @connect_implicit = ""
+      @l2n = nil
     end
     
     # %DRC%
@@ -90,13 +92,16 @@ module DRC
     # can be cleared with \clear_connections.
 
     def connect(a, b)
+
       a.is_a?(DRC::DRCLayer) || raise("First argument of Netter#connect must be a layer")
       b.is_a?(DRC::DRCLayer) || raise("Second argument of Netter#connect must be a layer")
       a.requires_region("Netter#connect (first argument)")
       b.requires_region("Netter#connect (second argument)")
-      [ a, b ].each { |l| @layers[l.data.data_id] = l.data }
-      @connections << [ a, b ].collect { |l| l.data.data_id }
-      modified
+
+      register_layer(a.data)
+      register_layer(b.data)
+      @l2n.connect(a.data, b.data)
+
     end
 
     # %DRC%
@@ -109,10 +114,13 @@ module DRC
     # to shapes belonging to tie-down diodes.
     
     def connect_global(l, name)
+
       l.is_a?(DRC::DRCLayer) || raise("Layer argument of Netter#connect_global must be a layer")
       l.requires_region("Netter#connect_global (layer argument)")
-      @layers[l.data.data_id] = l.data
-      @global_connections << [ l.data.data_id, name.to_s ]
+
+      register_layer(l.data)
+      @l2n.connect_global(l.data, name)
+
     end
     
     # %DRC%
@@ -153,6 +161,8 @@ module DRC
     # @/code
     
     def extract_devices(devex, layer_selection)
+    
+      ensure_l2n
 
       devex.is_a?(RBA::DeviceExtractorBase) || raise("First argument of Netter#extract_devices must be a device extractor instance in the two-arguments form")
 
@@ -161,12 +171,11 @@ module DRC
       ls = {}
       layer_selection.each do |n,l|
         l.requires_region("Netter#extract_devices (#{n} layer)")
-        @layers[l.data.data_id] = l.data
+        register_layer(l.data)
         ls[n.to_s] = l.data
       end
 
-      @devices_to_extract << [ devex, ls ]
-      modified
+      @engine._cmd(@l2n, :extract_devices, devex, ls) 
 
     end
     
@@ -177,12 +186,10 @@ module DRC
     # See \connect for more details.
 
     def clear_connections
-      @devices_to_extract = []
-      @connections = []
-      @global_connections = []
-      @layers = {}
+      @netlisted = false
       @connect_implicit = ""
-      modified
+      @l2n && @l2n._destroy
+      @l2n = nil
     end
     
     # %DRC%
@@ -207,8 +214,16 @@ module DRC
     # on "clear_connections".
 
     def connect_implicit(arg)
-      @connect_implicit = arg
-      modified
+
+      cleanup
+
+      if arg != @connect_implicit
+        if @connect_implicit != "" && arg != ""
+          raise("connect_implicit can only be used once")
+        end
+        @connect_implicit = arg
+      end
+
     end
 
     # %DRC%
@@ -308,8 +323,7 @@ module DRC
         end
       end
 
-      @l2n || make_l2n
-      DRC::DRCLayer::new(@engine, @engine._cmd(@l2n, :antenna_check, gate.data, metal.data, ratio, dl))
+      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, metal.data, ratio, dl))
 
     end
 
@@ -321,8 +335,17 @@ module DRC
     # the netter object.
 
     def l2n_data
-      @l2n || make_l2n
+
+      ensure_l2n
+
+      # run extraction in a timed environment
+      if ! @netlisted
+        @engine._cmd(@l2n, :extract_netlist, @connect_implicit)
+        @netlisted = true
+      end
+
       @l2n
+
     end
 
     # %DRC%
@@ -339,8 +362,6 @@ module DRC
     
     def _finish
       clear_connections
-      # cleans up the L2N object
-      modified
     end
 
     def _take_l2n_data
@@ -351,12 +372,17 @@ module DRC
 
   private
 
-    def modified
-      @l2n && @l2n._destroy
-      @l2n = nil
+    def cleanup
+      @netlisted && clear_connections
     end
     
+    def ensure_l2n
+      @l2n || make_l2n
+    end
+
     def make_l2n
+
+      @layers = {}
 
       if @engine._dss
         # TODO: check whether all layers are deep and come from the dss and layout index,
@@ -368,19 +394,24 @@ module DRC
         @l2n = RBA::LayoutToNetlist::new(layout.top_cell.name, layout.dbu)
       end
 
-      @layers.each { |id,l| @l2n.register(l, "l" + id.to_s) }
+    end
 
-      @devices_to_extract.each do |devex,ls| 
-        @engine._cmd(@l2n, :extract_devices, devex, ls) 
+    def register_layer(data)
+
+      id = data.data_id 
+
+      if @layers[id]
+        # already registered
+        return
       end
 
-      @layers.each { |id,l| @l2n.connect(l) }
-      @connections.each { |a,b| @l2n.connect(@layers[a], @layers[b]) }
-      @global_connections.each { |l,n| @l2n.connect_global(@layers[l], n) }
+      ensure_l2n
 
-      # run extraction in a timed environment
-      @engine._cmd(@l2n, :extract_netlist, @connect_implicit)
-      @l2n
+      @layers[id] = data
+
+      # every layer gets registered and intra-layer connections are made
+      @l2n.register(data, "l" + id.to_s)
+      @l2n.connect(data)
 
     end
     

@@ -71,6 +71,15 @@ public:
   virtual std::pair<pin_pair, Status> pin_from_index (const circuit_pair &circuits, size_t index) const;
   virtual std::pair<subcircuit_pair, Status> subcircuit_from_index (const circuit_pair &circuits, size_t index) const;
 
+  virtual std::string top_circuit_status_hint (size_t index) const;
+  virtual std::string circuit_status_hint (size_t index) const;
+  virtual std::string child_circuit_status_hint (const circuit_pair &circuits, size_t index) const;
+  virtual std::string circuit_pair_status_hint (const std::pair<circuit_pair, Status> &cp) const;
+  virtual std::string net_status_hint (const circuit_pair &circuits, size_t index) const;
+  virtual std::string device_status_hint (const circuit_pair &circuits, size_t index) const;
+  virtual std::string pin_status_hint (const circuit_pair &circuits, size_t index) const;
+  virtual std::string subcircuit_status_hint (const circuit_pair &circuits, size_t index) const;
+
   virtual size_t circuit_index (const circuit_pair &circuits) const;
   virtual size_t net_index (const net_pair &nets) const;
   virtual size_t device_index (const device_pair &devices) const;

@@ -163,6 +163,8 @@ NetlistBrowserTreeModel::data (const QModelIndex &index, int role) const
     return QVariant (icon_for_status (status (index)));
   } else if (role == Qt::DisplayRole) {
     return QVariant (text (index));
+  } else if (role == Qt::ToolTipRole && index.column () == m_status_column) {
+    return tooltip (index);
   } else if (role == Qt::UserRole) {
     return QVariant (search_text (index));
   } else if (role == Qt::FontRole) {
@@ -283,6 +285,35 @@ NetlistBrowserTreeModel::status (const QModelIndex &index) const
 {
   size_t nprod = 0, nlast = 0, nnlast = 0;
   return cp_status_from_index (index, nprod, nlast, nnlast).second;
+}
+
+QVariant
+NetlistBrowserTreeModel::tooltip (const QModelIndex &index) const
+{
+  typedef std::pair<std::pair<const db::Circuit *, const db::Circuit *>, db::NetlistCrossReference::Status> cp_status;
+  size_t nlast = 0;
+  std::string hint;
+
+  void *id = index.internalPointer ();
+  tl_assert (id != 0);
+
+  nlast = mp_indexer->top_circuit_count () + 1;
+  size_t i = pop (id, nlast);
+  hint = mp_indexer->top_circuit_status_hint (i - 1);
+  cp_status cps = mp_indexer->top_circuit_from_index (i - 1);
+
+  while (id != 0) {
+    nlast = mp_indexer->child_circuit_count (cps.first) + 1;
+    i = pop (id, nlast);
+    hint = mp_indexer->child_circuit_status_hint (cps.first, i - 1);
+    cps = mp_indexer->child_circuit_from_index (cps.first, i - 1);
+  }
+
+  if (! hint.empty ()) {
+    return QVariant (tl::to_qstring (hint));
+  } else {
+    return QVariant ();
+  }
 }
 
 Qt::ItemFlags

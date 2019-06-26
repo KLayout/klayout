@@ -204,6 +204,7 @@ private:
   std::pair<const db::Pin *, const db::Pin *> pins_from_id (void *id) const;
   std::pair<const db::SubCircuit *, const db::SubCircuit *> subcircuits_from_id (void *id) const;
   QString text (const QModelIndex &index) const;
+  QVariant tooltip (const QModelIndex &index) const;
   QString search_text (const QModelIndex &index) const;
   db::NetlistCrossReference::Status status (const QModelIndex &index) const;
   QIcon icon (const QModelIndex &index) const;

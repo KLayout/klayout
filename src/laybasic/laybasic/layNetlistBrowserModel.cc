@@ -664,6 +664,8 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
     return QVariant (icon_for_status (status (index)));
   } else if (role == Qt::DisplayRole) {
     return QVariant (text (index));
+  } else if (role == Qt::ToolTipRole && index.column () == m_status_column) {
+    return tooltip (index);
   } else if (role == Qt::UserRole) {
     return QVariant (search_text (index));
   } else if (role == Qt::FontRole) {
@@ -1339,15 +1341,107 @@ NetlistBrowserModel::status (const QModelIndex &index) const
     size_t index = circuit_subcircuit_index_from_id (id);
     return mp_indexer->subcircuit_from_index (circuits, index).second;
 
+  } else if (is_id_circuit_subcircuit_pin (id)) {
+
+    IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_id (id);
+    IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
+    IndexedNetlistModel::pin_pair pins = pins_from_id (id);
+
+    return mp_indexer->pin_from_index (circuit_refs, mp_indexer->pin_index (pins, circuit_refs)).second;
+
   } else if (is_id_circuit_net (id)) {
 
     IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
     size_t index = circuit_net_index_from_id (id);
     return mp_indexer->net_from_index (circuits, index).second;
 
+  } else if (is_id_circuit_net_device_terminal (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    IndexedNetlistModel::net_terminal_pair termrefs = net_terminalrefs_from_id (id);
+    IndexedNetlistModel::device_pair devices = devices_from_termrefs (termrefs);
+
+    return mp_indexer->device_from_index (circuits, mp_indexer->device_index (devices)).second;
+
+  } else if (is_id_circuit_net_subcircuit_pin (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    IndexedNetlistModel::net_subcircuit_pin_pair pinrefs = net_subcircuit_pinrefs_from_id (id);
+    IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (pinrefs);
+
+    return mp_indexer->subcircuit_from_index (circuits, mp_indexer->subcircuit_index (subcircuits)).second;
+
   }
 
   return db::NetlistCrossReference::None;
+}
+
+QVariant
+NetlistBrowserModel::tooltip (const QModelIndex &index) const
+{
+  void *id = index.internalPointer ();
+  std::string hint;
+
+  if (is_id_circuit (id)) {
+
+    size_t index = circuit_index_from_id (id);
+    hint = mp_indexer->circuit_status_hint (index);
+
+  } else if (is_id_circuit_pin (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    size_t index = circuit_pin_index_from_id (id);
+    hint = mp_indexer->pin_status_hint (circuits, index);
+
+  } else if (is_id_circuit_device (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    size_t index = circuit_device_index_from_id (id);
+    hint = mp_indexer->device_status_hint (circuits, index);
+
+  } else if (is_id_circuit_subcircuit (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    size_t index = circuit_subcircuit_index_from_id (id);
+    hint = mp_indexer->subcircuit_status_hint (circuits, index);
+
+  } else if (is_id_circuit_subcircuit_pin (id)) {
+
+    IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_id (id);
+    IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
+    IndexedNetlistModel::pin_pair pins = pins_from_id (id);
+
+    hint = mp_indexer->pin_status_hint (circuit_refs, mp_indexer->pin_index (pins, circuit_refs));
+
+  } else if (is_id_circuit_net (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    size_t index = circuit_net_index_from_id (id);
+    hint = mp_indexer->net_status_hint (circuits, index);
+
+  } else if (is_id_circuit_net_device_terminal (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    IndexedNetlistModel::net_terminal_pair termrefs = net_terminalrefs_from_id (id);
+    IndexedNetlistModel::device_pair devices = devices_from_termrefs (termrefs);
+
+    hint = mp_indexer->device_status_hint (circuits, mp_indexer->device_index (devices));
+
+  } else if (is_id_circuit_net_subcircuit_pin (id)) {
+
+    IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
+    IndexedNetlistModel::net_subcircuit_pin_pair pinrefs = net_subcircuit_pinrefs_from_id (id);
+    IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (pinrefs);
+
+    hint = mp_indexer->subcircuit_status_hint (circuits, mp_indexer->subcircuit_index (subcircuits));
+
+  }
+
+  if (hint.empty ()) {
+    return QVariant ();
+  } else {
+    return QVariant (tl::to_qstring (hint));
+  }
 }
 
 QString

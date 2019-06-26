@@ -32,12 +32,12 @@
 //  TODO: make this a feature?
 // #define PRINT_DEBUG_NETCOMPARE
 
-namespace db
-{
-
 //  Add this define for case insensitive compare
 //  (applies to circuits, device classes)
 #define COMPARE_CASE_INSENSITIVE
+
+namespace db
+{
 
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCompare definition and implementation

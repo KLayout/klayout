@@ -83,6 +83,7 @@ private:
   NetlistBrowserTreeModel &operator= (const NetlistBrowserTreeModel &);
 
   QString text (const QModelIndex &index) const;
+  QVariant tooltip (const QModelIndex &index) const;
   QString search_text (const QModelIndex &index) const;
   db::NetlistCrossReference::Status status (const QModelIndex &index) const;
   std::pair<std::pair<const db::Circuit *, const db::Circuit *>, db::NetlistCrossReference::Status> cp_status_from_index (const QModelIndex &index, size_t &nprod, size_t &nlast, size_t &nnlast) const;

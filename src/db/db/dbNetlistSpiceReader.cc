@@ -26,6 +26,7 @@
 
 #include "tlStream.h"
 #include "tlLog.h"
+#include "tlString.h"
 
 #include <sstream>
 #include <cctype>
@@ -539,7 +540,7 @@ void NetlistSpiceReader::read_pin_and_parameters (tl::Extractor &ex, std::vector
 
       if (ex.test ("=")) {
         //  a parameter
-        pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex)));
+        pv.insert (std::make_pair (n, read_value (ex)));
       } else {
         if (in_params) {
           error (tl::to_string (tr ("Missing '=' in parameter assignment")));
@@ -603,7 +604,9 @@ std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
 
   }
 
-  return nn;
+  //  TODO: allow configuring Spice reader as case sensitive?
+  //  this is easy to do: just avoid to_upper here:
+  return tl::to_upper_case (nn);
 }
 
 bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &element, const std::string &name)
@@ -616,7 +619,7 @@ bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &ele
   double value = 0.0;
 
   //  interpret the parameters according to the code
-  if (element == "X") {
+  if (element ==     "\1\n") {
 
     //  subcircuit call:
     //  Xname n1 n2 ... nn circuit [params]
@@ -655,7 +658,7 @@ bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &ele
     while (! ex.at_end ()) {
       std::string n = read_name (ex);
       if (ex.test ("=")) {
-        pv [tl::to_upper_case (n)] = read_value (ex);
+        pv [n] = read_value (ex);
       } else if (! model.empty ()) {
         error (tl::sprintf (tl::to_string (tr ("Too many arguments for two-terminal device (additional argumen is '%s')")), n));
       } else {
@@ -670,7 +673,7 @@ bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &ele
     while (! ex.at_end ()) {
       std::string n = read_name (ex);
       if (ex.test ("=")) {
-        pv [tl::to_upper_case (n)] = read_value (ex);
+        pv [n] = read_value (ex);
       } else {
         nn.push_back (n);
       }
@@ -710,10 +713,10 @@ bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &ele
     if (! pv.empty ()) {
       warn (tl::to_string (tr ("Circuit parameters are not allowed currently")));
     }
-    read_subcircuit (name, tl::to_upper_case (model), nets);
+    read_subcircuit (name, model, nets);
     return true;
   } else {
-    return mp_delegate->element (mp_circuit, element, name, tl::to_upper_case (model), value, nets, pv);
+    return mp_delegate->element (mp_circuit, element, name, model, value, nets, pv);
   }
 }
 

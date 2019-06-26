@@ -35,6 +35,10 @@
 namespace db
 {
 
+//  Add this define for case insensitive compare
+//  (applies to circuits, device classes)
+#define COMPARE_CASE_INSENSITIVE
+
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCompare definition and implementation
 
@@ -333,13 +337,18 @@ public:
       return cp->second;
     }
 
-    std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cls->name ());
+    std::string cls_name = cls->name ();
+#if defined(COMPARE_CASE_INSENSITIVE)
+    cls_name = tl::to_upper_case (cls_name);
+#endif
+
+    std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cls_name);
     if (c != m_cat_by_name.end ()) {
       m_cat_by_ptr.insert (std::make_pair (cls, c->second));
       return c->second;
     } else {
       ++m_next_cat;
-      m_cat_by_name.insert (std::make_pair (cls->name (), m_next_cat));
+      m_cat_by_name.insert (std::make_pair (cls_name, m_next_cat));
       m_cat_by_ptr.insert (std::make_pair (cls, m_next_cat));
       return m_next_cat;
     }
@@ -393,13 +402,18 @@ public:
       return cp->second;
     }
 
-    std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cr->name ());
+    std::string cr_name = cr->name ();
+#if defined(COMPARE_CASE_INSENSITIVE)
+    cr_name = tl::to_upper_case (cr_name);
+#endif
+
+    std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cr_name);
     if (c != m_cat_by_name.end ()) {
       m_cat_by_ptr.insert (std::make_pair (cr, c->second));
       return c->second;
     } else {
       ++m_next_cat;
-      m_cat_by_name.insert (std::make_pair (cr->name (), m_next_cat));
+      m_cat_by_name.insert (std::make_pair (cr_name, m_next_cat));
       m_cat_by_ptr.insert (std::make_pair (cr, m_next_cat));
       return m_next_cat;
     }

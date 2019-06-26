@@ -23,6 +23,7 @@
 #include "dbLayoutToNetlistWriter.h"
 #include "dbLayoutToNetlist.h"
 #include "dbLayoutToNetlistFormatDefs.h"
+#include "dbPolygonTools.h"
 
 namespace db
 {
@@ -341,7 +342,7 @@ void std_writer_impl<Keys>::write (const db::PolygonRef *s, const db::ICplxTrans
 
     *mp_stream << Keys::polygon_key << "(" << lname;
     if (poly.holes () > 0) {
-      db::SimplePolygon sp (poly);
+      db::SimplePolygon sp = db::polygon_to_simple_polygon (poly);
       write_points (*mp_stream, sp, t, m_ref, relative);
     } else {
       write_points (*mp_stream, poly, t, m_ref, relative);

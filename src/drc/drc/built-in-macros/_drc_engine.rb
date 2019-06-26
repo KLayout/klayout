@@ -28,7 +28,7 @@ module DRC
       @output_rdb = nil
       @output_rdb_file = nil
       @output_rdb_cell = nil
-      @output_l2ndb = nil
+      @show_l2ndb = nil
       @output_l2ndb_file = nil
       @target_netlist_file = nil
       @target_netlist_format = nil
@@ -42,6 +42,7 @@ module DRC
       @dss = nil
       @deep = false
       @netter = nil
+      @netter_data = nil
 
       @verbose = false
 
@@ -770,7 +771,7 @@ module DRC
     # will also be written to the given file.
     
     def report_netlist(filename = nil)
-      @output_l2ndb = true
+      @show_l2ndb = true
       if filename
         filename.is_a?(String) || raise("Argument must be string in report_netlist")
       end
@@ -1337,7 +1338,7 @@ CODE
 
       # save the report database if requested
       if @output_rdb_file
-        rdb_file = make_path(@output_rdb_file)
+        rdb_file = _make_path(@output_rdb_file)
         info("Writing report database: #{rdb_file} ..")
         @output_rdb.save(rdb_file)
       end
@@ -1403,35 +1404,34 @@ CODE
 
         writer = @target_netlist_format || RBA::NetlistSpiceWriter::new
 
-        netlist_file = make_path(@target_netlist_file)
+        netlist_file = _make_path(@target_netlist_file)
         info("Writing netlist: #{netlist_file} ..")
         self.netlist.write(netlist_file, writer, @target_netlist_comment || "")
 
       end
     
       # save the netlist database if requested
-      if @output_l2ndb && @netter && @netter.l2n_data
+      if @output_l2ndb_file && @netter && @netter.l2n_data
 
-        if @output_l2ndb_file
-          l2ndb_file = make_path(@output_l2ndb_file)
-          info("Writing netlist database: #{l2ndb_file} ..")
-          @netter.l2n_data.save(l2ndb_file)
-        end
-        if @output_l2ndb && final && view
-          # NOTE: to prevent the netter destroying the database, we need to take it
-          l2ndb = @netter._take_l2n_data
-          # we also need to make the extractor take over ownership over the DSS
-          # because otherwise we can't free the resources.
-          if l2ndb.dss == @dss
-            l2ndb.keep_dss
-            @dss = nil
-          end
-          l2ndb_index = view.add_l2ndb(l2ndb)
-          view.show_l2ndb(l2ndb_index, view.active_cellview_index)
-        end
+        l2ndb_file = _make_path(@output_l2ndb_file)
+        info("Writing netlist database: #{l2ndb_file} ..")
+        @netter.l2n_data.write_l2n(l2ndb_file)
 
       end
+
+      # give derived classes to perform actions
+      _before_cleanup
     
+      # show the data in the browser
+      if @show_l2ndb && @netter && @netter.l2n_data
+
+        # NOTE: to prevent the netter destroying the database, we need to take it
+        l2ndb = _take_data
+        l2ndb_index = view.add_l2ndb(l2ndb)
+        view.show_l2ndb(l2ndb_index, view.active_cellview_index)
+
+      end
+
       @output_layout = nil
       @output_layout_file = nil
       @output_cell = nil
@@ -1439,18 +1439,48 @@ CODE
       @output_rdb_cell = nil
       @output_rdb = nil
       @output_rdb_index = nil
-      @output_l2ndb = nil
+      @show_l2ndb = nil
       @output_l2ndb_file = nil
 
       # clean up temp data
       @dss && @dss._destroy
+      @dss = nil
       @netter && @netter._finish
+      @netter = nil
+      @netter_data = nil
       
       if final && @log_file
         @log_file.close
         @log_file = nil
       end
 
+    end
+
+    def _take_data
+
+      if ! @netter
+        return nil
+      end
+
+      if ! @netter_data
+
+        @netter_data = @netter._take_data
+
+        # we also need to make the extractor take over ownership over the DSS
+        # because otherwise we can't free the resources.
+        if @netter_data.dss == @dss
+          @netter_data.keep_dss
+          @dss = nil
+        end
+
+      end
+
+      @netter_data
+
+    end
+
+    def _before_cleanup
+      # nothing yet
     end
 
     def _dss
@@ -1461,9 +1491,7 @@ CODE
       @netter ||= DRC::DRCNetter::new(self)
     end
 
-  private
-
-    def make_path(file)
+    def _make_path(file)
       # resolves the file path relative to the source's path
       sp = self.source.path
       if sp
@@ -1472,6 +1500,8 @@ CODE
         return file
       end
     end
+
+  private
 
     def _make_string(v)
       if v.class.respond_to?(:from_s)

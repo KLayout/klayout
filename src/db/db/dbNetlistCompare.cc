@@ -275,9 +275,40 @@ public:
 
   void same_class (const db::DeviceClass *ca, const db::DeviceClass *cb)
   {
-    ++m_next_cat;
-    m_cat_by_ptr.insert (std::make_pair (ca, m_next_cat));
-    m_cat_by_ptr.insert (std::make_pair (cb, m_next_cat));
+    //  reuse existing category if one is assigned already -> this allows associating
+    //  multiple categories to other ones (A->C, B->C)
+    std::map<const db::DeviceClass *, size_t>::const_iterator cpa = m_cat_by_ptr.find (ca);
+    std::map<const db::DeviceClass *, size_t>::const_iterator cpb = m_cat_by_ptr.find (cb);
+
+    if (cpa != m_cat_by_ptr.end () && cpb != m_cat_by_ptr.end ()) {
+
+      if (cpa->second != cpb->second) {
+        //  join categories (cat(B)->cat(A))
+        for (std::map<const db::DeviceClass *, size_t>::iterator cp = m_cat_by_ptr.begin (); cp != m_cat_by_ptr.end (); ++cp) {
+          if (cp->second == cpb->second) {
+            cp->second = cpa->second;
+          }
+        }
+      }
+
+    } else if (cpb != m_cat_by_ptr.end ()) {
+
+      //  reuse cat(B) category
+      m_cat_by_ptr.insert (std::make_pair (ca, cpb->second));
+
+    } else if (cpa != m_cat_by_ptr.end ()) {
+
+      //  reuse cat(A) category
+      m_cat_by_ptr.insert (std::make_pair (cb, cpa->second));
+
+    } else {
+
+      //  new category
+      ++m_next_cat;
+      m_cat_by_ptr.insert (std::make_pair (ca, m_next_cat));
+      m_cat_by_ptr.insert (std::make_pair (cb, m_next_cat));
+
+    }
   }
 
   size_t cat_for_device (const db::Device *device)

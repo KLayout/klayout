@@ -480,11 +480,11 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "This variant accepts a database-unit location. The location is given in the\n"
     "coordinate space of the initial cell.\n"
   ) +
-  gsi::method ("write", &db::LayoutToNetlist::save, gsi::arg ("path"), gsi::arg ("short_format", false),
+  gsi::method ("write|write_l2n", &db::LayoutToNetlist::save, gsi::arg ("path"), gsi::arg ("short_format", false),
     "@brief Writes the extracted netlist to a file.\n"
     "This method employs the native format of KLayout.\n"
   ) +
-  gsi::method ("read", &db::LayoutToNetlist::load, gsi::arg ("path"),
+  gsi::method ("read|read_l2n", &db::LayoutToNetlist::load, gsi::arg ("path"),
     "@brief Reads the extracted netlist from the file.\n"
     "This method employs the native format of KLayout.\n"
   ) +

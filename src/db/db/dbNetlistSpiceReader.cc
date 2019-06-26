@@ -65,11 +65,27 @@ void NetlistSpiceReaderDelegate::error (const std::string &msg)
   throw tl::Exception (msg);
 }
 
+template <class Cls>
+static db::DeviceClass *make_device_class (db::Circuit *circuit, const std::string &name)
+{
+  if (! circuit || ! circuit->netlist ()) {
+    return 0;
+  }
+
+  db::DeviceClass *cls = circuit->netlist ()->device_class_by_name (name);
+  if (! cls) {
+    cls = new Cls ();
+    cls->set_name (name);
+    circuit->netlist ()->add_device_class (cls);
+  }
+
+  return cls;
+}
+
 bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
 {
   std::string cn = model;
   db::DeviceClass *cls = circuit->netlist ()->device_class_by_name (cn);
-  db::DeviceClass *new_cls = 0;
 
   if (cls) {
     //  use given class
@@ -77,53 +93,46 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     if (cn.empty ()) {
       cn = "RES";
     }
-    new_cls = new db::DeviceClassResistor ();
+    cls = make_device_class<db::DeviceClassResistor> (circuit, cn);
   } else if (element == "L") {
     if (cn.empty ()) {
       cn = "IND";
     }
-    new_cls = new db::DeviceClassInductor ();
+    cls = make_device_class<db::DeviceClassInductor> (circuit, cn);
   } else if (element == "C") {
     if (cn.empty ()) {
       cn = "CAP";
     }
-    new_cls = new db::DeviceClassCapacitor ();
+    cls = make_device_class<db::DeviceClassCapacitor> (circuit, cn);
   } else if (element == "D") {
     if (cn.empty ()) {
       cn = "DIODE";
     }
-    new_cls = new db::DeviceClassDiode ();
+    cls = make_device_class<db::DeviceClassDiode> (circuit, cn);
   } else if (element == "Q") {
     if (nets.size () == 3) {
       if (cn.empty ()) {
         cn = "BJT3";
       }
-      new_cls = new db::DeviceClassBJT3Transistor ();
+      cls = make_device_class<db::DeviceClassBJT3Transistor> (circuit, cn);
     } else if (nets.size () == 4) {
       if (cn.empty ()) {
         cn = "BJT4";
       }
-      new_cls = new db::DeviceClassBJT4Transistor ();
+      cls = make_device_class<db::DeviceClassBJT4Transistor> (circuit, cn);
+    } else {
+      error (tl::to_string (tr ("'Q' element needs to have 3 or 4 terminals")));
     }
   } else if (element == "M") {
-    if (nets.size () == 3) {
-      if (cn.empty ()) {
-        cn = "MOS3";
-      }
-      new_cls = new db::DeviceClassMOS3Transistor ();
-    } else if (nets.size () == 4) {
+    if (nets.size () == 4) {
       if (cn.empty ()) {
         cn = "MOS4";
       }
-      new_cls = new db::DeviceClassMOS4Transistor ();
+      cls = make_device_class<db::DeviceClassMOS4Transistor> (circuit, cn);
+    } else {
+      error (tl::to_string (tr ("'M' element needs to have 4 terminals")));
     }
-  }
-
-  if (new_cls) {
-    cls = new_cls;
-    cls->set_name (cn);
-    circuit->netlist ()->add_device_class (cls);
-  } else if (! cls) {
+  } else {
     error (tl::sprintf (tl::to_string (tr ("Not a known element type: '%s'")), element));
   }
 

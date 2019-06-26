@@ -2,7 +2,7 @@
 
 module DRC
 
-  # The netter object
+  # The DRC netter object
 
   # %DRC%
   # @scope 
@@ -13,6 +13,17 @@ module DRC
   # as global functions too where they act on a default incarnation
   # of the netter. Usually it's not required to instantiate a Netter
   # object, but it serves as a container for this functionality.
+
+  # %LVS%
+  # @scope
+  # @name Netter
+  # @brief LVS Reference: Netter object
+  # The Netter object provides services related to network extraction
+  # from a layout plus comparison against a reference netlist.
+  # Similar to the DRC netter (which lacks the compare ability), the
+  # relevant method of this object are available as global functions too
+  # where they act on a default incarnation. Usually it's not required
+  # to instantiate a Netter object explicitly. 
   #
   # An individual netter object can be created, if the netter results
   # need to be kept for multiple extractions. If you really need
@@ -162,7 +173,7 @@ module DRC
     
     def extract_devices(devex, layer_selection)
     
-      ensure_l2n
+      ensure_data
 
       devex.is_a?(RBA::DeviceExtractorBase) || raise("First argument of Netter#extract_devices must be a device extractor instance in the two-arguments form")
 
@@ -188,8 +199,7 @@ module DRC
     def clear_connections
       @netlisted = false
       @connect_implicit = ""
-      @l2n && @l2n._destroy
-      @l2n = nil
+      _clear_data
     end
     
     # %DRC%
@@ -336,7 +346,7 @@ module DRC
 
     def l2n_data
 
-      ensure_l2n
+      ensure_data
 
       # run extraction in a timed environment
       if ! @netlisted
@@ -364,7 +374,12 @@ module DRC
       clear_connections
     end
 
-    def _take_l2n_data
+    def _clear_data
+      @l2n && @l2n._destroy
+      @l2n = nil
+    end
+
+    def _take_data
       l2ndb = self.l2n_data
       @l2n = nil
       l2ndb
@@ -376,17 +391,16 @@ module DRC
       @netlisted && clear_connections
     end
     
-    def ensure_l2n
-      @l2n || make_l2n
+    def ensure_data
+      if !@l2n
+        @layers = {}
+        make_data
+      end
     end
 
-    def make_l2n
-
-      @layers = {}
+    def make_data
 
       if @engine._dss
-        # TODO: check whether all layers are deep and come from the dss and layout index,
-        # then use this layout index. This will remove the need for this check:
         @engine._dss.is_singular? || raise("The DRC script features more than one or no layout source - network extraction cannot be performed in such configurations")
         @l2n = RBA::LayoutToNetlist::new(@engine._dss)
       else
@@ -405,7 +419,7 @@ module DRC
         return
       end
 
-      ensure_l2n
+      ensure_data
 
       @layers[id] = data
 

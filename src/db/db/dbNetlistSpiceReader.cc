@@ -619,7 +619,7 @@ bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &ele
   double value = 0.0;
 
   //  interpret the parameters according to the code
-  if (element ==     "\1\n") {
+  if (element == "X") {
 
     //  subcircuit call:
     //  Xname n1 n2 ... nn circuit [params]

@@ -358,8 +358,10 @@ CODE
     end
 
     # %DRC%
+    # @name path
     # @brief Gets the path of the corresponding layout file or nil if there is no path
     # @synopsis path
+
     def path
       @path
     end

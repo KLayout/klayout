@@ -17,11 +17,23 @@ module LVS
   # LVS is built upon DRC. So all functions available in DRC are also available
   # in LVS. In LVS, DRC functions are used to derive functional layers from original 
   # layers or specification of the layout source.
+  #
+  # For more details about the DRC functions see \DRC::global.
 
   class LVSEngine < DRCEngine
 
     def initialize
       super
+    end
+
+    # %LVS%
+    # @name netter
+    # @brief Creates a new netter object
+    # @synopsis netter
+    # See \Netter# for more details
+ 
+    def netter
+      LVS::LVSNetter::new
     end
 
     def _netter
@@ -41,7 +53,7 @@ module LVS
 
     end
 
-    # %DRC%
+    # %LVS%
     # @name report_lvs
     # @brief Specifies an LVS report for output
     # @synopsis report_lvs([ filename ])
@@ -66,7 +78,7 @@ module LVS
       @output_lvsdb_file = filename
     end
 
-    # %DRC%
+    # %LVS%
     # @name schematic
     # @brief Reads the reference netlist
     # @synopsis schematic(filename)
@@ -74,36 +86,36 @@ module LVS
     # @synopsis schematic(netlist)
     # See \Netter#schematic for a description of that function.
  
-    # %DRC%
+    # %LVS%
     # @name compare
     # @brief Compares the extracted netlist vs. the schematic
     # @synopsis compare
     # See \Netter#compare for a description of that function.
  
-    # %DRC%
+    # %LVS%
     # @name same_nets
     # @brief Establishes an equivalence between the nets
     # @synopsis same_nets(circuit, net_a, net_b)
     # @synopsis same_nets(circuit_a, net_a, circuit_b, net_b)
     # See \Netter#same_nets for a description of that function.
  
-    # %DRC%
+    # %LVS%
     # @name same_circuits
     # @brief Establishes an equivalence between the circuits
     # @synopsis same_circuits(circuit_a, circuit_b)
     # See \Netter#same_circuits for a description of that function.
  
-    # %DRC%
+    # %LVS%
     # @name same_device_classes
     # @brief Establishes an equivalence between the device_classes
     # @synopsis same_device_classes(class_a, class_b)
     # See \Netter#same_device_classes for a description of that function.
  
-    # %DRC%
+    # %LVS%
     # @name equivalent_pins
     # @brief Marks pins as equivalent
     # @synopsis equivalent_pins(circuit, pins ...)
-    # See \Netter#equivalen_pins for a description of that function.
+    # See \Netter#equivalent_pins for a description of that function.
  
     # %LVS%
     # @name min_caps

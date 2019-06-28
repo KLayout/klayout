@@ -1112,7 +1112,7 @@ CODE
     # @name netter
     # @brief Creates a new netter object
     # @synopsis netter
-    # See \Netter for more details
+    # See \Netter# for more details
  
     def netter
       DRC::DRCNetter::new

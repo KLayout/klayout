@@ -51,7 +51,8 @@ ResourceHelpProvider::ResourceHelpProvider (const char *folder, const std::strin
 QDomDocument 
 ResourceHelpProvider::get (const std::string &path) const
 {
-  QResource res (resource_url (tl::to_qstring (path)));
+  QString qpath = tl::to_qstring (path);
+  QResource res (resource_url (qpath));
   if (res.size () == 0) {
     throw tl::Exception (tl::to_string (QObject::tr ("ERROR: no data found for resource ")) + tl::to_string (res.fileName ()));
   }

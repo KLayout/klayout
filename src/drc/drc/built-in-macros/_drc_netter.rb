@@ -23,8 +23,8 @@ module DRC
   #
   # Network formation:
   # 
-  # A basic Service the Netter object provides is the formation of 
-  # connected networks of conductive shapes. To do so, the Netter
+  # A basic service the Netter object provides is the formation of 
+  # connected networks of conductive shapes (netting). To do so, the Netter
   # must be given a connection specification. This happens by calling
   # "connect" with two polygon layers. The Netter will then regard all
   # overlaps of shapes on these layers as connections between the

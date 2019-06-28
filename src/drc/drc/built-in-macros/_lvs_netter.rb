@@ -12,25 +12,16 @@ module LVS
   # @brief LVS Reference: Netter object
   # The Netter object provides services related to network extraction
   # from a layout plus comparison against a reference netlist.
-  # Similar to the DRC netter (which lacks the compare ability), the
+  # Similar to the DRC \DRC::Netter (which lacks the compare ability), the
   # relevant method of this object are available as global functions too
   # where they act on a default incarnation. Usually it's not required
   # to instantiate a Netter object explicitly. 
   #
-  # An individual netter object can be created, if the netter results
-  # need to be kept for multiple extractions or when different configurations
-  # need to be used in the same script. If you really want
-  # a Netter object, use the global \netter function:
-  # The Netter object provides services related to network extraction
-  # from a layout plus comparison against a reference netlist.
-  # Similar to the DRC netter (which lacks the compare ability), the
-  # relevant method of this object are available as global functions too
-  # where they act on a default incarnation. Usually it's not required
-  # to instantiate a Netter object explicitly. 
-  # 
+  # The LVS Netter object inherits all methods of the \DRC::Netter.
+  #
   # An individual netter object can be created, if the netter results
   # need to be kept for multiple extractions. If you really need
-  # a Netter object, use the global \netter function:
+  # a Netter object, use the global \global#netter function:
   #
   # @code
   # # create a new Netter object:

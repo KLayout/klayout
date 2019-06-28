@@ -238,10 +238,14 @@ static IndexedNetlistModel::circuit_pair get_parent_of (const Pair &pair, const 
     }
 
     i = cache.find (pair);
-    tl_assert (i != cache.end ());
 
   }
-  return i->second;
+
+  if (i == cache.end ()) {
+    return IndexedNetlistModel::circuit_pair ((const db::Circuit *) 0, (const db::Circuit *) 0);
+  } else {
+    return i->second;
+  }
 }
 
 IndexedNetlistModel::circuit_pair NetlistCrossReferenceModel::parent_of (const IndexedNetlistModel::net_pair &net_pair) const
@@ -436,19 +440,19 @@ std::string NetlistCrossReferenceModel::circuit_pair_status_hint (const std::pai
   if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
     if (! cps.first.first || ! cps.first.second) {
       return tl::to_string (tr ("No matching circuit found in the other netlist.\n"
-                                "By default, circuits are identified by their name. "
+                                "By default, circuits are identified by their name.\n"
                                 "A missing circuit probably means there is no circuit in the other netlist with this name.\n"
-                                "If circuits with different names need to be associated, use 'same_circuits' in the "
+                                "If circuits with different names need to be associated, use 'same_circuits' in the\n"
                                 "LVS script to establish such an association."));
     } else {
       return tl::to_string (tr ("Circuits could be paired, but there is a mismatch inside.\n"
                                 "Browse the circuit's component list to identify the mismatching elements."));
     }
   } else if (cps.second == db::NetlistCrossReference::Skipped) {
-      return tl::to_string (tr ("Circuits can only be matched if their child circuits have a known counterpart and a pin-to-pin "
-                                "correspondence could be established for each child circuit.\n"
+      return tl::to_string (tr ("Circuits can only be matched if their child circuits have a known counterpart and a\n"
+                                "pin-to-pin correspondence could be established for each child circuit.\n"
                                 "This is not the case here. Browse the child circuits to identify the blockers.\n"
-                                "Potential blockers are subcircuits without a corresponding other circuit or circuits "
+                                "Potential blockers are subcircuits without a corresponding other circuit or circuits\n"
                                 "where some pins could not be mapped to pins from the corresponding other circuit."));
   }
   return std::string ();
@@ -469,15 +473,15 @@ std::string NetlistCrossReferenceModel::child_circuit_status_hint (const circuit
   std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> cps = child_circuit_from_index (circuits, index);
   if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
     if (!cps.first.first || !cps.first.second) {
-      return tl::to_string (tr ("No matching subcircuit was found in the other netlist - this is likely because pin assignment "
-                                "could not be derived from the nets connected to the pins.\n"
-                                "Check, if the pins are attached properly. If pins need to be swappable, consider using 'equivalent_pins' "
-                                "in the LVS script."));
+      return tl::to_string (tr ("No matching subcircuit was found in the other netlist - this is likely because pin\n"
+                                "assignment could not be derived from the nets connected to the pins.\n"
+                                "Check, if the pins are attached properly. If pins need to be swappable, consider using\n"
+                                "'equivalent_pins' in the LVS script."));
     } else {
-      return tl::to_string (tr ("Two different subcircuits fit here in the same way, but they are not "
+      return tl::to_string (tr ("Two different subcircuits fit here in the same way, but they are not\n"
                                 "originating from equivalent circuits.\n"
-                                "If the circuits behind the subcircuits are identical, using 'same_circuits' in the LVS script "
-                                "helps to associate them."));
+                                "If the circuits behind the subcircuits are identical, using 'same_circuits'\n"
+                                "in the LVS script will associate them."));
     }
   }
   return std::string ();
@@ -487,9 +491,9 @@ std::string NetlistCrossReferenceModel::net_status_hint (const circuit_pair &cir
 {
   std::pair<IndexedNetlistModel::net_pair, NetlistCrossReferenceModel::Status> cps = net_from_index (circuits, index);
   if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
-    return tl::to_string (tr ("Nets don't match. Nets match, if connected subcircuit pins and device terminals match to a counterpart in "
-                              "the other netlist (component-wise and pin/terminal-wise).\n"
-                              "If there already is a net candidate from the other netlist, scan the net members for "
+    return tl::to_string (tr ("Nets don't match. Nets match, if connected subcircuit pins and device terminals match to a\n"
+                              "counterpart in the other netlist (component-wise and pin/terminal-wise).\n"
+                              "If there already is a net candidate from the other netlist, scan the net members for\n"
                               "mismatching items (with errors or warnings) and fix these issues.\n"
                               "Otherwise, look for the corresponding other net.\n"
                               "Net items not found in the reference netlist indicate additional connections.\n"
@@ -504,15 +508,15 @@ std::string NetlistCrossReferenceModel::device_status_hint (const circuit_pair &
   if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
     if (!cps.first.first || !cps.first.second) {
       return tl::to_string (tr ("No matching device was found in the other netlist.\n"
-                                "Devices are identified by the nets they are attached to. Unmatched devices mean that "
+                                "Devices are identified by the nets they are attached to. Unmatched devices mean that\n"
                                 "at least one terminal net isn't matched with a corresponding net from the other netlist.\n"
                                 "Make all terminal nets match and the devices will match too."));
     }
   } else if (cps.second == db::NetlistCrossReference::MatchWithWarning) {
-    return tl::to_string (tr ("Topologically matching devices are found here but either the parameters or the "
+    return tl::to_string (tr ("Topologically matching devices are found here but either the parameters or the\n"
                               "device classes don't match.\n"
-                              "If the device class is different but should be considered the same, "
-                              "using 'same_device_class' in the LVS script will solve this issue."));
+                              "If the device class is different but should be considered the same, using\n"
+                              "'same_device_classed' in the LVS script will solve this issue."));
   }
   return std::string ();
 }
@@ -523,8 +527,8 @@ std::string NetlistCrossReferenceModel::pin_status_hint (const circuit_pair &cir
   if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
     if (!cps.first.first || !cps.first.second) {
       return tl::to_string (tr ("No matching pin was found in the other netlist.\n"
-                                "Pins are identified by the nets they are attached to - pins on equivalent nets are also equivalent.\n"
-                                "Making the nets match will make the pins match too."));
+                                "Pins are identified by the nets they are attached to - pins on equivalent nets are also\n"
+                                "equivalent. Making the nets match will make the pins match too."));
     }
   }
   return std::string ();
@@ -535,15 +539,15 @@ std::string NetlistCrossReferenceModel::subcircuit_status_hint (const circuit_pa
   std::pair<IndexedNetlistModel::subcircuit_pair, NetlistCrossReferenceModel::Status> cps = subcircuit_from_index (circuits, index);
   if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
     if (!cps.first.first || !cps.first.second) {
-      return tl::to_string (tr ("No matching subcircuit was found in the other netlist - this is likely because pin assignment "
+      return tl::to_string (tr ("No matching subcircuit was found in the other netlist - this is likely because pin assignment\n"
                                 "could not be derived from the nets connected to the pins.\n"
-                                "Check, if the pins are attached properly. If pins need to be swappable, consider using 'equivalent_pins' "
-                                "in the LVS script."));
+                                "Check, if the pins are attached properly. If pins need to be swappable, consider using\n"
+                                "'equivalent_pins' in the LVS script."));
     } else {
-      return tl::to_string (tr ("Two different subcircuits fit here in the same way, but they are not "
-                                "originating from equivalent circuits.\n"
-                                "If the circuits behind the subcircuits are identical, using 'same_circuits' in the LVS script "
-                                "helps to associate them."));
+      return tl::to_string (tr ("Two different subcircuits fit here in the same way, but they are not originating from\n"
+                                "equivalent circuits.\n"
+                                "If the circuits behind the subcircuits are identical, using 'same_circuits' in the LVS script\n"
+                                "will associate them."));
     }
   }
   return std::string ();

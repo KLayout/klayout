@@ -219,6 +219,8 @@ private:
     return std::pair<const db::Netlist *, const db::Netlist *> (mp_l2ndb->netlist (), (const db::Netlist *)0);
   }
 
+  bool is_valid_net_pair (const std::pair<const db::Net *, const db::Net *> &net) const;
+
   QIcon icon_for_nets (const std::pair<const db::Net *, const db::Net *> &net) const;
   QIcon icon_for_connection (const std::pair<const db::Net *, const db::Net *> &net) const;
 

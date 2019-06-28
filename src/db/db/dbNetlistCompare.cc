@@ -1942,6 +1942,89 @@ compute_subcircuit_key (const db::SubCircuit &subcircuit, const db::NetGraph &g,
   return k;
 }
 
+namespace {
+
+inline double size_dist (size_t a, size_t b)
+{
+  double d = a - b;
+  return d * d;
+}
+
+struct KeyDistance
+{
+  typedef std::pair<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *> value_type;
+
+  double operator() (const value_type &a, const value_type &b) const
+  {
+    tl_assert (a.first.size () == b.first.size ());
+    double d = 0.0;
+    for (std::vector<std::pair<size_t, size_t> >::const_iterator i = a.first.begin (), j = b.first.begin (); i != a.first.end (); ++i, ++j) {
+      d += size_dist (i->first, j->first) + size_dist (i->second, j->second);
+    }
+    return d;
+  }
+};
+
+struct KeySize
+{
+  typedef std::pair<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *> value_type;
+
+  bool operator() (const value_type &a, const value_type &b) const
+  {
+    return (a.first.size () < b.first.size ());
+  }
+};
+
+template <class Iter, class Distance>
+void align (Iter i1, Iter i2, Iter j1, Iter j2, Distance distance)
+{
+  //  TODO: this can probably be done more efficiently
+
+  std::vector<Iter> vi, vj;
+  vi.reserve (std::max (i2 - i1, j2 - j1));
+  vj.reserve (std::max (i2 - i1, j2 - j1));
+
+  for (Iter i = i1; i != i2; ++i) {
+    vi.push_back (i);
+  }
+
+  for (Iter j = j1; j != j2; ++j) {
+    vj.push_back (j);
+  }
+
+  while (vi.size () < vj.size ()) {
+    vi.push_back (Iter ());
+  }
+
+  while (vj.size () < vi.size ()) {
+    vj.push_back (Iter ());
+  }
+
+  if (vi.size () <= 1) {
+    return;
+  }
+
+  //  Caution: this is an O(2) algorithm ...
+  bool any_swapped = true;
+  for (size_t n = 0; n < vi.size () - 1 && any_swapped; ++n) {
+
+    any_swapped = false;
+
+    for (size_t m = n + 1; m < vj.size () - 1; ++m) {
+      if (vi [n] == Iter () || vi [m] == Iter () || vj [n] == Iter () || vj [m] == Iter ()) {
+        continue;
+      } else if (distance (*vi [n], *vj [m]) + distance (*vi [m], *vj [n]) < distance (*vi [n], *vj [n]) + distance (*vi [m], *vj [m])) {
+        //  this will reduce the overall distance:
+        std::swap (vj [n], vj [m]);
+        any_swapped = true;
+      }
+    }
+
+  }
+}
+
+}
+
 bool
 NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
 {
@@ -2325,6 +2408,9 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   }
 
+  typedef std::vector<std::pair<std::vector<std::pair<size_t, size_t> >, const db::SubCircuit *> > unmatched_list;
+  unmatched_list unmatched_a, unmatched_b;
+
   for (db::Circuit::const_subcircuit_iterator sc = c2->begin_subcircuits (); sc != c2->end_subcircuits (); ++sc) {
 
     std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper);
@@ -2345,7 +2431,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     if (! mapped || scm == subcircuit_map.end ()) {
 
       if (mp_logger) {
-        mp_logger->subcircuit_mismatch (0, sc.operator-> ());
+        unmatched_b.push_back (std::make_pair (k, sc.operator-> ()));
       }
       good = false;
 
@@ -2373,9 +2459,79 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> >::const_iterator scm = subcircuit_map.begin (); scm != subcircuit_map.end (); ++scm) {
     if (mp_logger) {
-      mp_logger->subcircuit_mismatch (scm->second.first, 0);
+      unmatched_a.push_back (std::make_pair (scm->first, scm->second.first));
     }
     good = false;
+  }
+
+  //  try to do some pairing between the mismatching subcircuits - even though we will still report them as
+  //  mismatches it will give some better hint about what needs to be fixed
+
+  if (mp_logger) {
+
+    size_t max_analysis_set = 1000;
+    if (unmatched_a.size () + unmatched_b.size () > max_analysis_set) {
+
+      //  don't try too much analysis - this may be a waste of time
+      for (unmatched_list::const_iterator i = unmatched_a.begin (); i != unmatched_a.end (); ++i) {
+        mp_logger->subcircuit_mismatch (i->second, 0);
+      }
+      for (unmatched_list::const_iterator i = unmatched_b.begin (); i != unmatched_b.end (); ++i) {
+        mp_logger->subcircuit_mismatch (0, i->second);
+      }
+
+    } else {
+
+      std::sort (unmatched_a.begin (), unmatched_a.end (), KeySize ());
+      std::sort (unmatched_b.begin (), unmatched_b.end (), KeySize ());
+
+      for (unmatched_list::iterator i = unmatched_a.begin (), j = unmatched_b.begin (); i != unmatched_a.end () || j != unmatched_b.end (); ) {
+
+        while (j != unmatched_b.end () && (i == unmatched_a.end () || j->first.size () < i->first.size ())) {
+          mp_logger->subcircuit_mismatch (0, j->second);
+          ++j;
+        }
+
+        while (i != unmatched_a.end () && (j == unmatched_b.end () || i->first.size () < j->first.size ())) {
+          mp_logger->subcircuit_mismatch (i->second, 0);
+          ++i;
+        }
+
+        if (i == unmatched_a.end () && j == unmatched_b.end ()) {
+          break;
+        }
+
+        unmatched_list::iterator ii = i, jj = j;
+        ++i, ++j;
+        size_t n = ii->first.size ();
+        tl_assert (n == jj->first.size ());
+
+        while (i != unmatched_a.end () && i->first.size () == n) {
+          ++i;
+        }
+
+        while (j != unmatched_b.end () && j->first.size () == n) {
+          ++j;
+        }
+
+        align (ii, i, jj, j, KeyDistance ());
+
+        for ( ; ii != i && jj != j; ++ii, ++jj) {
+          mp_logger->subcircuit_mismatch (ii->second, jj->second);
+        }
+
+        for ( ; jj != j; ++jj) {
+          mp_logger->subcircuit_mismatch (0, jj->second);
+        }
+
+        for ( ; ii != i; ++ii) {
+          mp_logger->subcircuit_mismatch (ii->second, 0);
+        }
+
+      }
+
+    }
+
   }
 
   return good;

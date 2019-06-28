@@ -830,6 +830,11 @@ std::string devices_string (const std::pair<const db::Device *, const db::Device
 
 static QString build_url (void *id, const std::string &tag, const std::string &title)
 {
+  if (id == 0) {
+    //  no link
+    return tl::to_qstring (tl::escaped_to_html (title));
+  }
+
   std::string s = std::string ("<a href='int:");
   s += tag;
   s += "?id=";
@@ -849,7 +854,15 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Net *, const db::Ne
   if ((! nets.first || column == m_second_column) && (! nets.second || column == m_first_column)) {
     return QString ();
   } else {
-    void *id = make_id_circuit_net (mp_indexer->circuit_index (mp_indexer->parent_of (nets)), mp_indexer->net_index (nets));
+
+    IndexedNetlistModel::circuit_pair circuits = mp_indexer->parent_of (nets);
+    void *id = 0;
+    //  NOTE: the nets may not be a valid net pair. In this case, circuits is (0, 0) and
+    //  no link is generated
+    if (circuits.first || circuits.second) {
+      id = make_id_circuit_net (mp_indexer->circuit_index (circuits), mp_indexer->net_index (nets));
+    }
+
     if (mp_indexer->is_single () || column == m_first_column) {
       return build_url (id, "net", str_from_expanded_name (nets.first));
     } else if (column == m_second_column) {
@@ -857,6 +870,7 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Net *, const db::Ne
     } else {
       return build_url (id, "net", str_from_expanded_names (nets, mp_indexer->is_single ()));
     }
+
   }
 }
 
@@ -866,7 +880,15 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Device *, const db:
   if ((! devices.first || column == m_second_column) && (! devices.second || column == m_first_column)) {
     return QString ();
   } else {
-    void *id = make_id_circuit_device (mp_indexer->circuit_index (mp_indexer->parent_of (devices)), mp_indexer->device_index (devices));
+
+    IndexedNetlistModel::circuit_pair circuits = mp_indexer->parent_of (devices);
+    void *id = 0;
+    //  NOTE: the devices may not be a valid device pair. In this case, circuits is (0, 0) and
+    //  no link is generated
+    if (circuits.first || circuits.second) {
+      id = make_id_circuit_device (mp_indexer->circuit_index (circuits), mp_indexer->device_index (devices));
+    }
+
     if (mp_indexer->is_single () || column == m_first_column) {
       return build_url (id, "device", str_from_expanded_name (devices.first));
     } else if (column == m_second_column) {
@@ -874,6 +896,7 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Device *, const db:
     } else {
       return build_url (id, "device", str_from_expanded_names (devices, mp_indexer->is_single ()));
     }
+
   }
 }
 
@@ -917,7 +940,15 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::SubCircuit *, const
   if ((! subcircuits.first || column == m_second_column) && (! subcircuits.second || column == m_first_column)) {
     return QString ();
   } else {
-    void *id = make_id_circuit_subcircuit (mp_indexer->circuit_index (mp_indexer->parent_of (subcircuits)), mp_indexer->subcircuit_index (subcircuits));
+
+    IndexedNetlistModel::circuit_pair circuits = mp_indexer->parent_of (subcircuits);
+    void *id = 0;
+    //  NOTE: the subcircuits may not be a valid subcircuit pair. In this case, circuits is (0, 0) and
+    //  no link is generated
+    if (circuits.first || circuits.second) {
+      id = make_id_circuit_subcircuit (mp_indexer->circuit_index (circuits), mp_indexer->subcircuit_index (subcircuits));
+    }
+
     if (mp_indexer->is_single () || column == m_first_column) {
       return build_url (id, "subcircuit", str_from_expanded_name (subcircuits.first));
     } else if (column == m_second_column) {
@@ -925,6 +956,7 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::SubCircuit *, const
     } else {
       return build_url (id, "subcircuit", str_from_expanded_names (subcircuits, mp_indexer->is_single ()));
     }
+
   }
 }
 
@@ -1313,6 +1345,13 @@ static std::string search_string_from_names (const std::pair<const Obj *, const 
   }
 }
 
+bool
+NetlistBrowserModel::is_valid_net_pair (const std::pair<const db::Net *, const db::Net *> &nets) const
+{
+  IndexedNetlistModel::circuit_pair net_parent = mp_indexer->parent_of (nets);
+  return (net_parent.first != 0 || net_parent.second != 0);
+}
+
 db::NetlistCrossReference::Status
 NetlistBrowserModel::status (const QModelIndex &index) const
 {
@@ -1347,7 +1386,17 @@ NetlistBrowserModel::status (const QModelIndex &index) const
     IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
     IndexedNetlistModel::pin_pair pins = pins_from_id (id);
 
-    return mp_indexer->pin_from_index (circuit_refs, mp_indexer->pin_index (pins, circuit_refs)).second;
+    db::NetlistCrossReference::Status status = mp_indexer->pin_from_index (circuit_refs, mp_indexer->pin_index (pins, circuit_refs)).second;
+    if (status == db::NetlistCrossReference::Mismatch || status == db::NetlistCrossReference::NoMatch) {
+      return status;
+    }
+
+    //  Another test here is to check whether the pins may be attached to an invalid net pair
+    if (! is_valid_net_pair (nets_from_subcircuit_pins (subcircuits, pins))) {
+      //  This indicates a wrong connection: the nets are associated in a way which is a not
+      //  corresponding to a mapped net pair. Report Mismatch here.
+      return db::NetlistCrossReference::Mismatch;
+    }
 
   } else if (is_id_circuit_net (id)) {
 
@@ -1371,9 +1420,29 @@ NetlistBrowserModel::status (const QModelIndex &index) const
 
     return mp_indexer->subcircuit_from_index (circuits, mp_indexer->subcircuit_index (subcircuits)).second;
 
+  } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
+
+    IndexedNetlistModel::net_subcircuit_pin_pair pinrefs = net_subcircuit_pinrefs_from_id (id);
+    IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (pinrefs);
+    size_t other_index = circuit_net_subcircuit_pin_other_index_from_id (id);
+
+    IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
+    IndexedNetlistModel::pin_pair pins = mp_indexer->pin_from_index (circuit_refs, other_index).first;
+
+    if (! is_valid_net_pair (nets_from_subcircuit_pins (subcircuits, pins))) {
+      //  This indicates a wrong connection: the nets are associated in a way which is a not
+      //  corresponding to a mapped net pair. Report Mismatch here.
+      return db::NetlistCrossReference::Mismatch;
+    }
+
   }
 
   return db::NetlistCrossReference::None;
+}
+
+static std::string rewire_subcircuit_pins_status_hint ()
+{
+  return tl::to_string (tr ("The nets attached to the pins are not equivalent.\nRewire the circuit or use 'equivalent_pins' in the LVS script to fix this issue."));
 }
 
 QVariant
@@ -1412,6 +1481,14 @@ NetlistBrowserModel::tooltip (const QModelIndex &index) const
     IndexedNetlistModel::pin_pair pins = pins_from_id (id);
 
     hint = mp_indexer->pin_status_hint (circuit_refs, mp_indexer->pin_index (pins, circuit_refs));
+    if (hint.empty ()) {
+
+      //  Another test here is to check whether the pins may be attached to an invalid net pair
+      if (! is_valid_net_pair (nets_from_subcircuit_pins (subcircuits, pins))) {
+        hint = rewire_subcircuit_pins_status_hint ();
+      }
+
+    }
 
   } else if (is_id_circuit_net (id)) {
 
@@ -1434,6 +1511,21 @@ NetlistBrowserModel::tooltip (const QModelIndex &index) const
     IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (pinrefs);
 
     hint = mp_indexer->subcircuit_status_hint (circuits, mp_indexer->subcircuit_index (subcircuits));
+
+  } else if (is_id_circuit_net_subcircuit_pin_others (id)) {
+
+    IndexedNetlistModel::net_subcircuit_pin_pair pinrefs = net_subcircuit_pinrefs_from_id (id);
+    IndexedNetlistModel::subcircuit_pair subcircuits = subcircuits_from_pinrefs (pinrefs);
+    size_t other_index = circuit_net_subcircuit_pin_other_index_from_id (id);
+
+    IndexedNetlistModel::circuit_pair circuit_refs = circuit_refs_from_subcircuits (subcircuits);
+    IndexedNetlistModel::pin_pair pins = mp_indexer->pin_from_index (circuit_refs, other_index).first;
+
+    if (! is_valid_net_pair (nets_from_subcircuit_pins (subcircuits, pins))) {
+      //  This indicates a wrong connection: the nets are associated in a way which is a not
+      //  corresponding to a mapped net pair. Report Mismatch here.
+      hint = rewire_subcircuit_pins_status_hint ();
+    }
 
   }
 
@@ -1773,7 +1865,7 @@ NetlistBrowserModel::icon (const QModelIndex &index) const
 
   } else if (is_id_circuit_subcircuit (id)) {
     return icon_for_circuit ();
-  } else if (is_id_circuit_subcircuit_pin (id) || is_id_circuit_net_pin (id) || is_id_circuit_net_subcircuit_pin_others (id)) {
+  } else if (is_id_circuit_subcircuit_pin (id) || is_id_circuit_net_pin (id)) {
     return icon_for_pin ();
   } else if (is_id_circuit_net_subcircuit_pin (id)) {
     return icon_for_circuit ();

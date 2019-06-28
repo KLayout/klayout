@@ -173,6 +173,7 @@ private slots:
   void selection_changed ();
   void browse_color_for_net ();
   void select_color_for_net ();
+  void mode_changed ();
 
 protected:
   bool eventFilter (QObject *watched, QEvent *event);
@@ -209,6 +210,7 @@ private:
   db::ContextCache m_cell_context_cache;
 
   void set_db (db::LayoutToNetlist *l2ndb);
+  void setup_trees ();
   void add_to_history (void *id, bool fwd);
   void navigate_to (void *id, bool forward = true);
   void adjust_view ();

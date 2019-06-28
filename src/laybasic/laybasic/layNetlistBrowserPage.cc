@@ -192,6 +192,9 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   connect (forward, SIGNAL (clicked ()), this, SLOT (navigate_forward ()));
   connect (backward, SIGNAL (clicked ()), this, SLOT (navigate_back ()));
 
+  connect (show_netlist, SIGNAL (clicked ()), this, SLOT (mode_changed ()));
+  connect (show_xref, SIGNAL (clicked ()), this, SLOT (mode_changed ()));
+
   connect (actionExportAll, SIGNAL (triggered ()), this, SLOT (export_all ()));
   connect (actionExportSelected, SIGNAL (triggered ()), this, SLOT (export_selected ()));
 
@@ -582,6 +585,12 @@ NetlistBrowserPage::info_button_pressed ()
   mp_info_dialog->show ();
 }
 
+void
+NetlistBrowserPage::mode_changed ()
+{
+  setup_trees ();
+}
+
 static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const QRegExp &to_find, const QModelIndex &from)
 {
   QModelIndex index = from;
@@ -721,9 +730,26 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
   mp_database.reset (l2ndb);
 
+  show_netlist->setVisible (lvsdb != 0);
+  show_xref->setVisible (lvsdb != 0);
+
+  bool se = m_signals_enabled;
+  m_signals_enabled = false;
+  show_netlist->setChecked (lvsdb == 0);
+  show_xref->setChecked (lvsdb != 0);
+  m_signals_enabled = se;
+
   clear_markers ();
   highlight (std::vector<const db::Net *> (), std::vector<const db::Device *> (), std::vector<const db::SubCircuit *> (), std::vector<const db::Circuit *> ());
 
+  m_cell_context_cache = db::ContextCache (mp_database->internal_layout ());
+
+  setup_trees ();
+}
+
+void
+NetlistBrowserPage::setup_trees ()
+{
   if (! mp_database.get ()) {
     delete directory_tree->model ();
     directory_tree->setModel (0);
@@ -732,7 +758,8 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
     return;
   }
 
-  m_cell_context_cache = db::ContextCache (mp_database->internal_layout ());
+  db::LayoutToNetlist *l2ndb = mp_database.get ();
+  db::LayoutVsSchematic *lvsdb = show_netlist->isChecked () ? 0 : dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
 
   {
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model

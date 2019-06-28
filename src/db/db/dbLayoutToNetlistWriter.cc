@@ -535,7 +535,7 @@ void std_writer_impl<Keys>::write (const db::DCplxTrans &tr)
   if (! first) {
     *mp_stream << " ";
   }
-  *mp_stream << Keys::location_key << "(" << tr.disp ().x () / m_dbu << " " << tr.disp ().y () / m_dbu << ")";
+  *mp_stream << Keys::location_key << "(" << floor (0.5 + tr.disp ().x () / m_dbu) << " " << floor (0.5 + tr.disp ().y () / m_dbu) << ")";
 }
 
 template <class Keys>

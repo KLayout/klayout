@@ -13,21 +13,6 @@ module DRC
   # as global functions too where they act on a default incarnation
   # of the netter. Usually it's not required to instantiate a Netter
   # object, but it serves as a container for this functionality.
-
-  # %LVS%
-  # @scope
-  # @name Netter
-  # @brief LVS Reference: Netter object
-  # The Netter object provides services related to network extraction
-  # from a layout plus comparison against a reference netlist.
-  # Similar to the DRC netter (which lacks the compare ability), the
-  # relevant method of this object are available as global functions too
-  # where they act on a default incarnation. Usually it's not required
-  # to instantiate a Netter object explicitly. 
-  #
-  # An individual netter object can be created, if the netter results
-  # need to be kept for multiple extractions. If you really need
-  # a Netter object, use the global \netter function:
   #
   # @code
   # # create a new Netter object:
@@ -394,11 +379,11 @@ module DRC
     def ensure_data
       if !@l2n
         @layers = {}
-        make_data
+        _make_data
       end
     end
 
-    def make_data
+    def _make_data
 
       if @engine._dss
         @engine._dss.is_singular? || raise("The DRC script features more than one or no layout source - network extraction cannot be performed in such configurations")

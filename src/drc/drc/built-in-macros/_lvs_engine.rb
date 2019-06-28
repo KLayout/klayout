@@ -66,7 +66,56 @@ module LVS
       @output_lvsdb_file = filename
     end
 
-    # ...
+    # %DRC%
+    # @name schematic
+    # @brief Reads the reference netlist
+    # @synopsis schematic(filename)
+    # @synopsis schematic(filename, reader)
+    # @synopsis schematic(netlist)
+    # See \Netter#schematic for a description of that function.
+ 
+    # %DRC%
+    # @name compare
+    # @brief Compares the extracted netlist vs. the schematic
+    # @synopsis compare
+    # See \Netter#compare for a description of that function.
+ 
+    # %DRC%
+    # @name same_nets
+    # @brief Establishes an equivalence between the nets
+    # @synopsis same_nets(circuit, net_a, net_b)
+    # @synopsis same_nets(circuit_a, net_a, circuit_b, net_b)
+    # See \Netter#same_nets for a description of that function.
+ 
+    # %DRC%
+    # @name same_circuits
+    # @brief Establishes an equivalence between the circuits
+    # @synopsis same_circuits(circuit_a, circuit_b)
+    # See \Netter#same_circuits for a description of that function.
+ 
+    # %DRC%
+    # @name same_device_classes
+    # @brief Establishes an equivalence between the device_classes
+    # @synopsis same_device_classes(class_a, class_b)
+    # See \Netter#same_device_classes for a description of that function.
+ 
+    # %DRC%
+    # @name equivalent_pins
+    # @brief Marks pins as equivalent
+    # @synopsis equivalent_pins(circuit, pins ...)
+    # See \Netter#equivalen_pins for a description of that function.
+ 
+    # %LVS%
+    # @name min_caps
+    # @brief Ignores capacitors with a capacitance below a certain value
+    # @synopsis min_caps(threshold)
+    # See \Netter#min_caps for a description of that function.
+
+    # %LVS%
+    # @name max_res
+    # @brief Ignores resistors with a resistance above a certain value
+    # @synopsis max_res(threshold)
+    # See \Netter#max_res for a description of that function.
 
     %w(schematic compare same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity).each do |f|
       eval <<"CODE"

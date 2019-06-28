@@ -1986,8 +1986,7 @@ TEST(14_Subcircuit2NandMismatchNoSwap)
     "match_pins $4 $4\n"
     "pin_mismatch (null) $0\n"
     "match_subcircuits $2 $1\n"
-    "subcircuit_mismatch (null) $2\n"
-    "subcircuit_mismatch $1 (null)\n"
+    "subcircuit_mismatch $1 $2\n"
     "end_circuit TOP TOP NOMATCH"
   );
 
@@ -2058,17 +2057,14 @@ TEST(14_Subcircuit2NandMismatchNoSwap)
     "  subcircuit_pin $2[$2]:$1[$2]\n"
     " net VDD:VDD [Mismatch]\n"
     "  pin $3:$3\n"
-    "  subcircuit_pin (null):$2[$3]\n"
-    "  subcircuit_pin $1[$3]:(null)\n"
+    "  subcircuit_pin $1[$3]:$2[$3]\n"
     "  subcircuit_pin $2[$3]:$1[$3]\n"
     " net VSS:VSS [Mismatch]\n"
     "  pin $4:$4\n"
-    "  subcircuit_pin (null):$2[$4]\n"
-    "  subcircuit_pin $1[$4]:(null)\n"
+    "  subcircuit_pin $1[$4]:$2[$4]\n"
     "  subcircuit_pin $2[$4]:$1[$4]\n"
-    " subcircuit (null):$2 [Mismatch]\n"
-    " subcircuit $1:(null) [Mismatch]\n"
     " subcircuit $2:$1 [Match]\n"
+    " subcircuit $1:$2 [Mismatch]\n"
   );
   EXPECT_EQ (good, false);
 }

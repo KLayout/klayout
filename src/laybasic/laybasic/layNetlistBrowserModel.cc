@@ -206,6 +206,8 @@ static inline bool always (bool)
   return true;
 }
 
+static void *no_id = reinterpret_cast<void *> (-1);
+
 NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb, NetColorizer *colorizer)
   : QAbstractItemModel (parent), mp_l2ndb (l2ndb), mp_lvsdb (0), mp_colorizer (colorizer)
 {
@@ -830,7 +832,7 @@ std::string devices_string (const std::pair<const db::Device *, const db::Device
 
 static QString build_url (void *id, const std::string &tag, const std::string &title)
 {
-  if (id == 0) {
+  if (id == no_id) {
     //  no link
     return tl::to_qstring (tl::escaped_to_html (title));
   }
@@ -856,7 +858,7 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Net *, const db::Ne
   } else {
 
     IndexedNetlistModel::circuit_pair circuits = mp_indexer->parent_of (nets);
-    void *id = 0;
+    void *id = no_id;
     //  NOTE: the nets may not be a valid net pair. In this case, circuits is (0, 0) and
     //  no link is generated
     if (circuits.first || circuits.second) {
@@ -882,7 +884,7 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::Device *, const db:
   } else {
 
     IndexedNetlistModel::circuit_pair circuits = mp_indexer->parent_of (devices);
-    void *id = 0;
+    void *id = no_id;
     //  NOTE: the devices may not be a valid device pair. In this case, circuits is (0, 0) and
     //  no link is generated
     if (circuits.first || circuits.second) {
@@ -942,7 +944,7 @@ NetlistBrowserModel::make_link_to (const std::pair<const db::SubCircuit *, const
   } else {
 
     IndexedNetlistModel::circuit_pair circuits = mp_indexer->parent_of (subcircuits);
-    void *id = 0;
+    void *id = no_id;
     //  NOTE: the subcircuits may not be a valid subcircuit pair. In this case, circuits is (0, 0) and
     //  no link is generated
     if (circuits.first || circuits.second) {
@@ -2012,7 +2014,7 @@ NetlistBrowserModel::headerData (int section, Qt::Orientation /*orientation*/, i
 QModelIndex
 NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) const
 {
-  void *new_id = 0;
+  void *new_id = no_id;
 
   if (! parent.isValid ()) {
 
@@ -2092,7 +2094,11 @@ NetlistBrowserModel::index (int row, int column, const QModelIndex &parent) cons
 
   }
 
-  return createIndex (row, column, new_id);
+  if (new_id != no_id) {
+    return createIndex (row, column, new_id);
+  } else {
+    return QModelIndex ();
+  }
 }
 
 void

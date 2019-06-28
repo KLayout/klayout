@@ -742,7 +742,7 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   clear_markers ();
   highlight (std::vector<const db::Net *> (), std::vector<const db::Device *> (), std::vector<const db::SubCircuit *> (), std::vector<const db::Circuit *> ());
 
-  m_cell_context_cache = db::ContextCache (mp_database->internal_layout ());
+  m_cell_context_cache = db::ContextCache (mp_database.get () ? mp_database->internal_layout () : 0);
 
   setup_trees ();
 }

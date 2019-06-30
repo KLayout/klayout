@@ -7,6 +7,8 @@
   <keyword name="Net tracer"/>
   <keyword name="Connectivity"/>
 
+  <h2-index/>
+
   <p>
   The net tracing function allows tracing of a net by detecting touching shapes that together form a conductive
   region. It features specification of a stack of metal (or in general "conductive") layers optionally connected through 
@@ -16,8 +18,10 @@
   active area region.
   </p>
 
+  <h2>Single net tracing</h2>
+
   <p>
-  The algorithm is intended for extracting single nets and employs an incremental extraction approach. Therefore 
+  This algorithm is intended for extracting single nets and employs an incremental extraction approach. Therefore 
   extraction of a single small net is comparatively fast while extraction of large nets such as power nets is considerably 
   slower compared to hierarchical LVS tools currently.
   </p>
@@ -59,6 +63,54 @@
   The display of the nets can be configured in many ways. The configuration dialog is opened when "Configure" is pressed in 
   the trace net dialog. Beside the color and style of the markers used to display the net it can be specified if and how the window
   is changed to fit the net.
+  </p>
+
+  <h2>Tracing all nets</h2>
+
+  <p>
+  This algorithm is borrowed from the LVS feature, where the scenario is extended by device 
+  recognition and netlist formation. In the context of the net tracer, nets consist of the 
+  connected shapes but don't attach to devices. As LVS extracts all nets in one sweep, using
+  this feature in the net tracer will deliver all nets at once. Although this is a richer
+  information output, the tracing of all nets is typically faster then tracing a single, big
+  net such as power nets. The LVS net extractor also supports hierarchical processing which
+  gives a considerable performance improvement and more compact net representations.
+  </p>
+
+  <p>
+  To extract all nets, use "Trace All Nets" from the "Tools" menu. It will start extracting
+  the nets immediately. It will take the connectivity definition from the standard, single-net
+  net tracer. You can edit this layer stack either from the single net tracer UI, from the technology
+  manager or "Edit Layer Stack" from the "Tools" menu.
+  </p>
+
+  <p>
+  After the net tracer has finished, the netlist browser dialog opens. In this dialog you
+  can:
+  </p>
+
+  <ul>
+    <li>Browser the circuit hierarchy (taken from the cell hierarchy) in the left half of the central 
+    view.
+    </li>
+    <li>Browse the nets of the circuits in the right half of the view. Clicking on a net
+    will highlight the net.
+    </li>
+    <li>Configure the net highlighting behavior. Use the "Configure" button.
+    </li>
+    <li>Export all or selected nets to layout, save the netlist (with shapes) to a file, load it back from a file and manage
+    the netlist database. Use the "File" menu button in the right upper corner.
+    </li>
+    <li>Search for net names (if labelled) and circuits using the search edit box.
+    </li>
+    <li>Navigate through the history using the "back" and "forward" buttons at the top left.
+    </li>
+  </ul>
+
+  <p>
+  Extracted nets are written and read in a KLayout-specific format called "L2N" ("layout to netlist").
+  This format contains both the nets and the shapes that make up a net. This way, the traced
+  nets can be saved and retrieved later.
   </p>
 
 </doc>

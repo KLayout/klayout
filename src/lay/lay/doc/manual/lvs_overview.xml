@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Layout vs. Schematic (LVS) Overview</title>
+  <keyword name="DRC"/>
+
+  <h2-index/>
+
+  <h2>Basic usage of LVS scripts</h2>
+
+  <p>
+  Starting with version 0.26, KLayout supports LVS as a built-in feature.
+  LVS is an important step in the verification of a layout: it ensures the 
+  drawn circuit matches the desired schematic.
+  </p>
+
+  <p>
+  The basic functionality is simply to analyze the input layout and derive a netlist from this. 
+  Then compare this netlist against a reference netlist (schematic). If both netlist are equivalent,
+  the circuit is likely to work in the intended fashion.
+  </p>
+
+  <p>
+  Beside the layout, a LVS script will also need a schematic netlist. Currently, KLayout
+  can read SPICE-format netlists. The reader can be configured to some extent, so the hope
+  is that a useful range of SPICE netlists can be digested.
+  </p>
+
+  <p> 
+  While the basic idea is simple, the details become pretty complex. This documentation
+  tries to cover the solutions KLayout offers to implement LVS as well as the constraints
+  imposed by this process.
+  </p>
+
+  <p>
+  KLayout's LVS is integrated into the Macro Development IDE the same way as DRC scripts. 
+  In fact, LVS is an add-on to DRC scripts. All DRC functions are available within LVS
+  scripts. Netlist extraction is performed in the DRC framework which was given the ability 
+  to recognize devices and connections and turn them into a netlist. Although DRC does not
+  really benefit from these extension, they are still useful for implementing Antenna checks
+  for example.
+  </p>
+
+  <p>
+  LVS scripts are created, edited and debugged in the Macro Editor IDE. They are managed
+  in the "LVS" tab. 
+  For more details about the IDE, see <link href="/about/macro_editor.xml"/>. For 
+  an introduction about how to work with DRC scripts see <link href="/manual/drc_basic.xml"/>.
+  </p>
+
+  <p>
+  LVS scripts carry the ".lylvs" extension for the XML form (in analogy to ".lydrc" for DRC) and 
+  ".lvs" for the plain text form (same as ".drc"). Like DRC scripts, LVS scripts can be 
+  executed standalone in batch mode like DRC scripts. See "Using KLayout as a standalone DRC engine" 
+  in <link href="/manual/drc_basic.xml"/>.
+  </p>
+
+  <h2>KLayout's LVS implementation</h2>
+
+  <p>
+  The LVS implementation inside KLayout is designed to be highly flexible in terms of connectivity,
+  device recognition and input/output channels. Here are some highlights:
+  </p>
+
+  <ul>
+    <li><b>Agnostic approach:</b> KLayout tries to make as few assumptions as possible.
+    It does not require labels (although they are helpful), a specific hierarchy, specific
+    cell names or specific geometries. Netlist extraction is done purely from the polygons
+    of the layout. Labels and the cell hierarchy add merely useful hints which simplify debugging 
+    and pin assignment, but no strict requirement.
+    </li>
+    <li><b>Hierarchical analysis:</b> KLayout got a hierarchical layout processing engine 
+    to support hierarchical LVS. Hierarchical processing means that boolean operations happen inside 
+    the local cell environment as far as possible. As a consequence, devices are recognized 
+    inside their layout cell and layout cells are turned into respective subcircuits in the 
+    netlist. The netlist compare will benefit as it is able follow the circuit hierarchy. 
+    This is more efficient and gives better debugging information in case of mismatches.
+    As a positive side effect of hierarchical layout processing the runtimes for some boolean and 
+    other operations is significantly reduced in most cases.
+    </li>
+    <li><b>Flexible engine:</b> The netlist formation engine is highly flexible with respect 
+    to device recognition and connectivity extraction. First, almost all DRC features can 
+    be used to derive intermediate layers for device formation and connectivity extraction.
+    Second, the device recognition can be scripted to implement custom device extractors.
+    Five built-in device extractors are available for MOS and bipolar transistors, resistors, capacitors
+    and diodes.
+    </li>
+    <li><b>Flexible I/O:</b> Netlists are KLayout object trees and their components (nets, devices,
+    circuits, subcircuits ...) are fully mapped to script objects.
+    Netlists can therefore be analyzed and manipulated within LVS scripts or in other
+    contexts. It is possible to fully script readers and writers for custom formats. 
+    Netlists plus the corresponding layout elements (sometimes called "annotated layout") can 
+    be persisted in a KLayout-specific yet open format. SPICE format is available to read and
+    write pure netlist information. The SPICE reader and writer is customizable 
+    through delegate classes which allow tailoring of the way devices are read and written.
+    </li>
+    <li><b>User interface integration:</b> KLayout offers a browser for the netlist 
+    extraction results and LVS reports (cross-reference, errors). 
+    </li>
+
+
+  
+
+
+    
+</doc>
+

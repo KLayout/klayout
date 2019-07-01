@@ -1423,7 +1423,7 @@ CODE
       _before_cleanup
     
       # show the data in the browser
-      if @show_l2ndb && @netter && @netter.l2n_data
+      if view && @show_l2ndb && @netter && @netter.l2n_data
 
         # NOTE: to prevent the netter destroying the database, we need to take it
         l2ndb = _take_data

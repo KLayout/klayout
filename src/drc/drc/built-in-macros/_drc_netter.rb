@@ -96,6 +96,8 @@ module DRC
 
       register_layer(a.data)
       register_layer(b.data)
+      @l2n.connect(a.data)
+      @l2n.connect(b.data)
       @l2n.connect(a.data, b.data)
 
     end
@@ -115,6 +117,7 @@ module DRC
       l.requires_region("Netter#connect_global (layer argument)")
 
       register_layer(l.data)
+      @l2n.connect(l.data)
       @l2n.connect_global(l.data, name)
 
     end
@@ -410,7 +413,6 @@ module DRC
 
       # every layer gets registered and intra-layer connections are made
       @l2n.register(data, "l" + id.to_s)
-      @l2n.connect(data)
 
     end
     

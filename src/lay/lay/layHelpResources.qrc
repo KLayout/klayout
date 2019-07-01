@@ -172,6 +172,7 @@
         <file alias="lvs.xml">doc/manual/lvs.xml</file>
         <file alias="lvs_overview.xml">doc/manual/lvs_overview.xml</file>
         <file alias="lvs_intro.xml">doc/manual/lvs_intro.xml</file>
+        <file alias="lvs_browser.png">doc/manual/lvs_browser.png</file>
         <file alias="inv.png">doc/manual/inv.png</file>
         <file alias="inv_no_transistors.png">doc/manual/inv_no_transistors.png</file>
         <file alias="inv_transistors.png">doc/manual/inv_transistors.png</file>

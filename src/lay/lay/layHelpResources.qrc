@@ -169,6 +169,15 @@
         <file alias="drc.xml">doc/manual/drc.xml</file>
         <file alias="drc_basic.xml">doc/manual/drc_basic.xml</file>
         <file alias="drc_runsets.xml">doc/manual/drc_runsets.xml</file>
+        <file alias="lvs.xml">doc/manual/lvs.xml</file>
+        <file alias="lvs_overview.xml">doc/manual/lvs_overview.xml</file>
+        <file alias="lvs_intro.xml">doc/manual/lvs_intro.xml</file>
+        <file alias="inv.png">doc/manual/inv.png</file>
+        <file alias="inv_no_transistors.png">doc/manual/inv_no_transistors.png</file>
+        <file alias="inv_transistors.png">doc/manual/inv_transistors.png</file>
+        <file alias="inv_with_diodes.png">doc/manual/inv_with_diodes.png</file>
+        <file alias="inv_schematic.png">doc/manual/inv_schematic.png</file>
+        <file alias="inv_schematic2.png">doc/manual/inv_schematic2.png</file>
         <file alias="edit_mode.xml">doc/manual/edit_mode.xml</file>
         <file alias="editor_advanced.xml">doc/manual/editor_advanced.xml</file>
         <file alias="editor_basics.xml">doc/manual/editor_basics.xml</file>

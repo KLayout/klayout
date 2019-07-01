@@ -1548,6 +1548,21 @@ Region::clear ()
 
 namespace {
 
+static inline bool shields (const db::EdgePair &ep, const db::Edge &q)
+{
+  db::Edge pe1 (ep.first ().p1 (), ep.second ().p2 ());
+  db::Edge pe2 (ep.second ().p1 (), ep.first ().p2 ());
+
+  std::pair<bool, db::Point> ip1 = pe1.intersect_point (q);
+  std::pair<bool, db::Point> ip2 = pe2.intersect_point (q);
+
+  if (ip1.first && ip2.first) {
+    return ip1.second != ip2.second || (ip1.second != q.p1 () && ip2.second != q.p2 ());
+  } else {
+    return false;
+  }
+}
+
 /**
  *  @brief A helper class for the DRC functionality which acts as an edge pair receiver
  */
@@ -1652,8 +1667,7 @@ public:
         for (std::vector<size_t>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
           if (! m_ep_discarded [*i]) {
             db::EdgePair ep = m_ep [*i].normalized ();
-            if (db::Edge (ep.first ().p1 (), ep.second ().p2 ()).intersect (*o2) && 
-                db::Edge (ep.second ().p1 (), ep.first ().p2 ()).intersect (*o2)) {
+            if (shields (ep, *o2)) {
               m_ep_discarded [*i] = true;
             }
           }
@@ -1825,7 +1839,7 @@ Region::run_check (db::edge_relation_type rel, bool different_polygons, const Re
   }
 
   EdgeRelationFilter check (rel, d, metrics);
-  check.set_include_zero (other != 0);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);
@@ -1847,6 +1861,7 @@ Region::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool 
   EdgePairs result;
 
   EdgeRelationFilter check (rel, d, metrics);
+  check.set_include_zero (false);
   check.set_whole_edges (whole_edges);
   check.set_ignore_angle (ignore_angle);
   check.set_min_projection (min_projection);

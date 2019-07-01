@@ -2276,7 +2276,17 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     //  skip pin mapping in case one circuit does not feature pins
     //  This is often the case for top-level circuits. We don't necessarily need pins for them.
     //  We still report those circuits with "pin mismatch" so they don't get considered within
-    //  subcircuits.
+    //  subcircuits. Plus we report the pins so they get listed in the cross-ref (but with a
+    //  "match" - this is important to cover the cases which are found when analyzing the nets).
+
+    if (mp_logger) {
+      for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
+        mp_logger->match_pins (p.operator-> (), 0);
+      }
+      for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
+        mp_logger->match_pins (0, p.operator-> ());
+      }
+    }
 
     if (c1->pin_count () != c2->pin_count ()) {
       pin_mismatch = true;

@@ -83,7 +83,7 @@ Mn OUT IN VSS SUBSTRATE NMOS W=0.9U L=0.25U
   <h2>Sample LVS script</h2>
 
   <p>
-  The LVS script to compare the layout above and the schematic now is this:
+  The LVS script to compare the layout above and the schematic now is this (for more details see <link href="/about/lvs_ref.xml"/>):
   </p>
 
   <pre># LVS script (demo technology, KLayout manual)
@@ -175,7 +175,7 @@ compare</pre>
   The first and important statement of a LVS script should be the "deep" switch which enables
   hierarchical mode. Without hierarchical mode, the netlist is produced without subcircuits.
   Such flat netlist are inefficient to compare and hard to debug. Hence we switch to 
-  hierarchical mode with the "deep" statement:
+  hierarchical mode with the "deep" statement (see <link href="/about/drc_ref_global.xml"/>):
   </p>
 
   <pre>deep</pre>
@@ -188,7 +188,7 @@ compare</pre>
   <pre>report_lvs</pre>
 
   <p>
-  We can also write the report to a file if we want:
+  We can also write the report to a file if we want (see <link href="/about/lvs_ref_global.xml"/>):
   </p>
 
   <pre>report_lvs("inv.lvsdb")</pre>
@@ -214,7 +214,7 @@ metal2_lbl  = labels(9, 1)</pre>
   (the layout source is - as in DRC - usually the current layout).
   While "input" pulls all kind of shapes, "labels" will only pull texts.
   We use "labels" to pull labels for first metal from GDS layer 7, datatype 1 and
-  labels for second metal from GDS layer 9, datatype 1.
+  labels for second metal from GDS layer 9, datatype 1. For details see <link href="/about/drc_ref_global.xml"/>.
   </p>
 
   <p>
@@ -245,7 +245,12 @@ nsd                   = nactive - ngate</pre>
   Hence "active_in_nwell" is the part of "ACTIVE" which is inside "NWELL" while "active_outside_nwell" is the 
   part of "ACTIVE" outside it. The main purpose of these formulas is to separate source and drain regions 
   but cutting away the gate area from the "ACTIVE" area. This renders "psd" and "nsd" (PMOS and NMOS source/drain).
-  We also separate gate regions for PMOS (pgate) and NMOS transistors (ngate). With these ingredients we are
+  The boolean operations are part of the DRC feature set. For more functions and detailed descriptions see
+  <link href="/about/drc_ref_layer.xml"/>.
+  </p>
+
+  <p>
+  We also separate gate regions for PMOS (pgate) and NMOS transistors (ngate) and with these ingredients we are
   ready to move to device extraction:
   </p>
 
@@ -253,7 +258,8 @@ nsd                   = nactive - ngate</pre>
                                 "tS" => psd, "tD" => psd, "tG" => poly, "tW" => nwell })</pre>
 
   <p>
-  The first argument of "extract_devices" is the device extractor. The device extractor is an object
+  The first argument of "extract_devices" (see <link href="/about/drc_ref_global.xml"/>) is the device extractor. 
+  The device extractor is an object
   responsible for the actual extraction of a certain device type. In our case the template is "MOS4" and we
   want to produce a new class of devices called "PMOS". <tt>mos4("PMOS")</tt> will create a new 
   device extractor which produces devices of "MOS4" kind with class name "PMOS".
@@ -283,7 +289,7 @@ nsd                   = nactive - ngate</pre>
                                 "tS" => nsd, "tD" => nsd, "tG" => poly, "tW" => bulk })</pre>
 
   <p>
-  Having the devices is already half the work. We now need to supply the connectivity:
+  Having the devices is already half the work. We now need to supply the connectivity (see <link href="/about/drc_ref_global.xml"/>):
   </p>
 
   <pre>connect(psd,        contact)
@@ -340,7 +346,7 @@ connect_global(nwell, "NWELL")</pre>
   <pre>compare</pre>
 
   <p>
-  If we insert a netlist write statement at the beginning of the script, we can obtain
+  If we insert a netlist write statement (see <link href="/about/drc_ref_global.xml"/>) at the beginning of the script, we can obtain
   a SPICE version of the extracted netlist:
   </p>
 

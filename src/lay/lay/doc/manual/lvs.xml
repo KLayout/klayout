@@ -13,10 +13,10 @@
   <topics>
     <topic href="/manual/lvs_overview.xml"/>
     <topic href="/manual/lvs_intro.xml"/>
+    <topic href="/manual/lvs_devices.xml"/>
 
     <!--
     <topic href="/manual/lvs_hierarchy.xml"/>
-    <topic href="/manual/lvs_devices.xml"/>
     <topic href="/manual/lvs_connect.xml"/>
     <topic href="/manual/lvs_reference.xml"/>
     <topic href="/manual/lvs_compare.xml"/>

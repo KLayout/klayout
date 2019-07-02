@@ -532,9 +532,9 @@ bool DeviceClassBJT3Transistor::combine_devices (Device *a, Device *b) const
 
 void DeviceClassBJT3Transistor::combine_parameters (Device *a, Device *b) const
 {
-  for (size_t i = 0; i < 7; ++i) {
-    a->set_parameter_value (i, a->parameter_value (i) + b->parameter_value (i));
-  }
+  a->set_parameter_value (param_id_AE, a->parameter_value (param_id_AE) + b->parameter_value (param_id_AE));
+  a->set_parameter_value (param_id_PE, a->parameter_value (param_id_PE) + b->parameter_value (param_id_PE));
+  a->set_parameter_value (param_id_NE, a->parameter_value (param_id_NE) + b->parameter_value (param_id_NE));
 }
 
 // ------------------------------------------------------------------------------------

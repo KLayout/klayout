@@ -448,6 +448,10 @@ extract_devices(mos4(model_name), { "SD" => (active - poly) &amp; pplus, "G" => 
   </p>
 
   <p>
+  <img src="/manual/bjt_lateral.png"/> (lateral PNP transistor)
+  </p>
+
+  <p>
   Vertical transistors are formed by a stack of n/p wells. Sometimes vertical transistors
   are formed as parasitic devices in standard CMOS processes. A PNP transistor can be formed
   by taking the collector as the substrate, nwell for the base and pplus implant for the emitter.
@@ -457,7 +461,7 @@ extract_devices(mos4(model_name), { "SD" => (active - poly) &amp; pplus, "G" => 
   </p>
 
   <p>
-  <img src="/manual/bjt_vertical.png"/>
+  <img src="/manual/bjt_vertical.png"/> (vertical PNP transistor)
   </p>
 
   <p>

@@ -457,6 +457,10 @@ extract_devices(mos4(model_name), { "SD" => (active - poly) &amp; pplus, "G" => 
   </p>
 
   <p>
+  <img src="/manual/bjt_vertical.png"/>
+  </p>
+
+  <p>
   In both cases, there can be multiple emitter regions inside a base island. In this
   case, one transistor is extracted for each emitter region.
   </p>

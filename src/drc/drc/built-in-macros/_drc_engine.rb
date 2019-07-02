@@ -206,7 +206,7 @@ module DRC
     # %DRC%
     # @brief Supplies the resistor extractor class that includes a bulk terminal
     # @name resistor_with_bulk
-    # @synopsis resistor_with_bulk(name)
+    # @synopsis resistor_with_bulk(name, sheet_rho)
     # Use this class with \device_extract to specify extraction of a resistor 
     # with a bulk terminal.
     # The sheet_rho value is the sheet resistance in ohms/square.
@@ -229,7 +229,7 @@ module DRC
     # %DRC%
     # @brief Supplies the capacitor extractor class that includes a bulk terminal
     # @name capacitor_with_bulk
-    # @synopsis capacitor_with_bulk(name)
+    # @synopsis capacitor_with_bulk(name, area_cap)
     # Use this class with \device_extract to specify extraction of a capacitor 
     # with a bulk terminal.
     # The area_cap argument is the capacitance in Farad per square micrometer.

@@ -27,7 +27,7 @@
 
   <h2>Device classes</h2>
 
-  <h3>Resistor (<class_doc href="DeviceClassResistor"/>)</h3>
+  <h3>Resistor</h3>
 
   <p>
   <img src="/manual/res_schematic.png"/>
@@ -52,9 +52,10 @@
 
   <p>
   In SPICE, plain resistors are represented by the "R" element.
+  The API class is <class_doc href="DeviceClassResistor"/>.
   </p>
 
-  <h3>Resistor with bulk terminal (<class_doc href="DeviceClassResistorWithBulk"/>)</h3>
+  <h3>Resistor with bulk terminal</h3>
 
   <p>
   <img src="/manual/res_with_bulk_schematic.png"/>
@@ -71,7 +72,11 @@
   bulk terminals are connected to the same net.
   </p>
 
-  <h3>Capacitor (<class_doc href="DeviceClassCapacitor"/>)</h3>
+  <p>
+  The API class of the resistor with bulk is <class_doc href="DeviceClassResistorWithBulk"/>.
+  </p>
+
+  <h3>Capacitor</h3>
 
   <p>
   <img src="/manual/cap_schematic.png"/>
@@ -90,9 +95,10 @@
 
   <p>
   In SPICE, plain capacitors are represented by the "C" element.
+  The API class is <class_doc href="DeviceClassCapacitor"/>.
   </p>
 
-  <h3>Capacitor with bulk terminal (<class_doc href="DeviceClassCapacitorWithBulk"/>)</h3>
+  <h3>Capacitor with bulk terminal</h3>
 
   <p>
   <img src="/manual/cap_with_bulk_schematic.png"/>
@@ -109,7 +115,11 @@
   bulk terminals are connected to the same net.
   </p>
 
-  <h3>Diode (<class_doc href="DeviceClassDiode"/>)</h3>
+  <p>
+  The API class of the capacitor with bulk is <class_doc href="DeviceClassCapacitorWithBulk"/>.
+  </p>
+
+  <h3>Diode</h3>
 
   <p>
   <img src="/manual/diode_schematic.png"/>
@@ -133,9 +143,10 @@
   <p>
   In SPICE, diodes are represented by the "D" element using the 
   device class name as the model name.
+  The API class is <class_doc href="DeviceClassDiode"/>.
   </p>
 
-  <h3>MOS transistor (<class_doc href="DeviceClassMOS3"/>)</h3>
+  <h3>MOS transistor</h3>
 
   <p>
   <img src="/manual/mos3_schematic.png"/>
@@ -161,7 +172,11 @@
   In this case their widths, areas and perimeters will add.
   </p>
 
-  <h3>MOS transistor with bulk (<class_doc href="DeviceClassMOS4"/>)</h3>
+  <h3>MOS transistor with bulk</h3>
+
+  <p>
+  The API class of the three-terminal MOS transistor is <class_doc href="DeviceClassMOS3"/>.
+  </p>
 
   <p>
   <img src="/manual/mos4_schematic.png"/>
@@ -182,9 +197,10 @@
   <p>
   In SPICE, MOS4 devices are represented by the "M" element with the
   device class name as the model name.
+  The API class is <class_doc href="DeviceClassDiode"/>.
   </p>
 
-  <h3>Bipolar transistor (<class_doc href="DeviceClassBJT3"/>)</h3>
+  <h3>Bipolar transistor</h3>
 
   <p>
   <img src="/manual/bjt3_schematic.png"/>
@@ -216,9 +232,10 @@
   <p>
   In SPICE, BJT3 devices are represented by the "Q" element with the
   device class name as the model name.
+  The API class is <class_doc href="DeviceClassBJT3"/>.
   </p>
 
-  <h3>Bipolar transistor with substrate (<class_doc href="DeviceClassBJT4"/>)</h3>
+  <h3>Bipolar transistor with substrate</h3>
 
   <p>
   <img src="/manual/bjt4_schematic.png"/>
@@ -237,6 +254,307 @@
   <p>
   In SPICE, BJT4 devices are represented by the "Q" element with four nodes and the
   device class name as the model name.
+  The API class is <class_doc href="DeviceClassBJT4"/>.
+  </p>
+
+  <h2>Device extractors</h2>
+
+  <h3>Resistor extractors (<a href="/about/drc_ref_global.xml#resistor">resistor</a> 
+      and <a href="/about/drc_ref_global.xml#resistor_with_bulk">resistor_with_bulk</a>)</h3>
+
+  <p>
+  The resistor extractor assumes a layout which consists of a resistor "wire"
+  and two caps (contacts). The wire is specified with the layer symbol "R", 
+  the caps are specified with the layer symbol "C":
+  </p>
+
+  <p>
+  <img src="/manual/res_ex_layout.png"/>
+  </p>
+
+  <p>
+  The extractor will compute the resistance from the number of squares
+  and the sheet resistance. The sheet resistance needs to be given 
+  when creating the extractor:
+  </p>
+
+  <pre>sheet_rho = 0.5
+model_name = "RES"
+extract_devices(resistor(model_name, sheet_rho), { "R" => res_layer, "C" => cap_layer })</pre>
+
+  <p>
+  The plain resistor offers two terminals which it outputs on "tA" and "tB" terminal layers.
+  If "tA" or "tB" is not specified, "A" or "B" terminals will be written on the "C" layer.
+  respectively.
+  </p>
+
+  <p>
+  <img src="/manual/res_ex_ta.png"/>
+  </p>
+
+  <p>
+  <img src="/manual/res_ex_tb.png"/>
+  </p>
+
+  <p>
+  For the resistor with bulk, the wire area is output on the "tW" terminal layer as
+  the "W" terminal:
+  </p>
+
+  <p>
+  <img src="/manual/res_ex_tw.png"/>
+  </p>
+
+  <h3>Capacitor extractors (<a href="/about/drc_ref_global.xml#capacitor">capacitor</a> 
+      and <a href="/about/drc_ref_global.xml#capacitor_with_bulk">capacitor_with_bulk</a>)</h3>
+
+  <p>
+  Capacitors are assumed to consist of two "plates" (vertical capacitors). 
+  The plates are on layers P1 and P2. The capacitor is extracted from the area where
+  these two layers overlap.
+  </p>
+
+  <p>
+  <img src="/manual/cap_ex_layout.png"/>
+  </p>
+
+  <p>
+  The extractor will compute the capacitance from the area of the 
+  overlap and the capacitance per area (F/µm²) value.
+  </p>
+
+  <pre>area_cap = 1.5e-15
+model_name = "CAP"
+extract_devices(capacitor(model_name, area_cap), { "P1" => metal1, "P2" => metal2 })</pre>
+
+  <p>
+  The plain capacitor offers two terminals which it outputs on "tA" and "tB" terminal layers.
+  If "tA" or "tB" is not specified, "A" or "B" terminals will be written on the "P1" and "P2" layers
+  respectively.
+  </p>
+
+  <p>
+  <img src="/manual/cap_ex_ta.png"/>
+  </p>
+
+  <p>
+  <img src="/manual/cap_ex_tb.png"/>
+  </p>
+
+  <p>
+  For the capacitor with bulk, the capacitor area is output on the "tW" terminal layer as
+  the "W" terminal:
+  </p>
+
+  <p>
+  <img src="/manual/cap_ex_tw.png"/>
+  </p>
+
+  <h3>Diode extractor (<a href="/about/drc_ref_global.xml#diode">diode</a>)</h3>
+
+  <p>
+  Diodes are assumed to consist of two vertical implant regions (wells, diffusion).
+  One of the regions is p type ("P" layer) and the other "n" type ("N" layer). 
+  These layers also form the anode (p) and cathode (n) of the diode.
+  </p>
+
+  <p>
+  <img src="/manual/diode_ex_layout.png"/>
+  </p>
+
+  <p>
+  The extractor will compute the capacitance from the area of the 
+  overlap and the capacitance per area (F/µm²) value.
+  </p>
+
+  <pre>model_name = "DIODE"
+extract_devices(diode(model_name), { "P" => pplus, "N" => nwell })</pre>
+
+  <p>
+  The diode offers two terminals which it outputs on "tA" and "tC" terminal layers.
+  If "tA" is not specified, "A" terminals will be written on the "P" layer. 
+  If "tC" is not specified, "C" terminals will be written on the "N" layer. 
+  </p>
+
+  <p>
+  <img src="/manual/diode_ex_ta.png"/>
+  </p>
+
+  <p>
+  <img src="/manual/diode_ex_tc.png"/>
+  </p>
+
+  <h3>MOS transistor extractor (<a href="/about/drc_ref_global.xml#mos3">mos3</a> and <a href="/about/drc_ref_global.xml#mos4">mos4</a>)</h3>
+
+  <p>
+  MOS transistors are recognized by their gate ("G" input) and source/drain ("SD" input) regions. 
+  Source and drain needs to be separated from the gate shape. The touching edges of gate and
+  source/drain regions define the width of the device, the perpendicular dimension the gate length.
+  Because the separation of source/drain, the computation of gates and the separation of 
+  these for NMOS and PMOS devices, the "G" and "SD" layers are usually derived layers.
+  As these usually won't participate in the connectivity, it's important to specify the 
+  "tS", "tD", "tG" and "tB" (for MOS4) layers explicitly and redirect the terminal shapes
+  to layers that really participate in connections.
+  </p>
+
+  <p>
+  <img src="/manual/mos_ex_layout.png"/>
+  </p>
+
+  <pre>model_name = "PMOS"
+extract_devices(mos4(model_name), { "SD" => (active - poly) &amp; pplus, "G" => (active &amp; poly), "W" => nwell,
+                                    "tS" => active, "tD" => active, "tG" => poly, "tB" => nwell })</pre>
+
+  <p>
+  The MOS3 device produces three terminals which it outputs on "tS", "tG" and "tD" terminal layers (source,
+  gate and drain respectively):
+  </p>
+
+  <p>
+  <img src="/manual/mos_ex_ts.png"/>
+  </p>
+
+  <p>
+  <img src="/manual/mos_ex_tg.png"/>
+  </p>
+
+  <p>
+  <img src="/manual/mos_ex_td.png"/>
+  </p>
+
+  <p>
+  The MOS4 device offers one more terminal (bulk) which it writes on "tB".
+  </p>
+
+  <p>
+  <img src="/manual/mos_ex_tb.png"/>
+  </p>
+
+  <h3>Bipolar transistor extractor (<a href="/about/drc_ref_global.xml#bjt3">bjt3</a> and <a href="/about/drc_ref_global.xml#bjt4">bjt4</a>)</h3>
+
+  <p>
+  There are basically two kind of bipolar transistors: vertical and lateral ones.
+  </p>
+
+  <p>
+  Lateral transistors are formed by implant or diffusion wells creating a intermittent 
+  n/p structure on the wafer. The basic recognition region is the base region. The collector
+  and emitter regions are inside or overlapping the base region and use the opposite doping 
+  than base: if the base region is n doped, then
+  collector and emitter regions have to be p doped. The structure then forms a PNP transistor.
+  KLayout recognizes lateral transistors when the base is <b>partially</b> covered by the collector region.
+  For lateral transistors, the emitter is defined by the emitter region inside base. The 
+  collector region is defined by collector inside base and outside emitter.
+  </p>
+
+  <p>
+  Vertical transistors are formed by a stack of n/p wells. Sometimes vertical transistors
+  are formed as parasitic devices in standard CMOS processes. A PNP transistor can be formed
+  by taking the collector as the substrate, nwell for the base and pplus implant for the emitter.
+  KLayout recognizes a vertical bipolar transistor when the base is covered <b>entirely</b> by the 
+  collector or has <b>no collector at all</b> - this means the collector
+  region can be empty (e.g. bulk).
+  </p>
+
+  <p>
+  In both cases, there can be multiple emitter regions inside a base island. In this
+  case, one transistor is extracted for each emitter region.
+  </p>
+
+  <h4>Vertical bipolar transistors</h4>
+
+  <p>
+  Vertical bipolar transistors take their inputs from "B" (base), "C" (collector)
+  and "E" (emitter). "C" is optional:
+  </p>
+
+  <p>
+  <img src="/manual/bjt_ex_layout.png"/>
+  </p>
+
+  <p>
+  Especially for bipolar devices it's important to device useful terminal output
+  layers. Typically, the wells and diffusion areas will be connected through "contact",
+  (not considering the Schottky diodes for now). 
+  So it's a good idea to send the terminals to the contact layer:
+  </p>
+
+  <pre>model_name = "PNP"
+extract_devices(bjt3(model_name), { "C" => collector, "B" => base, "E" => emitter, 
+                                    "tC" => contact, "tB" => contact, "tE" => contact })</pre>
+
+  <p>
+  The BJT3 device produces three terminals which it outputs on "tC", "tB" and "tE" terminal layers (collector,
+  base and emitter respectively):
+  </p>
+
+  <p>
+  <img src="/manual/bjt_ex_tc.png"/>
+  </p>
+
+  <p>
+  <img src="/manual/bjt_ex_tb.png"/>
+  </p>
+
+  <p>
+  <img src="/manual/bjt_ex_te.png"/>
+  </p>
+
+  <p>
+  If the collector region is empty (e.g. p substrate), the base shape is copied to the "tC" output layer 
+  for the collector terminal.
+  </p>
+
+  <p>
+  The BJT4 device offers one more terminal (substrate) which it writes on "tS". "tS" is
+  a copy of the emitter shape but connected to the substrate terminal:
+  </p>
+
+  <p>
+  <img src="/manual/bjt_ex_ts.png"/>
+  </p>
+
+  <h4>Lateral bipolar transistors</h4>
+
+  <p>
+  Lateral bipolar transistors also take their inputs from "B" (base), "C" (collector)
+  and "E" (emitter). For lateral transistors, "C" is not optional and must not fully cover
+  the base region. Apart from this, the use model for BJT3 and BJT4 extractors is 
+  identical for vertical and lateral transistors.
+  </p>
+
+  <p>
+  A typical lateral transistor is formed by a collector ring and emitter
+  island inside the base region:
+  </p>
+
+  <p>
+  <img src="/manual/bjtlat_ex_layout.png"/>
+  </p>
+
+  <p>
+  The terminals produced by the bipolar transistor extractor in the lateral case are
+  the same than for the vertical case, but with a different geometry:
+  </p>
+
+  <p>
+  <img src="/manual/bjtlat_ex_tc.png"/>
+  </p>
+
+  <p>
+  <img src="/manual/bjtlat_ex_tb.png"/>
+  </p>
+
+  <p>
+  <img src="/manual/bjtlat_ex_te.png"/>
+  </p>
+
+  <p>
+  Again, for BJT4, "tS" is a copy of the emitter shape but connected to the substrate terminal:
+  </p>
+
+  <p>
+  <img src="/manual/bjtlat_ex_ts.png"/>
   </p>
 
 </doc>

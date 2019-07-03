@@ -14,6 +14,9 @@
     <topic href="/manual/lvs_overview.xml"/>
     <topic href="/manual/lvs_intro.xml"/>
     <topic href="/manual/lvs_devices.xml"/>
+    <topic href="/manual/lvs_device_classes.xml"/>
+    <topic href="/manual/lvs_device_extractors.xml"/>
+    <topic href="/manual/lvs_io.xml"/>
 
     <!--
     <topic href="/manual/lvs_hierarchy.xml"/>
@@ -21,7 +24,7 @@
     <topic href="/manual/lvs_reference.xml"/>
     <topic href="/manual/lvs_compare.xml"/>
     <topic href="/manual/lvs_tweaks.xml"/>
-    <topuresic href="/manual/lvs_browser.xml"/>
+    <topic href="/manual/lvs_browser.xml"/>
     -->
   </topics>
 

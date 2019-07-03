@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>LVS Device Classes</title>
+  <keyword name="LVS"/>
+  <keyword name="LVS Device Classes"/>
+
+  <h2-index/>
+
+  <p>
+  LVS (and also DRC as far as netlist extraction is concerned) provides 
+
+  </p>
+
+</doc>

@@ -136,7 +136,7 @@ X$2 VSS IN OUT SUBSTRATE NMOS PARAMS: L=0.25 W=0.9 AS=0.405 AD=0.405 PS=2.7
 
   <p>
   Netlists can be written directly from the netlist object. Within the script, the
-  netlist object can be obtained with the <a href="/about/_drc_ref_global.xml#netlist">netlist</a> function.
+  netlist object can be obtained with the <a href="/about/drc_ref_global.xml#netlist">netlist</a> function.
   This function will first trigger a netlist extraction unless this was done already and
   return a <class_doc href="Netlist"/> object. Use <class_doc href="Netlist#write"/> to 
   write this netlist object then. Unlike "target_netlist", this method is executed immediately and
@@ -235,6 +235,42 @@ reader = RBA::NetlistSpiceReader::new(SubcircuitModelsReader::new)
 # Import the schematic with this reader
 schematic("inv_xmodels.cir", reader)</pre>
         
+  <h2>Layout-to-Netlist database/report</h2>
 
+  <p>
+  The layout-to-netlist database (L2N DB) is written using the global
+  <a href="/about/drc_ref_global.xml#report_netlist">report_netlist</a> function.
+  This function can be put anywhere in the script. Writing will happen after the
+  script executed successfully:
+  </p>
+
+  <pre>report_netlist("extracted.l2n")</pre>
+
+  <p>
+  Without the filename, only the netlist browser will be opened but no
+  file will be written. The layout-to-netlist database is a KLayout-specific format. 
+  It contains the netlist information plus the shape and instance information
+  from the layout. L2N databases can be read into the netlist browser for example.
+  Hence exchange of extracted netlists is possible.
+  </p>
+
+  <h2>Layout-vs-Schematic database/report</h2>
+
+  <p>
+  The Layout-vs-schematic database (LVS DB) is written using the global
+  <a href="/about/lvs_ref_global.xml#report_lvs">report_lvs</a> function.
+  This function can be put anywhere in the script. Writing will happen after the
+  script executed successfully:
+  </p>
+
+  <pre>report_lvs("extracted.lvsdb")</pre>
+
+  <p>
+  Without the filename, only the netlist browser will be opened but no
+  file will be written. The LVS database is a KLayout-specific format. 
+  It contains the extracted netlist information, the reference netlist and the
+  cross-reference table. LVS databases can be read into the netlist browser for example.
+  Hence exchange of LVS reports is possible.
+  </p>
 
 </doc>

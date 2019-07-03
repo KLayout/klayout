@@ -292,7 +292,7 @@ std::string NetlistSpiceReader::get_line ()
     tl::Extractor ex (l.c_str ());
     if (ex.test_without_case (".include")) {
 
-      std::string path = read_name (ex);
+      std::string path = read_name_with_case (ex);
 
       push_stream (path);
 
@@ -564,7 +564,7 @@ inline static int hex_num (char c)
   }
 }
 
-std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
+std::string NetlistSpiceReader::read_name_with_case (tl::Extractor &ex)
 {
   std::string n;
   ex.read_word_or_quoted (n, allowed_name_chars);
@@ -603,10 +603,13 @@ std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
     }
 
   }
+}
 
+std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
+{
   //  TODO: allow configuring Spice reader as case sensitive?
   //  this is easy to do: just avoid to_upper here:
-  return tl::to_upper_case (nn);
+  return tl::to_upper_case (read_name_with_case (ex));
 }
 
 bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &element, const std::string &name)

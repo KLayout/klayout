@@ -1507,12 +1507,10 @@ Class<NetlistSpiceWriterDelegateImpl> db_NetlistSpiceWriterDelegate ("db", "Netl
     "@brief Inserts a text for the given device class\n"
     "Reimplement this method to insert your own text at the beginning of the file for the given device class"
   ) +
+  gsi::method ("write_device", &NetlistSpiceWriterDelegateImpl::org_write_device, gsi::arg ("device"), "@hide") +
   gsi::callback ("write_device", &NetlistSpiceWriterDelegateImpl::reimpl_write_device, &NetlistSpiceWriterDelegateImpl::cb_write_device, gsi::arg ("device"),
     "@brief Inserts a text for the given device\n"
-    "Reimplement this method to write the given device in the desired way"
-  ) +
-  gsi::method ("write_device", &NetlistSpiceWriterDelegateImpl::org_write_device, gsi::arg ("device"),
-    "@brief Calls the default implementation of the \\write_device method.\n"
+    "Reimplement this method to write the given device in the desired way. "
     "The default implementation will utilize the device class information to write native SPICE "
     "elements for the devices."
   ) +
@@ -1620,7 +1618,7 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "@ul\n"
   "@li A global header (\\NetlistSpiceWriterDelegate#write_header): this method is called to print the part right after the headline @/li\n"
   "@li A per-device class header (\\NetlistSpiceWriterDelegate#write_device_intro): this method is called for every device class and may print device-class specific headers (e.g. model definitions) @/li\n"
-  "@li Per-device output: this method (\\NetlistSpiceWriterDelegate#write_device): this method is called for every device and may print the device statement(s) in a specific way.\n"
+  "@li Per-device output: this method (\\NetlistSpiceWriterDelegate#write_device): this method is called for every device and may print the device statement(s) in a specific way. @/li\n"
   "@/ul\n"
   "\n"
   "The delegate must use \\NetlistSpiceWriterDelegate#emit_line to print a line, \\NetlistSpiceWriterDelegate#emit_comment to print a comment etc.\n"
@@ -1641,10 +1639,13 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "\n"
   "  def write_device(dev)\n"
   "    if dev.device_class.name != \"MYDEVICE\"\n"
-  "    emit_comment(\"Terminal #1: \" + net_to_string(dev.net_for_terminal(0)))\n"
-  "    emit_comment(\"Terminal #2: \" + net_to_string(dev.net_for_terminal(1)))\n"
-  "    super(dev)\n"
-  "    emit_comment(\"After device \" + dev.expanded_name)\n"
+  "      emit_comment(\"Terminal #1: \" + net_to_string(dev.net_for_terminal(0)))\n"
+  "      emit_comment(\"Terminal #2: \" + net_to_string(dev.net_for_terminal(1)))\n"
+  "      super(dev)\n"
+  "      emit_comment(\"After device \" + dev.expanded_name)\n"
+  "    else\n"
+  "      super(dev)\n"
+  "    end\n"
   "  end\n"
   "\n"
   "end\n"

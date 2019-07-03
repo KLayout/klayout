@@ -139,6 +139,7 @@ private:
   void skip_circuit (tl::Extractor &ex);
   bool read_card ();
   double read_value (tl::Extractor &ex);
+  std::string read_name_with_case (tl::Extractor &ex);
   std::string read_name (tl::Extractor &ex);
   double read_atomic_value (tl::Extractor &ex);
   double read_dot_expr (tl::Extractor &ex);

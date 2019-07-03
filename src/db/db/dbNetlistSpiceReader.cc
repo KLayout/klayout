@@ -603,6 +603,8 @@ std::string NetlistSpiceReader::read_name_with_case (tl::Extractor &ex)
     }
 
   }
+
+  return nn;
 }
 
 std::string NetlistSpiceReader::read_name (tl::Extractor &ex)

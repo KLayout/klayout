@@ -525,7 +525,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2,C=n3);
-  device '' d1 (C=n1,B=n3,E=n2) (AE=3,PE=25,AB=5,PB=27,AC=7,PC=29,NE=5);
+  device '' d1 (C=n1,B=n3,E=n2) (AE=3,PE=25,AB=2,PB=13,AC=3,PC=14,NE=5);
 end;
 END
 
@@ -594,7 +594,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2,C=n3,D=n4);
-  device '' d1 (C=n1,B=n3,E=n2,S=n4) (AE=3,PE=25,AB=5,PB=27,AC=7,PC=29,NE=3);
+  device '' d1 (C=n1,B=n3,E=n2,S=n4) (AE=3,PE=25,AB=2,PB=13,AC=3,PC=14,NE=3);
 end;
 END
 

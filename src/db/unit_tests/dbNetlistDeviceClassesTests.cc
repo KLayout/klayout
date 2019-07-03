@@ -2103,7 +2103,7 @@ TEST(39_ParallelBJT3Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3) (AE=5,PE=25,AB=7,PB=27,AC=9,PC=29,NE=5);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3) (AE=5,PE=25,AB=3,PB=13,AC=4,PC=14,NE=5);\n"
     "end;\n"
   );
 }
@@ -2197,7 +2197,7 @@ TEST(40_ParallelBJT4Transistors)
 
   EXPECT_EQ (nl.to_string (),
     "circuit '' (A=n1,B=n2,C=n3,D=n4);\n"
-    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=5,PE=25,AB=7,PB=27,AC=9,PC=29,NE=5);\n"
+    "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=5,PE=25,AB=3,PB=13,AC=4,PC=14,NE=5);\n"
     "end;\n"
   );
 }

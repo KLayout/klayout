@@ -84,6 +84,14 @@
     As a positive side effect of hierarchical layout processing the runtimes for some boolean and 
     other operations is significantly reduced in most cases.
     </li>
+    <li><b>Hierarchically stable:</b> KLayout won't modify the layout's hierarchy nor 
+    will it introduce variants - at least for boolean and some other operations. 
+    This way, matching between layout and schematic hierarchy
+    is maintained even after hierarchical DRC operations.
+    Variants are introduced only for some anisotropic operations, the grid snap method
+    and some other features which require differentiation of cells in terms of location
+    and orientation.
+    </li>
     <li><b>Flexible engine:</b> The netlist formation engine is highly flexible with respect 
     to device recognition and connectivity extraction. First, almost all DRC features can 
     be used to derive intermediate layers for device formation and connectivity extraction.

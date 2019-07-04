@@ -179,6 +179,7 @@
         <file alias="lvs_io.xml">doc/manual/lvs_io.xml</file>
         <file alias="lvs_compare.xml">doc/manual/lvs_compare.xml</file>
         <file alias="lvs_tweaks.xml">doc/manual/lvs_tweaks.xml</file>
+        <file alias="lvs_connect.xml">doc/manual/lvs_connect.xml</file>
         <file alias="inv.png">doc/manual/inv.png</file>
         <file alias="inv_no_transistors.png">doc/manual/inv_no_transistors.png</file>
         <file alias="inv_transistors.png">doc/manual/inv_transistors.png</file>
@@ -222,6 +223,7 @@
         <file alias="bjtlat_ex_tc.png">doc/manual/bjtlat_ex_tc.png</file>
         <file alias="bjtlat_ex_tb.png">doc/manual/bjtlat_ex_tb.png</file>
         <file alias="bjtlat_ex_ts.png">doc/manual/bjtlat_ex_ts.png</file>
+        <file alias="metal_connections.png">doc/manual/metal_connections.png</file>
         <file alias="edit_mode.xml">doc/manual/edit_mode.xml</file>
         <file alias="editor_advanced.xml">doc/manual/editor_advanced.xml</file>
         <file alias="editor_basics.xml">doc/manual/editor_basics.xml</file>

@@ -205,7 +205,7 @@ extract_devices(mos4(model_name), { "SD" => (active - poly) &amp; pplus, "G" => 
   </p>
 
   <p>
-  <img src="/manual/bjt_lateral.png"/> (lateral PNP transistor)
+  <img src="/manual/bjt_lateral.png"/> (lateral NPN transistor)
   </p>
 
   <p>
@@ -218,7 +218,7 @@ extract_devices(mos4(model_name), { "SD" => (active - poly) &amp; pplus, "G" => 
   </p>
 
   <p>
-  <img src="/manual/bjt_vertical.png"/> (vertical PNP transistor)
+  <img src="/manual/bjt_vertical.png"/> (vertical NPN transistor)
   </p>
 
   <p>

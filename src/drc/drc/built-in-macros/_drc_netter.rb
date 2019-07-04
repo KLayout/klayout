@@ -65,7 +65,7 @@ module DRC
     def initialize(engine)
       @engine = engine
       @netlisted = false
-      @connect_implicit = ""
+      @connect_implicit = []
       @l2n = nil
     end
     
@@ -186,7 +186,7 @@ module DRC
 
     def clear_connections
       @netlisted = false
-      @connect_implicit = ""
+      @connect_implicit = []
       _clear_data
     end
     
@@ -194,34 +194,21 @@ module DRC
     # @name connect_implicit
     # @brief Specifies a search pattern for labels which create implicit net connections
     # @synopsis connect_implicit(label_pattern)
-    # Use this method to supply a glob pattern for labels which create implicit net connections
+    # Use this method to supply label strings which create implicit net connections
     # on the top level circuit. This feature is useful to connect identically labelled nets
-    # while a component isn't integrated yet. If the component is integrated, net may be connected
+    # while a component isn't integrated yet. If the component is integrated, nets may be connected
     # on a higher hierarchy level - e.g. by a power mesh. Inside the component this net consists
     # of individual islands. To properly perform netlist extraction and comparison, these islands
     # need to be connected even though there isn't a physical connection. "connect_implicit" can
     # achive this if these islands are labelled with the same text on the top level of the
     # component.
     #
-    # Glob pattern are used which resemble shell file pattern: "*" is for all labels, "VDD"
-    # for all "VDD" labels (pattern act case sensitive). "VDD*" is for all labels beginning
-    # with "VDD" (still different labels will be connected to different nets!). "{VDD,VSS}"
-    # is either "VDD" or "VSS".
-    #
-    # The search pattern is applied on the next net extraction. The search pattern is cleared
+    # The implicit connections are applied on the next net extraction and cleared
     # on "clear_connections".
 
     def connect_implicit(arg)
-
       cleanup
-
-      if arg != @connect_implicit
-        if @connect_implicit != "" && arg != ""
-          raise("connect_implicit can only be used once")
-        end
-        @connect_implicit = arg
-      end
-
+      @connect_implicit << arg
     end
 
     # %DRC%
@@ -338,7 +325,14 @@ module DRC
 
       # run extraction in a timed environment
       if ! @netlisted
-        @engine._cmd(@l2n, :extract_netlist, @connect_implicit)
+        # build a glob expression from the parts
+        exprs =  @connect_implicit.collect { |c| c.gsub(/\?\*\[\]\{\},\(\)\\/) { |x| "\\" + x } }
+        if exprs.size > 1
+          expr = "{" + exprs.join(",") + "}"
+        else
+          expr = exprs[0] || ""
+        end
+        @engine._cmd(@l2n, :extract_netlist, expr)
         @netlisted = true
       end
 

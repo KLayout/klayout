@@ -141,7 +141,7 @@ module DRC
     # @brief Supplies the MOS3 transistor extractor class
     # @name mos3
     # @synopsis mos3(name)
-    # Use this class with \device_extract to specify extraction of a 
+    # Use this class with \extract_devices to specify extraction of a 
     # three-terminal MOS transistor
 
     def mos3(name)
@@ -152,7 +152,7 @@ module DRC
     # @brief Supplies the MOS4 transistor extractor class
     # @name mos4
     # @synopsis mos4(name)
-    # Use this class with \device_extract to specify extraction of a 
+    # Use this class with \extract_devices to specify extraction of a 
     # four-terminal MOS transistor
 
     def mos4(name)
@@ -163,7 +163,7 @@ module DRC
     # @brief Supplies the BJT3 transistor extractor class
     # @name bjt3
     # @synopsis bjt3(name)
-    # Use this class with \device_extract to specify extraction of a 
+    # Use this class with \extract_devices to specify extraction of a 
     # bipolar junction transistor
 
     def bjt3(name)
@@ -174,7 +174,7 @@ module DRC
     # @brief Supplies the BJT4 transistor extractor class
     # @name bjt4
     # @synopsis bjt4(name)
-    # Use this class with \device_extract to specify extraction of a 
+    # Use this class with \extract_devices to specify extraction of a 
     # bipolar junction transistor with a substrate terminal
 
     def bjt4(name)
@@ -185,7 +185,7 @@ module DRC
     # @brief Supplies the diode extractor class
     # @name diode
     # @synopsis diode(name)
-    # Use this class with \device_extract to specify extraction of a 
+    # Use this class with \extract_devices to specify extraction of a 
     # planar diode 
 
     def diode(name)
@@ -196,7 +196,7 @@ module DRC
     # @brief Supplies the resistor extractor class
     # @name resistor
     # @synopsis resistor(name, sheet_rho)
-    # Use this class with \device_extract to specify extraction of a resistor.
+    # Use this class with \extract_devices to specify extraction of a resistor.
     # The sheet_rho value is the sheet resistance in ohms/square.
 
     def resistor(name, sheet_rho)
@@ -207,7 +207,7 @@ module DRC
     # @brief Supplies the resistor extractor class that includes a bulk terminal
     # @name resistor_with_bulk
     # @synopsis resistor_with_bulk(name, sheet_rho)
-    # Use this class with \device_extract to specify extraction of a resistor 
+    # Use this class with \extract_devices to specify extraction of a resistor 
     # with a bulk terminal.
     # The sheet_rho value is the sheet resistance in ohms/square.
 
@@ -219,7 +219,7 @@ module DRC
     # @brief Supplies the capacitor extractor class
     # @name capacitor
     # @synopsis capacitor(name, area_cap)
-    # Use this class with \device_extract to specify extraction of a capacitor.
+    # Use this class with \extract_devices to specify extraction of a capacitor.
     # The area_cap argument is the capacitance in Farad per square micrometer.
 
     def capacitor(name, area_cap)
@@ -230,7 +230,7 @@ module DRC
     # @brief Supplies the capacitor extractor class that includes a bulk terminal
     # @name capacitor_with_bulk
     # @synopsis capacitor_with_bulk(name, area_cap)
-    # Use this class with \device_extract to specify extraction of a capacitor 
+    # Use this class with \extract_devices to specify extraction of a capacitor 
     # with a bulk terminal.
     # The area_cap argument is the capacitance in Farad per square micrometer.
 

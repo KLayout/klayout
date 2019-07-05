@@ -30,6 +30,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <limits>
 
 namespace db
 {
@@ -47,6 +48,8 @@ namespace db
 
 namespace lay
 {
+
+const size_t no_netlist_index = std::numeric_limits<size_t>::max ();
 
 /**
  *  @brief An interface to supply the netlist browser model with indexed items

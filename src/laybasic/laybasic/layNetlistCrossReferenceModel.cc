@@ -393,7 +393,9 @@ size_t NetlistCrossReferenceModel::circuit_index (const circuit_pair &circuits) 
     }
 
     i = m_index_of_circuits.find (circuits);
-    tl_assert (i != m_index_of_circuits.end ());
+    if (i == m_index_of_circuits.end ()) {
+      return lay::no_netlist_index;
+    }
 
   }
 
@@ -403,35 +405,50 @@ size_t NetlistCrossReferenceModel::circuit_index (const circuit_pair &circuits) 
 size_t NetlistCrossReferenceModel::net_index (const net_pair &nets) const
 {
   circuit_pair circuits = parent_of (nets);
-  PerCircuitCacheData *data = & m_per_circuit_data [circuits];
+
   const db::NetlistCrossReference::PerCircuitData *org_data = mp_cross_ref->per_circuit_data_for (circuits);
-  tl_assert (org_data != 0);
+  if (! org_data) {
+    return lay::no_netlist_index;
+  }
+
+  PerCircuitCacheData *data = & m_per_circuit_data [circuits];
   return get_index_of (nets, org_data->nets.begin (), org_data->nets.end (), data->index_of_nets);
 }
 
 size_t NetlistCrossReferenceModel::device_index (const device_pair &devices) const
 {
   circuit_pair circuits = parent_of (devices);
-  PerCircuitCacheData *data = & m_per_circuit_data [circuits];
+
   const db::NetlistCrossReference::PerCircuitData *org_data = mp_cross_ref->per_circuit_data_for (circuits);
-  tl_assert (org_data != 0);
+  if (! org_data) {
+    return lay::no_netlist_index;
+  }
+
+  PerCircuitCacheData *data = & m_per_circuit_data [circuits];
   return get_index_of (devices, org_data->devices.begin (), org_data->devices.end (), data->index_of_devices);
 }
 
 size_t NetlistCrossReferenceModel::pin_index (const pin_pair &pins, const circuit_pair &circuits) const
 {
-  PerCircuitCacheData *data = & m_per_circuit_data [circuits];
   const db::NetlistCrossReference::PerCircuitData *org_data = mp_cross_ref->per_circuit_data_for (circuits);
-  tl_assert (org_data != 0);
+  if (! org_data) {
+    return lay::no_netlist_index;
+  }
+
+  PerCircuitCacheData *data = & m_per_circuit_data [circuits];
   return get_index_of (pins, org_data->pins.begin (), org_data->pins.end (), data->index_of_pins);
 }
 
 size_t NetlistCrossReferenceModel::subcircuit_index (const subcircuit_pair &subcircuits) const
 {
   circuit_pair circuits = parent_of (subcircuits);
-  PerCircuitCacheData *data = & m_per_circuit_data [circuits];
+
   const db::NetlistCrossReference::PerCircuitData *org_data = mp_cross_ref->per_circuit_data_for (circuits);
-  tl_assert (org_data != 0);
+  if (! org_data) {
+    return lay::no_netlist_index;
+  }
+
+  PerCircuitCacheData *data = & m_per_circuit_data [circuits];
   return get_index_of (subcircuits, org_data->subcircuits.begin (), org_data->subcircuits.end (), data->index_of_subcircuits);
 }
 

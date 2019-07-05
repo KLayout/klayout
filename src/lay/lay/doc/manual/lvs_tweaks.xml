@@ -105,7 +105,7 @@
   </p>
 
   <p>
-  To flatten a circuit from the extracted netlist use
+  To flatten a circuit from the extracted netlist use <class_doc href="Netlist#flatten_circuit"/>:
   </p>
 
   <pre>netlist.flatten_circuit("CIRCUIT_NAME")</pre>

@@ -65,6 +65,11 @@
 
   <pre>same_circuits("CIRCUIT_IN_LAYOUT", "CIRCUIT_IN_SCHEMATIC")</pre>
 
+  <p>
+  Declaring circuits as 'same' means they will still be compared. The function is just
+  a hint where to look for the compare target.
+  </p>
+
   <h2>Device class equivalence hint</h2>
 
   <p>
@@ -119,5 +124,61 @@ same_device_classes("NMOS_IN_LAYOUT", "NMOS_IN_SCHEMATIC")</pre>
   </p>
 
   <pre>max_caps(1e-16)</pre>
+
+  <h2>How the compare algorithm works</h2>
+
+  <p>
+  The coarse flow of the netlist compare algorithm is this:
+  </p>
+
+  <pre>foreach circuit bottom up:
+  if matching circuit found in reference netlist:
+    if all subcircuits have been matched and pin matching has been established for them:
+      compare net graph locally from this circuit
+    else:
+      skip circuit with warning
+  else:
+    issue a circuit mismatch error</pre>
+
+  <p>
+  A consequence of this flow is that the compare will stop treating parent circuits when 
+  one circuit's pins can't be matched to pins from the corresponding reference circuit
+  or the corresponding circuit can't be found in the reference netlist. This behaviour 
+  fosters a bottom-up debugging approach: first fix the issues in subcircuits, then
+  proceed to the parent circuits.
+  </p>
+
+  <p>
+  The local net graph compare algorithm is a backtracking algorithm with 
+  hinting through topological net classification. Topological net classification 
+  is based on nearest-net neighborhood. The following image illustrates this:
+  </p>
+
+  <p>
+  <img src="/manual/net_graph.png"/>
+  </p>
+
+  <p>
+  Here the IN net's neighborhood is VDD via a traversal of gate to source/drain 
+  over M1, to OUT via a twofold traversal of gate to source/drain over M1 and M2 
+  and to VSS via another single traversal of gate to source/drain over M2.
+  This uniquely identifies IN in this simple circuit. In effect, OUT, VDD and VSS
+  can be identified uniquely because their transitions from the IN net are 
+  unambigously identifying them. The topological neighborhood is a simple metrics
+  which allows identifying matching nets from two netlists and deducing further relations.
+  </p>
+
+  <p>
+  In big netlists, the algorithm will first try to match nets unambigously according 
+  to their neighborhood metrics and register them as paired nets.
+  Such pairs often allow deducing further matching pairs. This deduction is 
+  continued until all non-ambiguous pairing options are exhausted.
+  For resolving ambiguities, backtracking is employed: 
+  the algorithm proposes a match and tentatively proceeds with this assumption. 
+  If this execution path leads to a mismatch or logical contradiction, 
+  the algorith will go back to the beginning and restart with a 
+  new proposal. Backtracking is usually required mainly to match networks
+  with a high symmetry such as clock trees.
+  </p>
 
 </doc>

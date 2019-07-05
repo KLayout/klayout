@@ -186,6 +186,7 @@
         <file alias="inv_with_diodes.png">doc/manual/inv_with_diodes.png</file>
         <file alias="inv_schematic.png">doc/manual/inv_schematic.png</file>
         <file alias="inv_schematic2.png">doc/manual/inv_schematic2.png</file>
+        <file alias="net_graph.png">doc/manual/net_graph.png</file>
         <file alias="bjt3_schematic.png">doc/manual/bjt3_schematic.png</file>
         <file alias="bjt4_schematic.png">doc/manual/bjt4_schematic.png</file>
         <file alias="mos3_schematic.png">doc/manual/mos3_schematic.png</file>

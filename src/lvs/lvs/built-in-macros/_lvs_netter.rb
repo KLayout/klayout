@@ -80,11 +80,13 @@ module LVS
     def _clear_data
       super
       @lvs = nil
+      @schematic = nil
     end
 
     def _take_data
       data = super
       @lvs = nil
+      @schematic = nil
       data
     end
 
@@ -100,15 +102,16 @@ module LVS
     # otherwise.
 
     def compare
-      @lvs.compare(@comparer)
+      lvs_data.reference = _ensure_two_netlists[1]
+      lvs_data.compare(@comparer)
     end
 
     def _ensure_two_netlists
 
       netlist || raise("No netlist present (not extracted?)")
-      lvs_data.reference || raise("No reference schematic present (no set with 'schematic'?)")
+      schematic || raise("No reference schematic present (not set with 'schematic'?)")
 
-      [ netlist, lvs_data.reference ]
+      [ netlist, schematic ]
 
     end
       
@@ -256,10 +259,17 @@ module LVS
     # Alternatively, a RBA::Netlist object can be given which is obtained from any other
     # source.
       
-    def schematic(schematic, reader = nil)
+    def schematic(schematic = nil, reader = nil)
 
-      if schematic.is_a?(RBA::Netlist)
-        lvs_data.reference = netlist
+      if !schematic
+
+        # without arguments: return current schematic
+        @schematic
+
+      elsif schematic.is_a?(RBA::Netlist)
+
+        @schematic = netlist
+
       else
 
         schematic.is_a?(String) || raise("First argument must be string or netlist in 'schematic'")
@@ -276,7 +286,7 @@ module LVS
         netlist = RBA::Netlist::new
         netlist.read(netlist_file, reader)
 
-        lvs_data.reference = netlist 
+        @schematic = netlist 
 
       end
 

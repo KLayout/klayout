@@ -52,6 +52,8 @@ TEST(1)
       "# Write extracted netlist to inv_extracted.cir\n"
       "target_netlist('%s', write_spice, 'Extracted by KLayout')\n"
       "\n"
+      "schematic('%s')\n"
+      "\n"
       "# Drawing layers\n"
       "\n"
       "nwell       = input(1, 0)\n"
@@ -109,8 +111,6 @@ TEST(1)
       "connect_global(nwell, 'NWELL')\n"
       "\n"
       "# Compare section\n"
-      "\n"
-      "schematic('%s')\n"
       "\n"
       "compare\n"
     , input, output_lvsdb, output_cir, schematic)

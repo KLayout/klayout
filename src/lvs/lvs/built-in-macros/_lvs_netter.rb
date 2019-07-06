@@ -248,10 +248,14 @@ module LVS
 
     # %LVS%
     # @name schematic
-    # @brief Reads the reference netlist
+    # @brief Gets, sets or reads the reference netlist
     # @synopsis schematic(filename)
     # @synopsis schematic(filename, reader)
     # @synopsis schematic(netlist)
+    # @synopsis schematic
+    # If no argument is given, the current schematic netlist is returned. nil is 
+    # returned if no schematic netlist is set yet.
+    #
     # If a filename is given (first two forms), the netlist is read from the given file.
     # If no reader is provided, Spice format will be assumed. The reader object is a
     # RBA::NetlistReader object and allows detailed customization of the reader process.

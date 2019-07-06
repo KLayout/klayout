@@ -657,6 +657,11 @@ public:
   void connect_pin (size_t pin_id, Net *net);
 
   /**
+   *  @brief Renames the pin with the given ID
+   */
+  void rename_pin (size_t pin_id, const std::string &name);
+
+  /**
    *  @brief Purge unused nets
    *
    *  This method will purge all nets which return "floating".

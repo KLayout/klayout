@@ -804,6 +804,8 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
 
   for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
     db::Net *net = make_net (*i);
+    //  use the net name to name the pin (otherwise SPICE pins are always unnamed)
+    // @@@ mp_circuit->rename_pin (i - nn.begin (), net->name ());
     mp_circuit->connect_pin (i - nn.begin (), net);
   }
 

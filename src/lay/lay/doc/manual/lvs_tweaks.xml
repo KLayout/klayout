@@ -23,7 +23,7 @@
 
   <p>
   Netlist tweaks can also be applied to the schematic netlist. For example to flatten away 
-  a model subcircuit called "NMOS", use this expression:
+  a model subcircuit called "NMOS", use this <class_doc href="Netlist#flatten_circuit"/>:
   </p>
 
   <pre>schematic.flatten_circuit("NMOS")</pre>
@@ -109,6 +109,46 @@
   </p>
 
   <pre>netlist.flatten_circuit("CIRCUIT_NAME")</pre>
+
+  <p>
+  The argument to "flatten_circuit" is a glob pattern (shell-like).
+  For example, "NMOS*" will flatten all circuits starting with "NMOS".
+  </p>
+
+  <h2>Black boxing (circuit abstraction)</h2>
+
+  <p>
+  Circuit abstraction is a technique to reduce the verification overhead. 
+  At an early stage it might be useful to replace a cell by a simplified version or 
+  by a raw pin frame. The circuits extracted from such cells is basically empty or 
+  are intentionally simplified. But as long as there is something inside the
+  cell which the parent circuit connects to, pins will be generated. These 
+  pins then can be thought of as the circuit's abstraction.
+  </p>
+
+  <p>
+  A useful method in this context is the "blank_circuit" method. It clears
+  a circuit's innards and leaves only the pins. You can use this method to 
+  ensure abstracts in both the layout netlist and the schematic. After this,
+  the compare algorithm will identify both circuits as identical, provided
+  they feature the same number of pins.
+  </p>
+
+  <p>
+  To wipe out the innards of a circuit, use the <class_doc href="Netlist#blank_circuit"/> method:
+  </p>
+
+  <pre>netlist.blank_circuit("CIRCUIT_NAME")
+schematic.blank_circuit("CIRCUIT_NAME")</pre>
+
+  <p>
+  The argument to "blank_circuit" is a glob pattern (shell-like).
+  For example, "MEMORY*" will blank out all circuits starting with "MEMORY".
+  </p>
+
+  <p><b>NOTE:</b> Use "blank_circuit" before "purge" or "simplify" (see below). This method
+  sets a flag (<class_doc href="Circuit#dont_purge"/>) which prevents purging of abstract
+  circuits.</p>
 
   <h2>Purging (elimination of redundancy)</h2>
 

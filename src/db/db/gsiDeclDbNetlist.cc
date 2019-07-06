@@ -1081,6 +1081,10 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
     "@brief Iterates over the parent circuits of this circuit\n"
     "Child circuits are the ones that are referencing this circuit via subcircuits."
   ) +
+  gsi::method ("has_refs", &db::Circuit::has_refs,
+    "@brief Returns a value indicating whether the circuit has references\n"
+    "A circuit has references if there is at least one subcircuit referring to it."
+  ) +
   gsi::iterator ("each_ref", (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::begin_refs, (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::end_refs,
     "@brief Iterates over the subcircuit objects referencing this circuit\n"
   ) +
@@ -1170,6 +1174,14 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::iterator ("each_subcircuit", (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_subcircuits, (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::end_subcircuits,
     "@brief Iterates over the subcircuits of the circuit"
   ) +
+  gsi::method ("blank", &db::Circuit::blank,
+    "@brief Blanks out the circuit\n"
+    "This method will remove all the innards of the circuit and just leave the pins. "
+    "The pins won't be connected to inside nets anymore, but the circuit can still be "
+    "called by subcircuit references. "
+    "This method will eventually create a 'circuit abstract' (or black box). It will "
+    "set the \\dont_purge flag to mark this circuit as 'intentionally empty'."
+  ) +
   gsi::method ("netlist", (db::Netlist *(db::Circuit::*) ()) &db::Circuit::netlist,
     "@brief Gets the netlist object the circuit lives in"
   ) +
@@ -1178,6 +1190,14 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   ) +
   gsi::method ("name", &db::Circuit::name,
     "@brief Gets the name of the circuit"
+  ) +
+  gsi::method ("dont_purge", &db::Circuit::dont_purge,
+    "@brief Gets a value indicating whether the circuit can be purged on \\Netlist#purge.\n"
+  ) +
+  gsi::method ("dont_purge=", &db::Circuit::set_dont_purge, gsi::arg ("f"),
+    "@brief Sets a value indicating whether the circuit can be purged on \\Netlist#purge.\n"
+    "If this attribute is set to true, \\Netlist#purge will never delete this circuit.\n"
+    "This flag therefore marks this circuit as 'precious'."
   ) +
   gsi::method ("cell_index=", &db::Circuit::set_cell_index, gsi::arg ("cell_index"),
     "@brief Sets the cell index\n"
@@ -1287,7 +1307,7 @@ static void read_netlist (db::Netlist *nl, const std::string &file, db::NetlistR
 
 static void flatten_circuit_by_name (db::Netlist *nl, const std::string &name_pattern)
 {
-  std::list<db::Circuit *> circuits_to_flatten;
+  std::list<tl::weak_ptr<db::Circuit> > circuits_to_flatten;
   tl::GlobPattern pat (name_pattern);
   for (db::Netlist::circuit_iterator c = nl->begin_circuits (); c != nl->end_circuits (); ++c) {
     if (pat.match (c->name ())) {
@@ -1295,8 +1315,27 @@ static void flatten_circuit_by_name (db::Netlist *nl, const std::string &name_pa
     }
   }
 
-  for (std::list<db::Circuit *>::const_iterator c = circuits_to_flatten.begin (); c != circuits_to_flatten.end (); ++c) {
-    nl->flatten_circuit (*c);
+  for (std::list<tl::weak_ptr<db::Circuit> >::iterator c = circuits_to_flatten.begin (); c != circuits_to_flatten.end (); ++c) {
+    if (c->get ()) {
+      nl->flatten_circuit (c->get ());
+    }
+  }
+}
+
+static void blank_circuit_by_name (db::Netlist *nl, const std::string &name_pattern)
+{
+  std::list<tl::weak_ptr<db::Circuit> > circuits_to_blank;
+  tl::GlobPattern pat (name_pattern);
+  for (db::Netlist::circuit_iterator c = nl->begin_circuits (); c != nl->end_circuits (); ++c) {
+    if (pat.match (c->name ())) {
+      circuits_to_blank.push_back (c.operator-> ());
+    }
+  }
+
+  for (std::list<tl::weak_ptr<db::Circuit> >::iterator c = circuits_to_blank.begin (); c != circuits_to_blank.end (); ++c) {
+    if (c->get ()) {
+      (*c)->blank ();
+    }
   }
 }
 
@@ -1308,7 +1347,15 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   ) +
   gsi::method ("remove", &db::Netlist::remove_circuit, gsi::arg ("circuit"),
     "@brief Removes the given circuit object from the netlist\n"
-    "After the object has been removed, it becomes invalid and cannot be used further."
+    "After the circuit has been removed, the object becomes invalid and cannot be used further. "
+    "A circuit with references (see \\has_refs) should not be removed as the "
+    "subcircuits calling it would afterwards point to nothing."
+  ) +
+  gsi::method ("purge_circuit", &db::Netlist::purge_circuit, gsi::arg ("circuit"),
+    "@brief Removes the given circuit object and all child circuits which are not used otherwise from the netlist\n"
+    "After the circuit has been removed, the object becomes invalid and cannot be used further. "
+    "A circuit with references (see \\has_refs) should not be removed as the "
+    "subcircuits calling it would afterwards point to nothing."
   ) +
   gsi::method ("flatten_circuit", &db::Netlist::flatten_circuit, gsi::arg ("circuit"),
     "@brief Flattens a subcircuit\n"
@@ -1318,8 +1365,18 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method_ext ("flatten_circuit", &flatten_circuit_by_name, gsi::arg ("pattern"),
     "@brief Flattens circuits matching a certain pattern\n"
     "This method will substitute all instances (subcircuits) of all circuits with names matching the given name pattern. "
-    "The name pattern is a glob expression. For example, 'flatten_circuit(\"np*\")' will flatten all circuits witt names "
+    "The name pattern is a glob expression. For example, 'flatten_circuit(\"np*\")' will flatten all circuits with names "
     "starting with 'np'."
+  ) +
+  gsi::method_ext ("blank_circuit", &blank_circuit_by_name, gsi::arg ("pattern"),
+    "@brief Blanks circuits matching a certain pattern\n"
+    "This method will erase everything from inside the circuits matching the given pattern. It will only leave pins which are "
+    "not connected to any net. Hence, this method forms 'abstract' or black-box circuits which can be instantiated through "
+    "subcircuits like the former ones, but are empty shells.\n"
+    "The name pattern is a glob expression. For example, 'flatten_circuit(\"np*\")' will blank out all circuits with names "
+    "starting with 'np'.\n"
+    "\n"
+    "For more details see \\Circuit#blank which is the corresponding method on the actual object."
   ) +
   gsi::method ("circuit_by_cell_index", (db::Circuit *(db::Netlist::*) (db::cell_index_type)) &db::Netlist::circuit_by_cell_index, gsi::arg ("cell_index"),
     "@brief Gets the circuit object for a given cell index.\n"
@@ -1390,7 +1447,9 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("purge", &db::Netlist::purge,
     "@brief Purge unused nets, circuits and subcircuits.\n"
     "This method will purge all nets which return \\floating == true. Circuits which don't have any "
-    "nets (or only floating ones) and removed. Their subcircuits are disconnected."
+    "nets (or only floating ones) and removed. Their subcircuits are disconnected.\n"
+    "This method respects the \\Circuit#dont_purge attribute and will never delete circuits "
+    "with this flag set."
   ) +
   gsi::method ("purge_nets", &db::Netlist::purge_nets,
     "@brief Purges floating nets.\n"

@@ -139,6 +139,14 @@ public:
   void remove_circuit (Circuit *circuit);
 
   /**
+   *  @brief Purges a circuit from the netlist
+   *  In contrast to "delete", this method will
+   *  also remove subcircuits unless called
+   *  otherwise.
+   */
+  void purge_circuit (Circuit *circuit);
+
+  /**
    *  @brief Gets the number of circuits
    */
   size_t circuit_count () const
@@ -449,6 +457,9 @@ public:
    *
    *  This method will purge all nets which return "floating". Circuits which don't have any
    *  nets (or only floating ones) and removed. Their subcircuits are disconnected.
+   *
+   *  This method respects the circuit's "dont_purge" flag and will not purge them if this
+   *  flag is set.
    */
   void purge ();
 

@@ -165,6 +165,20 @@ public:
   }
 
   /**
+   *  @brief Sets or resets the "don't purge" flag
+   *  This flag will prevent "purge" from deleting this circuit. It is set by "blank".
+   */
+  void set_dont_purge (bool dp);
+
+  /**
+   *  @brief Gets or resets the "don't purge" flag
+   */
+  bool dont_purge () const
+  {
+    return m_dont_purge;
+  }
+
+  /**
    *  @brief The index of the circuit in the netlist
    *  CAUTION: this attribute is used for internal purposes and may not be valid always.
    */
@@ -216,6 +230,23 @@ public:
   }
 
   /**
+   *  @brief Gets the references to this circuit (end, const version)
+   *  This iterator will deliver all subcircuits referencing this circuit
+   */
+  const_refs_iterator end_refs () const
+  {
+    return m_refs.end ();
+  }
+
+  /**
+   *  @brief Returns a value indicating whether the circuit has references
+   */
+  bool has_refs () const
+  {
+    return begin_refs () != end_refs ();
+  }
+
+  /**
    *  @brief Gets the child circuits iterator (begin)
    *  The child circuits are the circuits referenced by all subcircuits
    *  in the circuit.
@@ -260,15 +291,6 @@ public:
    *  @brief Gets the parent circuits iterator (end, const version)
    */
   const_parent_circuit_iterator end_parents () const;
-
-  /**
-   *  @brief Gets the references to this circuit (end, const version)
-   *  This iterator will deliver all subcircuits referencing this circuit
-   */
-  const_refs_iterator end_refs () const
-  {
-    return m_refs.end ();
-  }
 
   /**
    *  @brief Clears the pins
@@ -658,6 +680,16 @@ public:
    */
   void flatten_subcircuit (SubCircuit *subcircuit);
 
+  /**
+   *  @brief Blanks out the circuit
+   *
+   *  This will remove all innards of the circuit (nets, devices, subcircuits)
+   *  and circuits which will itself are not longer be called after this.
+   *  This operation will eventually leave a blackbox model of the circuit
+   *  containing only pins.
+   */
+  void blank ();
+
 private:
   friend class Netlist;
   friend class Net;
@@ -665,6 +697,7 @@ private:
   friend class Device;
 
   std::string m_name;
+  bool m_dont_purge;
   db::cell_index_type m_cell_index;
   net_list m_nets;
   pin_list m_pins;

@@ -373,6 +373,12 @@ void Netlist::remove_circuit (Circuit *circuit)
   m_circuits.erase (circuit);
 }
 
+void Netlist::purge_circuit (Circuit *circuit)
+{
+  circuit->blank ();
+  remove_circuit (circuit);
+}
+
 void Netlist::flatten_circuit (Circuit *circuit)
 {
   tl_assert (circuit != 0);
@@ -463,7 +469,7 @@ void Netlist::purge ()
     Circuit *circuit = c.operator-> ();
 
     circuit->purge_nets ();
-    if (circuit->begin_nets () == circuit->end_nets ()) {
+    if (circuit->begin_nets () == circuit->end_nets () && ! circuit->dont_purge ()) {
 
       //  No nets left: delete the subcircuits that refer to us and finally delete the circuit
       while (circuit->begin_refs () != circuit->end_refs ()) {
@@ -563,13 +569,17 @@ std::string Netlist::to_string () const
       std::string ps;
       const db::SubCircuit &subcircuit = *sc;
       const db::Circuit *circuit = sc->circuit_ref ();
-      for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
-        if (p != circuit->begin_pins ()) {
-          ps += ",";
+      if (circuit) {
+        for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
+          if (p != circuit->begin_pins ()) {
+            ps += ",";
+          }
+          ps += pin2string (*p) + "=" + net2string (subcircuit.net_for_pin (p->id ()));
         }
-        ps += pin2string (*p) + "=" + net2string (subcircuit.net_for_pin (p->id ()));
+        res += std::string ("  subcircuit ") + tl::to_word_or_quoted_string (circuit->name ()) + " " + subcircuit2string (*sc) + " (" + ps + ");\n";
+      } else {
+        res += std::string ("  subcircuit (null);\n");
       }
-      res += std::string ("  subcircuit ") + tl::to_word_or_quoted_string (circuit->name ()) + " " + subcircuit2string (*sc) + " (" + ps + ");\n";
     }
 
     res += std::string ("end;\n");

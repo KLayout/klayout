@@ -1297,3 +1297,103 @@ TEST(21_FlattenSubCircuit2)
     "end;\n"
   );
 }
+
+TEST(22_BlankCircuit)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *dc;
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("NMOS");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("PMOS");
+  nl.add_device_class (dc);
+
+  nl.from_string (
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+  );
+
+  db::Netlist nl2;
+
+  nl2 = nl;
+  db::Circuit *circuit = nl2.circuit_by_name ("INV2");
+  nl2.purge_circuit (circuit);
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit (null);\n"
+    "  subcircuit (null);\n"
+    "end;\n"
+  );
+
+  nl2 = nl;
+  circuit = nl2.circuit_by_name ("INV2");
+  EXPECT_EQ (circuit->dont_purge (), false);
+  circuit->blank ();
+  EXPECT_EQ (circuit->dont_purge (), true);
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=(null),$2=(null),OUT=(null),$4=(null),$5=(null));\n"
+    "end;\n"
+  );
+
+  //  purge won't delete INV2
+  nl2.purge ();
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=(null),OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=(null),$2=(null),OUT=(null),$4=(null),$5=(null));\n"
+    "end;\n"
+  );
+
+  circuit->set_dont_purge (false);
+
+  //  now it will ...
+  nl2.purge ();
+
+  EXPECT_EQ (nl2.to_string (),
+    ""
+  );
+
+  nl2 = nl;
+  circuit = nl2.circuit_by_name ("RINGO");
+  nl2.purge_circuit (circuit);
+
+  EXPECT_EQ (nl2.to_string (),
+    ""
+  );
+
+  nl2 = nl;
+  circuit = nl2.circuit_by_name ("RINGO");
+  circuit->blank ();
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=(null),OSC=(null),VSS=(null),VDD=(null));\n"
+    "end;\n"
+  );
+}

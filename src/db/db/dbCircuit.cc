@@ -23,6 +23,8 @@
 #include "dbCircuit.h"
 #include "dbNetlist.h"
 
+#include <set>
+
 namespace db
 {
 
@@ -30,7 +32,7 @@ namespace db
 //  Circuit class implementation
 
 Circuit::Circuit ()
-  : m_cell_index (0), mp_netlist (0),
+  : m_dont_purge (false), m_cell_index (0), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
@@ -45,7 +47,7 @@ Circuit::Circuit ()
 }
 
 Circuit::Circuit (const Circuit &other)
-  : gsi::ObjectBase (other), tl::Object (other), m_cell_index (0), mp_netlist (0),
+  : gsi::ObjectBase (other), tl::Object (other), m_dont_purge (false), m_cell_index (0), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
@@ -80,6 +82,7 @@ Circuit &Circuit::operator= (const Circuit &other)
     clear ();
 
     m_name = other.m_name;
+    m_dont_purge = other.m_dont_purge;
     m_cell_index = other.m_cell_index;
     m_pins = other.m_pins;
 
@@ -189,6 +192,11 @@ void Circuit::set_name (const std::string &name)
   if (mp_netlist) {
     mp_netlist->m_circuit_by_name.invalidate ();
   }
+}
+
+void Circuit::set_dont_purge (bool dp)
+{
+  m_dont_purge = dp;
 }
 
 void Circuit::set_cell_index (const db::cell_index_type ci)
@@ -434,6 +442,35 @@ void Circuit::set_pin_ref_for_pin (size_t pin_id, Net::pin_iterator iter)
     m_pin_refs.resize (pin_id + 1, Net::pin_iterator ());
   }
   m_pin_refs [pin_id] = iter;
+}
+
+void Circuit::blank ()
+{
+  tl_assert (netlist () != 0);
+
+  std::set<db::Circuit *> cs;
+  for (subcircuit_iterator i = m_subcircuits.begin (); i != m_subcircuits.end (); ++i) {
+    cs.insert (i->circuit_ref ());
+  }
+
+  //  weak pointers are good because deleting a subcircuit might delete others ahead in
+  //  this list:
+  std::list<tl::weak_ptr<db::Circuit> > called_circuits;
+  for (std::set<db::Circuit *>::const_iterator c = cs.begin (); c != cs.end (); ++c) {
+    called_circuits.push_back (*c);
+  }
+
+  m_nets.clear ();
+  m_subcircuits.clear ();
+  m_devices.clear ();
+
+  for (std::list<tl::weak_ptr<db::Circuit> >::iterator c = called_circuits.begin (); c != called_circuits.end (); ++c) {
+    if (c->get () && ! (*c)->has_refs ()) {
+      netlist ()->purge_circuit (c->get ());
+    }
+  }
+
+  set_dont_purge (true);
 }
 
 const Net *Circuit::net_for_pin (size_t pin_id) const

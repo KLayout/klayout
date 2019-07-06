@@ -213,36 +213,53 @@ module LVS
     # %LVS%
     # @name equivalent_pins
     # @brief Marks pins as equivalent
-    # @synopsis equivalent_pins(circuit, pins ...)
+    # @synopsis equivalent_pins(circuit, pin ...)
     # This method will mark the given pins as equivalent. This gives the compare algorithm
     # more degrees of freedom when establishing net correspondence. Typically this method
     # is used to declare inputs from gates are equivalent where are are logically, but not
     # physically (e.g. in a CMOS NAND gate):
     #
     # @code
-    # netter.equivalent_pins("NAND2", "A", "B")
+    # netter.equivalent_pins("NAND2", 0, 1)
     # @/code
+    #
+    # The circuit argument is either a circuit name (a string) or a Circuit object
+    # from the schematic netlist.
+    #
+    # The pin arguments are zero-based pin numbers, where 0 is the first number, 1 the second etc.
+    # If the netlist provides named pins, names can be used instead of numbers.
     #
     # Before this method can be used, a schematic netlist needs to be loaded with
     # \schematic.
 
     def equivalent_pins(circuit, *pins)
 
-      circuit.is_a?(String) || raise("Circuit arguments of 'equivalent_pins' needs to be a string")
+      circuit.is_a?(String) || 
+        raise("Circuit argument of 'equivalent_pins' needs to be a string")
+
       pins.each do |a|
-        a.is_a?(String) || raise("All pin arguments of 'equivalent_pins' need to be strings")
+        a.is_a?(String) || 
+          a.respond_to?(:to_i) ||
+          raise("All pin arguments of 'equivalent_pins' need to be strings or numbers")
       end
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
       circuit_b = nl_b.circuit_by_name(circuit) || raise("Not a valid circuit name in reference netlist: #{circuit}")
 
+      pins_by_index = []
+      circuit_b.each_pin { |p| pins_by_index << p }
+
       pin_ids_b = pins.collect do |p|
-        pin = circuit_b.pin_by_name(p) || raise("Not a valid pin name in circuit '#{circuit}': #{p}")
+        if p.is_a?(String)
+          pin = circuit_b.pin_by_name(p) || raise("Not a valid pin name in circuit '#{circuit}': #{p}")
+        else
+          pin = pins_by_index[p.to_i] || raise("Not a valid pin index in circuit '#{circuit}': #{p}")
+        end  
         pin.id
       end
 
-      @comparer.equivalent_pins(circuit, pin_ids_b)
+      @comparer.equivalent_pins(circuit_b, pin_ids_b)
       
     end
 

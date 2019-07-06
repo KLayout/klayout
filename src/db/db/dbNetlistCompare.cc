@@ -1859,6 +1859,10 @@ std::vector<size_t> collect_pins_with_empty_nets (const db::Circuit *c, CircuitP
 void
 NetlistComparer::derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinMapper *circuit_pin_mapper)
 {
+  //  TODO: All pins with empty nets are treated as equivalent - this as a quick way to
+  //  treat circuits abstracts, although it's not really valid. By doing this, we
+  //  don't capture the case of multiple (abstract) subcircuits wired in different ways.
+
   std::vector<size_t> pa, pb;
   pa = collect_pins_with_empty_nets (ca, circuit_pin_mapper);
   pb = collect_pins_with_empty_nets (cb, circuit_pin_mapper);
@@ -2185,11 +2189,13 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
         if (next_float != floating_pins.end ()) {
 
           //  assign a floating pin
+#if 0
           if (mp_logger) {
             mp_logger->match_pins (p.operator-> (), *next_float);
           }
           c12_pin_mapping.map_pin (p->id (), (*next_float)->id ());
           c22_pin_mapping.map_pin ((*next_float)->id (), p->id ());
+#endif
 
           ++next_float;
 

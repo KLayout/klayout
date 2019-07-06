@@ -368,7 +368,9 @@ static size_t get_index_of (const Pair &pair, Iter begin, Iter end, std::map<Pai
     }
 
     i = cache.find (pair);
-    tl_assert (i != cache.end ());
+    if (i == cache.end ()) {
+      return lay::no_netlist_index;
+    }
 
   }
 

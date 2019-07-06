@@ -608,6 +608,24 @@ public:
 
       size_t this_pin_id = pin_id;
 
+      if (! cr->net_for_pin (pin_id)) {
+
+        //  fallback (e.g. when abstract circuits are addressed: just include a transition to 0
+        //  to make the net distinguishable from a net without this connection.
+        Transition ed (sc, circuit_categorizer.cat_for_subcircuit (sc), pin_id, pin_id);
+
+        std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (0);
+        if (in == n2entry.end ()) {
+          in = n2entry.insert (std::make_pair ((const db::Net *) 0, m_edges.size ())).first;
+          m_edges.push_back (std::make_pair (std::vector<Transition> (), std::make_pair (size_t (0), (const db::Net *) 0)));
+        }
+
+        m_edges [in->second].first.push_back (ed);
+
+        continue;
+
+      }
+
       std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
       if (icm == circuit_map->end ()) {
         //  this can happen if the other circuit is not present - this is allowed for single-pin
@@ -654,7 +672,11 @@ public:
         if (add_pin_id == pin_id) {
           break;
         }
-        if (cm->has_this_pin_for_other_pin (add_pin_id)) {
+        if (cm->has_this_pin_for_other_pin (add_pin_id)
+             //  NOTE: we do not include transitions to equivalent pins in our graph intentionally.
+             //  Reasoning: for abstract circuits, transitions are basically useless. For more than
+             //  two equivalent pins, the transitions are unpredictable.
+             && pin_map->normalize_pin_id (cr, cm->this_pin_from_other_pin (add_pin_id)) != pin_id) {
           pids.push_back (add_pin_id);
         } else {
           //  skip pins without mapping
@@ -2188,14 +2210,13 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
         if (next_float != floating_pins.end ()) {
 
-          //  assign a floating pin
-#if 0
+          //  assign a floating pin - this is a dummy assignment which is mitigated
+          //  by declaring the pins equivalent in derive_pin_equivalence
           if (mp_logger) {
             mp_logger->match_pins (p.operator-> (), *next_float);
           }
           c12_pin_mapping.map_pin (p->id (), (*next_float)->id ());
           c22_pin_mapping.map_pin ((*next_float)->id (), p->id ());
-#endif
 
           ++next_float;
 

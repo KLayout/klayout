@@ -1402,8 +1402,14 @@ static std::string search_string_from_names (const std::pair<const Obj *, const 
 bool
 NetlistBrowserModel::is_valid_net_pair (const std::pair<const db::Net *, const db::Net *> &nets) const
 {
-  IndexedNetlistModel::circuit_pair net_parent = mp_indexer->parent_of (nets);
-  return (net_parent.first != 0 || net_parent.second != 0);
+  if (! nets.first && ! nets.second) {
+    //  this is a valid case: e.g. two matching subcircuit pins without nets attached
+    //  to them
+    return true;
+  } else {
+    IndexedNetlistModel::circuit_pair net_parent = mp_indexer->parent_of (nets);
+    return (net_parent.first != 0 || net_parent.second != 0);
+  }
 }
 
 db::NetlistCrossReference::Status

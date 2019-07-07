@@ -1455,7 +1455,7 @@ NetlistBrowserModel::status (const QModelIndex &index) const
     if (! is_valid_net_pair (nets_from_subcircuit_pins (subcircuits, pins))) {
       //  This indicates a wrong connection: the nets are associated in a way which is a not
       //  corresponding to a mapped net pair. Report Mismatch here.
-      return db::NetlistCrossReference::Mismatch;
+      return db::NetlistCrossReference::MatchWithWarning;
     }
 
   } else if (is_id_circuit_net (id)) {
@@ -1492,7 +1492,7 @@ NetlistBrowserModel::status (const QModelIndex &index) const
     if (! is_valid_net_pair (nets_from_subcircuit_pins (subcircuits, pins))) {
       //  This indicates a wrong connection: the nets are associated in a way which is a not
       //  corresponding to a mapped net pair. Report Mismatch here.
-      return db::NetlistCrossReference::Mismatch;
+      return db::NetlistCrossReference::MatchWithWarning;
     }
 
   }
@@ -1502,7 +1502,7 @@ NetlistBrowserModel::status (const QModelIndex &index) const
 
 static std::string rewire_subcircuit_pins_status_hint ()
 {
-  return tl::to_string (tr ("The nets attached to the pins are not equivalent.\nRewire the circuit or use 'equivalent_pins' in the LVS script to fix this issue."));
+  return tl::to_string (tr ("Either pins or nets don't form a good pair.\nThis means either pin swapping happens (in this case, the nets will still match)\nor the subcircuit wiring is not correct (you'll see an error on the net)."));
 }
 
 QVariant

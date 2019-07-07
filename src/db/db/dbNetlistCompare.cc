@@ -32,6 +32,10 @@
 //  TODO: make this a feature?
 // #define PRINT_DEBUG_NETCOMPARE
 
+//  verbose net graph output
+//  TODO: make this a feature?
+// #define PRINT_DEBUG_NETGRAPH
+
 //  Add this define for case insensitive compare
 //  (applies to circuits, device classes)
 #define COMPARE_CASE_INSENSITIVE
@@ -551,6 +555,25 @@ public:
       return (m_id1 == other.m_id1 && m_id2 == other.m_id2);
     }
 
+    std::string to_string () const
+    {
+      if (is_for_subcircuit ()) {
+        size_t pin_id1 = std::numeric_limits<size_t>::max () - m_id1;
+        size_t pin_id2 = m_id2;
+        const db::SubCircuit *sc = subcircuit_pair ().first;
+        const db::Circuit *c = sc->circuit_ref ();
+        return std::string ("X") + sc->expanded_name () + " " + c->name () + " "
+          + "(" + c->pin_by_id (pin_id1)->expanded_name () + ")->(" + c->pin_by_id (pin_id2)->expanded_name () + ")";
+     } else {
+        size_t term_id1 = m_id1;
+        size_t term_id2 = m_id2;
+        const db::Device *d = device_pair ().first;
+        const db::DeviceClass *dc = d->device_class ();
+        return std::string ("D") + d->expanded_name () + " " + dc->name () + " "
+          + "(" + dc->terminal_definitions () [term_id1].name () + ")->(" + dc->terminal_definitions () [term_id2].name () + ")";
+      }
+    }
+
   private:
     char m_ref [sizeof (std::pair<const void *, size_t>)];
     size_t m_id1, m_id2;
@@ -605,26 +628,9 @@ public:
       const db::SubCircuit *sc = i->subcircuit ();
       size_t pin_id = i->pin ()->id ();
       const db::Circuit *cr = sc->circuit_ref ();
+      const db::Net *net_at_pin = cr->net_for_pin (pin_id);
 
       size_t this_pin_id = pin_id;
-
-      if (! cr->net_for_pin (pin_id)) {
-
-        //  fallback (e.g. when abstract circuits are addressed: just include a transition to 0
-        //  to make the net distinguishable from a net without this connection.
-        Transition ed (sc, circuit_categorizer.cat_for_subcircuit (sc), pin_id, pin_id);
-
-        std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (0);
-        if (in == n2entry.end ()) {
-          in = n2entry.insert (std::make_pair ((const db::Net *) 0, m_edges.size ())).first;
-          m_edges.push_back (std::make_pair (std::vector<Transition> (), std::make_pair (size_t (0), (const db::Net *) 0)));
-        }
-
-        m_edges [in->second].first.push_back (ed);
-
-        continue;
-
-      }
 
       std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
       if (icm == circuit_map->end ()) {
@@ -651,6 +657,25 @@ public:
 
       pin_id = pin_map->normalize_pin_id (cr, pin_id);
 
+      //  shortcut for idle pin (e.g. when abstract circuits are addressed: just include a transition to 0
+      //  to make the net distinguishable from a net without this connection.
+
+      if (! net_at_pin || net_at_pin->is_floating ()) {
+
+        Transition ed (sc, circuit_categorizer.cat_for_subcircuit (sc), pin_id, pin_id);
+
+        std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (0);
+        if (in == n2entry.end ()) {
+          in = n2entry.insert (std::make_pair ((const db::Net *) 0, m_edges.size ())).first;
+          m_edges.push_back (std::make_pair (std::vector<Transition> (), std::make_pair (size_t (0), (const db::Net *) 0)));
+        }
+
+        m_edges [in->second].first.push_back (ed);
+
+        continue;
+
+      }
+
       //  we cannot afford creating edges from all to all other pins, so we just create edges to the previous and next
       //  pin. This may take more iterations to solve, but should be equivalent.
 
@@ -664,8 +689,6 @@ public:
 
       std::vector<size_t> pids;
       pids.reserve (take_additional_pins + 1);
-      //  this symmetrizes the pin list with respect to the before-normalization pin id:
-      pids.push_back (pin_id);
 
       for (size_t n = 0; n < take_additional_pins; ++n) {
         size_t add_pin_id = (pin_id + n + 1) % pin_count;
@@ -676,7 +699,7 @@ public:
              //  NOTE: we do not include transitions to equivalent pins in our graph intentionally.
              //  Reasoning: for abstract circuits, transitions are basically useless. For more than
              //  two equivalent pins, the transitions are unpredictable.
-             && pin_map->normalize_pin_id (cr, cm->this_pin_from_other_pin (add_pin_id)) != pin_id) {
+             && pin_map->normalize_pin_id (cr, add_pin_id) != pin_id) {
           pids.push_back (add_pin_id);
         } else {
           //  skip pins without mapping
@@ -688,11 +711,6 @@ public:
 
         size_t pin2_id = *i;
         size_t this_pin2_id = cm->this_pin_from_other_pin (pin2_id);
-
-        if (this_pin2_id == this_pin_id) {
-          //  we should not go back to our original, non-normalized pin
-          continue;
-        }
 
         //  NOTE: if a pin mapping is given, EdgeDesc::pin1_id and EdgeDesc::pin2_id are given
         //  as pin ID's of the other circuit.
@@ -745,6 +763,36 @@ public:
       }
 
     }
+  }
+
+  std::string to_string () const
+  {
+    std::string res = std::string ("[");
+    if (mp_net) {
+      res += mp_net->expanded_name ();
+    } else {
+      res += "(null)";
+    }
+    res += "]";
+    if (m_other_net_index != std::numeric_limits<size_t>::max ()) {
+      res += " (other: #" + tl::to_string (m_other_net_index) + ")";
+    }
+    res += "\n";
+
+    for (std::vector<std::pair<std::vector<Transition>, std::pair<size_t, const db::Net *> > >::const_iterator e = m_edges.begin (); e != m_edges.end (); ++e) {
+      res += "  (\n";
+      for (std::vector<Transition>::const_iterator i = e->first.begin (); i != e->first.end (); ++i) {
+        res += std::string ("    ") + i->to_string () + "\n";
+      }
+      res += "  )->";
+      if (! e->second.second) {
+        res += "(null)";
+      } else {
+        res += e->second.second->expanded_name () + "[#" + tl::to_string (e->second.first) + "]";
+      }
+      res += "\n";
+    }
+    return res;
   }
 
   const db::Net *net () const
@@ -1170,6 +1218,11 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   for (std::vector<NetGraphNode>::iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
     i->apply_net_index (m_net_index);
   }
+#if defined(PRINT_DEBUG_NETGRAPH)
+  for (std::vector<NetGraphNode>::iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
+    tl::info << i->to_string () << tl::noendl;
+  }
+#endif
 }
 
 size_t

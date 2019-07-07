@@ -839,10 +839,10 @@ match_devices $3 $3
 match_devices $4 $4
 end_circuit NAND NAND MATCH
 begin_circuit TOP TOP
-match_nets OUT OUT
-match_nets INT INT
 match_nets IN2 IN2
+match_nets INT INT
 match_nets IN1 IN1
+match_nets OUT OUT
 match_nets VDD VDD
 match_nets VSS VSS
 match_pins $0 $0
@@ -883,10 +883,10 @@ match_devices $3 $3
 match_devices $4 $4
 end_circuit NAND NAND MATCH
 begin_circuit TOP TOP
-match_nets OUT OUT
-match_nets INT INT
 match_nets IN2 IN2
+match_nets INT INT
 match_nets IN1 IN1
+match_nets OUT OUT
 match_nets VDD VDD
 match_nets VSS VSS
 match_pins $0 $0

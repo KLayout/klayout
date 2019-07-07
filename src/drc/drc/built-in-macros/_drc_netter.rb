@@ -67,6 +67,7 @@ module DRC
       @netlisted = false
       @connect_implicit = []
       @l2n = nil
+      @lnum = 0
     end
     
     # %DRC%
@@ -404,9 +405,10 @@ module DRC
       ensure_data
 
       @layers[id] = data
+      @lnum += 1
 
       # every layer gets registered and intra-layer connections are made
-      @l2n.register(data, "l" + id.to_s)
+      @l2n.register(data, "l" + @lnum.to_s)
 
     end
     

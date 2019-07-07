@@ -103,6 +103,8 @@ void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
       read_xref (xref);
       xref->gen_end_netlist (lvs->netlist (), lvs->reference_netlist ());
 
+    } else if (at_end ()) {
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file")));
     } else {
       throw tl::Exception (tl::to_string (tr ("Invalid keyword")));
     }
@@ -145,6 +147,8 @@ void LayoutVsSchematicStandardReader::read_xrefs_for_circuits (db::NetlistCrossR
       read_device_pair (xref, circuit_a, circuit_b);
     } else if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
       read_subcircuit_pair (xref, circuit_a, circuit_b);
+    } else if (at_end ()) {
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (net, pin, device or circuit expected)")));
     } else {
       throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (net, pin, device or circuit expected)")));
     }
@@ -192,6 +196,8 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
           //  continue
         } else if (test (skeys::xref_key) || test (lkeys::xref_key)) {
           read_xrefs_for_circuits (xref, circuit_a, circuit_b);
+        } else if (at_end ()) {
+          throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (status keyword of xrefs expected)")));
         } else {
           throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (status keyword of xrefs expected)")));
         }

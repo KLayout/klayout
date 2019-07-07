@@ -2166,6 +2166,10 @@ template <class T>
 recursive_cluster_shape_iterator<T>::recursive_cluster_shape_iterator (const hier_clusters<T> &hc, unsigned int layer, db::cell_index_type ci, typename local_cluster<T>::id_type id)
   : mp_hc (&hc), m_layer (layer), m_id (id)
 {
+  if (id == 0) {
+    return;
+  }
+
   down (ci, id, db::ICplxTrans ());
 
   while (m_shape_iter.at_end () && ! m_conn_iter_stack.empty ()) {

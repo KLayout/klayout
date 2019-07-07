@@ -311,6 +311,8 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
           read_device (netlist, l2n, circuit, *map, connections);
         } else if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
           read_subcircuit (netlist, l2n, circuit, *map, connections);
+        } else if (at_end ()) {
+          throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (net, pin, device or circuit expected)")));
         } else {
           throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (net, pin, device or circuit expected)")));
         }
@@ -368,6 +370,8 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
 
         if (test (skeys::terminal_key) || test (lkeys::terminal_key)) {
           read_abstract_terminal (l2n, dm, gen_dc ? dc : 0);
+        } else if (at_end ()) {
+          throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside device abstract definition (terminal expected)")));
         } else {
           throw tl::Exception (tl::to_string (tr ("Invalid keyword inside device abstract definition (terminal expected)")));
         }
@@ -378,6 +382,8 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
 
     } else if (nested) {
       break;
+    } else if (at_end ()) {
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file")));
     } else {
       throw tl::Exception (tl::to_string (tr ("Invalid keyword")));
     }
@@ -448,6 +454,8 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
     poly.assign_hull (pt.begin (), pt.end ());
     return std::make_pair (lid, db::PolygonRef (poly, l2n->internal_layout ()->shape_repository ()));
 
+  } else if (at_end ()) {
+    throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside net or terminal definition (polygon or rect expected)")));
   } else {
     throw tl::Exception (tl::to_string (tr ("Invalid keyword inside net or terminal definition (polygon or rect expected)")));
   }
@@ -700,6 +708,8 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
       device->set_parameter_value (pid, value);
 
+    } else if (at_end ()) {
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside device definition (location, scale, mirror, rotation, param or terminal expected)")));
     } else {
       throw tl::Exception (tl::to_string (tr ("Invalid keyword inside device definition (location, scale, mirror, rotation, param or terminal expected)")));
     }
@@ -875,6 +885,8 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
         refs.push_back (Connections (net->cluster_id (), sc_net->cluster_id ()));
       }
 
+    } else if (at_end ()) {
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside subcircuit definition (location, rotation, mirror, scale or pin expected)")));
     } else {
       throw tl::Exception (tl::to_string (tr ("Invalid keyword inside subcircuit definition (location, rotation, mirror, scale or pin expected)")));
     }

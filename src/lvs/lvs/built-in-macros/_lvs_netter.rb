@@ -57,7 +57,8 @@ module LVS
         @lvs = RBA::LayoutVsSchematic::new(@engine._dss)
       else
         layout = @engine.source.layout
-        @lvs = RBA::LayoutVsSchematic::new(layout.top_cell.name, layout.dbu)
+        cell = @engine.source.cell_obj
+        @lvs = RBA::LayoutVsSchematic::new(cell.name, layout.dbu)
       end
 
       @l2n = @lvs
@@ -122,7 +123,11 @@ module LVS
     # @synopsis same_nets(circuit_a, net_a, circuit_b, net_b)
     # This method will force an equivalence between the net_a and net_b from circuit_a
     # and circuit_b (circuit in the three-argument form is for both circuit_a and circuit_b).
-    # Circuit and nets are string giving a circuit and net by name.
+    #
+    # In the four-argument form, the circuits can be either given by name or as Circuit
+    # objects. In the three-argument form, the circuit has to be given by name. 
+    # Nets can be either given by name or as Net objects.
+    #
     # After using this function, the compare algorithm will consider these nets equivalent.
     # Use this method to provide hints for the comparer in cases which are difficult to
     # resolve otherwise.
@@ -132,9 +137,6 @@ module LVS
 
     def same_nets(*args)
 
-      pins.each do |a|
-        a.is_a?(String) || raise("All arguments of 'same_nets' need to be strings")
-      end
       if args.size < 3 
         raise("Too few arguments to 'same_nets' (need at least 3)")
       end
@@ -145,17 +147,43 @@ module LVS
       if args.size == 3
         ( ca, a, b ) = args
         cb = ca
+        ca.is_a?(String) || raise("Circuit argument of 'same_nets' must be a string")
       else
         ( ca, a, cb, b ) = args
+        [ ca, cb ].each do |n|
+          n.is_a?(String) || n.is_a?(RBA::Net) || raise("Circuit arguments of 'same_nets' must be strings or Net objects")
+        end
+      end
+
+      [ a, b ].each do |n|
+        n.is_a?(String) || n.is_a?(RBA::Net) || raise("Net arguments of 'same_nets' must be strings or Net objects")
       end
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
-      circuit_a = nl_a.circuit_by_name(ca) || raise("Not a valid circuit name in extracted netlist: #{ca}")
-      circuit_b = nl_b.circuit_by_name(cb) || raise("Not a valid circuit name in reference netlist: #{cb}")
+      if ca.is_a?(String)
+        circuit_a = nl_a.circuit_by_name(ca) || raise("Not a valid circuit name in extracted netlist: #{ca}")
+      else 
+        circuit_a = ca
+      end
 
-      net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist: #{a} (for circuit #{circuit_a})")
-      net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in reference netlist: #{b} (for circuit #{circuit_b})")
+      if cb.is_a?(String)
+        circuit_b = nl_b.circuit_by_name(cb) || raise("Not a valid circuit name in reference netlist: #{cb}")
+      else
+        circuit_b = cb
+      end
+
+      if a.is_a?(String)
+        net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist: #{a} (for circuit #{circuit_a})")
+      else
+        net_a = a
+      end
+
+      if b.is_a?(String)
+        net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in reference netlist: #{b} (for circuit #{circuit_b})")
+      else
+        net_b = b
+      end
 
       @comparer.same_nets(net_a, net_b)
       

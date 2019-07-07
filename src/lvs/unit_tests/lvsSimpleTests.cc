@@ -94,3 +94,27 @@ TEST(4_simple_implicit_connections)
   run_test (_this, "ringo_simple_implicit_connections", "ringo_implicit_connections.gds");
 }
 
+TEST(5_simple_same_device_classes)
+{
+  run_test (_this, "ringo_simple_same_device_classes", "ringo.gds");
+}
+
+TEST(6_simple_pin_swapping)
+{
+  run_test (_this, "ringo_simple_pin_swapping", "ringo.gds");
+}
+
+TEST(7_net_and_circuit_equivalence)
+{
+  run_test (_this, "ringo_simple_net_and_circuit_equivalence", "ringo_renamed.gds");
+}
+
+TEST(8_simplification)
+{
+  run_test (_this, "ringo_simple_simplification", "ringo_for_simplification.gds");
+}
+
+TEST(9_blackboxing)
+{
+  run_test (_this, "ringo_simple_blackboxing", "ringo_for_blackboxing.gds");
+}

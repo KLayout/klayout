@@ -145,6 +145,12 @@ Connectivity::global_net_id (const std::string &gn)
   return id;
 }
 
+size_t
+Connectivity::global_nets () const
+{
+  return m_global_net_names.size ();
+}
+
 Connectivity::layer_iterator
 Connectivity::begin_layers () const
 {
@@ -2037,9 +2043,22 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
     //  insert the global nets from here
 
+    std::set<typename db::local_cluster<T>::global_net_id> gn_seen;
     for (typename db::connected_clusters<T>::const_iterator cl = local.begin (); cl != local.end (); ++cl) {
-      if (! cl->get_global_nets ().empty ()) {
-        global_net_clusters.add (cl->get_global_nets (), db::ClusterInstance (cl->id ()));
+      const typename db::local_cluster<T>::global_nets &gn = cl->get_global_nets ();
+      if (! gn.empty ()) {
+        gn_seen.insert (gn.begin (), gn.end ());
+        global_net_clusters.add (gn, db::ClusterInstance (cl->id ()));
+      }
+    }
+
+    //  add dummy clusters for global nets not having any shape on it
+
+    for (size_t gn_id = 0; gn_id < conn.global_nets (); ++gn_id) {
+      if (gn_seen.find (gn_id) == gn_seen.end ()) {
+        typename db::local_cluster<T>::global_nets gn;
+        gn.insert (gn_id);
+        global_net_clusters.add (gn, db::ClusterInstance ());
       }
     }
 

@@ -285,6 +285,8 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
 
       db::cell_index_type device_cell_index = 0;
 
+      db::CplxTrans dbu (m_dbu);
+
       if (l2n) {
 
         db::Layout *ly = l2n->internal_layout ();
@@ -303,7 +305,11 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
 
       while (br) {
 
-        if (test (skeys::net_key) || test (lkeys::net_key)) {
+        if (test (skeys::rect_key) || test (lkeys::rect_key)) {
+          circuit->set_boundary (db::DPolygon (dbu * read_rect ()));
+        } else if (test (skeys::polygon_key) || test (lkeys::polygon_key)) {
+          circuit->set_boundary (read_polygon ().transformed (dbu));
+        } else if (test (skeys::net_key) || test (lkeys::net_key)) {
           read_net (netlist, l2n, circuit, *map);
         } else if (test (skeys::pin_key) || test (lkeys::pin_key)) {
           read_pin (netlist, l2n, circuit, *map);
@@ -312,9 +318,9 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         } else if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
           read_subcircuit (netlist, l2n, circuit, *map, connections);
         } else if (at_end ()) {
-          throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (net, pin, device or circuit expected)")));
+          throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (rect, polygon, net, pin, device or circuit expected)")));
         } else {
-          throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (net, pin, device or circuit expected)")));
+          throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (rect, polygon, net, pin, device or circuit expected)")));
         }
 
       }
@@ -455,10 +461,44 @@ LayoutToNetlistStandardReader::read_geometry (db::LayoutToNetlist *l2n)
     return std::make_pair (lid, db::PolygonRef (poly, l2n->internal_layout ()->shape_repository ()));
 
   } else if (at_end ()) {
-    throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside net or terminal definition (polygon or rect expected)")));
+    throw tl::Exception (tl::to_string (tr ("Unexpected end of file (polygon or rect expected)")));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Invalid keyword inside net or terminal definition (polygon or rect expected)")));
+    throw tl::Exception (tl::to_string (tr ("Invalid keyword (polygon or rect expected)")));
   }
+}
+
+db::Box
+LayoutToNetlistStandardReader::read_rect ()
+{
+  m_ref = db::Point ();
+
+  Brace br (this);
+
+  db::Point lb = read_point ();
+  db::Point rt = read_point ();
+  db::Box box (lb, rt);
+
+  br.done ();
+
+  return box;
+}
+
+db::Polygon
+LayoutToNetlistStandardReader::read_polygon ()
+{
+  m_ref = db::Point ();
+
+  Brace br (this);
+
+  std::vector<db::Point> pt;
+  while (br) {
+    pt.push_back (read_point ());
+  }
+  br.done ();
+
+  db::Polygon poly;
+  poly.assign_hull (pt.begin (), pt.end ());
+  return poly;
 }
 
 void

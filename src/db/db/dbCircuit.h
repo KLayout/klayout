@@ -30,6 +30,7 @@
 #include "dbPin.h"
 #include "dbSubCircuit.h"
 #include "dbNetlistUtils.h"
+#include "dbPolygon.h"
 
 #include "tlObject.h"
 #include "tlObjectCollection.h"
@@ -40,6 +41,7 @@ namespace db
 {
 
 class Netlist;
+class Layout;
 
 /**
  *  @brief An iterator wrapper for the child and parent circuit iterator
@@ -114,6 +116,13 @@ public:
   Circuit ();
 
   /**
+   *  @brief Constructor
+   *
+   *  Creates a circuit corresponding to a layout cell
+   */
+  Circuit (const db::Layout &layout, db::cell_index_type ci);
+
+  /**
    *  @brief Copy constructor
    */
   Circuit (const Circuit &other);
@@ -162,6 +171,19 @@ public:
   const std::string &name () const
   {
     return m_name;
+  }
+
+  /**
+   *  @brief Sets the boundary
+   */
+  void set_boundary (const db::DPolygon &boundary);
+
+  /**
+   *  @brief Gets the boundary
+   */
+  const db::DPolygon &boundary () const
+  {
+    return m_boundary;
   }
 
   /**
@@ -697,6 +719,7 @@ private:
   friend class Device;
 
   std::string m_name;
+  db::DPolygon m_boundary;
   bool m_dont_purge;
   db::cell_index_type m_cell_index;
   net_list m_nets;

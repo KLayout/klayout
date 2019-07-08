@@ -64,6 +64,8 @@ namespace db
  *
  *  [circuit-def]:
  *
+ *    [boundary-def]
+ *
  *    net(<id> [name]? [geometry-def]*)
  *                                  - net geometry [short key: N]
  *                                    A net declaration shall be there also if no geometry
@@ -74,6 +76,13 @@ namespace db
  *                                  - device with connections [short key: D]
  *    circuit(<id> [name]? [subcircuit-def])
  *                                  - subcircuit with connections [short key: X]
+ *
+ *  [boundary-def]:
+ *
+ *    polygon([coord] ...)          - defines a polygon [short key: Q]
+ *                                    "*" for <x> or <y> means take previous
+ *    rect([coord] [coord])         - defines a rectangle [short key: R]
+ *                                    coordinates are bottom/left and top/right
  *
  *  [combined-device]:
  *

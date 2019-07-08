@@ -279,9 +279,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
     } else {
 
       //  create a new circuit for this cell
-      mp_circuit = new db::Circuit ();
-      mp_circuit->set_cell_index (*ci);
-      mp_circuit->set_name (layout.cell_name (*ci));
+      mp_circuit = new db::Circuit (layout, *ci);
       m_netlist->add_circuit (mp_circuit);
 
     }

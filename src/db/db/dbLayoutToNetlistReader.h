@@ -140,6 +140,8 @@ protected:
   bool read_trans_part (db::DCplxTrans &tr);
   void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc);
   std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n);
+  db::Polygon read_polygon ();
+  db::Box read_rect ();
   void read_geometries (Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell);
   db::Point read_point ();
 

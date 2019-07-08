@@ -22,6 +22,7 @@
 
 #include "dbCircuit.h"
 #include "dbNetlist.h"
+#include "dbLayout.h"
 
 #include <set>
 
@@ -44,6 +45,23 @@ Circuit::Circuit ()
   m_devices.changed ().add (this, &Circuit::devices_changed);
   m_nets.changed ().add (this, &Circuit::nets_changed);
   m_subcircuits.changed ().add (this, &Circuit::subcircuits_changed);
+}
+
+Circuit::Circuit (const db::Layout &layout, db::cell_index_type ci)
+  : m_name (layout.cell_name (ci)), m_dont_purge (false), m_cell_index (ci), mp_netlist (0),
+    m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
+    m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
+    m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
+    m_device_by_name (this, &Circuit::begin_devices, &Circuit::end_devices),
+    m_subcircuit_by_name (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
+    m_net_by_name (this, &Circuit::begin_nets, &Circuit::end_nets),
+    m_index (0)
+{
+  m_devices.changed ().add (this, &Circuit::devices_changed);
+  m_nets.changed ().add (this, &Circuit::nets_changed);
+  m_subcircuits.changed ().add (this, &Circuit::subcircuits_changed);
+
+  set_boundary (db::DPolygon (db::CplxTrans (layout.dbu ()) * layout.cell (ci).bbox ()));
 }
 
 Circuit::Circuit (const Circuit &other)
@@ -82,6 +100,7 @@ Circuit &Circuit::operator= (const Circuit &other)
     clear ();
 
     m_name = other.m_name;
+    m_boundary = other.m_boundary;
     m_dont_purge = other.m_dont_purge;
     m_cell_index = other.m_cell_index;
     m_pins = other.m_pins;
@@ -184,6 +203,7 @@ void Circuit::clear ()
   m_devices.clear ();
   m_nets.clear ();
   m_subcircuits.clear ();
+  m_boundary.clear ();
 }
 
 void Circuit::set_name (const std::string &name)
@@ -192,6 +212,11 @@ void Circuit::set_name (const std::string &name)
   if (mp_netlist) {
     mp_netlist->m_circuit_by_name.invalidate ();
   }
+}
+
+void Circuit::set_boundary (const db::DPolygon &boundary)
+{
+  m_boundary = boundary;
 }
 
 void Circuit::set_dont_purge (bool dp)

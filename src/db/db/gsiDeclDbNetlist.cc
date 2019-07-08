@@ -1191,6 +1191,12 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::method ("name", &db::Circuit::name,
     "@brief Gets the name of the circuit"
   ) +
+  gsi::method ("boundary=", &db::Circuit::set_boundary, gsi::arg ("boundary"),
+    "@brief Sets the boundary of the circuit"
+  ) +
+  gsi::method ("boundary", &db::Circuit::boundary,
+    "@brief Gets the boundary of the circuit"
+  ) +
   gsi::method ("dont_purge", &db::Circuit::dont_purge,
     "@brief Gets a value indicating whether the circuit can be purged on \\Netlist#purge.\n"
   ) +

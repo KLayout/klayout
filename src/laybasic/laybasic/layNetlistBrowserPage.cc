@@ -876,23 +876,24 @@ bbox_for_device_abstract (const db::Layout *layout, const db::DeviceAbstract *de
   return layout->cell (device_abstract->cell_index ()).bbox ().transformed (db::CplxTrans (layout->dbu ()).inverted () * trans * db::CplxTrans (layout->dbu ()));}
 
 static db::Box
-bbox_for_subcircuit (const db::Layout *layout, const db::SubCircuit *subcircuit)
+bbox_for_circuit (const db::Layout *layout, const db::Circuit *circuit)
 {
-  if (! subcircuit->circuit_ref () || ! layout->is_valid_cell_index (subcircuit->circuit_ref ()->cell_index ())) {
+
+  if (! circuit || ! layout->is_valid_cell_index (circuit->cell_index ())) {
     return db::Box ();
   }
 
-  return layout->cell (subcircuit->circuit_ref ()->cell_index ()).bbox ();
-}
-
-static db::Box
-bbox_for_circuit (const db::Layout *layout, const db::Circuit *circuit)
-{
-  if (! layout->is_valid_cell_index (circuit->cell_index ())) {
-    return db::Box ();
+  if (circuit->boundary ().vertices () > 0) {
+    return db::CplxTrans (layout->dbu ()).inverted () * circuit->boundary ().box ();
   }
 
   return layout->cell (circuit->cell_index ()).bbox ();
+}
+
+static db::Box
+bbox_for_subcircuit (const db::Layout *layout, const db::SubCircuit *subcircuit)
+{
+  return bbox_for_circuit (layout, subcircuit->circuit_ref ());
 }
 
 void

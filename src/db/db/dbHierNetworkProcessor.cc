@@ -2052,7 +2052,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
       }
     }
 
-    //  add dummy clusters for global nets not having any shape on it
+    //  add dummy cluster instance for global nets not having any shape on it
 
     for (size_t gn_id = 0; gn_id < conn.global_nets (); ++gn_id) {
       if (gn_seen.find (gn_id) == gn_seen.end ()) {

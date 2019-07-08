@@ -117,10 +117,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     std::map<db::cell_index_type, db::Circuit *>::const_iterator k = circuits.find (*cid);
     if (k == circuits.end ()) {
-      circuit = new db::Circuit ();
+      circuit = new db::Circuit (*mp_layout, *cid);
       nl.add_circuit (circuit);
-      circuit->set_name (mp_layout->cell_name (*cid));
-      circuit->set_cell_index (*cid);
       circuits.insert (std::make_pair (*cid, circuit));
     } else {
       circuit = k->second;

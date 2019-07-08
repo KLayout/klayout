@@ -200,9 +200,84 @@ void std_writer_impl<Keys>::write (const db::Netlist *nl, const db::LayoutToNetl
   }
 }
 
+void write_point (tl::OutputStream &stream, const db::Point &pt, db::Point &ref, bool relative)
+{
+  if (relative) {
+
+    stream << "(";
+    stream << pt.x () - ref.x ();
+    stream << " ";
+    stream << pt.y () - ref.y ();
+    stream << ")";
+
+  } else {
+
+    if (pt.x () == 0 || pt.x () != ref.x ()) {
+      stream << pt.x ();
+    } else {
+      stream << "*";
+    }
+
+    if (pt.y () == 0 || pt.y () != ref.y ()) {
+      stream << pt.y ();
+    } else {
+      stream << "*";
+    }
+
+  }
+
+  ref = pt;
+}
+
+template <class T, class Tr>
+void write_points (tl::OutputStream &stream, const T &poly, const Tr &tr, db::Point &ref, bool relative)
+{
+  for (typename T::polygon_contour_iterator c = poly.begin_hull (); c != poly.end_hull (); ++c) {
+
+    typename T::point_type pt = tr * *c;
+
+    stream << " ";
+    write_point (stream, pt, ref, relative);
+
+  }
+}
+
 template <class Keys>
 void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, const db::Circuit &circuit, const std::string &indent, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit)
 {
+  if (circuit.boundary ().vertices () > 0) {
+
+    if (! Keys::is_short ()) {
+      *mp_stream << endl << indent << indent1 << "# Circuit boundary" << endl;
+    }
+
+    reset_geometry_ref ();
+
+    db::Polygon poly = circuit.boundary ().transformed (db::VCplxTrans (1.0 / m_dbu));
+    if (poly.is_box ()) {
+
+      db::Box box = poly.box ();
+      *mp_stream << indent << indent1 << Keys::rect_key << "(";
+      write_point (*mp_stream, box.p1 (), m_ref, true);
+      *mp_stream << " ";
+      write_point (*mp_stream, box.p2 (), m_ref, true);
+      *mp_stream << ")" << endl;
+
+    } else {
+
+      *mp_stream << indent << indent1 << Keys::polygon_key << "(";
+      if (poly.holes () > 0) {
+        db::SimplePolygon sp = db::polygon_to_simple_polygon (poly);
+        write_points (*mp_stream, sp, db::UnitTrans (), m_ref, true);
+      } else {
+        write_points (*mp_stream, poly, db::UnitTrans (), m_ref, true);
+      }
+      *mp_stream << ")" << endl;
+
+    }
+
+  }
+
   std::map<const db::Net *, unsigned int> net2id_local;
   std::map<const db::Net *, unsigned int> *net2id = &net2id_local;
   if (net2id_per_circuit) {
@@ -271,48 +346,6 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
 
   if (! Keys::is_short ()) {
     *mp_stream << endl;
-  }
-}
-
-void write_point (tl::OutputStream &stream, const db::Point &pt, db::Point &ref, bool relative)
-{
-  if (relative) {
-
-    stream << "(";
-    stream << pt.x () - ref.x ();
-    stream << " ";
-    stream << pt.y () - ref.y ();
-    stream << ")";
-
-  } else {
-
-    if (pt.x () == 0 || pt.x () != ref.x ()) {
-      stream << pt.x ();
-    } else {
-      stream << "*";
-    }
-
-    if (pt.y () == 0 || pt.y () != ref.y ()) {
-      stream << pt.y ();
-    } else {
-      stream << "*";
-    }
-
-  }
-
-  ref = pt;
-}
-
-template <class T, class Tr>
-void write_points (tl::OutputStream &stream, const T &poly, const Tr &tr, db::Point &ref, bool relative)
-{
-  for (typename T::polygon_contour_iterator c = poly.begin_hull (); c != poly.end_hull (); ++c) {
-
-    typename T::point_type pt = tr * *c;
-
-    stream << " ";
-    write_point (stream, pt, ref, relative);
-
   }
 }
 

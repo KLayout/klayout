@@ -56,9 +56,9 @@ static const std::string indent1 (" ");
 static const std::string indent2 ("  ");
 
 template <class Keys>
-std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream, double dbu)
+std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream, double dbu, const std::string &progress_description)
   : mp_stream (&stream), m_dbu (dbu),
-    m_progress (tl::to_string (tr ("Writing L2N database")), 10000)
+    m_progress (progress_description.empty () ? tl::to_string (tr ("Writing L2N database")) : progress_description, 10000)
 {
   m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);

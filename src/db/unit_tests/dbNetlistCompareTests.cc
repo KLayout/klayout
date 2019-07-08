@@ -687,6 +687,48 @@ TEST(1_SimpleInverterSkippedDevices)
     " device $1:$4 [Match]\n"
   );
   EXPECT_EQ (good, true);
+
+  xref.clear ();
+
+  comp_xref.exclude_caps (-1);
+  comp_xref.exclude_resistors (-1);
+  comp_xref.same_device_classes (0, nl2.device_class_by_name ("RES"));
+  comp_xref.same_device_classes (0, nl2.device_class_by_name ("CAP"));
+  comp_xref.same_device_classes (nl1.device_class_by_name ("RES"), 0);
+  comp_xref.same_device_classes (nl1.device_class_by_name ("CAP"), 0);
+
+  good = comp_xref.compare (&nl1, &nl2);
+
+  EXPECT_EQ (xref2s (xref),
+    "INV:INV [Match]:\n"
+    " pin $0:$1 [Match]\n"
+    " pin $1:$3 [Match]\n"
+    " pin $2:$0 [Match]\n"
+    " pin $3:$2 [Match]\n"
+    " net IN:IN [Match]\n"
+    "  terminal (null):$2[B]\n"
+    "  terminal (null):$3[B]\n"
+    "  terminal $1[G]:$4[G]\n"
+    "  terminal $2[B]:(null)\n"
+    "  terminal $3[G]:$1[G]\n"
+    "  pin $0:$1\n"
+    " net OUT:OUT [Match]\n"
+    "  terminal (null):$2[A]\n"
+    "  terminal (null):$3[A]\n"
+    "  terminal $1[D]:$4[D]\n"
+    "  terminal $2[A]:(null)\n"
+    "  terminal $3[D]:$1[S]\n"
+    "  pin $1:$3\n"
+    " net VDD:VDD [Match]\n"
+    "  terminal $1[S]:$4[S]\n"
+    "  pin $2:$0\n"
+    " net VSS:VSS [Match]\n"
+    "  terminal $3[S]:$1[D]\n"
+    "  pin $3:$2\n"
+    " device $3:$1 [Match]\n"
+    " device $1:$4 [Match]\n"
+  );
+  EXPECT_EQ (good, true);
 }
 
 TEST(2_SimpleInverterWithForcedNetAssignment)
@@ -1713,6 +1755,43 @@ TEST(11_MismatchingSubcircuits)
     " subcircuit $1:$2 [Match]\n"
   );
   EXPECT_EQ (good, false);
+
+  xref.clear ();
+
+  //  ignore the subcircuits to make them match
+  comp_xref.same_circuits (nl1.circuit_by_name ("INV"), 0);
+  comp_xref.same_circuits (0, nl2.circuit_by_name ("INV"));
+  good = comp_xref.compare (&nl1, &nl2);
+
+  //  nets are now ambiguous
+  EXPECT_EQ (xref2s (xref),
+    "TOP:TOP [Match]:\n"
+    " pin $0:$0 [Match]\n"
+    " pin $1:$1 [Match]\n"
+    " pin $2:$2 [Match]\n"
+    " pin $3:$3 [Match]\n"
+    " net IN:OUT [MatchWithWarning]\n"
+    "  pin $0:$0\n"
+    "  subcircuit_pin (null):$1[$3]\n"
+    "  subcircuit_pin $1[$0]:(null)\n"
+    " net OUT:VDD [MatchWithWarning]\n"
+    "  pin $1:$1\n"
+    "  subcircuit_pin (null):$1[$0]\n"
+    "  subcircuit_pin (null):$2[$0]\n"
+    "  subcircuit_pin $2[$1]:(null)\n"
+    " net VDD:IN [MatchWithWarning]\n"
+    "  pin $2:$2\n"
+    "  subcircuit_pin (null):$2[$1]\n"
+    "  subcircuit_pin $1[$2]:(null)\n"
+    "  subcircuit_pin $2[$2]:(null)\n"
+    " net VSS:VSS [MatchWithWarning]\n"
+    "  pin $3:$3\n"
+    "  subcircuit_pin (null):$1[$2]\n"
+    "  subcircuit_pin (null):$2[$2]\n"
+    "  subcircuit_pin $1[$3]:(null)\n"
+    "  subcircuit_pin $2[$3]:(null)\n"
+  );
+  EXPECT_EQ (good, true);
 }
 
 TEST(12_MismatchingSubcircuitsDuplicates)

@@ -264,35 +264,46 @@ private:
 };
 
 // --------------------------------------------------------------------------------------------------------------------
-//  DeviceCategorizer definition and implementation
+//  generic_categorizer definition and implementation
 
 /**
- *  @brief A device categorizer
+ *  @brief A generic categorizer
  *
- *  The objective of this class is to supply a category ID for a given device class.
- *  The category ID also identities equivalent device classes from netlist A and B.
+ *  The objective of this class is to supply a category ID for a given object.
+ *  The category ID also identities equivalent objects from netlist A and B.
  */
-class DeviceCategorizer
+template <class Obj>
+class generic_categorizer
 {
 public:
-  DeviceCategorizer ()
+  generic_categorizer ()
     : m_next_cat (0)
   {
     //  .. nothing yet ..
   }
 
-  void same_class (const db::DeviceClass *ca, const db::DeviceClass *cb)
+  void same (const Obj *ca, const Obj *cb)
   {
+    if (! ca && ! cb) {
+      return;
+    } else if (! ca) {
+      same (cb, ca);
+    } else if (! cb) {
+      //  makeing a object same as null will make this device being ignored
+      m_cat_by_ptr [ca] = 0;
+      return;
+    }
+
     //  reuse existing category if one is assigned already -> this allows associating
     //  multiple categories to other ones (A->C, B->C)
-    std::map<const db::DeviceClass *, size_t>::const_iterator cpa = m_cat_by_ptr.find (ca);
-    std::map<const db::DeviceClass *, size_t>::const_iterator cpb = m_cat_by_ptr.find (cb);
+    typename std::map<const Obj *, size_t>::const_iterator cpa = m_cat_by_ptr.find (ca);
+    typename std::map<const Obj *, size_t>::const_iterator cpb = m_cat_by_ptr.find (cb);
 
     if (cpa != m_cat_by_ptr.end () && cpb != m_cat_by_ptr.end ()) {
 
       if (cpa->second != cpb->second) {
         //  join categories (cat(B)->cat(A))
-        for (std::map<const db::DeviceClass *, size_t>::iterator cp = m_cat_by_ptr.begin (); cp != m_cat_by_ptr.end (); ++cp) {
+        for (typename std::map<const Obj *, size_t>::iterator cp = m_cat_by_ptr.begin (); cp != m_cat_by_ptr.end (); ++cp) {
           if (cp->second == cpb->second) {
             cp->second = cpa->second;
           }
@@ -319,24 +330,14 @@ public:
     }
   }
 
-  size_t cat_for_device (const db::Device *device)
-  {
-    const db::DeviceClass *cls = device->device_class ();
-    if (! cls) {
-      return 0;
-    }
-
-    return cat_for_device_class (cls);
-  }
-
-  bool has_cat_for_device_class (const db::DeviceClass *cls)
+  bool has_cat_for (const Obj *cls)
   {
     return m_cat_by_ptr.find (cls) != m_cat_by_ptr.end ();
   }
 
-  size_t cat_for_device_class (const db::DeviceClass *cls)
+  size_t cat_for (const Obj *cls)
   {
-    std::map<const db::DeviceClass *, size_t>::const_iterator cp = m_cat_by_ptr.find (cls);
+    typename std::map<const Obj *, size_t>::const_iterator cp = m_cat_by_ptr.find (cls);
     if (cp != m_cat_by_ptr.end ()) {
       return cp->second;
     }
@@ -359,9 +360,54 @@ public:
   }
 
 public:
-  std::map<const db::DeviceClass *, size_t> m_cat_by_ptr;
+  std::map<const Obj *, size_t> m_cat_by_ptr;
   std::map<std::string, size_t> m_cat_by_name;
   size_t m_next_cat;
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+//  DeviceCategorizer definition and implementation
+
+/**
+ *  @brief A device categorizer
+ *
+ *  The objective of this class is to supply a category ID for a given device class.
+ *  The category ID also identities equivalent device classes from netlist A and B.
+ */
+class DeviceCategorizer
+  : private generic_categorizer<db::DeviceClass>
+{
+public:
+  DeviceCategorizer ()
+    : generic_categorizer<db::DeviceClass> ()
+  {
+    //  .. nothing yet ..
+  }
+
+  void same_class (const db::DeviceClass *ca, const db::DeviceClass *cb)
+  {
+    generic_categorizer<db::DeviceClass>::same (ca, cb);
+  }
+
+  size_t cat_for_device (const db::Device *device)
+  {
+    const db::DeviceClass *cls = device->device_class ();
+    if (! cls) {
+      return 0;
+    }
+
+    return cat_for_device_class (cls);
+  }
+
+  bool has_cat_for_device_class (const db::DeviceClass *cls)
+  {
+    return generic_categorizer<db::DeviceClass>::has_cat_for (cls);
+  }
+
+  size_t cat_for_device_class (const db::DeviceClass *cls)
+  {
+    return generic_categorizer<db::DeviceClass>::cat_for (cls);
+  }
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -374,19 +420,26 @@ public:
  *  The category ID also identities equivalent circuit from netlist A and B.
  */
 class CircuitCategorizer
+  : private generic_categorizer<db::Circuit>
 {
 public:
   CircuitCategorizer ()
-    : m_next_cat (0)
+    : generic_categorizer<db::Circuit> ()
   {
     //  .. nothing yet ..
   }
 
   void same_circuit (const db::Circuit *ca, const db::Circuit *cb)
   {
-    ++m_next_cat;
-    m_cat_by_ptr.insert (std::make_pair (ca, m_next_cat));
-    m_cat_by_ptr.insert (std::make_pair (cb, m_next_cat));
+    //  no arbitrary cross-pairing
+    if (ca && has_cat_for (ca)) {
+      throw tl::Exception (tl::to_string (tr ("Circuit is already paired with other circuit: ")) + ca->name ());
+    }
+    if (cb && has_cat_for (cb)) {
+      throw tl::Exception (tl::to_string (tr ("Circuit is already paired with other circuit: ")) + cb->name ());
+    }
+
+    generic_categorizer<db::Circuit>::same (ca, cb);
   }
 
   size_t cat_for_subcircuit (const db::SubCircuit *subcircuit)
@@ -401,32 +454,8 @@ public:
 
   size_t cat_for_circuit (const db::Circuit *cr)
   {
-    std::map<const db::Circuit *, size_t>::const_iterator cp = m_cat_by_ptr.find (cr);
-    if (cp != m_cat_by_ptr.end ()) {
-      return cp->second;
-    }
-
-    std::string cr_name = cr->name ();
-#if defined(COMPARE_CASE_INSENSITIVE)
-    cr_name = tl::to_upper_case (cr_name);
-#endif
-
-    std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cr_name);
-    if (c != m_cat_by_name.end ()) {
-      m_cat_by_ptr.insert (std::make_pair (cr, c->second));
-      return c->second;
-    } else {
-      ++m_next_cat;
-      m_cat_by_name.insert (std::make_pair (cr_name, m_next_cat));
-      m_cat_by_ptr.insert (std::make_pair (cr, m_next_cat));
-      return m_next_cat;
-    }
+    return generic_categorizer<db::Circuit>::cat_for (cr);
   }
-
-public:
-  std::map<const db::Circuit *, size_t> m_cat_by_ptr;
-  std::map<std::string, size_t> m_cat_by_name;
-  size_t m_next_cat;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -626,11 +655,15 @@ public:
     for (db::Net::const_subcircuit_pin_iterator i = net->begin_subcircuit_pins (); i != net->end_subcircuit_pins (); ++i) {
 
       const db::SubCircuit *sc = i->subcircuit ();
+      size_t circuit_cat = circuit_categorizer.cat_for_subcircuit (sc);
+      if (! circuit_cat) {
+        //  circuit is ignored
+        continue;
+      }
+
       size_t pin_id = i->pin ()->id ();
       const db::Circuit *cr = sc->circuit_ref ();
       const db::Net *net_at_pin = cr->net_for_pin (pin_id);
-
-      size_t this_pin_id = pin_id;
 
       std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
       if (icm == circuit_map->end ()) {
@@ -662,7 +695,7 @@ public:
 
       if (! net_at_pin || net_at_pin->is_floating ()) {
 
-        Transition ed (sc, circuit_categorizer.cat_for_subcircuit (sc), pin_id, pin_id);
+        Transition ed (sc, circuit_cat, pin_id, pin_id);
 
         std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (0);
         if (in == n2entry.end ()) {
@@ -714,7 +747,7 @@ public:
 
         //  NOTE: if a pin mapping is given, EdgeDesc::pin1_id and EdgeDesc::pin2_id are given
         //  as pin ID's of the other circuit.
-        Transition ed (sc, circuit_categorizer.cat_for_subcircuit (sc), pin_id, pin_map->normalize_pin_id (cr, pin2_id));
+        Transition ed (sc, circuit_cat, pin_id, pin_map->normalize_pin_id (cr, pin2_id));
 
         const db::Net *net2 = sc->net_for_pin (this_pin2_id);
 
@@ -738,6 +771,11 @@ public:
       }
 
       size_t device_cat = device_categorizer.cat_for_device (d);
+      if (! device_cat) {
+        //  device is ignored
+        continue;
+      }
+
       size_t terminal1_id = translate_terminal_id (i->terminal_id (), d);
 
       const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
@@ -1757,16 +1795,12 @@ NetlistComparer::equivalent_pins (const db::Circuit *cb, const std::vector<size_
 void
 NetlistComparer::same_device_classes (const db::DeviceClass *ca, const db::DeviceClass *cb)
 {
-  tl_assert (ca != 0);
-  tl_assert (cb != 0);
   mp_device_categorizer->same_class (ca, cb);
 }
 
 void
 NetlistComparer::same_circuits (const db::Circuit *ca, const db::Circuit *cb)
 {
-  tl_assert (ca != 0);
-  tl_assert (cb != 0);
   mp_circuit_categorizer->same_circuit (ca, cb);
 }
 
@@ -1799,15 +1833,26 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
   bool good = true;
 
   std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> > cat2circuits;
+  std::set<const db::Circuit *> verified_circuits_a, verified_circuits_b;
 
   for (db::Netlist::const_circuit_iterator i = a->begin_circuits (); i != a->end_circuits (); ++i) {
     size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
-    cat2circuits[cat].first = i.operator-> ();
+    if (cat) {
+      cat2circuits[cat].first = i.operator-> ();
+    } else {
+      //  skip circuit (but count it as verified)
+      verified_circuits_a.insert (i.operator-> ());
+    }
   }
 
   for (db::Netlist::const_circuit_iterator i = b->begin_circuits (); i != b->end_circuits (); ++i) {
     size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
-    cat2circuits[cat].second = i.operator-> ();
+    if (cat) {
+      cat2circuits[cat].second = i.operator-> ();
+    } else {
+      //  skip circuit (but count it as verified)
+      verified_circuits_b.insert (i.operator-> ());
+    }
   }
 
   if (mp_logger) {
@@ -1820,17 +1865,23 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
   for (db::Netlist::const_device_class_iterator dc = a->begin_device_classes (); dc != a->end_device_classes (); ++dc) {
     size_t cat = device_categorizer.cat_for_device_class (dc.operator-> ());
-    cat2dc.insert (std::make_pair (cat, std::make_pair ((const db::DeviceClass *) 0, (const db::DeviceClass *) 0))).first->second.first = dc.operator-> ();
+    if (cat) {
+      cat2dc.insert (std::make_pair (cat, std::make_pair ((const db::DeviceClass *) 0, (const db::DeviceClass *) 0))).first->second.first = dc.operator-> ();
+    }
   }
 
   for (db::Netlist::const_device_class_iterator dc = b->begin_device_classes (); dc != b->end_device_classes (); ++dc) {
     size_t cat = device_categorizer.cat_for_device_class (dc.operator-> ());
-    cat2dc.insert (std::make_pair (cat, std::make_pair ((const db::DeviceClass *) 0, (const db::DeviceClass *) 0))).first->second.second = dc.operator-> ();
+    if (cat) {
+      cat2dc.insert (std::make_pair (cat, std::make_pair ((const db::DeviceClass *) 0, (const db::DeviceClass *) 0))).first->second.second = dc.operator-> ();
+    }
   }
 
   for (std::map<size_t, std::pair<const db::DeviceClass *, const db::DeviceClass *> >::const_iterator i = cat2dc.begin (); i != cat2dc.end (); ++i) {
     if (! i->second.first || ! i->second.second) {
-      good = false;
+      //  NOTE: device class mismatch does not set good to false.
+      //  Reasoning: a device class may not be present because there is no device of a certain kind (e.g. in SPICE).
+      //  This isn't necessarily a failure.
       if (mp_logger) {
         mp_logger->device_class_mismatch (i->second.first, i->second.second);
       }
@@ -1848,12 +1899,14 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
     }
   }
 
-  std::set<const db::Circuit *> verified_circuits_a, verified_circuits_b;
   std::map<const db::Circuit *, CircuitMapper> c12_pin_mapping, c22_pin_mapping;
 
   for (db::Netlist::const_bottom_up_circuit_iterator c = a->begin_bottom_up (); c != a->end_bottom_up (); ++c) {
 
     size_t ccat = circuit_categorizer.cat_for_circuit (c.operator-> ());
+    if (! ccat) {
+      continue;
+    }
 
     std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = cat2circuits.find (ccat);
     tl_assert (i != cat2circuits.end ());
@@ -2384,6 +2437,12 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       continue;
     }
 
+    size_t device_cat = device_categorizer.cat_for_device (d.operator-> ());
+    if (! device_cat) {
+      //  device is ignored
+      continue;
+    }
+
     std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g1);
 
     bool mapped = true;
@@ -2400,7 +2459,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       good = false;
     } else {
       //  TODO: report devices which cannot be distiguished topologically?
-      device_map.insert (std::make_pair (k, std::make_pair (d.operator-> (), device_categorizer.cat_for_device (d.operator-> ()))));
+      device_map.insert (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
     }
 
   }
@@ -2408,6 +2467,12 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   for (db::Circuit::const_device_iterator d = c2->begin_devices (); d != c2->end_devices (); ++d) {
 
     if (! device_filter.filter (d.operator-> ())) {
+      continue;
+    }
+
+    size_t device_cat = device_categorizer.cat_for_device (d.operator-> ());
+    if (! device_cat) {
+      //  device is ignored
       continue;
     }
 
@@ -2436,8 +2501,6 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     } else {
 
       db::DeviceCompare dc;
-
-      size_t device_cat = device_categorizer.cat_for_device (d.operator-> ());
 
       if (! dc.equals (dm->second, std::make_pair (d.operator-> (), device_cat))) {
         if (dm->second.second != device_cat) {
@@ -2477,6 +2540,12 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::Circuit::const_subcircuit_iterator sc = c1->begin_subcircuits (); sc != c1->end_subcircuits (); ++sc) {
 
+    size_t sc_cat = circuit_categorizer.cat_for_subcircuit (sc.operator-> ());
+    if (! sc_cat) {
+      //  subcircuit is ignored
+      continue;
+    }
+
     std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper);
 
     bool mapped = true;
@@ -2493,7 +2562,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       good = false;
     } else if (! k.empty ()) {
       //  TODO: report devices which cannot be distiguished topologically?
-      subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), circuit_categorizer.cat_for_subcircuit (sc.operator-> ()))));
+      subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), sc_cat)));
     }
 
   }
@@ -2502,6 +2571,12 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   unmatched_list unmatched_a, unmatched_b;
 
   for (db::Circuit::const_subcircuit_iterator sc = c2->begin_subcircuits (); sc != c2->end_subcircuits (); ++sc) {
+
+    size_t sc_cat = circuit_categorizer.cat_for_subcircuit (sc.operator-> ());
+    if (! sc_cat) {
+      //  subcircuit is ignored
+      continue;
+    }
 
     std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key (*sc, g2, &c22_circuit_and_pin_mapping, &circuit_pin_mapper);
 
@@ -2528,7 +2603,6 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     } else {
 
       db::SubCircuitCompare scc;
-      size_t sc_cat = circuit_categorizer.cat_for_subcircuit (sc.operator-> ());
 
       if (! scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
         if (mp_logger) {

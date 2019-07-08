@@ -9,6 +9,7 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   lvsBasicTests.cc \
   lvsSimpleTests.cc \
+    lvsTests.cc
 
 INCLUDEPATH += $$DRC_INC $$TL_INC $$RDB_INC $$DB_INC $$GSI_INC $$LYM_INC
 DEPENDPATH += $$DRC_INC $$TL_INC $$RDB_INC $$DB_INC $$GSI_INC $$LYM_INC

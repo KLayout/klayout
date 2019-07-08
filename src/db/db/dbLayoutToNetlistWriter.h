@@ -48,7 +48,7 @@ template <class Keys>
 class std_writer_impl
 {
 public:
-  std_writer_impl (tl::OutputStream &stream, double dbu);
+  std_writer_impl (tl::OutputStream &stream, double dbu, const std::string &progress_description = std::string ());
 
   void write (const db::LayoutToNetlist *l2n);
 

@@ -196,18 +196,21 @@ module LVS
     # This method will force an equivalence between the two circuits.
     # By default, circuits are identified by name. If names are different, this
     # method allows establishing an explicit correspondence.
+    # 
+    # One of the circuits may be nil. In this case, the corresponding
+    # other circuit is mapped to "nothing", i.e. ignored.
     #
     # Before this method can be used, a schematic netlist needs to be loaded with
     # \schematic.
 
     def same_circuits(a, b)
 
-      a.is_a?(String) || b.is_a?(String) || raise("Both arguments of 'same_circuits' need to be strings")
+      a.is_a?(String) || a == nil || b.is_a?(String) || b == nil || raise("Both arguments of 'same_circuits' need to be strings or nil")
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
-      circuit_a = nl_a.circuit_by_name(a) || raise("Not a valid circuit name in extracted netlist: #{a}")
-      circuit_b = nl_b.circuit_by_name(b) || raise("Not a valid circuit name in reference netlist: #{b}")
+      circuit_a = a && (nl_a.circuit_by_name(a) || raise("Not a valid circuit name in extracted netlist: #{a}"))
+      circuit_b = b && (nl_b.circuit_by_name(b) || raise("Not a valid circuit name in reference netlist: #{b}"))
 
       @comparer.same_circuits(circuit_a, circuit_b)
       
@@ -222,17 +225,20 @@ module LVS
     # By default, device classes are identified by name. If names are different, this
     # method allows establishing an explicit correspondence.
     #
+    # One of the device classes may be nil. In this case, the corresponding
+    # other device class is mapped to "nothing", i.e. ignored.
+    #
     # Before this method can be used, a schematic netlist needs to be loaded with
     # \schematic.
 
     def same_device_classes(a, b)
 
-      a.is_a?(String) || b.is_a?(String) || raise("Both arguments of 'same_device_classes' need to be strings")
+      a.is_a?(String) || a == nil || b.is_a?(String) || b == nil || raise("Both arguments of 'same_device_classes' need to be strings or nil")
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
-      dc_a = nl_a.device_class_by_name(a) || raise("Not a valid device class in extracted netlist: #{a}")
-      dc_b = nl_b.device_class_by_name(b) || raise("Not a valid device class in reference netlist: #{b}")
+      dc_a = a && (nl_a.device_class_by_name(a) || raise("Not a valid device class in extracted netlist: #{a}"))
+      dc_b = b && (nl_b.device_class_by_name(b) || raise("Not a valid device class in reference netlist: #{b}"))
 
       @comparer.same_device_classes(dc_a, dc_b)
       

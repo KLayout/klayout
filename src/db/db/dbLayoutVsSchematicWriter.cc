@@ -59,7 +59,7 @@ class std_writer_impl
   : public l2n_std_format::std_writer_impl<typename Keys::l2n_keys>
 {
 public:
-  std_writer_impl (tl::OutputStream &stream, double dbu);
+  std_writer_impl (tl::OutputStream &stream, double dbu, const std::string &progress_description = std::string ());
 
   void write (const db::LayoutVsSchematic *l2n);
 
@@ -80,8 +80,8 @@ static const std::string indent1 (" ");
 static const std::string indent2 ("  ");
 
 template <class Keys>
-std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream, double dbu)
-  : l2n_std_format::std_writer_impl<typename Keys::l2n_keys> (stream, dbu)
+std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream, double dbu, const std::string &progress_description)
+  : l2n_std_format::std_writer_impl<typename Keys::l2n_keys> (stream, dbu, progress_description.empty () ? tl::to_string (tr ("Writing LVS database")) : progress_description)
 {
   //  .. nothing yet ..
 }

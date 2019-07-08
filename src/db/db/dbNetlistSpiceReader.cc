@@ -231,7 +231,7 @@ void NetlistSpiceReader::finish ()
 
   //  purge nets with single connections (this way unconnected pins can be realized)
   if (mp_netlist) {
-    mp_netlist->purge_nets ();
+    // @@@ mp_netlist->purge_nets ();
   }
 
   mp_stream.reset (0);
@@ -611,7 +611,11 @@ std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
 {
   //  TODO: allow configuring Spice reader as case sensitive?
   //  this is easy to do: just avoid to_upper here:
+#if 0 // @@@
   return tl::to_upper_case (read_name_with_case (ex));
+#else
+  return read_name_with_case (ex);
+#endif
 }
 
 bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &element, const std::string &name)

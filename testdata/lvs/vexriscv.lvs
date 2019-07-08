@@ -87,8 +87,8 @@ connect_implicit("VSS")
 
 netlist.flatten_circuit("*_{x0,x1,x2,x4}")
 
-same_device_classes("PMOS", "tp")
-same_device_classes("NMOS", "tn")
+same_device_classes("PMOS", "TP")
+same_device_classes("NMOS", "TN")
 
 # Ignore all caps from the schematic
 same_device_classes(nil, "CAP")

@@ -603,10 +603,6 @@ public:
       }
     }
 
-  private:
-    char m_ref [sizeof (std::pair<const void *, size_t>)];
-    size_t m_id1, m_id2;
-
     inline bool is_for_subcircuit () const
     {
       return m_id1 > std::numeric_limits<size_t>::max () / 2;
@@ -631,6 +627,10 @@ public:
     {
       return *reinterpret_cast<const std::pair<const db::SubCircuit *, size_t> *> ((const void *) &m_ref);
     }
+
+  private:
+    char m_ref [sizeof (std::pair<const void *, size_t>)];
+    size_t m_id1, m_id2;
   };
 
   struct EdgeToEdgeOnlyCompare
@@ -650,7 +650,7 @@ public:
       return;
     }
 
-    std::map<const db::Net *, size_t> n2entry;
+    std::map<const void *, size_t> n2entry;
 
     for (db::Net::const_subcircuit_pin_iterator i = net->begin_subcircuit_pins (); i != net->end_subcircuit_pins (); ++i) {
 
@@ -693,13 +693,13 @@ public:
       //  shortcut for idle pin (e.g. when abstract circuits are addressed: just include a transition to 0
       //  to make the net distinguishable from a net without this connection.
 
-      if (! net_at_pin || net_at_pin->is_floating ()) {
+      if (! net_at_pin || net_at_pin->is_floating ()) {   //  @@@ use this always
 
         Transition ed (sc, circuit_cat, pin_id, pin_id);
 
-        std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (0);
+        std::map<const void *, size_t>::const_iterator in = n2entry.find ((const void *) sc);
         if (in == n2entry.end ()) {
-          in = n2entry.insert (std::make_pair ((const db::Net *) 0, m_edges.size ())).first;
+          in = n2entry.insert (std::make_pair ((const void *) sc, m_edges.size ())).first;
           m_edges.push_back (std::make_pair (std::vector<Transition> (), std::make_pair (size_t (0), (const db::Net *) 0)));
         }
 
@@ -708,6 +708,8 @@ public:
         continue;
 
       }
+
+      //  @@@ drop this stupid logic:
 
       //  we cannot afford creating edges from all to all other pins, so we just create edges to the previous and next
       //  pin. This may take more iterations to solve, but should be equivalent.
@@ -751,9 +753,9 @@ public:
 
         const db::Net *net2 = sc->net_for_pin (this_pin2_id);
 
-        std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net2);
+        std::map<const void *, size_t>::const_iterator in = n2entry.find ((const void *) net2);
         if (in == n2entry.end ()) {
-          in = n2entry.insert (std::make_pair (net2, m_edges.size ())).first;
+          in = n2entry.insert (std::make_pair ((const void *) net2, m_edges.size ())).first;
           m_edges.push_back (std::make_pair (std::vector<Transition> (), std::make_pair (size_t (0), net2)));
         }
 
@@ -788,9 +790,9 @@ public:
 
           const db::Net *net2 = d->net_for_terminal (it->id ());
 
-          std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net2);
+          std::map<const void *, size_t>::const_iterator in = n2entry.find ((const void *) net2);
           if (in == n2entry.end ()) {
-            in = n2entry.insert (std::make_pair (net2, m_edges.size ())).first;
+            in = n2entry.insert (std::make_pair ((const void *) net2, m_edges.size ())).first;
             m_edges.push_back (std::make_pair (std::vector<Transition> (), std::make_pair (size_t (0), net2)));
           }
 
@@ -799,6 +801,61 @@ public:
         }
 
       }
+
+    }
+  }
+
+  NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
+    : mp_net (0), m_other_net_index (std::numeric_limits<size_t>::max ())
+  {
+    std::map<const db::Net *, size_t> n2entry;
+
+    size_t circuit_cat = circuit_categorizer.cat_for_subcircuit (sc);
+    if (! circuit_cat) {
+      tl_assert (false); // @@@@
+    }
+
+    const db::Circuit *cr = sc->circuit_ref ();
+    tl_assert (cr != 0);
+
+    std::map<const db::Circuit *, CircuitMapper>::const_iterator icm = circuit_map->find (cr);
+    if (icm == circuit_map->end ()) {
+      tl_assert (false); // @@@@
+    }
+
+    const CircuitMapper *cm = & icm->second;
+
+    for (db::Circuit::const_pin_iterator p = cr->begin_pins (); p != cr->end_pins (); ++p) {
+
+      size_t pin_id = p->id ();
+      const db::Net *net_at_pin = sc->net_for_pin (pin_id);
+
+      //  A pin assignment may be missing because there is no net for a pin -> skip this
+
+      if (! cm->has_other_pin_for_this_pin (pin_id)) {
+        continue;
+      }
+
+      //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
+      //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
+
+      pin_id = cm->other_pin_from_this_pin (pin_id);
+
+      //  realize pin swapping by normalization of pin ID
+
+      pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
+
+      //  Make the other endpoint
+
+      Transition ed (sc, circuit_cat, pin_id, pin_id);
+
+      std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net_at_pin);
+      if (in == n2entry.end ()) {
+        in = n2entry.insert (std::make_pair ((const db::Net *) net_at_pin, m_edges.size ())).first;
+        m_edges.push_back (std::make_pair (std::vector<Transition> (), std::make_pair (size_t (0), net_at_pin)));
+      }
+
+      m_edges [in->second].first.push_back (ed);
 
     }
   }
@@ -1024,6 +1081,15 @@ struct CompareNodePtr
 
 class TentativeNodeMapping;
 
+std::string indent (size_t depth)
+{
+  std::string s;
+  for (size_t d = 0; d < depth; ++d) {
+    s += " ";
+  }
+  return s;
+}
+
 /**
  *  @brief The net graph for the compare algorithm
  */
@@ -1066,6 +1132,28 @@ public:
   db::NetGraphNode &node (size_t net_index)
   {
     return m_nodes [net_index];
+  }
+
+  /**
+   *  @brief Gets the subcircuit distribution node per subcircuit
+   *  These nodes are a concept provided to reduce the effort for
+   *  subcircuit transitions. Instead of a transition from every pin
+   *  to every other pin the distribution node provides edges to
+   *  all pins of the subcircuit, but no front end.
+   */
+  const db::NetGraphNode &distro_node (const db::SubCircuit *sc) const
+  {
+    std::map<const db::SubCircuit *, db::NetGraphNode>::const_iterator j = m_distro_nodes.find (sc);
+    tl_assert (j != m_distro_nodes.end ());
+    return j->second;
+  }
+
+  /**
+   *  @brief Gets the subcircuit distribution node per subcircuit
+   */
+  db::NetGraphNode &distro_node (const db::SubCircuit *sc)
+  {
+    return const_cast<db::NetGraphNode &> (((const NetGraph *) this)->distro_node (sc));
   }
 
   /**
@@ -1154,8 +1242,11 @@ public:
 
 private:
   std::vector<NetGraphNode> m_nodes;
+  std::map<const db::SubCircuit *, NetGraphNode> m_distro_nodes;
   std::map<const db::Net *, size_t> m_net_index;
   const db::Circuit *mp_circuit;
+
+  size_t derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, size_t net_index, NetGraphNode *n, size_t other_net_index, NetGraphNode *nother, NetGraph &other, size_t depth, size_t max_depth, size_t n_branch, size_t max_n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous);
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1253,6 +1344,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   for (std::vector<NetGraphNode>::const_iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
     m_net_index.insert (std::make_pair (i->net (), i - m_nodes.begin ()));
   }
+
   for (std::vector<NetGraphNode>::iterator i = m_nodes.begin (); i != m_nodes.end (); ++i) {
     i->apply_net_index (m_net_index);
   }
@@ -1261,24 +1353,132 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
     tl::info << i->to_string () << tl::noendl;
   }
 #endif
+
+  //  create subcircuit distribution nodes
+
+  for (db::Circuit::const_subcircuit_iterator i = c->begin_subcircuits (); i != c->end_subcircuits (); ++i) {
+    m_distro_nodes.insert (std::make_pair (i.operator-> (), NetGraphNode (i.operator-> (), circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper)));
+  }
+
+  for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_distro_nodes.begin (); i != m_distro_nodes.end (); ++i) {
+    i->second.apply_net_index (m_net_index);
+  }
+#if defined(PRINT_DEBUG_NETGRAPH)
+  for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_distro_nodes.begin (); i != m_distro_nodes.end (); ++i) {
+    tl::info << i->second.to_string () << tl::noendl;
+  }
+#endif
+}
+
+size_t
+NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, size_t net_index, NetGraphNode *n, size_t other_net_index, NetGraphNode *nother, NetGraph &other, size_t depth, size_t max_depth, size_t n_branch, size_t max_n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous)
+{
+  size_t new_nodes = 0;
+
+  std::vector<const NetGraphNode *> nodes;
+  nodes.reserve (ee - e);
+
+  std::vector<const NetGraphNode *> other_nodes;
+  other_nodes.reserve (ee - e);
+#if defined(PRINT_DEBUG_NETCOMPARE)
+  tl::info << indent(depth) << "consider transitions:";
+#endif
+
+  for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
+    if (i->second.first != net_index) {
+      const NetGraphNode *nn = &node (i->second.first);
+#if defined(PRINT_DEBUG_NETCOMPARE)
+      tl::info << indent(depth) << "here: " << (nn->net() ? nn->net()->expanded_name().c_str() : "(null)") << " via";
+      for (std::vector<NetGraphNode::Transition>::const_iterator t = i->first.begin (); t != i->first.end(); ++t) {
+        tl::info << indent(depth) << "  " << t->to_string();
+      }
+#endif
+      nodes.push_back (nn);
+    }
+  }
+
+  if (! nodes.empty ()) {   //  if non-ambiguous, non-assigned
+
+    NetGraphNode::edge_iterator e_other = nother->find_edge (e->first);
+    if (e_other != nother->end ()) {
+
+      NetGraphNode::edge_iterator ee_other = e_other;
+      ++ee_other;
+
+      while (ee_other != nother->end () && ee_other->first == e_other->first) {
+        ++ee_other;
+      }
+
+      for (NetGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
+        if (i->second.first != other_net_index) {
+          const NetGraphNode *nn = &other.node (i->second.first);
+#if defined(PRINT_DEBUG_NETCOMPARE)
+          tl::info << indent(depth) << "there: " << (nn->net() ? nn->net()->expanded_name().c_str() : "(null)") << " via";
+          for (std::vector<NetGraphNode::Transition>::const_iterator t = i->first.begin (); t != i->first.end(); ++t) {
+            tl::info << indent(depth) << "  " << t->to_string();
+          }
+#endif
+          other_nodes.push_back (nn);
+        }
+      }
+
+    }
+
+  }
+
+  if (! nodes.empty () || ! other_nodes.empty ()) {
+
+    std::sort (nodes.begin (), nodes.end (), CompareNodePtr ());
+    std::sort (other_nodes.begin (), other_nodes.end (), CompareNodePtr ());
+
+    //  for the purpose of match evaluation we require an exact match of the node structure
+
+    if (tentative) {
+
+      if (nodes.size () != other_nodes.size ()) {
+        return std::numeric_limits<size_t>::max ();
+      }
+
+      //  1:1 pairing is less strict
+      if (nodes.size () > 1 || other_nodes.size () > 1) {
+        for (size_t i = 0; i < nodes.size (); ++i) {
+          if (! (*nodes[i] == *other_nodes[i])) {
+            return std::numeric_limits<size_t>::max ();
+          }
+        }
+      }
+
+    }
+
+    //  propagate pairing in picky mode: this means we only accept exact a match if the node set
+    //  is exactly identical and no ambiguous nodes are present when ambiguous nodes are forbidden
+
+    size_t bt_count = derive_node_identities_from_node_set (nodes, other_nodes, other, depth, max_depth, n_branch, max_n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
+
+    if (bt_count == std::numeric_limits<size_t>::max ()) {
+      if (tentative) {
+        return bt_count;
+      }
+    } else {
+      new_nodes += bt_count;
+    }
+
+  }
+
+  return new_nodes;
 }
 
 size_t
 NetGraph::derive_node_identities (size_t net_index, NetGraph &other, size_t depth, size_t max_depth, size_t n_branch, size_t max_n_branch, NetlistCompareLogger *logger, CircuitPinMapper *circuit_pin_mapper, TentativeNodeMapping *tentative, bool with_ambiguous)
 {
   NetGraphNode *n = & node (net_index);
-  NetGraphNode *nother = & other.node (n->other_net_index ());
 
-#if defined(PRINT_DEBUG_NETCOMPARE)
-  std::string indent;
-  for (size_t d = 0; d < depth; ++d) {
-    indent += " ";
-  }
-#endif
+  size_t other_net_index = n->other_net_index ();
+  NetGraphNode *nother = & other.node (other_net_index);
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
   if (! tentative) {
-    tl::info << indent << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << nother->net ()->expanded_name ();
+    tl::info << indent(depth) << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << nother->net ()->expanded_name ();
   }
 #endif
 
@@ -1296,77 +1496,44 @@ NetGraph::derive_node_identities (size_t net_index, NetGraph &other, size_t dept
       ++ee;
     }
 
-    std::vector<const NetGraphNode *> nodes;
-    nodes.reserve (ee - e);
+    new_nodes += derive_node_identities_for_edges (e, ee, net_index, n, other_net_index, nother, other, depth, max_depth, n_branch, max_n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
 
-    std::vector<const NetGraphNode *> other_nodes;
-    other_nodes.reserve (ee - e);
+    //  Subcircuits are handled explicitly: the edges aren't real edges, but pin descriptors with
+    //  a single endpoint and nil at the other end. The subcircuit provides a set of edges
+    //  providing the other endpoints and nil at our side. This saves us creating #pin*(#pin-1) edges
+    //  per circuit. This happens through a dummy node ("distro_node").
 
-    for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
-      // @@@ if (i->second.first != net_index) {
-      const NetGraphNode *nn = &node (i->second.first);
-      nodes.push_back (nn);
-      // @@@ }
-    }
+    if (ee == e + 1 && e->first.size () == 1 && e->first.front ().is_for_subcircuit()) {
 
-    if (! nodes.empty ()) {   //  if non-ambiguous, non-assigned
+      /* @@@
+      .... instead of ee = e + 1 say that in [e,ee[ there must be one element which does not
+      belong to a subcircuit already mapped (same in nother) ...
+      @@@ */
 
       NetGraphNode::edge_iterator e_other = nother->find_edge (e->first);
       if (e_other != nother->end ()) {
 
-        NetGraphNode::edge_iterator ee_other = e_other;
-        ++ee_other;
+        const db::SubCircuit *sc = e->first.front ().subcircuit_pair ().first;
+        NetGraphNode &dn = distro_node (sc);
 
-        while (ee_other != nother->end () && ee_other->first == e_other->first) {
-          ++ee_other;
-        }
+        const db::SubCircuit *sc_other = e_other->first.front ().subcircuit_pair ().first;
+        NetGraphNode &dn_other = other.distro_node (sc_other);
 
-        for (NetGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
-          // @@@ if (i->second.first != net_index) {
-          const NetGraphNode *nn = &other.node (i->second.first);
-          other_nodes.push_back (nn);
-          // @@@ }
-        }
+        for (NetGraphNode::edge_iterator de = dn.begin (); de != dn.end (); ) {
 
-      }
+          NetGraphNode::edge_iterator dee = de;
+          ++dee;
 
-    }
-
-    if (! nodes.empty () || ! other_nodes.empty ()) {
-
-      std::sort (nodes.begin (), nodes.end (), CompareNodePtr ());
-      std::sort (other_nodes.begin (), other_nodes.end (), CompareNodePtr ());
-
-      //  for the purpose of match evaluation we require an exact match of the node structure
-
-      if (tentative) {
-
-        if (nodes.size () != other_nodes.size ()) {
-          return std::numeric_limits<size_t>::max ();
-        }
-
-        //  1:1 pairing is less strict
-        if (nodes.size () > 1 || other_nodes.size () > 1) {
-          for (size_t i = 0; i < nodes.size (); ++i) {
-            if (! (*nodes[i] == *other_nodes[i])) {
-              return std::numeric_limits<size_t>::max ();
-            }
+          while (dee != dn.end () && dee->first == de->first) {
+            ++dee;
           }
+
+          new_nodes += derive_node_identities_for_edges (de, dee, net_index, &dn, other_net_index, &dn_other, other, depth, max_depth, n_branch, max_n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
+
+          de = dee;
+
         }
 
-      }
-
-      //  propagate pairing in picky mode: this means we only accept exact a match if the node set
-      //  is exactly identical and no ambiguous nodes are present when ambiguous nodes are forbidden
-
-      size_t bt_count = derive_node_identities_from_node_set (nodes, other_nodes, other, depth, max_depth, n_branch, max_n_branch, logger, circuit_pin_mapper, tentative, with_ambiguous);
-
-      if (bt_count == std::numeric_limits<size_t>::max ()) {
-        if (tentative) {
-          return bt_count;
-        }
-      } else {
-        new_nodes += bt_count;
       }
 
     }
@@ -1377,7 +1544,7 @@ NetGraph::derive_node_identities (size_t net_index, NetGraph &other, size_t dept
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
   if (! tentative && new_nodes > 0) {
-    tl::info << indent << "finished pair deduction: " << n->net ()->expanded_name () << " vs. " << nother->net ()->expanded_name () << " with " << new_nodes << " new pairs";
+    tl::info << indent(depth) << "finished pair deduction: " << n->net ()->expanded_name () << " vs. " << nother->net ()->expanded_name () << " with " << new_nodes << " new pairs";
   }
 #endif
 
@@ -1697,7 +1864,11 @@ NetGraph::derive_node_identities_from_node_set (const std::vector<const NetGraph
           TentativeNodeMapping::map_pair (tentative, this, ni, &other, other_ni);
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-          tl::info << indent << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+          if (equivalent_other_nodes.has_attribute (p->second)) {
+            tl::info << indent << "deduced ambiguous match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+          } else {
+            tl::info << indent << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+          }
 #endif
           if (logger) {
             bool ambiguous = equivalent_other_nodes.has_attribute (p->second);

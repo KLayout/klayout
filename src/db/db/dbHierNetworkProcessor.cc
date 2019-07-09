@@ -2043,22 +2043,10 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
     //  insert the global nets from here
 
-    std::set<typename db::local_cluster<T>::global_net_id> gn_seen;
     for (typename db::connected_clusters<T>::const_iterator cl = local.begin (); cl != local.end (); ++cl) {
       const typename db::local_cluster<T>::global_nets &gn = cl->get_global_nets ();
       if (! gn.empty ()) {
-        gn_seen.insert (gn.begin (), gn.end ());
         global_net_clusters.add (gn, db::ClusterInstance (cl->id ()));
-      }
-    }
-
-    //  add dummy cluster instance for global nets not having any shape on it
-
-    for (size_t gn_id = 0; gn_id < conn.global_nets (); ++gn_id) {
-      if (gn_seen.find (gn_id) == gn_seen.end ()) {
-        typename db::local_cluster<T>::global_nets gn;
-        gn.insert (gn_id);
-        global_net_clusters.add (gn, db::ClusterInstance ());
       }
     }
 

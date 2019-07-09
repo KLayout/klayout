@@ -331,6 +331,9 @@ TEST(3_CircuitBasic)
   c.set_name ("name");
   EXPECT_EQ (c.name (), "name");
 
+  c.set_boundary (db::DPolygon (db::DBox (0, 1, 2, 3)));
+  EXPECT_EQ (c.boundary ().to_string (), "(0,1;0,3;2,3;2,1)");
+
   db::Pin p1 = c.add_pin ("p1");
   db::Pin p2 = c.add_pin ("p2");
   EXPECT_EQ (pins2string (c), "p1#0,p2#1");

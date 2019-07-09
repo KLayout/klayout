@@ -112,6 +112,9 @@ layout(
  # Circuits are the hierarchical building blocks of the netlist.
  circuit(INV2
 
+  # Circuit boundary
+  rect((-1700 -2440) (3100 7820))
+
   # Nets with their geometries
   net(1
    rect(nwell (-1400 1800) (2800 3580))
@@ -259,6 +262,9 @@ layout(
  )
  circuit(INV2PAIR
 
+  # Circuit boundary
+  rect((0 -1640) (5740 7820))
+
   # Nets with their geometries
   net(1 name(BULK))
   net(2
@@ -373,6 +379,9 @@ layout(
 
  )
  circuit(RINGO
+
+  # Circuit boundary
+  rect((-1720 -2440) (26880 7820))
 
   # Nets with their geometries
   net(1 name(FB)

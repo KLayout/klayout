@@ -109,6 +109,9 @@ device(D$NMOS$1 NMOS
 # Circuits are the hierarchical building blocks of the netlist.
 circuit(INV2
 
+ # Circuit boundary
+ rect((-1700 -1640) (3100 6220))
+
  # Nets with their geometries
  net(1
   rect(nwell (-1400 1800) (2800 2780))
@@ -249,6 +252,9 @@ circuit(INV2
 )
 circuit(INV2PAIR
 
+ # Circuit boundary
+ rect((0 -840) (5740 6220))
+
  # Nets with their geometries
  net(1 name(BULK))
  net(2
@@ -330,6 +336,9 @@ circuit(INV2PAIR
 
 )
 circuit(RINGO
+
+ # Circuit boundary
+ rect((-1720 -1640) (26880 6220))
 
  # Nets with their geometries
  net(1 name(FB)

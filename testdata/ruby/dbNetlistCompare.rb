@@ -200,7 +200,7 @@ device_class_mismatch A (null)
 device_class_mismatch (null) B
 END
 
-    assert_equal(good, false)
+    assert_equal(good, true)
   
     nls1 = <<"END"
 circuit INV($1=IN,$2=OUT,$3=VDD,$4=VSS);

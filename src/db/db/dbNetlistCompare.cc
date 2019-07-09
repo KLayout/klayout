@@ -1303,8 +1303,10 @@ NetGraph::derive_node_identities (size_t net_index, NetGraph &other, size_t dept
     other_nodes.reserve (ee - e);
 
     for (NetGraphNode::edge_iterator i = e; i != ee; ++i) {
-      const NetGraphNode *n = &node (i->second.first);
-      nodes.push_back (n);
+      // @@@ if (i->second.first != net_index) {
+      const NetGraphNode *nn = &node (i->second.first);
+      nodes.push_back (nn);
+      // @@@ }
     }
 
     if (! nodes.empty ()) {   //  if non-ambiguous, non-assigned
@@ -1319,12 +1321,11 @@ NetGraph::derive_node_identities (size_t net_index, NetGraph &other, size_t dept
           ++ee_other;
         }
 
-        size_t count_other = 0;
-        for (NetGraphNode::edge_iterator i = e_other; i != ee_other && count_other < 2; ++i) {
-
-          const NetGraphNode *n = &other.node (i->second.first);
-          other_nodes.push_back (n);
-
+        for (NetGraphNode::edge_iterator i = e_other; i != ee_other; ++i) {
+          // @@@ if (i->second.first != net_index) {
+          const NetGraphNode *nn = &other.node (i->second.first);
+          other_nodes.push_back (nn);
+          // @@@ }
         }
 
       }

@@ -34,6 +34,9 @@ class DBNetlist_TestClass < TestBase
     c.name = "XYZ"
     assert_equal(c.name, "XYZ")
 
+    c.boundary = RBA::DPolygon::new(RBA::DBox::new(0, 1, 2, 3))
+    assert_equal(c.boundary.to_s, "(0,1;0,3;2,3;2,1)")
+
     c.cell_index = 42
     assert_equal(c.cell_index, 42)
 

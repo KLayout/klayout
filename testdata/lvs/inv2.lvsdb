@@ -81,6 +81,9 @@ layout(
  # Circuits are the hierarchical building blocks of the netlist.
  circuit(INVERTER_WITH_DIODES
 
+  # Circuit boundary
+  rect((0 0) (3000 6150))
+
   # Nets with their geometries
   net(1 name(IN)
    rect(l4 (900 50) (250 1050))

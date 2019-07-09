@@ -517,6 +517,8 @@ std::string NetlistCrossReferenceModel::net_status_hint (const circuit_pair &cir
                               "Otherwise, look for the corresponding other net.\n"
                               "Net items not found in the reference netlist indicate additional connections.\n"
                               "Net items only found in the reference netlist indicate missing connections."));
+  } else if (cps.second == db::NetlistCrossReference::MatchWithWarning) {
+    return tl::to_string (tr ("Nets match, but the choice was ambiguous. This may lead to mismatching nets in other places.\n"));
   }
   return std::string ();
 }

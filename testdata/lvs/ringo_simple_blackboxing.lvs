@@ -22,8 +22,10 @@ via1        = input(10, 0)
 metal2      = input(11, 0)
 
 # Bulk layer for terminal provisioning
+# and to provide the BULK labels for
+# the abstracts
 
-bulk        = polygon_layer
+bulk        = labels(13, 0)
 
 # Computed layers
 

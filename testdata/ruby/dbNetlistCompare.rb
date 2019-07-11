@@ -763,10 +763,10 @@ match_devices $1 $2
 end_circuit INV INVB MATCH
 begin_circuit TOP TOP
 match_nets OUT OUT
-match_nets VDD VDD
-match_nets IN IN
 match_nets VSS VSS
 match_nets INT INT
+match_nets IN IN
+match_nets VDD VDD
 match_pins $0 $2
 match_pins $1 $0
 match_pins $2 $1
@@ -839,12 +839,12 @@ match_devices $3 $3
 match_devices $4 $4
 end_circuit NAND NAND MATCH
 begin_circuit TOP TOP
-match_nets IN2 IN2
-match_nets INT INT
-match_nets IN1 IN1
 match_nets OUT OUT
-match_nets VDD VDD
 match_nets VSS VSS
+match_nets VDD VDD
+match_nets INT INT
+match_nets IN2 IN2
+match_nets IN1 IN1
 match_pins $0 $0
 match_pins $1 $1
 match_pins $2 $2
@@ -883,12 +883,12 @@ match_devices $3 $3
 match_devices $4 $4
 end_circuit NAND NAND MATCH
 begin_circuit TOP TOP
-match_nets IN2 IN2
-match_nets INT INT
-match_nets IN1 IN1
 match_nets OUT OUT
-match_nets VDD VDD
 match_nets VSS VSS
+match_nets VDD VDD
+match_nets INT INT
+match_nets IN2 IN2
+match_nets IN1 IN1
 match_pins $0 $0
 match_pins $1 $1
 match_pins $2 $2

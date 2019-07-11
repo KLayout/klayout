@@ -847,25 +847,25 @@ public:
   }
 
   /**
-   *  @brief Gets the subcircuit distribution node per subcircuit
+   *  @brief Gets the subcircuit virtual node per subcircuit
    *  These nodes are a concept provided to reduce the effort for
    *  subcircuit transitions. Instead of a transition from every pin
-   *  to every other pin the distribution node provides edges to
+   *  to every other pin the virtual node provides edges to
    *  all pins of the subcircuit, but no front end.
    */
-  const db::NetGraphNode &distro_node (const db::SubCircuit *sc) const
+  const db::NetGraphNode &virtual_node (const db::SubCircuit *sc) const
   {
-    std::map<const db::SubCircuit *, db::NetGraphNode>::const_iterator j = m_distro_nodes.find (sc);
-    tl_assert (j != m_distro_nodes.end ());
+    std::map<const db::SubCircuit *, db::NetGraphNode>::const_iterator j = m_virtual_nodes.find (sc);
+    tl_assert (j != m_virtual_nodes.end ());
     return j->second;
   }
 
   /**
-   *  @brief Gets the subcircuit distribution node per subcircuit
+   *  @brief Gets the subcircuit virtual node per subcircuit
    */
-  db::NetGraphNode &distro_node (const db::SubCircuit *sc)
+  db::NetGraphNode &virtual_node (const db::SubCircuit *sc)
   {
-    return const_cast<db::NetGraphNode &> (((const NetGraph *) this)->distro_node (sc));
+    return const_cast<db::NetGraphNode &> (((const NetGraph *) this)->virtual_node (sc));
   }
 
   /**
@@ -954,7 +954,7 @@ public:
 
 private:
   std::vector<NetGraphNode> m_nodes;
-  std::map<const db::SubCircuit *, NetGraphNode> m_distro_nodes;
+  std::map<const db::SubCircuit *, NetGraphNode> m_virtual_nodes;
   std::map<const db::Net *, size_t> m_net_index;
   const db::Circuit *mp_circuit;
 
@@ -1144,7 +1144,7 @@ NetGraphNode::expand_subcircuit_nodes (NetGraph *graph)
       }
     }
 
-    const NetGraphNode &dn = graph->distro_node (sc);
+    const NetGraphNode &dn = graph->virtual_node (sc);
     for (NetGraphNode::edge_iterator de = dn.begin (); de != dn.end (); ++de) {
 
       const db::Net *net_at_pin = de->second.second;
@@ -1407,7 +1407,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   }
 #endif
 
-  //  create subcircuit distribution nodes
+  //  create subcircuit virtual nodes
 
   for (db::Circuit::const_subcircuit_iterator i = c->begin_subcircuits (); i != c->end_subcircuits (); ++i) {
 
@@ -1422,15 +1422,15 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
       continue;
     }
 
-    m_distro_nodes.insert (std::make_pair (i.operator-> (), NetGraphNode (i.operator-> (), circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper)));
+    m_virtual_nodes.insert (std::make_pair (i.operator-> (), NetGraphNode (i.operator-> (), circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper)));
 
   }
 
-  for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_distro_nodes.begin (); i != m_distro_nodes.end (); ++i) {
+  for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_virtual_nodes.begin (); i != m_virtual_nodes.end (); ++i) {
     i->second.apply_net_index (m_net_index);
   }
 #if defined(PRINT_DEBUG_NETGRAPH)
-  for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_distro_nodes.begin (); i != m_distro_nodes.end (); ++i) {
+  for (std::map<const db::SubCircuit *, NetGraphNode>::iterator i = m_virtual_nodes.begin (); i != m_virtual_nodes.end (); ++i) {
     tl::info << i->second.to_string () << tl::noendl;
   }
 #endif

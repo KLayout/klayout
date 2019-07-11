@@ -948,7 +948,7 @@ xref(
    net(11 3 match)
    net(13 5 match)
    net(12 2 match)
-   net(15 1 mismatch)
+   net(15 1 match)
    pin(3 3 match)
    pin(0 2 match)
    pin(2 4 match)

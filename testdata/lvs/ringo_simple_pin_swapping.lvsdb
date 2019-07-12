@@ -651,13 +651,13 @@ reference(
   net(8 name('1'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin(5)
-  pin(6)
-  pin(7)
+  pin(1 name(VDD))
+  pin(2 name(OUT))
+  pin(3 name(VSS))
+  pin(4 name(NWELL))
+  pin(5 name(A))
+  pin(6 name(B))
+  pin(7 name(BULK))
 
   # Devices and their connections
   device(1 PMOS
@@ -725,12 +725,12 @@ reference(
   net(6 name(BULK))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin(5)
-  pin(6)
+  pin(1 name(VDD))
+  pin(2 name(OUT))
+  pin(3 name(VSS))
+  pin(4 name(NWELL))
+  pin(5 name(IN))
+  pin(6 name(BULK))
 
   # Devices and their connections
   device(1 PMOS
@@ -781,11 +781,11 @@ reference(
   net(15 name('10'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin(5)
+  pin(1 name(VSS))
+  pin(2 name(VDD))
+  pin(3 name(FB))
+  pin(4 name(ENABLE))
+  pin(5 name(OUT))
 
   # Subcircuits and their connections
   circuit(1 ND2X1 name($1)

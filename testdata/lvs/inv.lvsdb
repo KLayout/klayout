@@ -181,12 +181,12 @@ reference(
   net(6 name(VDD))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin(5)
-  pin(6)
+  pin(1 name(VSS))
+  pin(2 name(IN))
+  pin(3 name(OUT))
+  pin(4 name(NWELL))
+  pin(5 name(SUBSTRATE))
+  pin(6 name(VDD))
 
   # Devices and their connections
   device(1 PMOS
@@ -229,12 +229,12 @@ xref(
    net(6 5 match)
    net(3 6 match)
    net(2 1 match)
-   pin(() 0 match)
    pin(() 1 match)
-   pin(() 2 match)
    pin(() 3 match)
+   pin(() 2 match)
    pin(() 4 match)
    pin(() 5 match)
+   pin(() 0 match)
    device(2 2 match)
    device(1 1 match)
   )

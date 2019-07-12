@@ -28,6 +28,8 @@
 #include "tlEquivalenceClusters.h"
 #include "tlLog.h"
 
+#include <cstring>
+
 //  verbose debug output
 //  TODO: make this a feature?
 // #define PRINT_DEBUG_NETCOMPARE
@@ -42,6 +44,31 @@
 
 namespace db
 {
+
+// --------------------------------------------------------------------------------------------------------------------
+//  A generic string compare
+
+static int name_compare (const std::string &n1, const std::string &n2)
+{
+  //  TODO: unicode support?
+#if defined(COMPARE_CASE_INSENSITIVE)
+  return strcasecmp (n1.c_str (), n2.c_str ());
+#else
+  return strcmp (n1.c_str (), n2.c_str ());
+#endif
+}
+
+#if defined(COMPARE_CASE_INSENSITIVE)
+static std::string normalize_name (const std::string &n)
+{
+  return tl::to_upper_case (n);
+}
+#else
+static inline const std::string &normalize_name (const std::string &n)
+{
+  return n;
+}
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCompare definition and implementation
@@ -344,10 +371,7 @@ public:
 
     if (m_with_name) {
 
-      std::string cls_name = cls->name ();
-#if defined(COMPARE_CASE_INSENSITIVE)
-      cls_name = tl::to_upper_case (cls_name);
-#endif
+      std::string cls_name = normalize_name (cls->name ());
 
       std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cls_name);
       if (c != m_cat_by_name.end ()) {
@@ -1270,7 +1294,7 @@ NetGraphNode::edge_less (const db::Net *a, const db::Net *b)
       const std::string &pna = a->begin_pins ()->pin ()->name ();
       const std::string &pnb = b->begin_pins ()->pin ()->name ();
       if (! pna.empty () && ! pnb.empty ()) {
-        return pna < pnb;
+        return name_compare (pna, pnb) < 0;
       }
     }
     return false;
@@ -1293,7 +1317,7 @@ NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
       const std::string &pna = a->begin_pins ()->pin ()->name ();
       const std::string &pnb = b->begin_pins ()->pin ()->name ();
       if (! pna.empty () && ! pnb.empty ()) {
-        return pna == pnb;
+        return name_compare (pna, pnb) == 0;
       }
     }
     return true;
@@ -2535,13 +2559,38 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   if (c1->pin_count () > 0 && c2->pin_count () > 0) {
 
+    //  try to assign floating pins by name with higher prio
+    std::map<std::string, std::pair<const db::Pin *, const db::Pin *> > floating_pins_by_name;
+
+    for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
+      const db::Net *net = c2->net_for_pin (p->id ());
+      if (!net && !p->name ().empty ()) {
+        floating_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.second = p.operator-> ();
+      }
+    }
+
+    for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
+      const db::Net *net = c1->net_for_pin (p->id ());
+      if (!net && !p->name ().empty ()) {
+        floating_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.first = p.operator-> ();
+      }
+    }
+
+    std::map<const db::Pin *, const db::Pin *> floating_pin_name_mapping;
+    for (std::map<std::string, std::pair<const db::Pin *, const db::Pin *> >::const_iterator i = floating_pins_by_name.begin (); i != floating_pins_by_name.end (); ++i) {
+      if (i->second.first && i->second.second) {
+        floating_pin_name_mapping [i->second.first] = i->second.second;
+        floating_pin_name_mapping [i->second.second] = i->second.first;
+      }
+    }
+
     std::vector<const db::Pin *> floating_pins;
     std::multimap<size_t, const db::Pin *> net2pin;
     for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
       const db::Net *net = c2->net_for_pin (p->id ());
       if (net) {
         net2pin.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
-      } else {
+      } else if (floating_pin_name_mapping.find (p.operator-> ()) == floating_pin_name_mapping.end ()) {
         floating_pins.push_back (p.operator-> ());
       }
     }
@@ -2560,7 +2609,18 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       const db::Net *net = c1->net_for_pin (p->id ());
       if (! net) {
 
-        if (next_float != floating_pins.end ()) {
+        std::map<const db::Pin *, const db::Pin *>::const_iterator fp = floating_pin_name_mapping.find (p.operator-> ());
+        if (fp != floating_pin_name_mapping.end ()) {
+
+          //  assign a floating pin - this is a dummy assignment which is mitigated
+          //  by declaring the pins equivalent in derive_pin_equivalence
+          if (mp_logger) {
+            mp_logger->match_pins (p.operator-> (), fp->second);
+          }
+          c12_pin_mapping.map_pin (p->id (), fp->second->id ());
+          c22_pin_mapping.map_pin (fp->second->id (), p->id ());
+
+        } else if (next_float != floating_pins.end ()) {
 
           //  assign a floating pin - this is a dummy assignment which is mitigated
           //  by declaring the pins equivalent in derive_pin_equivalence

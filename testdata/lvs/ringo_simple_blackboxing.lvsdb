@@ -311,35 +311,35 @@ reference(
  circuit(ND2X1
 
   # Outgoing pins and their connections to nets
-  pin()
-  pin()
-  pin()
-  pin()
-  pin()
-  pin()
-  pin()
+  pin(name(VDD))
+  pin(name(OUT))
+  pin(name(VSS))
+  pin(name(NWELL))
+  pin(name(B))
+  pin(name(A))
+  pin(name(BULK))
 
  )
  circuit(INVX1
 
   # Outgoing pins and their connections to nets
-  pin()
-  pin()
-  pin()
-  pin()
-  pin()
-  pin()
+  pin(name(VDD))
+  pin(name(OUT))
+  pin(name(VSS))
+  pin(name(NWELL))
+  pin(name(IN))
+  pin(name(BULK))
 
  )
  circuit(INVX2
 
   # Outgoing pins and their connections to nets
-  pin()
-  pin()
-  pin()
-  pin()
-  pin()
-  pin()
+  pin(name(VDD))
+  pin(name(OUT))
+  pin(name(VSS))
+  pin(name(NWELL))
+  pin(name(IN))
+  pin(name(BULK))
 
  )
  circuit(RINGO
@@ -362,11 +362,11 @@ reference(
   net(15 name('10'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin(5)
+  pin(1 name(VSS))
+  pin(2 name(VDD))
+  pin(3 name(FB))
+  pin(4 name(ENABLE))
+  pin(5 name(OUT))
 
   # Subcircuits and their connections
   circuit(1 ND2X1 name($1)
@@ -484,12 +484,12 @@ xref(
  )
  circuit(INVX2 INVX2 match
   xref(
-   pin(4 4 match)
+   pin(4 3 match)
    pin(5 5 match)
-   pin(0 0 match)
-   pin(2 2 match)
-   pin(1 1 match)
-   pin(3 3 match)
+   pin(0 4 match)
+   pin(2 1 match)
+   pin(1 0 match)
+   pin(3 2 match)
   )
  )
  circuit(ND2X1 ND2X1 match

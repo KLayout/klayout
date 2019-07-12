@@ -799,12 +799,12 @@ reference(
   net(6 name('6'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin(5)
-  pin(6)
+  pin(1 name('1'))
+  pin(2 name('2'))
+  pin(3 name('3'))
+  pin(4 name('4'))
+  pin(5 name('5'))
+  pin(6 name('6'))
 
   # Devices and their connections
   device(1 PMOS
@@ -847,13 +847,13 @@ reference(
   net(7 name('7'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin(5)
-  pin(6)
-  pin(7)
+  pin(1 name('1'))
+  pin(2 name('2'))
+  pin(3 name('3'))
+  pin(4 name('4'))
+  pin(5 name('5'))
+  pin(6 name('6'))
+  pin(7 name('7'))
 
   # Subcircuits and their connections
   circuit(1 INV2 name($1)
@@ -887,10 +887,10 @@ reference(
   net(8 name('7'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
+  pin(1 name('1'))
+  pin(2 name('2'))
+  pin(3 name('3'))
+  pin(4 name('4'))
 
   # Subcircuits and their connections
   circuit(1 INV2PAIR name($1)

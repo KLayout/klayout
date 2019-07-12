@@ -92,7 +92,7 @@ class DBNetlistReaderTests_TestClass < TestBase
     assert_equal(nl.description, "Read by MyDelegate (sucessfully)")
 
     assert_equal(nl.to_s, <<"END")
-circuit SUBCKT ($1=$1,$2=A,$3=VDD,$4=Z,$5=GND,$6=GND$1);
+circuit SUBCKT ($1=$1,A=A,VDD=VDD,Z=Z,GND=GND,GND$1=GND$1);
   device HVPMOS $1 (S=VDD,G=$3,D=Z,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);
   device HVPMOS $2 (S=VDD,G=A,D=$3,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);
   device HVNMOS $3 (S=GND,G=$3,D=GND,B=GND$1) (L=1.695,W=3.18,AS=0,AD=0,PS=9,PD=9);
@@ -101,7 +101,7 @@ circuit SUBCKT ($1=$1,$2=A,$3=VDD,$4=Z,$5=GND,$6=GND$1);
   device RES $1 (A=A,B=Z) (R=100000,L=0,W=0,A=0,P=0);
 end;
 circuit .TOP ();
-  subcircuit SUBCKT SUBCKT ($1=(null),$2=(null),$3=(null),$4=(null),$5=VSS,$6=VSS);
+  subcircuit SUBCKT SUBCKT ($1=(null),A=(null),VDD=(null),Z=(null),GND=VSS,GND$1=VSS);
 end;
 END
 

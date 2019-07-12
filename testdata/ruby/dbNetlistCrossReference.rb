@@ -79,7 +79,7 @@ class DBNetlistCrossReference_TestClass < TestBase
     xref.each_pin_pair(cp_inv2) do |p|
       info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
     end
-    assert_equal(info.join(","), "/:Match,BULK/:Match,IN/:Match,OUT/:Match,VDD/:Match,VSS/:Match")
+    assert_equal(info.join(","), "/1:Match,BULK/6:Match,IN/2:Match,OUT/3:Match,VDD/5:Match,VSS/4:Match")
       
     info = []
     xref.each_net_pair(cp_inv2) do |p|
@@ -104,7 +104,7 @@ class DBNetlistCrossReference_TestClass < TestBase
     xref.each_net_pin_pair(netp_bulk) do |p|
       info << [ p.first, p.second ].collect { |s| s ? s.pin.name : "(nil)" }.join("/")
     end
-    assert_equal(info.join(","), "BULK/")
+    assert_equal(info.join(","), "BULK/6")
 
     info = []
     xref.each_net_subcircuit_pin_pair(netp_bulk) do |p|
@@ -137,7 +137,7 @@ class DBNetlistCrossReference_TestClass < TestBase
     xref.each_pin_pair(cp_inv2pair) do |p|
       info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
     end
-    assert_equal(info.join(","), "(nil)/:Mismatch,/(nil):Mismatch,/:Match,/:Match,/:Match,/:Match,/:Match,BULK/:Match")
+    assert_equal(info.join(","), "(nil)/5:Mismatch,/(nil):Mismatch,/2:Match,/3:Match,/4:Match,/6:Match,/7:Match,BULK/1:Match")
       
     info = []
     xref.each_net_pair(cp_inv2pair) do |p|

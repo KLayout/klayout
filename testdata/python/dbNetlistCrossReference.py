@@ -100,7 +100,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
     info = []
     for p in xref.each_pin_pair(cp_inv2):
       info.append("/".join([ self.name_call_or_nil(s) for s in [ p.first(), p.second() ] ]) + ":" + str(p.status()))
-    self.assertEqual(",".join(info), "/:Match,BULK/:Match,IN/:Match,OUT/:Match,VDD/:Match,VSS/:Match")
+    self.assertEqual(",".join(info), "/1:Match,BULK/6:Match,IN/2:Match,OUT/3:Match,VDD/5:Match,VSS/4:Match")
       
     info = []
     for p in xref.each_net_pair(cp_inv2):
@@ -120,7 +120,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
     info = []
     for p in xref.each_net_pin_pair(netp_bulk):
       info.append("/".join([ self.pin_name_or_nil(s) for s in [ p.first(), p.second() ] ]))
-    self.assertEqual(",".join(info), "BULK/")
+    self.assertEqual(",".join(info), "BULK/6")
 
     info = []
     for p in xref.each_net_subcircuit_pin_pair(netp_bulk):
@@ -147,7 +147,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
     info = []
     for p in xref.each_pin_pair(cp_inv2pair):
       info.append("/".join([ self.name_call_or_nil(s) for s in [ p.first(), p.second() ] ]) + ":" + str(p.status()))
-    self.assertEqual(",".join(info), "(nil)/:Mismatch,/(nil):Mismatch,/:Match,/:Match,/:Match,/:Match,/:Match,BULK/:Match")
+    self.assertEqual(",".join(info), "(nil)/5:Mismatch,/(nil):Mismatch,/2:Match,/3:Match,/4:Match,/6:Match,/7:Match,BULK/1:Match")
       
     info = []
     for p in xref.each_net_pair(cp_inv2pair):

@@ -47,7 +47,7 @@ module LVS
 
         lvsdb_file = _make_path(@output_lvsdb_file)
         info("Writing LVS database: #{lvsdb_file} ..")
-        @netter.lvs_data.write(lvsdb_file)
+        @netter.lvs_data.write(lvsdb_file, !@output_lvsdb_long)
 
       end
 
@@ -56,11 +56,12 @@ module LVS
     # %LVS%
     # @name report_lvs
     # @brief Specifies an LVS report for output
-    # @synopsis report_lvs([ filename ])
+    # @synopsis report_lvs([ filename [, long ] ])
     # After the comparison step, the LVS database will be shown 
     # in the netlist database browser in a cross-reference view.
     # If a filename is given, the LVS database is also written to
-    # this file.
+    # this file. If a file name is given and "long" is true, a
+    # verbose version of the LVS DB format will be used.
     #
     # If this method is called together with report_netlist and two files each, two
     # files can be generated - one for the extracted netlist (L2N database) and one for the
@@ -70,12 +71,13 @@ module LVS
     # 
     # report_lvs is only effective if a comparison step is included.
     
-    def report_lvs(filename = nil)
+    def report_lvs(filename = nil, long = nil)
       @show_l2ndb = true
       if filename
         filename.is_a?(String) || raise("Argument must be string in report_lvs")
       end
       @output_lvsdb_file = filename
+      @output_lvsdb_long = long
     end
 
     # %LVS%

@@ -761,7 +761,7 @@ module DRC
     # %DRC%
     # @name report_netlist
     # @brief Specifies an extracted netlist report for output
-    # @synopsis report_netlist([ filename ])
+    # @synopsis report_netlist([ filename [, long ] ])
     # This method applies to runsets creating a netlist through
     # extraction. Extraction happens when connections and/or device
     # extractions are made. If this statement is used, the extracted
@@ -769,13 +769,16 @@ module DRC
     # layout-to-netlist report (L2N database) and shown in the 
     # netlist browser window. If a file name is given, the report
     # will also be written to the given file.
+    # If a file name is given and "long" is true, a verbose 
+    # version of the L2N DB format will be used.
     
-    def report_netlist(filename = nil)
+    def report_netlist(filename = nil, long = nil)
       @show_l2ndb = true
       if filename
         filename.is_a?(String) || raise("Argument must be string in report_netlist")
       end
       @output_l2ndb_file = filename
+      @output_l2ndb_long = long
     end
 
     # %DRC%
@@ -1415,7 +1418,7 @@ CODE
 
         l2ndb_file = _make_path(@output_l2ndb_file)
         info("Writing netlist database: #{l2ndb_file} ..")
-        @netter.l2n_data.write_l2n(l2ndb_file)
+        @netter.l2n_data.write_l2n(l2ndb_file, !@output_l2ndb_long)
 
       end
 

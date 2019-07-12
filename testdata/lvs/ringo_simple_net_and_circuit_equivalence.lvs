@@ -1,7 +1,7 @@
 
 source($lvs_test_source, "top")
 
-report_lvs($lvs_test_target_lvsdb)
+report_lvs($lvs_test_target_lvsdb, true)
 
 target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
 

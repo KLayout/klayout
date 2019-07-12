@@ -47,7 +47,7 @@ TEST(1)
       "# Reports generated\n"
       "\n"
       "# LVS report to inv.lvsdb\n"
-      "report_lvs('%s')\n"
+      "report_lvs('%s', true)\n"
       "\n"
       "# Write extracted netlist to inv_extracted.cir\n"
       "target_netlist('%s', write_spice, 'Extracted by KLayout')\n"

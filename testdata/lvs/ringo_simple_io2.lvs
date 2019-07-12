@@ -1,7 +1,7 @@
 
 source($lvs_test_source, "RINGO")
 
-report_lvs($lvs_test_target_lvsdb)
+report_lvs($lvs_test_target_lvsdb, true)
 report_netlist($lvs_test_target_l2n)
 
 # Write extracted netlist to extracted.cir using a special

@@ -6,7 +6,7 @@ deep
 # Reports generated
 
 # LVS report to inv.lvsdb
-report_lvs("inv.lvsdb")
+report_lvs("inv.lvsdb", true)
 
 # Write extracted netlist to inv_extracted.cir
 target_netlist("inv_extracted.cir", write_spice, "Extracted by KLayout")

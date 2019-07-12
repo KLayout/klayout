@@ -2,7 +2,7 @@
 source($lvs_test_source)
 
 # will get pretty big:
-# report_lvs($lvs_test_target_lvsdb)
+# report_lvs($lvs_test_target_lvsdb, true)
 
 target_netlist($lvs_test_target_cir, write_spice(true), "Extracted by KLayout")
 

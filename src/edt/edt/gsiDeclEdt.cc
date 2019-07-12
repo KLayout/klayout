@@ -23,6 +23,7 @@
 
 #include "gsiDecl.h"
 #include "edtService.h"
+#include "dbRecursiveShapeIterator.h"
 #include "layObjectInstPath.h"
 #include "layLayoutView.h"
 
@@ -94,7 +95,42 @@ static db::DCplxTrans dtrans (const lay::ObjectInstPath *p)
   }
 }
 
+static std::vector<db::InstElement> get_path (const lay::ObjectInstPath *p)
+{
+  std::vector<db::InstElement> pe;
+  pe.insert (pe.end (), p->begin (), p->end ());
+  return pe;
+}
+
+static void set_path (lay::ObjectInstPath *p, const std::vector<db::InstElement> &pe)
+{
+  p->assign_path (pe.begin (), pe.end ());
+}
+
+static lay::ObjectInstPath *from_si (const db::RecursiveShapeIterator &si, int cv_index)
+{
+  lay::ObjectInstPath *ip = new lay::ObjectInstPath ();
+
+  if (! si.at_end ()) {
+
+    ip->set_cv_index (cv_index);
+    ip->set_layer (si.layer ());
+    ip->set_shape (si.shape ());
+    ip->set_topcell (si.top_cell ()->cell_index ());
+    std::vector<db::InstElement> path (si.path ());
+    ip->assign_path (path.begin (), path.end ());
+
+  }
+
+  return ip;
+}
+
 gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
+  gsi::constructor ("new", &from_si, gsi::arg ("si"), gsi::arg ("cv_index"),
+    "@brief Creates a new path object from a \\RecursiveShapeIterator\n"
+    "Use this constructor to quickly turn a recursive shape iterator delivery "
+    "into a shape selection."
+  ) +
   gsi::method ("<", &lay::ObjectInstPath::operator<,
     "@brief Provides an order criterion for two ObjectInstPath objects\n"
     "@args b\n"
@@ -281,7 +317,18 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "\n"
     "This method was introduced in version 0.24.\n"
   ) +
-  gsi::method ("append_path", (void (lay::ObjectInstPath::*) (const db::InstElement &)) &lay::ObjectInstPath::add_path, 
+  gsi::method_ext ("path", &get_path,
+    "@brief Gets the instantiation path\n"
+    "The path is a sequence of \\InstElement objects leading to the target object.\n"
+    "\n"
+    "This method was introduced in version 0.26.\n"
+  ) +
+  gsi::method_ext ("path=", &set_path, gsi::arg ("p"),
+    "@brief Sets the instantiation path\n"
+    "\n"
+    "This method was introduced in version 0.26.\n"
+  ) +
+  gsi::method ("append_path", (void (lay::ObjectInstPath::*) (const db::InstElement &)) &lay::ObjectInstPath::add_path,
     "@brief Appends an element to the instantiation path\n"
     "@args element\n"
     "\n"
@@ -527,7 +574,6 @@ static EditableSelectionIterator begin_objects_selected_transient (const lay::La
 {
   return EditableSelectionIterator (view->get_plugins <edt::Service> (), true);
 }
-
 
 static
 gsi::ClassExt<lay::LayoutView> layout_view_decl (

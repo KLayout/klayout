@@ -371,7 +371,23 @@ BEGIN_PROTECTED
   if (m_l2n_index < int (view ()->num_l2ndbs ()) && m_l2n_index >= 0) {
 
     db::LayoutToNetlist *l2ndb = view ()->get_l2ndb (m_l2n_index);
-    if (l2ndb) {
+    db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
+
+    if (lvsdb && ! browser_page->is_netlist_mode ()) {
+
+      //  prepare and open the file dialog
+      lay::FileDialog save_dialog (this, tl::to_string (QObject::tr ("Save LVS Database")), "KLayout LVS DB files (*.lvsdb)");
+      std::string fn (lvsdb->filename ());
+      if (save_dialog.get_save (fn)) {
+
+        tl::log << tl::to_string (QObject::tr ("Saving file: ")) << fn;
+        tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Saving")));
+
+        lvsdb->save (fn, true);
+
+      }
+
+    } else if (l2ndb) {
 
       //  prepare and open the file dialog
       lay::FileDialog save_dialog (this, tl::to_string (QObject::tr ("Save Netlist Database")), "KLayout L2N DB files (*.l2n)");

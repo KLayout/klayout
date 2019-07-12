@@ -69,6 +69,11 @@ public:
   ~NetlistBrowserPage ();
 
   /**
+   *  @brief Returns true if netlist mode is selected
+   */
+  bool is_netlist_mode ();
+
+  /**
    *  @brief Sets the plugin root object for this object
    */
   void set_plugin_root (lay::PluginRoot *pr);

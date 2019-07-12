@@ -209,6 +209,12 @@ NetlistBrowserPage::~NetlistBrowserPage ()
   clear_markers ();
 }
 
+bool
+NetlistBrowserPage::is_netlist_mode ()
+{
+  return show_netlist->isChecked ();
+}
+
 void
 NetlistBrowserPage::set_plugin_root (lay::PluginRoot *pr)
 {

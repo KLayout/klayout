@@ -164,6 +164,13 @@ const Pin *Circuit::pin_by_id (size_t id) const
   }
 }
 
+void Circuit::rename_pin (size_t id, const std::string &name)
+{
+  if (id < m_pins.size ()) {
+    m_pins [id].set_name (name);
+  }
+}
+
 const Pin *Circuit::pin_by_name (const std::string &name) const
 {
   for (Circuit::const_pin_iterator p = begin_pins (); p != end_pins (); ++p) {

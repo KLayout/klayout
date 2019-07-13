@@ -26,7 +26,9 @@
 
 #include "dbPCellDeclaration.h"
 
+#include <QFrame>
 #include <QScrollArea>
+#include <QLabel>
 
 namespace lay
 {
@@ -40,11 +42,20 @@ namespace edt
  *  @brief A QScrollArea that displays and allows editing PCell parameters
  */
 class PCellParametersPage
-  : public QScrollArea
+  : public QFrame
 {
 Q_OBJECT
 
 public:
+  struct State
+  {
+    State () : valid (false), hScrollPosition (0), vScrollPosition (0) { }
+
+    bool valid;
+    int hScrollPosition;
+    int vScrollPosition;
+  };
+
   /**
    *  @brief Constructor: create a page showing the given parameters
    *
@@ -56,6 +67,16 @@ public:
    *  @param parameters The parameter values to show (if empty, the default values are used)
    */
   PCellParametersPage (QWidget *parent, const db::Layout *layout, lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters);
+
+  /**
+   *  @brief Gets the pages current state
+   */
+  State get_state ();
+
+  /**
+   *  @brief Restores the state
+   */
+  void set_state (const State &s);
 
   /**
    *  @brief Get the current parameters
@@ -80,6 +101,9 @@ public slots:
   void clicked ();
   
 private:
+  QScrollArea *mp_parameters_area;
+  QLabel *mp_error_label;
+  QLabel *mp_error_icon;
   const db::PCellDeclaration *mp_pcell_decl;
   std::vector<QWidget *> m_widgets;
   const db::Layout *mp_layout;

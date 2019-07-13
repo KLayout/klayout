@@ -849,8 +849,11 @@ EditorOptionsInst::update_pcell_parameters (const std::vector <tl::Variant> &par
   }
   mp_ui->cell_le->setPalette (pl);
 
+  PCellParametersPage::State pcp_state;
+
   //  Hint: we shall not delete the page immediately. This gives a segmentation fault in some cases.
   if (mp_pcell_parameters) {
+    pcp_state = mp_pcell_parameters->get_state ();
     mp_pcell_parameters->hide ();
     mp_pcell_parameters->deleteLater ();
   }
@@ -863,6 +866,8 @@ EditorOptionsInst::update_pcell_parameters (const std::vector <tl::Variant> &par
     lay::LayoutView *view = lay::LayoutView::current ();
     mp_pcell_parameters = new PCellParametersPage (mp_ui->pcell_tab, &view->cellview (m_cv_index)->layout (), view, m_cv_index, layout->pcell_declaration (pc.second), parameters);
     mp_ui->pcell_tab->layout ()->addWidget (mp_pcell_parameters);
+
+    mp_pcell_parameters->set_state (pcp_state);
 
   } else {
     mp_ui->param_tab_widget->setTabEnabled (1, false);

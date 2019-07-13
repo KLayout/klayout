@@ -23,6 +23,7 @@
 
 #include "edtPCellParametersPage.h"
 #include "layWidgets.h"
+#include "tlScriptError.h"
 
 #include <QFrame>
 #include <QCheckBox>
@@ -32,6 +33,7 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
+#include <QScrollBar>
 
 namespace edt
 {
@@ -127,11 +129,34 @@ static void set_value (const db::PCellParameterDeclaration &p, const db::Layout 
 }
 
 PCellParametersPage::PCellParametersPage (QWidget *parent, const db::Layout *layout, lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
-  : QScrollArea (parent), mp_pcell_decl (pcell_decl), mp_layout (layout), mp_view (view), m_cv_index (cv_index)
+  : QFrame (parent), mp_pcell_decl (pcell_decl), mp_layout (layout), mp_view (view), m_cv_index (cv_index)
 {
+  QGridLayout *frame_layout = new QGridLayout (this);
+  setLayout (frame_layout);
+
+  mp_parameters_area = new QScrollArea (this);
+  frame_layout->addWidget (mp_parameters_area, 0, 0, 1, 2);
+  frame_layout->setRowStretch (0, 1);
+
+  mp_error_icon = new QLabel (this);
+  mp_error_icon->setPixmap (QPixmap (":/warn.png"));
+  mp_error_icon->hide ();
+  frame_layout->addWidget (mp_error_icon, 1, 0, 1, 1);
+
+  mp_error_label = new QLabel (this);
+  QPalette palette = mp_error_label->palette ();
+  palette.setColor (QPalette::Foreground, Qt::red);
+  mp_error_label->setPalette (palette);
+  QFont font = mp_error_label->font ();
+  font.setBold (true);
+  mp_error_label->setFont (font);
+  mp_error_label->hide ();
+  frame_layout->addWidget (mp_error_label, 1, 1, 1, 1);
+  frame_layout->setColumnStretch (1, 1);
+
   m_parameters = parameters;
 
-  QFrame *fi = new QFrame (this);
+  QFrame *fi = new QFrame (mp_parameters_area);
   QWidget *inner_frame = fi;
   fi->setFrameShape (QFrame::NoFrame);
   setFrameShape (QFrame::NoFrame);
@@ -295,11 +320,30 @@ PCellParametersPage::PCellParametersPage (QWidget *parent, const db::Layout *lay
 
   }
 
-  setWidget (main_frame);
+  mp_parameters_area->setWidget (main_frame);
   main_frame->show ();
 
   //  does a first coerce and update
   get_parameters ();
+}
+
+PCellParametersPage::State
+PCellParametersPage::get_state ()
+{
+  State s;
+  s.valid = true;
+  s.vScrollPosition = mp_parameters_area->verticalScrollBar ()->value ();
+  s.hScrollPosition = mp_parameters_area->horizontalScrollBar ()->value ();
+  return s;
+}
+
+void
+PCellParametersPage::set_state (const State &s)
+{
+  if (s.valid) {
+    mp_parameters_area->verticalScrollBar ()->setValue (s.vScrollPosition);
+    mp_parameters_area->horizontalScrollBar ()->setValue (s.hScrollPosition);
+  }
 }
 
 void  
@@ -416,10 +460,26 @@ PCellParametersPage::get_parameters ()
 
   }
 
-  //  call coerce on the parameters
-  mp_pcell_decl->coerce_parameters (*mp_layout, parameters);
+  try {
 
-  set_parameters (parameters);
+    //  coerce the parameters
+    mp_pcell_decl->coerce_parameters (*mp_layout, parameters);
+    set_parameters (parameters);
+
+  } catch (tl::ScriptError &ex) {
+
+    mp_error_label->setText (tl::to_qstring (ex.basic_msg ()));
+    mp_error_label->setToolTip (tl::to_qstring (ex.msg ()));
+    mp_error_icon->show ();
+    mp_error_label->show ();
+
+  } catch (tl::Exception &ex) {
+
+    mp_error_label->setText (tl::to_qstring (ex.msg ()));
+    mp_error_icon->show ();
+    mp_error_label->show ();
+
+  }
 
   return parameters;
 }

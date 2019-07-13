@@ -52,7 +52,11 @@ static int name_compare (const std::string &n1, const std::string &n2)
 {
   //  TODO: unicode support?
 #if defined(COMPARE_CASE_INSENSITIVE)
+#if defined(_WIN32)
+  return _stricmp (n1.c_str (), n2.c_str ());
+#else
   return strcasecmp (n1.c_str (), n2.c_str ());
+#endif
 #else
   return strcmp (n1.c_str (), n2.c_str ());
 #endif

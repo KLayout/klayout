@@ -5,4 +5,7 @@
         <file alias="lvs_interpreters.lym">built-in-macros/lvs_interpreters.lym</file>
         <file alias="lvs_install.lym">built-in-macros/lvs_install.lym</file>
     </qresource>
+    <qresource prefix="/lvs-templates">
+        <file alias="lvs.lym">templates/lvs.lym</file>
+    </qresource>
 </RCC>

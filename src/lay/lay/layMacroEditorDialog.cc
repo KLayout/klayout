@@ -43,6 +43,7 @@
 #include "tlString.h"
 #include "tlClassRegistry.h"
 #include "tlExceptions.h"
+#include "tlFileUtils.h"
 
 #include <cstdio>
 #include <limits>
@@ -487,43 +488,30 @@ MacroEditorDialog::MacroEditorDialog (lay::PluginRoot *pr, lym::MacroCollection 
         }
 
         std::string url = ":/macro-templates/" + ll;
-        QResource res (tl::to_qstring (url));
-        if (res.size () > 0) {
 
-          QByteArray data;
-          if (res.isCompressed ()) {
-            data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+        lym::Macro *m = new lym::Macro ();
+        try {
+
+          m->rename (tl::basename (url));
+          m->load_from (url);
+          if (! description.empty ()) {
+            m->set_description (description_prefix + description);
           } else {
-            data = QByteArray ((const char *)res.data (), (int)res.size ());
+            m->set_description (description_prefix + m->description ());
+          }
+          m->set_readonly (true);
+          if (! category.empty ()) {
+            m->set_category (category);
+          }
+          m_macro_templates.push_back (m);
+
+          if (tl::verbosity () >= 20) {
+            tl::info << "Using macro template from " << url << " (with name " << m->name () << ")";
           }
 
-          lym::Macro *m = new lym::Macro ();
-          try {
-
-            m->rename (tl::to_string (QFileInfo (QUrl (tl::to_qstring (url)).path ()).baseName ()));
-            m->load_from_string (std::string (data.constData (), data.size ()), url);
-            if (! description.empty ()) {
-              m->set_description (description_prefix + description);
-            } else {
-              m->set_description (description_prefix + m->description ());
-            }
-            m->set_readonly (true);
-            if (! category.empty ()) {
-              m->set_category (category);
-            }
-            m_macro_templates.push_back (m);
-
-            if (tl::verbosity () >= 20) {
-              tl::info << "Using macro template from " << url << " (with name " << m->name () << ")";
-            }
-
-          } catch (tl::Exception &ex) {
-            delete m;
-            tl::error << "Reading " << url << ": " << ex.msg ();
-          }
-
-        } else {
-          tl::error << "Macro template resource " << url << " not found";
+        } catch (tl::Exception &ex) {
+          delete m;
+          tl::error << "Reading " << url << ": " << ex.msg ();
         }
 
       }

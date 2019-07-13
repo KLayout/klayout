@@ -9,4 +9,7 @@
         <file alias="drc_interpreters.lym">built-in-macros/drc_interpreters.lym</file>
         <file alias="drc_install.lym">built-in-macros/drc_install.lym</file>
     </qresource>
+    <qresource prefix="/drc-templates">
+        <file alias="drc.lym">templates/drc.lym</file>
+    </qresource>
 </RCC>

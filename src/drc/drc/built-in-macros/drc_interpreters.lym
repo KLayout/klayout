@@ -68,13 +68,7 @@ module DRC
       register("drc-dsl-xml")
 
       # create a template for the macro editor:
-      mt = create_template("drc")
-      mt.text = "# Read about DRC scripts in the User Manual under \"Design Rule Check (DRC)\"\n# This is a sample:\n\npoly = input(6)\nactive = input(1)\ngate = poly &amp; active\ngate.width(0.25.micron).output(100, 0)"
-      mt.show_in_menu = true
-      mt.menu_path = "tools_menu.drc.end"
-      mt.group_name = "drc_scripts"
-      mt.description = "General;;DRC script (*.lydrc)\nA DRC script using KLayout's DRC language"
-      mt.category = "drc"
+      create_template(":/drc-templates/drc.lym")
 
     end
     

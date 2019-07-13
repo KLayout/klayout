@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>General;;DRC script (*.lydrc)\nA DRC script using KLayout's DRC language</description>
+ <version/>
+ <category>drc</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>true</show-in-menu>
+ <group-name>drc_scripts</group-name>
+ <menu-path>tools_menu.drc.end</menu-path>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+# Read about DRC scripts in the User Manual in "Design Rule Check (DRC)"
+
+# This is a sample:
+
+poly = input(6)
+active = input(1)
+gate = poly &amp; active
+gate.width(0.25.micron).output(100, 0)
+</text>
+</klayout-macro>
+

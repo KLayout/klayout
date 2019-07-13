@@ -32,6 +32,8 @@ class DBPolygon_TestClass < TestBase
     assert_equal( a.to_s, "()" )
     assert_equal( RBA::DPolygon::from_s(a.to_s).to_s, a.to_s )
     assert_equal( a.is_box?, false )
+    assert_equal( a.is_empty?, true )
+    assert_equal( a.is_rectilinear?, false )
 
     b = a.dup 
     a = RBA::DPolygon::new( [ RBA::DPoint::new( 0, 1 ), RBA::DPoint::new( 1, 5 ), RBA::DPoint::new( 5, 5 ) ] )
@@ -40,6 +42,8 @@ class DBPolygon_TestClass < TestBase
     assert_equal( RBA::DPolygon::from_s(a.to_s).to_s, a.to_s )
     assert_equal( a.is_box?, false )
     assert_equal( a.num_points_hull, 3 )
+    assert_equal( a.is_empty?, false )
+    assert_equal( a.is_rectilinear?, false )
     c = a.dup 
 
     assert_equal( a == b, false )
@@ -49,6 +53,8 @@ class DBPolygon_TestClass < TestBase
 
     a = RBA::DPolygon::new( RBA::DBox::new( 5, -10, 20, 15 ) )
     assert_equal( a.is_box?, true )
+    assert_equal( a.is_empty?, false )
+    assert_equal( a.is_rectilinear?, true )
     assert_equal( a.to_s, "(5,-10;5,15;20,15;20,-10)" )
     assert_equal( RBA::Polygon::new(a).to_s, "(5,-10;5,15;20,15;20,-10)" )
     assert_equal( a.num_points_hull, 4 )
@@ -355,6 +361,8 @@ class DBPolygon_TestClass < TestBase
     pts = [ RBA::Point::new(0, 0) ]
     p = RBA::Polygon::new(pts, false)
     assert_equal(p.to_s, "()")
+    assert_equal(p.is_empty?, true)
+    assert_equal(p.is_rectilinear?, false)
     
     pts = [ RBA::Point::new(0, 0) ]
     p = RBA::Polygon::new(pts)
@@ -426,17 +434,21 @@ class DBPolygon_TestClass < TestBase
     pts = [ RBA::DPoint::new(0, 0) ]
     p = RBA::DPolygon::new(pts, true)
     assert_equal(p.to_s, "(0,0)")
+    assert_equal(p.is_empty?, false)
+    assert_equal(p.is_rectilinear?, false)
 
     arr = []
     p.each_edge { |e| arr.push( e.to_s ) }
     assert_equal( arr, ["(0,0;0,0)"] )
     
     p = RBA::DPolygon::new(RBA::DBox::new(0, 0, 100, 100))
-    p.insert_hole( [ RBA::DPoint::new(0, 0), RBA::DPoint::new(10, 0) ], true )
+    assert_equal(p.is_empty?, false)
+    assert_equal(p.is_rectilinear?, true)
+    p.insert_hole([ RBA::DPoint::new(0, 0), RBA::DPoint::new(10, 0) ], true)
     assert_equal(p.to_s, "(0,0;0,100;100,100;100,0/0,0;10,0)")
-    p.assign_hole(0, [ RBA::DPoint::new(0, 0), RBA::DPoint::new(10, 0) ] )
+    p.assign_hole(0, [ RBA::DPoint::new(0, 0), RBA::DPoint::new(10, 0) ])
     assert_equal(p.to_s, "(0,0;0,100;100,100;100,0/0,0;10,0)")
-    p.assign_hole(0, [ RBA::DPoint::new(0, 0), RBA::DPoint::new(10, 0) ], true )
+    p.assign_hole(0, [ RBA::DPoint::new(0, 0), RBA::DPoint::new(10, 0) ], true)
     assert_equal(p.to_s, "(0,0;0,100;100,100;100,0/0,0;10,0)")
 
     pts = [ RBA::DPoint::new(0, 0), RBA::DPoint::new(10, 0) ]

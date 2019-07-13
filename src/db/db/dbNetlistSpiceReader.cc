@@ -173,7 +173,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
 // ------------------------------------------------------------------------------------------------------
 
-static const char *allowed_name_chars = "_.:,!+$/&\\#[]|";
+static const char *allowed_name_chars = "_.:,!+$/&\\#[]|<>";
 
 NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate)
   : mp_netlist (0), mp_stream (0), mp_delegate (delegate)

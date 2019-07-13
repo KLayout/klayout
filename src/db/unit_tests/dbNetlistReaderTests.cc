@@ -164,12 +164,12 @@ TEST(5_CircuitParameters)
   reader.read (is, nl);
 
   EXPECT_EQ (nl.to_string (),
-    "circuit SUBCKT ($1=$1,A=A,'V42(%)'='V42(%)',Z=Z,GND=GND,GND$1=GND$1);\n"
+    "circuit SUBCKT ($1=$1,'A[5]<1>'='A[5]<1>','V42(%)'='V42(%)',Z=Z,GND=GND,GND$1=GND$1);\n"
     "  subcircuit HVPMOS D_$1 ($1='V42(%)',$2=$3,$3=Z,$4=$1);\n"
-    "  subcircuit HVPMOS D_$2 ($1='V42(%)',$2=A,$3=$3,$4=$1);\n"
+    "  subcircuit HVPMOS D_$2 ($1='V42(%)',$2='A[5]<1>',$3=$3,$4=$1);\n"
     "  subcircuit HVNMOS D_$3 ($1=GND,$2=$3,$3=GND,$4=GND$1);\n"
     "  subcircuit HVNMOS D_$4 ($1=GND,$2=$3,$3=Z,$4=GND$1);\n"
-    "  subcircuit HVNMOS D_$5 ($1=GND,$2=A,$3=$3,$4=GND$1);\n"
+    "  subcircuit HVNMOS D_$5 ($1=GND,$2='A[5]<1>',$3=$3,$4=GND$1);\n"
     "end;\n"
     "circuit HVPMOS ($1=(null),$2=(null),$3=(null),$4=(null));\n"
     "end;\n"

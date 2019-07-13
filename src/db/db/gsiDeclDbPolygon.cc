@@ -75,6 +75,16 @@ struct simple_polygon_defs
     return c->hull ().size ();
   }
 
+  static bool is_rectilinear (C *c)
+  {
+    return c->hull ().is_rectilinear ();
+  }
+
+  static bool is_empty (C *c)
+  {
+    return c->hull ().size () == 0;
+  }
+
   static C *from_string (const char *s)
   {
     tl::Extractor ex (s);
@@ -260,39 +270,32 @@ struct simple_polygon_defs
       "\n"
       "The 'raw' argument has been added in version 0.24.\n"
     ) +
-    constructor ("new", &new_b,
+    constructor ("new", &new_b, gsi::arg ("box"),
       "@brief Constructor converting a box to a polygon\n"
-      "\n"
-      "@args box\n"
       "\n"
       "@param box The box to convert to a polygon\n"
     ) +
-    constructor ("ellipse", &ellipse, 
+    constructor ("ellipse", &ellipse, gsi::arg ("box"), gsi::arg ("n"),
       "@brief Creates a simple polygon appoximating an ellipse\n"
-      "\n"
-      "@args box, n\n"
       "\n"
       "@param box The bounding box of the ellipse\n"
       "@param n The number of points that will be used to approximate the ellipse\n"
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method ("<", &C::less,
-      "@brief Less operator\n"
-      "@args p\n"
+    method ("<", &C::less, gsi::arg ("p"),
+      "@brief Returns a value indicating whether self is less than p\n"
       "@param p The object to compare against\n"
       "This operator is provided to establish some, not necessarily a certain sorting order\n"
       "\n"
       "This method has been introduced in version 0.25."
     ) +
-    method ("==", &C::equal,
-      "@brief Equality test\n"
-      "@args p\n"
+    method ("==", &C::equal, gsi::arg ("p"),
+      "@brief Returns a value indicating whether self is equal to p\n"
       "@param p The object to compare against\n"
     ) +
-    method ("!=", &C::not_equal,
-      "@brief Inequality test\n"
-      "@args p\n"
+    method ("!=", &C::not_equal, gsi::arg ("p"),
+      "@brief Returns a value indicating whether self is not equal to p\n"
       "@param p The object to compare against\n"
     ) +
     method_ext ("hash", &hash_value,
@@ -301,16 +304,15 @@ struct simple_polygon_defs
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    method_ext ("points=", &set_points1,
-      "@brief Set the points of the simple polygon\n"
+    method_ext ("points=", &set_points1, gsi::arg ("pts"),
+      "@brief Sets the points of the simple polygon\n"
       "\n"
-      "@args pts\n"
       "@param pts An array of points to assign to the simple polygon\n"
       "\n"
       "See the constructor description for details about raw mode.\n"
     ) +
     method_ext ("set_points", &set_points, gsi::arg ("pts"), gsi::arg ("raw", false),
-      "@brief Set the points of the simple polygon\n"
+      "@brief Sets the points of the simple polygon\n"
       "\n"
       "@param pts An array of points to assign to the simple polygon\n"
       "@param raw If true, the points are taken as they are\n"
@@ -319,31 +321,34 @@ struct simple_polygon_defs
       "\n"
       "This method has been added in version 0.24.\n"
     ) +
-    method_ext ("point", &point,
-      "@brief Get a specific point of the contour"
-      "@args p\n"
+    method_ext ("point", &point, gsi::arg ("p"),
+      "@brief Gets a specific point of the contour"
       "@param p The index of the point to get\n"
       "If the index of the point is not a valid index, a default value is returned.\n"
       "This method was introduced in version 0.18.\n"
     ) +
     method_ext ("num_points", &num_points,
-      "@brief Get the number of points"
+      "@brief Gets the number of points"
     ) +
     iterator ("each_point", &C::begin_hull, &C::end_hull, 
-      "@brief Iterate over the points that make up the simple polygon"
+      "@brief Iterates over the points that make up the simple polygon"
     ) +
     iterator ("each_edge", &C::begin_edge, 
-      "@brief Iterate over the edges that make up the simple polygon"
+      "@brief Iterates over the edges that make up the simple polygon"
     ) +
-    method_ext ("inside?", &inside,
-      "@brief Test, if the given point is inside the polygon\n"
-      "@args p\n"
+    method_ext ("is_empty?", &is_empty,
+      "@brief Returns a value indicating whether the polygon is empty\n"
+    ) +
+    method_ext ("is_rectilinear?", &is_rectilinear,
+      "@brief Returns a value indicating whether the polygon is rectilinear\n"
+    ) +
+    method_ext ("inside?", &inside, gsi::arg ("p"),
+      "@brief Gets a value indicating whether the given point is inside the polygon\n"
       "If the given point is inside or on the edge the polygon, true is returned. "
       "This tests works well only if the polygon is not self-overlapping and oriented clockwise. "
     ) +
-    method_ext ("compress", &compress,
-      "@brief Compress the simple polygon.\n"
-      "@args remove_reflected\n"
+    method_ext ("compress", &compress, gsi::arg ("remove_reflected"),
+      "@brief Compressed the simple polygon.\n"
       "\n"
       "This method removes redundant points from the polygon, such as points being on a line formed by two other points.\n"
       "If remove_reflected is true, points are also removed if the two adjacent edges form a spike.\n"
@@ -353,7 +358,7 @@ struct simple_polygon_defs
       "This method was introduced in version 0.18.\n"
     ) +
     method ("is_box?", &C::is_box,
-      "@brief Returns true, if the polygon is a simple box.\n"
+      "@brief Returns a value indicating whether the polygon is a simple box.\n"
       "\n"
       "A polygon is a box if it is identical to it's bounding box.\n"
       "\n"
@@ -361,17 +366,14 @@ struct simple_polygon_defs
       "\n"
       "This method was introduced in version 0.23.\n"
     ) +
-    method_ext ("*", &scale,
-      "@brief Scaling by some factor\n"
-      "\n"
-      "@args f\n"
+    method_ext ("*", &scale, gsi::arg ("f"),
+      "@brief Scales the polygon by some factor\n"
       "\n"
       "Returns the scaled object. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method ("move", &C::move,
+    method ("move", &C::move, gsi::arg ("p"),
       "@brief Moves the simple polygon.\n"
-      "@args p\n"
       "\n"
       "Moves the simple polygon by the given offset and returns the \n"
       "moved simple polygon. The polygon is overwritten.\n"
@@ -380,9 +382,8 @@ struct simple_polygon_defs
       "\n"
       "@return The moved simple polygon.\n"
     ) +
-    method_ext ("move", &move_xy,
+    method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
       "@brief Moves the polygon.\n"
-      "@args x,y\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is overwritten.\n"
@@ -392,9 +393,8 @@ struct simple_polygon_defs
       "\n"
       "@return The moved polygon (self).\n"
     ) +
-    method ("moved", &C::moved,
+    method ("moved", &C::moved, gsi::arg ("p"),
       "@brief Returns the moved simple polygon\n"
-      "@args p\n"
       "\n"
       "Moves the simple polygon by the given offset and returns the \n"
       "moved simple polygon. The polygon is not modified.\n"
@@ -403,9 +403,8 @@ struct simple_polygon_defs
       "\n"
       "@return The moved simple polygon.\n"
     ) +
-    method_ext ("moved", &moved_xy,
+    method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("y"),
       "@brief Returns the moved polygon (does not modify self)\n"
-      "@args x,y\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is not modified.\n"
@@ -417,9 +416,8 @@ struct simple_polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("transform", &transform,
+    method_ext ("transform", &transform, gsi::arg ("t"),
       "@brief Transforms the simple polygon (in-place)\n"
-      "@args t\n"
       "\n"
       "Transforms the simple polygon with the given transformation.\n"
       "Modifies self and returns self. An out-of-place version which does not modify self is \\transformed.\n"
@@ -428,9 +426,8 @@ struct simple_polygon_defs
       "\n"
       "This method has been introduced in version 0.24.\n"
     ) +
-    method_ext ("transformed", &transformed,
+    method_ext ("transformed", &transformed, gsi::arg ("t"),
       "@brief Transforms the simple polygon.\n"
-      "@args t\n"
       "\n"
       "Transforms the simple polygon with the given transformation.\n"
       "Does not modify the simple polygon but returns the transformed polygon.\n"
@@ -439,9 +436,8 @@ struct simple_polygon_defs
       "\n"
       "@return The transformed simple polygon.\n"
     ) +
-    method_ext ("transformed|#transformed_cplx", &transformed_cplx,
+    method_ext ("transformed|#transformed_cplx", &transformed_cplx, gsi::arg ("t"),
       "@brief Transforms the simple polygon.\n"
-      "@args t\n"
       "\n"
       "Transforms the simple polygon with the given complex transformation.\n"
       "Does not modify the simple polygon but returns the transformed polygon.\n"
@@ -453,19 +449,17 @@ struct simple_polygon_defs
       "With version 0.25, the original 'transformed_cplx' method is deprecated and "
       "'transformed' takes both simple and complex transformations."
     ) +
-    constructor ("from_s", &from_string,
+    constructor ("from_s", &from_string, gsi::arg ("s"),
       "@brief Creates an object from a string\n"
-      "@args s\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
       "\n"
       "This method has been added in version 0.23.\n"
     ) +
     method ("to_s", (std::string (C::*) () const) &C::to_string,
-      "@brief Convert to a string\n"
+      "@brief Returns a string representing the polygon\n"
     ) +
-    method_ext ("round_corners", &round_corners,
-      "@brief Round the corners of the polygon\n"
-      "@args rinner, router, n\n"
+    method_ext ("round_corners", &round_corners, gsi::arg ("rinner"), gsi::arg ("router"), gsi::arg ("n"),
+      "@brief Rounds the corners of the polygon\n"
       "\n"
       "Replaces the corners of the polygon with circle segments.\n"
       "\n"
@@ -516,15 +510,15 @@ struct simple_polygon_defs
       "This method has been introduced in version 0.25.3."
     ) +
     method_ext ("area", &area,
-      "@brief The area of the polygon\n"
+      "@brief Gets the area of the polygon\n"
       "The area is correct only if the polygon is not self-overlapping and the polygon is oriented clockwise."
     ) +
     method ("perimeter", &C::perimeter,
-      "@brief The perimeter of the polygon\n"
+      "@brief Gets the perimeter of the polygon\n"
       "The perimeter is sum of the lengths of all edges making up the polygon."
     ) +
     method ("bbox", &C::box,
-      "@brief Return the bounding box of the simple polygon"
+      "@brief Returns the bounding box of the simple polygon"
     ) +
     method_ext ("touches?", &touches_box, gsi::arg ("box"),
       "@brief Returns true, if the polygon touches the given box.\n"
@@ -625,57 +619,48 @@ Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pe,
-    "@brief Compute the Minkowsky sum of a polygon and an edge\n"
-    "@args a, b, resolve_holes\n"
+  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pe, gsi::arg ("e"), gsi::arg ("resolve_holes"),
+    "@brief Computes the Minkowsky sum of a polygon and an edge\n"
     "\n"
-    "@param a The first argument.\n"
-    "@param b The second argument.\n"
+    "@param e The edge.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of a and b.\n"
+    "@return The new polygon representing the Minkowsky sum of self and e.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pp,
-    "@brief Compute the Minkowsky sum of a polygon and a polygon\n"
-    "@args a, b, resolve_holes\n"
+  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pp, gsi::arg ("p"), gsi::arg ("resolve_holes"),
+    "@brief Computes the Minkowsky sum of a polygon and a polygon\n"
     "\n"
-    "@param a The first argument.\n"
-    "@param b The second argument.\n"
+    "@param p The other polygon.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of a and b.\n"
+    "@return The new polygon representing the Minkowsky sum of self and p.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pb,
-    "@brief Compute the Minkowsky sum of a polygon and a box\n"
-    "@args a, b, resolve_holes\n"
+  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pb, gsi::arg ("b"), gsi::arg ("resolve_holes"),
+    "@brief Computes the Minkowsky sum of a polygon and a box\n"
     "\n"
-    "@param a The first argument.\n"
-    "@param b The second argument.\n"
+    "@param b The box.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of a and b.\n"
+    "@return The new polygon representing the Minkowsky sum of self and b.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pc,
-    "@brief Compute the Minkowsky sum of a polygon and a contour of points (a trace)\n"
-    "@args a, b, resolve_holes\n"
+  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pc, gsi::arg ("c"), gsi::arg ("resolve_holes"),
+    "@brief Computes the Minkowsky sum of a polygon and a contour of points (a trace)\n"
     "\n"
-    "@param a The first argument.\n"
-    "@param b The second argument (a series of points forming the trace).\n"
+    "@param c The contour (a series of points forming the trace).\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of a and b.\n"
+    "@return The new polygon representing the Minkowsky sum of self and c.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("transform", &transform_icplx_sp,
+  method_ext ("transform", &transform_icplx_sp, gsi::arg ("t"),
     "@brief Transforms the simple polygon with a complex transformation (in-place)\n"
-    "@args t\n"
     "\n"
     "Transforms the simple polygon with the given complex transformation.\n"
     "Modifies self and returns self. An out-of-place version which does not modify self is \\transformed.\n"
@@ -684,9 +669,8 @@ Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) +
-  method_ext ("transformed", &transformed_icplx_sp,
-    "@brief Transform the simple polygon.\n"
-    "@args t\n"
+  method_ext ("transformed", &transformed_icplx_sp, gsi::arg ("t"),
+    "@brief Transforms the simple polygon.\n"
     "\n"
     "Transforms the simple polygon with the given complex transformation.\n"
     "Does not modify the simple polygon but returns the transformed polygon.\n"
@@ -747,9 +731,8 @@ Class<db::DSimplePolygon> decl_DSimplePolygon ("db", "DSimplePolygon",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("transform", &transform_cplx_sp,
+  method_ext ("transform", &transform_cplx_sp, gsi::arg ("t"),
     "@brief Transforms the simple polygon with a complex transformation (in-place)\n"
-    "@args t\n"
     "\n"
     "Transforms the simple polygon with the given complex transformation.\n"
     "Modifies self and returns self. An out-of-place version which does not modify self is \\transformed.\n"
@@ -758,10 +741,8 @@ Class<db::DSimplePolygon> decl_DSimplePolygon ("db", "DSimplePolygon",
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) +
-  method_ext ("transformed", &transformed_vplx_sp,
+  method_ext ("transformed", &transformed_vplx_sp, gsi::arg ("t"),
     "@brief Transforms the polygon with the given complex transformation\n"
-    "\n"
-    "@args t\n"
     "\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed polygon (in this case an integer coordinate polygon)\n"
@@ -871,6 +852,16 @@ struct polygon_defs
   static size_t num_points (C *c)
   {
     return c->vertices ();
+  }
+
+  static bool is_rectilinear (C *c)
+  {
+    return c->is_rectilinear ();
+  }
+
+  static bool is_empty (C *c)
+  {
+    return c->vertices () == 0;
   }
 
   static point_type point_hull (C *c, size_t p)
@@ -1089,54 +1080,52 @@ struct polygon_defs
   {
     return
     constructor ("new", &new_v, 
-      "@brief Default constructor: creates an empty (invalid) polygon"
+      "@brief Creates an empty (invalid) polygon"
     ) +
-    constructor ("new", &p_from_sp, 
-      "@brief Constructor from a simple polygon\n"
-      "@args sp\n"
+    constructor ("new", &p_from_sp, gsi::arg ("sp"),
+      "@brief Creates a polygon from a simple polygon\n"
       "@param sp The simple polygon that is converted into the polygon\n"
       "This method was introduced in version 0.22.\n"
     ) +
     constructor ("new", &new_p, gsi::arg ("pts"), gsi::arg ("raw", false),
-      "@brief Constructor given the points of the polygon hull\n"
+      "@brief Creates a polygon from a point array for the hull\n"
       "\n"
       "@param pts The points forming the polygon hull\n"
       "@param raw If true, the point list won't be modified (see \\assign_hull)\n"
       "\n"
       "The 'raw' argument was added in version 0.24.\n"
     ) +
-    constructor ("new", &new_b,
-      "@brief Constructor converting a box to a polygon\n"
-      "\n"
-      "@args box\n"
+    constructor ("new", &new_b, gsi::arg ("box"),
+      "@brief Creates a polygon from a box\n"
       "\n"
       "@param box The box to convert to a polygon\n"
     ) +
-    constructor ("ellipse", &ellipse, 
+    constructor ("ellipse", &ellipse, gsi::arg ("box"), gsi::arg ("n"),
       "@brief Creates a simple polygon appoximating an ellipse\n"
-      "\n"
-      "@args box, n\n"
       "\n"
       "@param box The bounding box of the ellipse\n"
       "@param n The number of points that will be used to approximate the ellipse\n"
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method ("<", &C::less,
-      "@brief Less operator\n"
-      "@args p\n"
+    method ("<", &C::less, gsi::arg ("p"),
+      "@brief Returns a value indicating whether self is less than p\n"
       "@param p The object to compare against\n"
       "This operator is provided to establish some, not necessarily a certain sorting order\n"
     ) +
-    method ("==", &C::equal,
-      "@brief Equality test\n"
-      "@args p\n"
+    method ("==", &C::equal, gsi::arg ("p"),
+      "@brief Returns a value indicating whether the polygons are equal\n"
       "@param p The object to compare against\n"
     ) +
-    method ("!=", &C::not_equal,
-      "@brief Inequality test\n"
-      "@args p\n"
+    method ("!=", &C::not_equal, gsi::arg ("p"),
+      "@brief Returns a value indicating whether the polygons are not equal\n"
       "@param p The object to compare against\n"
+    ) +
+    method_ext ("is_empty?", &is_empty,
+      "@brief Returns a value indicating whether the polygon is empty\n"
+    ) +
+    method_ext ("is_rectilinear?", &is_rectilinear,
+      "@brief Returns a value indicating whether the polygon is rectilinear\n"
     ) +
     method_ext ("hash", &hash_value,
       "@brief Computes a hash value\n"
@@ -1144,16 +1133,14 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    method_ext ("hull=", &set_hull1,
-      "@brief Set the points of the hull of polygon\n"
-      "@args p\n"
+    method_ext ("hull=", &set_hull1, gsi::arg ("p"),
+      "@brief Sets the points of the hull of polygon\n"
       "@param p An array of points to assign to the polygon's hull"
       "\n"
       "The 'assign_hull' variant is provided in analogy to 'assign_hole'.\n"
     ) +
     method_ext ("assign_hull", &set_hull, gsi::arg ("p"), gsi::arg ("raw", false),
-      "@brief Set the points of the hull of polygon\n"
-      "@args p\n"
+      "@brief Sets the points of the hull of polygon\n"
       "@param p An array of points to assign to the polygon's hull\n"
       "@param raw If true, the points won't be compressed\n"
       "\n"
@@ -1171,7 +1158,7 @@ struct polygon_defs
       "The 'raw' argument was added in version 0.24.\n"
     ) +
     method_ext ("assign_hole", &set_hole, gsi::arg ("n"), gsi::arg ("p"), gsi::arg ("raw", false),
-      "@brief Set the points of the given hole of the polygon\n"
+      "@brief Sets the points of the given hole of the polygon\n"
       "@param n The index of the hole to which the points should be assigned\n"
       "@param p An array of points to assign to the polygon's hole\n"
       "@param raw If true, the points won't be compressed (see \\assign_hull)\n"
@@ -1180,66 +1167,59 @@ struct polygon_defs
       "This method was introduced in version 0.18.\n"
       "The 'raw' argument was added in version 0.24.\n"
     ) +
-    method_ext ("assign_hole", &set_hole_box,
-      "@brief Set the box as the given hole of the polygon\n"
-      "@args n,b\n"
+    method_ext ("assign_hole", &set_hole_box, gsi::arg ("n"), gsi::arg ("b"),
+      "@brief Sets the box as the given hole of the polygon\n"
       "@param n The index of the hole to which the points should be assigned\n"
       "@param b The box to assign to the polygon's hole\n"
       "If the hole index is not valid, this method does nothing.\n"
       "This method was introduced in version 0.23.\n"
     ) +
     method_ext ("num_points", &num_points,
-      "@brief Get the total number of points (hull plus holes)\n"
+      "@brief Gets the total number of points (hull plus holes)\n"
       "This method was introduced in version 0.18.\n"
     ) +
-    method_ext ("point_hull", &point_hull,
-      "@brief Get a specific point of the hull\n"
-      "@args p\n"
+    method_ext ("point_hull", &point_hull, gsi::arg ("p"),
+      "@brief Gets a specific point of the hull\n"
       "@param p The index of the point to get\n"
       "If the index of the point is not a valid index, a default value is returned.\n"
       "This method was introduced in version 0.18.\n"
     ) +
-    method_ext ("point_hole", &point_hole,
-      "@brief Get a specific point of a hole\n"
-      "@args n,p\n"
+    method_ext ("point_hole", &point_hole, gsi::arg ("n"), gsi::arg ("p"),
+      "@brief Gets a specific point of a hole\n"
       "@param n The index of the hole to which the points should be assigned\n"
       "@param p The index of the point to get\n"
       "If the index of the point or of the hole is not valid, a default value is returned.\n"
       "This method was introduced in version 0.18.\n"
     ) +
     method_ext ("num_points_hull", &num_points_hull,
-      "@brief Get the number of points of the hull\n"
+      "@brief Gets the number of points of the hull\n"
     ) +
-    method_ext ("num_points_hole", &num_points_hole,
-      "@brief Get the number of points of the given hole\n"
-      "@args n\n"
+    method_ext ("num_points_hole", &num_points_hole, gsi::arg ("n"),
+      "@brief Gets the number of points of the given hole\n"
       "The argument gives the index of the hole of which the number of points "
       "are requested. The index must be less than the number of holes (see \\holes). "
     ) +
     method_ext ("insert_hole", &insert_hole, gsi::arg ("p"), gsi::arg ("raw", false),
-      "@brief Insert a hole with the given points\n"
+      "@brief Inserts a hole with the given points\n"
       "@param p An array of points to insert as a new hole\n"
       "@param raw If true, the points won't be compressed (see \\assign_hull)\n"
       "\n"
       "The 'raw' argument was added in version 0.24.\n"
     ) +
-    method_ext ("insert_hole", &insert_hole_box,
-      "@brief Insert a hole from the given box\n"
-      "@args b\n"
+    method_ext ("insert_hole", &insert_hole_box, gsi::arg ("b"),
+      "@brief Inserts a hole from the given box\n"
       "@param b The box to insert as a new hole\n"
       "This method was introduced in version 0.23.\n"
     ) +
     iterator ("each_point_hull", &C::begin_hull, &C::end_hull, 
-      "@brief Iterate over the points that make up the hull"
+      "@brief Iterates over the points that make up the hull"
     ) +
-    iterator ("each_point_hole", &C::begin_hole, &C::end_hole, 
-      "@brief Iterate over the points that make up the nth hole\n"
-      "@args n\n"
+    iterator ("each_point_hole", &C::begin_hole, &C::end_hole, gsi::arg ("n"),
+      "@brief Iterates over the points that make up the nth hole\n"
       "The hole number must be less than the number of holes (see \\holes)"
     ) +
-    method_ext ("size", &size_xy,
-      "@brief Sizing (biasing)\n"
-      "@args dx, dy, mode\n"
+    method_ext ("size", &size_xy, gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
+      "@brief Sizes the polygon (biasing)\n"
       "\n"
       "Shifts the contour outwards (dx,dy>0) or inwards (dx,dy<0).\n"
       "dx is the sizing in x-direction and dy is the sizing in y-direction. The sign of dx and dy should be identical.\n"
@@ -1261,9 +1241,8 @@ struct polygon_defs
       "result = ep.simple_merge_p2p([ poly ], false, false, 1)\n"
       "@/code\n"
     ) +
-    method_ext ("size", &size_dm,
-      "@brief Sizing (biasing)\n"
-      "@args d, mode\n"
+    method_ext ("size", &size_dm, gsi::arg ("d"), gsi::arg ("mode"),
+      "@brief Sizes the polygon (biasing)\n"
       "\n"
       "Shifts the contour outwards (d>0) or inwards (d<0).\n"
       "This method is equivalent to\n"
@@ -1275,9 +1254,8 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("sized", &sized_xy,
-      "@brief Sizing (biasing) without modifying self\n"
-      "@args dx, dy, mode\n"
+    method_ext ("sized", &sized_xy, gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
+      "@brief Sizes the polygon (biasing) without modifying self\n"
       "\n"
       "This method applies sizing to the polygon but does not modify self. Instead a sized copy "
       "is returned.\n"
@@ -1285,9 +1263,8 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("sized", &sized_dm,
-      "@brief Sizing (biasing) without modifying self\n"
-      "@args d, mode\n"
+    method_ext ("sized", &sized_dm, gsi::arg ("d"), gsi::arg ("mode"),
+      "@brief Sizes the polygon (biasing) without modifying self\n"
       "\n"
       "Shifts the contour outwards (d>0) or inwards (d<0).\n"
       "This method is equivalent to\n"
@@ -1297,9 +1274,8 @@ struct polygon_defs
       "\n"
       "See \\size and \\sized for a detailed description.\n"
     ) +
-    method_ext ("sized", &sized_d,
-      "@brief Sizing (biasing)\n"
-      "@args d\n"
+    method_ext ("sized", &sized_d, gsi::arg ("d"),
+      "@brief Sizes the polygon (biasing)\n"
       "\n"
       "@brief Sizing (biasing) without modifying self\n"
       "This method is equivalent to\n"
@@ -1309,9 +1285,8 @@ struct polygon_defs
       "\n"
       "See \\size and \\sized for a detailed description.\n"
     ) +
-    method_ext ("size", &size_d,
-      "@brief Sizing (biasing)\n"
-      "@args d\n"
+    method_ext ("size", &size_d, gsi::arg ("d"),
+      "@brief Sizes the polygon (biasing)\n"
       "\n"
       "Shifts the contour outwards (d>0) or inwards (d<0).\n"
       "This method is equivalent to\n"
@@ -1325,15 +1300,14 @@ struct polygon_defs
       "@brief Returns the number of holes"
     ) +
     iterator ("each_edge", (typename C::polygon_edge_iterator (C::*)() const) (&C::begin_edge), 
-      "@brief Iterate over the edges that make up the polygon\n"
+      "@brief Iterates over the edges that make up the polygon\n"
       "\n"
       "This iterator will deliver all edges, including those of the holes. "
       "Hole edges are oriented counterclockwise while hull edges are oriented clockwise.\n"
     ) +
-    iterator ("each_edge", (typename C::polygon_edge_iterator (C::*)(unsigned int) const) (&C::begin_edge), 
-      "@brief Iterate over the edges of one contour of the polygon\n"
+    iterator ("each_edge", (typename C::polygon_edge_iterator (C::*)(unsigned int) const) (&C::begin_edge), gsi::arg ("contour"),
+      "@brief Iterates over the edges of one contour of the polygon\n"
       "\n"
-      "@args contour\n"
       "@param contour The contour number (0 for hull, 1 for first hole ...)\n"
       "\n"
       "This iterator will deliver all edges of the contour specified by the contour parameter. "
@@ -1342,15 +1316,13 @@ struct polygon_defs
       "\n"
       "This method was introduced in version 0.24."
     ) +
-    method_ext ("inside?", &inside,
-      "@brief Test, if the given point is inside the polygon\n"
-      "@args p\n"
+    method_ext ("inside?", &inside, gsi::arg ("p"),
+      "@brief Tests, if the given point is inside the polygon\n"
       "If the given point is inside or on the edge of the polygon, true is returned. "
       "This tests works well only if the polygon is not self-overlapping and oriented clockwise. "
     ) +
-    method_ext ("compress", &compress,
-      "@brief Compress the polygon.\n"
-      "@args remove_reflected\n"
+    method_ext ("compress", &compress, gsi::arg ("remove_reflected"),
+      "@brief Compresses the polygon.\n"
       "\n"
       "This method removes redundant points from the polygon, such as points being on a line formed by two other points.\n"
       "If remove_reflected is true, points are also removed if the two adjacent edges form a spike.\n"
@@ -1368,17 +1340,14 @@ struct polygon_defs
       "\n"
       "This method was introduced in version 0.23.\n"
     ) +
-    method_ext ("*", &scale,
-      "@brief Scaling by some factor\n"
-      "\n"
-      "@args f\n"
+    method_ext ("*", &scale, gsi::arg ("f"),
+      "@brief Scales the polygon by some factor\n"
       "\n"
       "Returns the scaled object. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method ("move", &C::move,
+    method ("move", &C::move, gsi::arg ("p"),
       "@brief Moves the polygon.\n"
-      "@args p\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is overwritten.\n"
@@ -1389,9 +1358,8 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("move", &move_xy,
+    method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
       "@brief Moves the polygon.\n"
-      "@args x,y\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is overwritten.\n"
@@ -1401,9 +1369,8 @@ struct polygon_defs
       "\n"
       "@return The moved polygon (self).\n"
     ) +
-    method ("moved", &C::moved,
+    method ("moved", &C::moved, gsi::arg ("p"),
       "@brief Returns the moved polygon (does not modify self)\n"
-      "@args p\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is not modified.\n"
@@ -1414,9 +1381,8 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("moved", &moved_xy,
+    method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("y"),
       "@brief Returns the moved polygon (does not modify self)\n"
-      "@args x,y\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is not modified.\n"
@@ -1428,9 +1394,8 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("transform", &transform,
+    method_ext ("transform", &transform, gsi::arg ("t"),
       "@brief Transforms the polygon (in-place)\n"
-      "@args t\n"
       "\n"
       "Transforms the polygon with the given transformation.\n"
       "Modifies self and returns self. An out-of-place version which does not modify self is \\transformed.\n"
@@ -1439,9 +1404,8 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.24.\n"
     ) +
-    method_ext ("transformed", &transformed,
+    method_ext ("transformed", &transformed, gsi::arg ("t"),
       "@brief Transforms the polygon\n"
-      "@args t\n"
       "\n"
       "Transforms the polygon with the given transformation.\n"
       "Does not modify the polygon but returns the transformed polygon.\n"
@@ -1450,9 +1414,8 @@ struct polygon_defs
       "\n"
       "@return The transformed polygon.\n"
     ) +
-    method_ext ("transformed|#transformed_cplx", &transformed_cplx,
+    method_ext ("transformed|#transformed_cplx", &transformed_cplx, gsi::arg ("t"),
       "@brief Transforms the polygon with a complex transformation\n"
-      "@args t\n"
       "\n"
       "Transforms the polygon with the given complex transformation.\n"
       "Does not modify the polygon but returns the transformed polygon.\n"
@@ -1464,19 +1427,17 @@ struct polygon_defs
       "With version 0.25, the original 'transformed_cplx' method is deprecated and "
       "'transformed' takes both simple and complex transformations."
     ) +
-    constructor ("from_s", &from_string,
-      "@brief Creates an object from a string\n"
-      "@args s\n"
+    constructor ("from_s", &from_string, gsi::arg ("s"),
+      "@brief Creates a polygon from a string\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
       "\n"
       "This method has been added in version 0.23.\n"
     ) +
     method ("to_s", (std::string (C::*) () const) &C::to_string,
-      "@brief Convert to a string\n"
+      "@brief Returns a string representing the polygon\n"
     ) +
-    method_ext ("round_corners", &round_corners,
+    method_ext ("round_corners", &round_corners, gsi::arg ("rinner"), gsi::arg ("router"), gsi::arg ("n"),
       "@brief Rounds the corners of the polygon\n"
-      "@args rinner, router, n\n"
       "\n"
       "Replaces the corners of the polygon with circle segments.\n"
       "\n"
@@ -1527,18 +1488,18 @@ struct polygon_defs
       "This method has been introduced in version 0.25.3."
     ) +
     method_ext ("area", &area,
-      "@brief The area of the polygon\n"
+      "@brief Gets the area of the polygon\n"
       "The area is correct only if the polygon is not self-overlapping and the polygon is oriented clockwise."
       "Orientation is ensured automatically in most cases.\n"
     ) +
     method ("perimeter", &C::perimeter,
-      "@brief The perimeter of the polygon\n"
+      "@brief Gets the perimeter of the polygon\n"
       "The perimeter is sum of the lengths of all edges making up the polygon.\n"
       "\n"
       "This method has been introduce in version 0.23.\n"
     ) +
     method ("bbox", &C::box,
-      "@brief Return the bounding box of the polygon\n"
+      "@brief Returns the bounding box of the polygon\n"
       "The bounding box is the box enclosing all points of the polygon.\n"
     ) +
     method_ext ("touches?", &touches_box, gsi::arg ("box"),
@@ -1788,9 +1749,8 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("smooth", &smooth,
+  method_ext ("smooth", &smooth, gsi::arg ("d"),
     "@brief Smoothes a polygon\n"
-    "@args d\n"
     "\n"
     "Remove vertices that deviate by more than the distance d from the average contour.\n"
     "The value d is basically the roughness which is removed.\n"
@@ -1801,9 +1761,8 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.23.\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pe,
+  method_ext ("minkowsky_sum", &minkowsky_sum_pe, gsi::arg ("e"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowsky sum of the polygon and an edge\n"
-    "@args e, resolve_holes\n"
     "\n"
     "@param e The edge.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
@@ -1816,9 +1775,8 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pp,
+  method_ext ("minkowsky_sum", &minkowsky_sum_pp, gsi::arg ("b"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowsky sum of the polygon and a polygon\n"
-    "@args p, resolve_holes\n"
     "\n"
     "@param p The first argument.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
@@ -1827,9 +1785,8 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pb,
+  method_ext ("minkowsky_sum", &minkowsky_sum_pb, gsi::arg ("b"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowsky sum of the polygon and a box\n"
-    "@args b, resolve_holes\n"
     "\n"
     "@param b The box.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
@@ -1838,9 +1795,8 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pc,
+  method_ext ("minkowsky_sum", &minkowsky_sum_pc, gsi::arg ("b"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowsky sum of the polygon and a contour of points (a trace)\n"
-    "@args b, resolve_holes\n"
     "\n"
     "@param b The contour (a series of points forming the trace).\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
@@ -1849,9 +1805,8 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("transform", &transform_icplx_dp,
+  method_ext ("transform", &transform_icplx_dp, gsi::arg ("t"),
     "@brief Transforms the polygon with a complex transformation (in-place)\n"
-    "@args t\n"
     "\n"
     "Transforms the polygon with the given complex transformation.\n"
     "This version modifies self and will return self as the modified polygon. An out-of-place version "
@@ -1861,9 +1816,8 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.24.\n"
   ) +
-  method_ext ("transformed", &transformed_icplx_dp,
+  method_ext ("transformed", &transformed_icplx_dp, gsi::arg ("t"),
     "@brief Transforms the polygon with a complex transformation\n"
-    "@args t\n"
     "\n"
     "Transforms the polygon with the given complex transformation.\n"
     "Does not modify the polygon but returns the transformed polygon.\n"

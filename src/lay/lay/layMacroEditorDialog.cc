@@ -685,27 +685,22 @@ BEGIN_PROTECTED
       }
     }
 
-    if (cat == "drc") {
-      TipDialog td (this, 
-                    tl::to_string (QObject::tr ("<html><body>To get started with the DRC feature, read the documentation provided: <a href=\"int:/manual/drc.xml\">Design Rule Checks (DRC)</a>.</body></html>")), 
-                    "macro-editor-drc-tips");
-      td.exec_dialog ();
-    } else {
-      TipDialog td (this, 
-                    tl::to_string (QObject::tr ("<html><body>To get started with the macro development feature, read the documentation provided: <a href=\"int:/about/macro_editor.xml\">About Macro Development</a>.</body></html>")), 
-                    "macro-editor-basic-tips");
-      td.exec_dialog ();
-    }
+    TipDialog td (this,
+                  tl::to_string (QObject::tr ("<html><body>To get started with the macro development feature, read the documentation provided: <a href=\"int:/about/macro_editor.xml\">About Macro Development</a>.</body></html>")),
+                  "macro-editor-basic-tips");
+    td.exec_dialog ();
 
-  } else if (force_add) {
+  } else {
 
     if (! cat.empty ()) {
       select_category (cat);
     }
 
-    lym::Macro *m = new_macro ();
-    if (force_add && m) {
-      set_run_macro (m);
+    if (force_add) {
+      lym::Macro *m = new_macro ();
+      if (m) {
+        set_run_macro (m);
+      }
     }
 
   }

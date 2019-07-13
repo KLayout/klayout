@@ -70,8 +70,18 @@ module LVS
       # create a template for the macro editor:
       mt = create_template("lvs")
       mt.text = &lt;&lt;"END"
+# Try this sample script with this layout:
+#   https://github.com/KLayout/klayout/tree/master/samples/lvs/ringo.gds
+# and this schematic:
+#   https://github.com/KLayout/klayout/tree/master/samples/lvs/schematic.cir
+
 # Reference schematic (if not absolute: path relative to original layout)
 schematic("schematic.cir")
+
+# Tip: you can also use:
+#   schematic(source.path.sub(/\.(oas|gds)/, ".cir"))
+# to derive the schematic name from the layout file's name 
+# by substituting .oas or .gsd with .cir.
 
 # Enable hierarchical mode
 deep
@@ -88,12 +98,10 @@ active      = input(2, 0)
 pplus       = input(3, 0)
 nplus       = input(4, 0)
 poly        = input(5, 0)
-contact     = input(6, 0)
-metal1      = input(7, 0)
-metal1_lbl  = labels(7, 1)
-via1        = input(8, 0)
-metal2      = input(9, 0)
-metal2_lbl  = labels(9, 1)
+contact     = input(8, 0)
+metal1      = input(9, 0)   # includes labels
+via1        = input(10, 0)
+metal2      = input(11, 0)  # includes labels
 
 # Bulk layer for terminal provisioning
 bulk        = polygon_layer
@@ -133,10 +141,8 @@ connect(ntie,       contact)
 connect(nwell,      ntie)
 connect(ptie,       contact)
 connect(contact,    metal1)
-connect(metal1,     metal1_lbl)   # attaches labels
 connect(metal1,     via1)
 connect(via1,       metal2)
-connect(metal2,     metal2_lbl)   # attaches labels
 
 # Global
 connect_global(bulk, "SUBSTRATE")

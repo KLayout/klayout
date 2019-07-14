@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>LVS Device Classes</title>
+  <keyword name="LVS"/>
+  <keyword name="LVS Device Classes"/>
+
+  <h2-index/>
+
+  <p>
+  KLayout implements a variety of standard device classes. These device classes
+  are the basis for forming particular incarnations of device classes. 
+  For example, the MOS4 class is the basis for the specific device classes
+  for NMOS and PMOS transistors.
+  </p>
+
+  <h2>Resistor</h2>
+
+  <p>
+  <img src="/manual/res_schematic.png"/>
+  </p>
+
+  <p>
+  The plain resistor has two terminals, A and B. It features the following
+  parameters:
+  </p>
+
+  <ul>
+    <li><b><tt>R</tt></b>: The resistance value in Ohm</li>
+    <li><b><tt>L</tt></b>: The length in µm</li>
+    <li><b><tt>W</tt></b>: The width in µm</li>
+    <li><b><tt>A</tt></b>: The area of the resistor area in µm²</li>
+    <li><b><tt>P</tt></b>: The perimeter of the resistor area in µm</li>
+  </ul>
+
+  <p>
+  Resistors can combine in parallel or serial fashion.
+  </p>
+
+  <p>
+  In SPICE, plain resistors are represented by the "R" element.
+  The API class is <class_doc href="DeviceClassResistor"/>.
+  </p>
+
+  <h2>Resistor with bulk terminal</h2>
+
+  <p>
+  <img src="/manual/res_with_bulk_schematic.png"/>
+  </p>
+
+  <p>
+  The resistor with bulk terminal is an extension of the plain resistor.
+  If has the same parameters, but one additional terminal (W) which connects to 
+  the area the resistor sits in (e.g. well or substrate).
+  </p>
+
+  <p>
+  Resistors with bulk can combine in parallel or serial fashion if their
+  bulk terminals are connected to the same net.
+  </p>
+
+  <p>
+  The API class of the resistor with bulk is <class_doc href="DeviceClassResistorWithBulk"/>.
+  </p>
+
+  <h2>Capacitor</h2>
+
+  <p>
+  <img src="/manual/cap_schematic.png"/>
+  </p>
+
+  <p>
+  The plain capacitor has two terminals, A and B. It features the following
+  parameters:
+  </p>
+
+  <ul>
+    <li><b><tt>C</tt></b>: The capacitance value in Farad</li>
+    <li><b><tt>A</tt></b>: The area of the capacitor area in µm²</li>
+    <li><b><tt>P</tt></b>: The perimeter of the capacitor area in µm</li>
+  </ul>
+
+  <p>
+  In SPICE, plain capacitors are represented by the "C" element.
+  The API class is <class_doc href="DeviceClassCapacitor"/>.
+  </p>
+
+  <h2>Capacitor with bulk terminal</h2>
+
+  <p>
+  <img src="/manual/cap_with_bulk_schematic.png"/>
+  </p>
+
+  <p>
+  The capacitor with bulk terminal is an extension of the plain capacitor.
+  If has the same parameters, but one additional terminal (W) which connects to 
+  the area the capacitor sits in (e.g. well or substrate).
+  </p>
+
+  <p>
+  Capacitors with bulk can combine in parallel or serial fashion if their
+  bulk terminals are connected to the same net.
+  </p>
+
+  <p>
+  The API class of the capacitor with bulk is <class_doc href="DeviceClassCapacitorWithBulk"/>.
+  </p>
+
+  <h2>Diode</h2>
+
+  <p>
+  <img src="/manual/diode_schematic.png"/>
+  </p>
+
+  <p>
+  Diodes have two terminals, A and C for anode and cathode. Diodes 
+  feature the following parameters:
+  </p>
+
+  <ul>
+    <li><b><tt>A</tt></b>: The area of the diode in µm²</li>
+    <li><b><tt>P</tt></b>: The perimeter of the diode in µm</li>
+  </ul>
+
+  <p>
+  Diodes combine in parallel (A to A and C to C). In this case
+  their areas and perimeters will add.
+  </p>
+
+  <p>
+  In SPICE, diodes are represented by the "D" element using the 
+  device class name as the model name.
+  The API class is <class_doc href="DeviceClassDiode"/>.
+  </p>
+
+  <h2>MOS transistor</h2>
+
+  <p>
+  <img src="/manual/mos3_schematic.png"/>
+  </p>
+
+  <p>
+  Three-terminal MOS transistors have terminals S, G and D for source, gate and drain.
+  S and D are commutable. They feature the following parameters:
+  </p>
+
+  <ul>
+    <li><b><tt>W</tt></b>: The gate width in µm</li>
+    <li><b><tt>L</tt></b>: The gate (channel) length in µm</li>
+    <li><b><tt>AS</tt></b>: The source area in µm²</li>
+    <li><b><tt>PS</tt></b>: The source perimeter in µm</li>
+    <li><b><tt>AD</tt></b>: The drain area in µm²</li>
+    <li><b><tt>PD</tt></b>: The drain perimeter in µm</li>
+  </ul>
+
+  <p>
+  MOS3 transistors combine in parallel when the source/drains and gates are connected
+  and their gate lengths are identical.
+  In this case their widths, areas and perimeters will add.
+  </p>
+
+  <h2>MOS transistor with bulk</h2>
+
+  <p>
+  The API class of the three-terminal MOS transistor is <class_doc href="DeviceClassMOS3"/>.
+  </p>
+
+  <p>
+  <img src="/manual/mos4_schematic.png"/>
+  </p>
+
+  <p>
+  The four-terminal transistor is an extension of the three-terminal one and
+  offers an additional bulk terminal (B). It is probably the most prominent 
+  transistor device as the four-terminal version is compatible with the SPICE
+  "M" element.
+  </p>
+
+  <p>
+  MOS transistors with bulk can combine in parallel the same way the three-terminal
+  versions do if their bulk terminals are connected to the same net.
+  </p>
+
+  <p>
+  In SPICE, MOS4 devices are represented by the "M" element with the
+  device class name as the model name.
+  The API class is <class_doc href="DeviceClassDiode"/>.
+  </p>
+
+  <h2>Bipolar transistor</h2>
+
+  <p>
+  <img src="/manual/bjt3_schematic.png"/>
+  </p>
+
+  <p>
+  The three-terminal bipolar transistor can be either NPN or PNP type. 
+  In KLayout, this device type can represent both lateral and vertical
+  types. 
+  The parameters are:
+  </p>
+
+  <ul>
+    <li><b><tt>AE</tt></b>: The emitter area in µm²</li>
+    <li><b><tt>PE</tt></b>: The emitter perimeter in µm</li>
+    <li><b><tt>NE</tt></b>: The emitter count (initially 1)</li>
+    <li><b><tt>AB</tt></b>: The base area in µm²</li>
+    <li><b><tt>PB</tt></b>: The base perimeter in µm</li>
+    <li><b><tt>AC</tt></b>: The collector area in µm²</li>
+    <li><b><tt>PC</tt></b>: The collector perimeter in µm</li>
+  </ul>
+
+  <p>
+  Upon extraction, multi-emitter versions are extracted as multiple devices - one
+  for each emitter area - and NE = 1. Bipolar transistors combine when in parallel.
+  In this case, their emitter parameters AE, PE and NE are added.
+  </p>
+
+  <p>
+  In SPICE, BJT3 devices are represented by the "Q" element with the
+  device class name as the model name.
+  The API class is <class_doc href="DeviceClassBJT3"/>.
+  </p>
+
+  <h2>Bipolar transistor with substrate</h2>
+
+  <p>
+  <img src="/manual/bjt4_schematic.png"/>
+  </p>
+
+  <p>
+  The four-terminal transistor is an extension of the three-terminal one and
+  offers an additional bulk terminal (S).
+  </p>
+
+  <p>
+  Bipolar transistors with bulk can combine in parallel the same way the three-terminal
+  versions do if their bulk terminals are connected to the same net.
+  </p>
+
+  <p>
+  In SPICE, BJT4 devices are represented by the "Q" element with four nodes and the
+  device class name as the model name.
+  The API class is <class_doc href="DeviceClassBJT4"/>.
+  </p>
+
+</doc>
+

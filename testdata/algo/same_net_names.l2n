@@ -1,0 +1,103 @@
+#%l2n-klayout
+W(CIRCUIT)
+U(0.001)
+D(D$HVPMOS HVPMOS
+ T(S
+ )
+ T(G
+ )
+ T(D
+ )
+ T(B
+ )
+)
+D(D$HVNMOS HVNMOS
+ T(S
+ )
+ T(G
+ )
+ T(D
+ )
+ T(B
+ )
+)
+X(SUBCKT
+ N(1
+ )
+ N(2 I(A)
+ )
+ N(3
+ )
+ N(4 I('V42(%)')
+ )
+ N(5 I(Z)
+ )
+ N(6 I(gnd)
+ )
+ N(7 I(gnd)
+ )
+ P(1)
+ P(2 I(A))
+ P(4 I(V42))
+ P(5 I(Z))
+ P(6 I(gnd))
+ P(7 I(gnd))
+ D(1 D$HVPMOS
+  E(L 0.2)
+  E(W 1)
+  E(AS 0.18)
+  E(AD 0.18)
+  E(PS 2.16)
+  E(PD 2.16)
+  T(S 4)
+  T(G 3)
+  T(D 5)
+  T(B 1)
+ )
+ D(2 D$HVPMOS
+  E(L 0.2)
+  E(W 1)
+  E(AS 0.18)
+  E(AD 0.18)
+  E(PS 2.16)
+  E(PD 2.16)
+  T(S 4)
+  T(G 2)
+  T(D 3)
+  T(B 1)
+ )
+ D(3 D$HVNMOS
+  E(L 1.13)
+  E(W 2.12)
+  E(PS 6)
+  E(PD 6)
+  T(S 6)
+  T(G 3)
+  T(D 6)
+  T(B 7)
+ )
+ D(4 D$HVNMOS
+  E(L 0.4)
+  E(W 0.4)
+  E(AS 0.19)
+  E(AD 0.19)
+  E(PS 1.16)
+  E(PD 1.16)
+  T(S 6)
+  T(G 3)
+  T(D 5)
+  T(B 7)
+ )
+ D(5 D$HVNMOS
+  E(L 0.4)
+  E(W 0.4)
+  E(AS 0.19)
+  E(AD 0.19)
+  E(PS 1.76)
+  E(PD 1.76)
+  T(S 6)
+  T(G 2)
+  T(D 3)
+  T(B 7)
+ )
+)

@@ -209,205 +209,205 @@
 * net 99 n98
 * net 100 n99
 * net 101 n100
-* device instance $1 0,0 RCLS
+* device instance $1 r0 *1 0,0 RCLS
 R$1 1 2 0
-* device instance $2 0,0 RCLS
+* device instance $2 r0 *1 0,0 RCLS
 R$2 1 3 0
-* device instance $3 0,0 RCLS
+* device instance $3 r0 *1 0,0 RCLS
 R$3 1 4 0
-* device instance $4 0,0 RCLS
+* device instance $4 r0 *1 0,0 RCLS
 R$4 1 5 0
-* device instance $5 0,0 RCLS
+* device instance $5 r0 *1 0,0 RCLS
 R$5 1 6 0
-* device instance $6 0,0 RCLS
+* device instance $6 r0 *1 0,0 RCLS
 R$6 1 7 0
-* device instance $7 0,0 RCLS
+* device instance $7 r0 *1 0,0 RCLS
 R$7 1 8 0
-* device instance $8 0,0 RCLS
+* device instance $8 r0 *1 0,0 RCLS
 R$8 1 9 0
-* device instance $9 0,0 RCLS
+* device instance $9 r0 *1 0,0 RCLS
 R$9 1 10 0
-* device instance $10 0,0 RCLS
+* device instance $10 r0 *1 0,0 RCLS
 R$10 1 11 0
-* device instance $11 0,0 RCLS
+* device instance $11 r0 *1 0,0 RCLS
 R$11 1 12 0
-* device instance $12 0,0 RCLS
+* device instance $12 r0 *1 0,0 RCLS
 R$12 1 13 0
-* device instance $13 0,0 RCLS
+* device instance $13 r0 *1 0,0 RCLS
 R$13 1 14 0
-* device instance $14 0,0 RCLS
+* device instance $14 r0 *1 0,0 RCLS
 R$14 1 15 0
-* device instance $15 0,0 RCLS
+* device instance $15 r0 *1 0,0 RCLS
 R$15 1 16 0
-* device instance $16 0,0 RCLS
+* device instance $16 r0 *1 0,0 RCLS
 R$16 1 17 0
-* device instance $17 0,0 RCLS
+* device instance $17 r0 *1 0,0 RCLS
 R$17 1 18 0
-* device instance $18 0,0 RCLS
+* device instance $18 r0 *1 0,0 RCLS
 R$18 1 19 0
-* device instance $19 0,0 RCLS
+* device instance $19 r0 *1 0,0 RCLS
 R$19 1 20 0
-* device instance $20 0,0 RCLS
+* device instance $20 r0 *1 0,0 RCLS
 R$20 1 21 0
-* device instance $21 0,0 RCLS
+* device instance $21 r0 *1 0,0 RCLS
 R$21 1 22 0
-* device instance $22 0,0 RCLS
+* device instance $22 r0 *1 0,0 RCLS
 R$22 1 23 0
-* device instance $23 0,0 RCLS
+* device instance $23 r0 *1 0,0 RCLS
 R$23 1 24 0
-* device instance $24 0,0 RCLS
+* device instance $24 r0 *1 0,0 RCLS
 R$24 1 25 0
-* device instance $25 0,0 RCLS
+* device instance $25 r0 *1 0,0 RCLS
 R$25 1 26 0
-* device instance $26 0,0 RCLS
+* device instance $26 r0 *1 0,0 RCLS
 R$26 1 27 0
-* device instance $27 0,0 RCLS
+* device instance $27 r0 *1 0,0 RCLS
 R$27 1 28 0
-* device instance $28 0,0 RCLS
+* device instance $28 r0 *1 0,0 RCLS
 R$28 1 29 0
-* device instance $29 0,0 RCLS
+* device instance $29 r0 *1 0,0 RCLS
 R$29 1 30 0
-* device instance $30 0,0 RCLS
+* device instance $30 r0 *1 0,0 RCLS
 R$30 1 31 0
-* device instance $31 0,0 RCLS
+* device instance $31 r0 *1 0,0 RCLS
 R$31 1 32 0
-* device instance $32 0,0 RCLS
+* device instance $32 r0 *1 0,0 RCLS
 R$32 1 33 0
-* device instance $33 0,0 RCLS
+* device instance $33 r0 *1 0,0 RCLS
 R$33 1 34 0
-* device instance $34 0,0 RCLS
+* device instance $34 r0 *1 0,0 RCLS
 R$34 1 35 0
-* device instance $35 0,0 RCLS
+* device instance $35 r0 *1 0,0 RCLS
 R$35 1 36 0
-* device instance $36 0,0 RCLS
+* device instance $36 r0 *1 0,0 RCLS
 R$36 1 37 0
-* device instance $37 0,0 RCLS
+* device instance $37 r0 *1 0,0 RCLS
 R$37 1 38 0
-* device instance $38 0,0 RCLS
+* device instance $38 r0 *1 0,0 RCLS
 R$38 1 39 0
-* device instance $39 0,0 RCLS
+* device instance $39 r0 *1 0,0 RCLS
 R$39 1 40 0
-* device instance $40 0,0 RCLS
+* device instance $40 r0 *1 0,0 RCLS
 R$40 1 41 0
-* device instance $41 0,0 RCLS
+* device instance $41 r0 *1 0,0 RCLS
 R$41 1 42 0
-* device instance $42 0,0 RCLS
+* device instance $42 r0 *1 0,0 RCLS
 R$42 1 43 0
-* device instance $43 0,0 RCLS
+* device instance $43 r0 *1 0,0 RCLS
 R$43 1 44 0
-* device instance $44 0,0 RCLS
+* device instance $44 r0 *1 0,0 RCLS
 R$44 1 45 0
-* device instance $45 0,0 RCLS
+* device instance $45 r0 *1 0,0 RCLS
 R$45 1 46 0
-* device instance $46 0,0 RCLS
+* device instance $46 r0 *1 0,0 RCLS
 R$46 1 47 0
-* device instance $47 0,0 RCLS
+* device instance $47 r0 *1 0,0 RCLS
 R$47 1 48 0
-* device instance $48 0,0 RCLS
+* device instance $48 r0 *1 0,0 RCLS
 R$48 1 49 0
-* device instance $49 0,0 RCLS
+* device instance $49 r0 *1 0,0 RCLS
 R$49 1 50 0
-* device instance $50 0,0 RCLS
+* device instance $50 r0 *1 0,0 RCLS
 R$50 1 51 0
-* device instance $51 0,0 RCLS
+* device instance $51 r0 *1 0,0 RCLS
 R$51 1 52 0
-* device instance $52 0,0 RCLS
+* device instance $52 r0 *1 0,0 RCLS
 R$52 1 53 0
-* device instance $53 0,0 RCLS
+* device instance $53 r0 *1 0,0 RCLS
 R$53 1 54 0
-* device instance $54 0,0 RCLS
+* device instance $54 r0 *1 0,0 RCLS
 R$54 1 55 0
-* device instance $55 0,0 RCLS
+* device instance $55 r0 *1 0,0 RCLS
 R$55 1 56 0
-* device instance $56 0,0 RCLS
+* device instance $56 r0 *1 0,0 RCLS
 R$56 1 57 0
-* device instance $57 0,0 RCLS
+* device instance $57 r0 *1 0,0 RCLS
 R$57 1 58 0
-* device instance $58 0,0 RCLS
+* device instance $58 r0 *1 0,0 RCLS
 R$58 1 59 0
-* device instance $59 0,0 RCLS
+* device instance $59 r0 *1 0,0 RCLS
 R$59 1 60 0
-* device instance $60 0,0 RCLS
+* device instance $60 r0 *1 0,0 RCLS
 R$60 1 61 0
-* device instance $61 0,0 RCLS
+* device instance $61 r0 *1 0,0 RCLS
 R$61 1 62 0
-* device instance $62 0,0 RCLS
+* device instance $62 r0 *1 0,0 RCLS
 R$62 1 63 0
-* device instance $63 0,0 RCLS
+* device instance $63 r0 *1 0,0 RCLS
 R$63 1 64 0
-* device instance $64 0,0 RCLS
+* device instance $64 r0 *1 0,0 RCLS
 R$64 1 65 0
-* device instance $65 0,0 RCLS
+* device instance $65 r0 *1 0,0 RCLS
 R$65 1 66 0
-* device instance $66 0,0 RCLS
+* device instance $66 r0 *1 0,0 RCLS
 R$66 1 67 0
-* device instance $67 0,0 RCLS
+* device instance $67 r0 *1 0,0 RCLS
 R$67 1 68 0
-* device instance $68 0,0 RCLS
+* device instance $68 r0 *1 0,0 RCLS
 R$68 1 69 0
-* device instance $69 0,0 RCLS
+* device instance $69 r0 *1 0,0 RCLS
 R$69 1 70 0
-* device instance $70 0,0 RCLS
+* device instance $70 r0 *1 0,0 RCLS
 R$70 1 71 0
-* device instance $71 0,0 RCLS
+* device instance $71 r0 *1 0,0 RCLS
 R$71 1 72 0
-* device instance $72 0,0 RCLS
+* device instance $72 r0 *1 0,0 RCLS
 R$72 1 73 0
-* device instance $73 0,0 RCLS
+* device instance $73 r0 *1 0,0 RCLS
 R$73 1 74 0
-* device instance $74 0,0 RCLS
+* device instance $74 r0 *1 0,0 RCLS
 R$74 1 75 0
-* device instance $75 0,0 RCLS
+* device instance $75 r0 *1 0,0 RCLS
 R$75 1 76 0
-* device instance $76 0,0 RCLS
+* device instance $76 r0 *1 0,0 RCLS
 R$76 1 77 0
-* device instance $77 0,0 RCLS
+* device instance $77 r0 *1 0,0 RCLS
 R$77 1 78 0
-* device instance $78 0,0 RCLS
+* device instance $78 r0 *1 0,0 RCLS
 R$78 1 79 0
-* device instance $79 0,0 RCLS
+* device instance $79 r0 *1 0,0 RCLS
 R$79 1 80 0
-* device instance $80 0,0 RCLS
+* device instance $80 r0 *1 0,0 RCLS
 R$80 1 81 0
-* device instance $81 0,0 RCLS
+* device instance $81 r0 *1 0,0 RCLS
 R$81 1 82 0
-* device instance $82 0,0 RCLS
+* device instance $82 r0 *1 0,0 RCLS
 R$82 1 83 0
-* device instance $83 0,0 RCLS
+* device instance $83 r0 *1 0,0 RCLS
 R$83 1 84 0
-* device instance $84 0,0 RCLS
+* device instance $84 r0 *1 0,0 RCLS
 R$84 1 85 0
-* device instance $85 0,0 RCLS
+* device instance $85 r0 *1 0,0 RCLS
 R$85 1 86 0
-* device instance $86 0,0 RCLS
+* device instance $86 r0 *1 0,0 RCLS
 R$86 1 87 0
-* device instance $87 0,0 RCLS
+* device instance $87 r0 *1 0,0 RCLS
 R$87 1 88 0
-* device instance $88 0,0 RCLS
+* device instance $88 r0 *1 0,0 RCLS
 R$88 1 89 0
-* device instance $89 0,0 RCLS
+* device instance $89 r0 *1 0,0 RCLS
 R$89 1 90 0
-* device instance $90 0,0 RCLS
+* device instance $90 r0 *1 0,0 RCLS
 R$90 1 91 0
-* device instance $91 0,0 RCLS
+* device instance $91 r0 *1 0,0 RCLS
 R$91 1 92 0
-* device instance $92 0,0 RCLS
+* device instance $92 r0 *1 0,0 RCLS
 R$92 1 93 0
-* device instance $93 0,0 RCLS
+* device instance $93 r0 *1 0,0 RCLS
 R$93 1 94 0
-* device instance $94 0,0 RCLS
+* device instance $94 r0 *1 0,0 RCLS
 R$94 1 95 0
-* device instance $95 0,0 RCLS
+* device instance $95 r0 *1 0,0 RCLS
 R$95 1 96 0
-* device instance $96 0,0 RCLS
+* device instance $96 r0 *1 0,0 RCLS
 R$96 1 97 0
-* device instance $97 0,0 RCLS
+* device instance $97 r0 *1 0,0 RCLS
 R$97 1 98 0
-* device instance $98 0,0 RCLS
+* device instance $98 r0 *1 0,0 RCLS
 R$98 1 99 0
-* device instance $99 0,0 RCLS
+* device instance $99 r0 *1 0,0 RCLS
 R$99 1 100 0
-* device instance $100 0,0 RCLS
+* device instance $100 r0 *1 0,0 RCLS
 R$100 1 101 0
 .ENDS
 + C1withaverylongextensionthatgoesbeyondmultiplelinesunlessipasteeverythingtogetherwhichmakesithardtoreadbutexactlythatisthereasonwhyiwriteitthisway

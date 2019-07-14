@@ -183,6 +183,11 @@ static size_t ld_index (const db::NetlistDeviceExtractorLayerDefinition *ld)
   return ld->index;
 }
 
+static size_t ld_fallback_index (const db::NetlistDeviceExtractorLayerDefinition *ld)
+{
+  return ld->fallback_index;
+}
+
 Class<db::NetlistDeviceExtractorLayerDefinition> decl_dbNetlistDeviceExtractorLayerDefinition ("db", "NetlistDeviceExtractorLayerDefinition",
   gsi::method_ext ("name", &ld_name,
     "@brief Gets the name of the layer.\n"
@@ -192,6 +197,10 @@ Class<db::NetlistDeviceExtractorLayerDefinition> decl_dbNetlistDeviceExtractorLa
   ) +
   gsi::method_ext ("index", &ld_index,
     "@brief Gets the index of the layer.\n"
+  ) +
+  gsi::method_ext ("fallback_index", &ld_fallback_index,
+    "@brief Gets the index of the fallback layer.\n"
+    "This is the index of the layer to be used when this layer isn't specified for input or (more important) output.\n"
   ),
   "@brief Describes a layer used in the device extraction\n"
   "This read-only structure is used to describe a layer in the device extraction.\n"
@@ -267,12 +276,22 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
    "This method shall be used inside the implementation of \\setup to register\n"
    "the device classes.\n"
   ) +
-  gsi::method ("define_layer", &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("description"),
+  gsi::method ("define_layer", (const db::NetlistDeviceExtractorLayerDefinition &(GenericDeviceExtractor::*) (const std::string &name, const std::string &)) &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("description"),
    "@brief Defines a layer.\n"
+   "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
    "Each call will define one more layer for the device extraction.\n"
    "This method shall be used inside the implementation of \\setup to define\n"
    "the device layers. The actual geometries are later available to \\extract_devices\n"
    "in the order the layers are defined.\n"
+  ) +
+  gsi::method ("define_opt_layer", (const db::NetlistDeviceExtractorLayerDefinition &(GenericDeviceExtractor::*) (const std::string &name, const std::string &)) &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("description"),
+   "@brief Defines a layer with a fallback layer.\n"
+   "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
+   "As \\define_layer, this method allows specification of device extraction layer. In addition to \\define_layout, it features "
+   "a fallback layer. If in the device extraction statement, the primary layer is not given, "
+   "the fallback layer will be used. Hence, this layer is optional. The fallback layer is given by it's "
+   "index and must be defined before the layer using the fallback layer is defined. "
+   "For the index, 0 is the first layer defined, 1 the second and so forth."
   ) +
   gsi::method ("create_device", &GenericDeviceExtractor::create_device,
    "@brief Creates a device.\n"
@@ -392,7 +411,10 @@ Class<db::NetlistDeviceExtractorMOS3Transistor> decl_NetlistDeviceExtractorMOS3T
   "conductive layer.\n"
   "\n"
   "The device class produced by this extractor is \\DeviceClassMOS3Transistor.\n"
-  "The extractor extracts the four parameters of this class: L, W, AS and AD.\n"
+  "The extractor extracts the six parameters of this class: L, W, AS, AD, PS and PD.\n"
+  "\n"
+  "The device recognition layer names are 'SD' (source/drain) and 'G' (gate).\n"
+  "The terminal output layer names are 'tS' (source), 'tG' (gate) and 'tD' (drain).\n"
   "\n"
   "The diffusion area is distributed on the number of gates connecting to\n"
   "the particular source or drain area.\n"
@@ -415,22 +437,231 @@ Class<db::NetlistDeviceExtractorMOS4Transistor> decl_NetlistDeviceExtractorMOS4T
   "@brief A device extractor for a four-terminal MOS transistor\n"
   "\n"
   "This class supplies the generic extractor for a MOS device.\n"
-  "The device is defined by two basic input layers: the diffusion area\n"
-  "(source and drain) and the gate area. It requires a third layer\n"
-  "(poly) to put the gate terminals on and a forth layer to put the bulk\n"
-  "terminal an. The separation between poly\n"
-  "and allows separating the device recognition layer (gate) from the\n"
-  "conductive layer.\n"
+  "It is based on the \\DeviceExtractorMOS3Transistor class with the extension of a bulk terminal "
+  "and corresponding bulk terminal output (annotation) layer.\n"
   "\n"
-  "The bulk terminal layer can be an empty layer representing the substrate.\n"
-  "In this use mode the bulk terminal shapes will be produced there. This\n"
-  "layer then needs to be connected to a global net to establish the net.\n"
+  "The bulk terminal layer ('tB') can be an empty layer representing the substrate.\n"
+  "In this use mode the bulk terminal shapes will be produced on the 'tB' layer. This\n"
+  "layer then needs to be connected to a global net to establish the net connection.\n"
   "\n"
   "The device class produced by this extractor is \\DeviceClassMOS4Transistor.\n"
-  "The extractor extracts the four parameters of this class: L, W, AS and AD.\n"
+  "The "
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
   "\n"
-  "The diffusion area is distributed on the number of gates connecting to\n"
-  "the particular source or drain area.\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorResistor *make_res_extractor (const std::string &name, double sheet_rho)
+{
+  return new db::NetlistDeviceExtractorResistor (name, sheet_rho);
+}
+
+Class<db::NetlistDeviceExtractorResistor> decl_NetlistDeviceExtractorResistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorResistor",
+  gsi::constructor ("new", &make_res_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a two-terminal resistor\n"
+  "\n"
+  "This class supplies the generic extractor for a resistor device.\n"
+  "The device is defined by two geometry layers: the resistor 'wire' and "
+  "two contacts per wire. The contacts should be attached to the ends "
+  "of the wire. The wire length and width is computed from the "
+  "edge lengths between the contacts and along the contacts respectively.\n"
+  "\n"
+  "This simple computation is precise only when the resistor shape is "
+  "a rectangle.\n"
+  "\n"
+  "Using the given sheet resistance, the resistance value is computed by "
+  "'R = L / W * sheet_rho'.\n"
+  "\n"
+  "The device class produced by this extractor is \\DeviceClassResistor.\n"
+  "The extractor extracts the three parameters of this class: R, A and P.\n"
+  "\n"
+  "The device recognition layer names are 'R' (resistor) and 'C' (contacts).\n"
+  "The terminal output layer names are 'tA' (terminal A) and 'tB' (terminal B).\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorResistorWithBulk *make_res_with_bulk_extractor (const std::string &name, double sheet_rho)
+{
+  return new db::NetlistDeviceExtractorResistorWithBulk (name, sheet_rho);
+}
+
+Class<db::NetlistDeviceExtractorResistorWithBulk> decl_NetlistDeviceExtractorResistorWithBulk (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorResistorWithBulk",
+  gsi::constructor ("new", &make_res_with_bulk_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a resistor with a bulk terminal\n"
+  "\n"
+  "This class supplies the generic extractor for a resistor device including a bulk terminal.\n"
+  "The device is defined the same way than devices are defined for \\DeviceExtractorResistor.\n"
+  "\n"
+  "In addition, a bulk terminal layer must be provided.\n"
+  "The bulk terminal layer can be an empty layer representing the substrate.\n"
+  "In this use mode the bulk terminal shapes will be produced on the 'tW' layer. This\n"
+  "layer then needs to be connected to a global net to establish the net connection.\n"
+  "\n"
+  "The device class produced by this extractor is \\DeviceClassResistorWithBulk.\n"
+  "The extractor extracts the three parameters of this class: R, A and P.\n"
+  "\n"
+  "The device recognition layer names are 'R' (resistor), 'C' (contacts) and 'W' (well, bulk).\n"
+  "The terminal output layer names are 'tA' (terminal A), 'tB' (terminal B) and 'tW' (well, bulk).\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorCapacitor *make_cap_extractor (const std::string &name, double area_cap)
+{
+  return new db::NetlistDeviceExtractorCapacitor (name, area_cap);
+}
+
+Class<db::NetlistDeviceExtractorCapacitor> decl_NetlistDeviceExtractorCapacitor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorCapacitor",
+  gsi::constructor ("new", &make_cap_extractor, gsi::arg ("name"), gsi::arg ("area_cap"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a two-terminal capacitor\n"
+  "\n"
+  "This class supplies the generic extractor for a capacitor device.\n"
+  "The device is defined by two geometry layers forming the 'plates' of the capacitor.\n"
+  "The capacitance is computed from the overlapping area of the plates "
+  "using 'C = A * area_cap' (area_cap is the capacitance per square micrometer area).\n"
+  "\n"
+  "The device class produced by this extractor is \\DeviceClassCapacitor.\n"
+  "The extractor extracts the three parameters of this class: C, A and P.\n"
+  "\n"
+  "The device recognition layer names are 'P1' (plate 1) and 'P2' (plate 2).\n"
+  "The terminal output layer names are 'tA' (terminal A) and 'tB' (terminal B).\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorCapacitorWithBulk *make_cap_with_bulk_extractor (const std::string &name, double area_cap)
+{
+  return new db::NetlistDeviceExtractorCapacitorWithBulk (name, area_cap);
+}
+
+Class<db::NetlistDeviceExtractorCapacitorWithBulk> decl_NetlistDeviceExtractorCapacitorWithBulk (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorCapacitorWithBulk",
+  gsi::constructor ("new", &make_cap_with_bulk_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a capacitor with a bulk terminal\n"
+  "\n"
+  "This class supplies the generic extractor for a capacitor device including a bulk terminal.\n"
+  "The device is defined the same way than devices are defined for \\DeviceExtractorCapacitor.\n"
+  "\n"
+  "In addition, a bulk terminal layer must be provided.\n"
+  "The bulk terminal layer can be an empty layer representing the substrate.\n"
+  "In this use mode the bulk terminal shapes will be produced on the 'tW' layer. This\n"
+  "layer then needs to be connected to a global net to establish the net connection.\n"
+  "\n"
+  "The device class produced by this extractor is \\DeviceClassCapacitorWithBulk.\n"
+  "The extractor extracts the three parameters of this class: C, A and P.\n"
+  "\n"
+  "The device recognition layer names are 'P1' (plate 1), 'P2' (plate 2) and 'W' (well, bulk).\n"
+  "The terminal output layer names are 'tA' (terminal A), 'tB' (terminal B) and 'tW' (well, bulk).\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorBJT3Transistor *make_bjt3_extractor (const std::string &name)
+{
+  return new db::NetlistDeviceExtractorBJT3Transistor (name);
+}
+
+Class<db::NetlistDeviceExtractorBJT3Transistor> decl_dbNetlistDeviceExtractorBJT3Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorBJT3Transistor",
+  gsi::constructor ("new", &make_bjt3_extractor, gsi::arg ("name"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a bipolar transistor (BJT)\n"
+  "\n"
+  "This class supplies the generic extractor for a bipolar transistor device.\n"
+  "\n"
+  "Extraction of vertical and lateral transistors is supported through a generic geometry model: "
+  "The basic area is the base area. A marker shape must be provided for this area. "
+  "The emitter of the transistor is defined by emitter layer shapes inside the base area. "
+  "Multiple emitter shapes can be present. In this case, multiple transistor devices sharing the "
+  "same base and collector are generated.\n"
+  "Finally, a collector layer can be given. If non-empty, the parts inside the base region will define "
+  "the collector terminals. If empty, the collector is formed by the substrate. In this case, the base "
+  "region will be output to the 'tC' terminal output layer. This layer then needs to be connected to a global net "
+  "to form the net connection.\n"
+  "\n"
+  "The device class produced by this extractor is \\DeviceClassBJT3Transistor.\n"
+  "The extractor extracts the two parameters of this class: AE and PE.\n"
+  "\n"
+  "The device recognition layer names are 'C' (collector), 'B' (base) and 'E' (emitter).\n"
+  "The terminal output layer names are 'tC' (collector), 'tB' (base) and 'tE' (emitter).\n"
+  "\n"
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorBJT4Transistor *make_bjt4_extractor (const std::string &name)
+{
+  return new db::NetlistDeviceExtractorBJT4Transistor (name);
+}
+
+Class<db::NetlistDeviceExtractorBJT4Transistor> decl_NetlistDeviceExtractorBJT4Transistor (decl_dbNetlistDeviceExtractorBJT3Transistor, "db", "DeviceExtractorBJT4Transistor",
+  gsi::constructor ("new", &make_bjt4_extractor, gsi::arg ("name"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a four-terminal bipolar transistor (BJT)\n"
+  "\n"
+  "This class supplies the generic extractor for a bipolar transistor device.\n"
+  "It is based on the \\DeviceExtractorBJT3Transistor class with the extension of a substrate terminal "
+  "and corresponding substrate terminal output (annotation) layer.\n"
+  "\n"
+  "The bulk terminal layer ('tS') can be an empty layer representing the wafer substrate.\n"
+  "In this use mode the substrate terminal shapes will be produced on the 'tS' layer. This\n"
+  "layer then needs to be connected to a global net to establish the net connection.\n"
+  "\n"
+  "The device class produced by this extractor is \\DeviceClassBJT4Transistor.\n"
+  "The "
+  "This class is a closed one and methods cannot be reimplemented. To reimplement "
+  "specific methods, see \\DeviceExtractor.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+db::NetlistDeviceExtractorDiode *make_diode_extractor (const std::string &name)
+{
+  return new db::NetlistDeviceExtractorDiode (name);
+}
+
+Class<db::NetlistDeviceExtractorDiode> decl_NetlistDeviceExtractorDiode (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorDiode",
+  gsi::constructor ("new", &make_diode_extractor, gsi::arg ("name"),
+    "@brief Creates a new device extractor with the given name."
+  ),
+  "@brief A device extractor for a planar diode\n"
+  "\n"
+  "This class supplies the generic extractor for a planar diode.\n"
+  "The diode is defined by two layers whose overlap area forms\n"
+  "the diode. The p-type layer forms the anode, the n-type layer\n"
+  "the cathode.\n"
+  "\n"
+  "The device class produced by this extractor is DeviceClassDiode.\n"
+  "The extractor extracts the two parameters of this class: A and P.\n"
+  "A is the area of the overlap area and P is the perimeter.\n"
+  "\n"
+  "The layers are \"P\" and \"N\" for the p and n region respectively.\n"
+  "The terminal output layers are \"tA\" and \"tC\" for anode and \n"
+  "cathode respectively.\n"
   "\n"
   "This class is a closed one and methods cannot be reimplemented. To reimplement "
   "specific methods, see \\DeviceExtractor.\n"

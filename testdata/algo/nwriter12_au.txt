@@ -1,0 +1,26 @@
+* written by unit test
+
+* cell SUBCKT
+* pin 
+* pin A
+* pin V42
+* pin Z
+* pin gnd
+* pin gnd
+.SUBCKT SUBCKT 1 2 4 5 6 7
+* net 2 A
+* net 4 V42(%)
+* net 5 Z
+* net 6 gnd
+* net 7 gnd
+* device instance $1 r0 *1 0,0 HVPMOS
+XD_$1 4 3 5 1 HVPMOS PARAMS: L=0.2 W=1 AS=0.18 AD=0.18 PS=2.16 PD=2.16
+* device instance $2 r0 *1 0,0 HVPMOS
+XD_$2 4 2 3 1 HVPMOS PARAMS: L=0.2 W=1 AS=0.18 AD=0.18 PS=2.16 PD=2.16
+* device instance $3 r0 *1 0,0 HVNMOS
+XD_$3 6 3 6 7 HVNMOS PARAMS: L=1.13 W=2.12 PS=6 PD=6 AS=0 AD=0
+* device instance $4 r0 *1 0,0 HVNMOS
+XD_$4 6 3 5 7 HVNMOS PARAMS: L=0.4 W=0.4 PS=1.16 PD=1.16 AS=0.19 AD=0.19
+* device instance $5 r0 *1 0,0 HVNMOS
+XD_$5 6 2 3 7 HVNMOS PARAMS: L=0.4 W=0.4 PS=1.76 PD=1.76 AS=0.19 AD=0.19
+.ENDS SUBCKT

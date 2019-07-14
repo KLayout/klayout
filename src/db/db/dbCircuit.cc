@@ -22,6 +22,9 @@
 
 #include "dbCircuit.h"
 #include "dbNetlist.h"
+#include "dbLayout.h"
+
+#include <set>
 
 namespace db
 {
@@ -30,7 +33,7 @@ namespace db
 //  Circuit class implementation
 
 Circuit::Circuit ()
-  : m_cell_index (0), mp_netlist (0),
+  : m_dont_purge (false), m_cell_index (0), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
@@ -44,8 +47,25 @@ Circuit::Circuit ()
   m_subcircuits.changed ().add (this, &Circuit::subcircuits_changed);
 }
 
+Circuit::Circuit (const db::Layout &layout, db::cell_index_type ci)
+  : m_name (layout.cell_name (ci)), m_dont_purge (false), m_cell_index (ci), mp_netlist (0),
+    m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
+    m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
+    m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
+    m_device_by_name (this, &Circuit::begin_devices, &Circuit::end_devices),
+    m_subcircuit_by_name (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
+    m_net_by_name (this, &Circuit::begin_nets, &Circuit::end_nets),
+    m_index (0)
+{
+  m_devices.changed ().add (this, &Circuit::devices_changed);
+  m_nets.changed ().add (this, &Circuit::nets_changed);
+  m_subcircuits.changed ().add (this, &Circuit::subcircuits_changed);
+
+  set_boundary (db::DPolygon (db::CplxTrans (layout.dbu ()) * layout.cell (ci).bbox ()));
+}
+
 Circuit::Circuit (const Circuit &other)
-  : gsi::ObjectBase (other), tl::Object (other), m_cell_index (0), mp_netlist (0),
+  : gsi::ObjectBase (other), tl::Object (other), m_dont_purge (false), m_cell_index (0), mp_netlist (0),
     m_device_by_id (this, &Circuit::begin_devices, &Circuit::end_devices),
     m_subcircuit_by_id (this, &Circuit::begin_subcircuits, &Circuit::end_subcircuits),
     m_net_by_cluster_id (this, &Circuit::begin_nets, &Circuit::end_nets),
@@ -80,6 +100,8 @@ Circuit &Circuit::operator= (const Circuit &other)
     clear ();
 
     m_name = other.m_name;
+    m_boundary = other.m_boundary;
+    m_dont_purge = other.m_dont_purge;
     m_cell_index = other.m_cell_index;
     m_pins = other.m_pins;
 
@@ -142,6 +164,13 @@ const Pin *Circuit::pin_by_id (size_t id) const
   }
 }
 
+void Circuit::rename_pin (size_t id, const std::string &name)
+{
+  if (id < m_pins.size ()) {
+    m_pins [id].set_name (name);
+  }
+}
+
 const Pin *Circuit::pin_by_name (const std::string &name) const
 {
   for (Circuit::const_pin_iterator p = begin_pins (); p != end_pins (); ++p) {
@@ -181,6 +210,7 @@ void Circuit::clear ()
   m_devices.clear ();
   m_nets.clear ();
   m_subcircuits.clear ();
+  m_boundary.clear ();
 }
 
 void Circuit::set_name (const std::string &name)
@@ -189,6 +219,16 @@ void Circuit::set_name (const std::string &name)
   if (mp_netlist) {
     mp_netlist->m_circuit_by_name.invalidate ();
   }
+}
+
+void Circuit::set_boundary (const db::DPolygon &boundary)
+{
+  m_boundary = boundary;
+}
+
+void Circuit::set_dont_purge (bool dp)
+{
+  m_dont_purge = dp;
 }
 
 void Circuit::set_cell_index (const db::cell_index_type ci)
@@ -358,6 +398,7 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
     if (! d->name ().empty ()) {
       device->set_name (subcircuit->expanded_name () + "." + d->name ());
     }
+    device->set_trans (subcircuit->trans () * device->trans ());
     add_device (device);
 
     const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
@@ -382,6 +423,7 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
     if (! new_subcircuit->name ().empty ()) {
       new_subcircuit->set_name (subcircuit->expanded_name () + "." + new_subcircuit->name ());
     }
+    new_subcircuit->set_trans (subcircuit->trans () * new_subcircuit->trans ());
     add_subcircuit (new_subcircuit);
 
     const db::Circuit *cr = sc->circuit_ref ();
@@ -422,11 +464,7 @@ void Circuit::translate_device_classes (const std::map<const DeviceClass *, Devi
 void Circuit::translate_device_abstracts (const std::map<const DeviceAbstract *, DeviceAbstract *> &map)
 {
   for (device_iterator i = m_devices.begin (); i != m_devices.end (); ++i) {
-    if (i->device_abstract ()) {
-      std::map<const DeviceAbstract *, DeviceAbstract *>::const_iterator m = map.find (i->device_abstract ());
-      tl_assert (m != map.end ());
-      i->set_device_abstract (m->second);
-    }
+    i->translate_device_abstracts (map);
   }
 }
 
@@ -436,6 +474,35 @@ void Circuit::set_pin_ref_for_pin (size_t pin_id, Net::pin_iterator iter)
     m_pin_refs.resize (pin_id + 1, Net::pin_iterator ());
   }
   m_pin_refs [pin_id] = iter;
+}
+
+void Circuit::blank ()
+{
+  tl_assert (netlist () != 0);
+
+  std::set<db::Circuit *> cs;
+  for (subcircuit_iterator i = m_subcircuits.begin (); i != m_subcircuits.end (); ++i) {
+    cs.insert (i->circuit_ref ());
+  }
+
+  //  weak pointers are good because deleting a subcircuit might delete others ahead in
+  //  this list:
+  std::list<tl::weak_ptr<db::Circuit> > called_circuits;
+  for (std::set<db::Circuit *>::const_iterator c = cs.begin (); c != cs.end (); ++c) {
+    called_circuits.push_back (*c);
+  }
+
+  m_nets.clear ();
+  m_subcircuits.clear ();
+  m_devices.clear ();
+
+  for (std::list<tl::weak_ptr<db::Circuit> >::iterator c = called_circuits.begin (); c != called_circuits.end (); ++c) {
+    if (c->get () && ! (*c)->has_refs ()) {
+      netlist ()->purge_circuit (c->get ());
+    }
+  }
+
+  set_dont_purge (true);
 }
 
 const Net *Circuit::net_for_pin (size_t pin_id) const
@@ -534,6 +601,7 @@ bool Circuit::combine_parallel_devices (const db::DeviceClass &cls)
     for (size_t i = 0; i < cl.size () - 1; ++i) {
       for (size_t j = i + 1; j < cl.size (); ) {
         if (cls.combine_devices (cl [i], cl [j])) {
+          cl [i]->join_device (cl [j]);
           check_device_before_remove (this, cl [j]);  //  sanity check
           delete cl [j];
           cl.erase (cl.begin () + j);
@@ -623,6 +691,7 @@ bool Circuit::combine_serial_devices(const db::DeviceClass &cls)
 
       //  found a combination candidate
       if (cls.combine_devices (dd.first, dd.second)) {
+        dd.first->join_device (dd.second);
         check_device_before_remove (this, dd.second);  //  sanity check
         delete dd.second;
         any = true;

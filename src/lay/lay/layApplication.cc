@@ -51,6 +51,7 @@
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
 #include "dbInit.h"
+#include "dbLayoutToNetlist.h"
 #include "tlExceptions.h"
 #include "tlException.h"
 #include "tlAssert.h"
@@ -495,6 +496,10 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
     } else if (a == "-m" && (i + 1) < argc) {
 
       m_files.push_back (std::make_pair (rdb_file, std::make_pair (std::string (args [++i]), std::string ())));
+
+    } else if (a == "-mn" && (i + 1) < argc) {
+
+      m_files.push_back (std::make_pair (l2ndb_file, std::make_pair (std::string (args [++i]), std::string ())));
 
     } else if (a[0] == '-') {
 
@@ -951,6 +956,7 @@ ApplicationBase::usage ()
   r += tl::to_string (QObject::tr ("  -lx                 With -l: add other layers as well")) + "\n";
   r += tl::to_string (QObject::tr ("  -lf                 With -l: use the lyp file as it is (no expansion to multiple layouts)")) + "\n";
   r += tl::to_string (QObject::tr ("  -m <database file>  Load RDB (report database) file (into previous layout view)")) + "\n";
+  r += tl::to_string (QObject::tr ("  -mn <database file> Load L2NDB (layout to netlist database) file (into previous layout view)")) + "\n";
   r += tl::to_string (QObject::tr ("  -n <technology>     Technology to use for next layout(s) on command line")) + "\n";
   r += tl::to_string (QObject::tr ("  -nn <tech file>     Technology file (.lyt) to use for next layout(s) on command line")) + "\n";
   r += tl::to_string (QObject::tr ("  -p <plugin>         Load the plugin (can be used multiple times)")) + "\n";
@@ -1069,7 +1075,7 @@ ApplicationBase::run ()
           mw->current_view ()->set_active_cellview_index (0);
         }
 
-      } else {
+      } else if (f->first == rdb_file) {
 
         if (mw->current_view () == 0) {
           mw->create_view ();
@@ -1080,6 +1086,17 @@ ApplicationBase::run ()
           db->load (f->second.first);
           int rdb_index = mw->current_view ()->add_rdb (db.release ());
           mw->current_view ()->open_rdb_browser (rdb_index, mw->current_view ()->active_cellview_index ());
+        }
+
+      } else if (f->first == l2ndb_file) {
+
+        if (mw->current_view () == 0) {
+          mw->create_view ();
+        }
+
+        if (mw->current_view () != 0) {
+          int l2ndb_index = mw->current_view ()->add_l2ndb (db::LayoutToNetlist::create_from_file (f->second.first));
+          mw->current_view ()->open_l2ndb_browser (l2ndb_index, mw->current_view ()->active_cellview_index ());
         }
 
       }

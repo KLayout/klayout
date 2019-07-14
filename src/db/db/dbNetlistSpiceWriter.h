@@ -29,6 +29,7 @@
 
 #include <string>
 #include <map>
+#include <limits>
 
 namespace db
 {
@@ -62,7 +63,7 @@ public:
   void emit_comment (const std::string &comment) const;
   std::string format_name (const std::string &s) const;
   std::string format_terminals (const db::Device &dev) const;
-  std::string format_params (const db::Device &dev) const;
+  std::string format_params (const db::Device &dev, size_t without_id = std::numeric_limits<size_t>::max ()) const;
 
 private:
   friend class NetlistSpiceWriter;
@@ -92,6 +93,12 @@ public:
     return m_use_net_names;
   }
 
+  void set_with_comments (bool f);
+  bool with_comments () const
+  {
+    return m_with_comments;
+  }
+
 private:
   friend class NetlistSpiceWriterDelegate;
 
@@ -99,7 +106,10 @@ private:
   tl::OutputStream *mp_stream;
   tl::weak_ptr<NetlistSpiceWriterDelegate> mp_delegate;
   std::map<const db::Net *, size_t> m_net_to_spice_id;
+  std::map<const db::Net *, std::string> m_net_to_spice_name;
+  mutable size_t m_next_net_id;
   bool m_use_net_names;
+  bool m_with_comments;
 
   void do_write (const std::string &description);
 

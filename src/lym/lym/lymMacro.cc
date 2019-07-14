@@ -684,15 +684,18 @@ void Macro::sync_properties_with_text ()
 
       for (size_t i = 0; i < sizeof (property_fields) / sizeof (property_fields[0]); ++i) {
 
+        tl::Extractor pex = ex;
+
         const PropertyField *pf = property_fields + i;
-        if (ex.test (pf->name)) {
+        if (pex.test (pf->name) && (pex.at_end () || pex.test (":"))) {
 
           if (pf->string_setter) {
-            ex.test (":");
-            (this->*(pf->string_setter)) (unescape_pta_string (ex.skip ()));
+            (this->*(pf->string_setter)) (unescape_pta_string (pex.skip ()));
           } else if (pf->bool_setter) {
             (this->*(pf->bool_setter)) (true);
           }
+
+          break;
 
         }
 
@@ -1334,6 +1337,7 @@ void MacroCollection::scan (const std::string &path)
 
     ResourceWithChildren res (tl::to_qstring (path));
     QStringList children = res.children ();
+    children.sort ();
 
     for (QStringList::const_iterator c = children.begin (); c != children.end (); ++c) {
 

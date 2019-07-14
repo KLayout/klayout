@@ -25,81 +25,10 @@
 
 #include <QIcon>
 #include <QPainter>
-#include <QAbstractTextDocumentLayout>
 #include <QApplication>
-#include <QListView>
 
 namespace lay
 {
-
-// --------------------------------------------------------------------------------------
-
-SaltItemDelegate::SaltItemDelegate (QObject *parent)
-  : QStyledItemDelegate (parent)
-{
-  // .. nothing yet ..
-}
-
-const int textWidth = 500;
-
-void
-SaltItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-  QStyleOptionViewItemV4 optionV4 = option;
-  initStyleOption (&optionV4, index);
-  //  let the text take all the available space (fixes #144)
-  optionV4.showDecorationSelected = true;
-
-  bool is_enabled = (optionV4.state & QStyle::State_Enabled);
-  if ((index.flags () & 0x10000) != 0) {
-    //  the item wants to be drawn "disabled"
-    is_enabled = false;
-  }
-
-  optionV4.state |= QStyle::State_Enabled;
-
-  QStyle *style = optionV4.widget ? optionV4.widget->style () : QApplication::style ();
-
-  QTextDocument doc;
-  doc.setHtml (optionV4.text);
-
-  optionV4.text = QString ();
-  style->drawControl (QStyle::CE_ItemViewItem, &optionV4, painter);
-
-  QAbstractTextDocumentLayout::PaintContext ctx;
-
-  if (optionV4.state & QStyle::State_Selected) {
-    ctx.palette.setColor (QPalette::Text, optionV4.palette.color (QPalette::Active, QPalette::HighlightedText));
-  } else if (! is_enabled) {
-    ctx.palette.setColor (QPalette::Text, optionV4.palette.color (QPalette::Disabled, QPalette::Text));
-  }
-
-  QRect textRect = style->subElementRect (QStyle::SE_ItemViewItemText, &optionV4);
-  painter->save ();
-  painter->translate (textRect.topLeft ());
-  painter->setClipRect (textRect.translated (-textRect.topLeft ()));
-  doc.setTextWidth (textWidth);
-  doc.documentLayout ()->draw (painter, ctx);
-  painter->restore ();
-}
-
-QSize
-SaltItemDelegate::sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-  QStyleOptionViewItemV4 optionV4 = option;
-  initStyleOption (&optionV4, index);
-
-  const QListView *view = dynamic_cast<const QListView *> (optionV4.widget);
-  QSize icon_size (0, 0);
-  if (view) {
-    icon_size = view->iconSize ();
-  }
-
-  QTextDocument doc;
-  doc.setHtml (optionV4.text);
-  doc.setTextWidth (textWidth);
-  return QSize (textWidth + icon_size.width () + 6, std::max (icon_size.height () + 12, int (doc.size ().height ())));
-}
 
 // --------------------------------------------------------------------------------------
 

@@ -52,35 +52,69 @@ namespace db
  *    description(<text>)           - an arbitrary description text [short key: B]
  *    unit(<unit>)                  - specifies the database unit [short key: U]
  *    top(<circuit>)                - specifies the name of the top circuit [short key: W]
- *    layer(<name>)                 - define a layer [short key: L]
+ *    layer(<name> <source-spec>?)  - define a layer [short key: L]
  *    connect(<layer1> <name> ...)  - connects layer1 with the following layers [short key: C]
  *    global(<layer> <net-name> ...)
  *                                  - connects the shapes of the layer with the given global
  *                                    nets [short key: G]
  *    circuit(<name> [circuit-def]) - circuit (cell) [short key: X]
+ *    class(<name> <template>)      - a device class definition (template: RES,CAP,...) [short key: K]
  *    device(<name> <class> [device-abstract-def])
  *                                  - device abstract [short key: D]
  *
  *  [circuit-def]:
  *
- *    net(<id> [net-name]? [geometry-def]*)
+ *    [boundary-def]
+ *
+ *    net(<id> [name]? [geometry-def]*)
  *                                  - net geometry [short key: N]
  *                                    A net declaration shall be there also if no geometry
  *                                    is present. The ID is a numerical shortcut for the net.
- *    pin(<name> <net-id>)          - outgoing pin connection [short key: P]
- *    device(<name> <abstract> [device-def])
+ *    pin(<net-id> [name]?)         - outgoing pin connection [short key: P]
+ *                                    Statement order specifies pin order.
+ *    device(<id> <abstract-or-class> [name]? [combined-device]* [terminal-route]* [device-def])
  *                                  - device with connections [short key: D]
- *    circuit(<name> [circuit-def]) - subcircuit with connections [short key: X]
+ *    circuit(<id> [name]? [subcircuit-def])
+ *                                  - subcircuit with connections [short key: X]
  *
- *  [net-name]:
- *    name(<net-name>)              - specify net name [short key:
+ *  [boundary-def]:
+ *
+ *    polygon([coord] ...)          - defines a polygon [short key: Q]
+ *                                    "*" for <x> or <y> means take previous
+ *    rect([coord] [coord])         - defines a rectangle [short key: R]
+ *                                    coordinates are bottom/left and top/right
+ *
+ *  [combined-device]:
+ *
+ *    device(<abstract> [trans-def])
+ *                                  - specifies an additional device component
+ *                                    (for combined devices) with abstract <abstract>
+ *                                    and offset dx, dy.
+ *
+ *  [terminal-route]:
+ *
+ *    connect(<device-index> <outer-terminal-name> <inner-terminal-name>)
+ *                                  - connects the outer terminal with the terminal
+ *                                    of the device component with <device-index>:
+ *                                    0 is the basic device, 1 the first combined
+ *                                    device etc.
+ *
+ *  [name]:
+ *
+ *    name(<name>)                  - specify net name [short key: I]
  *
  *  [geometry-def]:
  *
- *    polygon(<layer> <x> <y> ...)  - defines a polygon [short key: Q]
+ *    polygon(<layer> [coord] ...)  - defines a polygon [short key: Q]
  *                                    "*" for <x> or <y> means take previous
- *    rect(<layer> <left> <bottom> <right> <top>)
- *                                  - defines a rectangle [short key: R]
+ *    rect(<layer> [coord] [coord]) - defines a rectangle [short key: R]
+ *                                    coordinates are bottom/left and top/right
+ *
+ *  [coord]
+ *
+ *    <x> <y>                       - absolute coordinates
+ *    (<x> <y>)                     - relative coordinates (reference is reset to 0,0
+ *                                    for each net or terminal in device abstract)
  *
  *  [device-abstract-def]:
  *
@@ -89,7 +123,7 @@ namespace db
  *
  *  [device-def]:
  *
- *    location(<x> <y>)             - location of the device [short key Y]
+ *    [trans-def]                   - location of the device [short key Y]
  *                                    must be before terminal
  *    param(<name> <value>)         - defines a parameter [short key E]
  *    terminal(<terminal-name> <net-id>)
@@ -98,44 +132,91 @@ namespace db
  *
  *  [subcircuit-def]:
  *
- *    location(<x> <y>)             - location of the subcircuit [short key Y]
+ *    [trans-def]                   - location of the subcircuit [short key Y]
+ *    pin(<pin-id> <net-id>)        - specifies connection of the pin with a net [short key: P]
+ *
+ *  [trans-def]:
+ *
+ *    location(<x> <y>)             - location of the instance [short key Y]
  *    rotation(<angle>)             - rotation angle (in degree, default is 0) [short key O]
  *    mirror                        - if specified, the instance is mirrored before rotation [short key M]
  *    scale(<mag>)                  - magnification (default is 1) [short key S]
- *    pin(<pin-name> <net-id>)      - specifies connection of the pin with a net [short key: P]
  */
 
 namespace l2n_std_format
 {
-  template <bool Short>
-  struct DB_PUBLIC keys
+  struct DB_PUBLIC ShortKeys
   {
-    static const std::string version_key;
-    static const std::string description_key;
-    static const std::string top_key;
-    static const std::string unit_key;
-    static const std::string layer_key;
-    static const std::string connect_key;
-    static const std::string global_key;
-    static const std::string circuit_key;
-    static const std::string net_key;
-    static const std::string name_key;
-    static const std::string device_key;
-    static const std::string subcircuit_key;
-    static const std::string polygon_key;
-    static const std::string rect_key;
-    static const std::string terminal_key;
-    static const std::string abstract_key;
-    static const std::string param_key;
-    static const std::string location_key;
-    static const std::string rotation_key;
-    static const std::string mirror_key;
-    static const std::string scale_key;
-    static const std::string pin_key;
-    static const std::string indent1;
-    static const std::string indent2;
+    static std::string l2n_magic_string;
 
-    inline static bool is_short () { return Short; }
+    static std::string version_key;
+    static std::string description_key;
+    static std::string top_key;
+    static std::string unit_key;
+    static std::string layer_key;
+    static std::string class_key;
+    static std::string connect_key;
+    static std::string global_key;
+    static std::string circuit_key;
+    static std::string net_key;
+    static std::string name_key;
+    static std::string device_key;
+    static std::string subcircuit_key;
+    static std::string polygon_key;
+    static std::string rect_key;
+    static std::string terminal_key;
+    static std::string abstract_key;
+    static std::string param_key;
+    static std::string location_key;
+    static std::string rotation_key;
+    static std::string mirror_key;
+    static std::string scale_key;
+    static std::string pin_key;
+    static std::string indent1;
+    static std::string indent2;
+  };
+
+  struct DB_PUBLIC LongKeys
+  {
+    static std::string l2n_magic_string;
+
+    static std::string version_key;
+    static std::string description_key;
+    static std::string top_key;
+    static std::string unit_key;
+    static std::string layer_key;
+    static std::string class_key;
+    static std::string connect_key;
+    static std::string global_key;
+    static std::string circuit_key;
+    static std::string net_key;
+    static std::string name_key;
+    static std::string device_key;
+    static std::string subcircuit_key;
+    static std::string polygon_key;
+    static std::string rect_key;
+    static std::string terminal_key;
+    static std::string abstract_key;
+    static std::string param_key;
+    static std::string location_key;
+    static std::string rotation_key;
+    static std::string mirror_key;
+    static std::string scale_key;
+    static std::string pin_key;
+    static std::string indent1;
+    static std::string indent2;
+  };
+
+  template <bool Short> struct DB_PUBLIC keys;
+
+  template <> struct DB_PUBLIC keys<true> : public ShortKeys
+  {
+    inline static bool is_short () { return true; }
+  };
+
+  template <> struct DB_PUBLIC keys<false> : public LongKeys
+  {
+    inline static bool is_short () { return false; }
   };
 }
 

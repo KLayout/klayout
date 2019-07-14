@@ -40,12 +40,12 @@ namespace lay
  *
  *  The state can be recovered from the string using restore_dialog_state;
  */
-LAYBASIC_PUBLIC std::string save_dialog_state (QWidget *dialog);
+LAYBASIC_PUBLIC std::string save_dialog_state (QWidget *dialog, bool with_section_sizes = true);
 
 /**
  *  @brief Restore the dialog's state from the given string
  */
-LAYBASIC_PUBLIC void restore_dialog_state (QWidget *dialog, const std::string &s);
+LAYBASIC_PUBLIC void restore_dialog_state (QWidget *dialog, const std::string &s, bool with_section_sizes = true);
 
 /**
  *  @brief A utility function connecting a label's linkActivated event with the help browser
@@ -53,9 +53,14 @@ LAYBASIC_PUBLIC void restore_dialog_state (QWidget *dialog, const std::string &s
 LAYBASIC_PUBLIC void activate_help_links (QLabel *label);
 
 /**
- *  @brief Register the help handler (object and slot)
+ *  @brief A utility function connecting a label's linkActivated event with the help browser (modal help dialogs)
  */
-LAYBASIC_PUBLIC void register_help_handler (QObject *object, const char *slot);
+LAYBASIC_PUBLIC void activate_modal_help_links (QLabel *label);
+
+/**
+ *  @brief Register the help handler (object and slots for non-modal and modal help dialogs)
+ */
+LAYBASIC_PUBLIC void register_help_handler (QObject *object, const char *slot, const char *modal_slot);
 
 
 } // namespace lay

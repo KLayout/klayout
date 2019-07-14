@@ -37,6 +37,10 @@ class DBNetlistDeviceClasses_TestClass < TestBase
 
     r1 = circuit.create_device(cls, "r1")
     r1.set_parameter(RBA::DeviceClassResistor::PARAM_R, 1.0)
+    r1.set_parameter(RBA::DeviceClassResistor::PARAM_L, 10.0)
+    r1.set_parameter(RBA::DeviceClassResistor::PARAM_W, 11.0)
+    r1.set_parameter(RBA::DeviceClassResistor::PARAM_A, 12.0)
+    r1.set_parameter(RBA::DeviceClassResistor::PARAM_P, 13.0)
     r2 = circuit.create_device(cls, "r2")
     r2.set_parameter("R", 3.0)
 
@@ -57,8 +61,8 @@ class DBNetlistDeviceClasses_TestClass < TestBase
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n3);
-  device '' r1 (A=n1,B=n2) (R=1);
-  device '' r2 (A=n2,B=n3) (R=3);
+  device '' r1 (A=n1,B=n2) (R=1,L=10,W=11,A=12,P=13);
+  device '' r2 (A=n2,B=n3) (R=3,L=0,W=0,A=0,P=0);
 end;
 END
 
@@ -67,7 +71,65 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n3);
-  device '' r1 (A=n1,B=n3) (R=4);
+  device '' r1 (A=n1,B=n3) (R=4,L=10,W=11,A=12,P=13);
+end;
+END
+
+  end
+
+  def test_1_ResistorsWithBulk
+  
+    cls = RBA::DeviceClassResistorWithBulk::new
+
+    nl = RBA::Netlist::new
+    nl.add(cls)
+
+    circuit = RBA::Circuit::new
+    nl.add(circuit)
+
+    r1 = circuit.create_device(cls, "r1")
+    r1.set_parameter(RBA::DeviceClassResistorWithBulk::PARAM_R, 1.0)
+    r1.set_parameter(RBA::DeviceClassResistorWithBulk::PARAM_L, 10.0)
+    r1.set_parameter(RBA::DeviceClassResistorWithBulk::PARAM_W, 11.0)
+    r1.set_parameter(RBA::DeviceClassResistorWithBulk::PARAM_A, 12.0)
+    r1.set_parameter(RBA::DeviceClassResistorWithBulk::PARAM_P, 13.0)
+    r2 = circuit.create_device(cls, "r2")
+    r2.set_parameter("R", 3.0)
+
+    pin_a = circuit.create_pin ("A")
+    pin_b = circuit.create_pin ("B")
+    pin_bulk = circuit.create_pin ("BULK")
+
+    n1 = circuit.create_net("n1")
+    circuit.connect_pin(pin_a, n1)
+    r1.connect_terminal(RBA::DeviceClassResistorWithBulk::TERMINAL_A, n1)
+
+    n2 = circuit.create_net("n2")
+    r1.connect_terminal(RBA::DeviceClassResistorWithBulk::TERMINAL_B, n2)
+    r2.connect_terminal(RBA::DeviceClassResistorWithBulk::TERMINAL_A, n2)
+
+    n3 = circuit.create_net("n3")
+    r2.connect_terminal(RBA::DeviceClassResistorWithBulk::TERMINAL_B, n3)
+    circuit.connect_pin(pin_b, n3)
+
+    nb = circuit.create_net("nb")
+    r1.connect_terminal(RBA::DeviceClassResistorWithBulk::TERMINAL_W, nb)
+    r2.connect_terminal(RBA::DeviceClassResistorWithBulk::TERMINAL_W, nb)
+    circuit.connect_pin(pin_bulk, nb)
+
+    assert_equal(nl.to_s, <<END)
+circuit '' (A=n1,B=n3,BULK=nb);
+  device '' r1 (A=n1,B=n2,W=nb) (R=1,L=10,W=11,A=12,P=13);
+  device '' r2 (A=n2,B=n3,W=nb) (R=3,L=0,W=0,A=0,P=0);
+end;
+END
+
+    nl.combine_devices
+    nl.purge
+
+    assert_equal(nl.to_s, <<END)
+circuit '' (A=n1,B=n3,BULK=nb);
+  device '' r1 (A=n1,B=n3,W=nb) (R=4,L=10,W=11,A=12,P=13);
 end;
 END
 
@@ -85,6 +147,8 @@ END
 
     c1 = circuit.create_device(cls, "c1")
     c1.set_parameter(RBA::DeviceClassCapacitor::PARAM_C, 2.0)
+    c1.set_parameter(RBA::DeviceClassCapacitor::PARAM_A, 10.0)
+    c1.set_parameter(RBA::DeviceClassCapacitor::PARAM_P, 11.0)
     c2 = circuit.create_device(cls, "c2")
     c2.set_parameter("C", 3.0)
 
@@ -105,8 +169,8 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n3);
-  device '' c1 (A=n1,B=n2) (C=2);
-  device '' c2 (A=n2,B=n3) (C=3);
+  device '' c1 (A=n1,B=n2) (C=2,A=10,P=11);
+  device '' c2 (A=n2,B=n3) (C=3,A=0,P=0);
 end;
 END
 
@@ -115,7 +179,63 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n3);
-  device '' c1 (A=n1,B=n3) (C=1.2);
+  device '' c1 (A=n1,B=n3) (C=1.2,A=10,P=11);
+end;
+END
+
+  end
+
+  def test_2_CapacitorsWithBulk
+  
+    cls = RBA::DeviceClassCapacitorWithBulk::new
+
+    nl = RBA::Netlist::new
+    nl.add(cls)
+
+    circuit = RBA::Circuit::new
+    nl.add(circuit)
+
+    c1 = circuit.create_device(cls, "c1")
+    c1.set_parameter(RBA::DeviceClassCapacitorWithBulk::PARAM_C, 2.0)
+    c1.set_parameter(RBA::DeviceClassCapacitorWithBulk::PARAM_A, 10.0)
+    c1.set_parameter(RBA::DeviceClassCapacitorWithBulk::PARAM_P, 11.0)
+    c2 = circuit.create_device(cls, "c2")
+    c2.set_parameter("C", 3.0)
+
+    pin_a = circuit.create_pin ("A")
+    pin_b = circuit.create_pin ("B")
+    pin_bulk = circuit.create_pin ("BULK")
+
+    n1 = circuit.create_net("n1")
+    circuit.connect_pin(pin_a, n1)
+    c1.connect_terminal(RBA::DeviceClassCapacitorWithBulk::TERMINAL_A, n1)
+
+    n2 = circuit.create_net("n2")
+    c1.connect_terminal(RBA::DeviceClassCapacitorWithBulk::TERMINAL_B, n2)
+    c2.connect_terminal(RBA::DeviceClassCapacitorWithBulk::TERMINAL_A, n2)
+
+    n3 = circuit.create_net("n3")
+    c2.connect_terminal(RBA::DeviceClassCapacitorWithBulk::TERMINAL_B, n3)
+    circuit.connect_pin(pin_b, n3)
+
+    nb = circuit.create_net("nb")
+    c1.connect_terminal(RBA::DeviceClassCapacitorWithBulk::TERMINAL_W, nb)
+    c2.connect_terminal(RBA::DeviceClassCapacitorWithBulk::TERMINAL_W, nb)
+    circuit.connect_pin(pin_bulk, nb)
+
+    assert_equal(nl.to_s, <<END)
+circuit '' (A=n1,B=n3,BULK=nb);
+  device '' c1 (A=n1,B=n2,W=nb) (C=2,A=10,P=11);
+  device '' c2 (A=n2,B=n3,W=nb) (C=3,A=0,P=0);
+end;
+END
+
+    nl.combine_devices
+    nl.purge
+
+    assert_equal(nl.to_s, <<END)
+circuit '' (A=n1,B=n3,BULK=nb);
+  device '' c1 (A=n1,B=n3,W=nb) (C=1.2,A=10,P=11);
 end;
 END
 
@@ -181,8 +301,10 @@ END
 
     d1 = circuit.create_device(cls, "d1")
     d1.set_parameter(RBA::DeviceClassDiode::PARAM_A, 1.0)
+    d1.set_parameter(RBA::DeviceClassDiode::PARAM_P, 2.0)
     d2 = circuit.create_device(cls, "d2")
     d2.set_parameter("A", 3.0)
+    d2.set_parameter("P", 4.0)
 
     pin_a = circuit.create_pin ("A")
     pin_b = circuit.create_pin ("B")
@@ -199,8 +321,8 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2);
-  device '' d1 (A=n1,C=n2) (A=1);
-  device '' d2 (A=n1,C=n2) (A=3);
+  device '' d1 (A=n1,C=n2) (A=1,P=2);
+  device '' d2 (A=n1,C=n2) (A=3,P=4);
 end;
 END
 
@@ -209,7 +331,7 @@ END
 
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2);
-  device '' d1 (A=n1,C=n2) (A=4);
+  device '' d1 (A=n1,C=n2) (A=4,P=6);
 end;
 END
 
@@ -340,6 +462,139 @@ END
     assert_equal(nl.to_s, <<END)
 circuit '' (A=n1,B=n2,C=n3,D=n4);
   device '' d1 (S=n1,G=n3,D=n2,B=n4) (L=1,W=5,AS=7,AD=9,PS=27,PD=29);
+end;
+END
+
+  end
+
+  def test_7_BJT3
+  
+    cls = RBA::DeviceClassBJT3Transistor::new
+
+    nl = RBA::Netlist::new
+    nl.add(cls)
+
+    circuit = RBA::Circuit::new
+    nl.add(circuit)
+
+    d1 = circuit.create_device(cls, "d1")
+    d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_AE, 1.0)
+    d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_AB, 2.0)
+    d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_AC, 3.0)
+    d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_PE, 12.0)
+    d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_PB, 13.0)
+    d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_PC, 14.0)
+    d1.set_parameter(RBA::DeviceClassBJT3Transistor::PARAM_NE, 2.0)
+    d2 = circuit.create_device(cls, "d2")
+    d2.set_parameter("AE", 2.0)
+    d2.set_parameter("AB", 3.0)
+    d2.set_parameter("AC", 4.0)
+    d2.set_parameter("PE", 13.0)
+    d2.set_parameter("PB", 14.0)
+    d2.set_parameter("PC", 15.0)
+    d2.set_parameter("NE", 3.0)
+
+    pin_a = circuit.create_pin ("A")
+    pin_b = circuit.create_pin ("B")
+    pin_c = circuit.create_pin ("C")
+
+    n1 = circuit.create_net("n1")
+    circuit.connect_pin(pin_a, n1)
+    d1.connect_terminal(RBA::DeviceClassBJT3Transistor::TERMINAL_C, n1)
+    d2.connect_terminal(RBA::DeviceClassBJT3Transistor::TERMINAL_C, n1)
+
+    n2 = circuit.create_net("n2")
+    circuit.connect_pin(pin_b, n2)
+    d1.connect_terminal(RBA::DeviceClassBJT3Transistor::TERMINAL_E, n2)
+    d2.connect_terminal(RBA::DeviceClassBJT3Transistor::TERMINAL_E, n2)
+
+    n3 = circuit.create_net("n3")
+    circuit.connect_pin(pin_c, n3)
+    d1.connect_terminal(RBA::DeviceClassBJT3Transistor::TERMINAL_B, n3)
+    d2.connect_terminal(RBA::DeviceClassBJT3Transistor::TERMINAL_B, n3)
+
+    assert_equal(nl.to_s, <<END)
+circuit '' (A=n1,B=n2,C=n3);
+  device '' d1 (C=n1,B=n3,E=n2) (AE=1,PE=12,AB=2,PB=13,AC=3,PC=14,NE=2);
+  device '' d2 (C=n1,B=n3,E=n2) (AE=2,PE=13,AB=3,PB=14,AC=4,PC=15,NE=3);
+end;
+END
+
+    nl.combine_devices
+    nl.purge
+
+    assert_equal(nl.to_s, <<END)
+circuit '' (A=n1,B=n2,C=n3);
+  device '' d1 (C=n1,B=n3,E=n2) (AE=3,PE=25,AB=2,PB=13,AC=3,PC=14,NE=5);
+end;
+END
+
+  end
+
+  def test_8_BJT4
+  
+    cls = RBA::DeviceClassBJT4Transistor::new
+
+    nl = RBA::Netlist::new
+    nl.add(cls)
+
+    circuit = RBA::Circuit::new
+    nl.add(circuit)
+
+    d1 = circuit.create_device(cls, "d1")
+    d1.set_parameter(RBA::DeviceClassBJT4Transistor::PARAM_AE, 1.0)
+    d1.set_parameter(RBA::DeviceClassBJT4Transistor::PARAM_AB, 2.0)
+    d1.set_parameter(RBA::DeviceClassBJT4Transistor::PARAM_AC, 3.0)
+    d1.set_parameter(RBA::DeviceClassBJT4Transistor::PARAM_PE, 12.0)
+    d1.set_parameter(RBA::DeviceClassBJT4Transistor::PARAM_PB, 13.0)
+    d1.set_parameter(RBA::DeviceClassBJT4Transistor::PARAM_PC, 14.0)
+    d2 = circuit.create_device(cls, "d2")
+    d2.set_parameter("AE", 2.0)
+    d2.set_parameter("AB", 3.0)
+    d2.set_parameter("AC", 4.0)
+    d2.set_parameter("PE", 13.0)
+    d2.set_parameter("PB", 14.0)
+    d2.set_parameter("PC", 15.0)
+    d2.set_parameter("NE", 2.0)
+
+    pin_a = circuit.create_pin ("A")
+    pin_b = circuit.create_pin ("B")
+    pin_c = circuit.create_pin ("C")
+    pin_d = circuit.create_pin ("D")
+
+    n1 = circuit.create_net("n1")
+    circuit.connect_pin(pin_a, n1)
+    d1.connect_terminal(RBA::DeviceClassBJT4Transistor::TERMINAL_C, n1)
+    d2.connect_terminal(RBA::DeviceClassBJT4Transistor::TERMINAL_C, n1)
+
+    n2 = circuit.create_net("n2")
+    circuit.connect_pin(pin_b, n2)
+    d1.connect_terminal(RBA::DeviceClassBJT4Transistor::TERMINAL_E, n2)
+    d2.connect_terminal(RBA::DeviceClassBJT4Transistor::TERMINAL_E, n2)
+
+    n3 = circuit.create_net("n3")
+    circuit.connect_pin(pin_c, n3)
+    d1.connect_terminal(RBA::DeviceClassBJT4Transistor::TERMINAL_B, n3)
+    d2.connect_terminal(RBA::DeviceClassBJT4Transistor::TERMINAL_B, n3)
+
+    n4 = circuit.create_net("n4")
+    circuit.connect_pin(pin_d, n4)
+    d1.connect_terminal(RBA::DeviceClassBJT4Transistor::TERMINAL_S, n4)
+    d2.connect_terminal(RBA::DeviceClassBJT4Transistor::TERMINAL_S, n4)
+
+    assert_equal(nl.to_s, <<END)
+circuit '' (A=n1,B=n2,C=n3,D=n4);
+  device '' d1 (C=n1,B=n3,E=n2,S=n4) (AE=1,PE=12,AB=2,PB=13,AC=3,PC=14,NE=1);
+  device '' d2 (C=n1,B=n3,E=n2,S=n4) (AE=2,PE=13,AB=3,PB=14,AC=4,PC=15,NE=2);
+end;
+END
+
+    nl.combine_devices
+    nl.purge
+
+    assert_equal(nl.to_s, <<END)
+circuit '' (A=n1,B=n2,C=n3,D=n4);
+  device '' d1 (C=n1,B=n3,E=n2,S=n4) (AE=3,PE=25,AB=2,PB=13,AC=3,PC=14,NE=3);
 end;
 END
 

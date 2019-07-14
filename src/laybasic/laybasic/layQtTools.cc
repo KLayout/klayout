@@ -42,6 +42,7 @@ namespace lay
 
 QObject *s_help_handler = 0;
 const char *s_help_slot = 0;
+const char *s_modal_help_slot = 0;
 
 void activate_help_links (QLabel *label)
 {
@@ -50,16 +51,24 @@ void activate_help_links (QLabel *label)
   }
 }
 
-void register_help_handler (QObject *object, const char *slot)
+void activate_modal_help_links (QLabel *label)
+{
+  if (s_help_handler) {
+    QObject::connect (label, SIGNAL (linkActivated (const QString &)), s_help_handler, s_modal_help_slot);
+  }
+}
+
+void register_help_handler (QObject *object, const char *slot, const char *modal_slot)
 {
   s_help_handler = object;
   s_help_slot = slot;
+  s_modal_help_slot = modal_slot;
 }
 
 // --------------------------------------------------------------------------------
 
 std::string 
-save_dialog_state (QWidget *w)
+save_dialog_state (QWidget *w, bool with_section_sizes)
 {
   std::string s;
 
@@ -77,7 +86,7 @@ save_dialog_state (QWidget *w)
     s += (dynamic_cast<QSplitter *> (w))->saveState ().toBase64 ().constData ();
     s += "\";";
 
-  } else if (dynamic_cast<QTreeView *> (w)) {
+  } else if (with_section_sizes && dynamic_cast<QTreeView *> (w)) {
 
     s += tl::to_string (w->objectName ());
     s += "=\"";
@@ -103,7 +112,7 @@ save_dialog_state (QWidget *w)
 }
 
 void 
-restore_dialog_state (QWidget *dialog, const std::string &s)
+restore_dialog_state (QWidget *dialog, const std::string &s, bool with_section_sizes)
 {
   if (! dialog) {
     return;
@@ -136,7 +145,7 @@ restore_dialog_state (QWidget *dialog, const std::string &s)
 
         (dynamic_cast<QSplitter *> (widgets.front ()))->restoreState (QByteArray::fromBase64 (value.c_str ()));
 
-      } else if (dynamic_cast<QTreeView *> (widgets.front ())) {
+      } else if (with_section_sizes && dynamic_cast<QTreeView *> (widgets.front ())) {
 
 #if QT_VERSION >= 0x040500
         (dynamic_cast<QTreeView *> (widgets.front ()))->header ()->restoreState (QByteArray::fromBase64 (value.c_str ()));

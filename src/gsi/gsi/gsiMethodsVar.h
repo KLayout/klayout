@@ -398,7 +398,7 @@ private:
 
 //  pointer iterator method descriptors
 
-template <class X, class R _COMMA _TMPLARG>
+template <class X, class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(MethodPtrIter) 
   : public MethodSpecificBase <X>
 {
@@ -422,7 +422,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -447,7 +447,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG>
+template <class X, class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(MethodPtrConstIter) 
   : public MethodSpecificBase <X>
 {
@@ -471,7 +471,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -496,7 +496,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG>
+template <class X, class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ConstMethodPtrIter) 
   : public MethodSpecificBase <X>
 {
@@ -520,7 +520,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -545,7 +545,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG>
+template <class X, class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ConstMethodPtrConstIter) 
   : public MethodSpecificBase <X>
 {
@@ -569,7 +569,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -594,7 +594,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG>
+template <class X, class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ExtMethodPtrIter) 
   : public MethodSpecificBase <X>
 {
@@ -618,7 +618,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -643,7 +643,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG>
+template <class X, class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ExtMethodPtrConstIter) 
   : public MethodSpecificBase <X>
 {
@@ -667,7 +667,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -692,7 +692,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class R _COMMA _TMPLARG>
+template <class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(StaticMethodPtrIter) 
   : public StaticMethodBase
 {
@@ -716,7 +716,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -741,7 +741,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class R _COMMA _TMPLARG>
+template <class R _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(StaticMethodPtrConstIter) 
   : public StaticMethodBase
 {
@@ -765,7 +765,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -792,7 +792,7 @@ private:
 
 //  pair iterator method descriptors
 
-template <class X, class I _COMMA _TMPLARG>
+template <class X, class I _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(MethodBiIter) 
   : public MethodSpecificBase <X>
 {
@@ -815,7 +815,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -840,7 +840,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class I _COMMA _TMPLARG>
+template <class X, class I _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ConstMethodBiIter) 
   : public MethodSpecificBase <X>
 {
@@ -863,7 +863,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -888,7 +888,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class I _COMMA _TMPLARG>
+template <class X, class I _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ExtMethodBiIter) 
   : public MethodSpecificBase <X>
 {
@@ -911,7 +911,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -938,7 +938,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class I _COMMA _TMPLARG>
+template <class I _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(StaticMethodBiIter) 
   : public StaticMethodBase
 {
@@ -961,7 +961,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -988,7 +988,7 @@ private:
 
 //  free iterator method descriptors
 
-template <class X, class I _COMMA _TMPLARG>
+template <class X, class I _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(MethodFreeIter) 
   : public MethodSpecificBase <X>
 {
@@ -1011,7 +1011,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -1035,7 +1035,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class I _COMMA _TMPLARG>
+template <class X, class I _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ConstMethodFreeIter) 
   : public MethodSpecificBase <X>
 {
@@ -1058,7 +1058,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -1082,7 +1082,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class I _COMMA _TMPLARG>
+template <class X, class I _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(ExtMethodFreeIter) 
   : public MethodSpecificBase <X>
 {
@@ -1105,7 +1105,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -1129,7 +1129,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class I _COMMA _TMPLARG>
+template <class I _COMMA _TMPLARG, class Transfer = gsi::arg_default_return_value_preference>
 class _NAME(StaticMethodFreeIter) 
   : public StaticMethodBase
 {
@@ -1152,7 +1152,7 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<iter_adaptor_type> ();
+    this->template set_return<iter_adaptor_type, Transfer> ();
   }
 
   virtual MethodBase *clone () const 
@@ -1289,7 +1289,7 @@ method (const std::string &name, R (X::*m) (_FUNCARGLIST), const std::string &do
 
 template <class X, class R _COMMA _TMPLARG, class Transfer>
 Methods
-method (const std::string &name, R (X::*m) (_FUNCARGLIST), const std::string &doc = std::string ())
+method (const std::string &name, Transfer, R (X::*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
   return Methods (new _NAME(Method) <X, R _COMMA _FUNCARGLIST, Transfer> (name, m, doc));
 }
@@ -1304,7 +1304,7 @@ method (const std::string &name, R (X::*m) (_FUNCARGLIST) _COMMA _ARGSPECS, cons
 
 template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
 Methods
-method (const std::string &name, R (X::*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+method (const std::string &name, Transfer, R (X::*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
   return Methods ((new _NAME(Method) <X, R _COMMA _FUNCARGLIST, Transfer> (name, m, doc))->add_args (_ARGSPECARGS));
 }
@@ -1314,7 +1314,7 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 factory (const std::string &name, R *(X::*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(Method) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc));
+  return Methods (new _NAME(Method) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1322,7 +1322,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory (const std::string &name, R *(X::*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(Method) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(Method) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1335,7 +1335,7 @@ method_ext (const std::string &name, R (*xm) (X * _COMMA _FUNCARGLIST), const st
 
 template <class X, class R _COMMA _TMPLARG, class Transfer>
 Methods
-method_ext (const std::string &name, R (*xm) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
+method_ext (const std::string &name, Transfer, R (*xm) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
 {
   return Methods (new _NAME(ExtMethod) <X, R _COMMA _FUNCARGLIST, Transfer> (name, xm, doc));
 }
@@ -1350,7 +1350,7 @@ method_ext (const std::string &name, R (*xm) (X * _COMMA _FUNCARGLIST) _COMMA _A
 
 template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
 Methods
-method_ext (const std::string &name, R (*xm) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+method_ext (const std::string &name, Transfer, R (*xm) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
   return Methods ((new _NAME(ExtMethod) <X, R _COMMA _FUNCARGLIST, Transfer> (name, xm, doc))->add_args (_ARGSPECARGS));
 }
@@ -1360,7 +1360,7 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 factory_ext (const std::string &name, R *(*xm) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, xm, doc));
+  return Methods (new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, xm, doc));
 }
 
 #if _COUNT != 0
@@ -1368,7 +1368,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory_ext (const std::string &name, R *(*xm) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, xm, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, xm, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1376,7 +1376,7 @@ template <class X _COMMA _TMPLARG>
 Methods
 constructor (const std::string &name, X *(*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(StaticMethod) <X * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc));
+  return Methods (new _NAME(StaticMethod) <X * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1384,7 +1384,7 @@ template <class X _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 constructor (const std::string &name, X *(*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(StaticMethod) <X * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(StaticMethod) <X * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1397,7 +1397,7 @@ method (const std::string &name, R (*m) (_FUNCARGLIST), const std::string &doc =
 
 template <class R _COMMA _TMPLARG, class Transfer>
 Methods
-method (const std::string &name, R (*m) (_FUNCARGLIST), const std::string &doc = std::string ())
+method (const std::string &name, Transfer, R (*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
   return Methods (new _NAME(StaticMethod) <R _COMMA _FUNCARGLIST, Transfer> (name, m, doc));
 }
@@ -1412,7 +1412,7 @@ method (const std::string &name, R (*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const s
 
 template <class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
 Methods
-method (const std::string &name, R (*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+method (const std::string &name, Transfer, R (*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
   return Methods ((new _NAME(StaticMethod) <R _COMMA _FUNCARGLIST, Transfer> (name, m, doc))->add_args (_ARGSPECARGS));
 }
@@ -1422,7 +1422,7 @@ template <class R _COMMA _TMPLARG>
 Methods
 factory (const std::string &name, R *(*m) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(StaticMethod) <R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc));
+  return Methods (new _NAME(StaticMethod) <R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1430,7 +1430,7 @@ template <class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory (const std::string &name, R *(*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(StaticMethod) <R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(StaticMethod) <R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1450,11 +1450,18 @@ callback (const std::string &name, R (X::*m) (_FUNCARGLIST), Callback X::*cb _CO
 }
 #endif
 
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+callback (const std::string &name, Transfer, R (X::*m) (_FUNCARGLIST), Callback X::*cb _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(Method) <X, R _COMMA _FUNCARGLIST> (name, m, doc, cb))->add_args (_ARGSPECARGS));
+}
+
 template <class X, class R _COMMA _TMPLARG>
 Methods
 factory_callback (const std::string &name, R (X::*m) (_FUNCARGLIST), Callback X::*cb, const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(Method) <X, R _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc, cb));
+  return Methods (new _NAME(Method) <X, R _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc, cb));
 }
 
 #if _COUNT != 0
@@ -1462,7 +1469,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory_callback (const std::string &name, R (X::*m) (_FUNCARGLIST), Callback X::*cb _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(Method) <X, R _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc, cb))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(Method) <X, R _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc, cb))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1475,7 +1482,7 @@ method (const std::string &name, R (X::*m) (_FUNCARGLIST) const, const std::stri
 
 template <class X, class R _COMMA _TMPLARG, class Transfer>
 Methods
-method (const std::string &name, R (X::*m) (_FUNCARGLIST) const, const std::string &doc = std::string ())
+method (const std::string &name, Transfer, R (X::*m) (_FUNCARGLIST) const, const std::string &doc = std::string ())
 {
   return Methods (new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, Transfer> (name, m, doc));
 }
@@ -1490,7 +1497,7 @@ method (const std::string &name, R (X::*m) (_FUNCARGLIST) const _COMMA _ARGSPECS
 
 template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
 Methods
-method (const std::string &name, R (X::*m) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
+method (const std::string &name, Transfer, R (X::*m) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
   return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, Transfer> (name, m, doc))->add_args (_ARGSPECARGS));
 }
@@ -1500,7 +1507,7 @@ template <class X, class R _COMMA _TMPLARG>
 Methods
 factory (const std::string &name, R *(X::*m) (_FUNCARGLIST) const, const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc));
+  return Methods (new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc));
 }
 
 #if _COUNT != 0
@@ -1508,7 +1515,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory (const std::string &name, R *(X::*m) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1528,11 +1535,18 @@ callback (const std::string &name, R (X::*m) (_FUNCARGLIST) const, Callback X::*
 }
 #endif
 
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+callback (const std::string &name, Transfer, R (X::*m) (_FUNCARGLIST) const, Callback X::*cb _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, Transfer> (name, m, doc, cb))->add_args (_ARGSPECARGS));
+}
+
 template <class X, class R _COMMA _TMPLARG>
 Methods
 factory_callback (const std::string &name, R (X::*m) (_FUNCARGLIST) const, Callback X::*cb, const std::string &doc = std::string ())
 {
-  return Methods (new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc, cb));
+  return Methods (new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc, cb));
 }
 
 #if _COUNT != 0
@@ -1540,7 +1554,7 @@ template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 factory_callback (const std::string &name, R (X::*m) (_FUNCARGLIST) const, Callback X::*cb _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, gsi::arg_pass_ownership> (name, m, doc, cb))->add_args (_ARGSPECARGS));
+  return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc, cb))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1562,6 +1576,13 @@ iterator (const std::string &name, R *(*b) (_FUNCARGLIST), R *(*e) (_FUNCARGLIST
 }
 #endif
 
+template <class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer, R *(*b) (_FUNCARGLIST), R *(*e) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(StaticMethodPtrIter) <R _COMMA _FUNCARGLIST, Transfer> (name, b, e, doc))->add_args (_ARGSPECARGS));
+}
+
 template <class R _COMMA _TMPLARG>
 Methods
 iterator (const std::string &name, R const *(*b) (_FUNCARGLIST), R const *(*e) (_FUNCARGLIST), const std::string &doc = std::string ())
@@ -1577,6 +1598,13 @@ iterator (const std::string &name, R const *(*b) (_FUNCARGLIST), R const *(*e) (
   return Methods ((new _NAME(StaticMethodPtrConstIter) <R _COMMA _FUNCARGLIST> (name, b, e, doc))->add_args (_ARGSPECARGS));
 }
 #endif
+
+template <class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer, R const *(*b) (_FUNCARGLIST), R const *(*e) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(StaticMethodPtrConstIter) <R _COMMA _FUNCARGLIST, Transfer> (name, b, e, doc))->add_args (_ARGSPECARGS));
+}
 
 template <class X, class R _COMMA _TMPLARG>
 Methods
@@ -1594,6 +1622,13 @@ iterator (const std::string &name, R *(X::*b) (_FUNCARGLIST), R *(X::*e) (_FUNCA
 }
 #endif
 
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer, R *(X::*b) (_FUNCARGLIST), R *(X::*e) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(MethodPtrIter) <X, R _COMMA _FUNCARGLIST, Transfer> (name, b, e, doc))->add_args (_ARGSPECARGS));
+}
+
 template <class X, class R _COMMA _TMPLARG>
 Methods
 iterator (const std::string &name, R const *(X::*b) (_FUNCARGLIST), R const *(X::*e) (_FUNCARGLIST), const std::string &doc = std::string ())
@@ -1609,6 +1644,13 @@ iterator (const std::string &name, R const *(X::*b) (_FUNCARGLIST), R const *(X:
   return Methods ((new _NAME(MethodPtrConstIter) <X, R _COMMA _FUNCARGLIST> (name, b, e, doc))->add_args (_ARGSPECARGS));
 }
 #endif
+
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer, R const *(X::*b) (_FUNCARGLIST), R const *(X::*e) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(MethodPtrConstIter) <X, R _COMMA _FUNCARGLIST, Transfer> (name, b, e, doc))->add_args (_ARGSPECARGS));
+}
 
 template <class X, class R _COMMA _TMPLARG>
 Methods
@@ -1626,6 +1668,13 @@ iterator_ext (const std::string &name, R *(*xb) (X * _COMMA _FUNCARGLIST), R *(*
 }
 #endif
 
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator_ext (const std::string &name, Transfer, R *(*xb) (X * _COMMA _FUNCARGLIST), R *(*xe) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(ExtMethodPtrIter) <X, R _COMMA _FUNCARGLIST, Transfer> (name, xb, xe, doc))->add_args (_ARGSPECARGS));
+}
+
 template <class X, class R _COMMA _TMPLARG>
 Methods
 iterator_ext (const std::string &name, R const *(*xb) (X * _COMMA _FUNCARGLIST), R const *(*xe) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
@@ -1641,6 +1690,13 @@ iterator_ext (const std::string &name, R const *(*xb) (X * _COMMA _FUNCARGLIST),
   return Methods ((new _NAME(ExtMethodPtrConstIter) <X, R _COMMA _FUNCARGLIST> (name, xb, xe, doc))->add_args (_ARGSPECARGS));
 }
 #endif
+
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator_ext (const std::string &name, Transfer, R const *(*xb) (X * _COMMA _FUNCARGLIST), R const *(*xe) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(ExtMethodPtrConstIter) <X, R _COMMA _FUNCARGLIST, Transfer> (name, xb, xe, doc))->add_args (_ARGSPECARGS));
+}
 
 template <class X, class R _COMMA _TMPLARG>
 Methods
@@ -1658,6 +1714,13 @@ iterator (const std::string &name, R *(X::*b) (_FUNCARGLIST) const, R *(X::*e) (
 }
 #endif
 
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer, R *(X::*b) (_FUNCARGLIST) const, R *(X::*e) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(ConstMethodPtrIter) <X, R _COMMA _FUNCARGLIST, Transfer> (name, b, e, doc))->add_args (_ARGSPECARGS));
+}
+
 template <class X, class R _COMMA _TMPLARG>
 Methods
 iterator (const std::string &name, R const *(X::*b) (_FUNCARGLIST) const, R const *(X::*e) (_FUNCARGLIST) const, const std::string &doc = std::string ())
@@ -1674,34 +1737,41 @@ iterator (const std::string &name, R const *(X::*b) (_FUNCARGLIST) const, R cons
 }
 #endif
 
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer, R const *(X::*b) (_FUNCARGLIST) const, R const *(X::*e) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(ConstMethodPtrConstIter) <X, R _COMMA _FUNCARGLIST, Transfer> (name, b, e, doc))->add_args (_ARGSPECARGS));
+}
+
 //  pair iterators
 
-template <class X, class I _COMMA _TMPLARG>
-_NAME(MethodBiIter) <X, I _COMMA _FUNCARGLIST> *
-_iterator (const std::string &name, I (X::*b) (_FUNCARGLIST), I (X::*e) (_FUNCARGLIST), const std::string &doc)
+template <class X, class I _COMMA _TMPLARG, class Transfer>
+_NAME(MethodBiIter) <X, I _COMMA _FUNCARGLIST, Transfer> *
+_iterator (const std::string &name, I (X::*b) (_FUNCARGLIST), I (X::*e) (_FUNCARGLIST), Transfer, const std::string &doc)
 {
-  return new _NAME(MethodBiIter) <X, I _COMMA _FUNCARGLIST> (name, b, e, doc);
+  return new _NAME(MethodBiIter) <X, I _COMMA _FUNCARGLIST, Transfer> (name, b, e, doc);
 }
 
-template <class X, class I _COMMA _TMPLARG>
-_NAME(ExtMethodBiIter) <X, I _COMMA _FUNCARGLIST> *
-_iterator_ext (const std::string &name, I (*xb) (X * _COMMA _FUNCARGLIST), I (*xe) (X * _COMMA _FUNCARGLIST), const std::string &doc)
+template <class X, class I _COMMA _TMPLARG, class Transfer>
+_NAME(ExtMethodBiIter) <X, I _COMMA _FUNCARGLIST, Transfer> *
+_iterator_ext (const std::string &name, I (*xb) (X * _COMMA _FUNCARGLIST), I (*xe) (X * _COMMA _FUNCARGLIST), Transfer, const std::string &doc)
 {
-  return new _NAME(ExtMethodBiIter) <X, I _COMMA _FUNCARGLIST> (name, xb, xe, doc);
+  return new _NAME(ExtMethodBiIter) <X, I _COMMA _FUNCARGLIST, Transfer> (name, xb, xe, doc);
 }
 
-template <class I _COMMA _TMPLARG>
-_NAME(StaticMethodBiIter) <I _COMMA _FUNCARGLIST> *
-_iterator (const std::string &name, I (*b) (_FUNCARGLIST), I (*e) (_FUNCARGLIST), const std::string &doc)
+template <class I _COMMA _TMPLARG, class Transfer>
+_NAME(StaticMethodBiIter) <I _COMMA _FUNCARGLIST, Transfer> *
+_iterator (const std::string &name, I (*b) (_FUNCARGLIST), I (*e) (_FUNCARGLIST), Transfer, const std::string &doc)
 {
-  return new _NAME(StaticMethodBiIter) <I _COMMA _FUNCARGLIST> (name, b, e, doc);
+  return new _NAME(StaticMethodBiIter) <I _COMMA _FUNCARGLIST, Transfer> (name, b, e, doc);
 }
 
 template <class I _COMMA _TMPLARG>
 Methods
 iterator (const std::string &name, I (*b) (_FUNCARGLIST), I (*e) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, b, e, doc));
+  return Methods (_iterator (name, b, e, arg_default_return_value_preference (), doc));
 }
 
 #if _COUNT != 0
@@ -1709,15 +1779,22 @@ template <class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 iterator (const std::string &name, I (*b) (_FUNCARGLIST), I (*e) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, b, e, doc)->add_args (_ARGSPECARGS));
+  return Methods (_iterator (name, b, e, arg_default_return_value_preference (), doc)->add_args (_ARGSPECARGS));
 }
 #endif
+
+template <class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer transfer, I (*b) (_FUNCARGLIST), I (*e) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods (_iterator (name, b, e, transfer, doc)->add_args (_ARGSPECARGS));
+}
 
 template <class X, class I _COMMA _TMPLARG>
 Methods
 iterator (const std::string &name, I (X::*b) (_FUNCARGLIST), I (X::*e) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, b, e, doc));
+  return Methods (_iterator (name, b, e, arg_default_return_value_preference (), doc));
 }
 
 #if _COUNT != 0
@@ -1725,15 +1802,22 @@ template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 iterator (const std::string &name, I (X::*b) (_FUNCARGLIST), I (X::*e) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, b, e, doc)->add_args (_ARGSPECARGS));
+  return Methods (_iterator (name, b, e, arg_default_return_value_preference (), doc)->add_args (_ARGSPECARGS));
 }
 #endif
+
+template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer transfer, I (X::*b) (_FUNCARGLIST), I (X::*e) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods (_iterator (name, b, e, transfer, doc)->add_args (_ARGSPECARGS));
+}
 
 template <class X, class I _COMMA _TMPLARG>
 Methods
 iterator_ext (const std::string &name, I (*xb) (X * _COMMA _FUNCARGLIST), I (*xe) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (_iterator_ext (name, xb, xe, doc));
+  return Methods (_iterator_ext (name, xb, xe, arg_default_return_value_preference (), doc));
 }
 
 #if _COUNT != 0
@@ -1741,22 +1825,29 @@ template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 iterator_ext (const std::string &name, I (*xb) (X * _COMMA _FUNCARGLIST), I (*xe) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods (_iterator_ext (name, xb, xe, doc)->add_args (_ARGSPECARGS));
+  return Methods (_iterator_ext (name, xb, xe, arg_default_return_value_preference (), doc)->add_args (_ARGSPECARGS));
 }
 #endif
 
-template <class X, class I _COMMA _TMPLARG>
-_NAME(ConstMethodBiIter) <X, I _COMMA _FUNCARGLIST> *
-_iterator (const std::string &name, I (X::*b) (_FUNCARGLIST) const, I (X::*e) (_FUNCARGLIST) const, const std::string &doc)
+template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator_ext (const std::string &name, Transfer transfer, I (*xb) (X * _COMMA _FUNCARGLIST), I (*xe) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return new _NAME(ConstMethodBiIter) <X, I _COMMA _FUNCARGLIST> (name, b, e, doc);
+  return Methods (_iterator_ext (name, xb, xe, transfer, doc)->add_args (_ARGSPECARGS));
+}
+
+template <class X, class I _COMMA _TMPLARG, class Transfer>
+_NAME(ConstMethodBiIter) <X, I _COMMA _FUNCARGLIST, Transfer> *
+_iterator (const std::string &name, I (X::*b) (_FUNCARGLIST) const, I (X::*e) (_FUNCARGLIST) const, Transfer, const std::string &doc)
+{
+  return new _NAME(ConstMethodBiIter) <X, I _COMMA _FUNCARGLIST, Transfer> (name, b, e, doc);
 }
 
 template <class X, class I _COMMA _TMPLARG>
 Methods
 iterator (const std::string &name, I (X::*b) (_FUNCARGLIST) const, I (X::*e) (_FUNCARGLIST) const, const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, b, e, doc));
+  return Methods (_iterator (name, b, e, arg_default_return_value_preference (), doc));
 }
 
 #if _COUNT != 0
@@ -1764,38 +1855,45 @@ template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 iterator (const std::string &name, I (X::*b) (_FUNCARGLIST) const, I (X::*e) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, b, e, doc)->add_args (_ARGSPECARGS));
+  return Methods (_iterator (name, b, e, arg_default_return_value_preference (), doc)->add_args (_ARGSPECARGS));
 }
 #endif
 
+template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer transfer, I (X::*b) (_FUNCARGLIST) const, I (X::*e) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods (_iterator (name, b, e, transfer, doc)->add_args (_ARGSPECARGS));
+}
+
 //  free iterators
 
-template <class X, class I _COMMA _TMPLARG>
-_NAME(MethodFreeIter) <X, I _COMMA _FUNCARGLIST> *
-_iterator (const std::string &name, I (X::*i) (_FUNCARGLIST), const std::string &doc)
+template <class X, class I _COMMA _TMPLARG, class Transfer>
+_NAME(MethodFreeIter) <X, I _COMMA _FUNCARGLIST, Transfer> *
+_iterator (const std::string &name, I (X::*i) (_FUNCARGLIST), Transfer, const std::string &doc)
 {
-  return new _NAME(MethodFreeIter) <X, I _COMMA _FUNCARGLIST> (name, i, doc);
+  return new _NAME(MethodFreeIter) <X, I _COMMA _FUNCARGLIST, Transfer> (name, i, doc);
 }
 
-template <class X, class I _COMMA _TMPLARG>
-_NAME(ExtMethodFreeIter) <X, I _COMMA _FUNCARGLIST> *
-_iterator_ext (const std::string &name, I (*xi) (X * _COMMA _FUNCARGLIST), const std::string &doc)
+template <class X, class I _COMMA _TMPLARG, class Transfer>
+_NAME(ExtMethodFreeIter) <X, I _COMMA _FUNCARGLIST, Transfer> *
+_iterator_ext (const std::string &name, I (*xi) (X * _COMMA _FUNCARGLIST), Transfer, const std::string &doc)
 {
-  return new _NAME(ExtMethodFreeIter) <X, I _COMMA _FUNCARGLIST> (name, xi, doc);
+  return new _NAME(ExtMethodFreeIter) <X, I _COMMA _FUNCARGLIST, Transfer> (name, xi, doc);
 }
 
-template <class I _COMMA _TMPLARG>
-_NAME(StaticMethodFreeIter) <I _COMMA _FUNCARGLIST> *
-_iterator (const std::string &name, I (*i) (_FUNCARGLIST), const std::string &doc)
+template <class I _COMMA _TMPLARG, class Transfer>
+_NAME(StaticMethodFreeIter) <I _COMMA _FUNCARGLIST, Transfer> *
+_iterator (const std::string &name, I (*i) (_FUNCARGLIST), Transfer, const std::string &doc)
 {
-  return new _NAME(StaticMethodFreeIter) <I _COMMA _FUNCARGLIST> (name, i, doc);
+  return new _NAME(StaticMethodFreeIter) <I _COMMA _FUNCARGLIST, Transfer> (name, i, doc);
 }
 
 template <class I _COMMA _TMPLARG>
 Methods
 iterator (const std::string &name, I (*i) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, i, doc));
+  return Methods (_iterator (name, i, arg_default_return_value_preference (), doc));
 }
 
 #if _COUNT != 0
@@ -1803,15 +1901,22 @@ template <class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 iterator (const std::string &name, I (*i) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, i, doc)->add_args (_ARGSPECARGS));
+  return Methods (_iterator (name, i, arg_default_return_value_preference (), doc)->add_args (_ARGSPECARGS));
 }
 #endif
+
+template <class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer transfer, I (*i) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods (_iterator (name, i, transfer, doc)->add_args (_ARGSPECARGS));
+}
 
 template <class X, class I _COMMA _TMPLARG>
 Methods
 iterator (const std::string &name, I (X::*i) (_FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, i, doc));
+  return Methods (_iterator (name, i, arg_default_return_value_preference (), doc));
 }
 
 #if _COUNT != 0
@@ -1819,15 +1924,22 @@ template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 iterator (const std::string &name, I (X::*i) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, i, doc)->add_args (_ARGSPECARGS));
+  return Methods (_iterator (name, i, arg_default_return_value_preference (), doc)->add_args (_ARGSPECARGS));
 }
 #endif
+
+template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer transfer, I (X::*i) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods (_iterator (name, i, transfer, doc)->add_args (_ARGSPECARGS));
+}
 
 template <class X, class I _COMMA _TMPLARG>
 Methods
 iterator_ext (const std::string &name, I (*xi) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
 {
-  return Methods (_iterator_ext (name, xi, doc));
+  return Methods (_iterator_ext (name, xi, arg_default_return_value_preference (), doc));
 }
 
 #if _COUNT != 0
@@ -1835,22 +1947,29 @@ template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 iterator_ext (const std::string &name, I (*xi) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods (_iterator_ext (name, xi, doc)->add_args (_ARGSPECARGS));
+  return Methods (_iterator_ext (name, xi, arg_default_return_value_preference (), doc)->add_args (_ARGSPECARGS));
 }
 #endif
 
-template <class X, class I _COMMA _TMPLARG>
-_NAME(ConstMethodFreeIter) <X, I _COMMA _FUNCARGLIST> *
-_iterator (const std::string &name, I (X::*i) (_FUNCARGLIST) const, const std::string &doc)
+template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator_ext (const std::string &name, Transfer transfer, I (*xi) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return new _NAME(ConstMethodFreeIter) <X, I _COMMA _FUNCARGLIST> (name, i, doc);
+  return Methods (_iterator_ext (name, xi, transfer, doc)->add_args (_ARGSPECARGS));
+}
+
+template <class X, class I _COMMA _TMPLARG, class Transfer>
+_NAME(ConstMethodFreeIter) <X, I _COMMA _FUNCARGLIST, Transfer> *
+_iterator (const std::string &name, I (X::*i) (_FUNCARGLIST) const, Transfer, const std::string &doc)
+{
+  return new _NAME(ConstMethodFreeIter) <X, I _COMMA _FUNCARGLIST, Transfer> (name, i, doc);
 }
 
 template <class X, class I _COMMA _TMPLARG>
 Methods
 iterator (const std::string &name, I (X::*i) (_FUNCARGLIST) const, const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, i, doc));
+  return Methods (_iterator (name, i, arg_default_return_value_preference (), doc));
 }
 
 #if _COUNT != 0
@@ -1858,9 +1977,16 @@ template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
 Methods
 iterator (const std::string &name, I (X::*i) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
-  return Methods (_iterator (name, i, doc)->add_args (_ARGSPECARGS));
+  return Methods (_iterator (name, i, arg_default_return_value_preference (), doc)->add_args (_ARGSPECARGS));
 }
 #endif
+
+template <class X, class I _COMMA _TMPLARG _COMMA _TMPLARGSPECS, class Transfer>
+Methods
+iterator (const std::string &name, Transfer transfer, I (X::*i) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods (_iterator (name, i, transfer, doc)->add_args (_ARGSPECARGS));
+}
 
 #undef _COMMA
 

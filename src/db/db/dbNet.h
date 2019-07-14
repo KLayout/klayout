@@ -468,6 +468,15 @@ public:
   }
 
   /**
+   *  @brief Provided for API compatibility with the other objects
+   *  This ID is not well-formed like for other objects.
+   */
+  size_t id () const
+  {
+    return m_cluster_id;
+  }
+
+  /**
    *  @brief Adds a pin to this net
    */
   void add_pin (const NetPinRef &pin);

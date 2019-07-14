@@ -191,7 +191,7 @@ static std::string children2string (const db::Circuit *c)
     if (!res.empty ()) {
       res += ",";
     }
-    res += (*r)->name ();
+    res += r->name ();
   }
   return res;
 }
@@ -203,7 +203,7 @@ static std::string parents2string (const db::Circuit *c)
     if (!res.empty ()) {
       res += ",";
     }
-    res += (*r)->name ();
+    res += r->name ();
   }
   return res;
 }
@@ -215,7 +215,7 @@ static std::string td2string (const db::Netlist *nl)
     if (!res.empty ()) {
       res += ",";
     }
-    res += (*r)->name ();
+    res += r->name ();
   }
   return res;
 }
@@ -227,9 +227,26 @@ static std::string bu2string (const db::Netlist *nl)
     if (!res.empty ()) {
       res += ",";
     }
-    res += (*r)->name ();
+    res += r->name ();
   }
   return res;
+}
+
+// ----------------------------------------------------------------------------------------
+
+TEST(0_DeviceClassTemplates)
+{
+  db::DeviceClassMOS3Transistor mos3;
+  db::DeviceClass generic;
+
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("MOS3") != 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("RES") != 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("DOESNTEXIST") == 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("MOS3")->is_of (&mos3), true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::template_by_name ("RES")->is_of (&mos3), false);
+  EXPECT_EQ (db::DeviceClassTemplateBase::is_a (&mos3) != 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::is_a (&generic) == 0, true);
+  EXPECT_EQ (db::DeviceClassTemplateBase::is_a (&mos3)->name (), "MOS3");
 }
 
 // ----------------------------------------------------------------------------------------
@@ -313,6 +330,9 @@ TEST(3_CircuitBasic)
   db::Circuit c;
   c.set_name ("name");
   EXPECT_EQ (c.name (), "name");
+
+  c.set_boundary (db::DPolygon (db::DBox (0, 1, 2, 3)));
+  EXPECT_EQ (c.boundary ().to_string (), "(0,1;0,3;2,3;2,1)");
 
   db::Pin p1 = c.add_pin ("p1");
   db::Pin p2 = c.add_pin ("p2");
@@ -1006,8 +1026,8 @@ TEST(12_NetlistTopology)
   c2->set_name ("c2");
   nl->add_circuit (c2);
   EXPECT_EQ (nl->top_circuit_count (), size_t (2));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c2");
-  EXPECT_EQ (bu2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (bu2string (nl.get ()), "c1,c2");
 
   std::auto_ptr<db::NetlistLocker> locker (new db::NetlistLocker (nl.get ()));
 
@@ -1017,14 +1037,14 @@ TEST(12_NetlistTopology)
 
   //  because we locked, it did not get updated:
   EXPECT_EQ (nl->top_circuit_count (), size_t (2));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c2");
-  EXPECT_EQ (bu2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (bu2string (nl.get ()), "c1,c2");
   locker.reset (0);
 
   //  after removing the lock, it's updated
   EXPECT_EQ (nl->top_circuit_count (), size_t (3));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c2,c3");
-  EXPECT_EQ (bu2string (nl.get ()), "c3,c2,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c3,c2,c1");
+  EXPECT_EQ (bu2string (nl.get ()), "c1,c2,c3");
 
   db::SubCircuit *sc1 = new db::SubCircuit (c2);
   sc1->set_name ("sc1");
@@ -1032,8 +1052,8 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (children2string (c1), "c2");
   EXPECT_EQ (parents2string (c2), "c1");
   EXPECT_EQ (nl->top_circuit_count (), size_t (2));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
-  EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c3,c1,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c1,c3");
 
   db::SubCircuit *sc2 = new db::SubCircuit (c2);
   sc2->set_name ("sc2");
@@ -1041,8 +1061,8 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (children2string (c1), "c2");
   EXPECT_EQ (parents2string (c2), "c1");
   EXPECT_EQ (nl->top_circuit_count (), size_t (2));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
-  EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c3,c1,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c1,c3");
 
   db::SubCircuit *sc3 = new db::SubCircuit (c3);
   sc3->set_name ("sc3");
@@ -1053,8 +1073,8 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (parents2string (c2), "c1");
   EXPECT_EQ (parents2string (c3), "c1");
   EXPECT_EQ (nl->top_circuit_count (), size_t (1));
-  EXPECT_EQ (td2string (nl.get ()), "c1,c2,c3");
-  EXPECT_EQ (bu2string (nl.get ()), "c3,c2,c1");
+  EXPECT_EQ (td2string (nl.get ()), "c1,c3,c2");
+  EXPECT_EQ (bu2string (nl.get ()), "c2,c3,c1");
 
   db::SubCircuit *sc4 = new db::SubCircuit (*sc2);
   sc4->set_name ("sc4");
@@ -1277,6 +1297,106 @@ TEST(21_FlattenSubCircuit2)
     "end;\n"
     "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
     "  device NMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(22_BlankCircuit)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *dc;
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("NMOS");
+  nl.add_device_class (dc);
+
+  dc = new db::DeviceClassMOS3Transistor ();
+  dc->set_name ("PMOS");
+  nl.add_device_class (dc);
+
+  nl.from_string (
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device PMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+    "circuit NTRANS ($1=$1,$2=$2,$3=$3);\n"
+    "  device NMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);\n"
+    "end;\n"
+  );
+
+  db::Netlist nl2;
+
+  nl2 = nl;
+  db::Circuit *circuit = nl2.circuit_by_name ("INV2");
+  nl2.purge_circuit (circuit);
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit (null);\n"
+    "  subcircuit (null);\n"
+    "end;\n"
+  );
+
+  nl2 = nl;
+  circuit = nl2.circuit_by_name ("INV2");
+  EXPECT_EQ (circuit->dont_purge (), false);
+  circuit->blank ();
+  EXPECT_EQ (circuit->dont_purge (), true);
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=(null),$2=(null),OUT=(null),$4=(null),$5=(null));\n"
+    "end;\n"
+  );
+
+  //  purge won't delete INV2
+  nl2.purge ();
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=(null),OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=(null),$2=(null),OUT=(null),$4=(null),$5=(null));\n"
+    "end;\n"
+  );
+
+  circuit->set_dont_purge (false);
+
+  //  now it will ...
+  nl2.purge ();
+
+  EXPECT_EQ (nl2.to_string (),
+    ""
+  );
+
+  nl2 = nl;
+  circuit = nl2.circuit_by_name ("RINGO");
+  nl2.purge_circuit (circuit);
+
+  EXPECT_EQ (nl2.to_string (),
+    ""
+  );
+
+  nl2 = nl;
+  circuit = nl2.circuit_by_name ("RINGO");
+  circuit->blank ();
+
+  EXPECT_EQ (nl2.to_string (),
+    "circuit RINGO (IN=(null),OSC=(null),VSS=(null),VDD=(null));\n"
     "end;\n"
   );
 }

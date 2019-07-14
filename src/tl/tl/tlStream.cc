@@ -44,6 +44,11 @@
 #include "tlString.h"
 #include "tlUri.h"
 
+#if defined(HAVE_QT)
+#  include <QByteArray>
+#  include <QResource>
+#endif
+
 namespace tl
 {
 
@@ -155,9 +160,34 @@ InputStream::InputStream (const std::string &abstract_path)
 { 
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
-  mp_buffer = new char [m_bcap];
+  mp_buffer = 0;
 
   tl::Extractor ex (abstract_path.c_str ());
+
+#if defined(HAVE_QT)
+  if (ex.test (":")) {
+
+    QResource res (tl::to_qstring (abstract_path));
+    if (res.size () > 0) {
+
+      QByteArray data;
+      if (res.isCompressed ()) {
+        data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+      } else {
+        data = QByteArray ((const char *)res.data (), (int)res.size ());
+      }
+
+      mp_buffer = new char[data.size ()];
+      memcpy (mp_buffer, data.constData (), data.size ());
+
+      mp_bptr = mp_buffer;
+      m_bcap = data.size ();
+      m_blen = m_bcap;
+
+    }
+
+  } else
+#endif
 #if defined(HAVE_CURL) || defined(HAVE_QT)
   if (ex.test ("http:") || ex.test ("https:")) {
     mp_delegate = new InputHttpStream (abstract_path);
@@ -165,13 +195,15 @@ InputStream::InputStream (const std::string &abstract_path)
 #endif
   if (ex.test ("pipe:")) {
     mp_delegate = new InputPipe (ex.get ());
-  } else
-  if (ex.test ("file:")) {
+  } else if (ex.test ("file:")) {
     tl::URI uri (abstract_path);
     mp_delegate = new InputZLibFile (uri.path ());
-  } else
-  {
+  } else {
     mp_delegate = new InputZLibFile (abstract_path);
+  }
+
+  if (! mp_buffer) {
+    mp_buffer = new char [m_bcap];
   }
 
   m_owns_delegate = true;
@@ -182,9 +214,17 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
   //  TODO: align this implementation with InputStream ctor
 
   tl::Extractor ex (abstract_path.c_str ());
+#if defined(HAVE_QT)
+  if (ex.test (":")) {
+    return abstract_path;
+  } else
+#endif
+#if defined(HAVE_CURL) || defined(HAVE_QT)
   if (ex.test ("http:") || ex.test ("https:")) {
     return abstract_path;
-  } else if (ex.test ("pipe:")) {
+  } else
+#endif
+  if (ex.test ("pipe:")) {
     return abstract_path;
   } else if (ex.test ("file:")) {
     tl::URI uri (abstract_path);
@@ -247,7 +287,9 @@ InputStream::get (size_t n, bool bypass_inflate)
       memmove (mp_buffer, mp_bptr, m_blen);
     }
 
-    m_blen += mp_delegate->read (mp_buffer + m_blen, m_bcap - m_blen); 
+    if (mp_delegate) {
+      m_blen += mp_delegate->read (mp_buffer + m_blen, m_bcap - m_blen);
+    }
     mp_bptr = mp_buffer;
 
   }
@@ -308,12 +350,12 @@ InputStream::read_all ()
   return str;
 }
 
-void InputStream::copy_to(tl::OutputStream &os)
+void InputStream::copy_to (tl::OutputStream &os)
 {
   const size_t chunk = 65536;
   char b [chunk];
   size_t read;
-  while ((read = mp_delegate->read (b, sizeof (b))) > 0) {
+  while (mp_delegate && (read = mp_delegate->read (b, sizeof (b))) > 0) {
     os.put (b, read);
   }
 }

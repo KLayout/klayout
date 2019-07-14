@@ -43,6 +43,7 @@
 #include "tlString.h"
 #include "tlClassRegistry.h"
 #include "tlExceptions.h"
+#include "tlFileUtils.h"
 
 #include <cstdio>
 #include <limits>
@@ -487,43 +488,30 @@ MacroEditorDialog::MacroEditorDialog (lay::PluginRoot *pr, lym::MacroCollection 
         }
 
         std::string url = ":/macro-templates/" + ll;
-        QResource res (tl::to_qstring (url));
-        if (res.size () > 0) {
 
-          QByteArray data;
-          if (res.isCompressed ()) {
-            data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+        lym::Macro *m = new lym::Macro ();
+        try {
+
+          m->rename (tl::basename (url));
+          m->load_from (url);
+          if (! description.empty ()) {
+            m->set_description (description_prefix + description);
           } else {
-            data = QByteArray ((const char *)res.data (), (int)res.size ());
+            m->set_description (description_prefix + m->description ());
+          }
+          m->set_readonly (true);
+          if (! category.empty ()) {
+            m->set_category (category);
+          }
+          m_macro_templates.push_back (m);
+
+          if (tl::verbosity () >= 20) {
+            tl::info << "Using macro template from " << url << " (with name " << m->name () << ")";
           }
 
-          lym::Macro *m = new lym::Macro ();
-          try {
-
-            m->rename (tl::to_string (QFileInfo (QUrl (tl::to_qstring (url)).path ()).baseName ()));
-            m->load_from_string (std::string (data.constData (), data.size ()), url);
-            if (! description.empty ()) {
-              m->set_description (description_prefix + description);
-            } else {
-              m->set_description (description_prefix + m->description ());
-            }
-            m->set_readonly (true);
-            if (! category.empty ()) {
-              m->set_category (category);
-            }
-            m_macro_templates.push_back (m);
-
-            if (tl::verbosity () >= 20) {
-              tl::info << "Using macro template from " << url << " (with name " << m->name () << ")";
-            }
-
-          } catch (tl::Exception &ex) {
-            delete m;
-            tl::error << "Reading " << url << ": " << ex.msg ();
-          }
-
-        } else {
-          tl::error << "Macro template resource " << url << " not found";
+        } catch (tl::Exception &ex) {
+          delete m;
+          tl::error << "Reading " << url << ": " << ex.msg ();
         }
 
       }
@@ -685,27 +673,22 @@ BEGIN_PROTECTED
       }
     }
 
-    if (cat == "drc") {
-      TipDialog td (this, 
-                    tl::to_string (QObject::tr ("<html><body>To get started with the DRC feature, read the documentation provided: <a href=\"int:/manual/drc.xml\">Design Rule Checks (DRC)</a>.</body></html>")), 
-                    "macro-editor-drc-tips");
-      td.exec_dialog ();
-    } else {
-      TipDialog td (this, 
-                    tl::to_string (QObject::tr ("<html><body>To get started with the macro development feature, read the documentation provided: <a href=\"int:/about/macro_editor.xml\">About Macro Development</a>.</body></html>")), 
-                    "macro-editor-basic-tips");
-      td.exec_dialog ();
-    }
+    TipDialog td (this,
+                  tl::to_string (QObject::tr ("<html><body>To get started with the macro development feature, read the documentation provided: <a href=\"int:/about/macro_editor.xml\">About Macro Development</a>.</body></html>")),
+                  "macro-editor-basic-tips");
+    td.exec_dialog ();
 
-  } else if (force_add) {
+  } else {
 
     if (! cat.empty ()) {
       select_category (cat);
     }
 
-    lym::Macro *m = new_macro ();
-    if (force_add && m) {
-      set_run_macro (m);
+    if (force_add) {
+      lym::Macro *m = new_macro ();
+      if (m) {
+        set_run_macro (m);
+      }
     }
 
   }

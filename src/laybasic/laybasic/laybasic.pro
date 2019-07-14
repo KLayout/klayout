@@ -65,9 +65,16 @@ FORMS = \
   SpecificLoadLayoutOptionsDialog.ui \
   SelectLineStyleForm.ui \
   LayoutViewConfigPage6a.ui \
-  EditLineStylesForm.ui
+  EditLineStylesForm.ui \
+    NetlistBrowserPage.ui \
+    NetlistBrowserConfigPage.ui \
+    NetlistBrowserConfigPage2.ui \
+    NetlistBrowserDialog.ui \
+    NetInfoDialog.ui \
+    NetExportDialog.ui
 
 RESOURCES = \
+    laybasicResources.qrc
 
 SOURCES = \
   gtf.cc \
@@ -159,6 +166,16 @@ SOURCES = \
   layEditLineStylesForm.cc \
   layEditLineStyleWidget.cc \
   layBackgroundAwareTreeStyle.cc \
+    layNetlistBrowser.cc \
+    layNetlistBrowserDialog.cc \
+    layNetlistBrowserPage.cc \
+    layItemDelegates.cc \
+    layNetInfoDialog.cc \
+    layNetExportDialog.cc \
+    layNetlistBrowserModel.cc \
+    layIndexedNetlistModel.cc \
+    layNetlistCrossReferenceModel.cc \
+    layNetlistBrowserTreeModel.cc
 
 HEADERS = \
   gtf.h \
@@ -244,7 +261,17 @@ HEADERS = \
   layEditLineStyleWidget.h \
   laybasicCommon.h \
   laybasicConfig.h \
-  layBackgroundAwareTreeStyle.h
+  layBackgroundAwareTreeStyle.h \
+    layNetlistBrowser.h \
+    layNetlistBrowserDialog.h \
+    layNetlistBrowserPage.h \
+    layItemDelegates.h \
+    layNetInfoDialog.h \
+    layNetExportDialog.h \
+    layNetlistBrowserModel.h \
+    layIndexedNetlistModel.h \
+    layNetlistCrossReferenceModel.h \
+    layNetlistBrowserTreeModel.h
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC

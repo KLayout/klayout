@@ -964,7 +964,8 @@ public:
     ClassBase *non_const_pcls = const_cast<ClassBase *> (cls_decl<P> ());
     non_const_pcls->add_child_class (this);
 
-    return Class<X, Adapted>::consolidate ();
+    //  no longer required as it is a child now.
+    return false;
   }
 };
 

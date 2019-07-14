@@ -244,6 +244,20 @@ public:
   }
 
   /**
+   *  @brief Returns a list of all classes in definition order
+   *
+   *  Definition order is:
+   *  - No duplicate class entries
+   *  - Base classes before their derived classes
+   *  - Child classes after their parent classes
+   *
+   *  If a module name is given, only top-level classes from this
+   *  module will be considered. However, the list may also include
+   *  base classes or child classes from outside the module.
+   */
+  static std::list<const gsi::ClassBase *> classes_in_definition_order (const char *mod_name = 0);
+
+  /**
    *  @brief Iterates the methods (begin)
    */
   method_iterator begin_methods () const

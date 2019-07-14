@@ -67,7 +67,7 @@ Device &Device::operator= (const Device &other)
 {
   if (this != &other) {
     m_name = other.m_name;
-    m_position = other.m_position;
+    m_trans = other.m_trans;
     m_parameters = other.m_parameters;
     mp_device_class = other.mp_device_class;
     mp_device_abstract = other.mp_device_abstract;
@@ -97,9 +97,9 @@ void Device::set_name (const std::string &n)
   }
 }
 
-void Device::set_position (const db::DPoint &pt)
+void Device::set_trans (const db::DCplxTrans &tr)
 {
-  m_position = pt;
+  m_trans = tr;
 }
 
 void Device::set_terminal_ref_for_terminal (size_t terminal_id, Net::terminal_iterator iter)
@@ -184,6 +184,105 @@ void Device::set_parameter_value (const std::string &name, double v)
 {
   if (device_class ()) {
     set_parameter_value (device_class ()->parameter_id_for_name (name), v);
+  }
+}
+
+void Device::add_others_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal)
+{
+  std::vector<DeviceReconnectedTerminal> &terminals = m_reconnected_terminals [this_terminal];
+
+  std::map<unsigned int, std::vector<DeviceReconnectedTerminal> >::const_iterator ot = other->m_reconnected_terminals.find (other_terminal);
+  if (ot == other->m_reconnected_terminals.end ()) {
+
+    terminals.push_back (DeviceReconnectedTerminal (other_abstracts ().size () + 1, other_terminal));
+
+  } else {
+
+    size_t n = terminals.size ();
+    terminals.insert (terminals.end (), ot->second.begin (), ot->second.end ());
+
+    while (n < terminals.size ()) {
+      terminals [n].device_index += other_abstracts ().size () + 1;
+      ++n;
+    }
+
+  }
+}
+
+void Device::init_terminal_routes ()
+{
+  if (! device_class ()) {
+    return;
+  }
+
+  size_t n = device_class ()->terminal_definitions ().size ();
+  for (size_t i = 0; i < n; ++i) {
+    m_reconnected_terminals [i].push_back (DeviceReconnectedTerminal (0, i));
+  }
+}
+
+void Device::join_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal)
+{
+  if (m_reconnected_terminals.empty ()) {
+    init_terminal_routes ();
+  }
+
+  other->connect_terminal (other_terminal, 0);
+
+  add_others_terminals (this_terminal, other, other_terminal);
+}
+
+void Device::reroute_terminal (unsigned int this_terminal, db::Device *other, unsigned int from_other_terminal, unsigned int other_terminal)
+{
+  //  TODO: the internal connection is not represented currently ...
+
+  if (m_reconnected_terminals.empty ()) {
+    init_terminal_routes ();
+  }
+
+  if (! m_reconnected_terminals.empty ()) {
+    m_reconnected_terminals.erase (this_terminal);
+  }
+
+  add_others_terminals (this_terminal, other, other_terminal);
+
+  connect_terminal (this_terminal, other->net_for_terminal (other_terminal));
+
+  other->connect_terminal (from_other_terminal, 0);
+  other->connect_terminal (other_terminal, 0);
+}
+
+void Device::join_device (db::Device *other)
+{
+  db::DCplxTrans d = trans ().inverted () * other->trans ();
+
+  m_other_abstracts.reserve (m_other_abstracts.size () + 1 + other->m_other_abstracts.size ());
+
+  m_other_abstracts.push_back (db::DeviceAbstractRef (other->device_abstract (), d));
+
+  for (std::vector<db::DeviceAbstractRef>::const_iterator a = other->m_other_abstracts.begin (); a != other->m_other_abstracts.end (); ++a) {
+    m_other_abstracts.push_back (*a);
+    m_other_abstracts.back ().trans = d * m_other_abstracts.back ().trans;
+  }
+}
+
+static db::DeviceAbstract *map_da (const std::map<const DeviceAbstract *, DeviceAbstract *> &map, const db::DeviceAbstract *da)
+{
+  if (! da) {
+    return 0;
+  } else {
+    std::map<const DeviceAbstract *, DeviceAbstract *>::const_iterator m = map.find (da);
+    tl_assert (m != map.end ());
+    return m->second;
+  }
+}
+
+void Device::translate_device_abstracts (const std::map<const DeviceAbstract *, DeviceAbstract *> &map)
+{
+  set_device_abstract (map_da (map, device_abstract ()));
+
+  for (std::vector<db::DeviceAbstractRef>::iterator a = m_other_abstracts.begin (); a != m_other_abstracts.end (); ++a) {
+    a->device_abstract = map_da (map, a->device_abstract);
   }
 }
 

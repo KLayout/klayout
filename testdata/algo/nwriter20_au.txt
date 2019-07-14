@@ -14,11 +14,11 @@
 * net 1 n1
 * net 2 n2
 * net 3 n3
-* device instance $1 0,0 RCLS
+* device instance $1 r0 *1 0,0 RCLS
 *** Before device $1
 R$1 1 3 1.7
 *** After device $1
-* device instance $2 0,0 RCLS
+* device instance $2 r0 *1 0,0 RCLS
 *** Before device $2
 R$2 3 2 4.2e-05
 *** After device $2

@@ -27,6 +27,8 @@
 #include "dbHierNetworkProcessor.h"
 
 #include <map>
+#include <set>
+#include <string>
 
 namespace db
 {
@@ -92,9 +94,9 @@ private:
   std::pair<bool, db::property_names_id_type> m_device_annot_name_id;
   std::pair<bool, db::property_names_id_type> m_terminal_annot_name_id;
 
-  void assign_net_name (const std::string &n, db::Net *net);
   bool instance_is_device (db::properties_id_type prop_id) const;
   db::Device *device_from_instance (db::properties_id_type prop_id, db::Circuit *circuit) const;
+  void assign_net_names (db::Net *net, const std::set<std::string> &net_names);
 
   /**
    *  @brief Make a pin connection from clusters
@@ -151,7 +153,7 @@ private:
    */
   void collect_labels (const connected_clusters_type &clusters,
                        size_t cid,
-                       db::Net *net);
+                       std::set<std::string> &net_names);
 
   /**
    *  @brief Makes the terminal to cluster ID connections of the device abstract

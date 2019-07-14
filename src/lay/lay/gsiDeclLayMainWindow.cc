@@ -371,6 +371,13 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This event has been added in version 0.25.\n"
   ) +
+  gsi::method ("show_macro_editor", &lay::MainWindow::show_macro_editor, gsi::arg ("cat", std::string ()), gsi::arg ("add", false),
+    "@brief Shows the macro editor\n"
+    "If 'cat' is given, this category will be selected in the category tab. "
+    "If 'add' is true, the 'new macro' dialog will be opened.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
   gsi::method ("cm_reset_window_state", &lay::MainWindow::cm_reset_window_state,
     "@brief 'cm_reset_window_state' action (bound to a menu)"
     "\n"

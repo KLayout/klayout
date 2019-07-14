@@ -280,25 +280,14 @@ EnumSpecs<E> enum_const (const std::string &estr, E evalue, const std::string &d
 }
 
 /**
- *  @brief The basic declaration class
- *  This is a gsi::Class specialization which implements an enum declaration.
- *  The use is this:
- *
- *  @code
- *  gsi::Enum<E> e_enum ("A description", 
- *    gsi::enum_const ("a", E::a, "description of a") + 
- *    gsi::enum_const ("b", E::b) + 
- *    ...
- *  );
- *  @endcode
+ *  @brief A helper class for the enum implementation
  */
 template <class E>
-class Enum
-  : public Class<EnumAdaptor<E>, E>
+class EnumImpl
 {
 public:
-  Enum (const std::string &module, const std::string &name, const EnumSpecs<E> &specs, const std::string &doc = std::string ())
-    : Class<EnumAdaptor<E>, E> (module, name, specs.methods (), doc), m_specs (specs)
+  EnumImpl (const EnumSpecs<E> &specs)
+    : m_specs (specs)
   {
   }
 
@@ -329,6 +318,62 @@ public:
 
 private:
   EnumSpecs<E> m_specs;
+};
+
+/**
+ *  @brief The basic declaration class
+ *  This is a gsi::Class specialization which implements an enum declaration.
+ *  The use is this:
+ *
+ *  @code
+ *  gsi::Enum<E> e_enum ("A description", 
+ *    gsi::enum_const ("a", E::a, "description of a") + 
+ *    gsi::enum_const ("b", E::b) + 
+ *    ...
+ *  );
+ *  @endcode
+ */
+template <class E>
+class Enum
+  : public Class<EnumAdaptor<E>, E>, public EnumImpl<E>
+{
+public:
+  Enum (const std::string &module, const std::string &name, const EnumSpecs<E> &specs, const std::string &doc = std::string ())
+    : Class<EnumAdaptor<E>, E> (module, name, specs.methods (), doc), EnumImpl<E> (specs)
+  {
+  }
+};
+
+/**
+ *  @brief An enum declaration as a child class
+ *
+ *  @code
+ *  gsi::EnumIn<P, E> e_enum ("A description",
+ *    gsi::enum_const ("a", E::a, "description of a") +
+ *    gsi::enum_const ("b", E::b) +
+ *    ...
+ *  );
+ *  @endcode
+ */
+template <class P, class E>
+class EnumIn
+  : public Enum<E>
+{
+public:
+  EnumIn (const std::string &module, const std::string &name, const EnumSpecs<E> &specs, const std::string &doc = std::string ())
+    : Enum<E> (module, name, specs, doc)
+  {
+  }
+
+  virtual bool consolidate () const
+  {
+    //  TODO: ugly const cast
+    ClassBase *non_const_pcls = const_cast<ClassBase *> (cls_decl<P> ());
+    non_const_pcls->add_child_class (this);
+
+    //  no longer required as it is a child now.
+    return false;
+  }
 };
 
 #if defined(HAVE_QT)

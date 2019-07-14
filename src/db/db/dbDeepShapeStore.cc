@@ -222,17 +222,9 @@ DeepLayer::check_dss () const
 struct DeepShapeStore::LayoutHolder
 {
   LayoutHolder (const db::ICplxTrans &trans)
-    : refs (0), layout (false), builder (&layout, trans), m_empty_layer (std::numeric_limits<unsigned int>::max ())
+    : refs (0), layout (false), builder (&layout, trans)
   {
     //  .. nothing yet ..
-  }
-
-  unsigned int empty_layer () const
-  {
-    if (m_empty_layer == std::numeric_limits<unsigned int>::max ()) {
-      const_cast<LayoutHolder *> (this)->make_empty_layer ();
-    }
-    return m_empty_layer;
   }
 
   void add_layer_ref (unsigned int layer)
@@ -255,15 +247,6 @@ struct DeepShapeStore::LayoutHolder
   db::Layout layout;
   db::HierarchyBuilder builder;
   std::map<unsigned int, int> layer_refs;
-
-private:
-  unsigned int m_empty_layer;
-
-  void make_empty_layer ()
-  {
-    m_empty_layer = layout.insert_layer ();
-    layer_refs [m_empty_layer] += 1;  //  the empty layer is not deleted
-  }
 };
 
 // ----------------------------------------------------------------------------------
@@ -514,6 +497,18 @@ void DeepShapeStore::make_layout (unsigned int layout_index, const db::Recursive
   m_layout_map[std::make_pair (si, trans)] = layout_index;
 }
 
+static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIterator &si)
+{
+  unsigned int layer_index = layout.insert_layer ();
+
+  if (si.layout () && si.layer () < si.layout ()->layers ()) {
+    //  try to preserve the layer properties
+    layout.set_properties (layer_index, si.layout ()->get_properties (si.layer ()));
+  }
+
+  return layer_index;
+}
+
 DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)
 {
   if (max_area_ratio == 0.0) {
@@ -528,7 +523,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
 
-  unsigned int layer_index = layout.insert_layer ();
+  unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing clipped and reduced polygon references
@@ -540,6 +535,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   try {
 
     tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+    db::LayoutLocker ll (&layout, true /*no update*/);
 
     builder.set_shape_receiver (&clip);
     db::RecursiveShapeIterator (si).push (& builder);
@@ -553,17 +549,6 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   return DeepLayer (this, layout_index, layer_index);
 }
 
-DeepLayer DeepShapeStore::empty_layer (unsigned int layout_index) const
-{
-  return DeepLayer (const_cast<DeepShapeStore *> (this), layout_index, m_layouts[layout_index]->empty_layer ());
-}
-
-DeepLayer DeepShapeStore::empty_layer () const
-{
-  require_singular ();
-  return empty_layer (0);
-}
-
 DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator &si, HierarchyBuilderShapeReceiver *pipe, const db::ICplxTrans &trans)
 {
   unsigned int layout_index = layout_for_iter (si, trans);
@@ -571,13 +556,14 @@ DeepLayer DeepShapeStore::create_custom_layer (const db::RecursiveShapeIterator 
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
 
-  unsigned int layer_index = layout.insert_layer ();
+  unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
 
   //  Build the working hierarchy from the recursive shape iterator
   try {
 
     tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+    db::LayoutLocker ll (&layout, true /*no update*/);
 
     builder.set_shape_receiver (pipe);
     db::RecursiveShapeIterator (si).push (& builder);
@@ -624,7 +610,7 @@ DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &s
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
 
-  unsigned int layer_index = layout.insert_layer ();
+  unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing edges
@@ -634,6 +620,7 @@ DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &s
   try {
 
     tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+    db::LayoutLocker ll (&layout, true /*no update*/);
 
     builder.set_shape_receiver (&refs);
     db::RecursiveShapeIterator (si).push (& builder);
@@ -654,7 +641,7 @@ DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterat
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
 
-  unsigned int layer_index = layout.insert_layer ();
+  unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing the edge pairs
@@ -664,6 +651,7 @@ DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterat
   try {
 
     tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Building working hierarchy")));
+    db::LayoutLocker ll (&layout, true /*no update*/);
 
     builder.set_shape_receiver (&refs);
     db::RecursiveShapeIterator (si).push (& builder);
@@ -697,7 +685,7 @@ DeepShapeStore::issue_variants (unsigned int layout_index, const std::map<db::ce
 }
 
 const db::CellMapping &
-DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells)
+DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells, const std::set<db::cell_index_type> *included_cells)
 {
   const db::Layout *source_layout = &m_layouts [layout_index]->layout;
   if (source_layout->begin_top_down () == source_layout->end_top_cells ()) {
@@ -758,7 +746,7 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
     //  Add new cells for the variants and (possible) devices which are cells added during the device
     //  extraction process
-    cm->second.create_missing_mapping (*into_layout, into_cell, *source_layout, source_top, excluded_cells);
+    cm->second.create_missing_mapping (*into_layout, into_cell, *source_layout, source_top, excluded_cells, included_cells);
 
   }
 

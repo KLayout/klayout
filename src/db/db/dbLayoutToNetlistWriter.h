@@ -24,10 +24,58 @@
 #define HDR_dbLayoutToNetlistWriter
 
 #include "dbCommon.h"
+#include "dbPoint.h"
+#include "dbTrans.h"
+#include "dbPolygon.h"
 #include "tlStream.h"
+#include "tlProgress.h"
 
 namespace db
 {
+
+class Circuit;
+class SubCircuit;
+class Device;
+class DeviceAbstract;
+class Net;
+class Netlist;
+class LayoutToNetlist;
+
+namespace l2n_std_format
+{
+
+template <class Keys>
+class std_writer_impl
+{
+public:
+  std_writer_impl (tl::OutputStream &stream, double dbu, const std::string &progress_description = std::string ());
+
+  void write (const db::LayoutToNetlist *l2n);
+
+protected:
+  void write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit);
+  void write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, const db::Circuit &circuit, const std::string &indent, std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > *net2id_per_circuit);
+  void write (const db::Netlist *netlist, const db::LayoutToNetlist *l2n, const db::Net &net, unsigned int id, const std::string &indent);
+  void write (const db::LayoutToNetlist *l2n, const db::SubCircuit &subcircuit, std::map<const Net *, unsigned int> &net2id, const std::string &indent);
+  void write (const db::LayoutToNetlist *l2n, const db::Device &device, std::map<const Net *, unsigned int> &net2id, const std::string &indent);
+  void write (const db::LayoutToNetlist *l2n, const db::DeviceAbstract &device_abstract, const std::string &indent);
+  void write (const db::PolygonRef *s, const db::ICplxTrans &tr, const std::string &lname, bool relative);
+  void write (const db::DCplxTrans &trans);
+  void reset_geometry_ref ();
+
+  tl::OutputStream &stream ()
+  {
+    return *mp_stream;
+  }
+
+private:
+  tl::OutputStream *mp_stream;
+  db::Point m_ref;
+  double m_dbu;
+  tl::AbsoluteProgress m_progress;
+};
+
+}
 
 class LayoutToNetlist;
 
@@ -37,10 +85,16 @@ class LayoutToNetlist;
 class DB_PUBLIC LayoutToNetlistWriterBase
 {
 public:
-  LayoutToNetlistWriterBase () { }
-  virtual ~LayoutToNetlistWriterBase () { }
+  LayoutToNetlistWriterBase ();
+  virtual ~LayoutToNetlistWriterBase ();
 
-  virtual void write (const db::LayoutToNetlist *l2n) = 0;
+  void write (const db::LayoutToNetlist *l2n);
+
+protected:
+  virtual void do_write (const db::LayoutToNetlist *l2n) = 0;
+
+private:
+  std::string m_filename;
 };
 
 /**
@@ -52,7 +106,8 @@ class DB_PUBLIC LayoutToNetlistStandardWriter
 public:
   LayoutToNetlistStandardWriter (tl::OutputStream &stream, bool short_version);
 
-  void write (const db::LayoutToNetlist *l2n);
+protected:
+  void do_write (const db::LayoutToNetlist *l2n);
 
 private:
   tl::OutputStream *mp_stream;

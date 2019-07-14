@@ -23,7 +23,7 @@ end
 
 load("test_prologue.rb")
 
-class MyDelegate < RBA::NetlistSpiceWriterDelegate
+class MyNetlistSpiceWriterDelegate < RBA::NetlistSpiceWriterDelegate
 
   def write_header
     emit_line("*** My special header")
@@ -43,7 +43,7 @@ class MyDelegate < RBA::NetlistSpiceWriterDelegate
 
 end
 
-class DBLayoutToNetlist_TestClass < TestBase
+class DBNetlistWriterTests_TestClass < TestBase
 
   def test_1_Basic
 
@@ -114,7 +114,7 @@ class DBLayoutToNetlist_TestClass < TestBase
 
     input = File.join($ut_testsrc, "testdata", "algo", "nwriter_rba2_au.txt")
 
-    mydelegate = MyDelegate::new
+    mydelegate = MyNetlistSpiceWriterDelegate::new
     writer = RBA::NetlistSpiceWriter::new(mydelegate)
     # the delegate is kept by the SPICE writer ..
     mydelegate = nil

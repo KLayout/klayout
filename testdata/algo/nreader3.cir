@@ -1,6 +1,6 @@
 .subckt INVX1 1 2 3 4 5 6
-  m$1 1 5 2 4 MLVPMOS w=1.5um l=0.25um 
-  m$2 3 5 2 6 MLVNMOS w=0.95um l=0.25um
+  m$1 1 5 2 4 mlvpmos w=1.5um l=0.25um 
+  m$2 3 5 2 6 mlvnmos w=0.95um l=0.25um
 .ends 
 
 .subckt ND2X1 1 2 3 4 5 6 7

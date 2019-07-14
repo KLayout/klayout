@@ -211,7 +211,7 @@ public:
   /**
    *  @brief Creates an object of ContextCache associated with the given layout
    */
-  ContextCache (const db::Layout &layout);
+  ContextCache (const db::Layout *layout);
 
   /**
    *  @brief Find the context for the given cell combination

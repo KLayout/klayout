@@ -22,6 +22,7 @@
 
 #include "dbDeviceClass.h"
 #include "dbDevice.h"
+#include "tlClassRegistry.h"
 
 namespace db
 {
@@ -271,6 +272,31 @@ bool DeviceClass::equal (const db::Device &a, const db::Device &b)
     return true;
 
   }
+}
+
+// --------------------------------------------------------------------------------
+//  DeviceClassTemplateBase class implementation
+
+DeviceClassTemplateBase *
+DeviceClassTemplateBase::template_by_name (const std::string &name)
+{
+  for (tl::Registrar<db::DeviceClassTemplateBase>::iterator i = tl::Registrar<db::DeviceClassTemplateBase>::begin (); i != tl::Registrar<db::DeviceClassTemplateBase>::end (); ++i) {
+    if (i->name () == name) {
+      return i.operator-> ();
+    }
+  }
+  return 0;
+}
+
+DeviceClassTemplateBase *
+DeviceClassTemplateBase::is_a (const db::DeviceClass *dc)
+{
+  for (tl::Registrar<db::DeviceClassTemplateBase>::iterator i = tl::Registrar<db::DeviceClassTemplateBase>::begin (); i != tl::Registrar<db::DeviceClassTemplateBase>::end (); ++i) {
+    if (i->is_of (dc)) {
+      return i.operator-> ();
+    }
+  }
+  return 0;
 }
 
 }

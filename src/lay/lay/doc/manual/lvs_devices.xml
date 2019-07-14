@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>LVS Devices</title>
+  <keyword name="LVS"/>
+  <keyword name="LVS Devices"/>
+
+  <h2>Device extractors and device classes</h2>
+
+  <p>
+  KLayout provides two concepts for handling device variety: 
+  </p>
+  
+  <p>
+  <b>Device classes</b> are device categories. There are general categories such as
+  resistors or MOS transistors. Specific categories can be created to represent specific
+  incarnations - e.g. NMOS and PMOS devices. Device classes also determine how devices
+  combine.
+  </p>
+
+  <p>Device classes are documented here: <link href="/manual/lvs_device_classes.xml"/>.</p>
+
+  <p>
+  <b>Device extractors</b> are the actual worker objects that analyze layout and produce devices. 
+  As for device classes, there are general device extractors. Each device extractor produces
+  devices from a specific class.
+  </p>
+
+  <p>Device extractors are documented here: <link href="/manual/lvs_device_extractors.xml"/>.</p>
+
+</doc>
+

@@ -409,8 +409,8 @@ find_layout_context (const db::Layout &layout, db::cell_index_type from, db::cel
 // ------------------------------------------------------------
 //  Implementation of ContextCache
 
-ContextCache::ContextCache (const db::Layout &layout)
-  : mp_layout (&layout)
+ContextCache::ContextCache (const db::Layout *layout)
+  : mp_layout (layout)
 {
   //  .. nothing yet ..
 }
@@ -418,6 +418,11 @@ ContextCache::ContextCache (const db::Layout &layout)
 const std::pair<bool, db::ICplxTrans> &
 ContextCache::find_layout_context (db::cell_index_type from, db::cell_index_type to)
 {
+  if (! mp_layout) {
+    static std::pair<bool, db::ICplxTrans> nothing (false, db::ICplxTrans ());
+    return nothing;
+  }
+
   std::map<std::pair<db::cell_index_type, db::cell_index_type>, std::pair<bool, db::ICplxTrans> >::iterator c = m_cache.find (std::make_pair (from, to));
   if (c == m_cache.end ()) {
     c = m_cache.insert (std::make_pair (std::make_pair (from, to), std::make_pair (false, db::ICplxTrans ()))).first;

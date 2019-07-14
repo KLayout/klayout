@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>LVS Connectivity</title>
+  <keyword name="LVS"/>
+  <keyword name="LVS Connectivity"/>
+
+  <h2-index/>
+
+  <h2>Intra- and inter-layer connections</h2>
+
+  <p>
+  The connectivity setup of a LVS script determines how the connections are made.
+  Connections are usually made through conductive materials such as Aluminium or Copper.
+  The polygons representing such a material form a connection. Connections can be 
+  made across multiple polygons - touching polygons form connected islands of 
+  conductive material. This "intra-layer" connectivity is implicit: in LVS scripts
+  connections are always made between polygons on the same layer.
+  </p>
+
+  <p>
+  Connections often cross layers. A via for example is a hole in the insulator
+  sheet which connects two metal layers. This connection is modelled using
+  a "connect" statement (see <a href="/about/drc_ref_global.xml#connect">connect</a>):
+  </p>
+
+  <pre>connect(layer1, layer2)</pre>
+
+  <p>
+  A connect statement will specify an electrical connection when the polygons from layer1
+  and layer2 overlap. layer1 and layer2 are original or derived layers. "connect" statements
+  should appear in the script before the netlist is required - i.e. before "compare" 
+  or any other netlist-related statement inside the LVS script. The order of the connect
+  statements is not relevant. Neigther is the order of the arguments in "connect": 
+  connections are always bidirectional.
+  </p>
+
+  <p>
+  This is an example for a vertical cross section through a 
+  simple 3-metal layer stack with the corresponding "connect" statements:
+  </p>
+
+  <p>
+  <img src="/manual/metal_connections.png"/>
+  </p>
+
+  <p>
+  Labels can be included in the connectivity too. Typically labels are placed on
+  metal layers. If the labels are drawn on the same layer than the metal shapes
+  they are automatically included when using "input" to read the layer. If only
+  labels shall be read from a layer, use "labels" (see <a href="/about/drc_ref_global.xml#labels">labels</a>).
+  </p>
+
+  <p>
+  To attach labels to metal layers, simply connect the label and metal layers:
+  </p>
+
+  <pre>metal1_labels = labels(10, 0)
+metal1        = input(11, 0)
+via1          = input(12, 0)
+metal2_labels = labels(13, 0)
+metal2        = input(14, 0)
+
+connect(metal1, metal1_labels)
+connect(metal1, via1)
+connect(via1, metal2)
+connect(metal2, metal2_labels)</pre>
+
+  <p>
+  If labels are connected to metal layers, their text strings will be used to assign 
+  net names to the resulting nets. Ideally, one net is labelled with a single text 
+  or with texts with the same text string. In this case, the net name will 
+  be non-ambiguous. If multiple labels with different strings are present on a net, 
+  the net name will be made from a combination of these names.
+  </p>
+
+  <h2>Global connections</h2>
+
+  <p>
+  KLayout supports implicit connections made across all polygons on 
+  a layer, regardless whether they connect or not. A typical case for
+  such a connection is the substrate (aka "bulk"). This connection
+  represents the (lightly conductive) substrate material. There is no
+  polygon representing the wafer. Instead, a layer is defined which 
+  makes a global connection with "connect_global" (see <a href="/about/drc_ref_global.xml#connect_global">connect_global</a>):
+  </p>
+
+  <pre>connect_global(bulk, "VSS")</pre>
+
+  <p>
+  The arguments to "connect_global" is the globally connected layer and the 
+  name of the global net to create. The function will make all shapes on "bulk"
+  being connected to a single net "VSS". Every circuit will at least have 
+  the "VSS" net. In addition, each circuit will be 
+  given a pin called "VSS" which propagates this net to parent circuits.
+  </p>
+
+  <h2>Implicit connections</h2>
+
+  <p>
+  Implicit connections can be useful to supply preliminary connections
+  which are supposed to be created higher up in the hierarchy:
+  Imagine a circuit which a big power net for example. When the layout
+  is made, the power net may not be completely connected yet because the 
+  plan is to connect all parts of this power net later when the
+  cell is integrated. In this situation, the 
+  subcircuit cell itself won't be LVS clean because the power net is a single
+  net schematic-wise, but exist as multiple nets layout-wise. This prevents
+  bottom-up verification - a very useful technique to achieve LVS clean 
+  layouts.
+  </p>
+
+  <p>
+  To allow verification of such a cell, "implicit connections" can be
+  made by giving the net parts the same name through labels and assume
+  these parts are connected: 
+  for example to specify implicit connections between all parts of a "VDD" net,
+  place a label "VDD" on each part and include the following statement
+  in the script:
+  </p>
+
+  <pre>connect_implicit("VDD")</pre>
+
+  <p>
+  "connect_implicit" (see <a href="/about/drc_ref_global.xml#connect_implicit">connect_implicit</a>)
+  can be present multiple times to make many of such connections.
+  Implicit connections will only be made on the topmost circuit to prevent false verification results. 
+  Be careful not to use this option in a final verification of a full design as power net 
+  opens may pass unnoticed.
+  </p>
+
+</doc>

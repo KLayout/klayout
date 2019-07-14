@@ -332,7 +332,8 @@ private:
     layout_file,
     layout_file_with_tech,
     layout_file_with_tech_file,
-    rdb_file
+    rdb_file,
+    l2ndb_file
   };
 
   std::vector <std::pair<file_type, std::pair<std::string, std::string> > > m_files;

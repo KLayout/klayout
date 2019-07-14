@@ -14,10 +14,12 @@ SOURCES = \
   layParsedLayerSource.cc \
   layRenderer.cc \
   laySnap.cc \
-    layAbstractMenu.cc
+  layAbstractMenu.cc \
+  layNetlistBrowserModelTests.cc \
+    layNetlistBrowserTreeModelTests.cc
 
-INCLUDEPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
-DEPENDPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
+INCLUDEPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$OUT_PWD/../laybasic
+DEPENDPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$OUT_PWD/../laybasic
 
 LIBS += -L$$DESTDIR_UT -lklayout_laybasic -lklayout_db -lklayout_tl -lklayout_gsi
 

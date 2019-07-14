@@ -26,13 +26,30 @@
 #include "dbCommon.h"
 #include "dbPolygon.h"
 #include "dbCell.h"
+#include "dbLayoutToNetlist.h"
 #include "tlStream.h"
+#include "tlProgress.h"
 
 namespace db {
 
+class LayoutToNetlistStandardReader;
+
 namespace l2n_std_reader {
-  class Layers;
-  class Brace;
+
+  class Brace
+  {
+  public:
+    Brace (db::LayoutToNetlistStandardReader *reader);
+
+    operator bool ();
+    void done ();
+
+  private:
+    db::LayoutToNetlistStandardReader *mp_reader;
+    bool m_checked;
+    bool m_has_brace;
+  };
+
 }
 
 class LayoutToNetlist;
@@ -52,7 +69,13 @@ public:
   LayoutToNetlistReaderBase () { }
   virtual ~LayoutToNetlistReaderBase () { }
 
-  virtual void read (db::LayoutToNetlist *l2n) = 0;
+  void read (db::LayoutToNetlist *l2n)
+  {
+    do_read (l2n);
+  }
+
+private:
+  virtual void do_read (db::LayoutToNetlist *l2n) = 0;
 };
 
 /**
@@ -62,14 +85,35 @@ class DB_PUBLIC LayoutToNetlistStandardReader
   : public LayoutToNetlistReaderBase
 {
 public:
+
+  struct ObjectMap
+  {
+    std::map<unsigned int, db::Net *> id2net;
+    std::map<unsigned int, db::Device *> id2device;
+    std::map<unsigned int, db::SubCircuit *> id2subcircuit;
+  };
+
   LayoutToNetlistStandardReader (tl::InputStream &stream);
 
-  void read (db::LayoutToNetlist *l2n);
+  void do_read (db::LayoutToNetlist *l2n);
 
-private:
+protected:
   friend class l2n_std_reader::Brace;
   typedef l2n_std_reader::Brace Brace;
-  typedef l2n_std_reader::Layers Layers;
+
+  void read_netlist (Netlist *netlist, db::LayoutToNetlist *l2n, bool nested = false, std::map<const db::Circuit *, ObjectMap> *map_per_circuit = 0);
+  static size_t terminal_id (const db::DeviceClass *device_class, const std::string &tname);
+  static std::pair<db::DeviceAbstract *, const db::DeviceClass *> device_model_by_name (db::Netlist *netlist, const std::string &dmname);
+
+  const std::string &path () const
+  {
+    return m_path;
+  }
+
+  tl::TextInputStream &stream ()
+  {
+    return m_stream;
+  }
 
   struct Connections
   {
@@ -80,13 +124,6 @@ private:
     size_t from_cluster, to_cluster;
   };
 
-  tl::TextInputStream m_stream;
-  std::string m_path;
-  std::string m_line;
-  tl::Extractor m_ex;
-
-  void do_read (db::LayoutToNetlist *l2n);
-
   bool test (const std::string &token);
   void expect (const std::string &token);
   void read_word_or_quoted(std::string &s);
@@ -96,12 +133,26 @@ private:
   bool at_end ();
   void skip ();
 
-  void read_net (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, db::Net *> &id2net);
-  void read_pin (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::map<unsigned int, db::Net *> &id2net);
-  db::CellInstArray read_device (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, db::Net *> &id2net);
-  db::CellInstArray read_subcircuit (db::LayoutToNetlist *l2n, db::Circuit *circuit, std::list<Connections> &refs, std::map<unsigned int, db::Net *> &id2net);
+  void read_net (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map);
+  void read_pin (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map);
+  void read_device (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections);
+  void read_subcircuit (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections);
+  bool read_trans_part (db::DCplxTrans &tr);
   void read_abstract_terminal (db::LayoutToNetlist *l2n, db::DeviceAbstract *dm, db::DeviceClass *dc);
   std::pair<unsigned int, db::PolygonRef> read_geometry (db::LayoutToNetlist *l2n);
+  db::Polygon read_polygon ();
+  db::Box read_rect ();
+  void read_geometries (Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::PolygonRef> &lc, db::Cell &cell);
+  db::Point read_point ();
+
+private:
+  tl::TextInputStream m_stream;
+  std::string m_path;
+  std::string m_line;
+  double m_dbu;
+  tl::Extractor m_ex;
+  db::Point m_ref;
+  tl::AbsoluteProgress m_progress;
 };
 
 }

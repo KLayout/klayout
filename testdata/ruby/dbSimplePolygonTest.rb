@@ -31,6 +31,8 @@ class DBSimplePolygon_TestClass < TestBase
     a = RBA::DSimplePolygon::new
     assert_equal( a.to_s, "()" )
     assert_equal( RBA::DSimplePolygon::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( a.is_empty?, true )
+    assert_equal( a.is_rectilinear?, false )
 
     b = a.dup 
     a = RBA::DSimplePolygon::new( [ RBA::DPoint::new( 0, 1 ), RBA::DPoint::new( 1, 5 ), RBA::DPoint::new( 5, 5 ) ] )
@@ -46,6 +48,8 @@ class DBSimplePolygon_TestClass < TestBase
     assert_equal( a != c, false )
 
     a = RBA::DSimplePolygon::new( RBA::DBox::new( 5, -10, 20, 15 ) )
+    assert_equal( a.is_empty?, false )
+    assert_equal( a.is_rectilinear?, true )
     assert_equal( a.to_s, "(5,-10;5,15;20,15;20,-10)" )
     assert_equal( RBA::DPolygon.new(a).class.to_s, "RBA::DPolygon" )
     assert_equal( RBA::DPolygon.new(a).to_s, "(5,-10;5,15;20,15;20,-10)" )
@@ -107,6 +111,8 @@ class DBSimplePolygon_TestClass < TestBase
     # Ellipse constructor
     p = RBA::DSimplePolygon::ellipse( RBA::DBox::new(-10000, -20000, 30000, 40000), 200 )
     assert_equal(p.num_points, 200)
+    assert_equal(p.is_empty?, false)
+    assert_equal(p.is_rectilinear?, false)
     assert_equal(p.bbox.to_s, "(-10000,-20000;30000,40000)")
     assert_equal(p.area.to_i, 1884645544)    # roughly box.area*PI/4
     
@@ -121,6 +127,8 @@ class DBSimplePolygon_TestClass < TestBase
     a = RBA::SimplePolygon::new
     assert_equal( a.to_s, "()" )
     assert_equal( RBA::SimplePolygon::from_s(a.to_s).to_s, a.to_s )
+    assert_equal( a.is_empty?, true )
+    assert_equal( a.is_rectilinear?, false )
 
     b = a.dup 
     a = RBA::SimplePolygon::new( [ RBA::Point::new( 0, 1 ), RBA::Point::new( 1, 5 ), RBA::Point::new( 5, 5 ) ] )
@@ -137,6 +145,8 @@ class DBSimplePolygon_TestClass < TestBase
 
     a = RBA::SimplePolygon::new( RBA::Box::new( 5, -10, 20, 15 ) )
     assert_equal( a.to_s, "(5,-10;5,15;20,15;20,-10)" )
+    assert_equal( a.is_empty?, false )
+    assert_equal( a.is_rectilinear?, true )
     assert_equal( RBA::Polygon.new(a).class.to_s, "RBA::Polygon" )
     assert_equal( RBA::Polygon.new(a).to_s, "(5,-10;5,15;20,15;20,-10)" )
     assert_equal( a.num_points, 4 )
@@ -227,6 +237,8 @@ class DBSimplePolygon_TestClass < TestBase
     # Ellipse constructor
     p = RBA::SimplePolygon::ellipse( RBA::Box::new(-10000, -20000, 30000, 40000), 200 )
     assert_equal(p.num_points, 200)
+    assert_equal(p.is_empty?, false)
+    assert_equal(p.is_rectilinear?, false)
     assert_equal(p.bbox.to_s, "(-10000,-20000;30000,40000)")
     assert_equal(p.area, 1884651158)    # roughly box.area*PI/4
     

@@ -69,9 +69,10 @@ plugins.depends += lib rdb db
   }
 
   equals(HAVE_RUBY, "1") {
-    SUBDIRS += drc
-    MAIN_DEPENDS += drc
+    SUBDIRS += drc lvs
+    MAIN_DEPENDS += drc lvs
     drc.depends += rdb lym
+    lvs.depends += drc
   }
 
   equals(HAVE_QTBINDINGS, "1") {
@@ -99,3 +100,4 @@ plugins.depends += lib rdb db
 }
 
 unit_tests.depends += plugins $$MAIN_DEPENDS
+

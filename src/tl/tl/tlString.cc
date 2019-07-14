@@ -973,7 +973,7 @@ Extractor &
 Extractor::read (int &value)
 {
   if (! try_read (value)) {
-    error (tl::to_string (tr ("Expected a integer value")));
+    error (tl::to_string (tr ("Expected an integer value")));
   }
   return *this;
 }

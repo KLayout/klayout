@@ -16,6 +16,14 @@
   </p>
 
   <p>
+  As a special kind of macros, DRC and LVS scripts are available for editing
+  and debugging too. These scripts are basically Ruby scripts but run in a 
+  customized environment so that specific functions are provided.
+  For more details on these kind of scripts see <link href="/manual/drc.xml"/> 
+  and <link href="/manual/lvs.xml"/>.
+  </p>
+
+  <p>
   In a simple scenario, scripts can be stored in simple text files and loaded by KLayout using the "-rm" or "-r" command-line option. 
   "-rm" will run a script and then execute the normal application. "-r" will run a script and then exit the 
   application.
@@ -81,6 +89,9 @@
       contrast to "macros" and "pymacros", the locations of "ruby" and "python" paths are added to the Ruby or Python
       search paths. This makes those folders useful for keeping plain Ruby or Python libraries. Generic ".lym" files cannot 
       reside there and those locations are not scanned for autorun macros.
+    </li>
+    <li>
+      DRC and LVS scripts are kept inside "drc" and "lvs" folders respectively.
     </li>
     <li>
       In addition, further repositories can be given on the command line with the "-j" option. This allows

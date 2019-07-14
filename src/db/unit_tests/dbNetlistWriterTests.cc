@@ -24,6 +24,7 @@
 #include "dbNetlistSpiceWriter.h"
 #include "dbNetlist.h"
 #include "dbNetlistDeviceClasses.h"
+#include "dbLayoutToNetlist.h"
 
 #include "tlUnitTest.h"
 #include "tlStream.h"
@@ -307,9 +308,9 @@ TEST(4_WriterDiodeDevices)
   circuit1->add_net (n3);
 
   db::Device *ddev1 = new db::Device (dcls);
-  ddev1->set_parameter_value (db::DeviceClassDiode::param_id_A, 1.7e-10);
+  ddev1->set_parameter_value (db::DeviceClassDiode::param_id_A, 1.7);
   db::Device *ddev2 = new db::Device (dcls);
-  ddev2->set_parameter_value (db::DeviceClassDiode::param_id_A, 42e-9);
+  ddev2->set_parameter_value (db::DeviceClassDiode::param_id_A, 0.42);
   circuit1->add_device (ddev1);
   circuit1->add_device (ddev2);
 
@@ -866,6 +867,381 @@ TEST(10_WriterLongLines)
 
   compare_netlists (_this, path, au_path);
 }
+
+TEST(11_WriterNonConnectedPins)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *rcls = new db::DeviceClassResistor ();
+  db::DeviceClass *ccls = new db::DeviceClassCapacitor ();
+  db::DeviceClass *lcls = new db::DeviceClassInductor ();
+  db::DeviceClass *dcls = new db::DeviceClassDiode ();
+  db::DeviceClass *m3cls = new db::DeviceClassMOS3Transistor ();
+  db::DeviceClass *m4cls = new db::DeviceClassMOS4Transistor ();
+
+  rcls->set_name ("RCLS");
+  lcls->set_name ("LCLS");
+  ccls->set_name ("CCLS");
+  dcls->set_name ("DCLS");
+  m3cls->set_name ("M3CLS");
+  m4cls->set_name ("M4CLS");
+
+  nl.add_device_class (rcls);
+  nl.add_device_class (lcls);
+  nl.add_device_class (ccls);
+  nl.add_device_class (dcls);
+  nl.add_device_class (m3cls);
+  nl.add_device_class (m4cls);
+
+  db::Circuit *circuit1 = new db::Circuit ();
+  circuit1->set_name ("C1");
+  nl.add_circuit (circuit1);
+
+  {
+    db::Net *n1, *n2, *n3, *n4, *n5;
+    n1 = new db::Net ();
+    n1->set_name ("n1");
+    circuit1->add_net (n1);
+    n2 = new db::Net ();
+    n2->set_name ("n2");
+    circuit1->add_net (n2);
+    n3 = new db::Net ();
+    n3->set_name ("n3");
+    circuit1->add_net (n3);
+    n4 = new db::Net ();
+    n4->set_name ("n4");
+    circuit1->add_net (n4);
+    n5 = new db::Net ();
+    n5->set_name ("n5");
+    circuit1->add_net (n5);
+
+    db::Device *ddev1 = new db::Device (m4cls);
+    ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 0.25);
+    ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.18);
+    ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 1.2);
+    ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 0.75);
+    ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 2.2);
+    ddev1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 1.75);
+    db::Device *ddev2 = new db::Device (m4cls);
+    ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 1.4);
+    ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.25);
+    ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AS, 1.3);
+    ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_AD, 0.85);
+    ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PS, 2.3);
+    ddev2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_PD, 1.85);
+    circuit1->add_device (ddev1);
+    circuit1->add_device (ddev2);
+
+    size_t pid1 = circuit1->add_pin ("p1").id ();
+    size_t pid2 = circuit1->add_pin ("p2").id ();
+    size_t pid3 = circuit1->add_pin ("p3").id ();
+    size_t pid4 = circuit1->add_pin ("p4").id ();
+
+    circuit1->connect_pin (pid1, n1);
+    circuit1->connect_pin (pid2, n2);
+    circuit1->connect_pin (pid3, n4);
+    circuit1->connect_pin (pid4, n5);
+
+    ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("S"), n1);
+    ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("G"), n4);
+    ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("D"), n3);
+    ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("B"), n5);
+    ddev2->connect_terminal (ddev2->device_class ()->terminal_id_for_name ("S"), n3);
+    ddev2->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("G"), n4);
+    ddev2->connect_terminal (ddev2->device_class ()->terminal_id_for_name ("D"), n2);
+    ddev2->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("B"), n5);
+  }
+
+  db::Circuit *circuit2 = new db::Circuit ();
+  circuit2->set_name ("C2");
+  nl.add_circuit (circuit2);
+
+  {
+    db::Net *n1, *n2, *n3, *n4, *n5;
+    n1 = new db::Net ();
+    //  this gives a clash with the auto-generated node names with non-connected subcircuit pins
+    //  and terminals - we test proper generation of such names this way
+    n1->set_name ("nc_10");
+    circuit2->add_net (n1);
+    n2 = new db::Net ();
+    n2->set_name ("n2");
+    circuit2->add_net (n2);
+    n3 = new db::Net ();
+    n3->set_name ("n3");
+    circuit2->add_net (n3);
+    n4 = new db::Net ();
+    n4->set_name ("n4");
+    circuit2->add_net (n4);
+    n5 = new db::Net ();
+    n5->set_name ("n5");
+    circuit2->add_net (n5);
+
+    db::SubCircuit *sc1 = new db::SubCircuit (circuit1, "SC1");
+    circuit2->add_subcircuit (sc1);
+    sc1->connect_pin (0, n1);
+    sc1->connect_pin (1, n3);
+    //  pin 2 unconnected
+    sc1->connect_pin (3, n3);
+
+    db::SubCircuit *sc2 = new db::SubCircuit (circuit1, "SC2");
+    circuit2->add_subcircuit (sc2);
+    sc2->connect_pin (0, n3);
+    //  pin 1 unconnected
+    sc2->connect_pin (2, n4);
+    sc2->connect_pin (3, n3);
+
+    size_t pid1 = circuit2->add_pin ("p1").id ();
+    size_t pid2 = circuit2->add_pin ("p2").id ();
+    size_t pid3 = circuit2->add_pin ("p3").id ();
+
+    circuit2->connect_pin (pid1, n1);
+    circuit2->connect_pin (pid2, n2);
+    circuit2->connect_pin (pid3, n4);
+  }
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp_nwriter11.txt");
+  {
+    tl::OutputStream stream (path);
+    db::NetlistSpiceWriter writer;
+    writer.write (stream, nl, "written by unit test");
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter11_au.txt");
+
+  compare_netlists (_this, path, au_path);
+
+  path = tmp_file ("tmp_nwriter11b.txt");
+  {
+    tl::OutputStream stream (path);
+    db::NetlistSpiceWriter writer;
+    writer.set_use_net_names (true);
+    writer.write (stream, nl, "written by unit test");
+  }
+
+  au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter11b_au.txt");
+
+  compare_netlists (_this, path, au_path);
+}
+
+TEST(12_UniqueNetNames)
+{
+  db::LayoutToNetlist l2n;
+  std::string l2n_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "same_net_names.l2n");
+  l2n.load (l2n_path);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp_nwriter12.txt");
+  {
+    tl::OutputStream stream (path);
+    db::NetlistSpiceWriter writer;
+    writer.write (stream, *l2n.netlist (), "written by unit test");
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter12_au.txt");
+
+  compare_netlists (_this, path, au_path);
+
+  path = tmp_file ("tmp_nwriter12b.txt");
+  {
+    tl::OutputStream stream (path);
+    db::NetlistSpiceWriter writer;
+    writer.set_use_net_names (true);
+    writer.write (stream, *l2n.netlist (), "written by unit test");
+  }
+
+  au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter12b_au.txt");
+
+  compare_netlists (_this, path, au_path);
+}
+
+TEST(13_WriterBJT3Devices)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *rcls = new db::DeviceClassResistor ();
+  db::DeviceClass *ccls = new db::DeviceClassCapacitor ();
+  db::DeviceClass *lcls = new db::DeviceClassInductor ();
+  db::DeviceClass *dcls = new db::DeviceClassDiode ();
+  db::DeviceClass *b3cls = new db::DeviceClassBJT3Transistor ();
+  db::DeviceClass *b4cls = new db::DeviceClassBJT4Transistor ();
+
+  rcls->set_name ("RCLS");
+  lcls->set_name ("LCLS");
+  ccls->set_name ("CCLS");
+  dcls->set_name ("DCLS");
+  b3cls->set_name ("B3CLS");
+  b4cls->set_name ("B4CLS");
+
+  nl.add_device_class (rcls);
+  nl.add_device_class (lcls);
+  nl.add_device_class (ccls);
+  nl.add_device_class (dcls);
+  nl.add_device_class (b3cls);
+  nl.add_device_class (b4cls);
+
+  db::Circuit *circuit1 = new db::Circuit ();
+  circuit1->set_name ("C1");
+  nl.add_circuit (circuit1);
+
+  db::Net *n1, *n2, *n3, *n4;
+  n1 = new db::Net ();
+  n1->set_name ("n1");
+  circuit1->add_net (n1);
+  n2 = new db::Net ();
+  n2->set_name ("n2");
+  circuit1->add_net (n2);
+  n3 = new db::Net ();
+  n3->set_name ("n3");
+  circuit1->add_net (n3);
+  n4 = new db::Net ();
+  n4->set_name ("n4");
+  circuit1->add_net (n4);
+
+  db::Device *ddev1 = new db::Device (b3cls);
+  ddev1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AE, 0.25);
+  ddev1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PE, 0.18);
+  ddev1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AB, 1.2);
+  ddev1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PB, 0.75);
+  ddev1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AC, 1.0);
+  ddev1->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PC, 0.6);
+  db::Device *ddev2 = new db::Device (b3cls);
+  ddev2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AE, 1.2);
+  ddev2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PE, 2.5);
+  ddev2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AB, 1.4);
+  ddev2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PB, 2.8);
+  ddev2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AC, 1.5);
+  ddev2->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PC, 3.0);
+  circuit1->add_device (ddev1);
+  circuit1->add_device (ddev2);
+
+  size_t pid1 = circuit1->add_pin ("p1").id ();
+  size_t pid2 = circuit1->add_pin ("p2").id ();
+  size_t pid3 = circuit1->add_pin ("p3").id ();
+
+  circuit1->connect_pin (pid1, n1);
+  circuit1->connect_pin (pid2, n2);
+  circuit1->connect_pin (pid3, n4);
+
+  ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("E"), n1);
+  ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("B"), n4);
+  ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("C"), n3);
+  ddev2->connect_terminal (ddev2->device_class ()->terminal_id_for_name ("E"), n3);
+  ddev2->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("B"), n4);
+  ddev2->connect_terminal (ddev2->device_class ()->terminal_id_for_name ("C"), n2);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp_nwriter13.txt");
+  {
+    tl::OutputStream stream (path);
+    db::NetlistSpiceWriter writer;
+    writer.write (stream, nl, "written by unit test");
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter13_au.txt");
+
+  compare_netlists (_this, path, au_path);
+}
+
+TEST(14_WriterBJT4Devices)
+{
+  db::Netlist nl;
+
+  db::DeviceClass *rcls = new db::DeviceClassResistor ();
+  db::DeviceClass *ccls = new db::DeviceClassCapacitor ();
+  db::DeviceClass *lcls = new db::DeviceClassInductor ();
+  db::DeviceClass *dcls = new db::DeviceClassDiode ();
+  db::DeviceClass *b3cls = new db::DeviceClassBJT3Transistor ();
+  db::DeviceClass *b4cls = new db::DeviceClassBJT4Transistor ();
+
+  rcls->set_name ("RCLS");
+  lcls->set_name ("LCLS");
+  ccls->set_name ("CCLS");
+  dcls->set_name ("DCLS");
+  b3cls->set_name ("B3CLS");
+  b4cls->set_name ("B4CLS");
+
+  nl.add_device_class (rcls);
+  nl.add_device_class (lcls);
+  nl.add_device_class (ccls);
+  nl.add_device_class (dcls);
+  nl.add_device_class (b3cls);
+  nl.add_device_class (b4cls);
+
+  db::Circuit *circuit1 = new db::Circuit ();
+  circuit1->set_name ("C1");
+  nl.add_circuit (circuit1);
+
+  db::Net *n1, *n2, *n3, *n4, *n5;
+  n1 = new db::Net ();
+  n1->set_name ("n1");
+  circuit1->add_net (n1);
+  n2 = new db::Net ();
+  n2->set_name ("n2");
+  circuit1->add_net (n2);
+  n3 = new db::Net ();
+  n3->set_name ("n3");
+  circuit1->add_net (n3);
+  n4 = new db::Net ();
+  n4->set_name ("n4");
+  circuit1->add_net (n4);
+  n5 = new db::Net ();
+  n5->set_name ("n5");
+  circuit1->add_net (n5);
+
+  db::Device *ddev1 = new db::Device (b4cls);
+  ddev1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AE, 0.25);
+  ddev1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PE, 0.18);
+  ddev1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AB, 1.2);
+  ddev1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PB, 0.75);
+  ddev1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AC, 1.0);
+  ddev1->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PC, 0.6);
+  db::Device *ddev2 = new db::Device (b4cls);
+  ddev2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AE, 1.2);
+  ddev2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PE, 2.5);
+  ddev2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AB, 1.4);
+  ddev2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PB, 2.8);
+  ddev2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_AC, 1.5);
+  ddev2->set_parameter_value (db::DeviceClassBJT4Transistor::param_id_PC, 3.0);
+  circuit1->add_device (ddev1);
+  circuit1->add_device (ddev2);
+
+  size_t pid1 = circuit1->add_pin ("p1").id ();
+  size_t pid2 = circuit1->add_pin ("p2").id ();
+  size_t pid3 = circuit1->add_pin ("p3").id ();
+  size_t pid4 = circuit1->add_pin ("p4").id ();
+
+  circuit1->connect_pin (pid1, n1);
+  circuit1->connect_pin (pid2, n2);
+  circuit1->connect_pin (pid3, n4);
+  circuit1->connect_pin (pid4, n5);
+
+  ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("E"), n1);
+  ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("B"), n4);
+  ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("C"), n3);
+  ddev1->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("S"), n5);
+  ddev2->connect_terminal (ddev2->device_class ()->terminal_id_for_name ("E"), n3);
+  ddev2->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("B"), n4);
+  ddev2->connect_terminal (ddev2->device_class ()->terminal_id_for_name ("C"), n2);
+  ddev2->connect_terminal (ddev1->device_class ()->terminal_id_for_name ("S"), n5);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp_nwriter14.txt");
+  {
+    tl::OutputStream stream (path);
+    db::NetlistSpiceWriter writer;
+    writer.write (stream, nl, "written by unit test");
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter14_au.txt");
+
+  compare_netlists (_this, path, au_path);
+}
+
 
 namespace {
 

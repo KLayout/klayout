@@ -1,248 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category/>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>true</autorun>
- <autorun-early>true</autorun-early>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>ruby</interpreter>
- <dsl-interpreter-name/>
- <text>
-# Extend the Float class by methods which convert
-# values with units, i.e. 1.3nm gives 0.0013
-
-1.0.class.class_eval do
-
-  class &lt;&lt; self
-    @dbu = nil
-    def _dbu=(dbu)
-      @dbu = dbu
-    end
-    def _dbu
-      @dbu
-    end
-  end
-
-  def um
-    self
-  end
-  def micron
-    self
-  end
-  def degree
-    self
-  end
-  def nm
-    self*0.001
-  end
-  def mm
-    self*1000.0
-  end
-  def m
-    self*1000000.0
-  end
-  def nm2
-    self*1e-6
-  end
-  def um2
-    self
-  end
-  def micron2
-    self
-  end
-  def mm2
-    self*1.0e6
-  end
-  def m2
-    self*1.0e12
-  end
-  def dbu
-    self.class._dbu || raise("No layout loaded - cannot determine database unit")
-    self*self.class._dbu
-  end
-
-end
-
-# Extend the Fixnum class, so it is possible to 
-# convert a value to Float with a unit spec, i.e.
-# 5.nm -&gt; 0.005. A spec with ".dbu" gives the 
-# Fixnum value itself. This indicates a value in 
-# database units for most methods of the DRC 
-# framework.
-
-1.class.class_eval do
-
-  class &lt;&lt; self
-    @dbu = nil
-    def _dbu=(dbu)
-      @dbu = dbu
-    end
-    def _dbu
-      @dbu
-    end
-  end
-
-  def um
-    self.to_f
-  end
-  def micron
-    self.to_f
-  end
-  def degree
-    self.to_f
-  end
-  def nm
-    self*0.001
-  end
-  def mm
-    self*1000.0
-  end
-  def m
-    self*1000000.0
-  end
-  def nm2
-    self*1.0e-6
-  end
-  def um2
-    self.to_f
-  end
-  def micron2
-    self.to_f
-  end
-  def mm2
-    self*1.0e6
-  end
-  def m2
-    self*1.0e12
-  end
-  def dbu
-    self.class._dbu || raise("No layout loaded - cannot determine database unit")
-    self*self.class._dbu
-  end
-
-end
+# $autorun-early
 
 module DRC
 
-  include RBA
-
-  # A wrapper for a named value which is stored in
-  # a variable for delayed execution 
-  class DRCVar
-    def initialize(name)
-      @name = name
-    end
-    def inspect
-      @name
-    end
-    def to_s
-      @name
-    end
-  end
-  
-  # A wrapper for the sizing mode value
-  class DRCSizingMode
-    attr_accessor :value
-    def initialize(v)
-      self.value = v
-    end
-  end
- 
-  # A wrapper for the join flag for extended
-  class DRCJoinFlag
-    attr_accessor :value
-    def initialize(v)
-      self.value = v
-    end
-  end
-  
-  # A wrapper for the angle limit
-  # The purpose of this wrapper is to identify the
-  # angle limit specification
-  class DRCAngleLimit
-    attr_accessor :value
-    def initialize(v)
-      self.value = v
-    end
-  end
-  
-  # A wrapper for a metrics constant
-  # The purpose of this wrapper is to identify the 
-  # metrics constant by the class.
-  class DRCMetrics
-    attr_accessor :value
-    def initialize(v)
-      self.value = v
-    end
-  end
-  
-  # A wrapper for the "whole edges" flag for
-  # the DRC functions. The purpose of this class
-  # is to identify the value by the class.
-  class DRCWholeEdges
-    attr_accessor :value
-    def initialize(v)
-      self.value = v
-    end
-  end
-  
-  # A wrapper for the "as_dots" or "as_boxes" flag for
-  # some DRC functions. The purpose of this class
-  # is to identify the value by the class.
-  class DRCAsDots
-    attr_accessor :value
-    def initialize(v)
-      self.value = v
-    end
-  end
-  
-  # A wrapper for a glob-pattern style text selection for
-  # some DRC functions. The purpose of this class
-  # is to identify the value by the class.
-  class DRCPattern
-    attr_accessor :as_pattern
-    attr_accessor :pattern
-    def initialize(f, p)
-      self.as_pattern = f
-      self.pattern = p
-    end
-  end
-  
-  # A wrapper for a pair of limit values
-  # This class is used to identify projection limits for DRC
-  # functions
-  class DRCProjectionLimits
-    attr_accessor :min
-    attr_accessor :max
-    def initialize(*a)
-      if a.size &gt; 2 || a.size == 0
-        raise("A projection limits specification requires a maximum of two values and at least one argument")
-      elsif a.size == 1
-        if !a[0].is_a?(Range) || (!a[0].min.is_a?(Float) &amp;&amp; !a[0].min.is_a?(1.class))
-          raise("A projection limit requires an interval of two length values or two individual length values")
-        end
-        self.min = a[0].min
-        self.max = a[0].max
-      elsif a.size == 2
-        if a[0] &amp;&amp; !a[0].is_a?(Float) &amp;&amp; !a[0].is_a?(1.class)
-          raise("First argument to a projection limit must be either nil or a length value")
-        end
-        if a[1] &amp;&amp; !a[1].is_a?(Float) &amp;&amp; !a[1].is_a?(1.class)
-          raise("Second argument to a projection limit must be either nil or a length value")
-        end
-        self.min = a[0]
-        self.max = a[1]
-      end
-    end
-  end
-    
   # A single DRC layer which is either 
   # an edge pair, edge or region layer
   
@@ -488,7 +247,7 @@ module DRC
     %w(area).each do |f|
       [true, false].each do |inv|
         mn = (inv ? "without" : "with") + "_" + f
-        eval &lt;&lt;"CODE"
+        eval <<"CODE"
         def #{mn}(*args)
           requires_region("#{f}")
           if args.size == 1
@@ -638,7 +397,7 @@ CODE
     %w(bbox_height bbox_max bbox_min bbox_width perimeter).each do |f|
       [true, false].each do |inv|
         mn = (inv ? "without" : "with") + "_" + f
-        eval &lt;&lt;"CODE"
+        eval <<"CODE"
         def #{mn}(*args)
           requires_region("#{mn}")
           if args.size == 1
@@ -687,7 +446,7 @@ CODE
     %w(length).each do |f|
       [true, false].each do |inv|
         mn = (inv ? "without" : "with") + "_" + f
-        eval &lt;&lt;"CODE"
+        eval <<"CODE"
         def #{mn}(*args)
           requires_edges("#{mn}")
           if args.size == 1
@@ -754,7 +513,7 @@ CODE
     
     [true, false].each do |inv|
       mn = (inv ? "without" : "with") + "_angle"
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{mn}(*args)
         requires_edges_or_region("#{mn}")
         result_class = @data.is_a?(RBA::Region) ? RBA::EdgePairs : RBA::Edges
@@ -928,7 +687,7 @@ CODE
 
       args.each do |a|
         if a.is_a?(Range)
-          if (!a.min.is_a?(1.0.class) &amp;&amp; !a.min.is_a?(1.class)) || (!a.max.is_a?(1.0.class) &amp;&amp; !a.max.is_a?(1.class))
+          if (!a.min.is_a?(1.0.class) && !a.min.is_a?(1.class)) || (!a.max.is_a?(1.0.class) && !a.max.is_a?(1.class))
             raise("An angle limit requires an interval of two angles")
           end
           amin = a.min.to_f
@@ -1066,7 +825,7 @@ CODE
     # @/table
 
     %w(middle extent_refs).each do |f| 
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(*args)
 
         requires_region("#{f}")
@@ -1106,11 +865,11 @@ CODE
         }
 
         args.each do |a|
-          if a.is_a?(1.0.class) &amp;&amp; :#{f} != :middle
-            f &lt;&lt; a 
+          if a.is_a?(1.0.class) && :#{f} != :middle
+            f << a 
           elsif a.is_a?(DRCAsDots)
             as_edges = a.value
-          elsif @@std_refs[a] &amp;&amp; :#{f} != :middle
+          elsif @@std_refs[a] && :#{f} != :middle
             f = @@std_refs[a]
           else
             raise("Invalid argument for '#{f}' method")
@@ -1127,7 +886,7 @@ CODE
           DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :extent_refs_edges, *f))
         else
           # add oversize for point- and edge-like regions
-          zero_area = (f[0] - f[2]).abs &lt; 1e-7 || (f[1] - f[3]).abs &lt; 1e-7
+          zero_area = (f[0] - f[2]).abs < 1e-7 || (f[1] - f[3]).abs < 1e-7
           f += [ zero_area ? 1 : 0 ] * 2
           DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :extent_refs, *f))
         end
@@ -1153,12 +912,12 @@ CODE
     # new_layer = layer.select { |polygon| polygon.area >= 10.0 }
     # @/code
   
-    def select(&amp;block)
+    def select(&block)
       new_data = @data.class.new
       t = RBA::CplxTrans::new(@engine.dbu)
       @engine.run_timed("\"select\" in: #{@engine.src_line}", @data) do
         @data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
-          block.call(object.transformed(t)) &amp;&amp; new_data.insert(object)
+          block.call(object.transformed(t)) && new_data.insert(object)
         end
       end
       DRCLayer::new(@engine, new_data)
@@ -1174,7 +933,7 @@ CODE
     # Because this method executes inside the interpreter, it's inherently slow. Tiling does not
     # apply to this method.
   
-    def each(&amp;block)
+    def each(&block)
       t = RBA::CplxTrans::new(@engine.dbu)
       @engine.run_timed("\"select\" in: #{@engine.src_line}", @data) do
         @data.send(@data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
@@ -1238,8 +997,8 @@ CODE
     # deliver RBA::EdgePair, RBA::DEdgePair or RBA::EdgePairs objects.
     
     %w(collect collect_to_region collect_to_edges collect_to_edge_pairs).each do |f| 
-      eval &lt;&lt;"CODE"
-      def #{f}(&amp;block)
+      eval <<"CODE"
+      def #{f}(&block)
 
         if :#{f} == :collect
           new_data = @data.class.new
@@ -1325,7 +1084,7 @@ CODE
     # not modify the layer but returns a snapped copy.
     
     %w(snap snapped).each do |f| 
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(*args)
         requires_region("#{f}")
         gx = gy = 0
@@ -1338,7 +1097,7 @@ CODE
           raise("Invalid number of arguments for method 'ongrid'")
         end
         aa = args.collect { |a| prep_value(a) }
-        if :#{f} == :snap &amp;&amp; @engine.is_tiled?
+        if :#{f} == :snap && @engine.is_tiled?
           # in tiled mode, no modifying versions are available
           @data = @engine._tcmd(@data, 0, @data.class, :snapped, gx, gy)
           self
@@ -1357,7 +1116,7 @@ CODE
     # @brief Boolean AND operation
     # @synopsis layer.and(other)
     # The method computes a boolean AND between self and other.
-    # It is an alias for the "&amp;" operator.
+    # It is an alias for the "&" operator.
     #
     # This method is available for polygon and edge layers.
     # If the first operand is an edge layer and the second is a polygon layer, the
@@ -1376,7 +1135,7 @@ CODE
     # @/table
     
     def and(other)
-      self &amp; other    
+      self & other    
     end
     
     # %DRC%
@@ -1476,9 +1235,9 @@ CODE
     end
     
     # %DRC%
-    # @name &amp;
+    # @name &
     # @brief Boolean AND operation
-    # @synopsis self &amp; other
+    # @synopsis self & other
     # The method computes a boolean AND between self and other.
     #
     # This method is available for polygon and edge layers. An alias
@@ -1847,7 +1606,7 @@ CODE
     # @brief Returns the parts of the edges inside the given region
     # @synopsis layer.inside_part(region)
     # This method returns the parts of the edges which are inside the given region. This is similar to the
-    # "&amp;" operator, but this method does not return edges that are exactly on the boundaries
+    # "&" operator, but this method does not return edges that are exactly on the boundaries
     # of the polygons of the region.
     #
     # This method is available for edge layers. The argument must be a polygon layer.
@@ -1863,7 +1622,7 @@ CODE
     # @brief Returns the parts of the edges outside the given region
     # @synopsis layer.outside_part(region)
     # This method returns the parts of the edges which are outside the given region. This is similar to the
-    # "&amp;" operator, but this method does not remove edges that are exactly on the boundaries
+    # "&" operator, but this method does not remove edges that are exactly on the boundaries
     # of the polygons of the region.
     #
     # This method is available for edge layers. The argument must be a polygon layer.
@@ -1874,10 +1633,10 @@ CODE
     #   @/tr
     # @/table
     
-    %w(&amp; | ^ - + interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
-      eval &lt;&lt;"CODE"
+    %w(& | ^ - + interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
+      eval <<"CODE"
       def #{f}(other)
-        if :#{f} != :interacting &amp;&amp; :#{f} != :not_interacting &amp;&amp; :#{f} != :&amp; &amp;&amp; :#{f} != :-
+        if :#{f} != :interacting && :#{f} != :not_interacting && :#{f} != :& && :#{f} != :-
           requires_same_type(other, "#{f}")
         else
           other.requires_edges_or_region("#{f}")
@@ -1893,9 +1652,9 @@ CODE
     %w(interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside).each do |fi|
       f = "select_" + fi
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(other)
-        if :#{fi} != :interacting &amp;&amp; :#{f} != :not_interacting 
+        if :#{fi} != :interacting && :#{f} != :not_interacting 
           requires_same_type(other, "#{f}")
         else
           other.requires_edges_or_region("#{f}")
@@ -1913,7 +1672,7 @@ CODE
     
     %w(inside_part outside_part).each do |f|
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(other)
         other.requires_region("#{f}")
         requires_edges("#{f}")
@@ -1999,7 +1758,7 @@ CODE
 
     %w(rectangles rectilinear non_rectangles non_rectilinear
        holes hulls).each do |f| 
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}
         requires_region("#{f}")
         DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}))
@@ -2080,7 +1839,7 @@ CODE
     # @/table
     
     %w(end_segments start_segments centers).each do |f|
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(length, fraction = 0.0)
         requires_edges("#{f}")
         length = prep_value(length)
@@ -2092,7 +1851,7 @@ CODE
     # %DRC%
     # @name extended
     # @brief Returns polygons describing an area along the edges of the input
-    # @synopsis layer.extended([:begin =&gt; b,] [:end =&gt; e,] [:out =&gt; o,] [:in =&gt; i], [:joined =&gt; true])
+    # @synopsis layer.extended([:begin => b,] [:end => e,] [:out => o,] [:in => i], [:joined => true])
     # @synopsis layer.extended(b, e, o, i)
     # @synopsis layer.extended(b, e, o, i, joined)
     # 
@@ -2123,7 +1882,7 @@ CODE
     # @/table
     
     %w(extended).each do |f| 
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(*args)
       
         requires_edges("#{f}")
@@ -2131,13 +1890,13 @@ CODE
         av = [ 0, 0, 0, 0, false ]
         args.each_with_index do |a,i|
           if a.is_a?(Hash)
-            a[:begin]  &amp;&amp; av[0] = prep_value(a[:begin])
-            a[:end]    &amp;&amp; av[1] = prep_value(a[:end])
-            a[:out]    &amp;&amp; av[2] = prep_value(a[:out])
-            a[:in]     &amp;&amp; av[3] = prep_value(a[:in])
-            a[:joined] &amp;&amp; av[4] = true
-          elsif i &lt; 4
-            if !a.is_a?(1.class) &amp;&amp; !a.is_a?(Float)
+            a[:begin]  && av[0] = prep_value(a[:begin])
+            a[:end]    && av[1] = prep_value(a[:end])
+            a[:out]    && av[2] = prep_value(a[:out])
+            a[:in]     && av[3] = prep_value(a[:in])
+            a[:joined] && av[4] = true
+          elsif i < 4
+            if !a.is_a?(1.class) && !a.is_a?(Float)
               raise("Invalid type for argument " + (i+1).to_s + " (method '#{f}')")
             end
             av[i] = prep_value(a)
@@ -2183,7 +1942,7 @@ CODE
     # A version extending to the inside is \extended_in.
     
     %w(extended_in extended_out).each do |f| 
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(dist)
         requires_edges("#{f}")
         DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}, prep_value(dist)))
@@ -2204,7 +1963,7 @@ CODE
     # individual ones unless raw mode is chosen.
     
     %w(edges).each do |f| 
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}
         if @data.is_a?(RBA::Region)
           DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :#{f}))
@@ -2234,7 +1993,7 @@ CODE
     # Returns the second edges of the edge pairs in the collection.
     
     %w(first_edges second_edges).each do |f| 
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}
         requires_edge_pairs("#{f}")
         DRCLayer::new(@engine, @engine._cmd(@data, :#{f}))
@@ -2286,7 +2045,7 @@ CODE
     # @synopsis layer.is_deep?
     
     def is_deep?
-      @data.respond_to?(:is_deep?) &amp;&amp; @data.is_deep?
+      @data.respond_to?(:is_deep?) && @data.is_deep?
     end
     
     # %DRC%
@@ -2656,7 +2415,7 @@ CODE
     # @/table
     
     %w(width space overlap enclosing separation).each do |f|
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(*args)
 
         requires_edges_or_region("#{f}")
@@ -2683,7 +2442,7 @@ CODE
             minp = prep_value(a.min)
             maxp = prep_value(a.max)
           elsif a.is_a?(Float) || a.is_a?(1.class)
-            value &amp;&amp; raise("Value already specified")
+            value && raise("Value already specified")
             value = prep_value(a)
           else
             raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
@@ -2715,7 +2474,7 @@ CODE
     end
     
     %w(isolated notch).each do |f|
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(*args)
 
         requires_region("#{f}")
@@ -2742,7 +2501,7 @@ CODE
             minp = prep_value(a.min)
             maxp = prep_value(a.max)
           elsif a.is_a?(Float) || a.is_a?(1.class)
-            value &amp;&amp; raise("Value already specified")
+            value && raise("Value already specified")
             value = prep_value(a)
           else
             raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
@@ -2902,7 +2661,7 @@ CODE
     # it is called on. The input layer is returned and available for further processing.
     
     %w(size sized).each do |f|
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(*args)
       
         requires_region("#{f}")
@@ -2914,7 +2673,7 @@ CODE
         args.each do |a|
           if a.is_a?(1.class) || a.is_a?(Float)
             v = prep_value(a)
-            v.abs &gt; dist &amp;&amp; dist = v.abs 
+            v.abs > dist && dist = v.abs 
             values.push(v)
           elsif a.is_a?(DRCSizingMode)
             mode = a.value
@@ -2922,9 +2681,9 @@ CODE
         end
         
         aa = []
-        if values.size &lt; 1
+        if values.size < 1
           raise "#{f}: Method requires one or two sizing values"
-        elsif values.size &gt; 2
+        elsif values.size > 2
           raise "#{f}: Method must not have more than two values"
         else
           aa.push(values[0])
@@ -2933,7 +2692,7 @@ CODE
         
         aa.push(mode)
         
-        if :#{f} == :size &amp;&amp; @engine.is_tiled?
+        if :#{f} == :size && @engine.is_tiled?
           # in tiled mode, no modifying versions are available
           @data = @engine._tcmd(@data, dist, RBA::Region, :sized, *aa)
           self
@@ -2962,7 +2721,7 @@ CODE
     
     def polygons(*args)
       requires_edge_pairs("polygons")
-      args.size &lt;= 1 || raise("polygons: Method requires 0 or 1 arguments")
+      args.size <= 1 || raise("polygons: Method requires 0 or 1 arguments")
       aa = args.collect { |a| prep_value(a) }
       DRCLayer::new(@engine, @engine._cmd(@data, :polygons, *aa))
     end
@@ -3050,7 +2809,7 @@ CODE
     # further processing.
     
     %w(extents moved transformed).each do |f| 
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(*args)
         aa = args.collect { |a| prep_value(a) }
         DRCLayer::new(@engine, @engine._cmd(@data, :#{f}, *aa))
@@ -3059,7 +2818,7 @@ CODE
     end
     
     %w(move transform).each do |f| 
-      eval &lt;&lt;"CODE"
+      eval <<"CODE"
       def #{f}(*args)
         aa = args.collect { |a| prep_value(a) }
         @engine._cmd(@data, :#{f}, *aa)
@@ -3229,2176 +2988,6 @@ CODE
     end
     
   end
-  
-  # A layout source representative object.
-  # This object describes an input. It consists of a layout reference plus 
-  # some attributes describing how input is to be gathered. 
-  
-  # %DRC%
-  # @scope
-  # @name Source
-  # @brief DRC Reference: Source Object
-  # The layer object represents a collection of polygons, edges or edge pairs.
-  # A source specifies where to take layout from. That includes the actual layout,
-  # the top cell and options such as clip/query boxes, cell filters etc.
-  
-  class DRCSource
-  
-    def initialize(engine, layout, layout_var, cell)
-      @engine = engine
-      @layout = layout
-      @layout_var = layout_var
-      @cell = cell
-      @inside = nil
-      @box = nil
-      @layers = nil
-      @sel = []
-      @clip = false
-      @overlapping = false
-      @tmp_layers = []
-    end
-        
-    # %DRC%
-    # @name layout
-    # @brief Returns the RBA::Layout object associated with this source
-    # @synopsis layout
-    
-    def layout
-      @layout
-    end
-    
-    # %DRC%
-    # @name cell_name
-    # @brief Returns the name of the currently selected cell
-    # @synopsis cell_name
-    
-    def cell_name
-      @cell.name
-    end
-    
-    # %DRC%
-    # @name cell_obj
-    # @brief Returns the RBA::Cell object of the currently selected cell
-    # @synopsis cell_obj
-    
-    def cell_obj
-      @cell
-    end
-    
-    def finish
-      @tmp_layers.each do |li|
-        @layout.delete_layer(li)
-      end
-    end
-
-    def set_box(method, *args)
-      box = nil
-      if args.size == 1
-        box = args[0]
-        box.is_a?(RBA::DBox) || raise("'#{method}' method requires a box specification")
-      elsif args.size == 2
-        (args[0].is_a?(RBA::DPoint) &amp;&amp; args[1].is_a?(RBA::DPoint)) || raise("'#{method}' method requires a box specification with two points")
-        box = RBA::DBox::new(args[0], args[1])
-      elsif args.size == 4
-        box = RBA::DBox::new(*args)
-      else 
-        raise("Invalid number of arguments for '#{method}' method")
-      end
-      @box = RBA::Box::from_dbox(box * (1.0 / @layout.dbu))
-      self
-    end
-    
-    def inplace_clip(*args)
-      set_box("clip", *args)
-      @clip = true
-      @overlapping = true
-    end
-            
-    def inplace_touching(*args)
-      set_box("touching", *args)
-      @clip = false
-      @overlapping = false
-    end
-    
-    def inplace_overlapping(*args)
-      set_box("overlapping", *args)
-      @clip = false
-      @overlapping = true
-    end
-    
-    def inplace_cell(arg)
-      @cell = layout.cell(arg)
-      @cell ||= layout.create_cell(arg)
-      self  
-    end
-    
-    def inplace_select(*args)
-      args.each do |a|
-        a.is_a?(String) || raise("Invalid arguments to 'select' method - must be strings")
-        @sel.push(a)
-      end
-      self
-    end
-    
-    # %DRC%
-    # @name select
-    # @brief Adds cell name expressions to the cell filters
-    # @synopsis source.select(filter1, filter2, ...)
-    # This method will construct a new source object with the given cell filters 
-    # applied.
-    # Cell filters will enable or disable cells plus their subtree.
-    # Cells can be switched on and off, which makes the hierarchy traversal
-    # stop or begin delivering shapes at the given cell. The arguments of 
-    # the select method form a sequence of enabling or disabling instructions
-    # using cell name pattern in the glob notation ("*" as the wildcard, like shell).
-    # Disabling instructions start with a "-", enabling instructions with a "+" or
-    # no specification.
-    #
-    # The following options are available:
-    # 
-    # @ul
-    # @li @tt+@/tt @i name_filter @/i: Cells matching the name filter will be enabled @/li
-    # @li @i name_filter @/i: Same as "+name_filter" @/li
-    # @li @tt-@/tt @i name_filter @/i: Cells matching the name filter will be disabled @/li
-    # @/ul
-    #
-    # To disable the TOP cell but enabled a hypothetical cell B below the top cell, use that
-    # code:
-    #
-    # @code
-    # layout_with_selection = layout.select("-TOP", "+B")
-    # l1 = layout_with_selection.input(1, 0)
-    # ...
-    # @/code
-    #
-    # Please note that the sample above will deliver the children of "B" because there is 
-    # nothing said about how to proceed with cells other than "TOP" or "B".
-    # The following code will just select "B" without it's children, because in the 
-    # first "-*" selection, all cells including the children of "B" are disabled:
-    #
-    # @code
-    # layout_with_selection = layout.select("-*", "+B")
-    # l1 = layout_with_selection.input(1, 0)
-    # ...
-    # @/code
-    
-    # %DRC%
-    # @name cell
-    # @brief Specifies input from a specific cell
-    # @synopsis source.cell(name)
-    # This method will create a new source that delivers shapes from the 
-    # specified cell. 
-    
-    # %DRC%
-    # @name clip
-    # @brief Specifies clipped input
-    # @synopsis source.clip(box)
-    # @synopsis source.clip(p1, p2)
-    # @synopsis source.clip(l, b, r, t)
-    # Creates a source which represents a rectangular part of the 
-    # original input. Three ways are provided to specify the rectangular
-    # region: a single RBA::DBox object (micron units), two RBA::DPoint
-    # objects (lower/left and upper/right coordinate in micron units)
-    # or four coordinates: left, bottom, right and top coordinate.
-    # 
-    # This method will create a new source which delivers the shapes
-    # from that region clipped to the rectangle. A method doing the 
-    # same but without clipping is \touching or \overlapping.
-    
-    # %DRC%
-    # @name touching
-    # @brief Specifies input selected from a region in touching mode
-    # @synopsis source.touching(box)
-    # @synopsis source.touching(p1, p2)
-    # @synopsis source.touching(l, b, r, t)
-    # Like \clip, this method will create a new source delivering shapes
-    # from a specified rectangular region. In contrast to clip, all shapes
-    # touching the region with their bounding boxes are delivered as a whole
-    # and are not clipped. Hence shapes may extent beyond the limits of
-    # the specified rectangle.
-    # 
-    # \overlapping is a similar method which delivers shapes overlapping
-    # the search region with their bounding box (and not just touching)
-    
-    # %DRC%
-    # @name overlapping
-    # @brief Specifies input selected from a region in overlapping mode
-    # @synopsis source.overlapping(...)
-    # Like \clip, this method will create a new source delivering shapes
-    # from a specified rectangular region. In contrast to clip, all shapes
-    # overlapping the region with their bounding boxes are delivered as a whole
-    # and are not clipped. Hence shapes may extent beyond the limits of
-    # the specified rectangle.
-    # 
-    # \touching is a similar method which delivers shapes touching
-    # the search region with their bounding box (without the requirement to overlap)
-    
-    # export inplace_* as * out-of-place
-    %w(select cell clip touching overlapping).each do |f|
-      eval &lt;&lt;"CODE"
-        def #{f}(*args)
-          s = self.dup
-          s.inplace_#{f}(*args)
-          s
-        end
-CODE
-    end
-
-    # %DRC%
-    # @name extent
-    # @brief Returns a layer with the bounding box of the selected layout
-    # @synopsis source.extent
-    # The extent function is useful to invert a layer:
-    # 
-    # @code
-    # inverse_1 = extent.sized(100.0) - input(1, 0)
-    # @/code
-    
-    def extent
-      layer = input
-      if @box
-        layer.insert(RBA::DBox::from_ibox(@box) * @layout.dbu)
-      else
-        layer.insert(RBA::DBox::from_ibox(@cell.bbox) * @layout.dbu)
-      end
-      layer
-    end
-          
-    # %DRC%
-    # @name input
-    # @brief Specifies input from a source
-    # @synopsis source.input(layer)
-    # @synopsis source.input(layer, datatype)
-    # @synopsis source.input(layer_into)
-    # @synopsis source.input(filter, ...)
-    # Creates a layer with the shapes from the given layer of the source.
-    # The layer can be specified by layer and optionally datatype, by a RBA::LayerInfo
-    # object or by a sequence of filters. 
-    # Filters are expressions describing ranges
-    # of layers and/or datatype numbers or layer names. Multiple filters
-    # can be given and all layers matching at least one of these filter
-    # expressions are joined to render the input layer for the DRC engine.
-    #
-    # Some filter expressions are:
-    #
-    # @ul
-    # @li @tt 1/0-255 @/tt: Datatypes 0 to 255 for layer 1 @/li
-    # @li @tt 1-10 @/tt: Layers 1 to 10, datatype 0 @/li
-    # @li @tt METAL @/tt: A layer named "METAL" @/li
-    # @li @tt METAL (17/0) @/tt: A layer named "METAL" or layer 17, datatype 0 (for GDS, which does
-    #           not have names)@/li
-    # @/ul
-    #
-    # Layers created with "input" contain both texts and polygons. There is a subtle
-    # difference between flat and deep mode: in flat mode, texts are not visible in polygon
-    # operations. In deep mode, texts appear as small 2x2 DBU rectangles. In flat mode, 
-    # some operations such as clipping are not fully supported for texts. Also, texts will
-    # vanish in most polygon operations such as booleans etc.
-    #
-    # Texts can later be selected on the layer returned by "input" with the \Layer#texts method.
-    #
-    # If you don't want to see texts, use \polygons to create an input layer with polygon data
-    # only. If you only want to see texts, use \labels to create an input layer with texts only.
-    #
-    # Use the global version of "input" without a source object to address the default source.
-    
-    def input(*args)
-      layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll))
-    end
-
-    # %DRC%
-    # @name labels
-    # @brief Gets the labels (texts) from an input layer
-    # @synopsis source.labels(layer)
-    # @synopsis source.labels(layer, datatype)
-    # @synopsis source.labels(layer_into)
-    # @synopsis source.labels(filter, ...)
-    #
-    # Creates a layer with the labels from the given layer of the source.
-    # 
-    # This method is identical to \input, but takes only texts from the given input
-    # layer.
-    #
-    # Use the global version of "labels" without a source object to address the default source.
-    
-    def labels(*args)
-      layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts))
-    end
-
-    # %DRC%
-    # @name polygons
-    # @brief Gets the polygon shapes (or shapes that can be converted polygons) from an input layer
-    # @synopsis source.polygons(layer)
-    # @synopsis source.polygons(layer, datatype)
-    # @synopsis source.polygons(layer_into)
-    # @synopsis source.polygons(filter, ...)
-    #
-    # Creates a layer with the polygon shapes from the given layer of the source.
-    # With "polygon shapes" we mean all kind of shapes that can be converted to polygons.
-    # Those are boxes, paths and real polygons.
-    # 
-    # This method is identical to \input with respect to the options supported.
-    #
-    # Use the global version of "polygons" without a source object to address the default source.
-    
-    def polygons(*args)
-      layers = parse_input_layers(*args)
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs))
-    end
-
-    # %DRC%
-    # @name make_layer
-    # @brief Creates an empty polygon layer based on the hierarchy of the layout
-    # @synopsis make_layer
-    # This method delivers a new empty original layer.
-
-    def make_layer
-      layers = []
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll))
-    end
-
-    # %DRC%
-    # @name layers
-    # @brief Gets the layers the source contains
-    # @synopsis source.layers
-    # Delivers a list of RBA::LayerInfo objects representing the layers
-    # inside the source.
-    #
-    # One application is to read all layers from a source. In the following
-    # example, the "and" operation is used to perform a clip with the given
-    # rectangle. Note that this solution is not efficient - it's provided
-    # as an example only:
-    # 
-    # @code
-    # output_cell("Clipped")
-    # 
-    # clip_box = polygon_layer
-    # clip_box.insert(box(0.um, -4.um, 4.um, 0.um))
-    # 
-    # layers.each { |l| (input(l) &amp; clip_box).output(l) }
-    # @/code
-    
-    def layers
-      @layout.layer_indices.collect { |li| @layout.get_info(li) }
-    end
-     
-  private
-
-    def parse_input_layers(*args)
-
-      layers = []
-     
-      if args.size == 0
-      
-        li = @layout.insert_layer(RBA::LayerInfo::new)
-        li &amp;&amp; layers.push(li)
-        li &amp;&amp; @tmp_layers.push(li)
-      
-      elsif (args.size == 1 &amp;&amp; args[0].is_a?(RBA::LayerInfo))
-
-        li = @layout.find_layer(args[0])
-        li &amp;&amp; layers.push(li)
-
-      elsif (args.size == 1 || args.size == 2) &amp;&amp; args[0].is_a?(1.class)
-
-        li = @layout.find_layer(args[0], args[1] || 0)
-        li &amp;&amp; layers.push(li)
-        
-      else
-      
-        args.each do |a|
-          if a.is_a?(String)
-            # use the LayerMap class to fetch the matching layers
-            lm = RBA::LayerMap::new
-            lm.map(a, 0)
-            @layout.layer_indices.each do |li|
-              if lm.is_mapped?(@layout.get_info(li))
-                layers.push(li)
-              end
-            end
-          end
-        end
-        
-      end
-
-      layers
-
-    end
-
-  end
-
-  # The netter object
-
-  # %DRC%
-  # @scope 
-  # @name Netter 
-  # @brief DRC Reference: Netter object
-  # The Netter object provides services related to network extraction
-  # from a layout. The relevant methods of this object are available
-  # as global functions too where they act on a default incarnation
-  # of the netter. Usually it's not required to instantiate a Netter
-  # object, but it serves as a container for this functionality.
-  #
-  # An individual netter object can be created, if the netter results
-  # need to be kept for multiple extractions. If you really need
-  # a Netter object, use the global \netter function:
-  #
-  # @code
-  # # create a new Netter object:
-  # nx = netter
-  # nx.connect(poly, contact)
-  # ...
-  # @/code
-  #
-  # Network formation:
-  # 
-  # A basic Service the Netter object provides is the formation of 
-  # connected networks of conductive shapes. To do so, the Netter
-  # must be given a connection specification. This happens by calling
-  # "connect" with two polygon layers. The Netter will then regard all
-  # overlaps of shapes on these layers as connections between the
-  # respective materials. Networks are the basis for netlist extraction,
-  # network geometry deduction and the antenna check.
-  #
-  # Connections can be cleared with "clear_connections". If not, 
-  # connections add atop of the already defined ones. Here is an 
-  # example for the antenna check:
-  # 
-  # @code
-  # # build connction of poly+gate to metal1
-  # connect(gate, poly)
-  # connect(poly, contact)
-  # connect(contact, metal1)
-  #
-  # # runs an antenna check for metal1 with a ratio of 50
-  # m1_antenna_errors = antenna_check(gate, metal1, 50.0)
-  #  
-  # # add connections to metal2
-  # connect(metal1, via1)
-  # connect(via1, metal2)
-  #
-  # # runs an antenna check for metal2 with a ratio of 70.0
-  # m2_antenna_errors = antenna_check(gate, metal2, 70.0)
-  # 
-  # # this will remove all connections made
-  # clear_connections
-  # ...
-  # @/code
-  #
-  # Further functionality of the Netter object:
-  #
-  # More methods will be added in the future to support network-related features.
-
-  class DRCNetter
-
-    def initialize(engine)
-      @engine = engine
-      clear_connections
-    end
-    
-    # %DRC%
-    # @name connect
-    # @brief Specifies a connection between two layers
-    # @synopsis connect(a, b)
-    # a and b must be polygon layers. After calling this function, the
-    # Netter regards all overlapping or touching shapes on these layers
-    # to form an electrical connection between the materials formed by
-    # these layers. This also implies intra-layer connections: shapes
-    # on these layers touching or overlapping other shapes on these
-    # layers will form bigger, electrically connected areas.
-    #
-    # Multiple connect calls must be made to form larger connectivity
-    # stacks across multiple layers. Such stacks may include forks and
-    # joins.
-    #
-    # Connections are accumulated. The connections defined so far
-    # can be cleared with \clear_connections.
-
-    def connect(a, b)
-      a.is_a?(DRC::DRCLayer) || raise("First argument of Netter#connect must be a layer")
-      b.is_a?(DRC::DRCLayer) || raise("Second argument of Netter#connect must be a layer")
-      a.requires_region("Netter#connect (first argument)")
-      b.requires_region("Netter#connect (second argument)")
-      [ a, b ].each { |l| @layers[l.data.data_id] = l.data }
-      @connections &lt;&lt; [ a, b ].collect { |l| l.data.data_id }
-      modified
-    end
-
-    # %DRC%
-    # @name connect_global
-    # @brief Connects a layer with a global net
-    # @synopsis connect_global(l, name)
-    # Connects the shapes from the given layer l to a global net with the given name.
-    # Global nets are common to all cells. Global nets automatically connect to parent
-    # cells throughs implied pins. An example is the substrate (bulk) net which connects
-    # to shapes belonging to tie-down diodes.
-    
-    def connect_global(l, name)
-      l.is_a?(DRC::DRCLayer) || raise("Layer argument of Netter#connect_global must be a layer")
-      l.requires_region("Netter#connect_global (layer argument)")
-      @layers[l.data.data_id] = l.data
-      @global_connections &lt;&lt; [ l.data.data_id, name.to_s ]
-    end
-    
-    # %DRC%
-    # @name extract_devices
-    # @brief Extracts devices based on the given extractor class, name and device layer selection
-    # @synopsis extract_devices(extractor, layer_hash)
-    # Runs the device extraction for given device extractor class.
-    # 
-    # The device extractor is either an instance of one of the predefined extractor
-    # classes (e.g. RBA::DeviceExtractorMOS4Transistor) or a custom class. It provides the
-    # algorithms for deriving the device parameters from the device geometry. It needs 
-    # several device recognition layers which are passed in the layer hash.
-    #
-    # Each device class (e.g. n-MOS/p-MOS or high Vt/low Vt) needs it's own instance
-    # of device extractor. The device extractor beside the algorithm and specific 
-    # extraction settings defines the name of the device to be built.
-    #
-    # The layer hash is a map of device type specific functional names (key) and
-    # polygon layers (value). Here is an example:
-    #
-    # @code
-    # deep
-    # 
-    # nwell   = input(1, 0)
-    # active  = input(2, 0)
-    # poly    = input(3, 0)
-    # bulk    = make_layer   # renders an empty layer used for putting the terminals on
-    #
-    # nactive = active - nwell      # active area of NMOS
-    # nsd     = nactive - poly      # source/drain area
-    # gate    = nactive &amp; poly  # gate area
-    #
-    # mos4_ex = RBA::DeviceExtractorMOS4Transistor::new("NMOS4")
-    # extract_devices(mos4_ex, { :SD => nsd, :G => gate, :P => poly, :W => bulk })
-    # @/code
-    
-    def extract_devices(devex, layer_selection)
-
-      devex.is_a?(RBA::DeviceExtractorBase) || raise("First argument of Netter#extract_devices must be a device extractor instance")
-      layer_selection.is_a?(Hash) || raise("Second argument of Netter#extract_devices must be a hash")
-
-      ls = {}
-      layer_selection.each do |n,l|
-        l.requires_region("Netter#extract_devices (#{n} layer)")
-        @layers[l.data.data_id] = l.data
-        ls[n.to_s] = l.data
-      end
-
-      @devices_to_extract &lt;&lt; [ devex, ls ]
-      modified
-
-    end
-    
-    # %DRC%
-    # @name clear_connections
-    # @brief Clears all connections stored so far
-    # @synopsis clear_connections
-    # See \connect for more details.
-
-    def clear_connections
-      @devices_to_extract = []
-      @connections = []
-      @global_connections = []
-      @layers = {}
-      @join_nets = ""
-      modified
-    end
-    
-    # %DRC%
-    # @name join_nets
-    # @brief Specifies a search pattern for labels which create implicit net connections
-    # @synopsis join_nets(label_pattern)
-    # Use this method to supply a glob pattern for labels which create implicit net connections
-    # on the top level circuit. This feature is useful to connect identically labelled nets
-    # while a component isn't integrated yet. If the component is integrated, net may be connected
-    # on a higher hierarchy level - e.g. by a power mesh. Inside the component this net consists
-    # of individual islands. To properly perform netlist extraction and comparison, these islands
-    # need to be connected even though there isn't a physical connection. "join_nets" can
-    # achive this if these islands are labelled with the same text on the top level of the
-    # component.
-    #
-    # Glob pattern are used which resemble shell file pattern: "*" is for all labels, "VDD"
-    # for all "VDD" labels (pattern act case sensitive). "VDD*" is for all labels beginning
-    # with "VDD" (still different labels will be connected to different nets!). "{VDD,VSS}"
-    # is either "VDD" or "VSS".
-    #
-    # The search pattern is applied on the next net extraction. The search pattern is cleared
-    # on "clear_connections".
-
-    def join_nets(arg)
-      @join_nets = arg
-      modified
-    end
-
-    # %DRC%
-    # @brief Performs an antenna check
-    # @name antenna_check
-    # @synopsis antenna_check(gate, metal, ratio, [ diode_specs ... ])
-    #
-    # The antenna check is used to avoid plasma induced damage. Physically, 
-    # the damage happes if during the manufacturing of a metal layer with
-    # plasma etching charge accumulates on the metal islands. On reaching a
-    # certain threshold, this charge may discarge over gate oxide attached of 
-    # devices attached to such metal areas hence damaging it.
-    #
-    # Antenna checks are performed by collecting all connected nets up to
-    # a certain metal layer and then computing the area of all metal shapes
-    # and all connected gates of a certain kind (e.g. thin and thick oxide gates).
-    # The ratio of metal area divided by the gate area must not exceed a certain
-    # threshold.
-    #
-    # A simple antenna check is this:
-    #
-    # @code
-    # poly = ... # poly layer
-    # diff = ... # diffusion layer
-    # contact = ... # contact layer
-    # metal1 = ... # metal layer
-    # 
-    # # compute gate area
-    # gate = poly &amp; diff
-    #
-    # # note that gate and poly have to be included - gate is
-    # # a subset of poly, but forms the sensitive area
-    # connect(gate, poly)
-    # connect(poly, contact)
-    # connect(contact, metal1)
-    # errors = antenna_check(gate, metal1, 50.0)
-    # @/code
-    #
-    # Plasma induced damage can be rectified by including diodes
-    # which create a safe current path for discharging the metal
-    # islands. Such diodes can be identified with a recognition layer
-    # (usually the diffusion area of a certain kind). You can include
-    # such diode recognition layers in the antenna check. If a connection
-    # is detected to a diode, the respective network is skipped:
-    #
-    # @code
-    # ...
-    # diode = ... # diode recognition layer
-    #
-    # connect(diode, contact)
-    # errors = antenna_check(gate, metal1, 50.0, diode)
-    # @/code
-    #
-    # You can also make diode connections decreases the
-    # sensitivity of the antenna check depending on the size
-    # of the diode. The following specification makes 
-    # diode connections increase the ratio threshold by
-    # 10 per square micrometer of diode area:
-    #
-    # @code
-    # ...
-    # diode = ... # diode recognition layer
-    #
-    # connect(diode, contact)
-    # # each square micrometer of diode area connected to a network
-    # # will add 10 to the ratio:
-    # errors = antenna_check(gate, metal1, 50.0, [ diode, 10.0 ])
-    # @/code
-    #
-    # Multiple diode specifications are allowed. Just add them 
-    # to the antenna_check call.
-    #
-    # The error shapes produced by the antenna check are copies
-    # of the metal shapes on the metal layers of each network 
-    # violating the antenna rule.
-
-    def antenna_check(gate, metal, ratio, *diodes)
-
-      gate.is_a?(DRC::DRCLayer) || raise("gate argument of Netter#antenna_check must be a layer")
-      gate.requires_region("Netter#antenna_check (gate argument)")
-
-      metal.is_a?(DRC::DRCLayer) || raise("metal argument of Netter#antenna_check must be a layer")
-      metal.requires_region("Netter#antenna_check (metal argument)")
-
-      if !ratio.is_a?(1.class) &amp;&amp; !ratio.is_a?(Float)
-        raise("ratio argument Netter#antenna_check is not a number")
-      end
-
-      dl = diodes.collect do |d|
-        if d.is_a?(Array)
-          d.size == 2 || raise("diode specification pair expects two elements")
-          d[0].requires_region("Netter#antenna_check (diode layer)")
-          [ d[0].data, d[1].to_f ]
-        else 
-          d.requires_region("Netter#antenna_check (diode layer)")
-          [ d.data, 0.0 ]
-        end
-      end
-
-      @l2n || make_l2n
-      DRC::DRCLayer::new(@engine, @engine._cmd(@l2n, :antenna_check, gate.data, metal.data, ratio, dl))
-
-    end
-
-    # %DRC%
-    # @name l2n_data
-    # @brief Gets the internal RBA::LayoutToNetlist object
-    # @synopsis l2n_data
-    # The RBA::LayoutToNetlist object provides access to the internal details of
-    # the netter object.
-
-    def l2n_data
-      @l2n || make_l2n
-      @l2n
-    end
-    
-    def _finish
-      clear_connections
-      # cleans up the L2N object
-      modified
-    end
-
-  private
-
-    def modified
-      @l2n &amp;&amp; @l2n._destroy
-      @l2n = nil
-    end
-    
-    def make_l2n
-
-      if @engine._dss
-        # TODO: check whether all layers are deep and come from the dss and layout index,
-        # then use this layout index. This will remove the need for this check:
-        @engine._dss.is_singular? || raise("The DRC script features more than one or no layout source - network extraction cannot be performed in such configurations")
-        @l2n = RBA::LayoutToNetlist::new(@engine._dss)
-      else
-        layout = @engine.source.layout
-        @l2n = RBA::LayoutToNetlist::new(layout.top_cell.name, layout.dbu)
-      end
-
-      @layers.each { |id,l| @l2n.register(l, "l" + id.to_s) }
-
-      @devices_to_extract.each do |devex,ls| 
-        @engine._cmd(@l2n, :extract_devices, devex, ls) 
-      end
-
-      @layers.each { |id,l| @l2n.connect(l) }
-      @connections.each { |a,b| @l2n.connect(@layers[a], @layers[b]) }
-      @global_connections.each { |l,n| @l2n.connect_global(@layers[l], n) }
-
-      # run extraction in a timed environment
-      @engine._cmd(@l2n, :extract_netlist, @join_nets)
-      @l2n
-
-    end
-    
-  end
-
-  # The DRC engine
-  
-  # %DRC%
-  # @scope 
-  # @name global 
-  # @brief DRC Reference: Global Functions
-  # Some functions are available on global level and can be used without any object.
-  # Most of them are convenience functions that basically act on some default object
-  # or provide function-like alternatives for the methods.
-
-  class DRCEngine
-  
-    def initialize
-
-      cv = RBA::CellView::active
-
-      @def_layout = cv &amp;&amp; cv.layout
-      @def_cell = cv &amp;&amp; cv.cell
-      @def_source = nil
-      @dbu_read = false
-      use_dbu(@def_layout &amp;&amp; @def_layout.dbu)
-      @output_layout = nil
-      @output_rdb = nil
-      @output_rdb_file = nil
-      @output_rdb_cell = nil
-      @used_output_layers = {}
-      @output_layers = []
-      @vnum = 1
-      @layout_sources = {}
-      @lnum = 1
-      @log_file = nil
-      @dss = nil
-      @deep = false
-      @netter = nil
-
-      @verbose = false
-
-    end
-    
-    def joined
-      DRCJoinFlag::new(true)
-    end
-    
-    def diamond_limit
-      DRCSizingMode::new(0)
-    end
-    
-    def octagon_limit
-      DRCSizingMode::new(1)
-    end
-    
-    def square_limit
-      DRCSizingMode::new(2)
-    end
-    
-    def acute_limit
-      DRCSizingMode::new(3)
-    end
-    
-    def no_limit
-      DRCSizingMode::new(4)
-    end
-    
-    def projection_limits(*args)
-      DRCProjectionLimits::new(*args)
-    end
-    
-    def angle_limit(a)
-      DRCAngleLimit::new(a)
-    end
-    
-    def whole_edges(f = true)
-      DRCWholeEdges::new(f)
-    end
-    
-    def euclidian
-      DRCMetrics::new(RBA::Region::Euclidian)
-    end
-    
-    def square
-      DRCMetrics::new(RBA::Region::Square)
-    end
-    
-    def projection
-      DRCMetrics::new(RBA::Region::Projection)
-    end
-    
-    def pattern(p)
-      DRCPattern::new(true, p)
-    end
-    
-    def text(p)
-      DRCPattern::new(false, p)
-    end
-
-    def as_dots
-      DRCAsDots::new(true)
-    end
-    
-    def as_edges
-      DRCAsDots::new(true)
-    end
-    
-    def as_boxes
-      DRCAsDots::new(false)
-    end
-    
-    # %DRC%
-    # @name verbose?
-    # @brief Returns true, if verbose mode is enabled
-    # @synopsis verbose?
-    # In verbose mode, more output is generated in the log file
-    
-    def verbose?
-      @verbose
-    end
-    
-    # %DRC%
-    # @name verbose
-    # @brief Sets or resets verbose mode
-    # @synopsis verbose
-    # @synopsis verbose(m)
-    # In verbose mode, more output is generated in the log file
-    
-    def verbose(f = true)
-      self.verbose = f
-    end
-    
-    # %DRC%
-    # @name silent
-    # @brief Resets verbose mode
-    # @synopsis silent
-    # This function is equivalent to "verbose(false)" (see \verbose)
-    
-    def silent(f = true)
-      self.verbose = !f
-    end
-    
-    def verbose=(f)
-      @verbose = f
-    end
-    
-    # %DRC%
-    # @name info 
-    # @brief Outputs as message to the logger window
-    # @synopsis info(message)
-    # Prints the message to the log window in verbose mode.
-    # In non-verbose more, nothing is printed.
-    # \log is a function that always prints a message.
-    
-    def info(arg)
-      @verbose &amp;&amp; log(arg)
-    end
-    
-    # %DRC%
-    # @name log 
-    # @brief Outputs as message to the logger window
-    # @synopsis log(message)
-    # Prints the message to the log window.
-    # \info is a function that prints a message only if 
-    # verbose mode is enabled.
-    
-    def log(arg)
-      if @log_file
-        @log_file.puts(arg)
-      else
-        RBA::Logger::info(arg)
-      end
-    end
-    
-    # %DRC%
-    # @name error
-    # @brief Prints an error
-    # @synopsis error(message)
-    # Similar to \log, but the message is printed formatted as an error
-    
-    def error(arg)
-      if @log_file
-        @log_file.puts("ERROR: " + arg)
-      else
-        RBA::Logger::error(arg)
-      end
-    end
-    
-    # %DRC%
-    # @name log_file
-    # @brief Specify the log file where to send to log to
-    # @synopsis log_file(filename)
-    # After using that method, the log output is sent to the 
-    # given file instead of the logger window or the terminal.
-    
-    def log_file(arg)
-      @log_file &amp;&amp; @log_file.close
-      @log_file = File.open(arg, "w")
-    end
-    
-    # Specify the database unit to use
-    
-    def use_dbu(d)
-      if @dbu_read 
-        raise "Cannot change the database unit at this point"
-      end
-      # Should have a "context", but no such thing for Float or Fixnum
-      1.0.class._dbu = d
-      1.class._dbu = d
-      @dbu = d
-    end
-    
-    # %DRC%
-    # @name dbu
-    # @brief Gets or sets the database unit to use
-    # @synopsis dbu(dbu)
-    # @synopsis dbu
-    # Without any argument, this method gets the database unit
-    # used inside the DRC engine. 
-    #
-    # With an argument, sets the database unit used internally in the DRC engine.
-    # Without using that method, the database unit is automatically
-    # taken as the database unit of the last input. 
-    # A specific database unit can be set in order to optimize
-    # for two layouts (i.e. take the largest common denominator).
-    # When the database unit is set, it must be set at the beginning
-    # of the script and before any operation that uses it.
-    
-    def dbu(d = nil)
-      if !d
-        @dbu || raise("No database unit specified")
-      else
-        use_dbu(d.to_f)
-      end
-      @dbu_read = true
-      @dbu
-    end
-    
-    # %DRC%
-    # @name tiles
-    # @brief Specifies tiling 
-    # @synopsis tiles(t)
-    # @synopsis tiles(w, h)
-    # Specifies tiling mode. In tiling mode, the DRC operations are evaluated in tiles
-    # with width w and height h. With one argument, square tiles with width and height
-    # t are used.
-    # 
-    # Special care must be taken when using tiling mode, since some operations may not
-    # behave as expected at the borders of the tile. Tiles can be made overlapping by
-    # specifying a tile border dimension with \tile_borders. Some operations like sizing,
-    # the DRC functions specify a tile border implicitly. Other operations without a
-    # defined range won't do so and the consequences of tiling mode can be difficult to
-    # predict.
-    #
-    # In tiling mode, the memory requirements are usually smaller (depending on the 
-    # choice of the tile size) and multi-CPU support is enabled (see \threads).
-    # To disable tiling mode use \flat or \deep. 
-    #
-    # Tiling mode will disable deep mode (see \deep).
-    
-    def tiles(tx, ty = nil)
-      @tx = tx.to_f
-      @ty = (ty || tx).to_f
-      @deep = false
-    end
-    
-    # %DRC%
-    # @name is_tiled?
-    # @brief Returns true, if in tiled mode
-    # @synopsis is_tiled?
-    
-    def is_tiled?
-      @tx != nil
-    end
-    
-    # %DRC%
-    # @name deep
-    # @brief Enters deep (hierarchical) mode
-    # @synopsis deep
-    #
-    # In deep mode, the operations will be performed in a hierarchical fashion. 
-    # Sometimes this reduces the time and memory required for an operation, but this
-    # will also add some overhead for the hierarchical analysis.
-    #
-    # "deepness" is a property of layers. Layers created with "input" while in 
-    # deep mode carry hierarchy. Operations involving such layers at the only
-    # or the first argument are carried out in hierarchical mode. 
-    # 
-    # Hierarchical mode has some more implications, like "merged_semantics" being
-    # implied always. Sometimes cell variants will be created.
-    #
-    # Deep mode can be cancelled with \tiles or \flat.
-    
-    def deep
-      @deep = true
-      @tx = @ty = nil
-    end
-    
-    # %DRC%
-    # @name is_deep?
-    # @brief Returns true, if in deep mode
-    # @synopsis is_deep?
-    
-    def is_deep?
-      @deep
-    end
-    
-    # %DRC%
-    # @name tile_borders
-    # @brief Specifies a minimum tile border
-    # @synopsis tile_border(b)
-    # @synopsis tile_border(bx, by)
-    # The tile border specifies the distance to which shapes are collected into the 
-    # tile. In order words, when processing a tile, shapes within the border distance
-    # participate in the operations.
-    #
-    # For some operations such as booleans (\and, \or, ...), \size and the DRC functions (\width, \space, ...)
-    # a tile border is automatically established. For other operations such as \with_area
-    # or \edges, the exact distance is unknown, because such operations may have a long range.
-    # In that cases, no border is used. The tile_borders function may be used to specify a minimum border
-    # which is used in that case. That allows taking into account at least shapes within the 
-    # given range, although not necessarily all.
-    # 
-    # To reset the tile borders, use \no_borders or "tile_borders(nil)".
-    
-    def tile_borders(bx, by = nil)
-      @bx = bx.to_f
-      @by = (by || bx).to_f
-    end
-    
-    # %DRC%
-    # @name no_borders
-    # @brief Reset the tile borders
-    # @synopsis no_borders
-    # Resets the tile borders - see \tile_borders for a description of tile borders.
-    
-    def no_borders
-      @bx = @by = nil
-    end
-    
-    # %DRC%
-    # @name flat
-    # @brief Disables tiling mode 
-    # @synopsis flat
-    # Disables tiling mode. Tiling mode can be enabled again with \tiles later.
-    
-    def flat
-      @tx = @ty = nil
-      @deep = false
-    end
-    
-    # %DRC%
-    # @name threads
-    # @brief Specifies the number of CPU cores to use in tiling mode
-    # @synopsis threads(n)
-    # If using threads, tiles are distributed on multiple CPU cores for
-    # parallelization. Still, all tiles must be processed before the 
-    # operation proceeds with the next statement.
-    
-    def threads(n)
-      @tt = n.to_i
-    end
-    
-    # %DRC%
-    # @name make_layer
-    # @brief Creates an empty polygon layer based on the hierarchical scheme selected
-    # @synopsis make_layer
-    # The intention of this method is to provide an empty polygon layer based on the
-    # hierarchical scheme selected. This will create a new layer with the hierarchy
-    # of the current layout in deep mode and a flat layer in flat mode.
-    # This method is similar to \polygon_layer, but the latter does not create
-    # a hierarchical layer. Hence the layer created by \make_layer is suitable
-    # for use in device extraction for example, while the one
-    # delivered by \polygon_layer is not.
-    #
-    # On the other hand, a layer created by the \make_layer method is not intended to be
-    # filled with \Layer#insert.
-    
-    def make_layer
-      layout.make_layer
-    end
-      
-    # %DRC%
-    # @name polygon_layer
-    # @brief Creates an empty polygon layer
-    # @synopsis polygon_layer
-    # The intention of that method is to create an empty layer which can be 
-    # filled with polygon-like objects using \Layer#insert.
-    # A similar method which creates a hierarchical layer in deep mode is 
-    # \make_layer. This other layer is better suited for use with device extraction.
-    
-    def polygon_layer
-      DRCLayer::new(self, RBA::Region::new)
-    end
-      
-    # %DRC%
-    # @name edge_layer
-    # @brief Creates an empty edge layer
-    # @synopsis edge_layer
-    # The intention of that method is to create an empty layer which can be 
-    # filled with edge objects using \Layer#insert.
-    
-    def edge_layer
-      DRCLayer::new(self, RBA::Edges::new)
-    end
-      
-    # %DRC%
-    # @name source
-    # @brief Specifies a source layout
-    # @synopsis source
-    # @synopsis source(what)
-    # This function replaces the default source layout by the specified
-    # file. If this function is not used, the currently active layout 
-    # is used as input. 
-    #
-    # \layout is a similar method which specifies @i a additional @/i input layout.
-    # 
-    # "what" specifies what input to use. "what" be either
-    #
-    # @ul
-    # @li A string "\@n" specifying input from a layout in the current panel @/li
-    # @li A layout filename plus an optional cell name@/li
-    # @li A RBA::Layout object plus an optional cell name@/li
-    # @li A RBA::Cell object @/li
-    # @/ul
-    # 
-    # Without any arguments the default layout is returned. If a filename is given, a cell name
-    # can be specified as the second argument. If none is specified, the top cell is taken which
-    # must be unique in that case.
-    #
-    # @code
-    # # XOR between layers 1 of "first_layout.gds" and "second_layout.gds" and sends the results to "xor_layout.gds":
-    # target("xor_layout.gds")
-    # source("first_layout.gds")
-    # l2 = layout("second_layout.gds")
-    # (input(1, 0) ^ l2.input(1, 0)).output(100, 0)
-    # @/code
-    # 
-    # For further methods on the source object see \Source.
-    
-    def source(arg = nil, arg2 = nil)
-    
-      if arg
-      
-        if arg.is_a?(String)
-        
-          if arg =~ /^@(\d+)/
-            n = $1.to_i - 1
-            view = RBA::LayoutView::current
-            view || raise("No view open")
-            (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n + 1}")
-            cv = view.cellview(n)
-            cv.is_valid? || raise("Invalid layout @#{n + 1}")
-            @def_source = make_source(cv.layout, cv.cell)
-          else
-            layout = RBA::Layout::new
-            info("Reading #{arg} ..")
-            layout.read(arg)
-            cell = nil 
-            if arg2
-              arg2.is_a?(String) || raise("Second argument of 'source' must be a string")
-              cell = layout.cell(arg2)
-              cell || raise("Cell name #{arg2} not found in input layout")
-            end
-            @def_source = make_source(layout, cell)
-          end
-          
-        elsif arg.is_a?(RBA::Layout)
-
-          cell = arg2
-          if cell.is_a?(String)
-            cell = arg.cell(cell)
-            cell || raise("Cell name #{cell} not found in input layout")
-          elsif !cell.is_a?(RBA::Cell)
-            raise("Second argument of 'source' must be a string or RBA::Cell object")
-          end
-          @def_source = make_source(arg, cell)
-
-        elsif arg.is_a?(RBA::Cell)
-          @def_source = make_source(arg.layout, arg)
-        else
-          raise("Invalid argument for 'source' method")
-        end
-      
-      else
-        @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
-        @def_source ||= make_source(@def_layout, @def_cell)
-      end
-
-      # make default input also default output if none is set yet.
-      @def_layout ||= @def_source.layout
-      @def_cell ||= @def_source.cell_obj
-          
-      # use the DBU of the new input as DBU reference
-      @dbu_read || use_dbu(@def_source.layout.dbu)
-
-      @def_source
-
-    end
-
-    # %DRC%
-    # @name layout
-    # @brief Specifies an additional layout for the input source.
-    # @synopsis layout
-    # @synopsis layout(what)
-    # This function can be used to specify a new layout for input.
-    # It returns an Source object representing that layout. The "input" method
-    # of that object can be used to get input layers for that layout.
-    # 
-    # "what" specifies what input to use. "what" be either
-    #
-    # @ul
-    # @li A string "\@n" specifying input from a cellview in the current view @/li
-    # @li A layout filename plus an optional cell name @/li
-    # @li A RBA::Layout object @/li
-    # @li A RBA::Cell object @/li
-    # @/ul
-    # 
-    # Without any arguments the default layout is returned.
-    #
-    # If a file name is given, a cell name can be specified as the second argument.
-    # If not, the top cell is taken which must be unique in that case.
-    #
-    # Having specified a layout for input enables to use the input method
-    # for getting input:
-    #
-    # @code
-    # # XOR between layers 1 or the default input and "second_layout.gds":
-    # l2 = layout("second_layout.gds")
-    # (input(1, 0) ^ l2.input(1, 0)).output(100, 0)
-    # @/code
-    # 
-    # For further methods on the source object see \Source.
-    
-    def layout(arg = nil, arg2 = nil)
-    
-      if arg
-      
-        if arg.is_a?(String)
-        
-          if arg =~ /^@(\d+)/
-            n = $1.to_i - 1
-            view = RBA::LayoutView::current
-            view || raise("No view open")
-            (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n + 1}")
-            cv = view.cellview(n)
-            cv.is_valid? || raise("Invalid layout @#{n + 1}")
-            return make_source(cv.layout, cv.cell)
-          else
-            layout = RBA::Layout::new
-            info("Reading #{arg} ..")
-            layout.read(arg)
-            cell = nil 
-            if arg2
-              arg2.is_a?(String) || raise("Second argument of 'source' must be a string")
-              cell = layout.cell(arg2)
-              cell || raise("Cell name #{arg2} not found in input layout")
-            end
-            return make_source(layout, cell)
-          end
-          
-        elsif arg.is_a?(RBA::Layout)
-          return make_source(layout)
-        elsif arg.is_a?(RBA::Cell)
-          return make_source(arg.layout, arg)
-        else
-          raise("Invalid argument for 'layout' method")
-        end
-      
-      else
-        @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
-        @def_source ||= make_source(@def_layout, @def_cell)
-        @def_source
-      end
-          
-    end
-
-    # %DRC%
-    # @name report
-    # @brief Specifies a report database for output
-    # @synopsis report(description [, filename [, cellname ] ])
-    # After specifying a report database for output, \output method calls are redirected to
-    # the report database. The format of the \output calls changes and a category name plus
-    # description can be specified rather than a layer/datatype number of layer name.
-    # See the description of the output method for details.
-    #
-    # If a filename is given, the report database will be written to the specified file name.
-    # Otherwise it will be shown but not written.
-    #
-    # If external input is specified with \source, 
-    # "report" must be called after "source".
-    #
-    # The cellname specifies the top cell used for the report file.
-    # By default this is the cell name of the default source. If there
-    # is no source layout you'll need to give the cell name in the 
-    # third parameter.
-      
-    def report(description, filename = nil, cellname = nil)
-
-      @output_rdb_file = filename
-
-      name = filename &amp;&amp; File::basename(filename)
-      name ||= "DRC"
-      
-      lv = RBA::LayoutView::current
-      if lv
-        @output_rdb_index = lv.create_rdb(name)
-        @output_rdb = lv.rdb(@output_rdb_index)
-      else
-        @output_rdb = RBA::ReportDatabase::new(name)
-      end
-      
-      @output_layout = nil
-      @output_cell = nil
-      @output_layout_file = nil
-
-      cn = nil
-      cn ||= @def_cell &amp;&amp; @def_cell.name
-      cn ||= source &amp;&amp; source.cell_name
-      cn ||= cellname
-
-      cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter of 'report'")
-
-      @output_rdb_cell = @output_rdb.create_cell(cn)
-      @output_rdb.generator = $0
-      @output_rdb.top_cell_name = cn
-      @output_rdb.description = description
-      
-    end
-    
-    # %DRC%
-    # @name output_cell
-    # @brief Specifies a target cell, but does not change the target layout
-    # @synopsis output_cell(cellname)
-    # This method switches output to the specified cell, but does not
-    # change the target layout nor does it switch the output channel to
-    # layout if is report database. 
-    
-    def output_cell(cellname)
-
-      # finish what we got so far
-      _flush
-      
-      if @output_rdb
-      
-        cell = nil
-        @output_rdb.each_cell do |c|
-          if c.name == cellname
-            cell = c
-          end
-        end
-        
-        cell ||= @output_rdb.create_cell(cellname)
-        @output_rdb_cell = cell
-        
-      else
-      
-        @output_layout ||= @def_layout
-        if @output_layout
-          @output_cell = @output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)
-        end
-        
-      end
-          
-    end
-
-    # %DRC%
-    # @name target
-    # @brief Specify the target layout
-    # @synopsis target(what [, cellname])
-    # This function can be used to specify a target layout for output.
-    # Subsequent calls of "output" will send their results to that target
-    # layout. Using "target" will disable output to a report database.
-    # If any target was specified before, that target will be closed and 
-    # a new target will be set up.
-    # 
-    # "what" specifies what input to use. "what" be either
-    #
-    # @ul
-    # @li A string "\@n" specifying output to a layout in the current panel @/li
-    # @li A layout filename @/li 
-    # @li A RBA::Layout object @/li
-    # @li A RBA::Cell object @/li
-    # @/ul
-    # 
-    # Except if the argument is a RBA::Cell object, a cellname can be specified 
-    # stating the cell name under which the results are saved. If no cellname is 
-    # specified, either the current cell or "TOP" is used.
-    # 
-    
-    def target(arg, cellname = nil)
-    
-      # finish what we got so far
-      _finish(false)
-          
-      if arg.is_a?(String)
-      
-        if arg =~ /^@(\d+)/
-          n = $1.to_i - 1
-          view = RBA::LayoutView::current
-          view || raise("No view open")
-          (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n + 1}")
-          cv = view.cellview(n)
-          cv.is_valid? || raise("Invalid layout @#{n + 1}")
-          @output_layout = cv.layout
-          @output_cell = cellname ? (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)) : cv.cell
-          @output_layout_file = nil
-        else
-          @output_layout = RBA::Layout::new
-          @output_cell = cellname &amp;&amp; @output_layout.create_cell(cellname.to_s)
-          @output_layout_file = arg
-        end
-        
-      elsif arg.is_a?(RBA::Layout)
-      
-        @output_layout = arg
-        @output_cell = cellname &amp;&amp; (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s))
-        @output_layout_file = nil
-        
-      elsif arg.is_a?(RBA::Cell)
-      
-        @output_layout = arg.layout
-        @output_cell = arg
-        @output_layout_file = nil
-
-      else
-        raise("Invalid argument for 'target' method")
-      end
-    
-    end
-    
-    # %DRC%
-    # @name box 
-    # @brief Creates a box object
-    # @synopsis box(...)
-    # This function creates a box object. The arguments are the same than for the 
-    # RBA::DBox constructors.
- 
-    def box(*args)
-      RBA::DBox::new(*args)
-    end
-    
-    # %DRC%
-    # @name path 
-    # @brief Creates a path object
-    # @synopsis path(...)
-    # This function creates a path object. The arguments are the same than for the 
-    # RBA::DPath constructors.
- 
-    def path(*args)
-      RBA::DPath::new(*args)
-    end
-    
-    # %DRC%
-    # @name polygon 
-    # @brief Creates a polygon object
-    # @synopsis polygon(...)
-    # This function creates a polygon object. The arguments are the same than for the 
-    # RBA::DPolygon constructors.
- 
-    def polygon(*args)
-      RBA::DPolygon::new(*args)
-    end
-    
-    # %DRC%
-    # @name p
-    # @brief Creates a point object
-    # @synopsis p(x, y)
-    # A point is not a valid object by itself, but it is useful for creating 
-    # paths for polygons:
-    #
-    # @code
-    # x = polygon_layer
-    # x.insert(polygon([ p(0, 0), p(16.0, 0), p(8.0, 8.0) ]))
-    # @/code
-    
-    def p(x, y)
-      RBA::DPoint::new(x, y)
-    end
-    
-    # %DRC%
-    # @name edge 
-    # @brief Creates an edge object
-    # @synopsis edge(...)
-    # This function creates an edge object. The arguments are the same than for the 
-    # RBA::DEdge constructors.
- 
-    def edge(*args)
-      RBA::DEdge::new(*args)
-    end
-    
-    # %DRC%
-    # @name extent 
-    # @brief Creates a new layer with the bounding box of the default source
-    # @synopsis extent
-    # See \Source#extent for a description of that function.
- 
-    def extent
-      layout.extent
-    end
-    
-    # %DRC%
-    # @name input 
-    # @brief Fetches the shapes from the specified input from the default source
-    # @synopsis input(args)
-    # See \Source#input for a description of that function. This method will fetch
-    # polygons and labels. See \polygons and \labels for more specific versions of
-    # this method.
- 
-    def input(*args)
-      layout.input(*args)
-    end
-    
-    # %DRC%
-    # @name polygons 
-    # @brief Fetches the polygons (or shapes that can be converted to polygons) from the specified input from the default source
-    # @synopsis polygons(args)
-    # See \Source#polygons for a description of that function.
- 
-    def polygons(*args)
-      layout.polygons(*args)
-    end
-    
-    # %DRC%
-    # @name labels 
-    # @brief Gets the labels (text) from an original layer
-    # @synopsis labels
-    # See \Source#labels for a description of that function.
- 
-    def labels(*args)
-      layout.labels(*args)
-    end
-    
-    # %DRC%
-    # @name output
-    # @brief Outputs a layer to the report database or output layout
-    # @synopsis output(layer, args)
-    # This function is equivalent to "layer.output(args)". See \Layer#output for details about this function.
-    
-    def output(layer, *args)
-      layer.output(*args)
-    end
-    
-    # %DRC%
-    # @name layers 
-    # @brief Gets the layers contained in the default source
-    # @synopsis layers
-    # See \Source#layers for a description of that function.
- 
-    def layers
-      layout.layers
-    end
-    
-    # %DRC%
-    # @name cell 
-    # @brief Selects a cell for input on the default source
-    # @synopsis cell(args)
-    # See \Source#cell for a description of that function.
-    # In addition to the functionality described there, the global function will also send the output
-    # to the specified cell.
-    # 
-    # The following code will select cell "MACRO" from the input layout:
-    # 
-    # @code
-    # cell("MACRO")
-    # # shapes now will be taken from cell "MACRO"
-    # l1 = input(1, 0)
-    # @/code
- 
-    def cell(*args)
-      @def_source = layout.cell(*args)
-      output_cell(*args)
-      nil
-    end
-    
-    # %DRC%
-    # @name select 
-    # @brief Specifies cell filters on the default source
-    # @synopsis select(args)
-    # See \Source#select for a description of that function.
- 
-    def select(*args)
-      @def_source = layout.select(*args)
-      nil
-    end
-    
-    # %DRC%
-    # @name clip 
-    # @brief Specifies clipped input on the default source
-    # @synopsis clip(args)
-    # See \Source#clip for a description of that function.
-    #
-    # The following code will select shapes within a 500x600 micron rectangle (lower left corner at 0,0) 
-    # from the input layout. The shapes will be clipped to that rectangle:
-    # 
-    # @code
-    # clip(0.mm, 0.mm, 0.5.mm, 0.6.mm)
-    # # shapes now will be taken from the given rectangle and clipped to it
-    # l1 = input(1, 0)
-    # @/code
- 
-    def clip(*args)
-      @def_source = layout.clip(*args)
-      nil
-    end
-    
-    # make some DRCLayer methods available as functions
-    # for the engine
-    %w(join and or xor not 
-       in touching overlapping inside outside interacting
-       select_touching select_overlapping select_inside select_outside select_interacting
-       merge merged rectangles rectilinear non_rectangles non_rectilinear
-       with_area with_perimeter with_angle with_length with_bbox_width with_bbox_area with_bbox_height with_bbox_min with_bbox_max
-       without_area without_perimeter without_length without_angle without_bbox_width without_bbox_area without_bbox_height without_bbox_min without_bbox_max
-       bbox 
-       area length perimeter 
-       is_box? is_empty? is_merged? is_clean? is_raw? polygons? edges? edge_pairs?
-       strict non_strict is_strict?
-       centers end_segments start_segments
-       extended extended_in extended_out
-       extents hulls holes
-       scaled scale rotated rotate
-       move moved transform transformed
-       width space notch isolated overlap
-       size sized 
-       rounded_corners odd_polygons).each do |f|
-      eval &lt;&lt;"CODE"
-        def #{f}(*args)
-          obj = args.shift
-          obj.#{f}(*args)
-        end
-CODE
-    end
-    
-    # %DRC%
-    # @name netter
-    # @brief Creates a new netter object
-    # @synopsis netter
-    # See \Netter for more details
- 
-    def netter
-      DRC::DRCNetter::new
-    end
-
-    # %DRC%
-    # @name connect
-    # @brief Specifies a connection between two layers
-    # @synopsis connect(a, b)
-    # See \Netter#connect for a description of that function.
- 
-    # %DRC%
-    # @name connect_global
-    # @brief Specifies a connection to a global net
-    # @synopsis connect_global(l, name)
-    # See \Netter#connect_global for a description of that function.
- 
-    # %DRC%
-    # @name clear_connections
-    # @brief Clears all connections stored so far
-    # @synopsis clear_connections
-    # See \Netter#clear_connections for a description of that function
-
-    # %DRC%
-    # @name join_nets
-    # @brief Specifies a label pattern for implicit net connections
-    # @synopsis join_nets(label_pattern)
-    # See \Netter#join_nets for a description of that function
-
-    # %DRC%
-    # @name antenna_check
-    # @brief Performs an antenna check
-    # @synopsis antenna_check(gate, metal, ratio, [ diode_specs ... ])
-    # See \Netter#antenna_check for a description of that function
- 
-    # %DRC%
-    # @name l2n_data
-    # @brief Gets the internal RBA::LayoutToNetlist object for the default \Netter
-    # @synopsis l2n_data
-    # See \Netter#l2n_data for a description of that function
- 
-    # %DRC%
-    # @name extract_devices
-    # @brief Extracts devices for a given device extractor and device layer selection
-    # @synopsis extract_devices(extractor, layer_hash)
-    # See \Netter#extract_devices for a description of that function
- 
-    %w(connect connect_global clear_connections join_nets antenna_check l2n_data extract_devices).each do |f|
-      eval &lt;&lt;"CODE"
-        def #{f}(*args)
-          _netter.#{f}(*args)
-        end
-CODE
-    end
-    
-    def src_line
-      cc = caller.find do |c|
-        c !~ /drc.lym:/ &amp;&amp; c !~ /\(eval\)/
-      end
-      if cc =~ /(.*)\s*:\s*(\d+)\s*:\s*in.*$/
-        return File::basename($1) + ":" + $2
-      else
-        return cc
-      end
-    end
-    
-    def run_timed(desc, obj)
-
-      info(desc)
-
-      # enable progress
-      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs)
-        obj.enable_progress(desc)
-      end
-      
-      t = RBA::Timer::new
-      t.start
-      GC.start # force a garbage collection before the operation to free unused memory
-      res = yield
-      t.stop
-
-      info("Elapsed: #{'%.3f'%(t.sys+t.user)}s")
-
-      # disable progress
-      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs)
-        obj.disable_progress
-      end
-          
-      res
-
-    end
-    
-    def _cmd(obj, method, *args)
-      run_timed("\"#{method}\" in: #{src_line}", obj) do
-        obj.send(method, *args)
-      end
-    end
-    
-    def _tcmd(obj, border, result_cls, method, *args)
-    
-      if @tx &amp;&amp; @ty
-      
-        tp = RBA::TilingProcessor::new
-        tp.dbu = self.dbu
-        tp.scale_to_dbu = false
-        tp.tile_size(@tx, @ty)
-        bx = [ @bx || 0.0, border * self.dbu ].max
-        by = [ @by || 0.0, border * self.dbu ].max
-        tp.tile_border(bx, by)
-
-        res = result_cls.new      
-        tp.output("res", res)
-        tp.input("self", obj)
-        tp.threads = (@tt || 1)
-        args.each_with_index do |a,i|
-          if a.is_a?(RBA::Edges) || a.is_a?(RBA::Region)
-            tp.input("a#{i}", a)
-          else
-            tp.var("a#{i}", a)
-          end
-        end
-        av = args.size.times.collect { |i| "a#{i}" }.join(", ")
-        tp.queue("_output(res, self.#{method}(#{av}))")
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
-          tp.execute("Tiled \"#{method}\" in: #{src_line}")
-        end
-        
-      else
-        res = nil
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
-          res = obj.send(method, *args)
-        end
-      end
-      
-      # enable progress
-      if obj.is_a?(RBA::Region)
-        obj.disable_progress
-      end
-      
-      res
-      
-    end
-
-    # used for area and perimeter only    
-    def _tdcmd(obj, border, method)
-    
-      if @tx &amp;&amp; @ty
-      
-        tp = RBA::TilingProcessor::new
-        tp.tile_size(@tx, @ty)
-        tp.tile_border(border * self.dbu, border * self.dbu)
-
-        res = RBA::Value::new
-        res.value = 0.0
-        tp.output("res", res)
-        tp.input("self", obj)
-        tp.threads = (@tt || 1)
-        tp.queue("_output(res, _tile ? self.#{method}(_tile.bbox) : self.#{method})")
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
-          tp.execute("Tiled \"#{method}\" in: #{src_line}")
-        end
-        
-        res = res.value
-        
-      else
-        res = nil
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
-          res = obj.send(method)
-        end
-      end
-      
-      # enable progress
-      if obj.is_a?(RBA::Region)
-        obj.disable_progress
-      end
-      
-      res
-      
-    end
-    
-    def _rcmd(obj, method, *args)
-      run_timed("\"#{method}\" in: #{src_line}", obj) do
-        RBA::Region::new(obj.send(method, *args))
-      end
-    end
-    
-    def _vcmd(obj, method, *args)
-      run_timed("\"#{method}\" in: #{src_line}", obj) do
-        obj.send(method, *args)
-      end
-    end
-    
-    def _start
-    
-      # clearing the selection avoids some nasty problems
-      view = RBA::LayoutView::current
-      view &amp;&amp; view.cancel
-      
-    end
-    
-    def _flush
-    
-      # clean up resources (i.e. temp layers)
-      @layout_sources.each do |n,l|
-        l.finish
-      end
-      
-    end
-    
-    def _finish(final = true)
-
-      _flush    
-      
-      view = RBA::LayoutView::current
-
-      # save the report database if requested
-      if @output_rdb_file
-        info("Writing #{@output_rdb_file} ..")
-        @output_rdb.save(@output_rdb_file)
-      end
-      if @output_rdb &amp;&amp; final &amp;&amp; view
-        view.show_rdb(@output_rdb_index, view.active_cellview_index)
-      end
-    
-      # save the output file if requested
-      if @output_layout &amp;&amp; @output_layout_file
-        opt = RBA::SaveLayoutOptions::new
-        gzip = opt.set_format_from_filename(@output_layout_file)
-        info("Writing #{@output_layout_file} ..")
-        @output_layout.write(@output_layout_file, gzip, opt)
-      end
-      
-      # create the new layers as visual layers if necessary
-      if view
-      
-        output = @output_layout || @def_layout
-        cv_index = nil
-        view.cellviews.times do |cvi|
-          view.cellview(cvi).layout == output &amp;&amp; cv_index = cvi
-        end
-        if cv_index
-        
-          view = RBA::LayoutView::current
-          
-          # clear selection
-          view.cancel 
-    
-          # create layer views for those layers which are not present yet
-                
-          present_layers = {}
-          l = view.begin_layers
-          while !l.at_end?
-            if l.current.cellview == cv_index
-              present_layers[l.current.layer_index] = true
-            end
-            l.next
-          end
-          
-          @output_layers.each do |li|
-            if !present_layers[li]
-              info = @def_layout.get_info(li)
-              lp = RBA::LayerProperties::new
-              lp.source_layer = info.layer
-              lp.source_datatype = info.datatype
-              lp.source_name = info.name
-              lp.source_cellview = cv_index
-              view.init_layer_properties(lp)
-              view.insert_layer(view.end_layers, lp)     
-            end
-          end
-          
-          view.update_content
-    
-        end
-        
-      end
-        
-      @output_layout = nil
-      @output_layout_file = nil
-      @output_cell = nil
-      @output_rdb_file = nil
-      @output_rdb_cell = nil
-      @output_rdb = nil
-      @output_rdb_index = nil
-
-      # clean up temp data
-      @dss &amp;&amp; @dss._destroy
-      @netter &amp;&amp; @netter._finish
-      
-      if final &amp;&amp; @log_file
-        @log_file.close
-        @log_file = nil
-      end
-
-    end
-
-    def _dss
-      @dss
-    end
-
-    def _netter
-      @netter ||= DRC::DRCNetter::new(self)
-    end
-
-  private
-
-    def _make_string(v)
-      if v.class.respond_to?(:from_s)
-        v.class.to_s + "::from_s(" + v.to_s.inspect + ")"
-      else
-        v.inspect
-      end
-    end
-
-    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags)
-    
-      if layers.empty? &amp;&amp; ! @deep
-
-        r = RBA::Region::new
-       
-      else
-    
-        if box
-          iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers, box, overlapping)
-        else
-          iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers)
-        end
-        iter.shape_flags = shape_flags
-        
-        sel.each do |s|
-          if s == "-"
-            iter.unselect_cells(cell.cell_index)
-          elsif s == "-*"
-            iter.unselect_all_cells
-          elsif s == "+*"
-            iter.select_all_cells
-          elsif s =~ /^-(.*)/
-            iter.unselect_cells($1)
-          elsif s =~ /^\+(.*)/
-            iter.select_cells($1)
-          else
-            iter.select_cells(s)
-          end
-        end
-
-        sf = layout.dbu / self.dbu
-        if @deep
-          @dss ||= RBA::DeepShapeStore::new
-          # TODO: align with LayoutToNetlist by using a "master" L2N
-          # object which keeps the DSS.
-          @dss.text_property_name = "LABEL"
-          @dss.text_enlargement = 1
-          r = RBA::Region::new(iter, @dss, RBA::ICplxTrans::new(sf.to_f))
-        else
-          r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))
-        end
-        
-        # clip if a box is specified
-        if box &amp;&amp; clip
-          r &amp;= RBA::Region::new(box)
-        end
-      
-      end
-      
-      r
-
-    end
-    
-    def _layout(name)
-      @layout_sources[name].layout
-    end
-    
-    def _output(data, *args)
-
-      if @output_rdb
-        
-        if args.size &lt; 1
-          raise("Invalid number of arguments for 'output' on report - category name and optional description expected")
-        end
-
-        cat = @output_rdb.create_category(args[0].to_s)
-        args[1] &amp;&amp; cat.description = args[1]
-
-        cat.scan_collection(@output_rdb_cell, RBA::CplxTrans::new(self.dbu), data)
-      
-      else 
-
-        if @output_layout 
-          output = @output_layout
-          if @output_cell
-            output_cell = @output_cell
-          elsif @def_cell
-            output_cell = @output_layout.cell(@def_cell.name) || @output_layout.create_cell(@def_cell.name)
-          end
-          output_cell || raise("No output cell specified (see 'target' instruction)")
-        else
-          output = @def_layout
-          output || raise("No output layout specified")
-          output_cell = @output_cell || @def_cell
-          output_cell || raise("No output cell specified")
-        end
-
-        info = nil
-        if args.size == 1
-          if args[0].is_a?(1.class)
-            info = RBA::LayerInfo::new(args[0], 0)
-          elsif args[0].is_a?(RBA::LayerInfo)
-            info = args[0]
-          elsif args[0].is_a?(String)
-            info = RBA::LayerInfo::from_string(args[0])
-          else
-            raise("Invalid parameter type for 'output' - must be string or number")
-          end
-        elsif args.size == 2 || args.size == 3
-          info = RBA::LayerInfo::new(*args)
-        else
-          raise("Invalid number of arguments for 'output' - one, two or three arguments expected")
-        end
-        li = output.find_layer(info)
-        if !li
-          li = output.insert_layer(info)
-        end
-
-        # make sure the output has the right database unit
-        output.dbu = self.dbu
-
-        tmp = li
-
-        begin
-
-          if !@used_output_layers[li]
-            @output_layers.push(li)
-            # Note: to avoid issues with output onto the input layer, we
-            # output to a temp layer and later swap both. The simple implementation
-            # did a clear here and the effect of that was that the data potentially
-            # got invalidated.
-            tmp = output.insert_layer(RBA::LayerInfo::new)
-            @used_output_layers[li] = true
-          end
-
-          # insert the data into the output layer
-          if data.is_a?(RBA::EdgePairs)
-            data.insert_into_as_polygons(output, output_cell.cell_index, tmp, 1)
-          else
-            data.insert_into(output, output_cell.cell_index, tmp)
-          end
-
-          #  make the temp layer the output layer
-          if tmp != li
-            output.swap_layers(tmp, li)
-          end
-
-        ensure
-          #  clean up the original layer if requested
-          if tmp != li
-            output.delete_layer(tmp)
-          end
-        end
-
-      end        
-    end
-    
-    def make_source(layout, cell = nil)
-      name = "layout" + @lnum.to_s
-      @lnum += 1
-      @dbu ||= layout.dbu
-      src = DRCSource::new(self, layout, layout, cell || layout.top_cell)
-      @layout_sources[name] = src
-      src
-    end
-    
-  end
  
 end
-</text>
-</klayout-macro>
+

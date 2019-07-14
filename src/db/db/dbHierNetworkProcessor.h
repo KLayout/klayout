@@ -132,6 +132,11 @@ public:
   size_t global_net_id (const std::string &gn);
 
   /**
+   *  @brief Gets the number of global nets (it's also the max ID + 1)
+   */
+  size_t global_nets () const;
+
+  /**
    *  @brief Begin iterator for the layers involved
    */
   layer_iterator begin_layers () const;

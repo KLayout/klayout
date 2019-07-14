@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category/>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>true</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+module LVS
+
+  def LVS.execute_lvs(_macro)
+
+    _timer = RBA::Timer::new
+    _timer.start
+    _lvs = LVSEngine::new
+
+    begin
+
+      # Set a debugger scope so that our errors end up with the debugger set to the LVS's line
+      RBA::MacroExecutionContext::set_debugger_scope(_macro.path)
+      # No verbosity set in lvs engine - we cannot use the engine's logger 
+      RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{_macro.path}")
+      _lvs.instance_eval(_macro.text, _macro.path)
+      # Remove the debugger scope
+      RBA::MacroExecutionContext::remove_debugger_scope
+
+    rescue =&gt; ex
+
+      _lvs.error("In #{_macro.path}: #{ex.to_s}")
+      RBA::MacroExecutionContext::ignore_next_exception
+      raise ex
+
+    ensure
+
+      # cleans up and creates layout views
+      _lvs._finish
+
+    end
+
+    _timer.stop
+    _lvs.info("Total run time: #{'%.3f'%(_timer.sys+_timer.user)}s")
+
+  end
+  
+  # A DSL implementation for a LVS language (XML format)
+  class LVSInterpreter &lt; RBA::MacroInterpreter
+  
+    # Constructor
+    def initialize
+
+      # Make the DSL use ruby syntax highlighting
+      self.syntax_scheme = "ruby"
+      self.suffix = "lylvs"
+      self.debugger_scheme = RBA::MacroInterpreter::RubyDebugger
+      self.storage_scheme = RBA::MacroInterpreter::MacroFormat
+      self.description = "LVS"
+
+      # Registers the new interpreter
+      register("lvs-dsl-xml")
+
+      # create a template for the macro editor:
+      create_template(":/lvs-templates/lvs.lym")
+
+      # if available, create a menu branch
+      if RBA::Application::instance &amp;&amp; RBA::Application::instance.main_window
+        mw = RBA::Application::instance.main_window
+        mw.menu.insert_menu("tools_menu.verification_group+", "lvs", "LVS")
+      end
+
+    end
+    
+    # Implements the execute method
+    def execute(macro)
+      LVS::execute_lvs(macro)
+    end
+    
+  end
+  
+  # A DSL implementation for a LVS language (Plain text format)
+  class LVSPlainTextInterpreter &lt; RBA::MacroInterpreter
+  
+    # Constructor
+    def initialize
+
+      # Make the DSL use ruby syntax highlighting
+      self.syntax_scheme = "ruby"
+      self.suffix = "lvs"
+      self.debugger_scheme = RBA::MacroInterpreter::RubyDebugger
+      self.storage_scheme = RBA::MacroInterpreter::PlainTextWithHashAnnotationsFormat
+      self.description = "LVS (Text)"
+
+      # Registers the new interpreter
+      register("lvs-dsl")
+
+    end
+    
+    # Implements the execute method
+    def execute(macro)
+      LVS::execute_lvs(macro)
+    end
+    
+  end
+  
+  # Register the new interpreters
+  LVSInterpreter::new
+  LVSPlainTextInterpreter::new
+ 
+end
+</text>
+</klayout-macro>
+

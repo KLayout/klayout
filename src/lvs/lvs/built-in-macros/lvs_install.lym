@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category/>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+module LVS
+
+  # Installs the home menu entries (needs to be done on autorun, not autorun-early)
+
+  if RBA::Application::instance &amp;&amp; RBA::Application::instance.main_window
+
+    cat = "lvs"
+
+    name = cat.upcase
+
+    mw = RBA::Application::instance.main_window
+    mw.menu.insert_menu("tools_menu.verification_group+", cat, name)
+
+    @new_action = RBA::Action::new
+    @new_action.title = "New #{name} Script"
+    @new_action.on_triggered do
+      mw.show_macro_editor(cat, true) 
+    end
+
+    mw.menu.insert_item("tools_menu.#{cat}.end", "new_script", @new_action)
+
+    @edit_action = RBA::Action::new
+    @edit_action.title = "Edit #{name} Script"
+    @edit_action.on_triggered do
+      mw.show_macro_editor(cat, false) 
+    end
+
+    mw.menu.insert_item("tools_menu.#{cat}.end", "edit_script", @edit_action)
+
+  end
+
+end
+</text>
+</klayout-macro>
+

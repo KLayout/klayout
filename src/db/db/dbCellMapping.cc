@@ -295,7 +295,7 @@ CellMapping::create_from_names (const db::Layout &layout_a, db::cell_index_type 
 }
 
 std::vector<db::cell_index_type> 
-CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /*cell_index_a*/, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells)
+CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /*cell_index_a*/, const db::Layout &layout_b, db::cell_index_type cell_index_b, const std::set<db::cell_index_type> *exclude_cells, const std::set<db::cell_index_type> *include_cells)
 {
   std::vector<db::cell_index_type> new_cells;
   std::vector<db::cell_index_type> new_cells_b;
@@ -305,7 +305,9 @@ CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /
   called_b.insert (cell_index_b);
 
   for (std::set<db::cell_index_type>::const_iterator b = called_b.begin (); b != called_b.end (); ++b) {
-    if (m_b2a_mapping.find (*b) == m_b2a_mapping.end () && (! exclude_cells || exclude_cells->find (*b) == exclude_cells->end ())) {
+    if (m_b2a_mapping.find (*b) == m_b2a_mapping.end ()
+        && (! exclude_cells || exclude_cells->find (*b) == exclude_cells->end ())
+        && (! include_cells || include_cells->find (*b) != include_cells->end ())) {
       db::cell_index_type new_cell = layout_a.add_cell (layout_b.cell_name (*b));
       new_cells.push_back (new_cell);
       new_cells_b.push_back (*b);

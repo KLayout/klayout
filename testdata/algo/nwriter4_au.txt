@@ -7,8 +7,8 @@
 * net 1 n1
 * net 2 n2
 * net 3 n3
-* device instance $1 0,0 DCLS
-D$1 1 3 DDCLS
-* device instance $2 0,0 DCLS
-D$2 3 2 DDCLS
+* device instance $1 r0 *1 0,0 DCLS
+D$1 1 3 DCLS A=1.7P P=0U
+* device instance $2 r0 *1 0,0 DCLS
+D$2 3 2 DCLS A=0.42P P=0U
 .ENDS C1

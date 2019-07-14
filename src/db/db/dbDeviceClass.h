@@ -124,7 +124,7 @@ public:
    *  @brief Creates an empty device parameter definition
    */
   DeviceParameterDefinition ()
-    : m_name (), m_description (), m_default_value (0.0), m_id (0), m_is_primary (true)
+    : m_name (), m_description (), m_default_value (0.0), m_id (0), m_is_primary (true), m_si_scaling (1.0)
   {
     //  .. nothing yet ..
   }
@@ -132,8 +132,8 @@ public:
   /**
    *  @brief Creates a device parameter definition with the given name and description
    */
-  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0, bool is_primary = true)
-    : m_name (name), m_description (description), m_default_value (default_value), m_id (0), m_is_primary (is_primary)
+  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0, bool is_primary = true, double si_scaling = 1.0)
+    : m_name (name), m_description (description), m_default_value (default_value), m_id (0), m_is_primary (is_primary), m_si_scaling (si_scaling)
   {
     //  .. nothing yet ..
   }
@@ -179,6 +179,17 @@ public:
   }
 
   /**
+   *  @brief Gets the SI unit scaling factor
+   *
+   *  Some parameters are given in micrometers for example. This
+   *  scaling factor gives the translation to SI units (1e-6 for micrometers).
+   */
+  double si_scaling () const
+  {
+    return m_si_scaling;
+  }
+
+  /**
    *  @brief Sets the parameter description
    */
   void set_default_value (double d)
@@ -220,6 +231,7 @@ private:
   double m_default_value;
   size_t m_id;
   bool m_is_primary;
+  double m_si_scaling;
 
   void set_id (size_t id)
   {
@@ -534,6 +546,74 @@ private:
   {
     mp_netlist = nl;
   }
+};
+
+/**
+ *  @brief A device class template
+ *
+ *  This is a registered class which provides a device class template.
+ *  The built-in classes serve as templates and registering a template
+ *  allows regenerating the class from an abstract description (template
+ *  name).
+ *
+ *  NOTE: device classes derived from one of the built-in classes
+ *  cannot be distinguished from pure built-in classes. Entirely
+ *  customized classes are treated as "non-template based" (i.e.
+ *  "is_a" returns 0).
+ */
+class DB_PUBLIC DeviceClassTemplateBase
+{
+public:
+  DeviceClassTemplateBase (const std::string &name)
+    : m_name (name)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual ~DeviceClassTemplateBase () { }
+
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  virtual bool is_of (const db::DeviceClass *) const = 0;
+  virtual DeviceClass *create () const = 0;
+
+  static DeviceClassTemplateBase *template_by_name (const std::string &name);
+  static DeviceClassTemplateBase *is_a (const db::DeviceClass *dc);
+
+private:
+  std::string m_name;
+
+  DeviceClassTemplateBase (const DeviceClassTemplateBase &);
+  DeviceClassTemplateBase &operator= (const DeviceClassTemplateBase &);
+};
+
+template <class T>
+class DB_PUBLIC_TEMPLATE device_class_template
+  : public DeviceClassTemplateBase
+{
+public:
+  device_class_template (const std::string &name)
+    : DeviceClassTemplateBase (name)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual bool is_of (const db::DeviceClass *dc) const
+  {
+    return dynamic_cast<const T *> (dc) != 0;
+  }
+
+  virtual DeviceClass *create () const
+  {
+    return new T ();
+  }
+
+private:
+  device_class_template (const device_class_template &);
+  device_class_template &operator= (const device_class_template &);
 };
 
 }

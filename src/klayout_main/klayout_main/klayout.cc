@@ -44,6 +44,7 @@
 #include "imgForceLink.h"
 #if defined(HAVE_RUBY)
 #include "drcForceLink.h"
+#include "lvsForceLink.h"
 #endif
 
 #if defined(HAVE_QTBINDINGS)

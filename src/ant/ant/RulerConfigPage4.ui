@@ -89,7 +89,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../lay/layResources.qrc">
+            <iconset resource="../../lay/lay/layResources.qrc">
              <normaloff>:/up.png</normaloff>:/up.png</iconset>
            </property>
           </widget>
@@ -103,7 +103,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../lay/layResources.qrc">
+            <iconset resource="../../lay/lay/layResources.qrc">
              <normaloff>:/add.png</normaloff>:/add.png</iconset>
            </property>
           </widget>
@@ -117,7 +117,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../lay/layResources.qrc">
+            <iconset resource="../../lay/lay/layResources.qrc">
              <normaloff>:/del.png</normaloff>:/del.png</iconset>
            </property>
           </widget>
@@ -131,7 +131,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../lay/layResources.qrc">
+            <iconset resource="../../lay/lay/layResources.qrc">
              <normaloff>:/down.png</normaloff>:/down.png</iconset>
            </property>
           </widget>
@@ -866,7 +866,7 @@
   <tabstop>t_snap_cbx</tabstop>
  </tabstops>
  <resources>
-  <include location="../lay/layResources.qrc"/>
+  <include location="../../lay/lay/layResources.qrc"/>
  </resources>
  <connections/>
 </ui>

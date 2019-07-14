@@ -161,53 +161,35 @@ BitmapRenderer::insert (const db::DEdge &e)
   m_edges.push_back (e);
 }
 
+static inline bool point_inside_box (const db::DPoint &pt, const db::DBox &box)
+{
+  return (! (db::coord_traits<db::DBox::coord_type>::equal (pt.x (), box.left ()) || db::coord_traits<db::DBox::coord_type>::equal (pt.x (), box.right ())) &&
+          ! (db::coord_traits<db::DBox::coord_type>::equal (pt.y (), box.bottom ()) || db::coord_traits<db::DBox::coord_type>::equal (pt.y (), box.top ())));
+}
+
 void
 BitmapRenderer::add_xfill ()
 {
-  bool any = false;
-  db::DPoint a1, a2, b1, b2;
-  const double eps = 1e-10;
-
+  db::DBox box;
   for (std::vector<lay::RenderEdge>::const_iterator e = m_edges.begin (); e != m_edges.end (); ++e) {
-
-    db::DPoint p1 = e->p1 ();
-
-    if (!any) {
-
-      a1 = a2 = b1 = b2 = p1;
-      any = true;
-
-    } else {
-
-      db::DVector d;
-
-      d = p1 - a1;
-      if (d.x () - d.y () < -eps) {
-        a1 = p1;
-      }
-
-      d = p1 - a2;
-      if (d.x () - d.y () > eps) {
-        a2 = p1;
-      }
-
-      d = p1 - b1;
-      if (d.x () + d.y () < -eps) {
-        b1 = p1;
-      }
-
-      d = p1 - b2;
-      if (d.x () + d.y () > eps) {
-        b2 = p1;
-      }
-
+    if (! e->is_ortho ()) {
+      return;
     }
-
+    box += e->p1 ();
+    box += e->p2 ();
   }
 
-  if (any) {
-    insert (db::DEdge (a1, a2));
-    insert (db::DEdge (b1, b2));
+  if (! box.empty () && box.area () > 0.0) {
+
+    for (std::vector<lay::RenderEdge>::const_iterator e = m_edges.begin (); e != m_edges.end (); ++e) {
+      if (point_inside_box (e->p1 (), box) || point_inside_box (e->p2 (), box)) {
+        return;
+      }
+    }
+
+    insert (db::DEdge (box.p1 (), box.p2 ()));
+    insert (db::DEdge (box.lower_right (), box.upper_left ()));
+
   }
 }
 
@@ -483,6 +465,9 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
           render_fill (*fill);
         }
         if (frame) {
+          if (m_xfill) {
+            add_xfill ();
+          }
           render_contour (*frame);
         }
 

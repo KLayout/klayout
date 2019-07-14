@@ -55,10 +55,10 @@ public:
   typedef tl::shared_collection<DeviceAbstract> device_abstract_list;
   typedef device_abstract_list::const_iterator const_abstract_model_iterator;
   typedef device_abstract_list::iterator device_abstract_iterator;
-  typedef tl::vector<Circuit *>::const_iterator top_down_circuit_iterator;
-  typedef tl::vector<const Circuit *>::const_iterator const_top_down_circuit_iterator;
-  typedef tl::vector<Circuit *>::const_reverse_iterator bottom_up_circuit_iterator;
-  typedef tl::vector<const Circuit *>::const_reverse_iterator const_bottom_up_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<Circuit *>::iterator, Circuit> top_down_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_iterator, const Circuit>  const_top_down_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<Circuit *>::reverse_iterator, Circuit> bottom_up_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_reverse_iterator, const Circuit> const_bottom_up_circuit_iterator;
 
   /**
    *  @brief Constructor
@@ -137,6 +137,22 @@ public:
    *  @brief Deletes a circuit from the netlist
    */
   void remove_circuit (Circuit *circuit);
+
+  /**
+   *  @brief Purges a circuit from the netlist
+   *  In contrast to "delete", this method will
+   *  also remove subcircuits unless called
+   *  otherwise.
+   */
+  void purge_circuit (Circuit *circuit);
+
+  /**
+   *  @brief Gets the number of circuits
+   */
+  size_t circuit_count () const
+  {
+    return m_circuits.size ();
+  }
 
   /**
    *  @brief Flattens the given circuit
@@ -441,8 +457,16 @@ public:
    *
    *  This method will purge all nets which return "floating". Circuits which don't have any
    *  nets (or only floating ones) and removed. Their subcircuits are disconnected.
+   *
+   *  This method respects the circuit's "dont_purge" flag and will not purge them if this
+   *  flag is set.
    */
   void purge ();
+
+  /**
+   *  @brief Convenience method: simplify (purge, combine devices, ...)
+   */
+  void simplify ();
 
   /**
    *  @brief Combine devices

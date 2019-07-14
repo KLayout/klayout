@@ -344,19 +344,6 @@ public:
   DeepLayer create_copy (const DeepLayer &source, HierarchyBuilderShapeReceiver *pipe);
 
   /**
-   *  @brief Gets the empty working layer
-   *
-   *  This method will deliver an empty layer for the given layout index. CAUTION: don't modify this layer as it may
-   *  be reused.
-   */
-  DeepLayer empty_layer (unsigned int layout_index) const;
-
-  /**
-   *  @brief Gets the empty working layer for the singular layout
-   */
-  DeepLayer empty_layer () const;
-
-  /**
    *  @brief Inserts the deep layer's shapes into some target layout
    */
   void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);
@@ -375,9 +362,11 @@ public:
    *  "layout_index" is the layout to return to it's original. "into_layout" is the original layout, "into_cell"
    *  the original cell.
    *
-   *  "excluded_cells" - if not 0 - will exclude the given cells (and flatten them).
+   *  "excluded_cells" - if not 0 - will exclude the given cells
+   *
+   *  "included_cells" - if not 0 - will only include the given cells in the cell mapping
    */
-  const db::CellMapping &cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells = 0);
+  const db::CellMapping &cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells = 0, const std::set<db::cell_index_type> *included_cells = 0);
 
   /**
    *  @brief Create cell variants from the given variant collector

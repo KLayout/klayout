@@ -815,14 +815,18 @@ const char *color_icon =
   "xxxxE44ExxD33Dxxxx"
   "xxxxxeexxxxddxxxxx";
 
-void 
-ColorButton::build_menu ()
+void
+ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *browse_slot, const char *selected_slot)
 {
-  menu ()->clear ();
+  tl_assert (selected_slot != 0);
 
-  menu ()->addAction (QObject::tr ("Automatic"), this, SLOT (menu_selected ()))->setData (QVariant (QColor ()));
-  menu ()->addAction (QObject::tr ("Choose ..."), this, SLOT (browse_selected ()));
-  menu ()->addSeparator ();
+  menu->clear ();
+
+  menu->addAction (QObject::tr ("Automatic"), receiver, selected_slot)->setData (QVariant (QColor ()));
+  if (browse_slot) {
+    menu->addAction (QObject::tr ("Choose ..."), receiver, browse_slot);
+  }
+  menu->addSeparator ();
 
   try {
 
@@ -858,7 +862,7 @@ ColorButton::build_menu ()
           }
         }
 
-        submenu = menu ()->addMenu (QPixmap::fromImage (icon), tl::to_qstring (tl::sprintf ("#%d .. %d", i + 1, std::min (i + 6, palette.colors ()))));
+        submenu = menu->addMenu (QPixmap::fromImage (icon), tl::to_qstring (tl::sprintf ("#%d .. %d", i + 1, std::min (i + 6, palette.colors ()))));
 
       }
 
@@ -868,11 +872,17 @@ ColorButton::build_menu ()
       QPixmap icon (16, 16);
       icon.fill (color);
 
-      submenu->addAction (QIcon (icon), tl::to_qstring (name), this, SLOT (menu_selected ()))->setData (QVariant (color));
+      submenu->addAction (QIcon (icon), tl::to_qstring (name), receiver, selected_slot)->setData (QVariant (color));
 
     }
 
   } catch (...) { }
+}
+
+void 
+ColorButton::build_menu ()
+{
+  build_color_menu (menu (), this, SLOT (browse_selected ()), SLOT (menu_selected ()));
 }
 
 void

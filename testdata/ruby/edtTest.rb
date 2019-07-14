@@ -109,6 +109,16 @@ class EDT_TestClass < TestBase
     assert_equal(p.trans.to_s, "r0 *1 0,0")
     assert_equal(p.source_trans.to_s, "r0 *1 0,0")
 
+    # ObjectInstPath from RecursiveShapeIterator
+
+    si = tc.begin_shapes_rec(li)
+    oi = RBA::ObjectInstPath::new(si, 2)
+
+    assert_equal(oi.cv_index, 2)
+    assert_equal(oi.shape.to_s, si.shape.to_s)
+    assert_equal(oi.cell_index, si.cell.cell_index)
+    assert_equal(oi.top, tc.cell_index)
+
   end
 
   # Selection

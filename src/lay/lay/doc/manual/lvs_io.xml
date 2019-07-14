@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>LVS Input/Output</title>
+  <keyword name="LVS"/>
+  <keyword name="LVS Input Output"/>
+  <keyword name="LVS SPICE"/>
+
+  <h2-index/>
+
+  <p>
+  LVS (and also DRC as far as netlist extraction is concerned) provides interfaces
+  to write and read netlists/schematics, annotated layout and LVS results.
+  There are three major categories of I/O:
+  </p>
+
+  <ul>
+    <li><b>Netlist</b>: this is the plain circuit information. With subcircuit this 
+    forms a hierarchical netlist. Currently, the format available to import and export
+    netlists is a certain SPICE netlist flavor. It's possible to customize the reading
+    and writing process to achieve some flexibility.
+    </li>
+    <li><b>Layout-to-netlist database (L2N DB)</b>: also called extracted netlist or annotated layout.
+    This is the netlist taken from the original layout together with the corresponding shapes.
+    This database allows reconstructing a net geometrically as far as non-device shapes
+    are involved. Devices are abstracted by their terminal geometries.
+    </li>
+    <li><b>LVS result database (LVS DB)</b>: this is the L2N database plus the reference netlist
+    and a "cross reference": a list of paired circuits, nets, devices, pins and subcircuits 
+    and status information. The cross-reference is both a lookup table and a debugging 
+    aid.
+    </li>
+  </ul>
+
+  <h2>Writing netlists</h2>
+
+  <p>
+  You can write a netlist file to supply netlists for (functional) simulators for example. 
+  Within LVS scripts, the global "target_netlist" statement triggers writing of a netlist
+  (see <a href="/about/drc_ref_global.xml#target_netlist">target_netlist</a> for details).
+  </p>
+
+  <pre>target_netlist("output.cir", write_spice, "Created by KLayout")</pre>
+
+  <p>
+  This statement can basically appear anywhere in the LVS script. The netlist will 
+  written after the script has executed successfully. The first argument is 
+  the file's path (by default relative to the original layout file). The second
+  argument is the "writer". "write_spice" creates a netlist writer writing SPICE 
+  format with a limited degree of flexbility. See below for customizing the writer.
+  The third argument finally is an (optional) comment which will be written into
+  the netlist as a header.
+  </p>
+
+  <p>
+  The "write_spice" configuration function has two options:
+  </p>
+
+  <pre>write_spice(use_net_names, with_comments)</pre>
+
+  <p>
+  Both options are boolean values. If true and present, the first option will make
+  the writer use the real net's names instead of numerical IDs. If true and present,
+  "with_comments" will embed debug comments into the netlist showing instance
+  locations, pin names etc.
+  </p>
+
+  <p>
+  Further customization can be achieved by providing an explicit SPICE writer
+  with a delegate (see <class_doc href="NetlistSpiceWriterDelegate"/>). For
+  doing so, subclass NetlistSpiceWriterDelegate and reimplement one
+  or several of the methods provided for reimplementation. Those are 
+  <class_doc href="NetlistSpiceWriterDelegate#write_device"/>, 
+  <class_doc href="NetlistSpiceWriterDelegate#write_device_intro"/> and
+  <class_doc href="NetlistSpiceWriterDelegate#write_header"/>.
+  </p>
+
+  <p>
+  Here is an example that supplied subcircuit models rather than 
+  device elements:
+  </p>
+
+  <pre># Write extracted netlist to extracted.cir using a special
+# writer delegate
+
+# This delegate makes the writer emit subcicuit calls instead of 
+# standard elements for the devices
+class SubcircuitModels &lt; RBA::NetlistSpiceWriterDelegate
+
+  def write_header
+    emit_line(".INCLUDE 'models.cir'")
+  end
+
+  def write_device(device)
+    str = "X" + device.expanded_name
+    device_class = device.device_class
+    device_class.terminal_definitions.each do |td|
+      str += " " + net_to_string(device.net_for_terminal(td.id))
+    end
+    str += " " + device_class.name
+    str += " PARAMS:"
+    device_class.parameter_definitions.each do |pd|
+      str += " " + pd.name + ("=%.12g" % device.parameter(pd.id))
+    end
+    emit_line(str)
+  end      
+
+end
+
+# Prepare a writer using the new delegate
+custom_spice_writer = RBA::NetlistSpiceWriter::new(SubcircuitModels::new)
+custom_spice_writer.use_net_names= true
+custom_spice_writer.with_comments = false
+
+# The declaration of netlist production using the new custom writer
+target_netlist("extracted.cir", custom_spice_writer, "Extracted by KLayout")</pre>
+
+  <p>
+  This script will produce the following netlist for the simple inverter
+  from the LVS introduction. Instead of printing "M" elements - which is the
+  default - subcircuit calls are produced. This allows putting more elaborate
+  models into subcircuits. The device class name addresses these model
+  subcircuits:
+  </p>
+
+  <pre>* Extracted by KLayout
+.INCLUDE 'models.cir'
+
+.SUBCKT INVERTER
+X$1 VDD IN OUT NWELL PMOS PARAMS: L=0.25 W=1.5 AS=0.675 AD=0.675 PS=3.9 PD=3.9
+X$2 VSS IN OUT SUBSTRATE NMOS PARAMS: L=0.25 W=0.9 AS=0.405 AD=0.405 PS=2.7
++ PD=2.7
+.ENDS INVERTER</pre>
+
+  <p>
+  Netlists can be written directly from the netlist object. Within the script, the
+  netlist object can be obtained with the <a href="/about/drc_ref_global.xml#netlist">netlist</a> function.
+  This function will first trigger a netlist extraction unless this was done already and
+  return a <class_doc href="Netlist"/> object. Use <class_doc href="Netlist#write"/> to 
+  write this netlist object then. Unlike "target_netlist", this method is executed immediately and
+  this way, a single netlist can be written to multiple files in different flavours.
+  </p>
+
+  <h2>Reading netlists</h2>
+
+  <p>
+  The main use case for reading netlists is for comparison in LVS.
+  Reference netlists are read with the "schematic" function
+  (see <a href="/about/drc_ref_global.xml#schematic">schematic</a>):
+  </p>
+
+  <pre>schematic("inverter.cir")</pre>
+
+  <p>
+  Currently SPICE is understood with some limitations:
+  </p>
+
+  <ul>
+    <li>Parametrized circuits are not permitted except for device subcircuits 
+        (with a delegate)</li>
+    <li>Only a subset of elements is implemented by default. These are
+        "M" (gives "MOS4" device classes), "Q" (gives BJT3 or BJT4 device
+        classes), "R" (gives Resistor device classes), "C" (gives
+        Capacitor device classes) and "D" (gives diode device classes).</li>
+  </ul>
+
+  <p>
+  As for the SPICE reader, a delegate can be provided to customize the reader.
+  For doing so, subclass the <class_doc href="NetlistSpiceReaderDelegate"/>
+  class and reimplement the methods provided. These are:
+  <class_doc href="NetlistSpiceReaderDelegate#wants_subcircuit"/>,
+  <class_doc href="NetlistSpiceReaderDelegate#element"/>,
+  <class_doc href="NetlistSpiceReaderDelegate#finish"/> and
+  <class_doc href="NetlistSpiceReaderDelegate#start"/>
+  </p>
+
+  <p>
+  This example customizes a reader to pull MOS devices from
+  subcircuit models rather than from "M" elements. Basically this
+  customization does the opposite part of the writer customization
+  before (only for MOS devices).
+  </p>
+
+  <pre># Provides a SPICE netlist reader delegate which turns
+# some subcircuit models (for subcircuits NMOS and PMOS)
+# into devices
+
+class SubcircuitModelsReader &lt; RBA::NetlistSpiceReaderDelegate
+
+  # says we want to catch these subcircuits as devices
+  def wants_subcircuit(name)
+    name == "NMOS" || name == "PMOS"
+  end
+
+  # translate the element
+  def element(circuit, el, name, model, value, nets, params)
+
+    if el != "X"
+      # all other elements are left to the standard implementation
+      return super
+    end
+
+    if nets.size != 4
+      error("Subcircuit #{model} needs four nodes")
+    end
+
+    # provide a device class
+    cls = circuit.netlist.device_class_by_name(model)
+    if ! cls
+      cls = RBA::DeviceClassMOS4Transistor::new
+      cls.name = model
+      circuit.netlist.add(cls)
+    end
+
+    # create a device
+    device = circuit.create_device(cls, name)
+
+    # and configure the device
+    [ "S", "G", "D", "B" ].each_with_index do |t,index|
+      device.connect_terminal(t, nets[index])
+    end
+    params.each do |p,value|
+      device.set_parameter(p, value)
+    end
+
+  end
+
+end
+
+# Instantiate a reader using the new delegate
+reader = RBA::NetlistSpiceReader::new(SubcircuitModelsReader::new)
+
+# Import the schematic with this reader
+schematic("inv_xmodels.cir", reader)</pre>
+        
+  <h2>Layout-to-Netlist database/report</h2>
+
+  <p>
+  The layout-to-netlist database (L2N DB) is written using the global
+  <a href="/about/drc_ref_global.xml#report_netlist">report_netlist</a> function.
+  This function can be put anywhere in the script. Writing will happen after the
+  script executed successfully:
+  </p>
+
+  <pre>report_netlist("extracted.l2n")</pre>
+
+  <p>
+  Without the filename, only the netlist browser will be opened but no
+  file will be written. The layout-to-netlist database is a KLayout-specific format. 
+  It contains the netlist information plus the shape and instance information
+  from the layout. L2N databases can be read into the netlist browser for example.
+  Hence exchange of extracted netlists is possible.
+  </p>
+
+  <h2>Layout-vs-Schematic database/report</h2>
+
+  <p>
+  The Layout-vs-schematic database (LVS DB) is written using the global
+  <a href="/about/lvs_ref_global.xml#report_lvs">report_lvs</a> function.
+  This function can be put anywhere in the script. Writing will happen after the
+  script executed successfully:
+  </p>
+
+  <pre>report_lvs("extracted.lvsdb")</pre>
+
+  <p>
+  Without the filename, only the netlist browser will be opened but no
+  file will be written. The LVS database is a KLayout-specific format. 
+  It contains the extracted netlist information, the reference netlist and the
+  cross-reference table. LVS databases can be read into the netlist browser for example.
+  Hence exchange of LVS reports is possible.
+  </p>
+
+</doc>

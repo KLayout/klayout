@@ -29,6 +29,7 @@
 #include "rba.h"
 
 #include "tlClassRegistry.h"
+#include "tlFileUtils.h"
 
 #include <cstdio>
 
@@ -189,15 +190,19 @@ public:
     return m_suffix;
   }
 
-  lym::Macro *create_template (const std::string &name) 
+  lym::Macro *create_template (const std::string &url)
   {
     if (! mp_registration) {
       throw std::runtime_error (tl::to_string (QObject::tr ("MacroInterpreter::create_template must be called after register")));
     }
 
     lym::Macro *m = new lym::Macro ();
+    if (! url.empty ()) {
+      m->load_from (url);
+    }
 
-    m->rename (name);
+    m->rename (tl::basename (url));
+
     m->set_readonly (true);
     m->set_dsl_interpreter (m_name);
     m->set_interpreter (lym::Macro::DSLInterpreter);
@@ -281,10 +286,9 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "is set to 'dsl' can use this object to run the script. For executing a script, the system will "
     "call the interpreter's \\execute method.\n"
   ) + 
-  gsi::method ("create_template", &MacroInterpreter::create_template,
+  gsi::method ("create_template", &MacroInterpreter::create_template, gsi::arg ("url"),
     "@brief Creates a new macro template\n"
-    "@args name\n"
-    "@param name The template name. This is an arbitrary string which should be unique.\n"
+    "@url The template will be initialized from that URL.\n"
     "\n"
     "This method will create a register a new macro template. It returns a \\Macro object which "
     "can be modified in order to adjust the template (for example to set description, add a content, "

@@ -397,7 +397,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, 0, 0, 0);
+    l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, 0);
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
@@ -424,7 +424,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", 0, 0);
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, 0);
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
@@ -451,7 +451,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, 0, "CIRCUIT_", 0);
+    l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
@@ -478,7 +478,61 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", "CIRCUIT_", "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (42), db::LayoutToNetlist::BNH_Flatten, 0, 0);
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "device_extract_au1_rebuild_pf.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+
+  {
+    db::Layout ly2;
+    ly2.dbu (ly.dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = &rnsd;
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = rpoly.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = rdiff_cont.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = rpoly_cont.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = rmetal1.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
+
+    l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (42), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
+
+    std::string au = tl::testsrc ();
+    au = tl::combine_path (au, "testdata");
+    au = tl::combine_path (au, "algo");
+    au = tl::combine_path (au, "device_extract_au1_rebuild_pr.gds");
+
+    db::compare_layouts (_this, ly2, au);
+  }
+
+  {
+    db::Layout ly2;
+    ly2.dbu (ly.dbu ());
+    db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
+
+    db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
+
+    std::map<unsigned int, const db::Region *> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = &rnsd;
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = rpoly.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = rdiff_cont.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = rpoly_cont.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = rmetal1.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
+
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
@@ -1016,7 +1070,7 @@ TEST(3_GlobalNetConnections)
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (-2.0, 1.8))), "(null)");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (-1.5, 1.8))), "RINGO:FB");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (24.5, 1.8))), "RINGO:OSC");
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:BULK,VSS");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:VSS");
 
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I22");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "INV2PAIR:$I4");
@@ -1031,12 +1085,12 @@ TEST(3_GlobalNetConnections)
   //  compare netlist as string
   CHECKPOINT ();
   db::compare_netlist (_this, *l2n.netlist (),
-    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');\n"
-    "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
-    "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
-    "  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);\n"
-    "  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);\n"
-    "  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);\n"
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);\n"
     "end;\n"
     "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
     "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
@@ -1303,7 +1357,7 @@ TEST(4_GlobalNetDeviceExtraction)
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (-2.0, 1.8))), "(null)");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (-1.5, 1.8))), "RINGO:FB");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (24.5, 1.8))), "RINGO:OSC");
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:BULK,VSS");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:VSS");
 
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I22");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "INV2PAIR:$I4");
@@ -1318,12 +1372,12 @@ TEST(4_GlobalNetDeviceExtraction)
   //  compare netlist as string
   CHECKPOINT ();
   db::compare_netlist (_this, *l2n.netlist (),
-    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');\n"
-    "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);\n"
-    "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);\n"
-    "  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);\n"
-    "  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);\n"
-    "  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);\n"
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);\n"
     "end;\n"
     "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
     "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
@@ -1590,7 +1644,7 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (-2.0, 1.8))), "(null)");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (-1.5, 1.8))), "RINGO:FB");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (24.5, 1.8))), "RINGO:OSC");
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:BULK,VSS");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:VSS");
 
   // doesn't do anything here, but we test that this does not destroy anything:
   l2n.netlist ()->combine_devices ();
@@ -1602,12 +1656,12 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   //  compare netlist as string
   CHECKPOINT ();
   db::compare_netlist (_this, *l2n.netlist (),
-    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');\n"
-    "  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=FB,$5=$I7,$6=OSC,$7=VDD);\n"
-    "  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=FB,$6=$I13,$7=VDD);\n"
-    "  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=$I13,$6=$I5,$7=VDD);\n"
-    "  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=$I5,$6=$I6,$7=VDD);\n"
-    "  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=VDD,$3='BULK,VSS',$4=(null),$5=$I6,$6=$I7,$7=VDD);\n"
+    "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV2PAIR $1 (BULK=VSS,$2=VDD,$3=VSS,$4=FB,$5=$I7,$6=OSC,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=VDD,$3=VSS,$4=(null),$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=VDD,$3=VSS,$4=(null),$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=VDD,$3=VSS,$4=(null),$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=VDD,$3=VSS,$4=(null),$5=$I6,$6=$I7,$7=VDD);\n"
     "end;\n"
     "circuit INV2PAIR (BULK=BULK,$2=$I6,$3=$I5,$4=$I4,$5=$I3,$6=$I2,$7=$I1);\n"
     "  subcircuit INV2 $1 ($1=$I1,IN=$I3,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
@@ -2499,3 +2553,205 @@ TEST(10_Antenna)
   db::compare_layouts (_this, ly2, au);
 }
 
+TEST(11_DuplicateInstances)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int nwell      = define_layer (ly, lmap, 1);
+  unsigned int active     = define_layer (ly, lmap, 2);
+  unsigned int poly       = define_layer (ly, lmap, 3);
+  unsigned int poly_lbl   = define_layer (ly, lmap, 3, 1);
+  unsigned int diff_cont  = define_layer (ly, lmap, 4);
+  unsigned int poly_cont  = define_layer (ly, lmap, 5);
+  unsigned int metal1     = define_layer (ly, lmap, 6);
+  unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
+  unsigned int via1       = define_layer (ly, lmap, 7);
+  unsigned int metal2     = define_layer (ly, lmap, 8);
+  unsigned int metal2_lbl = define_layer (ly, lmap, 8, 1);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l1_dup_inst.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
+
+  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::auto_ptr<db::Region> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::auto_ptr<db::Region> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::auto_ptr<db::Region> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+
+  //  derived regions
+
+  db::Region rpactive = *ractive & *rnwell;
+  db::Region rpgate   = rpactive & *rpoly;
+  db::Region rpsd     = rpactive - rpgate;
+
+  db::Region rnactive = *ractive - *rnwell;
+  db::Region rngate   = rnactive & *rpoly;
+  db::Region rnsd     = rnactive - rngate;
+
+  db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
+
+  //  device extraction
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rpgate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  l2n.extract_devices (pmos_ex, dl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rngate;
+  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+  l2n.extract_devices (nmos_ex, dl);
+
+  //  return the computed layers into the original layout and write it for debugging purposes
+  //  NOTE: this will include the device layers too
+
+  unsigned int lgate  = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> Gate
+  unsigned int lsd    = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> Source/Drain
+  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> P Diffusion
+  unsigned int lndiff = ly.insert_layer (db::LayerProperties (13, 0));      // 13/0 -> N Diffusion
+  unsigned int lpoly  = ly.insert_layer (db::LayerProperties (14, 0));      // 14/0 -> Poly with gate terminal
+
+  rpgate.insert_into (&ly, tc.cell_index (), lgate);
+  rngate.insert_into (&ly, tc.cell_index (), lgate);
+  rpsd.insert_into (&ly, tc.cell_index (), lsd);
+  rnsd.insert_into (&ly, tc.cell_index (), lsd);
+  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
+  rnsd.insert_into (&ly, tc.cell_index (), lndiff);
+  rpoly->insert_into (&ly, tc.cell_index (), lpoly);
+
+  //  net extraction
+
+  l2n.register_layer (rpsd, "psd");
+  l2n.register_layer (rnsd, "nsd");
+
+  //  Intra-layer
+  l2n.connect (rpsd);
+  l2n.connect (rnsd);
+  l2n.connect (*rpoly);
+  l2n.connect (*rdiff_cont);
+  l2n.connect (*rpoly_cont);
+  l2n.connect (*rmetal1);
+  l2n.connect (*rvia1);
+  l2n.connect (*rmetal2);
+  //  Inter-layer
+  l2n.connect (rpsd,        *rdiff_cont);
+  l2n.connect (rnsd,        *rdiff_cont);
+  l2n.connect (*rpoly,      *rpoly_cont);
+  l2n.connect (*rpoly_cont, *rmetal1);
+  l2n.connect (*rdiff_cont, *rmetal1);
+  l2n.connect (*rmetal1,    *rvia1);
+  l2n.connect (*rvia1,      *rmetal2);
+  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
+  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
+  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
+
+  //  create some mess - we have to keep references to the layers to make them not disappear
+  rmetal1_lbl.reset (0);
+  rmetal2_lbl.reset (0);
+  rpoly_lbl.reset (0);
+
+  l2n.extract_netlist ();
+
+  //  debug layers produced for nets
+  //    202/0 -> Active
+  //    203/0 -> Poly
+  //    204/0 -> Diffusion contacts
+  //    205/0 -> Poly contacts
+  //    206/0 -> Metal1
+  //    207/0 -> Via1
+  //    208/0 -> Metal2
+  //    210/0 -> N source/drain
+  //    211/0 -> P source/drain
+  std::map<const db::Region *, unsigned int> dump_map;
+  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (210, 0));
+  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (211, 0));
+  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (203, 0));
+  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (204, 0));
+  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (205, 0));
+  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (206, 0));
+  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (207, 0));
+  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (208, 0));
+
+  //  write nets to layout
+  db::CellMapping cm = l2n.cell_mapping_into (ly, tc, true /*with device cells*/);
+  dump_nets_to_layout (l2n, ly, dump_map, cm);
+
+  dump_map.clear ();
+  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (310, 0));
+  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (311, 0));
+  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (303, 0));
+  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (304, 0));
+  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (305, 0));
+  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (306, 0));
+  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (307, 0));
+  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (308, 0));
+
+  dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
+
+  //  compare the collected test data
+
+  std::string au = tl::testsrc ();
+  au = tl::combine_path (au, "testdata");
+  au = tl::combine_path (au, "algo");
+  au = tl::combine_path (au, "device_extract_au1_dup_inst_with_rec_nets.gds");
+
+  db::compare_layouts (_this, ly, au);
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, *l2n.netlist (),
+    "circuit RINGO ();\n"
+    "  subcircuit INV2 $1 (IN=$I12,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=$I25,OUT=$I1,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $3 (IN=$I1,$2=$I26,OUT=$I2,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $4 (IN=$I2,$2=$I27,OUT=$I3,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $5 (IN=$I3,$2=$I28,OUT=$I4,$4=VSS,$5=VDD);\n"
+    "  subcircuit BLOCK $6 ($1=$I29,$2=VDD,$3=VSS,$4=$I11,$5=$I5,$6=$I4,$7=$I12);\n"
+    "  subcircuit INV2 $7 (IN=$I11,$2=$I29,OUT=$I5,$4=VSS,$5=VDD);\n"
+    "end;\n"
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  device NMOS $3 (S=$2,G=IN,D=$4) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
+    "  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);\n"
+    "  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);\n"
+    "  subcircuit TRANS $3 ($1=$5,$2=OUT,$3=$2);\n"
+    "  subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);\n"
+    "end;\n"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
+    "circuit BLOCK ($1=$I21,$2=$I14,$3=$I10,$4=$I9,$5=$I6,$6=$I5,$7=$I3);\n"
+    "  subcircuit INV2 $1 (IN=$I6,$2=$I22,OUT=$I1,$4=$I10,$5=$I14);\n"
+    "  subcircuit INV2 $2 (IN=$I9,$2=$I21,OUT=$I6,$4=$I10,$5=$I14);\n"
+    "  subcircuit INV2 $3 (IN=$I2,$2=$I20,OUT=$I3,$4=$I10,$5=$I14);\n"
+    "  subcircuit INV2 $4 (IN=$I1,$2=$I19,OUT=$I2,$4=$I10,$5=$I14);\n"
+    "  subcircuit INV2 $5 (IN=$I5,$2=$I18,OUT=$I9,$4=$I10,$5=$I14);\n"
+    "end;\n"
+  );
+}

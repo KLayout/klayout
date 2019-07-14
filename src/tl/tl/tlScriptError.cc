@@ -67,17 +67,17 @@ BacktraceElement::to_string() const
 std::string
 ScriptError::basic_msg () const
 {
-  std::string m = tl::Exception::msg ();
-  if (! m_context.empty ()) {
-    m += tl::to_string (tr (" in ")) + m_context;
-  }
-  return m;
+  return tl::Exception::msg ();
 }
 
 std::string 
 ScriptError::msg () const
 {
   std::string m = basic_msg ();
+
+  if (! m_context.empty ()) {
+    m += tl::to_string (tr (" in ")) + m_context;
+  }
 
   for (std::vector<BacktraceElement>::const_iterator bt = backtrace ().begin (); bt != backtrace ().end (); ++bt) {
     m += "\n  ";

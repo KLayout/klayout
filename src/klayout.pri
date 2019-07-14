@@ -2,6 +2,7 @@
 TL_INC = $$PWD/tl/tl
 DB_INC = $$PWD/db/db
 DRC_INC = $$PWD/drc/drc
+LVS_INC = $$PWD/lvs/lvs
 EDT_INC = $$PWD/edt/edt
 EXT_INC = $$PWD/ext/ext
 GSI_INC = $$PWD/gsi/gsi

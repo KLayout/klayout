@@ -30,6 +30,7 @@
 #include "dbShapes.h"
 #include "dbShape.h"
 #include "dbEdgeProcessor.h"
+#include "dbRegion.h"
 
 #include "tlProgress.h"
 #include "tlFixedVector.h"
@@ -44,6 +45,7 @@ namespace db
 class RecursiveShapeIterator;
 class NetTracerLayerElement;
 class NetTracerData;
+class LayoutToNetlist;
 
 /**
  *  @brief A shape heap where intermediate shapes can be placed into
@@ -261,6 +263,43 @@ public:
   enum Operator { OPNone, OPOr, OPNot, OPAnd, OPXor };
 
   /**
+   *  @brief A helper class wrapping a Region with a tl::Object
+   *  This way we can use tl::shared_ptr<RegionHolder> to manage the
+   *  region's lifetime.
+   */
+  class RegionHolder
+    : public tl::Object
+  {
+  public:
+    RegionHolder ()
+      : mp_region (0)
+    { }
+
+    RegionHolder (db::Region *region)
+      : mp_region (region)
+    { }
+
+    ~RegionHolder ()
+    {
+      delete mp_region;
+      mp_region = 0;
+    }
+
+    db::Region *get ()
+    {
+      return mp_region;
+    }
+
+    const db::Region *get () const
+    {
+      return mp_region;
+    }
+
+  private:
+    db::Region *mp_region;
+  };
+
+  /**
    *  @brief Default Constructor
    */
   NetTracerLayerExpression ();
@@ -383,12 +422,18 @@ public:
    */
   std::string to_string () const;
 
+  /**
+   *  @brief Create a corresponding region inside a LayoutToNetlist object
+   */
+  tl::shared_ptr<RegionHolder> make_l2n_region (db::LayoutToNetlist &l2n, std::map<unsigned int, tl::shared_ptr<RegionHolder> > &region_cache, const std::string &name);
+
 private:
   int m_a, m_b;
   NetTracerLayerExpression *mp_a, *mp_b;
   Operator m_op;
 
   void collect_original_layers (std::set<unsigned int> &l) const;
+  tl::shared_ptr<NetTracerLayerExpression::RegionHolder> make_l2n_region_for_org (db::LayoutToNetlist &l2n, std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > &region_cache, int org_index, const std::string &name);
 };
 
 /**
@@ -571,6 +616,16 @@ public:
     return m_connections.empty ();
   }
 
+  /**
+   *  @brief Prepares the connectivity for a LayoutToNetlist object
+   *
+   *  This method will provide the necessary regions for LayoutToNetlist,
+   *  perform the boolean operations if required and set up the connectivity
+   *  accordingly. The LayoutToNetlist object then is ready for netlist
+   *  extraction.
+   */
+  void configure_l2n (db::LayoutToNetlist &l2n);
+
 private:
   unsigned int m_next_log_layer;
   std::vector <NetTracerConnection> m_connections;
@@ -580,9 +635,11 @@ private:
   mutable std::map <unsigned int, NetTracerLayerExpression *> m_log_layers;
   mutable std::map <unsigned int, std::pair <std::set <unsigned int>, std::set <unsigned int> > > m_requires_booleans;
   std::map <std::string, unsigned int> m_symbols;
+  std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > m_l2n_regions;
 
   void add_layer_pair (unsigned int a, unsigned int b);
   void add_layers (unsigned int a, unsigned int b);
+  void clean_l2n_regions ();
 };
 
 /**

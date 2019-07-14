@@ -99,6 +99,9 @@ public:
   /**
    *  @brief Net a or b doesn't match
    *  "a" is null if there is no match for b and vice versa.
+   *  In some cases, a mismatch is reported with two nets given. This means,
+   *  nets are known not to match. Still the compare algorithm will proceed as
+   *  if these nets were equivalent to derive further matches.
    */
   virtual void net_mismatch (const db::Net * /*a*/, const db::Net * /*b*/) { }
 
@@ -155,7 +158,7 @@ public:
   /**
    *  @brief Constructor
    */
-  NetlistComparer (NetlistCompareLogger *logger);
+  NetlistComparer (NetlistCompareLogger *logger = 0);
 
   /**
    *  @brief Mark two nets as identical
@@ -258,12 +261,17 @@ public:
    */
   bool compare (const db::Netlist *a, const db::Netlist *b) const;
 
+  /**
+   *  @brief Actually compares the two netlists using the given logger
+   */
+  bool compare (const db::Netlist *a, const db::Netlist *b, db::NetlistCompareLogger *logger) const;
+
 protected:
   bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const;
   bool all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const;
   static void derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinMapper *circuit_pin_mapper);
 
-  NetlistCompareLogger *mp_logger;
+  mutable NetlistCompareLogger *mp_logger;
   std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > > m_same_nets;
   std::auto_ptr<CircuitPinMapper> mp_circuit_pin_mapper;
   std::auto_ptr<DeviceCategorizer> mp_device_categorizer;

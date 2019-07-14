@@ -61,6 +61,10 @@ public:
   }
 
   static size_t param_id_R;
+  static size_t param_id_L;
+  static size_t param_id_W;
+  static size_t param_id_A;
+  static size_t param_id_P;
 
   static size_t terminal_id_A;
   static size_t terminal_id_B;
@@ -72,6 +76,27 @@ public:
   {
     return terminal_id_A;
   }
+};
+
+/**
+ *  @brief A resistor device class with a bulk terminal (well, bulk)
+ *  In addition to DeviceClassResistor, this class defines a third terminal
+ *  ("W") for the bulk or well connection.
+ */
+class DB_PUBLIC DeviceClassResistorWithBulk
+  : public db::DeviceClassResistor
+{
+public:
+  DeviceClassResistorWithBulk ();
+
+  virtual db::DeviceClass *clone () const
+  {
+    return new DeviceClassResistorWithBulk (*this);
+  }
+
+  static size_t terminal_id_W;
+
+  virtual bool combine_devices (Device *a, Device *b) const;
 };
 
 /**
@@ -91,6 +116,8 @@ public:
   }
 
   static size_t param_id_C;
+  static size_t param_id_A;
+  static size_t param_id_P;
 
   static size_t terminal_id_A;
   static size_t terminal_id_B;
@@ -98,10 +125,31 @@ public:
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
 
-  virtual size_t normalize_terminal_id (size_t) const
+  virtual size_t normalize_terminal_id (size_t id) const
   {
-    return terminal_id_A;
+    return id == terminal_id_B ? terminal_id_A : id;
   }
+};
+
+/**
+ *  @brief A capacitor device class with a bulk terminal (well, bulk)
+ *  In addition to DeviceClassCapacitor, this class defines a third terminal
+ *  ("W") for the bulk or well connection.
+ */
+class DB_PUBLIC DeviceClassCapacitorWithBulk
+  : public db::DeviceClassCapacitor
+{
+public:
+  DeviceClassCapacitorWithBulk ();
+
+  virtual db::DeviceClass *clone () const
+  {
+    return new DeviceClassCapacitorWithBulk (*this);
+  }
+
+  static size_t terminal_id_W;
+
+  virtual bool combine_devices (Device *a, Device *b) const;
 };
 
 /**
@@ -128,9 +176,9 @@ public:
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
 
-  virtual size_t normalize_terminal_id (size_t) const
+  virtual size_t normalize_terminal_id (size_t id) const
   {
-    return terminal_id_A;
+    return id == terminal_id_B ? terminal_id_A : id;
   }
 };
 
@@ -147,6 +195,7 @@ public:
   DeviceClassDiode ();
 
   static size_t param_id_A;
+  static size_t param_id_P;
 
   static size_t terminal_id_A;
   static size_t terminal_id_C;
@@ -221,6 +270,63 @@ public:
   virtual size_t normalize_terminal_id (size_t tid) const
   {
     return tid == terminal_id_D ? terminal_id_S : tid;
+  }
+
+  virtual bool combine_devices (Device *a, Device *b) const;
+};
+
+/**
+ *  @brief A bipolar transistor device class with three terminals
+ *  A MOSFET defines two parameters: "AE" for the emitter area in square micrometers and "PE" for the emitter perimeter
+ *  in micrometers.
+ *  The bipolar transistor defines three terminals, "C", "B" and "E" for collector, base and emitter.
+ */
+class DB_PUBLIC DeviceClassBJT3Transistor
+  : public db::DeviceClass
+{
+public:
+  DeviceClassBJT3Transistor ();
+
+  static size_t param_id_AE;
+  static size_t param_id_PE;
+  static size_t param_id_AB;
+  static size_t param_id_PB;
+  static size_t param_id_AC;
+  static size_t param_id_PC;
+  static size_t param_id_NE;
+
+  static size_t terminal_id_C;
+  static size_t terminal_id_B;
+  static size_t terminal_id_E;
+
+  virtual db::DeviceClass *clone () const
+  {
+    return new DeviceClassBJT3Transistor (*this);
+  }
+
+  virtual bool combine_devices (Device *a, Device *b) const;
+  virtual bool supports_parallel_combination () const { return true; }
+
+protected:
+  void combine_parameters (Device *a, Device *b) const;
+};
+
+/**
+ *  @brief A basic bipolar transistor class with four terminals
+ *  The four-terminal BJT behaves identical to the three-terminal one but adds one more
+ *  terminal for the substrate.
+ */
+class DB_PUBLIC DeviceClassBJT4Transistor
+  : public DeviceClassBJT3Transistor
+{
+public:
+  DeviceClassBJT4Transistor ();
+
+  static size_t terminal_id_S;
+
+  virtual db::DeviceClass *clone () const
+  {
+    return new DeviceClassBJT4Transistor (*this);
   }
 
   virtual bool combine_devices (Device *a, Device *b) const;

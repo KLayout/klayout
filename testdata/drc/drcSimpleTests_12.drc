@@ -54,7 +54,7 @@ connect(metal2,    metal2_lbl)
 
 # Actually performs the extraction
 
-join_nets("{VDDZ,VSSZ,NEXT,FB}")
+connect_implicit("{VDDZ,VSSZ,NEXT,FB}")
 
 netlist = l2n_data.netlist
 

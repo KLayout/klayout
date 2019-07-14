@@ -23,6 +23,7 @@
 #include "tlUnitTest.h"
 #include "dbNetlistDeviceClasses.h"
 #include "dbNetlistCompare.h"
+#include "dbNetlistCrossReference.h"
 
 class NetlistCompareTestLogger
   : public db::NetlistCompareLogger
@@ -161,6 +162,114 @@ private:
     return x ? x->expanded_name () : "(null)";
   }
 };
+
+std::string xref_status2s (db::NetlistCrossReference::Status status)
+{
+  if (status == db::NetlistCrossReference::Match) {
+    return "Match";
+  } else if (status == db::NetlistCrossReference::Mismatch) {
+    return "Mismatch";
+  } else if (status == db::NetlistCrossReference::NoMatch) {
+    return "NoMatch";
+  } else if (status == db::NetlistCrossReference::MatchWithWarning) {
+    return "MatchWithWarning";
+  } else if (status == db::NetlistCrossReference::Skipped) {
+    return "Skipped";
+  } else {
+    return "None";
+  }
+}
+
+template <class Obj>
+static std::string name_of (const Obj *obj)
+{
+  return obj ? obj->name () : std::string ("(null)");
+}
+
+template <class Obj>
+static std::string expanded_name_of (const Obj *obj)
+{
+  return obj ? obj->expanded_name () : std::string ("(null)");
+}
+
+template <class PairData>
+static
+std::string dp2s (const PairData &dp)
+{
+  return expanded_name_of (dp.pair.first) + ":" + expanded_name_of (dp.pair.second) + " [" + xref_status2s (dp.status) + "]";
+}
+
+static std::string ne2s (const db::NetTerminalRef *ref)
+{
+  if (ref) {
+    return expanded_name_of (ref->device ()) + "[" + name_of (ref->terminal_def ()) + "]";
+  } else {
+    return "(null)";
+  }
+}
+
+static std::string ne2s (const db::NetSubcircuitPinRef *ref)
+{
+  if (ref) {
+    return expanded_name_of (ref->subcircuit ()) + "[" + expanded_name_of (ref->pin ()) + "]";
+  } else {
+    return "(null)";
+  }
+}
+
+static std::string ne2s (const db::NetPinRef *ref)
+{
+  if (ref) {
+    return expanded_name_of (ref->pin ());
+  } else {
+    return "(null)";
+  }
+}
+
+template <class Data>
+static std::string nep2s (const std::pair<const Data *, const Data *> &p)
+{
+  return ne2s (p.first) + ":" + ne2s (p.second);
+}
+
+std::string xref2s (const db::NetlistCrossReference &xref)
+{
+  std::string s;
+
+  for (db::NetlistCrossReference::circuits_iterator c = xref.begin_circuits (); c != xref.end_circuits (); ++c) {
+
+    const db::NetlistCrossReference::PerCircuitData *pcd = xref.per_circuit_data_for (*c);
+    tl_assert (pcd != 0);
+
+    s += name_of (c->first) + ":" + name_of (c->second) + " [" + xref_status2s (pcd->status) + "]:\n";
+
+    for (db::NetlistCrossReference::PerCircuitData::pin_pairs_const_iterator i = pcd->pins.begin (); i != pcd->pins.end (); ++i) {
+      s += " pin " + dp2s (*i) + "\n";
+    }
+    for (db::NetlistCrossReference::PerCircuitData::net_pairs_const_iterator i = pcd->nets.begin (); i != pcd->nets.end (); ++i) {
+      s += " net " + dp2s (*i) + "\n";
+      const db::NetlistCrossReference::PerNetData *pnd = xref.per_net_data_for (i->pair);
+      for (db::NetlistCrossReference::PerNetData::terminal_pairs_const_iterator j = pnd->terminals.begin (); j != pnd->terminals.end (); ++j) {
+         s += "  terminal " + nep2s (*j) + "\n";
+      }
+      for (db::NetlistCrossReference::PerNetData::pin_pairs_const_iterator j = pnd->pins.begin (); j != pnd->pins.end (); ++j) {
+         s += "  pin " + nep2s (*j) + "\n";
+      }
+      for (db::NetlistCrossReference::PerNetData::subcircuit_pin_pairs_const_iterator j = pnd->subcircuit_pins.begin (); j != pnd->subcircuit_pins.end (); ++j) {
+         s += "  subcircuit_pin " + nep2s (*j) + "\n";
+      }
+    }
+    for (db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator i = pcd->devices.begin (); i != pcd->devices.end (); ++i) {
+      s += " device " + dp2s (*i) + "\n";
+    }
+    for (db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator i = pcd->subcircuits.begin (); i != pcd->subcircuits.end (); ++i) {
+      s += " subcircuit " + dp2s (*i) + "\n";
+    }
+
+  }
+
+  return s;
+}
 
 static void prep_nl (db::Netlist &nl, const char *str)
 {
@@ -358,6 +467,36 @@ TEST(1_SimpleInverter)
      "end_circuit INV INV MATCH"
   );
   EXPECT_EQ (good, true);
+
+  db::NetlistCrossReference xref;
+  db::NetlistComparer comp_xref (&xref);
+
+  good = comp_xref.compare (&nl1, &nl2);
+
+  EXPECT_EQ (xref2s (xref),
+    "INV:INV [Match]:\n"
+    " pin $0:$1 [Match]\n"
+    " pin $1:$3 [Match]\n"
+    " pin $2:$0 [Match]\n"
+    " pin $3:$2 [Match]\n"
+    " net IN:IN [Match]\n"
+    "  terminal $1[G]:$2[G]\n"
+    "  terminal $2[G]:$1[G]\n"
+    "  pin $0:$1\n"
+    " net OUT:OUT [Match]\n"
+    "  terminal $1[D]:$2[D]\n"
+    "  terminal $2[D]:$1[S]\n"
+    "  pin $1:$3\n"
+    " net VDD:VDD [Match]\n"
+    "  terminal $1[S]:$2[S]\n"
+    "  pin $2:$0\n"
+    " net VSS:VSS [Match]\n"
+    "  terminal $2[S]:$1[D]\n"
+    "  pin $3:$2\n"
+    " device $2:$1 [Match]\n"
+    " device $1:$2 [Match]\n"
+  );
+  EXPECT_EQ (good, true);
 }
 
 TEST(1_SimpleInverterMatchedDeviceClasses)
@@ -438,9 +577,9 @@ TEST(1_SimpleInverterSkippedDevices)
   EXPECT_EQ (logger.text (),
      "begin_circuit INV INV\n"
      "match_nets VDD VDD\n"
-     "match_nets OUT OUT\n"
+     "net_mismatch OUT OUT\n"
      "match_nets VSS VSS\n"
-     "match_nets IN IN\n"
+     "net_mismatch IN IN\n"
      "match_pins $0 $1\n"
      "match_pins $1 $3\n"
      "match_pins $2 $0\n"
@@ -450,6 +589,42 @@ TEST(1_SimpleInverterSkippedDevices)
      "device_mismatch (null) $3\n"
      "match_devices $1 $4\n"
      "end_circuit INV INV NOMATCH"
+  );
+  EXPECT_EQ (good, false);
+
+  db::NetlistCrossReference xref;
+  db::NetlistComparer comp_xref (&xref);
+
+  good = comp_xref.compare (&nl1, &nl2);
+
+  EXPECT_EQ (xref2s (xref),
+    "INV:INV [NoMatch]:\n"
+    " pin $0:$1 [Match]\n"
+    " pin $1:$3 [Match]\n"
+    " pin $2:$0 [Match]\n"
+    " pin $3:$2 [Match]\n"
+    " net IN:IN [Mismatch]\n"
+    "  terminal (null):$3[B]\n"
+    "  terminal $1[G]:$4[G]\n"
+    "  terminal $2[B]:$2[B]\n"
+    "  terminal $3[G]:$1[G]\n"
+    "  pin $0:$1\n"
+    " net OUT:OUT [Mismatch]\n"
+    "  terminal (null):$3[A]\n"
+    "  terminal $1[D]:$4[D]\n"
+    "  terminal $2[A]:$2[A]\n"
+    "  terminal $3[D]:$1[S]\n"
+    "  pin $1:$3\n"
+    " net VDD:VDD [Match]\n"
+    "  terminal $1[S]:$4[S]\n"
+    "  pin $2:$0\n"
+    " net VSS:VSS [Match]\n"
+    "  terminal $3[S]:$1[D]\n"
+    "  pin $3:$2\n"
+    " device (null):$3 [Mismatch]\n"
+    " device $3:$1 [Match]\n"
+    " device $2:$2 [MatchWithWarning]\n"
+    " device $1:$4 [Match]\n"
   );
   EXPECT_EQ (good, false);
 
@@ -472,6 +647,86 @@ TEST(1_SimpleInverterSkippedDevices)
      "match_devices $3 $1\n"
      "match_devices $1 $4\n"
      "end_circuit INV INV MATCH"
+  );
+  EXPECT_EQ (good, true);
+
+  xref.clear ();
+
+  comp_xref.exclude_caps (1e-11);
+  comp_xref.exclude_resistors (900.0);
+
+  good = comp_xref.compare (&nl1, &nl2);
+
+  EXPECT_EQ (xref2s (xref),
+    "INV:INV [Match]:\n"
+    " pin $0:$1 [Match]\n"
+    " pin $1:$3 [Match]\n"
+    " pin $2:$0 [Match]\n"
+    " pin $3:$2 [Match]\n"
+    " net IN:IN [Match]\n"
+    "  terminal (null):$2[B]\n"
+    "  terminal (null):$3[B]\n"
+    "  terminal $1[G]:$4[G]\n"
+    "  terminal $2[B]:(null)\n"
+    "  terminal $3[G]:$1[G]\n"
+    "  pin $0:$1\n"
+    " net OUT:OUT [Match]\n"
+    "  terminal (null):$2[A]\n"
+    "  terminal (null):$3[A]\n"
+    "  terminal $1[D]:$4[D]\n"
+    "  terminal $2[A]:(null)\n"
+    "  terminal $3[D]:$1[S]\n"
+    "  pin $1:$3\n"
+    " net VDD:VDD [Match]\n"
+    "  terminal $1[S]:$4[S]\n"
+    "  pin $2:$0\n"
+    " net VSS:VSS [Match]\n"
+    "  terminal $3[S]:$1[D]\n"
+    "  pin $3:$2\n"
+    " device $3:$1 [Match]\n"
+    " device $1:$4 [Match]\n"
+  );
+  EXPECT_EQ (good, true);
+
+  xref.clear ();
+
+  comp_xref.exclude_caps (-1);
+  comp_xref.exclude_resistors (-1);
+  comp_xref.same_device_classes (0, nl2.device_class_by_name ("RES"));
+  comp_xref.same_device_classes (0, nl2.device_class_by_name ("CAP"));
+  comp_xref.same_device_classes (nl1.device_class_by_name ("RES"), 0);
+  comp_xref.same_device_classes (nl1.device_class_by_name ("CAP"), 0);
+
+  good = comp_xref.compare (&nl1, &nl2);
+
+  EXPECT_EQ (xref2s (xref),
+    "INV:INV [Match]:\n"
+    " pin $0:$1 [Match]\n"
+    " pin $1:$3 [Match]\n"
+    " pin $2:$0 [Match]\n"
+    " pin $3:$2 [Match]\n"
+    " net IN:IN [Match]\n"
+    "  terminal (null):$2[B]\n"
+    "  terminal (null):$3[B]\n"
+    "  terminal $1[G]:$4[G]\n"
+    "  terminal $2[B]:(null)\n"
+    "  terminal $3[G]:$1[G]\n"
+    "  pin $0:$1\n"
+    " net OUT:OUT [Match]\n"
+    "  terminal (null):$2[A]\n"
+    "  terminal (null):$3[A]\n"
+    "  terminal $1[D]:$4[D]\n"
+    "  terminal $2[A]:(null)\n"
+    "  terminal $3[D]:$1[S]\n"
+    "  pin $1:$3\n"
+    " net VDD:VDD [Match]\n"
+    "  terminal $1[S]:$4[S]\n"
+    "  pin $2:$0\n"
+    " net VSS:VSS [Match]\n"
+    "  terminal $3[S]:$1[D]\n"
+    "  pin $3:$2\n"
+    " device $3:$1 [Match]\n"
+    " device $1:$4 [Match]\n"
   );
   EXPECT_EQ (good, true);
 }
@@ -670,8 +925,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
     "begin_circuit BUF BUF\n"
     "match_nets OUT OUT\n"
     "match_nets INT $10\n"
-    "match_nets IN IN\n"
-    "match_nets INT2 $11\n"
+    "net_mismatch IN IN\n"
+    "net_mismatch INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -722,8 +977,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
     "begin_circuit BUF BUF\n"
     "match_nets OUT OUT\n"
     "match_nets INT $10\n"
-    "match_nets IN IN\n"
-    "match_nets INT2 $11\n"
+    "net_mismatch IN IN\n"
+    "net_mismatch INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -748,8 +1003,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
     "begin_circuit BUF BUF\n"
     "match_nets OUT OUT\n"
     "match_nets INT $10\n"
-    "match_nets IN IN\n"
-    "match_nets INT2 $11\n"
+    "net_mismatch IN IN\n"
+    "net_mismatch INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -828,8 +1083,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
     "begin_circuit BUF BUF\n"
     "match_nets OUT OUT\n"
     "match_nets INT $10\n"
-    "match_nets IN IN\n"
-    "match_nets INT2 $11\n"
+    "net_mismatch IN IN\n"
+    "net_mismatch INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -892,8 +1147,8 @@ TEST(5_BufferTwoPathsDifferentDeviceClasses)
     "begin_circuit BUF BUF\n"
     "match_nets INT $10\n"
     "match_nets IN IN\n"
-    "match_nets OUT OUT\n"
-    "match_nets INT2 $11\n"
+    "net_mismatch OUT OUT\n"
+    "net_mismatch INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -955,10 +1210,10 @@ TEST(6_BufferTwoPathsAdditionalResistor)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
-    "match_nets INT $10\n"
+    "net_mismatch INT $10\n"
     "match_nets IN IN\n"
     "match_nets OUT OUT\n"
-    "match_nets INT2 $11\n"
+    "net_mismatch INT2 $11\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -1017,11 +1272,11 @@ TEST(6_BufferTwoPathsAdditionalDevices)
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
     "match_nets INT $11\n"
-    "match_nets VDD VDD\n"
+    "net_mismatch VDD VDD\n"
     "match_nets IN IN\n"
-    "match_nets VSS VSS\n"
-    "match_nets OUT OUT\n"
-    "match_nets INT2 $10\n"
+    "net_mismatch VSS VSS\n"
+    "net_mismatch OUT OUT\n"
+    "net_mismatch INT2 $10\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -1110,8 +1365,8 @@ TEST(7_ResistorsParameterMismatch)
   EXPECT_EQ (logger.text (),
     "begin_circuit TRIANGLE TRIANGLE\n"
     "match_nets P2 P2\n"
-    "match_nets P1 P1\n"
-    "match_nets P3 P3\n"
+    "net_mismatch P1 P1\n"
+    "net_mismatch P3 P3\n"
     "match_pins $0 $0\n"
     "match_pins $1 $1\n"
     "match_pins $2 $2\n"
@@ -1152,8 +1407,8 @@ TEST(7_ResistorsPlusOneDevice)
   EXPECT_EQ (logger.text (),
     "begin_circuit TRIANGLE TRIANGLE\n"
     "match_nets P3 P3\n"
-    "match_nets P2 P2\n"
-    "match_nets P1 P1\n"
+    "net_mismatch P2 P2\n"
+    "net_mismatch P1 P1\n"
     "match_pins $0 $0\n"
     "match_pins $1 $1\n"
     "match_pins $2 $2\n"
@@ -1235,8 +1490,8 @@ TEST(8_DiodesDontMatchOnSwappedPins)
   EXPECT_EQ (logger.text (),
     "begin_circuit TRIANGLE TRIANGLE\n"
     "match_nets P1 P3\n"
-    "match_nets P2 P1\n"
-    "match_nets P3 P2\n"
+    "net_mismatch P2 P1\n"
+    "net_mismatch P3 P2\n"
     "match_pins $0 $2\n"
     "match_pins $1 $0\n"
     "match_pins $2 $1\n"
@@ -1295,10 +1550,10 @@ TEST(10_SimpleSubCircuits)
     "end_circuit INV INV MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
-    "match_nets VDD VDD\n"
-    "match_nets IN IN\n"
     "match_nets VSS VSS\n"
     "match_nets INT INT\n"
+    "match_nets IN IN\n"
+    "match_nets VDD VDD\n"
     "match_pins $0 $2\n"
     "match_pins $1 $0\n"
     "match_pins $2 $1\n"
@@ -1362,10 +1617,10 @@ TEST(10_SimpleSubCircuitsMatchedNames)
     "end_circuit INV INVB MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
-    "match_nets VDD VDD\n"
-    "match_nets IN IN\n"
     "match_nets VSS VSS\n"
     "match_nets INT INT\n"
+    "match_nets IN IN\n"
+    "match_nets VDD VDD\n"
     "match_pins $0 $2\n"
     "match_pins $1 $0\n"
     "match_pins $2 $1\n"
@@ -1386,8 +1641,8 @@ TEST(11_MismatchingSubcircuits)
     "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
     "end;\n"
     "circuit TOP ($0=IN,$1=OUT,$2=VDD,$3=VSS);\n"
-    "  subcircuit INV $1 ($1=IN,$2=INT,$3=VDD,$4=VSS);\n"
-    "  subcircuit INV $2 ($1=INT,$2=OUT,$3=VDD,$4=VSS);\n"
+    "  subcircuit INV $1 ($0=IN,$1=INT,$2=VDD,$3=VSS);\n"
+    "  subcircuit INV $2 ($0=INT,$1=OUT,$2=VDD,$3=VSS);\n"
     "end;\n";
 
   const char *nls2 =
@@ -1397,8 +1652,8 @@ TEST(11_MismatchingSubcircuits)
     "  device PMOS $2 (S=IN,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
     "end;\n"
     "circuit TOP ($0=OUT,$1=VDD,$2=IN,$3=VSS);\n"
-    "  subcircuit INV $1 ($1=VDD,$2=INT,$3=VSS,$4=OUT);\n"
-    "  subcircuit INV $2 ($1=VDD,$2=IN,$3=VSS,$4=INT);\n"
+    "  subcircuit INV $1 ($0=VDD,$1=INT,$2=VSS,$3=OUT);\n"
+    "  subcircuit INV $2 ($0=VDD,$1=IN,$2=VSS,$3=INT);\n"
     "end;\n";
 
   db::Netlist nl1, nl2;
@@ -1413,9 +1668,9 @@ TEST(11_MismatchingSubcircuits)
   EXPECT_EQ (logger.text (),
     "begin_circuit INV INV\n"
     "match_nets VSS VSS\n"
-    "match_nets OUT OUT\n"
-    "match_nets IN IN\n"
-    "match_nets VDD VDD\n"
+    "net_mismatch OUT OUT\n"
+    "net_mismatch IN IN\n"
+    "net_mismatch VDD VDD\n"
     "match_pins $0 $1\n"
     "match_pins $1 $3\n"
     "match_pins $2 $0\n"
@@ -1426,10 +1681,10 @@ TEST(11_MismatchingSubcircuits)
     "end_circuit INV INV NOMATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
-    "match_nets VDD VDD\n"
-    "match_nets IN IN\n"
     "match_nets VSS VSS\n"
     "match_nets INT INT\n"
+    "match_nets IN IN\n"
+    "match_nets VDD VDD\n"
     "match_pins $0 $2\n"
     "match_pins $1 $0\n"
     "match_pins $2 $1\n"
@@ -1440,6 +1695,101 @@ TEST(11_MismatchingSubcircuits)
   );
 
   EXPECT_EQ (good, false);
+
+  db::NetlistCrossReference xref;
+  db::NetlistComparer comp_xref (&xref);
+
+  good = comp_xref.compare (&nl1, &nl2);
+
+  EXPECT_EQ (xref2s (xref),
+    "INV:INV [NoMatch]:\n"
+    " pin $0:$1 [Match]\n"
+    " pin $1:$3 [Match]\n"
+    " pin $2:$0 [Match]\n"
+    " pin $3:$2 [Match]\n"
+    " net IN:IN [Mismatch]\n"
+    "  terminal (null):$2[S]\n"
+    "  terminal (null):$2[G]\n"
+    "  terminal $1[G]:(null)\n"
+    "  terminal $2[G]:$1[G]\n"
+    "  pin $0:$1\n"
+    " net OUT:OUT [Mismatch]\n"
+    "  terminal (null):$2[D]\n"
+    "  terminal $1[D]:(null)\n"
+    "  terminal $2[D]:$1[S]\n"
+    "  pin $1:$3\n"
+    " net VDD:VDD [Mismatch]\n"
+    "  terminal $1[S]:(null)\n"
+    "  pin $2:$0\n"
+    " net VSS:VSS [Match]\n"
+    "  terminal $2[S]:$1[D]\n"
+    "  pin $3:$2\n"
+    " device (null):$2 [Mismatch]\n"
+    " device $1:(null) [Mismatch]\n"
+    " device $2:$1 [Match]\n"
+    "TOP:TOP [Match]:\n"
+    " pin $0:$2 [Match]\n"
+    " pin $1:$0 [Match]\n"
+    " pin $2:$1 [Match]\n"
+    " pin $3:$3 [Match]\n"
+    " net IN:IN [Match]\n"
+    "  pin $0:$2\n"
+    "  subcircuit_pin $1[$0]:$2[$1]\n"
+    " net INT:INT [Match]\n"
+    "  subcircuit_pin $1[$1]:$2[$3]\n"
+    "  subcircuit_pin $2[$0]:$1[$1]\n"
+    " net OUT:OUT [Match]\n"
+    "  pin $1:$0\n"
+    "  subcircuit_pin $2[$1]:$1[$3]\n"
+    " net VDD:VDD [Match]\n"
+    "  pin $2:$1\n"
+    "  subcircuit_pin $1[$2]:$2[$0]\n"
+    "  subcircuit_pin $2[$2]:$1[$0]\n"
+    " net VSS:VSS [Match]\n"
+    "  pin $3:$3\n"
+    "  subcircuit_pin $1[$3]:$2[$2]\n"
+    "  subcircuit_pin $2[$3]:$1[$2]\n"
+    " subcircuit $2:$1 [Match]\n"
+    " subcircuit $1:$2 [Match]\n"
+  );
+  EXPECT_EQ (good, false);
+
+  xref.clear ();
+
+  //  ignore the subcircuits to make them match
+  comp_xref.same_circuits (nl1.circuit_by_name ("INV"), 0);
+  comp_xref.same_circuits (0, nl2.circuit_by_name ("INV"));
+  good = comp_xref.compare (&nl1, &nl2);
+
+  //  nets are now ambiguous
+  EXPECT_EQ (xref2s (xref),
+    "TOP:TOP [Match]:\n"
+    " pin $0:$0 [Match]\n"
+    " pin $1:$1 [Match]\n"
+    " pin $2:$2 [Match]\n"
+    " pin $3:$3 [Match]\n"
+    " net IN:OUT [MatchWithWarning]\n"
+    "  pin $0:$0\n"
+    "  subcircuit_pin (null):$1[$3]\n"
+    "  subcircuit_pin $1[$0]:(null)\n"
+    " net OUT:VDD [MatchWithWarning]\n"
+    "  pin $1:$1\n"
+    "  subcircuit_pin (null):$1[$0]\n"
+    "  subcircuit_pin (null):$2[$0]\n"
+    "  subcircuit_pin $2[$1]:(null)\n"
+    " net VDD:IN [MatchWithWarning]\n"
+    "  pin $2:$2\n"
+    "  subcircuit_pin (null):$2[$1]\n"
+    "  subcircuit_pin $1[$2]:(null)\n"
+    "  subcircuit_pin $2[$2]:(null)\n"
+    " net VSS:VSS [MatchWithWarning]\n"
+    "  pin $3:$3\n"
+    "  subcircuit_pin (null):$1[$2]\n"
+    "  subcircuit_pin (null):$2[$2]\n"
+    "  subcircuit_pin $1[$3]:(null)\n"
+    "  subcircuit_pin $2[$3]:(null)\n"
+  );
+  EXPECT_EQ (good, true);
 }
 
 TEST(12_MismatchingSubcircuitsDuplicates)
@@ -1489,10 +1839,10 @@ TEST(12_MismatchingSubcircuitsDuplicates)
     "end_circuit INV INV MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets IN IN\n"
-    "match_nets VDD VDD\n"
-    "match_nets VSS VSS\n"
-    "match_nets INT INT\n"
-    "match_nets OUT OUT\n"
+    "net_mismatch INT INT\n"
+    "net_mismatch VSS VSS\n"
+    "net_mismatch VDD VDD\n"
+    "net_mismatch OUT OUT\n"
     "match_pins $0 $1\n"
     "match_pins $1 $0\n"
     "match_pins $2 $2\n"
@@ -1557,10 +1907,10 @@ TEST(13_MismatchingSubcircuitsAdditionalHierarchy)
     "end_circuit INV INV MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
-    "match_nets VDD VDD\n"
-    "match_nets IN IN\n"
     "match_nets VSS VSS\n"
     "match_nets INT INT\n"
+    "match_nets IN IN\n"
+    "match_nets VDD VDD\n"
     "match_pins $0 $1\n"
     "match_pins $1 $0\n"
     "match_pins $2 $2\n"
@@ -1629,11 +1979,11 @@ TEST(14_Subcircuit2Nand)
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
     "match_nets INT INT\n"
     "match_nets IN2 IN2\n"
     "match_nets IN1 IN1\n"
-    "match_nets VDD VDD\n"
-    "match_nets VSS VSS\n"
     "match_pins $0 $0\n"
     "match_pins $1 $1\n"
     "match_pins $2 $2\n"
@@ -1703,11 +2053,11 @@ TEST(14_Subcircuit2NandMismatchNoSwap)
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
-    "match_nets IN1 INT\n"
-    "match_nets INT IN1\n"
-    "match_nets VDD VDD\n"
     "match_nets VSS VSS\n"
-    "match_nets IN2 IN2\n"
+    "match_nets VDD VDD\n"
+    "net_mismatch INT IN1\n"
+    "net_mismatch IN1 INT\n"
+    "net_mismatch IN2 IN2\n"
     "pin_mismatch $0 (null)\n"
     "match_pins $1 $1\n"
     "match_pins $2 $2\n"
@@ -1715,11 +2065,86 @@ TEST(14_Subcircuit2NandMismatchNoSwap)
     "match_pins $4 $4\n"
     "pin_mismatch (null) $0\n"
     "match_subcircuits $2 $1\n"
-    "subcircuit_mismatch (null) $2\n"
-    "subcircuit_mismatch $1 (null)\n"
+    "subcircuit_mismatch $1 $2\n"
     "end_circuit TOP TOP NOMATCH"
   );
 
+  EXPECT_EQ (good, false);
+
+  db::NetlistCrossReference xref;
+  db::NetlistComparer comp_xref (&xref);
+
+  good = comp_xref.compare (&nl1, &nl2);
+
+  EXPECT_EQ (xref2s (xref),
+    "NAND:NAND [Match]:\n"
+    " pin $0:$0 [Match]\n"
+    " pin $1:$1 [Match]\n"
+    " pin $2:$2 [Match]\n"
+    " pin $3:$3 [Match]\n"
+    " pin $4:$4 [Match]\n"
+    " net A:A [Match]\n"
+    "  terminal $1[G]:$1[G]\n"
+    "  terminal $3[G]:$3[G]\n"
+    "  pin $0:$0\n"
+    " net B:B [Match]\n"
+    "  terminal $2[G]:$2[G]\n"
+    "  terminal $4[G]:$4[G]\n"
+    "  pin $1:$1\n"
+    " net INT:INT [Match]\n"
+    "  terminal $3[D]:$3[D]\n"
+    "  terminal $4[S]:$4[S]\n"
+    " net OUT:OUT [Match]\n"
+    "  terminal $1[D]:$1[D]\n"
+    "  terminal $2[D]:$2[D]\n"
+    "  terminal $4[D]:$4[D]\n"
+    "  pin $2:$2\n"
+    " net VDD:VDD [Match]\n"
+    "  terminal $1[S]:$1[S]\n"
+    "  terminal $2[S]:$2[S]\n"
+    "  pin $3:$3\n"
+    " net VSS:VSS [Match]\n"
+    "  terminal $3[S]:$3[S]\n"
+    "  pin $4:$4\n"
+    " device $1:$1 [Match]\n"
+    " device $2:$2 [Match]\n"
+    " device $3:$3 [Match]\n"
+    " device $4:$4 [Match]\n"
+    "TOP:TOP [NoMatch]:\n"
+    " pin (null):$0 [Mismatch]\n"
+    " pin $0:(null) [Mismatch]\n"
+    " pin $1:$1 [Match]\n"
+    " pin $2:$2 [Match]\n"
+    " pin $3:$3 [Match]\n"
+    " pin $4:$4 [Match]\n"
+    " net IN1:INT [Mismatch]\n"
+    "  pin $0:(null)\n"
+    "  subcircuit_pin (null):$2[$2]\n"
+    "  subcircuit_pin $1[$0]:(null)\n"
+    "  subcircuit_pin $2[$0]:$1[$0]\n"
+    " net IN2:IN2 [Mismatch]\n"
+    "  pin $1:$1\n"
+    "  subcircuit_pin (null):$2[$0]\n"
+    "  subcircuit_pin $1[$1]:(null)\n"
+    " net INT:IN1 [Mismatch]\n"
+    "  pin (null):$0\n"
+    "  subcircuit_pin (null):$2[$1]\n"
+    "  subcircuit_pin $1[$2]:(null)\n"
+    "  subcircuit_pin $2[$1]:$1[$1]\n"
+    " net OUT:OUT [Match]\n"
+    "  pin $2:$2\n"
+    "  subcircuit_pin $2[$2]:$1[$2]\n"
+    " net VDD:VDD [Match]\n"
+    "  pin $3:$3\n"
+    "  subcircuit_pin $1[$3]:$2[$3]\n"
+    "  subcircuit_pin $2[$3]:$1[$3]\n"
+    " net VSS:VSS [Match]\n"
+    "  pin $4:$4\n"
+    "  subcircuit_pin $1[$4]:$2[$4]\n"
+    "  subcircuit_pin $2[$4]:$1[$4]\n"
+    " subcircuit $2:$1 [Match]\n"
+    " subcircuit $1:$2 [Mismatch]\n"
+  );
   EXPECT_EQ (good, false);
 }
 
@@ -1779,11 +2204,11 @@ TEST(14_Subcircuit2MatchWithSwap)
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit TOP TOP\n"
     "match_nets OUT OUT\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
     "match_nets INT INT\n"
     "match_nets IN2 IN2\n"
     "match_nets IN1 IN1\n"
-    "match_nets VDD VDD\n"
-    "match_nets VSS VSS\n"
     "match_pins $0 $0\n"
     "match_pins $1 $1\n"
     "match_pins $2 $2\n"
@@ -2017,14 +2442,14 @@ TEST(16_UniqueSubCircuitMatching)
     "end_circuit INV2 INV2 MATCH\n"
     "begin_circuit INV2PAIR INV2PAIR\n"
     "match_nets $I2 $I2\n"
-    "match_nets $I1 $I1\n"
+    "match_nets BULK BULK\n"
+    "match_nets $I6 $I6\n"
+    "match_nets $I5 $I5\n"
+    "match_nets $I4 $I4\n"
     "match_nets $I3 $I3\n"
     "match_nets $I7 $I7\n"
-    "match_nets $I4 $I4\n"
-    "match_nets $I5 $I5\n"
+    "match_nets $I1 $I1\n"
     "match_nets $I8 $I8\n"
-    "match_nets $I6 $I6\n"
-    "match_nets BULK BULK\n"
     "match_pins BULK BULK\n"
     "match_pins $1 $1\n"
     "match_pins $2 $2\n"
@@ -2037,17 +2462,17 @@ TEST(16_UniqueSubCircuitMatching)
     "end_circuit INV2PAIR INV2PAIR MATCH\n"
     "begin_circuit RINGO RINGO\n"
     "match_nets OSC OSC\n"
-    "match_nets BULK,VSS BULK,VSS\n"
-    "match_nets FB FB\n"
-    "match_nets $I22 $I22\n"
     "match_nets VDD VDD\n"
+    "match_nets FB FB\n"
     "match_nets $I13 $I13\n"
-    "match_nets $I23 $I23\n"
     "match_nets $I5 $I5\n"
-    "match_nets $I24 $I24\n"
     "match_nets $I6 $I6\n"
     "match_nets $I7 $I7\n"
+    "match_nets BULK,VSS BULK,VSS\n"
     "match_nets $I25 $I25\n"
+    "match_nets $I24 $I24\n"
+    "match_nets $I23 $I23\n"
+    "match_nets $I22 $I22\n"
     "match_subcircuits $1 $1\n"
     "match_subcircuits $4 $2\n"
     "match_subcircuits $3 $3\n"
@@ -2125,28 +2550,28 @@ TEST(17_InherentlyAmbiguousDecoder)
     "begin_circuit DECODER DECODER\n"
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
-    "match_ambiguous_nets A B\n"
-    "match_ambiguous_nets B A\n"
-    "match_nets NB NA\n"
-    "match_nets NA NB\n"
     "match_nets NQ0 NQ0\n"
-    "match_nets NQ2 NQ1\n"
-    "match_nets NQ1 NQ2\n"
+    "match_ambiguous_nets NQ1 NQ1\n"
+    "match_ambiguous_nets NQ2 NQ2\n"
     "match_nets NQ3 NQ3\n"
-    "match_pins $0 $0\n"
-    "match_pins $1 $1\n"
+    "match_ambiguous_nets NA NA\n"
+    "match_ambiguous_nets NB NB\n"
+    "match_nets B B\n"
+    "match_nets A A\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $0\n"
     "match_pins $2 $2\n"
-    "match_pins $3 $4\n"
-    "match_pins $4 $3\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
     "match_pins $5 $5\n"
     "match_pins $6 $6\n"
     "match_pins $7 $7\n"
-    "match_subcircuits $2 $1\n"
-    "match_subcircuits $1 $2\n"
-    "match_subcircuits $5 $3\n"
+    "match_subcircuits $1 $1\n"
+    "match_subcircuits $2 $2\n"
+    "match_subcircuits $4 $3\n"
     "match_subcircuits $6 $4\n"
     "match_subcircuits $3 $5\n"
-    "match_subcircuits $4 $6\n"
+    "match_subcircuits $5 $6\n"
     "end_circuit DECODER DECODER MATCH"
   );
 
@@ -2175,11 +2600,11 @@ TEST(17_InherentlyAmbiguousDecoder)
     "match_devices $4 $4\n"
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit DECODER DECODER\n"
-    "match_nets NB NB\n"
-    "match_nets B B\n"
-    "match_nets NA NA\n"
-    "match_nets VDD VDD\n"
     "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets B B\n"
+    "match_nets NB NB\n"
+    "match_nets NA NA\n"
     "match_nets NQ0 NQ0\n"
     "match_nets NQ2 NQ2\n"
     "match_nets NQ1 NQ1\n"
@@ -2261,7 +2686,13 @@ TEST(18_ClockTree)
 
   bool good = comp.compare (&nl1, &nl2);
 
-  EXPECT_EQ (logger.text (),
+  std::string txt = logger.text ();
+  //  because L/R matching is ambiguous, we need to do this to
+  //  establish reproducability on different platforms:
+  txt = tl::replaced (txt, "L", "X");
+  txt = tl::replaced (txt, "R", "X");
+
+  EXPECT_EQ (txt,
     "begin_circuit INV INV\n"
     "match_nets VDD VDD\n"
     "match_nets OUT OUT\n"
@@ -2274,41 +2705,41 @@ TEST(18_ClockTree)
     "match_devices $1 $1\n"
     "match_devices $2 $2\n"
     "end_circuit INV INV MATCH\n"
-    "begin_circuit TREE TREE\n"
+    "begin_circuit TXEE TXEE\n"
     "match_nets IN IN\n"
-    "match_nets S S\n"
-    "match_nets VDD VDD\n"
     "match_nets VSS VSS\n"
-    "match_ambiguous_nets SL SR\n"
-    "match_ambiguous_nets SR SL\n"
-    "match_ambiguous_nets SLL SRL\n"
-    "match_ambiguous_nets SLR SRR\n"
-    "match_ambiguous_nets SLLL SRLL\n"
-    "match_ambiguous_nets SLLR SRLR\n"
-    "match_ambiguous_nets SLRL SRRL\n"
-    "match_ambiguous_nets SLRR SRRR\n"
-    "match_ambiguous_nets SRL SLL\n"
-    "match_ambiguous_nets SRR SLR\n"
-    "match_ambiguous_nets SRLL SLLR\n"
-    "match_ambiguous_nets SRLR SLLL\n"
-    "match_ambiguous_nets SRRL SLRR\n"
-    "match_ambiguous_nets SRRR SLRL\n"
-    "match_subcircuits TRRL TLRR\n"
-    "match_subcircuits TL TR\n"
-    "match_subcircuits TLRL TRRL\n"
-    "match_subcircuits TLLR TRLR\n"
-    "match_subcircuits TRR TLR\n"
-    "match_subcircuits TRL TLL\n"
-    "match_subcircuits TLRR TRRR\n"
-    "match_subcircuits TRLR TLLL\n"
-    "match_subcircuits TRRR TLRL\n"
+    "match_nets VDD VDD\n"
+    "match_nets S S\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SX SX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXX SXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_ambiguous_nets SXXX SXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXXX TXXX\n"
     "match_subcircuits T T\n"
-    "match_subcircuits TRLL TLLR\n"
-    "match_subcircuits TR TL\n"
-    "match_subcircuits TLR TRR\n"
-    "match_subcircuits TLLL TRLL\n"
-    "match_subcircuits TLL TRL\n"
-    "end_circuit TREE TREE MATCH"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TX TX\n"
+    "match_subcircuits TXX TXX\n"
+    "match_subcircuits TXXX TXXX\n"
+    "match_subcircuits TXX TXX\n"
+    "end_circuit TXEE TXEE MATCH"
   );
   EXPECT_EQ (good, true);
 }

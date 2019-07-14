@@ -563,6 +563,16 @@ public:
   void set (const db::DPolygon &poly, const db::DCplxTrans &t1, const std::vector<db::DCplxTrans> &trans);
 
   /**
+   *  @brief Set the polygon reference the marker is to display
+   */
+  void set (const db::PolygonRef &poly_ref, const db::ICplxTrans &t1);
+
+  /**
+   *  @brief Set the polygon reference the marker is to display
+   */
+  void set (const db::PolygonRef &poly_ref, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans);
+
+  /**
    *  @brief Set the edge pair the marker is to display
    */
   void set (const db::EdgePair &edge_pair, const db::ICplxTrans &t1);
@@ -697,7 +707,7 @@ private:
   size_t m_max_shapes;
 
   enum { 
-    None, Box, DBox, Polygon, DPolygon, EdgePair, DEdgePair, Edge, DEdge, Path, DPath, Text, DText, Instance
+    None, Box, DBox, Polygon, PolygonRef, DPolygon, EdgePair, DEdgePair, Edge, DEdge, Path, DPath, Text, DText, Instance
   } m_type;
 
   union {
@@ -705,6 +715,7 @@ private:
     db::DBox *dbox;
     db::Polygon *polygon;
     db::DPolygon *dpolygon;
+    db::PolygonRef *polygon_ref;
     db::EdgePair *edge_pair;
     db::DEdgePair *dedge_pair;
     db::Edge *edge;

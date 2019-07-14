@@ -346,6 +346,12 @@ public:
   explicit Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics = true, double area_ratio = 3.0, size_t max_vertex_count = 16);
 
   /**
+   *  @brief Creates a new empty layer inside the dss
+   *  This method requires the DSS to be singular.
+   */
+  explicit Region (DeepShapeStore &dss);
+
+  /**
    *  @brief Gets the underlying delegate object
    */
   RegionDelegate *delegate () const

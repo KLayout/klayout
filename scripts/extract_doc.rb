@@ -2,15 +2,21 @@
 
 $script_call = $0 + " " + ARGV.join(" ")
 
-$key="%DRC%"
-$infile="src/drc/drc/built-in-macros/drc.lym" 
-$loc = "about/drc_ref"
+$indir="src/drc/drc/built-in-macros" 
+$loc = "about"
 $outfiles="src/lay/lay/doc"
-$title="DRC Reference"
 
-def create_ref(s)
-  if s =~ /(.*)#(.*)/
-    "<a href=\"/" + $loc + "_" + $1.downcase + ".xml#" + $2 + "\">#{s}</a>"
+def create_ref(mod, s)
+  if s =~ /(.*)::(.*)#(.*)/
+    "<a href=\"/" + $loc + "/" + $1.downcase + "_ref_" + $2.downcase + ".xml#" + $3 + "\">#{s}</a>"
+  elsif s =~ /(.*)::(.*)/
+    "<a href=\"/" + $loc + "/" + $1.downcase + "_ref_" + $2.downcase + ".xml\">#{s}</a>"
+  elsif s =~ /(.*)#(.*)/
+    if $2 != ""
+      "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml#" + $2 + "\">#{s}</a>"
+    else
+      "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml\">#{$1}</a>"
+    end
   else
     "<a href=\"#" + s + "\">#{s}</a>"
   end
@@ -20,11 +26,11 @@ def create_class_doc_ref(s)
   "<class_doc href=\"" + s + "\">#{s}</class_doc>"
 end
 
-def escape(s)
+def escape(mod, s)
   s.gsub("&", "&amp;").
     gsub("<", "&lt;").
     gsub(">", "&gt;").
-    gsub(/\\([\w#]+)/) { create_ref($1) }.
+    gsub(/\\([\w:#]+)/) { create_ref(mod, $1) }.
     gsub(/RBA::([\w#]+)/) { create_class_doc_ref($1) }
 end
 
@@ -38,12 +44,14 @@ class DocItem
   attr_accessor :synopsis
   attr_accessor :name
   attr_accessor :doc
+  attr_accessor :mod
 
-  def initialize(block)
+  def initialize(mod, block)
 
     @paragraphs = []
     para = nil
     self.synopsis = []
+    self.mod = mod
     in_code = false
 
     block.each do |b|
@@ -91,7 +99,7 @@ class DocItem
       i > 0 && doc += "</p><p>\n"
 
       p.each do |pp|
-        doc += escape(pp).
+        doc += escape(self.mod, pp).
               gsub(/\\@/, "&at;").
               gsub(/\s*@code\s*/, "<pre>").
               gsub(/\s*@\/code\s*/, "</pre>").
@@ -113,13 +121,13 @@ end
 
 class Scope < DocItem
 
-  def initialize(block)
-    super(block)
+  def initialize(mod, block)
+    super(mod, block)
     @items = {}
   end
 
-  def add_doc_item(block)
-    item = DocItem::new(block)
+  def add_doc_item(mod, block)
+    item = DocItem::new(mod, block)
     @items[item.name] = item
   end
 
@@ -137,8 +145,8 @@ class Scope < DocItem
 HEAD
 
     doc += "<doc>\n"
-    doc += "<title>" + escape(self.brief) + "</title>\n"
-    doc += "<keyword name=\"" + escape(self.name) + "\"/>\n"
+    doc += "<title>" + escape(self.mod, self.brief) + "</title>\n"
+    doc += "<keyword name=\"" + escape(self.mod, self.name) + "\"/>\n"
 
     doc += super_produce_doc
 
@@ -151,14 +159,14 @@ HEAD
       item.name || raise("Missing @name for item #{item_key}")
       item.brief || raise("Missing @brief for item #{item_key}")
 
-      doc += "<h2>\"" + escape(item.name) + "\" - " + escape(item.brief) + "</h2>\n"
-      doc += "<keyword name=\"" + escape(item.name) + "\"/>\n"
-      doc += "<a name=\"" + escape(item.name) + "\"/>"
+      doc += "<h2>\"" + escape(self.mod, item.name) + "\" - " + escape(self.mod, item.brief) + "</h2>\n"
+      doc += "<keyword name=\"" + escape(self.mod, item.name) + "\"/>\n"
+      doc += "<a name=\"" + escape(self.mod, item.name) + "\"/>"
       if ! item.synopsis.empty?
         doc += "<p>Usage:</p>\n"
         doc += "<ul>\n"
         item.synopsis.each do |s|
-          doc += "<li><tt>" + escape(s) + "</tt></li>\n"
+          doc += "<li><tt>" + escape(self.mod, s) + "</tt></li>\n"
         end
         doc += "</ul>\n"
       end
@@ -177,17 +185,22 @@ end
 
 class Collector
 
+  def initialize(mod, title)
+    @mod = mod
+    @title = title
+  end
+
   def add_block(block)
 
     if block.find { |l| l =~ /^@scope/ }
 
       # is a scope block
       @scopes ||= {}
-      @current_scope = Scope::new(block)
+      @current_scope = Scope::new(@mod, block)
       @scopes[@current_scope.name] = @current_scope
 
     else
-      @current_scope && @current_scope.add_doc_item(block)
+      @current_scope && @current_scope.add_doc_item(@mod, block)
     end
 
   end
@@ -196,7 +209,7 @@ class Collector
 
     @scopes.keys.sort.each do |k|
       suffix = k.downcase
-      outfile = $outfiles + "/" + $loc + "_" + suffix + ".xml"
+      outfile = $outfiles + "/" + $loc + "/" + @mod + "_ref_" + suffix + ".xml"
       File.open(outfile, "w") do |file|
         file.write(@scopes[k].produce_doc)
         puts "---> #{outfile} written."
@@ -207,7 +220,7 @@ class Collector
 
   def produce_index
 
-    outfile = $outfiles + "/" + $loc + ".xml"
+    outfile = $outfiles + "/" + $loc + "/" + @mod + "_ref.xml"
     File.open(outfile, "w") do |file|
 
       doc = <<HEAD
@@ -221,14 +234,14 @@ HEAD
 
       doc += "<doc>\n"
 
-      doc += "<title>#{escape($title)}</title>\n"
-      doc += "<keyword name=\"#{escape($title)}\"/>\n"
+      doc += "<title>#{escape(@mod, @title)}</title>\n"
+      doc += "<keyword name=\"#{escape(@mod, @title)}\"/>\n"
 
       doc += "<topics>\n"
 
       @scopes.keys.sort.each do |k|
         suffix = k.downcase
-        doc += "<topic href=\"/#{$loc}_#{suffix}.xml\"/>\n"
+        doc += "<topic href=\"/#{$loc}/#{@mod}_ref_#{suffix}.xml\"/>\n"
       end
 
       doc += "</topics>\n"
@@ -244,36 +257,68 @@ HEAD
 
 end
 
-collector = Collector::new
+collectors = {
+  "DRC" => Collector::new("drc", "DRC Reference"),
+  "LVS" => Collector::new("lvs", "LVS Reference")
+}
 
-File.open($infile, "r") do |file|
+Dir.entries($indir).each do |p|
 
-  block = nil
-  line = 0
+  if p !~ /\.rb$/
+    next
+  end
 
-  file.each_line do |l|
+  infile = File.join($indir, p)
+  puts "Extracting doc from #{infile} .."
 
-    line += 1
+  File.open(infile, "r") do |file|
 
-    begin
-      l = unescape(l)
-      if l =~ /^\s*#\s*#{$key}/
-        block = []
-      elsif l =~ /^\s*#\s*(.*)\s*$/
-        block && block.push($1)
-      elsif l =~ /^\s*$/
-        block && collector.add_block(block)
-        block = nil
+    block = []
+    collector = nil
+    line = 0
+
+    file.each_line do |l|
+
+      line += 1
+
+      begin
+
+        l = unescape(l)
+
+        if ! collector
+          collectors.each do |k,c|
+            if l =~ /^\s*#\s*%#{k}%/
+              collector = c
+              l = nil
+              block = []
+              break
+            end
+          end
+        end
+
+        if l
+          if l =~ /^\s*#\s*(.*)\s*$/
+            collector && block.push($1)
+          elsif l =~ /^\s*$/
+            collector && collector.add_block(block)
+            collector = nil
+          end
+        end
+
+      rescue => ex
+        puts "ERROR in line #{line}:\n" + ex.to_s
+        puts ex.backtrace # @@@
+        exit 1
       end
-    rescue => ex
-      puts "ERROR in line #{line}:\n" + ex.to_s
-      exit 1
+
     end
 
   end
 
 end
 
-collector.produce_doc
-collector.produce_index
+collectors.each do |k,collector|
+  collector.produce_doc
+  collector.produce_index
+end
 

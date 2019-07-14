@@ -281,6 +281,25 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
+bool
+NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerData &data)
+{
+  //  fetch the net tracer data from the technology and apply to the current layout
+  const db::Technology *tech = cv->technology ();
+  if (! tech) {
+    return false;
+  }
+  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
+  if (! tech_component) {
+    return false;
+  }
+
+  //  Set up the net tracer environment
+  data = tech_component->get_tracer_data (cv->layout ());
+
+  return true;
+}
+
 db::NetTracerNet *
 NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &stop_search_box, bool trace_path)
 {
@@ -331,18 +350,11 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
 
   }
 
-  //  fetch the net tracer data from the technology and apply to the current layout
-  const db::Technology *tech = cv->technology ();
-  if (! tech) {
-    return 0;
-  }
-  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
-  if (! tech_component) {
-    return 0;
-  }
-
   //  Set up the net tracer environment
-  db::NetTracerData tracer_data = tech_component->get_tracer_data (cv->layout ());
+  db::NetTracerData tracer_data;
+  if (! get_net_tracer_setup (cv, tracer_data)) {
+    return 0;
+  }
 
   unsigned int stop_layer = 0;
   db::Point stop_point;
@@ -535,12 +547,27 @@ NetTracerDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "lay::net_trace") {
 
-    lay::CellView cv = view ()->cellview (view ()->active_cellview_index ());
+    const lay::CellView &cv = view ()->cellview (view ()->active_cellview_index ());
     if (cv.is_valid ()) {
       show ();
       activateWindow ();
       raise ();
       activate ();
+    }
+
+  } else if (symbol == "lay::edit_layer_stack") {
+
+    layer_stack_clicked ();
+
+  } else if (symbol == "lay::trace_all_nets") {
+
+    const lay::CellView &cv = view ()->cellview (view ()->active_cellview_index ());
+    if (cv.is_valid ()) {
+      db::RecursiveShapeIterator si (cv->layout (), *cv.cell (), std::vector<unsigned int> ());
+      std::auto_ptr <db::LayoutToNetlist> l2ndb (new db::LayoutToNetlist (si));
+      trace_all_nets (l2ndb.get (), cv);
+      unsigned int l2ndb_index = view ()->add_l2ndb (l2ndb.release ());
+      view ()->open_l2ndb_browser (l2ndb_index, view ()->index_of_cellview (&cv));
     }
 
   } else {
@@ -1628,6 +1655,19 @@ NetTracerDialog::clear_markers ()
   }
 
   mp_markers.clear ();
+}
+
+void
+NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv)
+{
+  db::NetTracerData tracer_data;
+  if (! get_net_tracer_setup (cv, tracer_data)) {
+    return;
+  }
+
+  tracer_data.configure_l2n (*l2ndb);
+
+  l2ndb->extract_netlist ();
 }
 
 }

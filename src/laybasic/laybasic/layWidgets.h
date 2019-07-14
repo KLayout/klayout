@@ -325,6 +325,7 @@ public:
   ColorButton (QWidget *parent, const char *name = 0);
 
   QColor get_color () const;
+  static void build_color_menu (QMenu *menu, QObject *receiver, const char *browse_slot, const char *selected_slot);
 
 signals:
   void color_changed (QColor color);

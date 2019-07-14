@@ -1,0 +1,16 @@
+* written by unit test
+
+* cell C1
+* pin p1
+* pin p2
+* pin p3
+.SUBCKT C1 1 2 4
+* net 1 n1
+* net 2 n2
+* net 3 n3
+* net 4 n4
+* device instance $1 r0 *1 0,0 B3CLS
+Q$1 3 4 1 B3CLS AE=0.25P PE=0.18U AB=1.2P PB=0.75U AC=1P PC=0.6U NE=1
+* device instance $2 r0 *1 0,0 B3CLS
+Q$2 2 4 3 B3CLS AE=1.2P PE=2.5U AB=1.4P PB=2.8U AC=1.5P PC=3U NE=1
+.ENDS C1

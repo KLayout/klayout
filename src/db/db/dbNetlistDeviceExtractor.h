@@ -162,8 +162,8 @@ public:
     //  .. nothing yet ..
   }
 
-  NetlistDeviceExtractorLayerDefinition (const std::string &_name, const std::string &_description, size_t _index)
-    : name (_name), description (_description), index (_index)
+  NetlistDeviceExtractorLayerDefinition (const std::string &_name, const std::string &_description, size_t _index, size_t _fallback_index)
+    : name (_name), description (_description), index (_index), fallback_index (_fallback_index)
   {
     //  .. nothing yet ..
   }
@@ -182,6 +182,12 @@ public:
    *  @brief The index of the layer
    */
   size_t index;
+
+  /**
+   *  @brief The index of the fallback layer
+   *  This is the layer to be used when this layer isn't specified for input or (more important) output
+   */
+  size_t fallback_index;
 };
 
 /**
@@ -366,7 +372,14 @@ public:
    *  the device layers. The actual geometries are later available to "extract_devices"
    *  in the order the layers are defined.
    */
-  void define_layer (const std::string &name, const std::string &description = std::string ());
+  const db::NetlistDeviceExtractorLayerDefinition &define_layer (const std::string &name, const std::string &description = std::string ());
+
+  /**
+   *  @brief Defines a layer with a fallback layer
+   *  Like "define_layer" without fallback layer, but will fall back to the given layer
+   *  (by index) if this layer isn't specified for input or terminal markup.
+   */
+  const db::NetlistDeviceExtractorLayerDefinition &define_layer (const std::string &name, size_t fallback, const std::string &description = std::string ());
 
   /**
    *  @brief Creates a device
@@ -374,6 +387,11 @@ public:
    *  It will be owned by the netlist and must not be deleted by the caller.
    */
   Device *create_device ();
+
+  /**
+   *  @brief Defines a device terminal in the layout (a region)
+   */
+  void define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Region &region);
 
   /**
    *  @brief Defines a device terminal in the layout (a polygon)

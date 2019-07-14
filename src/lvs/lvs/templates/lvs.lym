@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>General;;LVS script (*.lylvs)\nA LVS script using KLayout's LVS language</description>
+ <version/>
+ <category>lvs</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>true</show-in-menu>
+ <group-name>lvs_scripts</group-name>
+ <menu-path>tools_menu.lvs.end</menu-path>
+ <interpreter></interpreter>
+ <dsl-interpreter-name/>
+ <text>
+# Read about LVS scripts in the User Manual in "Layout vs. Schematic (LVS)"
+
+# Try this sample script with this layout:
+#   https://github.com/KLayout/klayout/tree/master/samples/lvs/ringo.gds
+# and this schematic:
+#   https://github.com/KLayout/klayout/tree/master/samples/lvs/schematic.cir
+
+# Reference schematic (if not absolute: path relative to original layout)
+schematic("schematic.cir")
+
+# Tip: you can also use:
+#   schematic(source.path.sub(/\.(oas|gds)/, ".cir"))
+# to derive the schematic name from the layout file's name 
+# by substituting .oas or .gsd with .cir.
+
+# Enable hierarchical mode
+deep
+
+# Produce LVS report
+report_lvs
+
+# -------------------------------------------------------------------
+# Layers
+
+# Drawing layers
+nwell       = input(1, 0)
+active      = input(2, 0)
+pplus       = input(3, 0)
+nplus       = input(4, 0)
+poly        = input(5, 0)
+contact     = input(8, 0)
+metal1      = input(9, 0)   # includes labels
+via1        = input(10, 0)
+metal2      = input(11, 0)  # includes labels
+
+# Bulk layer for terminal provisioning
+bulk        = polygon_layer
+
+# Computed layers
+active_in_nwell       = active &amp; nwell
+pactive               = active_in_nwell &amp; pplus
+pgate                 = pactive &amp; poly
+psd                   = pactive - pgate
+ntie                  = active_in_nwell &amp; nplus
+
+active_outside_nwell  = active - nwell
+nactive               = active_outside_nwell &amp; nplus
+ngate                 = nactive &amp; poly
+nsd                   = nactive - ngate
+ptie                  = active_outside_nwell &amp; pplus
+
+# -------------------------------------------------------------------
+# Device extraction
+
+# PMOS transistor device extraction
+extract_devices(mos4("PMOS"), { "SD" => psd, "G" => pgate, "W" => nwell, 
+                                "tS" => psd, "tD" => psd, "tG" => poly, "tW" => nwell })
+
+# NMOS transistor device extraction
+extract_devices(mos4("NMOS"), { "SD" => nsd, "G" => ngate, "W" => bulk, 
+                                "tS" => nsd, "tD" => nsd, "tG" => poly, "tW" => bulk })
+
+# -------------------------------------------------------------------
+# Connectivity
+
+# Inter-layer
+connect(psd,        contact)
+connect(nsd,        contact)
+connect(poly,       contact)
+connect(ntie,       contact)
+connect(nwell,      ntie)
+connect(ptie,       contact)
+connect(contact,    metal1)
+connect(metal1,     via1)
+connect(via1,       metal2)
+
+# Global
+connect_global(bulk, "SUBSTRATE")
+connect_global(ptie, "SUBSTRATE")
+
+# -------------------------------------------------------------------
+# Netlist and compare
+
+# Netlist normalization
+netlist.simplify
+
+# Netlist vs. netlist
+compare
+</text>
+</klayout-macro>
+

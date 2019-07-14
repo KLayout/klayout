@@ -684,7 +684,7 @@ void MacroEditorPage::cursor_position_changed ()
 
             for (int p = t.size (); p > 0 && found < 0; ) {
               --p;
-              if (p + int (e->start_offset) < pos) {
+              if (p + int (e->start_offset) < int (pos)) {
                 QString c = t.mid (p, 1);
                 if (c == close_rbracket) {
                   bs.push_back (open_rbracket);

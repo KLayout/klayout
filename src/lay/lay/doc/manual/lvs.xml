@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Layout vs. Schematic (LVS)</title>
+
+  <p>
+  LVS is a verification step which checks whether a layout matches the circuit
+  from the schematic. The LVS feature is described in the following topic chapters:
+  </p>
+
+  <topics>
+    <topic href="/manual/lvs_overview.xml"/>
+    <topic href="/manual/lvs_intro.xml"/>
+    <topic href="/manual/lvs_devices.xml"/>
+    <topic href="/manual/lvs_device_classes.xml"/>
+    <topic href="/manual/lvs_device_extractors.xml"/>
+    <topic href="/manual/lvs_io.xml"/>
+    <topic href="/manual/lvs_connect.xml"/>
+    <topic href="/manual/lvs_compare.xml"/>
+    <topic href="/manual/lvs_tweaks.xml"/>
+  </topics>
+
+  <p>A reference for the functions and objects available for LVS scripts can be found here: <link href="/about/lvs_ref.xml"/>.</p>
+
+</doc>
+

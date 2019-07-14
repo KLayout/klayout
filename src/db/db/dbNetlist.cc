@@ -233,6 +233,10 @@ void Netlist::validate_topology ()
       throw tl::Exception (tl::to_string (tr ("Recursive hierarchy detected in netlist")));
     }
 
+    //  doing this reverse will mean we preserve bottom-up order. This is useful for
+    //  netlists where subcircuits have to be defined before they are used.
+    std::reverse (m_top_down_circuits.begin () + n_top_down_circuits, m_top_down_circuits.end ());
+
   }
 
   //  Determine the number of top cells
@@ -369,6 +373,12 @@ void Netlist::remove_circuit (Circuit *circuit)
   m_circuits.erase (circuit);
 }
 
+void Netlist::purge_circuit (Circuit *circuit)
+{
+  circuit->blank ();
+  remove_circuit (circuit);
+}
+
 void Netlist::flatten_circuit (Circuit *circuit)
 {
   tl_assert (circuit != 0);
@@ -431,7 +441,7 @@ void Netlist::make_top_level_pins ()
   size_t ntop = top_circuit_count ();
   for (top_down_circuit_iterator c = begin_top_down (); c != end_top_down () && ntop > 0; ++c, --ntop) {
 
-    Circuit *circuit = *c;
+    Circuit *circuit = c.operator-> ();
 
     if (circuit->pin_count () == 0) {
 
@@ -456,10 +466,10 @@ void Netlist::purge ()
 
   for (bottom_up_circuit_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
 
-    Circuit *circuit = *c;
+    Circuit *circuit = c.operator-> ();
 
     circuit->purge_nets ();
-    if (circuit->begin_nets () == circuit->end_nets ()) {
+    if (circuit->begin_nets () == circuit->end_nets () && ! circuit->dont_purge ()) {
 
       //  No nets left: delete the subcircuits that refer to us and finally delete the circuit
       while (circuit->begin_refs () != circuit->end_refs ()) {
@@ -477,6 +487,14 @@ void Netlist::combine_devices ()
   for (circuit_iterator c = begin_circuits (); c != end_circuits (); ++c) {
     c->combine_devices ();
   }
+}
+
+void Netlist::simplify ()
+{
+  make_top_level_pins ();
+  purge ();
+  combine_devices ();
+  purge_nets ();
 }
 
 static std::string net2string (const db::Net *net)
@@ -542,7 +560,7 @@ std::string Netlist::to_string () const
         if (p != pd.begin ()) {
           ps += ",";
         }
-        ps += p->name () + "=" + tl::to_string (d->parameter_value (p->id ()));
+        ps += p->name () + "=" + tl::sprintf ("%.12g", d->parameter_value (p->id ()));
       }
       res += std::string ("  device ") + tl::to_word_or_quoted_string (d->device_class ()->name ()) + " " + device2string (*d) + " (" + ts + ") (" + ps + ");\n";
     }
@@ -551,13 +569,17 @@ std::string Netlist::to_string () const
       std::string ps;
       const db::SubCircuit &subcircuit = *sc;
       const db::Circuit *circuit = sc->circuit_ref ();
-      for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
-        if (p != circuit->begin_pins ()) {
-          ps += ",";
+      if (circuit) {
+        for (db::Circuit::const_pin_iterator p = circuit->begin_pins (); p != circuit->end_pins (); ++p) {
+          if (p != circuit->begin_pins ()) {
+            ps += ",";
+          }
+          ps += pin2string (*p) + "=" + net2string (subcircuit.net_for_pin (p->id ()));
         }
-        ps += pin2string (*p) + "=" + net2string (subcircuit.net_for_pin (p->id ()));
+        res += std::string ("  subcircuit ") + tl::to_word_or_quoted_string (circuit->name ()) + " " + subcircuit2string (*sc) + " (" + ps + ");\n";
+      } else {
+        res += std::string ("  subcircuit (null);\n");
       }
-      res += std::string ("  subcircuit ") + tl::to_word_or_quoted_string (circuit->name ()) + " " + subcircuit2string (*sc) + " (" + ps + ");\n";
     }
 
     res += std::string ("end;\n");

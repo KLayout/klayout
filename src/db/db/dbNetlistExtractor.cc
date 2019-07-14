@@ -105,6 +105,7 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     db::DeviceAbstract *dm = nl.device_abstract_by_cell_index (*cid);
     if (dm) {
+      //  This is a device abstract cell:
       //  make the terminal to cluster ID connections for the device abstract from the device cells
       make_device_abstract_connections (dm, clusters);
       continue;
@@ -116,10 +117,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
     std::map<db::cell_index_type, db::Circuit *>::const_iterator k = circuits.find (*cid);
     if (k == circuits.end ()) {
-      circuit = new db::Circuit ();
+      circuit = new db::Circuit (*mp_layout, *cid);
       nl.add_circuit (circuit);
-      circuit->set_name (mp_layout->cell_name (*cid));
-      circuit->set_cell_index (*cid);
       circuits.insert (std::make_pair (*cid, circuit));
     } else {
       circuit = k->second;
@@ -142,11 +141,6 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
       net->set_cluster_id (*c);
       circuit->add_net (net);
 
-      const db::local_cluster<db::PolygonRef>::global_nets &gn = lc.get_global_nets ();
-      for (db::local_cluster<db::PolygonRef>::global_nets::const_iterator g = gn.begin (); g != gn.end (); ++g) {
-        assign_net_name (conn.global_net_name (*g), net);
-      }
-
       //  make subcircuit connections (also make the subcircuits if required) from the connections of the clusters
       make_and_connect_subcircuits (circuit, clusters, *c, net, subcircuits, circuits, pins_per_cluster_per_cell);
 
@@ -154,7 +148,18 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
       connect_devices (circuit, clusters, *c, net);
 
       //  collect labels to net names
-      collect_labels (clusters, *c, net);
+      std::set<std::string> net_names;
+      collect_labels (clusters, *c, net_names);
+
+      //  add the global names as second priority
+      if (net_names.empty ()) {
+        const db::local_cluster<db::PolygonRef>::global_nets &gn = lc.get_global_nets ();
+        for (db::local_cluster<db::PolygonRef>::global_nets::const_iterator g = gn.begin (); g != gn.end (); ++g) {
+          net_names.insert (conn.global_net_name (*g));
+        }
+      }
+
+      assign_net_names (net, net_names);
 
       if (! clusters.is_root (*c)) {
         //  a non-root cluster makes a pin
@@ -165,6 +170,22 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
     }
 
   }
+}
+
+void
+NetlistExtractor::assign_net_names (db::Net *net, const std::set<std::string> &net_names)
+{
+  std::string nn;
+  for (std::set<std::string>::const_iterator n = net_names.begin (); n != net_names.end (); ++n) {
+    if (! n->empty ()) {
+      if (! nn.empty ()) {
+        nn += ",";
+      }
+      nn += *n;
+    }
+  }
+
+  net->set_name (nn);
 }
 
 void
@@ -190,11 +211,19 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, cons
     }
 
   }
+
+  //  check whether all connections have been made
+  const std::vector<db::DeviceTerminalDefinition> &td = dm->device_class ()->terminal_definitions ();
+  for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
+    if (! dm->cluster_id_for_terminal (t->id ())) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Terminal '%s' of a device of class '%s' isn't connected - maybe the terminal annotation layer of this device type isn't part of the connectivity?")), t->name (), dm->device_class ()->name ()));
+    }
+  }
 }
 
 void NetlistExtractor::collect_labels (const connected_clusters_type &clusters,
                                        size_t cid,
-                                       db::Net *net)
+                                       std::set<std::string> &net_names)
 {
   //  collect the properties - we know that the cluster attributes are property ID's because the
   //  cluster processor converts shape property IDs to attributes
@@ -206,7 +235,7 @@ void NetlistExtractor::collect_labels (const connected_clusters_type &clusters,
     for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
 
       if (m_text_annot_name_id.first && j->first == m_text_annot_name_id.second) {
-        assign_net_name (j->second.to_string (), net);
+        net_names.insert (j->second.to_string ());
       }
 
     }
@@ -346,17 +375,6 @@ size_t NetlistExtractor::make_pin (db::Circuit *circuit, db::Net *net)
   circuit->connect_pin (pin_id, net);
 
   return pin_id;
-}
-
-void NetlistExtractor::assign_net_name (const std::string &n, db::Net *net)
-{
-  std::string nn = n;
-  if (! nn.empty ()) {
-    if (! net->name ().empty ()) {
-      nn = net->name () + "," + nn;
-    }
-    net->set_name (nn);
-  }
 }
 
 }

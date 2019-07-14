@@ -69,7 +69,7 @@ render_scanline_std_edge (const uint32_t *dp, unsigned int ds, const lay::Bitmap
   uint32_t ddp = 0;
 
   int x = int (w);
-  while (x >= 0) {
+  while (x > 0) {
 
     uint32_t d = 0;
     uint32_t dsn = 0, dsp = 0;

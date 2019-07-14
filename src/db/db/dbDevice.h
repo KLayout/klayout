@@ -26,6 +26,8 @@
 #include "dbCommon.h"
 #include "dbNet.h"
 #include "dbPoint.h"
+#include "dbVector.h"
+#include "dbTrans.h"
 
 #include "tlObject.h"
 
@@ -37,6 +39,51 @@ namespace db
 class Circuit;
 class DeviceClass;
 class DeviceAbstract;
+
+/**
+ *  @brief A structure describing a terminal reference into another device abstract
+ */
+struct DeviceReconnectedTerminal
+{
+  DeviceReconnectedTerminal (size_t _device_index, unsigned int _other_terminal_id)
+    : device_index (_device_index), other_terminal_id (_other_terminal_id)
+  {
+    //  .. nothing yet ..
+  }
+
+  DeviceReconnectedTerminal ()
+    : device_index (0), other_terminal_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  size_t device_index;
+  unsigned int other_terminal_id;
+};
+
+/**
+ *  @brief A structure describing a reference to another device abstract
+ *
+ *  This structure is used within Device to reference more than the standard
+ *  device abstract.
+ */
+struct DeviceAbstractRef
+{
+  DeviceAbstractRef (const db::DeviceAbstract *_device_abstract, const db::DCplxTrans &_trans)
+    : device_abstract (_device_abstract), trans (_trans)
+  {
+    //  .. nothing yet ..
+  }
+
+  DeviceAbstractRef ()
+    : device_abstract (0), trans ()
+  {
+    //  .. nothing yet ..
+  }
+
+  const db::DeviceAbstract *device_abstract;
+  db::DCplxTrans trans;
+};
 
 /**
  *  @brief An actual device
@@ -166,19 +213,19 @@ public:
 
   /**
    *  @brief Sets the device position
-   *  The device position should be the center of the recognition shape or something similar.
+   *  The device position should be the center and orientation of the recognition shape or something similar.
    *  Giving the device a position allows combining multiple devices with the same
    *  relative geometry into a single cell.
-   *  The position has to be given in micrometer units.
+   *  The transformation has to be given in micrometer units.
    */
-  void set_position (const db::DPoint &pos);
+  void set_trans (const db::DCplxTrans &tr);
 
   /**
    *  @brief Gets the device position
    */
-  const db::DPoint &position () const
+  const db::DCplxTrans &trans () const
   {
-    return m_position;
+    return m_trans;
   }
 
   /**
@@ -228,6 +275,80 @@ public:
    */
   void set_parameter_value (const std::string &name, double v);
 
+  /**
+   *  @brief Used for device combination: join terminals with other device
+   */
+  void join_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal);
+
+  /**
+   *  @brief Used for device combination: reroute terminal to other device
+   *
+   *  This will disconnect "this_terminal" from the device and make a connection to
+   *  "other_terminal" of the "other" device instead.
+   *
+   *  An internal connection between "this_terminal" and "from_other_terminal" is
+   *  implied.
+   */
+  void reroute_terminal (unsigned int this_terminal, db::Device *other, unsigned int from_other_terminal, unsigned int other_terminal);
+
+  /**
+   *  @brief Gets the set of other terminal references
+   *
+   *  This method will return 0 if the device isn't a combined device or the given terminal
+   *  is not connector to a different abstract.
+   *
+   *  The returned vector (if any) is a complete list of terminals connected to the given
+   *  logical device terminal.
+   */
+  const std::vector<DeviceReconnectedTerminal> *reconnected_terminals_for (unsigned int this_terminal) const
+  {
+    std::map<unsigned int, std::vector<DeviceReconnectedTerminal> >::const_iterator t = m_reconnected_terminals.find (this_terminal);
+    if (t != m_reconnected_terminals.end ()) {
+      return & t->second;
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   *  @brief Gets the map of reconnected terminals
+   */
+  const std::map<unsigned int, std::vector<DeviceReconnectedTerminal> > &reconnected_terminals () const
+  {
+    return m_reconnected_terminals;
+  }
+
+  /**
+   *  @brief Gets the map of reconnected terminals (non-const version)
+   *
+   *  NOTE: don't use this method to modify this container! It's provided for persistence implementation only.
+   */
+  std::map<unsigned int, std::vector<DeviceReconnectedTerminal> > &reconnected_terminals ()
+  {
+    return m_reconnected_terminals;
+  }
+
+  /**
+   *  @brief Gets the set of other device abstracts
+   *
+   *  This list does not include the intrinsic original abstract of the device.
+   *  This vector is non-empty if this device is a combined one.
+   */
+  const std::vector<DeviceAbstractRef> &other_abstracts () const
+  {
+    return m_other_abstracts;
+  }
+
+  /**
+   *  @brief Gets the set of other device abstracts (non-const version)
+   *
+   *  NOTE: don't use this method to modify this container! It's provided for persistence implementation only.
+   */
+  std::vector<DeviceAbstractRef> &other_abstracts ()
+  {
+    return m_other_abstracts;
+  }
+
 private:
   friend class Circuit;
   friend class Net;
@@ -235,11 +356,23 @@ private:
   DeviceClass *mp_device_class;
   DeviceAbstract *mp_device_abstract;
   std::string m_name;
-  db::DPoint m_position;
+  db::DCplxTrans m_trans;
   std::vector<Net::terminal_iterator> m_terminal_refs;
   std::vector<double> m_parameters;
   size_t m_id;
   Circuit *mp_circuit;
+  std::vector<DeviceAbstractRef> m_other_abstracts;
+  std::map<unsigned int, std::vector<DeviceReconnectedTerminal> > m_reconnected_terminals;
+
+  /**
+   * @brief Translates the device abstracts
+   */
+  void translate_device_abstracts (const std::map<const DeviceAbstract *, DeviceAbstract *> &map);
+
+  /**
+   *  @brief Joins this device with another
+   */
+  void join_device (db::Device *other);
 
   /**
    *  @brief Sets the terminal reference for a specific terminal
@@ -258,6 +391,9 @@ private:
    *  @brief Sets the circuit
    */
   void set_circuit (Circuit *circuit);
+
+  void add_others_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal);
+  void init_terminal_routes ();
 };
 
 }

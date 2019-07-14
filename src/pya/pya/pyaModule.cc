@@ -2366,548 +2366,519 @@ PythonModule::make_classes (const char *mod_name)
   //  Build a class for signals
   PYASignal::make_class (module);
 
-  bool more_classes = true;
-  while (more_classes) {
+  std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order (mod_name);
+  for (std::list<const gsi::ClassBase *>::const_iterator c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
 
-    std::string reason_for_more;
-    bool any = false;
-
-    more_classes = false;
-    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-
-      if (mod_name && c->module () != mod_name) {
-        //  don't handle classes outside this module
-        continue;
+    if (mod_name && (*c)->module () != mod_name) {
+      //  don't handle classes outside this module, but require them to be present
+      if (! PythonClassClientData::py_type (**c)) {
+        throw tl::Exception (tl::sprintf ("class %s.%s required from outside the module %s, but that module is not loaded", (*c)->module (), (*c)->name (), mod_name));
       }
+      continue;
+    }
 
-      if (PythonClassClientData::py_type (*c)) {
-        //  don't handle classes twice
-        continue;
-      }
+    //  we might encounter a child class which is a reference to a top-level class (e.g.
+    //  duplication of enums into child classes). In this case we create a constant inside the
+    //  target class.
+    if ((*c)->declaration () != *c) {
+      tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
+      PyTypeObject *parent_type = PythonClassClientData::py_type (*(*c)->parent ()->declaration ());
+      PyTypeObject *type = PythonClassClientData::py_type (*(*c)->declaration ());
+      tl_assert (type != 0);
+      PythonRef attr ((PyObject *) type, false /*borrowed*/);
+      set_type_attr (parent_type, (*c)->name ().c_str (), attr);
+      continue;
+    }
 
-      bool all_children_available = true;
-      for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
-        tl_assert (cc->declaration () != 0);
-        if (! PythonClassClientData::py_type (*cc->declaration ())) {
-          reason_for_more = tl::sprintf ("child of class %s.%s not available (%s.%s)", c->module (), c->name (), cc->module (), cc->name ());
-          all_children_available = false;
-          break;
+    //  NOTE: we create the class as a heap object, since that way we can dynamically extend the objects
+
+    //  Create the actual class
+
+    m_classes.push_back (*c);
+
+    PythonRef bases;
+    if ((*c)->base () != 0) {
+      bases = PythonRef (PyTuple_New (1));
+      PyTypeObject *pt = PythonClassClientData::py_type (*(*c)->base ());
+      tl_assert (pt != 0);
+      PyObject *base = (PyObject *) pt;
+      Py_INCREF (base);
+      PyTuple_SetItem (bases.get (), 0, base);
+    } else {
+      bases = PythonRef (PyTuple_New (0));
+    }
+
+    PythonRef dict (PyDict_New ());
+    PyDict_SetItemString (dict.get (), "__module__", PythonRef (c2python (m_mod_name)).get ());
+    PyDict_SetItemString (dict.get (), "__doc__", PythonRef (c2python ((*c)->doc ())).get ());
+    PyDict_SetItemString (dict.get (), "__gsi_id__", PythonRef (c2python (m_classes.size () - 1)).get ());
+
+    PythonRef args (PyTuple_New (3));
+    PyTuple_SetItem (args.get (), 0, c2python ((*c)->name ()));
+    PyTuple_SetItem (args.get (), 1, bases.release ());
+    PyTuple_SetItem (args.get (), 2, dict.release ());
+
+    PyTypeObject *type = (PyTypeObject *) PyObject_Call ((PyObject *) &PyType_Type, args.get (), NULL);
+    if (type == NULL) {
+      check_error ();
+      tl_assert (false);
+    }
+
+    //  Customize
+    type->tp_basicsize += sizeof (PYAObjectBase);
+    type->tp_init = &pya_object_init;
+    type->tp_new = &pya_object_new;
+    type->tp_dealloc = (destructor) &pya_object_deallocate;
+    type->tp_setattro = PyObject_GenericSetAttr;
+    type->tp_getattro = PyObject_GenericGetAttr;
+
+    PythonClassClientData::initialize (**c, type);
+
+    tl_assert (cls_for_type (type) == *c);
+
+    //  Add to the parent class as child class or add to module
+
+    if ((*c)->parent ()) {
+      tl_assert ((*c)->parent ()->declaration () != 0);
+      PyTypeObject *parent_type = PythonClassClientData::py_type (*(*c)->parent ()->declaration ());
+      PythonRef attr ((PyObject *) type);
+      set_type_attr (parent_type, (*c)->name ().c_str (), attr);
+    } else {
+      PyList_Append (all_list.get (), PythonRef (c2python ((*c)->name ())).get ());
+      PyModule_AddObject (module, (*c)->name ().c_str (), (PyObject *) type);
+    }
+
+    //  Build the attributes now ...
+
+    MethodTable *mt = MethodTable::method_table_by_class (*c);
+
+    //  signals are translated into the setters and getters
+    for (gsi::ClassBase::method_iterator m = (*c)->begin_methods (); m != (*c)->end_methods (); ++m) {
+      if ((*m)->is_signal ()) {
+        for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+          mt->add_getter (syn->name, *m);
+          mt->add_setter (syn->name, *m);
         }
       }
-      if (! all_children_available) {
-        //  can't produce this class yet - the children are not available yet.
-        more_classes = true;
-        continue;
-      }
+    }
 
-      if (c->base () && ! PythonClassClientData::py_type (*c->base ())) {
-        //  can't produce this class yet. The base class needs to be handled first.
-        reason_for_more = tl::sprintf ("base of class %s.%s not available (%s.%s)", c->module (), c->name (), c->base ()->module (), c->base ()->name ());
-        more_classes = true;
-        continue;
-      }
-
-      //  there should be only main declarations since we merged
-      tl_assert (c->declaration () == &*c);
-
-      //  Create the class as a heap object, since that way we can dynamically extend the objects
-
-      any = true;
-
-
-      //  Create the actual class
-
-      m_classes.push_back (c.operator-> ());
-
-      PythonRef bases;
-      if (c->base () != 0) {
-        bases = PythonRef (PyTuple_New (1));
-        PyTypeObject *pt = PythonClassClientData::py_type (*c->base ());
-        tl_assert (pt != 0);
-        PyObject *base = (PyObject *) pt;
-        Py_INCREF (base);
-        PyTuple_SetItem (bases.get (), 0, base);
-      } else {
-        bases = PythonRef (PyTuple_New (0));
-      }
-
-      PythonRef dict (PyDict_New ());
-      PyDict_SetItemString (dict.get (), "__module__", PythonRef (c2python (m_mod_name)).get ());
-      PyDict_SetItemString (dict.get (), "__doc__", PythonRef (c2python (c->doc ())).get ());
-      PyDict_SetItemString (dict.get (), "__gsi_id__", PythonRef (c2python (m_classes.size () - 1)).get ());
-
-      PythonRef args (PyTuple_New (3));
-      PyTuple_SetItem (args.get (), 0, c2python (c->name ()));
-      PyTuple_SetItem (args.get (), 1, bases.release ());
-      PyTuple_SetItem (args.get (), 2, dict.release ());
-
-      PyTypeObject *type = (PyTypeObject *) PyObject_Call ((PyObject *) &PyType_Type, args.get (), NULL);
-      if (type == NULL) {
-        check_error ();
-        tl_assert (false);
-      }
-
-      //  Customize
-      type->tp_basicsize += sizeof (PYAObjectBase);
-      type->tp_init = &pya_object_init;
-      type->tp_new = &pya_object_new;
-      type->tp_dealloc = (destructor) &pya_object_deallocate;
-      type->tp_setattro = PyObject_GenericSetAttr;
-      type->tp_getattro = PyObject_GenericGetAttr;
-
-      PythonClassClientData::initialize (*c, type);
-
-      tl_assert (cls_for_type (type) == c.operator-> ());
-
-      PyList_Append (all_list.get (), PythonRef (c2python (c->name ())).get ());
-      PyModule_AddObject (module, c->name ().c_str (), (PyObject *) type);
-
-      //  Create the sub-class attributes
-
-      for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
-        tl_assert (cc->declaration () != 0);
-        PythonRef cc_obj ((PyObject *) PythonClassClientData::py_type (*cc->declaration ()), false);
-        set_type_attr (type, cc->name ().c_str (), cc_obj);
-      }
-
-      //  Build the attributes now ...
-
-      MethodTable *mt = MethodTable::method_table_by_class (c.operator-> ());
-
-      //  signals are translated into the setters and getters
-      for (gsi::ClassBase::method_iterator m = c->begin_methods (); m != c->end_methods (); ++m) {
-        if ((*m)->is_signal ()) {
-          for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+    //  first add getters and setters
+    for (gsi::ClassBase::method_iterator m = (*c)->begin_methods (); m != (*c)->end_methods (); ++m) {
+      if (! (*m)->is_callback ()) {
+        for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+          if (syn->is_getter) {
             mt->add_getter (syn->name, *m);
+          } else if (syn->is_setter) {
             mt->add_setter (syn->name, *m);
           }
         }
       }
+    }
 
-      //  first add getters and setters
-      for (gsi::ClassBase::method_iterator m = c->begin_methods (); m != c->end_methods (); ++m) {
-        if (! (*m)->is_callback ()) {
-          for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
-            if (syn->is_getter) {
+    //  then add normal methods - on name clash with properties make them a getter
+    for (gsi::ClassBase::method_iterator m = (*c)->begin_methods (); m != (*c)->end_methods (); ++m) {
+      if (! (*m)->is_callback ()) {
+        for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+          if (! syn->is_getter && ! syn->is_setter) {
+            if ((*m)->end_arguments () - (*m)->begin_arguments () == 0 && mt->find_property ((*m)->is_static (), syn->name).first) {
               mt->add_getter (syn->name, *m);
-            } else if (syn->is_setter) {
-              mt->add_setter (syn->name, *m);
+            } else {
+              mt->add_method (syn->name, *m);
             }
           }
         }
       }
+    }
 
-      //  then add normal methods - on name clash with properties make them a getter
-      for (gsi::ClassBase::method_iterator m = c->begin_methods (); m != c->end_methods (); ++m) {
-        if (! (*m)->is_callback ()) {
-          for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
-            if (! syn->is_getter && ! syn->is_setter) {
-              if ((*m)->end_arguments () - (*m)->begin_arguments () == 0 && mt->find_property ((*m)->is_static (), syn->name).first) {
-                mt->add_getter (syn->name, *m);
-              } else {
-                mt->add_method (syn->name, *m);
-              }
-            }
-          }
-        }
+    //  produce the properties
+
+    for (size_t mid = mt->bottom_property_mid (); mid < mt->top_property_mid (); ++mid) {
+
+      MethodTableEntry::method_iterator begin_setters = mt->begin_setters (mid);
+      MethodTableEntry::method_iterator end_setters = mt->end_setters (mid);
+      MethodTableEntry::method_iterator begin_getters = mt->begin_getters (mid);
+      MethodTableEntry::method_iterator end_getters = mt->end_getters (mid);
+      int setter_mid = begin_setters != end_setters ? int (mid) : -1;
+      int getter_mid = begin_getters != end_getters ? int (mid) : -1;
+
+      bool is_static = false;
+      if (begin_setters != end_setters) {
+        is_static = (*begin_setters)->is_static ();
+      } else if (begin_getters != end_getters) {
+        is_static = (*begin_getters)->is_static ();
       }
 
-      //  produce the properties
+      const std::string &name = mt->property_name (mid);
 
-      for (size_t mid = mt->bottom_property_mid (); mid < mt->top_property_mid (); ++mid) {
+      //  look for the real getter and setter, also look in the base classes
+      const gsi::ClassBase *cls = *c;
+      while ((cls = cls->base ()) != 0 && (begin_setters == end_setters || begin_getters == end_getters)) {
 
-        MethodTableEntry::method_iterator begin_setters = mt->begin_setters (mid);
-        MethodTableEntry::method_iterator end_setters = mt->end_setters (mid);
-        MethodTableEntry::method_iterator begin_getters = mt->begin_getters (mid);
-        MethodTableEntry::method_iterator end_getters = mt->end_getters (mid);
-        int setter_mid = begin_setters != end_setters ? int (mid) : -1;
-        int getter_mid = begin_getters != end_getters ? int (mid) : -1;
-
-        bool is_static = false;
-        if (begin_setters != end_setters) {
-          is_static = (*begin_setters)->is_static ();
-        } else if (begin_getters != end_getters) {
-          is_static = (*begin_getters)->is_static ();
-        }
-
-        const std::string &name = mt->property_name (mid);
-
-        //  look for the real getter and setter, also look in the base classes
-        const gsi::ClassBase *cls = &*c;
-        while ((cls = cls->base ()) != 0 && (begin_setters == end_setters || begin_getters == end_getters)) {
-
-          const MethodTable *mt_base = MethodTable::method_table_by_class (cls);
-          tl_assert (mt_base);
-          std::pair<bool, size_t> t = mt_base->find_property (is_static, name);
-          if (t.first) {
-            if (begin_setters == end_setters && mt_base->begin_setters (t.second) != mt_base->end_setters (t.second)) {
-              setter_mid = int (t.second);
-              begin_setters = mt_base->begin_setters (t.second);
-              end_setters = mt_base->end_setters (t.second);
-            }
-            if (begin_getters == end_getters && mt_base->begin_getters (t.second) != mt_base->end_getters (t.second)) {
-              getter_mid = int (t.second);
-              begin_getters = mt_base->begin_getters (t.second);
-              end_getters = mt_base->end_getters (t.second);
-            }
+        const MethodTable *mt_base = MethodTable::method_table_by_class (cls);
+        tl_assert (mt_base);
+        std::pair<bool, size_t> t = mt_base->find_property (is_static, name);
+        if (t.first) {
+          if (begin_setters == end_setters && mt_base->begin_setters (t.second) != mt_base->end_setters (t.second)) {
+            setter_mid = int (t.second);
+            begin_setters = mt_base->begin_setters (t.second);
+            end_setters = mt_base->end_setters (t.second);
           }
-
-        }
-
-        std::string doc;
-
-        //  add getter and setter documentation, create specific Python documentation
-
-        for (MethodTableEntry::method_iterator m = begin_getters; m != end_getters; ++m) {
-          if (! doc.empty ()) {
-            doc += "\n\n";
+          if (begin_getters == end_getters && mt_base->begin_getters (t.second) != mt_base->end_getters (t.second)) {
+            getter_mid = int (t.second);
+            begin_getters = mt_base->begin_getters (t.second);
+            end_getters = mt_base->end_getters (t.second);
           }
-          doc += (*m)->doc ();
-          m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a readable attribute '%s'. This is the getter.\n\n")), name);
         }
-
-        for (MethodTableEntry::method_iterator m = begin_setters; m != end_setters; ++m) {
-          if (! doc.empty ()) {
-            doc += "\n\n";
-          }
-          doc += (*m)->doc ();
-          m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a writable attribute '%s'. This is the setter.\n\n")), name);
-        }
-
-        PythonRef attr;
-
-        if (! is_static) {
-
-          //  non-static attribute getters/setters
-          PyGetSetDef *getset = make_getset_def ();
-          getset->name = make_string (name);
-          getset->get = begin_getters != end_getters ? &property_getter_func : NULL;
-          getset->set = begin_setters != end_setters ? &property_setter_func : NULL;
-          getset->doc = make_string (doc);
-          getset->closure = make_closure (getter_mid, setter_mid);
-
-          attr = PythonRef (PyDescr_NewGetSet (type, getset));
-
-        } else {
-
-          PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (make_string (name));
-
-          desc->type = type;
-          desc->getter = begin_getters != end_getters ? property_getter_adaptors[getter_mid] : NULL;
-          desc->setter = begin_setters != end_setters ? property_setter_adaptors[setter_mid] : NULL;
-          attr = PythonRef (desc);
-
-        }
-
-        set_type_attr (type, name, attr);
 
       }
 
-      //  collec the names which have been disambiguated static/non-static wise
-      std::vector<std::string> disambiguated_names;
+      std::string doc;
 
-      //  check, whether there is an "inspect" method
-      bool has_inspect = false;
-      for (size_t mid = mt->bottom_mid (); mid < mt->top_mid () && ! has_inspect; ++mid) {
-        has_inspect = (mt->name (mid) == "inspect");
+      //  add getter and setter documentation, create specific Python documentation
+
+      for (MethodTableEntry::method_iterator m = begin_getters; m != end_getters; ++m) {
+        if (! doc.empty ()) {
+          doc += "\n\n";
+        }
+        doc += (*m)->doc ();
+        m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a readable attribute '%s'. This is the getter.\n\n")), name);
       }
 
-      //  produce the methods now
-      for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
+      for (MethodTableEntry::method_iterator m = begin_setters; m != end_setters; ++m) {
+        if (! doc.empty ()) {
+          doc += "\n\n";
+        }
+        doc += (*m)->doc ();
+        m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a writable attribute '%s'. This is the setter.\n\n")), name);
+      }
 
-        std::string name = mt->name (mid);
+      PythonRef attr;
 
-        //  extract a suitable Python name
-        name = extract_python_name (name);
+      if (! is_static) {
 
-        //  cannot extract a Python name
-        if (name.empty ()) {
+        //  non-static attribute getters/setters
+        PyGetSetDef *getset = make_getset_def ();
+        getset->name = make_string (name);
+        getset->get = begin_getters != end_getters ? &property_getter_func : NULL;
+        getset->set = begin_setters != end_setters ? &property_setter_func : NULL;
+        getset->doc = make_string (doc);
+        getset->closure = make_closure (getter_mid, setter_mid);
+
+        attr = PythonRef (PyDescr_NewGetSet (type, getset));
+
+      } else {
+
+        PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (make_string (name));
+
+        desc->type = type;
+        desc->getter = begin_getters != end_getters ? property_getter_adaptors[getter_mid] : NULL;
+        desc->setter = begin_setters != end_setters ? property_setter_adaptors[setter_mid] : NULL;
+        attr = PythonRef (desc);
+
+      }
+
+      set_type_attr (type, name, attr);
+
+    }
+
+    //  collect the names which have been disambiguated static/non-static wise
+    std::vector<std::string> disambiguated_names;
+
+    //  check, whether there is an "inspect" method
+    bool has_inspect = false;
+    for (size_t mid = mt->bottom_mid (); mid < mt->top_mid () && ! has_inspect; ++mid) {
+      has_inspect = (mt->name (mid) == "inspect");
+    }
+
+    //  produce the methods now
+    for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
+
+      std::string name = mt->name (mid);
+
+      //  extract a suitable Python name
+      name = extract_python_name (name);
+
+      //  cannot extract a Python name
+      if (name.empty ()) {
+
+        //  drop non-standard names
+        if (tl::verbosity () >= 20) {
+          tl::warn << tl::to_string (tr ("Class ")) << (*c)->name () << ": " << tl::to_string (tr ("no Python mapping for method ")) << mt->name (mid);
+        }
+
+        add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
+
+      } else {
+
+        std::string raw_name = name;
+
+        //  does this method hide a property? -> append "_" in that case
+        std::pair<bool, size_t> t = mt->find_property (mt->is_static (mid), name);
+        if (t.first) {
+          name += "_";
+        }
+
+        //  needs static/non-static disambiguation?
+        t = mt->find_method (! mt->is_static (mid), name);
+        if (t.first) {
+
+          disambiguated_names.push_back (name);
+          if (mt->is_static (mid)) {
+            name = "_class_" + name;
+          } else {
+            name = "_inst_" + name;
+          }
+
+        } else if (is_reserved_word (name)) {
 
           //  drop non-standard names
           if (tl::verbosity () >= 20) {
-            tl::warn << tl::to_string (tr ("Class ")) << c->name () << ": " << tl::to_string (tr ("no Python mapping for method ")) << mt->name (mid);
+            tl::warn << tl::to_string (tr ("Class ")) << (*c)->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
           }
 
-          add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
+          name += "_";
 
-        } else {
+        }
 
-          std::string raw_name = name;
+        if (name != raw_name) {
+          add_python_doc (**c, mt, int (mid), tl::sprintf (tl::to_string (tr ("This method is available as method '%s' in Python")), name));
+        }
 
-          //  does this method hide a property? -> append "_" in that case
-          std::pair<bool, size_t> t = mt->find_property (mt->is_static (mid), name);
-          if (t.first) {
-            name += "_";
+        //  create documentation
+        std::string doc;
+        for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
+          if (! doc.empty ()) {
+            doc = "\n\n";
           }
+          doc += (*m)->doc ();
+        }
 
-          //  needs static/non-static disambiguation?
-          t = mt->find_method (! mt->is_static (mid), name);
-          if (t.first) {
+        const gsi::MethodBase *m_first = *mt->begin (mid);
 
-            disambiguated_names.push_back (name);
-            if (mt->is_static (mid)) {
-              name = "_class_" + name;
-            } else {
-              name = "_inst_" + name;
-            }
+        tl_assert (mid < sizeof (method_adaptors) / sizeof (method_adaptors[0]));
+        if (! mt->is_static (mid)) {
 
-          } else if (is_reserved_word (name)) {
+          std::vector<std::string> alt_names;
 
-            //  drop non-standard names
-            if (tl::verbosity () >= 20) {
-              tl::warn << tl::to_string (tr ("Class ")) << c->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
-            }
+          if (name == "to_s" && m_first->compatible_with_num_args (0)) {
 
-            name += "_";
-
-          }
-
-          if (name != raw_name) {
-            add_python_doc (*c, mt, int (mid), tl::sprintf (tl::to_string (tr ("This method is available as method '%s' in Python")), name));
-          }
-
-          //  create documentation
-          std::string doc;
-          for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-            if (! doc.empty ()) {
-              doc = "\n\n";
-            }
-            doc += (*m)->doc ();
-          }
-
-          const gsi::MethodBase *m_first = *mt->begin (mid);
-
-          tl_assert (mid < sizeof (method_adaptors) / sizeof (method_adaptors[0]));
-          if (! mt->is_static (mid)) {
-
-            std::vector<std::string> alt_names;
-
-            if (name == "to_s" && m_first->compatible_with_num_args (0)) {
-
-              //  The str method is also routed via the tp_str implementation
-              alt_names.push_back ("__str__");
-              if (! has_inspect) {
-                add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
-                alt_names.push_back ("__repr__");
-              } else {
-                add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)'")));
-              }
-
-            } else if (name == "hash" && m_first->compatible_with_num_args (0)) {
-
-              //  The hash method is also routed via the tp_hash implementation
-              alt_names.push_back ("__hash__");
-              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'hash(object)'")));
-
-            } else if (name == "inspect" && m_first->compatible_with_num_args (0)) {
-
-              //  The str method is also routed via the tp_str implementation
-              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'repr(object)'")));
+            //  The str method is also routed via the tp_str implementation
+            alt_names.push_back ("__str__");
+            if (! has_inspect) {
+              add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
               alt_names.push_back ("__repr__");
-
-            } else if (name == "size" && m_first->compatible_with_num_args (0)) {
-
-              //  The size method is also routed via the sequence methods protocol if there
-              //  is a [] function
-              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'len(object)'")));
-              alt_names.push_back ("__len__");
-
-            } else if (name == "each" && m_first->compatible_with_num_args (0) && m_first->ret_type ().is_iter ()) {
-
-              //  each makes the object iterable
-              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method enables iteration of the object")));
-              alt_names.push_back ("__iter__");
-
-            } else if (name == "__mul__") {
-              // Adding right multiplication
-              // Rationale: if pyaObj * x works, so should x * pyaObj
-              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as '__mul__'")));
-              alt_names.push_back ("__rmul__");
+            } else {
+              add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)'")));
             }
 
-            for (std::vector <std::string>::const_iterator an = alt_names.begin (); an != alt_names.end (); ++an) {
+          } else if (name == "hash" && m_first->compatible_with_num_args (0)) {
 
-              //  needs registration under an alternative name to enable special protocols
+            //  The hash method is also routed via the tp_hash implementation
+            alt_names.push_back ("__hash__");
+            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'hash(object)'")));
 
-              PyMethodDef *method = make_method_def ();
-              method->ml_name = make_string (*an);
-              method->ml_meth = (PyCFunction) method_adaptors[mid];
-              method->ml_doc = make_string (doc);
-              method->ml_flags = METH_VARARGS;
+          } else if (name == "inspect" && m_first->compatible_with_num_args (0)) {
 
-              PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-              set_type_attr (type, *an, attr);
+            //  The str method is also routed via the tp_str implementation
+            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'repr(object)'")));
+            alt_names.push_back ("__repr__");
 
-            }
+          } else if (name == "size" && m_first->compatible_with_num_args (0)) {
+
+            //  The size method is also routed via the sequence methods protocol if there
+            //  is a [] function
+            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'len(object)'")));
+            alt_names.push_back ("__len__");
+
+          } else if (name == "each" && m_first->compatible_with_num_args (0) && m_first->ret_type ().is_iter ()) {
+
+            //  each makes the object iterable
+            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method enables iteration of the object")));
+            alt_names.push_back ("__iter__");
+
+          } else if (name == "__mul__") {
+            // Adding right multiplication
+            // Rationale: if pyaObj * x works, so should x * pyaObj
+            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as '__mul__'")));
+            alt_names.push_back ("__rmul__");
+          }
+
+          for (std::vector <std::string>::const_iterator an = alt_names.begin (); an != alt_names.end (); ++an) {
+
+            //  needs registration under an alternative name to enable special protocols
 
             PyMethodDef *method = make_method_def ();
-            method->ml_name = make_string (name);
+            method->ml_name = make_string (*an);
             method->ml_meth = (PyCFunction) method_adaptors[mid];
             method->ml_doc = make_string (doc);
             method->ml_flags = METH_VARARGS;
 
             PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-            set_type_attr (type, name, attr);
-
-          } else if (isupper (name [0]) || m_first->is_const ()) {
-
-            if ((mt->end (mid) - mt->begin (mid)) == 1 && m_first->begin_arguments () == m_first->end_arguments ()) {
-
-              //  static methods without arguments which start with a capital letter are treated as constants
-              PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (make_string (name));
-              desc->type = type;
-              desc->getter = method_adaptors[mid];
-
-              PythonRef attr (desc);
-              set_type_attr (type, name, attr);
-
-            } else if (tl::verbosity () >= 20) {
-              tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << c->name () << "." << name;
-              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
-            }
-
-          } else {
-
-            if (m_first->ret_type ().type () == gsi::T_object && m_first->ret_type ().pass_obj () && name == "new") {
-
-              //  The constructor is also routed via the pya_object_init implementation
-              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is the default initializer of the object")));
-
-              PyMethodDef *method = make_method_def ();
-              method->ml_name = "__init__";
-              method->ml_meth = (PyCFunction) method_init_adaptors[mid];
-              method->ml_doc = make_string (doc);
-              method->ml_flags = METH_VARARGS;
-
-              PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-              set_type_attr (type, method->ml_name, attr);
-
-            }
-
-            PyMethodDef *method = make_method_def ();
-            method->ml_name = make_string (name);
-            method->ml_meth = (PyCFunction) method_adaptors[mid];
-            method->ml_doc = make_string (doc);
-            method->ml_flags = METH_VARARGS | METH_CLASS;
-
-            PythonRef attr = PythonRef (PyDescr_NewClassMethod (type, method));
-            set_type_attr (type, name, attr);
+            set_type_attr (type, *an, attr);
 
           }
 
-        }
-
-      }
-
-      //  Complete the comparison operators if necessary.
-      //  Unlike Ruby, Python does not automatically implement != from == for example.
-      //  We assume that "==" and "<" are the minimum requirements for full comparison
-      //  and "==" is the minimum requirement for equality. Hence:
-      //    * If "==" is given, but no "!=", synthesize
-      //        "a != b" by "!a == b"
-      //    * If "==" and "<" are given, synthesize if required
-      //        "a <= b" by "a < b || a == b"
-      //        "a > b" by "!(a < b || a == b)"  (could be b < a, but this avoids having to switch arguments)
-      //        "a >= b" by "!a < b"
-
-      bool has_eq = mt->find_method (false, "==").first;
-      bool has_ne = mt->find_method (false, "!=").first;
-      bool has_lt = mt->find_method (false, "<").first;
-      bool has_le = mt->find_method (false, "<=").first;
-      bool has_gt = mt->find_method (false, ">").first;
-      bool has_ge = mt->find_method (false, ">=").first;
-      bool has_cmp = mt->find_method (false, "<=>").first;
-
-      if (! has_cmp && has_eq) {
-
-        if (! has_ne) {
-
-          //  Add a definition for "__ne__"
           PyMethodDef *method = make_method_def ();
-          method->ml_name = "__ne__";
-          method->ml_meth = &object_default_ne_impl;
+          method->ml_name = make_string (name);
+          method->ml_meth = (PyCFunction) method_adaptors[mid];
+          method->ml_doc = make_string (doc);
           method->ml_flags = METH_VARARGS;
 
           PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-          set_type_attr (type, method->ml_name, attr);
+          set_type_attr (type, name, attr);
 
-        }
+        } else if (isupper (name [0]) || m_first->is_const ()) {
 
-        if (has_lt && ! has_le) {
+          if ((mt->end (mid) - mt->begin (mid)) == 1 && m_first->begin_arguments () == m_first->end_arguments ()) {
 
-          //  Add a definition for "__le__"
-          PyMethodDef *method = make_method_def ();
-          method->ml_name = "__le__";
-          method->ml_meth = &object_default_le_impl;
-          method->ml_flags = METH_VARARGS;
+            //  static methods without arguments which start with a capital letter are treated as constants
+            PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (make_string (name));
+            desc->type = type;
+            desc->getter = method_adaptors[mid];
 
-          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-          set_type_attr (type, method->ml_name, attr);
+            PythonRef attr (desc);
+            set_type_attr (type, name, attr);
 
-        }
-
-        if (has_lt && ! has_gt) {
-
-          //  Add a definition for "__gt__"
-          PyMethodDef *method = make_method_def ();
-          method->ml_name = "__gt__";
-          method->ml_meth = &object_default_gt_impl;
-          method->ml_flags = METH_VARARGS;
-
-          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-          set_type_attr (type, method->ml_name, attr);
-
-        }
-
-        if (has_lt && ! has_ge) {
-
-          //  Add a definition for "__ge__"
-          PyMethodDef *method = make_method_def ();
-          method->ml_name = "__ge__";
-          method->ml_meth = &object_default_ge_impl;
-          method->ml_flags = METH_VARARGS;
-
-          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-          set_type_attr (type, method->ml_name, attr);
-
-        }
-
-      }
-
-      //  install the static/non-static dispatcher descriptor
-
-      for (std::vector<std::string>::const_iterator a = disambiguated_names.begin (); a != disambiguated_names.end (); ++a) {
-
-        PyObject *attr_inst = PyObject_GetAttrString ((PyObject *) type, ("_inst_" + *a).c_str ());
-        PyObject *attr_class = PyObject_GetAttrString ((PyObject *) type, ("_class_" + *a).c_str ());
-        if (attr_inst == NULL || attr_class == NULL) {
-
-          //  some error -> don't install the disambiguator
-          Py_XDECREF (attr_inst);
-          Py_XDECREF (attr_class);
-          PyErr_Clear ();
-
-          tl::warn << "Unable to install a static/non-static disambiguator for " << *a << " in class " << c->name ();
+          } else if (tl::verbosity () >= 20) {
+            tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << (*c)->name () << "." << name;
+            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
+          }
 
         } else {
 
-          PyObject *desc = PYAAmbiguousMethodDispatcher::create (attr_inst, attr_class);
-          PythonRef name (c2python (*a));
-          //  Note: we use GenericSetAttr since that one allows us setting attributes on built-in types
-          PyObject_GenericSetAttr ((PyObject *) type, name.get (), desc);
+          if (m_first->ret_type ().type () == gsi::T_object && m_first->ret_type ().pass_obj () && name == "new") {
+
+            //  The constructor is also routed via the pya_object_init implementation
+            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is the default initializer of the object")));
+
+            PyMethodDef *method = make_method_def ();
+            method->ml_name = "__init__";
+            method->ml_meth = (PyCFunction) method_init_adaptors[mid];
+            method->ml_doc = make_string (doc);
+            method->ml_flags = METH_VARARGS;
+
+            PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+            set_type_attr (type, method->ml_name, attr);
+
+          }
+
+          PyMethodDef *method = make_method_def ();
+          method->ml_name = make_string (name);
+          method->ml_meth = (PyCFunction) method_adaptors[mid];
+          method->ml_doc = make_string (doc);
+          method->ml_flags = METH_VARARGS | METH_CLASS;
+
+          PythonRef attr = PythonRef (PyDescr_NewClassMethod (type, method));
+          set_type_attr (type, name, attr);
 
         }
 
       }
 
-      mt->finish ();
+    }
+
+    //  Complete the comparison operators if necessary.
+    //  Unlike Ruby, Python does not automatically implement != from == for example.
+    //  We assume that "==" and "<" are the minimum requirements for full comparison
+    //  and "==" is the minimum requirement for equality. Hence:
+    //    * If "==" is given, but no "!=", synthesize
+    //        "a != b" by "!a == b"
+    //    * If "==" and "<" are given, synthesize if required
+    //        "a <= b" by "a < b || a == b"
+    //        "a > b" by "!(a < b || a == b)"  (could be b < a, but this avoids having to switch arguments)
+    //        "a >= b" by "!a < b"
+
+    bool has_eq = mt->find_method (false, "==").first;
+    bool has_ne = mt->find_method (false, "!=").first;
+    bool has_lt = mt->find_method (false, "<").first;
+    bool has_le = mt->find_method (false, "<=").first;
+    bool has_gt = mt->find_method (false, ">").first;
+    bool has_ge = mt->find_method (false, ">=").first;
+    bool has_cmp = mt->find_method (false, "<=>").first;
+
+    if (! has_cmp && has_eq) {
+
+      if (! has_ne) {
+
+        //  Add a definition for "__ne__"
+        PyMethodDef *method = make_method_def ();
+        method->ml_name = "__ne__";
+        method->ml_meth = &object_default_ne_impl;
+        method->ml_flags = METH_VARARGS;
+
+        PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+        set_type_attr (type, method->ml_name, attr);
+
+      }
+
+      if (has_lt && ! has_le) {
+
+        //  Add a definition for "__le__"
+        PyMethodDef *method = make_method_def ();
+        method->ml_name = "__le__";
+        method->ml_meth = &object_default_le_impl;
+        method->ml_flags = METH_VARARGS;
+
+        PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+        set_type_attr (type, method->ml_name, attr);
+
+      }
+
+      if (has_lt && ! has_gt) {
+
+        //  Add a definition for "__gt__"
+        PyMethodDef *method = make_method_def ();
+        method->ml_name = "__gt__";
+        method->ml_meth = &object_default_gt_impl;
+        method->ml_flags = METH_VARARGS;
+
+        PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+        set_type_attr (type, method->ml_name, attr);
+
+      }
+
+      if (has_lt && ! has_ge) {
+
+        //  Add a definition for "__ge__"
+        PyMethodDef *method = make_method_def ();
+        method->ml_name = "__ge__";
+        method->ml_meth = &object_default_ge_impl;
+        method->ml_flags = METH_VARARGS;
+
+        PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+        set_type_attr (type, method->ml_name, attr);
+
+      }
 
     }
 
-    if (! any && more_classes) {
-      //  prevent infinite recursion
-      throw tl::Exception ("Internal error: infinite recursion on class building. Reason is: " + reason_for_more);
+    //  install the static/non-static dispatcher descriptor
+
+    for (std::vector<std::string>::const_iterator a = disambiguated_names.begin (); a != disambiguated_names.end (); ++a) {
+
+      PyObject *attr_inst = PyObject_GetAttrString ((PyObject *) type, ("_inst_" + *a).c_str ());
+      PyObject *attr_class = PyObject_GetAttrString ((PyObject *) type, ("_class_" + *a).c_str ());
+      if (attr_inst == NULL || attr_class == NULL) {
+
+        //  some error -> don't install the disambiguator
+        Py_XDECREF (attr_inst);
+        Py_XDECREF (attr_class);
+        PyErr_Clear ();
+
+        tl::warn << "Unable to install a static/non-static disambiguator for " << *a << " in class " << (*c)->name ();
+
+      } else {
+
+        PyObject *desc = PYAAmbiguousMethodDispatcher::create (attr_inst, attr_class);
+        PythonRef name (c2python (*a));
+        //  Note: we use GenericSetAttr since that one allows us setting attributes on built-in types
+        PyObject_GenericSetAttr ((PyObject *) type, name.get (), desc);
+
+      }
+
     }
+
+    mt->finish ();
 
   }
 }

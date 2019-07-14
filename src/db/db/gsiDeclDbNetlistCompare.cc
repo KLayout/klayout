@@ -315,7 +315,13 @@ public:
 namespace gsi
 {
 
-Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "GenericNetlistCompareLogger",
+Class<db::NetlistCompareLogger> decl_dbNetlistCompareLogger ("db", "NetlistCompareLogger",
+  gsi::Methods (),
+  "@brief A base class for netlist comparer event receivers\n"
+  "See \\GenericNetlistCompareLogger for custom implementations of such receivers."
+);
+
+Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetlistCompareLogger, "db", "GenericNetlistCompareLogger",
   gsi::callback ("begin_netlist", &GenericNetlistCompareLogger::begin_netlist, &GenericNetlistCompareLogger::cb_begin_netlist, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called at the beginning of the compare process.\n"
     "This method is called once when the compare run begins.\n"
@@ -374,6 +380,10 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
     "@brief This function is called when a net can't be paired.\n"
     "This method will be called, if a net cannot be identified as identical with another net. The corresponding argument "
     "will identify the net and source netlist. The other argument will be nil.\n"
+    "\n"
+    "In some cases, a mismatch is reported with two nets given. This means,\n"
+    "nets are known not to match. Still the compare algorithm will proceed as\n"
+    "if these nets were equivalent to derive further matches.\n"
   ) +
   gsi::callback ("match_devices", &GenericNetlistCompareLogger::match_devices, &GenericNetlistCompareLogger::cb_match_devices, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called when two devices are identified.\n"
@@ -425,7 +435,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger ("db", "Gene
 
 static db::NetlistComparer *make_comparer0 ()
 {
-  return new db::NetlistComparer (0);
+  return new db::NetlistComparer ();
 }
 
 static db::NetlistComparer *make_comparer1 (GenericNetlistCompareLogger *logger)
@@ -505,9 +515,15 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "@brief Gets the maximum branch complexity\n"
     "See \\max_branch_complexity= for details."
   ) +
-  gsi::method ("compare", &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"),
+  gsi::method ("compare", (bool (db::NetlistComparer::*) (const db::Netlist *, const db::Netlist *) const) &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"),
     "@brief Compares two netlists.\n"
     "This method will perform the actual netlist compare. It will return true if both netlists are identical. "
+    "If the comparer has been configured with \\same_nets or similar methods, the objects given there must "
+    "be located inside 'circuit_a' and 'circuit_b' respectively."
+  ) +
+  gsi::method ("compare", (bool (db::NetlistComparer::*) (const db::Netlist *, const db::Netlist *, db::NetlistCompareLogger *) const) &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"), gsi::arg ("logger"),
+    "@brief Compares two netlists.\n"
+    "This method will perform the actual netlist compare using the given logger. It will return true if both netlists are identical. "
     "If the comparer has been configured with \\same_nets or similar methods, the objects given there must "
     "be located inside 'circuit_a' and 'circuit_b' respectively."
   ),

@@ -132,9 +132,31 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
 
   for (layer_definitions::const_iterator ld = begin_layer_definitions (); ld != end_layer_definitions (); ++ld) {
 
-    input_layers::const_iterator l = layer_map.find (ld->name);
+    size_t ld_index = ld->index;
+    input_layers::const_iterator l = layer_map.find (m_layer_definitions [ld_index].name);
+    while (l == layer_map.end () && m_layer_definitions [ld_index].fallback_index < m_layer_definitions.size ()) {
+      //  try fallback layer
+      ld_index = m_layer_definitions [ld_index].fallback_index;
+      l = layer_map.find (m_layer_definitions [ld_index].name);
+    }
+
     if (l == layer_map.end ()) {
-      throw tl::Exception (tl::to_string (tr ("Missing input layer for device extraction: ")) + ld->name);
+
+      //  gets the layer names for the error message
+      std::string layer_names = m_layer_definitions [ld_index].name;
+      ld_index = ld->index;
+      l = layer_map.find (m_layer_definitions [ld_index].name);
+      while (l == layer_map.end () && m_layer_definitions [ld_index].fallback_index < m_layer_definitions.size ()) {
+        ld_index = m_layer_definitions [ld_index].fallback_index;
+        std::string ln = m_layer_definitions [ld_index].name;
+        layer_names += "/";
+        layer_names += ln;
+        l = layer_map.find (ln);
+      }
+
+      //  TODO: maybe use empty layers for optional ones?
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Missing input layer for device extraction (device %s): %s")), name (), layer_names));
+
     }
 
     tl_assert (l->second != 0);
@@ -145,9 +167,6 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
       if (alias.first) {
         //  use deep layer alias for a given flat one (if found)
         layers.push_back (alias.second.layer ());
-      } else if (l->second->empty ()) {
-        //  provide a substitute empty layer
-        layers.push_back (dss.empty_layer (layout_index).layer ());
       } else {
         throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid region passed to input layer '%s' for device extraction (device %s): must be of deep region kind")), ld->name, name ()));
       }
@@ -260,9 +279,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
     } else {
 
       //  create a new circuit for this cell
-      mp_circuit = new db::Circuit ();
-      mp_circuit->set_cell_index (*ci);
-      mp_circuit->set_name (layout.cell_name (*ci));
+      mp_circuit = new db::Circuit (layout, *ci);
       m_netlist->add_circuit (mp_circuit);
 
     }
@@ -339,8 +356,8 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
 
     db::Device *device = d->second.first;
 
-    db::Vector disp = dbu_inv * device->position () - db::Point ();
-    device->set_position (device->position () + dbu * disp_cache);
+    db::Vector disp = dbu_inv * device->trans ().disp ();
+    device->set_trans (db::DCplxTrans (device->trans ().disp () + dbu * disp_cache));
 
     DeviceCellKey key;
 
@@ -426,11 +443,11 @@ void NetlistDeviceExtractor::push_cached_devices (const tl::vector<db::Device *>
   for (std::vector<db::Device *>::const_iterator d = cached_devices.begin (); d != cached_devices.end (); ++d) {
 
     db::Device *cached_device = *d;
-    db::Vector disp = dbu_inv * cached_device->position () - disp_cache - db::Point ();
+    db::Vector disp = dbu_inv * cached_device->trans ().disp () - disp_cache;
 
     db::Device *device = new db::Device (*cached_device);
     mp_circuit->add_device (device);
-    device->set_position (device->position () + dbu * (new_disp - disp_cache));
+    device->set_trans (db::DCplxTrans (device->trans ().disp () + dbu * (new_disp - disp_cache)));
 
     //  Build a property set for the device ID
     ps.clear ();
@@ -476,9 +493,16 @@ void NetlistDeviceExtractor::register_device_class (DeviceClass *device_class)
   m_netlist->add_device_class (device_class);
 }
 
-void NetlistDeviceExtractor::define_layer (const std::string &name, const std::string &description)
+const db::NetlistDeviceExtractorLayerDefinition &NetlistDeviceExtractor::define_layer (const std::string &name, const std::string &description)
 {
-  m_layer_definitions.push_back (db::NetlistDeviceExtractorLayerDefinition (name, description, m_layer_definitions.size ()));
+  m_layer_definitions.push_back (db::NetlistDeviceExtractorLayerDefinition (name, description, m_layer_definitions.size (), std::numeric_limits<size_t>::max ()));
+  return m_layer_definitions.back ();
+}
+
+const db::NetlistDeviceExtractorLayerDefinition &NetlistDeviceExtractor::define_layer (const std::string &name, size_t fallback, const std::string &description)
+{
+  m_layer_definitions.push_back (db::NetlistDeviceExtractorLayerDefinition (name, description, m_layer_definitions.size (), fallback));
+  return m_layer_definitions.back ();
 }
 
 Device *NetlistDeviceExtractor::create_device ()
@@ -491,6 +515,21 @@ Device *NetlistDeviceExtractor::create_device ()
   Device *device = new Device (mp_device_class);
   mp_circuit->add_device (device);
   return device;
+}
+
+void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t geometry_index, const db::Region &region)
+{
+  tl_assert (mp_layout != 0);
+  tl_assert (geometry_index < m_layers.size ());
+  unsigned int layer_index = m_layers [geometry_index];
+
+  std::pair<db::Device *, geometry_per_terminal_type> &dd = m_new_devices[device->id ()];
+  dd.first = device;
+  std::vector<db::PolygonRef> &geo = dd.second[terminal_id][layer_index];
+
+  for (db::Region::const_iterator p = region.begin_merged (); !p.at_end (); ++p) {
+    geo.push_back (db::PolygonRef (*p, mp_layout->shape_repository ()));
+  }
 }
 
 void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t geometry_index, const db::Polygon &polygon)

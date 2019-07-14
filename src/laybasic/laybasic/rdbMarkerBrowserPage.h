@@ -69,7 +69,7 @@ public:
    */
   void set_plugin_root (lay::PluginRoot *pr);
 
-  /*
+  /**
    *  @brief Attach the page to a view
    *
    *  This method can be given a layout view object.

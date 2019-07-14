@@ -34,6 +34,9 @@ class DBNetlist_TestClass < TestBase
     c.name = "XYZ"
     assert_equal(c.name, "XYZ")
 
+    c.boundary = RBA::DPolygon::new(RBA::DBox::new(0, 1, 2, 3))
+    assert_equal(c.boundary.to_s, "(0,1;0,3;2,3;2,1)")
+
     c.cell_index = 42
     assert_equal(c.cell_index, 42)
 
@@ -43,6 +46,10 @@ class DBNetlist_TestClass < TestBase
     assert_equal(nl.circuit_by_name("DOESNOTEXIST").inspect, "nil")
 
     cc = RBA::Circuit::new
+    assert_equal(cc.dont_purge, false)
+    cc.dont_purge = true
+    assert_equal(cc.dont_purge, true)
+
     nl.add(cc)
     cc.name = "ABC"
 
@@ -262,7 +269,72 @@ class DBNetlist_TestClass < TestBase
 
     d2.connect_terminal(0, net)
     assert_equal(net.terminal_count, 1)
+
+    assert_equal(d1.is_combined_device?, false)
+
+    da = RBA::DeviceAbstract::new
+    da.name = "xyz"
+    d1.device_abstract = da
+
+    a = []
+    d1.each_combined_abstract { |i| a << i }
+    assert_equal(a.size, 0)
+
+    t = RBA::DeviceAbstractRef::new
+    t.device_abstract = d1.device_abstract
+    t.trans = RBA::DCplxTrans::new(RBA::DVector::new(1, 2))
+    d1.add_combined_abstract(t)
+
+    a = []
+    d1.each_combined_abstract { |i| a << i }
+    assert_equal(a.size, 1)
+    assert_equal(a.collect { |i| i.device_abstract.name }.join(","), "xyz")
+    assert_equal(a.collect { |i| i.trans.to_s }.join(","), "r0 *1 1,2")
     
+    d1.clear_combined_abstracts
+
+    a = []
+    d1.each_combined_abstract { |i| a << i }
+    assert_equal(a.size, 0)
+
+    a = []
+    d1.each_reconnected_terminal_for(0) { |i| a << i }
+    assert_equal(a.size, 0)
+
+    a = []
+    d1.each_reconnected_terminal_for(1) { |i| a << i }
+    assert_equal(a.size, 0)
+
+    t = RBA::DeviceReconnectedTerminal::new
+    t.device_index = 0
+    t.other_terminal_id = 2
+    d1.add_reconnected_terminal_for(1, t)
+
+    t = RBA::DeviceReconnectedTerminal::new
+    t.device_index = 1
+    t.other_terminal_id = 1
+    d1.add_reconnected_terminal_for(1, t)
+    
+    a = []
+    d1.each_reconnected_terminal_for(0) { |i| a << i }
+    assert_equal(a.size, 0)
+
+    a = []
+    d1.each_reconnected_terminal_for(1) { |i| a << i }
+    assert_equal(a.size, 2)
+    assert_equal(a.collect { |i| i.device_index.to_s }.join(","), "0,1")
+    assert_equal(a.collect { |i| i.other_terminal_id.to_s }.join(","), "2,1")
+    
+    d1.clear_reconnected_terminals
+
+    a = []
+    d1.each_reconnected_terminal_for(0) { |i| a << i }
+    assert_equal(a.size, 0)
+
+    a = []
+    d1.each_reconnected_terminal_for(1) { |i| a << i }
+    assert_equal(a.size, 0)
+
   end
 
   def test_5_SubCircuit
@@ -648,11 +720,11 @@ END
 
     names = []
     nl.each_circuit_top_down { |c| names << c.name }
-    assert_equal(names.join(","), "C1,C2,C3")
+    assert_equal(names.join(","), "C3,C2,C1")
 
     names = []
     nl.each_circuit_bottom_up { |c| names << c.name }
-    assert_equal(names.join(","), "C3,C2,C1")
+    assert_equal(names.join(","), "C1,C2,C3")
 
     names = []
     c1.each_child { |c| names << c.name }
@@ -691,11 +763,11 @@ END
 
     names = []
     nl.each_circuit_top_down { |c| names << c.name }
-    assert_equal(names.join(","), "C1,C2,C3")
+    assert_equal(names.join(","), "C1,C3,C2")
 
     names = []
     nl.each_circuit_bottom_up { |c| names << c.name }
-    assert_equal(names.join(","), "C3,C2,C1")
+    assert_equal(names.join(","), "C2,C3,C1")
 
     c3.create_subcircuit(c2)
     assert_equal(nl.top_circuit_count, 1)
@@ -764,6 +836,7 @@ circuit NTRANS ($1=$1,$2=$2,$3=$3);
 end;
 END
 
+    nl3 = nl2.dup
     nl2.flatten_circuit(nl2.circuit_by_name("PTRANS"))
     nl2.flatten_circuit(nl2.circuit_by_name("NTRANS"))
 
@@ -773,6 +846,101 @@ circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
   device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
   device NMOS $3 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
   device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);
+end;
+END
+
+    nl3.flatten_circuit("{N,P}TRANS")
+    assert_equal(nl3.to_s, nl2.to_s)
+
+    nl2 = nl.dup
+    nl2.flatten_circuit("*")   # smoke test
+    assert_equal(nl2.to_s, "")
+
+  end
+
+  def test_12_BlankAndPurgeCircuits
+
+    nl = RBA::Netlist::new
+
+    dc = RBA::DeviceClassMOS3Transistor::new
+    dc.name = "NMOS"
+    nl.add(dc)
+
+    dc = RBA::DeviceClassMOS3Transistor::new
+    dc.name = "PMOS"
+    nl.add(dc)
+
+    nl.from_s(<<"END")
+circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);
+  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);
+  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);
+end;
+circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);
+  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);
+  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);
+  subcircuit PTRANS SC3 ($1=$5,$2=OUT,$3=$2);
+  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$2);
+end;
+circuit PTRANS ($1=$1,$2=$2,$3=$3);
+  device PMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);
+end;
+circuit NTRANS ($1=$1,$2=$2,$3=$3);
+  device NMOS $1 (S=$1,D=$2,G=$3) (L=0.25,W=0.95);
+end;
+END
+
+    nl2 = nl.dup
+    circuit = nl2.circuit_by_name("INV2")
+    nl2.purge_circuit(circuit)
+
+    assert_equal(nl2.to_s, <<"END")
+circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);
+  subcircuit (null);
+  subcircuit (null);
+end;
+END
+
+    nl2 = nl.dup
+    circuit = nl2.circuit_by_name("INV2")
+    circuit.blank
+
+    assert_equal(nl2.to_s, <<"END")
+circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);
+  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);
+  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);
+end;
+circuit INV2 (IN=(null),$2=(null),OUT=(null),$4=(null),$5=(null));
+end;
+END
+
+    nl2 = nl.dup
+    circuit = nl2.circuit_by_name("RINGO")
+    nl2.purge_circuit(circuit)
+
+    assert_equal(nl2.to_s, "")
+
+    nl2 = nl.dup
+    circuit = nl2.circuit_by_name("RINGO")
+    circuit.blank
+
+    assert_equal(nl2.to_s, <<"END")
+circuit RINGO (IN=(null),OSC=(null),VSS=(null),VDD=(null));
+end;
+END
+
+    nl2 = nl.dup
+    nl2.blank_circuit("*")
+
+    assert_equal(nl2.to_s, <<"END")
+circuit RINGO (IN=(null),OSC=(null),VSS=(null),VDD=(null));
+end;
+END
+
+    nl2 = nl.dup
+    nl2.blank_circuit("RINGO")
+
+    assert_equal(nl2.to_s, <<"END")
+circuit RINGO (IN=(null),OSC=(null),VSS=(null),VDD=(null));
 end;
 END
 

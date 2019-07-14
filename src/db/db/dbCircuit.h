@@ -30,6 +30,7 @@
 #include "dbPin.h"
 #include "dbSubCircuit.h"
 #include "dbNetlistUtils.h"
+#include "dbPolygon.h"
 
 #include "tlObject.h"
 #include "tlObjectCollection.h"
@@ -40,6 +41,43 @@ namespace db
 {
 
 class Netlist;
+class Layout;
+
+/**
+ *  @brief An iterator wrapper for the child and parent circuit iterator
+ */
+template <class Iter, class Value>
+struct DB_PUBLIC_TEMPLATE dereferencing_iterator
+  : public Iter
+{
+public:
+  typedef Value *pointer;
+  typedef Value &reference;
+  typedef typename Iter::difference_type difference_type;
+
+  dereferencing_iterator () { }
+  dereferencing_iterator (const dereferencing_iterator &d) : Iter (d) { }
+  dereferencing_iterator (const Iter &d) : Iter (d) { }
+  dereferencing_iterator &operator= (const dereferencing_iterator &d)
+  {
+    Iter::operator= (d);
+    return *this;
+  }
+
+  dereferencing_iterator operator+ (difference_type offset) const
+  {
+    return dereferencing_iterator (Iter::operator+ (offset));
+  }
+
+  dereferencing_iterator &operator+= (difference_type offset)
+  {
+    Iter::operator+= (offset);
+    return *this;
+  }
+
+  pointer operator-> () const { return Iter::operator* (); }
+  reference operator* () const { return *Iter::operator* (); }
+};
 
 /**
  *  @brief A circuit
@@ -65,10 +103,10 @@ public:
   typedef subcircuit_list::iterator subcircuit_iterator;
   typedef tl::weak_collection<SubCircuit>::const_iterator const_refs_iterator;
   typedef tl::weak_collection<SubCircuit>::iterator refs_iterator;
-  typedef tl::vector<Circuit *>::const_iterator child_circuit_iterator;
-  typedef tl::vector<const Circuit *>::const_iterator const_child_circuit_iterator;
-  typedef tl::vector<Circuit *>::const_iterator parent_circuit_iterator;
-  typedef tl::vector<const Circuit *>::const_iterator const_parent_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<Circuit *>::const_iterator, Circuit> child_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_iterator, const Circuit> const_child_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<Circuit *>::const_iterator, Circuit> parent_circuit_iterator;
+  typedef dereferencing_iterator<tl::vector<const Circuit *>::const_iterator, const Circuit> const_parent_circuit_iterator;
 
   /**
    *  @brief Constructor
@@ -76,6 +114,13 @@ public:
    *  Creates an empty circuit.
    */
   Circuit ();
+
+  /**
+   *  @brief Constructor
+   *
+   *  Creates a circuit corresponding to a layout cell
+   */
+  Circuit (const db::Layout &layout, db::cell_index_type ci);
 
   /**
    *  @brief Copy constructor
@@ -126,6 +171,33 @@ public:
   const std::string &name () const
   {
     return m_name;
+  }
+
+  /**
+   *  @brief Sets the boundary
+   */
+  void set_boundary (const db::DPolygon &boundary);
+
+  /**
+   *  @brief Gets the boundary
+   */
+  const db::DPolygon &boundary () const
+  {
+    return m_boundary;
+  }
+
+  /**
+   *  @brief Sets or resets the "don't purge" flag
+   *  This flag will prevent "purge" from deleting this circuit. It is set by "blank".
+   */
+  void set_dont_purge (bool dp);
+
+  /**
+   *  @brief Gets or resets the "don't purge" flag
+   */
+  bool dont_purge () const
+  {
+    return m_dont_purge;
   }
 
   /**
@@ -180,6 +252,23 @@ public:
   }
 
   /**
+   *  @brief Gets the references to this circuit (end, const version)
+   *  This iterator will deliver all subcircuits referencing this circuit
+   */
+  const_refs_iterator end_refs () const
+  {
+    return m_refs.end ();
+  }
+
+  /**
+   *  @brief Returns a value indicating whether the circuit has references
+   */
+  bool has_refs () const
+  {
+    return begin_refs () != end_refs ();
+  }
+
+  /**
    *  @brief Gets the child circuits iterator (begin)
    *  The child circuits are the circuits referenced by all subcircuits
    *  in the circuit.
@@ -224,15 +313,6 @@ public:
    *  @brief Gets the parent circuits iterator (end, const version)
    */
   const_parent_circuit_iterator end_parents () const;
-
-  /**
-   *  @brief Gets the references to this circuit (end, const version)
-   *  This iterator will deliver all subcircuits referencing this circuit
-   */
-  const_refs_iterator end_refs () const
-  {
-    return m_refs.end ();
-  }
 
   /**
    *  @brief Clears the pins
@@ -308,6 +388,14 @@ public:
    *  @brief Deletes a net from the circuit
    */
   void remove_net (Net *net);
+
+  /**
+   *  @brief Gets the number of nets
+   */
+  size_t net_count () const
+  {
+    return m_nets.size ();
+  }
 
   /**
    *  @brief Begin iterator for the nets of the circuit (non-const version)
@@ -394,6 +482,14 @@ public:
   void remove_device (Device *device);
 
   /**
+   *  @brief Gets the number of devices
+   */
+  size_t device_count () const
+  {
+    return m_devices.size ();
+  }
+
+  /**
    *  @brief Gets the device from a given ID (const version)
    *
    *  If the ID is not valid, null is returned.
@@ -476,6 +572,14 @@ public:
    *  @brief Deletes a subcircuit from the circuit
    */
   void remove_subcircuit (SubCircuit *subcircuit);
+
+  /**
+   *  @brief Gets the number of subcircuits
+   */
+  size_t subcircuit_count () const
+  {
+    return m_subcircuits.size ();
+  }
 
   /**
    *  @brief Gets the subcircuit from a given ID (const version)
@@ -575,6 +679,11 @@ public:
   void connect_pin (size_t pin_id, Net *net);
 
   /**
+   *  @brief Renames the pin with the given ID
+   */
+  void rename_pin (size_t pin_id, const std::string &name);
+
+  /**
    *  @brief Purge unused nets
    *
    *  This method will purge all nets which return "floating".
@@ -598,6 +707,16 @@ public:
    */
   void flatten_subcircuit (SubCircuit *subcircuit);
 
+  /**
+   *  @brief Blanks out the circuit
+   *
+   *  This will remove all innards of the circuit (nets, devices, subcircuits)
+   *  and circuits which will itself are not longer be called after this.
+   *  This operation will eventually leave a blackbox model of the circuit
+   *  containing only pins.
+   */
+  void blank ();
+
 private:
   friend class Netlist;
   friend class Net;
@@ -605,6 +724,8 @@ private:
   friend class Device;
 
   std::string m_name;
+  db::DPolygon m_boundary;
+  bool m_dont_purge;
   db::cell_index_type m_cell_index;
   net_list m_nets;
   pin_list m_pins;

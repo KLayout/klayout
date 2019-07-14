@@ -67,6 +67,7 @@
 #include "rdbForceLink.h"
 #if defined(HAVE_RUBY) && defined(HAVE_QT)
 #include "drcForceLink.h"
+#include "lvsForceLink.h"
 #endif
 
 static int main_cont (int &argc, char **argv);

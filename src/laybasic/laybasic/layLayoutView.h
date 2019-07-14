@@ -62,6 +62,7 @@ namespace db {
   class Layout;
   class Manager;
   class SaveLayoutOptions;
+  class LayoutToNetlist;
 }
 
 namespace lay {
@@ -2293,7 +2294,7 @@ public:
   void remove_rdb (unsigned int index);
 
   /**
-   *  @brief Get the number of databases
+   *  @brief Get the number of marker databases
    */
   unsigned int num_rdbs () const
   {
@@ -2306,6 +2307,61 @@ public:
    *  If marker databases are added or removed, this event is triggered.
    */
   tl::Event rdb_list_changed_event;
+
+  /**
+   *  @brief Add a Netlist database
+   *
+   *  The layout view will become owner of the database.
+   *
+   *  @param l2ndb The database to add
+   *  @return The index of the database
+   */
+  unsigned int add_l2ndb (db::LayoutToNetlist *l2ndb);
+
+  /**
+   *  @brief Get the netlist database by index
+   *
+   *  @param index The index of the database
+   *  @return A pointer to the database or 0 if the index was not valid.
+   */
+  db::LayoutToNetlist *get_l2ndb (int index);
+
+  /**
+   *  @brief Get the netlist database by index (const version)
+   *
+   *  @param index The index of the database
+   *  @return A pointer to the database or 0 if the index was not valid.
+   */
+  const db::LayoutToNetlist *get_l2ndb (int index) const;
+
+  /**
+   *  @brief Open the L2NDB browser for a given database and associated cv index
+   */
+  void open_l2ndb_browser (int l2ndb_index, int cv_index);
+
+  /**
+   *  @brief Remove the netlist database with the given index
+   *
+   *  This will release the netlist database at the given index. The list
+   *  will be reduced by that element. This means, that the following elements
+   *  will have different indicies.
+   */
+  void remove_l2ndb (unsigned int index);
+
+  /**
+   *  @brief Get the number of netlist databases
+   */
+  unsigned int num_l2ndbs () const
+  {
+    return (unsigned int) m_l2ndbs.size ();
+  }
+
+  /**
+   *  @brief An event signalling a change in the netlist database list
+   *
+   *  If netlist databases are added or removed, this event is triggered.
+   */
+  tl::Event l2ndb_list_changed_event;
 
   /**
    *  @brief Deliver a size hint (reimplementation of QWidget)
@@ -2635,6 +2691,7 @@ private:
   std::vector <std::set <cell_index_type> > m_hidden_cells;
   std::string m_title;
   tl::vector <rdb::Database *> m_rdbs;
+  tl::vector <db::LayoutToNetlist *> m_l2ndbs;
   std::string m_def_lyp_file;
   bool m_add_other_layers;
   bool m_always_show_source;

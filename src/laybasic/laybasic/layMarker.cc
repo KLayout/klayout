@@ -713,7 +713,29 @@ Marker::set (const db::Polygon &poly, const db::ICplxTrans &t1, const std::vecto
   GenericMarkerBase::set (t1, trans);
 }
 
-void 
+void
+Marker::set (const db::PolygonRef &poly, const db::ICplxTrans &trans)
+{
+  remove_object ();
+
+  m_type = PolygonRef;
+  m_object.polygon_ref = new db::PolygonRef (poly);
+
+  GenericMarkerBase::set (trans);
+}
+
+void
+Marker::set (const db::PolygonRef &poly, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans)
+{
+  remove_object ();
+
+  m_type = PolygonRef;
+  m_object.polygon_ref = new db::PolygonRef (poly);
+
+  GenericMarkerBase::set (t1, trans);
+}
+
+void
 Marker::set (const db::DPolygon &poly, const db::DCplxTrans &trans)
 {
   remove_object ();
@@ -960,6 +982,8 @@ Marker::item_bbox () const
     return *m_object.dbox;
   } else if (m_type == Polygon) {
     return db::DBox (m_object.polygon->box ());
+  } else if (m_type == PolygonRef) {
+    return db::DBox (m_object.polygon_ref->box ());
   } else if (m_type == DPolygon) {
     return m_object.dpolygon->box ();
   } else if (m_type == EdgePair) {
@@ -996,6 +1020,8 @@ Marker::remove_object ()
     delete m_object.dbox;
   } else if (m_type == Polygon) {
     delete m_object.polygon;
+  } else if (m_type == PolygonRef) {
+    delete m_object.polygon_ref;
   } else if (m_type == DPolygon) {
     delete m_object.dpolygon;
   } else if (m_type == EdgePair) {
@@ -1031,6 +1057,8 @@ Marker::draw (lay::Renderer &r, const db::CplxTrans &t, lay::CanvasPlane *fill, 
     r.draw (*m_object.dbox, db::DCplxTrans (t), fill, contour, vertex, text);
   } else if (m_type == Polygon) {
     r.draw (*m_object.polygon, t, fill, contour, vertex, text);
+  } else if (m_type == PolygonRef) {
+    r.draw (m_object.polygon_ref->obj (), t * db::ICplxTrans (m_object.polygon_ref->trans ()), fill, contour, vertex, text);
   } else if (m_type == DPolygon) {
     r.draw (*m_object.dpolygon, db::DCplxTrans (t), fill, contour, vertex, text);
   } else if (m_type == Path) {

@@ -739,8 +739,6 @@ public slots:
   void cm_help_about ();
   void cm_help_about_qt ();
   void cm_macro_editor ();
-  void cm_new_drc_script ();
-  void cm_edit_drc_scripts ();
   void cm_packages ();
   void cm_technologies ();
   void cm_open_too ();
@@ -832,10 +830,16 @@ public slots:
   void cm_navigator_close ();
 
   /**
-   *  @brief shows the given URL as a model help window
+   *  @brief shows the given URL as a non-modal help window
    *  Intended as a connection target for QLabel linkVisisted signals.
    */
   void show_help (const QString &url);
+
+  /**
+   *  @brief shows the given URL as a modal help window
+   *  Intended as a connection target for QLabel linkVisisted signals.
+   */
+  void show_modal_help (const QString &url);
 
   /**
    *  @brief visibility of one of the dock widgets changed

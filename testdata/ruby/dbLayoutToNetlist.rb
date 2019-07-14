@@ -65,6 +65,40 @@ class DBLayoutToNetlist_TestClass < TestBase
     bulk_id = l2n.connect_global(rmetal1, "BULK")
     assert_equal(l2n.global_net_name(bulk_id), "BULK")
 
+    # cell mapping with nets
+
+    l2n = RBA::LayoutToNetlist::new
+    l2n.read(File.join($ut_testsrc, "testdata", "algo", "l2n_writer_au.txt"))
+
+    nets = [
+      l2n.netlist.circuit_by_name("RINGO").net_by_name("VSS"),
+      l2n.netlist.circuit_by_name("RINGO").net_by_name("VDD")
+    ]
+
+    ly2 = RBA::Layout::new
+    ly2.create_cell("TOP")
+
+    cm = l2n.cell_mapping_into(ly2, ly2.top_cell, nets)
+
+    map = (0 .. l2n.internal_layout.cells - 1).collect do |ci|
+      cm.has_mapping?(ci) && (l2n.internal_layout.cell(ci).name + "=>" + ly2.cell(cm.cell_mapping(ci)).name)
+    end
+    assert_equal(map.select { |i| i }.join(","), "RINGO=>TOP")
+
+    nets = [
+      l2n.netlist.circuit_by_name("INV2").net_by_name("IN"),
+    ]
+
+    ly2 = RBA::Layout::new
+    ly2.create_cell("TOP")
+
+    cm = l2n.cell_mapping_into(ly2, ly2.top_cell, nets)
+
+    map = (0 .. l2n.internal_layout.cells - 1).collect do |ci|
+      cm.has_mapping?(ci) && (l2n.internal_layout.cell(ci).name + "=>" + ly2.cell(cm.cell_mapping(ci)).name)
+    end
+    assert_equal(map.select { |i| i }.join(","), "RINGO=>TOP,INV2=>INV2")
+
   end
 
   def test_2_ShapesFromNet
@@ -390,11 +424,11 @@ END
 
     assert_equal(l2n.netlist.to_s, <<END)
 circuit RINGO ();
-  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);
-  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=$I22,$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);
-  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=$I23,$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);
-  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=$I24,$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);
-  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=$I25,$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);
+  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC,$7=VDD);
+  subcircuit INV2PAIR $2 (BULK=VSS,$2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);
+  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);
+  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);
+  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);
 end;
 circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);
   subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);
@@ -419,12 +453,12 @@ END
     l2n.netlist.purge
 
     assert_equal(l2n.netlist.to_s, <<END)
-circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,'BULK,VSS'='BULK,VSS');
-  subcircuit INV2PAIR $1 (BULK='BULK,VSS',$2=FB,$3=VDD,$4='BULK,VSS',$5=$I7,$6=OSC,$7=VDD);
-  subcircuit INV2PAIR $2 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=FB,$6=$I13,$7=VDD);
-  subcircuit INV2PAIR $3 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I13,$6=$I5,$7=VDD);
-  subcircuit INV2PAIR $4 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I5,$6=$I6,$7=VDD);
-  subcircuit INV2PAIR $5 (BULK='BULK,VSS',$2=(null),$3=VDD,$4='BULK,VSS',$5=$I6,$6=$I7,$7=VDD);
+circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);
+  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC,$7=VDD);
+  subcircuit INV2PAIR $2 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);
+  subcircuit INV2PAIR $3 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);
+  subcircuit INV2PAIR $4 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);
+  subcircuit INV2PAIR $5 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);
 end;
 circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);
   subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);
@@ -456,8 +490,86 @@ END
     assert_equal(File.open(tmp, "r").read, File.open(input, "r").read)
 
     assert_equal(l2n.layer_names.join(","), "poly,poly_lbl,diff_cont,poly_cont,metal1,metal1_lbl,via1,metal2,metal2_lbl,psd,nsd")
-    assert_equal(l2n.name(l2n.layer_by_name("metal1")), "metal1")
-    assert_equal(l2n.name(l2n.layer_by_index(l2n.layer_of(l2n.layer_by_name("metal1")))), "metal1")
+    assert_equal(l2n.layer_name(l2n.layer_by_name("metal1")), "metal1")
+    assert_equal(l2n.layer_name(l2n.layer_by_index(l2n.layer_of(l2n.layer_by_name("metal1")))), "metal1")
+
+  end
+
+  def test_14_BuildNets
+
+    l2n = RBA::LayoutToNetlist::new
+
+    input = File.join($ut_testsrc, "testdata", "algo", "l2n_writer_au.txt")
+    l2n.read(input)
+
+    # build_all_nets
+
+    ly = RBA::Layout::new
+    ly.create_cell("TOP")
+
+    cm = l2n.cell_mapping_into(ly, ly.top_cell)
+
+    lmap = { 
+      ly.insert_layer(RBA::LayerInfo::new(10, 0)) => l2n.layer_by_name("psd"),
+      ly.insert_layer(RBA::LayerInfo::new(11, 0)) => l2n.layer_by_name("nsd"),
+      ly.insert_layer(RBA::LayerInfo::new(3, 0)) => l2n.layer_by_name("poly"),
+      ly.insert_layer(RBA::LayerInfo::new(4, 0)) => l2n.layer_by_name("diff_cont"),
+      ly.insert_layer(RBA::LayerInfo::new(5, 0)) => l2n.layer_by_name("poly_cont"),
+      ly.insert_layer(RBA::LayerInfo::new(6, 0)) => l2n.layer_by_name("metal1"),
+      ly.insert_layer(RBA::LayerInfo::new(7, 0)) => l2n.layer_by_name("via1"),
+      ly.insert_layer(RBA::LayerInfo::new(8, 0)) => l2n.layer_by_name("metal2")
+    }
+
+    l2n.build_all_nets(cm, ly, lmap, "NET_", nil, RBA::LayoutToNetlist::BNH_Disconnected, nil, "DEVICE_")
+
+    ly_au = RBA::Layout::new
+    au_file = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_au_1.gds")
+    ly_au.read(au_file)
+
+    lmap.each do |li,v|
+      li_au = ly_au.layer(ly.get_info(li))
+      ly_region = RBA::Region::new(ly.top_cell.begin_shapes_rec(li))
+      ly_au_region = RBA::Region::new(ly_au.top_cell.begin_shapes_rec(li_au))
+      info = ly.get_info(li).to_s + ":"
+      assert_equal(info + (ly_region ^ ly_au_region).to_s, info)
+    end  
+
+    # build_nets
+
+    ly = RBA::Layout::new
+    ly.create_cell("TOP")
+
+    cm = l2n.cell_mapping_into(ly, ly.top_cell)
+
+    lmap = { 
+      ly.insert_layer(RBA::LayerInfo::new(10, 0)) => l2n.layer_by_name("psd"),
+      ly.insert_layer(RBA::LayerInfo::new(11, 0)) => l2n.layer_by_name("nsd"),
+      ly.insert_layer(RBA::LayerInfo::new(3, 0)) => l2n.layer_by_name("poly"),
+      ly.insert_layer(RBA::LayerInfo::new(4, 0)) => l2n.layer_by_name("diff_cont"),
+      ly.insert_layer(RBA::LayerInfo::new(5, 0)) => l2n.layer_by_name("poly_cont"),
+      ly.insert_layer(RBA::LayerInfo::new(6, 0)) => l2n.layer_by_name("metal1"),
+      ly.insert_layer(RBA::LayerInfo::new(7, 0)) => l2n.layer_by_name("via1"),
+      ly.insert_layer(RBA::LayerInfo::new(8, 0)) => l2n.layer_by_name("metal2")
+    }
+
+    nets = [
+      l2n.netlist.circuit_by_name("RINGO").net_by_name("VSS"),
+      l2n.netlist.circuit_by_name("RINGO").net_by_name("VDD")
+    ]
+
+    l2n.build_nets(nets, cm, ly, lmap, "NET_", nil, RBA::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_")
+
+    ly_au = RBA::Layout::new
+    au_file = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_au_1d.gds")
+    ly_au.read(au_file)
+
+    lmap.each do |li,v|
+      li_au = ly_au.layer(ly.get_info(li))
+      ly_region = RBA::Region::new(ly.top_cell.begin_shapes_rec(li))
+      ly_au_region = RBA::Region::new(ly_au.top_cell.begin_shapes_rec(li_au))
+      info = ly.get_info(li).to_s + ":"
+      assert_equal(info + (ly_region ^ ly_au_region).to_s, info)
+    end  
 
   end
 

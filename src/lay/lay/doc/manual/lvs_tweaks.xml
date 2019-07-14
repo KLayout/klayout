@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>LVS Netlist Tweaks</title>
+  <keyword name="LVS"/>
+  <keyword name="LVS Netlist Tweaks"/>
+
+  <h2-index/>
+
+  <p>
+  Netlist tweaking is important to standardize netlists. Without tweaking,
+  the extracted netlist may contain elements that are redundant or
+  don't match anything found in the schematic.
+  </p>
+
+  <p>
+  Netlist tweaks are applied on the extracted <class_doc href="Netlist"/> object. 
+  This can be obtained with the <a href="/about/drc_ref_global.xml#netlist">netlist</a> function.
+  This function will extract the netlist if not done already.
+  </p>
+
+  <p>
+  Netlist tweaks can also be applied to the schematic netlist. For example to flatten away 
+  a model subcircuit called "NMOS", use this <class_doc href="Netlist#flatten_circuit"/>:
+  </p>
+
+  <pre>schematic.flatten_circuit("NMOS")</pre>
+
+  <h2>Top level pin generation</h2>
+
+  <p>
+  Circuits extracted don't have pins on the top hierarchy level as the
+  extractor cannot figure out where to connect to this circuit.
+  The compare function does not try to match pins in this case.
+  But to gain a useful extracted netlists, pins are required.
+  Without pins, a circuit can't be embedded in a testbench for 
+  example. 
+  </p>
+
+  <p>
+  KLayout offers a function to create top-level pins using 
+  a simple heuristics: for every named (i.e. labelled) net in the top level 
+  circuit a pin will be created (<class_doc href="Netlist#make_top_level_pins"/>):
+  </p>
+
+  <pre>netlist.make_top_level_pins</pre>
+
+  <h2>Device combination</h2>
+
+  <p>
+  Combining devices is important for devices which are not 
+  represented as coherent entities in the layout. Examples are:
+  </p>
+
+  <ul>
+    <li><b>Fingered MOS transistors:</b> MOS transistors with a large width
+    are often split into multiple pieces to reduce the parasitic gate and
+    diffusion resistances and capacitances. In the layout this is equivalent
+    to multiple parallel transistors.
+    </li>
+    <li><b>Serial resistors:</b> Large resistors are often separated into 
+    stripes which are then connected in a meander structure. From the device
+    perspective such resistors consist of several resistors connected in 
+    series.
+    </li>
+    <li><b>Array capacitors:</b> Large capacitors are often split into 
+    smaller ones which are arranged in an array and connected in parallel.
+    This helps controlling the parasitic series resistances and inductances
+    and avoids manufacturing issues.
+    </li>
+  </ul>
+
+  <p>
+  In all these cases, the schematic usually summarizes these devices 
+  into a single one with lumped parameter values (total resistance, capacitance,
+  transistor width). This creates a discrepancy which "device combination"
+  avoids. "Device combination" is a step in which devices are identified which
+  can be combined into single devices (such as serial or parallel resistors and
+  capacitors). To run device combination, use <class_doc href="Netlist#combine_devices"/>:
+  </p>
+
+  <pre>netlist.combine_devices</pre>
+
+  <p>
+  The combination of serial devices might leave floating nets (the net connecting the
+  devices originally. These nets can be removed with <class_doc href="Netlist#purge_nets"/>.
+  See also <class_doc href="Netlist#simplify"/>, which is wrapper for several 
+  methods related to netlist normalization.
+  </p>
+
+  <p>
+  It's recommended to run "make_toplevel_pins" and "purge" before this step (see below).
+  </p>
+
+  <h2>Circuit flattening (elimination)</h2>
+
+  <p>
+  It's often required to flatten circuits that do not represent a specific level of organisation but
+  act as a wrapper to something else. In layouts, devices are often implemented as PCells and 
+  appear as specific cells for no other reason than being implemented in a subcell. The same 
+  might happen for schematic subcircuits which wrap a device. "Flattening" means that a circuit
+  is removed and it's contents are integrated into the calling circuits.
+  </p>
+
+  <p>
+  To flatten a circuit from the extracted netlist use <class_doc href="Netlist#flatten_circuit"/>:
+  </p>
+
+  <pre>netlist.flatten_circuit("CIRCUIT_NAME")</pre>
+
+  <p>
+  The argument to "flatten_circuit" is a glob pattern (shell-like).
+  For example, "NMOS*" will flatten all circuits starting with "NMOS".
+  </p>
+
+  <h2>Black boxing (circuit abstraction)</h2>
+
+  <p>
+  Circuit abstraction is a technique to reduce the verification overhead. 
+  At an early stage it might be useful to replace a cell by a simplified version or 
+  by a raw pin frame. The circuits extracted from such cells is basically empty or 
+  are intentionally simplified. But as long as there is something inside the
+  cell which the parent circuit connects to, pins will be generated. These 
+  pins then can be thought of as the circuit's abstraction.
+  </p>
+
+  <p>
+  A useful method in this context is the "blank_circuit" method. It clears
+  a circuit's innards and leaves only the pins. You can use this method to 
+  ensure abstracts in both the layout netlist and the schematic. After this,
+  the compare algorithm will identify both circuits as identical, provided
+  they feature the same number of pins.
+  </p>
+
+  <p>
+  To wipe out the innards of a circuit, use the <class_doc href="Netlist#blank_circuit"/> method:
+  </p>
+
+  <pre>netlist.blank_circuit("CIRCUIT_NAME")
+schematic.blank_circuit("CIRCUIT_NAME")</pre>
+
+  <p>
+  The argument to "blank_circuit" is a glob pattern (shell-like).
+  For example, "MEMORY*" will blank out all circuits starting with "MEMORY".
+  </p>
+
+  <p><b>NOTE:</b> Use "blank_circuit" before "purge" or "simplify" (see below). This method
+  sets a flag (<class_doc href="Circuit#dont_purge"/>) which prevents purging of abstract
+  circuits.</p>
+
+  <h2>Purging (elimination of redundancy)</h2>
+
+  <p>
+  Extracted netlists often contain elements without a functional 
+  aspect: via cells for example generate subcircuits with a single pin and
+  no device. Isolated metal islands (letters, logos, fill/planarisation 
+  patches) will create floating nets etc. Two methods are available to 
+  purge those elements.
+  </p>
+
+  <p>
+  <class_doc href="Netlist#purge"/> will remove all floating nets,
+  all circuits without devices or subcircuits. <class_doc href="Netlist#purge_nets"/>
+  will only purge floating nets.
+  Floating nets are nets which don't connect to any device or subcircuit.
+  </p>
+
+  <pre>netlist.purge
+netlist.purge_nets</pre>
+
+  <h2>Normalization wrapper (simplification)</h2>
+
+  <p>
+  <class_doc href="Netlist#simplify"/> is a wrapper for "make_top_level_pins",
+  "combine_devices" and "purge" in the recommended order:
+  </p>
+
+  <pre>netlist.simplify</pre>
+
+</doc>

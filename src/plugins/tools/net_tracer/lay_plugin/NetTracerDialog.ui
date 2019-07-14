@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>NetTracerDialog</class>
- <widget class="QDialog" name="NetTracerDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="NetTracerDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,50 +10,55 @@
     <height>504</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Net Trace</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="leftMargin">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="1" column="0" colspan="4" >
-    <widget class="QLabel" name="label_2" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>1</vsizetype>
+   <item row="1" column="0" colspan="4">
+    <widget class="QLabel" name="label_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="text" >
-      <string>Choose "Trace Net" and click at one point in the net to trace the net and add it to the list.
+     <property name="text">
+      <string>Choose &quot;Trace Net&quot; and click at one point in the net to trace the net and add it to the list.
 Double-click the net entry to rename it.
-Select one or multiple nets and choose "Export" to export the selected nets to a new layout or cell.</string>
+Select one or multiple nets and choose &quot;Export&quot; to export the selected nets to a new layout or cell.</string>
      </property>
-     <property name="alignment" >
+     <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
-     <property name="wordWrap" >
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="4" >
-    <widget class="QLabel" name="label_3" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>1</vsizetype>
+   <item row="0" column="0" colspan="4">
+    <widget class="QLabel" name="label_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="font" >
+     <property name="font">
       <font>
        <pointsize>12</pointsize>
        <weight>75</weight>
@@ -60,130 +66,142 @@ Select one or multiple nets and choose "Export" to export the selected nets to a
        <bold>true</bold>
       </font>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Net Tracer</string>
      </property>
     </widget>
    </item>
-   <item rowspan="2" row="3" column="0" colspan="4" >
-    <widget class="Line" name="line" >
-     <property name="orientation" >
+   <item row="3" column="0" rowspan="2" colspan="4">
+    <widget class="Line" name="line">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item rowspan="2" row="5" column="0" >
-    <widget class="QPushButton" name="configure_pb" >
-     <property name="text" >
+   <item row="5" column="0" rowspan="2">
+    <widget class="QPushButton" name="configure_pb">
+     <property name="text">
       <string>Configure</string>
      </property>
-     <property name="autoDefault" >
+     <property name="autoDefault">
       <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item rowspan="2" row="5" column="1" >
-    <widget class="QPushButton" name="stack_pb" >
-     <property name="text" >
+   <item row="5" column="1" rowspan="2">
+    <widget class="QPushButton" name="stack_pb">
+     <property name="text">
       <string>Layer Stack</string>
      </property>
-     <property name="autoDefault" >
+     <property name="autoDefault">
       <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3" >
-    <widget class="QSplitter" name="splitter" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>5</vsizetype>
+   <item row="2" column="0" colspan="3">
+    <widget class="QSplitter" name="splitter">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>1</verstretch>
       </sizepolicy>
      </property>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QListWidget" name="net_list" >
-      <property name="sizePolicy" >
-       <sizepolicy>
-        <hsizetype>7</hsizetype>
-        <vsizetype>7</vsizetype>
+     <widget class="QListWidget" name="net_list">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="selectionMode" >
+      <property name="selectionMode">
        <enum>QAbstractItemView::ExtendedSelection</enum>
       </property>
-      <property name="uniformItemSizes" >
+      <property name="uniformItemSizes">
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QFrame" name="frame_2" >
-      <property name="sizePolicy" >
-       <sizepolicy>
-        <hsizetype>5</hsizetype>
-        <vsizetype>5</vsizetype>
+     <widget class="QFrame" name="frame_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>1</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="frameShape" >
+      <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
-      <property name="frameShadow" >
+      <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QVBoxLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
+      <layout class="QVBoxLayout">
+       <property name="spacing">
         <number>6</number>
        </property>
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
+        <number>9</number>
+       </property>
        <item>
-        <widget class="QFrame" name="frame_4" >
-         <property name="frameShape" >
+        <widget class="QFrame" name="frame_4">
+         <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
-         <property name="frameShadow" >
+         <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QHBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
+         <layout class="QHBoxLayout">
+          <property name="spacing">
            <number>6</number>
           </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="QLabel" name="label_4" >
-            <property name="font" >
+           <widget class="QLabel" name="label_4">
+            <property name="font">
              <font>
               <pointsize>12</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
-            <property name="text" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:12pt; font-weight:600; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:10pt;">Net Info&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:12pt; font-weight:600; font-style:normal; text-decoration:none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Net Info&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
           <item>
            <spacer>
-            <property name="orientation" >
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeType" >
+            <property name="sizeType">
              <enum>QSizePolicy::Fixed</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>10</width>
               <height>20</height>
@@ -192,21 +210,21 @@ p, li { white-space: pre-wrap; }
            </spacer>
           </item>
           <item>
-           <widget class="QCheckBox" name="detailed_cb" >
-            <property name="text" >
+           <widget class="QCheckBox" name="detailed_cb">
+            <property name="text">
              <string>Detailed</string>
             </property>
            </widget>
           </item>
           <item>
            <spacer>
-            <property name="orientation" >
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeType" >
+            <property name="sizeType">
              <enum>QSizePolicy::Expanding</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>10</width>
               <height>20</height>
@@ -215,15 +233,15 @@ p, li { white-space: pre-wrap; }
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="label" >
-            <property name="text" >
+           <widget class="QLabel" name="label">
+            <property name="text">
              <string>Color</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="lay::ColorButton" name="net_color" >
-            <property name="text" >
+           <widget class="lay::ColorButton" name="net_color">
+            <property name="text">
              <string>Color</string>
             </property>
            </widget>
@@ -232,59 +250,68 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QTextBrowser" name="net_info_text" >
-         <property name="autoFillBackground" >
+        <widget class="QTextBrowser" name="net_info_text">
+         <property name="autoFillBackground">
           <bool>false</bool>
          </property>
-         <property name="frameShape" >
+         <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
-         <property name="lineWrapMode" >
+         <property name="lineWrapMode">
           <enum>QTextEdit::NoWrap</enum>
          </property>
-         <property name="lineWrapColumnOrWidth" >
+         <property name="lineWrapColumnOrWidth">
           <number>0</number>
          </property>
-         <property name="cursorWidth" >
+         <property name="cursorWidth">
           <number>1</number>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame_3" >
-         <property name="frameShape" >
+        <widget class="QFrame" name="frame_3">
+         <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
-         <property name="frameShadow" >
+         <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QHBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
+         <layout class="QHBoxLayout">
+          <property name="spacing">
            <number>6</number>
           </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="QPushButton" name="export_pb" >
-            <property name="text" >
+           <widget class="QPushButton" name="export_pb">
+            <property name="text">
              <string>Export</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="export_text_pb" >
-            <property name="text" >
+           <widget class="QPushButton" name="export_text_pb">
+            <property name="text">
              <string>Export To Text</string>
             </property>
            </widget>
           </item>
           <item>
            <spacer>
-            <property name="orientation" >
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
               <height>20</height>
@@ -299,59 +326,68 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
    </item>
-   <item row="2" column="3" >
-    <widget class="QFrame" name="frame" >
-     <property name="minimumSize" >
+   <item row="2" column="3">
+    <widget class="QFrame" name="frame">
+     <property name="minimumSize">
       <size>
        <width>0</width>
        <height>0</height>
       </size>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QVBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QPushButton" name="add_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="add_pb">
+        <property name="text">
          <string>Trace Net</string>
         </property>
-        <property name="checkable" >
+        <property name="checkable">
          <bool>true</bool>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>false</bool>
         </property>
-        <property name="default" >
+        <property name="default">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="sticky_cbx" >
-        <property name="text" >
+       <widget class="QCheckBox" name="sticky_cbx">
+        <property name="text">
          <string>Lock</string>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>10</height>
@@ -360,21 +396,21 @@ p, li { white-space: pre-wrap; }
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="add2_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="add2_pb">
+        <property name="text">
          <string>Trace Path</string>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>10</height>
@@ -383,25 +419,25 @@ p, li { white-space: pre-wrap; }
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="del_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="del_pb">
+        <property name="text">
          <string>Delete</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="clear_all_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="clear_all_pb">
+        <property name="text">
          <string>Clear All</string>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>11</width>
           <height>261</height>
@@ -410,8 +446,8 @@ p, li { white-space: pre-wrap; }
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="redo_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="redo_pb">
+        <property name="text">
          <string>Redo</string>
         </property>
        </widget>
@@ -419,24 +455,22 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item rowspan="2" row="5" column="2" >
-    <widget class="QLabel" name="tech_info_label" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
+   <item row="5" column="2" rowspan="2">
+    <widget class="QLabel" name="tech_info_label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="text" >
+     <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item rowspan="2" row="5" column="3" >
-    <widget class="QPushButton" name="close_pb" >
-     <property name="text" >
+   <item row="5" column="3" rowspan="2">
+    <widget class="QPushButton" name="close_pb">
+     <property name="text">
       <string>Close</string>
      </property>
     </widget>
@@ -466,9 +500,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>stack_pb</tabstop>
   <tabstop>close_pb</tabstop>
  </tabstops>
- <resources>
-  <include location="layResources.qrc" />
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>close_pb</sender>
@@ -476,11 +508,11 @@ p, li { white-space: pre-wrap; }
    <receiver>NetTracerDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>512</x>
      <y>458</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>422</x>
      <y>472</y>
     </hint>

@@ -1464,206 +1464,184 @@ rba_init (RubyInterpreterPrivateData *d)
   //  because of the enum representative classes and enum constants are important)
   std::vector <RubyConstDescriptor> constants;
 
-  bool more_classes = true;
-  while (more_classes) {
+  std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order ();
+  for (std::list<const gsi::ClassBase *>::const_iterator c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
 
-    more_classes = false;
-    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+    //  we might encounter a child class which is a reference to a top-level class (e.g.
+    //  duplication of enums into child classes). In this case we create a constant inside the
+    //  target class.
+    if ((*c)->declaration () != *c) {
+      tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
+      rb_define_const (ruby_cls ((*c)->parent ()->declaration ()), (*c)->name ().c_str (), ruby_cls ((*c)->declaration ()));
+      continue;
+    }
 
-      //  don't handle classes twice
-      if (is_registered (&*c)) {
-        continue;
-      }
+    VALUE super = rb_cObject;
+    if ((*c)->base () != 0) {
+      tl_assert (is_registered ((*c)->base ()));
+      super = ruby_cls ((*c)->base ());
+    }
 
-      bool all_children_available = true;
-      for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
-        tl_assert (cc->declaration () != 0);
-        if (! is_registered (cc->declaration ())) {
-          all_children_available = false;
-          break;
-        }
-      }
-      if (! all_children_available) {
-        //  can't produce this class yet - the children are not available yet.
-        more_classes = true;
-        continue;
-      }
+    VALUE klass;
+    if ((*c)->parent ()) {
+      tl_assert (is_registered ((*c)->parent ()->declaration ()));
+      VALUE parent_class = ruby_cls ((*c)->parent ()->declaration ());
+      klass = rb_define_class_under (parent_class, (*c)->name ().c_str (), super);
+    } else {
+      klass = rb_define_class_under (module, (*c)->name ().c_str (), super);
+    }
 
-      VALUE super = rb_cObject;
-      if (c->base () != 0) {
-        if (! is_registered (c->base ())) {
-          //  can't produce this class yet. The base class needs to be handled first.
-          more_classes = true;
-          continue;
-        } else {
-          super = ruby_cls (c->base ());
-        }
-      }
+    register_class (klass, *c);
 
-      //  there should be only main declarations since we merged
-      tl_assert (c->declaration () == &*c);
+    rb_define_alloc_func (klass, alloc_proxy);
 
-      VALUE klass = rb_define_class_under (module, c->name ().c_str (), super);
-      register_class (klass, &*c);
+    MethodTable *mt = MethodTable::method_table_by_class (*c, true /*force init*/);
 
-      rb_define_alloc_func (klass, alloc_proxy);
+    for (gsi::ClassBase::method_iterator m = (*c)->begin_methods (); m != (*c)->end_methods (); ++m) {
 
-      MethodTable *mt = MethodTable::method_table_by_class (&*c, true /*force init*/);
+      if (! (*m)->is_callback ()) {
 
-      for (gsi::ClassBase::method_iterator m = c->begin_methods (); m != c->end_methods (); ++m) {
+        if (! (*m)->is_static ()) {
 
-        if (! (*m)->is_callback ()) {
+          bool drop_method = false;
+          if ((*m)->smt () == gsi::MethodBase::Dup) {
+            //  drop dup method -> replaced by Assign in ctor context
+            drop_method = true;
+          } else if ((*m)->smt () == gsi::MethodBase::Assign) {
+            mt->add_ctor_method ("initialize_copy", *m);
+          }
 
-          if (! (*m)->is_static ()) {
-
-            bool drop_method = false;
-            if ((*m)->smt () == gsi::MethodBase::Dup) {
-              //  drop dup method -> replaced by Assign in ctor context
-              drop_method = true;
-            } else if ((*m)->smt () == gsi::MethodBase::Assign) {
-              mt->add_ctor_method ("initialize_copy", *m);
-            }
-
-            if (! drop_method) {
-
-              for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
-                if (syn->is_predicate) {
-                  mt->add_method (syn->name, *m);
-                  mt->add_method (syn->name + "?", *m);
-                } else if (syn->is_setter) {
-                  mt->add_method (syn->name + "=", *m);
-                } else {
-                  mt->add_method (syn->name, *m);
-                }
-              }
-
-            }
-
-          } else {
+          if (! drop_method) {
 
             for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
-
-              if (isupper (syn->name [0]) && (*m)->begin_arguments () == (*m)->end_arguments ()) {
-
-                //  Static const methods are constants.
-                //  Methods without arguments which start with a capital letter are treated as constants
-                //  for backward compatibility
-                constants.push_back (RubyConstDescriptor ());
-                constants.back ().klass = klass;
-                constants.back ().meth = *m;
-                constants.back ().name = (*m)->begin_synonyms ()->name;
-
-              } else if ((*m)->ret_type ().type () == gsi::T_object && (*m)->ret_type ().pass_obj () && syn->name == "new") {
-
-                //  "new" is mapped to "initialize" member function (special translation of 
-                //  member to static is indicated through the "ctor" attribute.
-                mt->add_ctor_method ("initialize", *m);
-
-              } else if (syn->is_predicate) {
-
+              if (syn->is_predicate) {
                 mt->add_method (syn->name, *m);
                 mt->add_method (syn->name + "?", *m);
-
               } else if (syn->is_setter) {
-
                 mt->add_method (syn->name + "=", *m);
-
               } else {
-
                 mt->add_method (syn->name, *m);
-
               }
             }
 
           }
 
+        } else {
+
+          for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+
+            if (isupper (syn->name [0]) && (*m)->begin_arguments () == (*m)->end_arguments ()) {
+
+              //  Static const methods are constants.
+              //  Methods without arguments which start with a capital letter are treated as constants
+              //  for backward compatibility
+              constants.push_back (RubyConstDescriptor ());
+              constants.back ().klass = klass;
+              constants.back ().meth = *m;
+              constants.back ().name = (*m)->begin_synonyms ()->name;
+
+            } else if ((*m)->ret_type ().type () == gsi::T_object && (*m)->ret_type ().pass_obj () && syn->name == "new") {
+
+              //  "new" is mapped to "initialize" member function (special translation of
+              //  member to static is indicated through the "ctor" attribute.
+              mt->add_ctor_method ("initialize", *m);
+
+            } else if (syn->is_predicate) {
+
+              mt->add_method (syn->name, *m);
+              mt->add_method (syn->name + "?", *m);
+
+            } else if (syn->is_setter) {
+
+              mt->add_method (syn->name + "=", *m);
+
+            } else {
+
+              mt->add_method (syn->name, *m);
+
+            }
+          }
+
         }
 
       }
 
-      //  clean up the method table
-      mt->finish ();
+    }
 
-      //  Hint: we need to do static methods before the non-static ones because 
-      //  rb_define_module_function creates an private instance method.
-      //  If we do the non-static methods afterwards we will make it a public once again.
-      //  The order of the names will be "name(non-static), name(static), ..." because 
-      //  the static flag is the second member of the key (string, bool) pair.
-      for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
+    //  clean up the method table
+    mt->finish ();
 
-        if (mt->is_static (mid)) {
+    //  Hint: we need to do static methods before the non-static ones because
+    //  rb_define_module_function creates an private instance method.
+    //  If we do the non-static methods afterwards we will make it a public once again.
+    //  The order of the names will be "name(non-static), name(static), ..." because
+    //  the static flag is the second member of the key (string, bool) pair.
+    for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
 
-          tl_assert (mid < size_t (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
+      if (mt->is_static (mid)) {
 
-          /* Note: Ruby does not support static protected functions, hence we have them (i.e. QThread::usleep).
-           *       Do we silently create public ones from them:
-          if (mt->is_protected (mid)) {
-            tl::warn << "static '" << mt->name (mid) << "' method cannot be protected in class " << c->name ();
-          }
-          */
+        tl_assert (mid < size_t (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
 
-          rb_define_module_function (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
+        /* Note: Ruby does not support static protected functions, hence we have them (i.e. QThread::usleep).
+         *       Do we silently create public ones from them:
+        if (mt->is_protected (mid)) {
+          tl::warn << "static '" << mt->name (mid) << "' method cannot be protected in class " << c->name ();
+        }
+        */
 
+        rb_define_module_function (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
+
+      }
+
+    }
+
+    for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
+
+      if (mt->is_ctor (mid)) {
+
+        tl_assert (mid < size_t (sizeof (method_adaptors_ctor) / sizeof (method_adaptors_ctor [0])));
+
+        if (! mt->is_protected (mid)) {
+          rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
+        } else {
+          //  a protected constructor needs to be provided in both protected and non-protected mode
+          rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
+          rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
+        }
+
+      } else if (! mt->is_static (mid)) {
+
+        tl_assert (mid < size_t (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
+
+        if (! mt->is_protected (mid)) {
+          rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
+        } else {
+          rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
         }
 
       }
 
-      for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
+      if (mt->is_signal (mid)) {
+        //  We alias the signal name to an assignment, so the following can be done:
+        //    x = object with signal "signal"
+        //    x.signal = proc
+        //  this will basically map to
+       //    x.signal(proc)
+        //  which will make proc the only receiver for the signal
+        rb_define_alias (klass, (mt->name (mid) + "=").c_str (), mt->name (mid).c_str ());
+      }
 
-        if (mt->is_ctor (mid)) {
-
-          tl_assert (mid < size_t (sizeof (method_adaptors_ctor) / sizeof (method_adaptors_ctor [0])));
-
-          if (! mt->is_protected (mid)) {
-            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
-          } else {
-            //  a protected constructor needs to be provided in both protected and non-protected mode
-            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
-            rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
-          }
-
-        } else if (! mt->is_static (mid)) {
-
-          tl_assert (mid < size_t (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
-
-          if (! mt->is_protected (mid)) {
-            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
-          } else {
-            rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
-          }
-
-        }
-
-        if (mt->is_signal (mid)) {
-          //  We alias the signal name to an assignment, so the following can be done:
-          //    x = object with signal "signal"
-          //    x.signal = proc
-          //  this will basically map to
-          //    x.signal(proc)
-          //  which will make proc the only receiver for the signal
-          rb_define_alias (klass, (mt->name (mid) + "=").c_str (), mt->name (mid).c_str ());
-        }
-
-        if (mt->name (mid) == "to_s") {
+      if (mt->name (mid) == "to_s") {
 #if HAVE_RUBY_VERSION_CODE>=20000
-        //  Ruby 2.x does no longer alias "inspect" to "to_s" automatically, so we have to do this:
-          rb_define_alias (klass, "inspect", "to_s");
+      //  Ruby 2.x does no longer alias "inspect" to "to_s" automatically, so we have to do this:
+        rb_define_alias (klass, "inspect", "to_s");
 #endif
-        } else if (mt->name (mid) == "==") {
-          rb_define_alias (klass, "eql?", "==");
-        }
-
+      } else if (mt->name (mid) == "==") {
+        rb_define_alias (klass, "eql?", "==");
       }
 
     }
 
-  }
-
-  //  produce the child classes as constants
-  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-    for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
-      rb_define_const (ruby_cls (&*c), cc->name ().c_str (), ruby_cls (cc->declaration ()));
-    }
   }
 
   //  now make the constants

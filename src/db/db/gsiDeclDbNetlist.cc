@@ -29,6 +29,7 @@
 #include "tlException.h"
 #include "tlInternational.h"
 #include "tlStream.h"
+#include "tlGlobPattern.h"
 
 namespace gsi
 {
@@ -70,6 +71,160 @@ static void device_disconnect_terminal_by_name (db::Device *device, const std::s
   device_connect_terminal_by_name (device, terminal_name, 0);
 }
 
+static size_t get_device_index (const db::DeviceReconnectedTerminal *obj)
+{
+  return obj->device_index;
+}
+
+static void set_device_index (db::DeviceReconnectedTerminal *obj, size_t device_index)
+{
+  obj->device_index = device_index;
+}
+
+static size_t get_other_terminal_id (const db::DeviceReconnectedTerminal *obj)
+{
+  return obj->other_terminal_id;
+}
+
+static void set_other_terminal_id (db::DeviceReconnectedTerminal *obj, size_t other_terminal_id)
+{
+  obj->other_terminal_id = other_terminal_id;
+}
+
+Class<db::DeviceReconnectedTerminal> decl_dbDeviceReconnectedTerminal ("db", "DeviceReconnectedTerminal",
+  gsi::method_ext ("device_index=", &set_device_index, gsi::arg ("device_index"),
+    "@brief The device abstract index setter.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("device_index", &get_device_index,
+    "@brief The device abstract index getter.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("other_terminal_id=", &set_other_terminal_id, gsi::arg ("other_terminal_id"),
+    "@brief The setter for the abstract's connected terminal.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("other_terminal_id", &get_other_terminal_id,
+    "@brief The getter for the abstract's connected terminal.\n"
+    "See the class description for details."
+  ),
+  "@brief Describes a terminal rerouting in combined devices.\n"
+  "Combined devices are implemented as a generalization of the device abstract concept in \\Device. For "
+  "combined devices, multiple \\DeviceAbstract references are present. To support different combination schemes, "
+  "device-to-abstract routing is supported. Parallel combinations will route all outer terminals to corresponding "
+  "terminals of all device abstracts (because of terminal swapping these may be different ones).\n"
+  "\n"
+  "This object describes one route to an abstract's terminal. The device index is 0 for the main device abstract and "
+  "1 for the first combined device abstract.\n"
+  "\n"
+  "This class has been introduced in version 0.26.\n"
+);
+
+static const db::DeviceAbstract *get_device_abstract (const db::DeviceAbstractRef *obj)
+{
+  return obj->device_abstract;
+}
+
+static void set_device_abstract (db::DeviceAbstractRef *obj, const db::DeviceAbstract *device_abstract)
+{
+  obj->device_abstract = device_abstract;
+}
+
+static db::DCplxTrans get_trans (const db::DeviceAbstractRef *obj)
+{
+  return obj->trans;
+}
+
+static void set_trans (db::DeviceAbstractRef *obj, const db::DCplxTrans &trans)
+{
+  obj->trans = trans;
+}
+
+Class<db::DeviceAbstractRef> decl_dbDeviceAbstractRef ("db", "DeviceAbstractRef",
+  gsi::method_ext ("device_abstract=", &set_device_abstract, gsi::arg ("device_abstract"),
+    "@brief The setter for the device abstract reference.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("device_abstract", &get_device_abstract,
+    "@brief The getter for the device abstract reference.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("trans=", &set_trans, gsi::arg ("tr"),
+    "@brief The setter for the relative transformation of the instance.\n"
+    "See the class description for details."
+  ) +
+  gsi::method_ext ("trans", &get_trans,
+    "@brief The getter for the relative transformation of the instance.\n"
+    "See the class description for details."
+  ),
+  "@brief Describes an additional device abstract reference for combined devices.\n"
+  "Combined devices are implemented as a generalization of the device abstract concept in \\Device. For "
+  "combined devices, multiple \\DeviceAbstract references are present. This class describes such an "
+  "additional reference. A reference is a pointer to an abstract plus a transformation by which the abstract "
+  "is transformed geometrically as compared to the first (initial) abstract.\n"
+  "\n"
+  "This class has been introduced in version 0.26.\n"
+);
+
+static bool is_combined_device (const db::Device *device)
+{
+  return ! device->reconnected_terminals ().empty ();
+}
+
+static std::vector<db::DeviceReconnectedTerminal>::const_iterator begin_reconnected_terminals_for (const db::Device *device, size_t terminal_id)
+{
+  static std::vector<db::DeviceReconnectedTerminal> empty;
+
+  const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for (terminal_id);
+  if (! ti) {
+    return empty.begin ();
+  } else {
+    return ti->begin ();
+  }
+}
+
+static std::vector<db::DeviceReconnectedTerminal>::const_iterator end_reconnected_terminals_for (const db::Device *device, size_t terminal_id)
+{
+  static std::vector<db::DeviceReconnectedTerminal> empty;
+
+  const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for (terminal_id);
+  if (! ti) {
+    return empty.end ();
+  } else {
+    return ti->end ();
+  }
+}
+
+static void clear_reconnected_terminals (db::Device *device)
+{
+  device->reconnected_terminals ().clear ();
+}
+
+static void add_reconnected_terminals (db::Device *device, size_t outer_terminal, const db::DeviceReconnectedTerminal &t)
+{
+  device->reconnected_terminals () [outer_terminal].push_back (t);
+}
+
+static std::vector<db::DeviceAbstractRef>::const_iterator begin_other_abstracts (const db::Device *device)
+{
+  return device->other_abstracts ().begin ();
+}
+
+static std::vector<db::DeviceAbstractRef>::const_iterator end_other_abstracts (const db::Device *device)
+{
+  return device->other_abstracts ().end ();
+}
+
+static void clear_other_abstracts (db::Device *device)
+{
+  device->other_abstracts ().clear ();
+}
+
+static void add_other_abstracts (db::Device *device, const db::DeviceAbstractRef &ref)
+{
+  device->other_abstracts ().push_back (ref);
+}
+
 Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
@@ -78,7 +233,40 @@ Class<db::Device> decl_dbDevice ("db", "Device",
     "@brief Gets the device abstract for this device instance.\n"
     "See \\DeviceAbstract for more details.\n"
   ) +
-  gsi::method ("circuit", (db::Circuit *(db::Device::*) ()) &db::Device::circuit,
+  gsi::method ("device_abstract=", &db::Device::set_device_abstract,
+    "@hide\n"
+    "Provided for test purposes mainly. Be careful with pointers!"
+  ) +
+  gsi::method_ext ("is_combined_device?", &is_combined_device,
+    "@brief Returns true, if the device is a combined device.\n"
+    "Combined devices feature multiple device abstracts and device-to-abstract terminal connections.\n"
+    "See \\each_reconnected_terminal and \\each_combined_abstract for more details.\n"
+  ) +
+  gsi::iterator_ext ("each_reconnected_terminal_for", &begin_reconnected_terminals_for, &end_reconnected_terminals_for, gsi::arg ("terminal_id"),
+    "@brief Iterates over the reconnected terminal specifications for a given outer terminal.\n"
+    "This feature applies to combined devices. This iterator will deliver all device-to-abstract terminal reroutings.\n"
+  ) +
+  gsi::method_ext ("clear_reconnected_terminals", &clear_reconnected_terminals,
+    "@hide\n"
+    "Provided for test purposes mainly."
+  ) +
+  gsi::method_ext ("add_reconnected_terminal_for", &add_reconnected_terminals, gsi::arg ("outer_terminal"), gsi::arg ("descriptor"),
+    "@hide\n"
+    "Provided for test purposes mainly."
+  ) +
+  gsi::iterator_ext ("each_combined_abstract", &begin_other_abstracts, &end_other_abstracts,
+    "@brief Iterates over the combined device specifications.\n"
+    "This feature applies to combined devices. This iterator will deliver all device abstracts present in addition to the default device abstract.\n"
+  ) +
+  gsi::method_ext ("clear_combined_abstracts", &clear_other_abstracts,
+    "@hide\n"
+    "Provided for test purposes mainly."
+  ) +
+  gsi::method_ext ("add_combined_abstract", &add_other_abstracts, gsi::arg ("ref"),
+    "@hide\n"
+    "Provided for test purposes mainly."
+  ) +
+  gsi::method ("circuit", (const db::Circuit *(db::Device::*) () const) &db::Device::circuit,
     "@brief Gets the circuit the device lives in."
   ) +
   gsi::method ("id", &db::Device::id,
@@ -99,7 +287,7 @@ Class<db::Device> decl_dbDevice ("db", "Device",
     "@brief Gets the expanded name of the device.\n"
     "The expanded name takes the name of the device. If the name is empty, the numeric ID will be used to build a name. "
   ) +
-  gsi::method ("net_for_terminal", (db::Net *(db::Device::*) (size_t)) &db::Device::net_for_terminal, gsi::arg ("terminal_id"),
+  gsi::method ("net_for_terminal", (const db::Net *(db::Device::*) (size_t) const) &db::Device::net_for_terminal, gsi::arg ("terminal_id"),
     "@brief Gets the net connected to the specified terminal.\n"
     "If the terminal is not connected, nil is returned for the net."
   ) +
@@ -152,7 +340,7 @@ Class<db::Device> decl_dbDevice ("db", "Device",
 );
 
 Class<db::DeviceAbstract> decl_dbDeviceAbstract ("db", "DeviceAbstract",
-  gsi::method ("netlist", (db::Netlist *(db::DeviceAbstract::*) ()) &db::DeviceAbstract::netlist,
+  gsi::method ("netlist", (const db::Netlist *(db::DeviceAbstract::*) () const) &db::DeviceAbstract::netlist,
     "@brief Gets the netlist the device abstract lives in."
   ) +
   gsi::method ("device_class", &db::DeviceAbstract::device_class,
@@ -201,10 +389,10 @@ static void subcircuit_disconnect_pin1 (db::SubCircuit *subcircuit, const db::Pi
 }
 
 Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
-  gsi::method ("circuit_ref", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit_ref,
+  gsi::method ("circuit_ref", (const db::Circuit *(db::SubCircuit::*) () const) &db::SubCircuit::circuit_ref,
     "@brief Gets the circuit referenced by the subcircuit.\n"
   ) +
-  gsi::method ("circuit", (db::Circuit *(db::SubCircuit::*) ()) &db::SubCircuit::circuit,
+  gsi::method ("circuit", (const db::Circuit *(db::SubCircuit::*) () const) &db::SubCircuit::circuit,
     "@brief Gets the circuit the subcircuit lives in.\n"
     "This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \\circuit_ref."
   ) +
@@ -226,7 +414,7 @@ Class<db::SubCircuit> decl_dbSubCircuit ("db", "SubCircuit",
     "@brief Gets the expanded name of the subcircuit.\n"
     "The expanded name takes the name of the subcircuit. If the name is empty, the numeric ID will be used to build a name. "
   ) +
-  gsi::method ("net_for_pin", (db::Net *(db::SubCircuit::*) (size_t)) &db::SubCircuit::net_for_pin, gsi::arg ("pin_id"),
+  gsi::method ("net_for_pin", (const db::Net *(db::SubCircuit::*) (size_t) const) &db::SubCircuit::net_for_pin, gsi::arg ("pin_id"),
     "@brief Gets the net connected to the specified pin of the subcircuit.\n"
     "If the pin is not connected, nil is returned for the net."
   ) +
@@ -263,17 +451,17 @@ Class<db::NetTerminalRef> decl_dbNetTerminalRef ("db", "NetTerminalRef",
   gsi::method ("terminal_id", &db::NetTerminalRef::terminal_id,
     "@brief Gets the ID of the terminal of the device the connection is made to."
   ) +
-  gsi::method ("device", (db::Device *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::device,
+  gsi::method ("device", (const db::Device *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::device,
     "@brief Gets the device reference.\n"
     "Gets the device object that this connection is made to."
   ) +
-  gsi::method ("net", (db::Net *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::net,
+  gsi::method ("net", (const db::Net *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::net,
     "@brief Gets the net this terminal reference is attached to"
   ) +
-  gsi::method ("device_class", (db::DeviceClass *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::device_class,
+  gsi::method ("device_class", (const db::DeviceClass *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::device_class,
     "@brief Gets the class of the device which is addressed."
   ) +
-  gsi::method ("terminal_def", (db::DeviceTerminalDefinition *(db::NetTerminalRef::*) ()) &db::NetTerminalRef::terminal_def,
+  gsi::method ("terminal_def", (const db::DeviceTerminalDefinition *(db::NetTerminalRef::*) () const) &db::NetTerminalRef::terminal_def,
     "@brief Gets the terminal definition of the terminal that is connected"
   ),
   "@brief A connection to a terminal of a device.\n"
@@ -289,7 +477,7 @@ Class<db::NetPinRef> decl_dbNetPinRef ("db", "NetPinRef",
   gsi::method ("pin", &db::NetPinRef::pin,
     "@brief Gets the \\Pin object of the pin the connection is made to."
   ) +
-  gsi::method ("net", (db::Net *(db::NetPinRef::*) ()) &db::NetPinRef::net,
+  gsi::method ("net", (const db::Net *(db::NetPinRef::*) () const) &db::NetPinRef::net,
     "@brief Gets the net this pin reference is attached to"
   ),
   "@brief A connection to an outgoing pin of the circuit.\n"
@@ -305,12 +493,12 @@ Class<db::NetSubcircuitPinRef> decl_dbNetSubcircuitPinRef ("db", "NetSubcircuitP
   gsi::method ("pin", &db::NetSubcircuitPinRef::pin,
     "@brief Gets the \\Pin object of the pin the connection is made to."
   ) +
-  gsi::method ("subcircuit", (db::SubCircuit *(db::NetSubcircuitPinRef::*) ()) &db::NetSubcircuitPinRef::subcircuit,
+  gsi::method ("subcircuit", (const db::SubCircuit *(db::NetSubcircuitPinRef::*) () const) &db::NetSubcircuitPinRef::subcircuit,
     "@brief Gets the subcircuit reference.\n"
     "This attribute indicates the subcircuit the net attaches to. The "
     "subcircuit lives in the same circuit than the net. "
   ) +
-  gsi::method ("net", (db::Net *(db::NetSubcircuitPinRef::*) ()) &db::NetSubcircuitPinRef::net,
+  gsi::method ("net", (const db::Net *(db::NetSubcircuitPinRef::*) () const) &db::NetSubcircuitPinRef::net,
     "@brief Gets the net this pin reference is attached to"
   ),
   "@brief A connection to a pin of a subcircuit.\n"
@@ -353,17 +541,17 @@ Class<db::Net> decl_dbNet ("db", "Net",
     "@brief Gets the cluster ID of the net.\n"
     "See \\cluster_id= for details about the cluster ID."
   ) +
-  gsi::iterator ("each_pin", (db::Net::pin_iterator (db::Net::*) ()) &db::Net::begin_pins, (db::Net::pin_iterator (db::Net::*) ()) &db::Net::end_pins,
+  gsi::iterator ("each_pin", gsi::return_reference (), (db::Net::const_pin_iterator (db::Net::*) () const) &db::Net::begin_pins, (db::Net::const_pin_iterator (db::Net::*) () const) &db::Net::end_pins,
     "@brief Iterates over all outgoing pins the net connects.\n"
     "Pin connections are described by \\NetPinRef objects. Pin connections "
     "are connections to outgoing pins of the circuit the net lives in."
   ) +
-  gsi::iterator ("each_subcircuit_pin", (db::Net::subcircuit_pin_iterator (db::Net::*) ()) &db::Net::begin_subcircuit_pins, (db::Net::subcircuit_pin_iterator (db::Net::*) ()) &db::Net::end_subcircuit_pins,
+  gsi::iterator ("each_subcircuit_pin", gsi::return_reference (), (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::begin_subcircuit_pins, (db::Net::const_subcircuit_pin_iterator (db::Net::*) () const) &db::Net::end_subcircuit_pins,
     "@brief Iterates over all subcircuit pins the net connects.\n"
     "Subcircuit pin connections are described by \\NetSubcircuitPinRef objects. These are "
     "connections to specific pins of subcircuits."
   ) +
-  gsi::iterator ("each_terminal", (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::begin_terminals, (db::Net::terminal_iterator (db::Net::*) ()) &db::Net::end_terminals,
+  gsi::iterator ("each_terminal", gsi::return_reference (), (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::begin_terminals, (db::Net::const_terminal_iterator (db::Net::*) () const) &db::Net::end_terminals,
     "@brief Iterates over all terminals the net connects.\n"
     "Terminals connect devices. Terminal connections are described by \\NetTerminalRef "
     "objects."
@@ -434,14 +622,19 @@ Class<db::DeviceTerminalDefinition> decl_dbDeviceTerminalDefinition ("db", "Devi
   "This class has been added in version 0.26."
 );
 
-static db::DeviceParameterDefinition *new_parameter_definition (const std::string &name, const std::string &description, double default_value)
+static db::DeviceParameterDefinition *new_parameter_definition (const std::string &name, const std::string &description, double default_value, bool is_primary, double si_scaling)
 {
-  return new db::DeviceParameterDefinition (name, description, default_value);
+  return new db::DeviceParameterDefinition (name, description, default_value, is_primary, si_scaling);
 }
 
 Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "DeviceParameterDefinition",
-  gsi::constructor ("new", &gsi::new_parameter_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()), gsi::arg ("default_value", 0.0),
+  gsi::constructor ("new", &gsi::new_parameter_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()), gsi::arg ("default_value", 0.0), gsi::arg ("is_primary", true), gsi::arg ("si_scaling", 1.0),
     "@brief Creates a new parameter definition."
+    "@param name The name of the parameter\n"
+    "@param description The human-readable description\n"
+    "@param default_value The initial value\n"
+    "@param is_primary True, if the parameter is a primary parameter (see \\is_primary=)\n"
+    "@param si_scaling The scaling factor to SI units\n"
   ) +
   gsi::method ("name", &db::DeviceParameterDefinition::name,
     "@brief Gets the name of the parameter."
@@ -470,6 +663,10 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
     "@brief Sets a value indicating whether the parameter is a primary parameter\n"
     "If this flag is set to true (the default), the parameter is considered a primary parameter.\n"
     "Only primary parameters are compared by default.\n"
+  ) +
+  gsi::method ("si_scaling", &db::DeviceParameterDefinition::si_scaling,
+    "@brief Gets the scaling factor to SI units.\n"
+    "For parameters in micrometers for example, this factor will be 1e-6."
   ) +
   gsi::method ("id", &db::DeviceParameterDefinition::id,
     "@brief Gets the ID of the parameter.\n"
@@ -845,7 +1042,7 @@ static db::SubCircuit *create_subcircuit1 (db::Circuit *c, db::Circuit *cc, cons
   return sc;
 }
 
-static db::Net *circuit_net_for_pin (db::Circuit *c, const db::Pin *pin)
+static const db::Net *circuit_net_for_pin (const db::Circuit *c, const db::Pin *pin)
 {
   return pin ? c->net_for_pin (pin->id ()) : 0;
 }
@@ -883,6 +1080,10 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::iterator ("each_parent", (db::Circuit::parent_circuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_parents, (db::Circuit::parent_circuit_iterator (db::Circuit::*) ()) &db::Circuit::end_parents,
     "@brief Iterates over the parent circuits of this circuit\n"
     "Child circuits are the ones that are referencing this circuit via subcircuits."
+  ) +
+  gsi::method ("has_refs", &db::Circuit::has_refs,
+    "@brief Returns a value indicating whether the circuit has references\n"
+    "A circuit has references if there is at least one subcircuit referring to it."
   ) +
   gsi::iterator ("each_ref", (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::begin_refs, (db::Circuit::refs_iterator (db::Circuit::*) ()) &db::Circuit::end_refs,
     "@brief Iterates over the subcircuit objects referencing this circuit\n"
@@ -973,6 +1174,14 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   gsi::iterator ("each_subcircuit", (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_subcircuits, (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::end_subcircuits,
     "@brief Iterates over the subcircuits of the circuit"
   ) +
+  gsi::method ("blank", &db::Circuit::blank,
+    "@brief Blanks out the circuit\n"
+    "This method will remove all the innards of the circuit and just leave the pins. "
+    "The pins won't be connected to inside nets anymore, but the circuit can still be "
+    "called by subcircuit references. "
+    "This method will eventually create a 'circuit abstract' (or black box). It will "
+    "set the \\dont_purge flag to mark this circuit as 'intentionally empty'."
+  ) +
   gsi::method ("netlist", (db::Netlist *(db::Circuit::*) ()) &db::Circuit::netlist,
     "@brief Gets the netlist object the circuit lives in"
   ) +
@@ -981,6 +1190,20 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
   ) +
   gsi::method ("name", &db::Circuit::name,
     "@brief Gets the name of the circuit"
+  ) +
+  gsi::method ("boundary=", &db::Circuit::set_boundary, gsi::arg ("boundary"),
+    "@brief Sets the boundary of the circuit"
+  ) +
+  gsi::method ("boundary", &db::Circuit::boundary,
+    "@brief Gets the boundary of the circuit"
+  ) +
+  gsi::method ("dont_purge", &db::Circuit::dont_purge,
+    "@brief Gets a value indicating whether the circuit can be purged on \\Netlist#purge.\n"
+  ) +
+  gsi::method ("dont_purge=", &db::Circuit::set_dont_purge, gsi::arg ("f"),
+    "@brief Sets a value indicating whether the circuit can be purged on \\Netlist#purge.\n"
+    "If this attribute is set to true, \\Netlist#purge will never delete this circuit.\n"
+    "This flag therefore marks this circuit as 'precious'."
   ) +
   gsi::method ("cell_index=", &db::Circuit::set_cell_index, gsi::arg ("cell_index"),
     "@brief Sets the cell index\n"
@@ -1088,6 +1311,40 @@ static void read_netlist (db::Netlist *nl, const std::string &file, db::NetlistR
   reader->read (os, *nl);
 }
 
+static void flatten_circuit_by_name (db::Netlist *nl, const std::string &name_pattern)
+{
+  std::list<tl::weak_ptr<db::Circuit> > circuits_to_flatten;
+  tl::GlobPattern pat (name_pattern);
+  for (db::Netlist::circuit_iterator c = nl->begin_circuits (); c != nl->end_circuits (); ++c) {
+    if (pat.match (c->name ())) {
+      circuits_to_flatten.push_back (c.operator-> ());
+    }
+  }
+
+  for (std::list<tl::weak_ptr<db::Circuit> >::iterator c = circuits_to_flatten.begin (); c != circuits_to_flatten.end (); ++c) {
+    if (c->get ()) {
+      nl->flatten_circuit (c->get ());
+    }
+  }
+}
+
+static void blank_circuit_by_name (db::Netlist *nl, const std::string &name_pattern)
+{
+  std::list<tl::weak_ptr<db::Circuit> > circuits_to_blank;
+  tl::GlobPattern pat (name_pattern);
+  for (db::Netlist::circuit_iterator c = nl->begin_circuits (); c != nl->end_circuits (); ++c) {
+    if (pat.match (c->name ())) {
+      circuits_to_blank.push_back (c.operator-> ());
+    }
+  }
+
+  for (std::list<tl::weak_ptr<db::Circuit> >::iterator c = circuits_to_blank.begin (); c != circuits_to_blank.end (); ++c) {
+    if (c->get ()) {
+      (*c)->blank ();
+    }
+  }
+}
+
 Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method_ext ("add", &gsi::add_circuit, gsi::arg ("circuit"),
     "@brief Adds the circuit to the netlist\n"
@@ -1096,12 +1353,36 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   ) +
   gsi::method ("remove", &db::Netlist::remove_circuit, gsi::arg ("circuit"),
     "@brief Removes the given circuit object from the netlist\n"
-    "After the object has been removed, it becomes invalid and cannot be used further."
+    "After the circuit has been removed, the object becomes invalid and cannot be used further. "
+    "A circuit with references (see \\has_refs) should not be removed as the "
+    "subcircuits calling it would afterwards point to nothing."
+  ) +
+  gsi::method ("purge_circuit", &db::Netlist::purge_circuit, gsi::arg ("circuit"),
+    "@brief Removes the given circuit object and all child circuits which are not used otherwise from the netlist\n"
+    "After the circuit has been removed, the object becomes invalid and cannot be used further. "
+    "A circuit with references (see \\has_refs) should not be removed as the "
+    "subcircuits calling it would afterwards point to nothing."
   ) +
   gsi::method ("flatten_circuit", &db::Netlist::flatten_circuit, gsi::arg ("circuit"),
     "@brief Flattens a subcircuit\n"
     "This method will substitute all instances (subcircuits) of the given circuit by it's "
     "contents. After this, the circuit is removed."
+  ) +
+  gsi::method_ext ("flatten_circuit", &flatten_circuit_by_name, gsi::arg ("pattern"),
+    "@brief Flattens circuits matching a certain pattern\n"
+    "This method will substitute all instances (subcircuits) of all circuits with names matching the given name pattern. "
+    "The name pattern is a glob expression. For example, 'flatten_circuit(\"np*\")' will flatten all circuits with names "
+    "starting with 'np'."
+  ) +
+  gsi::method_ext ("blank_circuit", &blank_circuit_by_name, gsi::arg ("pattern"),
+    "@brief Blanks circuits matching a certain pattern\n"
+    "This method will erase everything from inside the circuits matching the given pattern. It will only leave pins which are "
+    "not connected to any net. Hence, this method forms 'abstract' or black-box circuits which can be instantiated through "
+    "subcircuits like the former ones, but are empty shells.\n"
+    "The name pattern is a glob expression. For example, 'flatten_circuit(\"np*\")' will blank out all circuits with names "
+    "starting with 'np'.\n"
+    "\n"
+    "For more details see \\Circuit#blank which is the corresponding method on the actual object."
   ) +
   gsi::method ("circuit_by_cell_index", (db::Circuit *(db::Netlist::*) (db::cell_index_type)) &db::Netlist::circuit_by_cell_index, gsi::arg ("cell_index"),
     "@brief Gets the circuit object for a given cell index.\n"
@@ -1172,12 +1453,18 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("purge", &db::Netlist::purge,
     "@brief Purge unused nets, circuits and subcircuits.\n"
     "This method will purge all nets which return \\floating == true. Circuits which don't have any "
-    "nets (or only floating ones) and removed. Their subcircuits are disconnected."
+    "nets (or only floating ones) and removed. Their subcircuits are disconnected.\n"
+    "This method respects the \\Circuit#dont_purge attribute and will never delete circuits "
+    "with this flag set."
   ) +
   gsi::method ("purge_nets", &db::Netlist::purge_nets,
     "@brief Purges floating nets.\n"
     "Floating nets can be created as effect of reconnections of devices or pins. "
     "This method will eliminate all nets that make less than two connections."
+  ) +
+  gsi::method ("simplify", &db::Netlist::simplify,
+    "@brief Convience method that combines the simplification.\n"
+    "This method is a convenience method that runs \\make_top_level_pins, \\purge, \\combine_devices and \\purge_nets."
   ) +
   gsi::method_ext ("read", &read_netlist, gsi::arg ("file"), gsi::arg ("reader"),
     "@brief Writes the netlist to the given file using the given reader object to parse the file\n"
@@ -1264,26 +1551,31 @@ public:
     db::NetlistSpiceWriterDelegate::write_device (dev);
   }
 
+  void org_write_header () const
+  {
+    db::NetlistSpiceWriterDelegate::write_header ();
+  }
+
   gsi::Callback cb_write_header;
   gsi::Callback cb_write_device_intro;
   gsi::Callback cb_write_device;
 };
 
 Class<NetlistSpiceWriterDelegateImpl> db_NetlistSpiceWriterDelegate ("db", "NetlistSpiceWriterDelegate",
+  gsi::method ("write_header", &NetlistSpiceWriterDelegateImpl::org_write_header, "@hide") +
   gsi::callback ("write_header", &NetlistSpiceWriterDelegateImpl::write_header, &NetlistSpiceWriterDelegateImpl::cb_write_header,
     "@brief Writes the text at the beginning of the SPICE netlist\n"
     "Reimplement this method to insert your own text at the beginning of the file"
   ) +
+  gsi::method ("write_device_intro", &NetlistSpiceWriterDelegateImpl::org_write_device_intro, "@hide") +
   gsi::callback ("write_device_intro", &NetlistSpiceWriterDelegateImpl::reimpl_write_device_intro, &NetlistSpiceWriterDelegateImpl::cb_write_device_intro, gsi::arg ("device_class"),
     "@brief Inserts a text for the given device class\n"
     "Reimplement this method to insert your own text at the beginning of the file for the given device class"
   ) +
+  gsi::method ("write_device", &NetlistSpiceWriterDelegateImpl::org_write_device, gsi::arg ("device"), "@hide") +
   gsi::callback ("write_device", &NetlistSpiceWriterDelegateImpl::reimpl_write_device, &NetlistSpiceWriterDelegateImpl::cb_write_device, gsi::arg ("device"),
     "@brief Inserts a text for the given device\n"
-    "Reimplement this method to write the given device in the desired way"
-  ) +
-  gsi::method ("write_device", &NetlistSpiceWriterDelegateImpl::org_write_device, gsi::arg ("device"),
-    "@brief Calls the default implementation of the \\write_device method.\n"
+    "Reimplement this method to write the given device in the desired way. "
     "The default implementation will utilize the device class information to write native SPICE "
     "elements for the devices."
   ) +
@@ -1357,8 +1649,15 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
     "@brief Sets a value indicating whether to use net names (true) or net numbers (false).\n"
     "The default is to use net numbers."
   ) +
-  gsi::method ("use_net_names", &db::NetlistSpiceWriter::use_net_names,
+  gsi::method ("use_net_names?", &db::NetlistSpiceWriter::use_net_names,
     "@brief Gets a value indicating whether to use net names (true) or net numbers (false).\n"
+  ) +
+  gsi::method ("with_comments=", &db::NetlistSpiceWriter::set_with_comments, gsi::arg ("f"),
+    "@brief Sets a value indicating whether to embed comments for position etc. (true) or not (false).\n"
+    "The default is to embed comments."
+  ) +
+  gsi::method ("with_comments?", &db::NetlistSpiceWriter::with_comments,
+    "@brief Gets a value indicating whether to embed comments for position etc. (true) or not (false).\n"
   ),
   "@brief Implements a netlist writer for the SPICE format.\n"
   "Provide a delegate for customizing the way devices are written.\n"
@@ -1384,7 +1683,7 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "@ul\n"
   "@li A global header (\\NetlistSpiceWriterDelegate#write_header): this method is called to print the part right after the headline @/li\n"
   "@li A per-device class header (\\NetlistSpiceWriterDelegate#write_device_intro): this method is called for every device class and may print device-class specific headers (e.g. model definitions) @/li\n"
-  "@li Per-device output: this method (\\NetlistSpiceWriterDelegate#write_device): this method is called for every device and may print the device statement(s) in a specific way.\n"
+  "@li Per-device output: this method (\\NetlistSpiceWriterDelegate#write_device): this method is called for every device and may print the device statement(s) in a specific way. @/li\n"
   "@/ul\n"
   "\n"
   "The delegate must use \\NetlistSpiceWriterDelegate#emit_line to print a line, \\NetlistSpiceWriterDelegate#emit_comment to print a comment etc.\n"
@@ -1405,10 +1704,13 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   "\n"
   "  def write_device(dev)\n"
   "    if dev.device_class.name != \"MYDEVICE\"\n"
-  "    emit_comment(\"Terminal #1: \" + net_to_string(dev.net_for_terminal(0)))\n"
-  "    emit_comment(\"Terminal #2: \" + net_to_string(dev.net_for_terminal(1)))\n"
-  "    super(dev)\n"
-  "    emit_comment(\"After device \" + dev.expanded_name)\n"
+  "      emit_comment(\"Terminal #1: \" + net_to_string(dev.net_for_terminal(0)))\n"
+  "      emit_comment(\"Terminal #2: \" + net_to_string(dev.net_for_terminal(1)))\n"
+  "      super(dev)\n"
+  "      emit_comment(\"After device \" + dev.expanded_name)\n"
+  "    else\n"
+  "      super(dev)\n"
+  "    end\n"
   "  end\n"
   "\n"
   "end\n"
@@ -1426,14 +1728,212 @@ Class<db::NetlistReader> db_NetlistReader ("db", "NetlistReader",
   "@hide\n"
 );
 
+/**
+ *  @brief A SPICE reader delegate base class for reimplementation
+ */
+class NetlistSpiceReaderDelegateImpl
+  : public db::NetlistSpiceReaderDelegate, public gsi::ObjectBase
+{
+public:
+  NetlistSpiceReaderDelegateImpl ()
+    : db::NetlistSpiceReaderDelegate ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void error (const std::string &msg)
+  {
+    //  doing this avoids passing exceptions through script code which spoils the message
+    //  (the exception will be decorated with a stack trace). TODO: a better solution was
+    //  to define a specific exception type for "raw exception".
+    m_error = msg;
+    db::NetlistSpiceReaderDelegate::error (msg);
+  }
+
+  virtual void start (db::Netlist *netlist)
+  {
+    try {
+      m_error.clear ();
+      if (cb_start.can_issue ()) {
+        cb_start.issue<db::NetlistSpiceReaderDelegate, db::Netlist *> (&db::NetlistSpiceReaderDelegate::start, netlist);
+      } else {
+        db::NetlistSpiceReaderDelegate::start (netlist);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+    }
+  }
+
+  virtual void finish (db::Netlist *netlist)
+  {
+    try {
+      m_error.clear ();
+      if (cb_finish.can_issue ()) {
+        cb_finish.issue<db::NetlistSpiceReaderDelegate, db::Netlist *> (&db::NetlistSpiceReaderDelegate::finish, netlist);
+      } else {
+        db::NetlistSpiceReaderDelegate::finish (netlist);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+    }
+  }
+
+  virtual bool wants_subcircuit (const std::string &circuit_name)
+  {
+    try {
+      m_error.clear ();
+      if (cb_wants_subcircuit.can_issue ()) {
+        return cb_wants_subcircuit.issue<db::NetlistSpiceReaderDelegate, bool, const std::string &> (&db::NetlistSpiceReaderDelegate::wants_subcircuit, circuit_name);
+      } else {
+        return db::NetlistSpiceReaderDelegate::wants_subcircuit (circuit_name);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+      return false;
+    }
+  }
+
+  virtual bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+  {
+    try {
+      m_error.clear ();
+      if (cb_element.can_issue ()) {
+        return cb_element.issue<db::NetlistSpiceReaderDelegate, bool, db::Circuit *, const std::string &, const std::string &, const std::string &, double, const std::vector<db::Net *> &, const std::map<std::string, double> &> (&db::NetlistSpiceReaderDelegate::element, circuit, element, name, model, value, nets, params);
+      } else {
+        return db::NetlistSpiceReaderDelegate::element (circuit, element, name, model, value, nets, params);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+      return false;
+    }
+  }
+
+  gsi::Callback cb_start;
+  gsi::Callback cb_finish;
+  gsi::Callback cb_wants_subcircuit;
+  gsi::Callback cb_element;
+
+private:
+  std::string m_error;
+};
+
+static void start_fb (db::NetlistSpiceReaderDelegate *delegate, db::Netlist *netlist)
+{
+  delegate->db::NetlistSpiceReaderDelegate::start (netlist);
+}
+
+static void finish_fb (db::NetlistSpiceReaderDelegate *delegate, db::Netlist *netlist)
+{
+  delegate->db::NetlistSpiceReaderDelegate::finish (netlist);
+}
+
+static bool wants_subcircuit_fb (db::NetlistSpiceReaderDelegate *delegate, const std::string &model)
+{
+  return delegate->db::NetlistSpiceReaderDelegate::wants_subcircuit (model);
+}
+
+static bool element_fb (db::NetlistSpiceReaderDelegate *delegate, db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+{
+  return delegate->db::NetlistSpiceReaderDelegate::element (circuit, element, name, model, value, nets, params);
+}
+
+Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "NetlistSpiceReaderDelegate",
+  gsi::method_ext ("start", &start_fb, "@hide") +
+  gsi::method_ext ("finish", &finish_fb, "@hide") +
+  gsi::method_ext ("wants_subcircuit", &wants_subcircuit_fb, "@hide") +
+  gsi::method_ext ("element", &element_fb, "@hide") +
+  gsi::callback ("start", &NetlistSpiceReaderDelegateImpl::start, &NetlistSpiceReaderDelegateImpl::cb_start, gsi::arg ("netlist"),
+    "@brief This method is called when the reader starts reading a netlist\n"
+  ) +
+  gsi::callback ("finish", &NetlistSpiceReaderDelegateImpl::finish, &NetlistSpiceReaderDelegateImpl::cb_finish, gsi::arg ("netlist"),
+    "@brief This method is called when the reader is done reading a netlist successfully\n"
+  ) +
+  gsi::callback ("wants_subcircuit", &NetlistSpiceReaderDelegateImpl::wants_subcircuit, &NetlistSpiceReaderDelegateImpl::cb_wants_subcircuit, gsi::arg ("circuit_name"),
+    "@brief Returns true, if the delegate wants subcircuit elements with this name\n"
+    "The name is always upper case.\n"
+  ) +
+  gsi::callback ("element", &NetlistSpiceReaderDelegateImpl::element, &NetlistSpiceReaderDelegateImpl::cb_element,
+    gsi::arg ("circuit"), gsi::arg ("element"), gsi::arg ("name"), gsi::arg ("model"), gsi::arg ("value"), gsi::arg ("nets"), gsi::arg ("parameters"),
+    "@brief Makes a device from an element line\n"
+    "@param circuit The circuit that is currently read.\n"
+    "@param element The upper-case element code (\"M\", \"R\", ...).\n"
+    "@param name The element's name.\n"
+    "@param model The upper-case model name (may be empty).\n"
+    "@param value The default value (e.g. registance for resistors) and may be zero.\n"
+    "@param nets The nets given in the element line.\n"
+    "@param parameters The parameters of the element statement (parameter names are upper case).\n"
+    "\n"
+    "The default implementation will create corresponding devices for\n"
+    "some known elements using the Spice writer's parameter conventions.\n"
+    "\n"
+    "The method must return true, if the element was was understood and false otherwise.\n"
+  ) +
+  gsi::method ("error", &NetlistSpiceReaderDelegateImpl::error, gsi::arg ("msg"),
+    "@brief Issues an error with the given message.\n"
+    "Use this method to generate an error."
+  ),
+  "@brief Provides a delegate for the SPICE reader for translating device statements\n"
+  "Supply a customized class to provide a specialized reading scheme for devices. "
+  "You need a customized class if you want to implement device reading from model subcircuits or to "
+  "translate device parameters.\n"
+  "\n"
+  "See \\NetlistSpiceReader for more details.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+namespace {
+
+class NetlistSpiceReaderWithOwnership
+  : public db::NetlistSpiceReader
+{
+public:
+  NetlistSpiceReaderWithOwnership (NetlistSpiceReaderDelegateImpl *delegate)
+    : db::NetlistSpiceReader (delegate), m_ownership (delegate)
+  {
+    if (delegate) {
+      delegate->keep ();
+    }
+  }
+
+private:
+  tl::shared_ptr<NetlistSpiceReaderDelegateImpl> m_ownership;
+};
+
+}
+
 db::NetlistSpiceReader *new_spice_reader ()
 {
   return new db::NetlistSpiceReader ();
 }
 
+db::NetlistSpiceReader *new_spice_reader2 (NetlistSpiceReaderDelegateImpl *delegate)
+{
+  return new NetlistSpiceReaderWithOwnership (delegate);
+}
+
 Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "NetlistSpiceReader",
   gsi::constructor ("new", &new_spice_reader,
     "@brief Creates a new reader.\n"
+  ) +
+  gsi::constructor ("new", &new_spice_reader2, gsi::arg ("delegate"),
+    "@brief Creates a new reader with a delegate.\n"
   ),
   "@brief Implements a netlist Reader for the SPICE format.\n"
   "Use the SPICE reader like this:\n"
@@ -1444,8 +1944,65 @@ Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "Ne
   "netlist.read(path, reader)\n"
   "@/code\n"
   "\n"
+  "The translation of SPICE elements can be tailored by providing a \\NetlistSpiceReaderDelegate class. "
+  "This allows translating of device parameters and mapping of some subcircuits to devices.\n"
+  "\n"
+  "The following example is a delegate that turns subcircuits called HVNMOS and HVPMOS into "
+  "MOS4 devices with the parameters scaled by 1.5:\n"
+  "\n"
+  "@code\n"
+  "class MyDelegate < RBA::NetlistSpiceReaderDelegate\n"
+  "\n"
+  "  # says we want to catch these subcircuits as devices\n"
+  "  def wants_subcircuit(name)\n"
+  "    name == \"HVNMOS\" || name == \"HVPMOS\"\n"
+  "  end\n"
+  "\n"
+  "  # translate the element\n"
+  "  def element(circuit, el, name, model, value, nets, params)\n"
+  "\n"
+  "    if el != \"X\"\n"
+  "      # all other elements are left to the standard implementation\n"
+  "      return super\n"
+  "    end\n"
+  "\n"
+  "    if nets.size != 4\n"
+  "      error(\"Subcircuit #{model} needs four nodes\")\n"
+  "    end\n"
+  "\n"
+  "    # provide a device class\n"
+  "    cls = circuit.netlist.device_class_by_name(model)\n"
+  "    if ! cls\n"
+  "      cls = RBA::DeviceClassMOS4Transistor::new\n"
+  "      cls.name = model\n"
+  "      circuit.netlist.add(cls)\n"
+  "    end\n"
+  "\n"
+  "    # create a device\n"
+  "    device = circuit.create_device(cls, name)\n"
+  "\n"
+  "    # and configure the device\n"
+  "    [ \"S\", \"G\", \"D\", \"B\" ].each_with_index do |t,index|\n"
+  "      device.connect_terminal(t, nets[index])\n"
+  "    end\n"
+  "    params.each do |p,value|\n"
+  "      device.set_parameter(p, value * 1.5)\n"
+  "    end\n"
+  "\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "# usage:\n"
+  "\n"
+  "mydelegate = MyDelegate::new\n"
+  "reader = RBA::NetlistSpiceReader::new(mydelegate)\n"
+  "\n"
+  "nl = RBA::Netlist::new\n"
+  "nl.read(input_file, reader)\n"
+  "@/code\n"
+  "\n"
   "This class has been introduced in version 0.26."
 );
-
 
 }

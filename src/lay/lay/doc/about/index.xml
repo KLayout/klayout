@@ -29,6 +29,13 @@
     <topic href="/about/custom_queries.xml"/>
     <topic href="/about/rba_notation.xml"/>
     <topic href="/about/drc_ref.xml"/>
+    <topic href="/about/drc_ref_layer.xml"/>
+    <topic href="/about/drc_ref_netter.xml"/>
+    <topic href="/about/drc_ref_source.xml"/>
+    <topic href="/about/drc_ref_global.xml"/>
+    <topic href="/about/lvs_ref.xml"/>
+    <topic href="/about/lvs_ref_netter.xml"/>
+    <topic href="/about/lvs_ref_global.xml"/>
     <!-- TODO: more -->
   </topics>
 

@@ -466,7 +466,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
 
   init_menu ();
 
-  lay::register_help_handler (this, SLOT (show_help (const QString &)));
+  lay::register_help_handler (this, SLOT (show_help (const QString &)), SLOT (show_modal_help (const QString &)));
 
   mp_assistant = new lay::HelpDialog (this);
 
@@ -697,7 +697,7 @@ MainWindow::~MainWindow ()
   }
   tl::DeferredMethodScheduler::instance ()->enable (false);
 
-  lay::register_help_handler (0, 0);
+  lay::register_help_handler (0, 0, 0);
 
   //  since the configuration actions unregister themselves, we need to do this before the main
   //  window is gone:
@@ -955,17 +955,10 @@ MainWindow::init_menu ()
     MenuLayoutEntry::last ()
   };
 
-  MenuLayoutEntry drc_menu [] = {
-    MenuLayoutEntry ("new_script",                      tl::to_string (QObject::tr ("New DRC Script")),                   SLOT (cm_new_drc_script ())),
-    MenuLayoutEntry ("edit_script",                     tl::to_string (QObject::tr ("Edit DRC Script")),                  SLOT (cm_edit_drc_scripts ())),
-    MenuLayoutEntry::last ()
-  };
-
   MenuLayoutEntry tools_menu [] = {
     MenuLayoutEntry ("packages",                        tl::to_string (QObject::tr ("Manage Packages")),                  SLOT (cm_packages ())),
     MenuLayoutEntry ("technologies",                    tl::to_string (QObject::tr ("Manage Technologies")),              SLOT (cm_technologies ())),
     MenuLayoutEntry::separator ("verification_group"),
-    MenuLayoutEntry ("drc",                             tl::to_string (QObject::tr ("DRC")),                              drc_menu),
     MenuLayoutEntry::separator ("post_verification_group"),
     MenuLayoutEntry::last ()
   };
@@ -4745,20 +4738,6 @@ MainWindow::show_macro_editor (const std::string &cat, bool add)
 }
 
 void
-MainWindow::cm_edit_drc_scripts ()
-{
-  //  TODO: implement this as generic menu provided by the Interpreter
-  show_macro_editor ("drc", false);
-}
-
-void
-MainWindow::cm_new_drc_script ()
-{
-  //  TODO: implement this as generic menu provided by the Interpreter
-  show_macro_editor ("drc", true);
-}
-
-void
 MainWindow::cm_macro_editor ()
 {
   //  TODO: implement this as generic menu provided by the plugin declaration
@@ -4781,6 +4760,12 @@ void
 MainWindow::show_help (const QString &url)
 {
   show_assistant_url (tl::to_string (url), false);
+}
+
+void
+MainWindow::show_modal_help (const QString &url)
+{
+  show_assistant_url (tl::to_string (url), true);
 }
 
 void

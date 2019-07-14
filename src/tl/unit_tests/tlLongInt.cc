@@ -87,12 +87,12 @@ static void run_test_int (tl::TestBase *_this, I1 a, I2 b)
   r -= basic_type (2);
   EXPECT_EQ (to_i (r), a - basic_type (2));
 
-  EXPECT_EQ (ae == be, a == b);
-  EXPECT_EQ (ae != be, a != b);
-  EXPECT_EQ (ae < be, a < b);
-  EXPECT_EQ (ae <= be, a <= b);
-  EXPECT_EQ (ae > be, a > b);
-  EXPECT_EQ (ae >= be, a >= b);
+  EXPECT_EQ (LI2 (ae) == be, I2 (a) == b);
+  EXPECT_EQ (LI2 (ae) != be, I2 (a) != b);
+  EXPECT_EQ (LI2 (ae) < be, I2 (a) < b);
+  EXPECT_EQ (LI2 (ae) <= be, I2 (a) <= b);
+  EXPECT_EQ (LI2 (ae) > be, I2 (a) > b);
+  EXPECT_EQ (LI2 (ae) >= be, I2 (a) >= b);
   EXPECT_EQ (ae.is_zero (), a == 0);
 
   EXPECT_EQ (to_i (ae * be), a * b);

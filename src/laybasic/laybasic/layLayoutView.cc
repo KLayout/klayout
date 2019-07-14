@@ -66,6 +66,7 @@
 #include "layRedrawThreadWorker.h"
 #include "layParsedLayerSource.h"
 #include "layBookmarkManagementForm.h"
+#include "layNetlistBrowserDialog.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
 #include "dbRecursiveShapeIterator.h"
@@ -73,6 +74,7 @@
 #include "dbEdgeProcessor.h"
 #include "rdb.h"
 #include "rdbMarkerBrowserDialog.h"
+#include "dbLayoutToNetlist.h"
 #include "tlXMLParser.h"
 #include "gsi.h"
 #include "gtf.h"
@@ -568,6 +570,7 @@ LayoutView::~LayoutView ()
   cellviews_changed_event.clear ();
   cellview_changed_event.clear ();
   rdb_list_changed_event.clear ();
+  l2ndb_list_changed_event.clear ();
   file_open_event.clear ();
   hier_changed_event.clear ();
   geom_changed_event.clear ();
@@ -579,6 +582,11 @@ LayoutView::~LayoutView ()
   //  remove all rdb's
   while (num_rdbs () > 0) {
     remove_rdb (0);
+  }
+
+  //  remove all L2N DB's
+  while (num_l2ndbs () > 0) {
+    remove_l2ndb (0);
   }
 
   //  delete layer lists
@@ -2305,6 +2313,10 @@ LayoutView::erase_cellview (unsigned int index)
 
   m_cellviews.erase (cellview_iter (int (index)));
 
+  if (m_hidden_cells.size () > index) {
+    m_hidden_cells.erase (m_hidden_cells.begin () + index);
+  }
+
   for (unsigned int lindex = 0; lindex < layer_lists (); ++lindex) {
 
     //  remove all references to the cellview
@@ -2967,7 +2979,7 @@ LayoutView::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, boo
 
     m_active_cellview_changed_event_enabled = false;
 
-    stop ();
+    stop_redraw ();
 
     bool set_max_hier = (m_full_hier_new_cell || has_max_hier ());
 
@@ -7074,19 +7086,17 @@ LayoutView::cm_clear_layer ()
   }
 }
 
-unsigned int 
-LayoutView::add_rdb (rdb::Database *rdb)
+template <class T, class Iter>
+static void make_unique_name (T *object, Iter from, Iter to)
 {
-  //  make the name unique 
-
-  std::string n (rdb->name ());
+  std::string n (object->name ());
   int nn = 0;
 
   do {
 
-    bool found = false;
-    for (unsigned int i = 0; i < num_rdbs () && !found; ++i) {
-      if (get_rdb (i)->name () == n) {
+    bool found = n.empty ();
+    for (Iter i = from; i != to && !found; ++i) {
+      if ((*i)->name () == n) {
         found = true;
       }
     }
@@ -7095,13 +7105,74 @@ LayoutView::add_rdb (rdb::Database *rdb)
       break;
     }
 
-    n = rdb->name () + tl::sprintf ("[%d]", ++nn);
+    n = object->name () + tl::sprintf ("[%d]", ++nn);
 
   } while (1);
 
-  rdb->set_name (n);
+  object->set_name (n);
+}
 
+unsigned int 
+LayoutView::add_l2ndb (db::LayoutToNetlist *l2ndb)
+{
+  make_unique_name (l2ndb, m_l2ndbs.begin (), m_l2ndbs.end ());
+  m_l2ndbs.push_back (l2ndb);
+
+  //  Mark this object as owned by us (for GSI)
+  l2ndb->keep ();
+
+  l2ndb_list_changed_event ();
+
+  return (unsigned int)(m_l2ndbs.size () - 1);
+}
+
+db::LayoutToNetlist *
+LayoutView::get_l2ndb (int index)
+{
+  if (index >= 0 && index < int (m_l2ndbs.size ())) {
+    return m_l2ndbs [index];
+  } else {
+    return 0;
+  }
+}
+
+void 
+LayoutView::open_l2ndb_browser (int l2ndb_index, int cv_index)
+{
+  lay::NetlistBrowserDialog *l2ndb_browser = get_plugin <lay::NetlistBrowserDialog> ();
+  if (l2ndb_browser) {
+    l2ndb_browser->load (l2ndb_index, cv_index);
+  }
+}
+
+const db::LayoutToNetlist *
+LayoutView::get_l2ndb (int index) const
+{
+  if (index >= 0 && index < int (m_l2ndbs.size ())) {
+    return m_l2ndbs [index];
+  } else {
+    return 0;
+  }
+}
+
+void 
+LayoutView::remove_l2ndb (unsigned int index)
+{
+  if (index < (unsigned int) (m_l2ndbs.size ())) {
+    delete m_l2ndbs [index];
+    m_l2ndbs.erase (m_l2ndbs.begin () + index);
+    l2ndb_list_changed_event ();
+  }
+}
+
+unsigned int
+LayoutView::add_rdb (rdb::Database *rdb)
+{
+  make_unique_name (rdb, m_l2ndbs.begin (), m_l2ndbs.end ());
   m_rdbs.push_back (rdb);
+
+  //  Mark this object as owned by us (for GSI)
+  rdb->keep ();
 
   rdb_list_changed_event ();
 
@@ -7118,7 +7189,7 @@ LayoutView::get_rdb (int index)
   }
 }
 
-void 
+void
 LayoutView::open_rdb_browser (int rdb_index, int cv_index)
 {
   rdb::MarkerBrowserDialog *rdb_browser = get_plugin <rdb::MarkerBrowserDialog> ();
@@ -7137,7 +7208,7 @@ LayoutView::get_rdb (int index) const
   }
 }
 
-void 
+void
 LayoutView::remove_rdb (unsigned int index)
 {
   if (index < (unsigned int) (m_rdbs.size ())) {
@@ -7147,7 +7218,7 @@ LayoutView::remove_rdb (unsigned int index)
   }
 }
 
-QSize 
+QSize
 LayoutView::sizeHint () const
 {
   if ((m_options & LV_Naked) != 0) {

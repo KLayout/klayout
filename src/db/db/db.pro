@@ -176,7 +176,14 @@ SOURCES = \
     dbNetlistCompare.cc \
     dbNetlistReader.cc \
     dbNetlistSpiceReader.cc \
-    gsiDeclDbNetlistCompare.cc
+    gsiDeclDbNetlistCompare.cc \
+    dbNetlistCrossReference.cc \
+    dbLayoutVsSchematicWriter.cc \
+    dbLayoutVsSchematicReader.cc \
+    dbLayoutVsSchematicFormatDefs.cc \
+    dbLayoutVsSchematic.cc \
+    gsiDeclDbNetlistCrossReference.cc \
+    gsiDeclDbLayoutVsSchematic.cc
 
 HEADERS = \
   dbArray.h \
@@ -317,7 +324,12 @@ HEADERS = \
     gsiDeclDbHelpers.h \
     dbNetlistCompare.h \
     dbNetlistReader.h \
-    dbNetlistSpiceReader.h
+    dbNetlistSpiceReader.h \
+    dbNetlistCrossReference.h \
+    dbLayoutVsSchematicWriter.h \
+    dbLayoutVsSchematicReader.h \
+    dbLayoutVsSchematicFormatDefs.h \
+    dbLayoutVsSchematic.h
 
 !equals(HAVE_QT, "0") {
 

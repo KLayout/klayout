@@ -26,6 +26,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbPolygonTools.h"
 #include "dbShapeProcessor.h"
+#include "dbLayoutToNetlist.h"
 #include "tlLog.h"
 
 //  -O3 appears not to work properly for gcc 4.4.7 (RHEL 6)
@@ -187,6 +188,8 @@ NetTracerData::~NetTracerData ()
     delete l->second;
   }
   m_log_layers.clear ();
+
+  clean_l2n_regions ();
 }
 
 void 
@@ -332,6 +335,58 @@ NetTracerData::requires_booleans (unsigned int from_layer) const
   } 
 
   return r->second;
+}
+
+void
+NetTracerData::clean_l2n_regions ()
+{
+  m_l2n_regions.clear ();
+}
+
+void
+NetTracerData::configure_l2n (db::LayoutToNetlist &l2n)
+{
+  clean_l2n_regions ();
+
+  //  take names from symbols
+  std::map<unsigned int, std::string> layer_to_symbol;
+  for (std::map<std::string, unsigned int>::const_iterator s = m_symbols.begin (); s != m_symbols.end (); ++s) {
+    layer_to_symbol.insert (std::make_pair (s->second, s->first));
+  }
+
+  std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > regions_per_org_layer;
+
+  tl::RelativeProgress progress (tl::to_string (tr ("Computing input layers")), m_log_layers.size ());
+
+  //  first fetch all the alias expressions
+  for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
+    if (l->second->is_alias ()) {
+      tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rh = l->second->make_l2n_region (l2n, regions_per_org_layer, layer_to_symbol [l->first]);
+      m_l2n_regions [l->first] = rh;
+      ++progress;
+    }
+  }
+
+  //  then compute all the symbolic expressions
+  for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
+    if (! l->second->is_alias ()) {
+      tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rh = l->second->make_l2n_region (l2n, regions_per_org_layer, layer_to_symbol [l->first]);
+      m_l2n_regions [l->first] = rh;
+      ++progress;
+    }
+  }
+
+  //  make all connections (intra and inter-layer)
+  for (std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> >::const_iterator r = m_l2n_regions.begin (); r != m_l2n_regions.end (); ++r) {
+    l2n.connect (*r->second->get ());
+    const std::set<unsigned int> &connections_to = log_connections (r->first);
+    for (std::set<unsigned int>::const_iterator c = connections_to.begin (); c != connections_to.end (); ++c) {
+      std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> >::const_iterator rc = m_l2n_regions.find (*c);
+      if (rc != m_l2n_regions.end ()) {
+        l2n.connect (*r->second->get (), *rc->second->get ());
+      }
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------------
@@ -726,6 +781,59 @@ NetTracerLayerExpression::to_string () const
     }
   }
   return s;
+}
+
+tl::shared_ptr<NetTracerLayerExpression::RegionHolder>
+NetTracerLayerExpression::make_l2n_region_for_org (db::LayoutToNetlist &l2n, std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > &region_cache, int org_index, const std::string &name)
+{
+  std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> >::iterator r = region_cache.find ((unsigned int) org_index);
+  if (r != region_cache.end ()) {
+    return r->second;
+  } else {
+    tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rh (new NetTracerLayerExpression::RegionHolder (l2n.make_layer ((unsigned int) org_index, name)));
+    region_cache.insert (std::make_pair ((unsigned int) org_index, rh));
+    return rh;
+  }
+}
+
+tl::shared_ptr<NetTracerLayerExpression::RegionHolder>
+NetTracerLayerExpression::make_l2n_region (db::LayoutToNetlist &l2n, std::map <unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> > &region_cache, const std::string &name)
+{
+  tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rha;
+  if (mp_a) {
+    rha = mp_a->make_l2n_region (l2n, region_cache, m_op == OPNone ? name : std::string ());
+  } else {
+    rha = make_l2n_region_for_org (l2n, region_cache, m_a, m_op == OPNone ? name : std::string ());
+  }
+
+  if (m_op == OPNone) {
+    return rha;
+  }
+
+  tl::shared_ptr<NetTracerLayerExpression::RegionHolder> rhb;
+  if (mp_b) {
+    rhb = mp_b->make_l2n_region (l2n, region_cache, std::string ());
+  } else {
+    rhb = make_l2n_region_for_org (l2n, region_cache, m_b, std::string ());
+  }
+
+  std::auto_ptr<db::Region> res (new db::Region (*rha->get ()));
+
+  if (m_op == OPAnd) {
+    *res &= *rhb->get ();
+  } else if (m_op == OPXor) {
+    *res ^= *rhb->get ();
+  } else if (m_op == OPOr) {
+    *res += *rhb->get ();
+  } else if (m_op == OPNot) {
+    *res -= *rhb->get ();
+  }
+
+  if (! name.empty ()) {
+    l2n.register_layer (*res, name);
+  }
+
+  return tl::shared_ptr<NetTracerLayerExpression::RegionHolder> (new NetTracerLayerExpression::RegionHolder (res.release ()));
 }
 
 // -----------------------------------------------------------------------------------

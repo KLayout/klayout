@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Layout vs. Schematic (LVS) Overview</title>
+  <keyword name="LVS"/>
+  <keyword name="LVS scripts"/>
+
+  <h2-index/>
+
+  <h2>Basic usage of LVS scripts</h2>
+
+  <p>
+  Starting with version 0.26, KLayout supports LVS as a built-in feature.
+  LVS is an important step in the verification of a layout: it ensures the 
+  drawn circuit matches the desired schematic.
+  </p>
+
+  <p>
+  The basic functionality is simply to analyze the input layout and derive a netlist from this. 
+  Then compare this netlist against a reference netlist (schematic). If both netlist are equivalent,
+  the circuit is likely to work in the intended fashion.
+  </p>
+
+  <p>
+  Beside the layout, a LVS script will also need a schematic netlist. Currently, KLayout
+  can read SPICE-format netlists. The reader can be configured to some extent, so the hope
+  is that a useful range of SPICE netlists can be digested.
+  </p>
+
+  <p> 
+  While the basic idea is simple, the details become pretty complex. This documentation
+  tries to cover the solutions KLayout offers to implement LVS as well as the constraints
+  imposed by this process.
+  </p>
+
+  <p>
+  KLayout's LVS is integrated into the Macro Development IDE the same way as DRC scripts. 
+  In fact, LVS is an add-on to DRC scripts. All DRC functions are available within LVS
+  scripts. Netlist extraction is performed in the DRC framework which was given the ability 
+  to recognize devices and connections and turn them into a netlist. Although DRC does not
+  really benefit from these extensions, they are still useful for implementing Antenna checks
+  for example. 
+  As it happens, the majority of features required for LVS is documented in the 
+  <link href="/about/drc_ref.xml"/>, while the few add-ons required specifically for LVS 
+  are documented in <link href="/about/lvs_ref.xml"/>.
+  </p>
+
+  <p>
+  LVS scripts are created, edited and debugged in the Macro Editor IDE. They are managed
+  in the "LVS" tab. 
+  For more details about the IDE, see <link href="/about/macro_editor.xml"/>. For 
+  an introduction about how to work with DRC scripts see <link href="/manual/drc_basic.xml"/>.
+  </p>
+
+  <p>
+  LVS scripts carry the ".lylvs" extension for the XML form (in analogy to ".lydrc" for DRC) and 
+  ".lvs" for the plain text form (same as ".drc"). Like DRC scripts, LVS scripts can be 
+  executed standalone in batch mode like DRC scripts. See "Using KLayout as a standalone DRC engine" 
+  in <link href="/manual/drc_basic.xml"/>.
+  </p>
+
+  <h2>KLayout's LVS implementation</h2>
+
+  <p>
+  The LVS implementation inside KLayout is designed to be highly flexible in terms of connectivity,
+  device recognition and input/output channels. Here are some highlights:
+  </p>
+
+  <ul>
+    <li><b>Agnostic approach:</b> KLayout tries to make as few assumptions as possible.
+    It does not require labels (although they are helpful), a specific hierarchy, specific
+    cell names or specific geometries. Netlist extraction is done purely from the polygons
+    of the layout. Labels and the cell hierarchy add merely useful hints which simplify debugging 
+    and pin assignment, but no strict requirement.
+    </li>
+    <li><b>Hierarchical analysis:</b> KLayout got a hierarchical layout processing engine 
+    to support hierarchical LVS. Hierarchical processing means that boolean operations happen inside 
+    the local cell environment as far as possible. As a consequence, devices are recognized 
+    inside their layout cell and layout cells are turned into respective subcircuits in the 
+    netlist. The netlist compare will benefit as it is able follow the circuit hierarchy. 
+    This is more efficient and gives better debugging information in case of mismatches.
+    As a positive side effect of hierarchical layout processing the runtimes for some boolean and 
+    other operations is significantly reduced in most cases.
+    </li>
+    <li><b>Hierarchically stable:</b> KLayout won't modify the layout's hierarchy nor 
+    will it introduce variants - at least for boolean and some other operations. 
+    This way, matching between layout and schematic hierarchy
+    is maintained even after hierarchical DRC operations.
+    Variants are introduced only for some anisotropic operations, the grid snap method
+    and some other features which require differentiation of cells in terms of location
+    and orientation.
+    </li>
+    <li><b>Flexible engine:</b> The netlist formation engine is highly flexible with respect 
+    to device recognition and connectivity extraction. First, almost all DRC features can 
+    be used to derive intermediate layers for device formation and connectivity extraction.
+    Second, the device recognition can be scripted to implement custom device extractors.
+    Five built-in device extractors are available for MOS and bipolar transistors, resistors, capacitors
+    and diodes.
+    </li>
+    <li><b>Flexible I/O:</b> Netlists are KLayout object trees and their components (nets, devices,
+    circuits, subcircuits ...) are fully mapped to script objects (for the main class see 
+    <class_doc href="Netlist"/> in the API documentation).
+    Netlists can therefore be analyzed and manipulated within LVS scripts or in other
+    contexts. It should be possible to fully script readers and writers for custom formats. 
+    Netlists plus the corresponding layout elements (sometimes called "annotated layout") can 
+    be persisted in a KLayout-specific, yet open format. SPICE format is available to read and
+    write pure netlist information. The SPICE reader and writer is customizable 
+    through delegate classes which allow tailoring of the way devices are read and written.
+    </li>
+    <li><b>User interface integration:</b> KLayout offers a browser for the netlist 
+    extraction results and LVS reports (cross-reference, errors). 
+    </li>
+  </ul>
+
+  <h2>Terminology</h2>
+
+  <p>
+  KLayout employs a specific terminology which is explained here:
+  </p>
+
+  <ul>
+    <li><b>Circuit:</b> A graph of connected elements as there are: devices, pins
+    and subcircuits. The nodes of the graph are the nets connecting at least two
+    elements.
+    If derived from a layout, a circuit corresponds to
+    a specific layout cell. 
+    </li>
+    <li><b>Abstract circuits:</b> Abstract circuits are circuits which are
+    cleared from their inner structure. Such circuits don't have nets and define
+    pins only. Abstract circuits are basically "black boxes" and LVS is required
+    to consider their inner structure as "don't care". Abstract circuits are useful
+    to reduce the netlist complexity by taking out big IP blocks verified separately
+    (e.g. RAM blocks).
+    </li>
+    <li><b>Pin:</b> A point at which a circuit makes a connection to the outside.
+    Circuits can embed other circuits as "subcircuits". Nets connecting to the
+    pins of these subcircuits will propagate into the subcircuit and connect
+    further elements there. Pins are usually attached to one net - in some cases,
+    pins can be unattached (circuits abstracts). 
+    Pins can be named. Upon extraction, the pin name
+    is derived from the name of the net attached to the pin.
+    </li>
+    <li><b>Subcircuit:</b> A circuit embedded into another circuit. One circuit 
+    can be used multiple times, hence many subcircuits can reference the same
+    circuit. If derived from a layout, a subcircuit corresponds to a specific
+    cell instance.
+    </li>
+    <li><b>Device:</b> A device is a n-terminal entity describing an atomic functional
+    unit. Devices are passive devices (resistors, capacitors) or active devices
+    such as transistors.
+    </li>
+    <li><b>Device class:</b> A device class is a type of device. Device classes
+    are of a certain kind and there can be multiple classes per type. For example
+    for MOS transistors, the kind is "MOS4" (a four-terminal MOS transistor) and
+    there is usually "NMOS" and "PMOS" classes at least in a CMOS process.
+    A device class typically corresponds to a model in SPICE.
+    </li>
+    <li><b>Device extraction:</b> Device extraction is the process of detecting
+    devices and forming links between conductive areas and the device bodies. These
+    links will eventually form the device terminals.
+    </li>
+    <li><b>Device combination:</b> Device combination is the process of forming
+    single devices from combinations of multiple devices of the same class. 
+    For example, serial resistors
+    can be combined into one. More importantly, parallel MOS transistors 
+    ("fingered" transistors) are combined into a single device.
+    Device combination is a step explicitly requested in the LVS script.
+    </li>
+    <li><b>Terminal:</b> A "terminal" is a pin of a device. Terminals are typically
+    named after their function (e.g. "G" for the gate of a MOS transistor).
+    </li>
+    <li><b>Connectivity:</b> The connectivity is a description of conductive regions
+    in the technology stack. A layer has intra-layer and intra-layer connectivity: 
+    "Intra-layer connectivity" means that polygons on the same layer touching other 
+    polygons form a connected - i.e. conductive - region. "Inter-layer connectivity" means
+    that two layers form a connection where their polygons overlap. The sum of these
+    rules forms the "connectivity graph".
+    </li>
+    <li><b>Netlist:</b> A hierarchical structure of circuits and subcircuits. 
+    A netlist typically has a top circuit from which other circuits are called
+    through subcircuits.
+    </li>
+    <li><b>Extracted netlist:</b> The extracted netlist is the netlist derived
+    from the layout. Sometimes, "extracted netlist" describes the netlist enriched
+    with parasitic elements such as resistors and capacitors derived from the
+    wire geometries. In the context of KLayout's LVS, "extracted netlist" is the 
+    pure connectivity without parasitic elements.
+    </li>
+    <li><b>Schematic:</b> The "schematic" is a netlist taken as reference for LVS.
+    The "schematic" is thought of the "drawn" netlist that is turned into a layout
+    by the physical implementation process. In LVS, the layout is turned back into
+    the "extracted netlist" which is compared to the schematic.
+    </li>
+    <li><b>Annotated layout, Net geometry:</b> The collection of polygons belonging to the 
+    individual nets. Each net inside a circuit is represented by a bunch of polygons
+    representing the original wire geometry and the device terminals.
+    As nets can propagate to subcircuits through pins, nets and therefore annotated
+    layout carries a per-net hierarchy. The per-net hierarchy consists of the 
+    subcircuits attached to one net and the nets within these subcircuits that 
+    connect to the outer net. Subcircuits can instantiate other subcircuits, so the
+    hierarchy may extend over many levels.
+    </li>
+    <li><b>Layout to netlist database (L2N DB):</b> This is a data structure combining the 
+    information from the extracted netlist and the annotated layout into a single
+    entity. The L2N database can be used to visualize nets, probe nets from known locations 
+    and perform other analysis and manipulation steps. An API for handling L2N databases
+    is available.
+    </li>
+    <li><b>Cross reference:</b> The cross reference is a list of matching objects 
+    from the two netlists involved in a LVS netlist compare ("pairing"). The cross-reference also 
+    lists non-matching items and inexact pairs. "Inexact pairs" are pairs of objects which do 
+    not match precisely, but still are likely to be paired. The cross reference also
+    keeps track of the compare status - i.e. whether the netlists match and if not, where 
+    a mismatch originates from.
+    </li>
+    <li><b>LVS database:</b> The "LVS database" is the combination of L2N database, the schematic
+    netlist and the cross-reference. It's a complete image of the LVS results.
+    An API is available to access the elements of the LVS database.
+    </li>
+    <li><b>Labels:</b> "Labels" are text objects drawn in a layout to mark certain locations
+    on certain layers with a text. Typically, labels are used to assign net names - if included
+    in the connectivity, nets formed from such labels get a name according to the text string
+    of the label.
+    </li>
+  </ul>
+
+</doc>
+

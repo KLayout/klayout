@@ -715,10 +715,12 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
     db::DBox dbbox = trans * bbox;
     if (dbbox.width () < 1.5 && dbbox.height () < 1.5) {
 
-      //  the cell is a very small box and we know there must be 
-      //  some level at which to draw the boundary: just draw it 
-      //  here and stop looking further down ..
-      draw_cell (drawing_context, level, trans, bbox, std::string ());
+      if (need_draw_box (mp_layout, cell, level, m_to_level, m_hidden_cells, m_cv_index)) {
+        //  the cell is a very small box and we know there must be
+        //  some level at which to draw the boundary: just draw it
+        //  here and stop looking further down ..
+        draw_cell (drawing_context, level, trans, bbox, std::string ());
+      }
 
     } else {
 
@@ -1166,7 +1168,7 @@ skip_quad (const db::Box &qb, const lay::Bitmap *vertex_bitmap, const db::CplxTr
     return false;
   }
 
-  db::DBox qb_trans = (trans * qb) & db::DBox (0, 0, vertex_bitmap->width () - 1e-6, vertex_bitmap->height () - 1e-6);
+  db::DBox qb_trans = (trans * qb) & db::DBox (0, 0, vertex_bitmap->width () - 1.0 - 1e-6, vertex_bitmap->height () - 1.0 - 1e-6);
   if (qb_trans.empty ()) {
     return true;
   }

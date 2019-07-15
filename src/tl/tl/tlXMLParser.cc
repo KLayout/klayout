@@ -43,21 +43,19 @@ namespace tl
 class XMLSourcePrivateData
 {
 public:
-  XMLSourcePrivateData (tl::InputStreamBase *stream_delegate)
-    : mp_stream_holder (new tl::InputStream (*stream_delegate)),
-      mp_stream_delegate (stream_delegate),
+  XMLSourcePrivateData (tl::InputStream *stream)
+    : mp_stream_holder (stream),
       m_has_error (false)
   {
-    mp_stream = mp_stream_holder.get ();
+    mp_stream = stream;
   }
 
-  XMLSourcePrivateData (tl::InputStreamBase *stream_delegate, const std::string &progress_message)
-    : mp_stream_holder (new tl::InputStream (*stream_delegate)),
-      mp_stream_delegate (stream_delegate),
+  XMLSourcePrivateData (tl::InputStream *stream, const std::string &progress_message)
+    : mp_stream_holder (stream),
       mp_progress (new AbsoluteProgress (progress_message, 100)),
       m_has_error (false)
   {
-    mp_stream = mp_stream_holder.get ();
+    mp_stream = stream;
     mp_progress->set_format (tl::to_string (tr ("%.0f MB")));
     mp_progress->set_unit (1024 * 1024);
   }
@@ -121,7 +119,6 @@ public:
 private:
   std::auto_ptr<tl::InputStream> mp_stream_holder;
   tl::InputStream *mp_stream;
-  std::auto_ptr<tl::InputStreamBase> mp_stream_delegate;
   std::auto_ptr<tl::AbsoluteProgress> mp_progress;
   bool m_has_error;
   std::string m_error;
@@ -154,17 +151,17 @@ XMLSource::reset ()
 XMLStringSource::XMLStringSource (const std::string &string)
   : m_copy (string)
 {
-  set_source (new XMLSourcePrivateData (new tl::InputMemoryStream (m_copy.c_str (), string.size ())));
+  set_source (new XMLSourcePrivateData (new tl::InputStream (new tl::InputMemoryStream (m_copy.c_str (), string.size ()))));
 }
 
 XMLStringSource::XMLStringSource (const char *cp)
 {
-  set_source (new XMLSourcePrivateData (new tl::InputMemoryStream (cp, strlen (cp))));
+  set_source (new XMLSourcePrivateData (new tl::InputStream (new tl::InputMemoryStream (cp, strlen (cp)))));
 }
 
 XMLStringSource::XMLStringSource (const char *cp, size_t len)
 {
-  set_source (new XMLSourcePrivateData (new tl::InputMemoryStream (cp, len)));
+  set_source (new XMLSourcePrivateData (new tl::InputStream (new tl::InputMemoryStream (cp, len))));
 }
 
 XMLStringSource::~XMLStringSource ()
@@ -177,12 +174,12 @@ XMLStringSource::~XMLStringSource ()
 
 XMLFileSource::XMLFileSource (const std::string &path, const std::string &progress_message)
 {
-  set_source (new XMLSourcePrivateData (new tl::InputZLibFile (path), progress_message));
+  set_source (new XMLSourcePrivateData (new tl::InputStream (path), progress_message));
 }
 
 XMLFileSource::XMLFileSource (const std::string &path)
 {
-  set_source (new XMLSourcePrivateData (new tl::InputZLibFile (path)));
+  set_source (new XMLSourcePrivateData (new tl::InputStream (path)));
 }
 
 XMLFileSource::~XMLFileSource ()

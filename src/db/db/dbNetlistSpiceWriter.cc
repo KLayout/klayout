@@ -106,7 +106,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
 
     os << "C";
     os << format_name (dev.expanded_name ());
-    os << format_terminals (dev);
+    os << format_terminals (dev, size_t (2));
     os << " ";
     os << tl::sprintf ("%.12g", dev.parameter_value (db::DeviceClassCapacitor::param_id_C));
 
@@ -114,7 +114,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
 
     os << "L";
     os << format_name (dev.expanded_name ());
-    os << format_terminals (dev);
+    os << format_terminals (dev, size_t (2));
     os << " ";
     os << tl::sprintf ("%.12g", dev.parameter_value (db::DeviceClassInductor::param_id_L));
 
@@ -122,7 +122,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
 
     os << "R";
     os << format_name (dev.expanded_name ());
-    os << format_terminals (dev);
+    os << format_terminals (dev, size_t (2));
     os << " ";
     os << tl::sprintf ("%.12g", dev.parameter_value (db::DeviceClassResistor::param_id_R));
 
@@ -180,12 +180,13 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
   emit_line (os.str ());
 }
 
-std::string NetlistSpiceWriterDelegate::format_terminals (const db::Device &dev) const
+std::string NetlistSpiceWriterDelegate::format_terminals (const db::Device &dev, size_t nmax) const
 {
   std::ostringstream os;
 
   const std::vector<db::DeviceTerminalDefinition> &td = dev.device_class ()->terminal_definitions ();
-  for (std::vector<db::DeviceTerminalDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {
+  size_t n = 0;
+  for (std::vector<db::DeviceTerminalDefinition>::const_iterator i = td.begin (); i != td.end () && n < nmax; ++i, ++n) {
     os << " " << net_to_string (dev.net_for_terminal (i->id ()));
   }
 

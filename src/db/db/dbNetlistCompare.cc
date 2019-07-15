@@ -2018,6 +2018,11 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
   m_max_n_branch = 100;
 }
 
+NetlistComparer::~NetlistComparer ()
+{
+  //  .. nothing yet ..
+}
+
 void
 NetlistComparer::exclude_caps (double threshold)
 {

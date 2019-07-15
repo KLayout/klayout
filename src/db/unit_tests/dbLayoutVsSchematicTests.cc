@@ -56,17 +56,7 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
 
 static void compare_lvsdbs (tl::TestBase *_this, const std::string &path, const std::string &au_path)
 {
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  std::string netlist = is.read_all ();
-  std::string netlist_au = is_au.read_all ();
-
-  if (netlist != netlist_au) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  _this->compare_text_files (path, au_path);
 }
 
 TEST(1_BasicFlow)

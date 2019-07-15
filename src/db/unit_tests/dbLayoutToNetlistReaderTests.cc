@@ -53,14 +53,7 @@ TEST(1_ReaderBasic)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_text_files (path, au_path);
 
   //  test build_all_nets from read l2n
 
@@ -270,15 +263,7 @@ TEST(1b_ReaderBasicShort)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_s.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
-
+  compare_text_files (path, au_path);
 }
 
 TEST(2_ReaderWithGlobalNets)
@@ -302,14 +287,7 @@ TEST(2_ReaderWithGlobalNets)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_2.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_text_files (path, au_path);
 
   //  test build_all_nets from read l2n
 
@@ -366,14 +344,7 @@ TEST(3_ReaderAbsoluteCoordinates)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_2.txt");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_text_files (path, au_path);
 
   //  test build_all_nets from read l2n
 
@@ -432,14 +403,7 @@ TEST(4_ReaderCombinedDevices)
 
   std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_au_4.l2n");
 
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  if (is.read_all () != is_au.read_all ()) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  compare_text_files (path, au_path);
 
   //  test build_all_nets from read l2n
 

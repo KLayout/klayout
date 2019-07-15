@@ -344,13 +344,49 @@ static std::string read_file (const std::string &path)
 
 void TestBase::compare_text_files (const std::string &path_a, const std::string &path_b)
 {
-  std::string text_a = read_file (path_a);
-  std::string text_b = read_file (path_b);
+  bool equal = false;
+  bool any = false;
 
-  if (text_a != text_b) {
-    raise (tl::sprintf ("Compare failed - see:\n  file 1: %s\n  file 2: %s",
-                        tl::absolute_file_path (path_a),
-                        tl::absolute_file_path (path_b)));
+  int n = 0;
+  for ( ; ! equal; ++n) {
+
+    std::string fn_a = path_a;  //  no variants for a
+    std::string fn_b = path_b;
+    if (n > 0) {
+      fn_b += tl::sprintf (".%d", n);
+    }
+
+    if (tl::file_exists (fn_b)) {
+
+      if (n == 1 && any) {
+        throw tl::Exception (tl::sprintf ("Inconsistent reference variants for %s: there can be either variants (.1,.2,... suffix) or a single file (without suffix)", path_b));
+      }
+
+      any = true;
+
+      std::string text_a = read_file (fn_a);
+      std::string text_b = read_file (fn_b);
+
+      equal = (text_a == text_b);
+
+      if (equal && n > 0) {
+        tl::info << tl::sprintf ("Found match on golden reference variant %s", fn_b);
+      }
+
+    } else if (n > 0) {
+      if (! any) {
+        tl::warn << tl::sprintf ("No golden data found (%s)", path_b);
+      }
+      break;
+    }
+
+  }
+
+  if (! equal) {
+    throw tl::Exception (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s%s",
+                               tl::absolute_file_path (path_a),
+                               tl::absolute_file_path (path_b),
+                               (n > 1 ? "\nand variants" : "")));
   }
 }
 

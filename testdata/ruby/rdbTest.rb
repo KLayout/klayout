@@ -695,6 +695,8 @@ class RDB_TestClass < TestBase
     assert_equal(view.num_rdbs, 2)
     assert_equal(ot, 0)
 
+    mw.close_current_view
+
   end
 
   # scan_... methods

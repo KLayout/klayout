@@ -112,6 +112,9 @@ layout(
  # Circuits are the hierarchical building blocks of the netlist.
  circuit(INV2
 
+  # Circuit boundary
+  rect((-1700 -2440) (3100 7820))
+
   # Nets with their geometries
   net(1
    rect(nwell (-1400 1800) (2800 3580))
@@ -259,6 +262,9 @@ layout(
  )
  circuit(INV2PAIR
 
+  # Circuit boundary
+  rect((0 -1640) (5740 7820))
+
   # Nets with their geometries
   net(1 name(BULK))
   net(2
@@ -373,6 +379,9 @@ layout(
 
  )
  circuit(RINGO
+
+  # Circuit boundary
+  rect((-1720 -2440) (26880 7820))
 
   # Nets with their geometries
   net(1 name(FB)
@@ -790,16 +799,17 @@ reference(
   net(6 name('6'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin(5)
-  pin(6)
+  pin(1 name('1'))
+  pin(2 name('2'))
+  pin(3 name('3'))
+  pin(4 name('4'))
+  pin(5 name('5'))
+  pin(6 name('6'))
 
   # Devices and their connections
   device(1 PMOS
- name($1)   param(L 0.25)
+   name($1)
+   param(L 0.25)
    param(W 3.5)
    param(AS 1.4)
    param(AD 1.4)
@@ -811,7 +821,8 @@ reference(
    terminal(B 1)
   )
   device(2 NMOS
- name($3)   param(L 0.25)
+   name($3)
+   param(L 0.25)
    param(W 3.5)
    param(AS 1.4)
    param(AD 1.4)
@@ -835,13 +846,13 @@ reference(
   net(6 name('7'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin()
-  pin(5)
-  pin(6)
+  pin(1 name('1'))
+  pin(2 name('2'))
+  pin(3 name('3'))
+  pin(4 name('4'))
+  pin(name('5'))
+  pin(5 name('6'))
+  pin(6 name('7'))
 
   # Subcircuits and their connections
   circuit(1 INV2 name($2)
@@ -867,10 +878,10 @@ reference(
   net(8 name('7'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
+  pin(1 name('1'))
+  pin(2 name('2'))
+  pin(3 name('3'))
+  pin(4 name('4'))
 
   # Subcircuits and their connections
   circuit(1 INV2PAIR name($1)
@@ -928,13 +939,13 @@ reference(
   net(6 name('7'))
 
   # Outgoing pins and their connections to nets
-  pin(1)
-  pin(2)
-  pin(3)
-  pin(4)
-  pin()
-  pin(5)
-  pin(6)
+  pin(1 name('1'))
+  pin(2 name('2'))
+  pin(3 name('3'))
+  pin(4 name('4'))
+  pin(name('5'))
+  pin(5 name('6'))
+  pin(6 name('7'))
 
   # Subcircuits and their connections
   circuit(1 INV2 name($2)

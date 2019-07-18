@@ -148,7 +148,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
 
     lvs = pya.LayoutVsSchematic()
 
-    infile = os.path.join(ut_testsrc, "testdata", "algo", "lvs_test1b_au.lvsdb")
+    infile = os.path.join(ut_testsrc, "testdata", "algo", "lvsdb_read_test.lvsdb")
     lvs.read(infile)
 
     tmp = os.path.join(ut_testtmp, "tmp.lvsdb")

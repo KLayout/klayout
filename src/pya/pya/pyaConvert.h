@@ -320,7 +320,7 @@ template <> struct python2c_func<unsigned char> : public python2c_func_cast<unsi
 template <> struct python2c_func<short> : public python2c_func_cast<short, long> { };
 template <> struct python2c_func<unsigned short> : public python2c_func_cast<unsigned short, long> { };
 template <> struct python2c_func<int> : public python2c_func_cast<int, long> { };
-template <> struct python2c_func<unsigned int> : public python2c_func_cast<unsigned int, long> { };
+template <> struct python2c_func<unsigned int> : public python2c_func_cast<unsigned int, unsigned long> { };
 
 template <> PYA_PUBLIC long long python2c_func<long long>::operator() (PyObject *rval);
 template <> PYA_PUBLIC unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval);
@@ -540,7 +540,7 @@ struct c2python_func<unsigned int>
 {
   PyObject *operator() (unsigned int c)
   {
-    return PyLong_FromLong (long (c));
+    return PyLong_FromUnsignedLong ((unsigned long) (c));
   }
 };
 

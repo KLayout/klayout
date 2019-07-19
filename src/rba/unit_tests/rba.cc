@@ -30,7 +30,7 @@
 // windows.h is included before ruby.h ...
 #include "tlUnitTest.h"
 
-TEST (1)
+TEST (basic)
 {
   EXPECT_EQ (gsi::has_class ("Value"), true);
   EXPECT_EQ (gsi::has_class ("DoesNotExist"), false);

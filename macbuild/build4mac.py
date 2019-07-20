@@ -54,37 +54,37 @@ def SetGlobals():
   global Bit                # machine bit-size
 
   Usage  = "\n"
-  Usage += "--------------------------------------------------------------------------------------------------------\n"
+  Usage += "---------------------------------------------------------------------------------------------------------\n"
   Usage += "<< Usage of 'build4mac.py' >>\n"
   Usage += "       for building KLayout 0.25 or later on different Apple Mac OSX platforms.\n"
   Usage += "\n"
   Usage += "$ [python] ./build4mac.py \n"
-  Usage += "   option & argument    : descriptions                                               | default value\n"
-  Usage += "   ----------------------------------------------------------------------------------+---------------\n"
-  Usage += "                        : * key type names below are case insensitive *              | \n"
-  Usage += "                        :   'nil' = not to support the script language               | \n"
-  Usage += "                        :   'Sys' = using the OS standard script language            | \n"
-  Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details           | \n"
-  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew']             | qt5macports \n"
-  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25']                | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37']       | sys \n"
-  Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                  | disabled \n"
-  Usage += "   [-m|--make <option>] : option passed to 'make'                                    | -j4 \n"
-  Usage += "   [-d|--debug]         : enable debug mode build                                    | disabled \n"
-  Usage += "   [-c|--checkcom]      : check command line and exit without building               | disabled \n"
-  Usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks    | disabled \n"
-  Usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout  | disabled \n"
-  Usage += "                        : from the source code and use the tools in the same machine | \n"
-  Usage += "                        : ! After confirmation of successful build of                | \n"
-  Usage += "                        :   KLayout, rerun this script with BOTH:                    | \n"
-  Usage += "                        :     1) the same options used for building AND              | \n"
-  Usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                      | \n"
-  Usage += "                        :   optionally with [-v|--verbose <0-3>]                     | \n"
-  Usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)    | 1 \n"
-  Usage += "                        : 0 = no output, 1 = error/warning (default),                | \n"
-  Usage += "                        : 2 = normal,    3 = debug                                   | \n"
-  Usage += "   [-?|--?]             : print this usage and exit                                  | disabled \n"
-  Usage += "--------------------------------------------------------------------------------------------------------\n"
+  Usage += "   option & argument    : descriptions                                                   | default value\n"
+  Usage += "   --------------------------------------------------------------------------------------+---------------\n"
+  Usage += "                        : * key type names below are case insensitive *                  | \n"
+  Usage += "                        :   'nil' = not to support the script language                   | \n"
+  Usage += "                        :   'Sys' = using the OS standard script language                | \n"
+  Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details               | \n"
+  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']      | qt5macports \n"
+  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25', 'Ana3']            | sys \n"
+  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37', 'Ana3']   | sys \n"
+  Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled \n"
+  Usage += "   [-m|--make <option>] : option passed to 'make'                                        | -j4 \n"
+  Usage += "   [-d|--debug]         : enable debug mode build                                        | disabled \n"
+  Usage += "   [-c|--checkcom]      : check command line and exit without building                   | disabled \n"
+  Usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks        | disabled \n"
+  Usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout      | disabled \n"
+  Usage += "                        : from the source code and use the tools in the same machine     | \n"
+  Usage += "                        : ! After confirmation of successful build of                    | \n"
+  Usage += "                        :   KLayout, rerun this script with BOTH:                        | \n"
+  Usage += "                        :     1) the same options used for building AND                  | \n"
+  Usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                          | \n"
+  Usage += "                        :   optionally with [-v|--verbose <0-3>]                         | \n"
+  Usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)        | 1 \n"
+  Usage += "                        : 0 = no output, 1 = error/warning (default),                    | \n"
+  Usage += "                        : 2 = normal,    3 = debug                                       | \n"
+  Usage += "   [-?|--?]             : print this usage and exit                                      | disabled \n"
+  Usage += "---------------------------------------------------------------------------------------------------------\n"
 
   ProjectDir = os.getcwd()
   BuildBash  = "./build.sh"
@@ -172,15 +172,15 @@ def ParseCommandLineArguments():
   p = optparse.OptionParser( usage=Usage )
   p.add_option( '-q', '--qt',
                 dest='type_qt',
-                help="Qt type=['Qt4MacPorts', 'Qt5MacPorts']" )
+                help="Qt type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']" )
 
   p.add_option( '-r', '--ruby',
                 dest='type_ruby',
-                help="Ruby type=['nil', 'Sys', 'Src24', 'MP24']" )
+                help="Ruby type=['nil', 'Sys', 'Src24', 'MP24', 'B25', 'Ana3']" )
 
   p.add_option( '-p', '--python',
                 dest='type_python',
-                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37']" )
+                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37', 'Ana3']" )
 
   p.add_option( '-n', '--noqtbinding',
                 action='store_true',
@@ -244,7 +244,7 @@ def ParseCommandLineArguments():
     exit()
 
   # Determine Qt type
-  candidates = ['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew']
+  candidates = ['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']
   candidates_upper = [ i.upper() for i in candidates ]
   ModuleQt   = ""
   index      = 0
@@ -261,7 +261,7 @@ def ParseCommandLineArguments():
   NonOSStdLang = False
 
   # Determine Ruby type
-  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24', 'B25'] ]
+  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24', 'B25', 'Ana3'] ]
   ModuleRuby = ""
   index      = 0
   for item in candidates:
@@ -292,6 +292,9 @@ def ParseCommandLineArguments():
       elif index == 4:
         ModuleRuby   = 'Ruby25Brew'
         NonOSStdLang = True
+      elif index == 5:
+        ModuleRuby   = 'RubyAnaconda3'
+        NonOSStdLang = True
     else:
       index += 1
   if ModuleRuby == "":
@@ -301,7 +304,7 @@ def ParseCommandLineArguments():
     exit()
 
   # Determine Python type
-  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37'] ]
+  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37', 'Ana3'] ]
   ModulePython = ""
   index        = 0
   for item in candidates:
@@ -334,6 +337,9 @@ def ParseCommandLineArguments():
         NonOSStdLang = True
       elif index == 5:
         ModulePython = 'Python37Brew'
+        NonOSStdLang = True
+      elif index == 6:
+        ModulePython = 'PythonAnaconda3'
         NonOSStdLang = True
     else:
       index += 1
@@ -439,6 +445,19 @@ def RunMainBuildBash():
   elif ModuleQt == 'Qt5Brew':
     parameters    += " \\\n  -qt5"
     parameters    += " \\\n  -qmake  %s" % Qt5Brew['qmake']
+    MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
+    MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
+    MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)
+    MacBuildLog    = "./qt5.build.macos-%s-%s.log"  % (Platform, mode)
+    AbsMacPkgDir   = "%s/qt5.pkg.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBinDir   = "%s/qt5.bin.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBuildDir = "%s/qt5.build.macos-%s-%s"     % (ProjectDir, Platform, mode)
+    AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
+    parameters    += " \\\n  -bin    %s" % MacBinDir
+    parameters    += " \\\n  -build  %s" % MacBuildDir
+  elif ModuleQt == 'Qt5Ana3':
+    parameters    += " \\\n  -qt5"
+    parameters    += " \\\n  -qmake  %s" % Qt5Ana3['qmake']
     MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
     MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
     MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)
@@ -757,6 +776,10 @@ def DeployBinariesForBundle():
       deploytool = Qt5Brew['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
+    elif ModuleQt == 'Qt5Ana3':
+      deploytool = Qt5Ana3['deploy']
+      app_bundle = "klayout.app"
+      options    = macdepQtOpt + verbose
 
     # Without the following, the plugin cocoa would not be found properly.
     shutil.copy2( sourceDir2 + "/qt.conf", targetDirM )
@@ -772,7 +795,8 @@ def DeployBinariesForBundle():
       os.chdir(ProjectDir)
       return 1
 
-    deploymentPython = True
+    deploymentPython = (ModulePython == 'Python37Brew')
+    #deploymentPython = True
     if deploymentPython and NonOSStdLang:
       from build4mac_util import WalkFrameworkPaths, PerformChanges
 

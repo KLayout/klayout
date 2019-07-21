@@ -147,6 +147,11 @@ public:
    *  "a" is null if there is no match for b and vice versa.
    */
   virtual void subcircuit_mismatch (const db::SubCircuit * /*a*/, const db::SubCircuit * /*b*/) { }
+
+private:
+  //  No copying
+  NetlistCompareLogger (const NetlistCompareLogger &);
+  NetlistCompareLogger &operator= (const NetlistCompareLogger &);
 };
 
 /**
@@ -159,6 +164,11 @@ public:
    *  @brief Constructor
    */
   NetlistComparer (NetlistCompareLogger *logger = 0);
+
+  /**
+   *  @brief Destructor
+   */
+  ~NetlistComparer ();
 
   /**
    *  @brief Mark two nets as identical
@@ -266,6 +276,11 @@ public:
    */
   bool compare (const db::Netlist *a, const db::Netlist *b, db::NetlistCompareLogger *logger) const;
 
+private:
+  //  No copying
+  NetlistComparer (const NetlistComparer &);
+  NetlistComparer &operator= (const NetlistComparer &);
+
 protected:
   bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const;
   bool all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const;
@@ -292,6 +307,12 @@ template<> struct type_traits<db::NetlistComparer> : public tl::type_traits<void
   //  mark "NetlistDeviceExtractor" as having a default ctor and no copy ctor
   typedef tl::false_tag has_copy_constructor;
   typedef tl::false_tag has_default_constructor;
+};
+
+template<> struct type_traits<db::NetlistCompareLogger> : public tl::type_traits<void>
+{
+  //  mark "NetlistDeviceExtractor" as having a default ctor and no copy ctor
+  typedef tl::false_tag has_copy_constructor;
 };
 
 }

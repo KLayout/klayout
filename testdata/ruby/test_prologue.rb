@@ -35,3 +35,6 @@ Object.constants.each do |c|
   end
 end
 
+# Some cleanup ahead
+GC.start
+

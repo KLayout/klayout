@@ -25,10 +25,12 @@
 #include "dbTestSupport.h"
 #include "dbNetlist.h"
 #include "dbNetlistSpiceReader.h"
+#include "dbNetlistCompare.h"
+#include "dbNetlistCrossReference.h"
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false, bool with_lvsdb = false)
+void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout)
 {
   std::string rs = tl::testsrc ();
   rs += "/testdata/lvs/" + suffix + ".lvs";
@@ -67,13 +69,33 @@ void run_test (tl::TestBase *_this, const std::string &suffix, const std::string
   lvs.load_from (rs);
   EXPECT_EQ (lvs.run (), 0);
 
-  _this->compare_text_files (output_cir, au_cir);
-  if (with_lvsdb) {
-    _this->compare_text_files (output_lvsdb, au_lvsdb);
+  db::Netlist nl1, nl2;
+
+  {
+    db::NetlistSpiceReader reader;
+    tl::InputStream stream (output_cir);
+    reader.read (stream, nl1);
   }
-  if (with_l2n) {
-    _this->compare_text_files (output_l2n, au_l2n);
+
+  {
+    db::NetlistSpiceReader reader;
+    tl::InputStream stream (au_cir);
+    reader.read (stream, nl2);
   }
+
+  //  NOTE: it's kind of redundant to use the comparer for checking the LVS
+  //  output, but this will essentially verify the output netlist's consistency.
+  db::NetlistCrossReference xref;
+  db::NetlistComparer comparer (&xref);
+  comparer.set_max_branch_complexity (500);
+  comparer.set_max_depth (20);
+  bool res = comparer.compare (&nl1, &nl2);
+  if (! res) {
+    tl::info << "Netlist mismatch:";
+    tl::info << "  current: " << output_cir;
+    tl::info << "  golden: " << au_cir;
+  }
+  EXPECT_EQ (res, true);
 }
 
 TEST(1_full)

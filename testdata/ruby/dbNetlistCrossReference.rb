@@ -31,7 +31,7 @@ class DBNetlistCrossReference_TestClass < TestBase
     xref = RBA::NetlistCrossReference::new
 
     lvs = RBA::LayoutVsSchematic::new
-    input = File.join($ut_testsrc, "testdata", "algo", "lvs_test1b_au.lvsdb")
+    input = File.join($ut_testsrc, "testdata", "algo", "lvsdb_read_test.lvsdb")
     lvs.read(input)
 
     reader = RBA::NetlistSpiceReader::new
@@ -54,7 +54,7 @@ class DBNetlistCrossReference_TestClass < TestBase
   def test_2_CircuitPairs
 
     lvs = RBA::LayoutVsSchematic::new
-    input = File.join($ut_testsrc, "testdata", "algo", "lvs_test2b_au.lvsdb")
+    input = File.join($ut_testsrc, "testdata", "algo", "lvsdb_read_test2.lvsdb")
     lvs.read(input)
 
     xref = lvs.xref

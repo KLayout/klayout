@@ -146,7 +146,7 @@ class DBLayoutVsSchematic_TestClass < TestBase
 
     lvs = RBA::LayoutVsSchematic::new
 
-    input = File.join($ut_testsrc, "testdata", "algo", "lvs_test1b_au.lvsdb")
+    input = File.join($ut_testsrc, "testdata", "algo", "lvsdb_read_test.lvsdb")
     lvs.read(input)
 
     tmp = File::join($ut_testtmp, "tmp.lvsdb")

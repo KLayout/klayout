@@ -41,7 +41,7 @@ module LVS
 
     ensure
 
-      # cleans up and creates layout views
+      # cleans up and creates layout and report views
       _lvs._finish
 
     end

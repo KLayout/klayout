@@ -41,7 +41,7 @@ module DRC
 
     ensure
 
-      # cleans up and creates layout views
+      # cleans up and creates layout and report views
       _drc._finish
 
     end

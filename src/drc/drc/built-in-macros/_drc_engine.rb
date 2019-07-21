@@ -1,5 +1,7 @@
 # $autorun-early
 
+require 'pathname'
+
 module DRC
 
   # The DRC engine
@@ -1335,126 +1337,135 @@ CODE
     
     def _finish(final = true)
 
-      _flush    
-      
-      view = RBA::LayoutView::current
+      begin
 
-      # save the report database if requested
-      if @output_rdb_file
-        rdb_file = _make_path(@output_rdb_file)
-        info("Writing report database: #{rdb_file} ..")
-        @output_rdb.save(rdb_file)
-      end
-      if @output_rdb && final && view
-        view.show_rdb(@output_rdb_index, view.active_cellview_index)
-      end
-    
-      # save the output file if requested
-      if @output_layout && @output_layout_file
-        opt = RBA::SaveLayoutOptions::new
-        gzip = opt.set_format_from_filename(@output_layout_file)
-        info("Writing layout file: #{@output_layout_file} ..")
-        @output_layout.write(@output_layout_file, gzip, opt)
-      end
-      
-      # create the new layers as visual layers if necessary
-      if view
-      
-        output = @output_layout || @def_layout
-        cv_index = nil
-        view.cellviews.times do |cvi|
-          view.cellview(cvi).layout == output && cv_index = cvi
-        end
-        if cv_index
+        _flush    
         
-          view = RBA::LayoutView::current
-          
-          # clear selection
-          view.cancel 
-    
-          # create layer views for those layers which are not present yet
-                
-          present_layers = {}
-          l = view.begin_layers
-          while !l.at_end?
-            if l.current.cellview == cv_index
-              present_layers[l.current.layer_index] = true
-            end
-            l.next
-          end
-          
-          @output_layers.each do |li|
-            if !present_layers[li]
-              info = @def_layout.get_info(li)
-              lp = RBA::LayerProperties::new
-              lp.source_layer = info.layer
-              lp.source_datatype = info.datatype
-              lp.source_name = info.name
-              lp.source_cellview = cv_index
-              view.init_layer_properties(lp)
-              view.insert_layer(view.end_layers, lp)     
-            end
-          end
-          
-          view.update_content
-    
+        view = RBA::LayoutView::current
+
+        # save the report database if requested
+        if @output_rdb_file
+          rdb_file = _make_path(@output_rdb_file)
+          info("Writing report database: #{rdb_file} ..")
+          @output_rdb.save(rdb_file)
+        end
+        if @output_rdb && final && view
+          view.show_rdb(@output_rdb_index, view.active_cellview_index)
+        end
+      
+        # save the output file if requested
+        if @output_layout && @output_layout_file
+          opt = RBA::SaveLayoutOptions::new
+          gzip = opt.set_format_from_filename(@output_layout_file)
+          info("Writing layout file: #{@output_layout_file} ..")
+          @output_layout.write(@output_layout_file, gzip, opt)
         end
         
-      end
-
-      # save the netlist if required
-      if @target_netlist_file && @netter && @netter.l2n_data
-
-        writer = @target_netlist_format || RBA::NetlistSpiceWriter::new
-
-        netlist_file = _make_path(@target_netlist_file)
-        info("Writing netlist: #{netlist_file} ..")
-        self.netlist.write(netlist_file, writer, @target_netlist_comment || "")
-
-      end
-    
-      # save the netlist database if requested
-      if @output_l2ndb_file && @netter && @netter.l2n_data
-
-        l2ndb_file = _make_path(@output_l2ndb_file)
-        info("Writing netlist database: #{l2ndb_file} ..")
-        @netter.l2n_data.write_l2n(l2ndb_file, !@output_l2ndb_long)
-
-      end
-
-      # give derived classes to perform actions
-      _before_cleanup
-    
-      # show the data in the browser
-      if view && @show_l2ndb && @netter && @netter.l2n_data
-
-        # NOTE: to prevent the netter destroying the database, we need to take it
-        l2ndb = _take_data
-        l2ndb_index = view.add_l2ndb(l2ndb)
-        view.show_l2ndb(l2ndb_index, view.active_cellview_index)
-
-      end
-
-      @output_layout = nil
-      @output_layout_file = nil
-      @output_cell = nil
-      @output_rdb_file = nil
-      @output_rdb_cell = nil
-      @output_rdb = nil
-      @output_rdb_index = nil
-      @show_l2ndb = nil
-      @output_l2ndb_file = nil
-
-      # clean up temp data
-      @dss && @dss._destroy
-      @dss = nil
-      @netter && @netter._finish
-      @netter = nil
-      @netter_data = nil
+        # create the new layers as visual layers if necessary
+        if view
+        
+          output = @output_layout || @def_layout
+          cv_index = nil
+          view.cellviews.times do |cvi|
+            view.cellview(cvi).layout == output && cv_index = cvi
+          end
+          if cv_index
+          
+            view = RBA::LayoutView::current
+            
+            # clear selection
+            view.cancel 
       
-      if final && @log_file
-        @log_file.close
-        @log_file = nil
+            # create layer views for those layers which are not present yet
+                  
+            present_layers = {}
+            l = view.begin_layers
+            while !l.at_end?
+              if l.current.cellview == cv_index
+                present_layers[l.current.layer_index] = true
+              end
+              l.next
+            end
+            
+            @output_layers.each do |li|
+              if !present_layers[li]
+                info = @def_layout.get_info(li)
+                lp = RBA::LayerProperties::new
+                lp.source_layer = info.layer
+                lp.source_datatype = info.datatype
+                lp.source_name = info.name
+                lp.source_cellview = cv_index
+                view.init_layer_properties(lp)
+                view.insert_layer(view.end_layers, lp)     
+              end
+            end
+            
+            view.update_content
+      
+          end
+          
+        end
+
+        # save the netlist if required
+        if @target_netlist_file && @netter && @netter.l2n_data
+
+          writer = @target_netlist_format || RBA::NetlistSpiceWriter::new
+
+          netlist_file = _make_path(@target_netlist_file)
+          info("Writing netlist: #{netlist_file} ..")
+          self.netlist.write(netlist_file, writer, @target_netlist_comment || "")
+
+        end
+      
+        # save the netlist database if requested
+        if @output_l2ndb_file && @netter && @netter.l2n_data
+
+          l2ndb_file = _make_path(@output_l2ndb_file)
+          info("Writing netlist database: #{l2ndb_file} ..")
+          @netter.l2n_data.write_l2n(l2ndb_file, !@output_l2ndb_long)
+
+        end
+
+        # give derived classes to perform actions
+        _before_cleanup
+      
+        # show the data in the browser
+        if view && @show_l2ndb && @netter && @netter.l2n_data
+
+          # NOTE: to prevent the netter destroying the database, we need to take it
+          l2ndb = _take_data
+          l2ndb_index = view.add_l2ndb(l2ndb)
+          view.show_l2ndb(l2ndb_index, view.active_cellview_index)
+
+        end
+
+      ensure
+
+        @output_layout = nil
+        @output_layout_file = nil
+        @output_cell = nil
+        @output_rdb_file = nil
+        @output_rdb_cell = nil
+        @output_rdb = nil
+        @output_rdb_index = nil
+        @show_l2ndb = nil
+        @output_l2ndb_file = nil
+
+        # clean up temp data
+        @dss && @dss._destroy
+        @dss = nil
+        @netter && @netter._finish
+        @netter = nil
+        @netter_data = nil
+        
+        if final && @log_file
+          @log_file.close
+          @log_file = nil
+        end
+
+        # force garbage collection
+        GC.start
+
       end
 
     end
@@ -1498,7 +1509,11 @@ CODE
       # resolves the file path relative to the source's path
       sp = self.source.path
       if sp
-        return File::absolute_path(file, File::dirname(sp))
+        if File.respond_to?(:absolute_path)
+          return File::absolute_path(file, File::dirname(sp))
+        else
+          return (Pathname::new(File::dirname(sp)) + Pathname.new(file)).to_s
+        end
       else
         return file
       end

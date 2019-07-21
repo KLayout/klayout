@@ -95,7 +95,7 @@ mkdir -p makedeb-tmp/${pylibdir}
 mkdir -p makedeb-tmp/${bindir}
 
 cp etc/klayout.desktop makedeb-tmp/${sharedir}/applications
-cp etc/logo.png makedeb-tmp/${sharedir}/pixmaps
+cp etc/logo.png makedeb-tmp/${sharedir}/pixmaps/klayout.png
 cp Changelog makedeb-tmp/${sharedir}/doc/klayout/changelog
 cp Changelog.Debian makedeb-tmp/${sharedir}/doc/klayout/changelog.Debian
 cp COPYRIGHT makedeb-tmp/${sharedir}/doc/klayout/copyright

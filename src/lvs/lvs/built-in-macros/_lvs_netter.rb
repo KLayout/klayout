@@ -371,11 +371,41 @@ module LVS
       @comparer.max_resistance = value.to_f
     end
 
+    # %LVS%
+    # @name max_depth
+    # @brief Configures the maximum search depth for net match deduction
+    # @synopsis max_depth(n)
+    # The netlist compare algorithm works recursively: once a net
+    # equivalence is established, additional matches are derived from
+    # this equivalence. Such equivalences in turn are used to derive
+    # new equivalences and so on. The maximum depth parameter configures
+    # the number of recursions the algorithm performs before picking
+    # the next net. With higher values for the depth, the algorithm
+    # pursues this "deduction path" in greater depth while with 
+    # smaller values, the algorithm prefers picking nets in a random fashion
+    # as the seeds for this deduction path. The default value is 8. 
+
     def max_depth(value)
       lvs_data
       @comparer.max_depth = value.to_i
     end
 
+    # @name max_branch_complexity
+    # @brief Configures the maximum branch complexity for ambiguous net matching
+    # @synopsis max_branch_complexity(n)
+    # The netlist compare algorithm is basically a backtracing algorithm.
+    # With ambiguous nets, the algorithm picks possible net pairs and
+    # tries whether they will make a good match. Following the deduction
+    # path for this nets may lead to further branches if more ambiguous
+    # nets are encountered. To avoid combinational explosion, the maximum
+    # branch complexity is limited to the value configured with this 
+    # function. The default value is 100 which means not more than
+    # 100 combinations are tried for a single seed pair. For networks
+    # with inherent ambiguity such as decoders, the complexity
+    # can be increased at the expense of potentially larger runtimes.
+    # The runtime penality is roughly proportional to the branch
+    # complexity.
+ 
     def max_branch_complexity(value)
       lvs_data
       @comparer.max_branch_complexity = value.to_i

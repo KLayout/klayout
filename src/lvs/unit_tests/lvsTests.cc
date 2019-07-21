@@ -87,6 +87,8 @@ void run_test (tl::TestBase *_this, const std::string &suffix, const std::string
   //  output, but this will essentially verify the output netlist's consistency.
   db::NetlistCrossReference xref;
   db::NetlistComparer comparer (&xref);
+  comparer.set_max_branch_complexity (500);
+  comparer.set_max_depth (20);
   bool res = comparer.compare (&nl1, &nl2);
   if (! res) {
     tl::info << "Netlist mismatch:";

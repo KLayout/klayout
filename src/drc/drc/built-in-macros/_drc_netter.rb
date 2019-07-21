@@ -170,7 +170,8 @@ module DRC
       layer_selection.is_a?(Hash) || raise("Second argument of Netter#extract_devices must be a hash")
 
       ls = {}
-      layer_selection.each do |n,l|
+      layer_selection.keys.sort.each do |n|
+        l = layer_selection[n]
         l.requires_region("Netter#extract_devices (#{n} layer)")
         register_layer(l.data)
         ls[n.to_s] = l.data

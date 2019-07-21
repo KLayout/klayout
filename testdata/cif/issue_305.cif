@@ -1,0 +1,18 @@
+DS 1 10 1;
+9 test;
+L TEST;
+
+(Origin marker)
+B 1 1 0,0;
+
+(Draw two offset boxes without rotation)
+B 10 1 20,-10;
+B 10 1 20,10;
+
+(Try drawing the same boxes with rotation)
+(They appear nearly centered on the origin in Klayout, the offset is wrong?)
+B 10 1 20,-10 5,-2;
+B 10 1 20,10 5,2;
+
+DF;
+E

@@ -592,11 +592,13 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
           double xw = sf * w * 0.5 * rx * n, yw = sf * w * 0.5 * ry * n;
           double xh = -sf * h * 0.5 * ry * n, yh = sf * h * 0.5 * rx * n;
 
+          db::Point c (sf * x, sf * y);
+
           db::Point points [4];
-          points [0] = db::Point (x - xw - xh, y - yw - yh);
-          points [1] = db::Point (x - xw + xh, y - yw + yh);
-          points [2] = db::Point (x + xw + xh, y + yw + yh);
-          points [3] = db::Point (x + xw - xh, y + yw - yh);
+          points [0] = c + db::Vector (-xw - xh, -yw - yh);
+          points [1] = c + db::Vector (-xw + xh, -yw + yh);
+          points [2] = c + db::Vector (xw + xh, yw + yh);
+          points [3] = c + db::Vector (xw - xh, yw - yh);
 
           db::Polygon p;
           p.assign_hull (points, points + 4);

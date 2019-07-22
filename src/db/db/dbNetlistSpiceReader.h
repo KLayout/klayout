@@ -128,6 +128,7 @@ private:
   std::auto_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
   std::string m_stored_line;
   std::map<std::string, bool> m_captured;
+  std::vector<std::string> m_global_nets;
 
   void push_stream (const std::string &path);
   void pop_stream ();

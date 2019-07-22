@@ -195,6 +195,7 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
   mp_netlist = &netlist;
   mp_circuit = 0;
   mp_nets_by_name.reset (0);
+  m_global_nets.clear ();
 
   try {
 
@@ -342,6 +343,11 @@ bool NetlistSpiceReader::read_card ()
     if (ex.test_without_case ("model")) {
 
       //  ignore model statements
+
+    } else if (ex.test_without_case ("global")) {
+
+      std::string n = read_name (ex);
+      m_global_nets.push_back (n);
 
     } else if (ex.test_without_case ("subckt")) {
 
@@ -496,6 +502,10 @@ void NetlistSpiceReader::ensure_circuit ()
     //  TODO: make top name configurable
     mp_circuit->set_name (".TOP");
     mp_netlist->add_circuit (mp_circuit);
+
+    for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
+      make_net (*gn);
+    }
 
   }
 }
@@ -737,16 +747,25 @@ void NetlistSpiceReader::read_subcircuit (const std::string &sc_name, const std:
 
   db::Circuit *cc = mp_netlist->circuit_by_name (nc_name);
   if (! cc) {
+
     cc = new db::Circuit ();
     mp_netlist->add_circuit (cc);
     cc->set_name (nc_name);
+
+    //  we'll make the names later ...
     for (std::vector<db::Net *>::const_iterator i = nets.begin (); i != nets.end (); ++i) {
       cc->add_pin (std::string ());
     }
+    for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
+      cc->add_pin (std::string ());
+    }
+
   } else {
-    if (cc->pin_count () != nets.size ()) {
+
+    if (cc->pin_count () != nets.size () + m_global_nets.size ()) {
       error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between circuit definition and circuit call: %d expected, got %d")), int (cc->pin_count ()), int (nets.size ())));
     }
+
   }
 
   db::SubCircuit *sc = new db::SubCircuit (cc, sc_name);
@@ -754,6 +773,11 @@ void NetlistSpiceReader::read_subcircuit (const std::string &sc_name, const std:
 
   for (std::vector<db::Net *>::const_iterator i = nets.begin (); i != nets.end (); ++i) {
     sc->connect_pin (i - nets.begin (), *i);
+  }
+
+  for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
+    db::Net *net = make_net (*gn);
+    sc->connect_pin (gn - m_global_nets.begin () + nets.size (), net);
   }
 }
 
@@ -789,16 +813,23 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
 
   db::Circuit *cc = mp_netlist->circuit_by_name (nc);
   if (! cc) {
+
     cc = new db::Circuit ();
     mp_netlist->add_circuit (cc);
     cc->set_name (nc);
     for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
       cc->add_pin (std::string ());
     }
+    for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
+      cc->add_pin (std::string ());
+    }
+
   } else {
-    if (cc->pin_count () != nn.size ()) {
+
+    if (cc->pin_count () != nn.size () + m_global_nets.size ()) {
       error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between implicit (through call) and explicit circuit definition: %d expected, got %d")), int (cc->pin_count ()), int (nn.size ())));
     }
+
   }
 
   std::auto_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
@@ -806,13 +837,23 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
 
   std::swap (cc, mp_circuit);
 
+  //  produce the explicit pins
   for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
     db::Net *net = make_net (*i);
     //  use the net name to name the pin (otherwise SPICE pins are always unnamed)
+    size_t pin_id = i - nn.begin ();
     if (! i->empty ()) {
-      mp_circuit->rename_pin (i - nn.begin (), net->name ());
+      mp_circuit->rename_pin (pin_id, net->name ());
     }
-    mp_circuit->connect_pin (i - nn.begin (), net);
+    mp_circuit->connect_pin (pin_id, net);
+  }
+
+  //  produce pins for the global nets
+  for (std::vector<std::string>::const_iterator gn = m_global_nets.begin (); gn != m_global_nets.end (); ++gn) {
+    db::Net *net = make_net (*gn);
+    size_t pin_id = gn - m_global_nets.begin () + nn.size ();
+    mp_circuit->rename_pin (pin_id, net->name ());
+    mp_circuit->connect_pin (pin_id, net);
   }
 
   while (! at_end ()) {

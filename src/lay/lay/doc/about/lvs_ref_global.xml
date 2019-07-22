@@ -19,6 +19,15 @@ layers or specification of the layout source.
 For more details about the DRC functions see <a href="/about/drc_ref_global.xml">DRC::global</a>.
 </p>
 <h2-index/>
+<h2>"align" - Aligns the extracted netlist vs. the schematic by flattening circuits where required</h2>
+<keyword name="align"/>
+<a name="align"/><p>Usage:</p>
+<ul>
+<li><tt>align</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#align">Netter#align</a> for a description of that function.
+</p>
 <h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
 <keyword name="compare"/>
 <a name="compare"/><p>Usage:</p>
@@ -36,6 +45,24 @@ See <a href="/about/lvs_ref_netter.xml#compare">Netter#compare</a> for a descrip
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#equivalent_pins">Netter#equivalent_pins</a> for a description of that function.
+</p>
+<h2>"max_branch_complexity" - Configures the maximum branch complexity for ambiguous net matching</h2>
+<keyword name="max_branch_complexity"/>
+<a name="max_branch_complexity"/><p>Usage:</p>
+<ul>
+<li><tt>max_branch_complexity(n)</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#max_branch_complexity">Netter#max_branch_complexity</a> for a description of that function.
+</p>
+<h2>"max_depth" - Configures the maximum search depth for net match deduction</h2>
+<keyword name="max_depth"/>
+<a name="max_depth"/><p>Usage:</p>
+<ul>
+<li><tt>max_depth(n)</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#max_depth">Netter#max_depth</a> for a description of that function.
 </p>
 <h2>"max_res" - Ignores resistors with a resistance above a certain value</h2>
 <keyword name="max_res"/>
@@ -68,13 +95,14 @@ See <a href="/about/lvs_ref_netter.xml">Netter</a> for more details
 <keyword name="report_lvs"/>
 <a name="report_lvs"/><p>Usage:</p>
 <ul>
-<li><tt>report_lvs([ filename ])</tt></li>
+<li><tt>report_lvs([ filename [, long ] ])</tt></li>
 </ul>
 <p>
 After the comparison step, the LVS database will be shown 
 in the netlist database browser in a cross-reference view.
 If a filename is given, the LVS database is also written to
-this file.
+this file. If a file name is given and "long" is true, a
+verbose version of the LVS DB format will be used.
 </p><p>
 If this method is called together with report_netlist and two files each, two
 files can be generated - one for the extracted netlist (L2N database) and one for the

@@ -30,10 +30,10 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout)
+void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &suffix, const std::string &layout)
 {
   std::string rs = tl::testsrc ();
-  rs += "/testdata/lvs/" + suffix + ".lvs";
+  rs += "/testdata/lvs/" + lvs_rs;
 
   std::string src = tl::testsrc ();
   src += "/testdata/lvs/" + layout;
@@ -100,5 +100,12 @@ void run_test (tl::TestBase *_this, const std::string &suffix, const std::string
 
 TEST(1_full)
 {
-  run_test (_this, "vexriscv", "vexriscv.oas.gz");
+  test_is_long_runner ();
+  run_test (_this, "vexriscv.lvs", "vexriscv", "vexriscv.oas.gz");
+}
+
+TEST(2_fullWithAlign)
+{
+  test_is_long_runner ();
+  run_test (_this, "vexriscv_align.lvs", "vexriscv", "vexriscv.oas.gz");
 }

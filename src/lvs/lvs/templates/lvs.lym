@@ -101,6 +101,9 @@ connect_global(ptie, "SUBSTRATE")
 # Netlist normalization
 netlist.simplify
 
+# Hierarchy alignment (flatten out unmatched cells)
+align
+
 # Netlist vs. netlist
 compare
 </text>

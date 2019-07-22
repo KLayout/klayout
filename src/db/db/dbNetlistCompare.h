@@ -267,6 +267,13 @@ public:
   }
 
   /**
+   *  @brief Gets the list of circuits without matching circuit in the other netlist
+   *  The result can be used to flatten these circuits prior to compare.
+   *  Mismatching top level circuits are not reported because they cannot be flattened.
+   */
+  void unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector<db::Circuit *> &in_a, std::vector<db::Circuit *> &in_b) const;
+
+  /**
    *  @brief Actually compares the two netlists
    */
   bool compare (const db::Netlist *a, const db::Netlist *b) const;

@@ -2083,6 +2083,49 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b, NetlistCom
   return res;
 }
 
+void
+NetlistComparer::unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector<db::Circuit *> &in_a, std::vector<db::Circuit *> &in_b) const
+{
+  //  we need to create a copy because this method is supposed to be const.
+  db::CircuitCategorizer circuit_categorizer = *mp_circuit_categorizer;
+
+  std::map<size_t, std::pair<db::Circuit *, db::Circuit *> > cat2circuits;
+
+  for (db::Netlist::circuit_iterator i = a->begin_circuits (); i != a->end_circuits (); ++i) {
+    size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
+    if (cat && i->begin_refs () != i->end_refs ()) {
+      cat2circuits[cat].first = i.operator-> ();
+    }
+  }
+
+  for (db::Netlist::circuit_iterator i = b->begin_circuits (); i != b->end_circuits (); ++i) {
+    size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
+    if (cat && i->begin_refs () != i->end_refs ()) {
+      cat2circuits[cat].second = i.operator-> ();
+    }
+  }
+
+  size_t na = 0, nb = 0;
+  for (std::map<size_t, std::pair<db::Circuit *, db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
+    if (! i->second.first) {
+      ++nb;
+    } else if (! i->second.second) {
+      ++na;
+    }
+  }
+
+  in_a.reserve (na);
+  in_b.reserve (nb);
+
+  for (std::map<size_t, std::pair<db::Circuit *, db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
+    if (! i->second.first) {
+      in_b.push_back (i->second.second);
+    } else if (! i->second.second) {
+      in_a.push_back (i->second.first);
+    }
+  }
+}
+
 bool
 NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 {

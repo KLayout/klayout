@@ -68,6 +68,7 @@ module DRC
       @connect_implicit = []
       @l2n = nil
       @lnum = 0
+      @device_scaling = 1.0
     end
     
     # %DRC%
@@ -177,6 +178,19 @@ module DRC
 
       @engine._cmd(@l2n, :extract_devices, devex, ls) 
 
+    end
+
+    # %DRC%
+    # @name device_scaling
+    # @brief Specifies a dimension scale factor for the geometrical device properties
+    # @synopsis device_scaling(factor)
+    # Specifying a factor of 2 will make all devices being extracted as if the 
+    # geometries were two times larger. This feature is useful when the drawn layout
+    # does not correspond to the physical dimensions.
+    
+    def device_scaling(factor)
+      @device_scaling = factor
+      @l2n && @l2n.device_scaling = factor
     end
     
     # %DRC%
@@ -378,6 +392,7 @@ module DRC
       if !@l2n
         @layers = {}
         _make_data
+        @l2n.device_scaling = @device_scaling
       end
     end
 

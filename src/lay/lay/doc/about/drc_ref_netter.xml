@@ -198,6 +198,17 @@ component.
 The implicit connections are applied on the next net extraction and cleared
 on "clear_connections".
 </p>
+<h2>"device_scaling" - Specifies a dimension scale factor for the geometrical device properties</h2>
+<keyword name="device_scaling"/>
+<a name="device_scaling"/><p>Usage:</p>
+<ul>
+<li><tt>device_scaling(factor)</tt></li>
+</ul>
+<p>
+Specifying a factor of 2 will make all devices being extracted as if the 
+geometries were two times larger. This feature is useful when the drawn layout
+does not correspond to the physical dimensions.
+</p>
 <h2>"extract_devices" - Extracts devices based on the given extractor class, name and device layer selection</h2>
 <keyword name="extract_devices"/>
 <a name="extract_devices"/><p>Usage:</p>

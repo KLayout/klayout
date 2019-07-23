@@ -287,6 +287,22 @@ private:
 };
 
 /**
+ *  @brief A parameter compare delegate that compares all parameters in a relative fashion
+ */
+class DB_PUBLIC AllDeviceParametersAreEqual
+  : public DeviceParameterCompareDelegate
+{
+public:
+  AllDeviceParametersAreEqual (double relative);
+
+  virtual bool less (const db::Device &a, const db::Device &b) const;
+  virtual bool equal (const db::Device &a, const db::Device &b) const;
+
+private:
+  double m_relative;
+};
+
+/**
  *  @brief A device class
  *
  *  A device class describes a type of device.

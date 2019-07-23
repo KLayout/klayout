@@ -1,0 +1,102 @@
+* Extracted by KLayout
+
+* cell RINGO
+* pin FB
+* pin VDD
+* pin OUT
+* pin ENABLE
+* pin VSS
+.SUBCKT RINGO 5 6 7 8 9
+* net 5 FB
+* net 6 VDD
+* net 7 OUT
+* net 8 ENABLE
+* net 9 VSS
+* cell instance $1 r0 *1 1.8,0
+X$1 6 1 9 6 5 8 9 ND2X1
+* cell instance $2 r0 *1 4.2,0
+X$2 6 2 9 6 1 9 INVX1
+* cell instance $3 r0 *1 6,0
+X$3 6 10 9 6 2 9 INVX1
+* cell instance $4 r0 *1 16.8,0
+X$4 6 3 9 6 11 9 INVX1
+* cell instance $5 r0 *1 18.6,0
+X$5 6 4 9 6 3 9 INVX1
+* cell instance $6 r0 *1 20.4,0
+X$6 6 5 9 6 4 9 INVX1
+* cell instance $7 r0 *1 22.2,0
+X$7 5 6 7 9 6 9 INVX2
+* cell instance $17 r0 *1 7.8,0
+X$17 6 12 9 6 10 9 INVX1
+* cell instance $18 r0 *1 9.6,0
+X$18 6 13 9 6 12 9 INVX1
+* cell instance $19 r0 *1 11.4,0
+X$19 6 14 9 6 13 9 INVX1
+* cell instance $20 r0 *1 13.2,0
+X$20 6 15 9 6 14 9 INVX1
+* cell instance $21 r0 *1 15,0
+X$21 6 11 9 6 15 9 INVX1
+.ENDS RINGO
+
+* cell INVX2
+* pin IN
+* pin VDD
+* pin OUT
+* pin VSS
+* pin 
+* pin SUBSTRATE
+.SUBCKT INVX2 1 2 3 4 5 6
+* net 1 IN
+* net 2 VDD
+* net 3 OUT
+* net 4 VSS
+* net 6 SUBSTRATE
+* device instance $1 r0 *1 0.85,5.8 PMOS
+M$1 2 1 3 5 PMOS L=0.25U W=3U AS=0.975P AD=0.975P PS=5.8U PD=5.8U
+* device instance $3 r0 *1 0.85,2.135 NMOS
+M$3 4 1 3 6 NMOS L=0.25U W=1.9U AS=0.6175P AD=0.6175P PS=4.15U PD=4.15U
+.ENDS INVX2
+
+* cell INVX1
+* pin VDD
+* pin OUT
+* pin VSS
+* pin 
+* pin IN
+* pin SUBSTRATE
+.SUBCKT INVX1 1 2 3 4 5 6
+* net 1 VDD
+* net 2 OUT
+* net 3 VSS
+* net 5 IN
+* net 6 SUBSTRATE
+* device instance $1 r0 *1 0.85,5.8 PMOS
+M$1 1 5 2 4 PMOS L=0.25U W=1.5U AS=0.6375P AD=0.6375P PS=3.85U PD=3.85U
+* device instance $2 r0 *1 0.85,2.135 NMOS
+M$2 3 5 2 6 NMOS L=0.25U W=0.95U AS=0.40375P AD=0.40375P PS=2.75U PD=2.75U
+.ENDS INVX1
+
+* cell ND2X1
+* pin VDD
+* pin OUT
+* pin VSS
+* pin 
+* pin B
+* pin A
+* pin SUBSTRATE
+.SUBCKT ND2X1 1 2 3 4 5 6 7
+* net 1 VDD
+* net 2 OUT
+* net 3 VSS
+* net 5 B
+* net 6 A
+* net 7 SUBSTRATE
+* device instance $1 r0 *1 0.85,5.8 PMOS
+M$1 2 6 1 4 PMOS L=0.25U W=1.5U AS=0.6375P AD=0.3375P PS=3.85U PD=1.95U
+* device instance $2 r0 *1 1.55,5.8 PMOS
+M$2 1 5 2 4 PMOS L=0.25U W=1.5U AS=0.3375P AD=0.6375P PS=1.95U PD=3.85U
+* device instance $3 r0 *1 0.85,2.135 NMOS
+M$3 3 6 8 7 NMOS L=0.25U W=0.95U AS=0.40375P AD=0.21375P PS=2.75U PD=1.4U
+* device instance $4 r0 *1 1.55,2.135 NMOS
+M$4 8 5 2 7 NMOS L=0.25U W=0.95U AS=0.21375P AD=0.40375P PS=1.4U PD=2.75U
+.ENDS ND2X1

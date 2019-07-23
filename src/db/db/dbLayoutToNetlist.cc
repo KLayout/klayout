@@ -58,7 +58,7 @@ LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
 }
 
 LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index)
-  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false)
+  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0)
 {
   if (dss->is_valid_layout_index (m_layout_index)) {
     m_iter = db::RecursiveShapeIterator (dss->layout (m_layout_index), dss->initial_cell (m_layout_index), std::set<unsigned int> ());
@@ -66,7 +66,7 @@ LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_i
 }
 
 LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
-  : m_iter (), m_netlist_extracted (false), m_is_flat (true)
+  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0)
 {
   mp_internal_dss.reset (new db::DeepShapeStore (topcell_name, dbu));
   mp_dss.reset (mp_internal_dss.get ());
@@ -77,7 +77,7 @@ LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
 
 LayoutToNetlist::LayoutToNetlist ()
   : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_layout_index (0),
-    m_netlist_extracted (false), m_is_flat (false)
+    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0)
 {
   init ();
 }
@@ -134,6 +134,16 @@ void LayoutToNetlist::set_max_vertex_count (size_t n)
 size_t LayoutToNetlist::max_vertex_count () const
 {
   return dss ().max_vertex_count ();
+}
+
+void LayoutToNetlist::set_device_scaling (double s)
+{
+  m_device_scaling = s;
+}
+
+double LayoutToNetlist::device_scaling () const
+{
+  return m_device_scaling;
 }
 
 db::Region *LayoutToNetlist::make_layer (const std::string &n)
@@ -195,7 +205,7 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
   if (! mp_netlist.get ()) {
     mp_netlist.reset (new db::Netlist ());
   }
-  extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters);
+  extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters, m_device_scaling);
 }
 
 void LayoutToNetlist::connect (const db::Region &l)

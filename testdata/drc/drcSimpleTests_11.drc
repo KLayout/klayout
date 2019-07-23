@@ -91,8 +91,8 @@ class CustomResistorExtraction < RBA::GenericDeviceExtractor
         # -> W = p-sqrt(p*p-A)
         # (p=P/4)
         
-        p = 0.25 * r.perimeter
-        a = r.area
+        p = sdbu * 0.25 * r.perimeter
+        a = sdbu * sdbu * r.area
         
         d = Math.sqrt(p * p - a)
         l = p + d
@@ -102,7 +102,10 @@ class CustomResistorExtraction < RBA::GenericDeviceExtractor
         
           device = create_device
 
+          device.trans = RBA::DCplxTrans::new(RBA::CplxTrans::new(dbu) * (r.bbox.center - RBA::Point::new));
+
           device.set_parameter(RBA::DeviceClassResistor::PARAM_R, @sheet_rho * l / w);
+          device.set_parameter(RBA::DeviceClassResistor::PARAM_A, a);
 
           define_terminal(device, RBA::DeviceClassResistor::TERMINAL_A, conductor_geometry_index, terminals[0]);
           define_terminal(device, RBA::DeviceClassResistor::TERMINAL_B, conductor_geometry_index, terminals[1]);

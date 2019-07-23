@@ -263,7 +263,7 @@ public:
    *
    *  NOTE: The extractor expects "PolygonRef" type layers.
    */
-  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, Netlist *netlist, hier_clusters_type &clusters);
+  void extract (Layout &layout, Cell &cell, const std::vector<unsigned int> &layers, Netlist *netlist, hier_clusters_type &clusters, double device_scaling = 1.0);
 
   /**
    *  @brief Extracts the devices from a list of regions
@@ -272,7 +272,7 @@ public:
    *  named regions for input. These regions need to be of deep region type and
    *  originate from the same layout than the DeepShapeStore.
    */
-  void extract (DeepShapeStore &dss, unsigned int layout_index, const input_layers &layers, Netlist &netlist, hier_clusters_type &clusters);
+  void extract (DeepShapeStore &dss, unsigned int layout_index, const input_layers &layers, Netlist &netlist, hier_clusters_type &clusters, double device_scaling = 1.0);
 
   /**
    *  @brief Gets the error iterator, begin
@@ -417,6 +417,16 @@ public:
   }
 
   /**
+   *  @brief Gets the scaled database unit
+   *  Use this unit to compute device properties. It is the database unit multiplied with the
+   *  device scaling factor.
+   */
+  double sdbu () const
+  {
+    return m_device_scaling * mp_layout->dbu ();
+  }
+
+  /**
    *  @brief Gets the layout the shapes are taken from
    *  NOTE: this method is provided for testing purposes mainly.
    */
@@ -523,6 +533,7 @@ private:
   db::properties_id_type m_terminal_id_propname_id, m_device_id_propname_id, m_device_class_propname_id;
   hier_clusters_type *mp_clusters;
   db::cell_index_type m_cell_index;
+  double m_device_scaling;
   db::Circuit *mp_circuit;
   db::DeviceClass *mp_device_class;
   std::string m_name;
@@ -542,7 +553,7 @@ private:
    */
   void initialize (db::Netlist *nl);
 
-  void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers);
+  void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling);
   void push_new_devices (const Vector &disp_cache);
   void push_cached_devices (const tl::vector<Device *> &cached_devices, const db::Vector &disp_cache, const db::Vector &new_disp);
 };

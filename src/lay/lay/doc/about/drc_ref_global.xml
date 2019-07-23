@@ -185,6 +185,15 @@ implied always. Sometimes cell variants will be created.
 </p><p>
 Deep mode can be cancelled with <a href="#tiles">tiles</a> or <a href="#flat">flat</a>.
 </p>
+<h2>"device_scaling" - Specifies a dimension scale factor for the geometrical device properties</h2>
+<keyword name="device_scaling"/>
+<a name="device_scaling"/><p>Usage:</p>
+<ul>
+<li><tt>device_scaling(factor)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#device_scaling">Netter#device_scaling</a> for a description of that function.
+</p>
 <h2>"diode" - Supplies the diode extractor class</h2>
 <keyword name="diode"/>
 <a name="diode"/><p>Usage:</p>

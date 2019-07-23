@@ -221,6 +221,18 @@ public:
   size_t max_vertex_count () const;
 
   /**
+   *  @brief Sets the device scaling factor
+   *  This factor will scale the physical properties of the extracted devices
+   *  accordingly. The scale factor applies an isotropic shrink (<1) or expansion (>1).
+   */
+  void set_device_scaling (double s);
+
+  /**
+   *  @brief Gets the device scaling factor
+   */
+  double device_scaling () const;
+
+  /**
    *  @brief Register a layer under the given name
    *  This is a formal name for the layer. Using a name or layer properties
    *  (see below) enhances readability of backannotated information
@@ -711,6 +723,7 @@ private:
   std::map<unsigned int, std::string> m_name_of_layer;
   bool m_netlist_extracted;
   bool m_is_flat;
+  double m_device_scaling;
   db::DeepLayer m_dummy_layer;
 
   struct CellReuseTableKey

@@ -18,21 +18,21 @@ layout(
  layer(l12 'METAL2 (9/0)')
  layer(l13 'METAL2_LABEL (9/1)')
  layer(l7)
- layer(l1)
- layer(l5)
+ layer(l2)
+ layer(l6)
 
  # Mask layer connectivity
  connect(l3 l3)
  connect(l4 l4 l8)
- connect(l8 l4 l8 l9 l1 l5)
+ connect(l8 l4 l8 l9 l2 l6)
  connect(l9 l8 l9 l10 l11)
  connect(l10 l9 l10)
  connect(l11 l9 l11 l12)
  connect(l12 l11 l12 l13)
  connect(l13 l12 l13)
  connect(l7 l7)
- connect(l1 l8 l1)
- connect(l5 l8 l5)
+ connect(l2 l8 l2)
+ connect(l6 l8 l6)
 
  # Global nets and connectivity
  global(l3 NWELL)
@@ -46,13 +46,13 @@ layout(
  # Device abstracts list the pin shapes of the devices.
  device(D$PMOS PMOS
   terminal(S
-   rect(l1 (-575 -750) (450 1500))
+   rect(l2 (-575 -750) (450 1500))
   )
   terminal(G
    rect(l4 (-125 -750) (250 1500))
   )
   terminal(D
-   rect(l1 (125 -750) (450 1500))
+   rect(l2 (125 -750) (450 1500))
   )
   terminal(B
    rect(l3 (-125 -750) (250 1500))
@@ -60,13 +60,13 @@ layout(
  )
  device(D$NMOS NMOS
   terminal(S
-   rect(l5 (-575 -450) (450 900))
+   rect(l6 (-575 -450) (450 900))
   )
   terminal(G
    rect(l4 (-125 -450) (250 900))
   )
   terminal(D
-   rect(l5 (125 -450) (450 900))
+   rect(l6 (125 -450) (450 900))
   )
   terminal(B
    rect(l7 (-125 -450) (250 900))
@@ -98,7 +98,7 @@ layout(
    rect(l11 (-200 300) (200 200))
    rect(l12 (-750 -850) (2000 1000))
    rect(l13 (-101 -851) (2 2))
-   rect(l5 (-1451 49) (450 900))
+   rect(l6 (-1451 49) (450 900))
   )
   net(3 name(VDD)
    rect(l8 (550 4350) (200 200))
@@ -109,7 +109,7 @@ layout(
    rect(l11 (-200 300) (200 200))
    rect(l12 (-750 -850) (2000 1000))
    rect(l13 (-151 -851) (2 2))
-   rect(l1 (-1401 -851) (450 1500))
+   rect(l2 (-1401 -851) (450 1500))
   )
   net(4 name(OUT)
    rect(l8 (1300 4350) (200 200))
@@ -122,8 +122,8 @@ layout(
    rect(l9 (-300 -2900) (450 400))
    rect(l9 (-450 -1550) (300 850))
    rect(l10 (-51 499) (2 2))
-   rect(l1 (-351 2649) (450 1500))
-   rect(l5 (-450 -5500) (450 900))
+   rect(l2 (-351 2649) (450 1500))
+   rect(l6 (-450 -5500) (450 900))
   )
   net(5 name(NWELL)
    rect(l3 (0 2950) (2000 3200))

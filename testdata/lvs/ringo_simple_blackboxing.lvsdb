@@ -16,22 +16,22 @@ layout(
  layer(l12 '10/0')
  layer(l13 '11/0')
  layer(l7 '13/0')
- layer(l1)
+ layer(l2)
  layer(l9)
- layer(l5)
+ layer(l6)
  layer(l10)
 
  # Mask layer connectivity
  connect(l3 l3 l9)
  connect(l4 l4 l8)
- connect(l8 l4 l8 l11 l1 l9 l5 l10)
+ connect(l8 l4 l8 l11 l2 l9 l6 l10)
  connect(l11 l8 l11 l12)
  connect(l12 l11 l12 l13)
  connect(l13 l12 l13)
  connect(l7 l7)
- connect(l1 l8 l1)
+ connect(l2 l8 l2)
  connect(l9 l3 l8 l9)
- connect(l5 l8 l5)
+ connect(l6 l8 l6)
  connect(l10 l8 l10)
 
  # Global nets and connectivity

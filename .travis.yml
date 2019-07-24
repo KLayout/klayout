@@ -208,6 +208,7 @@ matrix:
         homebrew:
           packages:
             - ccache
+          update: true
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"

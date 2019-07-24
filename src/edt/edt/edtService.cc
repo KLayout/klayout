@@ -829,7 +829,7 @@ double
 Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mode)
 {
   //  compute search box
-  double l = double (lay::search_range) / widget ()->mouse_event_trans ().mag ();
+  double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
   db::DBox search_box = db::DBox (pos, pos).enlarged (db::DVector (l, l));
 
   //  for single-point selections either exclude the current selection or the
@@ -889,7 +889,7 @@ Service::transient_select (const db::DPoint &pos)
   }
 
   //  compute search box
-  double l = double (lay::search_range) / widget ()->mouse_event_trans ().mag ();
+  double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
   db::DBox search_box = db::DBox (pos, pos).enlarged (db::DVector (l, l));
 
   if (m_cell_inst_service) {
@@ -1152,7 +1152,7 @@ bool
 Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 {
   //  compute search box
-  double l = double (lay::search_range) / widget ()->mouse_event_trans ().mag ();
+  double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
   db::DBox search_box = box.enlarged (db::DVector (l, l));
 
   bool needs_update = false;

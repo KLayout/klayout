@@ -1149,6 +1149,11 @@ IndexedNetlistModel::net_pair nets_from_device_terminals (const IndexedNetlistMo
 
 const std::string field_sep (" / ");
 
+static QString escaped (const std::string &s)
+{
+  return tl::to_qstring (tl::escaped_to_html (s));
+}
+
 QString
 NetlistBrowserModel::text (const QModelIndex &index) const
 {
@@ -1161,9 +1166,9 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     //  + dual mode:       name(a)/name(b)   | name(a)  | name(b)
     IndexedNetlistModel::circuit_pair circuits = circuits_from_id (id);
     if (index.column () == m_object_column) {
-      return tl::to_qstring (str_from_names (circuits, mp_indexer->is_single ()));
+      return escaped (str_from_names (circuits, mp_indexer->is_single ()));
     } else if (!mp_indexer->is_single () && (index.column () == m_first_column || index.column () == m_second_column)) {
-      return tl::to_qstring (str_from_name (index.column () == m_first_column ? circuits.first : circuits.second));
+      return escaped (str_from_name (index.column () == m_first_column ? circuits.first : circuits.second));
     }
 
   } else if (is_id_circuit_pin (id)) {
@@ -1173,9 +1178,9 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     //  + dual mode:       xname(a)/xname(b) | xname(a) | xname(b)
     IndexedNetlistModel::pin_pair pins = pins_from_id (id);
     if (index.column () == m_object_column) {
-      return tl::to_qstring (str_from_expanded_names (pins, mp_indexer->is_single ()));
+      return escaped (str_from_expanded_names (pins, mp_indexer->is_single ()));
     } else if (!mp_indexer->is_single () && (index.column () == m_first_column || index.column () == m_second_column)) {
-      return tl::to_qstring (str_from_expanded_name (index.column () == m_first_column ? pins.first : pins.second));
+      return escaped (str_from_expanded_name (index.column () == m_first_column ? pins.first : pins.second));
     }
 
   } else if (is_id_circuit_pin_net (id)) {
@@ -1186,7 +1191,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     IndexedNetlistModel::net_pair nets = nets_from_circuit_pins (circuits, pins);
 
     if (index.column () == m_object_column) {
-      return tl::to_qstring (str_from_expanded_names (nets, mp_indexer->is_single ()));
+      return escaped (str_from_expanded_names (nets, mp_indexer->is_single ()));
     } else if (index.column () == m_first_column || index.column () == m_second_column) {
       return make_link_to (nets, index.column ());
     }
@@ -1199,19 +1204,19 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     if (mp_indexer->is_single ()) {
 
       if (index.column () == m_object_column) {
-        return tl::to_qstring (device_string (devices.first));
+        return escaped (device_string (devices.first));
       } else if (index.column () == m_first_column) {
-        return tl::to_qstring (str_from_expanded_name (devices.first));
+        return escaped (str_from_expanded_name (devices.first));
       }
 
     } else {
 
       if (index.column () == m_object_column) {
-        return tl::to_qstring (devices_string (devices, mp_indexer->is_single ()));
+        return escaped (devices_string (devices, mp_indexer->is_single ()));
       } else if (index.column () == m_first_column) {
-        return tl::to_qstring (str_from_expanded_name (devices.first) + field_sep + device_string (devices.first));
+        return escaped (str_from_expanded_name (devices.first) + field_sep + device_string (devices.first));
       } else if (index.column () == m_second_column) {
-        return tl::to_qstring (str_from_expanded_name (devices.second) + field_sep + device_string (devices.second));
+        return escaped (str_from_expanded_name (devices.second) + field_sep + device_string (devices.second));
       }
 
     }
@@ -1227,7 +1232,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
 
     if (index.column () == m_object_column) {
 
-      return tl::to_qstring (str_from_names (termdefs, mp_indexer->is_single ()));
+      return escaped (str_from_names (termdefs, mp_indexer->is_single ()));
 
     } else if (index.column () == m_first_column || index.column () == m_second_column) {
 
@@ -1244,9 +1249,9 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     if (index.column () == m_object_column) {
       return make_link_to (circuit_refs);
     } else if (index.column () == m_first_column) {
-      return tl::to_qstring (str_from_expanded_name (subcircuits.first));
+      return escaped (str_from_expanded_name (subcircuits.first));
     } else if (index.column () == m_second_column) {
-      return tl::to_qstring (str_from_expanded_name (subcircuits.second));
+      return escaped (str_from_expanded_name (subcircuits.second));
     }
 
   } else if (is_id_circuit_subcircuit_pin (id)) {
@@ -1267,11 +1272,11 @@ NetlistBrowserModel::text (const QModelIndex &index) const
     //  circuit/net: header column = node count, second column net name
     IndexedNetlistModel::net_pair nets = nets_from_id (id);
     if (index.column () == m_object_column) {
-      return tl::to_qstring (str_from_expanded_names (nets, mp_indexer->is_single ()));
+      return escaped (str_from_expanded_names (nets, mp_indexer->is_single ()));
     } else if (index.column () == m_first_column && nets.first) {
-      return tl::to_qstring (nets.first->expanded_name () + " (" + tl::to_string (nets.first->pin_count () + nets.first->terminal_count () + nets.first->subcircuit_pin_count ()) + ")");
+      return escaped (nets.first->expanded_name () + " (" + tl::to_string (nets.first->pin_count () + nets.first->terminal_count () + nets.first->subcircuit_pin_count ()) + ")");
     } else if (index.column () == m_second_column && nets.second) {
-      return tl::to_qstring (nets.second->expanded_name () + " (" + tl::to_string (nets.second->pin_count () + nets.second->terminal_count () + nets.second->subcircuit_pin_count ()) + ")");
+      return escaped (nets.second->expanded_name () + " (" + tl::to_string (nets.second->pin_count () + nets.second->terminal_count () + nets.second->subcircuit_pin_count ()) + ")");
     }
 
   } else if (is_id_circuit_net_pin (id)) {
@@ -1325,9 +1330,9 @@ NetlistBrowserModel::text (const QModelIndex &index) const
       std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> termdefs = terminal_defs_from_terminal_refs (refs);
 
       if (mp_indexer->is_single ()) {
-        return tl::to_qstring (str_from_name (termdefs.first) + field_sep + device_string (devices.first));
+        return escaped (str_from_name (termdefs.first) + field_sep + device_string (devices.first));
       } else {
-        return tl::to_qstring (str_from_names (termdefs, mp_indexer->is_single ()) + field_sep + devices_string (devices, mp_indexer->is_single ()));
+        return escaped (str_from_names (termdefs, mp_indexer->is_single ()) + field_sep + devices_string (devices, mp_indexer->is_single ()));
       }
 
     } else if (index.column () == m_first_column || index.column () == m_second_column) {
@@ -1346,7 +1351,7 @@ NetlistBrowserModel::text (const QModelIndex &index) const
 
     if (index.column () == m_object_column) {
 
-      return tl::to_qstring (str_from_names (termdefs, mp_indexer->is_single ()));
+      return escaped (str_from_names (termdefs, mp_indexer->is_single ()));
 
     } else if (index.column () == m_first_column || index.column () == m_second_column) {
 

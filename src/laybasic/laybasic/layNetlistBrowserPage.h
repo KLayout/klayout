@@ -85,7 +85,7 @@ public:
    *  If that pointer is non-null, the browser will attach itself to
    *  the view and provide highlights for the selected markers inside the given cellview.
    */
-  void set_view (lay::LayoutView *view, unsigned int cv_index);
+  void set_view (lay::LayoutView *view, int cv_index);
 
   /**
    *  @brief Attaches the page to a L2N DB

@@ -235,14 +235,19 @@ NetlistBrowserPage::set_highlight_style (QColor color, int line_width, int verte
 }
 
 void
-NetlistBrowserPage::set_view (lay::LayoutView *view, unsigned int cv_index)
+NetlistBrowserPage::set_view (lay::LayoutView *view, int cv_index)
 {
   if (mp_view) {
     mp_view->layer_list_changed_event.remove (this, &NetlistBrowserPage::layer_list_changed);
   }
 
-  mp_view = view;
-  m_cv_index = cv_index;
+  if (cv_index < 0) {
+    mp_view = 0;
+    m_cv_index = 0;
+  } else {
+    mp_view = view;
+    m_cv_index = (unsigned int) cv_index;
+  }
 
   if (mp_view) {
     mp_view->layer_list_changed_event.add (this, &NetlistBrowserPage::layer_list_changed);

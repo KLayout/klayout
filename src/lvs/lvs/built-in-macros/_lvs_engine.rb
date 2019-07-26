@@ -131,6 +131,18 @@ module LVS
     # @synopsis max_res(threshold)
     # See \Netter#max_res for a description of that function.
 
+    # %LVS%
+    # @name max_branch_complexity
+    # @brief Configures the maximum branch complexity for ambiguous net matching
+    # @synopsis max_branch_complexity(n)
+    # See \Netter#max_branch_complexity for a description of that function.
+
+    # %LVS%
+    # @name max_depth
+    # @brief Configures the maximum search depth for net match deduction
+    # @synopsis max_depth(n)
+    # See \Netter#max_depth for a description of that function.
+
     %w(schematic compare same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity).each do |f|
       eval <<"CODE"
         def #{f}(*args)

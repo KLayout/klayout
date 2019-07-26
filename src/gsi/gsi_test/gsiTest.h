@@ -155,6 +155,15 @@ struct A
   bool a9a (int i) const { return i == 5; }
   int a9b (bool f) const { return f ? 5 : -5; }
 
+  short a11_s (double f) { return short(f); }
+  unsigned short a11_us (double f) { return (unsigned short)(f); }
+  int a11_i (double f) { return int(f); }
+  unsigned int a11_ui (double f) { return (unsigned int)(f); }
+  long a11_l (double f) { return long(f); }
+  unsigned long a11_ul (double f) { return (unsigned long)(f); }
+  long long a11_ll (double f) { return (long long)(f); }
+  unsigned long long a11_ull (double f) { return (unsigned long long)(f); }
+
   std::string a10_d (double f) { return tl::to_string (f); }
 #if defined(HAVE_QT)
   QByteArray a10_d_qba (double f) { return tl::to_qstring (tl::to_string (f)).toUtf8 (); }
@@ -162,6 +171,14 @@ struct A
   QStringRef a10_d_qstrref (double f) { m_s = tl::to_qstring (tl::to_string (f)); return QStringRef (&m_s); }
 #endif
   std::string a10_f (float f) { return tl::to_string(f); }
+  std::string a10_s (short l) { return tl::to_string(int (l)); }
+  std::string a10_us (unsigned short l) { return tl::to_string(int (l)); }
+  std::string a10_i (int l) { return tl::to_string(l); }
+  std::string a10_ui (unsigned int l) { return tl::to_string(l); }
+  std::string a10_l (long l) { return tl::to_string(l); }
+  std::string a10_ul (unsigned long l) { return tl::to_string(l); }
+  std::string a10_ll (long long l) { return tl::to_string(l); }
+  std::string a10_ull (unsigned long long l) { return tl::to_string(l); }
   std::string a10_fptr (float *f) { if (f) { *f += 5; return tl::to_string(*f); } else { return "nil"; } }
   std::string a10_dptr (double *f) { if (f) { *f += 6; return tl::to_string(*f); } else { return "nil"; } }
   std::string a10_iptr (int *f) { if (f) { *f += 7; return tl::to_string(*f); } else { return "nil"; } }

@@ -308,8 +308,17 @@ public:
   gsi::Callback cb_pin_mismatch;
   gsi::Callback cb_match_subcircuits;
   gsi::Callback cb_subcircuit_mismatch;
+
+private:
+  GenericNetlistCompareLogger (const GenericNetlistCompareLogger &d);
+  GenericNetlistCompareLogger &operator= (const GenericNetlistCompareLogger &d);
 };
 
+}
+
+namespace tl
+{
+  template<> struct type_traits<GenericNetlistCompareLogger> : public tl::type_traits<db::NetlistCompareLogger> { };
 }
 
 namespace gsi

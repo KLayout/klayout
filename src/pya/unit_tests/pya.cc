@@ -30,7 +30,7 @@
 
 static void run_pythontest (tl::TestBase *_this, const std::string &fn);
 
-TEST (1)
+TEST (basic)
 {
   EXPECT_EQ (gsi::has_class ("Value"), true);
   EXPECT_EQ (gsi::has_class ("DoesNotExist"), false);

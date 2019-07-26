@@ -208,6 +208,7 @@ matrix:
         homebrew:
           packages:
             - ccache
+          update: true
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
@@ -225,6 +226,7 @@ matrix:
         homebrew:
           packages:
             - ccache
+          update: true
       env:
         - MATRIX_EVAL="brew install python2 || brew link --overwrite python@2"  # deficient python2 in travis's xcode8.3 (no ssl)
         - ARCHFLAGS="-std=c++11"
@@ -281,6 +283,7 @@ matrix:
         homebrew:
           packages:
             - ccache
+          update: true
       env:
         - MATRIX_EVAL="brew update; brew tap sashkab/python; brew install sashkab/python/python36; brew link --force --overwrite python36; shopt -s expand_aliases; alias python='/usr/local/opt/python36/bin/python3.6'; alias pip='/usr/local/opt/python36/bin/pip3.6';"
         - ARCHFLAGS="-std=c++11"
@@ -298,6 +301,7 @@ matrix:
         homebrew:
           packages:
             - ccache
+          update: true
       env:
         - MATRIX_EVAL="brew update; brew tap sashkab/python; brew install sashkab/python/python35; brew link --force --overwrite python35; shopt -s expand_aliases; alias python='/usr/local/opt/python35/bin/python3.5'; alias pip='/usr/local/opt/python35/bin/pip3.5';"
         - ARCHFLAGS="-std=c++11"

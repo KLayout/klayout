@@ -786,7 +786,7 @@ private:
    *  @brief Compares edges as "less"
    *  Edge comparison is based on the pins attached (name of the first pin).
    */
-  static bool edge_less (const db::Net *a, const db::Net *b);
+  static bool net_less (const db::Net *a, const db::Net *b);
 
   /**
    *  @brief Compares edges as "equal"
@@ -1260,8 +1260,8 @@ NetGraphNode::operator< (const NetGraphNode &node) const
     }
   }
   if (m_edges.empty ()) {
-    //  do a more detailed analysis on the edges
-    return edge_less (net (), node.net ());
+    //  do a more detailed analysis on the nets involved
+    return net_less (net (), node.net ());
   }
   return false;
 }
@@ -1285,7 +1285,7 @@ NetGraphNode::operator== (const NetGraphNode &node) const
 }
 
 bool
-NetGraphNode::edge_less (const db::Net *a, const db::Net *b)
+NetGraphNode::net_less (const db::Net *a, const db::Net *b)
 {
   if ((a != 0) != (b != 0)) {
     return (a != 0) < (b != 0);
@@ -2016,6 +2016,11 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
 
   m_max_depth = 8;
   m_max_n_branch = 100;
+}
+
+NetlistComparer::~NetlistComparer ()
+{
+  //  .. nothing yet ..
 }
 
 void

@@ -269,6 +269,10 @@ public:
   }
 
 private:
+  //  No copying
+  NetlistCrossReference (const db::NetlistCrossReference &);
+  NetlistCrossReference &operator= (const db::NetlistCrossReference &);
+
   tl::weak_ptr<db::Netlist> mp_netlist_a, mp_netlist_b;
   std::vector<std::pair<const db::Circuit *, const db::Circuit *> > m_circuits;
   std::list<PerCircuitData> m_per_circuit_data;
@@ -292,6 +296,17 @@ private:
   void build_subcircuit_pin_refs (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const;
   void build_pin_refs (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const;
   void build_terminal_refs (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const;
+};
+
+}
+
+namespace tl
+{
+
+template<> struct type_traits<db::NetlistCrossReference> : public tl::type_traits<void>
+{
+  //  mark "NetlistDeviceExtractor" as having a default ctor and no copy ctor
+  typedef tl::false_tag has_copy_constructor;
 };
 
 }

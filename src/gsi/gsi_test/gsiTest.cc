@@ -834,6 +834,14 @@ static gsi::Class<A> decl_a ("", "A",
 #endif
   gsi::method ("*a10_prot", &A::a10_d) +
   gsi::method ("a10_f", &A::a10_f) +
+  gsi::method ("a10_s", &A::a10_s) +
+  gsi::method ("a10_us", &A::a10_us) +
+  gsi::method ("a10_i", &A::a10_i) +
+  gsi::method ("a10_l", &A::a10_l) +
+  gsi::method ("a10_ll", &A::a10_ll) +
+  gsi::method ("a10_ui", &A::a10_ui) +
+  gsi::method ("a10_ul", &A::a10_ul) +
+  gsi::method ("a10_ull", &A::a10_ull) +
   gsi::method ("a10_fptr", &A::a10_fptr) +
   gsi::method ("a10_dptr", &A::a10_dptr) +
   gsi::method ("a10_iptr", &A::a10_iptr) +
@@ -874,6 +882,14 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("a10_cllref", &A::a10_cllref) +
   gsi::method ("a10_cullref", &A::a10_cullref) +
   gsi::method ("a10_csref", &A::a10_csref) +
+  gsi::method ("a11_s", &A::a11_s) +
+  gsi::method ("a11_us", &A::a11_us) +
+  gsi::method ("a11_i", &A::a11_i) +
+  gsi::method ("a11_l", &A::a11_l) +
+  gsi::method ("a11_ll", &A::a11_ll) +
+  gsi::method ("a11_ui", &A::a11_ui) +
+  gsi::method ("a11_ul", &A::a11_ul) +
+  gsi::method ("a11_ull", &A::a11_ull) +
   gsi::method ("a_vp1", &A::a_vp1) +
   gsi::method ("a_vp2", &A::a_vp2) +
   gsi::method ("a9a", &A::a9a) +

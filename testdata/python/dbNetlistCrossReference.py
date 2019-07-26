@@ -32,7 +32,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
     xref = pya.NetlistCrossReference()
 
     lvs = pya.LayoutVsSchematic()
-    infile = os.path.join(ut_testsrc, "testdata", "algo", "lvs_test1b_au.lvsdb")
+    infile = os.path.join(ut_testsrc, "testdata", "algo", "lvsdb_read_test.lvsdb")
     lvs.read(infile)
 
     reader = pya.NetlistSpiceReader()
@@ -79,7 +79,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
     ut_testsrc = os.getenv("TESTSRC")
 
     lvs = pya.LayoutVsSchematic()
-    input = os.path.join(ut_testsrc, "testdata", "algo", "lvs_test2b_au.lvsdb")
+    input = os.path.join(ut_testsrc, "testdata", "algo", "lvsdb_read_test2.lvsdb")
     lvs.read(input)
 
     xref = lvs.xref()

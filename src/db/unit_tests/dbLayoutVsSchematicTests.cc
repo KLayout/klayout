@@ -40,13 +40,6 @@
 #include <memory>
 #include <limits>
 
-#if defined(_MSC_VER)
-//  different hash algorithm
-#  define AUFILE_SUFFIX ".2"
-#else
-#  define AUFILE_SUFFIX ""
-#endif
-
 static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_layer, int gds_datatype = 0)
 {
   unsigned int lid = ly.insert_layer (db::LayerProperties (gds_layer, gds_datatype));
@@ -56,17 +49,7 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
 
 static void compare_lvsdbs (tl::TestBase *_this, const std::string &path, const std::string &au_path)
 {
-  tl::InputStream is (path);
-  tl::InputStream is_au (au_path);
-
-  std::string netlist = is.read_all ();
-  std::string netlist_au = is_au.read_all ();
-
-  if (netlist != netlist_au) {
-    _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s",
-                               tl::absolute_file_path (path),
-                               tl::absolute_file_path (au_path)));
-  }
+  _this->compare_text_files (path, au_path);
 }
 
 TEST(1_BasicFlow)
@@ -249,7 +232,7 @@ TEST(1_BasicFlow)
   std::string path = tmp_file ("tmp_lvstest1.lvsdb");
   lvs.save (path, false);
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test1_au.lvsdb" AUFILE_SUFFIX);
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test1_au.lvsdb");
 
   compare_lvsdbs (_this, path, au_path);
 
@@ -261,7 +244,7 @@ TEST(1_BasicFlow)
   lvs2.load (path);
   lvs2.save (path2, false);
 
-  std::string au_path2 = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test1b_au.lvsdb" AUFILE_SUFFIX);
+  std::string au_path2 = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test1b_au.lvsdb");
 
   compare_lvsdbs (_this, path2, au_path2);
 }
@@ -447,7 +430,7 @@ TEST(2_FlowWithErrors)
   std::string path = tmp_file ("tmp_lvstest2.lvsdb");
   lvs.save (path, false);
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test2_au.lvsdb" AUFILE_SUFFIX);
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test2_au.lvsdb");
 
   compare_lvsdbs (_this, path, au_path);
 
@@ -459,7 +442,7 @@ TEST(2_FlowWithErrors)
   lvs2.load (path);
   lvs2.save (path2, false);
 
-  std::string au_path2 = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test2b_au.lvsdb" AUFILE_SUFFIX);
+  std::string au_path2 = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test2b_au.lvsdb");
 
   compare_lvsdbs (_this, path2, au_path2);
 }

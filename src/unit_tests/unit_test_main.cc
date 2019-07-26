@@ -43,6 +43,7 @@
 #if defined(HAVE_QT)
 
 #  include "layApplication.h"
+#  include "layMainWindow.h"
 #  include "laySystemPaths.h"
 #  include "layVersion.h"
 
@@ -87,6 +88,13 @@ main (int argc, char **argv)
 static bool
 run_test (tl::TestBase *t, bool editable, bool slow, int repeat)
 {
+#if defined(HAVE_QT)
+  //  provide a clean main window without any views attached
+  if (lay::MainWindow::instance ()) {
+    lay::MainWindow::instance ()->close_all ();
+  }
+#endif
+
   for (int i = 0; i < repeat; ++i) {
     if (repeat > 1) {
       ut::noctrl << "Repeat iteration " << i + 1 << " of " << repeat;

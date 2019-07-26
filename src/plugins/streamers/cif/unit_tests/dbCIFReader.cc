@@ -189,3 +189,8 @@ TEST(lasi)
   run_test (_this, tl::testsrc (), "lasi.cif.gz", "lasi_au.gds.gz");
 }
 
+//  Issue #305
+TEST(rot_boxes)
+{
+  run_test (_this, tl::testsrc (), "issue_305.cif", "issue_305_au.gds");
+}

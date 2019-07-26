@@ -197,14 +197,36 @@ db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const
   return region.release ();
 }
 
+size_t LayoutToNetlist::link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &dtrans)
+{
+  if (! subcircuit_net->circuit () || ! has_internal_layout () || ! internal_layout ()->is_valid_cell_index (parent_circuit->cell_index ())) {
+    return 0;
+  }
+
+  db::CplxTrans dbu_trans (internal_layout ()->dbu ());
+  db::ICplxTrans trans = dbu_trans.inverted () * dtrans * dbu_trans;
+
+  connected_clusters<db::PolygonRef> &parent_net_clusters = m_net_clusters.clusters_per_cell (parent_circuit->cell_index ());
+
+  size_t id = parent_net_clusters.insert_dummy (); // @@@
+
+  parent_net_clusters.add_connection (id, db::ClusterInstance (subcircuit_net->cluster_id (), subcircuit_net->circuit ()->cell_index (), trans, 0));
+  return id;
+}
+
+void LayoutToNetlist::ensure_netlist ()
+{
+  if (! mp_netlist.get ()) {
+    mp_netlist.reset (new db::Netlist (this));
+  }
+}
+
 void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::Region *> &layers)
 {
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
-  if (! mp_netlist.get ()) {
-    mp_netlist.reset (new db::Netlist ());
-  }
+  ensure_netlist ();
   extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters, m_device_scaling);
 }
 
@@ -277,9 +299,7 @@ void LayoutToNetlist::extract_netlist (const std::string &joined_net_names)
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
-  if (! mp_netlist.get ()) {
-    mp_netlist.reset (new db::Netlist ());
-  }
+  ensure_netlist ();
 
   db::NetlistExtractor netex;
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters, joined_net_names);
@@ -290,6 +310,11 @@ void LayoutToNetlist::extract_netlist (const std::string &joined_net_names)
 void LayoutToNetlist::set_netlist_extracted ()
 {
   m_netlist_extracted = true;
+}
+
+bool LayoutToNetlist::has_internal_layout () const
+{
+  return mp_dss.get () && mp_dss->is_valid_layout_index (m_layout_index);
 }
 
 const db::Layout *LayoutToNetlist::internal_layout () const
@@ -540,9 +565,7 @@ db::Netlist *LayoutToNetlist::netlist () const
 
 db::Netlist *LayoutToNetlist::make_netlist ()
 {
-  if (! mp_netlist.get ()) {
-    mp_netlist.reset (new db::Netlist ());
-  }
+  ensure_netlist ();
   return mp_netlist.get ();
 }
 

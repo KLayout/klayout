@@ -88,9 +88,7 @@ Circuit::~Circuit ()
 
   //  the default destructor will make the nets access "this" to unregister the
   //  objects - hence we have to do this explicitly.
-  m_nets.clear ();
-  m_subcircuits.clear ();
-  m_devices.clear ();
+  clear ();
 }
 
 Circuit &Circuit::operator= (const Circuit &other)
@@ -376,14 +374,22 @@ void Circuit::flatten_subcircuit (SubCircuit *subcircuit)
     db::Net *outside_net = 0;
 
     if (n->pin_count () > 0) {
+
       size_t pin_id = n->begin_pins ()->pin_id ();
       outside_net = subcircuit->net_for_pin (pin_id);
+
     } else {
+
       outside_net = new db::Net ();
       if (! n->name ().empty ()) {
         outside_net->set_name (subcircuit->expanded_name () + "." + n->name ());
       }
       add_net (outside_net);
+
+      if (netlist ()->callbacks ()) {
+        outside_net->set_cluster_id (netlist ()->callbacks ()->link_net_to_parent_circuit (n.operator-> (), this, subcircuit->trans ()));
+      }
+
     }
 
     net2net.insert (std::make_pair (n.operator-> (), outside_net));

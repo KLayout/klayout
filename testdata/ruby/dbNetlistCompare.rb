@@ -954,8 +954,8 @@ match_pins $2 $0
 match_pins $3 $2
 match_devices $3 $1
 match_devices_with_different_parameters $2 $2
-device_mismatch (null) $3
 match_devices $1 $4
+device_mismatch (null) $3
 end_circuit INV INV NOMATCH
 END
 

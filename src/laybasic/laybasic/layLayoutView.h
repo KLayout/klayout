@@ -2189,6 +2189,18 @@ public:
   }
 
   /**
+   *  @brief Gets the "search range" in pixels
+   *  The search range applies whenever some object is looked up in the vicinity of the
+   *  mouse cursor. This value gives the search range in pixels.
+   */
+  unsigned int search_range ();
+
+  /**
+   *  @brief Sets the "search range" in pixels
+   */
+  void set_search_range (unsigned int sr);
+
+  /**
    *  @brief Return true, if any cellview is editable
    */
   bool is_editable () const;
@@ -2733,6 +2745,8 @@ private:
   int m_marker_dither_pattern;
   int m_marker_line_style;
   bool m_marker_halo;
+
+  unsigned int m_search_range;
 
   bool m_transient_selection_mode;
   bool m_sel_inside_pcells;

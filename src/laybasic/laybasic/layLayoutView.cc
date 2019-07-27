@@ -435,6 +435,7 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   m_copy_cvr = -1;
   m_copy_layera = -1;
   m_copy_layerr = -1;
+  m_search_range = 5;
 
   m_layer_properties_lists.push_back (new LayerPropertiesList ());
   m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
@@ -1073,6 +1074,13 @@ LayoutView::configure (const std::string &name, const std::string &value)
     bool h;
     tl::from_string (value, h);
     child_ctx_enabled (h);
+    return true;
+
+  } else if (name == cfg_search_range) {
+
+    unsigned int n;
+    tl::from_string (value, n);
+    set_search_range (n);
     return true;
 
   } else if (name == cfg_abstract_mode_enabled) {
@@ -6422,6 +6430,18 @@ bool
 LayoutView::is_editable () const
 {
   return m_editable;
+}
+
+unsigned int
+LayoutView::search_range ()
+{
+  return m_search_range;
+}
+
+void
+LayoutView::set_search_range (unsigned int sr)
+{
+  m_search_range = sr;
 }
 
 void

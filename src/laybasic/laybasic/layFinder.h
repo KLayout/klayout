@@ -44,9 +44,6 @@ namespace tl
 namespace lay
 {
 
-//  default search range for select in pixels
-const unsigned int search_range = 5;   // TODO make variable?
-
 /**
  *  @brief A generic finder class
  *

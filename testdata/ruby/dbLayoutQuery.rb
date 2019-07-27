@@ -68,6 +68,33 @@ class DBLayoutQuery_TestClass < TestBase
 
   end
 
+  # variables
+  def test_4
+
+    ly = RBA::Layout::new
+    ly.read(ENV["TESTSRC"] + "/testdata/gds/t11.gds")
+
+    ctx = RBA::ExpressionContext::new
+    ctx.var("suffix", "!")
+    ctx.var("all", [])
+
+    q = RBA::LayoutQuery::new("select cell.name + suffix from *")
+    res = []
+    q.each(ly, ctx) do |iter|
+      res << iter.data.inspect
+    end
+
+    assert_equal(res.size, 2)
+    assert_equal(res[0], "[\"TOPTOP!\"]")
+    assert_equal(res[1], "[\"TOP!\"]")
+
+    q = RBA::LayoutQuery::new("with * do all.push(cell.name)")
+    q.execute(ly, ctx)
+
+    assert_equal(ctx.eval("all").join(","), "TOPTOP,TOP")
+
+  end
+
 end
 
 load("test_epilogue.rb")

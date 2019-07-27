@@ -468,8 +468,10 @@ public:
    *  as "delete" or "with ... do".
    *  It is basically equivalent to iterating over the query until it is
    *  done.
+   *
+   *  The context provides a way to define variables and functions.
    */
-  void execute (db::Layout &layout);
+  void execute (db::Layout &layout, tl::Eval *context = 0);
   
   /**
    *  @brief A dump method (for debugging)

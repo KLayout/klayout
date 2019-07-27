@@ -3127,7 +3127,7 @@ Expression::execute (EvalTarget &v) const
 
 Eval Eval::m_global;
 
-Eval::Eval (const Eval *parent, bool sloppy)
+Eval::Eval (Eval *parent, bool sloppy)
   : mp_parent (parent), m_sloppy (sloppy), mp_ctx_handler (0)
 {
   // .. nothing yet ..
@@ -3867,14 +3867,14 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
     const tl::Variant *value = 0;
     tl::Variant *var = 0;
 
-    resolve_var_name (t, var);
-    if (! var) {
-      if (am == 2) {
+    if (am == 2) {
+      resolve_var_name (t, var);
+      if (! var) {
         set_var (t, tl::Variant ());
         resolve_var_name (t, var);
-      } else {
-        resolve_name (t, function, value);
       }
+    } else {
+      resolve_name (t, function, value, var);
     }
 
     if (function) {
@@ -3935,31 +3935,31 @@ Eval::resolve_var_name (const std::string &t, tl::Variant *&value)
 }
 
 void 
-Eval::resolve_name (const std::string &t, const EvalFunction *&function, const tl::Variant *&value) const
+Eval::resolve_name (const std::string &t, const EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var)
 {
   function = 0;
   value = 0;
+  var = 0;
 
   std::map <std::string, EvalFunction *>::const_iterator f;
   f = m_local_functions.find (t);
   if (f != m_local_functions.end ()) {
     function = f->second;
   } else if ((function = EvalStaticFunction::function_by_name (t)) == 0) {
-
-    std::map<std::string, tl::Variant>::const_iterator v;
+    std::map<std::string, tl::Variant>::iterator v;
     v = m_local_vars.find (t);
     if (v != m_local_vars.end ()) {
-      value = &v->second;
+      var = &v->second;
     } else {
       value = EvalStaticConstant::constant_by_name (t);
     }
   }
 
-  if (! function && ! value) {
+  if (! function && ! value && ! var) {
     if (mp_parent) {
-      mp_parent->resolve_name (t, function, value);
+      mp_parent->resolve_name (t, function, value, var);
     } else if (this != &m_global) {
-      m_global.resolve_name (t, function, value);
+      m_global.resolve_name (t, function, value, var);
     }
   }
 }

@@ -75,8 +75,8 @@ struct LayoutQueryIteratorWrapper
   typedef void difference_type;
   typedef void pointer;
 
-  LayoutQueryIteratorWrapper (const db::LayoutQuery &q, const db::Layout *layout)
-    : mp_iter (new db::LayoutQueryIterator (q, layout))
+  LayoutQueryIteratorWrapper (const db::LayoutQuery &q, const db::Layout *layout, tl::Eval *eval)
+    : mp_iter (new db::LayoutQueryIterator (q, layout, eval))
   {
     //  .. nothing yet ..
   }
@@ -100,9 +100,9 @@ private:
   tl::shared_ptr<db::LayoutQueryIterator> mp_iter;
 };
 
-static LayoutQueryIteratorWrapper iterate (const db::LayoutQuery *q, const db::Layout *layout)
+static LayoutQueryIteratorWrapper iterate (const db::LayoutQuery *q, const db::Layout *layout, tl::Eval *eval)
 {
-  return LayoutQueryIteratorWrapper (*q, layout);
+  return LayoutQueryIteratorWrapper (*q, layout, eval);
 }
 
 static tl::Variant iter_get (db::LayoutQueryIterator *iter, const std::string &name)
@@ -187,18 +187,24 @@ Class<db::LayoutQuery> decl_LayoutQuery ("db", "LayoutQuery",
     "This method allows detection of the properties available. Within the query, all of these "
     "properties can be obtained from the query iterator using \\LayoutQueryIterator#get.\n"
   ) +
-  gsi::method ("execute", &db::LayoutQuery::execute, gsi::arg("layout"),
+  gsi::method ("execute", &db::LayoutQuery::execute, gsi::arg("layout"), gsi::arg ("context", (tl::Eval *) 0, "nil"),
     "@brief Executes the query\n"
     "\n"
     "This method can be used to execute \"active\" queries such\n"
     "as \"delete\" or \"with ... do\".\n"
     "It is basically equivalent to iterating over the query until it is\n"
     "done.\n"
+    "\n"
+    "The context argument allows supplying an expression execution context. This context can be used for "
+    "example to supply variables for the execution. It has been added in version 0.26.\n"
   ) +
-  gsi::iterator_ext ("each", &iterate, gsi::arg ("layout"),
+  gsi::iterator_ext ("each", &iterate, gsi::arg ("layout"), gsi::arg ("context", (tl::Eval *) 0, "nil"),
     "@brief Executes the query and delivered the results iteratively.\n"
     "The argument to the block is a \\LayoutQueryIterator object which can be "
     "asked for specific results.\n"
+    "\n"
+    "The context argument allows supplying an expression execution context. This context can be used for "
+    "example to supply variables for the execution. It has been added in version 0.26.\n"
   ),
   "@brief A layout query\n"
   "Layout queries are the backbone of the \"Search & replace\" feature. Layout queries allow retrieval of "

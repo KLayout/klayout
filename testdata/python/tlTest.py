@@ -24,6 +24,11 @@ class TLTest(unittest.TestCase):
 
   def test_1(self):
 
+    ctx = pya.ExpressionContext()
+    self.assertEqual(ctx.eval("1+2"), 3)
+    ctx.var("a", 21)
+    self.assertEqual(ctx.eval("2*a"), 42)
+
     expr = pya.Expression()
     res = expr.eval()
     self.assertEqual(str(type(res)).replace("class", "type"), "<type 'NoneType'>")

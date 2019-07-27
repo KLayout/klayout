@@ -118,3 +118,14 @@ TEST(9_blackboxing)
 {
   run_test (_this, "ringo_simple_blackboxing", "ringo_for_blackboxing.gds");
 }
+
+TEST(10_simplification_with_align)
+{
+  run_test (_this, "ringo_simple_simplification_with_align", "ringo_for_simplification.gds");
+}
+
+TEST(11_device_scaling)
+{
+  run_test (_this, "ringo_simple_device_scaling", "ringo.gds");
+}
+

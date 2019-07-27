@@ -36,6 +36,20 @@ namespace db
 {
 
 /**
+ *  @brief An interface which connects the netlist with a layout representation
+ *  Specifically this interface allows manipulating the layout in sync with the netlist.
+ */
+class DB_PUBLIC NetlistManipulationCallbacks
+  : public tl::Object
+{
+public:
+  NetlistManipulationCallbacks () { }
+  virtual ~NetlistManipulationCallbacks () { }
+
+  virtual size_t link_net_to_parent_circuit (const db::Net *subcircuit_net, db::Circuit *parent_circuit, const db::DCplxTrans &trans) = 0;
+};
+
+/**
  *  @brief The netlist class
  *
  *  This class represents a hierarchical netlist.
@@ -65,7 +79,7 @@ public:
    *
    *  This constructor creates an empty hierarchical netlist
    */
-  Netlist ();
+  Netlist (NetlistManipulationCallbacks *callbacks = 0);
 
   /**
    *  @brief Copy constructor
@@ -480,6 +494,7 @@ private:
   friend class Circuit;
   friend class DeviceAbstract;
 
+  tl::weak_ptr<db::NetlistManipulationCallbacks> mp_callbacks;
   circuit_list m_circuits;
   device_class_list m_device_classes;
   device_abstract_list m_device_abstracts;
@@ -493,6 +508,11 @@ private:
   object_by_attr<Netlist, Netlist::circuit_iterator, cell_index_attribute<Circuit> > m_circuit_by_cell_index;
   object_by_attr<Netlist, Netlist::device_abstract_iterator, name_attribute<DeviceAbstract> > m_device_abstract_by_name;
   object_by_attr<Netlist, Netlist::device_abstract_iterator, cell_index_attribute<DeviceAbstract> > m_device_abstract_by_cell_index;
+
+  db::NetlistManipulationCallbacks *callbacks ()
+  {
+    return mp_callbacks.get ();
+  }
 
   void invalidate_topology ();
   void validate_topology ();

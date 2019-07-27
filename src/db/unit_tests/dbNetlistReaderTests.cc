@@ -255,3 +255,42 @@ TEST(6_ReaderWithDelegate)
     "end;\n"
   );
 }
+
+TEST(7_GlobalNets)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader7.cir");
+
+  MyNetlistReaderDelegate delegate;
+  db::NetlistSpiceReader reader (&delegate);
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit RINGO (FB=FB,OUT=OUT,ENABLE=ENABLE,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit ND2X1 $1 (OUT='1',B=FB,A=ENABLE,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $2 (OUT='2',IN='1',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $3 (OUT='3',IN='2',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $4 (OUT='4',IN='3',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $5 (OUT='5',IN='4',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $6 (OUT='6',IN='5',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $7 (OUT='7',IN='6',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $8 (OUT='8',IN='7',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $9 (OUT='9',IN='8',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $10 (OUT='10',IN='9',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $11 (OUT=FB,IN='10',VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INVX1 $12 (OUT=OUT,IN=FB,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+    "circuit ND2X1 (OUT=OUT,B=B,A=A,VDD=VDD,VSS=VSS);\n"
+    "  device MLVPMOS $1 (S=OUT,G=A,D=VDD,B=VDD) (L=0.25,W=1.5,AS=0.6375,AD=0.3375,PS=3.85,PD=1.95);\n"
+    "  device MLVPMOS $2 (S=VDD,G=B,D=OUT,B=VDD) (L=0.25,W=1.5,AS=0.3375,AD=0.6375,PS=1.95,PD=3.85);\n"
+    "  device MLVNMOS $3 (S=VSS,G=A,D=INT,B=VSS) (L=0.25,W=0.95,AS=0.40375,AD=0.21375,PS=2.75,PD=1.4);\n"
+    "  device MLVNMOS $4 (S=INT,G=B,D=OUT,B=VSS) (L=0.25,W=0.95,AS=0.21375,AD=0.40375,PS=1.4,PD=2.75);\n"
+    "end;\n"
+    "circuit INVX1 (OUT=OUT,IN=IN,VDD=VDD,VSS=VSS);\n"
+    "  device MLVPMOS $1 (S=VDD,G=IN,D=OUT,B=VDD) (L=0.25,W=1.5,AS=0.6375,AD=0.6375,PS=3.85,PD=3.85);\n"
+    "  device MLVNMOS $2 (S=VSS,G=IN,D=OUT,B=VSS) (L=0.25,W=0.95,AS=0.40375,AD=0.40375,PS=2.75,PD=2.75);\n"
+    "end;\n"
+  );
+}

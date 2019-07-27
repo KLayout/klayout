@@ -115,6 +115,31 @@
   For example, "NMOS*" will flatten all circuits starting with "NMOS".
   </p>
 
+  <h2>Automatic circuit flattening (netlist alignment)</h2>
+
+  <p>
+  Instead of flattening circuits explicitly, automatic flattening is provided through
+  the <a href="/about/lvs_ref_global.xml#align">align</a> method.
+  </p>
+
+  <p>
+  The "align" step is optional, hence useful: it will identify cells in the 
+  layout without a corresponding schematic circuit and flatten them. "Flatten"
+  means their content is replicated inside their parent circuits and finally
+  the cell's corresponding circuit is removed. This is useful when the layout
+  contains structural cells: such cells are inserted not because the schematic
+  requires them as circuit building blocks, but because layout is easier to
+  create with these cells. Such cells can be PCells for devices or replication cells
+  which avoid duplicate layout work. 
+  </p>
+
+  <p>
+  The "align" method will also flatten schematic circuits for which there is no 
+  layout cell:
+  </p>
+
+  <pre>align</pre>
+
   <h2>Black boxing (circuit abstraction)</h2>
 
   <p>

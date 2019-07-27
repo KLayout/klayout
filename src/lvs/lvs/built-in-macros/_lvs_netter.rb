@@ -92,6 +92,46 @@ module LVS
     end
 
     # %LVS%
+    # @name align
+    # @brief Aligns the extracted netlist vs. the schematic
+    # @synopsis align
+    # The align method will modify the netlists in case of missing 
+    # corresponding circuits. It will flatten these circuits, thus 
+    # improving the equivalence between the netlists. Top level circuits
+    # are not flattened.
+    #
+    # This feature is in particular useful to remove structural cells
+    # like device PCells, reuse blocks etc.
+    # 
+    # This method will also remove schematic circuits for which there is
+    # no corresponding layout cell. In the extreme case of flat layout this
+    # will result in a flat vs. flat compare.
+    # 
+    # "netlist.flatten_circuit(...)" or "schematic.flatten_circuit(...)"
+    # are other (explicit) ways to flatten circuits.
+    #
+    # Please note that flattening circuits has some side effects such 
+    # as loss of details in the cross reference and net layout.
+
+    def align
+
+      nl = _ensure_two_netlists
+
+      # flatten layout cells for which there is no corresponding schematic circuit
+      @comparer.unmatched_circuits_a(*nl).each do |c|
+        @engine.info("Flatten layout cell (no schematic): #{c.name}")
+        nl[0].flatten_circuit(c)
+      end
+
+      # flatten schematic circuits for which there is no corresponding layout cell
+      @comparer.unmatched_circuits_b(*nl).each do |c|
+        @engine.info("Flatten schematic circuit (no layout): #{c.name}")
+        nl[1].flatten_circuit(c)
+      end
+
+    end
+
+    # %LVS%
     # @name compare
     # @brief Compares the extracted netlist vs. the schematic
     # @synopsis compare
@@ -99,12 +139,19 @@ module LVS
     # The compare can be configured in more details using \same_nets, \same_circuits,
     # \same_device_classes and \equivalent_pins.
     #
+    # The compare method will also modify the netlists in case of missing 
+    # corresponding circuits: the unpaired circuit will be flattened then.
+    #
     # This method will return true, if the netlists are equivalent and false
     # otherwise.
 
     def compare
-      lvs_data.reference = _ensure_two_netlists[1]
+
+      nl = _ensure_two_netlists
+      lvs_data.reference = nl[1]
+
       lvs_data.compare(@comparer)
+
     end
 
     def _ensure_two_netlists

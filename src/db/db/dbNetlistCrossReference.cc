@@ -141,6 +141,36 @@ struct by_expanded_name_value_compare
   }
 };
 
+struct ByDeviceClassNameCompare
+{
+  int operator() (const db::Device &a, const db::Device &b) const
+  {
+    if ((a.device_class () == 0) != (b.device_class () == 0)) {
+      return a.device_class () == 0 ? -1 : 1;
+    }
+    if (a.device_class () == 0) {
+      return 0;
+    } else {
+      return string_value_compare (a.device_class ()->name (), b.device_class ()->name ());
+    }
+  }
+};
+
+struct ByRefCircuitNameCompare
+{
+  int operator() (const db::SubCircuit &a, const db::SubCircuit &b) const
+  {
+    if ((a.circuit_ref () == 0) != (b.circuit_ref () == 0)) {
+      return a.circuit_ref () == 0 ? -1 : 1;
+    }
+    if (a.circuit_ref () == 0) {
+      return 0;
+    } else {
+      return string_value_compare (a.circuit_ref ()->name (), b.circuit_ref ()->name ());
+    }
+  }
+};
+
 template <class Obj>
 struct net_object_compare;
 
@@ -246,9 +276,15 @@ struct SortNetSubCircuitPins
 }
 
 void
-NetlistCrossReference::gen_end_netlist (const db::Netlist *, const db::Netlist *)
+NetlistCrossReference::sort_netlist ()
 {
   std::sort (m_circuits.begin (), m_circuits.end (), CircuitsCompareByName ());
+}
+
+void
+NetlistCrossReference::gen_end_netlist (const db::Netlist *, const db::Netlist *)
+{
+  //  .. nothing yet ..
 }
 
 void
@@ -324,14 +360,19 @@ NetlistCrossReference::gen_begin_circuit (const db::Circuit *a, const db::Circui
 }
 
 void
+NetlistCrossReference::sort_circuit ()
+{
+  std::stable_sort (mp_per_circuit_data->devices.begin (), mp_per_circuit_data->devices.end (), pair_data_compare<DevicePairData, ByDeviceClassNameCompare> ());
+  std::stable_sort (mp_per_circuit_data->subcircuits.begin (), mp_per_circuit_data->subcircuits.end (), pair_data_compare<SubCircuitPairData, ByRefCircuitNameCompare> ());
+
+  std::stable_sort (mp_per_circuit_data->pins.begin (), mp_per_circuit_data->pins.end (), pair_data_compare<PinPairData, by_name_value_compare<db::Pin> > ());
+  std::stable_sort (mp_per_circuit_data->nets.begin (), mp_per_circuit_data->nets.end (), pair_data_compare<NetPairData, by_name_value_compare<db::Net> > ());
+}
+
+void
 NetlistCrossReference::gen_end_circuit (const db::Circuit *, const db::Circuit *, Status status)
 {
   mp_per_circuit_data->status = status;
-
-  std::stable_sort (mp_per_circuit_data->devices.begin (), mp_per_circuit_data->devices.end (), pair_data_compare<DevicePairData, by_name_value_compare<db::Device> > ());
-  std::stable_sort (mp_per_circuit_data->pins.begin (), mp_per_circuit_data->pins.end (), pair_data_compare<PinPairData, by_name_value_compare<db::Pin> > ());
-  std::stable_sort (mp_per_circuit_data->subcircuits.begin (), mp_per_circuit_data->subcircuits.end (), pair_data_compare<SubCircuitPairData, by_name_value_compare<db::SubCircuit> > ());
-  std::stable_sort (mp_per_circuit_data->nets.begin (), mp_per_circuit_data->nets.end (), pair_data_compare<NetPairData, by_name_value_compare<db::Net> > ());
 
   m_current_circuits = std::make_pair((const db::Circuit *)0, (const db::Circuit *)0);
   mp_per_circuit_data = 0;

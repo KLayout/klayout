@@ -98,6 +98,41 @@ EqualDeviceParameters &EqualDeviceParameters::operator+= (const EqualDeviceParam
 }
 
 // --------------------------------------------------------------------------------
+//  AllDeviceParametersAreEqual class implementation
+
+AllDeviceParametersAreEqual::AllDeviceParametersAreEqual (double relative)
+  : m_relative (relative)
+{
+  //  .. nothing yet ..
+}
+
+bool AllDeviceParametersAreEqual::less (const db::Device &a, const db::Device &b) const
+{
+  const std::vector<db::DeviceParameterDefinition> &parameters = a.device_class ()->parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator c = parameters.begin (); c != parameters.end (); ++c) {
+    int cmp = compare_parameters (a.parameter_value (c->id ()), b.parameter_value (c->id ()), 0.0, m_relative);
+    if (cmp != 0) {
+      return cmp < 0;
+    }
+  }
+
+  return false;
+}
+
+bool AllDeviceParametersAreEqual::equal (const db::Device &a, const db::Device &b) const
+{
+  const std::vector<db::DeviceParameterDefinition> &parameters = a.device_class ()->parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator c = parameters.begin (); c != parameters.end (); ++c) {
+    int cmp = compare_parameters (a.parameter_value (c->id ()), b.parameter_value (c->id ()), 0.0, m_relative);
+    if (cmp != 0) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// --------------------------------------------------------------------------------
 //  DeviceClass class implementation
 
 DeviceClass::DeviceClass ()

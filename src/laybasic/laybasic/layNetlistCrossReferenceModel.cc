@@ -532,6 +532,11 @@ std::string NetlistCrossReferenceModel::device_status_hint (const circuit_pair &
                                 "Devices are identified by the nets they are attached to. Unmatched devices mean that\n"
                                 "at least one terminal net isn't matched with a corresponding net from the other netlist.\n"
                                 "Make all terminal nets match and the devices will match too."));
+    } else {
+      return tl::to_string (tr ("Devices don't match topologically.\n"
+                                "Check the terminal connections to identify the terminals not being connected to\n"
+                                "corresponding nets. Either the devices are not connected correctly or the nets\n"
+                                "need to be fixed before the devices will match too."));
     }
   } else if (cps.second == db::NetlistCrossReference::MatchWithWarning) {
     return tl::to_string (tr ("Topologically matching devices are found here but either the parameters or the\n"

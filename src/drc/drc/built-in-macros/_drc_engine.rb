@@ -1160,6 +1160,12 @@ CODE
     # See \Netter#l2n_data for a description of that function.
  
     # %DRC%
+    # @name device_scaling
+    # @brief Specifies a dimension scale factor for the geometrical device properties
+    # @synopsis device_scaling(factor)
+    # See \Netter#device_scaling for a description of that function.
+ 
+    # %DRC%
     # @name extract_devices
     # @brief Extracts devices for a given device extractor and device layer selection
     # @synopsis extract_devices(extractor, layer_hash)
@@ -1173,7 +1179,7 @@ CODE
     # yet, this method will trigger the extraction process.
     # See \Netter#netlist for a description of this function.
  
-    %w(connect connect_global clear_connections connect_implicit antenna_check l2n_data extract_devices netlist).each do |f|
+    %w(connect connect_global clear_connections connect_implicit antenna_check l2n_data device_scaling extract_devices netlist).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

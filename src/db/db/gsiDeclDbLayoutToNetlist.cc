@@ -198,6 +198,15 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("max_vertex_count", &db::LayoutToNetlist::max_vertex_count,
     "See \\max_vertex_count= for details about this attribute."
   ) +
+  gsi::method ("device_scaling=", &db::LayoutToNetlist::set_device_scaling, gsi::arg ("f"),
+   "@brief Sets the device scaling factor\n"
+   "This factor will scale the physical properties of the extracted devices\n"
+   "accordingly. The scale factor applies an isotropic shrink (<1) or expansion (>1).\n"
+  ) +
+  gsi::method ("device_scaling", &db::LayoutToNetlist::device_scaling,
+    "@brief Gets the device scaling factor\n"
+    "See \\device_scaling= for details about this attribute."
+  ) +
   gsi::method ("name", (const std::string &(db::LayoutToNetlist::*) () const) &db::LayoutToNetlist::name,
     "@brief Gets the name of the database\n"
   ) +

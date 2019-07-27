@@ -42,6 +42,25 @@ namespace db
 {
 
 // ------------------------------------------------------------------------------
+
+template <class Container, class Shape, class Trans> void insert_transformed (db::Layout &layout, Container &shapes, const Shape &s, const Trans &t);
+
+template <class Container, class Trans> void insert_transformed (db::Layout &layout, Container &shapes, const db::PolygonRef &s, const Trans &t)
+{
+  db::Polygon poly = s.obj ();
+  poly.transform (s.trans ());
+  if (! t.is_unity ()) {
+    poly.transform (t);
+  }
+  shapes.insert (db::PolygonRef (poly, layout.shape_repository ()));
+}
+
+template <class Container, class Trans> void insert_transformed (db::Layout & /*layout*/, Container &shapes, const db::Edge &s, const Trans &t)
+{
+  shapes.insert (s.transformed (t));
+}
+
+// ------------------------------------------------------------------------------
 //  Connectivity implementation
 
 Connectivity::Connectivity ()
@@ -993,7 +1012,6 @@ connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id,
     return;
   }
 
-  //  join the shape clusters
   local_clusters<T>::join_cluster_with (id, with_id);
 
   //  handle the connections by translating
@@ -2113,23 +2131,6 @@ hier_clusters<T>::clusters_per_cell (db::cell_index_type cell_index)
     c = m_per_cell_clusters.insert (std::make_pair (cell_index, connected_clusters<T> ())).first;
   }
   return c->second;
-}
-
-template <class Shape, class Trans> void insert_transformed (db::Layout &layout, db::Shapes &shapes, const Shape &s, const Trans &t);
-
-template <class Trans> void insert_transformed (db::Layout &layout, db::Shapes &shapes, const db::PolygonRef &s, const Trans &t)
-{
-  db::Polygon poly = s.obj ();
-  poly.transform (s.trans ());
-  if (! t.is_unity ()) {
-    poly.transform (t);
-  }
-  shapes.insert (db::PolygonRef (poly, layout.shape_repository ()));
-}
-
-template <class Trans> void insert_transformed (db::Layout & /*layout*/, db::Shapes &shapes, const db::Edge &s, const Trans &t)
-{
-  shapes.insert (s.transformed (t));
 }
 
 template <class T>

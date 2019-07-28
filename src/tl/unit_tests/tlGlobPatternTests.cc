@@ -30,6 +30,15 @@ TEST(1)
   tl::GlobPattern a ("*");
   tl::GlobPattern b ("a");
 
+  EXPECT_EQ (a.is_catchall (), true);
+  EXPECT_EQ (a.is_const (), false);
+  EXPECT_EQ (tl::GlobPattern (a).is_catchall (), true);
+  EXPECT_EQ (tl::GlobPattern (a).is_const (), false);
+  EXPECT_EQ (b.is_catchall (), false);
+  EXPECT_EQ (b.is_const (), true);
+  EXPECT_EQ (tl::GlobPattern (b).is_catchall (), false);
+  EXPECT_EQ (tl::GlobPattern (b).is_const (), true);
+
   EXPECT_EQ (a.match ("abc"), true);
   EXPECT_EQ (a.match ("a"), true);
   EXPECT_EQ (a.match (""), true);
@@ -43,6 +52,13 @@ TEST(2)
   tl::GlobPattern a ("*a*");
   tl::GlobPattern b ("*a?");
   tl::GlobPattern c ("*a\\?");
+
+  EXPECT_EQ (a.is_catchall (), false);
+  EXPECT_EQ (a.is_const (), false);
+  EXPECT_EQ (b.is_catchall (), false);
+  EXPECT_EQ (b.is_const (), false);
+  EXPECT_EQ (c.is_catchall (), false);
+  EXPECT_EQ (c.is_const (), false);
 
   EXPECT_EQ (a.match ("abc"), true);
   EXPECT_EQ (a.match ("a"), true);

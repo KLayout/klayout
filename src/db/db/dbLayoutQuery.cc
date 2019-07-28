@@ -167,6 +167,16 @@ public:
     return m_pattern.match (s, mp_eval->match_substrings ());
   }
 
+  bool is_catchall () const
+  {
+    return ! m_needs_eval && m_pattern.is_catchall ();
+  }
+
+  bool is_const () const
+  {
+    return ! m_needs_eval && m_pattern.is_const ();
+  }
+
 private:
   tl::GlobPattern m_pattern;
   tl::Expression m_expression;
@@ -484,9 +494,28 @@ public:
   ChildCellFilterState (const FilterBase *filter, const NameFilterArgument &pattern, ChildCellFilterInstanceMode instance_mode, tl::Eval &eval, db::Layout *layout, bool reading, const ChildCellFilterPropertyIDs &pids)
     : FilterStateBase (filter, layout, eval),
       m_pattern (pattern, eval), m_instance_mode (instance_mode), mp_parent (0), m_pids (pids),
-      m_weight (0), m_references (0), m_weight_set (false), m_references_set (false), m_reading (reading)
+      m_weight (0), m_references (0), m_weight_set (false), m_references_set (false), m_reading (reading),
+      m_cell_index (std::numeric_limits<db::cell_index_type>::max ())
   {
     //  .. nothing yet ..
+  }
+
+  bool cell_matches (db::cell_index_type ci)
+  {
+    if (m_pattern.is_catchall ()) {
+      return true;
+    } else if (m_cell_index != std::numeric_limits<db::cell_index_type>::max ()) {
+      return ci == db::cell_index_type (m_cell_index);
+    } else if (m_pattern.is_const ()) {
+      if (m_pattern.match (layout ()->cell (ci).get_qualified_name ())) {
+        m_cell_index = ci;
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return (m_pattern.match (layout ()->cell (ci).get_qualified_name ()));
+    }
   }
 
   virtual void reset (FilterStateBase *previous) 
@@ -511,7 +540,7 @@ public:
 
       m_top_cell = layout ()->begin_top_down ();
       m_top_cell_end = layout ()->end_top_cells ();
-      while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !m_pattern.match (layout ()->cell (*m_top_cell).get_qualified_name ()))) {
+      while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !cell_matches (*m_top_cell))) {
         ++m_top_cell;
       }
 
@@ -524,7 +553,7 @@ public:
       if (m_instance_mode == NoInstances) {
 
         m_child_cell = mp_parent->begin_child_cells ();
-        while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !m_pattern.match (layout ()->cell (*m_child_cell).get_qualified_name ()))) {
+        while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !cell_matches (*m_child_cell))) {
           ++m_child_cell;
         } 
 
@@ -536,7 +565,7 @@ public:
         while (m_inst != m_inst_end) {
 
           db::cell_index_type cid = (*m_inst)->object ().cell_index ();
-          if (layout ()->is_valid_cell_index (cid) && m_pattern.match (layout ()->cell (cid).get_qualified_name ())) {
+          if (layout ()->is_valid_cell_index (cid) && cell_matches (cid)) {
             break;
           }
 
@@ -576,7 +605,7 @@ public:
 
         do {
           ++m_child_cell;
-        } while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !m_pattern.match (layout ()->cell (*m_child_cell).get_qualified_name ())));
+        } while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !cell_matches (*m_child_cell)));
 
       } else {
 
@@ -600,7 +629,7 @@ public:
               while (m_inst != m_inst_end) {
 
                 cid = (*m_inst)->object ().cell_index ();
-                if (layout ()->is_valid_cell_index (cid) && m_pattern.match (layout ()->cell (cid).get_qualified_name ())) {
+                if (layout ()->is_valid_cell_index (cid) && cell_matches (cid)) {
                   break;
                 }
 
@@ -636,7 +665,7 @@ public:
 
       do {
         ++m_top_cell;
-      } while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !m_pattern.match (layout ()->cell (*m_top_cell).get_qualified_name ())));
+      } while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !cell_matches (*m_top_cell)));
 
     }
   }
@@ -1028,6 +1057,7 @@ private:
   bool m_reading;
   std::set<db::Instance> m_ignored;
   db::Instance m_i;
+  db::cell_index_type m_cell_index;
 };
 
 class DB_PUBLIC ChildCellFilter
@@ -1126,9 +1156,28 @@ public:
       m_pids (pids),
       m_pattern (pattern, eval),
       mp_parent (0),
-      m_reading (reading)
+      m_reading (reading),
+      m_cell_index (std::numeric_limits<db::cell_index_type>::max ())
   {
     //  .. nothing yet ..
+  }
+
+  bool cell_matches (db::cell_index_type ci)
+  {
+    if (m_pattern.is_catchall ()) {
+      return true;
+    } else if (m_cell_index != std::numeric_limits<db::cell_index_type>::max ()) {
+      return ci == db::cell_index_type (m_cell_index);
+    } else if (m_pattern.is_const ()) {
+      if (m_pattern.match (layout ()->cell (ci).get_qualified_name ())) {
+        m_cell_index = ci;
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return (m_pattern.match (layout ()->cell (ci).get_qualified_name ()));
+    }
   }
 
   virtual void reset (FilterStateBase *previous) 
@@ -1140,7 +1189,7 @@ public:
     m_cell = layout ()->begin_top_down ();
     m_cell_end = layout ()->end_top_down ();
 
-    while (m_cell != m_cell_end && !m_pattern.match (layout ()->cell (*m_cell).get_qualified_name ())) {
+    while (m_cell != m_cell_end && !cell_matches (*m_cell)) {
       ++m_cell;
     }
 
@@ -1158,7 +1207,7 @@ public:
   {
     do {
       ++m_cell;
-    } while (m_cell != m_cell_end && !m_pattern.match (layout ()->cell (*m_cell).get_qualified_name ()));
+    } while (m_cell != m_cell_end && !cell_matches (*m_cell));
   }
 
   virtual bool at_end () 
@@ -1275,6 +1324,7 @@ private:
   db::Layout::top_down_const_iterator m_cell, m_cell_end;
   std::auto_ptr<db::CellCounter> m_cell_counter;
   bool m_reading;
+  db::cell_index_type m_cell_index;
 };
 
 class DB_PUBLIC CellFilter

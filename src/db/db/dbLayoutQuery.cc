@@ -177,6 +177,16 @@ public:
     return ! m_needs_eval && m_pattern.is_const ();
   }
 
+  bool needs_eval () const
+  {
+    return m_needs_eval;
+  }
+
+  const std::string &pattern () const
+  {
+    return m_pattern.pattern ();
+  }
+
 private:
   tl::GlobPattern m_pattern;
   tl::Expression m_expression;
@@ -502,6 +512,11 @@ public:
 
   bool cell_matches (db::cell_index_type ci)
   {
+    //  prefilter with the cell objectives
+    if (! objectives ().wants_all_cells () && ! objectives ().wants_cell (ci)) {
+      return false;
+    }
+
     if (m_pattern.is_catchall ()) {
       return true;
     } else if (m_cell_index != std::numeric_limits<db::cell_index_type>::max ()) {
@@ -515,6 +530,58 @@ public:
       }
     } else {
       return (m_pattern.match (layout ()->cell (ci).get_qualified_name ()));
+    }
+  }
+
+  virtual void do_init ()
+  {
+    if (m_pattern.is_catchall () || m_pattern.needs_eval ()) {
+
+      if (! objectives ().wants_all_cells ()) {
+
+        //  wildcard or unknown filter: include the parent cells if specific child cells are looked for
+
+        int levels = 1;
+        for (size_t i = 0; i < followers ().size (); ++i) {
+          if (followers ()[i] == 0) {
+            //  this is a sign of recursion - collect caller cells from all levels.
+            levels = -1;
+          }
+        }
+
+        //  this means, one follower wants only certain cells. We can optimize by only checking for potential parents
+        std::set<db::cell_index_type> callers;
+        for (FilterStateObjectives::cell_iterator c = objectives ().begin_cells (); c != objectives ().end_cells (); ++c) {
+          layout ()->cell (*c).collect_caller_cells (callers, levels);
+        }
+
+        for (std::set<db::cell_index_type>::const_iterator c = callers.begin (); c != callers.end (); ++c) {
+          objectives ().request_cell (*c);
+        }
+
+      }
+
+    } else if (m_pattern.is_const ()) {
+
+      objectives ().set_wants_all_cells (false);
+
+      //  include the cell with the name we look for into the objectives
+      std::pair<bool, db::cell_index_type> cell_by_name = layout ()->cell_by_name (m_pattern.pattern ().c_str ());
+      if (cell_by_name.first) {
+        objectives ().request_cell (cell_by_name.second);
+      }
+
+    } else {
+
+      objectives ().set_wants_all_cells (false);
+
+      //  include all matching cells into the objectives
+      for (db::Layout::const_iterator c = layout ()->begin (); c != layout ()->end(); ++c) {
+        if (m_pattern.match (layout ()->cell_name (c->cell_index()))) {
+          objectives ().request_cell (c->cell_index ());
+        }
+      }
+
     }
   }
 
@@ -1999,6 +2066,7 @@ LayoutQueryIterator::init ()
 {
   std::vector<FilterStateBase *> f;
   mp_root_state = mp_q->root ().create_state (f, mp_layout, m_eval, false);
+  mp_root_state->init ();
   mp_root_state->reset (0);
   m_state.push_back (mp_root_state);
 
@@ -2867,11 +2935,90 @@ FilterBracket::optimize ()
 }
 
 // --------------------------------------------------------------------------------
+//  FilterStateObjectives implementation
+
+FilterStateObjectives::FilterStateObjectives ()
+  : m_wants_all_cells (false)
+{
+  //  .. nothing yet ..
+}
+
+FilterStateObjectives FilterStateObjectives::everything ()
+{
+  FilterStateObjectives all;
+  all.set_wants_all_cells (true);
+  return all;
+}
+
+FilterStateObjectives &
+FilterStateObjectives::operator+= (const FilterStateObjectives &other)
+{
+  if (! m_wants_all_cells) {
+    m_wants_all_cells = other.m_wants_all_cells;
+    if (! m_wants_all_cells) {
+      m_wants_cells.insert (other.m_wants_cells.begin (), other.m_wants_cells.end ());
+    }
+  }
+
+  return *this;
+}
+
+void
+FilterStateObjectives::set_wants_all_cells (bool f)
+{
+  m_wants_cells.clear ();
+  m_wants_all_cells = f;
+}
+
+void
+FilterStateObjectives::request_cell (db::cell_index_type ci)
+{
+  if (! m_wants_all_cells) {
+    m_wants_cells.insert (ci);
+  }
+}
+
+bool
+FilterStateObjectives::wants_cell (db::cell_index_type ci) const
+{
+  return m_wants_cells.find (ci) != m_wants_cells.end ();
+}
+
+// --------------------------------------------------------------------------------
 //  FilterStateBase implementation
 
 FilterStateBase::FilterStateBase (const FilterBase *filter, db::Layout *layout, tl::Eval &eval)
   : mp_previous (0), mp_filter (filter), mp_layout (layout), m_follower (0), mp_eval (&eval)
 {
+}
+
+void
+FilterStateBase::init (bool recursive)
+{
+  if (m_followers.empty ()) {
+
+    m_objectives = FilterStateObjectives::everything ();
+
+  } else {
+
+    for (std::vector<FilterStateBase *>::const_iterator f = m_followers.begin (); f != m_followers.end (); ++f) {
+      if (*f) {
+        if (recursive) {
+          (*f)->init ();
+        }
+        m_objectives += (*f)->objectives ();
+      }
+    }
+
+  }
+
+  do_init ();
+}
+
+void
+FilterStateBase::do_init ()
+{
+  //  .. nothing yet ..
 }
 
 void
@@ -2903,6 +3050,7 @@ FilterStateBase::child () const
     if (! b && mp_filter && mp_layout) {
       //  dynamically create a new recursive state execution graph snippet if required
       b = mp_filter->create_state (m_followers, mp_layout, *mp_eval, true);
+      b->init (false);
       m_followers [m_follower] = b;
     }
 

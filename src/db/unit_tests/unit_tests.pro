@@ -29,7 +29,6 @@ SOURCES = \
   dbLayout.cc \
   dbLayoutDiff.cc \
   dbLayoutUtils.cc \
-  dbLayoutQuery.cc \
   dbLibraries.cc \
   dbMatrix.cc \
   dbObject.cc \
@@ -72,7 +71,8 @@ SOURCES = \
     dbDeepEdgePairsTests.cc \
     dbNetlistCompareTests.cc \
     dbNetlistReaderTests.cc \
-    dbLayoutVsSchematicTests.cc
+    dbLayoutVsSchematicTests.cc \
+    dbLayoutQueryTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

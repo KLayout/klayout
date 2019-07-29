@@ -513,7 +513,7 @@ public:
   bool cell_matches (db::cell_index_type ci)
   {
     //  prefilter with the cell objectives
-    if (! objectives ().wants_all_cells () && ! objectives ().wants_cell (ci)) {
+    if (! objectives ().wants_cell (ci)) {
       return false;
     }
 
@@ -2960,6 +2960,10 @@ FilterStateObjectives::operator+= (const FilterStateObjectives &other)
     }
   }
 
+  if (m_wants_all_cells) {
+    m_wants_cells.clear ();
+  }
+
   return *this;
 }
 
@@ -2981,7 +2985,7 @@ FilterStateObjectives::request_cell (db::cell_index_type ci)
 bool
 FilterStateObjectives::wants_cell (db::cell_index_type ci) const
 {
-  return m_wants_cells.find (ci) != m_wants_cells.end ();
+  return m_wants_all_cells || m_wants_cells.find (ci) != m_wants_cells.end ();
 }
 
 // --------------------------------------------------------------------------------

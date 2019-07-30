@@ -61,6 +61,7 @@
 #include "layLayoutCanvas.h"
 #include "layLayerControlPanel.h"
 #include "layHierarchyControlPanel.h"
+#include "layLibrariesView.h"
 #include "layBrowser.h"
 #include "layRedrawThread.h"
 #include "layRedrawThreadWorker.h"
@@ -356,6 +357,8 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   mp_control_frame = 0;
   mp_hierarchy_panel = 0;
   mp_hierarchy_frame = 0;
+  mp_libraries_view = 0;
+  mp_libraries_frame = 0;
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
   m_from_level = 0;
@@ -488,6 +491,25 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
 
     connect (mp_min_hier_spbx, SIGNAL (valueChanged (int)), this, SLOT (min_hier_changed (int)));
     connect (mp_max_hier_spbx, SIGNAL (valueChanged (int)), this, SLOT (max_hier_changed (int)));
+
+  }
+
+  if ((m_options & LV_NoLibrariesView) == 0 && (m_options & LV_Naked) == 0) {
+
+    QFrame *libraries_frame = new QFrame (0);
+    libraries_frame->setObjectName (QString::fromUtf8 ("libs_frame"));
+    mp_libraries_frame = libraries_frame;
+    QVBoxLayout *left_frame_ly = new QVBoxLayout (libraries_frame);
+    left_frame_ly->setMargin (0);
+    left_frame_ly->setSpacing (0);
+
+    mp_libraries_view = new lay::LibrariesView (this, libraries_frame, "libs");
+    left_frame_ly->addWidget (mp_libraries_view, 1 /*stretch*/);
+
+#if 0 // @@@
+    connect (mp_libraries_view, SIGNAL (cell_selected (cell_path_type, int)), this, SLOT (select_cell_dispatch (cell_path_type, int)));
+    connect (mp_libraries_view, SIGNAL (active_cellview_changed (int)), this, SLOT (active_cellview_changed (int)));
+#endif
 
   }
 
@@ -628,6 +650,12 @@ LayoutView::~LayoutView ()
   }
   mp_hierarchy_frame = 0;
   mp_hierarchy_panel = 0;
+
+  if (mp_libraries_frame) {
+    delete mp_libraries_frame;
+  }
+  mp_libraries_frame = 0;
+  mp_libraries_view = 0;
 }
 
 void LayoutView::hideEvent (QHideEvent *)
@@ -7243,7 +7271,7 @@ LayoutView::sizeHint () const
 {
   if ((m_options & LV_Naked) != 0) {
     return QSize (200, 200);
-  } else if ((m_options & LV_NoLayers) != 0 || (m_options & LV_NoHierarchyPanel) != 0) {
+  } else if ((m_options & LV_NoLayers) != 0 || (m_options & LV_NoHierarchyPanel) != 0 || (m_options & LV_NoLibrariesView) != 0) {
     return QSize (400, 200);
   } else {
     return QSize (600, 200);

@@ -284,8 +284,21 @@ CellTreeModel::~CellTreeModel ()
 void
 CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
 {
-  bool flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
   db::Layout *layout = & view->cellview (cv_index)->layout ();
+
+  do_configure (layout, view, cv_index, flags, base, sorting);
+}
+
+void
+CellTreeModel::configure (db::Layout *layout, unsigned int flags, const db::Cell *base, Sorting sorting)
+{
+  do_configure (layout, 0, -1, flags, base, sorting);
+}
+
+void
+CellTreeModel::do_configure (db::Layout *layout, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
+{
+  bool flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
 
   bool need_reset = false;
   if (flat != m_flat || layout != mp_layout || view != mp_view) {
@@ -300,13 +313,17 @@ CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flag
 
   if (view != mp_view) {
 
-    mp_view->cell_visibility_changed_event.remove (this, &CellTreeModel::signal_data_changed);
-    mp_view->cellview_changed_event.remove (this, &CellTreeModel::signal_data_changed_with_int);
+    if (mp_view) {
+      mp_view->cell_visibility_changed_event.remove (this, &CellTreeModel::signal_data_changed);
+      mp_view->cellview_changed_event.remove (this, &CellTreeModel::signal_data_changed_with_int);
+    }
 
     mp_view = view;
 
-    mp_view->cell_visibility_changed_event.add (this, &CellTreeModel::signal_data_changed);
-    mp_view->cellview_changed_event.add (this, &CellTreeModel::signal_data_changed_with_int);
+    if (mp_view) {
+      mp_view->cell_visibility_changed_event.add (this, &CellTreeModel::signal_data_changed);
+      mp_view->cellview_changed_event.add (this, &CellTreeModel::signal_data_changed_with_int);
+    }
 
   }
 
@@ -406,7 +423,7 @@ void
 CellTreeModel::set_sorting (Sorting s)
 {
   if (s != m_sorting) {
-    configure (mp_view, m_cv_index, m_flags, mp_base, s);
+    do_configure (mp_layout, mp_view, m_cv_index, m_flags, mp_base, s);
   }
 }
 

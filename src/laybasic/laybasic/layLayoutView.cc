@@ -73,6 +73,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbManager.h"
 #include "dbEdgeProcessor.h"
+#include "dbLibrary.h"
 #include "rdb.h"
 #include "rdbMarkerBrowserDialog.h"
 #include "dbLayoutToNetlist.h"
@@ -508,8 +509,8 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
 
 #if 0 // @@@
     connect (mp_libraries_view, SIGNAL (cell_selected (cell_path_type, int)), this, SLOT (select_cell_dispatch (cell_path_type, int)));
-    connect (mp_libraries_view, SIGNAL (active_cellview_changed (int)), this, SLOT (active_cellview_changed (int)));
 #endif
+    connect (mp_libraries_view, SIGNAL (active_library_changed (int)), this, SLOT (active_library_changed (int)));
 
   }
 
@@ -818,6 +819,7 @@ LayoutView::init_menu (lay::AbstractMenu &menu)
 {
   lay::LayerControlPanel::init_menu (menu);
   lay::HierarchyControlPanel::init_menu (menu);
+  lay::LibrariesView::init_menu (menu);
 }
 
 void
@@ -976,6 +978,22 @@ LayoutView::configure (const std::string &name, const std::string &value)
     tl::from_string (value, f);
     if (mp_hierarchy_panel) {
       mp_hierarchy_panel->set_split_mode (f);
+    }
+    return true;
+
+  } else if (name == cfg_split_lib_views) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_libraries_view) {
+      mp_libraries_view->set_split_mode (f);
+    }
+    return true;
+
+  } else if (name == cfg_current_lib_view) {
+
+    if (mp_libraries_view) {
+      mp_libraries_view->select_active_lib_by_name (value);
     }
     return true;
 
@@ -4500,6 +4518,11 @@ LayoutView::background_color (QColor c)
     mp_hierarchy_panel->set_text_color (contrast);
   }
 
+  if (mp_libraries_view) {
+    mp_libraries_view->set_background_color (c);
+    mp_libraries_view->set_text_color (contrast);
+  }
+
   if (mp_selection_service) {
     mp_selection_service->set_colors (c, contrast);
   }
@@ -4576,6 +4599,19 @@ LayoutView::active_cellview_changed (int index)
     }
 
   }
+}
+
+void
+LayoutView::active_library_changed (int /*index*/)
+{
+  std::string lib_name;
+  if (mp_libraries_view->active_lib ()) {
+    lib_name = mp_libraries_view->active_lib ()->get_name ();
+  }
+
+  //  commit the new active library to the other views and persist this state
+  //  TODO: could be passed through the LibraryController (like through some LibraryController::active_library)
+  plugin_root ()->config_set (cfg_current_lib_view, lib_name);
 }
 
 void

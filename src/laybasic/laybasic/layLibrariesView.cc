@@ -42,6 +42,8 @@
 
 #include "dbClipboard.h"
 #include "dbClipboardData.h"
+#include "dbLibraryManager.h"
+#include "dbLibrary.h"
 #include "layLibrariesView.h"
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
@@ -200,7 +202,10 @@ void
 LibrariesView::init_menu (lay::AbstractMenu &menu)
 {
   MenuLayoutEntry context_menu [] = {
-    MenuLayoutEntry ("split_mode",                  tl::to_string (QObject::tr ("Split Mode")),             std::make_pair (cfg_split_cell_list, "?")),
+#if 0
+    //  doesn't make sense for many libs
+    MenuLayoutEntry ("split_mode",                  tl::to_string (QObject::tr ("Split Mode")),             std::make_pair (cfg_split_lib_views, "?")),
+#endif
 #if 0 // @@@
     MenuLayoutEntry::separator ("operations_group"),
     MenuLayoutEntry ("new_cell:edit:edit_mode",     tl::to_string (QObject::tr ("New Cell")),               SLOT (cm_new_cell ())),
@@ -328,10 +333,7 @@ LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char
   sp.setVerticalStretch (0);
   setSizePolicy (sp);
 
-#if 0 // @@@ TODO: attach to library controller
-  mp_view->cellviews_changed_event.add (this, &LibrariesView::update_required);
-  mp_view->hier_changed_event.add (this, &LibrariesView::update_required);
-#endif
+  db::LibraryManager::instance ().changed_event.add (this, &LibrariesView::update_required);
 
   do_update_content ();
 }
@@ -680,12 +682,17 @@ LibrariesView::set_text_color (QColor c)
   }
 }
 
-#if 0 // @@@
+void
+LibrariesView::update_required ()
+{
+  m_do_full_update_content_dm ();
+}
+
 void
 LibrariesView::do_full_update_content ()
 {
   size_t i = 0;
-  for (std::vector <lay::CellView>::const_iterator cv = m_cellviews.begin (); cv != m_cellviews.end (); ++cv, ++i) {
+  for (db::LibraryManager::iterator lib = db::LibraryManager::instance ().begin (); lib != db::LibraryManager::instance ().end (); ++lib, ++i) {
     if (m_needs_update.size () > i) {
       m_needs_update [i] = true;
     }
@@ -698,18 +705,211 @@ LibrariesView::do_full_update_content ()
 }
 
 void
-LibrariesView::update_required ()
+LibrariesView::do_update_content (int lib_index)
 {
-  m_do_full_update_content_dm ();
+  //  close the search box since we will modify the model
+  mp_search_frame->hide ();
+  mp_search_model = 0;
+
+  size_t imin = (lib_index < 0 ? 0 : (size_t) lib_index);
+  size_t imax = (lib_index < 0 ? std::numeric_limits <size_t>::max () : (size_t) lib_index);
+
+  std::vector<db::Library *> libraries;
+  for (db::LibraryManager::iterator lib = db::LibraryManager::instance ().begin (); lib != db::LibraryManager::instance ().end (); ++lib) {
+    libraries.push_back (db::LibraryManager::instance ().lib (lib->second));
+  }
+
+  for (size_t i = imin; i < libraries.size () && i <= imax; ++i) {
+    if (i < m_libraries.size () && ! m_libraries[i].get ()) {
+      tl_assert (i < m_force_close.size ());
+      m_force_close [i] = true;
+    }
+    if (i >= m_force_close.size ()) {
+      m_force_close.push_back (true);
+    }
+    if (i >= m_needs_update.size ()) {
+      m_needs_update.push_back (true);
+    }
+    if (i >= libraries.size ()) {
+      m_force_close [i] = true;
+      m_needs_update [i] = true;
+    }
+  }
+
+  size_t n = std::min (m_libraries.size (), libraries.size ());
+  for (size_t i = imin; i < n && i <= imax; ++i) {
+
+    if (m_libraries [i].get () != libraries [i]) {
+      m_needs_update [i] = true;
+      m_force_close [i] = true;
+    }
+
+    if (m_needs_update [i]) {
+      mp_cell_lists [i]->doItemsLayout ();   //  triggers a redraw
+    }
+
+    m_libraries [i].reset (libraries [i]);
+
+  }
+
+  if (m_libraries.size () < libraries.size ()) {
+    for (size_t i = n; i < libraries.size (); ++i) {
+      m_libraries.push_back (tl::weak_ptr<db::Library> (libraries [i]));
+    }
+  } else if (m_libraries.size () > libraries.size ()) {
+    m_libraries.erase (m_libraries.begin () + libraries.size (), m_libraries.end ());
+  }
+
+  bool split_mode = m_split_mode;
+  //  for more than max_cellviews_in_split_mode cellviews, switch to overlay mode
+  if (int (m_libraries.size ()) > max_cellviews_in_split_mode) {
+    split_mode = false;
+  }
+
+  while (mp_cell_lists.size () < m_libraries.size ()) {
+
+    size_t i = mp_cell_lists.size ();
+
+    QPalette pl;
+
+    QFrame *cl_frame = new QFrame (this);
+    cl_frame->setFrameShape (QFrame::NoFrame);
+    QVBoxLayout *cl_ly = new QVBoxLayout (cl_frame);
+    cl_ly->setSpacing (0);
+    cl_ly->setContentsMargins (0, 0, 0, 0);
+
+    QToolButton *header = new QToolButton (cl_frame);
+    connect (header, SIGNAL (clicked ()), this, SLOT (header_clicked ()));
+    header->setText (tl::to_qstring (display_string (int (i))));
+    header->setFocusPolicy (Qt::NoFocus);
+    header->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Preferred);
+    header->setCheckable (true);
+    header->setAutoRaise (true);
+    header->setAutoFillBackground (true);
+    header->setVisible (split_mode);
+    cl_ly->addWidget (header);
+
+    LibraryTreeWidget *cell_list = new LibraryTreeWidget (cl_frame, "tree", mp_view->view_object_widget ());
+    cl_ly->addWidget (cell_list);
+    cell_list->setModel (new CellTreeModel (cell_list, &m_libraries [i]->layout (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells, 0));
+    cell_list->setUniformRowHeights (true);
+
+    pl = cell_list->palette ();
+    if (m_text_color.isValid ()) {
+      pl.setColor (QPalette::Text, m_text_color);
+    }
+    if (m_background_color.isValid ()) {
+      pl.setColor (QPalette::Base, m_background_color);
+    }
+    cell_list->setPalette (pl);
+
+    cell_list->header ()->hide ();
+    cell_list->setSelectionMode (QTreeView::ExtendedSelection);
+    cell_list->setRootIsDecorated (false);
+    cell_list->setContextMenuPolicy (Qt::CustomContextMenu);
+
+    connect (cell_list, SIGNAL (customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
+#if 0 // @@@
+    connect (cell_list, SIGNAL (cell_clicked (const QModelIndex &)), this, SLOT (clicked (const QModelIndex &)));
+    connect (cell_list, SIGNAL (cell_double_clicked (const QModelIndex &)), this, SLOT (double_clicked (const QModelIndex &)));
+    connect (cell_list, SIGNAL (cell_middle_clicked (const QModelIndex &)), this, SLOT (middle_clicked (const QModelIndex &)));
+    connect (cell_list, SIGNAL (search_triggered (const QString &)), this, SLOT (search_triggered (const QString &)));
+#endif
+
+    mp_cell_lists.push_back (cell_list);
+    mp_cell_list_frames.push_back (cl_frame);
+    mp_cell_list_headers.push_back (header);
+
+    mp_splitter->addWidget (cl_frame);
+
+  }
+
+  while (mp_cell_lists.size () > m_libraries.size ()) {
+    delete mp_cell_list_frames.back ();
+    mp_cell_list_frames.pop_back ();
+    mp_cell_list_headers.pop_back ();
+    mp_cell_lists.pop_back ();
+  }
+
+  for (unsigned int i = imin; i < m_libraries.size () && i < (unsigned int) mp_selector->count () && i <= imax; ++i) {
+    mp_selector->setItemText (i, tl::to_qstring (display_string (i)));
+  }
+  while (mp_selector->count () < int (m_libraries.size ())) {
+    mp_selector->addItem (tl::to_qstring (display_string (mp_selector->count ())));
+  }
+  while (mp_selector->count () > int (m_libraries.size ())) {
+    mp_selector->removeItem (mp_selector->count () - 1);
+  }
+
+  if (m_active_index >= int (m_libraries.size ())) {
+    m_active_index = int (m_libraries.size ()) - 1;
+  } else if (m_active_index < 0 && ! m_libraries.empty ()) {
+    m_active_index = 0;
+  }
+  mp_selector->setCurrentIndex (m_active_index);
+  mp_selector->setVisible (mp_cell_lists.size () > 1 && ! split_mode);
+
+  for (unsigned int i = imin; i < m_libraries.size () && i <= imax; ++i) {
+
+    if (m_needs_update [i]) {
+
+      mp_cell_list_headers [i]->setText (tl::to_qstring (display_string (i)));
+
+      //  draw the cells in the level of the current cell,
+      //  add an "above" entry if there is a level above.
+      //  highlight the current entry. If the index is
+      //  invalid, just clear the list.
+
+      if (m_force_close [i]) {
+
+        m_force_close [i] = false;
+
+        CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [i]->model ());
+        if (model) {
+          model->configure (& m_libraries [i]->layout (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells, 0);
+        }
+
+      }
+
+      m_needs_update [i] = false;
+
+    }
+
+    mp_cell_list_headers [i]->setVisible (split_mode && m_libraries.size () > 1);
+    mp_cell_list_headers [i]->setChecked (int (i) == m_active_index);
+
+    mp_cell_list_frames [i]->setVisible (int (i) == m_active_index || split_mode);
+
+  }
 }
 
 void
-LibrariesView::select_active (int cellview_index)
+LibrariesView::select_active_lib_by_name (const std::string &name)
 {
-  if (cellview_index != m_active_index) {
-    mp_selector->setCurrentIndex (cellview_index);
-    selection_changed (cellview_index);
+  for (std::vector<tl::weak_ptr<db::Library> >::const_iterator i = m_libraries.begin (); i != m_libraries.end (); ++i) {
+    if (i->get () && (*i)->get_name () == name) {
+      select_active (int (i - m_libraries.begin ()));
+      break;
+    }
   }
+}
+
+void
+LibrariesView::select_active (int lib_index)
+{
+  if (lib_index != m_active_index) {
+    mp_selector->setCurrentIndex (lib_index);
+    selection_changed (lib_index);
+  }
+}
+
+db::Library *
+LibrariesView::active_lib ()
+{
+  if (m_active_index >= 0 && m_active_index < int (m_libraries.size ())) {
+    return m_libraries [m_active_index].get ();
+  }
+  return 0;
 }
 
 void
@@ -721,7 +921,7 @@ LibrariesView::selection_changed (int index)
 
     bool split_mode = m_split_mode;
     //  for more than max_cellviews_in_split_mode cellviews, switch to overlay mode
-    if (int (m_cellviews.size ()) > max_cellviews_in_split_mode) {
+    if (int (m_libraries.size ()) > max_cellviews_in_split_mode) {
       split_mode = false;
     }
 
@@ -735,11 +935,12 @@ LibrariesView::selection_changed (int index)
       (*f)->setChecked (i == index);
     }
 
-    emit active_cellview_changed (index);
+    emit active_library_changed (index);
 
   }
 }
 
+#if 0 // @@@
 QModelIndex
 LibrariesView::index_from_path (const cell_path_type &path, int cv_index)
 {
@@ -798,182 +999,17 @@ LibrariesView::find_child_item (cell_path_type::const_iterator start, cell_path_
 
   }
 }
+#endif
 
 std::string
 LibrariesView::display_string (int n) const
 {
-  return m_cellviews [n]->name () + " (@" + tl::to_string (n + 1) + ")";
-}
-
-void
-LibrariesView::do_update_content (int cv_index)
-{
-  //  close the search box since we will modify the model
-  mp_search_frame->hide ();
-  mp_search_model = 0;
-
-  unsigned int imin = (cv_index < 0 ? 0 : (unsigned int) cv_index);
-  unsigned int imax = (cv_index < 0 ? std::numeric_limits <unsigned int>::max () : (unsigned int) cv_index);
-
-  for (unsigned int i = imin; i < mp_view->cellviews () && i <= imax; ++i) {
-    if (i >= m_force_close.size ()) {
-      m_force_close.push_back (true);
-    }
-    if (i >= m_needs_update.size ()) {
-      m_needs_update.push_back (true);
-    }
-    if (i >= m_cellviews.size ()) {
-      m_force_close [i] = true;
-      m_needs_update [i] = true;
-    }
+  const db::Library *lib = m_libraries [n].get ();
+  std::string text = lib->get_name ();
+  if (! lib->get_description ().empty ()) {
+    text += " - " + lib->get_description ();
   }
-
-  unsigned int n = std::min ((unsigned int) m_cellviews.size (), mp_view->cellviews ());
-  for (unsigned int i = imin; i < n && i <= imax; ++i) {
-
-    if (&m_cellviews [i]->layout () != &mp_view->cellview (i)->layout ()) {
-      m_needs_update [i] = true;
-      m_force_close [i] = true;
-    } else if (m_cellviews [i].combined_unspecific_path () != mp_view->cellview (i).combined_unspecific_path ()) {
-      m_needs_update [i] = true;
-    }
-
-    if (m_needs_update [i]) {
-      mp_cell_lists [i]->doItemsLayout (); //  this schedules a redraw
-    }
-
-    m_cellviews [i] = mp_view->cellview (i);
-
-  }
-
-  if (m_cellviews.size () < mp_view->cellviews ()) {
-    for (unsigned int i = n; i < mp_view->cellviews (); ++i) {
-      m_cellviews.push_back (mp_view->cellview (i));
-    }
-  } else if (m_cellviews.size () > mp_view->cellviews ()) {
-    m_cellviews.erase (m_cellviews.begin () + mp_view->cellviews (), m_cellviews.end ());
-  }
-
-  bool split_mode = m_split_mode;
-  //  for more than max_cellviews_in_split_mode cellviews, switch to overlay mode
-  if (int (m_cellviews.size ()) > max_cellviews_in_split_mode) {
-    split_mode = false;
-  }
-
-  while (mp_cell_lists.size () < m_cellviews.size ()) {
-
-    QPalette pl;
-
-    int cv_index = int (mp_cell_lists.size ());
-
-    QFrame *cl_frame = new QFrame (this);
-    cl_frame->setFrameShape (QFrame::NoFrame);
-    QVBoxLayout *cl_ly = new QVBoxLayout (cl_frame);
-    cl_ly->setSpacing (0);
-    cl_ly->setContentsMargins (0, 0, 0, 0);
-
-    QToolButton *header = new QToolButton (cl_frame);
-    connect (header, SIGNAL (clicked ()), this, SLOT (header_clicked ()));
-    header->setText (tl::to_qstring (display_string (cv_index)));
-    header->setFocusPolicy (Qt::NoFocus);
-    header->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Preferred);
-    header->setCheckable (true);
-    header->setAutoRaise (true);
-    header->setAutoFillBackground (true);
-    header->setVisible (split_mode);
-    cl_ly->addWidget (header);
-
-    LibraryTreeWidget *cell_list = new LibraryTreeWidget (cl_frame, "tree", mp_view->view_object_widget ());
-    cl_ly->addWidget (cell_list);
-    cell_list->setModel (new CellTreeModel (cell_list, mp_view, cv_index, m_flat ? CellTreeModel::Flat : 0, 0, m_sorting));
-    cell_list->setUniformRowHeights (true);
-
-    pl = cell_list->palette ();
-    if (m_text_color.isValid ()) {
-      pl.setColor (QPalette::Text, m_text_color);
-    }
-    if (m_background_color.isValid ()) {
-      pl.setColor (QPalette::Base, m_background_color);
-    }
-    cell_list->setPalette (pl);
-
-    cell_list->header ()->hide ();
-    cell_list->setSelectionMode (QTreeView::ExtendedSelection);
-    cell_list->setRootIsDecorated (true);
-    cell_list->setIndentation (14);
-    cell_list->setContextMenuPolicy (Qt::CustomContextMenu);
-
-    connect (cell_list, SIGNAL (customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
-    connect (cell_list, SIGNAL (cell_clicked (const QModelIndex &)), this, SLOT (clicked (const QModelIndex &)));
-    connect (cell_list, SIGNAL (cell_double_clicked (const QModelIndex &)), this, SLOT (double_clicked (const QModelIndex &)));
-    connect (cell_list, SIGNAL (cell_middle_clicked (const QModelIndex &)), this, SLOT (middle_clicked (const QModelIndex &)));
-    connect (cell_list, SIGNAL (search_triggered (const QString &)), this, SLOT (search_triggered (const QString &)));
-
-    mp_cell_lists.push_back (cell_list);
-    mp_cell_list_frames.push_back (cl_frame);
-    mp_cell_list_headers.push_back (header);
-
-    mp_splitter->addWidget (cl_frame);
-
-  }
-
-  while (mp_cell_lists.size () > m_cellviews.size ()) {
-    delete mp_cell_list_frames.back ();
-    mp_cell_list_frames.pop_back ();
-    mp_cell_list_headers.pop_back ();
-    mp_cell_lists.pop_back ();
-  }
-
-  for (unsigned int i = imin; i < m_cellviews.size () && i < (unsigned int) mp_selector->count () && i <= imax; ++i) {
-    mp_selector->setItemText (i, tl::to_qstring (display_string (i)));
-  }
-  while (mp_selector->count () < int (m_cellviews.size ())) {
-    mp_selector->addItem (tl::to_qstring (display_string (mp_selector->count ())));
-  }
-  while (mp_selector->count () > int (m_cellviews.size ())) {
-    mp_selector->removeItem (mp_selector->count () - 1);
-  }
-
-  if (m_active_index >= int (m_cellviews.size ())) {
-    m_active_index = int (m_cellviews.size ()) - 1;
-  } else if (m_active_index < 0 && ! m_cellviews.empty ()) {
-    m_active_index = 0;
-  }
-  mp_selector->setCurrentIndex (m_active_index);
-  mp_selector->setVisible (mp_cell_lists.size () > 1 && ! split_mode);
-
-  for (unsigned int i = imin; i < m_cellviews.size () && i <= imax; ++i) {
-
-    if (m_needs_update [i]) {
-
-      mp_cell_list_headers [i]->setText (tl::to_qstring (display_string (i)));
-
-      //  draw the cells in the level of the current cell,
-      //  add an "above" entry if there is a level above.
-      //  highlight the current entry. If the index is
-      //  invalid, just clear the list.
-
-      if (m_force_close [i]) {
-
-        m_force_close [i] = false;
-
-        CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [i]->model ());
-        if (model) {
-          model->configure (mp_view, i, m_flat ? CellTreeModel::Flat : 0, 0, m_sorting);
-        }
-
-      }
-
-      m_needs_update [i] = false;
-
-    }
-
-    mp_cell_list_headers [i]->setVisible (split_mode && m_cellviews.size () > 1);
-    mp_cell_list_headers [i]->setChecked (int (i) == m_active_index);
-
-    mp_cell_list_frames [i]->setVisible (int (i) == m_active_index || split_mode);
-
-  }
+  return text;
 }
 
 CellTreeItem *
@@ -987,19 +1023,6 @@ LibrariesView::current_item () const
   } else {
     return 0;
   }
-}
-#endif
-
-void
-LibrariesView::do_update_content ()
-{
-  //  @@@
-}
-
-void
-LibrariesView::do_full_update_content ()
-{
-  //  @@@
 }
 
 bool

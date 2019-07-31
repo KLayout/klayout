@@ -104,9 +104,14 @@ public:
   virtual QMimeData *mimeData (const QModelIndexList &indexes) const;
 
   /**
-   *  @brief Reconfigures the model
+   *  @brief Reconfigures the model with a LayoutView
    */
   void configure (lay::LayoutView *view, int cv_index, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
+
+  /**
+   *  @brief Reconfigures the model with a pure Layout view
+   */
+  void configure (db::Layout *layout, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
 
   /**
    *  @brief Gets the layout this model is connected to
@@ -219,7 +224,7 @@ private:
   Sorting m_sorting;
   QWidget *mp_parent;
   lay::LayoutView *mp_view;
-  const db::Layout *mp_layout;
+  db::Layout *mp_layout;
   int m_cv_index;
   const db::Cell *mp_base;
   std::vector <CellTreeItem *> m_toplevel;
@@ -230,6 +235,7 @@ private:
   void build_top_level ();
   void clear_top_level ();
   void search_children (const tl::GlobPattern &pattern, CellTreeItem *item);
+  void do_configure (db::Layout *layout, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting);
 };
 
 /**

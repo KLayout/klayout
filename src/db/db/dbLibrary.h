@@ -28,6 +28,7 @@
 #include "gsiObject.h"
 #include "dbLayout.h"
 #include "tlTypeTraits.h"
+#include "tlObject.h"
 
 #include <string>
 
@@ -45,7 +46,7 @@ class Layout;
  *  is provided. To do so, this class must be reimplemented.
  */
 class DB_PUBLIC Library
-  : public gsi::ObjectBase
+  : public gsi::ObjectBase, public tl::Object
 {
 public:
   /**

@@ -134,14 +134,18 @@ public:
    */
   void set_text_color (QColor c);
 
-#if 0 // @@@
+  /**
+   *  @brief Sets the active library by name
+   */
+  void select_active_lib_by_name (const std::string &name);
+
   /**
    *  @brief Select the active cellview
    *
    *  selects the active cellview by index. The index must be
    *  a valid index within the context of the layout view.
    */
-  void select_active (int cellview_index);
+  void select_active (int lib_index);
 
   /**
    *  @brief Get the active cellview
@@ -153,6 +157,12 @@ public:
     return m_active_index;
   }
 
+  /**
+   *  @brief Gets the active library or 0 if there is no active library
+   */
+  db::Library *active_lib ();
+
+#if 0 // @@@
   /**
    *  @brief Returns the paths of the selected cells
    */
@@ -172,6 +182,7 @@ public:
    *  can be obtained with the "active" method.
    */
   void set_current_cell (int cv_index, const cell_path_type &path);
+#endif
 
   /**
    *  @brief Update the contents if necessary
@@ -191,7 +202,6 @@ public:
   {
     do_update_content (-1);
   }
-#endif
 
   /**
    *  @brief Event handler
@@ -228,18 +238,18 @@ public:
     return mp_view;
   }
 
-#if 0
 signals:
+#if 0 // @@@
   void cell_selected (cell_path_type path, int cellview_index);
-  void active_cellview_changed (int cellview_index);
 #endif
+  void active_library_changed (int cellview_index);
 
 public slots:
   void clicked (const QModelIndex &index);
   void header_clicked ();
   void double_clicked (const QModelIndex &index);
   void middle_clicked (const QModelIndex &index);
-  // @@@ void selection_changed (int index);
+  void selection_changed (int index);
   void context_menu (const QPoint &pt);
   void search_triggered (const QString &t);
   void search_edited ();
@@ -272,23 +282,23 @@ private:
   tl::DeferredMethod<LibrariesView> m_do_update_content_dm;
   tl::DeferredMethod<LibrariesView> m_do_full_update_content_dm;
   std::auto_ptr<QStyle> mp_tree_style;
-
-#if 0 // @@@
-  //  locate the CellTreeItem in the tree corresponding to a partial path starting from p.
-  CellTreeItem *find_child_item (cell_path_type::const_iterator start, cell_path_type::const_iterator end, CellTreeItem *p);
-
-  //  get the current item
-  CellTreeItem *current_item () const;
+  std::vector<tl::weak_ptr<db::Library> > m_libraries;
 
   //  event listener for changes in the cellview and layout
   void update_required ();
 
+#if 0 // @@@
+  //  locate the CellTreeItem in the tree corresponding to a partial path starting from p.
+  CellTreeItem *find_child_item (cell_path_type::const_iterator start, cell_path_type::const_iterator end, CellTreeItem *p);
+#endif
+
+  //  get the current item
+  CellTreeItem *current_item () const;
+
+#if 0 // @@@
   //  path from index and item from path ..
   void path_from_index (const QModelIndex &index, int cv_index, cell_path_type &path) const;
   QModelIndex index_from_path (const cell_path_type &path, int cv_index);
-
-  //  display string of nth cellview
-  std::string display_string (int n) const;
 
   //  select active cellview from sender (sender must be a cell tree)
   void set_active_celltree_from_sender ();
@@ -297,11 +307,11 @@ private:
   void clear_all ();
 #endif
 
+  //  display string of nth cellview
+  std::string display_string (int n) const;
+
   //  forces a complete update
   void do_full_update_content ();
-
-  //  updates the contents if necessary
-  void do_update_content ();
 };
 
 } // namespace lay

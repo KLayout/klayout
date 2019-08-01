@@ -449,6 +449,17 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   vbl->setMargin (0);
   vbl->setSpacing (0);
 
+  mp_canvas = new lay::LayoutCanvas (this, this);
+  vbl->addWidget (mp_canvas);
+  connect (mp_canvas, SIGNAL (left_arrow_key_pressed ()), this, SLOT (pan_left ()));
+  connect (mp_canvas, SIGNAL (up_arrow_key_pressed ()), this, SLOT (pan_up ()));
+  connect (mp_canvas, SIGNAL (right_arrow_key_pressed ()), this, SLOT (pan_right ()));
+  connect (mp_canvas, SIGNAL (down_arrow_key_pressed ()), this, SLOT (pan_down ()));
+  connect (mp_canvas, SIGNAL (left_arrow_key_pressed_with_shift ()), this, SLOT (pan_left_fast ()));
+  connect (mp_canvas, SIGNAL (up_arrow_key_pressed_with_shift ()), this, SLOT (pan_up_fast ()));
+  connect (mp_canvas, SIGNAL (right_arrow_key_pressed_with_shift ()), this, SLOT (pan_right_fast ()));
+  connect (mp_canvas, SIGNAL (down_arrow_key_pressed_with_shift ()), this, SLOT (pan_down_fast ()));
+
   if ((m_options & LV_NoHierarchyPanel) == 0 && (m_options & LV_Naked) == 0) {
 
     QFrame *hierarchy_frame = new QFrame (0);
@@ -513,17 +524,6 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
     connect (mp_libraries_view, SIGNAL (active_library_changed (int)), this, SLOT (active_library_changed (int)));
 
   }
-
-  mp_canvas = new lay::LayoutCanvas (this, this);
-  vbl->addWidget (mp_canvas);
-  connect (mp_canvas, SIGNAL (left_arrow_key_pressed ()), this, SLOT (pan_left ()));
-  connect (mp_canvas, SIGNAL (up_arrow_key_pressed ()), this, SLOT (pan_up ()));
-  connect (mp_canvas, SIGNAL (right_arrow_key_pressed ()), this, SLOT (pan_right ()));
-  connect (mp_canvas, SIGNAL (down_arrow_key_pressed ()), this, SLOT (pan_down ()));
-  connect (mp_canvas, SIGNAL (left_arrow_key_pressed_with_shift ()), this, SLOT (pan_left_fast ()));
-  connect (mp_canvas, SIGNAL (up_arrow_key_pressed_with_shift ()), this, SLOT (pan_up_fast ()));
-  connect (mp_canvas, SIGNAL (right_arrow_key_pressed_with_shift ()), this, SLOT (pan_right_fast ()));
-  connect (mp_canvas, SIGNAL (down_arrow_key_pressed_with_shift ()), this, SLOT (pan_down_fast ()));
 
   //  occupy services and editables:
   //  these services get deleted by the canvas destructor automatically:

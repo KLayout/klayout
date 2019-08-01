@@ -526,6 +526,10 @@ HierarchyControlPanel::search_prev ()
 void
 HierarchyControlPanel::search_editing_finished ()
 {
+  if (! mp_search_frame->isVisible ()) {
+    return;
+  }
+
   for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
     CellTreeModel *m = dynamic_cast<CellTreeModel *> ((*v)->model ());
     if (m) {
@@ -733,6 +737,8 @@ HierarchyControlPanel::selection_changed (int index)
 {
   if (index != m_active_index) {
 
+    search_editing_finished ();
+
     m_active_index = index;
 
     bool split_mode = m_split_mode;
@@ -744,6 +750,9 @@ HierarchyControlPanel::selection_changed (int index)
     int i = 0;
     for (std::vector <QFrame *>::const_iterator f = mp_cell_list_frames.begin (); f != mp_cell_list_frames.end (); ++f, ++i) {
       (*f)->setVisible (i == index || split_mode);
+      if (i == index) {
+        mp_cell_lists [i]->setFocus ();
+      }
     }
 
     i = 0;

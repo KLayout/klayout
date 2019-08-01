@@ -413,7 +413,6 @@ void
 LibrariesView::search_triggered (const QString &t)
 {
   mp_search_model = 0;
-#if 0 // @@@
   lay::LibraryTreeWidget *w = dynamic_cast<lay::LibraryTreeWidget *> (sender ());
   if (w) {
     for (size_t i = 0; i < mp_cell_lists.size (); ++i) {
@@ -425,7 +424,6 @@ LibrariesView::search_triggered (const QString &t)
       }
     }
   }
-#endif // @@@
 
   if (mp_search_model) {
     mp_search_close_cb->setChecked (true);
@@ -491,6 +489,10 @@ LibrariesView::search_prev ()
 void
 LibrariesView::search_editing_finished ()
 {
+  if (! mp_search_frame->isVisible ()) {
+    return;
+  }
+
   for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
     CellTreeModel *m = dynamic_cast<CellTreeModel *> ((*v)->model ());
     if (m) {
@@ -498,7 +500,6 @@ LibrariesView::search_editing_finished ()
     }
   }
 
-#if 0 // @@@
   //  give back the focus to the cell list
   for (size_t i = 0; i < mp_cell_lists.size (); ++i) {
     if (mp_cell_lists [i]->model () == mp_search_model) {
@@ -506,7 +507,6 @@ LibrariesView::search_editing_finished ()
       break;
     }
   }
-#endif
 
   mp_search_frame->hide ();
   mp_search_model = 0;
@@ -816,8 +816,8 @@ LibrariesView::do_update_content (int lib_index)
     connect (cell_list, SIGNAL (cell_clicked (const QModelIndex &)), this, SLOT (clicked (const QModelIndex &)));
     connect (cell_list, SIGNAL (cell_double_clicked (const QModelIndex &)), this, SLOT (double_clicked (const QModelIndex &)));
     connect (cell_list, SIGNAL (cell_middle_clicked (const QModelIndex &)), this, SLOT (middle_clicked (const QModelIndex &)));
-    connect (cell_list, SIGNAL (search_triggered (const QString &)), this, SLOT (search_triggered (const QString &)));
 #endif
+    connect (cell_list, SIGNAL (search_triggered (const QString &)), this, SLOT (search_triggered (const QString &)));
 
     mp_cell_lists.push_back (cell_list);
     mp_cell_list_frames.push_back (cl_frame);
@@ -920,6 +920,8 @@ LibrariesView::selection_changed (int index)
 {
   if (index != m_active_index) {
 
+    search_editing_finished ();
+
     m_active_index = index;
 
     bool split_mode = m_split_mode;
@@ -931,6 +933,9 @@ LibrariesView::selection_changed (int index)
     int i = 0;
     for (std::vector <QFrame *>::const_iterator f = mp_cell_list_frames.begin (); f != mp_cell_list_frames.end (); ++f, ++i) {
       (*f)->setVisible (i == index || split_mode);
+      if (i == index) {
+        mp_cell_lists [i]->setFocus ();
+      }
     }
 
     i = 0;

@@ -333,8 +333,6 @@ LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char
   sp.setVerticalStretch (0);
   setSizePolicy (sp);
 
-  db::LibraryManager::instance ().changed_event.add (this, &LibrariesView::update_required);
-
   do_update_content ();
 }
 
@@ -714,9 +712,14 @@ LibrariesView::do_update_content (int lib_index)
   size_t imin = (lib_index < 0 ? 0 : (size_t) lib_index);
   size_t imax = (lib_index < 0 ? std::numeric_limits <size_t>::max () : (size_t) lib_index);
 
+  //  rebuild all events
+  detach_from_all_events ();
+  db::LibraryManager::instance ().changed_event.add (this, &LibrariesView::update_required);
+
   std::vector<db::Library *> libraries;
   for (db::LibraryManager::iterator lib = db::LibraryManager::instance ().begin (); lib != db::LibraryManager::instance ().end (); ++lib) {
     libraries.push_back (db::LibraryManager::instance ().lib (lib->second));
+    libraries.back ()->layout ().hier_changed_event.add (this, &LibrariesView::update_required);
   }
 
   for (size_t i = imin; i < libraries.size () && i <= imax; ++i) {
@@ -791,7 +794,7 @@ LibrariesView::do_update_content (int lib_index)
 
     LibraryTreeWidget *cell_list = new LibraryTreeWidget (cl_frame, "tree", mp_view->view_object_widget ());
     cl_ly->addWidget (cell_list);
-    cell_list->setModel (new CellTreeModel (cell_list, &m_libraries [i]->layout (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells, 0));
+    cell_list->setModel (new CellTreeModel (cell_list, &m_libraries [i]->layout (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells | CellTreeModel::WithVariants, 0));
     cell_list->setUniformRowHeights (true);
 
     pl = cell_list->palette ();
@@ -805,7 +808,7 @@ LibrariesView::do_update_content (int lib_index)
 
     cell_list->header ()->hide ();
     cell_list->setSelectionMode (QTreeView::ExtendedSelection);
-    cell_list->setRootIsDecorated (false);
+    cell_list->setRootIsDecorated (true);
     cell_list->setContextMenuPolicy (Qt::CustomContextMenu);
 
     connect (cell_list, SIGNAL (customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
@@ -866,7 +869,7 @@ LibrariesView::do_update_content (int lib_index)
 
         CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [i]->model ());
         if (model) {
-          model->configure (& m_libraries [i]->layout (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells, 0);
+          model->configure (& m_libraries [i]->layout (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells | CellTreeModel::WithVariants, 0);
         }
 
       }

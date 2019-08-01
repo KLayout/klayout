@@ -25,6 +25,7 @@
 #include "layLayoutView.h"
 #include "tlGlobPattern.h"
 #include "dbPCellHeader.h"
+#include "dbPCellVariant.h"
 
 #include <QTreeView>
 #include <QPalette>
@@ -82,8 +83,8 @@ struct cmp_cell_tree_item_vs_name_f
 // --------------------------------------------------------------------
 //  CellTreeItem implementation
 
-CellTreeItem::CellTreeItem (const db::Layout *layout, CellTreeItem *parent, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting s)
-  : mp_layout (layout), mp_parent (parent), m_sorting (s), m_is_pcell (is_pcell), m_index (0), m_children (), m_cell_or_pcell_index (cell_or_pcell_index)
+CellTreeItem::CellTreeItem (const db::Layout *layout, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting s)
+  : mp_layout (layout), mp_parent (0), m_sorting (s), m_is_pcell (is_pcell), m_index (0), m_children (), m_cell_or_pcell_index (cell_or_pcell_index)
 {
   if (! flat && ! is_pcell) {
     m_child_count = int (mp_layout->cell (cell_index ()).child_cells ());
@@ -98,6 +99,12 @@ CellTreeItem::~CellTreeItem ()
     delete *c;
   }
   m_children.clear ();
+}
+
+bool
+CellTreeItem::is_valid () const
+{
+  return m_is_pcell || mp_layout->is_valid_cell_index (cell_index ());
 }
 
 std::string 
@@ -130,19 +137,36 @@ CellTreeItem::child (int index)
     m_children.reserve (m_child_count);
 
     for (db::Cell::child_cell_iterator child = cell->begin_child_cells (); ! child.at_end (); ++child) {
-      CellTreeItem *child_item = new CellTreeItem (mp_layout, this, false, *child, false, m_sorting);
-      m_children.push_back (child_item);
+      add_child (new CellTreeItem (mp_layout, false, *child, false, m_sorting));
     }
 
-    std::sort (m_children.begin (), m_children.end (), cmp_cell_tree_items_f (m_sorting));
-
-    for (size_t i = 0; i < m_children.size (); ++i) {
-      m_children [i]->set_index (i);
-    }
+    finish_children ();
 
   }
 
   return m_children [index];
+}
+
+void
+CellTreeItem::add_child (CellTreeItem *item)
+{
+  //  explicitly added
+  if (size_t (m_child_count) == m_children.size ()) {
+    ++m_child_count;
+  }
+
+  item->mp_parent = this;
+  m_children.push_back (item);
+}
+
+void
+CellTreeItem::finish_children ()
+{
+  std::sort (m_children.begin (), m_children.end (), cmp_cell_tree_items_f (m_sorting));
+
+  for (size_t i = 0; i < m_children.size (); ++i) {
+    m_children [i]->set_index (i);
+  }
 }
 
 db::cell_index_type
@@ -452,7 +476,7 @@ CellTreeModel::build_top_level ()
     if (mp_base) {
       m_toplevel.reserve (mp_base->child_cells ());
       for (db::Cell::child_cell_iterator child = mp_base->begin_child_cells (); ! child.at_end (); ++child) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *child, true, m_sorting);
+        CellTreeItem *item = new CellTreeItem (mp_layout, false, *child, true, m_sorting);
         m_toplevel.push_back (item);
       }
     }
@@ -464,7 +488,7 @@ CellTreeModel::build_top_level ()
     if (mp_base) {
       m_toplevel.reserve (mp_base->parent_cells ());
       for (db::Cell::parent_cell_iterator parent = mp_base->begin_parent_cells (); parent != mp_base->end_parent_cells (); ++parent) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *parent, true, m_sorting);
+        CellTreeItem *item = new CellTreeItem (mp_layout, false, *parent, true, m_sorting);
         m_toplevel.push_back (item);
       }
     }
@@ -479,11 +503,11 @@ CellTreeModel::build_top_level ()
     while (top != mp_layout->end_top_down ()) {
 
       if (m_flat) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *top, true, m_sorting);
+        CellTreeItem *item = new CellTreeItem (mp_layout, false, *top, true, m_sorting);
         m_toplevel.push_back (item);
       } else if (mp_layout->cell (*top).is_top ()) {
         if ((m_flags & BasicCells) == 0 || ! mp_layout->cell (*top).is_proxy ()) {
-          CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *top, (m_flags & TopCells) != 0, m_sorting);
+          CellTreeItem *item = new CellTreeItem (mp_layout, false, *top, (m_flags & TopCells) != 0, m_sorting);
           m_toplevel.push_back (item);
         }
       } else {
@@ -495,10 +519,25 @@ CellTreeModel::build_top_level ()
     }
 
     if ((m_flags & BasicCells) != 0) {
+
       for (db::Layout::pcell_iterator pc = mp_layout->begin_pcells (); pc != mp_layout->end_pcells (); ++pc) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, 0, true, pc->second, true, m_sorting);
+
+        CellTreeItem *item = new CellTreeItem (mp_layout, true, pc->second, true, m_sorting);
         m_toplevel.push_back (item);
+
+        if ((m_flags & WithVariants) != 0) {
+
+          const db::PCellHeader *pcell_header = mp_layout->pcell_header (pc->second);
+          for (db::PCellHeader::variant_iterator v = pcell_header->begin (); v != pcell_header->end (); ++v) {
+            item->add_child (new CellTreeItem (mp_layout, false, v->second->cell_index (), true, m_sorting));
+          }
+
+          item->finish_children ();
+
+        }
+
       }
+
     }
 
   }
@@ -699,7 +738,7 @@ CellTreeModel::rowCount (const QModelIndex &parent) const
     CellTreeItem *item = (CellTreeItem *) parent.internalPointer ();
     if (! item) {
       return 0;
-    } else if (! mp_layout->is_valid_cell_index (item->cell_index ())) {
+    } else if (! item->is_valid ()) {
       //  for safety we return 0 children for invalid cells
       return 0;
     } else {
@@ -719,7 +758,7 @@ CellTreeModel::index (int row, int column, const QModelIndex &parent) const
     CellTreeItem *item = (CellTreeItem *) parent.internalPointer ();
     if (! item) {
       return QModelIndex ();
-    } else if (! mp_layout->is_valid_cell_index (item->cell_index ())) {
+    } else if (! item->is_valid ()) {
       //  for safety we don't return valid child indexes for invalid cells
       return QModelIndex ();
     } else {

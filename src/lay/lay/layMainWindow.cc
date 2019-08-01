@@ -1248,6 +1248,7 @@ MainWindow::close_all ()
     mp_views.pop_back ();
     mp_lp_stack->removeWidget (mp_views.size ());
     mp_hp_stack->removeWidget (mp_views.size ());
+    mp_libs_stack->removeWidget (mp_views.size ());
     mp_view_stack->removeWidget (mp_views.size ());
 
     delete view;
@@ -3299,6 +3300,7 @@ MainWindow::select_view (int index)
       mp_view_stack->raiseWidget (index);
       mp_hp_stack->raiseWidget (index);
       mp_lp_stack->raiseWidget (index);
+      mp_libs_stack->raiseWidget (index);
       mp_setup_form->setup ();
 
     }
@@ -3970,6 +3972,7 @@ MainWindow::close_view (int index)
       mp_view_stack->removeWidget (index);
       mp_lp_stack->removeWidget (index);
       mp_hp_stack->removeWidget (index);
+      mp_libs_stack->removeWidget (index);
 
       view_closed_event (int (index));
 

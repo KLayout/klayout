@@ -51,6 +51,7 @@ class DB_PUBLIC PCellHeader
 {
 public:
   typedef std::map<const pcell_parameters_type *, db::PCellVariant *, PCellParametersCompareFunc> variant_map_t;
+  typedef variant_map_t::const_iterator variant_iterator;
 
   /**
    *  @brief The default constructor
@@ -111,6 +112,22 @@ public:
    *  @brief Unregister a variant 
    */
   void register_variant (PCellVariant *variant);
+
+  /**
+   *  @brief Iterates the variants (begin)
+   */
+  variant_iterator begin () const
+  {
+    return m_variant_map.begin ();
+  }
+
+  /**
+   *  @brief Iterates the variants (end)
+   */
+  variant_iterator end () const
+  {
+    return m_variant_map.end ();
+  }
 
   /**
    *  @brief Get the PCell Id for this variant

@@ -302,10 +302,10 @@ private:
 
   //  select active cellview from sender (sender must be a cell tree)
   void set_active_celltree_from_sender ();
+#endif
 
   //  clears all widgets of the cell lists
   void clear_all ();
-#endif
 
   //  display string of nth cellview
   std::string display_string (int n) const;

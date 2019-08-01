@@ -1107,12 +1107,12 @@ PathService::config_finalize ()
 InstService::InstService (db::Manager *manager, lay::LayoutView *view)
   : edt::Service (manager, view),
     m_angle (0.0), m_scale (1.0),
-    m_mirror (false), m_cell_name (""), m_lib_name (""), m_pcell_parameters (""),
+    m_mirror (false), m_cell_name (""), m_lib_name (""), m_pcell_parameters (),
     m_array (false), m_rows (1), m_columns (1), 
     m_row_x (0.0), m_row_y (0.0), m_column_x (0.0), m_column_y (0.0),
     m_place_origin (false), m_reference_transaction_id (0),
     m_needs_update (true), m_has_valid_cell (false), m_in_drag_drop (false), 
-    m_current_cell (0), m_drag_drop_cell (0), m_cv_index (-1)
+    m_current_cell (0), m_cv_index (-1)
 { 
   //  .. nothing yet ..
 }
@@ -1142,22 +1142,44 @@ bool
 InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase *data)
 { 
   const lay::CellDragDropData *cd = dynamic_cast <const lay::CellDragDropData *> (data);
-  if (view ()->is_editable () && cd && cd->layout () == & view ()->active_cellview ()->layout ()) {
+  if (view ()->is_editable () && cd && (cd->layout () == & view ()->active_cellview ()->layout () || cd->library ())) {
 
     view ()->cancel ();
 
-    //  NOTE: the cancel above might delete the cell we are dragging (if that is
-    //  a non-placed PCell). Hence we need to check whether the cell still is valid
-    if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
+    set_edit_marker (0);
 
-      set_edit_marker (0);
+    m_cv_index = view ()->active_cellview_index ();
+    m_in_drag_drop = true;
 
-      m_cv_index = view ()->active_cellview_index ();
-      m_in_drag_drop = true;
-      m_drag_drop_cell = cd->cell_index ();
+    if (cd->library ()) {
+      m_lib_name = cd->library ()->get_name ();
+    } else {
+      m_lib_name.clear ();
+    }
 
+    m_pcell_parameters.clear ();
+    m_cell_name.clear ();
+
+    if (cd->is_pcell ()) {
+
+      const db::PCellDeclaration *pcell_decl = cd->layout ()->pcell_declaration (cd->cell_index ());
+      if (pcell_decl) {
+
+        m_cell_name = pcell_decl->name ();
+        const std::vector<db::PCellParameterDeclaration> &pd = pcell_decl->parameter_declarations();
+        for (std::vector<db::PCellParameterDeclaration>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+          m_pcell_parameters.insert (std::make_pair (i->get_name (), i->get_default ()));
+        }
+
+        do_begin_edit (p);
+        return true;
+
+      }
+
+    } else if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
+
+      m_cell_name = cd->layout ()->cell_name (cd->cell_index ());
       do_begin_edit (p);
-
       return true;
 
     }
@@ -1260,10 +1282,6 @@ InstService::do_begin_edit (const db::DPoint &p)
 std::pair<bool, db::cell_index_type> 
 InstService::make_cell (const lay::CellView &cv)
 {
-  if (m_in_drag_drop) {
-    return std::make_pair (true, m_drag_drop_cell);
-  }
-
   if (m_has_valid_cell) {
     return std::make_pair (true, m_current_cell);
   }
@@ -1301,20 +1319,10 @@ InstService::make_cell (const lay::CellView &cv)
       const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pci.second);
       if (pc_decl) {
 
-        std::map<std::string, tl::Variant> parameters;
-        tl::Extractor ex (m_pcell_parameters.c_str ());
-        while (! ex.at_end ()) {
-          std::string n;
-          ex.read_word_or_quoted (n);
-          ex.test (":");
-          ex.read (parameters.insert (std::make_pair (n, tl::Variant ())).first->second);
-          ex.test (";");
-        }
-
         const std::vector<db::PCellParameterDeclaration> &pcp = pc_decl->parameter_declarations ();
         for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
-          std::map<std::string, tl::Variant>::const_iterator p = parameters.find (pd->get_name ());
-          if (p != parameters.end ()) {
+          std::map<std::string, tl::Variant>::const_iterator p = m_pcell_parameters.find (pd->get_name ());
+          if (p != m_pcell_parameters.end ()) {
             pv.push_back (p->second);
           } else {
             pv.push_back (pd->get_default ());
@@ -1491,9 +1499,20 @@ InstService::configure (const std::string &name, const std::string &value)
   }
 
   if (name == cfg_edit_inst_pcell_parameters) {
-    m_pcell_parameters = value;
+
+    m_pcell_parameters.clear ();
+    tl::Extractor ex (value.c_str ());
+    while (! ex.at_end ()) {
+      std::string n;
+      ex.read_word_or_quoted (n);
+      ex.test (":");
+      ex.read (m_pcell_parameters.insert (std::make_pair (n, tl::Variant ())).first->second);
+      ex.test (";");
+    }
+
     m_needs_update = true;
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_place_origin) {

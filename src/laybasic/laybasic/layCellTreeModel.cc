@@ -26,6 +26,7 @@
 #include "tlGlobPattern.h"
 #include "dbPCellHeader.h"
 #include "dbPCellVariant.h"
+#include "dbLibrary.h"
 
 #include <QTreeView>
 #include <QPalette>
@@ -273,6 +274,7 @@ CellTreeModel::CellTreeModel (QWidget *parent, lay::LayoutView *view, int cv_ind
   m_pad = ((flags & NoPadding) == 0);
 
   mp_layout = & view->cellview (cv_index)->layout ();
+  mp_library = 0;
   tl_assert (! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ()));
 
   build_top_level ();
@@ -293,6 +295,28 @@ CellTreeModel::CellTreeModel (QWidget *parent, db::Layout *layout, unsigned int 
   m_pad = ((flags & NoPadding) == 0);
 
   mp_layout = layout;
+  mp_library = 0;
+  tl_assert (! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ()));
+
+  build_top_level ();
+
+  m_current_index = m_selected_indexes.begin ();
+}
+
+CellTreeModel::CellTreeModel (QWidget *parent, db::Library *library, unsigned int flags, const db::Cell *base, Sorting sorting)
+  : QAbstractItemModel (parent),
+    m_flags (flags),
+    m_sorting (sorting),
+    mp_parent (parent),
+    mp_view (0),
+    m_cv_index (-1),
+    mp_base (base)
+{
+  m_flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
+  m_pad = ((flags & NoPadding) == 0);
+
+  mp_layout = &library->layout ();
+  mp_library = library;
   tl_assert (! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ()));
 
   build_top_level ();
@@ -309,18 +333,23 @@ void
 CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
 {
   db::Layout *layout = & view->cellview (cv_index)->layout ();
-
-  do_configure (layout, view, cv_index, flags, base, sorting);
+  do_configure (layout, 0, view, cv_index, flags, base, sorting);
 }
 
 void
 CellTreeModel::configure (db::Layout *layout, unsigned int flags, const db::Cell *base, Sorting sorting)
 {
-  do_configure (layout, 0, -1, flags, base, sorting);
+  do_configure (layout, 0, 0, -1, flags, base, sorting);
 }
 
 void
-CellTreeModel::do_configure (db::Layout *layout, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
+CellTreeModel::configure (db::Library *library, unsigned int flags, const db::Cell *base, Sorting sorting)
+{
+  do_configure (& library->layout (), library, 0, -1, flags, base, sorting);
+}
+
+void
+CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
 {
   bool flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
 
@@ -362,6 +391,7 @@ CellTreeModel::do_configure (db::Layout *layout, lay::LayoutView *view, int cv_i
   m_pad = ((flags & NoPadding) == 0);
 
   mp_layout = layout;
+  mp_library = library;
   tl_assert (! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ()));
 
   build_top_level ();
@@ -447,7 +477,7 @@ void
 CellTreeModel::set_sorting (Sorting s)
 {
   if (s != m_sorting) {
-    do_configure (mp_layout, mp_view, m_cv_index, m_flags, mp_base, s);
+    do_configure (mp_layout, mp_library, mp_view, m_cv_index, m_flags, mp_base, s);
   }
 }
 
@@ -566,19 +596,23 @@ CellTreeModel::mimeTypes () const
 QMimeData *
 CellTreeModel::mimeData(const QModelIndexList &indexes) const
 {
-  const db::Cell *c = 0;
-  for (QModelIndexList::const_iterator i = indexes.begin (); i != indexes.end () && !c; ++i) {
+  for (QModelIndexList::const_iterator i = indexes.begin (); i != indexes.end (); ++i) {
+
     if (i->isValid()) {
-      c = cell (*i);
+
+      if (is_pcell (*i)) {
+        lay::CellDragDropData data (mp_layout, mp_library, pcell_id (*i), true);
+        return data.to_mime_data ();
+      } else if (cell (*i)) {
+        lay::CellDragDropData data (mp_layout, mp_library, cell_index (*i), false);
+        return data.to_mime_data ();
+      }
+
     }
+
   }
 
-  if (c) {
-    lay::CellDragDropData data (mp_layout, c->cell_index ());
-    return data.to_mime_data ();
-  } else {
-    return 0;
-  }
+  return 0;
 }
 
 int 

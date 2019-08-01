@@ -223,7 +223,8 @@ private:
   double m_scale;
   bool m_mirror;
   db::DPoint m_disp;
-  std::string m_cell_name, m_lib_name, m_pcell_parameters;
+  std::string m_cell_name, m_lib_name;
+  std::map<std::string, tl::Variant> m_pcell_parameters;
   bool m_array;
   unsigned int m_rows, m_columns;
   double m_row_x, m_row_y, m_column_x, m_column_y;
@@ -232,7 +233,7 @@ private:
   bool m_needs_update;
   bool m_has_valid_cell;
   bool m_in_drag_drop;
-  db::cell_index_type m_current_cell, m_drag_drop_cell;
+  db::cell_index_type m_current_cell;
   int m_cv_index;
   db::ICplxTrans m_trans;
 

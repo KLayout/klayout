@@ -37,6 +37,11 @@ namespace tl
   class GlobPattern;
 }
 
+namespace db
+{
+  class Library;
+}
+
 namespace lay
 {
 
@@ -89,6 +94,13 @@ public:
   CellTreeModel (QWidget *parent, db::Layout *layout, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
 
   /**
+   *  @brief Constructor
+   *
+   *  This constructor does not take a view but rather a layout from a library. It does not display hidden status or similar.
+   */
+  CellTreeModel (QWidget *parent, db::Library *library, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
+
+  /**
    *  @brief Dtor
    */
   ~CellTreeModel ();
@@ -110,9 +122,14 @@ public:
   void configure (lay::LayoutView *view, int cv_index, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
 
   /**
-   *  @brief Reconfigures the model with a pure Layout view
+   *  @brief Reconfigures the model with a pure Layout
    */
   void configure (db::Layout *layout, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
+
+  /**
+   *  @brief Reconfigures the model with a pure Layout from a library
+   */
+  void configure (db::Library *library, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
 
   /**
    *  @brief Gets the layout this model is connected to
@@ -226,6 +243,7 @@ private:
   QWidget *mp_parent;
   lay::LayoutView *mp_view;
   db::Layout *mp_layout;
+  db::Library *mp_library;
   int m_cv_index;
   const db::Cell *mp_base;
   std::vector <CellTreeItem *> m_toplevel;
@@ -236,7 +254,7 @@ private:
   void build_top_level ();
   void clear_top_level ();
   void search_children (const tl::GlobPattern &pattern, CellTreeItem *item);
-  void do_configure (db::Layout *layout, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting);
+  void do_configure (db::Layout *layout, db::Library *library, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting);
 };
 
 /**

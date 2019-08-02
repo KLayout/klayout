@@ -1535,12 +1535,16 @@ InstService::configure (const std::string &name, const std::string &value)
     m_pcell_parameters.clear ();
     m_is_pcell = ex.test ("!") || ! ex.at_end ();
 
-    while (! ex.at_end ()) {
-      std::string n;
-      ex.read_word_or_quoted (n);
-      ex.test (":");
-      ex.read (m_pcell_parameters.insert (std::make_pair (n, tl::Variant ())).first->second);
-      ex.test (";");
+    try {
+      while (! ex.at_end ()) {
+        std::string n;
+        ex.read_word_or_quoted (n);
+        ex.test (":");
+        ex.read (m_pcell_parameters.insert (std::make_pair (n, tl::Variant ())).first->second);
+        ex.test (";");
+      }
+    } catch (...) {
+      //  ignore errors
     }
 
     m_needs_update = true;

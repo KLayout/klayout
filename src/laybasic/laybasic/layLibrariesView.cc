@@ -790,7 +790,7 @@ LibrariesView::do_update_content (int lib_index)
 
     LibraryTreeWidget *cell_list = new LibraryTreeWidget (cl_frame, "tree", mp_view->view_object_widget ());
     cl_ly->addWidget (cell_list);
-    cell_list->setModel (new CellTreeModel (cell_list, m_libraries [i].get (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells | CellTreeModel::WithVariants, 0));
+    cell_list->setModel (new CellTreeModel (cell_list, m_libraries [i].get (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells | CellTreeModel::WithVariants | CellTreeModel::WithIcons, 0));
     cell_list->setUniformRowHeights (true);
 
     pl = cell_list->palette ();
@@ -865,7 +865,7 @@ LibrariesView::do_update_content (int lib_index)
 
         CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [i]->model ());
         if (model) {
-          model->configure (m_libraries [i].get (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells | CellTreeModel::WithVariants, 0);
+          model->configure (m_libraries [i].get (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells | CellTreeModel::WithVariants | CellTreeModel::WithIcons, 0);
         }
 
       }

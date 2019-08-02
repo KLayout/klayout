@@ -737,6 +737,17 @@ CellTreeModel::data (const QModelIndex &index, int role) const
     return QVariant ();
 #endif
 
+  } else if (role == Qt::DecorationRole && (m_flags & WithIcons) != 0) {
+
+    //  TODO: icons for normal cells too?
+    if (item->is_pcell ()) {
+      QIcon icon (":/setup.png");
+      return QVariant (icon);
+    } else {
+      QIcon icon (":/instance.png");
+      return QVariant (icon);
+    }
+
   } else {
 
     return QVariant ();

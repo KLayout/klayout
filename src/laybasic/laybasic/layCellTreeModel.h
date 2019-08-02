@@ -67,7 +67,8 @@ public:
     TopCells = 8,       //  show top cells only
     BasicCells = 16,    //  show basic cells (PCells included, no proxies)
     WithVariants = 32,  //  show PCell variants below PCells
-    NoPadding = 64      //  disable padding of display string with a blank at the beginning and end
+    WithIcons = 64,     //  show icons for the top level cell type
+    NoPadding = 128     //  disable padding of display string with a blank at the beginning and end
   };
 
   enum Sorting {

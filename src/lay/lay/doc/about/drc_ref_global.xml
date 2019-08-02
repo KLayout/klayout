@@ -29,7 +29,7 @@ See <a href="/about/drc_ref_netter.xml#antenna_check">Netter#antenna_check</a> f
 <li><tt>bjt3(name)</tt></li>
 </ul>
 <p>
-Use this class with <a href="#device_extract">device_extract</a> to specify extraction of a 
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 bipolar junction transistor
 </p>
 <h2>"bjt4" - Supplies the BJT4 transistor extractor class</h2>
@@ -39,7 +39,7 @@ bipolar junction transistor
 <li><tt>bjt4(name)</tt></li>
 </ul>
 <p>
-Use this class with <a href="#device_extract">device_extract</a> to specify extraction of a 
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 bipolar junction transistor with a substrate terminal
 </p>
 <h2>"box" - Creates a box object</h2>
@@ -59,17 +59,17 @@ This function creates a box object. The arguments are the same than for the
 <li><tt>capacitor(name, area_cap)</tt></li>
 </ul>
 <p>
-Use this class with <a href="#device_extract">device_extract</a> to specify extraction of a capacitor.
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a capacitor.
 The area_cap argument is the capacitance in Farad per square micrometer.
 </p>
 <h2>"capacitor_with_bulk" - Supplies the capacitor extractor class that includes a bulk terminal</h2>
 <keyword name="capacitor_with_bulk"/>
 <a name="capacitor_with_bulk"/><p>Usage:</p>
 <ul>
-<li><tt>capacitor_with_bulk(name)</tt></li>
+<li><tt>capacitor_with_bulk(name, area_cap)</tt></li>
 </ul>
 <p>
-Use this class with <a href="#device_extract">device_extract</a> to specify extraction of a capacitor 
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a capacitor 
 with a bulk terminal.
 The area_cap argument is the capacitance in Farad per square micrometer.
 </p>
@@ -185,6 +185,15 @@ implied always. Sometimes cell variants will be created.
 </p><p>
 Deep mode can be cancelled with <a href="#tiles">tiles</a> or <a href="#flat">flat</a>.
 </p>
+<h2>"device_scaling" - Specifies a dimension scale factor for the geometrical device properties</h2>
+<keyword name="device_scaling"/>
+<a name="device_scaling"/><p>Usage:</p>
+<ul>
+<li><tt>device_scaling(factor)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#device_scaling">Netter#device_scaling</a> for a description of that function.
+</p>
 <h2>"diode" - Supplies the diode extractor class</h2>
 <keyword name="diode"/>
 <a name="diode"/><p>Usage:</p>
@@ -192,7 +201,7 @@ Deep mode can be cancelled with <a href="#tiles">tiles</a> or <a href="#flat">fl
 <li><tt>diode(name)</tt></li>
 </ul>
 <p>
-Use this class with <a href="#device_extract">device_extract</a> to specify extraction of a 
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 planar diode 
 </p>
 <h2>"edge" - Creates an edge object</h2>
@@ -396,7 +405,7 @@ filled with <a href="/about/drc_ref_layer.xml#insert">Layer#insert</a>.
 <li><tt>mos3(name)</tt></li>
 </ul>
 <p>
-Use this class with <a href="#device_extract">device_extract</a> to specify extraction of a 
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 three-terminal MOS transistor
 </p>
 <h2>"mos4" - Supplies the MOS4 transistor extractor class</h2>
@@ -406,7 +415,7 @@ three-terminal MOS transistor
 <li><tt>mos4(name)</tt></li>
 </ul>
 <p>
-Use this class with <a href="#device_extract">device_extract</a> to specify extraction of a 
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 four-terminal MOS transistor
 </p>
 <h2>"netlist" - Obtains the extracted netlist from the default <a href="#Netter">Netter</a></h2>
@@ -537,7 +546,7 @@ third parameter.
 <keyword name="report_netlist"/>
 <a name="report_netlist"/><p>Usage:</p>
 <ul>
-<li><tt>report_netlist([ filename ])</tt></li>
+<li><tt>report_netlist([ filename [, long ] ])</tt></li>
 </ul>
 <p>
 This method applies to runsets creating a netlist through
@@ -547,6 +556,8 @@ netlist plus the net and device shapes are turned into a
 layout-to-netlist report (L2N database) and shown in the 
 netlist browser window. If a file name is given, the report
 will also be written to the given file.
+If a file name is given and "long" is true, a verbose 
+version of the L2N DB format will be used.
 </p>
 <h2>"resistor" - Supplies the resistor extractor class</h2>
 <keyword name="resistor"/>
@@ -555,17 +566,17 @@ will also be written to the given file.
 <li><tt>resistor(name, sheet_rho)</tt></li>
 </ul>
 <p>
-Use this class with <a href="#device_extract">device_extract</a> to specify extraction of a resistor.
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a resistor.
 The sheet_rho value is the sheet resistance in ohms/square.
 </p>
 <h2>"resistor_with_bulk" - Supplies the resistor extractor class that includes a bulk terminal</h2>
 <keyword name="resistor_with_bulk"/>
 <a name="resistor_with_bulk"/><p>Usage:</p>
 <ul>
-<li><tt>resistor_with_bulk(name)</tt></li>
+<li><tt>resistor_with_bulk(name, sheet_rho)</tt></li>
 </ul>
 <p>
-Use this class with <a href="#device_extract">device_extract</a> to specify extraction of a resistor 
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a resistor 
 with a bulk terminal.
 The sheet_rho value is the sheet resistance in ohms/square.
 </p>

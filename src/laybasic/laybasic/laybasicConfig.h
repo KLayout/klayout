@@ -58,6 +58,8 @@ static const std::string cfg_child_ctx_dimming ("child-context-dimming");
 static const std::string cfg_child_ctx_hollow ("child-context-hollow");
 static const std::string cfg_child_ctx_enabled ("child-context-enabled");
 
+static const std::string cfg_search_range ("search-range");
+
 static const std::string cfg_abstract_mode_enabled ("abstract-mode-enabled");
 static const std::string cfg_abstract_mode_width ("abstract-mode-width");
 

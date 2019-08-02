@@ -155,10 +155,10 @@ struct A
   bool a9a (int i) const { return i == 5; }
   int a9b (bool f) const { return f ? 5 : -5; }
 
-  short a11_s (double f) { return short(f); }
-  unsigned short a11_us (double f) { return (unsigned short)(f); }
-  int a11_i (double f) { return int(f); }
-  unsigned int a11_ui (double f) { return (unsigned int)(f); }
+  short a11_s (double f) { return short(a11_l(f)); }
+  unsigned short a11_us (double f) { return (unsigned short)(a11_ul(f)); }
+  int a11_i (double f) { return int(a11_l(f)); }
+  unsigned int a11_ui (double f) { return (unsigned int)(a11_ul(f)); }
   long a11_l (double f) { return long(f); }
   unsigned long a11_ul (double f) { return (unsigned long)(f); }
   long long a11_ll (double f) { return (long long)(f); }

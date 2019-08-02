@@ -75,7 +75,7 @@ std::string NetlistDeviceExtractorError::to_string () const
 //  NetlistDeviceExtractor implementation
 
 NetlistDeviceExtractor::NetlistDeviceExtractor (const std::string &name)
-  : mp_layout (0), m_cell_index (0), mp_circuit (0)
+  : mp_layout (0), m_cell_index (0), m_device_scaling (1.0), mp_circuit (0)
 {
   m_name = name;
   m_terminal_id_propname_id = 0;
@@ -110,6 +110,7 @@ void NetlistDeviceExtractor::initialize (db::Netlist *nl)
 {
   m_layer_definitions.clear ();
   mp_device_class = 0;
+  m_device_scaling = 1.0;
   m_terminal_id_propname_id = 0;
   m_device_id_propname_id = 0;
   m_device_class_propname_id = 0;
@@ -123,7 +124,7 @@ static void insert_into_region (const db::PolygonRef &s, const db::ICplxTrans &t
   region.insert (s.obj ().transformed (tr * db::ICplxTrans (s.trans ())));
 }
 
-void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layout_index, const NetlistDeviceExtractor::input_layers &layer_map, db::Netlist &nl, hier_clusters_type &clusters)
+void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layout_index, const NetlistDeviceExtractor::input_layers &layer_map, db::Netlist &nl, hier_clusters_type &clusters, double device_scaling)
 {
   initialize (&nl);
 
@@ -183,13 +184,13 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
 
   }
 
-  extract_without_initialize (dss.layout (layout_index), dss.initial_cell (layout_index), clusters, layers);
+  extract_without_initialize (dss.layout (layout_index), dss.initial_cell (layout_index), clusters, layers, device_scaling);
 }
 
-void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl, hier_clusters_type &clusters)
+void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl, hier_clusters_type &clusters, double device_scaling)
 {
   initialize (nl);
-  extract_without_initialize (layout, cell, clusters, layers);
+  extract_without_initialize (layout, cell, clusters, layers, device_scaling);
 }
 
 namespace {
@@ -202,7 +203,7 @@ struct ExtractorCacheValueType {
 
 }
 
-void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers)
+void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling)
 {
   tl_assert (layers.size () == m_layer_definitions.size ());
 
@@ -212,6 +213,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   mp_layout = &layout;
   m_layers = layers;
   mp_clusters = &clusters;
+  m_device_scaling = device_scaling;
 
   //  terminal properties are kept in a property with the terminal_property_name name
   m_terminal_id_propname_id = mp_layout->properties_repository ().prop_name_id (terminal_id_property_name ());

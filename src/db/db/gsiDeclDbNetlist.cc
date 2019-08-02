@@ -283,6 +283,15 @@ Class<db::Device> decl_dbDevice ("db", "Device",
   gsi::method ("name", &db::Device::name,
     "@brief Gets the name of the device.\n"
   ) +
+  gsi::method ("trans=", &db::Device::set_trans, gsi::arg ("t"),
+    "@brief Sets the location of the device.\n"
+    "The device location is essentially describing the position of the device. The position is typically the center of some "
+    "recognition shape. In this case the transformation is a plain displacement to the center of this shape."
+  ) +
+  gsi::method ("trans", &db::Device::trans,
+    "@brief Gets the location of the device.\n"
+    "See \\trans= for details about this method."
+  ) +
   gsi::method ("expanded_name", &db::Device::expanded_name,
     "@brief Gets the expanded name of the device.\n"
     "The expanded name takes the name of the device. If the name is empty, the numeric ID will be used to build a name. "

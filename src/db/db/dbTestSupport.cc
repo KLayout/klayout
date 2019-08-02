@@ -291,7 +291,7 @@ private:
   }
 };
 
-void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string)
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string, bool exact_parameter_match)
 {
   db::Netlist au_nl;
   for (db::Netlist::const_device_class_iterator d = netlist.begin_device_classes (); d != netlist.end_device_classes (); ++d) {
@@ -300,27 +300,29 @@ void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist,
 
   au_nl.from_string (au_nl_string);
 
-  db::NetlistComparer comp (0);
-
-  if (! comp.compare (&netlist, &au_nl)) {
-    _this->raise ("Compare failed - see log for details.\n\nActual:\n" + netlist.to_string () + "\nGolden:\n" + au_nl_string);
-    //  Compare once again - this time with logger
-    CompareLogger logger;
-    db::NetlistComparer comp (&logger);
-    comp.compare (&netlist, &au_nl);
-  }
+  compare_netlist (_this, netlist, au_nl, exact_parameter_match);
 }
 
-void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au)
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au, bool exact_parameter_match)
 {
   db::NetlistComparer comp (0);
 
-  if (! comp.compare (&netlist, &netlist_au)) {
-    _this->raise ("Compare failed - see log for details.\n\nActual:\n" + netlist.to_string () + "\nGolden:\n" + netlist_au.to_string ());
+  db::Netlist netlist_copy (netlist);
+
+  if (exact_parameter_match) {
+    //  install a "all parameters are equal" device parameter comparer so we make sure the devices are compared exactly
+    for (db::Netlist::device_class_iterator dc = netlist_copy.begin_device_classes (); dc != netlist_copy.end_device_classes (); ++dc) {
+      db::DeviceClass &cls = *dc;
+      cls.set_parameter_compare_delegate (new db::AllDeviceParametersAreEqual (0.01));
+    }
+  }
+
+  if (! comp.compare (&netlist_copy, &netlist_au)) {
+    _this->raise ("Compare failed - see log for details.\n\nActual:\n" + netlist_copy.to_string () + "\nGolden:\n" + netlist_au.to_string ());
     //  Compare once again - this time with logger
     CompareLogger logger;
     db::NetlistComparer comp (&logger);
-    comp.compare (&netlist, &netlist_au);
+    comp.compare (&netlist_copy, &netlist_au);
   }
 }
 

@@ -95,6 +95,12 @@ module LVS
     # See \Netter#compare for a description of that function.
  
     # %LVS%
+    # @name align
+    # @brief Aligns the extracted netlist vs. the schematic by flattening circuits where required
+    # @synopsis align
+    # See \Netter#align for a description of that function.
+ 
+    # %LVS%
     # @name same_nets
     # @brief Establishes an equivalence between the nets
     # @synopsis same_nets(circuit, net_a, net_b)
@@ -143,7 +149,7 @@ module LVS
     # @synopsis max_depth(n)
     # See \Netter#max_depth for a description of that function.
 
-    %w(schematic compare same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity).each do |f|
+    %w(schematic compare align same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

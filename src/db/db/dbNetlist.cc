@@ -30,8 +30,9 @@ namespace db
 // --------------------------------------------------------------------------------
 //  Netlist class implementation
 
-Netlist::Netlist ()
-  : m_valid_topology (false), m_lock_count (0),
+Netlist::Netlist (NetlistManipulationCallbacks *callbacks)
+  : mp_callbacks (callbacks),
+    m_valid_topology (false), m_lock_count (0),
     m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
     m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits),
     m_device_abstract_by_name (this, &Netlist::begin_device_abstracts, &Netlist::end_device_abstracts),

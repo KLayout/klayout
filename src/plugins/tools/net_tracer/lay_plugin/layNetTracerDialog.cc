@@ -169,7 +169,7 @@ NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, b
       //  prepare for the net tracing 
       clear_markers ();
 
-      double l = double (lay::search_range) / widget ()->mouse_event_trans ().mag ();
+      double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
 
       db::DBox start_search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
 

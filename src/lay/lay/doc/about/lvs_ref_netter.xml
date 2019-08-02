@@ -43,6 +43,31 @@ end
 </pre>
 </p>
 <h2-index/>
+<h2>"align" - Aligns the extracted netlist vs. the schematic</h2>
+<keyword name="align"/>
+<a name="align"/><p>Usage:</p>
+<ul>
+<li><tt>align</tt></li>
+</ul>
+<p>
+The align method will modify the netlists in case of missing 
+corresponding circuits. It will flatten these circuits, thus 
+improving the equivalence between the netlists. Top level circuits
+are not flattened.
+</p><p>
+This feature is in particular useful to remove structural cells
+like device PCells, reuse blocks etc.
+</p><p>
+This method will also remove schematic circuits for which there is
+no corresponding layout cell. In the extreme case of flat layout this
+will result in a flat vs. flat compare.
+</p><p>
+"netlist.flatten_circuit(...)" or "schematic.flatten_circuit(...)"
+are other (explicit) ways to flatten circuits.
+</p><p>
+Please note that flattening circuits has some side effects such 
+as loss of details in the cross reference and net layout.
+</p>
 <h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
 <keyword name="compare"/>
 <a name="compare"/><p>Usage:</p>
@@ -54,6 +79,9 @@ Before using this method, a schematic netlist has to be loaded with <a href="#sc
 The compare can be configured in more details using <a href="#same_nets">same_nets</a>, <a href="#same_circuits">same_circuits</a>,
 <a href="#same_device_classes">same_device_classes</a> and <a href="#equivalent_pins">equivalent_pins</a>.
 </p><p>
+The compare method will also modify the netlists in case of missing 
+corresponding circuits: the unpaired circuit will be flattened then.
+</p><p>
 This method will return true, if the netlists are equivalent and false
 otherwise.
 </p>
@@ -61,7 +89,7 @@ otherwise.
 <keyword name="equivalent_pins"/>
 <a name="equivalent_pins"/><p>Usage:</p>
 <ul>
-<li><tt>equivalent_pins(circuit, pins ...)</tt></li>
+<li><tt>equivalent_pins(circuit, pin ...)</tt></li>
 </ul>
 <p>
 This method will mark the given pins as equivalent. This gives the compare algorithm
@@ -70,8 +98,14 @@ is used to declare inputs from gates are equivalent where are are logically, but
 physically (e.g. in a CMOS NAND gate):
 </p><p>
 <pre>
-netter.equivalent_pins("NAND2", "A", "B")
+netter.equivalent_pins("NAND2", 0, 1)
 </pre>
+</p><p>
+The circuit argument is either a circuit name (a string) or a Circuit object
+from the schematic netlist.
+</p><p>
+The pin arguments are zero-based pin numbers, where 0 is the first number, 1 the second etc.
+If the netlist provides named pins, names can be used instead of numbers.
 </p><p>
 Before this method can be used, a schematic netlist needs to be loaded with
 <a href="#schematic">schematic</a>.
@@ -85,6 +119,23 @@ Before this method can be used, a schematic netlist needs to be loaded with
 <p>
 The <class_doc href="LayoutVsSchematic">LayoutVsSchematic</class_doc> object provides access to the internal details of
 the netter object.
+</p>
+<h2>"max_depth" - Configures the maximum search depth for net match deduction</h2>
+<keyword name="max_depth"/>
+<a name="max_depth"/><p>Usage:</p>
+<ul>
+<li><tt>max_depth(n)</tt></li>
+</ul>
+<p>
+The netlist compare algorithm works recursively: once a net
+equivalence is established, additional matches are derived from
+this equivalence. Such equivalences in turn are used to derive
+new equivalences and so on. The maximum depth parameter configures
+the number of recursions the algorithm performs before picking
+the next net. With higher values for the depth, the algorithm
+pursues this "deduction path" in greater depth while with 
+smaller values, the algorithm prefers picking nets in a random fashion
+as the seeds for this deduction path. The default value is 8. 
 </p>
 <h2>"max_res" - Ignores resistors with a resistance above a certain value</h2>
 <keyword name="max_res"/>
@@ -117,6 +168,9 @@ This method will force an equivalence between the two circuits.
 By default, circuits are identified by name. If names are different, this
 method allows establishing an explicit correspondence.
 </p><p>
+One of the circuits may be nil. In this case, the corresponding
+other circuit is mapped to "nothing", i.e. ignored.
+</p><p>
 Before this method can be used, a schematic netlist needs to be loaded with
 <a href="#schematic">schematic</a>.
 </p>
@@ -132,6 +186,9 @@ Device classes are also known as "models".
 By default, device classes are identified by name. If names are different, this
 method allows establishing an explicit correspondence.
 </p><p>
+One of the device classes may be nil. In this case, the corresponding
+other device class is mapped to "nothing", i.e. ignored.
+</p><p>
 Before this method can be used, a schematic netlist needs to be loaded with
 <a href="#schematic">schematic</a>.
 </p>
@@ -145,7 +202,11 @@ Before this method can be used, a schematic netlist needs to be loaded with
 <p>
 This method will force an equivalence between the net_a and net_b from circuit_a
 and circuit_b (circuit in the three-argument form is for both circuit_a and circuit_b).
-Circuit and nets are string giving a circuit and net by name.
+</p><p>
+In the four-argument form, the circuits can be either given by name or as Circuit
+objects. In the three-argument form, the circuit has to be given by name. 
+Nets can be either given by name or as Net objects.
+</p><p>
 After using this function, the compare algorithm will consider these nets equivalent.
 Use this method to provide hints for the comparer in cases which are difficult to
 resolve otherwise.
@@ -153,15 +214,19 @@ resolve otherwise.
 Before this method can be used, a schematic netlist needs to be loaded with
 <a href="#schematic">schematic</a>.
 </p>
-<h2>"schematic" - Reads the reference netlist</h2>
+<h2>"schematic" - Gets, sets or reads the reference netlist</h2>
 <keyword name="schematic"/>
 <a name="schematic"/><p>Usage:</p>
 <ul>
 <li><tt>schematic(filename)</tt></li>
 <li><tt>schematic(filename, reader)</tt></li>
 <li><tt>schematic(netlist)</tt></li>
+<li><tt>schematic</tt></li>
 </ul>
 <p>
+If no argument is given, the current schematic netlist is returned. nil is 
+returned if no schematic netlist is set yet.
+</p><p>
 If a filename is given (first two forms), the netlist is read from the given file.
 If no reader is provided, Spice format will be assumed. The reader object is a
 <class_doc href="NetlistReader">NetlistReader</class_doc> object and allows detailed customization of the reader process.

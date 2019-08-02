@@ -2,9 +2,10 @@
 
 $script_call = $0 + " " + ARGV.join(" ")
 
-$indir="src/drc/drc/built-in-macros" 
+$indirs = [ "src/drc/drc/built-in-macros", "src/lvs/lvs/built-in-macros" ]
+
 $loc = "about"
-$outfiles="src/lay/lay/doc"
+$outfiles = "src/lay/lay/doc"
 
 def create_ref(mod, s)
   if s =~ /(.*)::(.*)#(.*)/
@@ -262,53 +263,57 @@ collectors = {
   "LVS" => Collector::new("lvs", "LVS Reference")
 }
 
-Dir.entries($indir).each do |p|
+$indirs.each do |indir|
 
-  if p !~ /\.rb$/
-    next
-  end
+  Dir.entries(indir).each do |p|
 
-  infile = File.join($indir, p)
-  puts "Extracting doc from #{infile} .."
+    if p !~ /\.rb$/
+      next
+    end
 
-  File.open(infile, "r") do |file|
+    infile = File.join(indir, p)
+    puts "Extracting doc from #{infile} .."
 
-    block = []
-    collector = nil
-    line = 0
+    File.open(infile, "r") do |file|
 
-    file.each_line do |l|
+      block = []
+      collector = nil
+      line = 0
 
-      line += 1
+      file.each_line do |l|
 
-      begin
+        line += 1
 
-        l = unescape(l)
+        begin
 
-        if ! collector
-          collectors.each do |k,c|
-            if l =~ /^\s*#\s*%#{k}%/
-              collector = c
-              l = nil
-              block = []
-              break
+          l = unescape(l)
+
+          if ! collector
+            collectors.each do |k,c|
+              if l =~ /^\s*#\s*%#{k}%/
+                collector = c
+                l = nil
+                block = []
+                break
+              end
             end
           end
-        end
 
-        if l
-          if l =~ /^\s*#\s*(.*)\s*$/
-            collector && block.push($1)
-          elsif l =~ /^\s*$/
-            collector && collector.add_block(block)
-            collector = nil
+          if l
+            if l =~ /^\s*#\s*(.*)\s*$/
+              collector && block.push($1)
+            elsif l =~ /^\s*$/
+              collector && collector.add_block(block)
+              collector = nil
+            end
           end
+
+        rescue => ex
+          puts "ERROR in line #{line}:\n" + ex.to_s
+          puts ex.backtrace # @@@
+          exit 1
         end
 
-      rescue => ex
-        puts "ERROR in line #{line}:\n" + ex.to_s
-        puts ex.backtrace # @@@
-        exit 1
       end
 
     end

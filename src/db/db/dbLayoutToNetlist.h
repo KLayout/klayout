@@ -70,7 +70,7 @@ namespace db
  *  @li
  */
 class DB_PUBLIC LayoutToNetlist
-  : public gsi::ObjectBase, public tl::Object
+  : public gsi::ObjectBase, public db::NetlistManipulationCallbacks
 {
 public:
   typedef std::map<unsigned int, std::string>::const_iterator layer_iterator;
@@ -219,6 +219,18 @@ public:
    *  @brief Gets the max vertex count
    */
   size_t max_vertex_count () const;
+
+  /**
+   *  @brief Sets the device scaling factor
+   *  This factor will scale the physical properties of the extracted devices
+   *  accordingly. The scale factor applies an isotropic shrink (<1) or expansion (>1).
+   */
+  void set_device_scaling (double s);
+
+  /**
+   *  @brief Gets the device scaling factor
+   */
+  double device_scaling () const;
 
   /**
    *  @brief Register a layer under the given name
@@ -396,6 +408,11 @@ public:
     tl_assert (mp_dss.get () != 0);
     return *mp_dss;
   }
+
+  /**
+   *  @brief Returns true, if there a layout is set
+   */
+  bool has_internal_layout () const;
 
   /**
    *  @brief Gets the internal layout
@@ -711,6 +728,7 @@ private:
   std::map<unsigned int, std::string> m_name_of_layer;
   bool m_netlist_extracted;
   bool m_is_flat;
+  double m_device_scaling;
   db::DeepLayer m_dummy_layer;
 
   struct CellReuseTableKey
@@ -743,6 +761,7 @@ private:
   typedef std::map<CellReuseTableKey, db::cell_index_type> cell_reuse_table_type;
 
   void init ();
+  void ensure_netlist ();
   size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<db::PolygonRef> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
   void build_net_rec (const db::Net &net, db::Layout &target, cell_index_type circuit_cell, const db::CellMapping &cmap, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
   void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
@@ -752,6 +771,9 @@ private:
   std::string make_new_name (const std::string &stem = std::string ());
   db::properties_id_type make_netname_propid (db::Layout &ly, const tl::Variant &netname_prop, const db::Net &net) const;
   db::CellMapping make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells);
+
+  //  implementation of NetlistManipulationCallbacks
+  virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);
 };
 
 }

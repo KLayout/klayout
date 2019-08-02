@@ -331,6 +331,11 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   gsi::method ("dbu", &GenericDeviceExtractor::dbu,
    "@brief Gets the database unit\n"
   ) +
+  gsi::method ("sdbu", &GenericDeviceExtractor::sdbu,
+   "@brief Gets the scaled database unit\n"
+   "Use this unit to compute device properties. It is the database unit multiplied with the\n"
+   "device scaling factor."
+  ) +
   gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &)) &GenericDeviceExtractor::error,
     gsi::arg ("message"),
    "@brief Issues an error with the given message\n"

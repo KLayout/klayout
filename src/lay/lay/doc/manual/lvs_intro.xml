@@ -342,8 +342,7 @@ connect_global(nwell, "NWELL")</pre>
   <pre>schematic("inv.cir")</pre>
 
   <p>
-  And with this we can trigger the compare step (this will implicitly trigger the netlist
-  extraction from the layout too):
+  Finally after having set this up, we can trigger the compare step:
   </p>
 
   <pre>compare</pre>
@@ -357,7 +356,7 @@ connect_global(nwell, "NWELL")</pre>
 target_netlist("inv_extracted.cir", write_spice, "Extracted by KLayout")</pre>
 
   <p>
-  The extracted netlist is pretty much the same than the reference netlist, but
+  Since we have a LVS match, the extracted netlist is pretty much the same than the reference netlist, but
   enhanced by some geometrical parameters such as source and drain area and 
   perimeter:
   </p>
@@ -390,8 +389,8 @@ M$2 2 1 4 6 NMOS L=0.25U W=0.9U AS=0.405P AD=0.405P PS=2.7U PD=2.7U
   Tie-down diodes are contacts over active regions. The active regions are
   implanted p+ on the substrate and n+ within the n well (the opposite implant
   type of transistors). With this doping profile, the metal contact won't form
-  a Schottky barrier to the Silicon bulk and pretty much behave like an ohmic contact
-  (so in fact, the "diode" isn't a real diode in the sense of a rectifier).
+  a Schottky barrier to the Silicon bulk and behave like an ohmic contact.
+  So in fact, the "diode" isn't a real diode in the sense of a rectifier.
   </p>
 
   <p>

@@ -2083,6 +2083,49 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b, NetlistCom
   return res;
 }
 
+void
+NetlistComparer::unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector<db::Circuit *> &in_a, std::vector<db::Circuit *> &in_b) const
+{
+  //  we need to create a copy because this method is supposed to be const.
+  db::CircuitCategorizer circuit_categorizer = *mp_circuit_categorizer;
+
+  std::map<size_t, std::pair<db::Circuit *, db::Circuit *> > cat2circuits;
+
+  for (db::Netlist::circuit_iterator i = a->begin_circuits (); i != a->end_circuits (); ++i) {
+    size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
+    if (cat && i->begin_refs () != i->end_refs ()) {
+      cat2circuits[cat].first = i.operator-> ();
+    }
+  }
+
+  for (db::Netlist::circuit_iterator i = b->begin_circuits (); i != b->end_circuits (); ++i) {
+    size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
+    if (cat && i->begin_refs () != i->end_refs ()) {
+      cat2circuits[cat].second = i.operator-> ();
+    }
+  }
+
+  size_t na = 0, nb = 0;
+  for (std::map<size_t, std::pair<db::Circuit *, db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
+    if (! i->second.first) {
+      ++nb;
+    } else if (! i->second.second) {
+      ++na;
+    }
+  }
+
+  in_a.reserve (na);
+  in_b.reserve (nb);
+
+  for (std::map<size_t, std::pair<db::Circuit *, db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
+    if (! i->second.first) {
+      in_b.push_back (i->second.second);
+    } else if (! i->second.second) {
+      in_a.push_back (i->second.first);
+    }
+  }
+}
+
 bool
 NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 {
@@ -2368,6 +2411,42 @@ struct KeySize
   }
 };
 
+struct DeviceConnectionDistance
+{
+  typedef std::pair<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> > value_type;
+
+  double operator() (const value_type &a, const value_type &b) const
+  {
+    int d = 0.0;
+    for (std::vector<std::pair<size_t, size_t> >::const_iterator i = a.first.begin (), j = b.first.begin (); i != a.first.end () && j != b.first.end (); ++i, ++j) {
+      if (i->second != j->second || i->second == std::numeric_limits<size_t>::max () || j->second == std::numeric_limits<size_t>::max ()) {
+        ++d;
+      }
+    }
+    return double (d);
+  }
+};
+
+struct DeviceParametersCompare
+{
+  typedef std::pair<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> > value_type;
+
+  bool operator() (const value_type &a, const value_type &b) const
+  {
+    //  category and parameters
+    return m_dc (a.second, b.second);
+  }
+
+  bool equals (const value_type &a, const value_type &b) const
+  {
+    //  category and parameters
+    return m_dc.equals (a.second, b.second);
+  }
+
+private:
+  db::DeviceCompare m_dc;
+};
+
 template <class Iter, class Distance>
 void align (Iter i1, Iter i2, Iter j1, Iter j2, Distance distance)
 {
@@ -2403,12 +2482,12 @@ void align (Iter i1, Iter i2, Iter j1, Iter j2, Distance distance)
 
     any_swapped = false;
 
-    for (size_t m = n + 1; m < vj.size () - 1; ++m) {
+    for (size_t m = n + 1; m < vj.size (); ++m) {
       if (vi [n] == Iter () || vi [m] == Iter () || vj [n] == Iter () || vj [m] == Iter ()) {
         continue;
       } else if (distance (*vi [n], *vj [m]) + distance (*vi [m], *vj [n]) < distance (*vi [n], *vj [n]) + distance (*vi [m], *vj [m])) {
         //  this will reduce the overall distance:
-        std::swap (vj [n], vj [m]);
+        std::swap (*vj [n], *vj [m]);
         any_swapped = true;
       }
     }
@@ -2419,7 +2498,14 @@ void align (Iter i1, Iter i2, Iter j1, Iter j2, Distance distance)
 }
 
 bool
-NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
+NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
+                                   db::DeviceCategorizer &device_categorizer,
+                                   db::CircuitCategorizer &circuit_categorizer,
+                                   db::CircuitPinMapper &circuit_pin_mapper,
+                                   const std::vector<std::pair<const Net *, const Net *> > &net_identity,
+                                   bool &pin_mismatch,
+                                   std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping,
+                                   std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
 {
   db::DeviceFilter device_filter (m_cap_threshold, m_res_threshold);
 
@@ -2562,7 +2648,16 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     }
   }
 
+  do_pin_assignment (c1, g1, c2, g2, c12_circuit_and_pin_mapping, c22_circuit_and_pin_mapping, pin_mismatch, good);
+  do_device_assignment (c1, g1, c2, g2, device_filter, device_categorizer, good);
+  do_subcircuit_assignment (c1, g1, c2, g2, circuit_categorizer, circuit_pin_mapper, c12_circuit_and_pin_mapping, c22_circuit_and_pin_mapping, good);
 
+  return good;
+}
+
+void
+NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &pin_mismatch, bool &good) const
+{
   //  Report pin assignment
   //  This step also does the pin identity mapping.
 
@@ -2742,9 +2837,17 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   }
 
+}
+
+void
+NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, const db::DeviceFilter &device_filter, db::DeviceCategorizer &device_categorizer, bool &good) const
+{
   //  Report device assignment
 
   std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> > device_map;
+
+  typedef std::vector<std::pair<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> > > unmatched_list;
+  unmatched_list unmatched_a, unmatched_b;
 
   for (db::Circuit::const_device_iterator d = c1->begin_devices (); d != c1->end_devices (); ++d) {
 
@@ -2761,15 +2864,16 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g1);
 
     bool mapped = true;
-    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end () && mapped; ++i) {
+    for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
       if (! g1.begin () [i->second].has_other ()) {
+        i->second = std::numeric_limits<size_t>::max ();  //  normalization
         mapped = false;
       }
     }
 
     if (! mapped) {
       if (mp_logger) {
-        mp_logger->device_mismatch (d.operator-> (), 0);
+        unmatched_a.push_back (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
       }
       good = false;
     } else {
@@ -2796,6 +2900,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
       if (! g2.begin () [i->second].has_other ()) {
+        i->second = std::numeric_limits<size_t>::max ();  //  normalization
         mapped = false;
       } else {
         i->second = g2.begin () [i->second].other_net_index ();
@@ -2809,7 +2914,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     if (! mapped || dm == device_map.end () || dm->first != k) {
 
       if (mp_logger) {
-        mp_logger->device_mismatch (0, d.operator-> ());
+        unmatched_b.push_back (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
       }
       good = false;
 
@@ -2843,12 +2948,90 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::const_iterator dm = device_map.begin (); dm != device_map.end (); ++dm) {
     if (mp_logger) {
-      mp_logger->device_mismatch (dm->second.first, 0);
+      unmatched_a.push_back (*dm);
     }
     good = false;
   }
 
+  //  try to do some better mapping of unmatched devices - they will still be reported as mismatching, but their pairing gives some hint
+  //  what to fix.
 
+  if (mp_logger) {
+
+    size_t max_analysis_set = 1000;
+    if (unmatched_a.size () + unmatched_b.size () > max_analysis_set) {
+
+      //  don't try too much analysis - this may be a waste of time
+      for (unmatched_list::const_iterator i = unmatched_a.begin (); i != unmatched_a.end (); ++i) {
+        mp_logger->device_mismatch (i->second.first, 0);
+      }
+      for (unmatched_list::const_iterator i = unmatched_b.begin (); i != unmatched_b.end (); ++i) {
+        mp_logger->device_mismatch (0, i->second.first);
+      }
+
+    } else {
+
+      DeviceParametersCompare cmp;
+
+      std::sort (unmatched_a.begin (), unmatched_a.end (), cmp);
+      std::sort (unmatched_b.begin (), unmatched_b.end (), cmp);
+
+      for (unmatched_list::iterator i = unmatched_a.begin (), j = unmatched_b.begin (); i != unmatched_a.end () || j != unmatched_b.end (); ) {
+
+        while (j != unmatched_b.end () && (i == unmatched_a.end () || !cmp.equals (*j, *i))) {
+          mp_logger->device_mismatch (0, j->second.first);
+          ++j;
+        }
+
+        while (i != unmatched_a.end () && (j == unmatched_b.end () || !cmp.equals (*i, *j))) {
+          mp_logger->device_mismatch (i->second.first, 0);
+          ++i;
+        }
+
+        if (i == unmatched_a.end () && j == unmatched_b.end ()) {
+          break;
+        }
+
+        unmatched_list::iterator ii = i, jj = j;
+        ++i, ++j;
+        size_t n = ii->first.size ();
+        tl_assert (n == jj->first.size ());
+
+        while (i != unmatched_a.end () && cmp.equals (*i, *ii)) {
+          ++i;
+        }
+
+        while (j != unmatched_b.end () && cmp.equals (*j, *jj)) {
+          ++j;
+        }
+
+        if (i - ii == size_t(2)) {
+          printf("@@@1\n"); fflush(stdout);
+        }
+        align (ii, i, jj, j, DeviceConnectionDistance ());
+
+        for ( ; ii != i && jj != j; ++ii, ++jj) {
+          mp_logger->device_mismatch (ii->second.first, jj->second.first);
+        }
+
+        for ( ; jj != j; ++jj) {
+          mp_logger->device_mismatch (0, jj->second.first);
+        }
+
+        for ( ; ii != i; ++ii) {
+          mp_logger->device_mismatch (ii->second.first, 0);
+        }
+
+      }
+
+    }
+
+  }
+}
+
+void
+NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, CircuitCategorizer &circuit_categorizer, const CircuitPinMapper &circuit_pin_mapper, std::map<const Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &good) const
+{
   //  Report subcircuit assignment
 
   std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::SubCircuit *, size_t> > subcircuit_map;
@@ -3012,8 +3195,6 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     }
 
   }
-
-  return good;
 }
 
 }

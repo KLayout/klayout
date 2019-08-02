@@ -522,6 +522,14 @@ public:
     return --m_next_dummy_id;
   }
 
+  /**
+   *  @brief Gets a value indicating whether the given ID is a dummy ID
+   */
+  bool is_dummy (typename local_cluster<T>::id_type id) const
+  {
+    return id > m_clusters.size ();
+  }
+
 private:
   void ensure_sorted ();
 
@@ -601,11 +609,19 @@ public:
   }
 
   /**
+   *  @brief Transform with the given transformation
+   */
+  void transform (const db::ICplxTrans &tr)
+  {
+    m_inst_trans = tr * m_inst_trans;
+  }
+
+  /**
    *  @brief Equality
    */
   bool operator== (const ClusterInstElement &other) const
   {
-    return m_inst_cell_index == other.m_inst_cell_index && m_inst_trans == other.m_inst_trans && m_inst_prop_id == other.m_inst_prop_id;
+    return m_inst_cell_index == other.m_inst_cell_index && m_inst_trans.equal (other.m_inst_trans) && m_inst_prop_id == other.m_inst_prop_id;
   }
 
   /**
@@ -624,8 +640,8 @@ public:
     if (m_inst_cell_index != other.m_inst_cell_index) {
       return m_inst_cell_index < other.m_inst_cell_index;
     }
-    if (m_inst_trans != other.m_inst_trans) {
-      return m_inst_trans < other.m_inst_trans;
+    if (! m_inst_trans.equal (other.m_inst_trans)) {
+      return m_inst_trans.less (other.m_inst_trans);
     }
     return m_inst_prop_id < other.m_inst_prop_id;
   }
@@ -803,7 +819,7 @@ public:
    *  The "with_id" cluster is removed. All connections of "with_id" are transferred to the
    *  first one. All shapes of "with_id" are transferred to "id".
    */
-  void join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
+  void join_cluster_with(typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
 
   /**
    *  @brief An iterator delivering all clusters (even the connectors)

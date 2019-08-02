@@ -153,6 +153,7 @@ public:
 
   virtual void end_netlist (const db::Netlist *a, const db::Netlist *b)
   {
+    sort_netlist ();
     gen_end_netlist (a, b);
   }
 
@@ -163,6 +164,7 @@ public:
 
   virtual void end_circuit (const db::Circuit *a, const db::Circuit *b, bool matching)
   {
+    sort_circuit ();
     gen_end_circuit (a, b, matching ? Match : NoMatch);
   }
 
@@ -291,6 +293,8 @@ private:
   void establish_pair (const db::Device *a, const db::Device *b, Status status);
   void establish_pair (const db::Pin *a, const db::Pin *b, Status status);
   void establish_pair (const db::SubCircuit *a, const db::SubCircuit *b, Status status);
+  void sort_circuit ();
+  void sort_netlist ();
 
   void build_per_net_info (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const;
   void build_subcircuit_pin_refs (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const;

@@ -112,8 +112,8 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 
       device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
 
-      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, dbu () * edges.length () * 0.5);
-      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, dbu () * (p->perimeter () - edges.length ()) * 0.5);
+      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, sdbu () * edges.length () * 0.5);
+      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, sdbu () * (p->perimeter () - edges.length ()) * 0.5);
 
       int diff_index = 0;
       for (db::Region::const_iterator d = rdiff2gate.begin (); !d.at_end () && diff_index < 2; ++d, ++diff_index) {
@@ -123,8 +123,8 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         size_t n = rgates.selected_interacting (db::Region (*d)).size ();
         tl_assert (n > 0);
 
-        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, dbu () * dbu () * d->area () / double (n));
-        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, dbu () * d->perimeter () / double (n));
+        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * d->area () / double (n));
+        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * d->perimeter () / double (n));
 
         unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
         define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *d);
@@ -262,10 +262,10 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     }
 
     device->set_parameter_value (db::DeviceClassResistor::param_id_R, m_sheet_rho * double (length) / double (width));
-    device->set_parameter_value (db::DeviceClassResistor::param_id_L, dbu () * length);
-    device->set_parameter_value (db::DeviceClassResistor::param_id_W, dbu () * width);
-    device->set_parameter_value (db::DeviceClassResistor::param_id_A, dbu () * dbu () * p->area ());
-    device->set_parameter_value (db::DeviceClassResistor::param_id_P, dbu () * p->perimeter ());
+    device->set_parameter_value (db::DeviceClassResistor::param_id_L, sdbu () * length);
+    device->set_parameter_value (db::DeviceClassResistor::param_id_W, sdbu () * width);
+    device->set_parameter_value (db::DeviceClassResistor::param_id_A, sdbu () * sdbu () * p->area ());
+    device->set_parameter_value (db::DeviceClassResistor::param_id_P, sdbu () * p->perimeter ());
 
     int cont_index = 0;
     for (db::Region::const_iterator d = contacts_per_res.begin (); !d.at_end () && cont_index < 2; ++d, ++cont_index) {
@@ -366,11 +366,11 @@ void NetlistDeviceExtractorCapacitor::extract_devices (const std::vector<db::Reg
 
     device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
 
-    double area = p->area () * dbu () * dbu ();
+    double area = p->area () * sdbu () * sdbu ();
 
     device->set_parameter_value (db::DeviceClassCapacitor::param_id_C, m_area_cap * area);
     device->set_parameter_value (db::DeviceClassCapacitor::param_id_A, area);
-    device->set_parameter_value (db::DeviceClassCapacitor::param_id_P, dbu () * p->perimeter ());
+    device->set_parameter_value (db::DeviceClassCapacitor::param_id_P, sdbu () * p->perimeter ());
 
     define_terminal (device, db::DeviceClassCapacitor::terminal_id_A, a_terminal_geometry_index, *p);
     define_terminal (device, db::DeviceClassCapacitor::terminal_id_B, b_terminal_geometry_index, *p);
@@ -498,11 +498,11 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
       //  emitter wins over collector for the collector contact
       rcollector -= remitter2base;
 
-      double ab = dbu () * dbu () * p->area ();
-      double pb = dbu () * p->perimeter ();
+      double ab = sdbu () * sdbu () * p->area ();
+      double pb = sdbu () * p->perimeter ();
 
-      double ac = dbu () * dbu () * rcollector2base.area ();
-      double pc = dbu () * rcollector2base.perimeter ();
+      double ac = sdbu () * sdbu () * rcollector2base.area ();
+      double pc = sdbu () * rcollector2base.perimeter ();
 
       for (db::Region::const_iterator pe = remitter2base.begin_merged (); !pe.at_end (); ++pe) {
 
@@ -512,8 +512,8 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
 
         device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_NE, 1.0);
 
-        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AE, dbu () * dbu () * pe->area ());
-        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PE, dbu () * pe->perimeter ());
+        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AE, sdbu () * sdbu () * pe->area ());
+        device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PE, sdbu () * pe->perimeter ());
 
         device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_AB, ab);
         device->set_parameter_value (db::DeviceClassBJT3Transistor::param_id_PB, pb);
@@ -629,10 +629,10 @@ void NetlistDeviceExtractorDiode::extract_devices (const std::vector<db::Region>
 
     device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
 
-    double area = p->area () * dbu () * dbu ();
+    double area = p->area () * sdbu () * sdbu ();
 
     device->set_parameter_value (db::DeviceClassDiode::param_id_A, area);
-    device->set_parameter_value (db::DeviceClassDiode::param_id_P, dbu () * p->perimeter ());
+    device->set_parameter_value (db::DeviceClassDiode::param_id_P, sdbu () * p->perimeter ());
 
     define_terminal (device, db::DeviceClassDiode::terminal_id_A, a_terminal_geometry_index, *p);
     define_terminal (device, db::DeviceClassDiode::terminal_id_C, c_terminal_geometry_index, *p);

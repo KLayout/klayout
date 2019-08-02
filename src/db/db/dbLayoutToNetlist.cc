@@ -38,7 +38,7 @@ namespace db
 //  the iterator provides the hierarchical selection (enabling/disabling cells etc.)
 
 LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
-  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false)
+  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0)
 {
   //  check the iterator
   if (iter.has_complex_region () || iter.region () != db::Box::world ()) {
@@ -58,7 +58,7 @@ LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
 }
 
 LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index)
-  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false)
+  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0)
 {
   if (dss->is_valid_layout_index (m_layout_index)) {
     m_iter = db::RecursiveShapeIterator (dss->layout (m_layout_index), dss->initial_cell (m_layout_index), std::set<unsigned int> ());
@@ -66,7 +66,7 @@ LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_i
 }
 
 LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
-  : m_iter (), m_netlist_extracted (false), m_is_flat (true)
+  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0)
 {
   mp_internal_dss.reset (new db::DeepShapeStore (topcell_name, dbu));
   mp_dss.reset (mp_internal_dss.get ());
@@ -77,7 +77,7 @@ LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
 
 LayoutToNetlist::LayoutToNetlist ()
   : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_layout_index (0),
-    m_netlist_extracted (false), m_is_flat (false)
+    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0)
 {
   init ();
 }
@@ -136,6 +136,16 @@ size_t LayoutToNetlist::max_vertex_count () const
   return dss ().max_vertex_count ();
 }
 
+void LayoutToNetlist::set_device_scaling (double s)
+{
+  m_device_scaling = s;
+}
+
+double LayoutToNetlist::device_scaling () const
+{
+  return m_device_scaling;
+}
+
 db::Region *LayoutToNetlist::make_layer (const std::string &n)
 {
   db::RecursiveShapeIterator si (m_iter);
@@ -187,15 +197,37 @@ db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const
   return region.release ();
 }
 
+size_t LayoutToNetlist::link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &dtrans)
+{
+  if (! subcircuit_net->circuit () || ! has_internal_layout () || ! internal_layout ()->is_valid_cell_index (parent_circuit->cell_index ())) {
+    return 0;
+  }
+
+  db::CplxTrans dbu_trans (internal_layout ()->dbu ());
+  db::ICplxTrans trans = dbu_trans.inverted () * dtrans * dbu_trans;
+
+  connected_clusters<db::PolygonRef> &parent_net_clusters = m_net_clusters.clusters_per_cell (parent_circuit->cell_index ());
+
+  size_t id = parent_net_clusters.insert_dummy (); // @@@
+
+  parent_net_clusters.add_connection (id, db::ClusterInstance (subcircuit_net->cluster_id (), subcircuit_net->circuit ()->cell_index (), trans, 0));
+  return id;
+}
+
+void LayoutToNetlist::ensure_netlist ()
+{
+  if (! mp_netlist.get ()) {
+    mp_netlist.reset (new db::Netlist (this));
+  }
+}
+
 void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::Region *> &layers)
 {
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
-  if (! mp_netlist.get ()) {
-    mp_netlist.reset (new db::Netlist ());
-  }
-  extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters);
+  ensure_netlist ();
+  extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters, m_device_scaling);
 }
 
 void LayoutToNetlist::connect (const db::Region &l)
@@ -267,9 +299,7 @@ void LayoutToNetlist::extract_netlist (const std::string &joined_net_names)
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
-  if (! mp_netlist.get ()) {
-    mp_netlist.reset (new db::Netlist ());
-  }
+  ensure_netlist ();
 
   db::NetlistExtractor netex;
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters, joined_net_names);
@@ -280,6 +310,11 @@ void LayoutToNetlist::extract_netlist (const std::string &joined_net_names)
 void LayoutToNetlist::set_netlist_extracted ()
 {
   m_netlist_extracted = true;
+}
+
+bool LayoutToNetlist::has_internal_layout () const
+{
+  return mp_dss.get () && mp_dss->is_valid_layout_index (m_layout_index);
 }
 
 const db::Layout *LayoutToNetlist::internal_layout () const
@@ -530,9 +565,7 @@ db::Netlist *LayoutToNetlist::netlist () const
 
 db::Netlist *LayoutToNetlist::make_netlist ()
 {
-  if (! mp_netlist.get ()) {
-    mp_netlist.reset (new db::Netlist ());
-  }
+  ensure_netlist ();
   return mp_netlist.get ();
 }
 

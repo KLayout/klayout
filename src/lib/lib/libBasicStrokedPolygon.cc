@@ -134,7 +134,12 @@ BasicStrokedPolygon::produce (const db::Layout &layout, const std::vector<unsign
 std::string 
 BasicStrokedPolygon::get_display_name (const db::pcell_parameters_type &parameters) const
 {
-  return std::string(m_box ? "STROKED_BOX" : "STROKED_POLYGON") + "(w=" + tl::micron_to_string (parameters [p_width].to_double ()) + ",r=" + tl::micron_to_string (parameters [p_radius].to_double ()) + ")";
+  return std::string(m_box ? "STROKED_BOX" : "STROKED_POLYGON") +
+                      "(l=" + std::string (parameters [p_layer].to_string ()) +
+                      ",w=" + tl::to_string (parameters [p_width].to_double ()) +
+                      ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
+                      ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+                        ")";
 }
 
 std::vector<db::PCellParameterDeclaration> 

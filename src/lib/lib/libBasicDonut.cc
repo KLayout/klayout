@@ -169,7 +169,11 @@ BasicDonut::produce (const db::Layout &layout, const std::vector<unsigned int> &
 std::string 
 BasicDonut::get_display_name (const db::pcell_parameters_type &parameters) const
 {
-  return std::string("DONUT(r=") + tl::micron_to_string (parameters [p_actual_radius1].to_double ()) + ".." + tl::micron_to_string (parameters [p_actual_radius2].to_double ()) + ")";
+  return "DONUT(l=" + std::string (parameters [p_layer].to_string ()) +
+              ",r=" + tl::to_string (parameters [p_actual_radius1].to_double ()) +
+               ".." + tl::to_string (parameters [p_actual_radius2].to_double ()) +
+              ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+                ")";
 }
 
 std::vector<db::PCellParameterDeclaration> 

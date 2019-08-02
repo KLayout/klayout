@@ -223,8 +223,9 @@ private:
   double m_scale;
   bool m_mirror;
   db::DPoint m_disp;
-  std::string m_cell_name, m_lib_name;
+  std::string m_cell_or_pcell_name, m_lib_name;
   std::map<std::string, tl::Variant> m_pcell_parameters;
+  bool m_is_pcell;
   bool m_array;
   unsigned int m_rows, m_columns;
   double m_row_x, m_row_y, m_column_x, m_column_y;

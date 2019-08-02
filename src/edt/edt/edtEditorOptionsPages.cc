@@ -643,10 +643,12 @@ EditorOptionsInst::apply (lay::Plugin *root)
     if (pc.first) {
       const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pc.second);
       if (pc_decl) {
+        param += "!";  //  flags PCells
         std::vector<tl::Variant> pv = mp_pcell_parameters->get_parameters ();
         const std::vector<db::PCellParameterDeclaration> &pcp = pc_decl->parameter_declarations ();
         for (size_t i = 0; i < std::min (pv.size (), pcp.size ()); ++i) {
-          param += tl::to_word_or_quoted_string (pcp [i].get_name ()) + ":";
+          param += tl::to_word_or_quoted_string (pcp [i].get_name ());
+          param += ":";
           param += pv [i].to_parsable_string ();
           param += ";";
         }
@@ -742,6 +744,7 @@ EditorOptionsInst::setup (lay::Plugin *root)
         std::map<std::string, tl::Variant> parameters;
         try {
           tl::Extractor ex (param.c_str ());
+          ex.test ("!");  //  used to flag PCells
           while (! ex.at_end ()) {
             std::string n;
             ex.read_word_or_quoted (n);

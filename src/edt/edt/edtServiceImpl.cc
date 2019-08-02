@@ -1107,7 +1107,7 @@ PathService::config_finalize ()
 InstService::InstService (db::Manager *manager, lay::LayoutView *view)
   : edt::Service (manager, view),
     m_angle (0.0), m_scale (1.0),
-    m_mirror (false), m_cell_name (""), m_lib_name (""), m_pcell_parameters (),
+    m_mirror (false), m_is_pcell (false),
     m_array (false), m_rows (1), m_columns (1), 
     m_row_x (0.0), m_row_y (0.0), m_column_x (0.0), m_column_y (0.0),
     m_place_origin (false), m_reference_transaction_id (0),
@@ -1158,14 +1158,17 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
     }
 
     m_pcell_parameters.clear ();
-    m_cell_name.clear ();
+    m_cell_or_pcell_name.clear ();
+    m_is_pcell = false;
 
     if (cd->is_pcell ()) {
 
       const db::PCellDeclaration *pcell_decl = cd->layout ()->pcell_declaration (cd->cell_index ());
       if (pcell_decl) {
 
-        m_cell_name = pcell_decl->name ();
+        m_cell_or_pcell_name = pcell_decl->name ();
+        m_is_pcell = true;
+
         const std::vector<db::PCellParameterDeclaration> &pd = pcell_decl->parameter_declarations();
         for (std::vector<db::PCellParameterDeclaration>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
           m_pcell_parameters.insert (std::make_pair (i->get_name (), i->get_default ()));
@@ -1178,7 +1181,7 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
 
     } else if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
 
-      m_cell_name = cd->layout ()->cell_name (cd->cell_index ());
+      m_cell_or_pcell_name = cd->layout ()->cell_name (cd->cell_index ());
       do_begin_edit (p);
       return true;
 
@@ -1299,10 +1302,16 @@ InstService::make_cell (const lay::CellView &cv)
     layout = &cv->layout ();
   }
 
-  std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (m_cell_name.c_str ());
-  std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (m_cell_name.c_str ());
+  std::pair<bool, db::cell_index_type> ci (false, db::cell_index_type (0));
+  std::pair<bool, db::pcell_id_type> pci (false, db::pcell_id_type (0));
+
+  if (! m_is_pcell) {
+    ci = layout->cell_by_name (m_cell_or_pcell_name.c_str ());
+  } else {
+    pci = layout->pcell_by_name (m_cell_or_pcell_name.c_str ());
+  }
+
   if (! ci.first && ! pci.first) {
-    //  throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
     return std::pair<bool, db::cell_index_type> (false, 0);
   }
 
@@ -1487,7 +1496,7 @@ bool
 InstService::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_edit_inst_cell_name) {
-    m_cell_name = value;
+    m_cell_or_pcell_name = value;
     m_needs_update = true;
     return true; // taken
   }
@@ -1500,8 +1509,11 @@ InstService::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_edit_inst_pcell_parameters) {
 
-    m_pcell_parameters.clear ();
     tl::Extractor ex (value.c_str ());
+
+    m_pcell_parameters.clear ();
+    m_is_pcell = ex.test ("!") || ! ex.at_end ();
+
     while (! ex.at_end ()) {
       std::string n;
       ex.read_word_or_quoted (n);

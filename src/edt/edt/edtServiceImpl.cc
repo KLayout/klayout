@@ -1487,6 +1487,11 @@ InstService::do_finish_edit ()
     m_has_valid_cell = false;
     m_in_drag_drop = false;
 
+    //  on a preconfigured PCell offer to edit the properties now
+    if (m_is_pcell) {
+      view ()->show_properties (QApplication::activeWindow ());
+    }
+
   } catch (...) {
     m_has_valid_cell = false;
     m_in_drag_drop = false;

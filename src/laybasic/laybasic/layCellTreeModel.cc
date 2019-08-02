@@ -88,7 +88,7 @@ CellTreeItem::CellTreeItem (const db::Layout *layout, bool is_pcell, size_t cell
   : mp_layout (layout), mp_parent (0), m_sorting (s), m_is_pcell (is_pcell), m_index (0), m_children (), m_cell_or_pcell_index (cell_or_pcell_index)
 {
   if (! flat && ! is_pcell) {
-    m_child_count = int (mp_layout->cell (cell_index ()).child_cells ());
+    m_child_count = int (mp_layout->cell (cell_or_pcell_index).child_cells ());
   } else {
     m_child_count = 0;
   }
@@ -105,7 +105,7 @@ CellTreeItem::~CellTreeItem ()
 bool
 CellTreeItem::is_valid () const
 {
-  return m_is_pcell || mp_layout->is_valid_cell_index (cell_index ());
+  return m_is_pcell || mp_layout->is_valid_cell_index (cell_or_pcell_index ());
 }
 
 std::string 
@@ -113,8 +113,8 @@ CellTreeItem::display_text () const
 {
   if (m_is_pcell) {
     return name ();
-  } else if (mp_layout->is_valid_cell_index (cell_index ())) {
-    return mp_layout->cell (cell_index ()).get_display_name ();
+  } else if (mp_layout->is_valid_cell_index (cell_or_pcell_index ())) {
+    return mp_layout->cell (cell_or_pcell_index ()).get_display_name ();
   } else {
     return std::string ();
   }
@@ -133,7 +133,7 @@ CellTreeItem::child (int index)
 
     //  create a list of child sub-item
 
-    const db::Cell *cell = & mp_layout->cell (cell_index ());
+    const db::Cell *cell = & mp_layout->cell (cell_or_pcell_index ());
 
     m_children.reserve (m_child_count);
 
@@ -171,7 +171,7 @@ CellTreeItem::finish_children ()
 }
 
 db::cell_index_type
-CellTreeItem::cell_index () const
+CellTreeItem::cell_or_pcell_index () const
 {
   return db::cell_index_type (m_cell_or_pcell_index);
 }
@@ -186,7 +186,7 @@ const char *
 CellTreeItem::name () const
 {
   if (! m_is_pcell) {
-    return mp_layout->cell_name (cell_index ());
+    return mp_layout->cell_name (cell_or_pcell_index ());
   } else {
     return mp_layout->pcell_header (m_cell_or_pcell_index)->get_name ().c_str ();
   }
@@ -239,7 +239,7 @@ CellTreeItem::by_area_less_than (const CellTreeItem *b) const
     return m_is_pcell > b->is_pcell ();
   }
   // Hint: since mp_layout == b.mp_layout, not conversion to um^2 is required because of different DBU
-  return mp_layout->cell (cell_index ()).bbox ().area () < b->mp_layout->cell (b->cell_index ()).bbox ().area ();
+  return mp_layout->cell (cell_or_pcell_index ()).bbox ().area () < b->mp_layout->cell (b->cell_or_pcell_index ()).bbox ().area ();
 }
 
 bool
@@ -249,7 +249,7 @@ CellTreeItem::by_area_equal_than (const CellTreeItem *b) const
     return false;
   }
   // Hint: since mp_layout == b.mp_layout, not conversion to um^2 is required because of different DBU
-  return mp_layout->cell (cell_index ()).bbox ().area () == b->mp_layout->cell (b->cell_index ()).bbox ().area ();
+  return mp_layout->cell (cell_or_pcell_index ()).bbox ().area () == b->mp_layout->cell (b->cell_or_pcell_index ()).bbox ().area ();
 }
 
 // --------------------------------------------------------------------
@@ -410,10 +410,10 @@ CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::Layo
 
     for (QModelIndexList::const_iterator index = indexes.begin (); index != indexes.end (); ++index) {
 
-      std::vector<db::cell_index_type> path;
+      std::vector<std::pair<bool, db::cell_index_type> > path;
       CellTreeItem *item = (CellTreeItem *) index->internalPointer ();
       while (item) {
-        path.push_back (item->cell_index ());
+        path.push_back (std::make_pair (item->is_pcell (), item->cell_or_pcell_index ()));
         item = item->parent ();
       }
 
@@ -425,22 +425,22 @@ CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::Layo
         //  because we push_back'd on our way up:
         std::reverse (path.begin (), path.end ());
 
-        for (std::vector<db::cell_index_type>::const_iterator ci = path.begin (); ci != path.end (); ++ci) {
+        for (std::vector<std::pair<bool, db::cell_index_type> >::const_iterator ci = path.begin (); ci != path.end (); ++ci) {
 
           CellTreeItem *new_parent = 0;
 
-          if (! layout->is_valid_cell_index (*ci)) {
+          if ((! ci->first && ! layout->is_valid_cell_index (ci->second)) || (ci->first && ! layout->pcell_declaration (ci->second))) {
             //  can't translate this index
           } else if (parent == 0) {
             for (int i = 0; i < int (m_toplevel.size ()) && !new_parent; ++i) {
-              if (m_toplevel [i]->cell_index () == *ci) {
+              if (m_toplevel [i]->cell_or_pcell_index () == ci->second && m_toplevel [i]->is_pcell () == ci->first) {
                 new_parent = m_toplevel [i];
                 row = i;
               }
             }
           } else {
             for (int i = 0; i < parent->children () && !new_parent; ++i) {
-              if (parent->child (i)->cell_index () == *ci) {
+              if (parent->child (i)->cell_or_pcell_index () == ci->second && parent->child (i)->is_pcell () == ci->first) {
                 new_parent = parent->child (i);
                 row = i;
               }
@@ -651,7 +651,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
       const lay::CellView::specific_cell_path_type &ctx_path = mp_view->cellview (m_cv_index).specific_path ();
 
       if (! path.empty ()) {
-        if (item->cell_index () == path.back ()) {
+        if (item->cell_or_pcell_index () == path.back ()) {
           if (m_flat) {
             f.setBold (true);
           } else {
@@ -659,7 +659,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
             lay::CellView::unspecific_cell_path_type::const_iterator p = path.end ();
             while (it && p != path.begin ()) {
               --p;
-              if (it->cell_index () != *p) {
+              if (it->cell_or_pcell_index () != *p) {
                 break;
               }
               it = it->parent ();
@@ -668,7 +668,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
               f.setBold (true);
             }
           }
-        } else if (! ctx_path.empty () && item->cell_index () == ctx_path.back ().inst_ptr.cell_index ()) {
+        } else if (! ctx_path.empty () && item->cell_or_pcell_index () == ctx_path.back ().inst_ptr.cell_index ()) {
           if (m_flat) {
             f.setUnderline (true);
           } else {
@@ -676,7 +676,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
             lay::CellView::specific_cell_path_type::const_iterator cp = ctx_path.end ();
             while (it && cp != ctx_path.begin ()) {
               --cp;
-              if (it->cell_index () != cp->inst_ptr.cell_index ()) {
+              if (it->cell_or_pcell_index () != cp->inst_ptr.cell_index ()) {
                 break;
               }
               it = it->parent ();
@@ -685,7 +685,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
               lay::CellView::unspecific_cell_path_type::const_iterator p = path.end ();
               while (it && p != path.begin ()) {
                 --p;
-                if (it->cell_index () != *p) {
+                if (it->cell_or_pcell_index () != *p) {
                   break;
                 }
                 it = it->parent ();
@@ -698,7 +698,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
         }
       }
 
-      if (mp_view->is_cell_hidden (item->cell_index (), m_cv_index)) {
+      if (mp_view->is_cell_hidden (item->cell_or_pcell_index (), m_cv_index)) {
         f.setStrikeOut (true);
       }
 
@@ -748,19 +748,6 @@ QVariant
 CellTreeModel::headerData (int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
 {
   return QVariant ();
-}
-
-bool searchItemPtr(CellTreeItem *parent, CellTreeItem *search)
-{
-  if (parent == search) {
-    return true;
-  }
-  for (int i = 0; i < parent->children(); ++i) {
-    if (searchItemPtr(parent->child(i), search)) {
-      return true;
-    }
-  }
-  return false;
 }
 
 int 
@@ -874,7 +861,7 @@ CellTreeModel::pcell_id (const QModelIndex &index) const
     return 0;
   } else {
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
-    return item->cell_index ();
+    return item->cell_or_pcell_index ();
   }
 }
 
@@ -885,7 +872,7 @@ CellTreeModel::cell_index (const QModelIndex &index) const
     return 0;
   } else {
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
-    return item->cell_index ();
+    return item->cell_or_pcell_index ();
   }
 }
 
@@ -894,7 +881,7 @@ CellTreeModel::cell (const QModelIndex &index) const
 {
   if (index.isValid () && ! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
-    return & mp_layout->cell (item->cell_index ());
+    return & mp_layout->cell (item->cell_or_pcell_index ());
   } else {
     return 0;
   }
@@ -906,9 +893,9 @@ CellTreeModel::cell_name (const QModelIndex &index) const
   if (index.isValid () && ! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
     if (item->is_pcell ()) {
-      return mp_layout->pcell_header (item->cell_index ())->get_name ().c_str ();
+      return mp_layout->pcell_header (item->cell_or_pcell_index ())->get_name ().c_str ();
     } else {
-      return mp_layout->cell_name (item->cell_index ());
+      return mp_layout->cell_name (item->cell_or_pcell_index ());
     }
   } else {
     return 0;

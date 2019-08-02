@@ -271,7 +271,7 @@ public:
 
   int children () const;
   CellTreeItem *child (int index);
-  db::cell_index_type cell_index () const;
+  db::cell_index_type cell_or_pcell_index () const;
   CellTreeItem *parent () const;
   bool by_name_less_than (const CellTreeItem *b) const;
   bool by_area_less_than (const CellTreeItem *b) const;

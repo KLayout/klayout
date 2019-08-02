@@ -241,6 +241,7 @@ private:
   void update_marker ();
   bool get_inst (db::CellInstArray &inst);
   std::pair<bool, db::cell_index_type> make_cell (const lay::CellView &cv);
+  tl::Variant get_default_layer_for_pcell ();
 };
 
 }

@@ -1138,6 +1138,20 @@ InstService::do_activated ()
   return true;  //  start editing immediately
 }
 
+tl::Variant
+InstService::get_default_layer_for_pcell ()
+{
+  lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
+  if (! cl.is_null () && ! cl->has_children () && (cl->source (true).cv_index() < 0 || cl->source (true).cv_index () == view ()->active_cellview_index ())) {
+    db::LayerProperties lp = cl->source (true).layer_props ();
+    if (! lp.is_null ()) {
+      return tl::Variant (lp);
+    }
+  }
+
+  return tl::Variant ();
+}
+
 bool
 InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase *data)
 { 
@@ -1171,7 +1185,11 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
 
         const std::vector<db::PCellParameterDeclaration> &pd = pcell_decl->parameter_declarations();
         for (std::vector<db::PCellParameterDeclaration>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-          m_pcell_parameters.insert (std::make_pair (i->get_name (), i->get_default ()));
+          if (i->get_type () == db::PCellParameterDeclaration::t_layer && i->get_default ().is_nil ()) {
+            m_pcell_parameters.insert (std::make_pair (i->get_name (), get_default_layer_for_pcell ()));
+          } else {
+            m_pcell_parameters.insert (std::make_pair (i->get_name (), i->get_default ()));
+          }
         }
 
         do_begin_edit (p);
@@ -1337,6 +1355,9 @@ InstService::make_cell (const lay::CellView &cv)
             pv.push_back (pd->get_default ());
           }
         }
+
+        //  make the parameters fit (i.e. PCells may not define consistent default parameters)
+        pc_decl->coerce_parameters (*layout, pv);
 
       }
 

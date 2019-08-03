@@ -716,6 +716,7 @@ LibrariesView::do_update_content (int lib_index)
   for (db::LibraryManager::iterator lib = db::LibraryManager::instance ().begin (); lib != db::LibraryManager::instance ().end (); ++lib) {
     libraries.push_back (db::LibraryManager::instance ().lib (lib->second));
     libraries.back ()->layout ().hier_changed_event.add (this, &LibrariesView::update_required);
+    libraries.back ()->retired_state_changed_event.add (this, &LibrariesView::update_required);
   }
 
   for (size_t i = imin; i < libraries.size () && i <= imax; ++i) {

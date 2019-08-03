@@ -164,11 +164,36 @@ public:
   void unregister_proxy (db::LibraryProxy *lib_proxy, db::Layout *layout);
 
   /**
+   *  @brief Retires a LibraryProxy in the given layout
+   *
+   *  A proxy becomes entirely retired if the refcount is equal to the
+   *  retired count. This feature is used to decide whether a proxy
+   *  is actually used or only present as a shadow object for the transaction
+   *  management.
+   */
+  void retire_proxy (db::LibraryProxy *lib_proxy);
+
+  /**
+   *  @brief Unretires the Library proxy
+   */
+  void unretire_proxy (db::LibraryProxy *lib_proxy);
+
+  /**
+   *  @brief Gets a value indicating whether a proxy is entirely retired
+   */
+  bool is_retired (const cell_index_type library_cell_index) const;
+
+  /**
    *  @brief Remap the library proxies to a different library
    *
    *  After remapping, "other" can replace "this".
    */
   void remap_to (db::Library *other);
+
+  /**
+   *  @brief This event is fired if proxies get retired on unretired
+   */
+  tl::Event retired_state_changed_event;
 
 private:
   std::string m_name;
@@ -177,7 +202,7 @@ private:
   lib_id_type m_id;
   db::Layout m_layout;
   std::map<db::Layout *, int> m_referrers;
-  std::map<db::cell_index_type, int> m_refcount;
+  std::map<db::cell_index_type, int> m_refcount, m_retired_count;
 
   // no copying.
   Library &operator=(const Library &);

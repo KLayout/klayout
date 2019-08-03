@@ -26,6 +26,7 @@
 #include "tlGlobPattern.h"
 #include "dbPCellHeader.h"
 #include "dbPCellVariant.h"
+#include "dbLibraryProxy.h"
 #include "dbLibrary.h"
 
 #include <QTreeView>
@@ -559,7 +560,12 @@ CellTreeModel::build_top_level ()
 
           const db::PCellHeader *pcell_header = mp_layout->pcell_header (pc->second);
           for (db::PCellHeader::variant_iterator v = pcell_header->begin (); v != pcell_header->end (); ++v) {
-            item->add_child (new CellTreeItem (mp_layout, false, v->second->cell_index (), true, m_sorting));
+            if (mp_library && mp_library->is_retired (v->second->cell_index ())) {
+              //  skip retired cells - this means we won't show variants which are just kept
+              //  as shadow variants for the transactions.
+            } else {
+              item->add_child (new CellTreeItem (mp_layout, false, v->second->cell_index (), true, m_sorting));
+            }
           }
 
           item->finish_children ();

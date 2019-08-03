@@ -262,10 +262,18 @@ class DB_PUBLIC Transaction
 {
 public:
   Transaction (db::Manager *manager, const std::string &desc)
-    : mp_manager (manager)
+    : mp_manager (manager), m_transaction_id (0)
   {
     if (mp_manager) {
-      mp_manager->transaction (desc);
+      m_transaction_id = mp_manager->transaction (desc);
+    }
+  }
+
+  Transaction (db::Manager *manager, const std::string &desc, db::Manager::transaction_id_t join_with)
+    : mp_manager (manager), m_transaction_id (0)
+  {
+    if (mp_manager) {
+      m_transaction_id = mp_manager->transaction (desc, join_with);
     }
   }
 
@@ -277,8 +285,14 @@ public:
     }
   }
 
+  db::Manager::transaction_id_t id () const
+  {
+    return m_transaction_id;
+  }
+
 private:
   db::Manager *mp_manager;
+  db::Manager::transaction_id_t m_transaction_id;
 
   //  no copying.
   Transaction (const Transaction &);

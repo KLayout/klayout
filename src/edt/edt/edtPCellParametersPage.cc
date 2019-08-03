@@ -129,14 +129,29 @@ static void set_value (const db::PCellParameterDeclaration &p, const db::Layout 
 }
 
 PCellParametersPage::PCellParametersPage (QWidget *parent, const db::Layout *layout, lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
-  : QFrame (parent), mp_pcell_decl (pcell_decl), mp_layout (layout), mp_view (view), m_cv_index (cv_index)
+  : QFrame (parent)
 {
+  init ();
+  setup (layout, view, cv_index, pcell_decl, parameters);
+}
+
+PCellParametersPage::PCellParametersPage (QWidget *parent)
+  : QFrame (parent)
+{
+  init ();
+}
+
+void
+PCellParametersPage::init ()
+{
+  mp_pcell_decl = 0;
+  mp_layout = 0;
+  mp_view = 0;
+  m_cv_index = 0;
+  mp_parameters_area = 0;
+
   QGridLayout *frame_layout = new QGridLayout (this);
   setLayout (frame_layout);
-
-  mp_parameters_area = new QScrollArea (this);
-  frame_layout->addWidget (mp_parameters_area, 0, 0, 1, 2);
-  frame_layout->setRowStretch (0, 1);
 
   mp_error_icon = new QLabel (this);
   mp_error_icon->setPixmap (QPixmap (":/warn.png"));
@@ -153,8 +168,27 @@ PCellParametersPage::PCellParametersPage (QWidget *parent, const db::Layout *lay
   mp_error_label->hide ();
   frame_layout->addWidget (mp_error_label, 1, 1, 1, 1);
   frame_layout->setColumnStretch (1, 1);
+}
 
+void
+PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
+{
+  mp_pcell_decl = pcell_decl;
+  mp_layout = layout;
+  mp_view = view;
+  m_cv_index = cv_index;
   m_parameters = parameters;
+
+  if (mp_parameters_area) {
+    delete mp_parameters_area;
+  }
+
+  m_widgets.clear ();
+
+  mp_parameters_area = new QScrollArea (this);
+  QGridLayout *frame_layout = dynamic_cast<QGridLayout *> (QFrame::layout ());
+  frame_layout->addWidget (mp_parameters_area, 0, 0, 1, 2);
+  frame_layout->setRowStretch (0, 1);
 
   QFrame *fi = new QFrame (mp_parameters_area);
   QWidget *inner_frame = fi;

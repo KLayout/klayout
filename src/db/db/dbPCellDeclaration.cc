@@ -111,5 +111,22 @@ PCellDeclaration::map_parameters (const std::map<std::string, tl::Variant> &para
   return new_param;
 }
 
+std::map<std::string, tl::Variant>
+PCellDeclaration::named_parameters (const pcell_parameters_type &pv) const
+{
+  std::map<std::string, tl::Variant> np;
+
+  const std::vector<db::PCellParameterDeclaration> &pcp = parameter_declarations ();
+  for (std::vector<PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
+    size_t index = pd - pcp.begin ();
+    if (index >= pv.size ()) {
+      break;
+    }
+    np.insert (std::make_pair (pd->get_name (), pv [index]));
+  }
+
+  return np;
+}
+
 }
 

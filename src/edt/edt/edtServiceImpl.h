@@ -27,6 +27,8 @@
 #include "edtService.h"
 #include "edtConfig.h"
 
+#include <memory>
+
 namespace lay
 {
   class CellView;
@@ -34,6 +36,8 @@ namespace lay
 
 namespace edt
 {
+
+class PCellParametersDialog;
 
 /**
  *  @brief Implementation of the edt::Service for generic shape editing
@@ -235,10 +239,14 @@ private:
   bool m_has_valid_cell;
   bool m_in_drag_drop;
   db::cell_index_type m_current_cell;
+  db::Layout *mp_current_layout;
+  const db::PCellDeclaration *mp_pcell_decl;
   int m_cv_index;
   db::ICplxTrans m_trans;
+  std::auto_ptr<edt::PCellParametersDialog> mp_pcell_parameters_dialog;
 
   void update_marker ();
+  void apply_edits ();
   bool get_inst (db::CellInstArray &inst);
   std::pair<bool, db::cell_index_type> make_cell (const lay::CellView &cv);
   tl::Variant get_default_layer_for_pcell ();

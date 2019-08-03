@@ -204,29 +204,6 @@ LibrariesView::init_menu (lay::AbstractMenu &menu)
     //  doesn't make sense for many libs
     MenuLayoutEntry ("split_mode",                  tl::to_string (QObject::tr ("Split Mode")),             std::make_pair (cfg_split_lib_views, "?")),
 #endif
-#if 0 // @@@
-    MenuLayoutEntry::separator ("operations_group"),
-    MenuLayoutEntry ("new_cell:edit:edit_mode",     tl::to_string (QObject::tr ("New Cell")),               SLOT (cm_new_cell ())),
-    MenuLayoutEntry ("delete_cell:edit:edit_mode",  tl::to_string (QObject::tr ("Delete Cell")),            SLOT (cm_cell_delete ())),
-    MenuLayoutEntry ("rename_cell:edit:edit_mode",  tl::to_string (QObject::tr ("Rename Cell")),            SLOT (cm_cell_rename ())),
-    MenuLayoutEntry ("replace_cell:edit:edit_mode", tl::to_string (QObject::tr ("Replace Cell")),           SLOT (cm_cell_replace ())),
-    MenuLayoutEntry ("flatten_cell:edit:edit_mode", tl::to_string (QObject::tr ("Flatten Cell")),           SLOT (cm_cell_flatten ())),
-    MenuLayoutEntry ("cell_user_properties",        tl::to_string (QObject::tr ("User Properties")),        SLOT (cm_cell_user_properties ())),
-    MenuLayoutEntry::separator ("clipboard_group:edit_mode"),
-    MenuLayoutEntry ("copy:edit_mode",              tl::to_string (QObject::tr ("Copy")),                   SLOT (cm_cell_copy ())),
-    MenuLayoutEntry ("cut:edit_mode",               tl::to_string (QObject::tr ("Cut")),                    SLOT (cm_cell_cut ())),
-    MenuLayoutEntry ("paste:edit_mode",             tl::to_string (QObject::tr ("Paste")),                  SLOT (cm_cell_paste ())),
-    MenuLayoutEntry::separator ("select_group"),
-    MenuLayoutEntry ("show_as_top",                 tl::to_string (QObject::tr ("Show As New Top")),        SLOT (cm_cell_select ())),
-    MenuLayoutEntry::separator ("visibility_group"),
-    MenuLayoutEntry ("hide_cell",                   tl::to_string (QObject::tr ("Hide")),                   SLOT (cm_cell_hide ())),
-    MenuLayoutEntry ("show_cell",                   tl::to_string (QObject::tr ("Show")),                   SLOT (cm_cell_show ())),
-    MenuLayoutEntry ("show_all",                    tl::to_string (QObject::tr ("Show All")),               SLOT (cm_cell_show_all ())),
-    MenuLayoutEntry::separator ("utils_group"),
-    MenuLayoutEntry ("open_current",                tl::to_string (QObject::tr ("Where Am I?")),            SLOT (cm_open_current_cell ())),
-    MenuLayoutEntry::separator ("file_group"),
-    MenuLayoutEntry ("save_cell_as:hide_vo",        tl::to_string (QObject::tr ("Save Selected Cells As")), SLOT (cm_save_current_cell_as ())),
- #endif
     MenuLayoutEntry::last ()
   };
 
@@ -365,7 +342,6 @@ LibrariesView::context_menu (const QPoint &p)
 
   QTreeView *cell_list = dynamic_cast<QTreeView *> (sender ());
   if (cell_list) {
-// @@@    set_active_celltree_from_sender ();
     QMenu *ctx_menu = lay::AbstractMenuProvider::instance ()->menu ()->detached_menu ("lib_context_menu");
     ctx_menu->exec (cell_list->mapToGlobal (p));
   }
@@ -393,16 +369,6 @@ LibrariesView::clear_all ()
   mp_cell_list_frames.clear ();
   mp_cell_list_headers.clear ();
   mp_cell_lists.clear ();
-}
-
-void
-LibrariesView::cm_cell_select ()
-{
-#if 0 // @@@
-  cell_path_type path;
-  current_cell (active (), path);
-  emit cell_selected (path, active ());
-#endif
 }
 
 void
@@ -511,148 +477,26 @@ LibrariesView::search_editing_finished ()
 void
 LibrariesView::middle_clicked (const QModelIndex &index)
 {
-#if 0 // @@@
-  BEGIN_PROTECTED
-  if (index.isValid ()) {
-    set_active_celltree_from_sender ();
-    cell_path_type path;
-    path_from_index (index, m_active_index, path);
-    emit cell_selected (path, active ());
-  }
-  END_PROTECTED
-#endif
+  //  ... nothing yet ..
 }
-
-#if 0 // @@@
-void
-LibrariesView::path_from_index (const QModelIndex &index, int cv_index, cell_path_type &path) const
-{
-  //  build the path to the cell given by the index
-  path.clear ();
-
-  if (index.isValid ()) {
-
-    CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
-
-    if (m_flat && cv_index >= 0 && cv_index < int (m_cellviews.size ()) && item) {
-
-      //  construct a path in the flat case
-      lay::CellView cv (m_cellviews [cv_index]);
-      cv.set_cell (item->cell_index ());
-      path = cv.unspecific_path ();
-
-    } else {
-
-      while (item) {
-        path.push_back (item->cell_index ());
-        item = item->parent ();
-      }
-
-      if (! path.empty ()) {
-        std::reverse (path.begin (), path.end ());
-      }
-
-    }
-
-  }
-}
-
-void
-LibrariesView::set_active_celltree_from_sender ()
-{
-  for (int i = 0; i < int (mp_cell_lists.size ()); ++i) {
-    if (mp_cell_lists [i] == sender ()) {
-      select_active (i);
-      return;
-    }
-    if (mp_cell_list_headers [i] == sender ()) {
-      select_active (i);
-      return;
-    }
-  }
-}
-#endif // @@@
 
 void
 LibrariesView::header_clicked ()
 {
-#if 0 // @@@
-  QToolButton *cb = dynamic_cast<QToolButton *> (sender ());
-  if (cb) {
-    cb->setChecked (true);
-    set_active_celltree_from_sender ();
-  }
-#endif
+  //  ... nothing yet ..
 }
 
 void
 LibrariesView::clicked (const QModelIndex & /*index*/)
 {
-#if 0 // @@@
-  set_active_celltree_from_sender ();
-#endif
+  //  ... nothing yet ..
 }
 
 void
 LibrariesView::double_clicked (const QModelIndex &index)
 {
-#if 0 // @@@
-  BEGIN_PROTECTED
-  if (index.isValid ()) {
-    set_active_celltree_from_sender ();
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Show or hide cell")));
-    CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
-    if (mp_view->is_cell_hidden (item->cell_index (), m_active_index)) {
-      mp_view->show_cell (item->cell_index (), m_active_index);
-    } else {
-      mp_view->hide_cell (item->cell_index (), m_active_index);
-    }
-    mp_view->manager ()->commit ();
-  }
-  END_PROTECTED
-#endif
+  //  ... nothing yet ..
 }
-
-#if 0 // @@@
-void
-LibrariesView::set_current_cell (int cv_index, const cell_path_type &path)
-{
-  if (cv_index < 0 || cv_index >= int (mp_cell_lists.size ())) {
-    return;
-  }
-
-  QModelIndex index = index_from_path (path, cv_index);
-  if (index.isValid ()) {
-    mp_cell_lists [cv_index]->scrollTo (index);
-    mp_cell_lists [cv_index]->clearSelection ();
-    mp_cell_lists [cv_index]->setCurrentIndex (index);
-  }
-}
-#endif
-
-#if 0 // @@@
-void
-LibrariesView::selected_cells (int cv_index, std::vector<LibrariesView::cell_path_type> &paths) const
-{
-  if (cv_index >= 0 && cv_index < int (mp_cell_lists.size ())) {
-    QModelIndexList sel = mp_cell_lists [cv_index]->selectionModel ()->selectedIndexes ();
-    for (QModelIndexList::const_iterator s = sel.begin (); s != sel.end (); ++s) {
-      paths.push_back (LibrariesView::cell_path_type ());
-      path_from_index (*s, cv_index, paths.back ());
-    }
-  }
-}
-#endif
-
-#if 0 // @@@
-void
-LibrariesView::current_cell (int cv_index, LibrariesView::cell_path_type &path) const
-{
-  if (cv_index >= 0 && cv_index < int (mp_cell_lists.size ())) {
-    path_from_index (mp_cell_lists [cv_index]->currentIndex (), cv_index, path);
-  }
-}
-#endif
 
 void
 LibrariesView::set_background_color (QColor c)
@@ -809,11 +653,9 @@ LibrariesView::do_update_content (int lib_index)
     cell_list->setContextMenuPolicy (Qt::CustomContextMenu);
 
     connect (cell_list, SIGNAL (customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
-#if 0 // @@@
     connect (cell_list, SIGNAL (cell_clicked (const QModelIndex &)), this, SLOT (clicked (const QModelIndex &)));
     connect (cell_list, SIGNAL (cell_double_clicked (const QModelIndex &)), this, SLOT (double_clicked (const QModelIndex &)));
     connect (cell_list, SIGNAL (cell_middle_clicked (const QModelIndex &)), this, SLOT (middle_clicked (const QModelIndex &)));
-#endif
     connect (cell_list, SIGNAL (search_triggered (const QString &)), this, SLOT (search_triggered (const QString &)));
 
     mp_cell_lists.push_back (cell_list);
@@ -944,67 +786,6 @@ LibrariesView::selection_changed (int index)
 
   }
 }
-
-#if 0 // @@@
-QModelIndex
-LibrariesView::index_from_path (const cell_path_type &path, int cv_index)
-{
-  if (cv_index >= 0 && cv_index < int (mp_cell_lists.size ()) && ! path.empty ()) {
-
-    CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [cv_index]->model ());
-    if (! model) {
-      return QModelIndex ();
-    }
-
-    if (m_flat) {
-
-      //  TODO: linear search might not be effective enough ..
-      for (int c = 0; c < model->toplevel_items (); ++c) {
-        CellTreeItem *item = model->toplevel_item (c);
-        if (item->cell_index () == path.back ()) {
-          return model->model_index (item);
-        }
-      }
-
-    } else {
-
-      for (int c = 0; c < model->toplevel_items (); ++c) {
-        CellTreeItem *item = model->toplevel_item (c);
-        if (item->cell_index () == path.front ()) {
-          item = find_child_item (path.begin () + 1, path.end (), item);
-          if (item) {
-            return model->model_index (item);
-          }
-        }
-      }
-
-    }
-
-  }
-
-  return QModelIndex ();
-}
-
-CellTreeItem *
-LibrariesView::find_child_item (cell_path_type::const_iterator start, cell_path_type::const_iterator end, CellTreeItem *p)
-{
-  if (start == end) {
-    return p;
-  } else {
-
-    for (int n = 0; n < p->children (); ++n) {
-      CellTreeItem *item = p->child (n);
-      if (item && item->cell_index () == *start) {
-        return find_child_item (start + 1, end, item);
-      }
-    }
-
-    //  not found
-    return 0;
-
-  }
-}
-#endif
 
 std::string
 LibrariesView::display_string (int n) const

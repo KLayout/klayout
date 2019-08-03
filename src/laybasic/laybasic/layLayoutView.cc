@@ -518,9 +518,6 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
     mp_libraries_view = new lay::LibrariesView (this, libraries_frame, "libs");
     left_frame_ly->addWidget (mp_libraries_view, 1 /*stretch*/);
 
-#if 0 // @@@
-    connect (mp_libraries_view, SIGNAL (cell_selected (cell_path_type, int)), this, SLOT (select_cell_dispatch (cell_path_type, int)));
-#endif
     connect (mp_libraries_view, SIGNAL (active_library_changed (int)), this, SLOT (active_library_changed (int)));
 
   }

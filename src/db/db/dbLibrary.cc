@@ -51,6 +51,7 @@ Library::register_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
 {
   m_referrers.insert (std::make_pair (ly, 0)).first->second += 1;
   m_refcount.insert (std::make_pair (lib_proxy->library_cell_index (), 0)).first->second += 1;
+  retired_state_changed_event ();
 }
 
 void 
@@ -73,6 +74,7 @@ Library::unregister_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
         layout ().delete_cell (ci);
       }
     }
+    retired_state_changed_event ();
   }
 }
 

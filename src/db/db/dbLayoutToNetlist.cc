@@ -208,7 +208,7 @@ size_t LayoutToNetlist::link_net_to_parent_circuit (const Net *subcircuit_net, C
 
   connected_clusters<db::PolygonRef> &parent_net_clusters = m_net_clusters.clusters_per_cell (parent_circuit->cell_index ());
 
-  size_t id = parent_net_clusters.insert_dummy (); // @@@
+  size_t id = parent_net_clusters.insert_dummy ();
 
   parent_net_clusters.add_connection (id, db::ClusterInstance (subcircuit_net->cluster_id (), subcircuit_net->circuit ()->cell_index (), trans, 0));
   return id;

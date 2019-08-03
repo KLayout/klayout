@@ -162,28 +162,6 @@ public:
    */
   db::Library *active_lib ();
 
-#if 0 // @@@
-  /**
-   *  @brief Returns the paths of the selected cells
-   */
-  void selected_cells (int cv_index, std::vector<cell_path_type> &paths) const;
-
-  /**
-   *  @brief Return the path to the current cell for the given cellview index
-   *
-   *  The current cell is the cell that is highlighted.
-   */
-  void current_cell (int cv_index, cell_path_type &path) const;
-
-  /**
-   *  @brief Set the path to the current cell
-   *
-   *  The current cell is the cell that is highlighted. The current cv index
-   *  can be obtained with the "active" method.
-   */
-  void set_current_cell (int cv_index, const cell_path_type &path);
-#endif
-
   /**
    *  @brief Update the contents if necessary
    *
@@ -239,9 +217,6 @@ public:
   }
 
 signals:
-#if 0 // @@@
-  void cell_selected (cell_path_type path, int cellview_index);
-#endif
   void active_library_changed (int cellview_index);
 
 public slots:
@@ -256,7 +231,6 @@ public slots:
   void search_editing_finished ();
   void search_next ();
   void search_prev ();
-  void cm_cell_select ();
 
 private:
   db::Layout *mp_layout;
@@ -287,22 +261,8 @@ private:
   //  event listener for changes in the cellview and layout
   void update_required ();
 
-#if 0 // @@@
-  //  locate the CellTreeItem in the tree corresponding to a partial path starting from p.
-  CellTreeItem *find_child_item (cell_path_type::const_iterator start, cell_path_type::const_iterator end, CellTreeItem *p);
-#endif
-
   //  get the current item
   CellTreeItem *current_item () const;
-
-#if 0 // @@@
-  //  path from index and item from path ..
-  void path_from_index (const QModelIndex &index, int cv_index, cell_path_type &path) const;
-  QModelIndex index_from_path (const cell_path_type &path, int cv_index);
-
-  //  select active cellview from sender (sender must be a cell tree)
-  void set_active_celltree_from_sender ();
-#endif
 
   //  clears all widgets of the cell lists
   void clear_all ();

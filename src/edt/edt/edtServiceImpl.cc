@@ -1288,22 +1288,27 @@ InstService::drop_event (const db::DPoint & /*p*/, const lay::DragDropDataBase *
       do_cancel_edit ();
     }
 
-    //  push the current setup to configuration so the instance dialog will take these as default
-    //  and "apply" of these instance properties doesn't fail because of insistency.
-    plugin_root ()->config_set (cfg_edit_inst_lib_name, m_lib_name);
-    plugin_root ()->config_set (cfg_edit_inst_cell_name, m_cell_or_pcell_name);
-    if (m_is_pcell) {
-      plugin_root ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
-    } else {
-      plugin_root ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
-    }
-    plugin_root ()->config_end ();
-
+    sync_to_config ();
     return true;
 
   } else {
     return false; 
   }
+}
+
+void
+InstService::sync_to_config ()
+{
+  //  push the current setup to configuration so the instance dialog will take these as default
+  //  and "apply" of these instance properties doesn't fail because of insistency.
+  plugin_root ()->config_set (cfg_edit_inst_lib_name, m_lib_name);
+  plugin_root ()->config_set (cfg_edit_inst_cell_name, m_cell_or_pcell_name);
+  if (m_is_pcell) {
+    plugin_root ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
+  } else {
+    plugin_root ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
+  }
+  plugin_root ()->config_end ();
 }
 
 void 
@@ -1679,8 +1684,7 @@ InstService::apply_edits()
     m_pcell_parameters = mp_pcell_decl->named_parameters (mp_pcell_parameters_dialog->get_parameters ());
   }
 
-  m_has_valid_cell = false;
-  update_marker ();
+  sync_to_config ();
 }
 
 void

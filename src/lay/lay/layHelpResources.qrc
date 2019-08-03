@@ -147,6 +147,8 @@
         <file alias="browse_instances.xml">doc/manual/browse_instances.xml</file>
         <file alias="browse_shapes.xml">doc/manual/browse_shapes.xml</file>
         <file alias="cell_list.xml">doc/manual/cell_list.xml</file>
+        <file alias="library_view.xml">doc/manual/library_view.xml</file>
+        <file alias="library_view.png">doc/manual/library_view.png</file>
         <file alias="cell.xml">doc/manual/cell.xml</file>
         <file alias="clip.xml">doc/manual/clip.xml</file>
         <file alias="copypaste_cell.xml">doc/manual/copypaste_cell.xml</file>

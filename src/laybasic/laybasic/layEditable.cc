@@ -143,7 +143,18 @@ Editables::selection_bbox ()
   return sel_bbox;
 }
 
-void 
+db::DBox
+Editables::selection_catch_bbox ()
+{
+  db::DBox sel_bbox;
+  for (iterator e = begin (); e != end (); ++e) {
+    double l = e->catch_distance ();
+    sel_bbox += e->selection_bbox ().enlarged (db::DVector (l, l));
+  }
+  return sel_bbox;
+}
+
+void
 Editables::transform (const db::DCplxTrans &tr)
 {
   if (selection_size () > 0) {
@@ -434,7 +445,7 @@ Editables::begin_move (const db::DPoint &p, lay::angle_constraint_type ac)
   //  sort the plugins found by the proximity
   std::sort (plugins.begin (), plugins.end (), first_of_pair_cmp_f<double, iterator> ());
 
-  if (selection_size () > 0 && selection_bbox ().contains (p)) {
+  if (selection_size () > 0 && selection_catch_bbox ().contains (p)) {
 
     //  if anything is selected and we are within the selection bbox, 
     //  issue a move operation on all editables: first try a Partial mode begin_move

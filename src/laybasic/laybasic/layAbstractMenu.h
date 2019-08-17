@@ -56,6 +56,26 @@ class AbstractMenu;
 class PluginRoot;
 
 /**
+ *  @brief A utility function to convert the packed key binding in the cfg_key_bindings string to a vector
+ */
+LAYBASIC_PUBLIC std::vector<std::pair<std::string, std::string> > unpack_key_binding (const std::string &packed);
+
+/**
+ *  @brief A utility function to convert the key binding (as path/shortcut pair vector) to a packed string for cfg_key_bindings
+ */
+LAYBASIC_PUBLIC std::string pack_key_binding (const std::vector<std::pair<std::string, std::string> > &unpacked);
+
+/**
+ *  @brief A utility function to convert the packed hidden flags in the cfg_menu_items_hidden string to a vector
+ */
+LAYBASIC_PUBLIC std::vector<std::pair<std::string, bool> > unpack_menu_items_hidden (const std::string &packed);
+
+/**
+ *  @brief A utility function to convert the hidde flags (as path/bool pair vector) to a packed string for cfg_menu_items_hidden
+ */
+LAYBASIC_PUBLIC std::string pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked);
+
+/**
  *  @brief A helper class that does reference counting for the QAction object
  */
 class ActionHandle

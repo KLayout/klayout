@@ -1576,10 +1576,18 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This method has been added in version 0.20.\n"
   ) +
   gsi::method ("is_valid_layer?", &db::Layout::is_valid_layer,
-    "@brief Returns true, if a layer index is a valid index\n"
+    "@brief Returns true, if a layer index is a valid normal layout layer index\n"
     "@args layer_index\n"
     "\n"
     "@return true, if this is the case\n"
+  ) +
+  gsi::method ("is_free_layer?", &db::Layout::is_free_layer,
+    "@brief Returns true, if a layer index is a free (unused) layer index\n"
+    "@args layer_index\n"
+    "\n"
+    "@return true, if this is the case\n"
+    "\n"
+    "This method has been introduced in version 0.26."
   ) +
   gsi::method ("is_special_layer?", &db::Layout::is_special_layer,
     "@brief Returns true, if a layer index is a special layer index\n"

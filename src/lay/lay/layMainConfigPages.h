@@ -199,6 +199,7 @@ private slots:
   void current_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous);
   void item_changed (QTreeWidgetItem *, int);
   void text_changed ();
+  void text_cleared ();
   void filter_changed ();
   void reset_clicked ();
 

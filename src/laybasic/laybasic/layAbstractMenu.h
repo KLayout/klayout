@@ -79,11 +79,12 @@ public:
   bool is_hidden () const;
   bool is_effective_visible () const;
 
-  void set_default_shortcut (const QKeySequence &sc);
-  void set_shortcut (const QKeySequence &sc);
-  const QKeySequence &get_default_shortcut () const;
-  const QKeySequence &get_shortcut () const;
-  QKeySequence get_effective_shortcut () const;
+  void set_default_shortcut (const std::string &sc);
+  void set_shortcut (const std::string &sc);
+  std::string get_default_shortcut () const;
+  std::string get_shortcut() const;
+  QKeySequence get_key_sequence () const;
+  QKeySequence get_key_sequence_for (const std::string &sc) const;
 
 protected slots:
   void destroyed (QObject *obj);
@@ -95,8 +96,11 @@ private:
   bool m_owned;
   bool m_visible;
   bool m_hidden;
-  QKeySequence m_default_shortcut;
-  QKeySequence m_shortcut;
+  std::string m_default_shortcut;
+  QKeySequence m_default_key_sequence;
+  std::string m_shortcut;
+  QKeySequence m_key_sequence;
+  bool m_no_key_sequence;
 
   //  no copying
   ActionHandle (const ActionHandle &);
@@ -173,14 +177,14 @@ public:
   std::string get_title () const;
 
   /**
-   *  @brief Sets the keyboard shortcut (as a QKeySequence object)
-   *  If no shortcut is set, the default shortcut will be taken.
+   *  @brief Gets the shortcut string for "no shortcut present"
    */
-  void set_shortcut (const QKeySequence &s);
+  static const std::string &no_shortcut ();
 
   /**
    *  @brief Sets the keyboard shortcut
-   *  If no shortcut is set, the default shortcut will be taken.
+   *  If no shortcut is set (empty string), the default shortcut will be taken.
+   *  If the shortcut string is "no_shortcut()", no shortcut will be assigned to the item.
    */
   void set_shortcut (const std::string &s);
 
@@ -190,12 +194,6 @@ public:
    *  use "get_effective_shortcut".
    */
   std::string get_shortcut () const;
-
-  /**
-   *  @brief Sets the default keyboard shortcut (as a QKeySequence object)
-   *  This shortcut is used when no specific shortcut is set.
-   */
-  void set_default_shortcut (const QKeySequence &s);
 
   /**
    *  @brief Sets the default keyboard shortcut
@@ -214,6 +212,11 @@ public:
    *  @brief Gets the effective shortcut
    */
   std::string get_effective_shortcut () const;
+
+  /**
+   *  @brief Gets the effective shortcut for a given key sequence string
+   */
+  std::string get_effective_shortcut_for (const std::string &sc) const;
 
   /**
    *  @brief "is_checkable" attribute

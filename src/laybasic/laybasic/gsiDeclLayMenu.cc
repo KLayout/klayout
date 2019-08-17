@@ -157,8 +157,16 @@ Class<lay::Action> decl_ActionBase ("lay", "ActionBase",
   method ("shortcut=", (void (lay::Action::*)(const std::string &)) &lay::Action::set_shortcut,
     "@brief Sets the keyboard shortcut\n"
     "@args shortcut\n"
+    "If the shortcut string is empty, the default shortcut will be used. If the string "
+    "is equal to \\Action#NoShortCut, no keyboard shortcut will be assigned.\n"
     "\n"
-    "@param shortcut The keyboard shortcut (i.e. \"Ctrl+C\")\n"
+    "@param shortcut The keyboard shortcut in Qt notation (i.e. \"Ctrl+C\")\n"
+    "\n"
+    "The NoShortCut option has been added in version 0.26."
+  ) +
+  constant ("NoShortCut", &lay::Action::no_shortcut,
+    "@brief Gets a shortcut value indicating that no shortcut shall be assigned\n"
+    "This method has been introduced in version 0.26."
   ) +
   method ("shortcut", &lay::Action::get_shortcut,
     "@brief Gets the keyboard shortcut\n"

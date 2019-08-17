@@ -1555,6 +1555,120 @@ TEST(204)
   EXPECT_EQ (pr.to_string (),  "(0,0;0,40000;40000,40000;40000,0/10000,10000;30000,10000;30000,30000;10000,30000)");
 }
 
+//  rounding
+TEST(205_issue318)
+{
+  db::Point pattern [] = {
+    db::Point (0, 0),
+    db::Point (0, 420000),
+    db::Point (400000, 400000),
+    db::Point (400000, 0),
+  };
+
+  db::Polygon p;
+  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+
+  double rinner = 0.0, router = 0.0;
+  unsigned int n;
+  db::Polygon pr;
+  db::Polygon pp = compute_rounded (p, 100000, 200000, 64);
+  EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
+
+  EXPECT_EQ (tl::to_string (rinner),  "0");
+  EXPECT_EQ (tl::to_string (router),  "200000");
+  EXPECT_EQ (tl::to_string (n),  "64");
+  //  slight rounding errors, but still a good approximation ...
+  EXPECT_EQ (pr.to_string (),  "(0,0;0,419998;400000,400002;400000,0)");
+
+  pp = compute_rounded (p, 50000, 100000, 64);
+  EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
+
+  EXPECT_EQ (tl::to_string (rinner),  "0");
+  EXPECT_EQ (tl::to_string (router),  "100000");
+  EXPECT_EQ (tl::to_string (n),  "64");
+  //  slight rounding issue due to  ...
+  EXPECT_EQ (pr.to_string (),  "(0,0;0,420001;400000,400000;400000,0)");
+}
+
+//  rounding
+TEST(206_issue318)
+{
+  db::Point pattern [] = {
+    db::Point (0, 0),
+    db::Point (0, 40000000),
+    db::Point (400000, 400000),
+    db::Point (400000, 0),
+  };
+
+  db::Polygon p;
+  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+
+  double rinner = 0.0, router = 0.0;
+  unsigned int n;
+  db::Polygon pr;
+  db::Polygon pp = compute_rounded (p, 100000, 200000, 64);
+  EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
+
+  EXPECT_EQ (tl::to_string (rinner),  "0");
+  EXPECT_EQ (tl::to_string (router),  "199992");
+  EXPECT_EQ (tl::to_string (n),  "65");
+  //  good approximation of a top edge ...
+  EXPECT_EQ (pr.to_string (),  "(0,0;0,618467;400000,581242;400000,0)");
+
+  pp = compute_rounded (p, 50000, 100000, 64);
+  EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
+
+  EXPECT_EQ (tl::to_string (rinner),  "0");
+  EXPECT_EQ (tl::to_string (router),  "100000");
+  EXPECT_EQ (tl::to_string (n),  "64");
+  //  the acute corner is split into two parts
+  EXPECT_EQ (pr.to_string (),  "(0,0;0,20309228;199083,20290710;400000,400000;400000,0)");
+}
+
+//  rounding
+TEST(207_issue318)
+{
+  db::Point pattern [] = {
+    db::Point(-2523825, -4693678),
+    db::Point(-2627783, -4676814),
+    db::Point(-2705532, -4629488),
+    db::Point(-2747861, -4559084),
+    db::Point(-2750596, -4499543),
+    db::Point(-2753284, -4335751),
+    db::Point(-2764621, -4271381),
+    db::Point(-2828260, -4154562),
+    db::Point(-2808940, -4144038),
+    db::Point(-2743579, -4264019),
+    db::Point(-2731316, -4333649),
+    db::Point(-2728604, -4498857),
+    db::Point(-2726139, -4552516),
+    db::Point(-2689468, -4613512),
+    db::Point(-2620017, -4655786),
+    db::Point(-2529175, -4670522),
+    db::Point(-2468652, -4627768),
+    db::Point(-2437469, -4536777),
+    db::Point(-2434902, -4384723),
+    db::Point(-2436252, -4320529),
+    db::Point(-2395450, -4234678),
+    db::Point(-2338494, -4144716),
+    db::Point(-2319906, -4156484),
+    db::Point(-2376150, -4245322),
+    db::Point(-2414148, -4325271),
+    db::Point(-2412898, -4384677),
+    db::Point(-2415531, -4540623),
+    db::Point(-2450148, -4641632)
+  };
+
+  db::Polygon p;
+  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+
+  double rinner = 0.0, router = 0.0;
+  unsigned int n;
+  db::Polygon pr;
+  //  this polygon should not be recognized as rounded - it kind of looks like ...
+  EXPECT_EQ (extract_rad (p, rinner, router, n, &pr), false);
+}
+
 //  is_convex
 TEST(300)
 {

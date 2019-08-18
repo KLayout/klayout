@@ -29,6 +29,11 @@ class Tl_TestClass < TestBase
   # Expression basics
   def test_1_Expression
 
+    ctx = RBA::ExpressionContext::new
+    assert_equal(ctx.eval("1+2"), 3)
+    ctx.var("a", 21)
+    assert_equal(ctx.eval("2*a"), 42)
+
     expr = RBA::Expression::new
     res = expr.eval
     assert_equal(res.class.to_s, "NilClass")

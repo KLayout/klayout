@@ -367,7 +367,7 @@ public:
    *  @param parent The parent evaluation context
    *  @param sloppy True to enable sloppy evaluation for pure parsing
    */
-  Eval (const Eval *parent = 0, bool sloppy = false);
+  Eval (Eval *parent = 0, bool sloppy = false);
 
   /**
    *  @brief virtual dtor to enable dynamic_cast on derived classes.
@@ -482,6 +482,11 @@ public:
   static std::string parse_expr (tl::Extractor &ex, bool top = true);
 
   /**
+   *  @brief A convenience method to evaluate an expression (by string) in this context
+   */
+  tl::Variant eval (const std::string &expr);
+
+  /**
    *  @brief Interpolate the string and return the result
    *
    *  Interpolation will replace all expressions of the form
@@ -508,14 +513,13 @@ public:
 private:
   friend class Expression;
 
-  const Eval *mp_parent;
+  Eval *mp_parent;
   std::map <std::string, tl::Variant> m_local_vars;
   std::map <std::string, EvalFunction *> m_local_functions;
   bool m_sloppy;
   const ContextHandler *mp_ctx_handler;
   std::vector<std::string> m_match_substrings;
 
-  tl::Variant eval (const std::string &expr);
   void eval_top (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
   void eval_assign (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
   void eval_if (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
@@ -528,7 +532,7 @@ private:
   void eval_unary (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
   void eval_atomic (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v, int am);
   void eval_suffix (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void resolve_name (const std::string &name, const EvalFunction *&function, const tl::Variant *&value) const;
+  void resolve_name (const std::string &name, const EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var);
   void resolve_var_name (const std::string &name, tl::Variant *&value);
 
   static Eval m_global;

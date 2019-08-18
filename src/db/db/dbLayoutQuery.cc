@@ -2427,9 +2427,9 @@ LayoutQuery::dump () const
 }
 
 void
-LayoutQuery::execute (db::Layout &layout) 
+LayoutQuery::execute (db::Layout &layout, tl::Eval *context)
 {
-  LayoutQueryIterator iq (*this, &layout);
+  LayoutQueryIterator iq (*this, &layout, context);
   while (! iq.at_end ()) {
     ++iq;
   }

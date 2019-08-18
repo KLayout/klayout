@@ -1094,7 +1094,7 @@ PartialService::timeout ()
   mp_view->clear_transient_selection ();
 
   //  compute search box
-  double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_box = db::DBox (m_hover_point, m_hover_point).enlarged (db::DVector (l, l));
 
   PartialShapeFinder finder (true, m_top_level_sel, db::ShapeIterator::All);
@@ -1748,7 +1748,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
     try {
 
       //  compute search box
-      double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+      double l = catch_distance ();
       db::DBox search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
 
       //  check, if there is a selected shape under the mouse - in this case, we do not do a new selection
@@ -2324,6 +2324,12 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
 
 }
 
+double
+PartialService::catch_distance ()
+{
+  return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+}
+
 db::DPoint 
 PartialService::single_selected_point () const
 {
@@ -2551,7 +2557,7 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
   clear_partial_transient_selection ();
 
   //  compute search box
-  double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_box = box.enlarged (db::DVector (l, l));
 
   bool needs_update = false;

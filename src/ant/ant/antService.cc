@@ -643,11 +643,6 @@ draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay
 
 // -------------------------------------------------------------
 
-//  search range for select in pixels
-static unsigned int search_range = 5;   // TODO: make variable?
-
-// -------------------------------------------------------------
-
 View::View (ant::Service *rulers, const ant::Object *ruler, bool selected)
   : lay::ViewObject (rulers->widget ()), 
     mp_rulers (rulers), m_selected (selected), mp_ruler (ruler)
@@ -888,6 +883,12 @@ Service::clear_rulers ()
   reduce_rulers (0);
 }
 
+double
+Service::catch_distance ()
+{
+  return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+}
+
 void 
 Service::drag_cancel () 
 {
@@ -1046,7 +1047,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
     m_move_mode = MoveNone;
 
     //  compute search box
-    double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+    double l = catch_distance ();
     db::DBox search_dbox = db::DBox (p, p).enlarged (db::DVector (l, l));
 
     //  test, whether we are moving a handle of one selected object
@@ -1081,7 +1082,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
     m_move_mode = MoveNone;
 
     //  compute search box
-    double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+    double l = catch_distance ();
     db::DBox search_dbox = db::DBox (p, p).enlarged (db::DVector (l, l));
 
     //  box-selection
@@ -1803,7 +1804,7 @@ double
 Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mode)
 {
   //  compute search box
-  double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_dbox = db::DBox (pos, pos).enlarged (db::DVector (l, l));
 
   //  for single-point selections either exclude the current selection or the
@@ -1858,7 +1859,7 @@ Service::transient_select (const db::DPoint &pos)
   bool any_selected = false;
 
   //  compute search box
-  double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_dbox = db::DBox (pos, pos).enlarged (db::DVector (l, l));
 
   //  point selection: look for the "closest" ruler
@@ -1963,7 +1964,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
   } else {
 
     //  compute search box
-    double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+    double l = catch_distance ();
     db::DBox search_dbox = box.enlarged (db::DVector (l, l));
 
     if (! box.is_point ()) {

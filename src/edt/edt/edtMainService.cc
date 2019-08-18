@@ -60,7 +60,13 @@ MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Plug
     m_align_hmode (0), m_align_vmode (0), m_align_visible_layers (false),
     m_origin_mode_x (-1), m_origin_mode_y (-1), m_origin_visible_layers_for_bbox (false),
     m_array_a (0.0, 1.0), m_array_b (1.0, 0.0),
-    m_array_na (1), m_array_nb (1)
+    m_array_na (1), m_array_nb (1),
+    m_router (0.0), m_rinner (0.0), m_npoints (64), m_undo_before_apply (true),
+    mp_round_corners_dialog (0),
+    mp_align_options_dialog (0),
+    mp_flatten_inst_options_dialog (0),
+    mp_make_cell_options_dialog (0),
+    mp_make_array_options_dialog (0)
 {
   //  .. nothing yet ..
 }
@@ -70,7 +76,52 @@ MainService::~MainService ()
   //  .. nothing yet ..
 }
 
-void 
+edt::RoundCornerOptionsDialog *
+MainService::round_corners_dialog ()
+{
+  if (! mp_round_corners_dialog) {
+    mp_round_corners_dialog = new edt::RoundCornerOptionsDialog (view ());
+  }
+  return mp_round_corners_dialog;
+}
+
+edt::AlignOptionsDialog *
+MainService::align_options_dialog ()
+{
+  if (! mp_align_options_dialog) {
+    mp_align_options_dialog = new edt::AlignOptionsDialog (view ());
+  }
+  return mp_align_options_dialog;
+}
+
+lay::FlattenInstOptionsDialog *
+MainService::flatten_inst_options_dialog ()
+{
+  if (! mp_flatten_inst_options_dialog) {
+    mp_flatten_inst_options_dialog = new lay::FlattenInstOptionsDialog (view (), false /*don't allow prunining*/);
+  }
+  return mp_flatten_inst_options_dialog;
+}
+
+edt::MakeCellOptionsDialog *
+MainService::make_cell_options_dialog ()
+{
+  if (! mp_make_cell_options_dialog) {
+    mp_make_cell_options_dialog = new edt::MakeCellOptionsDialog (view ());
+  }
+  return mp_make_cell_options_dialog;
+}
+
+edt::MakeArrayOptionsDialog *
+MainService::make_array_options_dialog ()
+{
+  if (! mp_make_array_options_dialog) {
+    mp_make_array_options_dialog = new edt::MakeArrayOptionsDialog (view ());
+  }
+  return mp_make_array_options_dialog;
+}
+
+void
 MainService::menu_activated (const std::string &symbol)
 {
   if (symbol == "edt::descend") {
@@ -318,9 +369,7 @@ MainService::cm_flatten_insts ()
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
-  lay::FlattenInstOptionsDialog options_dialog (view (), false /*don't allow prunining*/);
-
-  if (options_dialog.exec_dialog (m_flatten_insts_levels, m_flatten_prune) && m_flatten_insts_levels != 0) {
+  if (flatten_inst_options_dialog ()->exec_dialog (m_flatten_insts_levels, m_flatten_prune) && m_flatten_insts_levels != 0) {
 
     view ()->cancel_edits ();
 
@@ -908,11 +957,9 @@ MainService::cm_make_cell ()
 
   if (cv_index >= 0) {
 
-    MakeCellOptionsDialog dialog (view ());
-
     const lay::CellView &cv = view ()->cellview (cv_index);
 
-    if (dialog.exec_dialog (cv->layout (), m_make_cell_name, m_origin_mode_x, m_origin_mode_y)) {
+    if (make_cell_options_dialog ()->exec_dialog (cv->layout (), m_make_cell_name, m_origin_mode_x, m_origin_mode_y)) {
 
       //  Compute the selection's bbox to establish a good origin for the new cell
       db::Box selection_bbox; 
@@ -1231,9 +1278,10 @@ MainService::cm_convert_to_pcell ()
   }
 }
 
-static void extract_rad (std::vector <db::Polygon> &poly, double &rinner, double &router, unsigned int &n)
+static bool extract_rad (std::vector <db::Polygon> &poly, double &rinner, double &router, unsigned int &n)
 {
   std::vector <db::Point> new_pts;
+  bool any_extracted = false;
 
   for (std::vector<db::Polygon>::iterator p = poly.begin (); p != poly.end (); ++p) {
 
@@ -1246,6 +1294,7 @@ static void extract_rad (std::vector <db::Polygon> &poly, double &rinner, double
       new_poly.assign_hull (p->begin_hull (), p->end_hull (), false /*don't compress*/);
     } else {
       new_poly.assign_hull (new_pts.begin (), new_pts.end (), true /*compress*/);
+      any_extracted = true;
     }
 
     for (unsigned int h = 0; h < p->holes (); ++h) {
@@ -1257,13 +1306,16 @@ static void extract_rad (std::vector <db::Polygon> &poly, double &rinner, double
         new_poly.insert_hole (p->begin_hole (h), p->end_hole (h), false /*don't compress*/);
       } else {
         new_poly.insert_hole (new_pts.begin (), new_pts.end (), true /*compress*/);
+        any_extracted = true;
       }
 
     }
 
     p->swap (new_poly);
 
-  } 
+  }
+
+  return any_extracted;
 }
 
 void
@@ -1310,15 +1362,17 @@ MainService::cm_round_corners ()
 
   //  prepare: merge to remove cutlines and smooth to remove effects of cutlines
   db::EdgeProcessor ep;
-  std::vector <db::Polygon> out;
-  ep.merge (primary, out, 0 /*min_wc*/, false /*resolve holes*/, true /*min coherence*/);
-  for (std::vector <db::Polygon>::iterator p = out.begin (); p != out.end (); ++p) {
+  std::vector <db::Polygon> in;
+  ep.merge (primary, in, 0 /*min_wc*/, false /*resolve holes*/, true /*min coherence*/);
+  for (std::vector <db::Polygon>::iterator p = in.begin (); p != in.end (); ++p) {
     *p = smooth (*p, 1);
   }
 
+  std::vector <db::Polygon> out = in;
+
   unsigned int n = 100;
   double rinner = 0.0, router = 0.0;
-  extract_rad (out, rinner, router, n);
+  bool has_extracted = extract_rad (out, rinner, router, n);
 
   const lay::CellView &cv = view ()->cellview (cv_index);
   double dbu = cv->layout ().dbu ();
@@ -1326,13 +1380,16 @@ MainService::cm_round_corners ()
   rinner *= dbu;
   router *= dbu;
 
-  RoundCornerOptionsDialog dialog (view ());
-  if (! dialog.exec_dialog (cv->layout (), router, rinner, n)) {
+  if (! round_corners_dialog ()->exec_dialog (cv->layout (), m_router, m_rinner, m_npoints, m_undo_before_apply, router, rinner, n, has_extracted)) {
     return;
   }
 
+  if (! m_undo_before_apply || ! has_extracted) {
+    out.swap (in);
+  }
+
   for (std::vector <db::Polygon>::iterator p = out.begin (); p != out.end (); ++p) {
-    *p = compute_rounded (*p, rinner / dbu, router / dbu, n);
+    *p = compute_rounded (*p, m_rinner / dbu, m_router / dbu, m_npoints);
   }
 
   //  remove holes (result in primary)
@@ -1700,8 +1757,7 @@ MainService::cm_align ()
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
-  AlignOptionsDialog dialog (view ());
-  if (! dialog.exec_dialog (view (), m_align_hmode, m_align_vmode, m_align_visible_layers)) {
+  if (! align_options_dialog ()->exec_dialog (view (), m_align_hmode, m_align_vmode, m_align_visible_layers)) {
     return;
   }
 
@@ -1797,9 +1853,7 @@ MainService::cm_make_array ()
     throw tl::Exception (tl::to_string (QObject::tr ("Nothing selected to make arrays of")));
   }
 
-  MakeArrayOptionsDialog dialog (view ());
-
-  if (dialog.exec_dialog (m_array_a, m_array_na, m_array_b, m_array_nb)) {
+  if (make_array_options_dialog ()->exec_dialog (m_array_a, m_array_na, m_array_b, m_array_nb)) {
 
     view ()->cancel_edits ();
 

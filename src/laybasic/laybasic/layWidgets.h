@@ -439,6 +439,7 @@ signals:
   void esc_pressed ();
   void tab_pressed ();
   void backtab_pressed ();
+  void clear_pressed ();
 
 protected:
   void mousePressEvent (QMouseEvent *event);

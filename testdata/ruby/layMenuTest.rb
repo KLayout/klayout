@@ -59,6 +59,12 @@ class LAYMenuTest_TestClass < TestBase
     assert_equal(b.shortcut, "")
     assert_equal(b.effective_shortcut, "X")
 
+    a.shortcut = RBA::Action::NoKeyBound
+    assert_equal(a.default_shortcut, "X")
+    assert_equal(a.shortcut, "none")
+    assert_equal(a.effective_shortcut, "")
+    a.shortcut = ""
+
     assert_equal(a.is_visible?, true)
 
     a.hidden = false
@@ -316,6 +322,26 @@ RESULT
     menu.action("help_menu.new_item_copy").trigger
 
     assert_equal( triggered, true )
+
+  end
+
+  def test_3
+
+    map = RBA::AbstractMenu::unpack_key_binding("'path.a':X;'path.b':''")
+    assert_equal(map["path.a"], "X")
+    assert_equal(map["path.b"], "")
+    assert_equal(map["path.c"], nil)
+
+    map2 = RBA::AbstractMenu::unpack_key_binding(RBA::AbstractMenu::pack_key_binding(map))
+    assert_equal(map == map2, true)
+
+    map = RBA::AbstractMenu::unpack_menu_items_hidden("'path.a':true;'path.b':false")
+    assert_equal(map["path.a"], true)
+    assert_equal(map["path.b"], false)
+    assert_equal(map["path.c"], nil)
+
+    map2 = RBA::AbstractMenu::unpack_menu_items_hidden(RBA::AbstractMenu::pack_menu_items_hidden(map))
+    assert_equal(map == map2, true)
 
   end
 

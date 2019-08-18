@@ -83,25 +83,12 @@
        <widget class="lay::DecoratedLineEdit" name="binding_le"/>
       </item>
       <item>
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>10</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Examples:
+         <string>Delete text for
+&quot;no key bound&quot;.
+
+Key examples:
  - &quot;Ctrl+A&quot;
  - &quot;Shift+F2&quot;
  - &quot;M&quot;

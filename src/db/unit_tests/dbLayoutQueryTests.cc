@@ -1382,6 +1382,8 @@ TEST(62)
   for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
     if (p->get_name () == "text") {
       values.push_back (tl::Variant ("T1"));
+    } else if (p->get_name () == "layer") {
+      values.push_back (tl::Variant (db::LayerProperties (1, 0)));
     } else {
       values.push_back (p->get_default ());
     }
@@ -1393,6 +1395,8 @@ TEST(62)
   for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
     if (p->get_name () == "text") {
       values.push_back (tl::Variant ("T2"));
+    } else if (p->get_name () == "layer") {
+      values.push_back (tl::Variant (db::LayerProperties (2, 0)));
     } else {
       values.push_back (p->get_default ());
     }
@@ -1436,7 +1440,7 @@ TEST(62)
     db::LayoutQuery q ("instances of ...\"Basic.*\"");
     db::LayoutQueryIterator iq (q, &g);
     std::string s = q2s_expr (iq, "inst.cell.display_title");
-    EXPECT_EQ (s, "Basic.TEXT('T2'),Basic.TEXT('T1'),Basic.TEXT('T1')");
+    EXPECT_EQ (s, "Basic.TEXT(l=2/0,'T2'),Basic.TEXT(l=1/0,'T1'),Basic.TEXT(l=1/0,'T1')");
   }
 
   {

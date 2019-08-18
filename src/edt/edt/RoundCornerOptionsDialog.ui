@@ -1,70 +1,78 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>RoundCornerOptionsDialog</class>
- <widget class="QDialog" name="RoundCornerOptionsDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="RoundCornerOptionsDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>469</width>
-    <height>241</height>
+    <height>271</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" >
-   <item row="2" column="1" >
-    <widget class="QLineEdit" name="router_le" />
-   </item>
-   <item row="2" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Outer corner radius</string>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0" colspan="3">
+    <widget class="QCheckBox" name="amend_cb">
+     <property name="text">
+      <string>Amend mode (undo existing rounding before applying new one)</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="0" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
       <string>Number of points (for full circle)</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
       <string>Inner corner radius</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1" >
-    <widget class="QLineEdit" name="rinner_le" />
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="rinner_le"/>
    </item>
-   <item row="5" column="1" >
-    <widget class="QLineEdit" name="points_le" />
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="router_le"/>
    </item>
-   <item row="4" column="0" colspan="3" >
-    <widget class="Line" name="line" >
-     <property name="orientation" >
+   <item row="4" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Outer corner radius</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="points_le"/>
+   </item>
+   <item row="6" column="0" colspan="3">
+    <widget class="Line" name="line">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="3" >
-    <widget class="QLabel" name="label_4" >
-     <property name="text" >
+   <item row="0" column="0" colspan="3">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
       <string>Radius to apply on polygon corners
 (Radius for inner corners can be specified separately.
 Leave empty to get the same radius than for outer corners)</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="3" >
-    <spacer name="verticalSpacer" >
-     <property name="orientation" >
+   <item row="8" column="0" colspan="3">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>448</width>
        <height>11</height>
@@ -72,29 +80,29 @@ Leave empty to get the same radius than for outer corners)</string>
      </property>
     </spacer>
    </item>
-   <item row="2" column="2" >
-    <widget class="QLabel" name="label_5" >
-     <property name="text" >
+   <item row="4" column="2">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
       <string>micron</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2" >
-    <widget class="QLabel" name="label_6" >
-     <property name="text" >
+   <item row="5" column="2">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
       <string>micron</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3" >
-    <spacer name="verticalSpacer_2" >
-     <property name="orientation" >
+   <item row="3" column="0" colspan="3">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>10</height>
@@ -102,28 +110,33 @@ Leave empty to get the same radius than for outer corners)</string>
      </property>
     </spacer>
    </item>
-   <item row="7" column="0" colspan="3" >
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
+   <item row="9" column="0" colspan="3">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
+     <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
+   <item row="1" column="0" colspan="3">
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>5</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
-  <zorder>router_le</zorder>
-  <zorder>label</zorder>
-  <zorder>label_2</zorder>
-  <zorder>label_3</zorder>
-  <zorder>rinner_le</zorder>
-  <zorder>points_le</zorder>
-  <zorder>line</zorder>
-  <zorder>label_4</zorder>
-  <zorder>label_5</zorder>
-  <zorder>label_6</zorder>
-  <zorder>buttonBox</zorder>
  </widget>
  <resources/>
  <connections>
@@ -133,11 +146,11 @@ Leave empty to get the same radius than for outer corners)</string>
    <receiver>RoundCornerOptionsDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -149,11 +162,11 @@ Leave empty to get the same radius than for outer corners)</string>
    <receiver>RoundCornerOptionsDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

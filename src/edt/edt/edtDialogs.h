@@ -173,12 +173,18 @@ public:
   RoundCornerOptionsDialog (QWidget *parent);
   ~RoundCornerOptionsDialog ();
 
-  bool exec_dialog (const db::Layout &layout, double &rhull, double &rholes, unsigned int &npoints);
+  bool exec_dialog (const db::Layout &layout, double &router, double &rinner, unsigned int &npoints, bool &undo_before_apply, double router_extracted, double rinner_extracted, unsigned int npoints_extracted, bool has_extracted);
 
   virtual void accept ();
 
+private slots:
+  void amend_changed ();
+
 private:
   const db::Layout *mp_layout;
+  double m_router_extracted, m_rinner_extracted;
+  unsigned int m_npoints_extracted;
+  bool m_has_extracted;
 };
 
 } // namespace edt

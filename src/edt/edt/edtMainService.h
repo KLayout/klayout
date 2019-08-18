@@ -39,6 +39,7 @@
 
 namespace lay {
   class PluginRoot;
+  class FlattenInstOptionsDialog;
 }
 
 namespace edt {
@@ -46,6 +47,10 @@ namespace edt {
 class Service;
 class EditorOptionsPages;
 class EditorOptionsPage;
+class RoundCornerOptionsDialog;
+class MakeCellOptionsDialog;
+class MakeArrayOptionsDialog;
+class AlignOptionsDialog;
 
 // -------------------------------------------------------------
 
@@ -205,9 +210,22 @@ private:
   bool m_origin_visible_layers_for_bbox;
   db::DVector m_array_a, m_array_b;
   unsigned int m_array_na, m_array_nb;
+  double m_router, m_rinner;
+  unsigned int m_npoints;
+  bool m_undo_before_apply;
+  edt::RoundCornerOptionsDialog *mp_round_corners_dialog;
+  edt::AlignOptionsDialog *mp_align_options_dialog;
+  lay::FlattenInstOptionsDialog *mp_flatten_inst_options_dialog;
+  edt::MakeCellOptionsDialog *mp_make_cell_options_dialog;
+  edt::MakeArrayOptionsDialog *mp_make_array_options_dialog;
 
   void boolean_op (int mode);
   void check_no_guiding_shapes ();
+  edt::RoundCornerOptionsDialog *round_corners_dialog ();
+  edt::AlignOptionsDialog *align_options_dialog ();
+  lay::FlattenInstOptionsDialog *flatten_inst_options_dialog ();
+  edt::MakeCellOptionsDialog *make_cell_options_dialog ();
+  edt::MakeArrayOptionsDialog *make_array_options_dialog ();
 };
 
 }

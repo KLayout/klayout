@@ -414,11 +414,13 @@ MakeCellOptionsDialog::button_clicked ()
 //  RoundCornerOptionsDialog implementation
 
 RoundCornerOptionsDialog::RoundCornerOptionsDialog (QWidget *parent)
-  : QDialog (parent), mp_layout (0)
+  : QDialog (parent), mp_layout (0), m_router_extracted (0.0), m_rinner_extracted (0.0), m_npoints_extracted (64), m_has_extracted (false)
 {
   setObjectName (QString::fromUtf8 ("round_corners_options_dialog"));
 
   Ui::RoundCornerOptionsDialog::setupUi (this);
+
+  connect (amend_cb, SIGNAL (stateChanged (int)), this, SLOT (amend_changed ()));
 }
 
 RoundCornerOptionsDialog::~RoundCornerOptionsDialog ()
@@ -426,20 +428,50 @@ RoundCornerOptionsDialog::~RoundCornerOptionsDialog ()
   //  .. nothing yet ..
 }
 
-bool 
-RoundCornerOptionsDialog::exec_dialog (const db::Layout &layout, double &router, double &rinner, unsigned int &npoints)
+void
+RoundCornerOptionsDialog::amend_changed ()
 {
+  if (amend_cb->isChecked () && m_has_extracted) {
+    router_le->setText (tl::to_qstring (tl::to_string (m_router_extracted)));
+    if (db::coord_traits<double>::equal (m_router_extracted, m_rinner_extracted)) {
+      rinner_le->setText (QString ());
+    } else {
+      rinner_le->setText (tl::to_qstring (tl::to_string (m_rinner_extracted)));
+    }
+    points_le->setText (tl::to_qstring (tl::to_string (m_npoints_extracted)));
+  }
+}
+
+bool
+RoundCornerOptionsDialog::exec_dialog (const db::Layout &layout, double &router, double &rinner, unsigned int &npoints, bool &undo_before_apply, double router_extracted, double rinner_extracted, unsigned int npoints_extracted, bool has_extracted)
+{
+  m_router_extracted = router_extracted;
+  m_rinner_extracted = rinner_extracted;
+  m_npoints_extracted = npoints_extracted;
+  m_has_extracted = has_extracted;
+
+  amend_cb->blockSignals (true);
+  amend_cb->setEnabled (has_extracted);
+  amend_cb->setChecked (undo_before_apply && has_extracted);
+  amend_cb->blockSignals (false);
+
   mp_layout = &layout;
 
-  router_le->setText (tl::to_qstring (tl::to_string (router)));
-  if (fabs (router - rinner) < 1e-6) {
+  double ro = undo_before_apply && has_extracted ? router_extracted : router;
+  double ri = undo_before_apply && has_extracted ? rinner_extracted : rinner;
+  unsigned int n = undo_before_apply && has_extracted ? npoints_extracted : npoints;
+
+  router_le->setText (tl::to_qstring (tl::to_string (ro)));
+  if (db::coord_traits<double>::equal (ro, ri)) {
     rinner_le->setText (QString ());
   } else {
-    rinner_le->setText (tl::to_qstring (tl::to_string (rinner)));
+    rinner_le->setText (tl::to_qstring (tl::to_string (ri)));
   }
-  points_le->setText (tl::to_qstring (tl::to_string (npoints)));
+  points_le->setText (tl::to_qstring (tl::to_string (n)));
 
   if (QDialog::exec ()) {
+
+    undo_before_apply = m_has_extracted && amend_cb->isChecked ();
 
     tl::from_string (tl::to_string (router_le->text ()), router);
     if (rinner_le->text ().isEmpty ()) {

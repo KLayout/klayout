@@ -346,6 +346,8 @@ Plugin::config_get (const std::string &name, std::string &value) const
   if (p != m_repository.end ()) {
     value = p->second;
     return true;
+  } else if (mp_parent) {
+    return mp_parent->config_get (name, value);
   } else {
     value = "";
     return false;

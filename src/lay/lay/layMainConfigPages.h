@@ -48,27 +48,6 @@ class QAction;
 namespace lay
 {
 
-/** 
- *  @brief A utility function to convert the packed key binding in the cfg_key_bindings string to a vector
- */
-std::vector<std::pair<std::string, std::string> > unpack_key_binding (const std::string &packed);
-
-/** 
- *  @brief A utility function to convert the key binding (as path/shortcut pair vector) to a packed string for cfg_key_bindings
- */
-std::string pack_key_binding (const std::vector<std::pair<std::string, std::string> > &unpacked);
-
-/**
- *  @brief A utility function to convert the packed hidden flags in the cfg_menu_items_hidden string to a vector
- */
-std::vector<std::pair<std::string, bool> > unpack_menu_items_hidden (const std::string &packed);
-
-/**
- *  @brief A utility function to convert the hidde flags (as path/bool pair vector) to a packed string for cfg_menu_items_hidden
- */
-std::string pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked);
-
-
 class ColorButton;
 
 class MainConfigPage 
@@ -199,6 +178,7 @@ private slots:
   void current_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous);
   void item_changed (QTreeWidgetItem *, int);
   void text_changed ();
+  void text_cleared ();
   void filter_changed ();
   void reset_clicked ();
 

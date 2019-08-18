@@ -25,6 +25,8 @@
 #include "edtServiceImpl.h"
 #include "edtPropertiesPages.h"
 #include "edtInstPropertiesPage.h"
+#include "edtPCellParametersDialog.h"
+#include "edtService.h"
 #include "dbEdge.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
@@ -1107,12 +1109,12 @@ PathService::config_finalize ()
 InstService::InstService (db::Manager *manager, lay::LayoutView *view)
   : edt::Service (manager, view),
     m_angle (0.0), m_scale (1.0),
-    m_mirror (false), m_cell_name (""), m_lib_name (""), m_pcell_parameters (""),
+    m_mirror (false), m_is_pcell (false),
     m_array (false), m_rows (1), m_columns (1), 
     m_row_x (0.0), m_row_y (0.0), m_column_x (0.0), m_column_y (0.0),
     m_place_origin (false), m_reference_transaction_id (0),
     m_needs_update (true), m_has_valid_cell (false), m_in_drag_drop (false), 
-    m_current_cell (0), m_drag_drop_cell (0), m_cv_index (-1)
+    m_current_cell (0), mp_current_layout (0), mp_pcell_decl (0), m_cv_index (-1)
 { 
   //  .. nothing yet ..
 }
@@ -1138,26 +1140,75 @@ InstService::do_activated ()
   return true;  //  start editing immediately
 }
 
+tl::Variant
+InstService::get_default_layer_for_pcell ()
+{
+  lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
+  if (! cl.is_null () && ! cl->has_children () && (cl->source (true).cv_index() < 0 || cl->source (true).cv_index () == view ()->active_cellview_index ())) {
+    db::LayerProperties lp = cl->source (true).layer_props ();
+    if (! lp.is_null ()) {
+      return tl::Variant (lp);
+    }
+  }
+
+  return tl::Variant ();
+}
+
 bool
 InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase *data)
 { 
   const lay::CellDragDropData *cd = dynamic_cast <const lay::CellDragDropData *> (data);
-  if (view ()->is_editable () && cd && cd->layout () == & view ()->active_cellview ()->layout ()) {
+  if (view ()->is_editable () && cd && (cd->layout () == & view ()->active_cellview ()->layout () || cd->library ())) {
 
     view ()->cancel ();
 
-    //  NOTE: the cancel above might delete the cell we are dragging (if that is
-    //  a non-placed PCell). Hence we need to check whether the cell still is valid
-    if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
+    set_edit_marker (0);
 
-      set_edit_marker (0);
+    m_cv_index = view ()->active_cellview_index ();
+    m_in_drag_drop = true;
 
-      m_cv_index = view ()->active_cellview_index ();
-      m_in_drag_drop = true;
-      m_drag_drop_cell = cd->cell_index ();
+    if (cd->library ()) {
+      if (m_lib_name != cd->library ()->get_name ()) {
+        m_lib_name = cd->library ()->get_name ();
+        m_pcell_parameters.clear ();
+      }
+    } else {
+      m_lib_name.clear ();
+    }
 
+    m_is_pcell = false;
+
+    if (cd->is_pcell ()) {
+
+      const db::PCellDeclaration *pcell_decl = cd->layout ()->pcell_declaration (cd->cell_index ());
+      if (pcell_decl) {
+
+        if (m_cell_or_pcell_name != pcell_decl->name ()) {
+          m_cell_or_pcell_name = pcell_decl->name ();
+          m_pcell_parameters.clear ();
+        }
+
+        m_is_pcell = true;
+
+        //  NOTE: we reuse previous parameters for convenience unless PCell or library has changed
+        const std::vector<db::PCellParameterDeclaration> &pd = pcell_decl->parameter_declarations();
+        for (std::vector<db::PCellParameterDeclaration>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+          if (i->get_type () == db::PCellParameterDeclaration::t_layer && !i->is_hidden () && !i->is_readonly () && i->get_default ().is_nil ()) {
+            m_pcell_parameters.insert (std::make_pair (i->get_name (), get_default_layer_for_pcell ()));
+          } else {
+            m_pcell_parameters.insert (std::make_pair (i->get_name (), i->get_default ()));
+          }
+        }
+
+        do_begin_edit (p);
+        return true;
+
+      }
+
+    } else if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
+
+      m_cell_or_pcell_name = cd->layout ()->cell_name (cd->cell_index ());
       do_begin_edit (p);
-
       return true;
 
     }
@@ -1197,12 +1248,67 @@ bool
 InstService::drop_event (const db::DPoint & /*p*/, const lay::DragDropDataBase * /*data*/) 
 { 
   if (m_in_drag_drop) {
+
+    const lay::CellView &cv = view ()->cellview (m_cv_index);
+    if (! cv.is_valid ()) {
+      return false;
+    }
+
+    make_cell (cv);
+
+    bool accepted = true;
+
+    if (m_has_valid_cell && mp_pcell_decl) {
+
+      std::vector<tl::Variant> pv = mp_pcell_decl->map_parameters (m_pcell_parameters);
+
+      //  Turn off the drag cursor for the modal dialog
+      QApplication::restoreOverrideCursor ();
+
+      //  for PCells dragged show the parameter dialog for a chance to edit the initial parameters
+      if (! mp_pcell_parameters_dialog.get ()) {
+        mp_pcell_parameters_dialog.reset (new edt::PCellParametersDialog (view ()));
+        mp_pcell_parameters_dialog->parameters_changed_event.add (this, &InstService::apply_edits);
+      }
+
+      if (! mp_pcell_parameters_dialog->exec (mp_current_layout, view (), m_cv_index, mp_pcell_decl, pv)) {
+        accepted = false;
+      } else {
+        m_has_valid_cell = false;
+        m_pcell_parameters = mp_pcell_decl->named_parameters (mp_pcell_parameters_dialog->get_parameters ());
+      }
+
+    }
+
     set_edit_marker (0);
-    do_finish_edit ();
+
+    if (accepted) {
+      do_finish_edit ();
+    } else {
+      do_cancel_edit ();
+    }
+
+    sync_to_config ();
     return true;
+
   } else {
     return false; 
   }
+}
+
+void
+InstService::sync_to_config ()
+{
+  //  push the current setup to configuration so the instance dialog will take these as default
+  //  and "apply" of these instance properties doesn't fail because of insistency.
+  plugin_root ()->config_set (cfg_edit_inst_lib_name, m_lib_name);
+  plugin_root ()->config_set (cfg_edit_inst_cell_name, m_cell_or_pcell_name);
+  if (m_is_pcell) {
+    plugin_root ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
+  } else {
+    plugin_root ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
+  }
+  plugin_root ()->config_end ();
 }
 
 void 
@@ -1260,88 +1366,78 @@ InstService::do_begin_edit (const db::DPoint &p)
 std::pair<bool, db::cell_index_type> 
 InstService::make_cell (const lay::CellView &cv)
 {
-  if (m_in_drag_drop) {
-    return std::make_pair (true, m_drag_drop_cell);
-  }
-
   if (m_has_valid_cell) {
     return std::make_pair (true, m_current_cell);
   }
 
+  //  NOTE: do this at the beginning: creating a transaction might delete transactions behind the
+  //  head transaction, hence releasing (thus: deleting) cells. To prevert interference, create
+  //  the transaction at the beginning.
+  db::Transaction tr (manager (), tl::to_string (QObject::tr ("Create reference cell")), m_reference_transaction_id);
+  m_reference_transaction_id = tr.id ();
+
   lay::LayerState layer_state = view ()->layer_snapshot ();
 
-  db::Layout *layout;
   db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (m_lib_name);
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
   //  the library selected
   if (lib) {
-    layout = &lib->layout ();
+    mp_current_layout = &lib->layout ();
   } else {
-    layout = &cv->layout ();
+    mp_current_layout = &cv->layout ();
   }
 
-  std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (m_cell_name.c_str ());
-  std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (m_cell_name.c_str ());
+  std::pair<bool, db::cell_index_type> ci (false, db::cell_index_type (0));
+  std::pair<bool, db::pcell_id_type> pci (false, db::pcell_id_type (0));
+
+  if (! m_is_pcell) {
+    ci = mp_current_layout->cell_by_name (m_cell_or_pcell_name.c_str ());
+  } else {
+    pci = mp_current_layout->pcell_by_name (m_cell_or_pcell_name.c_str ());
+  }
+
   if (! ci.first && ! pci.first) {
-    //  throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
     return std::pair<bool, db::cell_index_type> (false, 0);
   }
 
-  m_reference_transaction_id = manager ()->transaction (tl::to_string (QObject::tr ("Create reference cell")), m_reference_transaction_id); 
   db::cell_index_type inst_cell_index = ci.second;
 
-  try {
+  mp_pcell_decl = 0;
 
-    //  instantiate the PCell
-    if (pci.first) {
+  //  instantiate the PCell
+  if (pci.first) {
 
-      std::vector<tl::Variant> pv;
+    std::vector<tl::Variant> pv;
 
-      const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pci.second);
-      if (pc_decl) {
+    mp_pcell_decl = mp_current_layout->pcell_declaration (pci.second);
+    if (mp_pcell_decl) {
 
-        std::map<std::string, tl::Variant> parameters;
-        tl::Extractor ex (m_pcell_parameters.c_str ());
-        while (! ex.at_end ()) {
-          std::string n;
-          ex.read_word_or_quoted (n);
-          ex.test (":");
-          ex.read (parameters.insert (std::make_pair (n, tl::Variant ())).first->second);
-          ex.test (";");
-        }
+      pv = mp_pcell_decl->map_parameters (m_pcell_parameters);
 
-        const std::vector<db::PCellParameterDeclaration> &pcp = pc_decl->parameter_declarations ();
-        for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
-          std::map<std::string, tl::Variant>::const_iterator p = parameters.find (pd->get_name ());
-          if (p != parameters.end ()) {
-            pv.push_back (p->second);
-          } else {
-            pv.push_back (pd->get_default ());
-          }
-        }
-
-      }
-
-      inst_cell_index = layout->get_pcell_variant (pci.second, pv);
+      //  make the parameters fit (i.e. PCells may not define consistent default parameters)
+      mp_pcell_decl->coerce_parameters (*mp_current_layout, pv);
 
     }
 
-    //  reference the library
-    if (lib) {
-      layout = & cv->layout ();
-      layout->cleanup ();
-      inst_cell_index = layout->get_lib_proxy (lib, inst_cell_index);
-    }
+    inst_cell_index = mp_current_layout->get_pcell_variant (pci.second, pv);
 
-    view ()->add_new_layers (layer_state);
-
-    manager ()->commit ();
-
-  } catch (...) {
-    manager ()->commit ();
-    throw;
   }
+
+  //  reference the library
+  if (lib) {
+
+    mp_current_layout = & cv->layout ();
+    inst_cell_index = mp_current_layout->get_lib_proxy (lib, inst_cell_index);
+
+    //  remove unused references
+    std::set<db::cell_index_type> keep;
+    keep.insert (inst_cell_index);
+    mp_current_layout->cleanup (keep);
+
+  }
+
+  view ()->add_new_layers (layer_state);
 
   m_has_valid_cell = true;
   m_current_cell = inst_cell_index;
@@ -1479,7 +1575,7 @@ bool
 InstService::configure (const std::string &name, const std::string &value)
 {
   if (name == cfg_edit_inst_cell_name) {
-    m_cell_name = value;
+    m_cell_or_pcell_name = value;
     m_needs_update = true;
     return true; // taken
   }
@@ -1491,9 +1587,13 @@ InstService::configure (const std::string &name, const std::string &value)
   }
 
   if (name == cfg_edit_inst_pcell_parameters) {
-    m_pcell_parameters = value;
+
+    m_pcell_parameters = pcell_parameters_from_string (value);
+    m_is_pcell = ! value.empty ();
+
     m_needs_update = true;
     return true; // taken
+
   }
 
   if (name == cfg_edit_inst_place_origin) {
@@ -1575,6 +1675,16 @@ InstService::config_finalize ()
   }
 
   edt::Service::config_finalize ();
+}
+
+void
+InstService::apply_edits()
+{
+  if (mp_pcell_decl && mp_pcell_parameters_dialog.get ()) {
+    m_pcell_parameters = mp_pcell_decl->named_parameters (mp_pcell_parameters_dialog->get_parameters ());
+  }
+
+  sync_to_config ();
 }
 
 void

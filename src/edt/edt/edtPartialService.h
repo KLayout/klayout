@@ -238,6 +238,11 @@ public:
    */
   virtual void transform (const db::DCplxTrans &tr);
 
+  /**
+   *  @brief Gets the catch distance
+   */
+  virtual double catch_distance ();
+
   /** 
    *  @brief Returns the number of selected objects
    */

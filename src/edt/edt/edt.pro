@@ -20,7 +20,8 @@ HEADERS = \
   edtService.h \
   edtServiceImpl.h \
   edtUtils.h \
-    edtCommon.h
+    edtCommon.h \
+    edtPCellParametersDialog.h
 
 FORMS = \
   AlignOptionsDialog.ui \
@@ -41,6 +42,7 @@ FORMS = \
   PolygonPropertiesPage.ui \
   RoundCornerOptionsDialog.ui \
   TextPropertiesPage.ui \
+    PCellParametersDialog.ui
 
 SOURCES = \
   edtConfig.cc \
@@ -57,6 +59,7 @@ SOURCES = \
   edtServiceImpl.cc \
   edtUtils.cc \
   gsiDeclEdt.cc \
+    edtPCellParametersDialog.cc
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC

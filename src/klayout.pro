@@ -101,6 +101,3 @@ plugins.depends += lib rdb db
 
 unit_tests.depends += plugins $$MAIN_DEPENDS
 
-RESOURCES += \
-    laybasic/laybasic/layResources.qrc
-

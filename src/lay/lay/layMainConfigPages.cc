@@ -68,6 +68,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_show_toolbar, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_show_layer_toolbox, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_show_hierarchy_panel, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_show_libraries_view, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_show_layer_panel, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_layout_file_watcher_enabled, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_window_state, ""));
@@ -326,76 +327,6 @@ MainConfigPage5::commit (lay::PluginRoot *root)
 // ------------------------------------------------------------
 //  The "key bindings" config page
 
-std::vector<std::pair<std::string, std::string> > 
-unpack_key_binding (const std::string &packed)
-{
-  tl::Extractor ex (packed.c_str ());
-
-  std::vector<std::pair<std::string, std::string> > key_bindings;
-
-  while (! ex.at_end ()) {
-    ex.test(";");
-    key_bindings.push_back (std::make_pair (std::string (), std::string ()));
-    ex.read_word_or_quoted (key_bindings.back ().first);
-    ex.test(":");
-    ex.read_word_or_quoted (key_bindings.back ().second);
-  }
-
-  return key_bindings;
-}
-
-std::string 
-pack_key_binding (const std::vector<std::pair<std::string, std::string> > &unpacked)
-{
-  std::string packed;
-
-  for (std::vector<std::pair<std::string, std::string> >::const_iterator p = unpacked.begin (); p != unpacked.end (); ++p) {
-    if (! packed.empty ()) {
-      packed += ";";
-    }
-    packed += tl::to_word_or_quoted_string (p->first);
-    packed += ":";
-    packed += tl::to_word_or_quoted_string (p->second);
-  }
-
-  return packed;
-}
-
-std::vector<std::pair<std::string, bool> >
-unpack_menu_items_hidden (const std::string &packed)
-{
-  tl::Extractor ex (packed.c_str ());
-
-  std::vector<std::pair<std::string, bool> > hidden;
-
-  while (! ex.at_end ()) {
-    ex.test(";");
-    hidden.push_back (std::make_pair (std::string (), false));
-    ex.read_word_or_quoted (hidden.back ().first);
-    ex.test(":");
-    ex.read (hidden.back ().second);
-  }
-
-  return hidden;
-}
-
-std::string
-pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked)
-{
-  std::string packed;
-
-  for (std::vector<std::pair<std::string, bool> >::const_iterator p = unpacked.begin (); p != unpacked.end (); ++p) {
-    if (! packed.empty ()) {
-      packed += ";";
-    }
-    packed += tl::to_word_or_quoted_string (p->first);
-    packed += ":";
-    packed += tl::to_string (p->second);
-  }
-
-  return packed;
-}
-
 CustomizeMenuConfigPage::CustomizeMenuConfigPage (QWidget *parent)
   : lay::ConfigPage (parent), m_enable_event (true)
 {
@@ -407,6 +338,7 @@ CustomizeMenuConfigPage::CustomizeMenuConfigPage (QWidget *parent)
 
   mp_ui->binding_le->setEnabled (false);
   mp_ui->binding_le->set_clear_button_enabled (true);
+  connect (mp_ui->binding_le, SIGNAL (clear_pressed ()), this, SLOT (text_cleared ()));
   connect (mp_ui->binding_le, SIGNAL (textChanged (QString)), this, SLOT (text_changed ()));
 
   mp_ui->filter->set_clear_button_enabled (true);
@@ -433,7 +365,7 @@ static void get_shortcuts (const lay::AbstractMenu &menu, const std::string &roo
           }
           get_shortcuts (menu, *i, bindings, with_defaults);
         } else if (! menu.is_separator (*i)) {
-          bindings.insert (std::make_pair (*i, with_defaults ? menu.action (*i).get_default_shortcut () : menu.action (*i).get_shortcut ()));
+          bindings.insert (std::make_pair (*i, with_defaults ? menu.action (*i).get_default_shortcut () : menu.action (*i).get_effective_shortcut ()));
         }
       }
     }
@@ -483,7 +415,8 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
   for (std::map<std::string, std::string>::iterator kb = m_current_bindings.begin (); kb != m_current_bindings.end (); ++kb) {
     std::map<std::string, std::string>::iterator bb = b.find (kb->first);
     if (bb != b.end ()) {
-      kb->second = bb->second;
+      lay::Action a = lay::MainWindow::instance ()->menu ()->action (kb->first);
+      kb->second = a.get_effective_shortcut_for (bb->second);
     } else {
       kb->second.clear ();
     }
@@ -517,13 +450,9 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
       bool hidden = m_hidden_flags[cb->first];
 
       std::map<std::string, std::string>::const_iterator db = default_bindings.find (cb->first);
-      bool is_default = false;
 
       std::string sc = cb->second;
-      if (sc.empty () && db != default_bindings.end ()) {
-        sc = db->second;
-        is_default = true;
-      }
+      bool is_default = (db != default_bindings.end () && db->second == sc);
 
       const std::string &path = cb->first;
 
@@ -599,7 +528,16 @@ CustomizeMenuConfigPage::commit (lay::PluginRoot *root)
   for (std::vector<std::pair<std::string, std::string> >::iterator kb = key_bindings.begin (); kb != key_bindings.end (); ++kb) {
     std::map<std::string, std::string>::iterator cb = m_current_bindings.find (kb->first);
     if (cb != m_current_bindings.end ()) {
-      kb->second = cb->second;
+      lay::Action a = lay::MainWindow::instance ()->menu ()->action (kb->first);
+      if (cb->second != a.get_default_shortcut ()) {
+        if (cb->second.empty ()) {
+          kb->second = lay::Action::no_shortcut ();
+        } else {
+          kb->second = cb->second;
+        }
+      } else {
+        kb->second.clear ();
+      }
       m_current_bindings.erase (cb);
     }
   }
@@ -629,6 +567,21 @@ CustomizeMenuConfigPage::commit (lay::PluginRoot *root)
 
   packed_hidden_flags = pack_menu_items_hidden (hidden);
   root->config_set (cfg_menu_items_hidden, packed_hidden_flags);
+}
+
+void
+CustomizeMenuConfigPage::text_cleared ()
+{
+  QTreeWidgetItem *item = mp_ui->bindings_list->currentItem ();
+  if (! item) {
+    return;
+  }
+
+  std::string path = tl::to_string (item->data (0, Qt::UserRole).toString ());
+  lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
+
+  //  "clear" reverts to default
+  mp_ui->binding_le->setText (tl::to_qstring (a.get_default_shortcut ()));
 }
 
 void
@@ -673,17 +626,18 @@ CustomizeMenuConfigPage::update_list_item (QTreeWidgetItem *item)
 
   std::string path = tl::to_string (item->data (0, Qt::UserRole).toString ());
   std::string shortcut = tl::to_string (mp_ui->binding_le->text ().simplified ());
+  //  normalize string
+  shortcut = tl::to_string (QKeySequence (tl::to_qstring (shortcut)).toString ());
   m_current_bindings[path] = shortcut;
 
   bool is_default = false;
-  std::string eff_shortcut = shortcut;
-  if (shortcut.empty ()) {
-    lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
-    eff_shortcut = a.get_default_shortcut ();
-    is_default = true;
-  }
 
-  item->setData (2, Qt::DisplayRole, tl::to_qstring (eff_shortcut));
+  lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
+  std::string def_shortcut = a.get_default_shortcut ();
+
+  is_default = (def_shortcut == shortcut);
+
+  item->setData (2, Qt::DisplayRole, tl::to_qstring (shortcut));
   item->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
 
   //  Set the aliases too
@@ -696,7 +650,7 @@ CustomizeMenuConfigPage::update_list_item (QTreeWidgetItem *item)
         m_current_bindings[*p] = shortcut;
         std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_item_for_path.find (*p);
         if (i != m_item_for_path.end ()) {
-          i->second->setData (2, Qt::DisplayRole, tl::to_qstring (eff_shortcut));
+          i->second->setData (2, Qt::DisplayRole, tl::to_qstring (shortcut));
           i->second->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
         }
       }

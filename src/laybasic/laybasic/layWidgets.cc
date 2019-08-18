@@ -1100,6 +1100,7 @@ void DecoratedLineEdit::mouseReleaseEvent (QMouseEvent *event)
     if (c == mp_clear_label) {
 
       clear ();
+      emit clear_pressed (); //  might modify the text
       emit textEdited (text ());
 
     }

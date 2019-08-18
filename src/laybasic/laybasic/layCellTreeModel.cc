@@ -25,6 +25,9 @@
 #include "layLayoutView.h"
 #include "tlGlobPattern.h"
 #include "dbPCellHeader.h"
+#include "dbPCellVariant.h"
+#include "dbLibraryProxy.h"
+#include "dbLibrary.h"
 
 #include <QTreeView>
 #include <QPalette>
@@ -82,11 +85,11 @@ struct cmp_cell_tree_item_vs_name_f
 // --------------------------------------------------------------------
 //  CellTreeItem implementation
 
-CellTreeItem::CellTreeItem (const db::Layout *layout, CellTreeItem *parent, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting s)
-  : mp_layout (layout), mp_parent (parent), m_sorting (s), m_is_pcell (is_pcell), m_index (0), m_children (), m_cell_or_pcell_index (cell_or_pcell_index)
+CellTreeItem::CellTreeItem (const db::Layout *layout, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting s)
+  : mp_layout (layout), mp_parent (0), m_sorting (s), m_is_pcell (is_pcell), m_index (0), m_children (), m_cell_or_pcell_index (cell_or_pcell_index)
 {
   if (! flat && ! is_pcell) {
-    m_child_count = int (mp_layout->cell (cell_index ()).child_cells ());
+    m_child_count = int (mp_layout->cell (cell_or_pcell_index).child_cells ());
   } else {
     m_child_count = 0;
   }
@@ -100,13 +103,19 @@ CellTreeItem::~CellTreeItem ()
   m_children.clear ();
 }
 
+bool
+CellTreeItem::is_valid () const
+{
+  return m_is_pcell || mp_layout->is_valid_cell_index (cell_or_pcell_index ());
+}
+
 std::string 
 CellTreeItem::display_text () const
 {
   if (m_is_pcell) {
     return name ();
-  } else if (mp_layout->is_valid_cell_index (cell_index ())) {
-    return mp_layout->cell (cell_index ()).get_display_name ();
+  } else if (mp_layout->is_valid_cell_index (cell_or_pcell_index ())) {
+    return mp_layout->cell (cell_or_pcell_index ()).get_display_name ();
   } else {
     return std::string ();
   }
@@ -125,28 +134,45 @@ CellTreeItem::child (int index)
 
     //  create a list of child sub-item
 
-    const db::Cell *cell = & mp_layout->cell (cell_index ());
+    const db::Cell *cell = & mp_layout->cell (cell_or_pcell_index ());
 
     m_children.reserve (m_child_count);
 
     for (db::Cell::child_cell_iterator child = cell->begin_child_cells (); ! child.at_end (); ++child) {
-      CellTreeItem *child_item = new CellTreeItem (mp_layout, this, false, *child, false, m_sorting);
-      m_children.push_back (child_item);
+      add_child (new CellTreeItem (mp_layout, false, *child, false, m_sorting));
     }
 
-    std::sort (m_children.begin (), m_children.end (), cmp_cell_tree_items_f (m_sorting));
-
-    for (size_t i = 0; i < m_children.size (); ++i) {
-      m_children [i]->set_index (i);
-    }
+    finish_children ();
 
   }
 
   return m_children [index];
 }
 
+void
+CellTreeItem::add_child (CellTreeItem *item)
+{
+  //  explicitly added
+  if (size_t (m_child_count) == m_children.size ()) {
+    ++m_child_count;
+  }
+
+  item->mp_parent = this;
+  m_children.push_back (item);
+}
+
+void
+CellTreeItem::finish_children ()
+{
+  std::sort (m_children.begin (), m_children.end (), cmp_cell_tree_items_f (m_sorting));
+
+  for (size_t i = 0; i < m_children.size (); ++i) {
+    m_children [i]->set_index (i);
+  }
+}
+
 db::cell_index_type
-CellTreeItem::cell_index () const
+CellTreeItem::cell_or_pcell_index () const
 {
   return db::cell_index_type (m_cell_or_pcell_index);
 }
@@ -161,7 +187,7 @@ const char *
 CellTreeItem::name () const
 {
   if (! m_is_pcell) {
-    return mp_layout->cell_name (cell_index ());
+    return mp_layout->cell_name (cell_or_pcell_index ());
   } else {
     return mp_layout->pcell_header (m_cell_or_pcell_index)->get_name ().c_str ();
   }
@@ -214,7 +240,7 @@ CellTreeItem::by_area_less_than (const CellTreeItem *b) const
     return m_is_pcell > b->is_pcell ();
   }
   // Hint: since mp_layout == b.mp_layout, not conversion to um^2 is required because of different DBU
-  return mp_layout->cell (cell_index ()).bbox ().area () < b->mp_layout->cell (b->cell_index ()).bbox ().area ();
+  return mp_layout->cell (cell_or_pcell_index ()).bbox ().area () < b->mp_layout->cell (b->cell_or_pcell_index ()).bbox ().area ();
 }
 
 bool
@@ -224,7 +250,7 @@ CellTreeItem::by_area_equal_than (const CellTreeItem *b) const
     return false;
   }
   // Hint: since mp_layout == b.mp_layout, not conversion to um^2 is required because of different DBU
-  return mp_layout->cell (cell_index ()).bbox ().area () == b->mp_layout->cell (b->cell_index ()).bbox ().area ();
+  return mp_layout->cell (cell_or_pcell_index ()).bbox ().area () == b->mp_layout->cell (b->cell_or_pcell_index ()).bbox ().area ();
 }
 
 // --------------------------------------------------------------------
@@ -249,6 +275,7 @@ CellTreeModel::CellTreeModel (QWidget *parent, lay::LayoutView *view, int cv_ind
   m_pad = ((flags & NoPadding) == 0);
 
   mp_layout = & view->cellview (cv_index)->layout ();
+  mp_library = 0;
   tl_assert (! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ()));
 
   build_top_level ();
@@ -269,6 +296,28 @@ CellTreeModel::CellTreeModel (QWidget *parent, db::Layout *layout, unsigned int 
   m_pad = ((flags & NoPadding) == 0);
 
   mp_layout = layout;
+  mp_library = 0;
+  tl_assert (! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ()));
+
+  build_top_level ();
+
+  m_current_index = m_selected_indexes.begin ();
+}
+
+CellTreeModel::CellTreeModel (QWidget *parent, db::Library *library, unsigned int flags, const db::Cell *base, Sorting sorting)
+  : QAbstractItemModel (parent),
+    m_flags (flags),
+    m_sorting (sorting),
+    mp_parent (parent),
+    mp_view (0),
+    m_cv_index (-1),
+    mp_base (base)
+{
+  m_flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
+  m_pad = ((flags & NoPadding) == 0);
+
+  mp_layout = &library->layout ();
+  mp_library = library;
   tl_assert (! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ()));
 
   build_top_level ();
@@ -284,8 +333,26 @@ CellTreeModel::~CellTreeModel ()
 void
 CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
 {
-  bool flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
   db::Layout *layout = & view->cellview (cv_index)->layout ();
+  do_configure (layout, 0, view, cv_index, flags, base, sorting);
+}
+
+void
+CellTreeModel::configure (db::Layout *layout, unsigned int flags, const db::Cell *base, Sorting sorting)
+{
+  do_configure (layout, 0, 0, -1, flags, base, sorting);
+}
+
+void
+CellTreeModel::configure (db::Library *library, unsigned int flags, const db::Cell *base, Sorting sorting)
+{
+  do_configure (& library->layout (), library, 0, -1, flags, base, sorting);
+}
+
+void
+CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
+{
+  bool flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
 
   bool need_reset = false;
   if (flat != m_flat || layout != mp_layout || view != mp_view) {
@@ -300,13 +367,17 @@ CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flag
 
   if (view != mp_view) {
 
-    mp_view->cell_visibility_changed_event.remove (this, &CellTreeModel::signal_data_changed);
-    mp_view->cellview_changed_event.remove (this, &CellTreeModel::signal_data_changed_with_int);
+    if (mp_view) {
+      mp_view->cell_visibility_changed_event.remove (this, &CellTreeModel::signal_data_changed);
+      mp_view->cellview_changed_event.remove (this, &CellTreeModel::signal_data_changed_with_int);
+    }
 
     mp_view = view;
 
-    mp_view->cell_visibility_changed_event.add (this, &CellTreeModel::signal_data_changed);
-    mp_view->cellview_changed_event.add (this, &CellTreeModel::signal_data_changed_with_int);
+    if (mp_view) {
+      mp_view->cell_visibility_changed_event.add (this, &CellTreeModel::signal_data_changed);
+      mp_view->cellview_changed_event.add (this, &CellTreeModel::signal_data_changed_with_int);
+    }
 
   }
 
@@ -321,6 +392,7 @@ CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flag
   m_pad = ((flags & NoPadding) == 0);
 
   mp_layout = layout;
+  mp_library = library;
   tl_assert (! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ()));
 
   build_top_level ();
@@ -339,10 +411,10 @@ CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flag
 
     for (QModelIndexList::const_iterator index = indexes.begin (); index != indexes.end (); ++index) {
 
-      std::vector<db::cell_index_type> path;
+      std::vector<std::pair<bool, db::cell_index_type> > path;
       CellTreeItem *item = (CellTreeItem *) index->internalPointer ();
       while (item) {
-        path.push_back (item->cell_index ());
+        path.push_back (std::make_pair (item->is_pcell (), item->cell_or_pcell_index ()));
         item = item->parent ();
       }
 
@@ -354,22 +426,22 @@ CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flag
         //  because we push_back'd on our way up:
         std::reverse (path.begin (), path.end ());
 
-        for (std::vector<db::cell_index_type>::const_iterator ci = path.begin (); ci != path.end (); ++ci) {
+        for (std::vector<std::pair<bool, db::cell_index_type> >::const_iterator ci = path.begin (); ci != path.end (); ++ci) {
 
           CellTreeItem *new_parent = 0;
 
-          if (! layout->is_valid_cell_index (*ci)) {
+          if ((! ci->first && ! layout->is_valid_cell_index (ci->second)) || (ci->first && ! layout->pcell_declaration (ci->second))) {
             //  can't translate this index
           } else if (parent == 0) {
             for (int i = 0; i < int (m_toplevel.size ()) && !new_parent; ++i) {
-              if (m_toplevel [i]->cell_index () == *ci) {
+              if (m_toplevel [i]->cell_or_pcell_index () == ci->second && m_toplevel [i]->is_pcell () == ci->first) {
                 new_parent = m_toplevel [i];
                 row = i;
               }
             }
           } else {
             for (int i = 0; i < parent->children () && !new_parent; ++i) {
-              if (parent->child (i)->cell_index () == *ci) {
+              if (parent->child (i)->cell_or_pcell_index () == ci->second && parent->child (i)->is_pcell () == ci->first) {
                 new_parent = parent->child (i);
                 row = i;
               }
@@ -406,7 +478,7 @@ void
 CellTreeModel::set_sorting (Sorting s)
 {
   if (s != m_sorting) {
-    configure (mp_view, m_cv_index, m_flags, mp_base, s);
+    do_configure (mp_layout, mp_library, mp_view, m_cv_index, m_flags, mp_base, s);
   }
 }
 
@@ -435,7 +507,7 @@ CellTreeModel::build_top_level ()
     if (mp_base) {
       m_toplevel.reserve (mp_base->child_cells ());
       for (db::Cell::child_cell_iterator child = mp_base->begin_child_cells (); ! child.at_end (); ++child) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *child, true, m_sorting);
+        CellTreeItem *item = new CellTreeItem (mp_layout, false, *child, true, m_sorting);
         m_toplevel.push_back (item);
       }
     }
@@ -447,7 +519,7 @@ CellTreeModel::build_top_level ()
     if (mp_base) {
       m_toplevel.reserve (mp_base->parent_cells ());
       for (db::Cell::parent_cell_iterator parent = mp_base->begin_parent_cells (); parent != mp_base->end_parent_cells (); ++parent) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *parent, true, m_sorting);
+        CellTreeItem *item = new CellTreeItem (mp_layout, false, *parent, true, m_sorting);
         m_toplevel.push_back (item);
       }
     }
@@ -462,11 +534,11 @@ CellTreeModel::build_top_level ()
     while (top != mp_layout->end_top_down ()) {
 
       if (m_flat) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *top, true, m_sorting);
+        CellTreeItem *item = new CellTreeItem (mp_layout, false, *top, true, m_sorting);
         m_toplevel.push_back (item);
       } else if (mp_layout->cell (*top).is_top ()) {
         if ((m_flags & BasicCells) == 0 || ! mp_layout->cell (*top).is_proxy ()) {
-          CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *top, (m_flags & TopCells) != 0, m_sorting);
+          CellTreeItem *item = new CellTreeItem (mp_layout, false, *top, (m_flags & TopCells) != 0, m_sorting);
           m_toplevel.push_back (item);
         }
       } else {
@@ -478,10 +550,30 @@ CellTreeModel::build_top_level ()
     }
 
     if ((m_flags & BasicCells) != 0) {
+
       for (db::Layout::pcell_iterator pc = mp_layout->begin_pcells (); pc != mp_layout->end_pcells (); ++pc) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, 0, true, pc->second, true, m_sorting);
+
+        CellTreeItem *item = new CellTreeItem (mp_layout, true, pc->second, true, m_sorting);
         m_toplevel.push_back (item);
+
+        if ((m_flags & WithVariants) != 0) {
+
+          const db::PCellHeader *pcell_header = mp_layout->pcell_header (pc->second);
+          for (db::PCellHeader::variant_iterator v = pcell_header->begin (); v != pcell_header->end (); ++v) {
+            if (mp_library && mp_library->is_retired (v->second->cell_index ())) {
+              //  skip retired cells - this means we won't show variants which are just kept
+              //  as shadow variants for the transactions.
+            } else {
+              item->add_child (new CellTreeItem (mp_layout, false, v->second->cell_index (), true, m_sorting));
+            }
+          }
+
+          item->finish_children ();
+
+        }
+
       }
+
     }
 
   }
@@ -510,19 +602,23 @@ CellTreeModel::mimeTypes () const
 QMimeData *
 CellTreeModel::mimeData(const QModelIndexList &indexes) const
 {
-  const db::Cell *c = 0;
-  for (QModelIndexList::const_iterator i = indexes.begin (); i != indexes.end () && !c; ++i) {
+  for (QModelIndexList::const_iterator i = indexes.begin (); i != indexes.end (); ++i) {
+
     if (i->isValid()) {
-      c = cell (*i);
+
+      if (is_pcell (*i)) {
+        lay::CellDragDropData data (mp_layout, mp_library, pcell_id (*i), true);
+        return data.to_mime_data ();
+      } else if (cell (*i)) {
+        lay::CellDragDropData data (mp_layout, mp_library, cell_index (*i), false);
+        return data.to_mime_data ();
+      }
+
     }
+
   }
 
-  if (c) {
-    lay::CellDragDropData data (mp_layout, c->cell_index ());
-    return data.to_mime_data ();
-  } else {
-    return 0;
-  }
+  return 0;
 }
 
 int 
@@ -561,7 +657,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
       const lay::CellView::specific_cell_path_type &ctx_path = mp_view->cellview (m_cv_index).specific_path ();
 
       if (! path.empty ()) {
-        if (item->cell_index () == path.back ()) {
+        if (item->cell_or_pcell_index () == path.back ()) {
           if (m_flat) {
             f.setBold (true);
           } else {
@@ -569,7 +665,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
             lay::CellView::unspecific_cell_path_type::const_iterator p = path.end ();
             while (it && p != path.begin ()) {
               --p;
-              if (it->cell_index () != *p) {
+              if (it->cell_or_pcell_index () != *p) {
                 break;
               }
               it = it->parent ();
@@ -578,7 +674,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
               f.setBold (true);
             }
           }
-        } else if (! ctx_path.empty () && item->cell_index () == ctx_path.back ().inst_ptr.cell_index ()) {
+        } else if (! ctx_path.empty () && item->cell_or_pcell_index () == ctx_path.back ().inst_ptr.cell_index ()) {
           if (m_flat) {
             f.setUnderline (true);
           } else {
@@ -586,7 +682,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
             lay::CellView::specific_cell_path_type::const_iterator cp = ctx_path.end ();
             while (it && cp != ctx_path.begin ()) {
               --cp;
-              if (it->cell_index () != cp->inst_ptr.cell_index ()) {
+              if (it->cell_or_pcell_index () != cp->inst_ptr.cell_index ()) {
                 break;
               }
               it = it->parent ();
@@ -595,7 +691,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
               lay::CellView::unspecific_cell_path_type::const_iterator p = path.end ();
               while (it && p != path.begin ()) {
                 --p;
-                if (it->cell_index () != *p) {
+                if (it->cell_or_pcell_index () != *p) {
                   break;
                 }
                 it = it->parent ();
@@ -608,7 +704,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
         }
       }
 
-      if (mp_view->is_cell_hidden (item->cell_index (), m_cv_index)) {
+      if (mp_view->is_cell_hidden (item->cell_or_pcell_index (), m_cv_index)) {
         f.setStrikeOut (true);
       }
 
@@ -647,6 +743,17 @@ CellTreeModel::data (const QModelIndex &index, int role) const
     return QVariant ();
 #endif
 
+  } else if (role == Qt::DecorationRole && (m_flags & WithIcons) != 0) {
+
+    //  TODO: icons for normal cells too?
+    if (item->is_pcell ()) {
+      QIcon icon (":/setup.png");
+      return QVariant (icon);
+    } else {
+      QIcon icon (":/instance.png");
+      return QVariant (icon);
+    }
+
   } else {
 
     return QVariant ();
@@ -660,19 +767,6 @@ CellTreeModel::headerData (int /*section*/, Qt::Orientation /*orientation*/, int
   return QVariant ();
 }
 
-bool searchItemPtr(CellTreeItem *parent, CellTreeItem *search)
-{
-  if (parent == search) {
-    return true;
-  }
-  for (int i = 0; i < parent->children(); ++i) {
-    if (searchItemPtr(parent->child(i), search)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 int 
 CellTreeModel::rowCount (const QModelIndex &parent) const 
 {
@@ -682,7 +776,7 @@ CellTreeModel::rowCount (const QModelIndex &parent) const
     CellTreeItem *item = (CellTreeItem *) parent.internalPointer ();
     if (! item) {
       return 0;
-    } else if (! mp_layout->is_valid_cell_index (item->cell_index ())) {
+    } else if (! item->is_valid ()) {
       //  for safety we return 0 children for invalid cells
       return 0;
     } else {
@@ -702,7 +796,7 @@ CellTreeModel::index (int row, int column, const QModelIndex &parent) const
     CellTreeItem *item = (CellTreeItem *) parent.internalPointer ();
     if (! item) {
       return QModelIndex ();
-    } else if (! mp_layout->is_valid_cell_index (item->cell_index ())) {
+    } else if (! item->is_valid ()) {
       //  for safety we don't return valid child indexes for invalid cells
       return QModelIndex ();
     } else {
@@ -784,7 +878,7 @@ CellTreeModel::pcell_id (const QModelIndex &index) const
     return 0;
   } else {
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
-    return item->cell_index ();
+    return item->cell_or_pcell_index ();
   }
 }
 
@@ -795,7 +889,7 @@ CellTreeModel::cell_index (const QModelIndex &index) const
     return 0;
   } else {
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
-    return item->cell_index ();
+    return item->cell_or_pcell_index ();
   }
 }
 
@@ -804,7 +898,7 @@ CellTreeModel::cell (const QModelIndex &index) const
 {
   if (index.isValid () && ! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
-    return & mp_layout->cell (item->cell_index ());
+    return & mp_layout->cell (item->cell_or_pcell_index ());
   } else {
     return 0;
   }
@@ -816,9 +910,9 @@ CellTreeModel::cell_name (const QModelIndex &index) const
   if (index.isValid () && ! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
     if (item->is_pcell ()) {
-      return mp_layout->pcell_header (item->cell_index ())->get_name ().c_str ();
+      return mp_layout->pcell_header (item->cell_or_pcell_index ())->get_name ().c_str ();
     } else {
-      return mp_layout->cell_name (item->cell_index ());
+      return mp_layout->cell_name (item->cell_or_pcell_index ());
     }
   } else {
     return 0;

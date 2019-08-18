@@ -167,6 +167,26 @@ public:
     return m_pattern.match (s, mp_eval->match_substrings ());
   }
 
+  bool is_catchall () const
+  {
+    return ! m_needs_eval && m_pattern.is_catchall ();
+  }
+
+  bool is_const () const
+  {
+    return ! m_needs_eval && m_pattern.is_const ();
+  }
+
+  bool needs_eval () const
+  {
+    return m_needs_eval;
+  }
+
+  const std::string &pattern () const
+  {
+    return m_pattern.pattern ();
+  }
+
 private:
   tl::GlobPattern m_pattern;
   tl::Expression m_expression;
@@ -484,9 +504,85 @@ public:
   ChildCellFilterState (const FilterBase *filter, const NameFilterArgument &pattern, ChildCellFilterInstanceMode instance_mode, tl::Eval &eval, db::Layout *layout, bool reading, const ChildCellFilterPropertyIDs &pids)
     : FilterStateBase (filter, layout, eval),
       m_pattern (pattern, eval), m_instance_mode (instance_mode), mp_parent (0), m_pids (pids),
-      m_weight (0), m_references (0), m_weight_set (false), m_references_set (false), m_reading (reading)
+      m_weight (0), m_references (0), m_weight_set (false), m_references_set (false), m_reading (reading),
+      m_cell_index (std::numeric_limits<db::cell_index_type>::max ())
   {
     //  .. nothing yet ..
+  }
+
+  bool cell_matches (db::cell_index_type ci)
+  {
+    //  prefilter with the cell objectives
+    if (! objectives ().wants_cell (ci)) {
+      return false;
+    }
+
+    if (m_pattern.is_catchall ()) {
+      return true;
+    } else if (m_cell_index != std::numeric_limits<db::cell_index_type>::max ()) {
+      return ci == db::cell_index_type (m_cell_index);
+    } else if (m_pattern.is_const ()) {
+      if (m_pattern.match (layout ()->cell (ci).get_qualified_name ())) {
+        m_cell_index = ci;
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return (m_pattern.match (layout ()->cell (ci).get_qualified_name ()));
+    }
+  }
+
+  virtual void do_init ()
+  {
+    if (m_pattern.is_catchall () || m_pattern.needs_eval ()) {
+
+      if (! objectives ().wants_all_cells ()) {
+
+        //  wildcard or unknown filter: include the parent cells if specific child cells are looked for
+
+        int levels = 1;
+        for (size_t i = 0; i < followers ().size (); ++i) {
+          if (followers ()[i] == 0) {
+            //  this is a sign of recursion - collect caller cells from all levels.
+            levels = -1;
+          }
+        }
+
+        //  this means, one follower wants only certain cells. We can optimize by only checking for potential parents
+        std::set<db::cell_index_type> callers;
+        for (FilterStateObjectives::cell_iterator c = objectives ().begin_cells (); c != objectives ().end_cells (); ++c) {
+          layout ()->cell (*c).collect_caller_cells (callers, levels);
+        }
+
+        for (std::set<db::cell_index_type>::const_iterator c = callers.begin (); c != callers.end (); ++c) {
+          objectives ().request_cell (*c);
+        }
+
+      }
+
+    } else if (m_pattern.is_const ()) {
+
+      objectives ().set_wants_all_cells (false);
+
+      //  include the cell with the name we look for into the objectives
+      std::pair<bool, db::cell_index_type> cell_by_name = layout ()->cell_by_name (m_pattern.pattern ().c_str ());
+      if (cell_by_name.first) {
+        objectives ().request_cell (cell_by_name.second);
+      }
+
+    } else {
+
+      objectives ().set_wants_all_cells (false);
+
+      //  include all matching cells into the objectives
+      for (db::Layout::const_iterator c = layout ()->begin (); c != layout ()->end(); ++c) {
+        if (m_pattern.match (layout ()->cell_name (c->cell_index()))) {
+          objectives ().request_cell (c->cell_index ());
+        }
+      }
+
+    }
   }
 
   virtual void reset (FilterStateBase *previous) 
@@ -511,7 +607,7 @@ public:
 
       m_top_cell = layout ()->begin_top_down ();
       m_top_cell_end = layout ()->end_top_cells ();
-      while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !m_pattern.match (layout ()->cell (*m_top_cell).get_qualified_name ()))) {
+      while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !cell_matches (*m_top_cell))) {
         ++m_top_cell;
       }
 
@@ -524,7 +620,7 @@ public:
       if (m_instance_mode == NoInstances) {
 
         m_child_cell = mp_parent->begin_child_cells ();
-        while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !m_pattern.match (layout ()->cell (*m_child_cell).get_qualified_name ()))) {
+        while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !cell_matches (*m_child_cell))) {
           ++m_child_cell;
         } 
 
@@ -536,7 +632,7 @@ public:
         while (m_inst != m_inst_end) {
 
           db::cell_index_type cid = (*m_inst)->object ().cell_index ();
-          if (layout ()->is_valid_cell_index (cid) && m_pattern.match (layout ()->cell (cid).get_qualified_name ())) {
+          if (layout ()->is_valid_cell_index (cid) && cell_matches (cid)) {
             break;
           }
 
@@ -576,7 +672,7 @@ public:
 
         do {
           ++m_child_cell;
-        } while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !m_pattern.match (layout ()->cell (*m_child_cell).get_qualified_name ())));
+        } while (! m_child_cell.at_end () && (!layout ()->is_valid_cell_index (*m_child_cell) || !cell_matches (*m_child_cell)));
 
       } else {
 
@@ -600,7 +696,7 @@ public:
               while (m_inst != m_inst_end) {
 
                 cid = (*m_inst)->object ().cell_index ();
-                if (layout ()->is_valid_cell_index (cid) && m_pattern.match (layout ()->cell (cid).get_qualified_name ())) {
+                if (layout ()->is_valid_cell_index (cid) && cell_matches (cid)) {
                   break;
                 }
 
@@ -636,7 +732,7 @@ public:
 
       do {
         ++m_top_cell;
-      } while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !m_pattern.match (layout ()->cell (*m_top_cell).get_qualified_name ())));
+      } while (m_top_cell != m_top_cell_end && (!layout ()->is_valid_cell_index (*m_top_cell) || !cell_matches (*m_top_cell)));
 
     }
   }
@@ -1028,6 +1124,7 @@ private:
   bool m_reading;
   std::set<db::Instance> m_ignored;
   db::Instance m_i;
+  db::cell_index_type m_cell_index;
 };
 
 class DB_PUBLIC ChildCellFilter
@@ -1126,9 +1223,28 @@ public:
       m_pids (pids),
       m_pattern (pattern, eval),
       mp_parent (0),
-      m_reading (reading)
+      m_reading (reading),
+      m_cell_index (std::numeric_limits<db::cell_index_type>::max ())
   {
     //  .. nothing yet ..
+  }
+
+  bool cell_matches (db::cell_index_type ci)
+  {
+    if (m_pattern.is_catchall ()) {
+      return true;
+    } else if (m_cell_index != std::numeric_limits<db::cell_index_type>::max ()) {
+      return ci == db::cell_index_type (m_cell_index);
+    } else if (m_pattern.is_const ()) {
+      if (m_pattern.match (layout ()->cell (ci).get_qualified_name ())) {
+        m_cell_index = ci;
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return (m_pattern.match (layout ()->cell (ci).get_qualified_name ()));
+    }
   }
 
   virtual void reset (FilterStateBase *previous) 
@@ -1140,7 +1256,7 @@ public:
     m_cell = layout ()->begin_top_down ();
     m_cell_end = layout ()->end_top_down ();
 
-    while (m_cell != m_cell_end && !m_pattern.match (layout ()->cell (*m_cell).get_qualified_name ())) {
+    while (m_cell != m_cell_end && !cell_matches (*m_cell)) {
       ++m_cell;
     }
 
@@ -1158,7 +1274,7 @@ public:
   {
     do {
       ++m_cell;
-    } while (m_cell != m_cell_end && !m_pattern.match (layout ()->cell (*m_cell).get_qualified_name ()));
+    } while (m_cell != m_cell_end && !cell_matches (*m_cell));
   }
 
   virtual bool at_end () 
@@ -1275,6 +1391,7 @@ private:
   db::Layout::top_down_const_iterator m_cell, m_cell_end;
   std::auto_ptr<db::CellCounter> m_cell_counter;
   bool m_reading;
+  db::cell_index_type m_cell_index;
 };
 
 class DB_PUBLIC CellFilter
@@ -1949,6 +2066,7 @@ LayoutQueryIterator::init ()
 {
   std::vector<FilterStateBase *> f;
   mp_root_state = mp_q->root ().create_state (f, mp_layout, m_eval, false);
+  mp_root_state->init ();
   mp_root_state->reset (0);
   m_state.push_back (mp_root_state);
 
@@ -2427,9 +2545,9 @@ LayoutQuery::dump () const
 }
 
 void
-LayoutQuery::execute (db::Layout &layout) 
+LayoutQuery::execute (db::Layout &layout, tl::Eval *context)
 {
-  LayoutQueryIterator iq (*this, &layout);
+  LayoutQueryIterator iq (*this, &layout, context);
   while (! iq.at_end ()) {
     ++iq;
   }
@@ -2817,11 +2935,94 @@ FilterBracket::optimize ()
 }
 
 // --------------------------------------------------------------------------------
+//  FilterStateObjectives implementation
+
+FilterStateObjectives::FilterStateObjectives ()
+  : m_wants_all_cells (false)
+{
+  //  .. nothing yet ..
+}
+
+FilterStateObjectives FilterStateObjectives::everything ()
+{
+  FilterStateObjectives all;
+  all.set_wants_all_cells (true);
+  return all;
+}
+
+FilterStateObjectives &
+FilterStateObjectives::operator+= (const FilterStateObjectives &other)
+{
+  if (! m_wants_all_cells) {
+    m_wants_all_cells = other.m_wants_all_cells;
+    if (! m_wants_all_cells) {
+      m_wants_cells.insert (other.m_wants_cells.begin (), other.m_wants_cells.end ());
+    }
+  }
+
+  if (m_wants_all_cells) {
+    m_wants_cells.clear ();
+  }
+
+  return *this;
+}
+
+void
+FilterStateObjectives::set_wants_all_cells (bool f)
+{
+  m_wants_cells.clear ();
+  m_wants_all_cells = f;
+}
+
+void
+FilterStateObjectives::request_cell (db::cell_index_type ci)
+{
+  if (! m_wants_all_cells) {
+    m_wants_cells.insert (ci);
+  }
+}
+
+bool
+FilterStateObjectives::wants_cell (db::cell_index_type ci) const
+{
+  return m_wants_all_cells || m_wants_cells.find (ci) != m_wants_cells.end ();
+}
+
+// --------------------------------------------------------------------------------
 //  FilterStateBase implementation
 
 FilterStateBase::FilterStateBase (const FilterBase *filter, db::Layout *layout, tl::Eval &eval)
   : mp_previous (0), mp_filter (filter), mp_layout (layout), m_follower (0), mp_eval (&eval)
 {
+}
+
+void
+FilterStateBase::init (bool recursive)
+{
+  if (m_followers.empty ()) {
+
+    m_objectives = FilterStateObjectives::everything ();
+
+  } else {
+
+    for (std::vector<FilterStateBase *>::const_iterator f = m_followers.begin (); f != m_followers.end (); ++f) {
+      if (*f) {
+        if (recursive) {
+          (*f)->init ();
+        }
+        m_objectives += (*f)->objectives ();
+      }
+    }
+
+  }
+
+  do_init ();
+}
+
+void
+FilterStateBase::do_init ()
+{
+  //  .. nothing yet ..
 }
 
 void
@@ -2853,6 +3054,7 @@ FilterStateBase::child () const
     if (! b && mp_filter && mp_layout) {
       //  dynamically create a new recursive state execution graph snippet if required
       b = mp_filter->create_state (m_followers, mp_layout, *mp_eval, true);
+      b->init (false);
       m_followers [m_follower] = b;
     }
 

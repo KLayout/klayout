@@ -526,6 +526,10 @@ HierarchyControlPanel::search_prev ()
 void
 HierarchyControlPanel::search_editing_finished ()
 {
+  if (! mp_search_frame->isVisible ()) {
+    return;
+  }
+
   for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
     CellTreeModel *m = dynamic_cast<CellTreeModel *> ((*v)->model ());
     if (m) {
@@ -572,13 +576,13 @@ HierarchyControlPanel::path_from_index (const QModelIndex &index, int cv_index, 
 
       //  construct a path in the flat case
       lay::CellView cv (m_cellviews [cv_index]);
-      cv.set_cell (item->cell_index ());
+      cv.set_cell (item->cell_or_pcell_index ());
       path = cv.unspecific_path ();
 
     } else {
 
       while (item) {
-        path.push_back (item->cell_index ());
+        path.push_back (item->cell_or_pcell_index ());
         item = item->parent ();
       }
 
@@ -630,10 +634,10 @@ HierarchyControlPanel::double_clicked (const QModelIndex &index)
     set_active_celltree_from_sender ();
     mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Show or hide cell"))); 
     CellTreeItem *item = (CellTreeItem *) index.internalPointer ();
-    if (mp_view->is_cell_hidden (item->cell_index (), m_active_index)) {
-      mp_view->show_cell (item->cell_index (), m_active_index);
+    if (mp_view->is_cell_hidden (item->cell_or_pcell_index (), m_active_index)) {
+      mp_view->show_cell (item->cell_or_pcell_index (), m_active_index);
     } else {
-      mp_view->hide_cell (item->cell_index (), m_active_index);
+      mp_view->hide_cell (item->cell_or_pcell_index (), m_active_index);
     }
     mp_view->manager ()->commit ();
   }
@@ -733,6 +737,8 @@ HierarchyControlPanel::selection_changed (int index)
 {
   if (index != m_active_index) {
 
+    search_editing_finished ();
+
     m_active_index = index;
 
     bool split_mode = m_split_mode;
@@ -744,6 +750,9 @@ HierarchyControlPanel::selection_changed (int index)
     int i = 0;
     for (std::vector <QFrame *>::const_iterator f = mp_cell_list_frames.begin (); f != mp_cell_list_frames.end (); ++f, ++i) {
       (*f)->setVisible (i == index || split_mode);
+      if (i == index) {
+        mp_cell_lists [i]->setFocus ();
+      }
     }
 
     i = 0;
@@ -771,7 +780,7 @@ HierarchyControlPanel::index_from_path (const cell_path_type &path, int cv_index
       //  TODO: linear search might not be effective enough ..
       for (int c = 0; c < model->toplevel_items (); ++c) {
         CellTreeItem *item = model->toplevel_item (c);
-        if (item->cell_index () == path.back ()) {
+        if (item->cell_or_pcell_index () == path.back ()) {
           return model->model_index (item);
         }
       }
@@ -780,7 +789,7 @@ HierarchyControlPanel::index_from_path (const cell_path_type &path, int cv_index
 
       for (int c = 0; c < model->toplevel_items (); ++c) {
         CellTreeItem *item = model->toplevel_item (c);
-        if (item->cell_index () == path.front ()) {
+        if (item->cell_or_pcell_index () == path.front ()) {
           item = find_child_item (path.begin () + 1, path.end (), item);
           if (item) {
             return model->model_index (item);
@@ -804,7 +813,7 @@ HierarchyControlPanel::find_child_item (cell_path_type::const_iterator start, ce
 
     for (int n = 0; n < p->children (); ++n) {
       CellTreeItem *item = p->child (n);
-      if (item && item->cell_index () == *start) {
+      if (item && item->cell_or_pcell_index () == *start) {
         return find_child_item (start + 1, end, item);
       }
     }

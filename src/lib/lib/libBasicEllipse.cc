@@ -173,7 +173,11 @@ BasicEllipse::produce (const db::Layout &layout, const std::vector<unsigned int>
 std::string 
 BasicEllipse::get_display_name (const db::pcell_parameters_type &parameters) const
 {
-  return std::string("ELLIPSE(rx=") + tl::micron_to_string (parameters [p_actual_radius_x].to_double ()) + ",ry=" + tl::micron_to_string (parameters [p_actual_radius_y].to_double ()) + ")";
+  return "ELLIPSE(l=" + std::string (parameters [p_layer].to_string ()) +
+               ",rx=" + tl::to_string (parameters [p_actual_radius_x].to_double ()) +
+               ",ry=" + tl::to_string (parameters [p_actual_radius_y].to_double ()) +
+                ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+                  ")";
 }
 
 std::vector<db::PCellParameterDeclaration> 

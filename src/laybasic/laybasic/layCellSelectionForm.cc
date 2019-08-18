@@ -384,7 +384,7 @@ CellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
   QModelIndex mi;
   for (int c = 0; c < model->toplevel_items (); ++c) {
     lay::CellTreeItem *item = model->toplevel_item (c);
-    if (item->cell_index () == ci) {
+    if (item->cell_or_pcell_index () == ci) {
       mi = model->model_index (item);
       break;
     }
@@ -736,7 +736,7 @@ LibraryCellSelectionForm::select_pcell_entry (db::pcell_id_type pci)
   QModelIndex mi;
   for (int c = 0; c < model->toplevel_items (); ++c) {
     lay::CellTreeItem *item = model->toplevel_item (c);
-    if (item->is_pcell () && item->cell_index () == pci) {
+    if (item->is_pcell () && item->cell_or_pcell_index () == pci) {
       mi = model->model_index (item);
       break;
     }
@@ -775,7 +775,7 @@ LibraryCellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
   QModelIndex mi;
   for (int c = 0; c < model->toplevel_items (); ++c) {
     lay::CellTreeItem *item = model->toplevel_item (c);
-    if (item->cell_index () == ci) {
+    if (item->cell_or_pcell_index () == ci) {
       mi = model->model_index (item);
       break;
     }

@@ -168,7 +168,10 @@ NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
     std::map <std::string, unsigned int>::const_iterator nl = m_new_layers.find (n);
     if (nl == m_new_layers.end ()) {
 
-      unsigned int ll = m_next_layer_index++;
+      unsigned int ll;
+      do {
+        ll = m_next_layer_index++;
+      } while (! layout.is_free_layer (ll));
 
       layout.insert_layer (ll, db::LayerProperties ());
       m_new_layers.insert (std::make_pair (n, ll));

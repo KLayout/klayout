@@ -45,6 +45,7 @@
 
 #include <cstring>
 #include <map>
+#include <set>
 #include <string>
 #include <list>
 #include <vector>
@@ -1236,9 +1237,7 @@ public:
   bool is_valid_cell_index (cell_index_type ci) const;
 
   /**
-   *  @brief Tell, if a layer index is a valid index
-   *
-   *  @return true, if this is so
+   *  @brief Returns true, if a layer index is a valid index for a normal layout layer
    */
   bool is_valid_layer (unsigned int n) const
   {
@@ -1246,9 +1245,15 @@ public:
   }
 
   /**
-   *  @brief Tell, if a layer index is a special layer index
-   *
-   *  @return true, if this is so
+   *  @brief Returns true, if a layer index is a free (unused) layer
+   */
+  bool is_free_layer (unsigned int n) const
+  {
+    return (n >= layers () || m_layer_states [n] == Free);
+  }
+
+  /**
+   *  @brief Returns true, if a layer index is a special layer index
    */
   bool is_special_layer (unsigned int n) const
   {
@@ -1442,9 +1447,10 @@ public:
   /**
    *  @brief Cleans up the layout
    *
-   *  This method removes proxy objects which are no longer used
+   *  This method removes proxy objects which are no longer used.
+   *  It can be given a list of cells which need to be kept.
    */
-  void cleanup ();
+  void cleanup (const std::set<db::cell_index_type> &keep = std::set<db::cell_index_type> ());
 
   /**
    *  @brief Implementation of the undo operations

@@ -260,6 +260,44 @@ private:
 };
 
 /**
+ *  @brief A structure representing optimization hints for the states
+ */
+struct DB_PUBLIC FilterStateObjectives
+{
+public:
+  typedef std::set<db::cell_index_type>::const_iterator cell_iterator;
+
+  FilterStateObjectives ();
+
+  FilterStateObjectives &operator+= (const FilterStateObjectives &other);
+
+  void set_wants_all_cells (bool f);
+  bool wants_all_cells () const
+  {
+    return m_wants_all_cells;
+  }
+
+  void request_cell (db::cell_index_type ci);
+  bool wants_cell (db::cell_index_type ci) const;
+
+  cell_iterator begin_cells () const
+  {
+    return m_wants_cells.begin ();
+  }
+
+  cell_iterator end_cells () const
+  {
+    return m_wants_cells.end ();
+  }
+
+  static FilterStateObjectives everything ();
+
+private:
+  bool m_wants_all_cells;
+  std::set<db::cell_index_type> m_wants_cells;
+};
+
+/**
  *  @brief A base class for the state objects
  *
  *  See \FilterBase for a brief description of the state objects.
@@ -279,6 +317,14 @@ public:
    *  @brief Destructor
    */
   virtual ~FilterStateBase () { }
+
+  /**
+   *  @brief Initializes the filter state object
+   *
+   *  This method is called after the state graph has been created. It will initialize all followers
+   *  and the call the virtual "do_init" method.
+   */
+  void init (bool recursive = true);
 
   /**
    *  @brief Reset the iterator
@@ -378,6 +424,21 @@ public:
    */
   virtual void dump () const;
 
+protected:
+  /**
+   *  @brief Performs the actual initialization
+   *
+   *  The main intention of this method is to specify optimization hints
+   *  for the objectives. Before this method is called the objectives are
+   *  initialized as the common objectives of all followers.
+   */
+  virtual void do_init ();
+
+  FilterStateObjectives &objectives ()
+  {
+    return m_objectives;
+  }
+
 private:
   friend class LayoutQueryIterator;
 
@@ -389,6 +450,7 @@ private:
   db::Layout *mp_layout;
   size_t m_follower;
   tl::Eval *mp_eval;
+  FilterStateObjectives m_objectives;
 
   void proceed (bool skip);
 };
@@ -468,8 +530,10 @@ public:
    *  as "delete" or "with ... do".
    *  It is basically equivalent to iterating over the query until it is
    *  done.
+   *
+   *  The context provides a way to define variables and functions.
    */
-  void execute (db::Layout &layout);
+  void execute (db::Layout &layout, tl::Eval *context = 0);
   
   /**
    *  @brief A dump method (for debugging)

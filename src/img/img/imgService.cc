@@ -429,11 +429,6 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 }
 
 // -------------------------------------------------------------
-
-//  search range for select in pixels
-static unsigned int search_range = 5;   // TODO: make variable?
-
-// -------------------------------------------------------------
 //  img::Service implementation
 
 Service::Service (db::Manager *manager, lay::LayoutView *view)
@@ -599,7 +594,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
   widget ()->drag_cancel (); // KLUDGE: every service does this to the same service manager
 
   //  compute search box
-  double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_dbox = db::DBox (p, p).enlarged (db::DVector (l, l));
 
   //  choose move mode
@@ -1105,10 +1100,16 @@ Service::clear_selection ()
 }
 
 double
+Service::catch_distance ()
+{
+  return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+}
+
+double
 Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mode)
 {
   //  compute search box
-  double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_dbox = db::DBox (pos, pos).enlarged (db::DVector (l, l));
 
   //  for single-point selections either exclude the current selection or the
@@ -1142,7 +1143,7 @@ Service::transient_select (const db::DPoint &pos)
   bool any_selected = false;
 
   //  compute search box
-  double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_dbox = db::DBox (pos, pos).enlarged (db::DVector (l, l));
 
   //  point selection: look for the "closest" image
@@ -1240,7 +1241,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
   } else {
 
     //  compute search box
-    double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+    double l = catch_distance ();
     db::DBox search_dbox = box.enlarged (db::DVector (l, l));
 
     if (! box.is_point ()) {

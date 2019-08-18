@@ -155,6 +155,17 @@ public:
   }
 
   /**
+   *  @brief The catch distance
+   *
+   *  The catch distance is a typical value for the "fuzzyness" of a mouse click.
+   *  It is given in micron.
+   */
+  virtual double catch_distance ()
+  {
+    return 0.0;
+  }
+
+  /**
    *  @brief transient selection
    *
    *  The transient selection is triggered when the mouse does not move for
@@ -577,6 +588,8 @@ private:
   bool m_move_selection;
   bool m_any_move_operation;
   db::DBox m_last_selected_point;
+
+  db::DBox selection_catch_bbox ();
 };
 
 }

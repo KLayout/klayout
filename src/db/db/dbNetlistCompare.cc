@@ -3005,9 +3005,6 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
           ++j;
         }
 
-        if (i - ii == size_t(2)) {
-          printf("@@@1\n"); fflush(stdout);
-        }
         align (ii, i, jj, j, DeviceConnectionDistance ());
 
         for ( ; ii != i && jj != j; ++ii, ++jj) {

@@ -108,6 +108,16 @@ public:
     return op;
   }
 
+  virtual bool is_const () const
+  {
+    return false;
+  }
+
+  virtual bool is_catchall () const
+  {
+    return false;
+  }
+
   virtual bool match (const char *s, std::vector<std::string> *e) const
   {
     size_t n = e ? e->size () : 0;
@@ -186,6 +196,11 @@ public:
     return op;
   }
 
+  virtual bool is_const () const
+  {
+    return next () == 0;
+  }
+
   virtual bool match (const char *s, std::vector<std::string> *e) const
   {
     if (! m_cs) {
@@ -238,6 +253,11 @@ public:
     GlobPatternPass *op = new GlobPatternPass ();
     init_clone (op);
     return op;
+  }
+
+  virtual bool is_catchall () const
+  {
+    return true;
   }
 
   virtual bool match (const char *, std::vector<std::string> *) const
@@ -809,6 +829,16 @@ GlobPatternOp *GlobPattern::op () const
   }
 
   return mp_op;
+}
+
+bool GlobPattern::is_catchall () const
+{
+  return op ()->is_catchall ();
+}
+
+bool GlobPattern::is_const () const
+{
+  return op ()->is_const ();
 }
 
 bool GlobPattern::match (const char *s) const

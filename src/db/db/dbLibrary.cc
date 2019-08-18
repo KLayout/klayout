@@ -51,6 +51,7 @@ Library::register_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
 {
   m_referrers.insert (std::make_pair (ly, 0)).first->second += 1;
   m_refcount.insert (std::make_pair (lib_proxy->library_cell_index (), 0)).first->second += 1;
+  retired_state_changed_event ();
 }
 
 void 
@@ -73,10 +74,38 @@ Library::unregister_proxy (db::LibraryProxy *lib_proxy, db::Layout *ly)
         layout ().delete_cell (ci);
       }
     }
+    retired_state_changed_event ();
   }
 }
 
-void 
+void
+Library::retire_proxy (db::LibraryProxy *lib_proxy)
+{
+  m_retired_count.insert (std::make_pair (lib_proxy->library_cell_index (), 0)).first->second += 1;
+  retired_state_changed_event ();
+}
+
+void
+Library::unretire_proxy (db::LibraryProxy *lib_proxy)
+{
+  std::map<db::cell_index_type, int>::iterator c = m_retired_count.find (lib_proxy->library_cell_index ());
+  if (c != m_retired_count.end ()) {
+    if (! --c->second) {
+      m_retired_count.erase (c);
+    }
+    retired_state_changed_event ();
+  }
+}
+
+bool
+Library::is_retired (const db::cell_index_type library_cell_index) const
+{
+  std::map<db::cell_index_type, int>::const_iterator i = m_refcount.find (library_cell_index);
+  std::map<db::cell_index_type, int>::const_iterator j = m_retired_count.find (library_cell_index);
+  return (i != m_refcount.end () && j != m_retired_count.end () && i->second == j->second);
+}
+
+void
 Library::remap_to (db::Library *other)
 {
   //  Hint: in the loop over the referrers we might unregister (delete from m_referrers) a referrer because no more cells refer to us.

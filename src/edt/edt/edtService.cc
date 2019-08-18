@@ -60,6 +60,45 @@ ac_from_buttons (unsigned int buttons)
 
 // -------------------------------------------------------------
 
+std::string pcell_parameters_to_string (const std::map<std::string, tl::Variant> &parameters)
+{
+  std::string param;
+
+  param = "!";  //  flags PCells
+  for (std::map<std::string, tl::Variant>::const_iterator p = parameters.begin (); p != parameters.end (); ++p) {
+    param += tl::to_word_or_quoted_string (p->first);
+    param += ":";
+    param += p->second.to_parsable_string ();
+    param += ";";
+  }
+
+  return param;
+}
+
+std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::string &s)
+{
+  tl::Extractor ex (s.c_str ());
+  std::map<std::string, tl::Variant> pm;
+
+  ex.test ("!");
+
+  try {
+    while (! ex.at_end ()) {
+      std::string n;
+      ex.read_word_or_quoted (n);
+      ex.test (":");
+      ex.read (pm.insert (std::make_pair (n, tl::Variant ())).first->second);
+      ex.test (";");
+    }
+  } catch (...) {
+    //  ignore errors
+  }
+
+  return pm;
+}
+
+// -------------------------------------------------------------
+
 Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type flags)
   : lay::ViewService (view->view_object_widget ()), 
     lay::Editable (view),
@@ -825,11 +864,17 @@ Service::has_transient_selection ()
   return ! m_transient_selection.empty ();
 }
 
+double
+Service::catch_distance ()
+{
+  return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+}
+
 double 
 Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mode)
 {
   //  compute search box
-  double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_box = db::DBox (pos, pos).enlarged (db::DVector (l, l));
 
   //  for single-point selections either exclude the current selection or the
@@ -889,7 +934,7 @@ Service::transient_select (const db::DPoint &pos)
   }
 
   //  compute search box
-  double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_box = db::DBox (pos, pos).enlarged (db::DVector (l, l));
 
   if (m_cell_inst_service) {
@@ -1152,7 +1197,7 @@ bool
 Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 {
   //  compute search box
-  double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+  double l = catch_distance ();
   db::DBox search_box = box.enlarged (db::DVector (l, l));
 
   bool needs_update = false;

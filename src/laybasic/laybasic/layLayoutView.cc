@@ -61,6 +61,7 @@
 #include "layLayoutCanvas.h"
 #include "layLayerControlPanel.h"
 #include "layHierarchyControlPanel.h"
+#include "layLibrariesView.h"
 #include "layBrowser.h"
 #include "layRedrawThread.h"
 #include "layRedrawThreadWorker.h"
@@ -72,6 +73,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbManager.h"
 #include "dbEdgeProcessor.h"
+#include "dbLibrary.h"
 #include "rdb.h"
 #include "rdbMarkerBrowserDialog.h"
 #include "dbLayoutToNetlist.h"
@@ -356,6 +358,8 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   mp_control_frame = 0;
   mp_hierarchy_panel = 0;
   mp_hierarchy_frame = 0;
+  mp_libraries_view = 0;
+  mp_libraries_frame = 0;
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
   m_from_level = 0;
@@ -445,6 +449,17 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   vbl->setMargin (0);
   vbl->setSpacing (0);
 
+  mp_canvas = new lay::LayoutCanvas (this, this);
+  vbl->addWidget (mp_canvas);
+  connect (mp_canvas, SIGNAL (left_arrow_key_pressed ()), this, SLOT (pan_left ()));
+  connect (mp_canvas, SIGNAL (up_arrow_key_pressed ()), this, SLOT (pan_up ()));
+  connect (mp_canvas, SIGNAL (right_arrow_key_pressed ()), this, SLOT (pan_right ()));
+  connect (mp_canvas, SIGNAL (down_arrow_key_pressed ()), this, SLOT (pan_down ()));
+  connect (mp_canvas, SIGNAL (left_arrow_key_pressed_with_shift ()), this, SLOT (pan_left_fast ()));
+  connect (mp_canvas, SIGNAL (up_arrow_key_pressed_with_shift ()), this, SLOT (pan_up_fast ()));
+  connect (mp_canvas, SIGNAL (right_arrow_key_pressed_with_shift ()), this, SLOT (pan_right_fast ()));
+  connect (mp_canvas, SIGNAL (down_arrow_key_pressed_with_shift ()), this, SLOT (pan_down_fast ()));
+
   if ((m_options & LV_NoHierarchyPanel) == 0 && (m_options & LV_Naked) == 0) {
 
     QFrame *hierarchy_frame = new QFrame (0);
@@ -491,16 +506,21 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
 
   }
 
-  mp_canvas = new lay::LayoutCanvas (this, this);
-  vbl->addWidget (mp_canvas);
-  connect (mp_canvas, SIGNAL (left_arrow_key_pressed ()), this, SLOT (pan_left ()));
-  connect (mp_canvas, SIGNAL (up_arrow_key_pressed ()), this, SLOT (pan_up ()));
-  connect (mp_canvas, SIGNAL (right_arrow_key_pressed ()), this, SLOT (pan_right ()));
-  connect (mp_canvas, SIGNAL (down_arrow_key_pressed ()), this, SLOT (pan_down ()));
-  connect (mp_canvas, SIGNAL (left_arrow_key_pressed_with_shift ()), this, SLOT (pan_left_fast ()));
-  connect (mp_canvas, SIGNAL (up_arrow_key_pressed_with_shift ()), this, SLOT (pan_up_fast ()));
-  connect (mp_canvas, SIGNAL (right_arrow_key_pressed_with_shift ()), this, SLOT (pan_right_fast ()));
-  connect (mp_canvas, SIGNAL (down_arrow_key_pressed_with_shift ()), this, SLOT (pan_down_fast ()));
+  if ((m_options & LV_NoLibrariesView) == 0 && (m_options & LV_Naked) == 0) {
+
+    QFrame *libraries_frame = new QFrame (0);
+    libraries_frame->setObjectName (QString::fromUtf8 ("libs_frame"));
+    mp_libraries_frame = libraries_frame;
+    QVBoxLayout *left_frame_ly = new QVBoxLayout (libraries_frame);
+    left_frame_ly->setMargin (0);
+    left_frame_ly->setSpacing (0);
+
+    mp_libraries_view = new lay::LibrariesView (this, libraries_frame, "libs");
+    left_frame_ly->addWidget (mp_libraries_view, 1 /*stretch*/);
+
+    connect (mp_libraries_view, SIGNAL (active_library_changed (int)), this, SLOT (active_library_changed (int)));
+
+  }
 
   //  occupy services and editables:
   //  these services get deleted by the canvas destructor automatically:
@@ -628,6 +648,12 @@ LayoutView::~LayoutView ()
   }
   mp_hierarchy_frame = 0;
   mp_hierarchy_panel = 0;
+
+  if (mp_libraries_frame) {
+    delete mp_libraries_frame;
+  }
+  mp_libraries_frame = 0;
+  mp_libraries_view = 0;
 }
 
 void LayoutView::hideEvent (QHideEvent *)
@@ -790,6 +816,7 @@ LayoutView::init_menu (lay::AbstractMenu &menu)
 {
   lay::LayerControlPanel::init_menu (menu);
   lay::HierarchyControlPanel::init_menu (menu);
+  lay::LibrariesView::init_menu (menu);
 }
 
 void
@@ -948,6 +975,22 @@ LayoutView::configure (const std::string &name, const std::string &value)
     tl::from_string (value, f);
     if (mp_hierarchy_panel) {
       mp_hierarchy_panel->set_split_mode (f);
+    }
+    return true;
+
+  } else if (name == cfg_split_lib_views) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_libraries_view) {
+      mp_libraries_view->set_split_mode (f);
+    }
+    return true;
+
+  } else if (name == cfg_current_lib_view) {
+
+    if (mp_libraries_view) {
+      mp_libraries_view->select_active_lib_by_name (value);
     }
     return true;
 
@@ -4472,6 +4515,11 @@ LayoutView::background_color (QColor c)
     mp_hierarchy_panel->set_text_color (contrast);
   }
 
+  if (mp_libraries_view) {
+    mp_libraries_view->set_background_color (c);
+    mp_libraries_view->set_text_color (contrast);
+  }
+
   if (mp_selection_service) {
     mp_selection_service->set_colors (c, contrast);
   }
@@ -4548,6 +4596,19 @@ LayoutView::active_cellview_changed (int index)
     }
 
   }
+}
+
+void
+LayoutView::active_library_changed (int /*index*/)
+{
+  std::string lib_name;
+  if (mp_libraries_view->active_lib ()) {
+    lib_name = mp_libraries_view->active_lib ()->get_name ();
+  }
+
+  //  commit the new active library to the other views and persist this state
+  //  TODO: could be passed through the LibraryController (like through some LibraryController::active_library)
+  plugin_root ()->config_set (cfg_current_lib_view, lib_name);
 }
 
 void
@@ -7243,7 +7304,7 @@ LayoutView::sizeHint () const
 {
   if ((m_options & LV_Naked) != 0) {
     return QSize (200, 200);
-  } else if ((m_options & LV_NoLayers) != 0 || (m_options & LV_NoHierarchyPanel) != 0) {
+  } else if ((m_options & LV_NoLayers) != 0 || (m_options & LV_NoHierarchyPanel) != 0 || (m_options & LV_NoLibrariesView) != 0) {
     return QSize (400, 200);
   } else {
     return QSize (600, 200);

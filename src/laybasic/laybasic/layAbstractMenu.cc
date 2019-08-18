@@ -66,6 +66,79 @@ static const bool s_can_move_menu = true;
 #endif
 
 // ---------------------------------------------------------------
+//  Serialization of key bindings and hidden menu state
+
+std::vector<std::pair<std::string, std::string> >
+unpack_key_binding (const std::string &packed)
+{
+  tl::Extractor ex (packed.c_str ());
+
+  std::vector<std::pair<std::string, std::string> > key_bindings;
+
+  while (! ex.at_end ()) {
+    ex.test(";");
+    key_bindings.push_back (std::make_pair (std::string (), std::string ()));
+    ex.read_word_or_quoted (key_bindings.back ().first);
+    ex.test(":");
+    ex.read_word_or_quoted (key_bindings.back ().second);
+  }
+
+  return key_bindings;
+}
+
+std::string
+pack_key_binding (const std::vector<std::pair<std::string, std::string> > &unpacked)
+{
+  std::string packed;
+
+  for (std::vector<std::pair<std::string, std::string> >::const_iterator p = unpacked.begin (); p != unpacked.end (); ++p) {
+    if (! packed.empty ()) {
+      packed += ";";
+    }
+    packed += tl::to_word_or_quoted_string (p->first);
+    packed += ":";
+    packed += tl::to_word_or_quoted_string (p->second);
+  }
+
+  return packed;
+}
+
+std::vector<std::pair<std::string, bool> >
+unpack_menu_items_hidden (const std::string &packed)
+{
+  tl::Extractor ex (packed.c_str ());
+
+  std::vector<std::pair<std::string, bool> > hidden;
+
+  while (! ex.at_end ()) {
+    ex.test(";");
+    hidden.push_back (std::make_pair (std::string (), false));
+    ex.read_word_or_quoted (hidden.back ().first);
+    ex.test(":");
+    ex.read (hidden.back ().second);
+  }
+
+  return hidden;
+}
+
+std::string
+pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked)
+{
+  std::string packed;
+
+  for (std::vector<std::pair<std::string, bool> >::const_iterator p = unpacked.begin (); p != unpacked.end (); ++p) {
+    if (! packed.empty ()) {
+      packed += ";";
+    }
+    packed += tl::to_word_or_quoted_string (p->first);
+    packed += ":";
+    packed += tl::to_string (p->second);
+  }
+
+  return packed;
+}
+
+// ---------------------------------------------------------------
 //  Helper function to parse a title with potential shortcut and
 //  icon specification
 
@@ -279,7 +352,8 @@ ActionHandle::ActionHandle (QWidget *parent)
     m_ref_count (0),
     m_owned (true),
     m_visible (true),
-    m_hidden (false)
+    m_hidden (false),
+    m_no_key_sequence (false)
 {
   if (! sp_actionHandles) {
     sp_actionHandles = new std::set<ActionHandle *> ();
@@ -296,7 +370,8 @@ ActionHandle::ActionHandle (QAction *action, bool owned)
     m_ref_count (0),
     m_owned (owned),
     m_visible (true),
-    m_hidden (false)
+    m_hidden (false),
+    m_no_key_sequence (false)
 {
   if (! sp_actionHandles) {
     sp_actionHandles = new std::set<ActionHandle *> ();
@@ -313,7 +388,8 @@ ActionHandle::ActionHandle (QMenu *menu, bool owned)
     m_ref_count (0),
     m_owned (owned),
     m_visible (true),
-    m_hidden (false)
+    m_hidden (false),
+    m_no_key_sequence (false)
 {
   if (! sp_actionHandles) {
     sp_actionHandles = new std::set<ActionHandle *> ();
@@ -390,7 +466,7 @@ ActionHandle::set_visible (bool v)
     m_visible = v;
     if (mp_action) {
       mp_action->setVisible (is_effective_visible ());
-      mp_action->setShortcut (get_effective_shortcut ());
+      mp_action->setShortcut (get_key_sequence ());
     }
   }
 }
@@ -402,7 +478,7 @@ ActionHandle::set_hidden (bool h)
     m_hidden = h;
     if (mp_action) {
       mp_action->setVisible (is_effective_visible ());
-      mp_action->setShortcut (get_effective_shortcut ());
+      mp_action->setShortcut (get_key_sequence ());
     }
   }
 }
@@ -426,49 +502,69 @@ ActionHandle::is_effective_visible () const
 }
 
 void
-ActionHandle::set_default_shortcut (const QKeySequence &sc)
+ActionHandle::set_default_shortcut (const std::string &sc)
 {
   if (m_default_shortcut != sc) {
     m_default_shortcut = sc;
+    m_default_key_sequence = QKeySequence (tl::to_qstring (sc));
     if (mp_action) {
-      mp_action->setShortcut (get_effective_shortcut ());
+      mp_action->setShortcut (get_key_sequence ());
     }
   }
 }
 
 void
-ActionHandle::set_shortcut (const QKeySequence &sc)
+ActionHandle::set_shortcut (const std::string &sc)
 {
   if (m_shortcut != sc) {
     m_shortcut = sc;
+    m_no_key_sequence = (sc == Action::no_shortcut ());
+    m_key_sequence = m_no_key_sequence ? QKeySequence () : QKeySequence (tl::to_qstring (m_shortcut));
     if (mp_action) {
-      mp_action->setShortcut (get_effective_shortcut ());
+      mp_action->setShortcut (get_key_sequence ());
     }
   }
 }
 
-const QKeySequence &
+std::string
 ActionHandle::get_default_shortcut () const
 {
-  return m_default_shortcut;
+  return tl::to_string (m_default_key_sequence.toString ());
 }
 
-const QKeySequence &
+std::string
 ActionHandle::get_shortcut () const
 {
-  return m_shortcut;
+  return m_no_key_sequence ? Action::no_shortcut () : tl::to_string (m_key_sequence.toString ());
 }
 
 QKeySequence
-ActionHandle::get_effective_shortcut () const
+ActionHandle::get_key_sequence () const
 {
   if (m_hidden) {
     //  A hidden menu item does not have a key sequence too.
     return QKeySequence ();
-  } else if (m_shortcut.isEmpty ()) {
-    return m_default_shortcut;
+  } else if (m_no_key_sequence) {
+    return QKeySequence ();
+  } else if (m_key_sequence.isEmpty ()) {
+    return m_default_key_sequence;
   } else {
-    return m_shortcut;
+    return m_key_sequence;
+  }
+}
+
+QKeySequence
+ActionHandle::get_key_sequence_for (const std::string &sc) const
+{
+  if (m_hidden) {
+    //  A hidden menu item does not have a key sequence too.
+    return QKeySequence ();
+  } else if (sc.empty ()) {
+    return m_default_key_sequence;
+  } else if (sc == Action::no_shortcut ()) {
+    return QKeySequence ();
+  } else {
+    return QKeySequence::fromString (tl::to_qstring (sc));
   }
 }
 
@@ -483,6 +579,13 @@ Action::Action ()
     gtf::action_connect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
     mp_handle->add_ref ();
   }
+}
+
+const std::string &
+Action::no_shortcut ()
+{
+  static const std::string no_shortcut ("none");
+  return no_shortcut;
 }
 
 Action::Action (const std::string &title)
@@ -587,7 +690,7 @@ Action::get_title () const
 }
 
 void
-Action::set_shortcut (const QKeySequence &s)
+Action::set_shortcut (const std::string &s)
 {
   if (mp_handle) {
     mp_handle->set_shortcut (s);
@@ -595,30 +698,28 @@ Action::set_shortcut (const QKeySequence &s)
 }
 
 void
-Action::set_default_shortcut (const QKeySequence &s)
+Action::set_default_shortcut (const std::string &s)
 {
   if (mp_handle) {
     mp_handle->set_default_shortcut (s);
   }
 }
 
-void
-Action::set_shortcut (const std::string &s)
-{
-  set_shortcut (QKeySequence (tl::to_qstring (s)));
-}
-
-void
-Action::set_default_shortcut (const std::string &s)
-{
-  set_default_shortcut (QKeySequence (tl::to_qstring (s)));
-}
-
 std::string
 Action::get_effective_shortcut () const
 {
   if (mp_handle) {
-    return tl::to_string (mp_handle->get_effective_shortcut ().toString ());
+    return tl::to_string (mp_handle->get_key_sequence ().toString ());
+  } else {
+    return std::string ();
+  }
+}
+
+std::string
+Action::get_effective_shortcut_for (const std::string &sc) const
+{
+  if (mp_handle) {
+    return tl::to_string (mp_handle->get_key_sequence_for (sc).toString ());
   } else {
     return std::string ();
   }
@@ -628,7 +729,7 @@ std::string
 Action::get_shortcut () const
 {
   if (mp_handle) {
-    return tl::to_string (mp_handle->get_shortcut ().toString ());
+    return mp_handle->get_shortcut ();
   } else {
     return std::string ();
   }
@@ -638,7 +739,7 @@ std::string
 Action::get_default_shortcut () const
 {
   if (mp_handle) {
-    return tl::to_string (mp_handle->get_default_shortcut ().toString ());
+    return mp_handle->get_default_shortcut ();
   } else {
     return std::string ();
   }
@@ -930,7 +1031,7 @@ AbstractMenu::create_action (const std::string &s)
   }
 
   if (! shortcut.empty ()) {
-    ah->set_default_shortcut (QKeySequence (tl::to_qstring (shortcut)));
+    ah->set_default_shortcut (shortcut);
   }
 
   return ah;

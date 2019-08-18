@@ -68,6 +68,37 @@ class DBLayoutQuery_TestClass < TestBase
 
   end
 
+  # variables
+  def test_4
+
+    ly = RBA::Layout::new
+    ly.read(ENV["TESTSRC"] + "/testdata/gds/t11.gds")
+
+    ctx = RBA::ExpressionContext::new
+    ctx.var("suffix", "!")
+    ctx.var("all", [])
+    ctx.var("nonmod", "")
+
+    q = RBA::LayoutQuery::new("select cell.name + suffix from *")
+    res = []
+    q.each(ly, ctx) do |iter|
+      res << iter.data.inspect
+    end
+
+    assert_equal(res.size, 2)
+    assert_equal(res[0], "[\"TOPTOP!\"]")
+    assert_equal(res[1], "[\"TOP!\"]")
+
+    q = RBA::LayoutQuery::new("with * do var nonmod = cell.name; all.push(nonmod)")
+    q.execute(ly, ctx)
+
+    assert_equal(ctx.eval("all").join(","), "TOPTOP,TOP")
+    # not modified, because we used "var nonmod" in the query which
+    # creates a local variable:
+    assert_equal(ctx.eval("nonmod"), "")
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -444,12 +444,13 @@ namespace
  *  @brief A convenience wrapper for the expression parser
  */
 class ExpressionWrapper
-  : public tl::Object
+  : public tl::Eval, public gsi::ObjectBase
 {
 public:
   ExpressionWrapper ()
-    : mp_eval (new tl::Eval ())
+    : tl::Eval ()
   {
+    //  .. nothing yet ..
   }
 
   void parse (const std::string &e)
@@ -457,18 +458,8 @@ public:
     mp_expr.reset (0);
 
     std::auto_ptr<tl::Expression> ex (new tl::Expression ());
-    mp_eval->parse (*ex, e);
+    tl::Eval::parse (*ex, e);
     mp_expr.reset (ex.release ());
-  }
-
-  void set_var (const std::string &name, const tl::Variant &value)
-  {
-    mp_eval->set_var (name, value);
-  }
-
-  static void set_global_var (const std::string &name, const tl::Variant &value)
-  {
-    tl::Eval::set_global_var (name, value);
   }
 
   tl::Variant eval ()
@@ -482,24 +473,23 @@ public:
 
 private:
   std::auto_ptr<tl::Expression> mp_expr;
-  std::auto_ptr<tl::Eval> mp_eval;
 };
 
-tl::Variant eval_expr (const std::string &e)
+static tl::Variant eval_expr (const std::string &e)
 {
   ExpressionWrapper expr;
   expr.parse (e);
   return expr.eval ();
 }
 
-ExpressionWrapper *new_expr1 (const std::string &e)
+static ExpressionWrapper *new_expr1 (const std::string &e)
 {
   std::auto_ptr<ExpressionWrapper> expr (new ExpressionWrapper ());
   expr->parse (e);
   return expr.release ();
 }
 
-ExpressionWrapper *new_expr2 (const std::string &e, const std::map<std::string, tl::Variant> &variables)
+static ExpressionWrapper *new_expr2 (const std::string &e, const std::map<std::string, tl::Variant> &variables)
 {
   std::auto_ptr<ExpressionWrapper> expr (new ExpressionWrapper ());
   for (std::map<std::string, tl::Variant>::const_iterator v = variables.begin (); v != variables.end (); ++v) {
@@ -523,7 +513,25 @@ namespace tl {
 namespace gsi
 {
 
-Class<ExpressionWrapper> decl_ExpressionWrapper ("tl", "Expression",
+Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
+  gsi::method ("var", &tl::Eval::set_var, gsi::arg ("name"), gsi::arg ("value"),
+    "@brief Defines a variable with the given name and value\n"
+  ) +
+  gsi::method ("global_var", &tl::Eval::set_global_var, gsi::arg ("name"), gsi::arg ("value"),
+    "@brief Defines a global variable with the given name and value\n"
+  ) +
+  gsi::method ("eval", &tl::Eval::eval, gsi::arg ("expr"),
+    "@brief Compiles and evaluates the given expression in this context\n"
+    "This method has been introduced in version 0.26."
+  ),
+  "@brief Represents the context of an expression evaluation\n"
+  "\n"
+  "The context provides a variable namespace for the expression evaluation.\n"
+  "\n"
+  "This class has been introduced in version 0.26 when \\Expression was separated into the execution and context part.\n"
+);
+
+Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "Expression",
   gsi::constructor ("new", &new_expr1, gsi::arg ("expr"),
     "@brief Creates an expression evaluator\n"
   ) +
@@ -533,12 +541,6 @@ Class<ExpressionWrapper> decl_ExpressionWrapper ("tl", "Expression",
   ) +
   gsi::method ("text=", &ExpressionWrapper::parse, gsi::arg ("expr"),
     "@brief Sets the given text as the expression."
-  ) +
-  gsi::method ("var", &ExpressionWrapper::set_var, gsi::arg ("name"), gsi::arg ("value"),
-    "@brief Defines a variable with the given name and value\n"
-  ) +
-  gsi::method ("global_var", &ExpressionWrapper::set_global_var, gsi::arg ("name"), gsi::arg ("value"),
-    "@brief Defines a global variable with the given name and value\n"
   ) +
   gsi::method ("eval", &ExpressionWrapper::eval,
     "@brief Evaluates the current expression and returns the result\n"
@@ -555,9 +557,8 @@ Class<ExpressionWrapper> decl_ExpressionWrapper ("tl", "Expression",
   "\n"
   "An expression is 'compiled' into an Expression object and can be evaluated multiple times.\n"
   "\n"
-  "This class has been introduced in version 0.25.\n"
+  "This class has been introduced in version 0.25. In version 0.26 it was separated into execution and context.\n"
 );
-
 
 static tl::GlobPattern *new_glob_pattern (const std::string &s)
 {

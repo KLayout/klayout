@@ -496,6 +496,11 @@ public:
    */
   pcell_parameters_type map_parameters (const std::map<std::string, tl::Variant> &named_parameters) const;
 
+  /**
+   *  @brief Converts a parameter vector to named parameters
+   */
+  std::map<std::string, tl::Variant> named_parameters (const pcell_parameters_type &pv) const;
+
 protected:
   /**
    *  @brief Gets a value indicating whether the PCell wants caching of the parameter declarations

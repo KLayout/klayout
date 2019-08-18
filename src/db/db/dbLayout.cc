@@ -1186,7 +1186,7 @@ Layout::allocate_new_cell ()
 }
 
 void
-Layout::cleanup ()
+Layout::cleanup (const std::set<db::cell_index_type> &keep)
 {
   //  deleting cells may create new top cells which need to be deleted as well, hence we iterate
   //  until there are no more cells to delete
@@ -1198,6 +1198,10 @@ Layout::cleanup ()
       if (cell (*c).is_proxy ()) {
         cells_to_delete.insert (*c);
       }
+    }
+
+    for (std::set<db::cell_index_type>::const_iterator k = keep.begin (); k != keep.end (); ++k) {
+      cells_to_delete.erase (*k);
     }
 
     if (cells_to_delete.empty ()) {

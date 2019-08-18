@@ -177,7 +177,8 @@ BasicText::get_display_name (const db::pcell_parameters_type &parameters) const
   if (! parameters.empty ()) {
     t = parameters [p_text].to_string ();
   }
-  return std::string("TEXT('") + t + "')";
+  return "TEXT(l=" + std::string (parameters [p_layer].to_string ()) +
+              ",'" + t + "')";
 }
 
 std::vector<db::PCellParameterDeclaration> 

@@ -28,7 +28,65 @@
 namespace gsi
 {
 
+static std::string pack_key_binding (const std::map<std::string, std::string> &kb)
+{
+  std::vector<std::pair<std::string, std::string> > v;
+  v.insert (v.end (), kb.begin (), kb.end ());
+  return lay::pack_key_binding (v);
+}
+
+static std::map<std::string, std::string> unpack_key_binding (const std::string &s)
+{
+  std::vector<std::pair<std::string, std::string> > v = lay::unpack_key_binding (s);
+  std::map<std::string, std::string> kb;
+  kb.insert (v.begin (), v.end ());
+  return kb;
+}
+
+static std::string pack_menu_items_hidden (const std::map<std::string, bool> &kb)
+{
+  std::vector<std::pair<std::string, bool> > v;
+  v.insert (v.end (), kb.begin (), kb.end ());
+  return lay::pack_menu_items_hidden (v);
+}
+
+static std::map<std::string, bool> unpack_menu_items_hidden (const std::string &s)
+{
+  std::vector<std::pair<std::string, bool> > v = lay::unpack_menu_items_hidden (s);
+  std::map<std::string, bool> kb;
+  kb.insert (v.begin (), v.end ());
+  return kb;
+}
+
 Class<lay::AbstractMenu> decl_AbstractMenu ("lay", "AbstractMenu",
+  method ("pack_key_binding", &pack_key_binding, gsi::arg ("path_to_keys"),
+    "@brief Serializes a key binding definition into a single string\n"
+    "The serialized format is used by the 'key-bindings' config key. "
+    "This method will take an array of path/key definitions (including the \\Action#NoKeyBound option) "
+    "and convert it to a single string suitable for assigning to the config key.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method ("unpack_key_binding", &unpack_key_binding, gsi::arg ("s"),
+    "@brief Deserializes a key binding definition\n"
+    "This method is the reverse of \\pack_key_binding.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method ("pack_menu_items_hidden", &pack_menu_items_hidden, gsi::arg ("path_to_visibility"),
+    "@brief Serializes a menu item visibility definition into a single string\n"
+    "The serialized format is used by the 'menu-items-hidden' config key. "
+    "This method will take an array of path/visibility flag definitions "
+    "and convert it to a single string suitable for assigning to the config key.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method ("unpack_menu_items_hidden", &unpack_menu_items_hidden, gsi::arg ("s"),
+    "@brief Deserializes a menu item visibility definition\n"
+    "This method is the reverse of \\pack_menu_items_hidden.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
   method ("action", &lay::AbstractMenu::action,
     "@brief Get the reference to a Action object associated with the given path\n"
     "@args path\n"
@@ -157,8 +215,16 @@ Class<lay::Action> decl_ActionBase ("lay", "ActionBase",
   method ("shortcut=", (void (lay::Action::*)(const std::string &)) &lay::Action::set_shortcut,
     "@brief Sets the keyboard shortcut\n"
     "@args shortcut\n"
+    "If the shortcut string is empty, the default shortcut will be used. If the string "
+    "is equal to \\Action#NoKeyBound, no keyboard shortcut will be assigned.\n"
     "\n"
-    "@param shortcut The keyboard shortcut (i.e. \"Ctrl+C\")\n"
+    "@param shortcut The keyboard shortcut in Qt notation (i.e. \"Ctrl+C\")\n"
+    "\n"
+    "The NoKeyBound option has been added in version 0.26."
+  ) +
+  constant ("NoKeyBound", &lay::Action::no_shortcut,
+    "@brief Gets a shortcut value indicating that no shortcut shall be assigned\n"
+    "This method has been introduced in version 0.26."
   ) +
   method ("shortcut", &lay::Action::get_shortcut,
     "@brief Gets the keyboard shortcut\n"

@@ -117,7 +117,52 @@ static std::string q2s_cell (db::LayoutQueryIterator &iq, const std::string &pna
   return res;
 }
 
-TEST(1) 
+TEST(0)
+{
+  //  FilterStateObjectives tests
+  db::FilterStateObjectives o1;
+
+  EXPECT_EQ (o1.wants_all_cells (), false);
+  o1.set_wants_all_cells (true);
+  EXPECT_EQ (o1.wants_cell (db::cell_index_type (17)), true);
+  EXPECT_EQ (o1.wants_all_cells (), true);
+
+  o1.set_wants_all_cells (false);
+  o1.request_cell (db::cell_index_type (17));
+  EXPECT_EQ (o1.wants_all_cells (), false);
+  EXPECT_EQ (o1.wants_cell (db::cell_index_type (17)), true);
+  EXPECT_EQ (o1.wants_cell (db::cell_index_type (16)), false);
+
+  db::FilterStateObjectives o2 = o1;
+
+  o1.set_wants_all_cells (false);
+  EXPECT_EQ (o1.wants_cell (db::cell_index_type (17)), false);
+
+  EXPECT_EQ (o2.wants_cell (db::cell_index_type (17)), true);
+
+  db::FilterStateObjectives o3 = o2;
+
+  EXPECT_EQ (o3.wants_cell (db::cell_index_type (17)), true);
+  o3 += db::FilterStateObjectives::everything ();
+  EXPECT_EQ (o3.wants_all_cells (), true);
+
+  o3 = db::FilterStateObjectives::everything ();
+  EXPECT_EQ (o3.wants_all_cells (), true);
+  o3 += o2;
+  EXPECT_EQ (o3.wants_all_cells (), true);
+
+  o3 = db::FilterStateObjectives ();
+  EXPECT_EQ (o3.wants_all_cells (), false);
+  o3.request_cell (db::cell_index_type (16));
+  EXPECT_EQ (o3.wants_cell (db::cell_index_type (17)), false);
+  EXPECT_EQ (o3.wants_cell (db::cell_index_type (16)), true);
+  o3 += o2;
+  EXPECT_EQ (o3.wants_all_cells (), false);
+  EXPECT_EQ (o3.wants_cell (db::cell_index_type (17)), true);
+  EXPECT_EQ (o3.wants_cell (db::cell_index_type (16)), true);
+}
+
+TEST(1)
 {
   db::Layout g;
   g.insert_layer (0);

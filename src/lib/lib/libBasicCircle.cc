@@ -142,7 +142,10 @@ BasicCircle::produce (const db::Layout &layout, const std::vector<unsigned int> 
 std::string 
 BasicCircle::get_display_name (const db::pcell_parameters_type &parameters) const
 {
-  return std::string("CIRCLE(r=") + tl::micron_to_string (parameters [p_actual_radius].to_double ()) + ")";
+  return "CIRCLE(l=" + std::string (parameters [p_layer].to_string ()) +
+               ",r=" + tl::to_string (parameters [p_actual_radius].to_double ()) +
+               ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+                 ")";
 }
 
 std::vector<db::PCellParameterDeclaration> 

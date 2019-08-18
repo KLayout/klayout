@@ -53,6 +53,12 @@ class QDragLeaveEvent;
 class QDropEvent;
 class QMimeData;
 
+namespace db
+{
+  class Library;
+  class Layout;
+}
+
 namespace lay {
 
 class Viewport;
@@ -113,7 +119,7 @@ public:
    *  @brief Default ctor
    */
   CellDragDropData ()
-    : mp_layout (0), m_cell_index (0)
+    : mp_layout (0), mp_library (0), m_cell_index (0), m_is_pcell (false)
   {
     //  .. nothing yet ..
   }
@@ -124,8 +130,8 @@ public:
    *  @param layout the layout where the cell lives in 
    *  @param cell_index The index of the cell
    */
-  CellDragDropData (const db::Layout *layout, db::cell_index_type cell_index)
-    : mp_layout (layout), m_cell_index (cell_index)
+  CellDragDropData (const db::Layout *layout, const db::Library *library, db::cell_index_type cell_or_pcell_index, bool is_pcell)
+    : mp_layout (layout), mp_library (library), m_cell_index (cell_or_pcell_index), m_is_pcell (is_pcell)
   {
     //  .. nothing yet ..
   }
@@ -139,11 +145,27 @@ public:
   }
 
   /**
+   *  @brief Gets the layout object where the cell lives in
+   */
+  const db::Library *library () const
+  {
+    return mp_library;
+  }
+
+  /**
    *  @brief Gets the index of the cell
    */
   db::cell_index_type cell_index () const
   {
     return m_cell_index;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the cell is a pcell
+   */
+  bool is_pcell () const
+  {
+    return m_is_pcell;
   }
 
   /**
@@ -160,7 +182,9 @@ public:
 
 private:
   const db::Layout *mp_layout;
+  const db::Library *mp_library;
   db::cell_index_type m_cell_index;
+  bool m_is_pcell;
 };
 
 /**

@@ -37,6 +37,11 @@ namespace tl
   class GlobPattern;
 }
 
+namespace db
+{
+  class Library;
+}
+
 namespace lay
 {
 
@@ -56,18 +61,20 @@ class CellTreeModel
 {
 public:
   enum Flags {
-    Flat = 1,         //  flat list (rather than hierarchy)
-    Children = 2,     //  direct children of cell "base"
-    Parents = 4,      //  direct parents of cell "base"
-    TopCells = 8,     //  show top cells only
-    BasicCells = 16,  //  show basic cells (PCells included, no proxies) 
-    NoPadding = 32    //  enable padding of display string with a blank at the beginning and end
+    Flat = 1,           //  flat list (rather than hierarchy)
+    Children = 2,       //  direct children of cell "base"
+    Parents = 4,        //  direct parents of cell "base"
+    TopCells = 8,       //  show top cells only
+    BasicCells = 16,    //  show basic cells (PCells included, no proxies)
+    WithVariants = 32,  //  show PCell variants below PCells
+    WithIcons = 64,     //  show icons for the top level cell type
+    NoPadding = 128     //  disable padding of display string with a blank at the beginning and end
   };
 
   enum Sorting {
-    ByName,         //  sort by name
-    ByArea,         //  sort by cell area (small to large)
-    ByAreaReverse   //  sort by cell area (large to small)
+    ByName,             //  sort by name
+    ByArea,             //  sort by cell area (small to large)
+    ByAreaReverse       //  sort by cell area (large to small)
   };
 
   /**
@@ -88,6 +95,13 @@ public:
   CellTreeModel (QWidget *parent, db::Layout *layout, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
 
   /**
+   *  @brief Constructor
+   *
+   *  This constructor does not take a view but rather a layout from a library. It does not display hidden status or similar.
+   */
+  CellTreeModel (QWidget *parent, db::Library *library, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
+
+  /**
    *  @brief Dtor
    */
   ~CellTreeModel ();
@@ -104,9 +118,19 @@ public:
   virtual QMimeData *mimeData (const QModelIndexList &indexes) const;
 
   /**
-   *  @brief Reconfigures the model
+   *  @brief Reconfigures the model with a LayoutView
    */
   void configure (lay::LayoutView *view, int cv_index, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
+
+  /**
+   *  @brief Reconfigures the model with a pure Layout
+   */
+  void configure (db::Layout *layout, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
+
+  /**
+   *  @brief Reconfigures the model with a pure Layout from a library
+   */
+  void configure (db::Library *library, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
 
   /**
    *  @brief Gets the layout this model is connected to
@@ -219,7 +243,8 @@ private:
   Sorting m_sorting;
   QWidget *mp_parent;
   lay::LayoutView *mp_view;
-  const db::Layout *mp_layout;
+  db::Layout *mp_layout;
+  db::Library *mp_library;
   int m_cv_index;
   const db::Cell *mp_base;
   std::vector <CellTreeItem *> m_toplevel;
@@ -230,6 +255,7 @@ private:
   void build_top_level ();
   void clear_top_level ();
   void search_children (const tl::GlobPattern &pattern, CellTreeItem *item);
+  void do_configure (db::Layout *layout, db::Library *library, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting);
 };
 
 /**
@@ -241,12 +267,12 @@ private:
 class CellTreeItem
 {
 public:
-  CellTreeItem (const db::Layout *layout, CellTreeItem *parent, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting sorting);
+  CellTreeItem (const db::Layout *layout, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting sorting);
   ~CellTreeItem ();
 
   int children () const;
   CellTreeItem *child (int index);
-  db::cell_index_type cell_index () const;
+  db::cell_index_type cell_or_pcell_index () const;
   CellTreeItem *parent () const;
   bool by_name_less_than (const CellTreeItem *b) const;
   bool by_area_less_than (const CellTreeItem *b) const;
@@ -255,6 +281,9 @@ public:
   bool name_equals (const char *name) const;
   bool name_matches (const tl::GlobPattern &p) const;
   std::string display_text () const;
+  void add_child (CellTreeItem *item);
+  void finish_children ();
+  bool is_valid () const;
 
   bool is_pcell () const
   {

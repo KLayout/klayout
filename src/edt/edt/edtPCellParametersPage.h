@@ -57,7 +57,7 @@ public:
   };
 
   /**
-   *  @brief Constructor: create a page showing the given parameters
+   *  @brief Constructor: creates a page showing the given parameters
    *
    *  @param parent The parent widget
    *  @param layout The layout in which the PCell instance resides
@@ -67,6 +67,20 @@ public:
    *  @param parameters The parameter values to show (if empty, the default values are used)
    */
   PCellParametersPage (QWidget *parent, const db::Layout *layout, lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters);
+
+  /**
+   *  @brief Default constructor
+   *
+   *  Use "setup" to configure the page.
+   */
+  PCellParametersPage (QWidget *parent);
+
+  /**
+   *  @brief Delayed initialization
+   *
+   *  Use this method to setup when the arguments are not available in the constructor
+   */
+  void setup (const db::Layout *layout, lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters);
 
   /**
    *  @brief Gets the pages current state
@@ -110,6 +124,8 @@ private:
   lay::LayoutView *mp_view;
   int m_cv_index;
   db::pcell_parameters_type m_parameters;
+
+  void init ();
 };
 
 }

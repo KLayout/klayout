@@ -45,6 +45,7 @@
 
 #include <cstring>
 #include <map>
+#include <set>
 #include <string>
 #include <list>
 #include <vector>
@@ -1446,9 +1447,10 @@ public:
   /**
    *  @brief Cleans up the layout
    *
-   *  This method removes proxy objects which are no longer used
+   *  This method removes proxy objects which are no longer used.
+   *  It can be given a list of cells which need to be kept.
    */
-  void cleanup ();
+  void cleanup (const std::set<db::cell_index_type> &keep = std::set<db::cell_index_type> ());
 
   /**
    *  @brief Implementation of the undo operations

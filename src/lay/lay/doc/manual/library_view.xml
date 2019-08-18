@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The Library View</title>
+  <keyword name="Library View"/>
+  <keyword name="View"/>
+
+  <p>
+  Beside the cell list, a library view is provided as a support view
+  for the layout panel. This sub-panel displays the libraries available 
+  and allows browsing the cells and PCells inside a library.
+  </p>
+
+  <p>
+  By default, the library view is shown below the cell tree. You can 
+  rearrange the views by dragging them at their title bar and docking
+  them in other places of the main window.
+  To reset the window arrangement to the default configuration, use "Restore Window" from the
+  "View" menu.
+  </p>
+
+  <p>
+  The library view shows the cells and PCells of one library. To select a library,
+  choose it from the selection box at the top of the library view.
+  </p>
+
+  <p>
+  PCells are shown with a small "gear" icon in the library view. If PCells are
+  instantiated, the variants in use are shown as entries below the PCell entry.
+  </p>
+
+  <p>
+  In edit mode, cells can conveniently be placed by dragging them from the 
+  library view to the layout canvas. If a PCell variant is dragged, another
+  instance of this PCell variant is created. If a PCell master is dragged,
+  KLayout will pop up the PCell parameter definition dialog on drop.
+  </p>
+
+</doc>

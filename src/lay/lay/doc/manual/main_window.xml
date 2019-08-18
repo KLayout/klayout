@@ -18,7 +18,7 @@
   <img src="/manual/main_window.png"/>
   </p>
 
-  <h2>Left Part - The Hierarchy Browser and Navigator</h2>
+  <h2>Left Part - The Hierarchy Browser, Library View and Navigator</h2>
 
   <p>
   The left panel is the
@@ -43,6 +43,20 @@
 
   <p>
   <img src="/manual/hierarchy_panel.png"/>
+  </p>
+
+  <p>
+  The sub-panel below the hierarchy browser is the library view. This view
+  shows the libraries registered in the system and their content:
+  </p>
+
+  <p>
+  <img src="/manual/library_view.png"/>
+  </p>
+
+  <p>
+  The library view is used to browse and place library cells, which can 
+  be normal cells or PCells. Read more about the library view here: <link href="/manual/library_view.xml"/>.
   </p>
 
   <p>

@@ -506,6 +506,13 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   connect (mp_hp_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_hp_visible = true;
 
+  mp_libs_dock_widget = new QDockWidget (QObject::tr ("Libraries"), this);
+  mp_libs_dock_widget->setObjectName (QString::fromUtf8 ("libs_dock_widget"));
+  mp_libs_stack = new ControlWidgetStack (mp_libs_dock_widget, "libs_stack");
+  mp_libs_dock_widget->setWidget (mp_libs_stack);
+  connect (mp_libs_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
+  m_libs_visible = true;
+
   mp_view_stack = new ViewWidgetStack (mp_main_frame);
   mp_view_stack->setObjectName (QString::fromUtf8 ("view_stack"));
   vbl->addWidget (mp_view_stack);
@@ -537,6 +544,7 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
 #endif
   addDockWidget(Qt::LeftDockWidgetArea, mp_navigator_dock_widget);
   addDockWidget(Qt::LeftDockWidgetArea, mp_hp_dock_widget);
+  addDockWidget(Qt::LeftDockWidgetArea, mp_libs_dock_widget);
   addDockWidget(Qt::RightDockWidgetArea, mp_lp_dock_widget);
   addDockWidget(Qt::RightDockWidgetArea, mp_layer_toolbox_dock_widget);
 
@@ -849,6 +857,7 @@ MainWindow::init_menu ()
     MenuLayoutEntry ("show_layer_panel",                tl::to_string (QObject::tr ("Layers")),                           std::make_pair (cfg_show_layer_panel, "?")),
     MenuLayoutEntry ("show_layer_toolbox",              tl::to_string (QObject::tr ("Layer Toolbox")),                    std::make_pair (cfg_show_layer_toolbox, "?")),
     MenuLayoutEntry ("show_hierarchy_panel",            tl::to_string (QObject::tr ("Cells")),                            std::make_pair (cfg_show_hierarchy_panel, "?")),
+    MenuLayoutEntry ("show_libraries_view",             tl::to_string (QObject::tr ("Libraries")),                        std::make_pair (cfg_show_libraries_view, "?")),
     MenuLayoutEntry ("reset_window_state",              tl::to_string (QObject::tr ("Restore Window")),                   SLOT (cm_reset_window_state ())),
     MenuLayoutEntry::separator ("selection_group"),
     MenuLayoutEntry ("transient_selection",             tl::to_string (QObject::tr ("Highlight Object Under Mouse")),     std::make_pair (cfg_sel_transient_mode, "?")),
@@ -1073,6 +1082,8 @@ MainWindow::dock_widget_visibility_changed (bool /*visible*/)
     plugin_root ()->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
   } else if (sender () == mp_hp_dock_widget) {
     plugin_root ()->config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
+  } else if (sender () == mp_libs_dock_widget) {
+    plugin_root ()->config_set (cfg_show_libraries_view, tl::to_string (!mp_libs_dock_widget->isHidden ()));
   } else if (sender () == mp_navigator_dock_widget) {
     plugin_root ()->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
   } else if (sender () == mp_layer_toolbox_dock_widget) {
@@ -1237,6 +1248,7 @@ MainWindow::close_all ()
     mp_views.pop_back ();
     mp_lp_stack->removeWidget (mp_views.size ());
     mp_hp_stack->removeWidget (mp_views.size ());
+    mp_libs_stack->removeWidget (mp_views.size ());
     mp_view_stack->removeWidget (mp_views.size ());
 
     delete view;
@@ -1685,6 +1697,17 @@ MainWindow::configure (const std::string &name, const std::string &value)
 
     return true;
 
+  } else if (name == cfg_show_libraries_view) {
+
+    tl::from_string (value, m_libs_visible);
+    if (m_libs_visible) {
+      mp_libs_dock_widget->show ();
+    } else {
+      mp_libs_dock_widget->hide ();
+    }
+
+    return true;
+
   } else if (name == cfg_show_layer_panel) {
 
     tl::from_string (value, m_lp_visible);
@@ -1797,6 +1820,7 @@ MainWindow::read_dock_widget_state ()
 {
   plugin_root ()->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
   plugin_root ()->config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
+  plugin_root ()->config_set (cfg_show_libraries_view, tl::to_string (!mp_libs_dock_widget->isHidden ()));
   plugin_root ()->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
   plugin_root ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
 }
@@ -1808,6 +1832,12 @@ MainWindow::update_dock_widget_state ()
     mp_hp_dock_widget->show ();
   } else {
     mp_hp_dock_widget->hide ();
+  }
+
+  if (m_libs_visible) {
+    mp_libs_dock_widget->show ();
+  } else {
+    mp_libs_dock_widget->hide ();
   }
 
   if (m_lp_visible) {
@@ -3270,6 +3300,7 @@ MainWindow::select_view (int index)
       mp_view_stack->raiseWidget (index);
       mp_hp_stack->raiseWidget (index);
       mp_lp_stack->raiseWidget (index);
+      mp_libs_stack->raiseWidget (index);
       mp_setup_form->setup ();
 
     }
@@ -3694,6 +3725,7 @@ MainWindow::clone_current_view ()
   mp_view_stack->addWidget (view);
   mp_lp_stack->addWidget (view->layer_control_frame ());
   mp_hp_stack->addWidget (view->hierarchy_control_frame ());
+  mp_libs_stack->addWidget (view->libraries_frame ());
 
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
@@ -3940,6 +3972,7 @@ MainWindow::close_view (int index)
       mp_view_stack->removeWidget (index);
       mp_lp_stack->removeWidget (index);
       mp_hp_stack->removeWidget (index);
+      mp_libs_stack->removeWidget (index);
 
       view_closed_event (int (index));
 
@@ -4312,6 +4345,7 @@ MainWindow::create_view ()
   mp_view_stack->addWidget (mp_views.back ());
   mp_lp_stack->addWidget (mp_views.back ()->layer_control_frame ());
   mp_hp_stack->addWidget (mp_views.back ()->hierarchy_control_frame ());
+  mp_libs_stack->addWidget (mp_views.back ()->libraries_frame ());
 
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
@@ -4373,6 +4407,7 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
       mp_view_stack->addWidget (mp_views.back ());
       mp_lp_stack->addWidget (mp_views.back ()->layer_control_frame ());
       mp_hp_stack->addWidget (mp_views.back ()->hierarchy_control_frame ());
+      mp_libs_stack->addWidget (mp_views.back ()->libraries_frame ());
 
       bool f = m_disable_tab_selected;
       m_disable_tab_selected = true;

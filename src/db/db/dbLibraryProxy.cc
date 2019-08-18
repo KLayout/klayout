@@ -59,6 +59,12 @@ LibraryProxy::unregister ()
   if (layout ()) {
     layout ()->unregister_lib_proxy (this);
   }
+  if (db::LibraryManager::initialized ()) {
+    db::Library *lib = db::LibraryManager::instance ().lib (m_lib_id);
+    if (lib) {
+      lib->retire_proxy (this);
+    }
+  }
 }
 
 void 
@@ -66,6 +72,12 @@ LibraryProxy::reregister ()
 {
   if (layout ()) {
     layout ()->register_lib_proxy (this);
+  }
+  if (db::LibraryManager::initialized ()) {
+    db::Library *lib = db::LibraryManager::instance ().lib (m_lib_id);
+    if (lib) {
+      lib->unretire_proxy (this);
+    }
   }
 }
 

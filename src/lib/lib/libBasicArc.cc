@@ -204,7 +204,13 @@ BasicArc::produce (const db::Layout &layout, const std::vector<unsigned int> &la
 std::string 
 BasicArc::get_display_name (const db::pcell_parameters_type &parameters) const
 {
-  return std::string("ARC(r=") + tl::micron_to_string (parameters [p_actual_radius1].to_double ()) + ".." + tl::micron_to_string (parameters [p_actual_radius2].to_double ()) + ",a=" + tl::to_string (parameters [p_start_angle].to_double (), 6) + ".." + tl::to_string (parameters [p_end_angle].to_double (), 6) + ")";
+  return "ARC(l=" + std::string (parameters [p_layer].to_string ()) +
+            ",r=" + tl::to_string (parameters [p_actual_radius1].to_double ()) +
+             ".." + tl::to_string (parameters [p_actual_radius2].to_double ()) +
+            ",a=" + tl::to_string (parameters [p_start_angle].to_double (), 6) +
+             ".." + tl::to_string (parameters [p_end_angle].to_double (), 6) +
+            ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+              ")";
 }
 
 std::vector<db::PCellParameterDeclaration> 

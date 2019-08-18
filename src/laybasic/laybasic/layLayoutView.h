@@ -70,6 +70,7 @@ namespace lay {
 class AbstractMenu;
 class LayerControlPanel;
 class HierarchyControlPanel;
+class LibrariesView;
 class MouseTracker;
 class ZoomService;
 class SelectionService;
@@ -168,13 +169,14 @@ public:
     LV_Normal = 0, 
     LV_NoLayers = 1, 
     LV_NoHierarchyPanel = 2, 
-    LV_Naked = 4, 
-    LV_NoZoom = 8, 
-    LV_NoGrid = 16,
-    LV_NoMove = 32,
-    LV_NoTracker = 64,
-    LV_NoSelection = 128,
-    LV_NoPlugins = 256,
+    LV_NoLibrariesView = 4,
+    LV_Naked = 8,
+    LV_NoZoom = 16,
+    LV_NoGrid = 32,
+    LV_NoMove = 64,
+    LV_NoTracker = 128,
+    LV_NoSelection = 256,
+    LV_NoPlugins = 512,
     LV_NoServices = LV_NoMove + LV_NoTracker + LV_NoSelection + LV_NoPlugins
   };
 
@@ -221,7 +223,7 @@ public:
   bool has_selection ();
 
   /**
-   *  @brief Get the container with the layer control panel
+   *  @brief Gets the container with the layer control panel
    */
   QWidget *layer_control_frame () 
   {
@@ -229,7 +231,7 @@ public:
   }
 
   /**
-   *  @brief Get the container with the hierarchy control panel
+   *  @brief Gets the container with the hierarchy control panel
    */
   QWidget *hierarchy_control_frame () 
   {
@@ -237,7 +239,15 @@ public:
   }
 
   /**
-   *  @brief Paste from clipboard
+   *  @brief Gets the container with the libraries view
+   */
+  QWidget *libraries_frame ()
+  {
+    return mp_libraries_frame;
+  }
+
+  /**
+   *  @brief Pastes from clipboard
    *
    *  This reimplementation of the lay::Editables interface additionally
    *  looks for paste receivers in the tree views for example.
@@ -245,7 +255,7 @@ public:
   void paste ();
 
   /**
-   *  @brief Copy to clipboard
+   *  @brief Copies to clipboard
    *
    *  This reimplementation of the lay::Editables interface additionally
    *  looks for copy providers in the tree views for example.
@@ -253,7 +263,7 @@ public:
   void copy ();
 
   /**
-   *  @brief Cut to clipboard
+   *  @brief Cuts to clipboard
    *
    *  This reimplementation of the lay::Editables interface additionally
    *  looks for cut & copy providers in the tree views for example.
@@ -261,7 +271,7 @@ public:
   void cut ();
 
   /**
-   *  @brief Get the explicit title string of the view
+   *  @brief Gets the explicit title string of the view
    *
    *  This is the one explicitly set, not the one displayed. The displayed text is composed of internal information 
    *  if no title string is set.
@@ -272,17 +282,17 @@ public:
   }
 
   /**
-   *  @brief Get the window title of the view
+   *  @brief Gets the window title of the view
    */
   std::string title () const;
 
   /**
-   *  @brief Set the window title to an explicit string
+   *  @brief Sets the window title to an explicit string
    */
   void set_title (const std::string &t);
 
   /**
-   *  @brief Reset the explicit title and enable the automatic naming
+   *  @brief Resets the explicit title and enable the automatic naming
    */
   void reset_title ();
 
@@ -2627,6 +2637,7 @@ public slots:
 
 private slots:
   void active_cellview_changed (int index);
+  void active_library_changed (int index);
   void goto_bookmark ();
 
 signals:
@@ -2695,7 +2706,8 @@ private:
   QFrame *mp_left_frame;
   lay::LayerControlPanel *mp_control_panel;
   lay::HierarchyControlPanel *mp_hierarchy_panel;
-  QWidget *mp_control_frame, *mp_hierarchy_frame;
+  lay::LibrariesView *mp_libraries_view;
+  QWidget *mp_control_frame, *mp_hierarchy_frame, *mp_libraries_frame;
   QSpinBox *mp_min_hier_spbx;
   QSpinBox *mp_max_hier_spbx;
   std::list <CellView> m_cellviews;

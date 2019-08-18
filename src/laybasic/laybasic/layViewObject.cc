@@ -70,7 +70,9 @@ CellDragDropData::serialized () const
 
   stream << QString::fromUtf8 ("CellDragDropData");
   stream << (quintptr) mp_layout;
+  stream << (quintptr) mp_library;
   stream << m_cell_index;
+  stream << m_is_pcell;
 
   return data;
 }
@@ -88,7 +90,10 @@ CellDragDropData::deserialize (const QByteArray &ba)
     quintptr p = 0;
     stream >> p;
     mp_layout = reinterpret_cast <const db::Layout *> (p);
+    stream >> p;
+    mp_library = reinterpret_cast <const db::Library *> (p);
     stream >> m_cell_index;
+    stream >> m_is_pcell;
     return true;
 
   } else {

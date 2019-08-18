@@ -112,7 +112,10 @@ BasicRoundPolygon::produce (const db::Layout &layout, const std::vector<unsigned
 std::string 
 BasicRoundPolygon::get_display_name (const db::pcell_parameters_type &parameters) const
 {
-  return std::string("ROUND_POLYGON(r=") + tl::micron_to_string (parameters [p_radius].to_double ()) + ")";
+  return "ROUND_POLYGON(l=" + std::string (parameters [p_layer].to_string ()) +
+                      ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
+                      ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
+                        ")";
 }
 
 std::vector<db::PCellParameterDeclaration> 

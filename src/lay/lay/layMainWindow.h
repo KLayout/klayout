@@ -872,9 +872,9 @@ private:
   QToolBar *mp_tool_bar;
   QDockWidget *mp_navigator_dock_widget;
   lay::Navigator *mp_navigator;
-  QDockWidget *mp_hp_dock_widget, *mp_lp_dock_widget;
-  ControlWidgetStack *mp_hp_stack, *mp_lp_stack;
-  bool m_hp_visible, m_lp_visible, m_navigator_visible, m_layer_toolbox_visible;
+  QDockWidget *mp_hp_dock_widget, *mp_lp_dock_widget, *mp_libs_dock_widget;
+  ControlWidgetStack *mp_hp_stack, *mp_lp_stack, *mp_libs_stack;
+  bool m_hp_visible, m_lp_visible, m_libs_visible, m_navigator_visible, m_layer_toolbox_visible;
   QDockWidget *mp_layer_toolbox_dock_widget;
   lay::LayerToolbox *mp_layer_toolbox;
   ViewWidgetStack *mp_view_stack;

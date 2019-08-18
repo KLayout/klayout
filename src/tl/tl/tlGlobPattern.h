@@ -107,6 +107,16 @@ public:
   }
 
   /**
+   *  @brief Returns true, if the pattern is a catchall expression ("*")
+   */
+  bool is_catchall () const;
+
+  /**
+   *  @brief Returns true, if the pattern is a const string
+   */
+  bool is_const () const;
+
+  /**
    *  @brief Match the given string 
    *
    *  Returns true, if the given subject string matches the glob pattern 

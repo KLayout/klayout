@@ -15,7 +15,6 @@ SOURCES = \
   tlEvents.cc \
   tlExpression.cc \
   tlFileUtils.cc \
-  tlGlobPattern.cc \
   tlIntervalMap.cc \
   tlIntervalSet.cc \
   tlKDTree.cc \
@@ -38,7 +37,8 @@ SOURCES = \
   tlUniqueIdTests.cc \
   tlListTests.cc \
   tlEquivalenceClustersTests.cc \
-    tlUniqueNameTests.cc
+    tlUniqueNameTests.cc \
+    tlGlobPatternTests.cc
 
 !equals(HAVE_QT, "0") {
 

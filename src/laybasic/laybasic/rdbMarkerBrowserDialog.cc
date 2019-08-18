@@ -636,9 +636,7 @@ void
 MarkerBrowserDialog::activated ()
 {
   std::string state;
-  if (lay::PluginRoot::instance ()) {
-    lay::PluginRoot::instance ()->config_get (cfg_rdb_window_state, state);
-  }
+  view ()->config_get (cfg_rdb_window_state, state);
   lay::restore_dialog_state (this, state);
 
   //  Switch to the active cellview index when no valid one is set.

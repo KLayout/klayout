@@ -674,9 +674,7 @@ void
 NetlistBrowserDialog::activated ()
 {
   std::string state;
-  if (lay::PluginRoot::instance ()) {
-    lay::PluginRoot::instance ()->config_get (cfg_l2ndb_window_state, state);
-  }
+  view ()->config_get (cfg_l2ndb_window_state, state);
   lay::restore_dialog_state (this, state, false /*don't adjust the section sizes*/);
 
   //  Switch to the active cellview index when no valid one is set.

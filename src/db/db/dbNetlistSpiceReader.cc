@@ -417,8 +417,10 @@ bool NetlistSpiceReader::read_card ()
 
     } else if (ex.test_without_case ("global")) {
 
-      std::string n = read_name (ex);
-      m_global_nets.push_back (n);
+      while (! ex.at_end ()) {
+        std::string n = read_name (ex);
+        m_global_nets.push_back (n);
+      }
 
     } else if (ex.test_without_case ("subckt")) {
 
@@ -812,10 +814,6 @@ bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &ele
 
 void NetlistSpiceReader::read_subcircuit (const std::string &sc_name, const std::string &nc_name, const std::vector<db::Net *> &nets)
 {
-  if (nets.empty ()) {
-    error (tl::to_string (tr ("A circuit call needs at least one net")));
-  }
-
   db::Circuit *cc = mp_netlist->circuit_by_name (nc_name);
   if (! cc) {
 

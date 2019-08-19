@@ -561,23 +561,13 @@ public:
 
       }
 
-    } else if (m_pattern.is_const ()) {
-
-      objectives ().set_wants_all_cells (false);
-
-      //  include the cell with the name we look for into the objectives
-      std::pair<bool, db::cell_index_type> cell_by_name = layout ()->cell_by_name (m_pattern.pattern ().c_str ());
-      if (cell_by_name.first) {
-        objectives ().request_cell (cell_by_name.second);
-      }
-
     } else {
 
       objectives ().set_wants_all_cells (false);
 
       //  include all matching cells into the objectives
       for (db::Layout::const_iterator c = layout ()->begin (); c != layout ()->end(); ++c) {
-        if (m_pattern.match (layout ()->cell_name (c->cell_index()))) {
+        if (m_pattern.match (c->get_qualified_name ())) {
           objectives ().request_cell (c->cell_index ());
         }
       }

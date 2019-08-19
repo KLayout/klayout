@@ -119,11 +119,11 @@ same_device_classes("NMOS_IN_LAYOUT", "NMOS_IN_SCHEMATIC")</pre>
 
   <p>
   To eliminate all capacitors with a capacitance value below a certain threshold, use the
-  <a href="/about/lvs_ref_global.xml#max_caps">max_caps</a> function. This will
+  <a href="/about/lvs_ref_global.xml#min_caps">min_caps</a> function. This will
   eliminate all capacitances with a value &lt;= 0.1fF:
   </p>
 
-  <pre>max_caps(1e-16)</pre>
+  <pre>min_caps(1e-16)</pre>
 
   <h2>How the compare algorithm works</h2>
 

@@ -27,6 +27,8 @@
 #include "tlStream.h"
 #include "tlLog.h"
 #include "tlString.h"
+#include "tlFileUtils.h"
+#include "tlUri.h"
 
 #include <sstream>
 #include <cctype>
@@ -243,7 +245,20 @@ void NetlistSpiceReader::finish ()
 
 void NetlistSpiceReader::push_stream (const std::string &path)
 {
-  tl::InputStream *istream = new tl::InputStream (path);
+  tl::URI current_uri (mp_stream->source ());
+  tl::URI new_uri (path);
+
+  tl::InputStream *istream;
+  if (current_uri.scheme ().empty () && new_uri.scheme ().empty ()) {
+    if (tl::is_absolute (path)) {
+      istream = new tl::InputStream (path);
+    } else {
+      istream = new tl::InputStream (tl::combine_path (tl::dirname (mp_stream->source ()), path));
+    }
+  } else {
+    istream = new tl::InputStream (current_uri.resolved (new_uri).to_string ());
+  }
+
   m_streams.push_back (std::make_pair (istream, mp_stream.release ()));
   mp_stream.reset (new tl::TextInputStream (*istream));
 }
@@ -291,7 +306,7 @@ std::string NetlistSpiceReader::get_line ()
     }
 
     tl::Extractor ex (l.c_str ());
-    if (ex.test_without_case (".include")) {
+    if (ex.test_without_case (".include") || ex.test_without_case (".inc")) {
 
       std::string path = read_name_with_case (ex);
 

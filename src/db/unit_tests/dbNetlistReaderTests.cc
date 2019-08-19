@@ -294,3 +294,42 @@ TEST(7_GlobalNets)
     "end;\n"
   );
 }
+
+TEST(8_Include)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader8.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit INVX1 ('1'='1','2'='2','3'='3','4'='4','5'='5','6'='6');\n"
+    "  device MLVPMOS $1 (S='1',G='5',D='2',B='4') (L=0.25,W=1.5,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device MLVNMOS $2 (S='3',G='5',D='2',B='6') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit ND2X1 ('1'='1','2'='2','3'='3','4'='4','5'='5','6'='6','7'='7');\n"
+    "  device MLVPMOS $1 (S='2',G='6',D='1',B='4') (L=0.25,W=1.5,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device MLVPMOS $2 (S='1',G='5',D='2',B='4') (L=0.25,W=1.5,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device MLVNMOS $3 (S='3',G='6',D='8',B='7') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device MLVNMOS $4 (S='8',G='5',D='2',B='7') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit RINGO ('11'='11','12'='12','13'='13','14'='14','15'='15');\n"
+    "  subcircuit ND2X1 $1 ('1'='12','2'='1','3'='15','4'='12','5'='11','6'='14','7'='15');\n"
+    "  subcircuit INVX1 $2 ('1'='12','2'='2','3'='15','4'='12','5'='1','6'='15');\n"
+    "  subcircuit INVX1 $3 ('1'='12','2'='3','3'='15','4'='12','5'='2','6'='15');\n"
+    "  subcircuit INVX1 $4 ('1'='12','2'='4','3'='15','4'='12','5'='3','6'='15');\n"
+    "  subcircuit INVX1 $5 ('1'='12','2'='5','3'='15','4'='12','5'='4','6'='15');\n"
+    "  subcircuit INVX1 $6 ('1'='12','2'='6','3'='15','4'='12','5'='5','6'='15');\n"
+    "  subcircuit INVX1 $7 ('1'='12','2'='7','3'='15','4'='12','5'='6','6'='15');\n"
+    "  subcircuit INVX1 $8 ('1'='12','2'='8','3'='15','4'='12','5'='7','6'='15');\n"
+    "  subcircuit INVX1 $9 ('1'='12','2'='9','3'='15','4'='12','5'='8','6'='15');\n"
+    "  subcircuit INVX1 $10 ('1'='12','2'='10','3'='15','4'='12','5'='9','6'='15');\n"
+    "  subcircuit INVX1 $11 ('1'='12','2'='11','3'='15','4'='12','5'='10','6'='15');\n"
+    "  subcircuit INVX1 $12 ('1'='12','2'='13','3'='15','4'='12','5'='11','6'='15');\n"
+    "end;\n"
+  );
+}
+

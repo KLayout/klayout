@@ -285,9 +285,13 @@ module LVS
       ( nl_a, nl_b ) = _ensure_two_netlists
 
       dc_a = a && (nl_a.device_class_by_name(a) || raise("Not a valid device class in extracted netlist: #{a}"))
-      dc_b = b && (nl_b.device_class_by_name(b) || raise("Not a valid device class in reference netlist: #{b}"))
+      dc_b = b && nl_b.device_class_by_name(b)
 
-      @comparer.same_device_classes(dc_a, dc_b)
+      # NOTE: a device class is allowed to be missing in the reference netlist because the
+      # device may simply not be used there.
+      if dc_b
+        @comparer.same_device_classes(dc_a, dc_b)
+      end
       
     end
 

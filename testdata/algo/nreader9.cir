@@ -1,0 +1,12 @@
+
+R$1 1 2 1.7k M=2
+R$2 3 4 1.7k
+M$1 1 2 3 4 NMOS W=2u L=7u M=2
+M$2 1 2 3 4 PMOS W=2u L=7u 
+C$1 1 2 1e-9 M=2 
+C$2 3 4 1e-9 
+D$1 1 2 DIODE A=10P M=2 
+D$2 3 4 DIODE A=10P
+Q$1 1 2 3 4 BIP AE=10P M=2 
+Q$2 1 2 3 4 BIP AE=10P
+

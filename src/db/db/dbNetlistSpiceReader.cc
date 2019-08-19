@@ -85,34 +85,73 @@ static db::DeviceClass *make_device_class (db::Circuit *circuit, const std::stri
   return cls;
 }
 
-bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &pv)
 {
+  std::map<std::string, double> params = pv;
+
+  double mult = 1.0;
+  std::map<std::string, double>::const_iterator mp = params.find ("M");
+  if (mp != params.end ()) {
+    mult = mp->second;
+  }
+
+  if (mult < 1e-10) {
+    error (tl::sprintf (tl::to_string (tr ("Invalid multiplier value (M=%.12g) - must not be zero or negative")), mult));
+  }
+
   std::string cn = model;
   db::DeviceClass *cls = circuit->netlist ()->device_class_by_name (cn);
 
   if (cls) {
+
     //  use given class
+
   } else if (element == "R") {
+
     if (cn.empty ()) {
       cn = "RES";
     }
     cls = make_device_class<db::DeviceClassResistor> (circuit, cn);
+
+    //  Apply multiplier
+    value /= mult;
+
   } else if (element == "L") {
+
     if (cn.empty ()) {
       cn = "IND";
     }
     cls = make_device_class<db::DeviceClassInductor> (circuit, cn);
+
+    //  Apply multiplier
+    value /= mult;
+
   } else if (element == "C") {
+
     if (cn.empty ()) {
       cn = "CAP";
     }
     cls = make_device_class<db::DeviceClassCapacitor> (circuit, cn);
+
+    //  Apply multiplier
+    value *= mult;
+
   } else if (element == "D") {
+
     if (cn.empty ()) {
       cn = "DIODE";
     }
     cls = make_device_class<db::DeviceClassDiode> (circuit, cn);
+
+    //  Apply multiplier to "A"
+    std::map<std::string, double>::iterator p;
+    p = params.find ("A");
+    if (p != params.end ()) {
+      p->second *= mult;
+    }
+
   } else if (element == "Q") {
+
     if (nets.size () == 3) {
       if (cn.empty ()) {
         cn = "BJT3";
@@ -126,12 +165,29 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     } else {
       error (tl::to_string (tr ("'Q' element needs to have 3 or 4 terminals")));
     }
+
+    //  Apply multiplier to "AE"
+    std::map<std::string, double>::iterator p;
+    p = params.find ("AE");
+    if (p != params.end ()) {
+      p->second *= mult;
+    }
+
   } else if (element == "M") {
+
     if (nets.size () == 4) {
       if (cn.empty ()) {
         cn = "MOS4";
       }
       cls = make_device_class<db::DeviceClassMOS4Transistor> (circuit, cn);
+
+      //  Apply multiplier to "W"
+      std::map<std::string, double>::iterator p;
+      p = params.find ("W");
+      if (p != params.end ()) {
+        p->second *= mult;
+      }
+
     } else {
       error (tl::to_string (tr ("'M' element needs to have 4 terminals")));
     }

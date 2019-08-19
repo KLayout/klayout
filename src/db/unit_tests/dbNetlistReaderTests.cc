@@ -333,3 +333,29 @@ TEST(8_Include)
   );
 }
 
+TEST(9_DeviceMultipliers)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader9.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  device RES $1 (A='1',B='2') (R=850,L=0,W=0,A=0,P=0);\n"
+    "  device RES $2 (A='3',B='4') (R=1700,L=0,W=0,A=0,P=0);\n"
+    "  device NMOS $1 (S='1',G='2',D='3',B='4') (L=7,W=4,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S='1',G='2',D='3',B='4') (L=7,W=2,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device CAP $1 (A='1',B='2') (C=2e-09,A=0,P=0);\n"
+    "  device CAP $2 (A='3',B='4') (C=1e-09,A=0,P=0);\n"
+    "  device DIODE $1 (A='1',C='2') (A=20,P=0);\n"
+    "  device DIODE $2 (A='3',C='4') (A=10,P=0);\n"
+    "  device BIP $1 (C='1',B='2',E='3',S='4') (AE=20,PE=0,AB=0,PB=0,AC=0,PC=0,NE=1);\n"
+    "  device BIP $2 (C='1',B='2',E='3',S='4') (AE=10,PE=0,AB=0,PB=0,AC=0,PC=0,NE=1);\n"
+    "end;\n"
+  );
+}
+

@@ -588,10 +588,6 @@ LibrariesView::do_update_content (int lib_index)
       m_force_close [i] = true;
     }
 
-    if (m_needs_update [i]) {
-      mp_cell_lists [i]->doItemsLayout ();   //  triggers a redraw
-    }
-
     m_libraries [i].reset (libraries [i]);
 
   }
@@ -714,6 +710,8 @@ LibrariesView::do_update_content (int lib_index)
       }
 
       m_needs_update [i] = false;
+
+      mp_cell_lists [i]->doItemsLayout ();   //  triggers a redraw -> the model might need this
 
     }
 

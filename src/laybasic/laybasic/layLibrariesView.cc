@@ -795,6 +795,10 @@ LibrariesView::display_string (int n) const
   if (! lib->get_description ().empty ()) {
     text += " - " + lib->get_description ();
   }
+  if (! lib->get_technology ().empty ()) {
+    text += " ";
+    text += tl::to_string (QObject::tr ("[Technology %1]").arg (tl::to_qstring (lib->get_technology ())));
+  }
   return text;
 }
 

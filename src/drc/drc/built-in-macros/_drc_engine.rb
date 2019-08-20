@@ -162,6 +162,32 @@ module DRC
     end
 
     # %DRC%
+    # @brief Supplies the DMOS3 transistor extractor class
+    # @name dmos3
+    # @synopsis dmos3(name)
+    # Use this class with \extract_devices to specify extraction of a 
+    # three-terminal DMOS transistor. A DMOS transistor is essentially
+    # the same than a MOS transistor, but source and drain are 
+    # separated.
+
+    def dmos3(name)
+      RBA::DeviceExtractorMOS3Transistor::new(name, true)
+    end
+
+    # %DRC%
+    # @brief Supplies the MOS4 transistor extractor class
+    # @name dmos4
+    # @synopsis dmos4(name)
+    # Use this class with \extract_devices to specify extraction of a 
+    # four-terminal DMOS transistor. A DMOS transistor is essentially
+    # the same than a MOS transistor, but source and drain are 
+    # separated.
+
+    def dmos4(name)
+      RBA::DeviceExtractorMOS4Transistor::new(name, true)
+    end
+
+    # %DRC%
     # @brief Supplies the BJT3 transistor extractor class
     # @name bjt3
     # @synopsis bjt3(name)

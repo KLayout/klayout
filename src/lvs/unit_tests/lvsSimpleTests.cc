@@ -129,3 +129,8 @@ TEST(11_device_scaling)
   run_test (_this, "ringo_simple_device_scaling", "ringo.gds");
 }
 
+TEST(12_simple_dmos)
+{
+  run_test (_this, "ringo_simple_dmos", "ringo.gds");
+}
+

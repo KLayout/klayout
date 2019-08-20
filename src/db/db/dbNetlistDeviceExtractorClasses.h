@@ -48,11 +48,16 @@ class DB_PUBLIC NetlistDeviceExtractorMOS3Transistor
   : public db::NetlistDeviceExtractor
 {
 public:
-  NetlistDeviceExtractorMOS3Transistor (const std::string &name);
+  NetlistDeviceExtractorMOS3Transistor (const std::string &name, bool strict = false);
 
   virtual void setup ();
   virtual db::Connectivity get_connectivity (const db::Layout &layout, const std::vector<unsigned int> &layers) const;
   virtual void extract_devices (const std::vector<db::Region> &layer_geometry);
+
+  bool is_strict () const
+  {
+    return m_strict;
+  }
 
 protected:
   /**
@@ -72,6 +77,8 @@ protected:
     //  .. no specific implementation ..
   }
 
+private:
+  bool m_strict;
 };
 
 /**
@@ -87,7 +94,7 @@ class DB_PUBLIC NetlistDeviceExtractorMOS4Transistor
   : public NetlistDeviceExtractorMOS3Transistor
 {
 public:
-  NetlistDeviceExtractorMOS4Transistor (const std::string &name);
+  NetlistDeviceExtractorMOS4Transistor (const std::string &name, bool strict = false);
 
   virtual void setup ();
 

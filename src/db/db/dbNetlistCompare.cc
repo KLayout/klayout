@@ -447,6 +447,24 @@ public:
   {
     return generic_categorizer<db::DeviceClass>::cat_for (cls);
   }
+
+  void clear_strict_device_categories ()
+  {
+    m_strict_device_categories.clear ();
+  }
+
+  void set_strict_device_category (size_t cat)
+  {
+    m_strict_device_categories.insert (cat);
+  }
+
+  bool is_strict_device_category (size_t cat) const
+  {
+    return m_strict_device_categories.find (cat) != m_strict_device_categories.end ();
+  }
+
+private:
+  std::set<size_t> m_strict_device_categories;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1070,14 +1088,17 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
       continue;
     }
 
-    size_t terminal1_id = translate_terminal_id (i->terminal_id (), d);
+    bool is_strict = device_categorizer.is_strict_device_category (device_cat);
+
+    //  strict device checking means no terminal swapping
+    size_t terminal1_id = is_strict ? i->terminal_id () : translate_terminal_id (i->terminal_id (), d);
 
     const std::vector<db::DeviceTerminalDefinition> &td = d->device_class ()->terminal_definitions ();
     for (std::vector<db::DeviceTerminalDefinition>::const_iterator it = td.begin (); it != td.end (); ++it) {
 
       if (it->id () != i->terminal_id ()) {
 
-        size_t terminal2_id = translate_terminal_id (it->id (), d);
+        size_t terminal2_id = is_strict ? it->id () : translate_terminal_id (it->id (), d);
         Transition ed2 (d, device_cat, terminal1_id, terminal2_id);
 
         const db::Net *net2 = d->net_for_terminal (it->id ());
@@ -2203,6 +2224,16 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
     }
   }
 
+  //  device whether to use a device category in strict mode
+
+  device_categorizer.clear_strict_device_categories ();
+
+  for (std::map<size_t, std::pair<const db::DeviceClass *, const db::DeviceClass *> >::const_iterator i = cat2dc.begin (); i != cat2dc.end (); ++i) {
+    if (i->second.first && i->second.second && (i->second.first->is_strict () || i->second.second->is_strict ())) {
+      device_categorizer.set_strict_device_category (i->first);
+    }
+  }
+
   //  check for circuits that don't match
 
   for (std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
@@ -2333,13 +2364,13 @@ NetlistComparer::all_subcircuits_verified (const db::Circuit *c, const std::set<
 }
 
 static std::vector<std::pair<size_t, size_t> >
-compute_device_key (const db::Device &device, const db::NetGraph &g)
+compute_device_key (const db::Device &device, const db::NetGraph &g, bool strict)
 {
   std::vector<std::pair<size_t, size_t> > k;
 
   const std::vector<db::DeviceTerminalDefinition> &td = device.device_class ()->terminal_definitions ();
   for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
-    size_t terminal_id = translate_terminal_id (t->id (), &device);
+    size_t terminal_id = strict ? t->id () : translate_terminal_id (t->id (), &device);
     const db::Net *net = device.net_for_terminal (t->id ());
     size_t net_id = g.node_index_for_net (net);
     k.push_back (std::make_pair (terminal_id, net_id));
@@ -2872,7 +2903,7 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g1);
+    std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g1, device_categorizer.is_strict_device_category (device_cat));
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
@@ -2906,7 +2937,7 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       continue;
     }
 
-    std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g2);
+    std::vector<std::pair<size_t, size_t> > k = compute_device_key (*d, g2, device_categorizer.is_strict_device_category (device_cat));
 
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {

@@ -2414,7 +2414,6 @@ MainWindow::cm_undo ()
       (*vp)->cancel ();
     }
     m_manager.undo ();
-    current_view ()->update_content ();
   }
 
   END_PROTECTED
@@ -2431,7 +2430,6 @@ MainWindow::cm_redo ()
       (*vp)->cancel ();
     }
     m_manager.redo ();
-    current_view ()->update_content ();
   }
 
   END_PROTECTED

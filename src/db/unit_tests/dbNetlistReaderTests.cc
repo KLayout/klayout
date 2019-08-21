@@ -343,7 +343,11 @@ TEST(9_DeviceMultipliers)
   tl::InputStream is (path);
   reader.read (is, nl);
 
-  EXPECT_EQ (nl.to_string (),
+  std::string nl_string = nl.to_string ();
+  //  normalization of exponential representation:
+  nl_string = tl::replaced (nl_string, "e-009", "e-09");
+
+  EXPECT_EQ (nl_string,
     "circuit .TOP ();\n"
     "  device RES $1 (A='1',B='2') (R=850,L=0,W=0,A=0,P=0);\n"
     "  device RES $2 (A='3',B='4') (R=1700,L=0,W=0,A=0,P=0);\n"

@@ -138,3 +138,8 @@ TEST(13_simple_ringo_device_subcircuits)
 {
   run_test (_this, "ringo_device_subcircuits", "ringo.gds");
 }
+
+TEST(14_simple_ringo_mixed_hierarchy)
+{
+  run_test (_this, "ringo_mixed_hierarchy", "ringo_mixed_hierarchy.gds");
+}

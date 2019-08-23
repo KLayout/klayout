@@ -5,56 +5,7 @@ report_lvs($lvs_test_target_lvsdb, true)
 
 target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
 
-
-# Provide a special reader
-class SubcircuitModelsReader < RBA::NetlistSpiceReaderDelegate
-
-  # says we want to catch these subcircuits as devices
-  def wants_subcircuit(name)
-    name == "NMOS" || name == "XPMOS"
-  end
-
-  # translate the element
-  def element(circuit, el, name, model, value, nets, params)
-
-    if el != "X"
-      # all other elements are left to the standard implementation
-      return super
-    end
-
-    if nets.size != 4
-      error("Subcircuit #{model} needs four nodes")
-    end
-
-    # provide a device class
-    cls = circuit.netlist.device_class_by_name(model)
-    if ! cls
-      cls = RBA::DeviceClassMOS4Transistor::new
-      cls.name = model
-      circuit.netlist.add(cls)
-    end
-
-    # create a device
-    device = circuit.create_device(cls, name)
-
-    # and configure the device
-    [ "S", "G", "D", "B" ].each_with_index do |t,index|
-      device.connect_terminal(t, nets[index])
-    end
-
-    # parameters in the model are given in micrometer units, so 
-    # we need to translate the parameter values from SI to um values:
-    device.set_parameter("W", (params["W"] || 0.0) * 1e6)
-    device.set_parameter("L", (params["L"] || 0.0) * 1e6)
-
-    return true
-
-  end
-
-end
-
-
-schematic("ringo_xdevice.cir", RBA::NetlistSpiceReader::new(SubcircuitModelsReader::new))
+schematic("ringo.cir")
 
 deep
 
@@ -115,12 +66,11 @@ connect(via1,       metal2)
 connect_global(bulk, "SUBSTRATE")
 connect_global(ptie, "SUBSTRATE")
 
-# Test same_device_classes
-same_device_classes("PMOS", "XPMOS")
-
 # Compare section
 
 netlist.simplify
+
+align
 
 compare
 

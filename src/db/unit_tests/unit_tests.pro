@@ -36,7 +36,6 @@ SOURCES = \
   dbPCells.cc \
   dbPoint.cc \
   dbPolygon.cc \
-  dbPolygonTools.cc \
   dbPropertiesRepository.cc \
   dbRegion.cc \
   dbShapeArray.cc \
@@ -72,7 +71,8 @@ SOURCES = \
     dbNetlistCompareTests.cc \
     dbNetlistReaderTests.cc \
     dbLayoutVsSchematicTests.cc \
-    dbLayoutQueryTests.cc
+    dbLayoutQueryTests.cc \
+    dbPolygonToolsTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

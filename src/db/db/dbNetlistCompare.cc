@@ -692,6 +692,12 @@ public:
 
   typedef std::pair<std::vector<Transition>, std::pair<size_t, const db::Net *> > edge_type;
 
+  static void swap_edges (edge_type &e1, edge_type &e2)
+  {
+    e1.first.swap (e2.first);
+    std::swap (e1.second, e2.second);
+  }
+
   struct EdgeToEdgeOnlyCompare
   {
     bool operator() (const edge_type &a, const std::vector<Transition> &b) const
@@ -1149,16 +1155,21 @@ NetGraphNode::expand_subcircuit_nodes (NetGraph *graph)
 
   std::list<edge_type> sc_edges;
 
-  for (size_t i = 0; i < m_edges.size (); ) {
-    if (m_edges [i].second.second == 0) {
+  size_t ii = 0;
+  for (size_t i = 0; i < m_edges.size (); ++i) {
+    if (ii != i) {
+      swap_edges (m_edges [ii], m_edges [i]);
+    }
+    if (m_edges [ii].second.second == 0) {
       //  subcircuit pin
-      sc_edges.push_back (m_edges [i]);
-      m_edges.erase (m_edges.begin () + i);
+      sc_edges.push_back (m_edges [ii]);
     } else {
-      n2entry.insert (std::make_pair (m_edges [i].second.second, i));
-      ++i;
+      n2entry.insert (std::make_pair (m_edges [ii].second.second, ii));
+      ++ii;
     }
   }
+
+  m_edges.erase (m_edges.begin () + ii, m_edges.end ());
 
   for (std::list<edge_type>::const_iterator e = sc_edges.begin (); e != sc_edges.end (); ++e) {
 

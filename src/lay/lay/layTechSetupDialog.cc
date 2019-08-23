@@ -37,6 +37,8 @@
 #include "tlStream.h"
 #include "tlClassRegistry.h"
 #include "dbStream.h"
+#include "dbLibraryManager.h"
+#include "dbLibrary.h"
 
 #include "ui_TechSetupDialog.h"
 #include "ui_TechMacrosPage.h"
@@ -51,6 +53,7 @@
 #include <QHeaderView>
 #include <QFileDialog>
 #include <QScrollArea>
+#include <QListWidgetItem>
 
 #include <stdio.h>
 #include <fstream>
@@ -114,6 +117,38 @@ TechBaseEditorPage::setup ()
   mp_ui->lyp_grp->setChecked (! lyp.empty ());
   mp_ui->lyp_le->setText (tl::to_qstring (lyp));
   mp_ui->add_other_layers_cbx->setChecked (tech ()->add_other_layers ());
+
+  mp_ui->libs_lw->clear ();
+
+  if (! tech ()->name ().empty ()) {
+
+    mp_ui->libs_lbl->setEnabled (true);
+    mp_ui->libs_lw->setEnabled (true);
+
+    std::vector<std::string> libs;
+
+    for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
+      const db::Library *lib = db::LibraryManager::instance ().lib (l->second);
+      if (lib->get_technology () == tech ()->name ()) {
+        std::string text = lib->get_name ();
+        if (! lib->get_description ().empty ()) {
+          text += " - " + lib->get_description ();
+        }
+        libs.push_back (text);
+      }
+    }
+
+    std::sort (libs.begin (), libs.end ());
+
+    for (std::vector<std::string>::const_iterator l = libs.begin (); l != libs.end (); ++l) {
+      mp_ui->libs_lw->addItem (new QListWidgetItem (tl::to_qstring (*l)));
+    }
+
+  } else {
+    mp_ui->libs_lbl->setEnabled (false);
+    mp_ui->libs_lw->setEnabled (false);
+    mp_ui->libs_lw->addItem (tr ("The default technology can't have libraries"));
+  }
 }
 
 void 

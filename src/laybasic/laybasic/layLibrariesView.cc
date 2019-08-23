@@ -588,10 +588,6 @@ LibrariesView::do_update_content (int lib_index)
       m_force_close [i] = true;
     }
 
-    if (m_needs_update [i]) {
-      mp_cell_lists [i]->doItemsLayout ();   //  triggers a redraw
-    }
-
     m_libraries [i].reset (libraries [i]);
 
   }
@@ -715,6 +711,8 @@ LibrariesView::do_update_content (int lib_index)
 
       m_needs_update [i] = false;
 
+      mp_cell_lists [i]->doItemsLayout ();   //  triggers a redraw -> the model might need this
+
     }
 
     mp_cell_list_headers [i]->setVisible (split_mode && m_libraries.size () > 1);
@@ -794,6 +792,10 @@ LibrariesView::display_string (int n) const
   std::string text = lib->get_name ();
   if (! lib->get_description ().empty ()) {
     text += " - " + lib->get_description ();
+  }
+  if (! lib->get_technology ().empty ()) {
+    text += " ";
+    text += tl::to_string (QObject::tr ("[Technology %1]").arg (tl::to_qstring (lib->get_technology ())));
   }
   return text;
 }

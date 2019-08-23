@@ -1769,7 +1769,7 @@ TEST(119_WithAndWithoutContext)
 
     const db::Cell &text_cell = gg.cell (tc.second);
     EXPECT_EQ (text_cell.is_proxy (), true);
-    EXPECT_EQ (text_cell.get_display_name (), "Basic.TEXT('KLAYOUT RULES')");
+    EXPECT_EQ (text_cell.get_display_name (), "Basic.TEXT(l=1/0,'KLAYOUT RULES')");
 
     CHECKPOINT ();
     db::compare_layouts (_this, gg, tl::testsrc () + "/testdata/oasis/dbOASISWriter119_au.gds", db::NoNormalization);

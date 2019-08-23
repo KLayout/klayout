@@ -1706,9 +1706,12 @@ LayoutView::insert_layer_list (unsigned index, const LayerPropertiesList &props)
 
   m_current_layer_list = index;
   current_layer_list_changed_event (index);
+
   layer_list_inserted_event (index);
 
   redraw ();
+
+  dm_prop_changed ();
 }
 
 void 
@@ -1750,6 +1753,7 @@ LayoutView::delete_layer_list (unsigned index)
   }
 
   layer_list_deleted_event (index);
+  dm_prop_changed ();
 }
 
 void 
@@ -1986,6 +1990,7 @@ LayoutView::insert_layer (unsigned int index, const LayerPropertiesConstIterator
   if (index == current_layer_list ()) {
     layer_list_changed_event (2);
     redraw ();
+    dm_prop_changed ();
   }
 
   return ret;
@@ -2013,6 +2018,7 @@ LayoutView::delete_layer (unsigned int index, LayerPropertiesConstIterator &iter
   if (index == current_layer_list ()) {
     layer_list_changed_event (2);
     redraw ();
+    dm_prop_changed ();
   }
 
   //  invalidate the iterator so it can be used to refer to the next element

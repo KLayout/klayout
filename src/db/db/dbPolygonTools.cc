@@ -858,6 +858,7 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
   typename db::polygon<C>::polygon_contour_iterator p2 = p1;
 
   const double cos_thr = 0.8;
+  const double acute_cos_thr = -0.8;
   const double circle_segment_thr = 2.5;
 
   //  search for the first circle segment (where cos(a) > cos_thr) 
@@ -1031,7 +1032,7 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
         if (in_corner) {
 
           std::pair<bool, db::point<C> > cp = elast.cut_point (e);
-          if (! cp.first) {
+          if (! cp.first || db::sprod (elast, e) < acute_cos_thr * elast.double_length () * e.double_length ()) {
 
             //  We have a full 180 degree bend without a stop (actually two corners).
             //  Use the segment in between that is perpendicular to the start and end segment as stop edge.
@@ -1048,7 +1049,7 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
               }
 
               e = db::edge<C> (*pp1, *pp2);
-              if (db::sprod_sign (elast, e) == 0) {
+              if (db::sprod_sign (elast, e) <= 0) {
                 break;
               }
 
@@ -1059,6 +1060,13 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
 
             }
 
+            ++nseg_part;
+
+            if (nseg_part >= nseg) {
+              //  not a valid rounded bend - skip this solution
+              return false;
+            }
+
             cp = elast.cut_point (e);
             if (! cp.first) {
               return false;
@@ -1067,8 +1075,6 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
             if (new_pts) {
               new_pts->push_back (cp.second);
             }
-
-            ++nseg_part;
 
             asum -= asum_part;
             asum -= db::vprod (e.p1 () - db::point<C> (), e.p2 () - db::point<C> ());

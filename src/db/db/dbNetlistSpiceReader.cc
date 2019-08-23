@@ -478,7 +478,7 @@ void NetlistSpiceReader::error (const std::string &msg)
 
 void NetlistSpiceReader::warn (const std::string &msg)
 {
-  std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, mp_stream->source (), mp_stream->line_number ());
+  std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, mp_stream->source (), mp_stream->line_number () - 1);
   tl::warn << fmt_msg;
 }
 

@@ -134,3 +134,7 @@ TEST(12_simple_dmos)
   run_test (_this, "ringo_simple_dmos", "ringo.gds");
 }
 
+TEST(13_simple_ringo_device_subcircuits)
+{
+  run_test (_this, "ringo_device_subcircuits", "ringo.gds");
+}

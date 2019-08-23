@@ -38,6 +38,9 @@ namespace lay
 static const std::string cfg_grid ("grid-micron");
 
 static const std::string cfg_grid_color ("grid-color");
+static const std::string cfg_grid_ruler_color ("grid-ruler-color");
+static const std::string cfg_grid_axis_color ("grid-axis-color");
+static const std::string cfg_grid_grid_color ("grid-grid-color");
 static const std::string cfg_grid_style0 ("grid-style0");
 static const std::string cfg_grid_style1 ("grid-style1");
 static const std::string cfg_grid_style2 ("grid-style2");

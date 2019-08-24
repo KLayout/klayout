@@ -143,3 +143,8 @@ TEST(14_simple_ringo_mixed_hierarchy)
 {
   run_test (_this, "ringo_mixed_hierarchy", "ringo_mixed_hierarchy.gds");
 }
+
+TEST(15_simple_dummy_device)
+{
+  run_test (_this, "ringo_simple_dummy_device", "ringo_dummy_device.gds");
+}

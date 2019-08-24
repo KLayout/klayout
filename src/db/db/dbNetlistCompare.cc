@@ -732,7 +732,14 @@ public:
     //  .. nothing yet ..
   }
 
+  /**
+   *  @brief Builds a node for a net
+   */
   NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map);
+
+  /**
+   *  @brief Builds a virtual node for a subcircuit
+   */
   NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map);
 
   void expand_subcircuit_nodes (NetGraph *graph);
@@ -1102,6 +1109,9 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
         Transition ed2 (d, device_cat, terminal1_id, terminal2_id);
 
         const db::Net *net2 = d->net_for_terminal (it->id ());
+        if (! net2) {
+          continue;
+        }
 
         std::map<const void *, size_t>::const_iterator in = n2entry.find ((const void *) net2);
         if (in == n2entry.end ()) {
@@ -1138,6 +1148,9 @@ NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circui
 
     size_t pin_id = p->id ();
     const db::Net *net_at_pin = sc->net_for_pin (pin_id);
+    if (! net_at_pin) {
+      continue;
+    }
 
     //  A pin assignment may be missing because there is no net for a pin -> skip this
 

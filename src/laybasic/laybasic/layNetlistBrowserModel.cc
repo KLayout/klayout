@@ -824,6 +824,9 @@ static
 std::string device_parameter_string (const db::Device *device)
 {
   std::string s;
+  if (! device || ! device->device_class ()) {
+    return s;
+  }
 
   bool first = true;
   const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();

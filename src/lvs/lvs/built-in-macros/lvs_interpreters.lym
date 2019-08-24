@@ -80,6 +80,7 @@ module LVS
     
     # Implements the execute method
     def execute(macro)
+      $0 = macro.path
       LVS::execute_lvs(macro)
     end
     

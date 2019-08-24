@@ -2138,14 +2138,14 @@ NetlistComparer::unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector
 
   for (db::Netlist::circuit_iterator i = a->begin_circuits (); i != a->end_circuits (); ++i) {
     size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
-    if (cat && i->begin_refs () != i->end_refs ()) {
+    if (cat) {
       cat2circuits[cat].first = i.operator-> ();
     }
   }
 
   for (db::Netlist::circuit_iterator i = b->begin_circuits (); i != b->end_circuits (); ++i) {
     size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
-    if (cat && i->begin_refs () != i->end_refs ()) {
+    if (cat) {
       cat2circuits[cat].second = i.operator-> ();
     }
   }

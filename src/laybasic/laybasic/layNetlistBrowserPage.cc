@@ -30,6 +30,7 @@
 #include "layMarker.h"
 #include "layNetInfoDialog.h"
 #include "layNetExportDialog.h"
+#include "lymMacro.h"
 #include "tlProgress.h"
 #include "tlExceptions.h"
 #include "dbLayoutToNetlist.h"
@@ -124,6 +125,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     m_update_needed (true),
     mp_info_dialog (0),
     dm_update_highlights (this, &NetlistBrowserPage::update_highlights),
+    dm_rerun_macro (this, &NetlistBrowserPage::rerun_macro),
     m_cell_context_cache (0)
 {
   Ui::NetlistBrowserPage::setupUi (this);
@@ -188,6 +190,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 
   connect (m_show_all_action, SIGNAL (triggered ()), this, SLOT (show_all_clicked ()));
   connect (info_button, SIGNAL (pressed ()), this, SLOT (info_button_pressed ()));
+  connect (rerun_button, SIGNAL (pressed ()), this, SLOT (rerun_button_pressed ()));
   connect (find_button, SIGNAL (pressed ()), this, SLOT (find_button_pressed ()));
   connect (forward, SIGNAL (clicked ()), this, SLOT (navigate_forward ()));
   connect (backward, SIGNAL (clicked ()), this, SLOT (navigate_back ()));
@@ -586,6 +589,27 @@ NetlistBrowserPage::navigate_forward ()
 }
 
 void
+NetlistBrowserPage::rerun_button_pressed ()
+{
+  //  NOTE: we use deferred execution, because otherwise the button won't get repainted properly
+  dm_rerun_macro ();
+}
+
+void
+NetlistBrowserPage::rerun_macro ()
+{
+  if (! mp_database->generator ().empty ()) {
+
+    lym::Macro *generator = lym::MacroCollection::root ().find_macro (mp_database->generator ());
+    if (! generator) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot find generator script: %s")), mp_database->generator()));
+    } else {
+      generator->run ();
+    }
+
+  }
+}
+void
 NetlistBrowserPage::info_button_pressed ()
 {
   if (! mp_info_dialog) {
@@ -740,6 +764,13 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 
   db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
   mp_database.reset (l2ndb);
+
+  rerun_button->setEnabled (mp_database.get () && ! mp_database->generator ().empty ());
+  if (rerun_button->isEnabled ()) {
+    rerun_button->setToolTip (tl::to_qstring (tl::to_string (tr ("Run ")) + mp_database->generator ()));
+  } else {
+    rerun_button->setToolTip (QString ());
+  }
 
   show_netlist->setVisible (lvsdb != 0);
   show_xref->setVisible (lvsdb != 0);

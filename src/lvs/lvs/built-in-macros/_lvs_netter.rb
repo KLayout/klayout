@@ -61,6 +61,8 @@ module LVS
         @lvs = RBA::LayoutVsSchematic::new(cell.name, layout.dbu)
       end
 
+      @lvs.generator = $0
+
       @l2n = @lvs
       @comparer = RBA::NetlistComparer::new
 
@@ -117,8 +119,16 @@ module LVS
 
       nl = _ensure_two_netlists
 
+      unmatched_a = @comparer.unmatched_circuits_a(*nl)
+
+      # check whether we're about to flatten away the internal top cell - that's bad
+      top_cell = l2n_data.internal_top_cell.name
+      if unmatched_a.find { |c| c.name == top_cell }
+        raise("Can't find a schematic counterpart for the top cell #{top_cell} - use 'same_circuit' to establish a correspondence")
+      end
+
       # flatten layout cells for which there is no corresponding schematic circuit
-      @comparer.unmatched_circuits_a(*nl).each do |c|
+      unmatched_a.each do |c|
         @engine.info("Flatten layout cell (no schematic): #{c.name}")
         nl[0].flatten_circuit(c)
       end

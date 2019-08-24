@@ -74,6 +74,7 @@ module DRC
     
     # Implements the execute method
     def execute(macro)
+      $0 = macro.path
       DRC::execute_drc(macro)
     end
     

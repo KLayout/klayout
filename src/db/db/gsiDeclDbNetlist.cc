@@ -1106,7 +1106,7 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
     "@brief Iterates over the parent circuits of this circuit\n"
     "Child circuits are the ones that are referencing this circuit via subcircuits."
   ) +
-  gsi::method ("has_refs", &db::Circuit::has_refs,
+  gsi::method ("has_refs?", &db::Circuit::has_refs,
     "@brief Returns a value indicating whether the circuit has references\n"
     "A circuit has references if there is at least one subcircuit referring to it."
   ) +
@@ -1379,13 +1379,13 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("remove", &db::Netlist::remove_circuit, gsi::arg ("circuit"),
     "@brief Removes the given circuit object from the netlist\n"
     "After the circuit has been removed, the object becomes invalid and cannot be used further. "
-    "A circuit with references (see \\has_refs) should not be removed as the "
+    "A circuit with references (see \\has_refs?) should not be removed as the "
     "subcircuits calling it would afterwards point to nothing."
   ) +
   gsi::method ("purge_circuit", &db::Netlist::purge_circuit, gsi::arg ("circuit"),
     "@brief Removes the given circuit object and all child circuits which are not used otherwise from the netlist\n"
     "After the circuit has been removed, the object becomes invalid and cannot be used further. "
-    "A circuit with references (see \\has_refs) should not be removed as the "
+    "A circuit with references (see \\has_refs?) should not be removed as the "
     "subcircuits calling it would afterwards point to nothing."
   ) +
   gsi::method ("flatten_circuit", &db::Netlist::flatten_circuit, gsi::arg ("circuit"),

@@ -642,13 +642,15 @@ Class<tl::GlobPattern> decl_GlobPattern ("tl", "GlobPattern",
 );
 
 class Recipe_Impl
-  : public tl::Recipe
+  : public tl::Recipe, public gsi::ObjectBase
 {
 public:
   Recipe_Impl (const std::string &name, const std::string &description)
     : tl::Recipe (name, description)
   {
-    //  .. nothing yet ..
+    //  makes the object owned by the C++ side (registrar). This way we don't need to keep a
+    //  singleton instance.
+    keep ();
   }
 
   virtual tl::Variant execute (const std::map<std::string, tl::Variant> &params) const
@@ -688,9 +690,11 @@ Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
   gsi::method ("description", &Recipe_Impl::description,
     "@brief Gets the description of the recipe."
   ) +
-  gsi::method ("make", &Recipe_Impl::make, gsi::arg ("generator"),
+  gsi::method ("make", &Recipe_Impl::make, gsi::arg ("generator"), gsi::arg ("add_params", std::map<std::string, tl::Variant> ()),
     "@brief Executes the recipe given by the generator string.\n"
-    "The generator string is the one delivered with \\generator."
+    "The generator string is the one delivered with \\generator.\n"
+    "Additional parameters can be passed in \"add_params\". They have lower priority than the parameters "
+    "kept inside the generator string."
   ) +
   gsi::method ("generator", &Recipe_Impl::generator, gsi::arg ("params"),
     "@brief Delivers the generator string from the given parameters.\n"
@@ -711,9 +715,9 @@ Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
   "user requests a re-run of the DRC, the recipe will be called and \n"
   "the implementation is supposed to deliver a new database.\n"
   "\n"
-  "To register a recipe, reimplement tl::Recipe and create a singleton\n"
+  "To register a recipe, reimplement the Recipe class and create an\n"
   "instance. To serialize a recipe, use \"generator\", to execute the\n"
-  "recipe, use \"make\". \n"
+  "recipe, use \"make\".\n"
   "\n"
   "Parameters are kept as a generic key/value map.\n"
   "\n"

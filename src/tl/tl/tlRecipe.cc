@@ -51,7 +51,7 @@ std::string Recipe::generator (const std::map<std::string, tl::Variant> &params)
   return g;
 }
 
-tl::Variant Recipe::make (const std::string &generator)
+tl::Variant Recipe::make (const std::string &generator, const std::map<std::string, tl::Variant> &padd)
 {
   tl::Extractor ex (generator.c_str ());
 
@@ -68,6 +68,10 @@ tl::Variant Recipe::make (const std::string &generator)
     ex.read (v);
     ex.test (",");
     params.insert (std::make_pair (key, v));
+  }
+
+  for (std::map<std::string, tl::Variant>::const_iterator p = padd.begin (); p != padd.end (); ++p) {
+    params.insert (*p);
   }
 
   tl::Recipe *recipe_obj = 0;

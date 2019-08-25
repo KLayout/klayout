@@ -36,7 +36,8 @@ namespace {
     {
       int a = get_value (params, "A", 0);
       double b = get_value (params, "B", 0.0);
-      return tl::Variant (b * a);
+      double c = get_value (params, "C", 1.0);
+      return tl::Variant (b * a * c);
     }
   };
 
@@ -55,4 +56,9 @@ TEST(1)
 
   tl::Variant res = tl::Recipe::make (g);
   EXPECT_EQ (res.to_double (), 42.0);
+
+  std::map<std::string, tl::Variant> padd;
+  padd["C"] = tl::Variant(1.5);
+  res = tl::Recipe::make (g, padd);
+  EXPECT_EQ (res.to_double (), 63.0);
 }

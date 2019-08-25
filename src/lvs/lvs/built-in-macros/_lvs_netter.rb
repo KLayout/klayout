@@ -61,7 +61,7 @@ module LVS
         @lvs = RBA::LayoutVsSchematic::new(cell.name, layout.dbu)
       end
 
-      @lvs.generator = $0
+      @lvs.generator = @engine._generator
 
       @l2n = @lvs
       @comparer = RBA::NetlistComparer::new

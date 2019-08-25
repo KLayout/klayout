@@ -30,9 +30,9 @@
 #include "layMarker.h"
 #include "layNetInfoDialog.h"
 #include "layNetExportDialog.h"
-#include "lymMacro.h"
 #include "tlProgress.h"
 #include "tlExceptions.h"
+#include "tlRecipe.h"
 #include "dbLayoutToNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 #include "dbCellMapping.h"
@@ -600,12 +600,16 @@ NetlistBrowserPage::rerun_macro ()
 {
   if (! mp_database->generator ().empty ()) {
 
-    lym::Macro *generator = lym::MacroCollection::root ().find_macro (mp_database->generator ());
-    if (! generator) {
-      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot find generator script: %s")), mp_database->generator()));
-    } else {
-      generator->run ();
+    std::map<std::string, tl::Variant> add_pars;
+
+    for (unsigned int i = 0; i < mp_view->num_l2ndbs (); ++i) {
+      if (mp_view->get_l2ndb (i) == mp_database.get ()) {
+        add_pars["l2ndb_index"] = tl::Variant (int (i));
+        break;
+      }
     }
+
+    tl::Recipe::make (mp_database->generator (), add_pars);
 
   }
 }
@@ -767,7 +771,11 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 
   rerun_button->setEnabled (mp_database.get () && ! mp_database->generator ().empty ());
   if (rerun_button->isEnabled ()) {
-    rerun_button->setToolTip (tl::to_qstring (tl::to_string (tr ("Run ")) + mp_database->generator ()));
+    QString shortcut;
+    if (! rerun_button->shortcut ().isEmpty ()) {
+      shortcut = QString::fromUtf8 (" (%1)").arg (rerun_button->shortcut ().toString ());
+    }
+    rerun_button->setToolTip (tl::to_qstring (tl::to_string (tr ("Run ")) + mp_database->generator ()) + shortcut);
   } else {
     rerun_button->setToolTip (QString ());
   }

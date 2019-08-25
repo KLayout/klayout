@@ -141,6 +141,9 @@
              <iconset resource="../../lay/lay/layResources.qrc">
               <normaloff>:/run.png</normaloff>:/run.png</iconset>
             </property>
+            <property name="shortcut">
+             <string>F5</string>
+            </property>
             <property name="autoRaise">
              <bool>true</bool>
             </property>

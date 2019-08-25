@@ -407,7 +407,7 @@ module DRC
         @l2n = RBA::LayoutToNetlist::new(layout.top_cell.name, layout.dbu)
       end
 
-      @l2n.generator = $0
+      @l2n.generator = @engine._generator
 
     end
 

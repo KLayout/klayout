@@ -218,10 +218,16 @@ static db::LayoutVsSchematic *get_lvsdb (lay::LayoutView *view, unsigned int ind
   return dynamic_cast<db::LayoutVsSchematic *> (db);
 }
 
-static void add_lvsdb (lay::LayoutView *view, db::LayoutVsSchematic *lvsdb)
+static unsigned int add_lvsdb (lay::LayoutView *view, db::LayoutVsSchematic *lvsdb)
 {
-  view->add_l2ndb (lvsdb);
+  return view->add_l2ndb (lvsdb);
 }
+
+static unsigned int replace_lvsdb (lay::LayoutView *view, unsigned int db_index, db::LayoutVsSchematic *lvsdb)
+{
+  return view->replace_l2ndb (db_index, lvsdb);
+}
+
 
 //  this binding returns a const pointer which is not converted into a copy by RBA
 static lay::LayerPropertiesNodeRef insert_layer1 (lay::LayoutView *view, const lay::LayerPropertiesConstIterator &iter, const lay::LayerProperties &props)
@@ -1499,6 +1505,15 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been added in version 0.26."
   ) +
+  gsi::method ("replace_l2ndb", &lay::LayoutView::replace_l2ndb, gsi::arg ("db_index"), gsi::arg ("db"),
+    "@brief Replaces the database with the given index\n"
+    "\n"
+    "If the index is not valid, the database will be added to the view (see \\add_lvsdb).\n"
+    "\n"
+    "@return The index of the database within the view (see \\lvsdb)\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
   gsi::method_ext ("create_l2ndb", &create_l2ndb, gsi::arg ("name"),
     "@brief Creates a new netlist database and returns the index of the new database\n"
     "@param name The name of the new netlist database\n"
@@ -1527,6 +1542,15 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method will add an existing database to the view. It will then appear in the netlist database browser.\n"
     "A similar method is \\create_lvsdb which will create a new database within the view.\n"
+    "\n"
+    "@return The index of the database within the view (see \\lvsdb)\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method_ext ("replace_lvsdb", &replace_lvsdb, gsi::arg ("db_index"), gsi::arg ("db"),
+    "@brief Replaces the database with the given index\n"
+    "\n"
+    "If the index is not valid, the database will be added to the view (see \\add_lvsdb).\n"
     "\n"
     "@return The index of the database within the view (see \\lvsdb)\n"
     "\n"

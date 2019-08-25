@@ -265,13 +265,14 @@ class Tl_TestClass < TestBase
   class MyRecipe < RBA::Recipe
 
     def initialize
-      super("test_recipe", "description")
+      super("rba_test_recipe", "description")
     end
 
     def execute(params)
       a = params["A"] || 0
       b = params["B"] || 0.0
-      b * a
+      c = params["C"] || 1.0
+      b * a * c
     end
 
   end
@@ -285,12 +286,13 @@ class Tl_TestClass < TestBase
     my_recipe = MyRecipe::new
     my_recipe._create # makes debugging easier
 
-    assert_equal(my_recipe.name, "test_recipe")
+    assert_equal(my_recipe.name, "rba_test_recipe")
     assert_equal(my_recipe.description, "description")
 
     g = my_recipe.generator("A" => 6, "B" => 7.0)
-    assert_equal(g, "test_recipe: A=#6,B=##7")
+    assert_equal(g, "rba_test_recipe: A=#6,B=##7")
     assert_equal("%g" % RBA::Recipe::make(g).to_s, "42")
+    assert_equal("%g" % RBA::Recipe::make(g, "C" => 1.5).to_s, "63")
 
     my_recipe._destroy
     my_recipe = nil

@@ -20,6 +20,9 @@ module DRC
 
       cv = RBA::CellView::active
 
+      @generator = ""
+      @rdb_index = nil
+      @l2ndb_index = nil
       @def_layout = cv && cv.layout
       @def_cell = cv && cv.cell
       @def_path = cv && cv.filename
@@ -780,7 +783,7 @@ module DRC
       cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter of 'report'")
 
       @output_rdb_cell = @output_rdb.create_cell(cn)
-      @output_rdb.generator = $0
+      @output_rdb.generator = self._generator
       @output_rdb.top_cell_name = cn
       @output_rdb.description = description
       
@@ -1466,7 +1469,11 @@ CODE
 
           # NOTE: to prevent the netter destroying the database, we need to take it
           l2ndb = _take_data
-          l2ndb_index = view.add_l2ndb(l2ndb)
+          if self._l2ndb_index
+            l2ndb_index = view.replace_l2ndb(self._l2ndb_index, l2ndb)
+          else
+            l2ndb_index = view.add_l2ndb(l2ndb)
+          end
           view.show_l2ndb(l2ndb_index, view.active_cellview_index)
 
         end
@@ -1549,6 +1556,30 @@ CODE
       else
         return file
       end
+    end
+
+    def _generator
+      @generator
+    end
+
+    def _generator=(g)
+      @generator = g
+    end
+
+    def _rdb_index
+      @rdb_index
+    end
+
+    def _rdb_index=(i)
+      @rdb_index = i
+    end
+    
+    def _l2ndb_index
+      @l2ndb_index
+    end
+
+    def _l2ndb_index=(i)
+      @l2ndb_index = i
     end
 
   private
@@ -1717,7 +1748,7 @@ CODE
       @layout_sources[name] = src
       src
     end
-    
+
   end
  
 end

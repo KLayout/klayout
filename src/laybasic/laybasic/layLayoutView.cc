@@ -7207,6 +7207,37 @@ LayoutView::add_l2ndb (db::LayoutToNetlist *l2ndb)
   return (unsigned int)(m_l2ndbs.size () - 1);
 }
 
+unsigned int
+LayoutView::replace_l2ndb (unsigned int db_index, db::LayoutToNetlist *l2ndb)
+{
+  if (db_index < m_l2ndbs.size ()) {
+
+    std::string n = m_l2ndbs [db_index]->name ();
+
+    delete m_l2ndbs [db_index];
+    m_l2ndbs.erase (m_l2ndbs.begin () + db_index);
+
+    //  keep old name if possible
+    if (l2ndb->name ().empty ()) {
+      l2ndb->set_name (n);
+    } else {
+      make_unique_name (l2ndb, m_l2ndbs.begin (), m_l2ndbs.end ());
+    }
+
+    m_l2ndbs.insert (m_l2ndbs.begin () + db_index, l2ndb);
+
+    //  Mark this object as owned by us (for GSI)
+    l2ndb->keep ();
+
+    l2ndb_list_changed_event ();
+
+    return db_index;
+
+  } else {
+    return add_l2ndb (l2ndb);
+  }
+}
+
 db::LayoutToNetlist *
 LayoutView::get_l2ndb (int index)
 {

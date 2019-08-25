@@ -104,8 +104,10 @@ public:
    *  @brief Executes the recipe from the generator
    *
    *  Returns nil if the recipe can't be executed, e.g. because the recipe isn't known.
+   *  Additional parameters can be passed in the second argument.
+   *  They have lower priority than the parameters kept in the generator argument.
    */
-  static tl::Variant make (const std::string &generator);
+  static tl::Variant make (const std::string &generator, const std::map<std::string, tl::Variant> &params = std::map<std::string, tl::Variant> ());
 
   /**
    *  @brief Recipe interface: executes the recipe with the given parameters

@@ -62,6 +62,9 @@ public:
 private:
   Ui::GridNetConfigPage *mp_ui;
   lay::ColorButton *mp_grid_color_cbtn;
+  lay::ColorButton *mp_grid_grid_color_cbtn;
+  lay::ColorButton *mp_grid_axis_color_cbtn;
+  lay::ColorButton *mp_grid_ruler_color_cbtn;
 };
 
 class GridNet
@@ -92,6 +95,9 @@ private:
   bool m_show_ruler;
   double m_grid;
   QColor m_color;
+  QColor m_grid_color;
+  QColor m_axis_color;
+  QColor m_ruler_color;
   GridStyle m_style0;
   GridStyle m_style1;
   GridStyle m_style2;

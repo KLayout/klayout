@@ -262,6 +262,42 @@ class Tl_TestClass < TestBase
 
   end
 
+  class MyRecipe < RBA::Recipe
+
+    def initialize
+      super("test_recipe", "description")
+    end
+
+    def execute(params)
+      a = params["A"] || 0
+      b = params["B"] || 0.0
+      b * a
+    end
+
+  end
+
+  # Recipe
+  def test_4_Recipe
+
+    # make sure there isn't a second instance
+    GC.start
+
+    my_recipe = MyRecipe::new
+    my_recipe._create # makes debugging easier
+
+    assert_equal(my_recipe.name, "test_recipe")
+    assert_equal(my_recipe.description, "description")
+
+    g = my_recipe.generator("A" => 6, "B" => 7.0)
+    assert_equal(g, "test_recipe: A=#6,B=##7")
+    assert_equal("%g" % RBA::Recipe::make(g).to_s, "42")
+
+    my_recipe._destroy
+    my_recipe = nil
+    GC.start
+
+  end
+
 end
 
 load("test_epilogue.rb")

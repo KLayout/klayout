@@ -1448,10 +1448,19 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@return The \\ReportDatabase object or nil if the index is not valid"
   ) +
   gsi::method ("add_rdb", &lay::LayoutView::add_rdb, gsi::arg ("db"),
-    "@brief Adds the given database to the view\n"
+    "@brief Adds the given report database to the view\n"
     "\n"
     "This method will add an existing database to the view. It will then appear in the marker database browser.\n"
     "A similar method is \\create_rdb which will create a new database within the view.\n"
+    "\n"
+    "@return The index of the database within the view (see \\rdb)\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
+  gsi::method ("replace_rdb", &lay::LayoutView::replace_rdb, gsi::arg ("db_index"), gsi::arg ("db"),
+    "@brief Replaces the report database with the given index\n"
+    "\n"
+    "If the index is not valid, the database will be added to the view (see \\add_rdb).\n"
     "\n"
     "@return The index of the database within the view (see \\rdb)\n"
     "\n"
@@ -1496,7 +1505,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "This method has been added in version 0.26."
   ) +
   gsi::method ("add_l2ndb", &lay::LayoutView::add_l2ndb, gsi::arg ("db"),
-    "@brief Adds the given database to the view\n"
+    "@brief Adds the given netlist database to the view\n"
     "\n"
     "This method will add an existing database to the view. It will then appear in the netlist database browser.\n"
     "A similar method is \\create_l2ndb which will create a new database within the view.\n"
@@ -1506,7 +1515,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "This method has been added in version 0.26."
   ) +
   gsi::method ("replace_l2ndb", &lay::LayoutView::replace_l2ndb, gsi::arg ("db_index"), gsi::arg ("db"),
-    "@brief Replaces the database with the given index\n"
+    "@brief Replaces the netlist database with the given index\n"
     "\n"
     "If the index is not valid, the database will be added to the view (see \\add_lvsdb).\n"
     "\n"

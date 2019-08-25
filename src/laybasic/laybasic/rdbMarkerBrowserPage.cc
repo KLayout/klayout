@@ -26,6 +26,7 @@
 
 #include "dbLayoutUtils.h"
 
+#include "tlRecipe.h"
 #include "layLayoutView.h"
 #include "layMarker.h"
 
@@ -1463,7 +1464,8 @@ MarkerBrowserPage::MarkerBrowserPage (QWidget * /*parent*/)
     m_marker_list_sort_order (Qt::DescendingOrder),
     m_directory_tree_sorted_section (-1),
     m_directory_tree_sort_order (Qt::DescendingOrder),
-    mp_plugin_root (0)
+    mp_plugin_root (0),
+    dm_rerun_macro (this, &MarkerBrowserPage::rerun_macro)
 {
   Ui::MarkerBrowserPage::setupUi (this);
 
@@ -1514,6 +1516,7 @@ MarkerBrowserPage::MarkerBrowserPage (QWidget * /*parent*/)
   connect (info_text, SIGNAL (anchorClicked (const QUrl &)), this, SLOT (info_anchor_clicked (const QUrl &)));
   connect (cat_filter, SIGNAL (textEdited (const QString &)), this, SLOT (filter_changed ()));
   connect (cell_filter, SIGNAL (textEdited (const QString &)), this, SLOT (filter_changed ()));
+  connect (rerun_button, SIGNAL (pressed ()), this, SLOT (rerun_button_pressed ()));
 
   m_show_all_action = new QAction (QObject::tr ("Show All"), this);
   m_show_all_action->setCheckable (true);
@@ -1677,6 +1680,17 @@ MarkerBrowserPage::set_rdb (rdb::Database *database)
     release_markers ();
 
     mp_database = database;
+
+    rerun_button->setEnabled (mp_database && ! mp_database->generator ().empty ());
+    if (rerun_button->isEnabled ()) {
+      QString shortcut;
+      if (! rerun_button->shortcut ().isEmpty ()) {
+        shortcut = QString::fromUtf8 (" (%1)").arg (rerun_button->shortcut ().toString ());
+      }
+      rerun_button->setToolTip (tl::to_qstring (tl::to_string (tr ("Run ")) + mp_database->generator ()) + shortcut);
+    } else {
+      rerun_button->setToolTip (QString ());
+    }
 
     QAbstractItemModel *tree_model = directory_tree->model ();
 
@@ -2641,6 +2655,32 @@ MarkerBrowserPage::flag_button_clicked ()
   }
 
   list_model->mark_data_changed ();
+}
+
+void
+MarkerBrowserPage::rerun_button_pressed ()
+{
+  //  NOTE: we use deferred execution, because otherwise the button won't get repainted properly
+  dm_rerun_macro ();
+}
+
+void
+MarkerBrowserPage::rerun_macro ()
+{
+  if (! mp_database->generator ().empty ()) {
+
+    std::map<std::string, tl::Variant> add_pars;
+
+    for (unsigned int i = 0; i < mp_view->num_rdbs (); ++i) {
+      if (mp_view->get_rdb (i) == mp_database) {
+        add_pars["rdb_index"] = tl::Variant (int (i));
+        break;
+      }
+    }
+
+    tl::Recipe::make (mp_database->generator (), add_pars);
+
+  }
 }
 
 void

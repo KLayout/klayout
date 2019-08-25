@@ -763,10 +763,17 @@ module DRC
       name = filename && File::basename(filename)
       name ||= "DRC"
       
-      lv = RBA::LayoutView::current
-      if lv
-        @output_rdb_index = lv.create_rdb(name)
-        @output_rdb = lv.rdb(@output_rdb_index)
+      @output_rdb_index = nil
+
+      view = RBA::LayoutView::current
+      if view
+        if self._rdb_index
+          @output_rdb = RBA::ReportDatabase::new("")   # reuse existing name
+          @output_rdb_index = view.replace_rdb(self._rdb_index, @output_rdb)
+        else
+          @output_rdb = RBA::ReportDatabase::new(name)
+          @output_rdb_index = view.add_rdb(@output_rdb)
+        end
       else
         @output_rdb = RBA::ReportDatabase::new(name)
       end

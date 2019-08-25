@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MarkerBrowserDialog</class>
- <widget class="QDialog" name="MarkerBrowserDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="MarkerBrowserDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,40 +10,75 @@
     <height>553</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Marker Database Browser</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QFrame" name="frame_3" >
-     <property name="frameShape" >
+    <widget class="QFrame" name="frame_3">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="leftMargin">
        <number>0</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="0" column="2" >
+      <item row="0" column="3">
+       <widget class="QToolButton" name="file_menu">
+        <property name="text">
+         <string>File ...  </string>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::InstantPopup</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>    ... on layout </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>20</height>
@@ -50,152 +86,133 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="1" >
-       <widget class="QComboBox" name="rdb_cb" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>7</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="rdb_cb">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="sizeAdjustPolicy" >
+        <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
          <string>Database </string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>    ... on layout </string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="layout_cb" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>7</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="layout_cb">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="sizeAdjustPolicy" >
+        <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
         </property>
        </widget>
-      </item>
-      <item row="0" column="3" >
-       <widget class="QToolButton" name="file_menu" >
-        <property name="text" >
-         <string>File ...  </string>
-        </property>
-        <property name="popupMode" >
-         <enum>QToolButton::InstantPopup</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="4" >
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>20</width>
-          <height>10</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame_4" >
-     <property name="frameShape" >
+    <widget class="QFrame" name="frame_4">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QStackedWidget" name="central_stack" >
-        <property name="currentIndex" >
+       <widget class="QStackedWidget" name="central_stack">
+        <property name="currentIndex">
          <number>1</number>
         </property>
-        <widget class="QWidget" name="page" >
-         <layout class="QVBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
+        <widget class="QWidget" name="page">
+         <layout class="QVBoxLayout">
+          <property name="spacing">
            <number>6</number>
           </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="rdb::MarkerBrowserPage" name="browser_frame" >
-            <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>13</hsizetype>
-              <vsizetype>13</vsizetype>
+           <widget class="rdb::MarkerBrowserPage" name="browser_frame">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="frameShape" >
+            <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
             </property>
-            <property name="frameShadow" >
+            <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="page_2" >
-         <layout class="QVBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
+        <widget class="QWidget" name="page_2">
+         <layout class="QVBoxLayout">
+          <property name="spacing">
            <number>6</number>
           </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="QLabel" name="label_2" >
-            <property name="text" >
-             <string>Choose "Open" from the "File ..." menu 
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Choose &quot;Open&quot; from the &quot;File ...&quot; menu 
 to load a marker database</string>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <property name="wordWrap" >
+            <property name="wordWrap">
              <bool>true</bool>
             </property>
            </widget>
@@ -208,40 +225,49 @@ to load a marker database</string>
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line_2" >
-     <property name="orientation" >
+    <widget class="Line" name="line_2">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="frame_2" >
-     <property name="frameShape" >
+    <widget class="QFrame" name="frame_2">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QPushButton" name="configure_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="configure_pb">
+        <property name="text">
          <string>Configure</string>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -250,8 +276,8 @@ to load a marker database</string>
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2" >
-        <property name="text" >
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
          <string>Close</string>
         </property>
        </widget>
@@ -266,6 +292,7 @@ to load a marker database</string>
    <class>rdb::MarkerBrowserPage</class>
    <extends>QFrame</extends>
    <header>rdbMarkerBrowserPage.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -282,11 +309,11 @@ to load a marker database</string>
    <receiver>MarkerBrowserDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>837</x>
      <y>441</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>881</x>
      <y>387</y>
     </hint>

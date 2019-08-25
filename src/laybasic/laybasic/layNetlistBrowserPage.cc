@@ -613,6 +613,7 @@ NetlistBrowserPage::rerun_macro ()
 
   }
 }
+
 void
 NetlistBrowserPage::info_button_pressed ()
 {

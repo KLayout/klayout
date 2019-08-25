@@ -61,6 +61,7 @@ module LVS
         @lvs = RBA::LayoutVsSchematic::new(cell.name, layout.dbu)
       end
 
+      @lvs.name = "LVS"
       @lvs.generator = @engine._generator
 
       @l2n = @lvs

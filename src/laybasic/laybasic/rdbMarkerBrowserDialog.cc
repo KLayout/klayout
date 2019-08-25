@@ -671,6 +671,7 @@ MarkerBrowserDialog::update_content ()
   m_reload_action->setEnabled (rdb != 0);
 
   browser_frame->enable_updates (false);  //  Avoid building the internal lists several times ...
+  browser_frame->set_rdb (0);    //  force update
   browser_frame->set_rdb (rdb);
   browser_frame->set_max_marker_count (m_max_marker_count);
   browser_frame->set_marker_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern);

@@ -681,7 +681,7 @@ static Recipe_Impl *make_recipe (const std::string &name, const std::string &des
 }
 
 Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
-  gsi::constructor ("new", &make_recipe, gsi::arg ("name"), gsi::arg ("description", std::string ()),
+  gsi::constructor ("new", &make_recipe, gsi::arg ("name"), gsi::arg ("description", std::string (), "\"\""),
     "@brief Creates a new recipe object with the given name and (optional) description"
   ) +
   gsi::method ("name", &Recipe_Impl::name,
@@ -690,7 +690,7 @@ Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
   gsi::method ("description", &Recipe_Impl::description,
     "@brief Gets the description of the recipe."
   ) +
-  gsi::method ("make", &Recipe_Impl::make, gsi::arg ("generator"), gsi::arg ("add_params", std::map<std::string, tl::Variant> ()),
+  gsi::method ("make", &Recipe_Impl::make, gsi::arg ("generator"), gsi::arg ("add_params", std::map<std::string, tl::Variant> (), "{}"),
     "@brief Executes the recipe given by the generator string.\n"
     "The generator string is the one delivered with \\generator.\n"
     "Additional parameters can be passed in \"add_params\". They have lower priority than the parameters "
@@ -700,7 +700,7 @@ Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
     "@brief Delivers the generator string from the given parameters.\n"
     "The generator string can be used with \\make to re-run the recipe."
   ) +
-  gsi::callback ("execute", &Recipe_Impl::execute, &Recipe_Impl::execute_cb,
+  gsi::callback ("execute", &Recipe_Impl::execute, &Recipe_Impl::execute_cb, gsi::arg ("params"),
     "@brief Reimplement this method to provide the functionality of the recipe.\n"
     "This method is supposed to re-run the recipe with the given parameters and deliver the "
     "the intended output object."

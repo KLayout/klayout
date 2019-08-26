@@ -126,7 +126,7 @@ StreamImportData::setup_importer (StreamImporter *importer)
   importer->set_reference_points (reference_points);
   importer->set_cell_mapping (mode);
   importer->set_layer_mapping (layer_mode);
-  importer->set_file (file);
+  importer->set_files (files);
   importer->set_topcell (topcell);
   importer->set_layer_offset (layer_offset);
   importer->set_reader_options (options);
@@ -136,9 +136,12 @@ static tl::XMLElementList xml_elements ()
 {
   typedef std::pair <db::DPoint, db::DPoint> ref_point;
   typedef std::vector<ref_point> ref_point_v;
+  typedef std::vector<std::string> string_v;
 
   return
-    tl::make_member (&StreamImportData::file, "file") +
+    tl::make_element (&StreamImportData::files, "files",
+      tl::make_member<std::string, string_v::const_iterator, string_v> (&string_v::begin, &string_v::end, &string_v::push_back, "file")
+    ) +
     tl::make_member (&StreamImportData::topcell, "cell-name") +
     tl::make_member (&StreamImportData::layer_offset, "layer-offset") +
     tl::make_member (&StreamImportData::layer_mode, "layer-mode", LayerModeConverter ()) +
@@ -217,10 +220,14 @@ StreamImportDialog::reset_options ()
 void  
 StreamImportDialog::browse_filename ()
 {
-  QString file = mp_ui->file_le->text ();
-  file = QFileDialog::getOpenFileName (this, QObject::tr ("File To Import"), file, QObject::tr ("All files (*)"));
-  if (! file.isNull ()) {
-    mp_ui->file_le->setText (file);
+  QStringList files = mp_ui->files_te->toPlainText ().split (QString::fromUtf8 ("\n"));
+  QString file;
+  if (! files.isEmpty ()) {
+    file = files.front ();
+  }
+  files = QFileDialog::getOpenFileNames (this, QObject::tr ("File To Import"), file, QObject::tr ("All files (*)"));
+  if (! files.isEmpty ()) {
+    mp_ui->files_te->setPlainText (files.join (QString::fromUtf8 ("\n")));
   }
 }
 
@@ -319,7 +326,7 @@ StreamImportDialog::commit_page ()
   if (page == 0) {
 
     //  --- General page
-    mp_data->file = tl::to_string (mp_ui->file_le->text ());
+    mp_data->files = tl::split (tl::to_string (mp_ui->files_te->toPlainText ()), "\n");
     mp_data->topcell = tl::to_string (mp_ui->topcell_le->text ());
     if (mp_ui->import_simple_rb->isChecked ()) {
       mp_data->mode = StreamImportData::Simple;
@@ -426,7 +433,7 @@ StreamImportDialog::update ()
   mp_ui->section_header_lbl->setText (tl::to_qstring (section_headers [page]));
 
   //  --- General page
-  mp_ui->file_le->setText (tl::to_qstring (mp_data->file));
+  mp_ui->files_te->setPlainText (tl::to_qstring (tl::join (mp_data->files, "\n")));
   mp_ui->topcell_le->setText (tl::to_qstring (mp_data->topcell));
   mp_ui->import_simple_rb->setChecked (mp_data->mode == StreamImportData::Simple);
   mp_ui->import_extra_rb->setChecked (mp_data->mode == StreamImportData::Extra);

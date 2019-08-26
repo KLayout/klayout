@@ -93,19 +93,19 @@ public:
   }
 
   /**
-   *  @brief Set file which is read.
+   *  @brief Set files which are read.
    */
-  void set_file (const std::string &file)
+  void set_files (const std::vector<std::string> &files)
   {
-    m_file = file;
+    m_files = files;
   }
 
   /**
    *  @brief Get the file which is read
    */
-  const std::string &file () const
+  const std::vector<std::string> &files () const
   {
-    return m_file;
+    return m_files;
   }
 
   /**
@@ -192,7 +192,7 @@ public:
   }
 
 private:
-  std::string m_file;
+  std::vector<std::string> m_files;
   std::string m_topcell;
   db::DCplxTrans m_global_trans;
   std::vector <std::pair <db::DPoint, db::DPoint> > m_reference_points;

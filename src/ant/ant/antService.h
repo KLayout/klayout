@@ -427,6 +427,11 @@ public:
   AnnotationIterator begin_annotations () const;
 
   /**
+   *  @brief Creates an auto-measure ruler at the given point with the given angle constraint
+   */
+  ant::Object create_measure_ruler(const db::DPoint &pt, lay::angle_constraint_type ac);
+
+  /**
    *  @brief An event triggered when the annotations changed
    *  When an annotation is added or removed, this event is triggered.
    */

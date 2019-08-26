@@ -913,7 +913,7 @@ DXFReader::spline_interpolation (std::vector<db::DPoint> &points, int n, const s
   std::list<db::DPoint> new_points;
   new_points.push_back (points.front ());
 
-  double dt = 0.5 * (tn + t0);
+  double dt = 0.5 * (tn - t0);
 
   for (double t = t0 + dt; t < tn + 1e-6; t += dt) {
 

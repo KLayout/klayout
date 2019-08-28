@@ -204,6 +204,24 @@ static void replace_annotation (lay::LayoutView *view, int id, const AnnotationR
   }
 }
 
+static AnnotationRef create_measure_ruler (lay::LayoutView *view, const db::DPoint &pt, int angle_constraint)
+{
+  std::vector<ant::Service *> ant_services = view->get_plugins <ant::Service> ();
+  if (! ant_services.empty ()) {
+
+    ant::Object ant = ant_services.front ()->create_measure_ruler (pt, lay::angle_constraint_type (angle_constraint));
+
+    int id = ant_services.front ()->insert_ruler (ant, false /*do not observe the ruler count limit*/);
+    AnnotationRef ant_ref (ant, view);
+    ant_ref.id (id);
+
+    return ant_ref;
+
+  } else {
+    return AnnotationRef ();
+  }
+}
+
 static int get_style (const AnnotationRef *obj)
 {
   return int (obj->style ());
@@ -638,39 +656,34 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "coordinates.\n"
     "@return The second point\n"
   ) +
-  gsi::method ("p1=", (void (AnnotationRef::*) (const db::DPoint &)) &AnnotationRef::p1,
+  gsi::method ("p1=", (void (AnnotationRef::*) (const db::DPoint &)) &AnnotationRef::p1, gsi::arg ("point"),
     "@brief Sets the first point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
-    "@args point\n"
   ) +
-  gsi::method ("p2=", (void (AnnotationRef::*) (const db::DPoint &)) &AnnotationRef::p2,
+  gsi::method ("p2=", (void (AnnotationRef::*) (const db::DPoint &)) &AnnotationRef::p2, gsi::arg ("point"),
     "@brief Sets the second point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
-    "@args point\n"
   ) +
   gsi::method ("box", &AnnotationRef::box,
     "@brief Gets the bounding box of the object (not including text)\n"
     "@return The bounding box\n"
   ) +
-  gsi::method ("transformed", &AnnotationRef::transformed<db::DTrans>,
+  gsi::method ("transformed", &AnnotationRef::transformed<db::DTrans>, gsi::arg ("t"),
     "@brief Transforms the ruler or marker with the given simple transformation\n"
-    "@args t\n"
     "@param t The transformation to apply\n"
     "@return The transformed object\n"
   ) +
-  gsi::method ("transformed|#transformed_cplx", &AnnotationRef::transformed<db::DCplxTrans>,
+  gsi::method ("transformed|#transformed_cplx", &AnnotationRef::transformed<db::DCplxTrans>, gsi::arg ("t"),
     "@brief Transforms the ruler or marker with the given complex transformation\n"
-    "@args t\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed object\n"
     "\n"
     "Starting with version 0.25, all overloads all available as 'transform'."
   ) +
-  gsi::method ("transformed|#transformed_cplx", &AnnotationRef::transformed<db::ICplxTrans>,
+  gsi::method ("transformed|#transformed_cplx", &AnnotationRef::transformed<db::ICplxTrans>, gsi::arg ("t"),
     "@brief Transforms the ruler or marker with the given complex transformation\n"
-    "@args t\n"
     "@param t The magnifying transformation to apply\n"
     "@return The transformed object (in this case an integer coordinate object)\n"
     "\n"
@@ -678,9 +691,8 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "\n"
     "Starting with version 0.25, all overloads all available as 'transform'."
   ) +
-  gsi::method ("fmt=", (void (AnnotationRef::*) (const std::string &)) &AnnotationRef::fmt,
+  gsi::method ("fmt=", (void (AnnotationRef::*) (const std::string &)) &AnnotationRef::fmt, gsi::arg ("format"),
     "@brief Sets the format used for the label\n"
-    "@args format\n"
     "@param format The format string\n"
     "Format strings can contain placeholders for values and formulas for computing derived "
     "values. See @<a href=\"/manual/ruler_properties.xml\">Ruler properties@</a> for "
@@ -693,9 +705,8 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "values. See @<a href=\"/manual/ruler_properties.xml\">Ruler properties@</a> for "
     "more details."
   ) +
-  gsi::method ("fmt_x=", (void (AnnotationRef::*) (const std::string &)) &AnnotationRef::fmt_x,
+  gsi::method ("fmt_x=", (void (AnnotationRef::*) (const std::string &)) &AnnotationRef::fmt_x, gsi::arg ("format"),
     "@brief Sets the format used for the x-axis label\n"
-    "@args format\n"
     "X-axis labels are only used for styles that have a horizontal component. "
     "@param format The format string\n"
     "Format strings can contain placeholders for values and formulas for computing derived "
@@ -709,9 +720,8 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "values. See @<a href=\"/manual/ruler_properties.xml\">Ruler properties@</a> for "
     "more details."
   ) +
-  gsi::method ("fmt_y=", (void (AnnotationRef::*) (const std::string &)) &AnnotationRef::fmt_y,
+  gsi::method ("fmt_y=", (void (AnnotationRef::*) (const std::string &)) &AnnotationRef::fmt_y, gsi::arg ("format"),
     "@brief Sets the format used for the y-axis label\n"
-    "@args format\n"
     "Y-axis labels are only used for styles that have a vertical component. "
     "@param format The format string\n"
     "Format strings can contain placeholders for values and formulas for computing derived "
@@ -725,18 +735,16 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "values. See @<a href=\"/manual/ruler_properties.xml\">Ruler properties@</a> for "
     "more details."
   ) +
-  gsi::method_ext ("style=", &gsi::set_style, 
+  gsi::method_ext ("style=", &gsi::set_style, gsi::arg ("style"),
     "@brief Sets the style used for drawing the annotation object\n"
-    "@args style\n"
     "The Style... values can be used for defining the annotation object's style. The style determines "
     "if ticks or arrows are drawn."
   ) +
   gsi::method_ext ("style", &gsi::get_style,
     "@brief Returns the style of the annotation object\n"
   ) +
-  gsi::method_ext ("outline=", &gsi::set_outline,
+  gsi::method_ext ("outline=", &gsi::set_outline, gsi::arg ("outline"),
     "@brief Sets the outline style used for drawing the annotation object\n"
-    "@args outline\n"
     "The Outline... values can be used for defining the annotation object's outline. The "
     "outline style determines what components are drawn. "
   ) +
@@ -840,17 +848,15 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "\n"
     "This method has been introduced in version 0.25"
   ) +
-  gsi::method ("snap=", (void (AnnotationRef::*) (bool)) &AnnotationRef::snap,
+  gsi::method ("snap=", (void (AnnotationRef::*) (bool)) &AnnotationRef::snap, gsi::arg ("flag"),
     "@brief Sets the 'snap to objects' attribute\n"
-    "@args flag\n"
     "If this attribute is set to true, the ruler or marker snaps to other objects when moved. "
   ) +
   gsi::method ("snap?", (bool (AnnotationRef::*) () const) &AnnotationRef::snap,
     "@brief Returns the 'snap to objects' attribute\n"
   ) +
-  gsi::method_ext ("angle_constraint=", &gsi::set_angle_constraint,
+  gsi::method_ext ("angle_constraint=", &gsi::set_angle_constraint, gsi::arg ("flag"),
     "@brief Sets the angle constraint attribute\n"
-    "@args flag\n"
     "This attribute controls if an angle constraint is applied when moving one of the ruler's "
     "points. The Angle... values can be used for this purpose." 
   ) +
@@ -887,13 +893,11 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "\n"
     "This method was introduced in version 0.19."
   ) +
-  gsi::method ("==", &AnnotationRef::operator==,
+  gsi::method ("==", &AnnotationRef::operator==, gsi::arg ("other"),
     "@brief Equality operator\n"
-    "@args other"
   ) +
-  gsi::method ("!=", &AnnotationRef::operator!=,
+  gsi::method ("!=", &AnnotationRef::operator!=, gsi::arg ("other"),
     "@brief Inequality operator\n"
-    "@args other"
   ),
   "@brief A layout annotation (i.e. ruler)\n"
   "\n"
@@ -998,6 +1002,28 @@ gsi::ClassExt<lay::LayoutView> layout_view_decl (
   ) +
   gsi::iterator_ext ("each_annotation", &gsi::begin_annotations,
     "@brief Iterates over all annotations attached to this view"
+  ) +
+  gsi::method_ext ("create_measure_ruler", &gsi::create_measure_ruler, gsi::arg ("point"), gsi::arg ("ac", int (lay::AC_Any), "\\Annotation#AngleAny"),
+    "@brief Createas an auto-measure ruler at the given point.\n"
+    "\n"
+    "@param point The seed point where to create the auto-measure ruler\n"
+    "@param ac The orientation constraints (determines the search direction too)\n"
+    "\n"
+    "The \\ac parameters takes one of the Angle... constants from \\Annotation.\n"
+    "\n"
+    "This method will create a ruler with a measurement, looking to the sides of the seed point for "
+    "visible layout in the vicinity. The angle constraint determines the main directions where to look. "
+    "If suitable edges are found, the method will pull a line between the closest "
+    "edges. The ruler's endpoints will sit on these lines and the ruler's length will be the distance.\n"
+    "Only visible layers will participate in the measurement.\n"
+    "\n"
+    "The new ruler is inserted into the view already. It is created with the default style of rulers.\n"
+    "If the measurement fails because there is no layout in the vicinity, a ruler with identical start and end "
+    "points will be created.\n"
+    "\n"
+    "@return The new ruler object\n"
+    "\n"
+    "This method was introduced in version 0.26."
   ),
   ""
 );
@@ -1073,7 +1099,6 @@ static AnnotationSelectionIterator begin_annotations_selected (const lay::Layout
 {
   return AnnotationSelectionIterator (view->get_plugins <ant::Service> ());
 }
-
 
 static
 gsi::ClassExt<lay::LayoutView> layout_view_decl2 (

@@ -3043,14 +3043,12 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
           ++i;
         }
 
-        if (i == unmatched_a.end () && j == unmatched_b.end ()) {
+        if (i == unmatched_a.end () || j == unmatched_b.end ()) {
           break;
         }
 
         unmatched_list::iterator ii = i, jj = j;
         ++i, ++j;
-        size_t n = ii->first.size ();
-        tl_assert (n == jj->first.size ());
 
         while (i != unmatched_a.end () && cmp.equals (*i, *ii)) {
           ++i;
@@ -3211,7 +3209,7 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
           ++i;
         }
 
-        if (i == unmatched_a.end () && j == unmatched_b.end ()) {
+        if (i == unmatched_a.end () || j == unmatched_b.end ()) {
           break;
         }
 

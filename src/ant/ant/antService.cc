@@ -1499,6 +1499,22 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
   return false;
 }
 
+ant::Object
+Service::create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type ac)
+{
+  double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
+  snap_range *= 0.5;
+
+  ant::Template tpl;
+
+  std::pair<bool, db::DEdge> ee = lay::obj_snap2 (mp_view, pt, db::DVector (), ac, snap_range, snap_range * 1000.0);
+  if (ee.first) {
+    return ant::Object (ee.second.p1 (), ee.second.p2 (), 0, tpl);
+  } else {
+    return ant::Object (pt, pt, 0, tpl);
+  }
+}
+
 bool 
 Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 {

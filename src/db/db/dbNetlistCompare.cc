@@ -2711,185 +2711,169 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 }
 
 void
+NetlistComparer::handle_pin_mismatch (const db::Circuit *c1, const db::Pin *pin1, const db::Circuit *c2, const db::Pin *pin2, bool &good, bool &pin_mismatch) const
+{
+  //  Determine whether the pin in question is used - only in this case we will report an error.
+  //  Otherwise, the report will be "match" against 0.
+
+  const db::Circuit *c = pin1 ? c1 : c2;
+  const db::Pin *pin = pin1 ? pin1 : pin2;
+
+  bool is_not_connected = true;
+  for (db::Circuit::const_refs_iterator r = c->begin_refs (); r != c->end_refs () && is_not_connected; ++r) {
+    const db::SubCircuit *sc = r.operator-> ();
+    const db::Net *net = sc->net_for_pin (pin->id ());
+    if (net && ((net->terminal_count () + net->pin_count ()) > 0 || net->subcircuit_pin_count () > 1)) {
+      is_not_connected = false;
+    }
+  }
+
+  if (is_not_connected) {
+    if (mp_logger) {
+      mp_logger->match_pins (pin1, pin2);
+    }
+  } else {
+    if (mp_logger) {
+      mp_logger->pin_mismatch (pin1, pin2);
+    }
+    good = false;
+    pin_mismatch = true;
+  }
+}
+
+void
 NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &pin_mismatch, bool &good) const
 {
   //  Report pin assignment
   //  This step also does the pin identity mapping.
 
-  if (c1->pin_count () > 0 && c2->pin_count () > 0) {
+  //  try to assign floating pins by name with higher prio
+  std::map<std::string, std::pair<const db::Pin *, const db::Pin *> > floating_pins_by_name;
 
-    //  try to assign floating pins by name with higher prio
-    std::map<std::string, std::pair<const db::Pin *, const db::Pin *> > floating_pins_by_name;
-
-    for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
-      const db::Net *net = c2->net_for_pin (p->id ());
-      if (!net && !p->name ().empty ()) {
-        floating_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.second = p.operator-> ();
-      }
+  for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
+    const db::Net *net = c2->net_for_pin (p->id ());
+    if (!net && !p->name ().empty ()) {
+      floating_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.second = p.operator-> ();
     }
+  }
 
-    for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
-      const db::Net *net = c1->net_for_pin (p->id ());
-      if (!net && !p->name ().empty ()) {
-        floating_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.first = p.operator-> ();
-      }
+  for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
+    const db::Net *net = c1->net_for_pin (p->id ());
+    if (!net && !p->name ().empty ()) {
+      floating_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.first = p.operator-> ();
     }
+  }
 
-    std::map<const db::Pin *, const db::Pin *> floating_pin_name_mapping;
-    for (std::map<std::string, std::pair<const db::Pin *, const db::Pin *> >::const_iterator i = floating_pins_by_name.begin (); i != floating_pins_by_name.end (); ++i) {
-      if (i->second.first && i->second.second) {
-        floating_pin_name_mapping [i->second.first] = i->second.second;
-        floating_pin_name_mapping [i->second.second] = i->second.first;
-      }
+  std::map<const db::Pin *, const db::Pin *> floating_pin_name_mapping;
+  for (std::map<std::string, std::pair<const db::Pin *, const db::Pin *> >::const_iterator i = floating_pins_by_name.begin (); i != floating_pins_by_name.end (); ++i) {
+    if (i->second.first && i->second.second) {
+      floating_pin_name_mapping [i->second.first] = i->second.second;
+      floating_pin_name_mapping [i->second.second] = i->second.first;
     }
+  }
 
-    std::vector<const db::Pin *> floating_pins;
-    std::multimap<size_t, const db::Pin *> net2pin;
-    for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
-      const db::Net *net = c2->net_for_pin (p->id ());
-      if (net) {
-        net2pin.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
-      } else if (floating_pin_name_mapping.find (p.operator-> ()) == floating_pin_name_mapping.end ()) {
-        floating_pins.push_back (p.operator-> ());
-      }
+  std::vector<const db::Pin *> floating_pins;
+  std::multimap<size_t, const db::Pin *> net2pin;
+  for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
+    const db::Net *net = c2->net_for_pin (p->id ());
+    if (net) {
+      net2pin.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
+    } else if (floating_pin_name_mapping.find (p.operator-> ()) == floating_pin_name_mapping.end ()) {
+      floating_pins.push_back (p.operator-> ());
     }
+  }
 
-    std::vector<const db::Pin *>::iterator next_float = floating_pins.begin ();
+  std::vector<const db::Pin *>::iterator next_float = floating_pins.begin ();
 
-    CircuitMapper &c12_pin_mapping = c12_circuit_and_pin_mapping [c1];
-    c12_pin_mapping.set_other (c2);
+  CircuitMapper &c12_pin_mapping = c12_circuit_and_pin_mapping [c1];
+  c12_pin_mapping.set_other (c2);
 
-    //  dummy mapping: we show this circuit is used.
-    CircuitMapper &c22_pin_mapping = c22_circuit_and_pin_mapping [c2];
-    c22_pin_mapping.set_other (c2);
+  //  dummy mapping: we show this circuit is used.
+  CircuitMapper &c22_pin_mapping = c22_circuit_and_pin_mapping [c2];
+  c22_pin_mapping.set_other (c2);
 
-    for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
+  for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
 
-      const db::Net *net = c1->net_for_pin (p->id ());
-      if (! net) {
+    const db::Net *net = c1->net_for_pin (p->id ());
+    if (! net) {
 
-        std::map<const db::Pin *, const db::Pin *>::const_iterator fp = floating_pin_name_mapping.find (p.operator-> ());
-        if (fp != floating_pin_name_mapping.end ()) {
+      std::map<const db::Pin *, const db::Pin *>::const_iterator fp = floating_pin_name_mapping.find (p.operator-> ());
+      if (fp != floating_pin_name_mapping.end ()) {
 
-          //  assign a floating pin - this is a dummy assignment which is mitigated
-          //  by declaring the pins equivalent in derive_pin_equivalence
-          if (mp_logger) {
-            mp_logger->match_pins (p.operator-> (), fp->second);
-          }
-          c12_pin_mapping.map_pin (p->id (), fp->second->id ());
-          c22_pin_mapping.map_pin (fp->second->id (), p->id ());
-
-        } else if (next_float != floating_pins.end ()) {
-
-          //  assign a floating pin - this is a dummy assignment which is mitigated
-          //  by declaring the pins equivalent in derive_pin_equivalence
-          if (mp_logger) {
-            mp_logger->match_pins (p.operator-> (), *next_float);
-          }
-          c12_pin_mapping.map_pin (p->id (), (*next_float)->id ());
-          c22_pin_mapping.map_pin ((*next_float)->id (), p->id ());
-
-          ++next_float;
-
-        } else {
-
-          //  otherwise this is an error
-          if (mp_logger) {
-            mp_logger->pin_mismatch (p.operator-> (), 0);
-          }
-
-          pin_mismatch = true;
-          good = false;
-
+        //  assign a floating pin - this is a dummy assignment which is mitigated
+        //  by declaring the pins equivalent in derive_pin_equivalence
+        if (mp_logger) {
+          mp_logger->match_pins (p.operator-> (), fp->second);
         }
+        c12_pin_mapping.map_pin (p->id (), fp->second->id ());
+        c22_pin_mapping.map_pin (fp->second->id (), p->id ());
 
-        continue;
+      } else if (next_float != floating_pins.end ()) {
+
+        //  assign a floating pin - this is a dummy assignment which is mitigated
+        //  by declaring the pins equivalent in derive_pin_equivalence
+        if (mp_logger) {
+          mp_logger->match_pins (p.operator-> (), *next_float);
+        }
+        c12_pin_mapping.map_pin (p->id (), (*next_float)->id ());
+        c22_pin_mapping.map_pin ((*next_float)->id (), p->id ());
+
+        ++next_float;
+
+      } else {
+
+        //  otherwise this is an error for subcircuits or worth a report for top-level circuits
+        handle_pin_mismatch (c1, p.operator-> (), c2, 0, good, pin_mismatch);
 
       }
 
-      const db::NetGraphNode &n = *(g1.begin () + g1.node_index_for_net (net));
+      continue;
 
-      if (! n.has_other ()) {
+    }
+
+    const db::NetGraphNode &n = *(g1.begin () + g1.node_index_for_net (net));
+
+    if (! n.has_other ()) {
+
+      handle_pin_mismatch (c1, p.operator-> (), c2, 0, good, pin_mismatch);
+
+      continue;
+
+    }
+
+    std::multimap<size_t, const db::Pin *>::iterator np = net2pin.find (n.other_net_index ());
+    for (db::Net::const_pin_iterator pi = net->begin_pins (); pi != net->end_pins (); ++pi) {
+
+      if (np != net2pin.end () && np->first == n.other_net_index ()) {
 
         if (mp_logger) {
-          mp_logger->pin_mismatch (p.operator-> (), 0);
+          mp_logger->match_pins (pi->pin (), np->second);
         }
+        c12_pin_mapping.map_pin (pi->pin ()->id (), np->second->id ());
+        //  dummy mapping: we show this pin is used.
+        c22_pin_mapping.map_pin (np->second->id (), np->second->id ());
 
-        pin_mismatch = true;
-        good = false;
+        std::multimap<size_t, const db::Pin *>::iterator np_delete = np;
+        ++np;
+        net2pin.erase (np_delete);
 
-        continue;
+      } else {
 
-      }
-
-      std::multimap<size_t, const db::Pin *>::iterator np = net2pin.find (n.other_net_index ());
-      for (db::Net::const_pin_iterator pi = net->begin_pins (); pi != net->end_pins (); ++pi) {
-
-        if (np != net2pin.end () && np->first == n.other_net_index ()) {
-
-          if (mp_logger) {
-            mp_logger->match_pins (pi->pin (), np->second);
-          }
-          c12_pin_mapping.map_pin (pi->pin ()->id (), np->second->id ());
-          //  dummy mapping: we show this pin is used.
-          c22_pin_mapping.map_pin (np->second->id (), np->second->id ());
-
-          std::multimap<size_t, const db::Pin *>::iterator np_delete = np;
-          ++np;
-          net2pin.erase (np_delete);
-
-        } else {
-
-          if (mp_logger) {
-            mp_logger->pin_mismatch (pi->pin (), 0);
-          }
-          pin_mismatch = true;
-          good = false;
-
-        }
+        handle_pin_mismatch (c1, pi->pin (), c2, 0, good, pin_mismatch);
 
       }
 
     }
 
-    for (std::multimap<size_t, const db::Pin *>::iterator np = net2pin.begin (); np != net2pin.end (); ++np) {
-      if (mp_logger) {
-        mp_logger->pin_mismatch (0, np->second);
-      }
-      pin_mismatch = true;
-      good = false;
-    }
+  }
 
-    while (next_float != floating_pins.end ()) {
-      if (mp_logger) {
-        mp_logger->pin_mismatch (0, *next_float);
-      }
-      pin_mismatch = true;
-      good = false;
-      ++next_float;
-    }
+  for (std::multimap<size_t, const db::Pin *>::iterator np = net2pin.begin (); np != net2pin.end (); ++np) {
+    handle_pin_mismatch (c1, 0, c2, np->second, good, pin_mismatch);
+  }
 
-  } else {
-
-    //  skip pin mapping in case one circuit does not feature pins
-    //  This is often the case for top-level circuits. We don't necessarily need pins for them.
-    //  We still report those circuits with "pin mismatch" so they don't get considered within
-    //  subcircuits. Plus we report the pins so they get listed in the cross-ref (but with a
-    //  "match" - this is important to cover the cases which are found when analyzing the nets).
-
-    if (mp_logger) {
-      for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
-        mp_logger->match_pins (p.operator-> (), 0);
-      }
-      for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
-        mp_logger->match_pins (0, p.operator-> ());
-      }
-    }
-
-    if (c1->pin_count () != c2->pin_count ()) {
-      pin_mismatch = true;
-    }
-
+  while (next_float != floating_pins.end ()) {
+    handle_pin_mismatch (c1, 0, c2, *next_float, good, pin_mismatch);
+    ++next_float;
   }
 
 }

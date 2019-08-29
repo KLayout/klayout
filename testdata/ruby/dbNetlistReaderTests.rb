@@ -101,7 +101,7 @@ circuit SUBCKT ($1=$1,A=A,VDD=VDD,Z=Z,GND=GND,GND$1=GND$1);
   device RES $1 (A=A,B=Z) (R=100000,L=0,W=0,A=0,P=0);
 end;
 circuit .TOP ();
-  subcircuit SUBCKT SUBCKT ($1=(null),A=(null),VDD=(null),Z=(null),GND=VSS,GND$1=VSS);
+  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VDD=VDD,Z=Z,GND=VSS,GND$1=VSS);
 end;
 END
 

@@ -137,10 +137,10 @@ TEST(4_ReaderWithUnconnectedPins)
   EXPECT_EQ (nl.to_string (),
     "circuit RINGO ('1'='1','2'='2','3'='3','4'='4');\n"
     "  subcircuit INV2PAIR $1 ('1'='4','2'='3','3'='4','4'='1','5'='6','6'='2','7'='3');\n"
-    "  subcircuit INV2PAIR $2 ('1'='4','2'='3','3'='4','4'=(null),'5'='1','6'='5','7'='3');\n"
-    "  subcircuit INV2PAIR $3 ('1'='4','2'='3','3'='4','4'=(null),'5'='5','6'='8','7'='3');\n"
-    "  subcircuit INV2PAIR $4 ('1'='4','2'='3','3'='4','4'=(null),'5'='8','6'='7','7'='3');\n"
-    "  subcircuit INV2PAIR $5 ('1'='4','2'='3','3'='4','4'=(null),'5'='7','6'='6','7'='3');\n"
+    "  subcircuit INV2PAIR $2 ('1'='4','2'='3','3'='4','4'='100','5'='1','6'='5','7'='3');\n"
+    "  subcircuit INV2PAIR $3 ('1'='4','2'='3','3'='4','4'='101','5'='5','6'='8','7'='3');\n"
+    "  subcircuit INV2PAIR $4 ('1'='4','2'='3','3'='4','4'='102','5'='8','6'='7','7'='3');\n"
+    "  subcircuit INV2PAIR $5 ('1'='4','2'='3','3'='4','4'='103','5'='7','6'='6','7'='3');\n"
     "end;\n"
     "circuit INV2PAIR ('1'='1','2'='2','3'='3','4'='4','5'='5','6'='6','7'='7');\n"
     "  subcircuit INV2 $1 ('1'='7','2'='5','3'='4','4'='3','5'='2','6'='1');\n"
@@ -251,7 +251,7 @@ TEST(6_ReaderWithDelegate)
     "  device RES $1 (A=A,B=Z) (R=100000,L=0,W=0,A=0,P=0);\n"
     "end;\n"
     "circuit .TOP ();\n"
-    "  subcircuit SUBCKT SUBCKT ($1=(null),A=(null),VDD=(null),Z=(null),GND=VSS,GND$1=VSS);\n"
+    "  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VDD=VDD,Z=Z,GND=VSS,GND$1=VSS);\n"
     "end;\n"
   );
 }

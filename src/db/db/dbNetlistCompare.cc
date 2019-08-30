@@ -523,12 +523,13 @@ class NetGraph;
 struct CompareData
 {
   CompareData ()
-    : other (0), max_depth (0), max_n_branch (0), logger (0), circuit_pin_mapper (0)
+    : other (0), max_depth (0), max_n_branch (0), dont_consider_net_names (false), logger (0), circuit_pin_mapper (0)
   { }
 
   NetGraph *other;
   size_t max_depth;
   size_t max_n_branch;
+  bool dont_consider_net_names;
   NetlistCompareLogger *logger;
   CircuitPinMapper *circuit_pin_mapper;
 };
@@ -1009,7 +1010,7 @@ public:
    *  with a proposed identity. With "with_ambiguous", amiguities are resolved by trying
    *  different combinations in tentative mode and deciding for one combination if possible.
    */
-  size_t derive_node_identities_from_node_set (const std::vector<const NetGraphNode *> &nodes, const std::vector<const NetGraphNode *> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data);
+  size_t derive_node_identities_from_node_set (std::vector<const NetGraphNode *> &nodes, std::vector<const NetGraphNode *> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data);
 
 private:
   std::vector<NetGraphNode> m_nodes;
@@ -1382,7 +1383,7 @@ NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
  */
 struct NodeRange
 {
-  NodeRange (size_t _num, std::vector<const NetGraphNode *>::const_iterator _n1, std::vector<const NetGraphNode *>::const_iterator _nn1, std::vector<const NetGraphNode *>::const_iterator _n2, std::vector<const NetGraphNode *>::const_iterator _nn2)
+  NodeRange (size_t _num, std::vector<const NetGraphNode *>::iterator _n1, std::vector<const NetGraphNode *>::iterator _nn1, std::vector<const NetGraphNode *>::iterator _n2, std::vector<const NetGraphNode *>::iterator _nn2)
     : num (_num), n1 (_n1), nn1 (_nn1), n2 (_n2), nn2 (_nn2)
   {
     //  .. nothing yet ..
@@ -1394,7 +1395,7 @@ struct NodeRange
   }
 
   size_t num;
-  std::vector<const NetGraphNode *>::const_iterator n1, nn1, n2, nn2;
+  std::vector<const NetGraphNode *>::iterator n1, nn1, n2, nn2;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1680,8 +1681,81 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
   return new_nodes;
 }
 
+namespace {
+
+  struct SortNodeByNet
+  {
+    public:
+      bool operator() (const NetGraphNode *a, const NetGraphNode *b) const
+      {
+        tl_assert (a->net () && b->net ());
+        return a->net ()->name () < b->net ()->name ();
+      }
+  };
+
+}
+
+static void sort_node_range_by_best_match (NodeRange &nr)
+{
+  std::stable_sort (nr.n1, nr.nn1, SortNodeByNet ());
+  std::stable_sort (nr.n2, nr.nn2, SortNodeByNet ());
+
+  std::vector<const NetGraphNode *> nomatch1, nomatch2;
+  nomatch1.reserve (nr.nn1 - nr.n1);
+  nomatch2.reserve (nr.nn2 - nr.n2);
+
+  std::vector<const NetGraphNode *>::const_iterator i = nr.n1, j = nr.n2;
+  std::vector<const NetGraphNode *>::iterator iw = nr.n1, jw = nr.n2;
+
+  SortNodeByNet compare;
+
+  while (i != nr.nn1 || j != nr.nn2) {
+    if (j == nr.nn2) {
+      nomatch1.push_back (*i);
+      ++i;
+    } else if (i == nr.nn1) {
+      nomatch2.push_back (*j);
+      ++j;
+    } else if (compare (*i, *j)) {
+      nomatch1.push_back (*i);
+      ++i;
+    } else if (compare (*j, *i)) {
+      nomatch2.push_back (*j);
+      ++j;
+    } else {
+      if (iw != i) {
+        *iw = *i;
+      }
+      ++iw, ++i;
+      if (jw != j) {
+        *jw = *j;
+      }
+      ++jw, ++j;
+    }
+  }
+
+  tl_assert (iw + nomatch1.size () == nr.nn1);
+  tl_assert (jw + nomatch2.size () == nr.nn2);
+
+  for (i = nomatch1.begin (); i != nomatch1.end (); ++i) {
+    *iw++ = *i;
+  }
+  for (j = nomatch2.begin (); j != nomatch2.end (); ++j) {
+    *jw++ = *j;
+  }
+}
+
+static bool net_names_are_different (const db::Net *a, const db::Net *b)
+{
+  if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
+    return false;
+  } else {
+    return (a->name () != b->name ());
+  }
+}
+
 size_t
-NetGraph::derive_node_identities_from_node_set (const std::vector<const NetGraphNode *> &nodes, const std::vector<const NetGraphNode *> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
+NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *> &nodes, std::vector<const NetGraphNode *> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
 {
 #if defined(PRINT_DEBUG_NETCOMPARE)
   std::string indent;
@@ -1757,8 +1831,8 @@ NetGraph::derive_node_identities_from_node_set (const std::vector<const NetGraph
 
   std::vector<NodeRange> node_ranges;
 
-  std::vector<const NetGraphNode *>::const_iterator n1 = nodes.begin ();
-  std::vector<const NetGraphNode *>::const_iterator n2 = other_nodes.begin ();
+  std::vector<const NetGraphNode *>::iterator n1 = nodes.begin ();
+  std::vector<const NetGraphNode *>::iterator n2 = other_nodes.begin ();
 
   while (n1 != nodes.end () && n2 != other_nodes.end ()) {
 
@@ -1778,7 +1852,7 @@ NetGraph::derive_node_identities_from_node_set (const std::vector<const NetGraph
       continue;
     }
 
-    std::vector<const NetGraphNode *>::const_iterator nn1 = n1, nn2 = n2;
+    std::vector<const NetGraphNode *>::iterator nn1 = n1, nn2 = n2;
 
     size_t num = 1;
     ++nn1;
@@ -1853,6 +1927,16 @@ NetGraph::derive_node_identities_from_node_set (const std::vector<const NetGraph
 
       if (! (*nr->n1)->has_other () && ! (*nr->n2)->has_other ()) {
 
+        //  in tentative mode, reject this choice if both nets are named and
+        //  their names differ -> this favors net matching by name
+
+        if (tentative && ! data->dont_consider_net_names && net_names_are_different ((*nr->n1)->net (), (*nr->n2)->net ())) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+          tl::info << indent << "rejecting pair as names are not identical: " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
+#endif
+          return std::numeric_limits<size_t>::max ();
+        }
+
         //  A single candiate: just take this one -> this may render
         //  inexact matches, but further propagates net pairing
 
@@ -1909,9 +1993,16 @@ NetGraph::derive_node_identities_from_node_set (const std::vector<const NetGraph
 #if defined(PRINT_DEBUG_NETCOMPARE)
       tl::info << indent << "analyzing ambiguity group with " << nr->num << " members";
 #endif
+
+      //  sort the ambiguity group such that net names
+
       std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> > pairs;
       tl::equivalence_clusters<const NetGraphNode *> equivalent_other_nodes;
       std::set<const NetGraphNode *> seen;
+
+      if (! data->dont_consider_net_names) {
+        sort_node_range_by_best_match (*nr);
+      }
 
       for (std::vector<const NetGraphNode *>::const_iterator i1 = nr->n1; i1 != nr->nn1; ++i1) {
 
@@ -2061,6 +2152,8 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
 
   m_max_depth = 8;
   m_max_n_branch = 100;
+
+  m_dont_consider_net_names = false;
 }
 
 NetlistComparer::~NetlistComparer ()
@@ -2617,6 +2710,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
           data.other = &g2;
           data.max_depth = m_max_depth;
           data.max_n_branch = m_max_n_branch;
+          data.dont_consider_net_names = m_dont_consider_net_names;
           data.circuit_pin_mapper = &circuit_pin_mapper;
           data.logger = mp_logger;
 
@@ -2669,6 +2763,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       data.other = &g2;
       data.max_depth = m_max_depth;
       data.max_n_branch = m_max_n_branch;
+      data.dont_consider_net_names = m_dont_consider_net_names;
       data.circuit_pin_mapper = &circuit_pin_mapper;
       data.logger = mp_logger;
 

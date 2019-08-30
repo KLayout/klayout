@@ -1661,6 +1661,7 @@ TEST(11_MismatchingSubcircuits)
 
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -1696,6 +1697,7 @@ TEST(11_MismatchingSubcircuits)
 
   db::NetlistCrossReference xref;
   db::NetlistComparer comp_xref (&xref);
+  comp_xref.set_dont_consider_net_names (true);
 
   good = comp_xref.compare (&nl1, &nl2);
 
@@ -2521,6 +2523,7 @@ TEST(17_InherentlyAmbiguousDecoder)
   NetlistCompareTestLogger logger;
   db::NetlistComparer comp (&logger);
   comp.equivalent_pins (nl2.circuit_by_name ("NAND"), 0, 1);
+  comp.set_dont_consider_net_names (true);
 
   bool good = comp.compare (&nl1, &nl2);
 
@@ -2572,7 +2575,61 @@ TEST(17_InherentlyAmbiguousDecoder)
 
   EXPECT_EQ (good, true);
 
+  comp.set_dont_consider_net_names (false);
+
   logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (logger.text (),
+    "begin_circuit NAND NAND\n"
+    "match_nets VSS VSS\n"
+    "match_nets INT INT\n"
+    "match_nets OUT OUT\n"
+    "match_nets VDD VDD\n"
+    "match_nets B B\n"
+    "match_nets A A\n"
+    "match_pins $0 $0\n"
+    "match_pins $1 $1\n"
+    "match_pins $2 $2\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "match_devices $3 $3\n"
+    "match_devices $4 $4\n"
+    "end_circuit NAND NAND MATCH\n"
+    "begin_circuit DECODER DECODER\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets NQ0 NQ0\n"
+    "match_nets NQ1 NQ1\n"
+    "match_nets NQ2 NQ2\n"
+    "match_nets NQ3 NQ3\n"
+    "match_ambiguous_nets NA NA\n"
+    "match_ambiguous_nets NB NB\n"
+    "match_nets B B\n"
+    "match_nets A A\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $0\n"
+    "match_pins $2 $2\n"
+    "match_pins $3 $3\n"
+    "match_pins $4 $4\n"
+    "match_pins $5 $5\n"
+    "match_pins $6 $6\n"
+    "match_pins $7 $7\n"
+    "match_subcircuits $1 $1\n"
+    "match_subcircuits $2 $2\n"
+    "match_subcircuits $4 $3\n"
+    "match_subcircuits $6 $4\n"
+    "match_subcircuits $3 $5\n"
+    "match_subcircuits $5 $6\n"
+    "end_circuit DECODER DECODER MATCH"
+  );
+
+  EXPECT_EQ (good, true);
+
+  logger.clear ();
+  comp.set_dont_consider_net_names (true);
   comp.same_nets (nl1.circuit_by_name ("DECODER")->net_by_name ("A"), nl2.circuit_by_name ("DECODER")->net_by_name ("A"));
   good = comp.compare (&nl1, &nl2);
 

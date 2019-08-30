@@ -1,0 +1,454 @@
+#%lvsdb-klayout
+
+# Layout
+layout(
+ top(TOP)
+ unit(0.001)
+
+ # Layer section
+ # This section lists the mask layers (drawing or derived) and their connections.
+
+ # Mask layers
+ layer(l3 '1/0')
+ layer(l4 '5/0')
+ layer(l8 '8/0')
+ layer(l11 '9/0')
+ layer(l12 '5/0')
+ layer(l13 '5/0')
+ layer(l7)
+ layer(l2)
+ layer(l9)
+ layer(l6)
+ layer(l10)
+
+ # Mask layer connectivity
+ connect(l3 l3 l9)
+ connect(l4 l4 l8)
+ connect(l8 l4 l8 l11 l2 l9 l6 l10)
+ connect(l11 l8 l11 l12)
+ connect(l12 l11 l12 l13)
+ connect(l13 l12 l13)
+ connect(l7 l7)
+ connect(l2 l8 l2)
+ connect(l9 l3 l8 l9)
+ connect(l6 l8 l6)
+ connect(l10 l8 l10)
+
+ # Global nets and connectivity
+ global(l7 SUBSTRATE)
+ global(l10 SUBSTRATE)
+
+ # Device class section
+ class(PMOS MOS4)
+ class(NMOS MOS4)
+
+ # Device abstracts section
+ # Device abstracts list the pin shapes of the devices.
+ device(D$PMOS PMOS
+  terminal(S
+   rect(l2 (-550 -750) (425 1500))
+  )
+  terminal(G
+   rect(l4 (-125 -750) (250 1500))
+  )
+  terminal(D
+   rect(l2 (125 -750) (425 1500))
+  )
+  terminal(B
+   rect(l3 (-125 -750) (250 1500))
+  )
+ )
+ device(D$NMOS NMOS
+  terminal(S
+   rect(l6 (-550 -475) (425 950))
+  )
+  terminal(G
+   rect(l4 (-125 -475) (250 950))
+  )
+  terminal(D
+   rect(l6 (125 -475) (425 950))
+  )
+  terminal(B
+   rect(l7 (-125 -475) (250 950))
+  )
+ )
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(INVX1
+
+  # Circuit boundary
+  rect((-100 400) (2000 7600))
+
+  # Nets with their geometries
+  net(1 name(OUT)
+   rect(l8 (1110 5160) (180 180))
+   rect(l8 (-180 920) (180 180))
+   rect(l8 (-180 -730) (180 180))
+   rect(l8 (-180 -4120) (180 180))
+   rect(l8 (-180 370) (180 180))
+   rect(l11 (-240 -790) (300 4790))
+   rect(l11 (-151 -2501) (2 2))
+   rect(l2 (-226 1049) (425 1500))
+   rect(l6 (-425 -4890) (425 950))
+  )
+  net(2 name(VDD)
+   rect(l3 (-100 4500) (2000 3500))
+   rect(l8 (-1090 -890) (180 180))
+   rect(l8 (-580 -1030) (180 180))
+   rect(l8 (-180 -730) (180 180))
+   rect(l8 (-180 -730) (180 180))
+   rect(l11 (-590 1460) (1800 800))
+   rect(l11 (-1050 -550) (300 300))
+   rect(l11 (-700 -850) (300 300))
+   rect(l11 (299 499) (2 2))
+   rect(l11 (-601 -2201) (300 1400))
+   rect(l2 (-350 -1450) (425 1500))
+   rect(l9 (-75 450) (500 500))
+  )
+  net(3 name(IN)
+   rect(l4 (725 2860) (250 1940))
+   rect(l4 (-525 -1850) (300 300))
+   rect(l4 (-25 -1840) (250 1450))
+   rect(l4 (-250 1940) (250 2000))
+   rect(l4 (-250 -2000) (250 2000))
+   rect(l8 (-465 -3790) (180 180))
+   rect(l11 (-91 -91) (2 2))
+   rect(l11 (-151 -151) (300 300))
+  )
+  net(4 name(VSS)
+   rect(l8 (810 710) (180 180))
+   rect(l8 (-580 880) (180 180))
+   rect(l8 (-180 370) (180 180))
+   rect(l11 (-590 -2100) (1800 800))
+   rect(l11 (-1050 -550) (300 300))
+   rect(l11 (-101 -151) (2 2))
+   rect(l11 (-601 399) (300 1360))
+   rect(l6 (-350 -900) (425 950))
+   rect(l10 (-75 -2010) (500 400))
+  )
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(OUT))
+  pin(2 name(VDD))
+  pin(3 name(IN))
+  pin(4 name(VSS))
+
+  # Devices and their connections
+  device(1 D$NMOS
+   location(850 2135)
+   param(L 0.25)
+   param(W 0.95)
+   param(AS 0.40375)
+   param(AD 0.40375)
+   param(PS 2.75)
+   param(PD 2.75)
+   terminal(S 4)
+   terminal(G 3)
+   terminal(D 1)
+   terminal(B 4)
+  )
+  device(2 D$PMOS
+   location(850 5800)
+   param(L 0.25)
+   param(W 1.5)
+   param(AS 0.6375)
+   param(AD 0.6375)
+   param(PS 3.85)
+   param(PD 3.85)
+   terminal(S 2)
+   terminal(G 3)
+   terminal(D 1)
+   terminal(B 2)
+  )
+
+ )
+ circuit(DINV
+
+  # Circuit boundary
+  rect((-100 400) (3800 7600))
+
+  # Nets with their geometries
+  net(1 name('A<1>')
+   rect(l8 (510 3010) (180 180))
+   rect(l11 (-91 -91) (2 2))
+  )
+  net(2 name('A<2>')
+   rect(l8 (2310 3010) (180 180))
+   rect(l11 (-91 -91) (2 2))
+  )
+  net(3 name('B<2>')
+   rect(l11 (2999 3999) (2 2))
+   rect(l2 (-226 1049) (425 1500))
+   rect(l6 (-425 -4890) (425 950))
+  )
+  net(4 name('B<1>')
+   rect(l11 (1199 3999) (2 2))
+   rect(l2 (-226 1049) (425 1500))
+   rect(l6 (-425 -4890) (425 950))
+  )
+  net(5 name(VDD)
+   rect(l11 (1799 7199) (2 2))
+   rect(l2 (299 -2151) (425 1500))
+   rect(l2 (-2225 -1500) (425 1500))
+  )
+  net(6 name(VSS)
+   rect(l11 (1799 799) (2 2))
+   rect(l6 (299 859) (425 950))
+   rect(l6 (-2225 -950) (425 950))
+  )
+
+  # Outgoing pins and their connections to nets
+  pin(1 name('A<1>'))
+  pin(2 name('A<2>'))
+  pin(3 name('B<2>'))
+  pin(5 name(VDD))
+  pin(6 name(VSS))
+
+  # Subcircuits and their connections
+  circuit(1 INVX1 location(0 0)
+   pin(0 4)
+   pin(1 5)
+   pin(2 1)
+   pin(3 6)
+  )
+  circuit(2 INVX1 location(1800 0)
+   pin(0 3)
+   pin(1 5)
+   pin(2 2)
+   pin(3 6)
+  )
+
+ )
+ circuit(TOP
+
+  # Circuit boundary
+  rect((-100 400) (5600 7600))
+
+  # Nets with their geometries
+  net(1
+   rect(l8 (4110 3010) (180 180))
+   rect(l11 (-1190 -240) (950 300))
+   rect(l2 (-1275 1800) (425 1500))
+   rect(l6 (-425 -4890) (425 950))
+  )
+  net(2 name(A)
+   rect(l8 (510 3010) (180 180))
+   rect(l11 (-91 -91) (2 2))
+  )
+  net(3 name(C)
+   rect(l8 (2310 3010) (180 180))
+   rect(l11 (-91 -91) (2 2))
+  )
+  net(4 name(SUBSTRATE)
+   rect(l6 (3900 1660) (425 950))
+   rect(l6 (-2225 -950) (425 950))
+   rect(l6 (-2225 -950) (425 950))
+  )
+  net(5
+   rect(l2 (4575 5050) (425 1500))
+   rect(l6 (-425 -4890) (425 950))
+  )
+  net(6
+   rect(l2 (3900 5050) (425 1500))
+   rect(l2 (-2225 -1500) (425 1500))
+   rect(l2 (-2225 -1500) (425 1500))
+  )
+
+  # Outgoing pins and their connections to nets
+  pin(2 name(A))
+  pin(3 name(C))
+  pin(4 name(SUBSTRATE))
+
+  # Subcircuits and their connections
+  circuit(1 DINV location(0 0)
+   pin(0 2)
+   pin(1 3)
+   pin(2 1)
+   pin(3 6)
+   pin(4 4)
+  )
+  circuit(2 INVX1 location(3600 0)
+   pin(0 5)
+   pin(1 6)
+   pin(2 1)
+   pin(3 4)
+  )
+
+ )
+)
+
+# Reference netlist
+reference(
+
+ # Device class section
+ class(NMOS MOS4)
+ class(PMOS MOS4)
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(INVX1
+
+  # Nets
+  net(1 name(A))
+  net(2 name(Z))
+  net(3 name(VDD))
+  net(4 name(VSS))
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(A))
+  pin(2 name(Z))
+  pin(3 name(VDD))
+  pin(4 name(VSS))
+
+  # Devices and their connections
+  device(1 NMOS
+   name('0')
+   param(L 0.25)
+   param(W 0.95)
+   param(AS 0)
+   param(AD 0)
+   param(PS 0)
+   param(PD 0)
+   terminal(S 2)
+   terminal(G 1)
+   terminal(D 4)
+   terminal(B 4)
+  )
+  device(2 PMOS
+   name('1')
+   param(L 0.25)
+   param(W 1.5)
+   param(AS 0)
+   param(AD 0)
+   param(PS 0)
+   param(PD 0)
+   terminal(S 2)
+   terminal(G 1)
+   terminal(D 3)
+   terminal(B 3)
+  )
+
+ )
+ circuit(DINV
+
+  # Nets
+  net(1 name('A<1>'))
+  net(2 name('A<2>'))
+  net(3 name('B<1>'))
+  net(4 name('B<2>'))
+  net(5 name(VDD))
+  net(6 name(VSS))
+
+  # Outgoing pins and their connections to nets
+  pin(1 name('A<1>'))
+  pin(2 name('A<2>'))
+  pin(3 name('B<1>'))
+  pin(4 name('B<2>'))
+  pin(5 name(VDD))
+  pin(6 name(VSS))
+
+  # Subcircuits and their connections
+  circuit(1 INVX1 name(A)
+   pin(0 1)
+   pin(1 3)
+   pin(2 5)
+   pin(3 6)
+  )
+  circuit(2 INVX1 name(B)
+   pin(0 2)
+   pin(1 4)
+   pin(2 5)
+   pin(3 6)
+  )
+
+ )
+ circuit(TOP
+
+  # Nets
+  net(1 name(A))
+  net(2 name(C))
+  net(3 name(D))
+  net(4 name(VDD))
+  net(5 name(VSS))
+  net(6 name(B))
+  net(7 name(E))
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(A))
+  pin(2 name(C))
+  pin(3 name(D))
+  pin(4 name(VDD))
+  pin(5 name(VSS))
+
+  # Subcircuits and their connections
+  circuit(1 DINV name('0')
+   pin(0 1)
+   pin(1 2)
+   pin(2 6)
+   pin(3 7)
+   pin(4 4)
+   pin(5 5)
+  )
+  circuit(2 INVX1 name('1')
+   pin(0 7)
+   pin(1 3)
+   pin(2 4)
+   pin(3 5)
+  )
+
+ )
+)
+
+# Cross reference
+xref(
+ circuit(DINV DINV match
+  xref(
+   net(1 1 match)
+   net(2 2 match)
+   net(4 3 warning)
+   net(3 4 warning)
+   net(5 5 match)
+   net(6 6 match)
+   pin(() 2 match)
+   pin(0 0 match)
+   pin(1 1 match)
+   pin(2 3 match)
+   pin(3 4 match)
+   pin(4 5 match)
+   circuit(1 1 match)
+   circuit(2 2 match)
+  )
+ )
+ circuit(INVX1 INVX1 match
+  xref(
+   net(3 1 match)
+   net(1 2 match)
+   net(2 3 match)
+   net(4 4 match)
+   pin(2 0 match)
+   pin(0 1 match)
+   pin(1 2 match)
+   pin(3 3 match)
+   device(1 1 match)
+   device(2 2 match)
+  )
+ )
+ circuit(TOP TOP match
+  xref(
+   net(5 3 match)
+   net(1 7 match)
+   net(6 4 match)
+   net(2 1 match)
+   net(3 2 match)
+   net(4 5 match)
+   pin(() 2 match)
+   pin(() 3 match)
+   pin(0 0 match)
+   pin(1 1 match)
+   pin(2 4 match)
+   circuit(1 1 match)
+   circuit(2 2 match)
+  )
+ )
+)

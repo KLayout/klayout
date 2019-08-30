@@ -246,6 +246,23 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether not to consider net names
+   *  This feature is mainly intended for testing.
+   */
+  void set_dont_consider_net_names (bool f)
+  {
+    m_dont_consider_net_names = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether not to consider net names
+   */
+  bool dont_consider_net_names () const
+  {
+    return m_dont_consider_net_names;
+  }
+
+  /**
    *  @brief Sets the maximum branch complexity
    *
    *  This value limits the maximum branch complexity of the backtracking algorithm.
@@ -308,6 +325,7 @@ protected:
   double m_res_threshold;
   size_t m_max_n_branch;
   size_t m_max_depth;
+  bool m_dont_consider_net_names;
 };
 
 }

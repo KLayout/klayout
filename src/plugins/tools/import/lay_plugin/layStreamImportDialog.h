@@ -73,7 +73,7 @@ public:
   enum layer_mode_type { Original = 0, Offset = 1 };
 
   mode_type mode;
-  std::string file;
+  std::vector<std::string> files;
   std::string topcell;
   std::vector <std::pair <db::DPoint, db::DPoint> > reference_points;
   db::DCplxTrans explicit_trans;

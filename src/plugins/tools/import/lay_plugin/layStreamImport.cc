@@ -61,7 +61,7 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("lay::import_stream", "import_stream:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("Other File Into Current"))));
+    menu_entries.push_back (lay::MenuEntry ("lay::import_stream", "import_stream:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("Other Files Into Current"))));
   }
 
   virtual bool configure (const std::string &name, const std::string &value)

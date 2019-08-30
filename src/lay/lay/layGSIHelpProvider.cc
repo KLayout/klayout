@@ -825,7 +825,7 @@ method_arguments (const gsi::MethodBase *method, const gsi::ClassBase *cls_obj, 
         if (a->spec ()->has_default ()) {
           r += " = ";
           if (! a->spec ()->init_doc ().empty ()) {
-            r += replace_references (a->spec ()->init_doc (), cls_obj);
+            r += replace_references (escape_xml (a->spec ()->init_doc ()), cls_obj);
           } else {
             r += escape_xml (a->spec ()->default_value ().to_string ());
           }

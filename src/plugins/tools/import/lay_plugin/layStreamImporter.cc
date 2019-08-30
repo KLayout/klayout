@@ -126,61 +126,6 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
 
   }
 
-  //  Prepare the layout to read
-  db::Layout source;
-
-  //  Load the layout
-  {
-    tl::InputStream stream (m_file);
-    db::Reader reader (stream);
-
-    tl::log << tl::to_string (QObject::tr ("Loading file: ")) << m_file;
-    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading")));
-    reader.read (source, m_options);
-  }
-
-  //  Locate the top cell in the source file
-  db::cell_index_type source_topcell;
-  std::vector <db::cell_index_type> source_cells;
-
-  if (m_cell_mapping != StreamImportData::Extra || !m_topcell.empty ()) {
-
-    if (m_topcell.empty ()) {
-
-      db::Layout::top_down_const_iterator t = source.begin_top_down ();
-      if (t == source.end_top_down ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Source layout does not have a top cell")));
-      }
-
-      source_topcell = *t;
-
-      ++t;
-      if (t != source.end_top_cells ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Source layout does not have a unique top cell - specify one explicitly")));
-      }
-
-    } else {
-
-      std::pair<bool, db::cell_index_type> t = source.cell_by_name (m_topcell.c_str ());
-      if (! t.first) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Source layout does not have a cell named '%s'")), m_topcell);
-      }
-
-      source_topcell = t.second;
-
-    }
-
-    source_cells.push_back (source_topcell);
-
-  } else {
-
-    // collect source cells
-    for (db::Layout::top_down_const_iterator t = source.begin_top_down (); t != source.end_top_cells (); ++t) {
-      source_cells.push_back (*t);
-    }
-
-  }
-
   //  Issue a warning, if the transformation is not ortho etc.
   if (fabs (global_trans.mag () - floor (global_trans.mag () + 0.5)) > 1e-6 || ! global_trans.is_ortho ()) {
 
@@ -193,76 +138,141 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
     }
 
   }
-     
-  //  Create a layer map 
-  std::map <unsigned int, unsigned int> layer_map;
-  for (db::Layout::layer_iterator l = source.begin_layers (); l != source.end_layers (); ++l) {
-     
-    db::LayerProperties lp (*(*l).second);
-    if (m_layer_mapping == StreamImportData::Offset) {
-      lp = m_layer_offset.apply (lp);
+
+  //  TODO: Currently no merging is provided for non-unity transformations
+  if (m_cell_mapping == StreamImportData::Merge && ! global_trans.equal (db::DCplxTrans ())) {
+
+    if (QMessageBox::warning (QApplication::activeWindow (),
+      QObject::tr ("Merge Mode Is Not Available"),
+      tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("Merge mode is not supported for the specified transformation (%s).\nSimple mode will be used instead.\nPress 'Ok' to continue.")), global_trans.to_string ())),
+      QMessageBox::Ok | QMessageBox::Cancel,
+      QMessageBox::Ok) != QMessageBox::Ok) {
+      return;
     }
 
-    bool layer_found = false;
-    for (db::Layout::layer_iterator ll = target.begin_layers (); ll != target.end_layers () && ! layer_found; ++ll) {
-      if ((*ll).second->log_equal (lp)) {
-        layer_map.insert (std::make_pair ((*l).first, (*ll).first));
-        layer_found = true;
-      }
-    }
-
-    if (! layer_found) {
-      unsigned int new_layer = target.insert_layer (lp);
-      layer_map.insert (std::make_pair ((*l).first, new_layer));
-      new_layers.push_back (new_layer);
-    }
+    m_cell_mapping = StreamImportData::Simple;
 
   }
 
-  //  Create a cell map
-  std::map <db::cell_index_type, db::cell_index_type> cell_map;
+  for (size_t file_index = 0; file_index < m_files.size (); ++file_index) {
 
-  if (m_cell_mapping == StreamImportData::Simple) {
+    std::string file = m_files [file_index];
 
-    cell_map.insert (std::make_pair (source_topcell, target_cell_index));
+    //  Prepare the layout to read
+    db::Layout source;
 
-  } else if (m_cell_mapping == StreamImportData::Extra) {
+    //  Load the layout
+    {
+      tl::InputStream stream (file);
+      db::Reader reader (stream);
 
-    //  create new top cells for each source top cell
-    for (std::vector<db::cell_index_type>::const_iterator t = source_cells.begin (); t != source_cells.end (); ++t) {
-      db::cell_index_type new_top = target.add_cell (source.cell_name (*t));
-      cell_map.insert (std::make_pair (*t, new_top));
+      tl::log << tl::to_string (QObject::tr ("Loading file: ")) << file;
+      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading file: ")) + file);
+      reader.read (source, m_options);
     }
 
-  } else if (m_cell_mapping == StreamImportData::Instantiate) {
+    //  Locate the top cell in the source file
+    db::cell_index_type source_topcell;
+    std::vector <db::cell_index_type> source_cells;
 
-    //  Create a new top cell for importing into and use the cell reference to produce the first part of the transformation
+    if (m_cell_mapping != StreamImportData::Extra || !m_topcell.empty ()) {
 
-    db::cell_index_type new_top = target.add_cell (source.cell_name (source_topcell));
-    cell_map.insert (std::make_pair (source_topcell, new_top));
+      if (m_topcell.empty ()) {
 
-    db::ICplxTrans gt_dbu = db::VCplxTrans (1.0 / target.dbu ()) * global_trans * db::CplxTrans (source.dbu ());
-    target.cell (target_cell_index).insert (db::CellInstArray (new_top, gt_dbu * db::ICplxTrans (1.0 / global_trans.mag ())));
+        db::Layout::top_down_const_iterator t = source.begin_top_down ();
+        if (t == source.end_top_down ()) {
+          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Source layout '%s' does not have a top cell")), file));
+        }
 
-    global_trans = db::DCplxTrans (global_trans.mag ());
+        source_topcell = *t;
 
-  } else if (m_cell_mapping == StreamImportData::Merge) {
+        ++t;
+        if (t != source.end_top_cells ()) {
+          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Source layout '%s' does not have a unique top cell - specify one explicitly")), file));
+        }
 
-    //  Create the cell mapping
-    //  TODO: Currently no merging is provided for non-unity transformations
-    if (! global_trans.equal (db::DCplxTrans ())) {
+      } else {
 
-      if (QMessageBox::warning (QApplication::activeWindow (),
-        QObject::tr ("Merge Mode Is Not Available"),
-        tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("Merge mode is not supported for the specified transformation (%s).\nSimple mode will be used instead.\nPress 'Ok' to continue.")), global_trans.to_string ())),
-        QMessageBox::Ok | QMessageBox::Cancel,
-        QMessageBox::Ok) != QMessageBox::Ok) {
-        return;
+        std::pair<bool, db::cell_index_type> t = source.cell_by_name (m_topcell.c_str ());
+        if (! t.first) {
+          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Source layout '%s' does not have a cell named '%s'")), file, m_topcell));
+        }
+
+        source_topcell = t.second;
+
       }
+
+      source_cells.push_back (source_topcell);
+
+    } else {
+
+      // collect source cells
+      for (db::Layout::top_down_const_iterator t = source.begin_top_down (); t != source.end_top_cells (); ++t) {
+        source_cells.push_back (*t);
+      }
+
+    }
+
+    //  Create a layer map
+    std::map <unsigned int, unsigned int> layer_map;
+    for (db::Layout::layer_iterator l = source.begin_layers (); l != source.end_layers (); ++l) {
+
+      db::LayerProperties lp (*(*l).second);
+      if (m_layer_mapping == StreamImportData::Offset) {
+        lp = m_layer_offset.apply (lp);
+      }
+
+      bool layer_found = false;
+      for (db::Layout::layer_iterator ll = target.begin_layers (); ll != target.end_layers () && ! layer_found; ++ll) {
+        if ((*ll).second->log_equal (lp)) {
+          layer_map.insert (std::make_pair ((*l).first, (*ll).first));
+          layer_found = true;
+        }
+      }
+
+      if (! layer_found) {
+        unsigned int new_layer = target.insert_layer (lp);
+        layer_map.insert (std::make_pair ((*l).first, new_layer));
+        new_layers.push_back (new_layer);
+      }
+
+    }
+
+    //  Computes the final global transformation
+    db::DCplxTrans gt = global_trans;
+
+    //  Create a cell map
+    std::map <db::cell_index_type, db::cell_index_type> cell_map;
+
+    if (m_cell_mapping == StreamImportData::Simple) {
 
       cell_map.insert (std::make_pair (source_topcell, target_cell_index));
 
-    } else {
+    } else if (m_cell_mapping == StreamImportData::Extra) {
+
+      //  create new top cells for each source top cell
+      for (std::vector<db::cell_index_type>::const_iterator t = source_cells.begin (); t != source_cells.end (); ++t) {
+        db::cell_index_type new_top = target.add_cell (source.cell_name (*t));
+        cell_map.insert (std::make_pair (*t, new_top));
+      }
+
+    } else if (m_cell_mapping == StreamImportData::Instantiate) {
+
+      //  Create a new top cell for importing into and use the cell reference to produce the first part of the transformation
+
+      db::cell_index_type new_top = target.add_cell (source.cell_name (source_topcell));
+      cell_map.insert (std::make_pair (source_topcell, new_top));
+
+      db::ICplxTrans gt_dbu = db::VCplxTrans (1.0 / target.dbu ()) * gt * db::CplxTrans (source.dbu ());
+      target.cell (target_cell_index).insert (db::CellInstArray (new_top, gt_dbu * db::ICplxTrans (1.0 / gt.mag ())));
+
+      gt = db::DCplxTrans (gt.mag ());
+
+    } else if (m_cell_mapping == StreamImportData::Merge) {
+
+      //  Create the cell mapping
+      //  TODO: Currently no merging is provided for non-unity transformations
+      tl_assert (gt.equal (db::DCplxTrans ()));
 
       db::CellMapping cm;
       cm.create_from_geometry (target, target_cell_index, source, source_topcell);
@@ -270,11 +280,10 @@ StreamImporter::read (db::Layout &target, db::cell_index_type target_cell_index,
 
     }
 
+    //  And actually merge
+    db::merge_layouts (target, source, db::VCplxTrans (1.0 / target.dbu ()) * gt * db::CplxTrans (source.dbu ()), source_cells, cell_map, layer_map);
+
   }
-
-  //  And actually merge
-  db::merge_layouts (target, source, db::VCplxTrans (1.0 / target.dbu ()) * global_trans * db::CplxTrans (source.dbu ()), source_cells, cell_map, layer_map);
-
 }
 
 }

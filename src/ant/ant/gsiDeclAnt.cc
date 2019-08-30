@@ -37,6 +37,9 @@ static int style_arrow_end ()   { return int (ant::Object::STY_arrow_end); }
 static int style_arrow_start () { return int (ant::Object::STY_arrow_start); }
 static int style_arrow_both ()  { return int (ant::Object::STY_arrow_both); }
 static int style_line ()        { return int (ant::Object::STY_line); }
+static int style_cross_end ()   { return int (ant::Object::STY_cross_end); }
+static int style_cross_start () { return int (ant::Object::STY_cross_start); }
+static int style_cross_both ()  { return int (ant::Object::STY_cross_both); }
 
 static int outline_diag ()      { return int (ant::Object::OL_diag); }
 static int outline_xy ()        { return int (ant::Object::OL_xy); }
@@ -491,7 +494,25 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
   ) +
   gsi::method ("StyleLine|#style_line", &gsi::style_line,
     "@brief Gets the line style code for use with the \\style method\n"
-    "When this style is specified, plain line is drawn."
+    "When this style is specified, a plain line is drawn."
+  ) +
+  gsi::method ("StyleCrossStart|#style_cross_start", &gsi::style_cross_start,
+    "@brief Gets the line style code for use with the \\style method\n"
+    "When this style is specified, a cross is drawn at the start point.\n"
+    "\n"
+    "This constant has been added in version 0.26."
+  ) +
+  gsi::method ("StyleCrossEnd|#style_cross_end", &gsi::style_cross_end,
+    "@brief Gets the line style code for use with the \\style method\n"
+    "When this style is specified, a cross is drawn at the end point.\n"
+    "\n"
+    "This constant has been added in version 0.26."
+  ) +
+  gsi::method ("StyleCrossBoth|#style_cross_both", &gsi::style_cross_both,
+    "@brief Gets the line style code for use with the \\style method\n"
+    "When this style is specified, a cross is drawn at both points.\n"
+    "\n"
+    "This constant has been added in version 0.26."
   ) +
   gsi::method ("OutlineDiag|#outline_diag", &gsi::outline_diag,
     "@brief Gets the diagonal output code for use with the \\outline method\n"

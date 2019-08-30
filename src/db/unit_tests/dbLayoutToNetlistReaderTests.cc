@@ -317,7 +317,7 @@ TEST(2_ReaderWithGlobalNets)
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
     au = tl::combine_path (au, "algo");
-    au = tl::combine_path (au, "l2n_reader_au_2.gds");
+    au = tl::combine_path (au, "l2n_reader_au_2r.gds");
 
     db::compare_layouts (_this, ly2, au);
   }
@@ -374,7 +374,7 @@ TEST(3_ReaderAbsoluteCoordinates)
     std::string au = tl::testsrc ();
     au = tl::combine_path (au, "testdata");
     au = tl::combine_path (au, "algo");
-    au = tl::combine_path (au, "l2n_reader_au_2.gds");
+    au = tl::combine_path (au, "l2n_reader_au_2r.gds");
 
     db::compare_layouts (_this, ly2, au);
   }

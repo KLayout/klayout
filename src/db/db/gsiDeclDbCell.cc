@@ -3960,7 +3960,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "If the instance is a PCell instance, this method will convert the cell into a static cell and "
     "remove the PCell variant if required. A new cell will be created containing the PCell content "
-    "but begin a static cell. If the instance is not a PCell instance, this method will not do anything.\n"
+    "but being a static cell. If the instance is not a PCell instance, this method won't do anything.\n"
     "\n"
     "This method has been introduced in version 0.24."
   ) +

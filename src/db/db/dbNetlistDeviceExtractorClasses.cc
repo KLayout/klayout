@@ -30,114 +30,252 @@ namespace db
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorMOS3Transistor implementation
 
-NetlistDeviceExtractorMOS3Transistor::NetlistDeviceExtractorMOS3Transistor (const std::string &name)
-  : db::NetlistDeviceExtractor (name)
+NetlistDeviceExtractorMOS3Transistor::NetlistDeviceExtractorMOS3Transistor (const std::string &name, bool strict)
+  : db::NetlistDeviceExtractor (name),
+    m_strict (strict)
 {
   //  .. nothing yet ..
 }
 
 void NetlistDeviceExtractorMOS3Transistor::setup ()
 {
-  define_layer ("SD", "Source/drain diffusion");                        // #0
-  define_layer ("G", "Gate input");                                     // #1
-  //  for backward compatibility
-  define_layer ("P", 1, "Gate terminal output");                        // #2 -> G
+  if (! is_strict ()) {
 
-  //  terminal output
-  define_layer ("tG", 2, "Gate terminal output");                       // #3 -> P -> G
-  define_layer ("tS", 0, "Source terminal output (default is SD)");     // #4
-  define_layer ("tD", 0, "Drain terminal output (default is SD)");      // #5
+    define_layer ("SD", "Source/drain diffusion");                        // #0
+    define_layer ("G", "Gate input");                                     // #1
+    //  for backward compatibility
+    define_layer ("P", 1, "Gate terminal output");                        // #2 -> G
 
-  register_device_class (new db::DeviceClassMOS3Transistor ());
+    //  terminal output
+    define_layer ("tG", 2, "Gate terminal output");                       // #3 -> P -> G
+    define_layer ("tS", 0, "Source terminal output (default is SD)");     // #4
+    define_layer ("tD", 0, "Drain terminal output (default is SD)");      // #5
+
+  } else {
+
+    define_layer ("S", "Source diffusion");                               // #0
+    define_layer ("D", "Drain diffusion");                                // #1
+    define_layer ("G", "Gate input");                                     // #2
+    //  for backward compatibility
+    define_layer ("P", 2, "Gate terminal output");                        // #3 -> G
+
+    //  terminal output
+    define_layer ("tG", 3, "Gate terminal output");                       // #4 -> P -> G
+    define_layer ("tS", 0, "Source terminal output (default is S)");      // #5
+    define_layer ("tD", 1, "Drain terminal output (default is D)");       // #6
+
+  }
+
+  db::DeviceClass *cls = new db::DeviceClassMOS3Transistor ();
+  cls->set_strict (m_strict);
+  register_device_class (cls);
 }
 
 db::Connectivity NetlistDeviceExtractorMOS3Transistor::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
 {
-  tl_assert (layers.size () >= 3);
+  if (! is_strict ()) {
 
-  unsigned int diff = layers [0];
-  unsigned int gate = layers [1];
-  //  not used for device recognition: poly (2), but used for producing the gate terminals
+    tl_assert (layers.size () >= 3);
 
-  //  The layer definition is diff, gate
-  db::Connectivity conn;
-  //  collect all connected diffusion shapes
-  conn.connect (diff, diff);
-  //  collect all connected gate shapes
-  conn.connect (gate, gate);
-  //  connect gate with diff to detect gate/diffusion boundary
-  conn.connect (diff, gate);
-  return conn;
+    unsigned int diff = layers [0];
+    unsigned int gate = layers [1];
+
+    //  The layer definition is diff, gate
+    db::Connectivity conn;
+    //  collect all connected diffusion shapes
+    conn.connect (diff, diff);
+    //  collect all connected gate shapes
+    conn.connect (gate, gate);
+    //  connect gate with diff to detect gate/diffusion boundary
+    conn.connect (diff, gate);
+    return conn;
+
+  } else {
+
+
+    tl_assert (layers.size () >= 4);
+
+    unsigned int sdiff = layers [0];
+    unsigned int ddiff = layers [1];
+    unsigned int gate = layers [2];
+
+    //  The layer definition is diff, gate
+    db::Connectivity conn;
+    //  collect all connected diffusion shapes
+    conn.connect (sdiff, sdiff);
+    conn.connect (ddiff, ddiff);
+    //  collect all connected gate shapes
+    conn.connect (gate, gate);
+    //  connect gate with diff to detect gate/diffusion boundary
+    conn.connect (sdiff, gate);
+    conn.connect (ddiff, gate);
+    return conn;
+
+  }
 }
 
 void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db::Region> &layer_geometry)
 {
-  unsigned int diff_geometry_index = 0;
-  unsigned int gate_geometry_index = 1;
-  unsigned int gate_terminal_geometry_index = 3;
-  unsigned int source_terminal_geometry_index = 4;
-  unsigned int drain_terminal_geometry_index = 5;
+  if (! is_strict ()) {
 
-  const db::Region &rdiff = layer_geometry [diff_geometry_index];
-  const db::Region &rgates = layer_geometry [gate_geometry_index];
+    //  See setup() for the geometry indexes
+    unsigned int diff_geometry_index = 0;
+    unsigned int gate_geometry_index = 1;
+    unsigned int gate_terminal_geometry_index = 3;
+    unsigned int source_terminal_geometry_index = 4;
+    unsigned int drain_terminal_geometry_index = 5;
 
-  for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
+    const db::Region &rdiff = layer_geometry [diff_geometry_index];
+    const db::Region &rgates = layer_geometry [gate_geometry_index];
 
-    db::Region rgate (*p);
-    rgate.set_base_verbosity (rgates.base_verbosity ());
+    for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
 
-    db::Region rdiff2gate = rdiff.selected_interacting (rgate);
-    rdiff2gate.set_base_verbosity (rdiff.base_verbosity ());
+      db::Region rgate (*p);
+      rgate.set_base_verbosity (rgates.base_verbosity ());
 
-    if (rdiff2gate.empty ()) {
-      error (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
-    } else {
+      db::Region rdiff2gate = rdiff.selected_interacting (rgate);
+      rdiff2gate.set_base_verbosity (rdiff.base_verbosity ());
 
-      if (rdiff2gate.size () != 2) {
-        error (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting with one gate shape (found %d) - gate shape ignored")), int (rdiff2gate.size ())), *p);
-        continue;
+      if (rdiff2gate.empty ()) {
+        error (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
+      } else {
+
+        if (rdiff2gate.size () != 2) {
+          error (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting with one gate shape (found %d) - gate shape ignored")), int (rdiff2gate.size ())), *p);
+          continue;
+        }
+
+        db::Edges edges (rgate.edges () & rdiff2gate.edges ());
+        if (edges.size () != 2) {
+          error (tl::sprintf (tl::to_string (tr ("Expected two edges interacting gate/diff (found %d) - width and length may be incorrect")), int (edges.size ())), *p);
+          continue;
+        }
+
+        if (! p->is_box ()) {
+          error (tl::to_string (tr ("Gate shape is not a box - width and length may be incorrect")), *p);
+        }
+
+        db::Device *device = create_device ();
+
+        device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
+
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, sdbu () * edges.length () * 0.5);
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, sdbu () * (p->perimeter () - edges.length ()) * 0.5);
+
+        int diff_index = 0;
+        for (db::Region::const_iterator d = rdiff2gate.begin (); !d.at_end () && diff_index < 2; ++d, ++diff_index) {
+
+          //  count the number of gate shapes attached to this shape and distribute the area of the
+          //  diffusion region to the number of gates
+          size_t n = rgates.selected_interacting (db::Region (*d)).size ();
+          tl_assert (n > 0);
+
+          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * d->area () / double (n));
+          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * d->perimeter () / double (n));
+
+          unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
+          define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *d);
+
+        }
+
+        define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_terminal_geometry_index, *p);
+
+        //  allow derived classes to modify the device
+        modify_device (*p, layer_geometry, device);
+
+        //  output the device for debugging
+        device_out (device, rdiff2gate, rgate);
+
       }
 
-      db::Edges edges (rgate.edges () & rdiff2gate.edges ());
-      if (edges.size () != 2) {
-        error (tl::sprintf (tl::to_string (tr ("Expected two edges interacting gate/diff (found %d) - width and length may be incorrect")), int (edges.size ())), *p);
-        continue;
+    }
+
+  } else {
+
+    //  See setup() for the geometry indexes
+    unsigned int source_geometry_index = 0;
+    unsigned int drain_geometry_index = 1;
+    unsigned int gate_geometry_index = 2;
+    unsigned int gate_terminal_geometry_index = 4;
+    unsigned int source_terminal_geometry_index = 5;
+    unsigned int drain_terminal_geometry_index = 6;
+
+    const db::Region &sdiff = layer_geometry [source_geometry_index];
+    const db::Region &ddiff = layer_geometry [drain_geometry_index];
+    const db::Region &rgates = layer_geometry [gate_geometry_index];
+
+    for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
+
+      db::Region rgate (*p);
+      rgate.set_base_verbosity (rgates.base_verbosity ());
+
+      db::Region sdiff2gate = sdiff.selected_interacting (rgate);
+      sdiff2gate.set_base_verbosity (sdiff.base_verbosity ());
+
+      db::Region ddiff2gate = ddiff.selected_interacting (rgate);
+      ddiff2gate.set_base_verbosity (ddiff.base_verbosity ());
+
+      if (sdiff2gate.empty () && ddiff2gate.empty ()) {
+        error (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
+      } else if (sdiff2gate.empty () || ddiff2gate.empty ()) {
+        error (tl::to_string (tr ("Gate shape touches a single diffusion only - ignored")), *p);
+      } else {
+
+        if (sdiff2gate.size () != 1) {
+          error (tl::sprintf (tl::to_string (tr ("Expected one polygons on source diff interacting with one gate shape (found %d) - gate shape ignored")), int (sdiff2gate.size ())), *p);
+          continue;
+        }
+
+        if (ddiff2gate.size () != 1) {
+          error (tl::sprintf (tl::to_string (tr ("Expected one polygons on drain diff interacting with one gate shape (found %d) - gate shape ignored")), int (ddiff2gate.size ())), *p);
+          continue;
+        }
+
+        db::Region diff2gate = sdiff2gate + ddiff2gate;
+
+        db::Edges edges (rgate.edges () & diff2gate.edges ());
+        if (edges.size () != 2) {
+          error (tl::sprintf (tl::to_string (tr ("Expected two edges interacting gate/diff (found %d) - width and length may be incorrect")), int (edges.size ())), *p);
+          continue;
+        }
+
+        if (! p->is_box ()) {
+          error (tl::to_string (tr ("Gate shape is not a box - width and length may be incorrect")), *p);
+        }
+
+        db::Device *device = create_device ();
+
+        device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
+
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, sdbu () * edges.length () * 0.5);
+        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, sdbu () * (p->perimeter () - edges.length ()) * 0.5);
+
+        for (int diff_index = 0; diff_index < 2; ++diff_index) {
+
+          const db::Region *diff = diff_index == 0 ? &sdiff2gate : &ddiff2gate;
+
+          //  count the number of gate shapes attached to this shape and distribute the area of the
+          //  diffusion region to the number of gates
+          size_t n = rgates.selected_interacting (*diff).size ();
+          tl_assert (n > 0);
+
+          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * diff->area () / double (n));
+          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * diff->perimeter () / double (n));
+
+          unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
+          define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *diff);
+
+        }
+
+        define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_terminal_geometry_index, *p);
+
+        //  allow derived classes to modify the device
+        modify_device (*p, layer_geometry, device);
+
+        //  output the device for debugging
+        device_out (device, diff2gate, rgate);
+
       }
-
-      if (! p->is_box ()) {
-        error (tl::to_string (tr ("Gate shape is not a box - width and length may be incorrect")), *p);
-      }
-
-      db::Device *device = create_device ();
-
-      device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
-
-      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, sdbu () * edges.length () * 0.5);
-      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, sdbu () * (p->perimeter () - edges.length ()) * 0.5);
-
-      int diff_index = 0;
-      for (db::Region::const_iterator d = rdiff2gate.begin (); !d.at_end () && diff_index < 2; ++d, ++diff_index) {
-
-        //  count the number of gate shapes attached to this shape and distribute the area of the
-        //  diffusion region to the number of gates
-        size_t n = rgates.selected_interacting (db::Region (*d)).size ();
-        tl_assert (n > 0);
-
-        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * d->area () / double (n));
-        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * d->perimeter () / double (n));
-
-        unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
-        define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *d);
-
-      }
-
-      define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_terminal_geometry_index, *p);
-
-      //  allow derived classes to modify the device
-      modify_device (*p, layer_geometry, device);
-
-      //  output the device for debugging
-      device_out (device, rdiff2gate, rgate);
 
     }
 
@@ -147,35 +285,61 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorMOS4Transistor implementation
 
-NetlistDeviceExtractorMOS4Transistor::NetlistDeviceExtractorMOS4Transistor (const std::string &name)
-  : NetlistDeviceExtractorMOS3Transistor (name)
+NetlistDeviceExtractorMOS4Transistor::NetlistDeviceExtractorMOS4Transistor (const std::string &name, bool strict)
+  : NetlistDeviceExtractorMOS3Transistor (name, strict)
 {
   //  .. nothing yet ..
 }
 
 void NetlistDeviceExtractorMOS4Transistor::setup ()
 {
-  define_layer ("SD", "Source/drain diffusion");                      // #0
-  define_layer ("G", "Gate input");                                   // #1
-  //  for backward compatibility
-  define_layer ("P", 1, "Gate terminal output");                      // #2 -> G
+  if (! is_strict ()) {
 
-  //  terminal output
-  define_layer ("tG", 2, "Gate terminal output");                     // #3 -> P -> G
-  define_layer ("tS", 0, "Source terminal output (default is SD)");   // #4
-  define_layer ("tD", 0, "Drain terminal output (default is SD)");    // #5
+    define_layer ("SD", "Source/drain diffusion");                      // #0
+    define_layer ("G", "Gate input");                                   // #1
+    //  for backward compatibility
+    define_layer ("P", 1, "Gate terminal output");                      // #2 -> G
 
-  //  for backward compatibility
-  define_layer ("W", "Well (bulk) terminal output");                  // #6
+    //  terminal output
+    define_layer ("tG", 2, "Gate terminal output");                     // #3 -> P -> G
+    define_layer ("tS", 0, "Source terminal output (default is SD)");   // #4
+    define_layer ("tD", 0, "Drain terminal output (default is SD)");    // #5
 
-  define_layer ("tB", 6, "Well (bulk) terminal output");              // #7 -> W
+    //  for backward compatibility
+    define_layer ("W", "Well (bulk) terminal output");                  // #6
 
-  register_device_class (new db::DeviceClassMOS4Transistor ());
+    define_layer ("tB", 6, "Well (bulk) terminal output");              // #7 -> W
+
+  } else {
+
+    define_layer ("S", "Source diffusion");                             // #0
+    define_layer ("D", "Drain diffusion");                              // #1
+    define_layer ("G", "Gate input");                                   // #2
+    //  for backward compatibility
+    define_layer ("P", 2, "Gate terminal output");                      // #3 -> G
+
+    //  terminal output
+    define_layer ("tG", 3, "Gate terminal output");                     // #4 -> P -> G
+    define_layer ("tS", 0, "Source terminal output (default is S)");    // #5
+    define_layer ("tD", 1, "Drain terminal output (default is D)");     // #6
+
+    //  for backward compatibility
+    define_layer ("W", "Well (bulk) terminal output");                  // #7
+
+    define_layer ("tB", 7, "Well (bulk) terminal output");              // #8 -> W
+
+  }
+
+  db::DeviceClass *cls = new db::DeviceClassMOS4Transistor ();
+  cls->set_strict (is_strict ());
+  register_device_class (cls);
 }
 
 void NetlistDeviceExtractorMOS4Transistor::modify_device (const db::Polygon &rgate, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device)
 {
-  unsigned int bulk_terminal_geometry_index = 7;
+  //  see setup() for the layer indexes:
+  unsigned int bulk_terminal_geometry_index = is_strict () ? 8 : 7;
+
   define_terminal (device, db::DeviceClassMOS4Transistor::terminal_id_B, bulk_terminal_geometry_index, rgate);
 }
 

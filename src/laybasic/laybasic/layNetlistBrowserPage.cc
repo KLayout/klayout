@@ -32,6 +32,7 @@
 #include "layNetExportDialog.h"
 #include "tlProgress.h"
 #include "tlExceptions.h"
+#include "tlRecipe.h"
 #include "dbLayoutToNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 #include "dbCellMapping.h"
@@ -124,6 +125,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     m_update_needed (true),
     mp_info_dialog (0),
     dm_update_highlights (this, &NetlistBrowserPage::update_highlights),
+    dm_rerun_macro (this, &NetlistBrowserPage::rerun_macro),
     m_cell_context_cache (0)
 {
   Ui::NetlistBrowserPage::setupUi (this);
@@ -188,6 +190,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 
   connect (m_show_all_action, SIGNAL (triggered ()), this, SLOT (show_all_clicked ()));
   connect (info_button, SIGNAL (pressed ()), this, SLOT (info_button_pressed ()));
+  connect (rerun_button, SIGNAL (pressed ()), this, SLOT (rerun_button_pressed ()));
   connect (find_button, SIGNAL (pressed ()), this, SLOT (find_button_pressed ()));
   connect (forward, SIGNAL (clicked ()), this, SLOT (navigate_forward ()));
   connect (backward, SIGNAL (clicked ()), this, SLOT (navigate_back ()));
@@ -586,6 +589,32 @@ NetlistBrowserPage::navigate_forward ()
 }
 
 void
+NetlistBrowserPage::rerun_button_pressed ()
+{
+  //  NOTE: we use deferred execution, because otherwise the button won't get repainted properly
+  dm_rerun_macro ();
+}
+
+void
+NetlistBrowserPage::rerun_macro ()
+{
+  if (! mp_database->generator ().empty ()) {
+
+    std::map<std::string, tl::Variant> add_pars;
+
+    for (unsigned int i = 0; i < mp_view->num_l2ndbs (); ++i) {
+      if (mp_view->get_l2ndb (i) == mp_database.get ()) {
+        add_pars["l2ndb_index"] = tl::Variant (int (i));
+        break;
+      }
+    }
+
+    tl::Recipe::make (mp_database->generator (), add_pars);
+
+  }
+}
+
+void
 NetlistBrowserPage::info_button_pressed ()
 {
   if (! mp_info_dialog) {
@@ -740,6 +769,17 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 
   db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
   mp_database.reset (l2ndb);
+
+  rerun_button->setEnabled (mp_database.get () && ! mp_database->generator ().empty ());
+  if (rerun_button->isEnabled ()) {
+    QString shortcut;
+    if (! rerun_button->shortcut ().isEmpty ()) {
+      shortcut = QString::fromUtf8 (" (%1)").arg (rerun_button->shortcut ().toString ());
+    }
+    rerun_button->setToolTip (tl::to_qstring (tl::to_string (tr ("Run ")) + mp_database->generator ()) + shortcut);
+  } else {
+    rerun_button->setToolTip (QString ());
+  }
 
   show_netlist->setVisible (lvsdb != 0);
   show_xref->setVisible (lvsdb != 0);

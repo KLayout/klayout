@@ -541,12 +541,10 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
   gsi::method_ext ("unmatched_circuits_a", &unmatched_circuits_a, gsi::arg ("a"), gsi::arg ("b"),
     "@brief Returns a list of circuits in A for which there is not corresponding circuit in B\n"
     "This list can be used to flatten these circuits so they do not participate in the compare process.\n"
-    "Top level circuits are not included as they cannot be flattened.\n"
   ) +
   gsi::method_ext ("unmatched_circuits_b", &unmatched_circuits_b, gsi::arg ("a"), gsi::arg ("b"),
     "@brief Returns a list of circuits in B for which there is not corresponding circuit in A\n"
     "This list can be used to flatten these circuits so they do not participate in the compare process.\n"
-    "Top level circuits are not included as they cannot be flattened.\n"
   ) +
   gsi::method ("compare", (bool (db::NetlistComparer::*) (const db::Netlist *, const db::Netlist *) const) &db::NetlistComparer::compare, gsi::arg ("netlist_a"), gsi::arg ("netlist_b"),
     "@brief Compares two netlists.\n"

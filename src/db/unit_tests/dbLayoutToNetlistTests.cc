@@ -554,15 +554,15 @@ TEST(1_BasicExtraction)
   db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD);\n"
     "  subcircuit INV2 $1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $2 (IN=FB,$2=(null),OUT=$I19,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $3 (IN=$I19,$2=(null),OUT=$I1,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $4 (IN=$I1,$2=(null),OUT=$I2,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $5 (IN=$I2,$2=(null),OUT=$I3,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $6 (IN=$I3,$2=(null),OUT=$I4,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $7 (IN=$I4,$2=(null),OUT=$I5,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $8 (IN=$I5,$2=(null),OUT=$I6,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $9 (IN=$I6,$2=(null),OUT=$I7,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $10 (IN=$I7,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $2 (IN=FB,$2=$I38,OUT=$I19,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $3 (IN=$I19,$2=$I39,OUT=$I1,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $4 (IN=$I1,$2=$I40,OUT=$I2,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $5 (IN=$I2,$2=$I41,OUT=$I3,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $6 (IN=$I3,$2=$I42,OUT=$I4,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $7 (IN=$I4,$2=$I43,OUT=$I5,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $8 (IN=$I5,$2=$I44,OUT=$I6,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $9 (IN=$I6,$2=$I45,OUT=$I7,$4=VSS,$5=VDD);\n"
+    "  subcircuit INV2 $10 (IN=$I7,$2=$I46,OUT=$I8,$4=VSS,$5=VDD);\n"
     "end;\n"
     "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
     "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
@@ -583,7 +583,7 @@ TEST(1_BasicExtraction)
   //  the transistor which supplies this probe target has been optimized away by "purge".
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "(null)");
 
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "INV2:$2");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I39");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "RINGO:$I2");
 }
 
@@ -806,14 +806,14 @@ TEST(2_Probing)
   db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VSS=VSS,VDD=VDD);\n"
     "  subcircuit INV2PAIR $1 ($1=FB,$2=VDD,$3=VSS,$4=$I3,$5=OSC);\n"
-    "  subcircuit INV2PAIR $2 ($1=(null),$2=VDD,$3=VSS,$4=FB,$5=$I9);\n"
-    "  subcircuit INV2PAIR $3 ($1=(null),$2=VDD,$3=VSS,$4=$I9,$5=$I1);\n"
-    "  subcircuit INV2PAIR $4 ($1=(null),$2=VDD,$3=VSS,$4=$I1,$5=$I2);\n"
-    "  subcircuit INV2PAIR $5 ($1=(null),$2=VDD,$3=VSS,$4=$I2,$5=$I3);\n"
+    "  subcircuit INV2PAIR $2 ($1=$I18,$2=VDD,$3=VSS,$4=FB,$5=$I9);\n"
+    "  subcircuit INV2PAIR $3 ($1=$I19,$2=VDD,$3=VSS,$4=$I9,$5=$I1);\n"
+    "  subcircuit INV2PAIR $4 ($1=$I20,$2=VDD,$3=VSS,$4=$I1,$5=$I2);\n"
+    "  subcircuit INV2PAIR $5 ($1=$I21,$2=VDD,$3=VSS,$4=$I2,$5=$I3);\n"
     "end;\n"
     "circuit INV2PAIR ($1=$I7,$2=$I5,$3=$I4,$4=$I2,$5=$I1);\n"
     "  subcircuit INV2 $1 (IN=$I3,$2=$I7,OUT=$I1,$4=$I4,$5=$I5);\n"
-    "  subcircuit INV2 $2 (IN=$I2,$2=(null),OUT=$I3,$4=$I4,$5=$I5);\n"
+    "  subcircuit INV2 $2 (IN=$I2,$2=$I6,OUT=$I3,$4=$I4,$5=$I5);\n"
     "end;\n"
     "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
     "  device PMOS $1 (S=$2,G=IN,D=$5) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
@@ -834,7 +834,7 @@ TEST(2_Probing)
   //  the transistor which supplies this probe target has been optimized away by "purge".
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "(null)");
 
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "INV2PAIR:$I7");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I18");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "INV2PAIR:$I3");
 }
 
@@ -1087,13 +1087,13 @@ TEST(3_GlobalNetConnections)
   db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
     "  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC,$7=VDD);\n"
-    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);\n"
-    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);\n"
-    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);\n"
-    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);\n"
     "end;\n"
     "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
-    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
     "  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
     "end;\n"
     "circuit INV2 ($1=(null),IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=(null));\n"
@@ -1115,7 +1115,7 @@ TEST(3_GlobalNetConnections)
   //  the transistor which supplies this probe target has been optimized away by "purge".
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "(null)");
 
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "INV2PAIR:$I8");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I22");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "INV2PAIR:$I4");
 }
 
@@ -1374,13 +1374,13 @@ TEST(4_GlobalNetDeviceExtraction)
   db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
     "  subcircuit INV2PAIR $1 (BULK=VSS,$2=FB,$3=VDD,$4=VSS,$5=$I7,$6=OSC,$7=VDD);\n"
-    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);\n"
-    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);\n"
-    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);\n"
-    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=(null),$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=$I22,$3=VDD,$4=VSS,$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=$I23,$3=VDD,$4=VSS,$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=$I24,$3=VDD,$4=VSS,$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7,$7=VDD);\n"
     "end;\n"
     "circuit INV2PAIR (BULK=BULK,$2=$I8,$3=$I6,$4=$I5,$5=$I3,$6=$I2,$7=$I1);\n"
-    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=(null),OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
+    "  subcircuit INV2 $1 ($1=$I1,IN=$I3,$3=$I7,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"
     "  subcircuit INV2 $2 ($1=$I1,IN=$I4,$3=$I8,OUT=$I2,VSS=$I5,VDD=$I6,BULK=BULK);\n"
     "end;\n"
     "circuit INV2 ($1=$1,IN=IN,$3=$3,OUT=OUT,VSS=VSS,VDD=VDD,BULK=BULK);\n"
@@ -1402,7 +1402,7 @@ TEST(4_GlobalNetDeviceExtraction)
   //  the transistor which supplies this probe target has been optimized away by "purge".
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "(null)");
 
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "INV2PAIR:$I8");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I22");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "INV2PAIR:$I4");
 }
 
@@ -1658,10 +1658,10 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   db::compare_netlist (_this, *l2n.netlist (),
     "circuit RINGO (FB=FB,OSC=OSC,VDD=VDD,VSS=VSS);\n"
     "  subcircuit INV2PAIR $1 (BULK=VSS,$2=VDD,$3=VSS,$4=FB,$5=$I7,$6=OSC,$7=VDD);\n"
-    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=VDD,$3=VSS,$4=(null),$5=FB,$6=$I13,$7=VDD);\n"
-    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=VDD,$3=VSS,$4=(null),$5=$I13,$6=$I5,$7=VDD);\n"
-    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=VDD,$3=VSS,$4=(null),$5=$I5,$6=$I6,$7=VDD);\n"
-    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=VDD,$3=VSS,$4=(null),$5=$I6,$6=$I7,$7=VDD);\n"
+    "  subcircuit INV2PAIR $2 (BULK=VSS,$2=VDD,$3=VSS,$4=$I22,$5=FB,$6=$I13,$7=VDD);\n"
+    "  subcircuit INV2PAIR $3 (BULK=VSS,$2=VDD,$3=VSS,$4=$I23,$5=$I13,$6=$I5,$7=VDD);\n"
+    "  subcircuit INV2PAIR $4 (BULK=VSS,$2=VDD,$3=VSS,$4=$I24,$5=$I5,$6=$I6,$7=VDD);\n"
+    "  subcircuit INV2PAIR $5 (BULK=VSS,$2=VDD,$3=VSS,$4=$I25,$5=$I6,$6=$I7,$7=VDD);\n"
     "end;\n"
     "circuit INV2PAIR (BULK=BULK,$2=$I6,$3=$I5,$4=$I4,$5=$I3,$6=$I2,$7=$I1);\n"
     "  subcircuit INV2 $1 ($1=$I1,IN=$I3,OUT=$I4,VSS=$I5,VDD=$I6,BULK=BULK);\n"

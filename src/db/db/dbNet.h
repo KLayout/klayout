@@ -603,11 +603,11 @@ public:
   }
 
   /**
-   *  @brief Returns true, if the net is floating (has no or only a single connection)
+   *  @brief Returns true, if the net is floating (there is no active element on the net)
    */
   bool is_floating () const
   {
-    return (m_pins.size () + m_subcircuit_pins.size () + m_terminals.size ()) < 2;
+    return (m_subcircuit_pins.size () + m_terminals.size ()) < 1;
   }
 
   /**

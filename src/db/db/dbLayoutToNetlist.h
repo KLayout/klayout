@@ -255,6 +255,19 @@ public:
   std::string name (unsigned int) const;
 
   /**
+   *  @brief Sets the generator string
+   */
+  void set_generator (const std::string &g);
+
+  /**
+   *  @brief Gets the generator string
+   */
+  const std::string &generator () const
+  {
+    return m_generator;
+  }
+
+  /**
    *  @brief Returns true, if the region is a persisted region
    *  Persisted regions have a name and are kept inside the LayoutToNetlist
    *  object.
@@ -730,6 +743,7 @@ private:
   bool m_is_flat;
   double m_device_scaling;
   db::DeepLayer m_dummy_layer;
+  std::string m_generator;
 
   struct CellReuseTableKey
   {

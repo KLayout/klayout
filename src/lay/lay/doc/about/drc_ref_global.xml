@@ -204,6 +204,30 @@ See <a href="/about/drc_ref_netter.xml#device_scaling">Netter#device_scaling</a>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
 planar diode 
 </p>
+<h2>"dmos3" - Supplies the DMOS3 transistor extractor class</h2>
+<keyword name="dmos3"/>
+<a name="dmos3"/><p>Usage:</p>
+<ul>
+<li><tt>dmos3(name)</tt></li>
+</ul>
+<p>
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
+three-terminal DMOS transistor. A DMOS transistor is essentially
+the same than a MOS transistor, but source and drain are 
+separated.
+</p>
+<h2>"dmos4" - Supplies the MOS4 transistor extractor class</h2>
+<keyword name="dmos4"/>
+<a name="dmos4"/><p>Usage:</p>
+<ul>
+<li><tt>dmos4(name)</tt></li>
+</ul>
+<p>
+Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
+four-terminal DMOS transistor. A DMOS transistor is essentially
+the same than a MOS transistor, but source and drain are 
+separated.
+</p>
 <h2>"edge" - Creates an edge object</h2>
 <keyword name="edge"/>
 <a name="edge"/><p>Usage:</p>

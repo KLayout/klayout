@@ -351,6 +351,26 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether this class performs strict terminal mapping
+   *
+   *  Classes with this flag set don't allow terminal swapping, independently of the
+   *  "normalize_terminal_id" implementation. If two classes are involved in a compare,
+   *  both classes are treated strict if one of them operates in strict mode.
+   */
+  void set_strict (bool s)
+  {
+    m_strict = s;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether this class performs strict terminal mapping
+   */
+  bool is_strict () const
+  {
+    return m_strict;
+  }
+
+  /**
    *  @brief Gets the name of the device class
    *
    *  The name is a formal name which identifies the class.
@@ -555,6 +575,7 @@ private:
   std::string m_name, m_description;
   std::vector<DeviceTerminalDefinition> m_terminal_definitions;
   std::vector<DeviceParameterDefinition> m_parameter_definitions;
+  bool m_strict;
   db::Netlist *mp_netlist;
   tl::shared_ptr<db::DeviceParameterCompareDelegate> mp_pc_delegate;
 

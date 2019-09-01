@@ -350,8 +350,14 @@ struct writer<gsi::VectorType>
         aa->write<void *> ((void *)0);
       }
     } else {
+
+      if (TYPE (arg) != T_ARRAY) {
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected array, got %s)")), rba_class_name (arg).c_str ()));
+      }
+
       tl_assert (atype.inner () != 0);
       aa->write<void *> ((void *)new RubyBasedVectorAdaptor (arg, atype.inner ()));
+
     }
   }
 };
@@ -370,10 +376,17 @@ struct writer<gsi::MapType>
       } else {
         aa->write<void *> ((void *)0);
       }
+
     } else {
+
+      if (TYPE (arg) != T_HASH) {
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected hash, got %s)")), rba_class_name (arg).c_str ()));
+      }
+
       tl_assert (atype.inner () != 0);
       tl_assert (atype.inner_k () != 0);
       aa->write<void *> ((void *)new RubyBasedMapAdaptor (arg, atype.inner (), atype.inner_k ()));
+
     }
   }
 };

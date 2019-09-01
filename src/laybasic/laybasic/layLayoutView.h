@@ -2286,6 +2286,17 @@ public:
   unsigned int add_rdb (rdb::Database *rdb);
 
   /**
+   *  @brief Replaces a marker database
+   *
+   *  The layout view will become owner of the database.
+   *  If the index is not valid, the database will be added and the new index will be returned.
+   *
+   *  @param db_index The index of the database to replace
+   *  @param rdb The database to add
+   */
+  unsigned int replace_rdb (unsigned int db_index, rdb::Database *rdb);
+
+  /**
    *  @brief Get the marker database by index
    *
    *  @param index The index of the database
@@ -2339,6 +2350,17 @@ public:
    *  @return The index of the database
    */
   unsigned int add_l2ndb (db::LayoutToNetlist *l2ndb);
+
+  /**
+   *  @brief Replaces a Netlist database
+   *
+   *  The layout view will become owner of the database.
+   *  If the index is not valid, the database will be added and the new index will be returned.
+   *
+   *  @param db_index The index of the database to replace
+   *  @param l2ndb The database to add
+   */
+  unsigned int replace_l2ndb (unsigned int db_index, db::LayoutToNetlist *l2ndb);
 
   /**
    *  @brief Get the netlist database by index

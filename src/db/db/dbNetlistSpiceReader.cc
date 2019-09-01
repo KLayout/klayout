@@ -27,6 +27,8 @@
 #include "tlStream.h"
 #include "tlLog.h"
 #include "tlString.h"
+#include "tlFileUtils.h"
+#include "tlUri.h"
 
 #include <sstream>
 #include <cctype>
@@ -83,34 +85,73 @@ static db::DeviceClass *make_device_class (db::Circuit *circuit, const std::stri
   return cls;
 }
 
-bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &pv)
 {
+  std::map<std::string, double> params = pv;
+
+  double mult = 1.0;
+  std::map<std::string, double>::const_iterator mp = params.find ("M");
+  if (mp != params.end ()) {
+    mult = mp->second;
+  }
+
+  if (mult < 1e-10) {
+    error (tl::sprintf (tl::to_string (tr ("Invalid multiplier value (M=%.12g) - must not be zero or negative")), mult));
+  }
+
   std::string cn = model;
   db::DeviceClass *cls = circuit->netlist ()->device_class_by_name (cn);
 
   if (cls) {
+
     //  use given class
+
   } else if (element == "R") {
+
     if (cn.empty ()) {
       cn = "RES";
     }
     cls = make_device_class<db::DeviceClassResistor> (circuit, cn);
+
+    //  Apply multiplier
+    value /= mult;
+
   } else if (element == "L") {
+
     if (cn.empty ()) {
       cn = "IND";
     }
     cls = make_device_class<db::DeviceClassInductor> (circuit, cn);
+
+    //  Apply multiplier
+    value /= mult;
+
   } else if (element == "C") {
+
     if (cn.empty ()) {
       cn = "CAP";
     }
     cls = make_device_class<db::DeviceClassCapacitor> (circuit, cn);
+
+    //  Apply multiplier
+    value *= mult;
+
   } else if (element == "D") {
+
     if (cn.empty ()) {
       cn = "DIODE";
     }
     cls = make_device_class<db::DeviceClassDiode> (circuit, cn);
+
+    //  Apply multiplier to "A"
+    std::map<std::string, double>::iterator p;
+    p = params.find ("A");
+    if (p != params.end ()) {
+      p->second *= mult;
+    }
+
   } else if (element == "Q") {
+
     if (nets.size () == 3) {
       if (cn.empty ()) {
         cn = "BJT3";
@@ -124,12 +165,29 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     } else {
       error (tl::to_string (tr ("'Q' element needs to have 3 or 4 terminals")));
     }
+
+    //  Apply multiplier to "AE"
+    std::map<std::string, double>::iterator p;
+    p = params.find ("AE");
+    if (p != params.end ()) {
+      p->second *= mult;
+    }
+
   } else if (element == "M") {
+
     if (nets.size () == 4) {
       if (cn.empty ()) {
         cn = "MOS4";
       }
       cls = make_device_class<db::DeviceClassMOS4Transistor> (circuit, cn);
+
+      //  Apply multiplier to "W"
+      std::map<std::string, double>::iterator p;
+      p = params.find ("W");
+      if (p != params.end ()) {
+        p->second *= mult;
+      }
+
     } else {
       error (tl::to_string (tr ("'M' element needs to have 4 terminals")));
     }
@@ -243,7 +301,20 @@ void NetlistSpiceReader::finish ()
 
 void NetlistSpiceReader::push_stream (const std::string &path)
 {
-  tl::InputStream *istream = new tl::InputStream (path);
+  tl::URI current_uri (mp_stream->source ());
+  tl::URI new_uri (path);
+
+  tl::InputStream *istream;
+  if (current_uri.scheme ().empty () && new_uri.scheme ().empty ()) {
+    if (tl::is_absolute (path)) {
+      istream = new tl::InputStream (path);
+    } else {
+      istream = new tl::InputStream (tl::combine_path (tl::dirname (mp_stream->source ()), path));
+    }
+  } else {
+    istream = new tl::InputStream (current_uri.resolved (new_uri).to_string ());
+  }
+
   m_streams.push_back (std::make_pair (istream, mp_stream.release ()));
   mp_stream.reset (new tl::TextInputStream (*istream));
 }
@@ -291,7 +362,7 @@ std::string NetlistSpiceReader::get_line ()
     }
 
     tl::Extractor ex (l.c_str ());
-    if (ex.test_without_case (".include")) {
+    if (ex.test_without_case (".include") || ex.test_without_case (".inc")) {
 
       std::string path = read_name_with_case (ex);
 
@@ -346,8 +417,10 @@ bool NetlistSpiceReader::read_card ()
 
     } else if (ex.test_without_case ("global")) {
 
-      std::string n = read_name (ex);
-      m_global_nets.push_back (n);
+      while (! ex.at_end ()) {
+        std::string n = read_name (ex);
+        m_global_nets.push_back (n);
+      }
 
     } else if (ex.test_without_case ("subckt")) {
 
@@ -405,7 +478,7 @@ void NetlistSpiceReader::error (const std::string &msg)
 
 void NetlistSpiceReader::warn (const std::string &msg)
 {
-  std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, mp_stream->source (), mp_stream->line_number ());
+  std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, mp_stream->source (), mp_stream->line_number () - 1);
   tl::warn << fmt_msg;
 }
 
@@ -741,10 +814,6 @@ bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &ele
 
 void NetlistSpiceReader::read_subcircuit (const std::string &sc_name, const std::string &nc_name, const std::vector<db::Net *> &nets)
 {
-  if (nets.empty ()) {
-    error (tl::to_string (tr ("A circuit call needs at least one net")));
-  }
-
   db::Circuit *cc = mp_netlist->circuit_by_name (nc_name);
   if (! cc) {
 

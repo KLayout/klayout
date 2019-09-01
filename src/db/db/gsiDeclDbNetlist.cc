@@ -809,6 +809,20 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name=", &db::DeviceClass::set_name, gsi::arg ("name"),
     "@brief Sets the name of the device class."
   ) +
+  gsi::method ("strict?", &db::DeviceClass::is_strict,
+    "@brief Gets a value indicating whether this class performs strict terminal mapping\n"
+    "See \\strict= for details about this attribute."
+  ) +
+  gsi::method ("strict=", &db::DeviceClass::set_strict, gsi::arg ("s"),
+    "@brief Sets a value indicating whether this class performs strict terminal mapping\n"
+    "\n"
+    "Classes with this flag set never allow terminal swapping, even if the device symmetry supports that. "
+    "If two classes are involved in a netlist compare,\n"
+    "terminal swapping will be disabled if one of the classes is in strict mode.\n"
+    "\n"
+    "By default, device classes are not strict and terminal swapping is allowed as far as the "
+    "device symmetry supports that."
+  ) +
   gsi::method ("description", &db::DeviceClass::description,
     "@brief Gets the description text of the device class."
   ) +
@@ -1014,7 +1028,9 @@ Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "Ge
   gsi::method ("equivalent_terminal_id", &GenericDeviceClass::equivalent_terminal_id, gsi::arg ("original_id"), gsi::arg ("equivalent_id"),
     "@brief Specifies a terminal to be equivalent to another.\n"
     "Use this method to specify two terminals to be exchangeable. For example to make S and D of a MOS transistor equivalent, "
-    "call this method with S and D terminal IDs. In netlist matching, S will be translated to D and thus made equivalent to D."
+    "call this method with S and D terminal IDs. In netlist matching, S will be translated to D and thus made equivalent to D.\n"
+    "\n"
+    "Note that terminal equivalence is not effective if the device class operates in strict mode (see \\DeviceClass#strict=)."
   ),
   "@brief A generic device class\n"
   "This class allows building generic device classes. Specificially, terminals can be defined "
@@ -1090,7 +1106,7 @@ Class<db::Circuit> decl_dbCircuit ("db", "Circuit",
     "@brief Iterates over the parent circuits of this circuit\n"
     "Child circuits are the ones that are referencing this circuit via subcircuits."
   ) +
-  gsi::method ("has_refs", &db::Circuit::has_refs,
+  gsi::method ("has_refs?", &db::Circuit::has_refs,
     "@brief Returns a value indicating whether the circuit has references\n"
     "A circuit has references if there is at least one subcircuit referring to it."
   ) +
@@ -1363,13 +1379,13 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::method ("remove", &db::Netlist::remove_circuit, gsi::arg ("circuit"),
     "@brief Removes the given circuit object from the netlist\n"
     "After the circuit has been removed, the object becomes invalid and cannot be used further. "
-    "A circuit with references (see \\has_refs) should not be removed as the "
+    "A circuit with references (see \\has_refs?) should not be removed as the "
     "subcircuits calling it would afterwards point to nothing."
   ) +
   gsi::method ("purge_circuit", &db::Netlist::purge_circuit, gsi::arg ("circuit"),
     "@brief Removes the given circuit object and all child circuits which are not used otherwise from the netlist\n"
     "After the circuit has been removed, the object becomes invalid and cannot be used further. "
-    "A circuit with references (see \\has_refs) should not be removed as the "
+    "A circuit with references (see \\has_refs?) should not be removed as the "
     "subcircuits calling it would afterwards point to nothing."
   ) +
   gsi::method ("flatten_circuit", &db::Netlist::flatten_circuit, gsi::arg ("circuit"),

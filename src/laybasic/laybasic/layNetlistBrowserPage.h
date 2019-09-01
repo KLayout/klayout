@@ -169,6 +169,7 @@ public slots:
 private slots:
   void show_all_clicked ();
   void info_button_pressed ();
+  void rerun_button_pressed ();
   void find_button_pressed ();
   void anchor_clicked (const QString &url);
   void navigate_back ();
@@ -212,6 +213,7 @@ private:
   std::vector<const db::Circuit *> m_current_circuits;
   lay::NetInfoDialog *mp_info_dialog;
   tl::DeferredMethod<NetlistBrowserPage> dm_update_highlights;
+  tl::DeferredMethod<NetlistBrowserPage> dm_rerun_macro;
   db::ContextCache m_cell_context_cache;
 
   void set_db (db::LayoutToNetlist *l2ndb);
@@ -233,6 +235,7 @@ private:
   bool produce_highlights_for_subcircuit (const db::SubCircuit *subcircuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   void configure_marker (lay::Marker *marker, bool with_fill);
+  void rerun_macro ();
 
   void export_nets (const std::vector<const db::Net *> *nets);
 };

@@ -115,6 +115,10 @@ class DBNetlist_TestClass < TestBase
     assert_equal(nl.device_class_by_name("UVW") == cc, true)
     assert_equal(nl.device_class_by_name("doesntexist") == nil, true)
 
+    assert_equal(cc.strict?, false)
+    cc.strict = true
+    assert_equal(cc.strict?, true)
+
     names = []
     nl.each_device_class { |i| names << i.name }
     assert_equal(names, [ c.name, cc.name ])
@@ -218,7 +222,7 @@ class DBNetlist_TestClass < TestBase
 
     d1.connect_terminal(1, net)
 
-    assert_equal(net.is_floating?, true)
+    assert_equal(net.is_floating?, false)
     assert_equal(net.is_internal?, false)
     assert_equal(net.terminal_count, 1)
     assert_equal(net.pin_count, 0)
@@ -411,7 +415,7 @@ class DBNetlist_TestClass < TestBase
     assert_equal(net.pin_count, 0)
     assert_equal(net.subcircuit_pin_count, 1)
     assert_equal(net.terminal_count, 0)
-    assert_equal(net.is_floating?, true)
+    assert_equal(net.is_floating?, false)
     assert_equal(net.is_internal?, false)
     assert_equal(sc1.net_for_pin(1).name, "NET")
     assert_equal(sc1.net_for_pin(0).inspect, "nil")

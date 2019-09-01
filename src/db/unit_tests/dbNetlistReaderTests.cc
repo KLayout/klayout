@@ -137,10 +137,10 @@ TEST(4_ReaderWithUnconnectedPins)
   EXPECT_EQ (nl.to_string (),
     "circuit RINGO ('1'='1','2'='2','3'='3','4'='4');\n"
     "  subcircuit INV2PAIR $1 ('1'='4','2'='3','3'='4','4'='1','5'='6','6'='2','7'='3');\n"
-    "  subcircuit INV2PAIR $2 ('1'='4','2'='3','3'='4','4'=(null),'5'='1','6'='5','7'='3');\n"
-    "  subcircuit INV2PAIR $3 ('1'='4','2'='3','3'='4','4'=(null),'5'='5','6'='8','7'='3');\n"
-    "  subcircuit INV2PAIR $4 ('1'='4','2'='3','3'='4','4'=(null),'5'='8','6'='7','7'='3');\n"
-    "  subcircuit INV2PAIR $5 ('1'='4','2'='3','3'='4','4'=(null),'5'='7','6'='6','7'='3');\n"
+    "  subcircuit INV2PAIR $2 ('1'='4','2'='3','3'='4','4'='100','5'='1','6'='5','7'='3');\n"
+    "  subcircuit INV2PAIR $3 ('1'='4','2'='3','3'='4','4'='101','5'='5','6'='8','7'='3');\n"
+    "  subcircuit INV2PAIR $4 ('1'='4','2'='3','3'='4','4'='102','5'='8','6'='7','7'='3');\n"
+    "  subcircuit INV2PAIR $5 ('1'='4','2'='3','3'='4','4'='103','5'='7','6'='6','7'='3');\n"
     "end;\n"
     "circuit INV2PAIR ('1'='1','2'='2','3'='3','4'='4','5'='5','6'='6','7'='7');\n"
     "  subcircuit INV2 $1 ('1'='7','2'='5','3'='4','4'='3','5'='2','6'='1');\n"
@@ -251,7 +251,7 @@ TEST(6_ReaderWithDelegate)
     "  device RES $1 (A=A,B=Z) (R=100000,L=0,W=0,A=0,P=0);\n"
     "end;\n"
     "circuit .TOP ();\n"
-    "  subcircuit SUBCKT SUBCKT ($1=(null),A=(null),VDD=(null),Z=(null),GND=VSS,GND$1=VSS);\n"
+    "  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VDD=VDD,Z=Z,GND=VSS,GND$1=VSS);\n"
     "end;\n"
   );
 }
@@ -294,3 +294,93 @@ TEST(7_GlobalNets)
     "end;\n"
   );
 }
+
+TEST(8_Include)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader8.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit INVX1 ('1'='1','2'='2','3'='3','4'='4','5'='5','6'='6');\n"
+    "  device MLVPMOS $1 (S='1',G='5',D='2',B='4') (L=0.25,W=1.5,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device MLVNMOS $2 (S='3',G='5',D='2',B='6') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit ND2X1 ('1'='1','2'='2','3'='3','4'='4','5'='5','6'='6','7'='7');\n"
+    "  device MLVPMOS $1 (S='2',G='6',D='1',B='4') (L=0.25,W=1.5,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device MLVPMOS $2 (S='1',G='5',D='2',B='4') (L=0.25,W=1.5,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device MLVNMOS $3 (S='3',G='6',D='8',B='7') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device MLVNMOS $4 (S='8',G='5',D='2',B='7') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit RINGO ('11'='11','12'='12','13'='13','14'='14','15'='15');\n"
+    "  subcircuit ND2X1 $1 ('1'='12','2'='1','3'='15','4'='12','5'='11','6'='14','7'='15');\n"
+    "  subcircuit INVX1 $2 ('1'='12','2'='2','3'='15','4'='12','5'='1','6'='15');\n"
+    "  subcircuit INVX1 $3 ('1'='12','2'='3','3'='15','4'='12','5'='2','6'='15');\n"
+    "  subcircuit INVX1 $4 ('1'='12','2'='4','3'='15','4'='12','5'='3','6'='15');\n"
+    "  subcircuit INVX1 $5 ('1'='12','2'='5','3'='15','4'='12','5'='4','6'='15');\n"
+    "  subcircuit INVX1 $6 ('1'='12','2'='6','3'='15','4'='12','5'='5','6'='15');\n"
+    "  subcircuit INVX1 $7 ('1'='12','2'='7','3'='15','4'='12','5'='6','6'='15');\n"
+    "  subcircuit INVX1 $8 ('1'='12','2'='8','3'='15','4'='12','5'='7','6'='15');\n"
+    "  subcircuit INVX1 $9 ('1'='12','2'='9','3'='15','4'='12','5'='8','6'='15');\n"
+    "  subcircuit INVX1 $10 ('1'='12','2'='10','3'='15','4'='12','5'='9','6'='15');\n"
+    "  subcircuit INVX1 $11 ('1'='12','2'='11','3'='15','4'='12','5'='10','6'='15');\n"
+    "  subcircuit INVX1 $12 ('1'='12','2'='13','3'='15','4'='12','5'='11','6'='15');\n"
+    "end;\n"
+  );
+}
+
+TEST(9_DeviceMultipliers)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader9.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  std::string nl_string = nl.to_string ();
+  //  normalization of exponential representation:
+  nl_string = tl::replaced (nl_string, "e-009", "e-09");
+
+  EXPECT_EQ (nl_string,
+    "circuit .TOP ();\n"
+    "  device RES $1 (A='1',B='2') (R=850,L=0,W=0,A=0,P=0);\n"
+    "  device RES $2 (A='3',B='4') (R=1700,L=0,W=0,A=0,P=0);\n"
+    "  device NMOS $1 (S='1',G='2',D='3',B='4') (L=7,W=4,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S='1',G='2',D='3',B='4') (L=7,W=2,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device CAP $1 (A='1',B='2') (C=2e-09,A=0,P=0);\n"
+    "  device CAP $2 (A='3',B='4') (C=1e-09,A=0,P=0);\n"
+    "  device DIODE $1 (A='1',C='2') (A=20,P=0);\n"
+    "  device DIODE $2 (A='3',C='4') (A=10,P=0);\n"
+    "  device BIP $1 (C='1',B='2',E='3',S='4') (AE=20,PE=0,AB=0,PB=0,AC=0,PC=0,NE=1);\n"
+    "  device BIP $2 (C='1',B='2',E='3',S='4') (AE=10,PE=0,AB=0,PB=0,AC=0,PC=0,NE=1);\n"
+    "end;\n"
+  );
+}
+
+TEST(10_SubcircuitsNoPins)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader10.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  device RES $1 (A=VDD,B=GND) (R=1000,L=0,W=0,A=0,P=0);\n"
+    "  subcircuit FILLER_CAP '0' (VDD=VDD,GND=GND);\n"
+    "end;\n"
+    "circuit FILLER_CAP (VDD=VDD,GND=GND);\n"
+    "  device NMOS '0' (S=GND,G=VDD,D=GND,B=GND) (L=10,W=10,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+

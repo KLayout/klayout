@@ -119,11 +119,59 @@ same_device_classes("NMOS_IN_LAYOUT", "NMOS_IN_SCHEMATIC")</pre>
 
   <p>
   To eliminate all capacitors with a capacitance value below a certain threshold, use the
-  <a href="/about/lvs_ref_global.xml#max_caps">max_caps</a> function. This will
+  <a href="/about/lvs_ref_global.xml#min_caps">min_caps</a> function. This will
   eliminate all capacitances with a value &lt;= 0.1fF:
   </p>
 
-  <pre>max_caps(1e-16)</pre>
+  <pre>min_caps(1e-16)</pre>
+
+  <h2>Compare and netlist hierarchy</h2>
+
+  <p>
+  Good layouts are built hierarchically and the netlist compare can make use
+  of hierarchy. "Hierarchically" means that a circuit is built from cells 
+  which itself map to subcircuits of the schematic netlist. The netlist
+  extractor tries hard to maintain the hierarchy and the netlist compare
+  will utilize the hierarchy to provide more meaningful reports and enable
+  a bottom-up design approach. 
+  </p>
+
+  <p>
+  Given a hierarchical layout and schematic netlist, the compare algorithm
+  will work bottom-up: it will first compare the leaf circuits (circuits without
+  subcircuit calls) and if those match, it will continue with the calling
+  circuits. This approach is more efficient and fosters a clean relationship
+  between layout and schematic netlist.
+  </p>
+
+  <p>
+  To enable hierarchical extraction, you must use "deep" mode (<a href="/about/drc_ref_global.xml#deep">deep</a>). 
+  If the deep mode statement is missing, the layout netlist will be flat (i.e. without
+  subcircuits).
+  </p>
+
+  <p>
+  The second useful feature is "align" (<a href="/about/lvs_ref_global.xml#align">align</a>). 
+  This statement will remove circuits from the layout or schematic netlist which are
+  unknown in the other netlist. Often, layouts contain helper cells which are not 
+  corresponding to a circuit (e.g. via cells). These are removed in this step. Eventually, 
+  this step will also flatten the schematic netlist if the layout has been extracted
+  in a flat way.
+  </p>
+
+  <p>
+  In general, it's a good idea to include "align" before the "compare" step.
+  </p>
+
+  <p>
+  A very useful side effect of "align" is this: it will remove circuits above the 
+  top level circuit of either side. So it will eventually render a sub-tree from 
+  the circuit tree and use that for compare. This enables <b>subcell verification</b>:
+  by selecting a subcell in the layout hierarchy, an "align"-enabled LVS script will
+  compare this cell against the corresponding subcircuit in the schematic netlist.
+  It will ignore the parent hierarchy of this subcircuit. This way, you can work yourself 
+  upwards in the hierarchy and fix LVS errors cell by cell with the same schematic netlist.
+  </p>
 
   <h2>How the compare algorithm works</h2>
 

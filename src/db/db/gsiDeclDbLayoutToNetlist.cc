@@ -169,6 +169,13 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "The database unit is mandatory because the physical parameter extraction "
     "for devices requires this unit for translation of layout to physical dimensions.\n"
   ) +
+  gsi::method ("generator", &db::LayoutToNetlist::generator,
+    "@brief Gets the generator string.\n"
+    "The generator is the script that created this database.\n"
+  ) +
+  gsi::method ("generator=", &db::LayoutToNetlist::set_generator, gsi::arg ("generator"),
+    "@brief Sets the generator string.\n"
+  ) +
   gsi::method ("dss", (db::DeepShapeStore &(db::LayoutToNetlist::*) ()) &db::LayoutToNetlist::dss,
     "@brief Gets a reference to the internal DSS object.\n"
   ) +

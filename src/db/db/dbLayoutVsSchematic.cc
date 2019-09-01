@@ -86,7 +86,7 @@ db::NetlistCrossReference *LayoutVsSchematic::make_cross_ref ()
 }
 
 
-void db::LayoutVsSchematic::save (const std::string &path, bool short_format)
+void LayoutVsSchematic::save (const std::string &path, bool short_format)
 {
   tl::OutputStream stream (path);
   db::LayoutVsSchematicStandardWriter writer (stream, short_format);
@@ -94,7 +94,7 @@ void db::LayoutVsSchematic::save (const std::string &path, bool short_format)
   writer.write (this);
 }
 
-void db::LayoutVsSchematic::load (const std::string &path)
+void LayoutVsSchematic::load (const std::string &path)
 {
   tl::InputStream stream (path);
   db::LayoutVsSchematicStandardReader reader (stream);

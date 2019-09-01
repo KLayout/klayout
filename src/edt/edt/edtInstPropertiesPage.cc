@@ -44,8 +44,8 @@ namespace edt
 // -------------------------------------------------------------------------
 //  InstPropertiesPage implementation
 
-InstPropertiesPage::InstPropertiesPage (edt::Service *service, QWidget *parent)
-  : lay::PropertiesPage (parent, service), mp_service (service), m_enable_cb_callback (true), mp_pcell_parameters (0)
+InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
+  : lay::PropertiesPage (parent, manager, service), mp_service (service), m_enable_cb_callback (true), mp_pcell_parameters (0)
 {
   m_selection_ptrs.reserve (service->selection ().size ());
   for (edt::Service::obj_iterator s = service->selection ().begin (); s != service->selection ().end (); ++s) {

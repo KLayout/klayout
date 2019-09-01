@@ -296,9 +296,9 @@ PolygonService::PolygonService (db::Manager *manager, lay::LayoutView *view)
 }
 
 lay::PropertiesPage *
-PolygonService::properties_page (QWidget *parent)
+PolygonService::properties_page (db::Manager *manager, QWidget *parent)
 {
-  return new edt::PolygonPropertiesPage (this, parent);
+  return new edt::PolygonPropertiesPage (this, manager, parent);
 }
 
 void 
@@ -624,9 +624,9 @@ BoxService::BoxService (db::Manager *manager, lay::LayoutView *view)
 }
   
 lay::PropertiesPage *
-BoxService::properties_page (QWidget *parent)
+BoxService::properties_page (db::Manager *manager, QWidget *parent)
 {
-  return new edt::BoxPropertiesPage (this, parent);
+  return new edt::BoxPropertiesPage (this, manager, parent);
 }
 
 void 
@@ -712,9 +712,9 @@ TextService::~TextService ()
 }
 
 lay::PropertiesPage *
-TextService::properties_page (QWidget *parent)
+TextService::properties_page (db::Manager *manager, QWidget *parent)
 {
-  return new edt::TextPropertiesPage (this, parent);
+  return new edt::TextPropertiesPage (this, manager, parent);
 }
 
 void 
@@ -895,12 +895,12 @@ PathService::~PathService ()
 }
 
 lay::PropertiesPage *
-PathService::properties_page (QWidget *parent)
+PathService::properties_page (db::Manager *manager, QWidget *parent)
 {
   if (view ()->is_editable ()) {
-    return new edt::EditablePathPropertiesPage (this, parent);
+    return new edt::EditablePathPropertiesPage (this, manager, parent);
   } else {
-    return new edt::PathPropertiesPage (this, parent);
+    return new edt::PathPropertiesPage (this, manager, parent);
   }
 }
 
@@ -1120,9 +1120,9 @@ InstService::InstService (db::Manager *manager, lay::LayoutView *view)
 }
 
 lay::PropertiesPage *
-InstService::properties_page (QWidget *parent)
+InstService::properties_page (db::Manager *manager, QWidget *parent)
 {
-  return new edt::InstPropertiesPage (this, parent);
+  return new edt::InstPropertiesPage (this, manager, parent);
 }
 
 bool

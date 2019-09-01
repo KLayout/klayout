@@ -31,13 +31,31 @@ namespace ant
 // -------------------------------------------------------------------------
 //  PropertiesPage implementation
 
-PropertiesPage::PropertiesPage (ant::Service *rulers, QWidget *parent)
-  : lay::PropertiesPage (parent, rulers), mp_rulers (rulers), m_enable_cb_callback (true)
+PropertiesPage::PropertiesPage (ant::Service *rulers, db::Manager *manager, QWidget *parent)
+  : lay::PropertiesPage (parent, manager, rulers), mp_rulers (rulers), m_enable_cb_callback (true)
 {
   mp_rulers->get_selection (m_selection);
   m_pos = m_selection.begin ();
 
   setupUi (this);
+
+  connect (p1x_to_p2x, SIGNAL (clicked ()), this, SLOT (xfer_coord_clicked ()));
+  connect (p2x_to_p1x, SIGNAL (clicked ()), this, SLOT (xfer_coord_clicked ()));
+  connect (p1y_to_p2y, SIGNAL (clicked ()), this, SLOT (xfer_coord_clicked ()));
+  connect (p2y_to_p1y, SIGNAL (clicked ()), this, SLOT (xfer_coord_clicked ()));
+
+  connect (p1_to_layout, SIGNAL (clicked ()), this, SLOT (snap_to_layout_clicked ()));
+  connect (p2_to_layout, SIGNAL (clicked ()), this, SLOT (snap_to_layout_clicked ()));
+  connect (both_to_layout, SIGNAL (clicked ()), this, SLOT (snap_to_layout_clicked ()));
+
+  p1x_to_p2x->setEnabled (! readonly());
+  p2x_to_p1x->setEnabled (! readonly());
+  p1y_to_p2y->setEnabled (! readonly());
+  p2y_to_p1y->setEnabled (! readonly());
+
+  p1_to_layout->setEnabled (! readonly());
+  p2_to_layout->setEnabled (! readonly());
+  both_to_layout->setEnabled (! readonly());
 
   lay::activate_help_links (help_label);
 
@@ -59,6 +77,115 @@ void
 PropertiesPage::front ()
 {
   m_pos = m_selection.begin ();
+}
+
+void
+PropertiesPage::xfer_coord_clicked ()
+{
+  if (readonly ()) {
+    return;
+  }
+
+  if (sender () == p1x_to_p2x) {
+    x2->setText (x1->text ());
+  } else if (sender () == p2x_to_p1x) {
+    x1->setText (x2->text ());
+  } else if (sender () == p1y_to_p2y) {
+    y2->setText (y1->text ());
+  } else if (sender () == p2y_to_p1y) {
+    y1->setText (y2->text ());
+  }
+
+  db::Transaction t (manager (), tl::to_string (QObject::tr ("Copy ruler coordinates")));
+  apply ();
+}
+
+void
+PropertiesPage::snap_to_layout_clicked ()
+{
+  if (readonly ()) {
+    return;
+  }
+
+  ant::Service *service = dynamic_cast<ant::Service *> (editable ());
+  tl_assert (service != 0);
+
+  double dx1 = 0.0, dy1 = 0.0, dx2 = 0.0, dy2 = 0.0;
+  tl::from_string (tl::to_string (x1->text ()), dx1);
+  tl::from_string (tl::to_string (x2->text ()), dx2);
+  tl::from_string (tl::to_string (y1->text ()), dy1);
+  tl::from_string (tl::to_string (y2->text ()), dy2);
+
+  db::DPoint p1 (dx1, dy1), p2 (dx2, dy2);
+
+  ant::Object r = current ();
+
+  //  for auto-metric we need some cutline constraint - any or global won't do.
+  lay::angle_constraint_type ac = r.angle_constraint ();
+  if (ac == lay::AC_Global) {
+    ac = service->snap_mode ();
+  }
+  if (ac == lay::AC_Global) {
+    ac = lay::AC_Diagonal;
+  }
+
+  db::DVector g;
+  if (service->grid_snap ()) {
+    g = db::DVector (service->grid (), service->grid ());
+  }
+
+  if (sender () == p1_to_layout || sender () == p2_to_layout) {
+
+    double snap_range = service->widget ()->mouse_event_trans ().inverted ().ctrans (service->snap_range ());
+    double max_range = 1000 * snap_range;
+
+    while (snap_range < max_range) {
+
+      std::pair<bool, db::DPoint> pp = lay::obj_snap (service->view (), p1, p1, g, ac, snap_range);
+      if (pp.first) {
+
+        QString xs = tl::to_qstring (tl::micron_to_string (pp.second.x ()));
+        QString ys = tl::to_qstring (tl::micron_to_string (pp.second.y ()));
+
+        if (sender () == p1_to_layout) {
+          x1->setText (xs);
+          y1->setText (ys);
+        } else {
+          x2->setText (xs);
+          y2->setText (ys);
+        }
+
+        db::Transaction t (manager (), tl::to_string (sender () == p1_to_layout ? QObject::tr ("Snap first ruler point") : QObject::tr ("Snap second ruler point")));
+        apply ();
+
+        break;
+
+      }
+
+      //  no point found -> one more iteration with increased range
+      snap_range *= 2.0;
+
+    }
+
+  } else {
+
+    double snap_range = service->widget ()->mouse_event_trans ().inverted ().ctrans (service->snap_range ());
+    snap_range *= 0.5;
+
+    std::pair<bool, db::DEdge> ee = lay::obj_snap2 (service->view (), p1, g, ac, snap_range, snap_range * 1000.0);
+    if (ee.first) {
+
+      x1->setText (tl::to_qstring (tl::micron_to_string (ee.second.p1 ().x ())));
+      y1->setText (tl::to_qstring (tl::micron_to_string (ee.second.p1 ().y ())));
+      x2->setText (tl::to_qstring (tl::micron_to_string (ee.second.p2 ().x ())));
+      y2->setText (tl::to_qstring (tl::micron_to_string (ee.second.p2 ().y ())));
+
+      db::Transaction t (manager (), tl::to_string (QObject::tr ("Snap both ruler points")));
+      apply ();
+
+    }
+
+  }
 }
 
 const ant::Object &

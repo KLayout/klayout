@@ -333,7 +333,7 @@ public:
   /**
    *  @brief Create the properties page
    */
-  virtual lay::PropertiesPage *properties_page (QWidget * /*parent*/);
+  virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
 
   /**
    *  @brief Get the selection for the properties page
@@ -415,7 +415,39 @@ public:
   {
     return mp_view;
   }
-  
+
+  /**
+   *  @brief Gets the snap range
+   */
+  int snap_range () const
+  {
+    return m_snap_range;
+  }
+
+  /**
+   *  @brief Gets the global snap mode
+   */
+  lay::angle_constraint_type snap_mode () const
+  {
+    return m_snap_mode;
+  }
+
+  /**
+   *  @brief Gets the grid
+   */
+  double grid () const
+  {
+    return m_grid;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether to snap to grid
+   */
+  bool grid_snap () const
+  {
+    return m_grid_snap;
+  }
+
   /**
    *  @brief Implement the menu response function
    */

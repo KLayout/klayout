@@ -352,7 +352,7 @@ public:
   /**
    *  @brief Create the properties page
    */
-  virtual lay::PropertiesPage *properties_page (QWidget * /*parent*/);
+  virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
 
   /**
    *  @brief Get the selection for the properties page

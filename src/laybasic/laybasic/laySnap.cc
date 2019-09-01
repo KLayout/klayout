@@ -441,7 +441,7 @@ private:
 
       if (m_directed) {
         for (std::vector<db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
-          if (db::sprod_sign (p - cl->p1 (), cl->d ()) <= 0) {
+          if (db::sprod_sign (p - m_original, cl->d ()) <= 0) {
             return;
           }
         }
@@ -462,7 +462,7 @@ private:
 
       if (m_directed) {
         for (std::vector<db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
-          if (db::sprod_sign (p - cl->p1 (), cl->d ()) < 0) {
+          if (db::sprod_sign (p - m_original, cl->d ()) < 0) {
             return;
           }
         }
@@ -765,10 +765,12 @@ do_obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &gri
 }
 
 std::pair <bool, db::DEdge>
-do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range, const std::vector <db::DEdge> &cutlines)
+do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range, const std::vector <db::DEdge> &cutlines)
 {
-  db::DPoint dp (pt);
-  ContourFinder finder (dp, grid, cutlines, false /*no vertex snap*/);
+  db::DPoint dp1 (pt1);
+  db::DPoint dp2 (pt2);
+
+  ContourFinder finder (dp1, grid, cutlines, false /*no vertex snap*/);
 
   double sr = min_search_range;
   while (sr < max_search_range + 1e-6) {
@@ -788,9 +790,9 @@ do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &gr
         for (std::vector<db::DEdge>::const_iterator i = cutlines.begin (); i != cutlines.end (); ++i) {
 
           db::DVector n = i->d ();
-          db::DVector d = dp - p1;
+          db::DVector d = dp2 - p1;
           if (fabs (db::vprod (n, d)) < 1e-6 * n.length () * d.length ()) {
-            if (db::sprod (n, d) < 0.0) {
+            if (db::sprod_sign (n, d) < 0) {
               n = -n;
             }
             cl.push_back (db::DEdge (p1, p1 + n));
@@ -801,14 +803,14 @@ do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &gr
       } else if (finder.has_found_edge ()) {
 
         n = finder.get_found_edge ().d ().transformed (db::DTrans (db::DTrans::r90));
-        if (db::sprod (n, dp - p1) < 0.0) {
+        if (db::sprod_sign (n, dp2 - p1) < 0) {
           n = -n;
         }
         cl.push_back (db::DEdge (p1, p1 + n));
 
       }
 
-      ContourFinder finder2 (dp, grid, cl, false /*no vertex snap*/, true /*directional cutlines*/);
+      ContourFinder finder2 (dp2, grid, cl, false /*no vertex snap*/, true /*directional cutlines*/);
 
       double sr2 = min_search_range;
       while (sr2 < max_search_range + 1e-6) {
@@ -872,17 +874,33 @@ obj_snap (lay::LayoutView *view, const db::DPoint &p1, const db::DPoint &p2, con
 std::pair <bool, db::DEdge>
 obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range)
 {
-  return do_obj_snap2 (view, lay::snap_xy (pt, grid), db::DVector (), min_search_range, max_search_range, std::vector<db::DEdge> ());
+  return obj_snap2 (view, pt, pt, grid, min_search_range, max_search_range);
 }
 
 std::pair <bool, db::DEdge>
-obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type snap_mode, double min_search_range, double max_search_range)
+obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range)
 {
-  db::DPoint dp = lay::snap_xy (pt, grid);
+  return obj_snap2 (view, pt, pt, grid, ac, min_search_range, max_search_range);
+}
+
+std::pair <bool, db::DEdge>
+obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range)
+{
+  db::DPoint dp1 = lay::snap_xy (pt1, grid);
+  db::DPoint dp2 = lay::snap_xy (pt2, grid);
+
+  return do_obj_snap2 (view, dp1, dp2, db::DVector (), min_search_range, max_search_range, std::vector<db::DEdge> ());
+}
+
+std::pair <bool, db::DEdge>
+obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double min_search_range, double max_search_range)
+{
+  db::DPoint dp1 = lay::snap_xy (pt1, grid);
+  db::DPoint dp2 = lay::snap_xy (pt2, grid);
 
   std::vector <db::DEdge> cutlines;
-  make_cutlines (snap_mode, dp, cutlines);
-  return do_obj_snap2 (view, dp, db::DVector (), min_search_range, max_search_range, cutlines);
+  make_cutlines (snap_mode, dp1, cutlines);
+  return do_obj_snap2 (view, dp1, dp2, db::DVector (), min_search_range, max_search_range, cutlines);
 }
 
 }

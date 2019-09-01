@@ -39,20 +39,13 @@ PropertiesPage::PropertiesPage (ant::Service *rulers, db::Manager *manager, QWid
 
   setupUi (this);
 
-  connect (p1x_to_p2x, SIGNAL (clicked ()), this, SLOT (xfer_coord_clicked ()));
-  connect (p2x_to_p1x, SIGNAL (clicked ()), this, SLOT (xfer_coord_clicked ()));
-  connect (p1y_to_p2y, SIGNAL (clicked ()), this, SLOT (xfer_coord_clicked ()));
-  connect (p2y_to_p1y, SIGNAL (clicked ()), this, SLOT (xfer_coord_clicked ()));
+  connect (swap_points, SIGNAL (clicked ()), this, SLOT (swap_points_clicked ()));
 
   connect (p1_to_layout, SIGNAL (clicked ()), this, SLOT (snap_to_layout_clicked ()));
   connect (p2_to_layout, SIGNAL (clicked ()), this, SLOT (snap_to_layout_clicked ()));
   connect (both_to_layout, SIGNAL (clicked ()), this, SLOT (snap_to_layout_clicked ()));
 
-  p1x_to_p2x->setEnabled (! readonly());
-  p2x_to_p1x->setEnabled (! readonly());
-  p1y_to_p2y->setEnabled (! readonly());
-  p2y_to_p1y->setEnabled (! readonly());
-
+  swap_points->setEnabled (! readonly());
   p1_to_layout->setEnabled (! readonly());
   p2_to_layout->setEnabled (! readonly());
   both_to_layout->setEnabled (! readonly());
@@ -80,23 +73,24 @@ PropertiesPage::front ()
 }
 
 void
-PropertiesPage::xfer_coord_clicked ()
+PropertiesPage::swap_points_clicked ()
 {
   if (readonly ()) {
     return;
   }
 
-  if (sender () == p1x_to_p2x) {
-    x2->setText (x1->text ());
-  } else if (sender () == p2x_to_p1x) {
-    x1->setText (x2->text ());
-  } else if (sender () == p1y_to_p2y) {
-    y2->setText (y1->text ());
-  } else if (sender () == p2y_to_p1y) {
-    y1->setText (y2->text ());
-  }
+  QString tx1 = x1->text (), tx2 = x2->text ();
+  QString ty1 = y1->text (), ty2 = y2->text ();
 
-  db::Transaction t (manager (), tl::to_string (QObject::tr ("Copy ruler coordinates")));
+  std::swap (tx1, tx2);
+  std::swap (ty1, ty2);
+
+  x1->setText (tx1);
+  x2->setText (tx2);
+  y1->setText (ty1);
+  y2->setText (ty2);
+
+  db::Transaction t (manager (), tl::to_string (QObject::tr ("Swap ruler points")));
   apply ();
 }
 
@@ -136,12 +130,14 @@ PropertiesPage::snap_to_layout_clicked ()
 
   if (sender () == p1_to_layout || sender () == p2_to_layout) {
 
+    bool snap_p1 = sender () == p1_to_layout;
+
     double snap_range = service->widget ()->mouse_event_trans ().inverted ().ctrans (service->snap_range ());
     double max_range = 1000 * snap_range;
 
     while (snap_range < max_range) {
 
-      std::pair<bool, db::DPoint> pp = lay::obj_snap (service->view (), p1, p1, g, ac, snap_range);
+      std::pair<bool, db::DPoint> pp = lay::obj_snap (service->view (), snap_p1 ? p2 : p1, snap_p1 ? p1 : p2, g, ac, snap_range);
       if (pp.first) {
 
         QString xs = tl::to_qstring (tl::micron_to_string (pp.second.x ()));
@@ -155,7 +151,7 @@ PropertiesPage::snap_to_layout_clicked ()
           y2->setText (ys);
         }
 
-        db::Transaction t (manager (), tl::to_string (sender () == p1_to_layout ? QObject::tr ("Snap first ruler point") : QObject::tr ("Snap second ruler point")));
+        db::Transaction t (manager (), tl::to_string (snap_p1 ? QObject::tr ("Snap first ruler point") : QObject::tr ("Snap second ruler point")));
         apply ();
 
         break;
@@ -172,7 +168,7 @@ PropertiesPage::snap_to_layout_clicked ()
     double snap_range = service->widget ()->mouse_event_trans ().inverted ().ctrans (service->snap_range ());
     snap_range *= 0.5;
 
-    std::pair<bool, db::DEdge> ee = lay::obj_snap2 (service->view (), p1, g, ac, snap_range, snap_range * 1000.0);
+    std::pair<bool, db::DEdge> ee = lay::obj_snap2 (service->view (), p1, p2, g, ac, snap_range, snap_range * 1000.0);
     if (ee.first) {
 
       x1->setText (tl::to_qstring (tl::micron_to_string (ee.second.p1 ().x ())));

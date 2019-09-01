@@ -54,7 +54,7 @@ public:
   virtual void apply (); 
 
 private slots:
-  void xfer_coord_clicked ();
+  void swap_points_clicked ();
   void snap_to_layout_clicked ();
 
 private:

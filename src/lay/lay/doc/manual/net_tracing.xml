@@ -101,7 +101,7 @@
     <li>Export all or selected nets to layout, save the netlist (with shapes) to a file, load it back from a file and manage
     the netlist database. Use the "File" menu button in the right upper corner.
     </li>
-    <li>Search for net names (if labelled) and circuits using the search edit box.
+    <li>Search for net names (if labeled) and circuits using the search edit box.
     </li>
     <li>Navigate through the history using the "back" and "forward" buttons at the top left.
     </li>

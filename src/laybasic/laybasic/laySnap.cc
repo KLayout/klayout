@@ -552,7 +552,7 @@ private:
 
         std::pair<bool, db::DPoint> ip = e.intersect_point (db::DEdge (e1, e2));
         if (ip.first) { 
-          find_closest (ip.second, e);
+          find_closest_exact (ip.second, e);
         }
 
       }
@@ -770,7 +770,7 @@ do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt
   db::DPoint dp1 (pt1);
   db::DPoint dp2 (pt2);
 
-  ContourFinder finder (dp1, grid, cutlines, false /*no vertex snap*/);
+  ContourFinder finder (dp1, grid, cutlines, cutlines.empty () /*vertex snap on "any direction"*/);
 
   double sr = min_search_range;
   while (sr < max_search_range + 1e-6) {
@@ -799,6 +799,10 @@ do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt
           }
 
         }
+
+      } else if (finder.is_vertex ()) {
+
+        cl.push_back (db::DEdge (p1, dp2));
 
       } else if (finder.has_found_edge ()) {
 

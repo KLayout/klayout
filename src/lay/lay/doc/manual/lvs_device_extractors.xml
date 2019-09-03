@@ -187,6 +187,27 @@ extract_devices(mos4(model_name), { "SD" => (active - poly) &amp; pplus, "G" => 
   <img src="/manual/mos_ex_tb.png"/>
   </p>
 
+  <h2>Diffusion MOS transistor extractor (<a href="/about/drc_ref_global.xml#dmos3">dmos3</a> and <a href="/about/drc_ref_global.xml#dmos4">dmos4</a>)</h2>
+
+  <p>
+  DMOS devices are basically identical to MOS devices, but for those source and drain are 
+  separated. This is often the case for diffusion MOS transistory, hence this name.
+  </p>
+
+  <p>
+  DMOS and MOS devices share the same device class. DMOS devices are configured
+  such that source and drain cannot be swapped. The netlist compare will report
+  source/drain swapping as errors for such devices.
+  </p>
+
+  <p>
+  DMOS transistors are recognized by their gate ("G" input), source ("S" input) and drain ("D" input)
+  regions. Source and drain needs to be separated from the gate shape. The touching edges of gate and
+  source/drain regions define the width of the device, the perpendicular dimension the gate length.
+  The terminal output layers for DMOS devices are the same than for MOS devices: "tS" for source, 
+  "tD" for drain, "tG" for gate, "tB" for bulk (4-terminal version).
+  </p>
+
   <h2>Bipolar transistor extractor (<a href="/about/drc_ref_global.xml#bjt3">bjt3</a> and <a href="/about/drc_ref_global.xml#bjt4">bjt4</a>)</h2>
 
   <p>

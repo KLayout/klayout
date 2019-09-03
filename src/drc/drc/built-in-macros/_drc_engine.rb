@@ -20,6 +20,9 @@ module DRC
 
       cv = RBA::CellView::active
 
+      @generator = ""
+      @rdb_index = nil
+      @l2ndb_index = nil
       @def_layout = cv && cv.layout
       @def_cell = cv && cv.cell
       @def_path = cv && cv.filename
@@ -159,6 +162,32 @@ module DRC
 
     def mos4(name)
       RBA::DeviceExtractorMOS4Transistor::new(name)
+    end
+
+    # %DRC%
+    # @brief Supplies the DMOS3 transistor extractor class
+    # @name dmos3
+    # @synopsis dmos3(name)
+    # Use this class with \extract_devices to specify extraction of a 
+    # three-terminal DMOS transistor. A DMOS transistor is essentially
+    # the same than a MOS transistor, but source and drain are 
+    # separated.
+
+    def dmos3(name)
+      RBA::DeviceExtractorMOS3Transistor::new(name, true)
+    end
+
+    # %DRC%
+    # @brief Supplies the MOS4 transistor extractor class
+    # @name dmos4
+    # @synopsis dmos4(name)
+    # Use this class with \extract_devices to specify extraction of a 
+    # four-terminal DMOS transistor. A DMOS transistor is essentially
+    # the same than a MOS transistor, but source and drain are 
+    # separated.
+
+    def dmos4(name)
+      RBA::DeviceExtractorMOS4Transistor::new(name, true)
     end
 
     # %DRC%
@@ -734,10 +763,17 @@ module DRC
       name = filename && File::basename(filename)
       name ||= "DRC"
       
-      lv = RBA::LayoutView::current
-      if lv
-        @output_rdb_index = lv.create_rdb(name)
-        @output_rdb = lv.rdb(@output_rdb_index)
+      @output_rdb_index = nil
+
+      view = RBA::LayoutView::current
+      if view
+        if self._rdb_index
+          @output_rdb = RBA::ReportDatabase::new("")   # reuse existing name
+          @output_rdb_index = view.replace_rdb(self._rdb_index, @output_rdb)
+        else
+          @output_rdb = RBA::ReportDatabase::new(name)
+          @output_rdb_index = view.add_rdb(@output_rdb)
+        end
       else
         @output_rdb = RBA::ReportDatabase::new(name)
       end
@@ -754,7 +790,7 @@ module DRC
       cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter of 'report'")
 
       @output_rdb_cell = @output_rdb.create_cell(cn)
-      @output_rdb.generator = $0
+      @output_rdb.generator = self._generator
       @output_rdb.top_cell_name = cn
       @output_rdb.description = description
       
@@ -1440,7 +1476,11 @@ CODE
 
           # NOTE: to prevent the netter destroying the database, we need to take it
           l2ndb = _take_data
-          l2ndb_index = view.add_l2ndb(l2ndb)
+          if self._l2ndb_index
+            l2ndb_index = view.replace_l2ndb(self._l2ndb_index, l2ndb)
+          else
+            l2ndb_index = view.add_l2ndb(l2ndb)
+          end
           view.show_l2ndb(l2ndb_index, view.active_cellview_index)
 
         end
@@ -1523,6 +1563,30 @@ CODE
       else
         return file
       end
+    end
+
+    def _generator
+      @generator
+    end
+
+    def _generator=(g)
+      @generator = g
+    end
+
+    def _rdb_index
+      @rdb_index
+    end
+
+    def _rdb_index=(i)
+      @rdb_index = i
+    end
+    
+    def _l2ndb_index
+      @l2ndb_index
+    end
+
+    def _l2ndb_index=(i)
+      @l2ndb_index = i
     end
 
   private
@@ -1691,7 +1755,7 @@ CODE
       @layout_sources[name] = src
       src
     end
-    
+
   end
  
 end

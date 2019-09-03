@@ -246,6 +246,23 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether not to consider net names
+   *  This feature is mainly intended for testing.
+   */
+  void set_dont_consider_net_names (bool f)
+  {
+    m_dont_consider_net_names = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether not to consider net names
+   */
+  bool dont_consider_net_names () const
+  {
+    return m_dont_consider_net_names;
+  }
+
+  /**
    *  @brief Sets the maximum branch complexity
    *
    *  This value limits the maximum branch complexity of the backtracking algorithm.
@@ -297,6 +314,7 @@ protected:
   void do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &pin_mismatch, bool &good) const;
   void do_device_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, const db::DeviceFilter &device_filter, DeviceCategorizer &device_categorizer, bool &good) const;
   void do_subcircuit_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, CircuitCategorizer &circuit_categorizer, const db::CircuitPinMapper &circuit_pin_mapper, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &good) const;
+  void handle_pin_mismatch (const db::Circuit *c1, const db::Pin *pin1, const db::Circuit *c2, const db::Pin *p2, bool &good, bool &pin_mismatch) const;
 
   mutable NetlistCompareLogger *mp_logger;
   std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > > m_same_nets;
@@ -307,6 +325,7 @@ protected:
   double m_res_threshold;
   size_t m_max_n_branch;
   size_t m_max_depth;
+  bool m_dont_consider_net_names;
 };
 
 }

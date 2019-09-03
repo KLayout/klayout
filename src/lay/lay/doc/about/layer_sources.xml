@@ -7,7 +7,7 @@
 
   <p>
   KLayout implements a concept of "layer views". The layer list is made up of such layer views.
-  A "view" is bascically a specification of what is shown how.
+  A "view" is basically a specification of what is shown how.
   The "how" part is given by the colors, stipples, styles etc. 
   The "what" part is given by the source specification.
   </p>

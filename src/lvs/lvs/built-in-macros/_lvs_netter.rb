@@ -61,6 +61,9 @@ module LVS
         @lvs = RBA::LayoutVsSchematic::new(cell.name, layout.dbu)
       end
 
+      @lvs.name = "LVS"
+      @lvs.generator = @engine._generator
+
       @l2n = @lvs
       @comparer = RBA::NetlistComparer::new
 
@@ -117,8 +120,16 @@ module LVS
 
       nl = _ensure_two_netlists
 
+      unmatched_a = @comparer.unmatched_circuits_a(*nl)
+
+      # check whether we're about to flatten away the internal top cell - that's bad
+      top_cell = l2n_data.internal_top_cell.name
+      if unmatched_a.find { |c| c.name == top_cell }
+        raise("Can't find a schematic counterpart for the top cell #{top_cell} - use 'same_circuit' to establish a correspondence")
+      end
+
       # flatten layout cells for which there is no corresponding schematic circuit
-      @comparer.unmatched_circuits_a(*nl).each do |c|
+      unmatched_a.each do |c|
         @engine.info("Flatten layout cell (no schematic): #{c.name}")
         nl[0].flatten_circuit(c)
       end
@@ -285,9 +296,13 @@ module LVS
       ( nl_a, nl_b ) = _ensure_two_netlists
 
       dc_a = a && (nl_a.device_class_by_name(a) || raise("Not a valid device class in extracted netlist: #{a}"))
-      dc_b = b && (nl_b.device_class_by_name(b) || raise("Not a valid device class in reference netlist: #{b}"))
+      dc_b = b && nl_b.device_class_by_name(b)
 
-      @comparer.same_device_classes(dc_a, dc_b)
+      # NOTE: a device class is allowed to be missing in the reference netlist because the
+      # device may simply not be used there.
+      if dc_b
+        @comparer.same_device_classes(dc_a, dc_b)
+      end
       
     end
 

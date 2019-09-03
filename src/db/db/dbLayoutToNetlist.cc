@@ -1148,7 +1148,7 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, const db::Reg
 }
 
 
-void db::LayoutToNetlist::save (const std::string &path, bool short_format)
+void LayoutToNetlist::save (const std::string &path, bool short_format)
 {
   tl::OutputStream stream (path);
   db::LayoutToNetlistStandardWriter writer (stream, short_format);
@@ -1156,7 +1156,7 @@ void db::LayoutToNetlist::save (const std::string &path, bool short_format)
   writer.write (this);
 }
 
-void db::LayoutToNetlist::load (const std::string &path)
+void LayoutToNetlist::load (const std::string &path)
 {
   tl::InputStream stream (path);
   db::LayoutToNetlistStandardReader reader (stream);
@@ -1165,7 +1165,7 @@ void db::LayoutToNetlist::load (const std::string &path)
   reader.read (this);
 }
 
-db::LayoutToNetlist *db::LayoutToNetlist::create_from_file (const std::string &path)
+db::LayoutToNetlist *LayoutToNetlist::create_from_file (const std::string &path)
 {
   std::auto_ptr<db::LayoutToNetlist> db;
 
@@ -1187,6 +1187,11 @@ db::LayoutToNetlist *db::LayoutToNetlist::create_from_file (const std::string &p
   }
 
   return db.release ();
+}
+
+void LayoutToNetlist::set_generator (const std::string &g)
+{
+  m_generator = g;
 }
 
 }

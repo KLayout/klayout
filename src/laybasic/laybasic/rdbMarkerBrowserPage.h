@@ -26,6 +26,7 @@
 
 #include "ui_MarkerBrowserPage.h"
 #include "rdbMarkerBrowser.h"
+#include "tlDeferredExecution.h"
 #include "dbBox.h"
 
 #include <QFrame>
@@ -155,6 +156,7 @@ public slots:
   void dir_down_clicked ();
   void list_up_clicked ();
   void list_down_clicked ();
+  void rerun_button_pressed ();
   void flag_button_clicked ();
   void flag_menu_selected ();
   void important_button_clicked ();
@@ -205,6 +207,7 @@ private:
   int m_directory_tree_sorted_section;
   Qt::SortOrder m_directory_tree_sort_order;
   lay::PluginRoot *mp_plugin_root;
+  tl::DeferredMethod<MarkerBrowserPage> dm_rerun_macro;
 
   void release_markers ();
   void update_marker_list (int selection_mode);
@@ -214,6 +217,7 @@ private:
   void mark_visited (bool visited);
   void do_update_markers ();
   void update_info_text ();
+  void rerun_macro ();
 };
 
 } // namespace rdb

@@ -89,12 +89,12 @@ plugins.depends += lib rdb db
 
   plugins.depends += lay ant
 
-  laybasic.depends += rdb
+  lym.depends += gsi $$LANG_DEPENDS
+  laybasic.depends += rdb lym
   ant.depends += laybasic
   img.depends += laybasic
   edt.depends += laybasic
-  lym.depends += gsi $$LANG_DEPENDS
-  lay.depends += laybasic ant img edt lym
+  lay.depends += laybasic ant img edt
   klayout_main.depends += plugins $$MAIN_DEPENDS
 
 }

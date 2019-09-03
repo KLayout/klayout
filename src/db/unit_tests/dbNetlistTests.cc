@@ -780,7 +780,7 @@ TEST(7_NetTerminalsEditing)
 
   EXPECT_EQ (n1->terminal_count (), size_t (1));
   EXPECT_EQ (n1->pin_count (), size_t (0));
-  EXPECT_EQ (n1->is_floating (), true);
+  EXPECT_EQ (n1->is_floating (), false);
   EXPECT_EQ (n1->is_internal (), false);
 
   d2->connect_terminal (1, n1);

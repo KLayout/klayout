@@ -275,9 +275,9 @@ HEADERS = \
     layNetlistBrowserTreeModel.h \
     layLibrariesView.h
 
-INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym
 
 INCLUDEPATH += $$QTBASIC_INC
 DEPENDPATH += $$QTBASIC_INC

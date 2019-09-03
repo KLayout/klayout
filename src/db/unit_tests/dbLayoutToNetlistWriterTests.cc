@@ -371,14 +371,14 @@ TEST(2_WriterWithGlobalNets)
   l2n.netlist ()->make_top_level_pins ();
   l2n.netlist ()->purge ();
 
-  std::string path = tmp_file ("tmp_l2nwriter_2.txt");
+  std::string path = tmp_file ("tmp_l2nwriter_2b.txt");
   {
     tl::OutputStream stream (path);
     db::LayoutToNetlistStandardWriter writer (stream, false);
     writer.write (&l2n);
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_2.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_2b.txt");
 
   compare_text_files (path, au_path);
 

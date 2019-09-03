@@ -1,0 +1,126 @@
+
+source($lvs_test_source, "RINGO")
+
+report_lvs($lvs_test_target_lvsdb, true)
+
+target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+
+
+# Provide a special reader
+class SubcircuitModelsReader < RBA::NetlistSpiceReaderDelegate
+
+  # says we want to catch these subcircuits as devices
+  def wants_subcircuit(name)
+    name == "NMOS" || name == "XPMOS"
+  end
+
+  # translate the element
+  def element(circuit, el, name, model, value, nets, params)
+
+    if el != "X"
+      # all other elements are left to the standard implementation
+      return super
+    end
+
+    if nets.size != 4
+      error("Subcircuit #{model} needs four nodes")
+    end
+
+    # provide a device class
+    cls = circuit.netlist.device_class_by_name(model)
+    if ! cls
+      cls = RBA::DeviceClassMOS4Transistor::new
+      cls.name = model
+      circuit.netlist.add(cls)
+    end
+
+    # create a device
+    device = circuit.create_device(cls, name)
+
+    # and configure the device
+    [ "S", "G", "D", "B" ].each_with_index do |t,index|
+      device.connect_terminal(t, nets[index])
+    end
+
+    # parameters in the model are given in micrometer units, so 
+    # we need to translate the parameter values from SI to um values:
+    device.set_parameter("W", (params["W"] || 0.0) * 1e6)
+    device.set_parameter("L", (params["L"] || 0.0) * 1e6)
+
+    return true
+
+  end
+
+end
+
+
+schematic("ringo_xdevice.cir", RBA::NetlistSpiceReader::new(SubcircuitModelsReader::new))
+
+deep
+
+# Drawing layers
+
+nwell       = input(1, 0)
+active      = input(2, 0)
+pplus       = input(3, 0)
+nplus       = input(4, 0)
+poly        = input(5, 0)
+contact     = input(8, 0)
+metal1      = input(9, 0)
+via1        = input(10, 0)
+metal2      = input(11, 0)
+
+# Bulk layer for terminal provisioning
+
+bulk        = polygon_layer
+
+# Computed layers
+
+active_in_nwell       = active & nwell
+pactive               = active_in_nwell & pplus
+pgate                 = pactive & poly
+psd                   = pactive - pgate
+ntie                  = active_in_nwell & nplus
+
+active_outside_nwell  = active - nwell
+nactive               = active_outside_nwell & nplus
+ngate                 = nactive & poly
+nsd                   = nactive - ngate
+ptie                  = active_outside_nwell & pplus
+
+# Device extraction
+
+# PMOS transistor device extraction
+extract_devices(mos4("PMOS"), { "SD" => psd, "G" => pgate, "W" => nwell, 
+                                "tS" => psd, "tD" => psd, "tG" => poly, "tW" => nwell })
+
+# NMOS transistor device extraction
+extract_devices(mos4("NMOS"), { "SD" => nsd, "G" => ngate, "W" => bulk, 
+                                "tS" => nsd, "tD" => nsd, "tG" => poly, "tW" => bulk })
+
+# Define connectivity for netlist extraction
+
+# Inter-layer
+connect(psd,        contact)
+connect(nsd,        contact)
+connect(poly,       contact)
+connect(ntie,       contact)
+connect(nwell,      ntie)
+connect(ptie,       contact)
+connect(contact,    metal1)
+connect(metal1,     via1)
+connect(via1,       metal2)
+
+# Global
+connect_global(bulk, "SUBSTRATE")
+connect_global(ptie, "SUBSTRATE")
+
+# Test same_device_classes
+same_device_classes("PMOS", "XPMOS")
+
+# Compare section
+
+netlist.simplify
+
+compare
+

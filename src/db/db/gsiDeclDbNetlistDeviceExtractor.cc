@@ -397,14 +397,19 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorMOS3Transistor *make_mos3_extractor (const std::string &name)
+static db::NetlistDeviceExtractorMOS3Transistor *make_mos3_extractor (const std::string &name, bool strict)
 {
-  return new db::NetlistDeviceExtractorMOS3Transistor (name);
+  return new db::NetlistDeviceExtractorMOS3Transistor (name, strict);
 }
 
 Class<db::NetlistDeviceExtractorMOS3Transistor> decl_NetlistDeviceExtractorMOS3Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorMOS3Transistor",
-  gsi::constructor ("new", &make_mos3_extractor, gsi::arg ("name"),
-    "@brief Creates a new device extractor with the given name."
+  gsi::constructor ("new", &make_mos3_extractor, gsi::arg ("name"), gsi::arg ("strict", false),
+    "@brief Creates a new device extractor with the given name.\n"
+    "If \\strict is true, the MOS device extraction will happen in strict mode. That is, source and drain "
+    "are not interchangeable."
+  ) +
+  gsi::method ("strict?", &db::NetlistDeviceExtractorMOS3Transistor::is_strict,
+    "@brief Returns a value indicating whether extraction happens in strict mode."
   ),
   "@brief A device extractor for a three-terminal MOS transistor\n"
   "\n"
@@ -418,7 +423,8 @@ Class<db::NetlistDeviceExtractorMOS3Transistor> decl_NetlistDeviceExtractorMOS3T
   "The device class produced by this extractor is \\DeviceClassMOS3Transistor.\n"
   "The extractor extracts the six parameters of this class: L, W, AS, AD, PS and PD.\n"
   "\n"
-  "The device recognition layer names are 'SD' (source/drain) and 'G' (gate).\n"
+  "In strict mode, the device recognition layer names are 'S' (source), 'D' (drain) and 'G' (gate).\n"
+  "Otherwise, they are 'SD' (source/drain) and 'G' (gate).\n"
   "The terminal output layer names are 'tS' (source), 'tG' (gate) and 'tD' (drain).\n"
   "\n"
   "The diffusion area is distributed on the number of gates connecting to\n"
@@ -430,13 +436,13 @@ Class<db::NetlistDeviceExtractorMOS3Transistor> decl_NetlistDeviceExtractorMOS3T
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorMOS4Transistor *make_mos4_extractor (const std::string &name)
+static db::NetlistDeviceExtractorMOS4Transistor *make_mos4_extractor (const std::string &name, bool strict)
 {
-  return new db::NetlistDeviceExtractorMOS4Transistor (name);
+  return new db::NetlistDeviceExtractorMOS4Transistor (name, strict);
 }
 
 Class<db::NetlistDeviceExtractorMOS4Transistor> decl_NetlistDeviceExtractorMOS4Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorMOS4Transistor",
-  gsi::constructor ("new", &make_mos4_extractor, gsi::arg ("name"),
+  gsi::constructor ("new", &make_mos4_extractor, gsi::arg ("name"), gsi::arg ("strict", false),
     "@brief Creates a new device extractor with the given name."
   ),
   "@brief A device extractor for a four-terminal MOS transistor\n"

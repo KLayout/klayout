@@ -189,12 +189,14 @@ X$2 VSS IN OUT SUBSTRATE NMOS PARAMS: L=0.25 W=0.9 AS=0.405 AD=0.405 PS=2.7
 
 class SubcircuitModelsReader &lt; RBA::NetlistSpiceReaderDelegate
 
+  # implements the delegate interface:
   # says we want to catch these subcircuits as devices
   def wants_subcircuit(name)
     name == "NMOS" || name == "PMOS"
   end
 
-  # translate the element
+  # implements the delegate interface: 
+  # take and translate the element
   def element(circuit, el, name, model, value, nets, params)
 
     if el != "X"
@@ -221,9 +223,13 @@ class SubcircuitModelsReader &lt; RBA::NetlistSpiceReaderDelegate
     [ "S", "G", "D", "B" ].each_with_index do |t,index|
       device.connect_terminal(t, nets[index])
     end
-    params.each do |p,value|
-      device.set_parameter(p, value)
-    end
+
+    # parameters in the model are given in micrometer units, so 
+    # we need to translate the parameter values from SI to um values:
+    device.set_parameter("W", (params["W"] || 0.0) * 1e6)
+    device.set_parameter("L", (params["L"] || 0.0) * 1e6)
+
+    return true
 
   end
 

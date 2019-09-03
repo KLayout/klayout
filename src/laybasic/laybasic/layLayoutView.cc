@@ -7213,6 +7213,32 @@ LayoutView::add_l2ndb (db::LayoutToNetlist *l2ndb)
   return (unsigned int)(m_l2ndbs.size () - 1);
 }
 
+unsigned int
+LayoutView::replace_l2ndb (unsigned int db_index, db::LayoutToNetlist *l2ndb)
+{
+  tl_assert (l2ndb != 0);
+
+  if (db_index < m_l2ndbs.size ()) {
+
+    //  keep the name as it is used for reference in the browser for example
+    std::string n = m_l2ndbs [db_index]->name ();
+    l2ndb->set_name (n);
+
+    delete m_l2ndbs [db_index];
+    m_l2ndbs [db_index] = l2ndb;
+
+    //  Mark this object as owned by us (for GSI)
+    l2ndb->keep ();
+
+    l2ndb_list_changed_event ();
+
+    return db_index;
+
+  } else {
+    return add_l2ndb (l2ndb);
+  }
+}
+
 db::LayoutToNetlist *
 LayoutView::get_l2ndb (int index)
 {
@@ -7255,7 +7281,7 @@ LayoutView::remove_l2ndb (unsigned int index)
 unsigned int
 LayoutView::add_rdb (rdb::Database *rdb)
 {
-  make_unique_name (rdb, m_l2ndbs.begin (), m_l2ndbs.end ());
+  make_unique_name (rdb, m_rdbs.begin (), m_rdbs.end ());
   m_rdbs.push_back (rdb);
 
   //  Mark this object as owned by us (for GSI)
@@ -7264,6 +7290,32 @@ LayoutView::add_rdb (rdb::Database *rdb)
   rdb_list_changed_event ();
 
   return (unsigned int)(m_rdbs.size () - 1);
+}
+
+unsigned int
+LayoutView::replace_rdb (unsigned int db_index, rdb::Database *rdb)
+{
+  tl_assert (rdb != 0);
+
+  if (db_index < m_rdbs.size ()) {
+
+    //  keep name because it's used for reference in the browser for example
+    std::string n = m_rdbs [db_index]->name ();
+    rdb->set_name (n);
+
+    delete m_rdbs [db_index];
+    m_rdbs [db_index] = rdb;
+
+    //  Mark this object as owned by us (for GSI)
+    rdb->keep ();
+
+    rdb_list_changed_event ();
+
+    return db_index;
+
+  } else {
+    return add_rdb (rdb);
+  }
 }
 
 rdb::Database *

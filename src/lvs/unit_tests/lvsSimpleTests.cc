@@ -28,7 +28,7 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false)
+void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false, const std::string &top = std::string ())
 {
   std::string rs = tl::testsrc ();
   rs += "/testdata/lvs/" + suffix + ".lvs";
@@ -57,7 +57,8 @@ void run_test (tl::TestBase *_this, const std::string &suffix, const std::string
         "$lvs_test_target_lvsdb = '%s'\n"
         "$lvs_test_target_cir = '%s'\n"
         "$lvs_test_target_l2n = '%s'\n"
-      , src, output_lvsdb, output_cir, output_l2n)
+        "$lvs_test_top = '%s'\n"
+      , src, output_lvsdb, output_cir, output_l2n, top)
     );
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
@@ -129,3 +130,27 @@ TEST(11_device_scaling)
   run_test (_this, "ringo_simple_device_scaling", "ringo.gds");
 }
 
+TEST(12_simple_dmos)
+{
+  run_test (_this, "ringo_simple_dmos", "ringo.gds");
+}
+
+TEST(13_simple_ringo_device_subcircuits)
+{
+  run_test (_this, "ringo_device_subcircuits", "ringo.gds");
+}
+
+TEST(14_simple_ringo_mixed_hierarchy)
+{
+  run_test (_this, "ringo_mixed_hierarchy", "ringo_mixed_hierarchy.gds");
+}
+
+TEST(15_simple_dummy_device)
+{
+  run_test (_this, "ringo_simple_dummy_device", "ringo_dummy_device.gds");
+}
+
+TEST(16_floating)
+{
+  run_test (_this, "floating", "floating.gds", false, "TOP");
+}

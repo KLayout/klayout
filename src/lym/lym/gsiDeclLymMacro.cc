@@ -73,9 +73,8 @@ public:
 };
 
 Class<gsi::MacroExecutionContext> decl_MacroExecutionContext ("lay", "MacroExecutionContext",
-  gsi::method ("set_debugger_scope", &gsi::MacroExecutionContext::set_debugger_scope,
+  gsi::method ("set_debugger_scope", &gsi::MacroExecutionContext::set_debugger_scope, gsi::arg ("filename"),
     "@brief Sets a debugger scope (file level which shall appear in the debugger)\n"
-    "@args filename\n"
     "If a debugger scope is set, back traces will be produced starting from that scope. "
     "Setting a scope is useful for implementing DSL interpreters and giving a proper hint about "
     "the original location of an error."
@@ -277,9 +276,8 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   gsi::method ("NoDebugger", &const_NoDebugger,
     "@brief Indicates no debugging for \\debugger_scheme\n"
   ) +
-  gsi::method ("register", &MacroInterpreter::register_gsi,
+  gsi::method ("register", &MacroInterpreter::register_gsi, gsi::arg ("name"),
     "@brief Registers the macro interpreter\n"
-    "@args name\n"
     "@param name The interpreter name. This is an arbitrary string which should be unique.\n"
     "\n"
     "Registration of the interpreter makes the object known to the system. After registration, macros whose interpreter "
@@ -351,9 +349,8 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "Before version 0.25 this attribute was a reimplementable method. It has been turned into an attribute for "
     "performance reasons in version 0.25.\n"
   ) +
-  gsi::callback ("execute", &gsi::MacroInterpreter::execute, &gsi::MacroInterpreter::f_execute,
+  gsi::callback ("execute", &gsi::MacroInterpreter::execute, &gsi::MacroInterpreter::f_execute, gsi::arg ("macro"),
     "@brief Gets called to execute a macro\n"
-    "@args macro\n"
     "This method must be reimplemented to execute the macro. "
     "The system will call this script when a macro with interpreter type 'dsl' and the "
     "name of this interpreter is run."
@@ -424,6 +421,11 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   "This class has been introduced in version 0.23.\n"
 );
 
+static lym::Macro *macro_by_path (const std::string &path)
+{
+  return lym::MacroCollection::root ().find_macro (path);
+}
+
 Class<lym::Macro> decl_Macro ("lay", "Macro",
   gsi::method ("path", &lym::Macro::path,
     "@brief Gets the path of the macro\n"
@@ -431,6 +433,13 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "The path is the path where the macro is stored, starting with an abstract group identifier. "
     "The path is used to identify the macro in the debugger for example."
   ) + 
+  gsi::method ("macro_by_path", &macro_by_path, gsi::arg ("path"),
+    "@brief Finds the macro by installation path\n"
+    "\n"
+    "Returns nil if no macro with this path can be found.\n"
+    "\n"
+    "This method has been added in version 0.26."
+  ) +
   gsi::method ("name", &lym::Macro::name,
     "@brief Gets the name of the macro\n"
     "\n"
@@ -443,9 +452,8 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "the description text can have the format \"Group;;Description\". In that case, the macro "
     "will appear in a group with title \"Group\"."
   ) + 
-  gsi::method ("description=", &lym::Macro::set_description,
+  gsi::method ("description=", &lym::Macro::set_description, gsi::arg ("description"),
     "@brief Sets the description text\n"
-    "@args description\n"
     "@param description The description text.\n"
     "See \\description for details.\n"
   ) +
@@ -455,9 +463,8 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "The prolog is executed before the actual code is executed. Interpretation depends on the "
     "implementation of the DSL interpreter for DSL macros."
   ) + 
-  gsi::method ("prolog=", &lym::Macro::set_prolog,
+  gsi::method ("prolog=", &lym::Macro::set_prolog, gsi::arg ("string"),
     "@brief Sets the prolog\n"
-    "@args string\n"
     "See \\prolog for details.\n"
   ) +
   gsi::method ("epilog", &lym::Macro::epilog,
@@ -466,9 +473,8 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "The epilog is executed after the actual code is executed. Interpretation depends on the "
     "implementation of the DSL interpreter for DSL macros."
   ) + 
-  gsi::method ("epilog=", &lym::Macro::set_epilog,
+  gsi::method ("epilog=", &lym::Macro::set_epilog, gsi::arg ("string"),
     "@brief Sets the epilog\n"
-    "@args string\n"
     "See \\epilog for details.\n"
   ) +
   gsi::method ("category", &lym::Macro::category,
@@ -477,9 +483,8 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "The category tags string indicates to which categories a macro will belong to. This string "
     "is only used for templates currently and is a comma-separated list of category names."
   ) + 
-  gsi::method ("category=", &lym::Macro::set_category,
+  gsi::method ("category=", &lym::Macro::set_category, gsi::arg ("string"),
     "@brief Sets the category tags string\n"
-    "@args string\n"
     "See \\category for details.\n"
   ) +
   gsi::method ("text", &lym::Macro::text,
@@ -488,17 +493,15 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "The text is the code executed by the macro interpreter. "
     "Depending on the DSL interpreter, the text can be any kind of code."
   ) + 
-  gsi::method ("text=", &lym::Macro::set_text,
+  gsi::method ("text=", &lym::Macro::set_text, gsi::arg ("string"),
     "@brief Sets the macro text\n"
-    "@args string\n"
     "See \\text for details.\n"
   ) +
   gsi::method ("show_in_menu?", &lym::Macro::show_in_menu,
     "@brief Gets a value indicating whether the macro shall be shown in the menu\n"
   ) + 
-  gsi::method ("show_in_menu=", &lym::Macro::set_show_in_menu,
+  gsi::method ("show_in_menu=", &lym::Macro::set_show_in_menu, gsi::arg ("flag"),
     "@brief Sets a value indicating whether the macro shall be shown in the menu\n"
-    "@args flag\n"
   ) +
   gsi::method ("group_name", &lym::Macro::group_name,
     "@brief Gets the menu group name\n"
@@ -506,9 +509,8 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "If a group name is specified and \\show_in_menu? is true, the macro will appear in "
     "a separate group (separated by a separator) together with other macros sharing the same group."
   ) + 
-  gsi::method ("group_name=", &lym::Macro::set_group_name,
+  gsi::method ("group_name=", &lym::Macro::set_group_name, gsi::arg ("string"),
     "@brief Sets the menu group name\n"
-    "@args string\n"
     "See \\group_name for details.\n"
   ) +
   gsi::method ("menu_path", &lym::Macro::menu_path,
@@ -517,9 +519,8 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "If a menu path is specified and \\show_in_menu? is true, the macro will appear in "
     "the menu at the specified position."
   ) + 
-  gsi::method ("menu_path=", &lym::Macro::set_menu_path,
+  gsi::method ("menu_path=", &lym::Macro::set_menu_path, gsi::arg ("string"),
     "@brief Sets the menu path\n"
-    "@args string\n"
     "See \\menu_path for details.\n"
   ),
   "@brief A macro class\n"

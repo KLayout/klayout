@@ -27,6 +27,7 @@
 #include "tlProgress.h"
 #include "tlExpression.h"
 #include "tlGlobPattern.h"
+#include "tlRecipe.h"
 
 // ----------------------------------------------------------------
 //  Logger binding
@@ -636,6 +637,89 @@ Class<tl::GlobPattern> decl_GlobPattern ("tl", "GlobPattern",
   "This class is provided to make KLayout's glob pattern matching available to scripts too. "
   "The intention is to provide an implementation which is compatible with KLayout's pattern "
   "syntax.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
+);
+
+class Recipe_Impl
+  : public tl::Recipe, public gsi::ObjectBase
+{
+public:
+  Recipe_Impl (const std::string &name, const std::string &description)
+    : tl::Recipe (name, description)
+  {
+    //  makes the object owned by the C++ side (registrar). This way we don't need to keep a
+    //  singleton instance.
+    keep ();
+  }
+
+  virtual tl::Variant execute (const std::map<std::string, tl::Variant> &params) const
+  {
+    if (execute_cb.can_issue ()) {
+      return execute_cb.issue<tl::Recipe, tl::Variant, const std::map<std::string, tl::Variant> &> (&tl::Recipe::execute, params);
+    } else {
+      return tl::Variant ();
+    }
+  }
+
+  gsi::Callback execute_cb;
+};
+
+}
+
+namespace tl
+{
+  template <> struct type_traits<gsi::Recipe_Impl> : public type_traits<tl::Recipe> { };
+}
+
+namespace gsi
+{
+
+static Recipe_Impl *make_recipe (const std::string &name, const std::string &description)
+{
+  return new Recipe_Impl (name, description);
+}
+
+Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
+  gsi::constructor ("new", &make_recipe, gsi::arg ("name"), gsi::arg ("description", std::string (), "\"\""),
+    "@brief Creates a new recipe object with the given name and (optional) description"
+  ) +
+  gsi::method ("name", &Recipe_Impl::name,
+    "@brief Gets the name of the recipe."
+  ) +
+  gsi::method ("description", &Recipe_Impl::description,
+    "@brief Gets the description of the recipe."
+  ) +
+  gsi::method ("make", &Recipe_Impl::make, gsi::arg ("generator"), gsi::arg ("add_params", std::map<std::string, tl::Variant> (), "{}"),
+    "@brief Executes the recipe given by the generator string.\n"
+    "The generator string is the one delivered with \\generator.\n"
+    "Additional parameters can be passed in \"add_params\". They have lower priority than the parameters "
+    "kept inside the generator string."
+  ) +
+  gsi::method ("generator", &Recipe_Impl::generator, gsi::arg ("params"),
+    "@brief Delivers the generator string from the given parameters.\n"
+    "The generator string can be used with \\make to re-run the recipe."
+  ) +
+  gsi::callback ("execute", &Recipe_Impl::execute, &Recipe_Impl::execute_cb, gsi::arg ("params"),
+    "@brief Reimplement this method to provide the functionality of the recipe.\n"
+    "This method is supposed to re-run the recipe with the given parameters and deliver the "
+    "the intended output object."
+  ),
+  "@brief A facility for providing reproducable recipes\n"
+  "The idea of this facility is to provide a service by which an object\n"
+  "can be reproduced in a parametrized way. The intended use case is a \n"
+  "DRC report for example, where the DRC script is the generator.\n"
+  "\n"
+  "In this use case, the DRC engine will register a recipe. It will \n"
+  "put the serialized version of the recipe into the DRC report. If the \n"
+  "user requests a re-run of the DRC, the recipe will be called and \n"
+  "the implementation is supposed to deliver a new database.\n"
+  "\n"
+  "To register a recipe, reimplement the Recipe class and create an\n"
+  "instance. To serialize a recipe, use \"generator\", to execute the\n"
+  "recipe, use \"make\".\n"
+  "\n"
+  "Parameters are kept as a generic key/value map.\n"
   "\n"
   "This class has been introduced in version 0.26."
 );

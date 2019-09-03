@@ -17,37 +17,39 @@
  <text>
 module DRC
 
-  def DRC.execute_drc(_macro)
+  def DRC.execute_drc(macro, generator, rdb_index = nil)
 
-    _timer = RBA::Timer::new
-    _timer.start
-    _drc = DRCEngine::new
+    timer = RBA::Timer::new
+    timer.start
+    drc = DRCEngine::new
+    drc._rdb_index = rdb_index
+    drc._generator = generator
 
     begin
 
       # Set a debugger scope so that our errors end up with the debugger set to the DRC's line
-      RBA::MacroExecutionContext::set_debugger_scope(_macro.path)
+      RBA::MacroExecutionContext::set_debugger_scope(macro.path)
       # No verbosity set in drc engine - we cannot use the engine's logger 
-      RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{_macro.path}")
-      _drc.instance_eval(_macro.text, _macro.path)
+      RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{macro.path}")
+      drc.instance_eval(macro.text, macro.path)
       # Remove the debugger scope
       RBA::MacroExecutionContext::remove_debugger_scope
 
     rescue =&gt; ex
 
-      _drc.error("In #{_macro.path}: #{ex.to_s}")
+      drc.error("In #{macro.path}: #{ex.to_s}")
       RBA::MacroExecutionContext::ignore_next_exception
       raise ex
 
     ensure
 
       # cleans up and creates layout and report views
-      _drc._finish
+      drc._finish
 
     end
 
-    _timer.stop
-    _drc.info("Total run time: #{'%.3f'%(_timer.sys+_timer.user)}s")
+    timer.stop
+    drc.info("Total run time: #{'%.3f'%(timer.sys+timer.user)}s")
 
   end
   
@@ -55,7 +57,9 @@ module DRC
   class DRCInterpreter &lt; RBA::MacroInterpreter
   
     # Constructor
-    def initialize
+    def initialize(recipe)
+
+      @recipe = recipe
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
@@ -74,7 +78,7 @@ module DRC
     
     # Implements the execute method
     def execute(macro)
-      DRC::execute_drc(macro)
+      DRC::execute_drc(macro, @recipe.generator("script" => macro.path))
     end
     
   end
@@ -83,7 +87,9 @@ module DRC
   class DRCPlainTextInterpreter &lt; RBA::MacroInterpreter
   
     # Constructor
-    def initialize
+    def initialize(recipe)
+
+      @recipe = recipe
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
@@ -99,14 +105,40 @@ module DRC
     
     # Implements the execute method
     def execute(macro)
-      DRC::execute_drc(macro)
+      DRC::execute_drc(macro, @recipe.generator("script" => macro.path))
     end
     
   end
   
+  # A recipe implementation allowing the LVS run to be redone
+  class DRCRecipe &lt; RBA::Recipe
+
+    def initialize
+      super("drc", "DRC recipe")
+    end
+
+    def execute(params)
+
+      script = params["script"]
+      if ! script
+        return
+      end
+
+      macro = RBA::Macro::macro_by_path(script)
+      macro || raise("Can't find DRC script #{script} - unable to re-run")
+
+      DRC::execute_drc(macro, self.generator("script" => script), params["rdb_index"])
+      
+    end
+
+  end
+  
+  # Register the recipe
+  drc_recipe = DRCRecipe::new
+ 
   # Register the new interpreters
-  DRCInterpreter::new
-  DRCPlainTextInterpreter::new
+  DRCInterpreter::new(drc_recipe)
+  DRCPlainTextInterpreter::new(drc_recipe)
  
 end
 </text>

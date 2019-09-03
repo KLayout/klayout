@@ -136,13 +136,13 @@ bool AllDeviceParametersAreEqual::equal (const db::Device &a, const db::Device &
 //  DeviceClass class implementation
 
 DeviceClass::DeviceClass ()
-  : mp_netlist (0)
+  : mp_netlist (0), m_strict (false)
 {
   // .. nothing yet ..
 }
 
 DeviceClass::DeviceClass (const DeviceClass &other)
-  : gsi::ObjectBase (other), tl::Object (other), tl::UniqueId (other), mp_netlist (0)
+  : gsi::ObjectBase (other), tl::Object (other), tl::UniqueId (other), mp_netlist (0), m_strict (false)
 {
   operator= (other);
 }
@@ -154,6 +154,7 @@ DeviceClass &DeviceClass::operator= (const DeviceClass &other)
     m_parameter_definitions = other.m_parameter_definitions;
     m_name = other.m_name;
     m_description = other.m_description;
+    m_strict = other.m_strict;
     mp_pc_delegate.reset (const_cast<DeviceParameterCompareDelegate *> (other.mp_pc_delegate.get ()));
   }
   return *this;

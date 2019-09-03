@@ -229,6 +229,22 @@ MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool 
   return false;
 }
 
+bool
+MoveService::begin_move ()
+{
+  drag_cancel ();
+
+  db::DBox bbox = mp_editables->selection_bbox ();
+  if (bbox.empty ()) {
+    //  nothing selected
+    return false;
+  }
+
+  set_cursor (lay::Cursor::size_all);
+
+  //  emulate a "begin move" at the center of the selection bbox - this will become the reference point
+  return handle_dragging (bbox.center (), 0);
+}
 
 bool 
 MoveService::handle_dragging (const db::DPoint &p, unsigned int buttons)

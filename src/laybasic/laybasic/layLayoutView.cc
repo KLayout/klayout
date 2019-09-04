@@ -5090,9 +5090,9 @@ LayoutView::paste_interactive ()
 {
   clear_selection ();
 
-  {
-    db::Transaction trans (manager (), tl::to_string (QObject::tr ("Paste")));
+  std::auto_ptr<db::Transaction> trans (new db::Transaction (manager (), tl::to_string (QObject::tr ("Paste and move"))));
 
+  {
     //  let the receivers sort out who is pasting what ..
     if (mp_hierarchy_panel) {
       mp_hierarchy_panel->paste ();
@@ -5103,7 +5103,11 @@ LayoutView::paste_interactive ()
     lay::Editables::paste ();
   }
 
-  if (mp_move_service->begin_move ()) {
+  //  temporarily close the transaction and pass to the move service for appending it's own
+  //  operations.
+  trans->close ();
+
+  if (mp_move_service->begin_move (trans.release ())) {
     switch_mode (-1);  //  move mode
   }
 }

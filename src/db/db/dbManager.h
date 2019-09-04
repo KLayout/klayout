@@ -141,6 +141,14 @@ public:
   void commit ();
 
   /**
+   *  @brief Cancels a transaction
+   *
+   *  If called instead of commit, this method will undo all operations of the pending
+   *  transaction.
+   */
+  void cancel ();
+
+  /**
    *  @brief Undo the current transaction
    *
    *  The current transaction is undone with this method.
@@ -256,13 +264,20 @@ private:
  *
  *  This object controls a transaction through it's lifetime. On construction, the 
  *  transaction is started, on destruction, the transaction is committed.
+ *
+ *  "cancel" can be used to cancel the operation. This will undo all operations collected
+ *  so far and delete the transaction.
+ *
+ *  "close" temporarily disable the collection of operations.
+ *  "open" will enable operation collection again and continue
+ *  collection at the point when it was stopped with "close".
  */
 
 class DB_PUBLIC Transaction
 {
 public:
   Transaction (db::Manager *manager, const std::string &desc)
-    : mp_manager (manager), m_transaction_id (0)
+    : mp_manager (manager), m_transaction_id (0), m_description (desc)
   {
     if (mp_manager) {
       m_transaction_id = mp_manager->transaction (desc);
@@ -270,7 +285,7 @@ public:
   }
 
   Transaction (db::Manager *manager, const std::string &desc, db::Manager::transaction_id_t join_with)
-    : mp_manager (manager), m_transaction_id (0)
+    : mp_manager (manager), m_transaction_id (0), m_description (desc)
   {
     if (mp_manager) {
       m_transaction_id = mp_manager->transaction (desc, join_with);
@@ -280,8 +295,33 @@ public:
   ~Transaction ()
   {
     if (mp_manager) {
-      mp_manager->commit ();
+      if (mp_manager->transacting ()) {
+        mp_manager->commit ();
+      }
       mp_manager = 0;
+    }
+  }
+
+  void cancel ()
+  {
+    if (mp_manager) {
+      open ();
+      mp_manager->cancel ();
+      mp_manager = 0;
+    }
+  }
+
+  void close ()
+  {
+    if (mp_manager->transacting ()) {
+      mp_manager->commit ();
+    }
+  }
+
+  void open ()
+  {
+    if (! mp_manager->transacting ()) {
+      mp_manager->transaction (m_description, m_transaction_id);
     }
   }
 
@@ -293,6 +333,7 @@ public:
 private:
   db::Manager *mp_manager;
   db::Manager::transaction_id_t m_transaction_id;
+  std::string m_description;
 
   //  no copying.
   Transaction (const Transaction &);

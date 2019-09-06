@@ -460,13 +460,13 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   }
   mw_instance = this;
 
+  lay::register_help_handler (this, SLOT (show_help (const QString &)), SLOT (show_modal_help (const QString &)));
+
   mp_setup_form = new SettingsForm (0, plugin_root (), "setup_form"),
 
   db::LibraryManager::instance ().changed_event.add (this, &MainWindow::libraries_changed);
 
   init_menu ();
-
-  lay::register_help_handler (this, SLOT (show_help (const QString &)), SLOT (show_modal_help (const QString &)));
 
   mp_assistant = new lay::HelpDialog (this);
 
@@ -4792,7 +4792,9 @@ MainWindow::cm_show_assistant ()
 void
 MainWindow::show_help (const QString &url)
 {
-  show_assistant_url (tl::to_string (url), false);
+  //  NOTE: from inside a modal widget we show the help dialog modal too
+  //  (otherwise it's not usable)
+  show_assistant_url (tl::to_string (url), QApplication::activeModalWidget () != 0);
 }
 
 void

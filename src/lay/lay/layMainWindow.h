@@ -505,13 +505,6 @@ public:
   void select_view (int index);
 
   /**
-   *  @brief Select the given mode
-   *
-   *  @param The index of the mode to select
-   */
-  void select_mode (int m);
-
-  /**
    *  @brief Get the instance of the assistant
    */
   lay::HelpDialog *assistant () const
@@ -645,17 +638,17 @@ signals:
 
 public slots:
   /**
-   *  @brief Display the current position
+   *  @brief Displays the current position
    */
   void current_pos (double x, double y, bool dbu_units);
 
   /**
-   *  @brief Clear the current position
+   *  @brief Clears the current position
    */
   void clear_current_pos ();
 
   /**
-   *  @brief Display a status message next to the coordinates
+   *  @brief Displays a status message next to the coordinates
    */
   void message (const std::string &s, int ms);
 
@@ -663,6 +656,13 @@ public slots:
    *  @brief Clears the current message 
    */
   void clear_message ();
+
+  /**
+   *  @brief Selects the given mode
+   *
+   *  @param The index of the mode to select
+   */
+  void select_mode (int m);
 
   /**
    *  @brief Called when one of the built-in modes (i.e. select, move) is selected
@@ -691,7 +691,9 @@ public slots:
   void cm_show_properties ();
   void cm_copy ();
   void cm_paste ();
+  void cm_paste_interactive ();
   void cm_duplicate ();
+  void cm_duplicate_interactive ();
   void cm_cut ();
   void cm_zoom_fit_sel ();
   void cm_zoom_fit ();
@@ -772,6 +774,7 @@ public slots:
   void cm_sel_scale ();
   void cm_sel_move ();
   void cm_sel_move_to ();
+  void cm_sel_move_interactive ();
   void cm_show_assistant ();
 
   //  forwarded to the current view: layer list context menu
@@ -946,6 +949,9 @@ private:
   void closeEvent (QCloseEvent *event);
   void resizeEvent (QResizeEvent *event);
 
+  void do_cm_paste (bool interactive);
+  void do_cm_duplicate (bool interactive);
+
   void format_message ();
 
   int dirty_files (std::string &dirty_files);
@@ -956,6 +962,7 @@ private:
   void current_view_changed ();
   void update_window_title ();
   void update_tab_title (int i);
+  void add_view (LayoutView *view);
 
   bool can_close ();
   lay::CellViewRef create_or_load_layout (const std::string *filename, const db::LoadLayoutOptions *options, const std::string &tech, const int mode);

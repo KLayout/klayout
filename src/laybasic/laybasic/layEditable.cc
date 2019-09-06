@@ -28,6 +28,7 @@
 #include "layPropertiesDialog.h"
 
 #include <algorithm>
+#include <memory>
 
 namespace lay
 {
@@ -82,24 +83,29 @@ Editables::~Editables ()
 }
 
 void 
-Editables::del ()
+Editables::del (db::Transaction *transaction)
 {
+  std::auto_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Delete"))));
+
   if (selection_size () > 0) {
 
-    cancel_edits ();
+    try {
 
-    //  begin the transaction
-    tl_assert (! manager ()->transacting ());
-    manager ()->transaction (tl::to_string (QObject::tr ("Delete"))); 
-    //  this dummy operation will update the screen:
-    manager ()->queue (this, new db::Op ());
+      trans_holder->open ();
 
-    for (iterator e = begin (); e != end (); ++e) {
-      e->del ();
+      cancel_edits ();
+
+      //  this dummy operation will update the screen:
+      manager ()->queue (this, new db::Op ());
+
+      for (iterator e = begin (); e != end (); ++e) {
+        e->del ();
+      }
+
+    } catch (...) {
+      trans_holder->cancel ();
+      throw;
     }
-
-    //  end the transaction
-    manager ()->commit ();
 
   }
 }
@@ -155,14 +161,16 @@ Editables::selection_catch_bbox ()
 }
 
 void
-Editables::transform (const db::DCplxTrans &tr)
+Editables::transform (const db::DCplxTrans &tr, db::Transaction *transaction)
 {
+  std::auto_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Transform"))));
+
   if (selection_size () > 0) {
 
     try {
 
-      tl_assert (! manager ()->transacting ());
-      manager ()->transaction (tl::to_string (QObject::tr ("Transform"))); 
+      trans_holder->open ();
+
       //  this dummy operation will update the screen:
       manager ()->queue (this, new db::Op ());
 
@@ -170,11 +178,8 @@ Editables::transform (const db::DCplxTrans &tr)
         e->transform (tr);
       }
 
-      //  end the transaction
-      manager ()->commit ();
-
     } catch (...) {
-      manager ()->clear ();
+      trans_holder->cancel ();
       throw;
     }
 
@@ -525,13 +530,14 @@ Editables::move_transform (const db::DPoint &p, db::DFTrans t, lay::angle_constr
 }
 
 void 
-Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac)
+Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction)
 {
+  std::auto_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Move"))));
+
   if (m_any_move_operation) {
 
-    //  begin the transaction
-    tl_assert (! manager ()->transacting ());
-    manager ()->transaction (tl::to_string (QObject::tr ("Move"))); 
+    trans_holder->open ();
+
     //  this dummy operation will update the screen:
     manager ()->queue (this, new db::Op ());
 
@@ -539,15 +545,14 @@ Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac)
       e->end_move (p, ac);
     }
 
-    //  end the transaction
-    manager ()->commit ();
-
     //  clear the selection that was set previously
     if (m_move_selection) {
       clear_selection ();
     }
 
   } else {
+
+    trans_holder->cancel ();
 
     //  if nothing was moved, treat the end_move as a select which makes the move sticky or
     //  replaces a complex selection by a simple one

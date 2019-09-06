@@ -25,10 +25,13 @@
 #ifndef HDR_layMove
 #define HDR_layMove
 
+#include "dbManager.h"
 #include "layViewObject.h"
 
 #include <QTimer>
 #include <QObject>
+
+#include <memory>
 
 namespace lay {
 
@@ -46,6 +49,7 @@ public:
   ~MoveService ();
 
   virtual bool configure (const std::string &name, const std::string &value);
+  bool begin_move (db::Transaction *transaction = 0);
 
 private:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);
@@ -58,13 +62,14 @@ private:
   virtual void drag_cancel ();
   virtual void deactivated ();
 
-  bool handle_dragging (const db::DPoint &p, unsigned int buttons);
+  bool handle_dragging (const db::DPoint &p, unsigned int buttons, db::Transaction *transaction);
 
   bool m_dragging;
   lay::Editables *mp_editables;
   lay::LayoutView *mp_view;
   double m_global_grid;
   db::DPoint m_shift;
+  std::auto_ptr<db::Transaction> mp_transaction;
 };
 
 }

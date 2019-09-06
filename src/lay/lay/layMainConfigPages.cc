@@ -434,9 +434,10 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
   //  extract the top level menues
   std::map <std::string, std::string> top_level_menus;
   top_level_menus.insert (std::make_pair (std::string (), tl::to_string (QObject::tr ("Main Menu"))));
+  top_level_menus.insert (std::make_pair (std::string ("secrets"), tl::to_string (QObject::tr ("Key Binding Targets"))));
   top_level_menus.insert (std::make_pair (std::string ("lcp_context_menu"), tl::to_string (QObject::tr ("Layer Panel Context Menu"))));
   top_level_menus.insert (std::make_pair (std::string ("hcp_context_menu"), tl::to_string (QObject::tr ("Cell List Context Menu"))));
-   
+
   //  fill the bindings list
   mp_ui->bindings_list->clear ();
 

@@ -40,8 +40,8 @@ namespace edt
 // -------------------------------------------------------------------------
 //  ShapePropertiesPage implementation
 
-ShapePropertiesPage::ShapePropertiesPage (edt::Service *service, QWidget *parent)
-  : lay::PropertiesPage (parent, service), 
+ShapePropertiesPage::ShapePropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
+  : lay::PropertiesPage (parent, manager, service),
     mp_service (service), m_enable_cb_callback (true)
 {
   m_selection_ptrs.reserve (service->selection ().size ());
@@ -403,8 +403,8 @@ ShapePropertiesPage::readonly ()
 // -------------------------------------------------------------------------
 //  PolygonPropertiesPage implementation
 
-PolygonPropertiesPage::PolygonPropertiesPage (edt::Service *service, QWidget *parent)
-  : ShapePropertiesPage (service, parent)
+PolygonPropertiesPage::PolygonPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
+  : ShapePropertiesPage (service, manager, parent)
 {
   setupUi (this);
   setup ();
@@ -517,8 +517,8 @@ PolygonPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Sha
 
 static bool s_coordinateMode = true;
 
-BoxPropertiesPage::BoxPropertiesPage (edt::Service *service, QWidget *parent)
-  : ShapePropertiesPage (service, parent),
+BoxPropertiesPage::BoxPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
+  : ShapePropertiesPage (service, manager, parent),
     m_recursion_sentinel (false), m_tab_index (0), m_dbu (1.0), m_lr_swapped (false), m_tb_swapped (false)
 {
   setupUi (this);
@@ -669,8 +669,8 @@ BoxPropertiesPage::changed ()
 // -------------------------------------------------------------------------
 //  TextPropertiesPage implementation
 
-TextPropertiesPage::TextPropertiesPage (edt::Service *service, QWidget *parent)
-  : ShapePropertiesPage (service, parent)
+TextPropertiesPage::TextPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
+  : ShapePropertiesPage (service, manager, parent)
 {
   setupUi (this);
   setup ();
@@ -755,8 +755,8 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
 // -------------------------------------------------------------------------
 //  PathPropertiesPage implementation
 
-PathPropertiesPage::PathPropertiesPage (edt::Service *service, QWidget *parent)
-  : ShapePropertiesPage (service, parent)
+PathPropertiesPage::PathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
+  : ShapePropertiesPage (service, manager, parent)
 {
   setupUi (this);
   setup ();
@@ -857,8 +857,8 @@ PathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
 // -------------------------------------------------------------------------
 //  EditablePathPropertiesPage implementation
 
-EditablePathPropertiesPage::EditablePathPropertiesPage (edt::Service *service, QWidget *parent)
-  : ShapePropertiesPage (service, parent)
+EditablePathPropertiesPage::EditablePathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
+  : ShapePropertiesPage (service, manager, parent)
 {
   setupUi (this);
   setup ();

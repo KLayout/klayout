@@ -43,7 +43,7 @@ class InstPropertiesPage
 Q_OBJECT
 
 public:
-  InstPropertiesPage (edt::Service *service, QWidget *parent);
+  InstPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
   ~InstPropertiesPage ();
 
   virtual void back ();

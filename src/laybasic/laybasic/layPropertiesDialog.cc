@@ -46,7 +46,7 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   mp_stack = new QStackedLayout;
 
   for (lay::Editables::iterator e = mp_editables->begin (); e != mp_editables->end (); ++e) {
-    mp_properties_pages.push_back (e->properties_page (content_frame));
+    mp_properties_pages.push_back (e->properties_page (mp_manager, content_frame));
     if (mp_properties_pages.back ()) {
       mp_stack->addWidget (mp_properties_pages.back ());
     }

@@ -45,7 +45,7 @@ class ShapePropertiesPage
 Q_OBJECT
 
 public:
-  ShapePropertiesPage (edt::Service *service, QWidget *parent);
+  ShapePropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
   ~ShapePropertiesPage ();
 
   virtual void back ();
@@ -96,7 +96,7 @@ class PolygonPropertiesPage
 Q_OBJECT
 
 public:
-  PolygonPropertiesPage (edt::Service *service, QWidget *parent);
+  PolygonPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
@@ -113,7 +113,7 @@ class BoxPropertiesPage
 Q_OBJECT
 
 public:
-  BoxPropertiesPage (edt::Service *service, QWidget *parent);
+  BoxPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
@@ -142,7 +142,7 @@ class TextPropertiesPage
 Q_OBJECT
 
 public:
-  TextPropertiesPage (edt::Service *service, QWidget *parent);
+  TextPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
@@ -159,7 +159,7 @@ class PathPropertiesPage
 Q_OBJECT
 
 public:
-  PathPropertiesPage (edt::Service *service, QWidget *parent);
+  PathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
@@ -176,7 +176,7 @@ class EditablePathPropertiesPage
 Q_OBJECT
 
 public:
-  EditablePathPropertiesPage (edt::Service *service, QWidget *parent);
+  EditablePathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);

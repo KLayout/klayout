@@ -27,8 +27,8 @@
 namespace lay
 {
 
-PropertiesPage::PropertiesPage (QWidget *parent, lay::Editable *editable)
-  : QFrame (parent), mp_editable (editable)
+PropertiesPage::PropertiesPage (QWidget *parent, db::Manager *manager, lay::Editable *editable)
+  : QFrame (parent), mp_manager (manager), mp_editable (editable)
 {
   //  .. nothing else ..
 }

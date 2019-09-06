@@ -331,7 +331,7 @@ public:
    *  by the caller. The return value is 0 if the Editable object does
    *  not support a properties page.
    */
-  virtual lay::PropertiesPage *properties_page (QWidget * /*parent*/)
+  virtual lay::PropertiesPage *properties_page (db::Manager * /*manager*/, QWidget * /*parent*/)
   {
     return 0;
   }

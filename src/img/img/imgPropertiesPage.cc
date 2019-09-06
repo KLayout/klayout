@@ -36,8 +36,8 @@ const double max_gamma = 3.0;
 // -------------------------------------------------------------------------
 //  PropertiesPage implementation
 
-PropertiesPage::PropertiesPage (img::Service *service, QWidget *parent)
-  : lay::PropertiesPage (parent, service), mp_service (service), mp_direct_image (0)
+PropertiesPage::PropertiesPage (img::Service *service, db::Manager *manager, QWidget *parent)
+  : lay::PropertiesPage (parent, manager, service), mp_service (service), mp_direct_image (0)
 {
   mp_service->get_selection (m_selection);
   m_pos = m_selection.begin ();
@@ -48,7 +48,7 @@ PropertiesPage::PropertiesPage (img::Service *service, QWidget *parent)
 }
 
 PropertiesPage::PropertiesPage (QWidget *parent)
-  : lay::PropertiesPage (parent, 0), mp_service (0), mp_direct_image (0)
+  : lay::PropertiesPage (parent, 0, 0), mp_service (0), mp_direct_image (0)
 {
   init ();
 }

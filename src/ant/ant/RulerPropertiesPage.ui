@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>622</width>
-    <height>502</height>
+    <height>621</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,6 +53,96 @@
       <property name="spacing">
        <number>6</number>
       </property>
+      <item row="15" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Second point (x/y)    </string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0" colspan="2">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>Style</string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="2" colspan="3">
+       <widget class="QLabel" name="help_label">
+        <property name="text">
+         <string>&lt;html&gt;(See &lt;a href=&quot;int:/manual/ruler_properties.xml&quot;&gt;here&lt;/a&gt; for a description of the properties)&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_25">
+        <property name="text">
+         <string>   ... position</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0" colspan="5">
+       <spacer name="verticalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>5</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="7" column="2" colspan="3">
+       <widget class="QLineEdit" name="fmt_y_le"/>
+      </item>
+      <item row="11" column="2" colspan="3">
+       <widget class="QComboBox" name="outline_cb">
+        <item>
+         <property name="text">
+          <string>Diagonal</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Horizonal and vertical (in this order)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Diagonal plus horizonal and vertical (triangle)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Vertical and horizonal (in this order)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Diagonal plus vertical and horizontal (triangle)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Box</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Ellipse</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="19" column="1">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>d = </string>
+        </property>
+       </widget>
+      </item>
       <item row="3" column="0" colspan="5">
        <spacer name="verticalSpacer">
         <property name="orientation">
@@ -66,90 +156,21 @@
         </property>
        </spacer>
       </item>
-      <item row="6" column="0" colspan="5">
-       <spacer name="verticalSpacer_2">
+      <item row="13" column="0" colspan="5">
+       <spacer>
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>5</height>
+          <width>456</width>
+          <height>16</height>
          </size>
         </property>
        </spacer>
-      </item>
-      <item row="15" column="2">
-       <widget class="QLineEdit" name="x2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="15" column="1">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>x = </string>
-        </property>
-       </widget>
-      </item>
-      <item row="11" column="0" colspan="2">
-       <widget class="QLabel" name="label_17">
-        <property name="text">
-         <string>Outline</string>
-        </property>
-       </widget>
-      </item>
-      <item row="12" column="2" colspan="3">
-       <widget class="QLabel" name="help_label">
-        <property name="text">
-         <string>&lt;html&gt;(See &lt;a href=&quot;int:/manual/ruler_properties.xml&quot;&gt;here&lt;/a&gt; for a description of the properties)&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="17" column="2">
-       <widget class="QLineEdit" name="dx">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="QLabel" name="label_14">
-        <property name="text">
-         <string>X label format</string>
-        </property>
-       </widget>
-      </item>
-      <item row="14" column="3">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>y = </string>
-        </property>
-       </widget>
-      </item>
-      <item row="15" column="3">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>y = </string>
-        </property>
-       </widget>
-      </item>
-      <item row="18" column="1">
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>d = </string>
-        </property>
-       </widget>
       </item>
       <item row="10" column="2" colspan="3">
        <widget class="QComboBox" name="style_cb">
@@ -195,10 +216,20 @@
         </item>
        </widget>
       </item>
+      <item row="14" column="4">
+       <widget class="QLineEdit" name="y1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
       <item row="18" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Length</string>
+         <string>Delta (x/y)</string>
         </property>
        </widget>
       </item>
@@ -347,83 +378,38 @@
         </layout>
        </widget>
       </item>
-      <item row="18" column="2">
-       <widget class="QLineEdit" name="dd">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="16" column="0" colspan="5">
+      <item row="17" column="0" colspan="5">
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="15" column="4">
-       <widget class="QLineEdit" name="y2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2" colspan="3">
-       <widget class="QLineEdit" name="fmt_x_le"/>
-      </item>
-      <item row="17" column="1">
-       <widget class="QLabel" name="label_9">
+      <item row="14" column="1">
+       <widget class="QLabel" name="label_5">
         <property name="text">
          <string>x = </string>
         </property>
        </widget>
       </item>
-      <item row="17" column="4">
-       <widget class="QLineEdit" name="dy">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="14" column="2">
-       <widget class="QLineEdit" name="x1">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" colspan="3">
-       <widget class="QLineEdit" name="fmt_le"/>
-      </item>
-      <item row="17" column="3">
-       <widget class="QLabel" name="label_10">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_13">
         <property name="text">
-         <string>y = </string>
+         <string>Label format</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_25">
+      <item row="19" column="0">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>   ... position</string>
+         <string>Length</string>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0" colspan="2">
+       <widget class="QLabel" name="label_17">
+        <property name="text">
+         <string>Outline</string>
         </property>
        </widget>
       </item>
@@ -538,94 +524,29 @@
         </layout>
        </widget>
       </item>
-      <item row="14" column="1">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>x = </string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="5">
-       <widget class="QLabel" name="label_12">
+      <item row="18" column="2">
+       <widget class="QLineEdit" name="dx">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <family>Sans Serif</family>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <italic>false</italic>
-          <bold>true</bold>
-          <underline>false</underline>
-          <strikeout>false</strikeout>
-         </font>
-        </property>
-        <property name="text">
-         <string>Ruler Properties</string>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="17" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Delta (x/y)</string>
+      <item row="19" column="2">
+       <widget class="QLineEdit" name="dd">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-       </widget>
-      </item>
-      <item row="11" column="2" colspan="3">
-       <widget class="QComboBox" name="outline_cb">
-        <item>
-         <property name="text">
-          <string>Diagonal</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Horizonal and vertical (in this order)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Diagonal plus horizonal and vertical (triangle)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Vertical and horizonal (in this order)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Diagonal plus vertical and horizontal (triangle)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Box</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Ellipse</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="15" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Second point (x/y)    </string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_13">
-        <property name="text">
-         <string>Label format</string>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -636,31 +557,8 @@
         </property>
        </widget>
       </item>
-      <item row="13" column="0" colspan="5">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>456</width>
-          <height>16</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="label_26">
-        <property name="text">
-         <string>   ... position</string>
-        </property>
-       </widget>
-      </item>
-      <item row="14" column="4">
-       <widget class="QLineEdit" name="y1">
+      <item row="15" column="2">
+       <widget class="QLineEdit" name="x2">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>1</horstretch>
@@ -669,32 +567,112 @@
         </property>
        </widget>
       </item>
-      <item row="10" column="0" colspan="2">
-       <widget class="QLabel" name="label_16">
+      <item row="18" column="3">
+       <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>Style</string>
+         <string>y = </string>
         </property>
        </widget>
       </item>
-      <item row="7" column="2" colspan="3">
-       <widget class="QLineEdit" name="fmt_y_le"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_18">
-        <property name="text">
-         <string>   ... position</string>
+      <item row="16" column="2" colspan="3">
+       <widget class="QFrame" name="frame_7">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
         </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QToolButton" name="swap_points">
+           <property name="text">
+            <string>Swap points</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_9">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_24">
+           <property name="text">
+            <string>Snap to layout:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="p1_to_layout">
+           <property name="text">
+            <string>P1</string>
+           </property>
+           <property name="autoRaise">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="p2_to_layout">
+           <property name="text">
+            <string>P2</string>
+           </property>
+           <property name="autoRaise">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="both_to_layout">
+           <property name="text">
+            <string>Both (auto-measure)</string>
+           </property>
+           <property name="autoRaise">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="7" column="0" colspan="2">
-       <widget class="QLabel" name="label_15">
-        <property name="text">
-         <string>Y label format</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="0" colspan="5">
-       <spacer name="verticalSpacer_3">
+      <item row="6" column="0" colspan="5">
+       <spacer name="verticalSpacer_2">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
@@ -705,6 +683,49 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="14" column="3">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>y = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2" colspan="3">
+       <widget class="QLineEdit" name="fmt_x_le"/>
+      </item>
+      <item row="18" column="4">
+       <widget class="QLineEdit" name="dy">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="4">
+       <widget class="QLineEdit" name="y2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>   ... position</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="3">
+       <widget class="QLineEdit" name="fmt_le"/>
       </item>
       <item row="8" column="2" colspan="3">
        <widget class="QFrame" name="frame_4">
@@ -815,6 +836,82 @@
           </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_26">
+        <property name="text">
+         <string>   ... position</string>
+        </property>
+       </widget>
+      </item>
+      <item row="18" column="1">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>x = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="2">
+       <widget class="QLineEdit" name="x1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0" colspan="2">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Y label format</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>X label format</string>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="3">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>y = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="1">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>x = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="5">
+       <widget class="QLabel" name="label_12">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Sans Serif</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <italic>false</italic>
+          <bold>true</bold>
+          <underline>false</underline>
+          <strikeout>false</strikeout>
+         </font>
+        </property>
+        <property name="text">
+         <string>Ruler Properties</string>
+        </property>
        </widget>
       </item>
      </layout>

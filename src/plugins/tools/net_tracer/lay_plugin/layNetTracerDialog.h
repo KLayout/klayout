@@ -118,7 +118,7 @@ private:
   void release_mouse ();
   db::NetTracerNet *do_trace (const db::DBox &start_search_box, const db::DBox &stop_search_box, bool trace_path);
   bool get_net_tracer_setup (const lay::CellView &cv, db::NetTracerData &data);
-  void trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv);
+  void trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv, bool flat);
 };
 
 }

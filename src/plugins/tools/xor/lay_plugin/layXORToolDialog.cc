@@ -25,11 +25,13 @@
 #include "layXORProgress.h"
 #include "antService.h"
 #include "rdb.h"
+#include "rdbUtils.h"
 #include "dbShapeProcessor.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbClip.h"
 #include "dbLayoutUtils.h"
 #include "dbRegion.h"
+#include "dbDeepShapeStore.h"
 #include "tlTimer.h"
 #include "tlProgress.h"
 #include "tlThreadedWorkers.h"
@@ -58,6 +60,7 @@ std::string cfg_xor_anotb ("xor-anotb");
 std::string cfg_xor_bnota ("xor-bnota");
 std::string cfg_xor_summarize ("xor-summarize");
 std::string cfg_xor_tolerances ("xor-tolerances");
+std::string cfg_xor_deep ("xor-deep");
 std::string cfg_xor_tiling ("xor-tiling");
 std::string cfg_xor_tiling_heal ("xor-tiling-heal");
 std::string cfg_xor_region_mode ("xor-region-mode");
@@ -169,6 +172,7 @@ XORToolDialog::XORToolDialog (QWidget *parent)
 
   connect (mp_ui->input_layers_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (input_changed (int)));
   connect (mp_ui->output_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (output_changed (int)));
+  connect (mp_ui->deep, SIGNAL (clicked ()), this, SLOT (deep_changed ()));
 
   input_changed (0);
   output_changed (0);
@@ -250,6 +254,12 @@ XORToolDialog::exec_dialog (lay::LayoutView *view)
   if (config_root->config_get (cfg_xor_tolerances, tol)) {
     mp_ui->tolerances->setText (tl::to_qstring (tol));
   }
+
+  bool deep = false;
+  if (config_root->config_get (cfg_xor_deep, deep)) {
+    mp_ui->deep->setChecked (deep);
+  }
+  deep_changed ();
 
   std::string tiling;
   if (config_root->config_get (cfg_xor_tiling, tiling)) {
@@ -335,6 +345,7 @@ BEGIN_PROTECTED
   config_root->config_set (cfg_xor_layer_offset, tl::to_string (mp_ui->layer_offset_le->text ()));
   config_root->config_set (cfg_xor_summarize, mp_ui->summarize_cb->isChecked ());
   config_root->config_set (cfg_xor_tolerances, tl::to_string (mp_ui->tolerances->text ()));
+  config_root->config_set (cfg_xor_deep, mp_ui->deep->isChecked ());
   config_root->config_set (cfg_xor_tiling, tl::to_string (mp_ui->tiling->text ()));
   config_root->config_set (cfg_xor_tiling_heal, mp_ui->heal_cb->isChecked ());
   config_root->config_end ();
@@ -342,6 +353,14 @@ BEGIN_PROTECTED
   QDialog::accept ();
 
 END_PROTECTED
+}
+
+void
+XORToolDialog::deep_changed ()
+{
+  bool deep = mp_ui->deep->isChecked ();
+  mp_ui->tiling->setEnabled (!deep);
+  mp_ui->heal_cb->setEnabled (!deep);
 }
 
 void
@@ -510,6 +529,28 @@ public:
     }
   }
 
+  void issue_region (unsigned int tol_index, unsigned int layer_index, const db::Region &region)
+  {
+    QMutexLocker locker (&m_mutex);
+    db::CplxTrans trans (dbu ());
+
+    if (m_output_mode == OMMarkerDatabase) {
+
+      rdb::Category *layercat = m_layer_categories[tol_index][layer_index];
+
+      std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = region.begin_iter ();
+      rdb::scan_layer (layercat, m_rdb_cell, trans * it.second, it.first, false);
+
+    } else {
+
+      db::Cell *output_cell = m_sub_cells[tol_index];
+      unsigned int output_layer = m_sub_output_layers[tol_index][layer_index];
+
+      region.insert_into (output_cell->layout (), output_cell->cell_index (), output_layer);
+
+    }
+  }
+
   void issue_polygon (unsigned int tol_index, unsigned int layer_index, const db::Polygon &polygon, bool touches_border = false)
   {
     QMutexLocker locker (&m_mutex);
@@ -588,10 +629,15 @@ class XORTask
   : public tl::Task
 {
 public:
-  XORTask (const std::string &tile_desc, const db::Box &clip_box, const db::Box &region_a, const db::Box &region_b, unsigned int layer_index, const db::LayerProperties &lp, const std::vector<unsigned int> &la, const std::vector<unsigned int> &lb, int ix, int iy)
-    : m_tile_desc (tile_desc), m_clip_box (clip_box), m_region_a (region_a), m_region_b (region_b), m_layer_index (layer_index), m_lp (lp), m_la (la), m_lb (lb), m_ix (ix), m_iy (iy)
+  XORTask (bool deep, const std::string &tile_desc, const db::Box &clip_box, const db::Box &region_a, const db::Box &region_b, unsigned int layer_index, const db::LayerProperties &lp, const std::vector<unsigned int> &la, const std::vector<unsigned int> &lb, int ix, int iy)
+    : m_deep (deep), m_tile_desc (tile_desc), m_clip_box (clip_box), m_region_a (region_a), m_region_b (region_b), m_layer_index (layer_index), m_lp (lp), m_la (la), m_lb (lb), m_ix (ix), m_iy (iy)
   {
     //  .. nothing yet ..
+  }
+
+  bool deep () const
+  {
+    return m_deep;
   }
 
   const std::string &tile_desc () const
@@ -645,6 +691,7 @@ public:
   }
 
 private:
+  bool m_deep;
   std::string m_tile_desc;
   db::Box m_clip_box, m_region_a, m_region_b;
   unsigned int m_layer_index;
@@ -675,10 +722,117 @@ private:
   XORJob *mp_job;
 
   void do_perform (const XORTask *task);
+  void do_perform_tiled (const XORTask *task);
+  void do_perform_deep (const XORTask *task);
 };
 
 void
 XORWorker::do_perform (const XORTask *xor_task)
+{
+  if (xor_task->deep ()) {
+    do_perform_deep (xor_task);
+  } else {
+    do_perform_tiled (xor_task);
+  }
+}
+
+void
+XORWorker::do_perform_deep (const XORTask *xor_task)
+{
+  db::DeepShapeStore dss;
+  db::Region rr;
+
+  unsigned int tol_index = 0;
+  for (std::vector <db::Coord>::const_iterator t = mp_job->tolerances ().begin (); t != mp_job->tolerances ().end (); ++t, ++tol_index) {
+
+    const std::vector<unsigned int> &la = xor_task->la ();
+    const std::vector<unsigned int> &lb = xor_task->lb ();
+
+    if ((!la.empty () && !lb.empty ()) || mp_job->el_handling () != XORJob::EL_summarize) {
+
+      if (tl::verbosity () >= 10) {
+        tl::info << "XOR tool (hierarchical): layer " << xor_task->lp ().to_string () << ", tolerance " << *t * mp_job->dbu ();
+      }
+
+      tl::SelfTimer timer (tl::verbosity () >= 11, "Elapsed time");
+
+      if (tol_index == 0) {
+
+        if ((!la.empty () && !lb.empty ()) || mp_job->el_handling () == XORJob::EL_process) {
+
+          tl::SelfTimer timer (tl::verbosity () >= 21, "Boolean part");
+
+          db::RecursiveShapeIterator s_a (mp_job->cva ()->layout (), mp_job->cva ()->layout ().cell (mp_job->cva ().cell_index ()), la, xor_task->region_a ());
+          db::RecursiveShapeIterator s_b (mp_job->cvb ()->layout (), mp_job->cvb ()->layout ().cell (mp_job->cvb ().cell_index ()), lb, xor_task->region_b ());
+
+          db::Region ra (s_a, dss, db::ICplxTrans (mp_job->cva ()->layout ().dbu () / mp_job->dbu ()));
+          db::Region rb (s_b, dss, db::ICplxTrans (mp_job->cvb ()->layout ().dbu () / mp_job->dbu ()));
+
+          if (mp_job->op () == db::BooleanOp::Xor) {
+            rr = ra ^ rb;
+          } else if (mp_job->op () == db::BooleanOp::ANotB) {
+            rr = ra - rb;
+          } else if (mp_job->op () == db::BooleanOp::BNotA) {
+            rr = rb - ra;
+          }
+
+        } else if (mp_job->op () == db::BooleanOp::Xor ||
+                   (mp_job->op () == db::BooleanOp::ANotB && !la.empty ()) ||
+                   (mp_job->op () == db::BooleanOp::BNotA && !lb.empty ())) {
+
+          tl::SelfTimer timer (tl::verbosity () >= 21, "Boolean part (shortcut)");
+
+          db::RecursiveShapeIterator s;
+          db::ICplxTrans dbu_scale;
+
+          if (!la.empty ()) {
+            s = db::RecursiveShapeIterator (mp_job->cva ()->layout (), *mp_job->cva ().cell (), la, xor_task->region_a ());
+            dbu_scale = db::ICplxTrans (mp_job->cva ()->layout ().dbu () / mp_job->dbu ());
+          } else if (!lb.empty ()) {
+            s = db::RecursiveShapeIterator (mp_job->cvb ()->layout (), *mp_job->cvb ().cell (), lb, xor_task->region_b ());
+            dbu_scale = db::ICplxTrans (mp_job->cvb ()->layout ().dbu () / mp_job->dbu ());
+          }
+
+          rr = db::Region (s, dss, dbu_scale);
+
+        }
+
+      }
+
+      if (*t > 0) {
+        tl::SelfTimer timer (tl::verbosity () >= 21, "Sizing part");
+        rr.size (-((*t + 1) / 2), (unsigned int)2, false);
+        rr.size (((*t + 1) / 2), (unsigned int)2, false);
+      }
+
+      //  TODO: no clipping for hieararchical mode yet
+      mp_job->issue_region (tol_index, xor_task->layer_index (), rr);
+
+      mp_job->add_results (xor_task->lp (), *t, rr.size (), xor_task->ix (), xor_task->iy ());
+
+    } else if (mp_job->op () == db::BooleanOp::Xor ||
+               (mp_job->op () == db::BooleanOp::ANotB && !la.empty ()) ||
+               (mp_job->op () == db::BooleanOp::BNotA && !lb.empty ())) {
+
+      if (!la.empty ()) {
+        mp_job->issue_string (tol_index, xor_task->layer_index (), tl::to_string (QObject::tr ("Layer not present at all in layout B")));
+        mp_job->add_results (xor_task->lp (), *t, missing_in_b, 0, 0);
+      }
+
+      if (!lb.empty ()) {
+        mp_job->issue_string (tol_index, xor_task->layer_index (), tl::to_string (QObject::tr ("Layer not present at all in layout A")));
+        mp_job->add_results (xor_task->lp (), *t, missing_in_a, 0, 0);
+      }
+
+    }
+
+    mp_job->next_progress ();
+
+  }
+}
+
+void
+XORWorker::do_perform_tiled (const XORTask *xor_task)
 {
   db::ShapeProcessor sp (true);
 
@@ -927,6 +1081,8 @@ XORToolDialog::run_xor ()
   bool anotb = mp_ui->anotb_cb->isChecked ();
   bool bnota = mp_ui->bnota_cb->isChecked ();
 
+  bool deep = mp_ui->deep->isChecked ();
+
   bool summarize = mp_ui->summarize_cb->isChecked ();
   //  TODO: make this a user interface feature later
   bool process_el = lay::ApplicationBase::instance ()->special_app_flag ("ALWAYS_DO_XOR");
@@ -1018,7 +1174,7 @@ XORToolDialog::run_xor ()
   double tile_size = 0; // in micron units
   bool tile_heal = mp_ui->heal_cb->isChecked ();
 
-  {
+  if (! deep) {
     std::string text (tl::to_string (mp_ui->tiling->text ()));
     tl::Extractor ex (text.c_str ());
     double t = 0.0;
@@ -1357,7 +1513,7 @@ XORToolDialog::run_xor ()
 
           unsigned int layer_index = 0;
           for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int> >, db::LPLogicalLessFunc>::const_iterator l = layers.begin (); l != layers.end (); ++l, ++layer_index) {
-            job.schedule (new XORTask (tile_desc, clip_box, region_a, region_b, layer_index, l->first, l->second.first, l->second.second, int (nw), int (nh)));
+            job.schedule (new XORTask (deep, tile_desc, clip_box, region_a, region_b, layer_index, l->first, l->second.first, l->second.second, int (nw), int (nh)));
           }
 
         }

@@ -30,7 +30,7 @@
 
 BD_PUBLIC int strmxor (int argc, char *argv[]);
 
-TEST(0)
+TEST(0_Basic_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -51,7 +51,28 @@ TEST(0)
   );
 }
 
-TEST(1A)
+TEST(0_Basic_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in1.gds";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
+
+  EXPECT_EQ (cap.captured_text (),
+    "No differences found\n"
+  );
+}
+
+TEST(1A_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -93,7 +114,49 @@ TEST(1A)
   );
 }
 
-TEST(1B)
+TEST(1A_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in2.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/bd/strmxor_au1d.oas";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "--deep", input_a.c_str (), input_b.c_str (), output.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (this, layout, au, db::NoNormalization);
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 10/0 is not present in first layout, but in second\n"
+    "Result summary (layers without differences are not shown):\n"
+    "\n"
+    "  Layer      Output       Differences (shape count)\n"
+    "  -------------------------------------------------------\n"
+    "  3/0        3/0          3\n"
+    "  6/0        6/0          314\n"
+    "  8/1        8/1          1\n"
+    "  10/0       -            (no such layer in first layout)\n"
+    "\n"
+  );
+}
+
+TEST(1B_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -123,7 +186,37 @@ TEST(1B)
   );
 }
 
-TEST(1C)
+TEST(1B_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in2.gds";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 10/0 is not present in first layout, but in second\n"
+    "Result summary (layers without differences are not shown):\n"
+    "\n"
+    "  Layer      Output       Differences (shape count)\n"
+    "  -------------------------------------------------------\n"
+    "  3/0        -            30\n"
+    "  6/0        -            314\n"
+    "  8/1        -            1\n"
+    "  10/0       -            (no such layer in first layout)\n"
+    "\n"
+  );
+}
+
+TEST(1C_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -144,7 +237,28 @@ TEST(1C)
   );
 }
 
-TEST(1D)
+TEST(1C_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in2.gds";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "-u", "--no-summary", input_a.c_str (), input_b.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 10/0 is not present in first layout, but in second\n"
+  );
+}
+
+TEST(1D_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -162,7 +276,25 @@ TEST(1D)
   EXPECT_EQ (cap.captured_text (), "");
 }
 
-TEST(2)
+TEST(1D_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in2.gds";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "-u", "-s", input_a.c_str (), input_b.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+  EXPECT_EQ (cap.captured_text (), "");
+}
+
+TEST(2_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -195,7 +327,40 @@ TEST(2)
   );
 }
 
-TEST(3)
+TEST(2_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in2.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/bd/strmxor_au2d.oas";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "-u", "--no-summary", "-l", input_a.c_str (), input_b.c_str (), output.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (this, layout, au, db::NoNormalization);
+  EXPECT_EQ (cap.captured_text (),
+    ""
+  );
+}
+
+TEST(3_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -228,7 +393,41 @@ TEST(3)
   );
 }
 
-TEST(4)
+TEST(3_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in2.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/bd/strmxor_au3d.oas";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  //  NOTE: -p is ignored in deep mode
+  const char *argv[] = { "x", "-u", "--no-summary", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (this, layout, au, db::NoNormalization);
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 10/0 is not present in first layout, but in second\n"
+  );
+}
+
+TEST(4_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -261,7 +460,40 @@ TEST(4)
   );
 }
 
-TEST(5)
+TEST(4_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in2.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/bd/strmxor_au4d.oas";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "-u", "--no-summary", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (this, layout, au, db::NoNormalization);
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 10/0 is not present in first layout, but in second\n"
+  );
+}
+
+TEST(5_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -294,7 +526,40 @@ TEST(5)
   );
 }
 
-TEST(6)
+TEST(5_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in2.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/bd/strmxor_au5d.oas";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "-u", "--no-summary", "-b=1000", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (this, layout, au, db::NoNormalization);
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 10/0 is not present in first layout, but in second\n"
+  );
+}
+
+TEST(6_Flat)
 {
   tl::CaptureChannel cap;
 
@@ -310,6 +575,39 @@ TEST(6)
   std::string output = this->tmp_file ("tmp.oas");
 
   const char *argv[] = { "x", "--no-summary", "-ta=INV2", "-tb=2VNI", input_a.c_str (), input_b.c_str (), output.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (this, layout, au, db::NoNormalization);
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 10/0 is not present in first layout, but in second\n"
+  );
+}
+
+TEST(6_Deep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testsrc ();
+  input_a += "/testdata/bd/strmxor_in1.gds";
+
+  std::string input_b = tl::testsrc ();
+  input_b += "/testdata/bd/strmxor_in2.gds";
+
+  std::string au = tl::testsrc ();
+  au += "/testdata/bd/strmxor_au6d.oas";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "-u", "--no-summary", "-ta=INV2", "-tb=2VNI", input_a.c_str (), input_b.c_str (), output.c_str () };
 
   EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 

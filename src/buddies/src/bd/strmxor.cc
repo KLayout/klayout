@@ -94,9 +94,11 @@ struct ResultDescriptor
   size_t count () const
   {
     if (layout && layer_output >= 0) {
-      //  NOTE: this assumes the output is flat
-      tl_assert (layout->cells () == 1);
-      return layout->cell (top_cell).shapes (layer_output).size ();
+      size_t res = 0;
+      for (db::Layout::const_iterator c = layout->begin (); c != layout->end (); ++c) {
+        res += c->shapes (layer_output).size ();
+      }
+      return res;
     } else {
       return shape_count;
     }
@@ -105,9 +107,12 @@ struct ResultDescriptor
   bool is_empty () const
   {
     if (layout && layer_output >= 0) {
-      //  NOTE: this assumes the output is flat
-      tl_assert (layout->cells () == 1);
-      return layout->cell (top_cell).shapes (layer_output).empty ();
+      for (db::Layout::const_iterator c = layout->begin (); c != layout->end (); ++c) {
+        if (! c->shapes (layer_output).empty ()) {
+          return false;
+        }
+      }
+      return true;
     } else {
       return shape_count == 0;
     }
@@ -185,7 +190,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
       << tl::arg ("-tb|--top-b=name",          &top_b,      "Specifies the top cell for the second layout",
                   "See --top-a for details."
                  )
-      << tl::arg ("-d|--deep",                 &deep,       "Deep (hierarchical mode)",
+      << tl::arg ("-u|--deep",                 &deep,       "Deep (hierarchical mode)",
                   "Enables hierarchical XOR (experimental). In this mode, tiling is not supported "
                   "and the tiling arguments are ignored."
                  )
@@ -593,7 +598,7 @@ bool run_deep_xor (const XORData &xor_data)
         ri_a = db::RecursiveShapeIterator (*xor_data.layout_a, xor_data.layout_a->cell (xor_data.cell_a), ll->second.first);
       }
 
-      if (ll->second.second < 0) {
+      if (ll->second.second >= 0) {
         ri_b = db::RecursiveShapeIterator (*xor_data.layout_b, xor_data.layout_b->cell (xor_data.cell_b), ll->second.second);
       }
 

@@ -551,8 +551,15 @@ private:
       if (dworld.contains (e1) && dworld.contains (e2)) {
 
         std::pair<bool, db::DPoint> ip = e.intersect_point (db::DEdge (e1, e2));
-        if (ip.first) { 
-          find_closest_exact (ip.second, e);
+        if (ip.first) {
+          //  as we are not looking into a specific direction, this found
+          //  is high-prio only on "any angle". Otherwise it's a low-prio
+          //  fallback.
+          if (m_cutlines.empty ()) {
+            find_closest_exact (ip.second, e);
+          } else {
+            find_closest (ip.second, e);
+          }
         }
 
       }

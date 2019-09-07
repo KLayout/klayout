@@ -35,6 +35,7 @@ namespace lay
 {
 
 class LayoutView;
+class AbstractMenu;
 
 /**
  *  @brief A widget to display a bookmark list
@@ -53,10 +54,13 @@ public:
 
   void refresh ();
 
+  static void init_menu (lay::AbstractMenu &menu);
+
 public slots:
   void bookmark_triggered (const QModelIndex &index);
+  void context_menu (const QPoint &p);
 
-public:
+private:
   LayoutView *mp_view;
   QListView *mp_bookmarks;
 };

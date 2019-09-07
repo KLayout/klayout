@@ -23,6 +23,8 @@
 
 #include "layBookmarksView.h"
 #include "layLayoutView.h"
+#include "layAbstractMenu.h"
+#include "layAbstractMenuProvider.h"
 
 #include <QVBoxLayout>
 
@@ -100,13 +102,33 @@ BookmarksView::BookmarksView (LayoutView *view, QWidget *parent, const char *nam
   layout->addWidget (mp_bookmarks);
 
   mp_bookmarks->setModel (new BookmarkListModel (&view->bookmarks ()));
+  mp_bookmarks->setContextMenuPolicy (Qt::CustomContextMenu);
 
+  connect (mp_bookmarks, SIGNAL (customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
   connect (mp_bookmarks, SIGNAL (doubleClicked (const QModelIndex &)), this, SLOT (bookmark_triggered (const QModelIndex &)));
 }
 
 BookmarksView::~BookmarksView ()
 {
   //  .. nothing yet ..
+}
+
+void
+BookmarksView::init_menu (lay::AbstractMenu &menu)
+{
+  MenuLayoutEntry context_menu [] = {
+    MenuLayoutEntry ("manage_bookmarks",     tl::to_string (QObject::tr ("Manage Bookmarks")),    SLOT (cm_manage_bookmarks ())),
+    MenuLayoutEntry ("load_bookmarks",       tl::to_string (QObject::tr ("Load Bookmarks")),      SLOT (cm_load_bookmarks ())),
+    MenuLayoutEntry ("save_bookmarks",       tl::to_string (QObject::tr ("Save Bookmarks")),      SLOT (cm_save_bookmarks ())),
+    MenuLayoutEntry::last ()
+  };
+
+  MenuLayoutEntry main_menu [] = {
+    MenuLayoutEntry ("@bookmarks_context_menu", "", context_menu),
+    MenuLayoutEntry::last ()
+  };
+
+  menu.init (main_menu);
 }
 
 void
@@ -131,6 +153,18 @@ BookmarksView::refresh ()
   BookmarkListModel *model = dynamic_cast<BookmarkListModel *> (mp_bookmarks->model ());
   if (model) {
     model->refresh ();
+  }
+}
+
+void
+BookmarksView::context_menu (const QPoint &p)
+{
+  tl_assert (lay::AbstractMenuProvider::instance () != 0);
+
+  QListView *bm_list = dynamic_cast<QListView *> (sender ());
+  if (bm_list) {
+    QMenu *ctx_menu = lay::AbstractMenuProvider::instance ()->menu ()->detached_menu ("bookmarks_context_menu");
+    ctx_menu->exec (bm_list->mapToGlobal (p));
   }
 }
 

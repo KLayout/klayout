@@ -840,6 +840,7 @@ LayoutView::init_menu (lay::AbstractMenu &menu)
   lay::LayerControlPanel::init_menu (menu);
   lay::HierarchyControlPanel::init_menu (menu);
   lay::LibrariesView::init_menu (menu);
+  lay::BookmarksView::init_menu (menu);
 }
 
 void

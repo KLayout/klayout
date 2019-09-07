@@ -25,6 +25,8 @@
 #include "tlXMLParser.h"
 
 #include <fstream>
+#include <cstdlib>
+#include <cctype>
 
 namespace lay
 {
@@ -86,6 +88,33 @@ BookmarkList::save (const std::string &fn) const
   tl::log << "Saved bookmarks to " << fn;
 }
 
+std::string
+BookmarkList::propose_new_bookmark_name () const
+{
+  int n = 0;
+
+  for (const_iterator b = begin (); b != end (); ++b) {
+
+    const std::string &name = b->name ();
+    if (! name.empty ()) {
+
+      const char *cp = name.c_str () + name.size ();
+      while (cp != name.c_str ()) {
+        if (! isdigit (cp [-1])) {
+          break;
+        }
+        --cp;
+      }
+
+      int nn = atoi (cp);
+      n = std::max (nn, n);
+
+    }
+
+  }
+
+  return "B" + tl::to_string (n + 1);
+}
 
 }
 

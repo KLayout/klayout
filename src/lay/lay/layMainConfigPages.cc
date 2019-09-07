@@ -69,6 +69,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_show_layer_toolbox, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_show_hierarchy_panel, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_show_libraries_view, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_show_bookmarks_view, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_show_layer_panel, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_layout_file_watcher_enabled, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_window_state, ""));

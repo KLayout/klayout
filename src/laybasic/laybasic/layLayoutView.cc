@@ -68,6 +68,7 @@
 #include "layParsedLayerSource.h"
 #include "layBookmarkManagementForm.h"
 #include "layNetlistBrowserDialog.h"
+#include "layBookmarksView.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
 #include "dbRecursiveShapeIterator.h"
@@ -359,7 +360,9 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   mp_hierarchy_panel = 0;
   mp_hierarchy_frame = 0;
   mp_libraries_view = 0;
+  mp_bookmarks_view = 0;
   mp_libraries_frame = 0;
+  mp_bookmarks_frame = 0;
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
   m_from_level = 0;
@@ -503,6 +506,20 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
 
     connect (mp_min_hier_spbx, SIGNAL (valueChanged (int)), this, SLOT (min_hier_changed (int)));
     connect (mp_max_hier_spbx, SIGNAL (valueChanged (int)), this, SLOT (max_hier_changed (int)));
+
+  }
+
+  if ((m_options & LV_NoBookmarksView) == 0 && (m_options & LV_Naked) == 0) {
+
+    QFrame *bookmarks_frame = new QFrame (0);
+    bookmarks_frame->setObjectName (QString::fromUtf8 ("bookmarks_frame"));
+    mp_bookmarks_frame = bookmarks_frame;
+    QVBoxLayout *left_frame_ly = new QVBoxLayout (bookmarks_frame);
+    left_frame_ly->setMargin (0);
+    left_frame_ly->setSpacing (0);
+
+    mp_bookmarks_view = new lay::BookmarksView (this, bookmarks_frame, "bookmarks");
+    left_frame_ly->addWidget (mp_bookmarks_view, 1 /*stretch*/);
 
   }
 
@@ -654,6 +671,12 @@ LayoutView::~LayoutView ()
   }
   mp_libraries_frame = 0;
   mp_libraries_view = 0;
+
+  if (mp_bookmarks_frame) {
+    delete mp_bookmarks_frame;
+  }
+  mp_bookmarks_frame = 0;
+  mp_bookmarks_view = 0;
 }
 
 void LayoutView::hideEvent (QHideEvent *)
@@ -3771,10 +3794,12 @@ LayoutView::cancel ()
 void
 LayoutView::bookmark_current_view ()
 {
+  QString proposed_name = tl::to_qstring (m_bookmarks.propose_new_bookmark_name ());
+
   while (true) {
     bool ok = false;
     QString text = QInputDialog::getText (this, QObject::tr ("Enter Bookmark Name"), QObject::tr ("Bookmark name"),
-                                          QLineEdit::Normal, QString::null, &ok);
+                                          QLineEdit::Normal, proposed_name, &ok);
     if (! ok) {
       break;
     } else if (text.isEmpty ()) {
@@ -3799,6 +3824,7 @@ void
 LayoutView::bookmarks (const BookmarkList &b)
 {
   m_bookmarks = b;
+  mp_bookmarks_view->refresh ();
   emit menu_needs_update ();
 }
 
@@ -3807,6 +3833,7 @@ LayoutView::bookmark_view (const std::string &name)
 {
   DisplayState state (box (), get_min_hier_levels (), get_max_hier_levels (), m_cellviews);
   m_bookmarks.add (name, state);
+  mp_bookmarks_view->refresh ();
   emit menu_needs_update ();
 }
 
@@ -4524,6 +4551,11 @@ LayoutView::background_color (QColor c)
   if (mp_libraries_view) {
     mp_libraries_view->set_background_color (c);
     mp_libraries_view->set_text_color (contrast);
+  }
+
+  if (mp_bookmarks_view) {
+    mp_bookmarks_view->set_background_color (c);
+    mp_bookmarks_view->set_text_color (contrast);
   }
 
   if (mp_selection_service) {

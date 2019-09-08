@@ -69,7 +69,7 @@ public:
     if (parent.isValid ()) {
       return QModelIndex ();
     } else {
-      return createIndex (row, column, 0);
+      return createIndex (row, column);
     }
   }
 
@@ -80,7 +80,7 @@ public:
 
   void refresh ()
   {
-    dataChanged (createIndex (0, 0, 0), createIndex (rowCount (QModelIndex ()), 1, 0));
+    dataChanged (createIndex (0, 0), createIndex (rowCount (QModelIndex ()), 1));
   }
 
 private:

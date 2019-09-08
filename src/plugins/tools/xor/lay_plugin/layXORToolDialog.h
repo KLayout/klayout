@@ -68,6 +68,7 @@ protected:
   void run_xor ();
 
 protected slots:
+  void deep_changed ();
   void input_changed (int index);
   void output_changed (int index);
 

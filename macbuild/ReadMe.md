@@ -1,4 +1,4 @@
-Relevant KLayout version: 0.25.2
+Relevant KLayout version: 0.25.9
 
 # 1. Introduction
 This directory "macbuild" contains different files required for building KLayout (http://www.klayout.de/) version 0.25 or later for different 64-bit Mac OSXs including:
@@ -6,33 +6,27 @@ This directory "macbuild" contains different files required for building KLayout
 * El Capitan  (10.11)
 * Sierra      (10.12)
 * High Sierra (10.13)
+* Mojave      (10.14)
 
-By default, Qt framework is "Qt5" from MacPorts (https://www.macports.org/) which is usually located under:
+By default, Qt framework is "Qt5" from **MacPorts** (https://www.macports.org/) which is usually located under:
 ```
 /opt/local/libexec/qt5/
 ```
 
-Alternatively, you can use "Qt5" from Homebrew (https://brew.sh/) which is usually located under:
+Alternatively, you can use "Qt5" from **Homebrew** (https://brew.sh/) which is usually located under:
 ```
 /usr/local/opt/qt/
 ```
-Please refer to Section # 5. of this document regarding use of Homebrew.
-
-KLayout 0.25.2 was successfully built with "Qt 5.10.0" from MacPorts and "Qt 5.10.1" from Homebrew.
+Please refer to Section # 5.1 of this document regarding the use of Qt5 from **Homebrew**.
 
 ### IMPORTANT
-```
-* Please DO NOT USE "Qt 4.x" which is problematic in compilation.
-```
-
-Also by default, supported script languages, i.e, Ruby and Python, are those standard ones bundled with the OS.
+By default, the supported script languages, i.e., Ruby and Python, are those standard ones bundled with the OS.
 
 # 2. Non-OS-standard script language support
-You may want to use a non-OS-standard script language such as Python 3.6 from Anaconda2 (https://www.anaconda.com/download/#macos) in combination with KLayout.
+You may want to use a non-OS-standard script language such as Python 3.7 from **Homebrew** or **Anaconda3** (https://www.anaconda.com/download/#macos) in combination with KLayout.
 
-Since Anaconda2 is a popular Python development environment, this is worth trying. Unfortunately, however, some dynamic linkage problems are observed as of today. 
-On the other hand, Python 3.7 provided by MacPorts or Homebrew is usable.
-Please try this (refer to 3B below or Section #5) if you feel it's useful.
+Section # 5.1 of this document explains the use of **Homebrew**; Section # 5.2, **Anaconda3**.<br>
+Please try these if you feel they are useful.
 
 # 3. Use-cases
 ### 3A. Debug build using the OS-standard script languages
@@ -41,16 +35,16 @@ Please try this (refer to 3B below or Section #5) if you feel it's useful.
   build4mac.py -> macbuild/build4mac.py
 ```
 2. Invoke 'build4mac.py' with appropriate options ("-d" for debug build):
-``` 
+```
 $ cd /where/'build.sh'/exists
 $ ./build4mac.py -d
 ```
 3. Confirm successful build (it will take about one hour).
-4. Run 'build4mac.py' again with the same options used in 2. PLUS "-y" to deploy executables and libraries (including Qt's frameworks) under "klayout.app" bundle. The buddy command line tools (strm*) will also be deployed in this step.
+4. Run 'build4mac.py' again with the same options used in 2. PLUS "-y" to deploy executables and libraries (including Qt's frameworks) under "klayout.app" bundle. The buddy command-line tools (strm*) will also be deployed in this step.
 ```
 $ ./build4mac.py -d -y
 ```
-5. Copy/move generated bundles ("klayout.app" and "klayout.scripts/") to your "/Applications" directory for installation.
+5. Copy/move the generated bundle ("klayout.app") to your "/Applications" directory for installation.
 
 ### 3B. Release build using the non-OS-standard Ruby 2.4 and Python 3.6 both from MacPorts
 1. Make a symbolic link (if it does not exist) from the parent directory (where 'build.sh' exists) to 'build4mac.py', that is,
@@ -63,14 +57,14 @@ $ cd /where/'build.sh'/exists
 $ ./build4mac.py -r mp24 -p mp36
 ```
 3. Confirm successful build (it will take about one hour).
-4. Run 'build4mac.py' again with the same options used in 2. PLUS "-Y" to deploy executables and libraries under "klayout.app" bundle. The buddy command line tools (strm*) will also be deployed in this step.
+4. Run 'build4mac.py' again with the same options used in 2. PLUS "-Y" to deploy executables and libraries under "klayout.app" bundle. The buddy command-line tools (strm*) will also be deployed in this step.
 ```
 $ ./build4mac.py -r mp24 -p mp36 -Y
 ```
 * [-Y|--DEPLOY] option deploys KLayout's dylibs and executables only.
 That is, paths to other modules (Ruby, Python, and Qt5 Frameworks) remain unchanged (absolute paths in your development environment).
 
-5. Copy/move generated bundles ("klayout.app" and "klayout.scripts/") to your "/Applications" directory for installation.
+5. Copy/move the generated bundle ("klayout.app") to your "/Applications" directory for installation.
 
 ----
 
@@ -85,9 +79,9 @@ makeDMG4mac.py -> macbuild/makeDMG4mac.py
 2. Invoke 'makeDMG4mac.py' with -p and -m options, for example,
 ```
 $ cd /where/'build.sh'/exists
-$ ./makeDMG4mac.py -p qt5.pkg.macos-HighSierra-release -m 
+$ ./makeDMG4mac.py -p qt5.pkg.macos-HighSierra-release -m
 ```
-
+----
 
 # 5. Alternative building options
 ### 5.1 Python 3.7 from Homebrew, Qt 5.10.1 from Homebrew
@@ -114,9 +108,43 @@ Homebrew's installation of python3 (`brew install python3`) places a `Python.fra
 
 Because we link python to `/usr/local/opt/python/Frameworks/Python.framework/`, updating python from brew might break KLayout if the new version is incompatible. To fix this, it is better to link python directly to `/usr/local/Cellar/python/3.6.4_4/Frameworks/Python.framework`, but that might complicate release builds, because that assumes users have the exact version of python installed by brew.
 
-[End of File] 
+### 5.2 Qt 5.9.7, Ruby 2.5, Python 3.7 (as of Sep. 2019) from Anaconda3
+If you wish to use all the three components (Qt5, Ruby, and Python) bundled with **Anaconda3**, this is the case, <br>
+where the build script assumes **Anaconda3** is installed under **$HOME/anaconda3/**. <br>
+This case does not support the standard packaging step due to a known issue in solving inter-library dependencies.<br>
+Instead, you need to move/copy the deployed application bundle ("klayout.app") to your "/Applications" directory for installation.
 
+```
+# Build step
+./build4mac.py -q Qt5Ana3 -r ana3 -p ana3
 
+# Deploy step
+./build4mac.py -q Qt5Ana3 -r ana3 -p ana3 -Y  # not '-y'
+
+# Packaging step
+-- N/A --
+
+# Manual installation step
+$ cd  qt5.pkg.macos-{OS_NAME}-release
+
+$ mv  klayout.app  klayout-anaconda3.app
+
+$ cp -Rp  klayout-anaconda3.app  /Applications
+```
+
+#### Additional steps to start KLayout using the Python in **Anaconda3**
+```
+$ export PYTHONHOME=$HOME/anaconda3
+
+$ open /Applications/klayout-anaconda3.app
+```
+
+You can make an application bundle (icon) for the above Bash script using MacOS' **Automator** tool.<br>
+A related Github ticket is [here](https://github.com/Kazzz-S/klayout/issues/34).
+
+[End of File]
+
+----
 #### Creating a template DMG file
 
 Starting from a `klayout-0.25.8-macOS-Mojave-1-Qt5101.dmg` file:

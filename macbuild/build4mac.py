@@ -65,9 +65,9 @@ def SetGlobals():
   Usage += "                        :   'nil' = not to support the script language                   | \n"
   Usage += "                        :   'Sys' = using the OS standard script language                | \n"
   Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details               | \n"
-  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']      | qt5macports \n"
-  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25', 'Ana3']            | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37', 'Ana3']   | sys \n"
+  Usage += "   [-q|--qt <type>]     : type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']                     | qt5macports \n"
+  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'MP24', 'B25', 'Ana3']                     | sys \n"
+  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'MP36', 'B37', 'Ana3']                     | sys \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled \n"
   Usage += "   [-m|--make <option>] : option passed to 'make'                                        | -j4 \n"
   Usage += "   [-d|--debug]         : enable debug mode build                                        | disabled \n"
@@ -94,7 +94,7 @@ def SetGlobals():
     print("")
     print( "!!! Sorry. Your system <%s> looks like non-Mac" % System, file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   release = int( Release.split(".")[0] ) # take the first of ['14', '5', '0']
   if release == 14:
@@ -112,13 +112,13 @@ def SetGlobals():
     print("")
     print( "!!! Sorry. Unsupported major OS release <%d>" % release, file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   if not Machine == "x86_64":
     print("")
     print( "!!! Sorry. Only x86_64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   # default modules
   ModuleQt = "Qt5MacPorts"
@@ -172,15 +172,15 @@ def ParseCommandLineArguments():
   p = optparse.OptionParser( usage=Usage )
   p.add_option( '-q', '--qt',
                 dest='type_qt',
-                help="Qt type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']" )
+                help="Qt type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']" )
 
   p.add_option( '-r', '--ruby',
                 dest='type_ruby',
-                help="Ruby type=['nil', 'Sys', 'Src24', 'MP24', 'B25', 'Ana3']" )
+                help="Ruby type=['nil', 'Sys', 'MP24', 'B25', 'Ana3']" )
 
   p.add_option( '-p', '--python',
                 dest='type_python',
-                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37', 'Ana3']" )
+                help="Python type=['nil', 'Sys', 'MP36', 'B37', 'Ana3']" )
 
   p.add_option( '-n', '--noqtbinding',
                 action='store_true',
@@ -241,13 +241,13 @@ def ParseCommandLineArguments():
   opt, args = p.parse_args()
   if (opt.checkusage):
     print(Usage)
-    exit()
+    sys.exit(0)
 
   # Determine Qt type
-  candidates = ['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']
+  candidates = ['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']
   candidates_upper = [ i.upper() for i in candidates ]
-  ModuleQt   = ""
-  index      = 0
+  ModuleQt = ""
+  index    = 0
   if opt.type_qt.upper() in candidates_upper:
     idx = candidates_upper.index(opt.type_qt.upper())
     ModuleQt = candidates[idx]
@@ -255,13 +255,13 @@ def ParseCommandLineArguments():
     print("")
     print( "!!! Unknown Qt type %s. Candidates: %s" % (opt.type_qt, candidates), file=sys.stderr )
     print(Usage)
-    exit(1)
+    sys.exit(1)
 
   # By default, OS-standard script languages (Ruby and Python) are used
   NonOSStdLang = False
 
   # Determine Ruby type
-  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24', 'B25', 'Ana3'] ]
+  candidates = [ i.upper() for i in ['nil', 'Sys', 'MP24', 'B25', 'Ana3'] ]
   ModuleRuby = ""
   index      = 0
   for item in candidates:
@@ -284,15 +284,12 @@ def ParseCommandLineArguments():
           ModuleRuby = ''
         break
       elif index == 2:
-        ModuleRuby   = 'Ruby24SrcBuild'
-        NonOSStdLang = True
-      elif index == 3:
         ModuleRuby   = 'Ruby24MacPorts'
         NonOSStdLang = True
-      elif index == 4:
+      elif index == 3:
         ModuleRuby   = 'Ruby25Brew'
         NonOSStdLang = True
-      elif index == 5:
+      elif index == 4:
         ModuleRuby   = 'RubyAnaconda3'
         NonOSStdLang = True
     else:
@@ -301,10 +298,10 @@ def ParseCommandLineArguments():
     print("")
     print( "!!! Unknown Ruby type", file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   # Determine Python type
-  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37', 'Ana3'] ]
+  candidates   = [ i.upper() for i in ['nil', 'Sys', 'MP36', 'B37', 'Ana3'] ]
   ModulePython = ""
   index        = 0
   for item in candidates:
@@ -327,18 +324,12 @@ def ParseCommandLineArguments():
           ModulePython = ''
         break
       elif index == 2:
-        ModulePython = 'Anaconda27'
-        NonOSStdLang = True
-      elif index == 3:
-        ModulePython = 'Anaconda36'
-        NonOSStdLang = True
-      elif index == 4:
         ModulePython = 'Python36MacPorts'
         NonOSStdLang = True
-      elif index == 5:
+      elif index == 3:
         ModulePython = 'Python37Brew'
         NonOSStdLang = True
-      elif index == 6:
+      elif index == 4:
         ModulePython = 'PythonAnaconda3'
         NonOSStdLang = True
     else:
@@ -347,7 +338,7 @@ def ParseCommandLineArguments():
     print("")
     print( "!!! Unknown Python type", file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   NoQtBindings  = opt.no_qt_binding
   MakeOptions   = opt.make_option
@@ -360,14 +351,14 @@ def ParseCommandLineArguments():
     print("")
     print( "!!! Choose either [-y|--deploy] or [-Y|--DEPLOY]", file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   DeployVerbose = int(opt.deploy_verbose)
   if not DeployVerbose in [0, 1, 2, 3]:
     print("")
     print( "!!! Unsupported verbose level passed to `macdeployqt` tool", file=sys.stderr )
     print(Usage)
-    exit()
+    sys.exit(1)
 
   if not DeploymentF and not DeploymentP:
     target  = "%s %s %s" % (Platform, Release, Machine)
@@ -415,21 +406,8 @@ def RunMainBuildBash():
     mode        = "release"
     parameters += "  -release"
 
-  # (B) Qt4 or Qt5
-  if ModuleQt == 'Qt4MacPorts':
-    parameters    += " \\\n  -qt4"
-    parameters    += " \\\n  -qmake  %s" % Qt4MacPorts['qmake']
-    MacPkgDir      = "./qt4.pkg.macos-%s-%s"        % (Platform, mode)
-    MacBinDir      = "./qt4.bin.macos-%s-%s"        % (Platform, mode)
-    MacBuildDir    = "./qt4.build.macos-%s-%s"      % (Platform, mode)
-    MacBuildLog    = "./qt4.build.macos-%s-%s.log"  % (Platform, mode)
-    AbsMacPkgDir   = "%s/qt4.pkg.macos-%s-%s"       % (ProjectDir, Platform, mode)
-    AbsMacBinDir   = "%s/qt4.bin.macos-%s-%s"       % (ProjectDir, Platform, mode)
-    AbsMacBuildDir = "%s/qt4.build.macos-%s-%s"     % (ProjectDir, Platform, mode)
-    AbsMacBuildLog = "%s/qt4.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
-    parameters    += " \\\n  -bin    %s" % MacBinDir
-    parameters    += " \\\n  -build  %s" % MacBuildDir
-  elif ModuleQt == 'Qt5MacPorts':
+  # (B) Qt5
+  if ModuleQt == 'Qt5MacPorts':
     parameters    += " \\\n  -qt5"
     parameters    += " \\\n  -qmake  %s" % Qt5MacPorts['qmake']
     MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
@@ -468,7 +446,7 @@ def RunMainBuildBash():
     AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
     parameters    += " \\\n  -bin    %s" % MacBinDir
     parameters    += " \\\n  -build  %s" % MacBuildDir
-  parameters    += " \\\n  -rpath    %s" % "@executable_path/../Frameworks"
+  parameters += " \\\n  -rpath    %s" % "@executable_path/../Frameworks"
 
   # (C) want Qt bindings with Ruby scripts?
   if NoQtBindings:
@@ -505,7 +483,7 @@ def RunMainBuildBash():
   command += "  2>&1 | tee %s" % MacBuildLog
   if CheckComOnly:
     print(command)
-    exit()
+    sys.exit(0)
 
   #-----------------------------------------------------
   # [3] Invoke the main Bash script; takes time:-)
@@ -681,7 +659,7 @@ def DeployBinariesForBundle():
       depDicOrdinary.update(dependDic)
   '''
   PrintLibraryDependencyDictionary( depDicOrdinary, "Style (3)" )
-  exit()
+  sys.exit(0)
   '''
 
   print( " [5] Setting and changing the identification names among KLayout's libraries ..." )
@@ -764,11 +742,7 @@ def DeployBinariesForBundle():
     # [8] Deploy Qt Frameworks
     #-------------------------------------------------------------
     verbose = " -verbose=%d" % DeployVerbose
-    if ModuleQt == 'Qt4MacPorts':
-      deploytool = Qt4MacPorts['deploy']
-      app_bundle = "klayout.app"
-      options    = macdepQtOpt + verbose
-    elif ModuleQt == 'Qt5MacPorts':
+    if ModuleQt == 'Qt5MacPorts':
       deploytool = Qt5MacPorts['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
@@ -822,7 +796,7 @@ def DeployBinariesForBundle():
         if subprocess.call( command, shell=True ) != 0:
           msg = "command failed: %s"
           print( msg % command, file=sys.stderr )
-          exit(1)
+          sys.exit(1)
 
       shutil.copy2( sourceDir2 + "/start-console.py", targetDirM )
       shutil.copy2( sourceDir2 + "/klayout_console", targetDirM )

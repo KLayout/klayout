@@ -17,4 +17,33 @@
   Bookmarks" and "Save Bookmarks" functions from the "Bookmarks" menu.
   </p>
 
+  <p>
+  The bookmark list is available as a dockable tool window as well:
+  check the "View/Bookmark List" option to enable this dock window.
+  The bookmark list by default is shown at the bottom right side of 
+  the layout view.
+  </p>
+
+  <h2>Dockable Bookmark List</h2>
+
+  <p>
+  To navigate to a bookmark from the dockable bookmark list, double-click
+  the entry.
+  From the context menu (right mouse click) you can select these functions:
+  </p>
+
+  <ul>
+    <li><b>Follow Selection</b>: if this option is checked, the selected
+    bookmark will immediately change the view accordingly. With this
+    option, you can browse the bookmark list with the arrow keys
+    while the view updates automatically.
+    </li>
+    <li><b>Manage bookmarks</b>: opens the bookmark management dialog (same
+    as from the "Bookmarks" menu).
+    </li>
+    <li><b>Load bookmarks</b> and <b>Save bookmarks</b>: loads or saves the 
+    bookmarks to a file (same function as from the "Bookmarks" menu).
+    </li>
+  </ul>
+
 </doc>

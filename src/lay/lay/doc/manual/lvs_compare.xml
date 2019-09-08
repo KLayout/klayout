@@ -46,7 +46,7 @@
   <pre>same_nets("LOGIC", "VDD", "VDD:P")</pre>
 
   <p>
-  In this example it is assumed that the power net is labelled "VDD" in the 
+  In this example it is assumed that the power net is labeled "VDD" in the 
   layout and called "VDD:P" in the schematic. Don't leave this statement in 
   the script for final verification as it may mask real errors.
   </p>
@@ -160,7 +160,8 @@ same_device_classes("NMOS_IN_LAYOUT", "NMOS_IN_SCHEMATIC")</pre>
   </p>
 
   <p>
-  In general, it's a good idea to include "align" before the "compare" step.
+  In general, it's a good idea to include "align" before "netlist.simplify" or 
+  similar netlist manipulation and the "compare" step.
   </p>
 
   <p>

@@ -175,6 +175,11 @@ public:
   void flatten_circuit (Circuit *circuit);
 
   /**
+   *  @brief Flattens the netlist
+   */
+  void flatten ();
+
+  /**
    *  @brief Begin iterator for the circuits of the netlist (non-const version)
    */
   circuit_iterator begin_circuits ()

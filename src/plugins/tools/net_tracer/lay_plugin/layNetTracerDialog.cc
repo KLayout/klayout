@@ -559,13 +559,15 @@ NetTracerDialog::menu_activated (const std::string &symbol)
 
     layer_stack_clicked ();
 
-  } else if (symbol == "lay::trace_all_nets") {
+  } else if (symbol == "lay::trace_all_nets" || symbol == "lay::trace_all_nets_flat") {
+
+    bool flat = symbol == "lay::trace_all_nets_flat";
 
     const lay::CellView &cv = view ()->cellview (view ()->active_cellview_index ());
     if (cv.is_valid ()) {
       db::RecursiveShapeIterator si (cv->layout (), *cv.cell (), std::vector<unsigned int> ());
       std::auto_ptr <db::LayoutToNetlist> l2ndb (new db::LayoutToNetlist (si));
-      trace_all_nets (l2ndb.get (), cv);
+      trace_all_nets (l2ndb.get (), cv, flat);
       unsigned int l2ndb_index = view ()->add_l2ndb (l2ndb.release ());
       view ()->open_l2ndb_browser (l2ndb_index, view ()->index_of_cellview (&cv));
     }
@@ -1658,7 +1660,7 @@ NetTracerDialog::clear_markers ()
 }
 
 void
-NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv)
+NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv, bool flat)
 {
   db::NetTracerData tracer_data;
   if (! get_net_tracer_setup (cv, tracer_data)) {
@@ -1668,6 +1670,10 @@ NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView
   tracer_data.configure_l2n (*l2ndb);
 
   l2ndb->extract_netlist ();
+
+  if (flat) {
+    l2ndb->netlist ()->flatten ();
+  }
 }
 
 }

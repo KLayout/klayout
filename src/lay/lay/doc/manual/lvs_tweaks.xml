@@ -41,7 +41,7 @@
 
   <p>
   KLayout offers a function to create top-level pins using 
-  a simple heuristics: for every named (i.e. labelled) net in the top level 
+  a simple heuristics: for every named (i.e. labeled) net in the top level 
   circuit a pin will be created (<class_doc href="Netlist#make_top_level_pins"/>):
   </p>
 
@@ -199,9 +199,16 @@ netlist.purge_nets</pre>
 
   <p>
   <class_doc href="Netlist#simplify"/> is a wrapper for "make_top_level_pins",
-  "combine_devices" and "purge" in the recommended order:
+  "purge", "combine_devices" and "purge_nets" in this recommended order:
   </p>
 
   <pre>netlist.simplify</pre>
+
+  <p>
+  As a technical detail, "make_top_level_pins" is included in this sequence as with
+  pins, nets are not considered floating. So "purge_nets" will maintain pins for
+  labeled nets even if these nets are not connected to devices. This allows adding 
+  optional pins while maintaining the top level circuit's interface.
+  </p>
 
 </doc>

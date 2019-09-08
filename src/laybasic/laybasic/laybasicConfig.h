@@ -130,6 +130,8 @@ static const std::string cfg_cell_list_sorting ("cell-list-sorting");
 static const std::string cfg_split_lib_views ("split-lib-views");
 static const std::string cfg_current_lib_view ("current-lib-view");
 
+static const std::string cfg_bookmarks_follow_selection ("bookmarks-follow-selection");
+
 static const std::string cfg_pan_distance ("pan-distance");
 static const std::string cfg_paste_display_mode ("paste-display-mode");
 

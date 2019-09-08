@@ -53,7 +53,7 @@ private:
 
 // ------------------------------------------------------------
 
-BookmarkManagementForm::BookmarkManagementForm (QWidget *parent, const char *name, const lay::BookmarkList &bookmarks)
+BookmarkManagementForm::BookmarkManagementForm (QWidget *parent, const char *name, const lay::BookmarkList &bookmarks, const std::set<size_t> &selected)
   : QDialog (parent), Ui::BookmarkManagementForm (),
     m_bookmarks (bookmarks)
 {
@@ -61,8 +61,18 @@ BookmarkManagementForm::BookmarkManagementForm (QWidget *parent, const char *nam
 
   Ui::BookmarkManagementForm::setupUi (this);
 
+  QListWidgetItem *first_item = 0;
+
   for (size_t i = 0; i < m_bookmarks.size (); ++i) {
-    new BookmarkListLVI (bookmark_list, m_bookmarks.name (i), m_bookmarks.state (i));
+    QListWidgetItem *item = new BookmarkListLVI (bookmark_list, m_bookmarks.name (i), m_bookmarks.state (i));
+    item->setSelected (selected.find (i) != selected.end ());
+    if (! first_item && item->isSelected ()) {
+      first_item = item;
+    }
+  }
+
+  if (first_item) {
+    bookmark_list->scrollToItem (first_item);
   }
 
   connect (delete_button, SIGNAL (clicked ()), this, SLOT (delete_pressed ()));

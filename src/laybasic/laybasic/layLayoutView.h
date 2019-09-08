@@ -71,6 +71,7 @@ class AbstractMenu;
 class LayerControlPanel;
 class HierarchyControlPanel;
 class LibrariesView;
+class BookmarksView;
 class MouseTracker;
 class ZoomService;
 class SelectionService;
@@ -170,13 +171,14 @@ public:
     LV_NoLayers = 1, 
     LV_NoHierarchyPanel = 2, 
     LV_NoLibrariesView = 4,
-    LV_Naked = 8,
-    LV_NoZoom = 16,
-    LV_NoGrid = 32,
-    LV_NoMove = 64,
-    LV_NoTracker = 128,
-    LV_NoSelection = 256,
-    LV_NoPlugins = 512,
+    LV_NoBookmarksView = 8,
+    LV_Naked = 16,
+    LV_NoZoom = 32,
+    LV_NoGrid = 64,
+    LV_NoMove = 128,
+    LV_NoTracker = 256,
+    LV_NoSelection = 512,
+    LV_NoPlugins = 1024,
     LV_NoServices = LV_NoMove + LV_NoTracker + LV_NoSelection + LV_NoPlugins
   };
 
@@ -244,6 +246,14 @@ public:
   QWidget *libraries_frame ()
   {
     return mp_libraries_frame;
+  }
+
+  /**
+   *  @brief Gets the container with the bookmarks view
+   */
+  QWidget *bookmarks_frame ()
+  {
+    return mp_bookmarks_frame;
   }
 
   /**
@@ -2748,7 +2758,8 @@ private:
   lay::LayerControlPanel *mp_control_panel;
   lay::HierarchyControlPanel *mp_hierarchy_panel;
   lay::LibrariesView *mp_libraries_view;
-  QWidget *mp_control_frame, *mp_hierarchy_frame, *mp_libraries_frame;
+  lay::BookmarksView *mp_bookmarks_view;
+  QWidget *mp_control_frame, *mp_hierarchy_frame, *mp_libraries_frame, *mp_bookmarks_frame;
   QSpinBox *mp_min_hier_spbx;
   QSpinBox *mp_max_hier_spbx;
   std::list <CellView> m_cellviews;

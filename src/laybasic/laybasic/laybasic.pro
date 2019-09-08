@@ -176,7 +176,8 @@ SOURCES = \
     layIndexedNetlistModel.cc \
     layNetlistCrossReferenceModel.cc \
     layNetlistBrowserTreeModel.cc \
-    layLibrariesView.cc
+    layLibrariesView.cc \
+    layBookmarksView.cc
 
 HEADERS = \
   gtf.h \
@@ -273,7 +274,8 @@ HEADERS = \
     layIndexedNetlistModel.h \
     layNetlistCrossReferenceModel.h \
     layNetlistBrowserTreeModel.h \
-    layLibrariesView.h
+    layLibrariesView.h \
+    layBookmarksView.h
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC

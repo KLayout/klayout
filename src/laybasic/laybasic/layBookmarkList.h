@@ -27,6 +27,7 @@
 #include "laybasicCommon.h"
 
 #include "layDisplayState.h"
+#include "tlObject.h"
 
 #include <vector>
 #include <string>
@@ -89,6 +90,7 @@ public:
  *  @brief The list of bookmarks
  */
 class LAYBASIC_PUBLIC BookmarkList
+  : public tl::Object
 {
 public:
   typedef std::vector<BookmarkListElement> bookmark_list_type;
@@ -181,6 +183,11 @@ public:
   {
     return m_list [index];
   }
+
+  /**
+   *  @brief Propose a new bookmark name
+   */
+  std::string propose_new_bookmark_name () const;
 
   /**
    *  @brief Save the list 

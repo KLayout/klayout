@@ -915,7 +915,7 @@ begin
   view.transaction("Restyle annotations")
 
   view.each_annotation do |a|
-    adup.style = RBA::Annotation::StyleArrowBoth
+    a.style = RBA::Annotation::StyleArrowBoth
   end
   
 ensure

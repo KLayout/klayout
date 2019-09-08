@@ -47,6 +47,7 @@ static int outline_diag_xy ()   { return int (ant::Object::OL_diag_xy); }
 static int outline_yx ()        { return int (ant::Object::OL_yx); }
 static int outline_diag_yx ()   { return int (ant::Object::OL_diag_yx); }
 static int outline_box ()       { return int (ant::Object::OL_box); }
+static int outline_ellipse ()   { return int (ant::Object::OL_ellipse); }
 
 static int angle_any ()         { return int (lay::AC_Any); }
 static int angle_diagonal ()    { return int (lay::AC_Diagonal); }
@@ -551,6 +552,13 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "When this outline style is specified, a box is drawn with the corners specified by the "
     "start and end point. All box edges are drawn in the style specified with the \\style "
     "attribute."
+  ) +
+  gsi::method ("OutlineEllipse|#outline_ellipse", &gsi::outline_ellipse,
+    "@brief Gets the ellipse outline code for use with the \\outline method\n"
+    "When this outline style is specified, an ellipse is drawn with the extensions specified by the "
+    "start and end point. The contour drawn as a line.\n"
+    "\n"
+    "This constant has been introduced in version 0.26."
   ) +
   gsi::method ("AngleAny|#angle_any", &gsi::angle_any,
     "@brief Gets the any angle code for use with the \\angle_constraint method\n"

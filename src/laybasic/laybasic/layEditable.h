@@ -32,6 +32,7 @@
 #include "dbPoint.h"
 #include "dbBox.h"
 #include "dbObject.h"
+#include "dbManager.h"
 
 #include <set>
 #include <limits>
@@ -331,7 +332,7 @@ public:
    *  by the caller. The return value is 0 if the Editable object does
    *  not support a properties page.
    */
-  virtual lay::PropertiesPage *properties_page (QWidget * /*parent*/)
+  virtual lay::PropertiesPage *properties_page (db::Manager * /*manager*/, QWidget * /*parent*/)
   {
     return 0;
   }
@@ -386,8 +387,11 @@ public:
 
   /**
    *  @brief The delete operation
+   *
+   *  If a transaction is given, the operation will be appended to this pending transaction
+   *  The Editables object takes ownership over the Transaction object.
    */
-  void del ();
+  void del (db::Transaction *transaction = 0);
 
   /**
    *  @brief "cut" operation
@@ -419,8 +423,11 @@ public:
    *  @brief transform the selection
    *
    *  The transformation is given in micron units.
+   *
+   *  If a transaction is given, the operation will be appended to this pending transaction.
+   *  The Editables object takes ownership over the Transaction object.
    */
-  void transform (const db::DCplxTrans &tr);
+  void transform (const db::DCplxTrans &tr, db::Transaction *transaction = 0);
 
   /**
    *  @brief Enable or disable a certain editable
@@ -494,8 +501,11 @@ public:
 
   /**
    *  @brief End "move" operation
+   *
+   *  If a transaction is given, the operation will be appended to this pending transaction
+   *  The Editables object takes ownership over the Transaction object.
    */
-  void end_move (const db::DPoint &p, lay::angle_constraint_type ac);
+  void end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction = 0);
 
   /**
    *  @brief Tell how many objects are selected.

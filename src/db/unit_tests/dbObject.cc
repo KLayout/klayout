@@ -151,6 +151,8 @@ struct B : public db::Object
   {
     if (transacting ()) {
       manager ()->queue (this, new BO (d));
+    } else {
+       x += d;
     }
   }
   
@@ -222,6 +224,87 @@ TEST(2)
     
     man->undo ();
     EXPECT_EQ (b.x, 0);
+    EXPECT_EQ (man->available_undo ().first, false);
+    EXPECT_EQ (man->available_redo ().first, true);
+  }
+
+  delete man;
+  EXPECT_EQ (BO::inst_count (), 0);
+}
+
+TEST(3) 
+{
+  db::Manager *man = new db::Manager ();
+  {
+    EXPECT_EQ (man->available_undo ().first, false);
+    EXPECT_EQ (man->available_redo ().first, false);
+
+    B b (man);
+    man->transaction ("add 1");
+    b.add (1);
+    man->commit ();
+
+    EXPECT_EQ (b.x, 1);
+    EXPECT_EQ (man->available_undo ().first, true);
+    EXPECT_EQ (man->available_undo ().second, "add 1");
+
+    man->transaction ("add 1,2");
+    b.add (1);
+    b.add (2);
+    man->cancel ();
+    EXPECT_EQ (b.x, 1);
+    EXPECT_EQ (man->available_undo ().first, true);
+    EXPECT_EQ (man->available_redo ().first, false);
+
+    man->undo ();
+    EXPECT_EQ (b.x, 0);
+    EXPECT_EQ (man->available_undo ().first, false);
+    EXPECT_EQ (man->available_redo ().first, true);
+  }
+
+  delete man;
+  EXPECT_EQ (BO::inst_count (), 0);
+}
+
+TEST(4)
+{
+  db::Manager *man = new db::Manager ();
+  {
+    EXPECT_EQ (man->available_undo ().first, false);
+    EXPECT_EQ (man->available_redo ().first, false);
+
+    B b (man);
+    {
+      db::Transaction t (man, "add 1");
+      b.add (1);
+    }
+
+    EXPECT_EQ (b.x, 1);
+    EXPECT_EQ (man->available_undo ().first, true);
+    EXPECT_EQ (man->available_undo ().second, "add 1");
+
+    {
+      db::Transaction t (man, "add 1,2");
+      b.add (1);
+      EXPECT_EQ (b.x, 2);
+      EXPECT_EQ (man->transacting (), true);
+      t.close ();
+      EXPECT_EQ (man->transacting (), false);
+      b.add (1);  //  after close -> not undone!
+      EXPECT_EQ (b.x, 3);
+      t.open ();
+      EXPECT_EQ (man->transacting (), true);
+      b.add (2);
+      EXPECT_EQ (b.x, 5);
+      t.cancel ();
+    }
+
+    EXPECT_EQ (b.x, 2);
+    EXPECT_EQ (man->available_undo ().first, true);
+    EXPECT_EQ (man->available_redo ().first, false);
+
+    man->undo ();
+    EXPECT_EQ (b.x, 1);
     EXPECT_EQ (man->available_undo ().first, false);
     EXPECT_EQ (man->available_redo ().first, true);
   }

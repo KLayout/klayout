@@ -255,6 +255,11 @@ public:
   void paste ();
 
   /**
+   *  @brief Pastes from clipboard and initiates a move
+   */
+  void paste_interactive ();
+
+  /**
    *  @brief Copies to clipboard
    *
    *  This reimplementation of the lay::Editables interface additionally
@@ -1618,6 +1623,14 @@ public:
   void mode (int m);
   
   /**
+   *  @brief Switches the application's mode
+   *
+   *  Switches the mode on application level. Use this method to initiate
+   *  a mode switch from the view.
+   */
+  void switch_mode (int m);
+
+  /**
    *  @brief Test, if the view is currently in move mode.
    */
   bool is_move_mode () const;
@@ -2582,6 +2595,7 @@ public slots:
   void cm_sel_scale ();
   void cm_sel_move ();
   void cm_sel_move_to ();
+  void cm_sel_move_interactive ();
 
   //  forwarded to the layer control panel
   void cm_new_tab ();
@@ -2697,6 +2711,11 @@ signals:
    *  @brief This signal is sent when the view wants to update the menu
    */
   void menu_needs_update ();
+
+  /**
+   *  @brief The view initiated a mode change
+   */
+  void mode_change (int m);
 
 protected:
   /**

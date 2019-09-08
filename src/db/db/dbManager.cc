@@ -143,6 +143,22 @@ Manager::last_transaction_id () const
   return m_transactions.empty () ? 0 : reinterpret_cast<transaction_id_t> (& m_transactions.back ());
 }
 
+void
+Manager::cancel ()
+{
+  if (db::transactions_enabled ()) {
+
+    //  commit and undo - revert changes done so far
+    commit ();
+    undo ();
+
+    //  delete all following transactions
+    erase_transactions (m_current, m_transactions.end ());
+    m_current = m_transactions.end ();
+
+  }
+}
+
 void 
 Manager::commit ()
 {

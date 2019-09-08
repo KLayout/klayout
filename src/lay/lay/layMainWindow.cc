@@ -460,13 +460,13 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
   }
   mw_instance = this;
 
+  lay::register_help_handler (this, SLOT (show_help (const QString &)), SLOT (show_modal_help (const QString &)));
+
   mp_setup_form = new SettingsForm (0, plugin_root (), "setup_form"),
 
   db::LibraryManager::instance ().changed_event.add (this, &MainWindow::libraries_changed);
 
   init_menu ();
-
-  lay::register_help_handler (this, SLOT (show_help (const QString &)), SLOT (show_modal_help (const QString &)));
 
   mp_assistant = new lay::HelpDialog (this);
 
@@ -742,6 +742,13 @@ MainWindow::init_menu ()
 {
   //  default menu layout
 
+  MenuLayoutEntry secret_menu [] = {
+    MenuLayoutEntry ("paste_interactive:edit",          tl::to_string (QObject::tr ("Paste Interactive")),                SLOT (cm_paste_interactive ())),
+    MenuLayoutEntry ("duplicate_interactive:edit",      tl::to_string (QObject::tr ("Duplicate Interactive")),            SLOT (cm_duplicate_interactive ())),
+    MenuLayoutEntry ("sel_move_interactive",            tl::to_string (QObject::tr ("Move Interactive")),                 SLOT (cm_sel_move_interactive ())),
+    MenuLayoutEntry::last ()
+  };
+
   MenuLayoutEntry empty_menu [] = {
     MenuLayoutEntry::last ()
   };
@@ -995,6 +1002,7 @@ MainWindow::init_menu ()
     MenuLayoutEntry ("macros_menu",                     tl::to_string (QObject::tr ("&Macros")),                          macros_menu),
     MenuLayoutEntry::separator ("help_group"),
     MenuLayoutEntry ("help_menu",                       tl::to_string (QObject::tr ("&Help")),                            help_menu),
+    MenuLayoutEntry ("@secrets",                        tl::to_string (QObject::tr ("Secret Features")),                  secret_menu),
     MenuLayoutEntry ("@toolbar",                        "",                                                               toolbar_entries),
     MenuLayoutEntry::last ()
   };
@@ -2233,7 +2241,7 @@ MainWindow::cm_cell_copy ()
 }
 
 void
-MainWindow::cm_duplicate ()
+MainWindow::do_cm_duplicate (bool interactive)
 {
   BEGIN_PROTECTED
 
@@ -2248,7 +2256,11 @@ MainWindow::cm_duplicate ()
       current_view ()->copy ();
       current_view ()->clear_selection ();
       current_view ()->cancel ();
-      current_view ()->paste ();
+      if (interactive) {
+        current_view ()->paste_interactive ();
+      } else {
+        current_view ()->paste ();
+      }
       db::Clipboard::instance ().swap (saved_clipboard);
     } catch (...) {
       db::Clipboard::instance ().swap (saved_clipboard);
@@ -2256,6 +2268,26 @@ MainWindow::cm_duplicate ()
     }
 
   }
+
+  END_PROTECTED
+}
+
+void
+MainWindow::cm_duplicate ()
+{
+  BEGIN_PROTECTED
+
+    do_cm_duplicate (false);
+
+  END_PROTECTED
+}
+
+void
+MainWindow::cm_duplicate_interactive ()
+{
+  BEGIN_PROTECTED
+
+    do_cm_duplicate (true);
 
   END_PROTECTED
 }
@@ -2274,17 +2306,33 @@ MainWindow::cm_copy ()
 }
 
 void
-MainWindow::cm_paste ()
+MainWindow::do_cm_paste (bool interactive)
 {
   BEGIN_PROTECTED
 
   if (current_view () && ! db::Clipboard::instance ().empty ()) {
     current_view ()->cancel ();
     current_view ()->clear_selection ();
-    current_view ()->paste ();
+    if (interactive) {
+      current_view ()->paste_interactive ();
+    } else {
+      current_view ()->paste ();
+    }
   }
 
   END_PROTECTED
+}
+
+void
+MainWindow::cm_paste ()
+{
+  do_cm_paste (false);
+}
+
+void
+MainWindow::cm_paste_interactive ()
+{
+  do_cm_paste (true);
 }
 
 void
@@ -3569,6 +3617,12 @@ MainWindow::cm_sel_move_to ()
 }
 
 void
+MainWindow::cm_sel_move_interactive ()
+{
+  call_on_current_view (&lay::LayoutView::cm_sel_move_interactive, tl::to_string (QObject::tr ("move selection interactively")));
+}
+
+void
 MainWindow::cm_sel_scale ()
 {
   call_on_current_view (&lay::LayoutView::cm_sel_scale, tl::to_string (QObject::tr ("scale selection")));
@@ -3685,19 +3739,7 @@ MainWindow::clone_current_view ()
 
   //  create a new view
   view = new lay::LayoutView (current_view (), &m_manager, lay::ApplicationBase::instance ()->is_editable (), plugin_root (), mp_view_stack);
-  connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
-  connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
-  connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
-  connect (view, SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
-  connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
-  connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
-  connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
-  mp_views.push_back (view);
-
-  //  we must resize the widget here to set the geometry properly.
-  //  This is required to make zoom_fit work.
-  view->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
-  view->show ();
+  add_view (view);
 
   //  set initial attributes
   view->set_hier_levels (curr->get_hier_levels ());
@@ -4291,12 +4333,9 @@ MainWindow::create_layout (const std::string &technology, int mode)
   return create_or_load_layout (0, 0, technology, mode);
 }
 
-int
-MainWindow::do_create_view ()
+void
+MainWindow::add_view (lay::LayoutView *view)
 {
-  //  create a new view
-  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::ApplicationBase::instance ()->is_editable (), plugin_root (), mp_view_stack);
-
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
@@ -4304,6 +4343,7 @@ MainWindow::do_create_view ()
   connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
   connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
   connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
+  connect (view, SIGNAL (mode_change (int)), this, SLOT (select_mode (int)));
 
   mp_views.push_back (view);
 
@@ -4311,6 +4351,14 @@ MainWindow::do_create_view ()
   //  This is required to make zoom_fit work.
   view->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
   view->show ();
+}
+
+int
+MainWindow::do_create_view ()
+{
+  //  create a new view
+  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::ApplicationBase::instance ()->is_editable (), plugin_root (), mp_view_stack);
+  add_view (view);
 
   //  set initial attributes
   view->set_synchronous (synchronous ());
@@ -4792,7 +4840,9 @@ MainWindow::cm_show_assistant ()
 void
 MainWindow::show_help (const QString &url)
 {
-  show_assistant_url (tl::to_string (url), false);
+  //  NOTE: from inside a modal widget we show the help dialog modal too
+  //  (otherwise it's not usable)
+  show_assistant_url (tl::to_string (url), QApplication::activeModalWidget () != 0);
 }
 
 void

@@ -144,11 +144,30 @@ namespace lay
   LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range);
 
   /**
+   *  @brief Same than obj_snap, but delivers two points on two opposite sides of the initial points
+   *
+   *  This method basically implements "auto measure". The first value of the returned pair
+   *  is true if such an edge could be found. Otherwise it's false.
+   *
+   *  This version accepts two points defining different search regions for first and second edge.
+   */
+  LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range);
+
+  /**
    *  @brief Same than the previous obj_snap2, but allows specification of an angle constraint
    *
    *  Measurements will be confined to the direction specified.
    */
   LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range);
+
+  /**
+   *  @brief Same than the previous obj_snap2, but allows specification of an angle constraint
+   *
+   *  Measurements will be confined to the direction specified.
+   *
+   *  This version accepts two points defining different search regions for first and second edge.
+   */
+  LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range);
 
   /**
    *  @brief Reduce a given vector according to the angle constraint

@@ -39,7 +39,7 @@ class PropertiesPage
 Q_OBJECT
 
 public:
-  PropertiesPage (ant::Service *rulers, QWidget *parent);
+  PropertiesPage (ant::Service *rulers, db::Manager *manager, QWidget *parent);
   ~PropertiesPage ();
 
   virtual void back ();
@@ -52,6 +52,10 @@ public:
   virtual void leave ();
   virtual bool readonly ();
   virtual void apply (); 
+
+private slots:
+  void swap_points_clicked ();
+  void snap_to_layout_clicked ();
 
 private:
   std::vector <ant::Service::obj_iterator> m_selection;

@@ -45,7 +45,7 @@ class PropertiesPage
 Q_OBJECT
 
 public:
-  PropertiesPage (img::Service *service, QWidget *parent);
+  PropertiesPage (img::Service *service, db::Manager *manager, QWidget *parent);
   PropertiesPage (QWidget *parent);
   ~PropertiesPage ();
 

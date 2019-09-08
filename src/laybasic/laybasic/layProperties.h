@@ -57,7 +57,7 @@ public:
    *  empty, at_start () is supposed to return true then.
    *  The dialog will call update () to update the display accordingly.
    */
-  PropertiesPage (QWidget *parent, lay::Editable *editable);
+  PropertiesPage (QWidget *parent, db::Manager *manager, lay::Editable *editable);
 
   /**
    *  @brief The destructor
@@ -210,7 +210,17 @@ public:
     return mp_editable;
   }
 
+  /**
+   *  @brief Gets the transaction manager object
+   *  Use this object to implement undable operations on the properties page.
+   */
+  db::Manager *manager ()
+  {
+    return mp_manager;
+  }
+
 private:
+  db::Manager *mp_manager;
   lay::Editable *mp_editable;
 };
 

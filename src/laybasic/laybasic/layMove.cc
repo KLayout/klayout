@@ -163,7 +163,7 @@ MoveService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool 
     return true;
   } 
   if (prio && (buttons & lay::LeftButton) != 0) {
-    if (handle_dragging (p, buttons)) {
+    if (handle_dragging (p, buttons, 0)) {
       return true;
     }
   } 
@@ -216,7 +216,7 @@ bool
 MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (prio && (buttons & lay::LeftButton) != 0) {
-    if (handle_dragging (p, buttons)) {
+    if (handle_dragging (p, buttons, 0)) {
       return true;
     }
   } 
@@ -229,11 +229,33 @@ MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool 
   return false;
 }
 
+bool
+MoveService::begin_move (db::Transaction *transaction)
+{
+  std::auto_ptr<db::Transaction> trans_holder (transaction);
+
+  drag_cancel ();
+
+  db::DBox bbox = mp_editables->selection_bbox ();
+  if (bbox.empty ()) {
+    //  nothing selected
+    return false;
+  }
+
+  set_cursor (lay::Cursor::size_all);
+
+  //  emulate a "begin move" at the center of the selection bbox - this will become the reference point
+  return handle_dragging (bbox.center (), 0, trans_holder.release ());
+}
 
 bool 
-MoveService::handle_dragging (const db::DPoint &p, unsigned int buttons)
+MoveService::handle_dragging (const db::DPoint &p, unsigned int buttons, db::Transaction *transaction)
 {
+  std::auto_ptr<db::Transaction> trans_holder (transaction);
+
   if (! m_dragging) {
+
+    mp_transaction.reset (trans_holder.release ());
 
     if (mp_editables->begin_move (p, ac_from_buttons (buttons))) {
 
@@ -257,7 +279,7 @@ MoveService::handle_dragging (const db::DPoint &p, unsigned int buttons)
 
     m_dragging = false;
     widget ()->ungrab_mouse (this);
-    mp_editables->end_move (p, ac_from_buttons (buttons));
+    mp_editables->end_move (p, ac_from_buttons (buttons), mp_transaction.release ());
     return true;
 
   }
@@ -269,9 +291,17 @@ MoveService::drag_cancel ()
 { 
   m_shift = db::DPoint ();
   if (m_dragging) {
+
     mp_editables->edit_cancel ();
     widget ()->ungrab_mouse (this);
+
     m_dragging = false;
+
+    if (mp_transaction.get ()) {
+      mp_transaction->cancel ();
+    }
+    mp_transaction.reset (0);
+
   }
 }
 

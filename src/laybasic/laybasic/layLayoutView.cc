@@ -5086,6 +5086,33 @@ LayoutView::paste ()
 }
 
 void
+LayoutView::paste_interactive ()
+{
+  clear_selection ();
+
+  std::auto_ptr<db::Transaction> trans (new db::Transaction (manager (), tl::to_string (QObject::tr ("Paste and move"))));
+
+  {
+    //  let the receivers sort out who is pasting what ..
+    if (mp_hierarchy_panel) {
+      mp_hierarchy_panel->paste ();
+    }
+    if (mp_control_panel) {
+      mp_control_panel->paste ();
+    }
+    lay::Editables::paste ();
+  }
+
+  //  temporarily close the transaction and pass to the move service for appending it's own
+  //  operations.
+  trans->close ();
+
+  if (mp_move_service->begin_move (trans.release ())) {
+    switch_mode (-1);  //  move mode
+  }
+}
+
+void
 LayoutView::copy ()
 {
   if (mp_hierarchy_panel && mp_hierarchy_panel->has_focus ()) {
@@ -6760,6 +6787,23 @@ LayoutView::cm_sel_scale ()
     }
     do_transform (tr);
 
+  }
+}
+
+void
+LayoutView::cm_sel_move_interactive ()
+{
+  if (mp_move_service->begin_move ()) {
+    switch_mode (-1);  //  move mode
+  }
+}
+
+void
+LayoutView::switch_mode (int m)
+{
+  if (m_mode != m) {
+    mode (m);
+    emit mode_change (m);
   }
 }
 

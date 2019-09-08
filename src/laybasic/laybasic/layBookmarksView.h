@@ -31,6 +31,8 @@
 #include <QFrame>
 #include <QListView>
 
+#include <set>
+
 namespace lay
 {
 
@@ -51,6 +53,9 @@ public:
 
   void set_background_color (QColor c);
   void set_text_color (QColor c);
+  void follow_selection (bool f);
+
+  std::set<size_t> selected_bookmarks ();
 
   void refresh ();
 
@@ -58,11 +63,13 @@ public:
 
 public slots:
   void bookmark_triggered (const QModelIndex &index);
+  void current_bookmark_changed (const QModelIndex &index);
   void context_menu (const QPoint &p);
 
 private:
   LayoutView *mp_view;
   QListView *mp_bookmarks;
+  bool m_follow_selection;
 };
 
 } // namespace lay

@@ -26,6 +26,8 @@
 #include "layAbstractMenu.h"
 #include "layAbstractMenuProvider.h"
 
+#include "laybasicConfig.h"
+
 #include <QVBoxLayout>
 
 namespace lay
@@ -88,7 +90,7 @@ private:
 // --------------------------------------------------------------------------------------------
 
 BookmarksView::BookmarksView (LayoutView *view, QWidget *parent, const char *name)
-  : QFrame (parent)
+  : QFrame (parent), m_follow_selection (false)
 {
   setObjectName (QString::fromUtf8 (name));
 
@@ -102,10 +104,12 @@ BookmarksView::BookmarksView (LayoutView *view, QWidget *parent, const char *nam
   layout->addWidget (mp_bookmarks);
 
   mp_bookmarks->setModel (new BookmarkListModel (&view->bookmarks ()));
+  mp_bookmarks->setSelectionMode (QAbstractItemView::ExtendedSelection);
   mp_bookmarks->setContextMenuPolicy (Qt::CustomContextMenu);
 
   connect (mp_bookmarks, SIGNAL (customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
   connect (mp_bookmarks, SIGNAL (doubleClicked (const QModelIndex &)), this, SLOT (bookmark_triggered (const QModelIndex &)));
+  connect (mp_bookmarks->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_bookmark_changed (const QModelIndex &)));
 }
 
 BookmarksView::~BookmarksView ()
@@ -113,10 +117,29 @@ BookmarksView::~BookmarksView ()
   //  .. nothing yet ..
 }
 
+std::set<size_t>
+BookmarksView::selected_bookmarks ()
+{
+  QModelIndexList sel = mp_bookmarks->selectionModel ()->selectedIndexes ();
+  std::set<size_t> res;
+  for (QModelIndexList::const_iterator i = sel.begin (); i != sel.end (); ++i) {
+    res.insert (int (i->row ()));
+  }
+  return res;
+}
+
+void
+BookmarksView::follow_selection (bool f)
+{
+  m_follow_selection = f;
+}
+
 void
 BookmarksView::init_menu (lay::AbstractMenu &menu)
 {
   MenuLayoutEntry context_menu [] = {
+    MenuLayoutEntry ("follow_selection",     tl::to_string (QObject::tr ("Follow Selection")),    std::make_pair (cfg_bookmarks_follow_selection, "?")),
+    MenuLayoutEntry::separator ("ops_group"),
     MenuLayoutEntry ("manage_bookmarks",     tl::to_string (QObject::tr ("Manage Bookmarks")),    SLOT (cm_manage_bookmarks ())),
     MenuLayoutEntry ("load_bookmarks",       tl::to_string (QObject::tr ("Load Bookmarks")),      SLOT (cm_load_bookmarks ())),
     MenuLayoutEntry ("save_bookmarks",       tl::to_string (QObject::tr ("Save Bookmarks")),      SLOT (cm_save_bookmarks ())),
@@ -165,6 +188,14 @@ BookmarksView::context_menu (const QPoint &p)
   if (bm_list) {
     QMenu *ctx_menu = lay::AbstractMenuProvider::instance ()->menu ()->detached_menu ("bookmarks_context_menu");
     ctx_menu->exec (bm_list->mapToGlobal (p));
+  }
+}
+
+void
+BookmarksView::current_bookmark_changed (const QModelIndex &index)
+{
+  if (m_follow_selection) {
+    bookmark_triggered (index);
   }
 }
 

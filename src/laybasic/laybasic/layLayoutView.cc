@@ -1011,6 +1011,15 @@ LayoutView::configure (const std::string &name, const std::string &value)
     }
     return true;
 
+  } else if (name == cfg_bookmarks_follow_selection) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_bookmarks_view) {
+      mp_bookmarks_view->follow_selection (f);
+    }
+    return true;
+
   } else if (name == cfg_current_lib_view) {
 
     if (mp_libraries_view) {
@@ -3815,7 +3824,12 @@ LayoutView::bookmark_current_view ()
 void
 LayoutView::manage_bookmarks ()
 {
-  BookmarkManagementForm dialog (this, "bookmark_form", bookmarks ());
+  std::set<size_t> selected_bm;
+  if (mp_bookmarks_frame->isVisible ()) {
+    selected_bm = mp_bookmarks_view->selected_bookmarks ();
+  }
+
+  BookmarkManagementForm dialog (this, "bookmark_form", bookmarks (), selected_bm);
   if (dialog.exec ()) {
     bookmarks (dialog.bookmarks ());
   }

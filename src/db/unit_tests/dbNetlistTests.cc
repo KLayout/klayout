@@ -1188,6 +1188,20 @@ TEST(20_FlattenSubCircuit)
     "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
+
+  db::Netlist nl3;
+
+  nl3 = nl;
+  nl3.flatten ();
+
+  EXPECT_EQ (nl3.to_string (),
+    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
+    "  device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=$5,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$4,G=$2,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
 }
 
 TEST(21_FlattenSubCircuit2)

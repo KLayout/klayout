@@ -156,6 +156,9 @@ connect_global(nwell, "NWELL")
 
 schematic("inv.cir")
 
+align              # flattens unpaired circuits 
+netlist.simplify   # removes floating nets, combines devices
+
 compare</pre>
 
   <p>
@@ -336,10 +339,34 @@ connect_global(nwell, "NWELL")</pre>
 
   <p>
   We have now provided all the essential inputs for the netlist formation.
-  We only have to specify the reference netlist:
+  We now have to specify the reference netlist:
   </p>
 
   <pre>schematic("inv.cir")</pre>
+
+  <p>
+  Two optional, but recommended steps are hierarchy alignment and extracted
+  netlist simplification:
+  </p>
+
+  <pre>align              # flattens unpaired circuits 
+netlist.simplify   # removes floating nets, combines devices
+  </pre>
+
+  <p>
+  "align" will remove circuits which are not present in the other netlist by
+  integrating their content into the parent cell. This will remove auxiliary cells
+  which are usually present in a layout but don't map to a schematic cell (e.g.
+  device PCells). "netlist.simplify" reduces the netlist by floating nets, 
+  performs device combination (e.g. fingered transistors). This method will 
+  also create pins from labeled nets in the top level circuit. 
+  </p>
+
+  <p>
+  The order should be "align", then "netlist.simplify". Both have to happen before
+  "compare" to be effective. "align" is described in <link href="/manual/lvs_compare.xml"/>,
+  "netlist.simplify" in <link href="/manual/lvs_tweaks.xml"/>.
+  </p>
 
   <p>
   Finally after having set this up, we can trigger the compare step:
@@ -497,6 +524,9 @@ connect_global(ptie, "SUBSTRATE")
 # Compare section
 
 schematic("inv2.cir")
+
+align
+netlist.simplify
 
 compare</pre>
 

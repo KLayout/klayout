@@ -1388,6 +1388,10 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "A circuit with references (see \\has_refs?) should not be removed as the "
     "subcircuits calling it would afterwards point to nothing."
   ) +
+  gsi::method ("flatten", &db::Netlist::flatten,
+    "@brief Flattens all circuits of the netlist\n"
+    "After calling this method, only the top circuits will remain."
+  ) +
   gsi::method ("flatten_circuit", &db::Netlist::flatten_circuit, gsi::arg ("circuit"),
     "@brief Flattens a subcircuit\n"
     "This method will substitute all instances (subcircuits) of the given circuit by it's "

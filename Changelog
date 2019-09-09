@@ -88,7 +88,7 @@
       The library browser is a dockable tool window which shows
       all libraries installed. Use drag and drop to place a library
       cell from the library browser in edit mode. 
-* Enhancements: Query enhancements
+* Enhancement: Layout query enhancements
       Layout queries (aka "Search and replace") now allow specification
       of Variables when using the script API. The performance of queries has been 
       enhanced in the case of cell tree recursion.

@@ -1,10 +1,173 @@
-0.26            (2018-12-31):
+0.26            (2019-09-20):
 
-* YET TO BE RELEASED
-* Enhancement: Standalone Python modules provided
-       For details see: 
-       %GITHUB%/wiki/klayout---Standalone-KLayout-Python-Module
+* Bugfix: %GITHUB%/issues/197
+      Python: Reimplemented methods are not getting called
+* Bugfix: %GITHUB%/issues/236
+      Crash when using "Delete all rulers"
+* Bugfix: %GITHUB%/issues/251
+      Register application exit handler in Ruby
+* Bugfix: %GITHUB%/issues/264
+      Python exceptions are redirected when PCell is used
+* Bugfix: %GITHUB%/issues/265
+      LEF file can't be read
+* Bugfix: %GITHUB%/issues/277
+      Region#min_coherence is not recognized by Region#sized
+* Bugfix: %GITHUB%/issues/293
+      File/Setup menu and dialog names are inconsistent 
+* Bugfix: %GITHUB%/issues/294
+      Cannot display the right icon in Ubuntu
+* Bugfix: %GITHUB%/issues/302
+      Display issues with small cells
+* Bugfix: %GITHUB%/issues/305
+      CIF box positions are incorrect when a rotation is specified
+* Bugfix: %GITHUB%/issues/306
+      Round corners issue
+* Bugfix: %GITHUB%/issues/316
+      Text capture box has zero dimension for move
+* Bugfix: %GITHUB%/issues/318
+      Unable to disable a key binding
+* Bugfix: %GITHUB%/issues/321
+      Something's wrong with tip windows
+* Bugfix: %GITHUB%/issues/322
+      CIF, error when changing layer name while file open in KLayout
+* Bugfix: %GITHUB%/issues/330
+      DXF reader stalls
+* Bugfix: %GITHUB%/issues/337
+      Annotation: make "cross" styles available for scripts
+* Bugfix: %GITHUB%/issues/338
+      Unreadable Assistant document: QComboBox
+* Bugfix: Rare crash fixed with line width > 1
+      With line widths > 1, segfaults have been observed in some
+      rare cases.
+* Enhancement: %GITHUB%/issues/287
+      Return an ObjectInstPath from the RecursiveShapeIterator
+* Enhancement: %GITHUB%/issues/317
+      "infix move"
+* Enhancement: %GITHUB%/issues/333
+      Ruby/Python automation of "auto measure"
+* Enhancement: %GITHUB%/issues/342
+      Ruler properties editor: swap points and snap to object buttons
+* Enhancement: %GITHUB%/issues/343
+      Dockable bookmark window
+* Enhancement: Hierarchical mode for DRC ("deep" keyword)
+      DRC can be put into hierarchical mode with the "deep"
+      statement at the beginning of the file. 
+      In hierarchical mode, most operations are performed
+      in a hierarchical fashion - i.e. trying to maintain
+      as much from the original hierarchy as possible.
+* Enhancements: Antenna checks for DRC
+      DRC now got an antenna check feature. Netlist extraction
+      is the basis for this feature.
+* Enhancement: Hierarchical mode in XOR tool and "strmxor"
+      The XOR tool and the "strmxor" buddy tool provide 
+      switches to enable hierarchical mode. These options
+      are considered experimental currently as XOR between
+      two different layouts was not the implementation goal.
+* Enhancement: Netlist extraction
+      KLayout supports extraction of netlists from a layout.
+      This is the first step towards LVS. This feature includes
+      an infrastructure providing netlist data structures
+      (with Ruby/Python bindings), Netlist readers and writers
+      (Spice format), device recognition and a netlist browser.
+* Enhancement: LVS
+      The LVS feature is based on the netlist extraction capabilities.
+      It adds netlist vs. netlist compare and the corresponding
+      infrastructure.
+      LVS is a new script environment that is based on the DRC feature
+      and extends the DRC script language by LVS elements.
+* Enhancement: Command line option -mn to open netlist database
+* Enhancement: Net tracer "trace all nets"
+      Based on the netlist extraction feature, an alternative mode 
+      for net tracing is provided. With "trace all nets", no a single
+      but all nets are traced at once. Probing then happens in the 
+      final nets extracted rather than providing the seed shape.
+      "Trace all nets" operates in hierarchical mode and therefore
+      usually is faster and has a smaller memory footprint when 
+      extracting huge nets such as power nets.
+* Enhancement: Library browser
+      The library browser is a dockable tool window which shows
+      all libraries installed. Use drag and drop to place a library
+      cell from the library browser in edit mode. 
+* Enhancement: Layout query enhancements
+      Layout queries (aka "Search and replace") now allow specification
+      of Variables when using the script API. The performance of queries has been 
+      enhanced in the case of cell tree recursion.
+* Enhancement: Gridline colors
+      The grid lines (or dots, depending on the style) can now be given 
+      different colors for axes, grid lines and the ruler inset.
+* Enhancement: Multiple files on import
+      The "File/Import/Other files into current" feature now allows
+      importing multiple files into the current layout.
+* Enhancement: Python standalone module
+      KLayout supports production of standalone Python modules 
+      which provide the same features than the "pya" module but 
+      for use without the KLayout binary. If installed properly,
+      "import klayout" will pull in all modules. "import klayout.db"
+      will pull in the database part.
+      Deployment on PyPI is supported.
+* Enhancement: Modal help dialog from modal windows
+      When using Assistant links in the UI, the assistant now is shown
+      as a modal window when called from a modal dialog. Before, the 
+      Assistant window wasn't usable in this case.
 
+0.25.9          (2019-06-18):
+
+* Bugfix: %GITHUB%/issues/261
+       Issue with iterating Python sequences
+* Bugfix: %GITHUB%/issues/271
+       Chose cell coordinates on "Make Cell"
+* Bugfix: %GITHUB%/issues/272
+       Error message if trying to run macros in unsupported languages
+* Bugfix: %GITHUB%/issues/275
+       "Write without context" did not have an effect with OASIS
+* Bugfix: %GITHUB%/issues/276
+       LayerPropertiesNodeRef was not working as documented
+* Bugfix: %GITHUB%/issues/278
+       Lost reference with ObjectInstPath#shape
+* Bugfix: %GITHUB%/issues/281
+       Width and space violations are reported now also for 
+       the "kissing corners" case
+ 
+0.25.8          (2019-02-23):
+
+* Bugfix: %GITHUB%/issues/234
+       Issues with LayoutView#save_image_with_options
+* Bugfix: %GITHUB%/issues/232
+       Crash on reading .lyp files with big stipple pattern
+* Bugfix: %GITHUB%/issues/228
+       Bug in Region#interact and DRC's "interact" function.
+* Bugfix: %GITHUB%/issues/225
+       Mirrored custom stipple pattern
+ 
+0.25.7          (2019-01-09):
+
+* Bugfix: %GITHUB%/issues/200
+       Safer iteration of cell instances and shapes (with
+       modifications of container during iteration) - in this
+       case while flattening instances
+* Bugfix: %GITHUB%/issues/209
+       Reader options were grayed out in stream import feature.
+* Bugfix: %GITHUB%/issues/207
+       Basic.TEXT PCell was rounding bias a spacing values to
+       integer multiples.
+* Bugfix: %GITHUB%/issues/203
+       A segfault was fixed that happend on certain platforms
+       when closing the application (e.g. CentOS7).
+* Bugfix: (RBA/pya) Technology#load was not working 
+       Instead of load, the technology was saved.
+ 
+0.25.6          (2018-11-23):
+
+* Enhancement: %GITHUB%/pull/199
+       Added an option to export DXF polygons as LINE objects
+* Bugfix: %GITHUB%/issues/198
+       Stitching of DXF contours wasn't taking nearest neighbours
+* Bugfix: %GITHUB%/issues/191
+       MainWindow/PluginRoot classes got mixed up
+       As a side effect of this fix, layout views can now
+       be configured individually. This wasn't working 
+       consistently before.
+ 
 0.25.5          (2018-09-30):
 
 * Bugfix: %GITHUB%/issues/162

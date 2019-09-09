@@ -396,6 +396,22 @@ void Netlist::flatten_circuit (Circuit *circuit)
   delete circuit;
 }
 
+void Netlist::flatten ()
+{
+  std::set<db::Circuit *> top_circuits;
+  size_t ntop = top_circuit_count ();
+  for (db::Netlist::top_down_circuit_iterator tc = begin_top_down (); tc != end_top_down () && ntop > 0; ++tc) {
+    top_circuits.insert (tc.operator-> ());
+    --ntop;
+  }
+
+  for (db::Netlist::bottom_up_circuit_iterator c = begin_bottom_up (); c != end_bottom_up(); ++c) {
+    if (top_circuits.find (c.operator-> ()) == top_circuits.end ()) {
+      flatten_circuit (c.operator-> ());
+    }
+  }
+}
+
 DeviceClass *Netlist::device_class_by_name (const std::string &name)
 {
   for (device_class_iterator d = begin_device_classes (); d != end_device_classes (); ++d) {

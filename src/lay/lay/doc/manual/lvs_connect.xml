@@ -70,7 +70,7 @@ connect(metal2, metal2_labels)</pre>
 
   <p>
   If labels are connected to metal layers, their text strings will be used to assign 
-  net names to the resulting nets. Ideally, one net is labelled with a single text 
+  net names to the resulting nets. Ideally, one net is labeled with a single text 
   or with texts with the same text string. In this case, the net name will 
   be non-ambiguous. If multiple labels with different strings are present on a net, 
   the net name will be made from a combination of these names.

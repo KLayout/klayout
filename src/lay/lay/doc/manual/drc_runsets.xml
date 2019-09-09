@@ -715,5 +715,111 @@ no_borders</pre>
   structure fidelity. Hence, small tiles should be avoided in that sense too.
   </p>
 
+  <h2>Hierarchical mode</h2>
+
+  <p>
+  Alternatively to the tiling option, hierarchical mode is available. In hierarchical
+  mode, the DRC functions operate on subcells if their configuration allows this.
+  The algorithm will automatically detect whether an operation can be performed in 
+  a subcell. For example, a sizing operation can be done inside a subcell, if the 
+  cell's content is not connected to anything outside the cell.
+  </p>
+
+  <p>
+  To enable hierarchical operations, use the "<a href="/about/drc_ref_global.xml#deep">deep</a>" statement:
+  </p>
+
+  <pre>
+report("deep 2")
+
+# enable deep (hierarchical) operations
+deep
+
+poly = input(3)
+
+spc = poly.space(0.5)
+spc.output("poly space &gt;0.5")
+</pre>
+
+  <p>
+  "deep" is not compatible with tiling. "tiles" will disable "deep" and vice versa. 
+  To disable deep mode, use "<a href="/about/drc_ref_global.xml#flat">flat</a>".
+  </p>
+
+  <p>
+  Deep processing is a layer property. After "deep" has been specified, layers derived 
+  with "input" are declared to be deep - i.e. hierarchical operations are enabled on 
+  them. Operations on deep layers will usually render other deep layers. 
+  This is also true for edge and edge pair layers. For example, the "space" operation 
+  above will render a hierarchical edge pair layer.
+  </p>
+
+  <p>
+  In binary operations such as boolean operations, the operation is performed 
+  hierarchically, if both involved layers are deep. A layer can be explicitly 
+  converted to a flat layer using "<a href="/about/drc_ref_layer.xml#flatten">flatten</a>".
+  </p>
+
+  <p>
+  To check whether a layer is deep, use "is_deep?".
+  </p>
+
+  <pre>
+report("deep 2")
+
+# enable deep (hierarchical) operations
+deep
+
+poly = input(3)
+puts poly.is_deep?   # -&gt; true
+poly.flatten
+puts poly.is_deep?   # -&gt; false
+</pre>
+
+  <p>
+  Most operations are hierarchy enabled, with a few exceptions. Some operations - 
+  specifically the transformation operations such as "move", "rotate" and the 
+  anisotropic sizing or the grid snap operations will generate cell variants. Such 
+  variants reflect different configurations of cells with respect to the 
+  requested operation. For example, with anisotropy (x != y), rotated cells need
+  to be treated differently from non-rotated ones.
+  In the "snap" feature, cell variants are created if the cell's instances are not all on-grid. 
+  Most functions need to create variants only when the same cell is instantiated with 
+  different magnification factors.
+  </p>
+
+  <p>
+  When writing back a layout with cell variants, new versions of cells will 
+  appear.
+  </p>
+
+  <p>
+  When sending the output of hierarchical operations to a report database, the markers 
+  will be listed under the cell name they appear. 
+  A sample cell instance is provided within the marker database to allow visualizing 
+  the marker in at least one context.
+  </p>
+
+  <h3>Limitations</h3>
+
+  <p>
+  Functions which require merged polygons utilize the net clustering algorithm 
+  to form the merged polygons. All connected shapes are collected and merged 
+  into a bigger polygon. This happens in the lowest possible level on the hierarchy 
+  where the shape clusters are complete. 
+  In some cases - when the shapes come from big coherent regions - this may happen on 
+  the top cell level and the resulting polygon will be very big. 
+  This will lead to poor performance.
+  </p>
+
+  <p>
+  The DRC's hierarchical mode will - except for cell variants in the cases mentioned - not modify the 
+  cell hierarchy. This hierarchy-preserving nature is good for certain applications, 
+  but leads to a compromise in terms of resolving hierarchically different configurations.
+  As the algorithm is not allowed to create variants in most cases, the only remaining
+  option is to propagate results from such cases into the parent cells. In the worst
+  case this will lead to flattening of the layout and loss of hierarchy.
+  </p>
+
 </doc>
 

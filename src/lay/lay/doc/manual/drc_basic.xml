@@ -22,6 +22,7 @@
     <li>The capability the work with multiple input layouts.</li>
     <li>Cell filtering, local (region-constrained) operation.</li>
     <li>A tiling approach for large layouts which can be configured to make use of multiple CPU cores.</li>
+    <li>A hierarchical option.</li>
   </ul>
 
   <p>

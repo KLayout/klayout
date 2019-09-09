@@ -128,7 +128,7 @@ RDB_PUBLIC void create_items_from_edge_pairs (rdb::Database *db, rdb::id_type ce
  *  This transformation is useful for providing the DBU-to-micron conversion.
  */
 template <class Trans, class Iter>
-RDB_PUBLIC void create_items_from_sequence (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const Trans &trans, Iter begin, Iter end)
+RDB_PUBLIC_TEMPLATE void create_items_from_sequence (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const Trans &trans, Iter begin, Iter end)
 {
   for (Iter o = begin; o != end; ++o) {
     rdb::Item *item = db->create_item (cell_id, cat_id);

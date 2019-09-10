@@ -1,4 +1,4 @@
-0.26            (2019-09-20):
+0.26            (2019-09-10):
 
 * Bugfix: %GITHUB%/issues/197
       Python: Reimplemented methods are not getting called

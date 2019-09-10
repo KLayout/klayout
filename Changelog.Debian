@@ -1,8 +1,9 @@
 klayout (0.26-1) unstable; urgency=low
 
-  * YET TO BE RELEASED
+  * New features and bugfixes
+    - See changelog
 
- -- Matthias Köfferlein <matthias@koefferlein.de>  Sat, 31 Dec 2018 23:15:23 +0200
+ -- Matthias Köfferlein <matthias@koefferlein.de>  Tue, 10 Sep 2019 07:41:47 +0200
 
 klayout (0.25.5-1) unstable; urgency=low
 

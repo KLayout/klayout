@@ -15,9 +15,9 @@ SOURCES = \
   bdStrmcmpTests.cc \
   bdStrmxorTests.cc \
   bdStrmrunTests.cc \
+  buddies_main.cc \
 
+INCLUDEPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$RBA_INC
+DEPENDPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$RBA_INC
 
-INCLUDEPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC
-DEPENDPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC
-
-LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi
+LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_rba

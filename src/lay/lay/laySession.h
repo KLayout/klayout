@@ -112,6 +112,7 @@ struct SessionViewDescriptor
   std::vector<lay::LayerPropertiesList> layer_properties_lists;
   unsigned int current_layer_list;
   std::vector<std::string> rdb_filenames;
+  std::vector<std::string> l2ndb_filenames;
   SessionCellViewDescriptors cellviews;
   SessionAnnotationShapes annotation_shapes;
   int active_cellview;
@@ -174,6 +175,8 @@ private:
   std::string m_window_state;
   std::string m_window_geometry;
   std::string m_base_dir;
+
+  std::string make_absolute (const std::string &fp) const;
 };
 
 }

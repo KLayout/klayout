@@ -72,14 +72,6 @@ BD_PUBLIC int strmrun (int argc, char *argv[])
 
   cmd.parse (argc, argv);
 
-  //  initialize the GSI class system (Variant binding, Expression support)
-  //  We have to do this now since plugins may register GSI classes and before the
-  //  ruby interpreter, because it depends on a proper class system.
-  gsi::initialize ();
-
-  //  initialize the tl::Expression subsystem with GSI-bound classes
-  gsi::initialize_expressions ();
-
   //  create the ruby and python interpreter instances now.
   //  Hint: we do this after load_plugin, because that way the plugins can register GSI classes and methods.
   //  TODO: do this through some auto-registration

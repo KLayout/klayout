@@ -21,9 +21,12 @@
 */
 
 #include "bdInit.h"
+#include "dbInit.h"
 #include "tlCommandLineParser.h"
 #include "tlProgress.h"
 #include "version.h"
+#include "gsi.h"
+#include "gsiExpression.h"
 
 #include <list>
 
@@ -48,8 +51,18 @@ void init ()
   license += "\n";
   license += prg_about_text;
   tl::CommandLineOptions::set_license (license);
-}
 
+  //  initialize db plugins
+  db::init ();
+
+  //  initialize the GSI class system (Variant binding, Expression support)
+  //  We have to do this now since plugins may register GSI classes and before the
+  //  ruby interpreter, because it depends on a proper class system.
+  gsi::initialize ();
+
+  //  initialize the tl::Expression subsystem with GSI-bound classes
+  gsi::initialize_expressions ();
+}
 
 class ProgressAdaptor
   : public tl::ProgressAdaptor

@@ -30,7 +30,10 @@
 #include "layStream.h"
 #include "tlXMLParser.h"
 #include "tlStream.h"
+#include "tlFileUtils.h"
+#include "tlUri.h"
 #include "dbStream.h"
+#include "dbLayoutToNetlist.h"
 #include "rdb.h"
 
 #include <fstream>
@@ -86,7 +89,16 @@ Session::fetch (const lay::MainWindow &mw)
 
       const rdb::Database *rdb = view->get_rdb (j);
       if (rdb && ! rdb->filename ().empty ()) {
-        view_desc.rdb_filenames.push_back (rdb->filename ());
+        view_desc.rdb_filenames.push_back (tl::InputStream::absolute_path (rdb->filename ()));
+      }
+
+    }
+
+    for (unsigned int j = 0; j < view->num_l2ndbs (); ++j) {
+
+      const db::LayoutToNetlist *l2ndb = view->get_l2ndb (j);
+      if (l2ndb && ! l2ndb->filename ().empty ()) {
+        view_desc.l2ndb_filenames.push_back (tl::InputStream::absolute_path (l2ndb->filename ()));
       }
 
     }
@@ -128,6 +140,17 @@ Session::fetch (const lay::MainWindow &mw)
 
 }
 
+std::string
+Session::make_absolute (const std::string &fp) const
+{
+  tl::URI fp_uri (fp);
+  if (! m_base_dir.empty () && ! tl::is_absolute (fp_uri.path ())) {
+    return tl::URI (m_base_dir).resolved (fp_uri).to_string ();
+  } else {
+    return fp;
+  }
+}
+
 void 
 Session::restore (lay::MainWindow &mw)
 {
@@ -163,11 +186,7 @@ Session::restore (lay::MainWindow &mw)
 
         std::map <std::string, const SessionLayoutDescriptor *>::const_iterator ld = ld_by_name.find (cvd->layout_name);
 
-        std::string fp = ld->second->file_path;
-        QFileInfo fi (tl::to_qstring (fp));
-        if (! m_base_dir.empty () && fi.isRelative ()) {
-          fp = tl::to_string (QDir (tl::to_qstring (m_base_dir)).filePath (tl::to_qstring (ld->second->file_path)));
-        }
+        std::string fp = make_absolute (ld->second->file_path);
 
         bool ok = false;
         if (ld != ld_by_name.end ()) {
@@ -218,13 +237,26 @@ Session::restore (lay::MainWindow &mw)
 
     for (unsigned int j = 0; j < vd.rdb_filenames.size (); ++j) {
 
-      rdb::Database *rdb = new rdb::Database ();
+      std::auto_ptr<rdb::Database> rdb (new rdb::Database ());
 
       try {
-        rdb->load (vd.rdb_filenames[j]);
-        view->add_rdb (rdb);
-      } catch (...) { 
-        delete rdb;
+        rdb->load (make_absolute (vd.rdb_filenames[j]));
+        view->add_rdb (rdb.release ());
+      } catch (tl::Exception &ex) {
+        tl::error << ex.msg ();
+      } catch (...) {
+      }
+
+    }
+
+    for (unsigned int j = 0; j < vd.l2ndb_filenames.size (); ++j) {
+
+      try {
+        db::LayoutToNetlist *l2ndb = db::LayoutToNetlist::create_from_file (make_absolute (vd.l2ndb_filenames [j]));
+        view->add_l2ndb (l2ndb);
+      } catch (tl::Exception &ex) {
+        tl::error << ex.msg ();
+      } catch (...) {
       }
 
     }
@@ -288,6 +320,9 @@ session_structure ()
       ) +
       tl::make_element<std::vector<std::string>, SessionViewDescriptor> (&SessionViewDescriptor::rdb_filenames, "rdb-files",
         tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string> > (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "rdb-file")
+      ) +
+      tl::make_element<std::vector<std::string>, SessionViewDescriptor> (&SessionViewDescriptor::l2ndb_filenames, "l2ndb-files",
+        tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string> > (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "l2ndb-file")
       ) +
       //  for backward compatibility:
       tl::make_element<lay::LayerPropertiesList, SessionViewDescriptor> (&SessionViewDescriptor::set_layer_properties, "layer-properties", lay::LayerPropertiesList::xml_format ()) +

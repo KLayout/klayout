@@ -220,30 +220,36 @@ module LVS
       ( nl_a, nl_b ) = _ensure_two_netlists
 
       if ca.is_a?(String)
-        circuit_a = nl_a.circuit_by_name(ca) || raise("Not a valid circuit name in extracted netlist: #{ca}")
+        circuit_a = nl_a.circuit_by_name(ca)
       else 
         circuit_a = ca
       end
 
       if cb.is_a?(String)
-        circuit_b = nl_b.circuit_by_name(cb) || raise("Not a valid circuit name in reference netlist: #{cb}")
+        circuit_b = nl_b.circuit_by_name(cb)
       else
         circuit_b = cb
       end
 
-      if a.is_a?(String)
-        net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist: #{a} (for circuit #{circuit_a})")
-      else
-        net_a = a
-      end
+      if circuit_a && circuit_b
 
-      if b.is_a?(String)
-        net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in reference netlist: #{b} (for circuit #{circuit_b})")
-      else
-        net_b = b
-      end
+        if a.is_a?(String)
+          net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist: #{a} (for circuit #{circuit_a})")
+        else
+          net_a = a
+        end
 
-      @comparer.same_nets(net_a, net_b)
+        if b.is_a?(String)
+          net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in extracted netlist: #{b} (for circuit #{circuit_b})")
+        else
+          net_b = b
+        end
+
+        if net_a && net_b
+          @comparer.same_nets(net_a, net_b)
+        end
+
+      end
       
     end
 
@@ -267,10 +273,12 @@ module LVS
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
-      circuit_a = a && (nl_a.circuit_by_name(a) || raise("Not a valid circuit name in extracted netlist: #{a}"))
-      circuit_b = b && (nl_b.circuit_by_name(b) || raise("Not a valid circuit name in reference netlist: #{b}"))
+      circuit_a = a && nl_a.circuit_by_name(a)
+      circuit_b = b && nl_b.circuit_by_name(b)
 
-      @comparer.same_circuits(circuit_a, circuit_b)
+      if circuit_a && circuit_b
+        @comparer.same_circuits(circuit_a, circuit_b)
+      end
       
     end
 
@@ -341,21 +349,24 @@ module LVS
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
-      circuit_b = nl_b.circuit_by_name(circuit) || raise("Not a valid circuit name in reference netlist: #{circuit}")
+      circuit_b = nl_b.circuit_by_name(circuit)
+      if circuit_b
 
-      pins_by_index = []
-      circuit_b.each_pin { |p| pins_by_index << p }
+        pins_by_index = []
+        circuit_b.each_pin { |p| pins_by_index << p }
 
-      pin_ids_b = pins.collect do |p|
-        if p.is_a?(String)
-          pin = circuit_b.pin_by_name(p) || raise("Not a valid pin name in circuit '#{circuit}': #{p}")
-        else
-          pin = pins_by_index[p.to_i] || raise("Not a valid pin index in circuit '#{circuit}': #{p}")
-        end  
-        pin.id
+        pin_ids_b = pins.collect do |p|
+          if p.is_a?(String)
+            pin = circuit_b.pin_by_name(p) || raise("Not a valid pin name in circuit '#{circuit}': #{p}")
+          else
+            pin = pins_by_index[p.to_i] || raise("Not a valid pin index in circuit '#{circuit}': #{p}")
+          end
+          pin.id
+        end
+
+        @comparer.equivalent_pins(circuit_b, pin_ids_b)
+
       end
-
-      @comparer.equivalent_pins(circuit_b, pin_ids_b)
       
     end
 

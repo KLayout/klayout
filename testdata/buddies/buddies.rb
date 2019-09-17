@@ -47,11 +47,20 @@ class Buddies_TestClass < TestBase
 
   def test_converters
 
+    signatures = {
+      "strm2cif" => 0x28434946,
+      "strm2dxf" => 0x300a5345,
+      "strm2gds" => 0x00060002,
+      "strm2gdstxt" => 0x48454144,
+      "strm2oas" => 0x2553454d,
+      "strm2txt" => 0x62656769,
+    }
+
     %w(strm2cif strm2dxf strm2gds strm2gdstxt strm2oas strm2txt).each do |bin|
    
       puts "Testing #{bin} ..."
 
-      out_file = File.join($ut_testtmp, "out")
+      out_file = File.join($ut_testtmp, "out_" + bin)
       if File.exists?(out_file)
         File.unlink(out_file)
       end
@@ -62,6 +71,11 @@ class Buddies_TestClass < TestBase
       log = bin + "\n" + `#{self.buddy_bin(bin)} #{in_file} #{out_file} 2>&1`
       assert_equal(File.exists?(out_file), true)
       assert_equal(log, bin + "\n")
+
+      File.open(out_file, "rb") do |file|
+        sig = file.read(4).unpack('N').first
+        assert_equal(sig, signatures[bin])
+      end
 
     end
 

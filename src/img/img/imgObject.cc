@@ -28,6 +28,8 @@
 #include "layPlugin.h"
 #include "layConverters.h"
 #include "dbPolygonTools.h"
+#include "tlFileUtils.h"
+#include "tlUri.h"
 
 #include <cmath>
 #include <cstring>
@@ -1205,7 +1207,7 @@ Object::transform (const db::DFTrans &t)
 }
 
 void 
-Object::from_string (const char *str)
+Object::from_string (const char *str, const char *base_dir)
 {
   bool en = m_updates_enabled;
   m_updates_enabled = false;
@@ -1306,6 +1308,12 @@ Object::from_string (const char *str)
       } else if (ex.test ("file=")) {
 
         ex.read_word_or_quoted (m_filename);
+
+        tl::URI fp_uri (m_filename);
+        if (base_dir && ! tl::is_absolute (fp_uri.path ())) {
+          m_filename = tl::URI (base_dir).resolved (fp_uri).to_string ();
+        }
+
         read_file ();
 
       } else if (ex.test ("byte_data=")) {
@@ -1427,7 +1435,7 @@ Object::load_data (const std::string &filename, bool adjust_min_max)
   m_min_value_set = ! adjust_min_max;
   m_max_value_set = ! adjust_min_max;
 
-  m_filename = filename;
+  m_filename = tl::absolute_file_path (filename);
 
   read_file ();
 

@@ -25,5 +25,5 @@
 
 BD_PUBLIC int strm2oas (int argc, char *argv[])
 {
-  return bd::converter_main (argc, argv, bd::GenericWriterOptions::gds2_format_name);
+  return bd::converter_main (argc, argv, bd::GenericWriterOptions::oasis_format_name);
 }

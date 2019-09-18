@@ -69,6 +69,7 @@ connect_global(ptie, "SUBSTRATE")
 # Compare section
 
 equivalent_pins("ND2X1", 4, 5)
+equivalent_pins("DOESNOTEXIST", 4, 5)
 
 netlist.simplify
 

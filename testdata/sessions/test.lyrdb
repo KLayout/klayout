@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<report-database>
+ <description>desc</description>
+ <original-file>of</original-file>
+ <generator>gg</generator>
+ <top-cell>top</top-cell>
+ <tags>
+  <tag>
+   <name>x</name>
+   <description>xdesc</description>
+  </tag>
+  <tag>
+   <name>x2</name>
+   <description/>
+  </tag>
+  <tag>
+   <name>x1</name>
+   <description/>
+  </tag>
+ </tags>
+ <categories>
+  <category>
+   <name>cat</name>
+   <description/>
+   <categories>
+    <category>
+     <name>subcat</name>
+     <description/>
+     <categories>
+     </categories>
+    </category>
+   </categories>
+  </category>
+ </categories>
+ <cells>
+  <cell>
+   <name>cell_name</name>
+   <variant/>
+   <references>
+   </references>
+  </cell>
+ </cells>
+ <items>
+  <item>
+   <tags>#x2,x1</tags>
+   <category>cat</category>
+   <cell>cell_name</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <image>iVBORw0KGgoAAAANSUhEUgAAACoAAAA0CAIAAABzfT3nAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA0SAAANOgHo3ZneAAAA3UlEQVRYhe2WwQ3DIAxFoco8XaGZIaeO43FyYgZYgYXcQ6SWuDGgBhWq/qccIvGCEd9SbAwAAPSGaW2lFR2rfWDpXrPpSe2SP10fvnn/PZHZH9IwbKFVZZ/Z6wMtZcjW02Bn2FVpZYdWdkr2nvh23S2FyDNJuVITpwmRjTGbNr0v20U5byNtJuuJt/fO2f93+UlbEJl5UjVPr3Y71EQ/PoPPlU+lDJtWlCt3GwCMG33BuJGAcWMEMG6c1jBudCyf/nzV8nbZPRohclFLHdGbZ8eNSjN1fmf0AACA1jwA4hKxu4C6P7EAAAAASUVORK5CYII=</image>
+   <values>
+    <value>[#x2] text: a</value>
+    <value>[x1] text: b</value>
+   </values>
+  </item>
+ </items>
+</report-database>

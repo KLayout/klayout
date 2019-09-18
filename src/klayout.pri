@@ -22,14 +22,18 @@ VERSION_INC = $$PWD/version
 
 equals(HAVE_RUBY, "1") {
   RBA_INC = $$PWD/rba/rba
+  RBA_LIB = klayout_rba
 } else {
   RBA_INC = $$PWD/rbastub
+  RBA_LIB = klayout_rbastub
 }
 
 equals(HAVE_PYTHON, "1") {
   PYA_INC = $$PWD/pya/pya
+  PYA_LIB = klayout_pya
 } else {
   PYA_INC = $$PWD/pyastub
+  PYA_LIB = klayout_pyastub
 }
 
 equals(HAVE_QTBINDINGS, "1") {

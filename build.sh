@@ -615,7 +615,7 @@ qmake_options=(
 
 # This should speed up build time considerably
 # https://ortogonal.github.io/ccache-and-qmake-qtcreator/
-if [ $QMAKE_CCACHE = 1 ]; then
+if [ "$QMAKE_CCACHE" = 1 ]; then
   qmake_options+=(
     CONFIG+="ccache"
   )

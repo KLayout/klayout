@@ -70,7 +70,9 @@ connect_global(ptie, "SUBSTRATE")
 
 same_circuits("top", "RINGO")
 same_circuits("INV", "INVX1")
+same_circuits("DOESNOTEXIST", "DOESNOTEXIST2")
 same_nets("top", "ENABLE", "RINGO", "ENABLE")
+same_nets("DOESNOTEXIST", "ENABLE", "DOESNOTEXIST2", "ENABLE")
 
 netlist.simplify
 

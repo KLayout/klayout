@@ -284,6 +284,8 @@ PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int
           ul->setText (tl::to_qstring (p->get_unit ()));
 
           inner_grid->addWidget (f, row, 1);
+
+          connect (le, SIGNAL (editingFinished ()), this, SLOT (activated ()));
         }
         break;
 
@@ -295,6 +297,8 @@ PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int
           le->setEnabled (! p->is_readonly ());
           m_widgets.push_back (le);
           inner_grid->addWidget (le, row, 1);
+
+          connect (le, SIGNAL (editingFinished ()), this, SLOT (activated ()));
         }
         break;
 
@@ -315,6 +319,8 @@ PCellParametersPage::setup (const db::Layout *layout, lay::LayoutView *view, int
           cbx->setEnabled (! p->is_readonly ());
           m_widgets.push_back (cbx);
           inner_grid->addWidget (cbx, row, 1);
+
+          connect (cbx, SIGNAL (stateChanged (int)), this, SLOT (activated (int)));
         }
         break;
 
@@ -381,7 +387,7 @@ PCellParametersPage::set_state (const State &s)
 }
 
 void  
-PCellParametersPage::activated (int)
+PCellParametersPage::activated (int /*i=0*/)
 {
   //  does a coerce and update
   get_parameters ();

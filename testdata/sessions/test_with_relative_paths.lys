@@ -386,7 +386,7 @@
    </annotation>
    <annotation>
     <class>img::Object</class>
-    <value>color:matrix=(1,0,0) (0,1,0) (0,0,1);min_value=0;max_value=255;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];file='../testdata/sessions/test.png'</value>
+    <value>color:matrix=(1,0,0) (0,1,0) (0,0,1);min_value=0;max_value=255;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];file='test.png'</value>
    </annotation>
   </annotations>
  </view>

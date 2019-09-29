@@ -147,7 +147,7 @@ public:
    *  This method needs to be implemented mainly if the object is to be created from the
    *  generic factory.
    */
-  virtual void from_string (const char *) { }
+  virtual void from_string (const char * /*str*/, const char * /*base_path*/) { }
 
   /**
    *  @brief Convert to a string
@@ -447,14 +447,14 @@ public:
    *
    *  If the class name is not registered, no object is created and 0 is returned.
    */
-  static user_object_base<C> *create (const char *class_name, const char *string)
+  static user_object_base<C> *create (const char *class_name, const char *string, const char *base_path)
   {
     tl::Registrar< user_object_factory_base<C> > *factory = tl::Registrar< user_object_factory_base<C> >::get_instance ();
     if (factory != 0) {
       for (typename tl::Registrar< user_object_factory_base<C> >::iterator i = factory->begin (); i != factory->end (); ++i) {
         if (strcmp (class_name, i->class_name ()) == 0) {
           user_object_base<C> *obj = i->create ();
-          obj->from_string (string);
+          obj->from_string (string, base_path);
           return obj;
         }
       }

@@ -341,7 +341,7 @@ Object::class_name () const
 }
 
 void 
-Object::from_string (const char *s)
+Object::from_string (const char *s, const char * /*base_dir*/)
 {
   tl::Extractor ex (s);
   while (! ex.at_end ()) {

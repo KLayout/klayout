@@ -489,14 +489,10 @@ public:
   void same_circuit (const db::Circuit *ca, const db::Circuit *cb)
   {
     //  no arbitrary cross-pairing
+    //  NOTE: many layout circuits are allowed for one schematic to account for layout alternatives.
     if (ca && has_cat_for (ca)) {
       throw tl::Exception (tl::to_string (tr ("Circuit is already paired with other circuit: ")) + ca->name ());
     }
-#if 0 //  can pair multiple layout cells with one schematic circuit
-    if (cb && has_cat_for (cb)) {
-      throw tl::Exception (tl::to_string (tr ("Circuit is already paired with other circuit: ")) + cb->name ());
-    }
-#endif
     generic_categorizer<db::Circuit>::same (ca, cb);
   }
 

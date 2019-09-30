@@ -488,10 +488,10 @@ void Netlist::purge ()
     //  purge floating, disconnected nets
     circuit->purge_nets ();
 
-    //  if only floating net - connected to a pin - are left, consider this circuit for purging
+    //  if only passive nets are left, consider this circuit for purging
     bool purge_candidate = ! circuit->dont_purge ();
     for (db::Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets () && purge_candidate; ++n) {
-      purge_candidate = n->is_floating ();
+      purge_candidate = n->is_passive ();
     }
 
     if (purge_candidate) {

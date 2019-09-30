@@ -320,7 +320,7 @@ public:
     } else if (! ca) {
       same (cb, ca);
     } else if (! cb) {
-      //  makeing a object same as null will make this device being ignored
+      //  making a object same as null will make this device being ignored
       m_cat_by_ptr [ca] = 0;
       return;
     }
@@ -2428,7 +2428,7 @@ std::vector<size_t> collect_pins_with_empty_nets (const db::Circuit *c, CircuitP
 
   for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p) {
     const db::Net *net = c->net_for_pin (p->id ());
-    if ((! net || net->is_floating ()) && ! circuit_pin_mapper->is_mapped (c, p->id ())) {
+    if ((! net || net->is_passive ()) && ! circuit_pin_mapper->is_mapped (c, p->id ())) {
       pins.push_back (p->id ());
     }
   }

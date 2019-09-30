@@ -545,7 +545,7 @@ void Circuit::purge_nets ()
 {
   std::vector<db::Net *> nets_to_be_purged;
   for (net_iterator n = begin_nets (); n != end_nets (); ++n) {
-    if (n->is_floating () && n->pin_count () == 0) {
+    if (n->is_floating ()) {
       nets_to_be_purged.push_back (n.operator-> ());
     }
   }

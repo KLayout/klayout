@@ -48,6 +48,7 @@ module LVS
 
     def initialize(engine)
       super
+      @comparer_config = []
     end
 
     def _make_data
@@ -161,6 +162,11 @@ module LVS
       nl = _ensure_two_netlists
       lvs_data.reference = nl[1]
 
+      # execute the configuration commands
+      @comparer_config.each do |cc|
+        cc.call
+      end
+
       lvs_data.compare(@comparer)
 
     end
@@ -217,6 +223,12 @@ module LVS
         n.is_a?(String) || n.is_a?(RBA::Net) || raise("Net arguments of 'same_nets' must be strings or Net objects")
       end
 
+      @comparer_config << lambda { self._same_nets(ca, a, cb, b) }
+
+    end
+
+    def _same_nets(ca, a, cb, b)
+
       ( nl_a, nl_b ) = _ensure_two_netlists
 
       if ca.is_a?(String)
@@ -234,13 +246,13 @@ module LVS
       if circuit_a && circuit_b
 
         if a.is_a?(String)
-          net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist: #{a} (for circuit #{circuit_a})")
+          net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist in 'same_nets': #{a} (for circuit #{circuit_a})")
         else
           net_a = a
         end
 
         if b.is_a?(String)
-          net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in extracted netlist: #{b} (for circuit #{circuit_b})")
+          net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in extracted netlist in 'same_nets': #{b} (for circuit #{circuit_b})")
         else
           net_b = b
         end
@@ -270,6 +282,12 @@ module LVS
     def same_circuits(a, b)
 
       a.is_a?(String) || a == nil || b.is_a?(String) || b == nil || raise("Both arguments of 'same_circuits' need to be strings or nil")
+
+      @comparer_config << lambda { self._same_circuits(a, b) }
+
+    end
+
+    def _same_circuits(a, b)
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
@@ -301,9 +319,15 @@ module LVS
 
       a.is_a?(String) || a == nil || b.is_a?(String) || b == nil || raise("Both arguments of 'same_device_classes' need to be strings or nil")
 
+      @comparer_config << lambda { self._same_device_classes(a, b) }
+
+    end
+
+    def _same_device_classes(a, b)
+
       ( nl_a, nl_b ) = _ensure_two_netlists
 
-      dc_a = a && (nl_a.device_class_by_name(a) || raise("Not a valid device class in extracted netlist: #{a}"))
+      dc_a = a && (nl_a.device_class_by_name(a) || raise("Not a valid device class in extracted netlist in 'same_device_class': #{a}"))
       dc_b = b && nl_b.device_class_by_name(b)
 
       # NOTE: a device class is allowed to be missing in the reference netlist because the
@@ -347,6 +371,12 @@ module LVS
           raise("All pin arguments of 'equivalent_pins' need to be strings or numbers")
       end
 
+      @comparer_config << lambda { self._equivalent_pins(circuit, *pins) }
+
+    end
+
+    def _equivalent_pins(circuit, *pins)
+
       ( nl_a, nl_b ) = _ensure_two_netlists
 
       circuit_b = nl_b.circuit_by_name(circuit)
@@ -357,9 +387,9 @@ module LVS
 
         pin_ids_b = pins.collect do |p|
           if p.is_a?(String)
-            pin = circuit_b.pin_by_name(p) || raise("Not a valid pin name in circuit '#{circuit}': #{p}")
+            pin = circuit_b.pin_by_name(p) || raise("Not a valid pin name in circuit '#{circuit}' in 'equivalent_pins': #{p}")
           else
-            pin = pins_by_index[p.to_i] || raise("Not a valid pin index in circuit '#{circuit}': #{p}")
+            pin = pins_by_index[p.to_i] || raise("Not a valid pin index in circuit '#{circuit}' in 'equivalent_pins': #{p}")
           end
           pin.id
         end

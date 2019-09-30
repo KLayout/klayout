@@ -5,6 +5,10 @@ report_lvs($lvs_test_target_lvsdb, true)
 
 target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
 
+# both INVX1 and INVX1B are the same schematic cell
+same_circuits("INVX1", "INVX1")
+same_circuits("INVX1B", "INVX1")
+
 schematic("ringo.cir")
 
 deep
@@ -69,10 +73,6 @@ connect_global(ptie, "SUBSTRATE")
 # Compare section
 
 netlist.simplify
-
-# both INVX1 and INVX1B are the same schematic cell
-same_circuits("INVX1", "INVX1")
-same_circuits("INVX1B", "INVX1")
 
 compare
 

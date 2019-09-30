@@ -492,10 +492,11 @@ public:
     if (ca && has_cat_for (ca)) {
       throw tl::Exception (tl::to_string (tr ("Circuit is already paired with other circuit: ")) + ca->name ());
     }
+#if 0 //  can pair multiple layout cells with one schematic circuit
     if (cb && has_cat_for (cb)) {
       throw tl::Exception (tl::to_string (tr ("Circuit is already paired with other circuit: ")) + cb->name ());
     }
-
+#endif
     generic_categorizer<db::Circuit>::same (ca, cb);
   }
 
@@ -2274,13 +2275,13 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
   bool good = true;
 
-  std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> > cat2circuits;
+  std::map<size_t, std::pair<std::vector<const db::Circuit *>, std::vector<const db::Circuit *> > > cat2circuits;
   std::set<const db::Circuit *> verified_circuits_a, verified_circuits_b;
 
   for (db::Netlist::const_circuit_iterator i = a->begin_circuits (); i != a->end_circuits (); ++i) {
     size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
     if (cat) {
-      cat2circuits[cat].first = i.operator-> ();
+      cat2circuits[cat].first.push_back (i.operator-> ());
     } else {
       //  skip circuit (but count it as verified)
       verified_circuits_a.insert (i.operator-> ());
@@ -2290,7 +2291,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
   for (db::Netlist::const_circuit_iterator i = b->begin_circuits (); i != b->end_circuits (); ++i) {
     size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
     if (cat) {
-      cat2circuits[cat].second = i.operator-> ();
+      cat2circuits[cat].second.push_back (i.operator-> ());
     } else {
       //  skip circuit (but count it as verified)
       verified_circuits_b.insert (i.operator-> ());
@@ -2342,11 +2343,21 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
   //  check for circuits that don't match
 
-  for (std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
-    if (! i->second.first || ! i->second.second) {
+  for (std::map<size_t, std::pair<std::vector<const db::Circuit *>, std::vector<const db::Circuit *> > >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
+    if (i->second.first.empty ()) {
       good = false;
       if (mp_logger) {
-        mp_logger->circuit_mismatch (i->second.first, i->second.second);
+        for (std::vector<const db::Circuit *>::const_iterator j = i->second.second.begin (); j != i->second.second.end (); ++j) {
+          mp_logger->circuit_mismatch (0, *j);
+        }
+      }
+    }
+    if (i->second.second.empty ()) {
+      good = false;
+      if (mp_logger) {
+        for (std::vector<const db::Circuit *>::const_iterator j = i->second.first.begin (); j != i->second.first.end (); ++j) {
+          mp_logger->circuit_mismatch (*j, 0);
+        }
       }
     }
   }
@@ -2355,59 +2366,62 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
   for (db::Netlist::const_bottom_up_circuit_iterator c = a->begin_bottom_up (); c != a->end_bottom_up (); ++c) {
 
-    size_t ccat = circuit_categorizer.cat_for_circuit (c.operator-> ());
+    const db::Circuit *ca = c.operator-> ();
+
+    size_t ccat = circuit_categorizer.cat_for_circuit (ca);
     if (! ccat) {
       continue;
     }
 
-    std::map<size_t, std::pair<const db::Circuit *, const db::Circuit *> >::const_iterator i = cat2circuits.find (ccat);
+    std::map<size_t, std::pair<std::vector<const db::Circuit *>, std::vector<const db::Circuit *> > >::const_iterator i = cat2circuits.find (ccat);
     tl_assert (i != cat2circuits.end ());
+    tl_assert (! i->second.first.empty ());
+    if (i->second.second.empty ()) {
+      continue;
+    }
 
-    if (i->second.first && i->second.second) {
+    //  NOTE: there can only be one schematic circuit
+    tl_assert (i->second.second.size () == size_t (1));
+    const db::Circuit *cb = i->second.second.front ();
 
-      const db::Circuit *ca = i->second.first;
-      const db::Circuit *cb = i->second.second;
+    std::vector<std::pair<const Net *, const Net *> > empty;
+    const std::vector<std::pair<const Net *, const Net *> > *net_identity = &empty;
+    std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
+    if (sn != m_same_nets.end ()) {
+      net_identity = &sn->second;
+    }
 
-      std::vector<std::pair<const Net *, const Net *> > empty;
-      const std::vector<std::pair<const Net *, const Net *> > *net_identity = &empty;
-      std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
-      if (sn != m_same_nets.end ()) {
-        net_identity = &sn->second;
-      }
-
-      if (all_subcircuits_verified (ca, verified_circuits_a) && all_subcircuits_verified (cb, verified_circuits_b)) {
+    if (all_subcircuits_verified (ca, verified_circuits_a) && all_subcircuits_verified (cb, verified_circuits_b)) {
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << "treating circuit: " << ca->name () << " vs. " << cb->name ();
+      tl::info << "treating circuit: " << ca->name () << " vs. " << cb->name ();
 #endif
-        if (mp_logger) {
-          mp_logger->begin_circuit (ca, cb);
-        }
+      if (mp_logger) {
+        mp_logger->begin_circuit (ca, cb);
+      }
 
-        bool pin_mismatch = false;
-        bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, circuit_pin_mapper, *net_identity, pin_mismatch, c12_pin_mapping, c22_pin_mapping);
-        if (! g) {
-          good = false;
-        }
+      bool pin_mismatch = false;
+      bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, circuit_pin_mapper, *net_identity, pin_mismatch, c12_pin_mapping, c22_pin_mapping);
+      if (! g) {
+        good = false;
+      }
 
-        if (! pin_mismatch) {
-          verified_circuits_a.insert (ca);
-          verified_circuits_b.insert (cb);
-        }
+      if (! pin_mismatch) {
+        verified_circuits_a.insert (ca);
+        verified_circuits_b.insert (cb);
+      }
 
-        derive_pin_equivalence (ca, cb, &circuit_pin_mapper);
+      derive_pin_equivalence (ca, cb, &circuit_pin_mapper);
 
-        if (mp_logger) {
-          mp_logger->end_circuit (ca, cb, g);
-        }
+      if (mp_logger) {
+        mp_logger->end_circuit (ca, cb, g);
+      }
 
-      } else {
+    } else {
 
-        if (mp_logger) {
-          mp_logger->circuit_skipped (ca, cb);
-          good = false;
-        }
-
+      if (mp_logger) {
+        mp_logger->circuit_skipped (ca, cb);
+        good = false;
       }
 
     }

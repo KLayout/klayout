@@ -481,40 +481,41 @@ public:
 /**
  *  @brief A helper class for the region to edge interaction functionality
  */
-class DB_PUBLIC RegionToEdgeInteractionFilterBase
+template <class OutputType>
+class DB_PUBLIC region_to_edge_interaction_filter_base
   : public db::box_scanner_receiver2<db::Polygon, size_t, db::Edge, size_t>
 {
 public:
-  RegionToEdgeInteractionFilterBase (bool inverse);
+  region_to_edge_interaction_filter_base (bool inverse);
 
-  void preset (const db::Polygon *poly);
+  void preset (const OutputType *s);
   void add (const db::Polygon *p, size_t, const db::Edge *e, size_t);
   void fill_output ();
 
 protected:
-  virtual void put (const db::Polygon &poly) const = 0;
+  virtual void put (const OutputType &s) const = 0;
 
 private:
-  std::set<const db::Polygon *> m_seen;
+  std::set<const OutputType *> m_seen;
   bool m_inverse;
 };
 
 /**
  *  @brief A helper class for the region to edge interaction functionality
  */
-template <class OutputContainer>
+template <class OutputContainer, class OutputType = typename OutputContainer::value_type>
 class DB_PUBLIC_TEMPLATE region_to_edge_interaction_filter
-  : public RegionToEdgeInteractionFilterBase
+  : public region_to_edge_interaction_filter_base<OutputType>
 {
 public:
   region_to_edge_interaction_filter (OutputContainer &output, bool inverse)
-    : RegionToEdgeInteractionFilterBase (inverse), mp_output (&output)
+    : region_to_edge_interaction_filter_base<OutputType> (inverse), mp_output (&output)
   {
     //  .. nothing yet ..
   }
 
 protected:
-  virtual void put (const db::Polygon &poly) const
+  virtual void put (const OutputType &poly) const
   {
     mp_output->insert (poly);
   }

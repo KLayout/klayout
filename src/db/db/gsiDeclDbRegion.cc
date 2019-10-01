@@ -1600,6 +1600,49 @@ Class<db::Region> decl_Region ("db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
+  method ("pull_inside", &db::Region::pull_inside, gsi::arg ("other"),
+    "@brief Returns all polygons of \"other\" which are inside polygons of this region\n"
+    "The \"pull_...\" methods are similar to \"selected_...\" but work the opposite way: they "
+    "select shapes from the argument region rather than self. In a deep (hierarchical) context "
+    "the output region will be hierarchically aligned with self, so the \"pull_...\" methods "
+    "provide a way for rehierarchisation.\n"
+    "\n"
+    "@return The region after the polygons have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.26.1\n"
+  ) +
+  method ("pull_overlapping", &db::Region::pull_overlapping, gsi::arg ("other"),
+    "@brief Returns all polygons of \"other\" which are overlapping polygons of this region\n"
+    "See \\pull_inside for a description of the \"pull_...\" methods.\n"
+    "\n"
+    "@return The region after the polygons have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.26.1\n"
+  ) +
+  method ("pull_interacting", static_cast<db::Region (db::Region::*) (const db::Region &) const> (&db::Region::pull_interacting), gsi::arg ("other"),
+    "@brief Returns all polygons of \"other\" which are interacting with (overlapping, touching) polygons of this region\n"
+    "See \\pull_inside for a description of the \"pull_...\" methods.\n"
+    "\n"
+    "@return The region after the polygons have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.26.1\n"
+  ) +
+  method ("pull_interacting", static_cast<db::Edges (db::Region::*) (const db::Edges &) const> (&db::Region::pull_interacting), gsi::arg ("other"),
+    "@brief Returns all edges of \"other\" which are interacting with polygons of this region\n"
+    "See \\pull_inside for a description of the \"pull_...\" methods.\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.26.1\n"
+  ) +
   method ("is_box?", &db::Region::is_box,
     "@brief Returns true, if the region is a simple box\n"
     "\n"

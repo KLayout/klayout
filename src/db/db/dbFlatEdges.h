@@ -178,6 +178,8 @@ public:
     }
   }
 
+  db::Shapes &raw_edges () { return m_edges; }
+
 protected:
   virtual void merged_semantics_changed ();
   virtual Box compute_bbox () const;
@@ -186,8 +188,6 @@ protected:
 
 private:
   friend class AsIfFlatEdges;
-
-  db::Shapes &raw_edges () { return m_edges; }
 
   FlatEdges &operator= (const FlatEdges &other);
 

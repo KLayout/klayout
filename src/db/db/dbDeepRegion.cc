@@ -1855,10 +1855,12 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
+  std::auto_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
-    // @@@ turn into deep
-    return db::AsIfFlatRegion::selected_interacting_generic (other, mode, touching, inverse);
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
   }
 
   ensure_merged_polygons_valid ();
@@ -1890,10 +1892,12 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) cons
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
+  std::auto_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
-    //  @@@ turn into deep
-    return db::AsIfFlatRegion::selected_interacting_generic (other, inverse);
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
   }
 
   ensure_merged_polygons_valid ();
@@ -1959,10 +1963,12 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
 EdgesDelegate *
 DeepRegion::pull_generic (const Edges &other) const
 {
+  std::auto_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
-    // @@@ see above
-    return db::AsIfFlatRegion::pull_generic (other);
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
   }
 
   ensure_merged_polygons_valid ();

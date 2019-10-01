@@ -41,6 +41,7 @@ namespace db {
 
 class DeepShapeStore;
 class Region;
+class Edges;
 
 /**
  *  @brief Represents a shape collection from the deep shape store
@@ -273,6 +274,17 @@ public:
    *  are used for net names.
    */
   DeepLayer create_from_flat (const db::Region &region, bool for_netlist, double max_area_ratio = 0.0, size_t max_vertex_count = 0, const db::ICplxTrans &trans = db::ICplxTrans ());
+
+  /**
+   *  @brief Creates a new layer from a flat edge collection (or the edge collection is made flat)
+   *
+   *  This method is intended for use with singular-created DSS objects (see
+   *  singular constructor).
+   *
+   *  After a flat layer has been created for a region, it can be retrieved
+   *  from the region later with layer_for_flat (region).
+   */
+  DeepLayer create_from_flat (const db::Edges &region, const db::ICplxTrans &trans = db::ICplxTrans ());
 
   /**
    *  @brief Gets the layer for a given flat region.

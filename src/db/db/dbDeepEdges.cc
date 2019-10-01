@@ -108,6 +108,15 @@ DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, con
   set_merged_semantics (merged_semantics);
 }
 
+DeepEdges::DeepEdges (const db::Edges &other, DeepShapeStore &dss)
+  : AsIfFlatEdges (), m_merged_edges ()
+{
+  m_deep_layer = dss.create_from_flat (other);
+
+  init ();
+  set_merged_semantics (other.merged_semantics ());
+}
+
 DeepEdges::DeepEdges ()
   : AsIfFlatEdges ()
 {

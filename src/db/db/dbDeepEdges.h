@@ -43,6 +43,7 @@ class DB_PUBLIC DeepEdges
 {
 public:
   DeepEdges ();
+  DeepEdges (const db::Edges &other, DeepShapeStore &dss);
   DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, bool as_edges = true);
   DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges = true, bool merged_semantics = true);
 

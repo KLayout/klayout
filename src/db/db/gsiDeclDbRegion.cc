@@ -1519,7 +1519,7 @@ Class<db::Region> decl_Region ("db", "Region",
   ) + 
   method ("pull_inside", &db::Region::pull_inside, gsi::arg ("other"),
     "@brief Returns all polygons of \"other\" which are inside polygons of this region\n"
-    "The \"pull_...\" methods are similar to \"selected_...\" but work the opposite way: they "
+    "The \"pull_...\" methods are similar to \"select_...\" but work the opposite way: they "
     "select shapes from the argument region rather than self. In a deep (hierarchical) context "
     "the output region will be hierarchically aligned with self, so the \"pull_...\" methods "
     "provide a way for rehierarchisation.\n"

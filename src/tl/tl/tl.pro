@@ -102,7 +102,8 @@ HEADERS = \
     tlList.h \
     tlEquivalenceClusters.h \
     tlUniqueName.h \
-    tlRecipe.h
+    tlRecipe.h \
+    tlSelect.h
 
 equals(HAVE_CURL, "1") {
 

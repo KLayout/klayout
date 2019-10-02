@@ -440,13 +440,13 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   std::auto_ptr<FlatEdges> output (new FlatEdges (false));
   region_to_edge_interaction_filter<Shapes, db::Edge> filter (output->raw_edges (), false);
 
-  AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
+  AddressablePolygonDelivery p (begin (), has_valid_merged_polygons ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert1 (p.operator-> (), 0);
   }
 
-  AddressableEdgeDelivery e (other.addressable_edges ());
+  AddressableEdgeDelivery e (other.addressable_merged_edges ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert2 (e.operator-> (), 0);
@@ -471,13 +471,13 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   }
 
   size_t n = 1;
-  for (RegionIterator p = other.begin (); ! p.at_end (); ++p, ++n) {
+  for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p, ++n) {
     if (p->box ().touches (bbox ())) {
       ep.insert (*p, n);
     }
   }
 
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+  for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
     if (mode > 0 || p->box ().touches (other.bbox ())) {
       ep.insert (*p, 0);
     }
@@ -501,7 +501,7 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   output->reserve (n);
 
   n = 1;
-  for (RegionIterator p = other.begin (); ! p.at_end (); ++p, ++n) {
+  for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p, ++n) {
     if (selected.find (n) != selected.end ()) {
       output->raw_polygons ().insert (*p);
     }

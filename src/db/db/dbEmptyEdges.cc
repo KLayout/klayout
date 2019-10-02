@@ -60,6 +60,12 @@ EmptyEdges::extended (coord_type, coord_type, coord_type, coord_type, bool) cons
   return new EmptyRegion ();
 }
 
+RegionDelegate *
+EmptyEdges::pull_interacting (const Region &) const
+{
+  return new EmptyRegion ();
+}
+
 EdgePairsDelegate *
 EmptyEdges::processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &) const
 {

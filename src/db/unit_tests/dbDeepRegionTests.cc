@@ -1283,6 +1283,65 @@ TEST(24_TextsFromDeep)
   }
 }
 
+TEST(25_Pull)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l6 = ly.get_layer (db::LayerProperties (6, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.pull_interacting (r2));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.pull_inside (r2));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1.pull_overlapping (r2));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2.pull_interacting (r6));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2.pull_inside (r6));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2.pull_overlapping (r6));
+
+    EXPECT_EQ (r2.pull_interacting (r6).is_merged (), true);
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au25a.gds");
+  }
+
+  db::Edges r1e = r1.edges ();
+
+  {
+    db::Layout target;
+    unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r6);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1e);
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r6.pull_interacting (r1e));
+
+    EXPECT_EQ (r6.pull_interacting (r1e).is_merged (), true);
+
+    CHECKPOINT();
+    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au25b.gds");
+  }
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;
@@ -1433,3 +1492,4 @@ TEST(issue_277)
   r.set_min_coherence (false);  //  needs to merge again
   EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "");
 }
+

@@ -81,6 +81,7 @@ class DB_PUBLIC FlatRegion
   : public AsIfFlatRegion
 {
 public:
+  typedef db::Polygon value_type;
   typedef db::layer<db::Polygon, db::unstable_layer_tag> polygon_layer_type;
   typedef polygon_layer_type::iterator polygon_iterator_type;
 

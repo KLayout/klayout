@@ -22,6 +22,7 @@
 
 
 #include "dbRegionUtils.h"
+#include "tlSelect.h"
 
 namespace db
 {
@@ -288,26 +289,6 @@ Poly2PolyCheckBase::enter (const db::Polygon &o1, size_t p1, const db::Polygon &
 // -------------------------------------------------------------------------------------
 //  RegionToEdgeInteractionFilterBase implementation
 
-namespace
-{
-
-template <class OutputType>
-struct edge_or_polygon;
-
-template <>
-struct edge_or_polygon<db::Polygon>
-{
-  const db::Polygon *operator() (const db::Polygon *p, const db::Edge *) const { return p; }
-};
-
-template <>
-struct edge_or_polygon<db::Edge>
-{
-  const db::Edge *operator() (const db::Polygon *, const db::Edge *e) const { return e; }
-};
-
-}
-
 template <class OutputType>
 region_to_edge_interaction_filter_base<OutputType>::region_to_edge_interaction_filter_base (bool inverse)
   : m_inverse (inverse)
@@ -326,7 +307,8 @@ template <class OutputType>
 void
 region_to_edge_interaction_filter_base<OutputType>::add (const db::Polygon *p, size_t, const db::Edge *e, size_t)
 {
-  const OutputType *o = edge_or_polygon<OutputType> () (p, e);
+  const OutputType *o = 0;
+  tl::select (o, p, e);
 
   if ((m_seen.find (o) == m_seen.end ()) != m_inverse) {
 

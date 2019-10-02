@@ -32,6 +32,7 @@
 #include "dbBoxConvert.h"
 #include "dbRegion.h"
 #include "dbFlatRegion.h"
+#include "dbEmptyRegion.h"
 #include "dbPolygonTools.h"
 #include "dbShapeProcessor.h"
 #include "dbEdgeProcessor.h"
@@ -124,6 +125,125 @@ AsIfFlatEdges::selected_interacting_generic (const Region &other, bool inverse) 
 }
 
 EdgesDelegate *
+AsIfFlatEdges::selected_interacting_generic (const Edges &edges, bool inverse) const
+{
+  db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
+
+  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+
+  for ( ; ! e.at_end (); ++e) {
+    scanner.insert (e.operator-> (), 0);
+  }
+
+  AddressableEdgeDelivery ee = edges.addressable_edges ();
+
+  for ( ; ! ee.at_end (); ++ee) {
+    scanner.insert (ee.operator-> (), 1);
+  }
+
+  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
+
+  if (! inverse) {
+
+    edge_interaction_filter<FlatEdges> filter (*output);
+    scanner.process (filter, 1, db::box_convert<db::Edge> ());
+
+  } else {
+
+    std::set<db::Edge> interacting;
+    edge_interaction_filter<std::set<db::Edge> > filter (interacting);
+    scanner.process (filter, 1, db::box_convert<db::Edge> ());
+
+    for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
+      if (interacting.find (*o) == interacting.end ()) {
+        output->insert (*o);
+      }
+    }
+
+  }
+
+  return output.release ();
+}
+
+EdgesDelegate *
+AsIfFlatEdges::pull_generic (const Edges &edges) const
+{
+  db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
+
+  AddressableEdgeDelivery e (begin (), true);
+
+  for ( ; ! e.at_end (); ++e) {
+    scanner.insert (e.operator-> (), 1);
+  }
+
+  AddressableEdgeDelivery ee = edges.addressable_merged_edges ();
+
+  for ( ; ! ee.at_end (); ++ee) {
+    scanner.insert (ee.operator-> (), 0);
+  }
+
+  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
+  edge_interaction_filter<FlatEdges> filter (*output);
+  scanner.process (filter, 1, db::box_convert<db::Edge> ());
+
+  return output.release ();
+}
+
+RegionDelegate *
+AsIfFlatEdges::pull_generic (const Region &other) const
+{
+  //  shortcuts
+  if (other.empty () || empty ()) {
+    return new EmptyRegion ();
+  }
+
+  db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
+
+  AddressableEdgeDelivery e (begin (), true);
+
+  for ( ; ! e.at_end (); ++e) {
+    scanner.insert1 (e.operator-> (), 0);
+  }
+
+  AddressablePolygonDelivery p = other.addressable_merged_polygons ();
+
+  for ( ; ! p.at_end (); ++p) {
+    scanner.insert2 (p.operator-> (), 1);
+  }
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (true));
+
+  edge_to_region_interaction_filter<FlatRegion> filter (*output);
+  scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
+
+  return output.release ();
+}
+
+EdgesDelegate *
+AsIfFlatEdges::pull_interacting (const Edges &other) const
+{
+  return pull_generic (other);
+}
+
+RegionDelegate *
+AsIfFlatEdges::pull_interacting (const Region &other) const
+{
+  return pull_generic (other);
+}
+
+EdgesDelegate *
+AsIfFlatEdges::selected_interacting (const Edges &other) const
+{
+  return selected_interacting_generic (other, false);
+}
+
+EdgesDelegate *
+AsIfFlatEdges::selected_not_interacting (const Edges &other) const
+{
+  return selected_interacting_generic (other, true);
+}
+
+EdgesDelegate *
 AsIfFlatEdges::selected_interacting (const Region &other) const
 {
   return selected_interacting_generic (other, false);
@@ -193,59 +313,6 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
     return output.release ();
 
   }
-}
-
-EdgesDelegate *
-AsIfFlatEdges::selected_interacting_generic (const Edges &edges, bool inverse) const
-{
-  db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
-
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
-
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert (e.operator-> (), 0);
-  }
-
-  AddressableEdgeDelivery ee = edges.addressable_edges ();
-
-  for ( ; ! ee.at_end (); ++ee) {
-    scanner.insert (ee.operator-> (), 1);
-  }
-
-  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
-
-  if (! inverse) {
-
-    edge_interaction_filter<FlatEdges> filter (*output);
-    scanner.process (filter, 1, db::box_convert<db::Edge> ());
-
-  } else {
-
-    std::set<db::Edge> interacting;
-    edge_interaction_filter<std::set<db::Edge> > filter (interacting);
-    scanner.process (filter, 1, db::box_convert<db::Edge> ());
-
-    for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
-      if (interacting.find (*o) == interacting.end ()) {
-        output->insert (*o);
-      }
-    }
-
-  }
-
-  return output.release ();
-}
-
-EdgesDelegate *
-AsIfFlatEdges::selected_interacting (const Edges &other) const
-{
-  return selected_interacting_generic (other, false);
-}
-
-EdgesDelegate *
-AsIfFlatEdges::selected_not_interacting (const Edges &other) const
-{
-  return selected_interacting_generic (other, true);
 }
 
 EdgesDelegate *

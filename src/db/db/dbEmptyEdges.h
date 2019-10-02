@@ -86,6 +86,8 @@ public:
 
   virtual EdgesDelegate *inside_part (const Region &) const { return new EmptyEdges (); }
   virtual EdgesDelegate *outside_part (const Region &) const { return new EmptyEdges (); }
+  virtual RegionDelegate *pull_interacting (const Region &) const;
+  virtual EdgesDelegate *pull_interacting (const Edges &) const { return new EmptyEdges (); }
   virtual EdgesDelegate *selected_interacting (const Edges &) const { return new EmptyEdges (); }
   virtual EdgesDelegate *selected_not_interacting (const Edges &) const { return new EmptyEdges (); }
   virtual EdgesDelegate *selected_interacting (const Region &) const { return new EmptyEdges (); }

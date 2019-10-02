@@ -81,6 +81,8 @@ class DB_PUBLIC FlatEdges
   : public AsIfFlatEdges
 {
 public:
+  typedef db::Edge value_type;
+
   typedef db::layer<db::Edge, db::unstable_layer_tag> edge_layer_type;
   typedef edge_layer_type::iterator edge_iterator_type;
 

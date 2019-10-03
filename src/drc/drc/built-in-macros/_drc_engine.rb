@@ -1296,10 +1296,16 @@ CODE
         end
         
       else
+
+        if @dss
+          @dss.threads = (@tt || 1)
+        end
+
         res = nil
         run_timed("\"#{method}\" in: #{src_line}", obj) do
           res = obj.send(method, *args)
         end
+
       end
       
       # enable progress
@@ -1333,10 +1339,16 @@ CODE
         res = res.value
         
       else
+
+        if @dss
+          @dss.threads = (@tt || 1)
+        end
+
         res = nil
         run_timed("\"#{method}\" in: #{src_line}", obj) do
           res = obj.send(method)
         end
+
       end
       
       # enable progress

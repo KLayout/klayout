@@ -1235,7 +1235,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
       if (subject_cell == intruder_cell) {
 
         //  Use the same id's for same instances - this way we can easily detect same instances
-        //  and don't make the self-interacting
+        //  and don't make them self-interacting
 
         for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
           unsigned int iid = ++id;
@@ -1327,7 +1327,11 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
               db::ICplxTrans tk = (*j)->complex_trans (*k);
               //  NOTE: no self-interactions
               if (i->first != *j || tn != tk) {
-                intruders_below.first.insert (db::CellInstArray (db::CellInst ((*j)->object ().cell_index ()), tni * tk));
+                //  optimize the intruder instance so it will be as low as possible
+                std::pair<bool, db::CellInstArray> ei = effective_instance (contexts, i->first->object ().cell_index (), (*j)->object ().cell_index (), tni * tk, dist);
+                if (ei.first) {
+                  intruders_below.first.insert (ei.second);
+                }
               }
             }
           }
@@ -1341,6 +1345,64 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
     }
 
+  }
+
+}
+
+/**
+ *  @brief Returns a cell instance array suitable for adding as intruder
+ *
+ *  The given intruder cell with the transformation ti2s - which transforms the intruder instance into
+ *  the coordinate system of the subject cell - is analysed and either this instance or a sub-instance
+ *  is chosen.
+ *  Sub-instances are chosen if the intruder cell does not have shapes which interact with the subject
+ *  cell and there is exactly one sub-instance interacting with the subject cell.
+ */
+template <class TS, class TI, class TR>
+std::pair<bool, db::CellInstArray>
+local_processor<TS, TI, TR>::effective_instance (local_processor_contexts<TS, TI, TR> &contexts, db::cell_index_type subject_cell_index, db::cell_index_type intruder_cell_index, const db::ICplxTrans &ti2s, db::Coord dist) const
+{
+  db::Box bbox = safe_box_enlarged (mp_subject_layout->cell (subject_cell_index).bbox (contexts.subject_layer ()), dist - 1, dist - 1);
+  if (bbox.empty ()) {
+    //  should not happen, but skip if it does
+    return std::make_pair (false, db::CellInstArray ());
+  }
+
+  db::Box ibbox = bbox.transformed (ti2s.inverted ());
+
+  const db::Cell &intruder_cell = mp_intruder_layout->cell (intruder_cell_index);
+  const db::Shapes &intruder_shapes = intruder_cell.shapes (contexts.intruder_layer ());
+  if (! intruder_shapes.empty () && ! intruder_shapes.begin_touching (ibbox, db::ShapeIterator::All).at_end ()) {
+    return std::make_pair (true, db::CellInstArray (db::CellInst (intruder_cell_index), ti2s));
+  }
+
+  db::box_convert <db::CellInst, true> inst_bcii (*mp_intruder_layout, contexts.intruder_layer ());
+
+  size_t ni = 0;
+  db::cell_index_type eff_cell_index = 0;
+  db::ICplxTrans eff_trans;
+
+  for (db::Cell::touching_iterator i = intruder_cell.begin_touching (ibbox); ! i.at_end() && ni < 2; ++i) {
+    const db::CellInstArray &ci = i->cell_inst ();
+    db::Box cbox = mp_intruder_layout->cell (ci.object ().cell_index ()).bbox (contexts.intruder_layer ());
+    for (db::CellInstArray::iterator k = ci.begin_touching (ibbox, inst_bcii); ! k.at_end () && ni < 2; ++k) {
+      db::ICplxTrans tk = ci.complex_trans (*k);
+      if (ibbox.overlaps (cbox.transformed (tk))) {
+        eff_trans = tk;
+        eff_cell_index = ci.object ().cell_index ();
+        ++ni;
+      }
+    }
+  }
+
+  if (ni == 0) {
+    //  should not happen, but skip if it does
+    return std::make_pair (false, db::CellInstArray ());
+  } else if (ni == 1) {
+    //  one instance - dive down
+    return effective_instance (contexts, subject_cell_index, eff_cell_index, ti2s * eff_trans, dist);
+  } else {
+    return std::make_pair (true, db::CellInstArray (db::CellInst (intruder_cell_index), ti2s));
   }
 }
 

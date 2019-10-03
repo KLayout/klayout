@@ -1570,7 +1570,7 @@ public:
 
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    m_ep.clear ();
+    db::EdgeProcessor ep;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -1583,20 +1583,20 @@ public:
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
       const db::PolygonRef &subject = interactions.subject_shape (i->first);
       for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-        m_ep.insert (*e, n);
+        ep.insert (*e, n);
       }
     }
 
     for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
       for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-        m_ep.insert (*e, 0);
+        ep.insert (*e, 0);
       }
     }
 
     db::InteractionDetector id (m_mode, 0);
     id.set_include_touching (m_touching);
     db::EdgeSink es;
-    m_ep.process (es, id);
+    ep.process (es, id);
     id.finish ();
 
     n = 0;
@@ -1633,7 +1633,6 @@ private:
   int m_mode;
   bool m_touching;
   bool m_inverse;
-  mutable db::EdgeProcessor m_ep;
 };
 
 class PullLocalOperation
@@ -1653,7 +1652,7 @@ public:
 
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    m_ep.clear ();
+    db::EdgeProcessor ep;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -1665,21 +1664,21 @@ public:
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       const db::PolygonRef &subject = interactions.subject_shape (i->first);
       for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-        m_ep.insert (*e, 0);
+        ep.insert (*e, 0);
       }
     }
 
     size_t n = 1;
     for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o, ++n) {
       for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-        m_ep.insert (*e, n);
+        ep.insert (*e, n);
       }
     }
 
     db::InteractionDetector id (m_mode, 0);
     id.set_include_touching (m_touching);
     db::EdgeSink es;
-    m_ep.process (es, id);
+    ep.process (es, id);
     id.finish ();
 
     n = 0;
@@ -1704,13 +1703,12 @@ public:
 
   virtual std::string description () const
   {
-    return tl::to_string (tr ("Pull regions by their geometric relation to first (interacting, inside)"));
+    return tl::to_string (tr ("Pull regions by their geometrical relation to first"));
   }
 
 private:
   int m_mode;
   bool m_touching;
-  mutable db::EdgeProcessor m_ep;
 };
 
 struct ResultInserter
@@ -1770,14 +1768,14 @@ public:
 
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    m_scanner.clear ();
+    db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
 
     ResultInserter inserter (layout, result);
     region_to_edge_interaction_filter<ResultInserter> filter (inserter, m_inverse);
 
     for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        m_scanner.insert2 (& interactions.intruder_shape (*j), 0);
+        scanner.insert2 (& interactions.intruder_shape (*j), 0);
       }
     }
 
@@ -1787,14 +1785,14 @@ public:
       const db::PolygonRef &subject = interactions.subject_shape (i->first);
       heap.push_back (subject.obj ().transformed (subject.trans ()));
 
-      m_scanner.insert1 (&heap.back (), 0);
+      scanner.insert1 (&heap.back (), 0);
       if (m_inverse) {
         filter.preset (&heap.back ());
       }
 
     }
 
-    m_scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
+    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
     if (m_inverse) {
       filter.fill_output ();
     }
@@ -1816,7 +1814,6 @@ public:
 
 private:
   bool m_inverse;
-  mutable db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> m_scanner;
 };
 
 class PullWithEdgeLocalOperation
@@ -1836,14 +1833,14 @@ public:
 
   virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    m_scanner.clear ();
+    db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
 
     EdgeResultInserter inserter (result);
     region_to_edge_interaction_filter<EdgeResultInserter> filter (inserter, false);
 
     for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        m_scanner.insert2 (& interactions.intruder_shape (*j), 0);
+        scanner.insert2 (& interactions.intruder_shape (*j), 0);
       }
     }
 
@@ -1853,11 +1850,11 @@ public:
       const db::PolygonRef &subject = interactions.subject_shape (i->first);
       heap.push_back (subject.obj ().transformed (subject.trans ()));
 
-      m_scanner.insert1 (&heap.back (), 0);
+      scanner.insert1 (&heap.back (), 0);
 
     }
 
-    m_scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
+    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
   }
 
   virtual on_empty_intruder_mode on_empty_intruder_hint () const
@@ -1867,11 +1864,8 @@ public:
 
   virtual std::string description () const
   {
-    return tl::to_string (tr ("Select edges from second by their geometric relation to first"));
+    return tl::to_string (tr ("Pull edges from second by their geometric relation to first"));
   }
-
-private:
-  mutable db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> m_scanner;
 };
 
 }

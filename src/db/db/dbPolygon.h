@@ -759,6 +759,16 @@ public:
    */
   area_type area () const 
   {
+    return area2 () / 2;
+  }
+
+  /**
+   *  @brief The area of the contour times 2
+   *  For integer area types, this is the more precise value as the division
+   *  by 2 might round off.
+   */
+  area_type area2 () const
+  {
     size_type n = size ();
     if (n < 3) {
       return 0;
@@ -771,10 +781,10 @@ public:
       a += db::vprod (pp - point_type (), pl - point_type ());
       pl = pp;
     }
-    return a / 2;
+    return a;
   }
 
-  /** 
+  /**
    *  @brief The perimeter of the contour
    */
   perimeter_type perimeter () const 
@@ -1682,7 +1692,13 @@ public:
    */
   double area_ratio () const
   {
-    return double (box ().area ()) / double (area ());
+    area_type a = area2 ();
+    if (a == 0) {
+      //  By our definition, an empty polygon has an area ratio of 0
+      return 0.0;
+    } else {
+      return double (box ().area ()) / (0.5 * a);
+    }
   }
 
   /**
@@ -2135,7 +2151,21 @@ public:
     return a;
   }
 
-  /** 
+  /**
+   *  @brief The area of the polygon times 2
+   *  For integer area types, this is the more precise value as the division
+   *  by 2 might round off.
+   */
+  area_type area2 () const
+  {
+    area_type a = 0;
+    for (typename contour_list_type::const_iterator h = m_ctrs.begin (); h != m_ctrs.end (); ++h) {
+      a += h->area2 ();
+    }
+    return a;
+  }
+
+  /**
    *  @brief The perimeter of the polygon
    */
   perimeter_type perimeter () const 
@@ -2861,7 +2891,17 @@ public:
     return m_hull.area ();
   }
 
-  /** 
+  /**
+   *  @brief The area of the polygon times 2
+   *  For integer area types, this is the more precise value as the division
+   *  by 2 might round off.
+   */
+  area_type area2 () const
+  {
+    return m_hull.area2 ();
+  }
+
+  /**
    *  @brief The perimeter of the polygon
    */
   perimeter_type perimeter () const 
@@ -2977,7 +3017,13 @@ public:
    */
   double area_ratio () const
   {
-    return double (box ().area ()) / double (area ());
+    area_type a = area2 ();
+    if (a == 0) {
+      //  By our definition, an empty polygon has an area ratio of 0
+      return 0.0;
+    } else {
+      return double (box ().area ()) / (0.5 * a);
+    }
   }
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
@@ -3154,7 +3200,17 @@ public:
     return this->obj ().area ();
   }
 
-  /** 
+  /**
+   *  @brief The area of the polygon times 2
+   *  For integer area types, this is the more precise value as the division
+   *  by 2 might round off.
+   */
+  area_type area2 () const
+  {
+    return this->obj ().area2 ();
+  }
+
+  /**
    *  @brief The perimeter of the polygon
    */
   perimeter_type perimeter () const 

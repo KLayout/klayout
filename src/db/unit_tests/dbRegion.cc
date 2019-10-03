@@ -391,30 +391,6 @@ TEST(10c)
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
 }
 
-TEST(10d)
-{
-  db::Region r;
-  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
-  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
-  r.insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
-  r.set_merged_semantics (true);
-  r.set_min_coherence (false);
-  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(20,20;20,30;30,30;30,20)");
-  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(-20,-20;-20,30;30,30;30,-20)");
-  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
-
-  r.clear ();
-  r.insert(db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
-  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000)))).to_string (), "");
-  EXPECT_EQ (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000))).pull_overlapping (r).to_string (), "");
-  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4000), db::Point (1000, 6000)))).to_string (), "");
-  EXPECT_EQ (db::Region (db::Box (db::Point (0, 4000), db::Point (1000, 6000))).pull_overlapping (r).to_string (), "");
-  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4001), db::Point (2000, 6000)))).to_string (), "");
-  EXPECT_EQ (db::Region (db::Box (db::Point (0, 4001), db::Point (2000, 6000))).pull_overlapping (r).to_string (), "");
-  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000)))).to_string (), "(0,3999;0,6000;1001,6000;1001,3999)");
-  EXPECT_EQ (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000))).pull_overlapping (r).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
-}
-
 TEST(11)
 {
   db::Box bb[3] = { db::Box (db::Point (0, 0), db::Point (10, 10)), db::Box (), db::Box (db::Point (20, 20), db::Point (40, 50)) };
@@ -1389,6 +1365,30 @@ TEST(30c)
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
   r.select_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (-10, -10))));
   EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+}
+
+TEST(31)
+{
+  db::Region r;
+  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  r.insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(20,20;20,30;30,30;30,20)");
+  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(-20,-20;-20,30;30,30;30,-20)");
+  EXPECT_EQ (r.pull_interacting (db::Region (db::Box (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
+
+  r.clear ();
+  r.insert(db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
+  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000)))).to_string (), "");
+  EXPECT_EQ (db::Region (db::Box (db::Point (0, 4000), db::Point (2000, 6000))).pull_overlapping (r).to_string (), "");
+  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4000), db::Point (1000, 6000)))).to_string (), "");
+  EXPECT_EQ (db::Region (db::Box (db::Point (0, 4000), db::Point (1000, 6000))).pull_overlapping (r).to_string (), "");
+  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 4001), db::Point (2000, 6000)))).to_string (), "");
+  EXPECT_EQ (db::Region (db::Box (db::Point (0, 4001), db::Point (2000, 6000))).pull_overlapping (r).to_string (), "");
+  EXPECT_EQ (r.pull_overlapping (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000)))).to_string (), "(0,3999;0,6000;1001,6000;1001,3999)");
+  EXPECT_EQ (db::Region (db::Box (db::Point (0, 3999), db::Point (1001, 6000))).pull_overlapping (r).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
 }
 
 TEST(100_Processors)

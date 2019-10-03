@@ -1620,6 +1620,7 @@ template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair>;
 template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::EdgePair>;
 
 }

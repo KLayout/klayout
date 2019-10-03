@@ -1114,6 +1114,12 @@ public:
     //  .. nothing yet ..
   }
 
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
+  }
+
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     db::box_scanner<db::Edge, size_t> scanner;
@@ -1183,6 +1189,12 @@ public:
     //  .. nothing yet ..
   }
 
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
+  }
+
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     db::box_scanner<db::Edge, size_t> scanner;
@@ -1227,6 +1239,12 @@ public:
     : m_inverse (inverse)
   {
     //  .. nothing yet ..
+  }
+
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
   }
 
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
@@ -1317,6 +1335,12 @@ public:
   Edge2PolygonPullLocalOperation ()
   {
     //  .. nothing yet ..
+  }
+
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
   }
 
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
@@ -1448,7 +1472,7 @@ EdgesDelegate *DeepEdges::pull_generic (const Edges &other) const
   }
 
   const db::DeepLayer &edges = deep_layer ();
-  const db::DeepLayer &other_edges = merged_deep_layer ();
+  const db::DeepLayer &other_edges = other_deep->merged_deep_layer ();
 
   DeepLayer dl_out (other_edges.derived ());
 

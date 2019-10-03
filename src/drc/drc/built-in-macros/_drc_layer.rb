@@ -1681,10 +1681,11 @@ CODE
     %w(pull_interacting pull_overlapping pull_inside).each do |f| 
       eval <<"CODE"
       def #{f}(other)
-        requires_region("#{f}")
         if :#{f} != :pull_interacting 
-          requires_same_type(other, "#{f}")
+          requires_region("#{f}")
+          other.requires_region("#{f}")
         else
+          requires_edges_or_region("#{f}")
           other.requires_edges_or_region("#{f}")
         end
         DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))

@@ -919,7 +919,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
   }
 
-  res->set_is_merged (true);
+  res->set_is_merged (merged_semantics () || is_merged ());
   return res.release ();
 }
 
@@ -1282,7 +1282,7 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
 
   //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
   //  overlap after size and are not necessarily merged)
-  if (d < 0) {
+  if (d < 0 && (merged_semantics () || is_merged ())) {
     res->set_is_merged (true);
   }
 
@@ -1367,7 +1367,7 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
   //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
   //  overlap after size and are not necessarily merged)
-  if (dx < 0 && dy < 0) {
+  if (dx < 0 && dy < 0 && (merged_semantics () || is_merged ())) {
     res->set_is_merged (true);
   }
 
@@ -1563,6 +1563,11 @@ public:
     //  .. nothing yet ..
   }
 
+  virtual db::Coord dist () const
+  {
+    return m_touching ? 1 : 0;
+  }
+
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     m_ep.clear ();
@@ -1639,6 +1644,11 @@ public:
     : m_mode (mode), m_touching (touching)
   {
     //  .. nothing yet ..
+  }
+
+  virtual db::Coord dist () const
+  {
+    return m_touching ? 1 : 0;
   }
 
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
@@ -1752,6 +1762,12 @@ public:
     //  .. nothing yet ..
   }
 
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
+  }
+
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     m_scanner.clear ();
@@ -1810,6 +1826,12 @@ public:
   PullWithEdgeLocalOperation ()
   {
     //  .. nothing yet ..
+  }
+
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
   }
 
   virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
@@ -1887,7 +1909,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   proc.run (&op, polygons.layer (), other_polygons.layer (), dl_out.layer ());
 
   db::DeepRegion *res = new db::DeepRegion (dl_out);
-  if (! split_after) {
+  if (! split_after && ((mode < 0 && other.merged_semantics ()) || other.is_merged ()) && (merged_semantics () || is_merged ())) {
     res->set_is_merged (true);
   }
   return res;
@@ -1925,7 +1947,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) cons
 
   db::DeepRegion *res = new db::DeepRegion (dl_out);
   if (! split_after) {
-    res->set_is_merged (true);
+    res->set_is_merged (other.is_merged () && (merged_semantics () || is_merged ()));
   }
   return res;
 }
@@ -1963,7 +1985,7 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
   proc.run (&op, polygons.layer (), other_polygons.layer (), dl_out.layer ());
 
   db::DeepRegion *res = new db::DeepRegion (dl_out);
-  if (! split_after) {
+  if (! split_after && ((mode < 0 && merged_semantics ()) || is_merged ()) && (other.merged_semantics () || other.is_merged ())) {
     res->set_is_merged (true);
   }
   return res;
@@ -1994,7 +2016,7 @@ DeepRegion::pull_generic (const Edges &other) const
   proc.run (&op, polygons.layer (), other_edges.layer (), dl_out.layer ());
 
   db::DeepEdges *res = new db::DeepEdges (dl_out);
-  res->set_is_merged (true);
+  res->set_is_merged (is_merged () && (other.merged_semantics () || other.is_merged ()));
   return res;
 }
 

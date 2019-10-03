@@ -441,6 +441,7 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
 
   for (typename std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> >::const_iterator c = sorted_contexts.begin (); c != sorted_contexts.end (); ++c) {
 
+    proc->next ();
     ++index;
 
     if (tl::verbosity () >= proc->base_verbosity () + 20) {
@@ -1046,14 +1047,14 @@ template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::E
 
 template <class TS, class TI, class TR>
 local_processor<TS, TI, TR>::local_processor (db::Layout *layout, db::Cell *top)
-  : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
+  : mp_subject_layout (layout), mp_intruder_layout (layout), mp_subject_top (top), mp_intruder_top (top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
 
 template <class TS, class TI, class TR>
 local_processor<TS, TI, TR>::local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_top)
-  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30)
+  : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), mp_subject_top (subject_top), mp_intruder_top (intruder_top), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
@@ -1066,6 +1067,31 @@ std::string local_processor<TS, TI, TR>::description (const local_operation<TS, 
   } else {
     return m_description;
   }
+}
+
+template <class TS, class TI, class TR>
+void local_processor<TS, TI, TR>::next () const
+{
+  static tl::Mutex s_lock;
+  tl::MutexLocker locker (&s_lock);
+  ++m_progress;
+
+  tl::RelativeProgress *rp = dynamic_cast<tl::RelativeProgress *> (mp_progress);
+  if (rp) {
+    rp->set (m_progress);
+  }
+}
+
+template <class TS, class TI, class TR>
+size_t local_processor<TS, TI, TR>::get_progress () const
+{
+  size_t p = 0;
+  {
+    static tl::Mutex s_lock;
+    tl::MutexLocker locker (&s_lock);
+    p = m_progress;
+  }
+  return p;
 }
 
 template <class TS, class TI, class TR>
@@ -1416,6 +1442,16 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
   mp_subject_layout->update ();
   db::LayoutLocker layout_update_locker (mp_subject_layout);
 
+  //  prepare a progress for the computation tasks
+  size_t comp_effort = 0;
+  for (typename local_processor_contexts<TS, TI, TR>::iterator c = contexts.begin (); c != contexts.end (); ++c) {
+    comp_effort += c->second.size ();
+  }
+
+  tl::RelativeProgress progress (description (op), comp_effort, 1);
+  m_progress = 0;
+  mp_progress = 0;
+
   if (m_nthreads > 0) {
 
     std::auto_ptr<tl::Job<local_processor_result_computation_worker<TS, TI, TR> > > rc_job (new tl::Job<local_processor_result_computation_worker<TS, TI, TR> > (m_nthreads));
@@ -1471,22 +1507,44 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
       }
 
       if (rc_job.get ()) {
-        rc_job->start ();
-        rc_job->wait ();
+
+        try {
+
+          rc_job->start ();
+          while (! rc_job->wait (10)) {
+            progress.set (get_progress ());
+          }
+
+        } catch (...) {
+          rc_job->terminate ();
+          throw;
+        }
+
       }
 
     }
 
   } else {
 
-    for (db::Layout::bottom_up_const_iterator bu = mp_subject_layout->begin_bottom_up (); bu != mp_subject_layout->end_bottom_up (); ++bu) {
+    try {
 
-      typename local_processor_contexts<TS, TI, TR>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
-      if (cpc != contexts.context_map ().end ()) {
-        cpc->second.compute_results (contexts, cpc->first, op, output_layer, this);
-        contexts.context_map ().erase (cpc);
+      mp_progress = &progress;
+
+      for (db::Layout::bottom_up_const_iterator bu = mp_subject_layout->begin_bottom_up (); bu != mp_subject_layout->end_bottom_up (); ++bu) {
+
+        typename local_processor_contexts<TS, TI, TR>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
+        if (cpc != contexts.context_map ().end ()) {
+          cpc->second.compute_results (contexts, cpc->first, op, output_layer, this);
+          contexts.context_map ().erase (cpc);
+        }
+
       }
 
+      mp_progress = 0;
+
+    } catch (...) {
+      mp_progress = 0;
+      throw;
     }
 
   }

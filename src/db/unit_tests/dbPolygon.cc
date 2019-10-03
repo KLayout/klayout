@@ -79,6 +79,8 @@ TEST(1)
   b = p.box ();
   EXPECT_EQ (p.holes (), size_t (0));
   EXPECT_EQ (p.area (), 1000*100);
+  EXPECT_EQ (p.area2 (), 2*1000*100);
+  EXPECT_EQ (tl::to_string (p.area_ratio ()), "1");
   EXPECT_EQ (p.perimeter (), db::Polygon::perimeter_type (2200));
   EXPECT_EQ (p.is_box (), true);
 
@@ -103,6 +105,8 @@ TEST(1)
   EXPECT_EQ (ip.vertices (), size_t (12));
 
   EXPECT_EQ (p.area (), 1000*100-2*380*80);
+  EXPECT_EQ (p.area2 (), 2*(1000*100-2*380*80));
+  EXPECT_EQ (tl::to_string (p.area_ratio (), 6), "2.55102");
   EXPECT_EQ (p.perimeter (), db::Polygon::perimeter_type (2000+200+4*(380+80)));
   EXPECT_EQ (p.is_box (), false);
   EXPECT_EQ (p.box (), b);
@@ -121,6 +125,7 @@ TEST(1)
   pp.insert_hole (c2.begin (), c2.end ());
   pp.assign_hull (c1.begin (), c1.end ());
   EXPECT_EQ (pp.area (), 1000*100-2*380*80);
+  EXPECT_EQ (pp.area2 (), 2*(1000*100-2*380*80));
   EXPECT_EQ (pp.box (), b);
 
   EXPECT_EQ (p, pp);
@@ -163,6 +168,8 @@ TEST(2)
   b = p.box ();
   EXPECT_EQ (p.holes (), size_t (0));
   EXPECT_EQ (p.area (), 1000*100);
+  EXPECT_EQ (p.area2 (), 2*1000*100);
+  EXPECT_EQ (tl::to_string (p.area_ratio ()), "1");
   EXPECT_EQ (p.perimeter (), db::SimplePolygon::perimeter_type (2000+200));
   EXPECT_EQ (p.is_box (), true);
 
@@ -460,8 +467,11 @@ TEST(5)
   }
 
   EXPECT_EQ (p.area (), 100*1000-10*100);
+  EXPECT_EQ (p.area2 (), 2*(100*1000-10*100));
+  EXPECT_EQ (tl::to_string (p.area_ratio (), 6), "1.0101");
   EXPECT_EQ (p.perimeter (), db::Polygon::perimeter_type (200+2000+20+200));
   EXPECT_EQ (pref.area (), 100*1000-10*100);
+  EXPECT_EQ (pref.area2 (), 2*(100*1000-10*100));
   EXPECT_EQ (pref.perimeter (), db::Polygon::perimeter_type (200+2000+20+200));
 
 }

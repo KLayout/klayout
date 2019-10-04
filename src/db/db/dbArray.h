@@ -417,6 +417,19 @@ struct regular_array
         ab_coord (b.p2 ())
       };
 
+      //  NOTE: we need to take some care we don't overiterate in case of vanishing row
+      //  or column vectors. Hence eff_amax and eff_bmax which are 1 in this case.
+
+      unsigned long eff_amax = m_amax;
+      if (m_a.equal (vector_type ())) {
+        eff_amax = 1;
+      }
+
+      unsigned long eff_bmax = m_bmax;
+      if (m_b.equal (vector_type ())) {
+        eff_bmax = 1;
+      }
+
       double amin = ab [0].first;
       double amax = ab [0].first;
       double bmin = ab [0].second;
@@ -436,8 +449,8 @@ struct regular_array
         } else {
           amini = (unsigned long) (amin + 1.0 - epsilon);
         }
-        if (amini > m_amax) {
-          amini = m_amax;
+        if (amini > eff_amax) {
+          amini = eff_amax;
         }
       }
          
@@ -448,8 +461,8 @@ struct regular_array
         } else {
           amaxi = (unsigned long) (amax + epsilon) + 1;
         }
-        if (amaxi > m_amax) {
-          amaxi = m_amax;
+        if (amaxi > eff_amax) {
+          amaxi = eff_amax;
         }
       }
 
@@ -460,8 +473,8 @@ struct regular_array
         } else {
           bmini = (unsigned long) (bmin + 1.0 - epsilon);
         }
-        if (bmini > m_bmax) {
-          bmini = m_bmax;
+        if (bmini > eff_bmax) {
+          bmini = eff_bmax;
         }
       }
          
@@ -472,8 +485,8 @@ struct regular_array
         } else {
           bmaxi = (unsigned long) (bmax + epsilon) + 1;
         }
-        if (bmaxi > m_bmax) {
-          bmaxi = m_bmax;
+        if (bmaxi > eff_bmax) {
+          bmaxi = eff_bmax;
         }
       }
       
@@ -590,16 +603,44 @@ protected:
   unsigned long m_amax, m_bmax;
   double m_det;
 
+  inline vector_type eff_a () const
+  {
+    if (m_a.equal (vector_type ())) {
+      if (m_b.equal (vector_type ())) {
+        return vector_type (1, 0);
+      } else {
+        return vector_type (m_b.y (), -m_b.x ());
+      }
+    } else {
+      return m_a;
+    }
+  }
+
+  inline vector_type eff_b () const
+  {
+    if (m_b.equal (vector_type ())) {
+      if (m_a.equal (vector_type ())) {
+        return vector_type (0, 1);
+      } else {
+        return vector_type (-m_a.y (), m_a.x ());
+      }
+    } else {
+      return m_b;
+    }
+  }
+
   std::pair <double, double> ab_coord (const point_type &p) const
   {
-    double a = (double (p.x ()) * double (m_b.y ()) - double (p.y ()) * double (m_b.x ())) / m_det;
-    double b = (double (m_a.x ()) * double (p.y ()) - double (m_a.y ()) * double (p.x ())) / m_det;
-    return std::make_pair (a, b);
+    vector_type a = eff_a (), b = eff_b ();
+    double ia = (double (p.x ()) * double (b.y ()) - double (p.y ()) * double (b.x ())) / m_det;
+    double ib = (double (a.x ()) * double (p.y ()) - double (a.y ()) * double (p.x ())) / m_det;
+    return std::make_pair (ia, ib);
   }
 
   void compute_det () 
   {
-    m_det = double (m_a.x ()) * double (m_b.y ()) - double (m_a.y ()) * double (m_b.x ());
+    vector_type a = eff_a (), b = eff_b ();
+    m_det = double (a.x ()) * double (b.y ()) - double (a.y ()) * double (b.x ());
   }
 };
 

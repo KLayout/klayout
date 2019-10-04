@@ -463,3 +463,23 @@ TEST(11)
   EXPECT_EQ (ba1cplx == ba2x3cplx, false);
 }
 
+TEST(12_1dArraysX)
+{
+  db::Vector a (0, 0);
+  db::Vector b (200, 0);
+  BoxArray ba (db::Box (10, 30, 30, 40), db::Trans (db::Vector (0, 0)), new db::regular_array<db::Coord> (a, b, 1, 3));
+
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin ()), "0,0;200,0;400,0");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (0, 0, 200, 100), MyBoxConvert ())), "0,0");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (0, 50, 200, 110), MyBoxConvert ())), "");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (0, 40, 200, 110), MyBoxConvert ())), "0,0");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (31, 40, 210, 130), MyBoxConvert ())), "200,0");
+
+  ba = BoxArray (db::Box (10, 30, 30, 40), db::Trans (db::Vector (0, 0)), new db::regular_array<db::Coord> (b, a, 3, 1));
+
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin ()), "0,0;200,0;400,0");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (0, 0, 200, 100), MyBoxConvert ())), "0,0");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (0, 50, 200, 110), MyBoxConvert ())), "");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (0, 40, 200, 110), MyBoxConvert ())), "0,0");
+  EXPECT_EQ (positions (ba, db::Point (0, 0), ba.begin_touching (db::Box (31, 40, 210, 130), MyBoxConvert ())), "200,0");
+}

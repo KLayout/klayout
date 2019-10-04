@@ -1,14 +1,15 @@
 
-source($lvs_test_source, "top")
+source($lvs_test_source, "RINGO")
 
 report_lvs($lvs_test_target_lvsdb, true)
 
 target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
 
-schematic("ringo.cir")
+# both INVX1 and INVX1B are the same schematic cell
+same_circuits("INVX1", "INVX1")
+same_circuits("INVX1B", "INVX1")
 
-# preempt configuration (see below)
-same_nets("top", "ENABLE", "RINGO", "ENABLE")
+schematic("ringo.cir")
 
 deep
 
@@ -70,11 +71,6 @@ connect_global(bulk, "SUBSTRATE")
 connect_global(ptie, "SUBSTRATE")
 
 # Compare section
-
-same_circuits("top", "RINGO")
-same_circuits("INV", "INVX1")
-same_circuits("DOESNOTEXIST", "DOESNOTEXIST2")
-same_nets("DOESNOTEXIST", "ENABLE", "DOESNOTEXIST2", "ENABLE")
 
 netlist.simplify
 

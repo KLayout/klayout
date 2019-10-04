@@ -8,6 +8,9 @@ target_netlist($lvs_test_target_cir, writer, "Extracted by KLayout")
 
 schematic("ringo.cir")
 
+# preempt configuration
+same_device_classes("PM", "PMOS")
+
 deep
 
 # Drawing layers
@@ -90,7 +93,6 @@ connect_global(ptie, "SUBSTRATE")
 
 netlist.simplify
 
-same_device_classes("PM", "PMOS")
 same_device_classes("NM", "NMOS")
 same_device_classes("PMHV", "PMOSHV")
 same_device_classes("NMHV", "NMOSHV")

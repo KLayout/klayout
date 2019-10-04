@@ -485,8 +485,16 @@ void Netlist::purge ()
 
     Circuit *circuit = c.operator-> ();
 
+    //  purge floating, disconnected nets
     circuit->purge_nets ();
-    if (circuit->begin_nets () == circuit->end_nets () && ! circuit->dont_purge ()) {
+
+    //  if only passive nets are left, consider this circuit for purging
+    bool purge_candidate = ! circuit->dont_purge ();
+    for (db::Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets () && purge_candidate; ++n) {
+      purge_candidate = n->is_passive ();
+    }
+
+    if (purge_candidate) {
 
       //  No nets left: delete the subcircuits that refer to us and finally delete the circuit
       while (circuit->begin_refs () != circuit->end_refs ()) {

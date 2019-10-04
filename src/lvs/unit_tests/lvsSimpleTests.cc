@@ -154,3 +154,9 @@ TEST(16_floating)
 {
   run_test (_this, "floating", "floating.gds", false, "TOP");
 }
+
+TEST(17_layout_variants)
+{
+  run_test (_this, "ringo_layout_var", "ringo_layout_var.gds");
+}
+

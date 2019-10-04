@@ -752,6 +752,7 @@ TEST(6_Net)
   EXPECT_EQ (n.pin_count (), size_t (0));
   EXPECT_EQ (n.terminal_count (), size_t (0));
   EXPECT_EQ (n.is_floating (), true);
+  EXPECT_EQ (n.is_passive (), true);
   EXPECT_EQ (n.is_internal (), false);
 }
 
@@ -781,6 +782,7 @@ TEST(7_NetTerminalsEditing)
   EXPECT_EQ (n1->terminal_count (), size_t (1));
   EXPECT_EQ (n1->pin_count (), size_t (0));
   EXPECT_EQ (n1->is_floating (), false);
+  EXPECT_EQ (n1->is_passive (), false);
   EXPECT_EQ (n1->is_internal (), false);
 
   d2->connect_terminal (1, n1);
@@ -789,6 +791,7 @@ TEST(7_NetTerminalsEditing)
   EXPECT_EQ (n1->terminal_count (), size_t (2));
   EXPECT_EQ (n1->pin_count (), size_t (0));
   EXPECT_EQ (n1->is_floating (), false);
+  EXPECT_EQ (n1->is_passive (), false);
   EXPECT_EQ (n1->is_internal (), true);
 
   EXPECT_EQ (d1->net_for_terminal (0), n1);
@@ -871,7 +874,8 @@ TEST(8_NetSubCircuitsEditing)
 
   EXPECT_EQ (n1->terminal_count (), size_t (0));
   EXPECT_EQ (n1->pin_count (), size_t (1));
-  EXPECT_EQ (n1->is_floating (), true);
+  EXPECT_EQ (n1->is_floating (), false);
+  EXPECT_EQ (n1->is_passive (), true);
   EXPECT_EQ (n1->is_internal (), false);
   EXPECT_NE (n1->pin_count (), size_t (0));
 
@@ -886,6 +890,7 @@ TEST(8_NetSubCircuitsEditing)
   EXPECT_EQ (n1->pin_count (), size_t (1));
   EXPECT_EQ (n1->subcircuit_pin_count (), size_t (1));
   EXPECT_EQ (n1->is_floating (), false);
+  EXPECT_EQ (n1->is_passive (), false);
   EXPECT_EQ (n1->is_internal (), false);
 
   sc2->connect_pin (1, n1);
@@ -1380,7 +1385,7 @@ TEST(22_BlankCircuit)
   nl2.purge ();
 
   EXPECT_EQ (nl2.to_string (),
-    "circuit RINGO (IN=(null),OSC=OSC,VSS=VSS,VDD=VDD);\n"
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
     "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
     "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
     "end;\n"

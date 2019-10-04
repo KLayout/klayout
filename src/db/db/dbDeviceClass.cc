@@ -136,13 +136,13 @@ bool AllDeviceParametersAreEqual::equal (const db::Device &a, const db::Device &
 //  DeviceClass class implementation
 
 DeviceClass::DeviceClass ()
-  : mp_netlist (0), m_strict (false)
+  : m_strict (false), mp_netlist (0)
 {
   // .. nothing yet ..
 }
 
 DeviceClass::DeviceClass (const DeviceClass &other)
-  : gsi::ObjectBase (other), tl::Object (other), tl::UniqueId (other), mp_netlist (0), m_strict (false)
+  : gsi::ObjectBase (other), tl::Object (other), tl::UniqueId (other), m_strict (false), mp_netlist (0)
 {
   operator= (other);
 }

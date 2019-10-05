@@ -142,7 +142,7 @@ struct test_type_func<__int128>
 {
   bool operator() (PyObject *rval, bool loose)
   {
-    return test_type<int> (rval, loose);
+    return test_type_func<int> () (rval, loose);
   }
 };
 #endif
@@ -582,7 +582,7 @@ struct c2python_func<unsigned long long>
 
 #if defined(HAVE_64BIT_COORD)
 template <>
-struct c2python_func<const __int128 &>
+struct c2python_func<__int128>
 {
   PyObject *operator() (const __int128 &c)
   {

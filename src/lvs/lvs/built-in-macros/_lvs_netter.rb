@@ -66,7 +66,6 @@ module LVS
       @lvs.generator = @engine._generator
 
       @l2n = @lvs
-      @comparer = RBA::NetlistComparer::new
 
     end
 
@@ -121,7 +120,9 @@ module LVS
 
       nl = _ensure_two_netlists
 
-      unmatched_a = @comparer.unmatched_circuits_a(*nl)
+      comparer = self._comparer 
+
+      unmatched_a = comparer.unmatched_circuits_a(*nl)
 
       # check whether we're about to flatten away the internal top cell - that's bad
       top_cell = l2n_data.internal_top_cell.name
@@ -136,7 +137,7 @@ module LVS
       end
 
       # flatten schematic circuits for which there is no corresponding layout cell
-      @comparer.unmatched_circuits_b(*nl).each do |c|
+      comparer.unmatched_circuits_b(*nl).each do |c|
         @engine.info("Flatten schematic circuit (no layout): #{c.name}")
         nl[1].flatten_circuit(c)
       end
@@ -162,12 +163,20 @@ module LVS
       nl = _ensure_two_netlists
       lvs_data.reference = nl[1]
 
+      lvs_data.compare(self._comparer)
+
+    end
+
+    def _comparer
+
+      comparer = RBA::NetlistComparer::new
+
       # execute the configuration commands
       @comparer_config.each do |cc|
-        cc.call
+        cc.call(comparer)
       end
 
-      lvs_data.compare(@comparer)
+      return comparer
 
     end
 
@@ -223,11 +232,11 @@ module LVS
         n.is_a?(String) || n.is_a?(RBA::Net) || raise("Net arguments of 'same_nets' must be strings or Net objects")
       end
 
-      @comparer_config << lambda { self._same_nets(ca, a, cb, b) }
+      @comparer_config << lambda { |comparer| self._same_nets(comparer, ca, a, cb, b) }
 
     end
 
-    def _same_nets(ca, a, cb, b)
+    def _same_nets(comparer, ca, a, cb, b)
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
@@ -258,7 +267,7 @@ module LVS
         end
 
         if net_a && net_b
-          @comparer.same_nets(net_a, net_b)
+          comparer.same_nets(net_a, net_b)
         end
 
       end
@@ -283,11 +292,11 @@ module LVS
 
       a.is_a?(String) || a == nil || b.is_a?(String) || b == nil || raise("Both arguments of 'same_circuits' need to be strings or nil")
 
-      @comparer_config << lambda { self._same_circuits(a, b) }
+      @comparer_config << lambda { |comparer| self._same_circuits(comparer, a, b) }
 
     end
 
-    def _same_circuits(a, b)
+    def _same_circuits(comparer, a, b)
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
@@ -295,7 +304,7 @@ module LVS
       circuit_b = b && nl_b.circuit_by_name(b)
 
       if circuit_a && circuit_b
-        @comparer.same_circuits(circuit_a, circuit_b)
+        comparer.same_circuits(circuit_a, circuit_b)
       end
       
     end
@@ -319,11 +328,11 @@ module LVS
 
       a.is_a?(String) || a == nil || b.is_a?(String) || b == nil || raise("Both arguments of 'same_device_classes' need to be strings or nil")
 
-      @comparer_config << lambda { self._same_device_classes(a, b) }
+      @comparer_config << lambda { |comparer| self._same_device_classes(comparer, a, b) }
 
     end
 
-    def _same_device_classes(a, b)
+    def _same_device_classes(comparer, a, b)
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
@@ -333,7 +342,7 @@ module LVS
       # NOTE: a device class is allowed to be missing in the reference netlist because the
       # device may simply not be used there.
       if dc_b
-        @comparer.same_device_classes(dc_a, dc_b)
+        comparer.same_device_classes(dc_a, dc_b)
       end
       
     end
@@ -371,11 +380,11 @@ module LVS
           raise("All pin arguments of 'equivalent_pins' need to be strings or numbers")
       end
 
-      @comparer_config << lambda { self._equivalent_pins(circuit, *pins) }
+      @comparer_config << lambda { |comparer| self._equivalent_pins(comparer, circuit, *pins) }
 
     end
 
-    def _equivalent_pins(circuit, *pins)
+    def _equivalent_pins(comparer, circuit, *pins)
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
@@ -394,7 +403,7 @@ module LVS
           pin.id
         end
 
-        @comparer.equivalent_pins(circuit_b, pin_ids_b)
+        comparer.equivalent_pins(circuit_b, pin_ids_b)
 
       end
       
@@ -459,7 +468,8 @@ module LVS
 
     def min_caps(value)
       lvs_data
-      @comparer.min_capacitance = value.to_f
+      v = value.to_f
+      @comparer_config << lambda { |comparer| comparer.min_capacitance = v }
     end
       
     # %LVS%
@@ -471,7 +481,8 @@ module LVS
 
     def max_res(value)
       lvs_data
-      @comparer.max_resistance = value.to_f
+      v = value.to_f
+      @comparer_config << lambda { |comparer| comparer.max_resistance = v }
     end
 
     # %LVS%
@@ -490,7 +501,8 @@ module LVS
 
     def max_depth(value)
       lvs_data
-      @comparer.max_depth = value.to_i
+      v = value.to_i
+      @comparer_config << lambda { |comparer| comparer.max_depth = v }
     end
 
     # @name max_branch_complexity
@@ -511,7 +523,8 @@ module LVS
  
     def max_branch_complexity(value)
       lvs_data
-      @comparer.max_branch_complexity = value.to_i
+      v = value.to_i
+      @comparer_config << lambda { |comparer| comparer.max_branch_complexity = v }
     end
 
   end

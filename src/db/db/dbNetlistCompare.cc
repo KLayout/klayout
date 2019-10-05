@@ -2224,39 +2224,39 @@ NetlistComparer::unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector
   //  we need to create a copy because this method is supposed to be const.
   db::CircuitCategorizer circuit_categorizer = *mp_circuit_categorizer;
 
-  std::map<size_t, std::pair<db::Circuit *, db::Circuit *> > cat2circuits;
+  std::map<size_t, std::pair<std::vector<db::Circuit *>, std::vector<db::Circuit *> > > cat2circuits;
 
   for (db::Netlist::circuit_iterator i = a->begin_circuits (); i != a->end_circuits (); ++i) {
     size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
     if (cat) {
-      cat2circuits[cat].first = i.operator-> ();
+      cat2circuits[cat].first.push_back (i.operator-> ());
     }
   }
 
   for (db::Netlist::circuit_iterator i = b->begin_circuits (); i != b->end_circuits (); ++i) {
     size_t cat = circuit_categorizer.cat_for_circuit (i.operator-> ());
     if (cat) {
-      cat2circuits[cat].second = i.operator-> ();
+      cat2circuits[cat].second.push_back (i.operator-> ());
     }
   }
 
   size_t na = 0, nb = 0;
-  for (std::map<size_t, std::pair<db::Circuit *, db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
-    if (! i->second.first) {
-      ++nb;
-    } else if (! i->second.second) {
-      ++na;
+  for (std::map<size_t, std::pair<std::vector<db::Circuit *>, std::vector<db::Circuit *> > >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
+    if (i->second.first.empty ()) {
+      nb += i->second.second.size ();
+    } else if (i->second.second.empty ()) {
+      na += i->second.first.size ();
     }
   }
 
   in_a.reserve (na);
   in_b.reserve (nb);
 
-  for (std::map<size_t, std::pair<db::Circuit *, db::Circuit *> >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
-    if (! i->second.first) {
-      in_b.push_back (i->second.second);
-    } else if (! i->second.second) {
-      in_a.push_back (i->second.first);
+  for (std::map<size_t, std::pair<std::vector<db::Circuit *>, std::vector<db::Circuit *> > >::const_iterator i = cat2circuits.begin (); i != cat2circuits.end (); ++i) {
+    if (i->second.first.empty ()) {
+      in_b.insert (in_b.end (), i->second.second.begin (), i->second.second.end ());
+    } else if (i->second.second.empty ()) {
+      in_a.insert (in_a.end (), i->second.first.begin (), i->second.first.end ());
     }
   }
 }

@@ -101,9 +101,11 @@ db::Connectivity NetlistDeviceExtractorMOS3Transistor::get_connectivity (const d
 
     //  The layer definition is diff, gate
     db::Connectivity conn;
+if (false) { // @@@
     //  collect all connected diffusion shapes
     conn.connect (sdiff, sdiff);
     conn.connect (ddiff, ddiff);
+} // @@@
     //  collect all connected gate shapes
     conn.connect (gate, gate);
     //  connect gate with diff to detect gate/diffusion boundary

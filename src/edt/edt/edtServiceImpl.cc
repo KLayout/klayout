@@ -365,53 +365,34 @@ PolygonService::do_mouse_click (const db::DPoint &p)
 void 
 PolygonService::do_finish_edit ()
 {
-  //  one point is reserved for the current one
-  if (m_points.size () < 4) {
-    throw tl::Exception (tl::to_string (QObject::tr ("A polygon must have at least 3 points")));
-  }
-  m_points.pop_back ();
-
-  deliver_shape (get_polygon (true /*compress*/));
+  deliver_shape (get_polygon ());
 }
 
 db::Polygon
-PolygonService::get_polygon (bool compress) const
+PolygonService::get_polygon () const
 {
   db::Polygon poly;
 
+  if (m_points.size () < 4) {
+    throw tl::Exception (tl::to_string (QObject::tr ("A polygon must have at least 3 points")));
+  }
+
   std::vector<db::Point> points_dbu;
-  points_dbu.reserve (m_points.size () + 1);
-  for (std::vector<db::DPoint>::const_iterator p = m_points.begin (); p != m_points.end (); ++p) {
+  points_dbu.reserve (m_points.size ());
+
+  //  one point is reserved for the current one
+  for (std::vector<db::DPoint>::const_iterator p = m_points.begin (); p + 1 != m_points.end (); ++p) {
     points_dbu.push_back (trans () * *p);
   }
   if (m_closure_set) {
     points_dbu.push_back (trans () * m_closure);
   }
 
-  if (compress) {
+  poly.assign_hull (points_dbu.begin (), points_dbu.end (), true, true /*remove reflected*/);
 
-    std::vector<db::Point>::iterator wp = points_dbu.begin ();
-
-    db::Point p0 = points_dbu.back ();
-
-    for (std::vector<db::Point>::const_iterator p = points_dbu.begin (); p != points_dbu.end (); ++p) {
-
-      db::Point p1 = *p;
-      db::Point p2 = (p + 1 == points_dbu.end () ? points_dbu [0] : p[1]);
-
-      if (db::vprod_sign (db::Vector (p0, p1), db::Vector (p1, p2)) != 0) {
-        *wp++ = p1;
-      }
-
-      p0 = p1;
-
-    }
-
-    points_dbu.erase (wp, points_dbu.end ());
-
+  if (poly.hull ().size () < 3) {
+    throw tl::Exception (tl::to_string (QObject::tr ("A polygon must have at least 3 effective points")));
   }
-
-  poly.assign_hull (points_dbu.begin (), points_dbu.end (), false);
 
   return poly;
 }

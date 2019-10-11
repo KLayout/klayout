@@ -571,7 +571,12 @@ void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape
     if (! trans.is_unity ()) {
       poly.transform (trans);
     }
-    target->insert (db::PolygonRef (poly, mp_layout->shape_repository ()));
+
+    //  NOTE: as this is a specialized receiver for the purpose of building region
+    //  representations we don't need empty polygons here
+    if (poly.area2 () > 0) {
+      target->insert (db::PolygonRef (poly, mp_layout->shape_repository ()));
+    }
 
   } else if (shape.is_text () && m_text_enlargement >= 0) {
 
@@ -598,12 +603,16 @@ void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape
 
 void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
-  target->insert (db::PolygonRef (db::Polygon (shape.transformed (trans)), mp_layout->shape_repository ()));
+  if (shape.area () > 0) {
+    target->insert (db::PolygonRef (db::Polygon (shape.transformed (trans)), mp_layout->shape_repository ()));
+  }
 }
 
 void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
-  target->insert (db::PolygonRef (shape.transformed (trans), mp_layout->shape_repository ()));
+  if (shape.area2 () > 0) {
+    target->insert (db::PolygonRef (shape.transformed (trans), mp_layout->shape_repository ()));
+  }
 }
 
 // ---------------------------------------------------------------------------------------------

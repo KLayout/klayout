@@ -184,6 +184,16 @@ struct simple_polygon_defs
     return poly->area ();
   }
 
+#if defined(HAVE_64BIT_COORD)
+  //  workaround for missing 128bit binding of GSI
+  static double area2 (const C *poly)
+#else
+  static area_type area2 (const C *poly)
+#endif
+  {
+    return poly->area2 ();
+  }
+
   static std::vector<tl::Variant> extract_rad (const C *sp)
   {
     db::polygon<coord_type> p, pnew;
@@ -512,6 +522,13 @@ struct simple_polygon_defs
     method_ext ("area", &area,
       "@brief Gets the area of the polygon\n"
       "The area is correct only if the polygon is not self-overlapping and the polygon is oriented clockwise."
+    ) +
+    method_ext ("area2", &area2,
+      "@brief Gets the double area of the polygon\n"
+      "This method is provided because the area for an integer-type polygon is a multiple of 1/2. "
+      "Hence the double area can be expresses precisely as an integer for these types.\n"
+      "\n"
+      "This method has been introduced in version 0.26.1\n"
     ) +
     method ("perimeter", &C::perimeter,
       "@brief Gets the perimeter of the polygon\n"
@@ -1022,6 +1039,16 @@ struct polygon_defs
     return poly->area ();
   }
 
+#if defined(HAVE_64BIT_COORD)
+  //  workaround for missing 128bit binding of GSI
+  static double area2 (const C *poly)
+#else
+  static area_type area2 (const C *poly)
+#endif
+  {
+    return poly->area2 ();
+  }
+
   static std::vector<tl::Variant> extract_rad (const C *p)
   {
     C pnew;
@@ -1491,6 +1518,13 @@ struct polygon_defs
       "@brief Gets the area of the polygon\n"
       "The area is correct only if the polygon is not self-overlapping and the polygon is oriented clockwise."
       "Orientation is ensured automatically in most cases.\n"
+    ) +
+    method_ext ("area2", &area2,
+      "@brief Gets the double area of the polygon\n"
+      "This method is provided because the area for an integer-type polygon is a multiple of 1/2. "
+      "Hence the double area can be expresses precisely as an integer for these types.\n"
+      "\n"
+      "This method has been introduced in version 0.26.1\n"
     ) +
     method ("perimeter", &C::perimeter,
       "@brief Gets the perimeter of the polygon\n"

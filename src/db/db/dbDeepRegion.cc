@@ -527,7 +527,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
 
   db::BoolAndOrNotLocalOperation op (and_op);
 
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), m_deep_layer.breakout_cells (), other->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (m_deep_layer.store ()->threads ());
   proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
@@ -1501,7 +1501,9 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&polygons.layout ()),
                                                                           const_cast<db::Cell *> (&polygons.initial_cell ()),
                                                                           other_deep ? &other_deep->deep_layer ().layout () : const_cast<db::Layout *> (&polygons.layout ()),
-                                                                          other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&polygons.initial_cell ()));
+                                                                          other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&polygons.initial_cell ()),
+                                                                          m_deep_layer.breakout_cells (),
+                                                                          other_deep ? other_deep->deep_layer ().breakout_cells () : 0);
 
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (polygons.store ()->threads ());
@@ -1892,7 +1894,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
 
   db::InteractingLocalOperation op (mode, touching, inverse);
 
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell ());
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (polygons.store ()->threads ());
   if (split_after) {
@@ -1929,7 +1931,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) cons
 
   db::InteractingWithEdgeLocalOperation op (inverse);
 
-  db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (polygons.store ()->threads ());
   if (split_after) {
@@ -1968,7 +1970,7 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
 
   db::PullLocalOperation op (mode, touching);
 
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell ());
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (polygons.store ()->threads ());
   if (split_after) {
@@ -2004,7 +2006,7 @@ DeepRegion::pull_generic (const Edges &other) const
 
   db::PullWithEdgeLocalOperation op;
 
-  db::local_processor<db::PolygonRef, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_edges.layout (), &other_edges.initial_cell ());
+  db::local_processor<db::PolygonRef, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_edges.layout (), &other_edges.initial_cell (), polygons.breakout_cells (), other_edges.breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (polygons.store ()->threads ());
   proc.run (&op, polygons.layer (), other_edges.layer (), dl_out.layer ());

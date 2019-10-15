@@ -22,9 +22,77 @@
 
 #include "gsiDecl.h"
 #include "dbDeepShapeStore.h"
+#include "tlGlobPattern.h"
 
 namespace gsi
 {
+
+static void set_or_add_breakout_cells (db::DeepShapeStore *dss, const std::string &pattern, bool add, unsigned int layout_index = std::numeric_limits<unsigned int>::max ())
+{
+  //  set or add for all
+  if (layout_index == std::numeric_limits<unsigned int>::max ()) {
+    for (unsigned int l = 0; l < dss->layouts (); ++l) {
+      set_or_add_breakout_cells (dss, pattern, add, l);
+    }
+    return;
+  }
+
+  std::set<db::cell_index_type> cc;
+
+  if (! pattern.empty ()) {
+    tl::GlobPattern p (pattern);
+    const db::Layout &ly = dss->layout (layout_index);
+    for (db::Layout::const_iterator ci = ly.begin (); ci != ly.end (); ++ci) {
+      if (p.match (ly.cell_name (ci->cell_index ()))) {
+        cc.insert (ci->cell_index ());
+      }
+    }
+  }
+
+  if (! add) {
+    dss->clear_breakout_cells (layout_index);
+  }
+  if (! cc.empty ()) {
+    dss->add_breakout_cells (layout_index, cc);
+  }
+}
+
+static void clear_breakout_cells (db::DeepShapeStore *dss)
+{
+  set_or_add_breakout_cells (dss, std::string (), false);
+}
+
+static void set_breakout_cells (db::DeepShapeStore *dss, unsigned int layout_index, const std::vector<db::cell_index_type> &cc)
+{
+  std::set<db::cell_index_type> cs (cc.begin (), cc.end ());
+  dss->set_breakout_cells (layout_index, cs);
+}
+
+static void set_breakout_cells2 (db::DeepShapeStore *dss, unsigned int layout_index, const std::string &pattern)
+{
+  set_or_add_breakout_cells (dss, pattern, false, layout_index);
+}
+
+static void set_breakout_cells3 (db::DeepShapeStore *dss, const std::string &pattern)
+{
+  set_or_add_breakout_cells (dss, pattern, false);
+}
+
+static void add_breakout_cells (db::DeepShapeStore *dss, unsigned int layout_index, const std::vector<db::cell_index_type> &cc)
+{
+  std::set<db::cell_index_type> cs (cc.begin (), cc.end ());
+  dss->add_breakout_cells (layout_index, cs);
+}
+
+static void add_breakout_cells2 (db::DeepShapeStore *dss, unsigned int layout_index, const std::string &pattern)
+{
+  set_or_add_breakout_cells (dss, pattern, true, layout_index);
+}
+
+static void add_breakout_cells3 (db::DeepShapeStore *dss, const std::string &pattern)
+{
+  set_or_add_breakout_cells (dss, pattern, true);
+}
 
 Class<db::DeepShapeStore> decl_dbDeepShapeStore ("db", "DeepShapeStore",
   gsi::method ("instance_count", &db::DeepShapeStore::instance_count,
@@ -84,6 +152,82 @@ Class<db::DeepShapeStore> decl_dbDeepShapeStore ("db", "DeepShapeStore",
   ) +
   gsi::method ("text_enlargement", &db::DeepShapeStore::text_enlargement,
     "@brief Gets the text enlargement value.\n"
+  ) +
+  gsi::method ("clear_breakout_cells", &db::DeepShapeStore::clear_breakout_cells, gsi::arg ("layout_index"),
+    "@brief Clears the breakout cells\n"
+    "Breakout cells are a feature by which hierarchy handling can be disabled for specific cells. "
+    "If cells are specified as breakout cells, they don't interact with neighbor or parent cells, hence "
+    "are virtually isolated. Breakout cells are useful to shortcut hierarchy evaluation for cells which "
+    "are otherwise difficult to handle. An example are memory array cells with overlaps to their neighbors: "
+    "a precise handling of such cells would generate variants and the boundary of the array. Although precise, "
+    "this behavior leads to partial flattening and propagation of shapes. In consequence, this will also "
+    "result in wrong device detection in LVS applications. In such cases, these array cells can be declared "
+    "'breakout cells' which makes them isolated entities and variant generation does not happen.\n"
+    "\n"
+    "See also \\set_breakout_cells and \\add_breakout_cells.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method_ext ("clear_breakout_cells", &clear_breakout_cells,
+    "@brief Clears the breakout cells\n"
+    "See the other variant of \\clear_breakout_cells for details.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method_ext ("set_breakout_cells", &set_breakout_cells, gsi::arg ("layout_index"), gsi::arg ("cells"),
+    "@brief Sets the breakout cell list (as cell indexes) for the given layout inside the store\n"
+    "See \\clear_breakout_cells for an explanation of breakout cells.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method_ext ("set_breakout_cells", &set_breakout_cells2, gsi::arg ("layout_index"), gsi::arg ("pattern"),
+    "@brief Sets the breakout cell list (as cell name pattern) for the given layout inside the store\n"
+    "See \\clear_breakout_cells for an explanation of breakout cells.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method_ext ("set_breakout_cells", &set_breakout_cells3, gsi::arg ("pattern"),
+    "@brief Sets the breakout cell list (as cell name pattern) for the all layouts inside the store\n"
+    "See \\clear_breakout_cells for an explanation of breakout cells.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method_ext ("add_breakout_cells", &add_breakout_cells, gsi::arg ("layout_index"), gsi::arg ("cells"),
+    "@brief Adds cell indexes to the breakout cell list for the given layout inside the store\n"
+    "See \\clear_breakout_cells for an explanation of breakout cells.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method_ext ("add_breakout_cell", &add_breakout_cells, gsi::arg ("layout_index"), gsi::arg ("cell_index"),
+    "@brief Adds a cell indexe to the breakout cell list for the given layout inside the store\n"
+    "See \\clear_breakout_cells for an explanation of breakout cells.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method_ext ("add_breakout_cells", &add_breakout_cells2, gsi::arg ("layout_index"), gsi::arg ("pattern"),
+    "@brief Adds cells (given by a cell name pattern) to the breakout cell list for the given layout inside the store\n"
+    "See \\clear_breakout_cells for an explanation of breakout cells.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method_ext ("add_breakout_cells", &add_breakout_cells3, gsi::arg ("pattern"),
+    "@brief Adds cells (given by a cell name pattern) to the breakout cell list to all layouts inside the store\n"
+    "See \\clear_breakout_cells for an explanation of breakout cells.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method ("push_state", &db::DeepShapeStore::push_state,
+    "@brief Pushes the store's state on the state state\n"
+    "This will save the stores state (\\threads, \\max_vertex_count, \\max_area_ratio, breakout cells ...) on "
+    "the state stack. \\pop_state can be used to restore the state.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
+  ) +
+  gsi::method ("pop_state", &db::DeepShapeStore::pop_state,
+    "@brief Restores the store's state on the state state\n"
+    "This will restore the state pushed by \\push_state.\n"
+    "\n"
+    "This method has been added in version 0.26.1\n"
   ),
   "@brief An opaque layout heap for the deep region processor\n"
   "\n"

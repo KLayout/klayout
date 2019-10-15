@@ -35,6 +35,8 @@
 #include "tlGlobPattern.h"
 
 #include <memory>
+#include <vector>
+#include <set>
 
 namespace gsi
 {
@@ -801,7 +803,7 @@ Class<db::Region> decl_Region ("db", "Region",
     "See \\strict_handling= for a description of this attribute.\n"
     "\n"
     "This method has been introduced in version 0.23.2."
-  ) + 
+  ) +
   method ("min_coherence=", &db::Region::set_min_coherence, gsi::arg ("f"),
     "@brief Enable or disable minimum coherence\n"
     "If minimum coherence is set, the merge operations (explicit merge with \\merge or\n"

@@ -1117,11 +1117,11 @@ void hier_clusters<T>::clear ()
 
 template <class T>
 void
-hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
+hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
 {
   clear ();
   cell_clusters_box_converter<T> cbc (layout, *this);
-  do_build (cbc, layout, cell, shape_flags, conn, attr_equivalence);
+  do_build (cbc, layout, cell, shape_flags, conn, attr_equivalence, breakout_cells);
 }
 
 namespace
@@ -1793,7 +1793,7 @@ hier_clusters<T>::make_path (const db::Layout &layout, const db::Cell &cell, siz
 
 template <class T>
 void
-hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence)
+hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn, const tl::equivalence_clusters<unsigned int> *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
 {
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Computing shape clusters")));
 
@@ -1835,7 +1835,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
           todo.push_back (*c);
         } else {
           tl_assert (! todo.empty ());
-          build_hier_connections_for_cells (cbc, layout, todo, conn, progress);
+          build_hier_connections_for_cells (cbc, layout, todo, conn, breakout_cells, progress);
           done.insert (todo.begin (), todo.end ());
           todo.clear ();
           todo.push_back (*c);
@@ -1845,7 +1845,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
 
     }
 
-    build_hier_connections_for_cells (cbc, layout, todo, conn, progress);
+    build_hier_connections_for_cells (cbc, layout, todo, conn, breakout_cells, progress);
   }
 }
 
@@ -1865,10 +1865,10 @@ hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell 
 
 template <class T>
 void
-hier_clusters<T>::build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, tl::RelativeProgress &progress)
+hier_clusters<T>::build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells, tl::RelativeProgress &progress)
 {
   for (std::vector<db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
-    build_hier_connections (cbc, layout, layout.cell (*c), conn);
+    build_hier_connections (cbc, layout, layout.cell (*c), conn, breakout_cells);
     ++progress;
   }
 }
@@ -1950,9 +1950,14 @@ private:
 
 }
 
+static bool is_breakout_cell (const std::set<db::cell_index_type> *breakout_cells, db::cell_index_type ci)
+{
+  return breakout_cells && breakout_cells->find (ci) != breakout_cells->end ();
+}
+
 template <class T>
 void
-hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn)
+hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells)
 {
   std::string msg = tl::to_string (tr ("Computing hierarchical clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
   if (tl::verbosity () >= m_base_verbosity + 20) {
@@ -1992,7 +1997,9 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     db::box_scanner<db::Instance, unsigned int> bs (true, desc);
 
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
-      bs.insert (inst.operator-> (), 0);
+      if (! is_breakout_cell (breakout_cells, inst->cell_index ())) {
+        bs.insert (inst.operator-> (), 0);
+      }
     }
 
     bs.process (*rec, 1 /*touching*/, cibc);
@@ -2026,7 +2033,9 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     }
 
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
-      bs2.insert2 (inst.operator-> (), 0);
+      if (! is_breakout_cell (breakout_cells, inst->cell_index ())) {
+        bs2.insert2 (inst.operator-> (), 0);
+      }
     }
 
     bs2.process (*rec, 1 /*touching*/, local_cluster_box_convert<T> (), cibc);

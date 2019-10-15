@@ -75,7 +75,7 @@ std::string NetlistDeviceExtractorError::to_string () const
 //  NetlistDeviceExtractor implementation
 
 NetlistDeviceExtractor::NetlistDeviceExtractor (const std::string &name)
-  : mp_layout (0), m_cell_index (0), m_device_scaling (1.0), mp_circuit (0)
+  : mp_layout (0), m_cell_index (0), mp_breakout_cells (0), m_device_scaling (1.0), mp_circuit (0)
 {
   m_name = name;
   m_terminal_id_propname_id = 0;
@@ -184,13 +184,13 @@ void NetlistDeviceExtractor::extract (db::DeepShapeStore &dss, unsigned int layo
 
   }
 
-  extract_without_initialize (dss.layout (layout_index), dss.initial_cell (layout_index), clusters, layers, device_scaling);
+  extract_without_initialize (dss.layout (layout_index), dss.initial_cell (layout_index), clusters, layers, device_scaling, dss.breakout_cells (layout_index));
 }
 
-void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl, hier_clusters_type &clusters, double device_scaling)
+void NetlistDeviceExtractor::extract (db::Layout &layout, db::Cell &cell, const std::vector<unsigned int> &layers, db::Netlist *nl, hier_clusters_type &clusters, double device_scaling, const std::set<db::cell_index_type> *breakout_cells)
 {
   initialize (nl);
-  extract_without_initialize (layout, cell, clusters, layers, device_scaling);
+  extract_without_initialize (layout, cell, clusters, layers, device_scaling, breakout_cells);
 }
 
 namespace {
@@ -203,7 +203,7 @@ struct ExtractorCacheValueType {
 
 }
 
-void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling)
+void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling, const std::set<db::cell_index_type> *breakout_cells)
 {
   tl_assert (layers.size () == m_layer_definitions.size ());
 
@@ -214,6 +214,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   m_layers = layers;
   mp_clusters = &clusters;
   m_device_scaling = device_scaling;
+  mp_breakout_cells = breakout_cells;
 
   //  terminal properties are kept in a property with the terminal_property_name name
   m_terminal_id_propname_id = mp_layout->properties_repository ().prop_name_id (terminal_id_property_name ());
@@ -246,7 +247,7 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
 
   db::Connectivity device_conn = get_connectivity (layout, layers);
   db::hier_clusters<shape_type> device_clusters;
-  device_clusters.build (layout, cell, shape_iter_flags, device_conn);
+  device_clusters.build (layout, cell, shape_iter_flags, device_conn, 0, breakout_cells);
 
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Extracting devices")));
 

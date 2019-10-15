@@ -1461,22 +1461,22 @@ CODE
         end
 
         # save the netlist if required
-        if @target_netlist_file && @netter && @netter.l2n_data
+        if @target_netlist_file && @netter && @netter._l2n_data
 
           writer = @target_netlist_format || RBA::NetlistSpiceWriter::new
 
           netlist_file = _make_path(@target_netlist_file)
           info("Writing netlist: #{netlist_file} ..")
-          self.netlist.write(netlist_file, writer, @target_netlist_comment || "")
+          netlist.write(netlist_file, writer, @target_netlist_comment || "")
 
         end
       
         # save the netlist database if requested
-        if @output_l2ndb_file && @netter && @netter.l2n_data
+        if @output_l2ndb_file && @netter && @netter._l2n_data
 
           l2ndb_file = _make_path(@output_l2ndb_file)
           info("Writing netlist database: #{l2ndb_file} ..")
-          @netter.l2n_data.write_l2n(l2ndb_file, !@output_l2ndb_long)
+          @netter._l2n_data.write_l2n(l2ndb_file, !@output_l2ndb_long)
 
         end
 
@@ -1484,7 +1484,7 @@ CODE
         _before_cleanup
       
         # show the data in the browser
-        if view && @show_l2ndb && @netter && @netter.l2n_data
+        if view && @show_l2ndb && @netter && @netter._l2n_data
 
           # NOTE: to prevent the netter destroying the database, we need to take it
           l2ndb = _take_data

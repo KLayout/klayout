@@ -94,6 +94,10 @@ module LVS
       data
     end
 
+    def _lvs_data
+      _l2n_data && @lvs
+    end
+
     # %LVS%
     # @name align
     # @brief Aligns the extracted netlist vs. the schematic

@@ -1120,6 +1120,108 @@ module DRC
       @def_source = layout.clip(*args)
       nil
     end
+
+    # %DRC%
+    # @name cheat 
+    # @brief Hierarchy cheats
+    # @synopsis cheat(args) { block }
+    #
+    # Hierarchy cheats can be used in deep mode to shortcut hierarchy evaluation
+    # for certain cells and consider their local configuration only.
+    # Cheats are useful for example when dealing with memory arrays. Often
+    # such arrays are build from unit cells and those often overlap with their
+    # neighbors. Now, if the hierarchical engine encounters such a situation, it
+    # will first analyse all these interactions (which can be expensive) and then
+    # it may come to the conclusion that boundary instances need to be handled
+    # differently than inside instances. This in turn might lead to propagation of
+    # shapes and in an LVS context to device externalisation: because some devices
+    # might have different parameters for boundary cells than for inside cells, the
+    # device instances can no longer be kept inside the unit cell. Specifically for
+    # memory arrays, this is not desired as eventually this leads to flattening
+    # of the whole array. 
+    #
+    # The solution is to cheat: provided the unit cell is fully fledged and neighbors
+    # do not disturb the unit cell's configuration in critical ways, the unit cell 
+    # can be treated as being isolated and results are put together in the usual way.
+    #
+    # Cheats can be applied on layout operations - specifically booleans - and device
+    # extraction operations. Cheats are only effective in \deep mode.
+    #
+    # For booleans, a cheat means that the cheating cell's boolean results are computed
+    # locally and are combined afterwards. A cheat is introduced this way:
+    #
+    # @code
+    # deep
+    # 
+    # l1 = input(1, 0)
+    # l2 = input(2, 0)
+    # 
+    # # usual booleans
+    # l1and2 = l1 & l2
+    #
+    # # will compute "UNIT_CELL" isolated and everything else in normal hierarchical mode:
+    # l1minus2 = cheat("UNIT_CELL) { l1 - l2 }
+    # @/code
+    #
+    # The cheat block can also be wrapped in do .. end statements and can return multiple
+    # layer objects:
+    #
+    # @code
+    # deep
+    # 
+    # l1 = input(1, 0)
+    # l2 = input(2, 0)
+    # 
+    # # computes both AND and NOT of l1 and l2 with cheating for "UNIT_CELL"
+    # l1and2, l1minus2 = cheat("UNIT_CELL) do
+    #   [ l1 & l2, l1 - l2 ]
+    # end
+    # @/code
+    #
+    # (Technically, the cheat code block is a Ruby Proc and cannot create variables
+    # outside it's scope. Hence the results of this code block have to be passed
+    # through the "cheat" method).
+    # 
+    # To apply cheats for device extraction, use the following scheme:
+    #
+    # @code
+    # deep
+    # 
+    # poly = input(1, 0)
+    # active = input(2, 0)
+    #
+    # sd = active - poly
+    # gate = active & poly
+    # 
+    # # device extraction with cheating for "UNIT_CELL":
+    # cheat("UNIT_CELL") do
+    #   extract_devices(mos3("NMOS"), { "SD" => sd, "G" => gate, "tS" => sd, "tD" => sd, "tG" => poly }
+    # end
+    # @/code
+    #
+    # The argument to the cheat method is a list of cell name pattern (glob-style
+    # pattern). For example:
+    #
+    # @code
+    # cheat("UNIT_CELL*") { ... }
+    # cheat("UNIT_CELL1", "UNIT_CELL2") { ... }
+    # cheat("UNIT_CELL{1,2}") { ... }
+    # @/code
+    #
+    # For LVS applications, it's usually sufficient to cheat in the device extraction step. 
+    # Cheats have been introduced in version 0.26.1.
+
+    def cheat(*args, &block)
+      if _dss
+        _dss.push_state
+        args.flatten.each { |a| _dss.add_breakout_cells(a.to_s) }
+        ret = block.call
+        _dss.pop_state
+      else
+        ret = block.call
+      end
+      ret
+    end
     
     # make some DRCLayer methods available as functions
     # for the engine

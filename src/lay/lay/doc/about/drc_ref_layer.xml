@@ -735,7 +735,7 @@ This method is available for edge layers. The argument must be a polygon layer.
 </ul>
 <p>
 This method selects all shapes or regions from self which touch or overlap shapes from the other
-region. If self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_interacting">select_interacting</a>.
@@ -1085,7 +1085,7 @@ The following image shows the effect of the "not_inside" method (input1: red, in
 </ul>
 <p>
 This method selects all shapes or regions from self which do not touch or overlap shapes from the other
-region. If self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_interacting">select_not_interacting</a>.
@@ -1134,7 +1134,7 @@ The following image shows the effect of the "not_outside" method (input1: red, i
 </ul>
 <p>
 This method selects all shapes or regions from self which do not overlap shapes from the other
-region. If self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 </p><p>
 The "not_overlapping" method is equivalent to the <a href="#outside">outside</a> method. It is provided
@@ -1322,7 +1322,7 @@ The following images show the effect of the overlap check (layer1: red, layer2: 
 </ul>
 <p>
 This method selects all shapes or regions from self which overlap shapes from the other
-region. If self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_overlapping">select_overlapping</a>.
@@ -1372,6 +1372,60 @@ parameter is 0, special edge pairs with an area of 0 will be dropped.
 <ul>
 <li><tt>layer.polygons?</tt></li>
 </ul>
+<h2>"pull_inside" - Selects shapes or regions of other which are inside polygons from the this region</h2>
+<keyword name="pull_inside"/>
+<a name="pull_inside"/><p>Usage:</p>
+<ul>
+<li><tt>layer.pull_inside(other)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from other which are inside polygons from this
+region. Unless other is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from other, 
+otherwise individual shapes are selected.
+</p><p>
+The functionality is similar to select_inside, but chosing shapes from other rather
+than from self. Because in deep mode the hierarchy reference comes from self, this method
+provides a way to pull shapes from other to the hierarchy to self.
+</p><p>
+This method is available for polygon layers. Other needs to be a polygon layer too.
+</p>
+<h2>"pull_interacting" - Selects shapes or edges of other which touch or overlap shapes from the this region</h2>
+<keyword name="pull_interacting"/>
+<a name="pull_interacting"/><p>Usage:</p>
+<ul>
+<li><tt>layer.pull_interacting(other)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from other which touch or overlap shapes from this
+region. Unless other is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from other, 
+otherwise individual shapes are selected.
+</p><p>
+The functionality is similar to select_interacting, but chosing shapes from other rather
+than from self. Because in deep mode the hierarchy reference comes from self, this method
+provides a way to pull shapes from other to the hierarchy to self.
+</p><p>
+This method will neither modify self nor other.
+</p><p>
+This method is available for polygon layers. Other can be an edge or polygon layer. 
+Edges or polygons can be selected with respect to polygons of self.
+</p>
+<h2>"pull_overlapping" - Selects shapes or regions of other which overlap shapes from the this region</h2>
+<keyword name="pull_overlapping"/>
+<a name="pull_overlapping"/><p>Usage:</p>
+<ul>
+<li><tt>layer.pull_overlapping(other)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from other which overlap shapes from this
+region. Unless other is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from other, 
+otherwise individual shapes are selected.
+</p><p>
+The functionality is similar to select_overlapping, but chosing shapes from other rather
+than from self. Because in deep mode the hierarchy reference comes from self, this method
+provides a way to pull shapes from other to the hierarchy to self.
+</p><p>
+This method is available for polygon layers. Other needs to be a polygon layer too.
+</p>
 <h2>"raw" - Marks a layer as raw</h2>
 <keyword name="raw"/>
 <a name="raw"/><p>Usage:</p>
@@ -1562,7 +1616,7 @@ This method is available for polygon layers.
 </ul>
 <p>
 This method selects all shapes or regions from self which touch or overlap shapes from the other
-region. If self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#interacting">interacting</a>.
@@ -1595,7 +1649,7 @@ This method is available for polygon layers.
 </ul>
 <p>
 This method selects all shapes or regions from self which do not touch or overlap shapes from the other
-region. If self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#not_interacting">not_interacting</a>.
@@ -1628,7 +1682,7 @@ This method is available for polygon layers.
 </ul>
 <p>
 This method selects all shapes or regions from self which do not overlap shapes from the other
-region. If self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected. 
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#not_overlapping">not_overlapping</a>.
@@ -1661,7 +1715,7 @@ This method is available for polygon layers.
 </ul>
 <p>
 This method selects all shapes or regions from self which overlap shapes from the other
-region. If self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#overlapping">overlapping</a>.

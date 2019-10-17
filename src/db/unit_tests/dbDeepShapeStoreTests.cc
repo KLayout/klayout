@@ -208,3 +208,16 @@ TEST(4_FlatAndEmptyInput)
   EXPECT_EQ ((dr1 - dr3).to_string (), "(0,0;0,1000;1000,1000;1000,0)");
 }
 
+TEST(5_State)
+{
+  db::DeepShapeStore store;
+
+  store.set_threads (4);
+  EXPECT_EQ (store.threads (), 4);
+  store.push_state ();
+  store.set_threads (2);
+  EXPECT_EQ (store.threads (), 2);
+  store.pop_state ();
+  EXPECT_EQ (store.threads (), 4);
+}
+

@@ -2108,3 +2108,198 @@ TEST(9_StrictDeviceExtraction)
 
   db::compare_layouts (_this, ly, au);
 }
+
+TEST(10_DeviceExtractionWithBreakoutCells)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int nwell      = define_layer (ly, lmap, 1);
+  unsigned int active     = define_layer (ly, lmap, 2);
+  unsigned int poly       = define_layer (ly, lmap, 3);
+  unsigned int poly_lbl   = define_layer (ly, lmap, 3, 1);
+  unsigned int diff_cont  = define_layer (ly, lmap, 4);
+  unsigned int poly_cont  = define_layer (ly, lmap, 5);
+  unsigned int metal1     = define_layer (ly, lmap, 6);
+  unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
+  unsigned int via1       = define_layer (ly, lmap, 7);
+  unsigned int metal2     = define_layer (ly, lmap, 8);
+  unsigned int metal2_lbl = define_layer (ly, lmap, 8, 1);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn = tl::combine_path (fn, "testdata");
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_l10.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region rnwell (db::RecursiveShapeIterator (ly, tc, nwell), dss);
+  db::Region ractive (db::RecursiveShapeIterator (ly, tc, active), dss);
+  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
+  db::Region rpoly_lbl (db::RecursiveShapeIterator (ly, tc, poly_lbl), dss);
+  db::Region rdiff_cont (db::RecursiveShapeIterator (ly, tc, diff_cont), dss);
+  db::Region rpoly_cont (db::RecursiveShapeIterator (ly, tc, poly_cont), dss);
+  db::Region rmetal1 (db::RecursiveShapeIterator (ly, tc, metal1), dss);
+  db::Region rmetal1_lbl (db::RecursiveShapeIterator (ly, tc, metal1_lbl), dss);
+  db::Region rvia1 (db::RecursiveShapeIterator (ly, tc, via1), dss);
+  db::Region rmetal2 (db::RecursiveShapeIterator (ly, tc, metal2), dss);
+  db::Region rmetal2_lbl (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss);
+
+  //  derived regions
+
+  db::Region rpactive = ractive & rnwell;
+  db::Region rpgate   = rpactive & rpoly;
+  db::Region rpsd     = rpactive - rpgate;
+
+  db::Region rnactive = ractive - rnwell;
+  db::Region rngate   = rnactive & rpoly;
+  db::Region rnsd     = rnactive - rngate;
+
+  //  return the computed layers into the original layout and write it for debugging purposes
+
+  unsigned int lpgate = ly.insert_layer (db::LayerProperties (20, 0));      // 20/0 -> P Gate
+  unsigned int lngate = ly.insert_layer (db::LayerProperties (21, 0));      // 21/0 -> N Gate
+  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (22, 0));      // 22/0 -> P Diffusion
+  unsigned int lndiff = ly.insert_layer (db::LayerProperties (23, 0));      // 23/0 -> N Diffusion
+
+  rpgate.insert_into (&ly, tc.cell_index (), lpgate);
+  rngate.insert_into (&ly, tc.cell_index (), lngate);
+  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
+  rnsd.insert_into (&ly, tc.cell_index (), lndiff);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::PolygonRef> cl;
+
+  db::NetlistDeviceExtractorMOS3Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS3Transistor nmos_ex ("NMOS");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dss.push_state ();
+  std::set<db::cell_index_type> boc;
+  boc.insert (dss.layout (0).cell_by_name ("INV").second);
+  dss.set_breakout_cells (0, boc);
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rpgate;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  pmos_ex.extract (dss, 0, dl, nl, cl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rngate;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  nmos_ex.extract (dss, 0, dl, nl, cl);
+
+  dss.pop_state ();
+
+  //  perform the net extraction
+
+  db::NetlistExtractor net_ex;
+
+  db::Connectivity conn;
+  //  Intra-layer
+  conn.connect (rpsd);
+  conn.connect (rnsd);
+  conn.connect (rpoly);
+  conn.connect (rdiff_cont);
+  conn.connect (rpoly_cont);
+  conn.connect (rmetal1);
+  conn.connect (rvia1);
+  conn.connect (rmetal2);
+  //  Inter-layer
+  conn.connect (rpsd,       rdiff_cont);
+  conn.connect (rnsd,       rdiff_cont);
+  conn.connect (rpoly,      rpoly_cont);
+  conn.connect (rpoly_cont, rmetal1);
+  conn.connect (rdiff_cont, rmetal1);
+  conn.connect (rmetal1,    rvia1);
+  conn.connect (rvia1,      rmetal2);
+  conn.connect (rpoly,      rpoly_lbl);     //  attaches labels
+  conn.connect (rmetal1,    rmetal1_lbl);   //  attaches labels
+  conn.connect (rmetal2,    rmetal2_lbl);   //  attaches labels
+
+  //  extract the nets
+
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
+
+  //  debug layers produced for nets
+  //    202/0 -> Active
+  //    203/0 -> Poly
+  //    204/0 -> Diffusion contacts
+  //    205/0 -> Poly contacts
+  //    206/0 -> Metal1
+  //    207/0 -> Via1
+  //    208/0 -> Metal2
+  //    210/0 -> N source/drain
+  //    211/0 -> P source/drain
+  std::map<unsigned int, unsigned int> dump_map;
+  dump_map [layer_of (rpsd)      ] = ly.insert_layer (db::LayerProperties (210, 0));
+  dump_map [layer_of (rnsd)      ] = ly.insert_layer (db::LayerProperties (211, 0));
+  dump_map [layer_of (rpoly)     ] = ly.insert_layer (db::LayerProperties (203, 0));
+  dump_map [layer_of (rdiff_cont)] = ly.insert_layer (db::LayerProperties (204, 0));
+  dump_map [layer_of (rpoly_cont)] = ly.insert_layer (db::LayerProperties (205, 0));
+  dump_map [layer_of (rmetal1)   ] = ly.insert_layer (db::LayerProperties (206, 0));
+  dump_map [layer_of (rvia1)     ] = ly.insert_layer (db::LayerProperties (207, 0));
+  dump_map [layer_of (rmetal2)   ] = ly.insert_layer (db::LayerProperties (208, 0));
+
+  //  write nets to layout
+  db::CellMapping cm = dss.cell_mapping_to_original (0, &ly, tc.cell_index ());
+  dump_nets_to_layout (nl, cl, ly, dump_map, cm);
+
+  std::string nl_au_string =
+    "circuit INVCHAIN ();"
+    "  subcircuit INV3 $1 ($1=$9,$2=$7,$3=$8,$4=IN,$5=$9,$6=$6,$7=$2,$8=$6,$9=$4,$10=$3,$11=VDD,$12=VSS);"
+    "  subcircuit INV2 $2 ($1=$8,$2=$11,$3=$9,$4=$10,$5=$8,$6=$11,$7=$3,$8=OUT,$9=$3,$10=OUT,$11=$6,$12=$5,$13=VDD,$14=VSS);"
+    "  subcircuit INV $3 ($1=VSS,$2=VDD,$3=$11,$4=OUT,$5=$5,$6=$5,$7=$10,$8=$10);"
+    "end;"
+    "circuit INV2 ($1=$I16,$2=$I15,$3=$I14,$4=$I13,$5=$I12,$6=$I11,$7=$I10,$8=$I9,$9=$I8,$10=$I7,$11=$I6,$12=$I5,$13=$I4,$14=$I2);"
+    "  subcircuit INV $1 ($1=$I2,$2=$I4,$3=$I14,$4=$I6,$5=$I8,$6=$I10,$7=$I16,$8=$I12);"
+    "  subcircuit INV $2 ($1=$I2,$2=$I4,$3=$I13,$4=$I5,$5=$I7,$6=$I9,$7=$I15,$8=$I11);"
+    "end;"
+    "circuit INV ($1=$1,$2=$2,$3=$3,$4=$4,$5=$5,$6=$9,$7=$I8,$8=$I7);"
+    "  device PMOS $1 (S=$4,G=$3,D=$2) (L=0.25,W=0.95,AS=0.79325,AD=0.26125,PS=3.57,PD=1.5);"
+    "  device PMOS $2 (S=$2,G=$I8,D=$5) (L=0.25,W=0.95,AS=0.26125,AD=0.03325,PS=1.5,PD=1.97);"
+    "  device NMOS $3 (S=$4,G=$3,D=$1) (L=0.25,W=0.95,AS=0.79325,AD=0.26125,PS=3.57,PD=1.5);"
+    "  device NMOS $4 (S=$1,G=$I7,D=$9) (L=0.25,W=0.95,AS=0.26125,AD=0.03325,PS=1.5,PD=1.97);"
+    "  subcircuit TRANS $1 ($1=$4,$2=$1,$3=$3);"
+    "  subcircuit TRANS $2 ($1=$4,$2=$2,$3=$3);"
+    "end;"
+    "circuit TRANS ($1=$1,$2=$2,$3=$3);"
+    "end;"
+    "circuit INV3 ($1=$I17,$2=$I16,$3=$I15,$4=$I14,$5=$I12,$6=$I11,$7=$I9,$8=$I8,$9=$I7,$10=$I5,$11=$I4,$12=$I2);"
+    "  subcircuit INV $1 ($1=$I2,$2=$I4,$3=$I15,$4=$I5,$5=$I8,$6=$I11,$7=$I17,$8=$I12);"
+    "  subcircuit INV $2 ($1=$I2,$2=$I4,$3=$I14,$4=$I9,$5=$I7,$6=$I7,$7=$I16,$8=$I16);"
+    "  subcircuit INV $3 ($1=$I2,$2=$I4,$3=$I16,$4=$I7,$5=$I9,$6=$I9,$7=$I14,$8=$I14);"
+    "end;"
+  ;
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl, nl_au_string);
+
+  //  compare the collected test data
+
+  std::string au = tl::testsrc ();
+  au = tl::combine_path (au, "testdata");
+  au = tl::combine_path (au, "algo");
+  au = tl::combine_path (au, "device_extract_au10.gds");
+
+  db::compare_layouts (_this, ly, au);
+}

@@ -160,3 +160,8 @@ TEST(17_layout_variants)
   run_test (_this, "ringo_layout_var", "ringo_layout_var.gds");
 }
 
+TEST(18_cheats)
+{
+  run_test (_this, "invchain_cheat", "invchain_for_cheat.gds");
+}
+

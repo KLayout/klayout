@@ -1452,6 +1452,44 @@ TEST(25_Pull)
   }
 }
 
+TEST(26_BreakoutCells)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l26.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  dss.add_breakout_cell (0, ly.cell_by_name ("CHILD").second);
+
+  db::Region r12 = r1 & r2;
+  db::Region r1m2 = r1 - r2;
+  db::Region r21 = r2 & r1;
+  db::Region r2m1 = r2 - r1;
+
+  ly.insert (top_cell.cell_index (), ly.get_layer (db::LayerProperties (100, 0)), r12);
+  ly.insert (top_cell.cell_index (), ly.get_layer (db::LayerProperties (101, 0)), r1m2);
+  ly.insert (top_cell.cell_index (), ly.get_layer (db::LayerProperties (102, 0)), r21);
+  ly.insert (top_cell.cell_index (), ly.get_layer (db::LayerProperties (103, 0)), r2m1);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au26.gds");
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

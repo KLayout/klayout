@@ -1181,28 +1181,33 @@ public:
     db::ICplxTrans t2 = i2->complex_trans ();
     db::ICplxTrans t21 = t1.inverted () * t2;
 
-    std::list<std::pair<ClusterInstance, ClusterInstance> > *ic = 0;
-    db::ICplxTrans ic_trans;
-
     InstanceToInstanceInteraction ii_key (i1->cell_index (), i2->cell_index (), t21);
 
     instance_interaction_cache_type::iterator ii = mp_instance_interaction_cache->find (ii_key);
     if (ii != mp_instance_interaction_cache->end ()) {
 
-      ic = &ii->second.second;
-      ic_trans = t1 * ii->second.first.inverted ();
+      db::ICplxTrans ic_trans = t1 * ii->second.first.inverted ();
+      connect_clusters (ii->second.second, &ic_trans, i1->prop_id (), i2->prop_id ());
 
     } else {
 
-      ic = &mp_instance_interaction_cache->insert (std::make_pair (ii_key, std::make_pair (t1, cluster_instance_pair_list_type ()))).first->second.second;
+      std::list<std::pair<ClusterInstance, ClusterInstance> > &ic = mp_instance_interaction_cache->insert (std::make_pair (ii_key, std::make_pair (t1, cluster_instance_pair_list_type ()))).first->second.second;
 
       std::vector<ClusterInstElement> p;
       db::ICplxTrans t;
-      add_pair (box_type::world (), *i1, p, t, *i2, p, t, *ic);
+      add_pair (box_type::world (), *i1, p, t, *i2, p, t, ic);
+
+#if 1
+      //  For debugging: ensures the instance properties are configured properly (important for cache consistency)
+      for (cluster_instance_pair_list_type::const_iterator i = ic.begin (); i != ic.end (); ++i) {
+        tl_assert (i->first.inst_prop_id () == i1->prop_id ());
+        tl_assert (i->second.inst_prop_id () == i2->prop_id ());
+      }
+#endif
+
+      connect_clusters (ic);
 
     }
-
-    connect_clusters (*ic, ic_trans);
   }
 
   /**
@@ -1526,7 +1531,7 @@ private:
             }
           }
 
-          connect_clusters (interacting_clusters, db::ICplxTrans ());
+          connect_clusters (interacting_clusters);
 
           any = true;
 
@@ -1710,16 +1715,18 @@ private:
   /**
    *  @brief Establishes connections between the cluster instances listed in the argument
    */
-  void connect_clusters (const cluster_instance_pair_list_type &interacting_clusters, const db::ICplxTrans &ic_trans)
+  void connect_clusters (const cluster_instance_pair_list_type &interacting_clusters, const db::ICplxTrans *ic_trans = 0, db::properties_id_type prop_id1 = 0, db::properties_id_type prop_id2 = 0)
   {
     for (cluster_instance_pair_list_type::const_iterator ic = interacting_clusters.begin (); ic != interacting_clusters.end (); ++ic) {
 
       ClusterInstance k1 = ic->first;
       ClusterInstance k2 = ic->second;
 
-      if (! ic_trans.is_unity ()) {
-        k1.transform (ic_trans);
-        k2.transform (ic_trans);
+      if (ic_trans) {
+        k1.transform (*ic_trans);
+        k1.set_inst_prop_id (prop_id1);
+        k2.transform (*ic_trans);
+        k2.set_inst_prop_id (prop_id2);
       }
 
       id_type x1 = mp_cell_clusters->find_cluster_with_connection (k1);

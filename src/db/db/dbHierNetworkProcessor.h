@@ -611,6 +611,14 @@ public:
   }
 
   /**
+   *  @brief Sets the instance properties id
+   */
+  void set_inst_prop_id (db::properties_id_type pid)
+  {
+    m_inst_prop_id = pid;
+  }
+
+  /**
    *  @brief Transform with the given transformation
    */
   void transform (const db::ICplxTrans &tr)

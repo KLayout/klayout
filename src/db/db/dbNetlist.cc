@@ -380,6 +380,30 @@ void Netlist::purge_circuit (Circuit *circuit)
   remove_circuit (circuit);
 }
 
+void Netlist::flatten_circuits (const std::vector<Circuit *> &circuits)
+{
+  if (circuits.empty ()) {
+    return;
+  }
+
+  std::set<Circuit *> circuits_set (circuits.begin (), circuits.end ());
+
+  std::vector<Circuit *> to_flatten;
+  to_flatten.reserve (circuits.size ());
+
+  //  Before flatten, we sort top-down. This optimizes for the case of flattening away
+  //  some hierarchy above a certain circuit.
+  for (top_down_circuit_iterator c = begin_top_down (); c != end_top_down (); ++c) {
+    if (circuits_set.find (c.operator-> ()) != circuits_set.end ()) {
+      to_flatten.push_back (c.operator-> ());
+    }
+  }
+
+  for (std::vector<Circuit *>::const_iterator c = to_flatten.begin (); c != to_flatten.end (); ++c) {
+    flatten_circuit (*c);
+  }
+}
+
 void Netlist::flatten_circuit (Circuit *circuit)
 {
   tl_assert (circuit != 0);

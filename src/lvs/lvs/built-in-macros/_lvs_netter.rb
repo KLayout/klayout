@@ -137,14 +137,15 @@ module LVS
       # flatten layout cells for which there is no corresponding schematic circuit
       unmatched_a.each do |c|
         @engine.info("Flatten layout cell (no schematic): #{c.name}")
-        nl[0].flatten_circuit(c)
       end
+      nl[0].flatten_circuits(unmatched_a)
 
       # flatten schematic circuits for which there is no corresponding layout cell
-      comparer.unmatched_circuits_b(*nl).each do |c|
+      unmatched_b = comparer.unmatched_circuits_b(*nl)
+      unmatched_b.each do |c|
         @engine.info("Flatten schematic circuit (no layout): #{c.name}")
-        nl[1].flatten_circuit(c)
       end
+      nl[1].flatten_circuits(unmatched_b)
 
     end
 

@@ -32,7 +32,7 @@
 
 //  verbose debug output
 //  TODO: make this a feature?
-#define PRINT_DEBUG_NETCOMPARE
+// #define PRINT_DEBUG_NETCOMPARE
 
 //  verbose net graph output
 //  TODO: make this a feature?

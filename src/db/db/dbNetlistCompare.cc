@@ -32,7 +32,7 @@
 
 //  verbose debug output
 //  TODO: make this a feature?
-// #define PRINT_DEBUG_NETCOMPARE
+#define PRINT_DEBUG_NETCOMPARE
 
 //  verbose net graph output
 //  TODO: make this a feature?
@@ -1561,6 +1561,9 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
     if (tentative) {
 
       if (nodes.size () != other_nodes.size ()) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+        tl::info << indent(depth) << "! rejected branch.";
+#endif
         return std::numeric_limits<size_t>::max ();
       }
 
@@ -1568,6 +1571,9 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
       if (nodes.size () > 1 || other_nodes.size () > 1) {
         for (size_t i = 0; i < nodes.size (); ++i) {
           if (! (*nodes[i] == *other_nodes[i])) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+            tl::info << indent(depth) << "! rejected branch.";
+#endif
             return std::numeric_limits<size_t>::max ();
           }
         }
@@ -1582,6 +1588,9 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 
     if (bt_count == std::numeric_limits<size_t>::max ()) {
       if (tentative) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+        tl::info << indent(depth) << "! rejected branch.";
+#endif
         return bt_count;
       }
     } else {
@@ -1617,6 +1626,8 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
 #if defined(PRINT_DEBUG_NETCOMPARE)
   if (! tentative) {
     tl::info << indent(depth) << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+  } else {
+    tl::info << indent(depth) << "tentatively deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
   }
 #endif
 
@@ -1661,7 +1672,15 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
         ++ee_other;
       }
 
-      new_nodes += derive_node_identities_for_edges (e, ee, e_other, ee_other, net_index, other_net_index, depth, n_branch, tentative, with_ambiguous, data);
+      size_t bt_count = derive_node_identities_for_edges (e, ee, e_other, ee_other, net_index, other_net_index, depth, n_branch, tentative, with_ambiguous, data);
+      if (bt_count == std::numeric_limits<size_t>::max ()) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+        tl::info << indent(depth) << "! rejected pair.";
+#endif
+        return bt_count;
+      } else {
+        new_nodes += bt_count;
+      }
 
     }
 
@@ -1686,7 +1705,7 @@ namespace {
       bool operator() (const NetGraphNode *a, const NetGraphNode *b) const
       {
         tl_assert (a->net () && b->net ());
-        return a->net ()->name () < b->net ()->name ();
+        return name_compare (a->net ()->name (), b->net ()->name ()) < 0;
       }
   };
 
@@ -1747,7 +1766,7 @@ static bool net_names_are_different (const db::Net *a, const db::Net *b)
   if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
     return false;
   } else {
-    return (a->name () != b->name ());
+    return name_compare (a->name (), b->name ()) != 0;
   }
 }
 

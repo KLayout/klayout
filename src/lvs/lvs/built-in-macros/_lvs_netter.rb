@@ -472,7 +472,6 @@ module LVS
     # with a capacitance values below the given threshold (in Farad).
 
     def min_caps(value)
-      lvs_data
       v = value.to_f
       @comparer_config << lambda { |comparer| comparer.min_capacitance = v }
     end
@@ -485,7 +484,6 @@ module LVS
     # with a resistance value above the given threshold (in Farad).
 
     def max_res(value)
-      lvs_data
       v = value.to_f
       @comparer_config << lambda { |comparer| comparer.max_resistance = v }
     end
@@ -505,7 +503,6 @@ module LVS
     # as the seeds for this deduction path. The default value is 8. 
 
     def max_depth(value)
-      lvs_data
       v = value.to_i
       @comparer_config << lambda { |comparer| comparer.max_depth = v }
     end
@@ -527,7 +524,6 @@ module LVS
     # complexity.
  
     def max_branch_complexity(value)
-      lvs_data
       v = value.to_i
       @comparer_config << lambda { |comparer| comparer.max_branch_complexity = v }
     end

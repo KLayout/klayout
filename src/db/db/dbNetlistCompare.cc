@@ -2166,8 +2166,8 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
   m_cap_threshold = -1.0;   //  not set
   m_res_threshold = -1.0;   //  not set
 
-  m_max_depth = 8;
-  m_max_n_branch = 100;
+  m_max_depth = 50;
+  m_max_n_branch = 500;
 
   m_dont_consider_net_names = false;
 }

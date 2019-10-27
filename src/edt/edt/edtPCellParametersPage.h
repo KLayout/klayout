@@ -111,7 +111,7 @@ public:
   void set_parameters (const  std::vector<tl::Variant> &values);
 
 public slots:
-  void activated (int);
+  void activated ();
   void clicked ();
   
 private:

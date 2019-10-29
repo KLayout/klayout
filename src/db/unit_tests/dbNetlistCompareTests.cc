@@ -3003,3 +3003,251 @@ TEST(19_SymmetricCircuit)
   );
   EXPECT_EQ (good, true);
 }
+
+TEST(20_BusLikeConnections)
+{
+  //  Test test requires a certain depth and tests the backtracking paths.
+
+  const char *nls1 =
+    "circuit INV (IN=IN,OUT=OUT,VDD=VDD,VSS=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit INV8 (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I1 (IN=IN1,OUT=OUT1,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I2 (IN=IN2,OUT=OUT2,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I3 (IN=IN3,OUT=OUT3,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I4 (IN=IN4,OUT=OUT4,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I5 (IN=IN5,OUT=OUT5,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I6 (IN=IN6,OUT=OUT6,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I7 (IN=IN7,OUT=OUT7,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I8 (IN=IN8,OUT=OUT8,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+    "circuit INV8_WRAP (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV8 INV8 (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+    "circuit TOP (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV8_WRAP INV8 (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+  ;
+
+  const char *nls2 =
+    "circuit INV (OUT=OUT,IN=IN,VDD=VDD,VSS=VSS);\n"
+    "  device PMOS $1 (S=VDD,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "  device NMOS $2 (S=VSS,G=IN,D=OUT) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
+    "end;\n"
+    "circuit INV8 (Q1=Q1,A1=A1,Q2=Q2,A2=A2,Q3=Q3,A3=A3,Q4=Q4,A4=A4,Q5=Q5,A5=A5,Q6=Q6,A6=A6,Q7=Q7,A7=A7,Q8=Q8,A8=A8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I1 (OUT=Q1,IN=A1,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I8 (OUT=Q8,IN=A8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I3 (OUT=Q3,IN=A3,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I7 (OUT=Q7,IN=A7,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I4 (OUT=Q4,IN=A4,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I2 (OUT=Q2,IN=A2,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I6 (OUT=Q6,IN=A6,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV I5 (OUT=Q5,IN=A5,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+    "circuit INV8_WRAP (Q1=Q1,A1=A1,Q2=Q2,A2=A2,Q3=Q3,A3=A3,Q4=Q4,A4=A4,Q5=Q5,A5=A5,Q6=Q6,A6=A6,Q7=Q7,A7=A7,Q8=Q8,A8=A8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV8 INV8 (Q1=Q1,A1=A1,Q2=Q2,A2=A2,Q3=Q3,A3=A3,Q4=Q4,A4=A4,Q5=Q5,A5=A5,Q6=Q6,A6=A6,Q7=Q7,A7=A7,Q8=Q8,A8=A8,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+    "circuit TOP (Q1=Q1,A1=A1,Q2=Q2,A2=A2,Q3=Q3,A3=A3,Q4=Q4,A4=A4,Q5=Q5,A5=A5,Q6=Q6,A6=A6,Q7=Q7,A7=A7,Q8=Q8,A8=A8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV8_WRAP INV8 (Q1=Q1,A1=A1,Q2=Q2,A2=A2,Q3=Q3,A3=A3,Q4=Q4,A4=A4,Q5=Q5,A5=A5,Q6=Q6,A6=A6,Q7=Q7,A7=A7,Q8=Q8,A8=A8,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+  ;
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  std::string txt = logger.text ();
+
+  EXPECT_EQ (txt,
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_nets VSS VSS\n"
+    "match_pins IN IN\n"
+    "match_pins OUT OUT\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_devices $1 $1\n"
+    "match_devices $2 $2\n"
+    "end_circuit INV INV MATCH\n"
+    "begin_circuit INV8 INV8\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_ambiguous_nets IN1 A1\n"
+    "match_ambiguous_nets IN2 A2\n"
+    "match_ambiguous_nets IN3 A3\n"
+    "match_ambiguous_nets IN4 A4\n"
+    "match_ambiguous_nets IN5 A5\n"
+    "match_ambiguous_nets IN6 A6\n"
+    "match_ambiguous_nets IN7 A7\n"
+    "match_ambiguous_nets IN8 A8\n"
+    "match_nets OUT1 Q1\n"
+    "match_nets OUT2 Q2\n"
+    "match_nets OUT3 Q3\n"
+    "match_nets OUT4 Q4\n"
+    "match_nets OUT5 Q5\n"
+    "match_nets OUT6 Q6\n"
+    "match_nets OUT7 Q7\n"
+    "match_nets OUT8 Q8\n"
+    "match_pins IN1 A1\n"
+    "match_pins OUT1 Q1\n"
+    "match_pins IN2 A2\n"
+    "match_pins OUT2 Q2\n"
+    "match_pins IN3 A3\n"
+    "match_pins OUT3 Q3\n"
+    "match_pins IN4 A4\n"
+    "match_pins OUT4 Q4\n"
+    "match_pins IN5 A5\n"
+    "match_pins OUT5 Q5\n"
+    "match_pins IN6 A6\n"
+    "match_pins OUT6 Q6\n"
+    "match_pins IN7 A7\n"
+    "match_pins OUT7 Q7\n"
+    "match_pins IN8 A8\n"
+    "match_pins OUT8 Q8\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_subcircuits I1 I1\n"
+    "match_subcircuits I8 I8\n"
+    "match_subcircuits I3 I3\n"
+    "match_subcircuits I7 I7\n"
+    "match_subcircuits I4 I4\n"
+    "match_subcircuits I2 I2\n"
+    "match_subcircuits I6 I6\n"
+    "match_subcircuits I5 I5\n"
+    "end_circuit INV8 INV8 MATCH\n"
+    "begin_circuit INV8_WRAP INV8_WRAP\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets IN8 A8\n"
+    "match_nets OUT8 Q8\n"
+    "match_nets IN7 A7\n"
+    "match_nets OUT7 Q7\n"
+    "match_nets IN6 A6\n"
+    "match_nets OUT6 Q6\n"
+    "match_nets IN5 A5\n"
+    "match_nets OUT5 Q5\n"
+    "match_nets IN4 A4\n"
+    "match_nets OUT4 Q4\n"
+    "match_nets IN3 A3\n"
+    "match_nets OUT3 Q3\n"
+    "match_nets IN2 A2\n"
+    "match_nets OUT2 Q2\n"
+    "match_nets IN1 A1\n"
+    "match_nets OUT1 Q1\n"
+    "match_pins IN1 A1\n"
+    "match_pins OUT1 Q1\n"
+    "match_pins IN2 A2\n"
+    "match_pins OUT2 Q2\n"
+    "match_pins IN3 A3\n"
+    "match_pins OUT3 Q3\n"
+    "match_pins IN4 A4\n"
+    "match_pins OUT4 Q4\n"
+    "match_pins IN5 A5\n"
+    "match_pins OUT5 Q5\n"
+    "match_pins IN6 A6\n"
+    "match_pins OUT6 Q6\n"
+    "match_pins IN7 A7\n"
+    "match_pins OUT7 Q7\n"
+    "match_pins IN8 A8\n"
+    "match_pins OUT8 Q8\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_subcircuits INV8 INV8\n"
+    "end_circuit INV8_WRAP INV8_WRAP MATCH\n"
+    "begin_circuit TOP TOP\n"
+    "match_nets VSS VSS\n"
+    "match_nets VDD VDD\n"
+    "match_nets IN8 A8\n"
+    "match_nets OUT8 Q8\n"
+    "match_nets IN7 A7\n"
+    "match_nets OUT7 Q7\n"
+    "match_nets IN6 A6\n"
+    "match_nets OUT6 Q6\n"
+    "match_nets IN5 A5\n"
+    "match_nets OUT5 Q5\n"
+    "match_nets IN4 A4\n"
+    "match_nets OUT4 Q4\n"
+    "match_nets IN3 A3\n"
+    "match_nets OUT3 Q3\n"
+    "match_nets IN2 A2\n"
+    "match_nets OUT2 Q2\n"
+    "match_nets IN1 A1\n"
+    "match_nets OUT1 Q1\n"
+    "match_pins IN1 A1\n"
+    "match_pins OUT1 Q1\n"
+    "match_pins IN2 A2\n"
+    "match_pins OUT2 Q2\n"
+    "match_pins IN3 A3\n"
+    "match_pins OUT3 Q3\n"
+    "match_pins IN4 A4\n"
+    "match_pins OUT4 Q4\n"
+    "match_pins IN5 A5\n"
+    "match_pins OUT5 Q5\n"
+    "match_pins IN6 A6\n"
+    "match_pins OUT6 Q6\n"
+    "match_pins IN7 A7\n"
+    "match_pins OUT7 Q7\n"
+    "match_pins IN8 A8\n"
+    "match_pins OUT8 Q8\n"
+    "match_pins VDD VDD\n"
+    "match_pins VSS VSS\n"
+    "match_subcircuits INV8 INV8\n"
+    "end_circuit TOP TOP MATCH"
+  );
+  EXPECT_EQ (good, true);
+}
+
+TEST(21_BusLikeAmbiguousConnections)
+{
+  //  Test test requires a certain depth and tests the backtracking paths.
+
+  const char *nls1 =
+    "circuit INV8 (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    //  NOTE: passive nets make the pins ambiguous
+    "end;\n"
+    "circuit INV8_WRAP (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV8 INV8 (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+    "circuit TOP (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV8_WRAP INV8 (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+  ;
+
+  const char *nls2 =
+    "circuit INV8 (IN1=IN1,OUT1=OUT1,IN2=IN2,OUT2=OUT2,IN3=IN3,OUT3=OUT3,IN4=IN4,OUT4=OUT4,IN5=IN5,OUT5=OUT5,IN6=IN6,OUT6=OUT6,IN7=IN7,OUT7=OUT7,IN8=IN8,OUT8=OUT8,VDD=VDD,VSS=VSS);\n"
+    //  NOTE: passive nets make the pins ambiguous
+    "end;\n"
+    "circuit INV8_WRAP (Q1=Q1,A1=A1,Q2=Q2,A2=A2,Q3=Q3,A3=A3,Q4=Q4,A4=A4,Q5=Q5,A5=A5,Q6=Q6,A6=A6,Q7=Q7,A7=A7,Q8=Q8,A8=A8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV8 INV8 (IN1=A1,OUT1=Q1,IN2=A2,OUT2=Q2,IN3=A3,OUT3=Q3,IN4=A4,OUT4=Q4,IN5=A5,OUT5=Q5,IN6=A6,OUT6=Q6,IN7=A7,OUT7=Q7,IN8=A8,OUT8=Q8,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+    "circuit TOP (Q1=Q1,A1=A1,Q2=Q2,A2=A2,Q3=Q3,A3=A3,Q4=Q4,A4=A4,Q5=Q5,A5=A5,Q6=Q6,A6=A6,Q7=Q7,A7=A7,Q8=Q8,A8=A8,VDD=VDD,VSS=VSS);\n"
+    "  subcircuit INV8_WRAP INV8 (Q1=Q1,A1=A1,Q2=Q2,A2=A2,Q3=Q3,A3=A3,Q4=Q4,A4=A4,Q5=Q5,A5=A5,Q6=Q6,A6=A6,Q7=Q7,A7=A7,Q8=Q8,A8=A8,VDD=VDD,VSS=VSS);\n"
+    "end;\n"
+  ;
+
+  db::Netlist nl1, nl2;
+  prep_nl (nl1, nls1);
+  prep_nl (nl2, nls2);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+
+  bool good = comp.compare (&nl1, &nl2);
+
+  std::string txt = logger.text ();
+
+  EXPECT_EQ (txt,
+    ""
+  );
+  EXPECT_EQ (good, true);
+}
+

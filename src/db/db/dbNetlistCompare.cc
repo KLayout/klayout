@@ -660,12 +660,9 @@ public:
     std::string to_string () const
     {
       if (is_for_subcircuit ()) {
-        size_t pin_id1 = std::numeric_limits<size_t>::max () - m_id1;
-        size_t pin_id2 = m_id2;
         const db::SubCircuit *sc = subcircuit_pair ().first;
         const db::Circuit *c = sc->circuit_ref ();
-        return std::string ("X") + sc->expanded_name () + " " + c->name () + " "
-          + "(" + c->pin_by_id (pin_id1)->expanded_name () + ")->(" + c->pin_by_id (pin_id2)->expanded_name () + ")";
+        return std::string ("X") + sc->expanded_name () + " " + c->name ();
      } else {
         size_t term_id1 = m_id1;
         size_t term_id2 = m_id2;
@@ -854,7 +851,7 @@ std::string indent (size_t depth)
 {
   std::string s;
   for (size_t d = 0; d < depth; ++d) {
-    s += " ";
+    s += "|  ";
   }
   return s;
 }
@@ -1599,6 +1596,11 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 
   }
 
+#if defined(PRINT_DEBUG_NETCOMPARE)
+  if (! new_nodes) {
+    tl::info << indent(depth) << "! no updates.";
+  }
+#endif
   return new_nodes;
 }
 
@@ -1774,18 +1776,15 @@ size_t
 NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *> &nodes, std::vector<const NetGraphNode *> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool with_ambiguous, CompareData *data)
 {
 #if defined(PRINT_DEBUG_NETCOMPARE)
-  std::string indent;
-  for (size_t d = 0; d < depth; ++d) {
-    indent += " ";
-  }
-  indent += "*" + tl::to_string (n_branch) + " ";
+  std::string indent_s = indent (depth);
+  indent_s += "*" + tl::to_string (n_branch) + " ";
 #endif
 
   size_t new_nodes = 0;
 
   if (depth > data->max_depth) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
-    tl::info << indent << "max. depth exhausted (" << depth + 1 << ">" << data->max_depth << ")";
+    tl::info << indent_s << "max. depth exhausted (" << depth + 1 << ">" << data->max_depth << ")";
 #endif
     return std::numeric_limits<size_t>::max ();
   }
@@ -1803,7 +1802,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
       TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni);
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent << "deduced match (singular): " << nodes.front ()->net ()->expanded_name () << " vs. " << other_nodes.front ()->net ()->expanded_name ();
+      tl::info << indent_s << "deduced match (singular): " << nodes.front ()->net ()->expanded_name () << " vs. " << other_nodes.front ()->net ()->expanded_name ();
 #endif
       if (data->logger && ! tentative) {
         if (! (node (ni) == data->other->node (other_ni))) {
@@ -1948,7 +1947,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
         if (tentative && ! data->dont_consider_net_names && net_names_are_different ((*nr->n1)->net (), (*nr->n2)->net ())) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
-          tl::info << indent << "rejecting pair as names are not identical: " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
+          tl::info << indent_s << "rejecting pair as names are not identical: " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
 #endif
           return std::numeric_limits<size_t>::max ();
         }
@@ -1962,7 +1961,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
         TentativeNodeMapping::map_pair (tentative, this, ni, data->other, other_ni);
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-        tl::info << indent << "deduced match (singular): " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
+        tl::info << indent_s << "deduced match (singular): " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
 #endif
         if (data->logger && ! tentative) {
           if (! (node (ni) == data->other->node (other_ni))) {
@@ -2000,14 +1999,14 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
     } else if (nr->num * n_branch > data->max_n_branch) {
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
+      tl::info << indent_s << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
 #endif
       return std::numeric_limits<size_t>::max ();
 
     } else {
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent << "analyzing ambiguity group with " << nr->num << " members";
+      tl::info << indent_s << "analyzing ambiguity group with " << nr->num << " members";
 #endif
 
       //  sort the ambiguity group such that net names
@@ -2047,14 +2046,14 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
           //  try this candidate in tentative mode
 #if defined(PRINT_DEBUG_NETCOMPARE)
-          tl::info << indent << "trying in tentative mode: " << (*i1)->net ()->expanded_name () << " vs. " << (*i2)->net ()->expanded_name ();
+          tl::info << indent_s << "trying in tentative mode: " << (*i1)->net ()->expanded_name () << " vs. " << (*i2)->net ()->expanded_name ();
 #endif
           size_t bt_count = derive_node_identities (ni, depth + 1, nr->num * n_branch, &tn, with_ambiguous, data);
 
           if (bt_count != std::numeric_limits<size_t>::max ()) {
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-            tl::info << indent << "match found";
+            tl::info << indent_s << "match found";
 #endif
             //  we have a match ...
 
@@ -2080,7 +2079,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
         if (! any && tentative) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
-          tl::info << indent << "mismatch.";
+          tl::info << indent_s << "mismatch.";
 #endif
           //  a mismatch - stop here.
           return std::numeric_limits<size_t>::max ();
@@ -2101,9 +2100,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
           if (equivalent_other_nodes.has_attribute (p->second)) {
-            tl::info << indent << "deduced ambiguous match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+            tl::info << indent_s << "deduced ambiguous match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
           } else {
-            tl::info << indent << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+            tl::info << indent_s << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
           }
 #endif
           if (data->logger) {
@@ -2142,7 +2141,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
       }
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-      tl::info << indent << "finished analysis of ambiguity group with " << nr->num << " members";
+      tl::info << indent_s << "finished analysis of ambiguity group with " << nr->num << " members";
 #endif
 
     }

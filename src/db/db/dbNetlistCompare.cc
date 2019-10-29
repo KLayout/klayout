@@ -42,6 +42,18 @@
 //  (applies to circuits, device classes)
 #define COMPARE_CASE_INSENSITIVE
 
+//  A constant indicating a failed match
+const size_t failed_match = std::numeric_limits<size_t>::max ();
+
+//  A constant indicating an unknown match
+// const size_t unknown_match = std::numeric_limits<size_t>::max () - 1;
+
+//  A constant indicating an invalid ID
+const size_t invalid_id = std::numeric_limits<size_t>::max ();
+
+//  A constant indicating an unknown ID
+const size_t unknown_id = std::numeric_limits<size_t>::max () - 1;
+
 namespace db
 {
 
@@ -748,7 +760,17 @@ public:
 
   bool has_other () const
   {
-    return m_other_net_index != std::numeric_limits<size_t>::max ();
+    return m_other_net_index != invalid_id && m_other_net_index != unknown_id;
+  }
+
+  bool has_any_other () const
+  {
+    return m_other_net_index != invalid_id;
+  }
+
+  bool has_unknown_other () const
+  {
+    return m_other_net_index == unknown_id;
   }
 
   size_t other_net_index () const
@@ -763,7 +785,7 @@ public:
 
   void unset_other_net ()
   {
-    m_other_net_index = std::numeric_limits<size_t>::max ();
+    m_other_net_index = invalid_id;
   }
 
   bool empty () const
@@ -1018,7 +1040,7 @@ private:
 // --------------------------------------------------------------------------------------------------------------------
 
 NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
-  : mp_net (net), m_other_net_index (std::numeric_limits<size_t>::max ())
+  : mp_net (net), m_other_net_index (invalid_id)
 {
   if (! net) {
     return;
@@ -1124,7 +1146,7 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
 }
 
 NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
-  : mp_net (0), m_other_net_index (std::numeric_limits<size_t>::max ())
+  : mp_net (0), m_other_net_index (invalid_id)
 {
   std::map<const db::Net *, size_t> n2entry;
 
@@ -1250,7 +1272,7 @@ NetGraphNode::to_string () const
     res += "(null)";
   }
   res += "]";
-  if (m_other_net_index != std::numeric_limits<size_t>::max ()) {
+  if (m_other_net_index != invalid_id) {
     res += " (other: #" + tl::to_string (m_other_net_index) + ")";
   }
   res += "\n";
@@ -1400,15 +1422,16 @@ struct NodeRange
 class TentativeNodeMapping
 {
 public:
-  TentativeNodeMapping (NetGraph *g1, NetGraph *g2)
-    : mp_g1 (g1), mp_g2 (g2)
+  TentativeNodeMapping ()
   { }
 
   ~TentativeNodeMapping ()
   {
-    for (std::vector<std::pair<size_t, size_t> >::const_iterator i = m_to_undo.begin (); i != m_to_undo.end (); ++i) {
-      mp_g1->unidentify (i->first);
-      mp_g2->unidentify (i->second);
+    for (std::vector<std::pair<NetGraph *, size_t> >::const_iterator i = m_to_undo.begin (); i != m_to_undo.end (); ++i) {
+      i->first->unidentify (i->second);
+    }
+    for (std::vector<std::pair<NetGraph *, size_t> >::const_iterator i = m_to_undo_to_unknown.begin (); i != m_to_undo_to_unknown.end (); ++i) {
+      i->first->identify (i->second, unknown_id);
     }
   }
 
@@ -1417,17 +1440,40 @@ public:
     g1->identify (n1, n2);
     g2->identify (n2, n1);
     if (nm) {
-      nm->keep (n1, n2);
+      nm->keep (g1, n1);
+      nm->keep (g2, n2);
+    }
+  }
+
+  static void map_pair_from_unknown (TentativeNodeMapping *nm, NetGraph *g1, size_t n1, NetGraph *g2, size_t n2)
+  {
+    g1->identify (n1, n2);
+    g2->identify (n2, n1);
+    if (nm) {
+      nm->keep_for_unknown (g1, n1);
+      nm->keep_for_unknown (g2, n2);
+    }
+  }
+
+  static void map_to_unknown (TentativeNodeMapping *nm, NetGraph *g1, size_t n1)
+  {
+    g1->identify (n1, unknown_id);
+    if (nm) {
+      nm->keep (g1, n1);
     }
   }
 
 private:
-  std::vector<std::pair<size_t, size_t> > m_to_undo;
-  NetGraph *mp_g1, *mp_g2;
+  std::vector<std::pair<NetGraph *, size_t> > m_to_undo, m_to_undo_to_unknown;
 
-  void keep (size_t n1, size_t n2)
+  void keep (NetGraph *g1, size_t n1)
   {
-    m_to_undo.push_back (std::make_pair (n1, n2));
+    m_to_undo.push_back (std::make_pair (g1, n1));
+  }
+
+  void keep_for_unknown (NetGraph *g1, size_t n1)
+  {
+    m_to_undo_to_unknown.push_back (std::make_pair (g1, n1));
   }
 };
 
@@ -1561,7 +1607,7 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 #if defined(PRINT_DEBUG_NETCOMPARE)
         tl::info << indent(depth) << "! rejected branch.";
 #endif
-        return std::numeric_limits<size_t>::max ();
+        return failed_match;
       }
 
       //  1:1 pairing is less strict
@@ -1571,7 +1617,7 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 #if defined(PRINT_DEBUG_NETCOMPARE)
             tl::info << indent(depth) << "! rejected branch.";
 #endif
-            return std::numeric_limits<size_t>::max ();
+            return failed_match;
           }
         }
       }
@@ -1583,7 +1629,7 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 
     size_t bt_count = derive_node_identities_from_node_set (nodes, other_nodes, depth, n_branch, tentative, with_ambiguous, data);
 
-    if (bt_count == std::numeric_limits<size_t>::max ()) {
+    if (bt_count == failed_match) {
       if (tentative) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
         tl::info << indent(depth) << "! rejected branch.";
@@ -1675,7 +1721,7 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
       }
 
       size_t bt_count = derive_node_identities_for_edges (e, ee, e_other, ee_other, net_index, other_net_index, depth, n_branch, tentative, with_ambiguous, data);
-      if (bt_count == std::numeric_limits<size_t>::max ()) {
+      if (bt_count == failed_match) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
         tl::info << indent(depth) << "! rejected pair.";
 #endif
@@ -1786,12 +1832,12 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 #if defined(PRINT_DEBUG_NETCOMPARE)
     tl::info << indent_s << "max. depth exhausted (" << depth + 1 << ">" << data->max_depth << ")";
 #endif
-    return std::numeric_limits<size_t>::max ();
+    return failed_match;
   }
 
   if (nodes.size () == 1 && other_nodes.size () == 1) {
 
-    if (! nodes.front ()->has_other () && ! other_nodes.front ()->has_other ()) {
+    if (! nodes.front ()->has_any_other () && ! other_nodes.front ()->has_any_other ()) {
 
       //  a single candiate: just take this one -> this may render
       //  inexact matches, but further propagates net pairing
@@ -1816,7 +1862,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
       //  continue here.
       size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, with_ambiguous, data);
 
-      if (bt_count != std::numeric_limits<size_t>::max ()) {
+      if (bt_count != failed_match) {
         new_nodes += bt_count;
       } else if (tentative) {
         return bt_count;
@@ -1824,17 +1870,21 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
       new_nodes += 1;
 
+    } else if (nodes.front ()->has_unknown_other ()) {
+
+      //  accept this solution as the pairing is possible
+
     } else if (nodes.front ()->has_other ()) {
 
       //  this decision leads to a contradiction
       if (data->other->node_index_for_net (other_nodes.front ()->net ()) != nodes.front ()->other_net_index ()) {
-        return std::numeric_limits<size_t>::max ();
+        return failed_match;
       }
 
     } else {
 
       //  mismatch of assignment state
-      return std::numeric_limits<size_t>::max ();
+      return failed_match;
 
     }
 
@@ -1851,10 +1901,10 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
   while (n1 != nodes.end () && n2 != other_nodes.end ()) {
 
-    if ((*n1)->has_other ()) {
+    if ((*n1)->has_any_other ()) {
       ++n1;
       continue;
-    } else if ((*n2)->has_other ()) {
+    } else if ((*n2)->has_any_other ()) {
       ++n2;
       continue;
     }
@@ -1873,9 +1923,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
     ++nn1;
     ++nn2;
     while (nn1 != nodes.end () && nn2 != other_nodes.end ()) {
-      if ((*nn1)->has_other ()) {
+      if ((*nn1)->has_any_other ()) {
         ++nn1;
-      } else if ((*nn2)->has_other ()) {
+      } else if ((*nn2)->has_any_other ()) {
         ++nn2;
       } else if (! (**nn1 == **n1) || ! (**nn2 == **n2)) {
         break;
@@ -1893,7 +1943,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
     //  in tentative mode ambiguous nodes don't make a match without
     //  with_ambiguous
     if (num > 1 && tentative && ! with_ambiguous) {
-      return std::numeric_limits<size_t>::max ();
+      return failed_match;
     }
 
     n1 = nn1;
@@ -1910,9 +1960,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
     //  node ranges might have changed - adjust to real count and skip leading pairs assigned already
 
     while (nr->n1 != nr->nn1 && nr->n2 != nr->nn2) {
-      if ((*nr->n1)->has_other ()) {
+      if ((*nr->n1)->has_any_other ()) {
         ++nr->n1;
-      } else if ((*nr->n2)->has_other ()) {
+      } else if ((*nr->n2)->has_any_other ()) {
         ++nr->n2;
       } else {
         break;
@@ -1923,9 +1973,9 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
     std::vector<const NetGraphNode *>::const_iterator i1 = nr->n1, i2 = nr->n2;
 
     while (i1 != nr->nn1 && i2 != nr->nn2) {
-      if ((*i1)->has_other ()) {
+      if ((*i1)->has_any_other ()) {
         ++i1;
-      } else if ((*i2)->has_other ()) {
+      } else if ((*i2)->has_any_other ()) {
         ++i2;
       } else {
         ++nr->num;
@@ -1940,7 +1990,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 
     } else if (nr->num == 1) {
 
-      if (! (*nr->n1)->has_other () && ! (*nr->n2)->has_other ()) {
+      if (! (*nr->n1)->has_any_other () && ! (*nr->n2)->has_any_other ()) {
 
         //  in tentative mode, reject this choice if both nets are named and
         //  their names differ -> this favors net matching by name
@@ -1949,7 +1999,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 #if defined(PRINT_DEBUG_NETCOMPARE)
           tl::info << indent_s << "rejecting pair as names are not identical: " << (*nr->n1)->net ()->expanded_name () << " vs. " << (*nr->n2)->net ()->expanded_name ();
 #endif
-          return std::numeric_limits<size_t>::max ();
+          return failed_match;
         }
 
         //  A single candiate: just take this one -> this may render
@@ -1975,24 +2025,28 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
         //  continue here.
         size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative, with_ambiguous, data);
 
-        if (bt_count != std::numeric_limits<size_t>::max ()) {
+        if (bt_count != failed_match) {
           new_nodes += bt_count;
           new_nodes += 1;
         } else if (tentative) {
           new_nodes = bt_count;
         }
 
+      } else if ((*nr->n1)->has_unknown_other ()) {
+
+        //  accept any other net
+
       } else if ((*nr->n1)->has_other ()) {
 
         //  this decision leads to a contradiction
         if (data->other->node_index_for_net ((*nr->n2)->net ()) != (*nr->n1)->other_net_index ()) {
-          return std::numeric_limits<size_t>::max ();
+          return failed_match;
         }
 
       } else {
 
         //  mismatch of assignment state
-        return std::numeric_limits<size_t>::max ();
+        return failed_match;
 
       }
 
@@ -2001,7 +2055,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
 #if defined(PRINT_DEBUG_NETCOMPARE)
       tl::info << indent_s << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
 #endif
-      return std::numeric_limits<size_t>::max ();
+      return failed_match;
 
     } else {
 
@@ -2009,7 +2063,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
       tl::info << indent_s << "analyzing ambiguity group with " << nr->num << " members";
 #endif
 
-      //  sort the ambiguity group such that net names
+      //  sort the ambiguity group such that net names match best
 
       std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> > pairs;
       tl::equivalence_clusters<const NetGraphNode *> equivalent_other_nodes;
@@ -2019,70 +2073,91 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
         sort_node_range_by_best_match (*nr);
       }
 
-      for (std::vector<const NetGraphNode *>::const_iterator i1 = nr->n1; i1 != nr->nn1; ++i1) {
+      {
 
-        if ((*i1)->has_other ()) {
-          continue;
+        //  marks the nodes from the ambiguity group as unknown so we don't revisit them (causing deep recursion)
+        TentativeNodeMapping tn2unknown;
+
+        //  collect and mark the ambiguity combinations to consider
+        std::vector<std::vector<const NetGraphNode *>::const_iterator> iters1, iters2;
+
+        for (std::vector<const NetGraphNode *>::const_iterator i1 = nr->n1; i1 != nr->nn1; ++i1) {
+          if (! (*i1)->has_any_other ()) {
+            iters1.push_back (i1);
+            size_t ni = node_index_for_net ((*i1)->net ());
+            TentativeNodeMapping::map_to_unknown (&tn2unknown, this, ni);
+          }
         }
 
-        bool any = false;
-
-        std::vector<const NetGraphNode *>::const_iterator i2;
-        for (i2 = nr->n2; i2 != nr->nn2; ++i2) {
-
-          if ((*i2)->has_other ()) {
-            continue;
+        for (std::vector<const NetGraphNode *>::const_iterator i2 = nr->n2; i2 != nr->nn2; ++i2) {
+          if (! (*i2)->has_any_other ()) {
+            iters2.push_back (i2);
+            size_t other_ni = data->other->node_index_for_net ((*i2)->net ());
+            TentativeNodeMapping::map_to_unknown (&tn2unknown, data->other, other_ni);
           }
+        }
 
-          if (seen.find (*i2) != seen.end ()) {
-            continue;
-          }
+        for (std::vector<std::vector<const NetGraphNode *>::const_iterator>::const_iterator ii1 = iters1.begin (); ii1 != iters1.end (); ++ii1) {
 
-          size_t ni = node_index_for_net ((*i1)->net ());
-          size_t other_ni = data->other->node_index_for_net ((*i2)->net ());
+          std::vector<const NetGraphNode *>::const_iterator i1 = *ii1;
 
-          TentativeNodeMapping tn (this, data->other);
-          TentativeNodeMapping::map_pair (&tn, this, ni, data->other, other_ni);
+          bool any = false;
 
-          //  try this candidate in tentative mode
+          for (std::vector<std::vector<const NetGraphNode *>::const_iterator>::const_iterator ii2 = iters2.begin (); ii2 != iters2.end (); ++ii2) {
+
+            std::vector<const NetGraphNode *>::const_iterator i2 = *ii2;
+
+            if (seen.find (*i2) != seen.end ()) {
+              continue;
+            }
+
+            size_t ni = node_index_for_net ((*i1)->net ());
+            size_t other_ni = data->other->node_index_for_net ((*i2)->net ());
+
+            TentativeNodeMapping tn;
+            TentativeNodeMapping::map_pair_from_unknown (&tn, this, ni, data->other, other_ni);
+
+            //  try this candidate in tentative mode
 #if defined(PRINT_DEBUG_NETCOMPARE)
-          tl::info << indent_s << "trying in tentative mode: " << (*i1)->net ()->expanded_name () << " vs. " << (*i2)->net ()->expanded_name ();
+            tl::info << indent_s << "trying in tentative mode: " << (*i1)->net ()->expanded_name () << " vs. " << (*i2)->net ()->expanded_name ();
 #endif
-          size_t bt_count = derive_node_identities (ni, depth + 1, nr->num * n_branch, &tn, with_ambiguous, data);
+            size_t bt_count = derive_node_identities (ni, depth + 1, nr->num * n_branch, &tn, with_ambiguous, data);
 
-          if (bt_count != std::numeric_limits<size_t>::max ()) {
+            if (bt_count != failed_match) {
 
 #if defined(PRINT_DEBUG_NETCOMPARE)
-            tl::info << indent_s << "match found";
+              tl::info << indent_s << "match found";
 #endif
-            //  we have a match ...
+              //  we have a match ...
 
-            if (any) {
+              if (any) {
 
-              //  there is already a known pair, so we can mark *i2 and the previous *i2 as equivalent
-              //  (makes them ambiguous)
-              equivalent_other_nodes.same (*i2, pairs.back ().second);
+                //  there is already a known pair, so we can mark *i2 and the previous *i2 as equivalent
+                //  (makes them ambiguous)
+                equivalent_other_nodes.same (*i2, pairs.back ().second);
 
-            } else {
+              } else {
 
-              //  identified a new pair
-              new_nodes += bt_count + 1;
-              pairs.push_back (std::make_pair (*i1, *i2));
-              seen.insert (*i2);
-              any = true;
+                //  identified a new pair
+                new_nodes += bt_count + 1;
+                pairs.push_back (std::make_pair (*i1, *i2));
+                seen.insert (*i2);
+                any = true;
+
+              }
 
             }
 
           }
 
-        }
-
-        if (! any && tentative) {
+          if (! any && tentative) {
 #if defined(PRINT_DEBUG_NETCOMPARE)
-          tl::info << indent_s << "mismatch.";
+            tl::info << indent_s << "mismatch.";
 #endif
-          //  a mismatch - stop here.
-          return std::numeric_limits<size_t>::max ();
+            //  a mismatch - stop here.
+            return failed_match;
+          }
+
         }
 
       }
@@ -2123,7 +2198,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<const NetGraphNode *
           size_t ni = node_index_for_net (p->first->net ());
 
           size_t bt_count = derive_node_identities (ni, depth + 1, nr->num * n_branch, tentative, with_ambiguous, data);
-          tl_assert (bt_count != std::numeric_limits<size_t>::max ());
+          tl_assert (bt_count != failed_match);
 
         }
 
@@ -2595,7 +2670,7 @@ struct DeviceConnectionDistance
   {
     int d = 0.0;
     for (std::vector<std::pair<size_t, size_t> >::const_iterator i = a.first.begin (), j = b.first.begin (); i != a.first.end () && j != b.first.end (); ++i, ++j) {
-      if (i->second != j->second || i->second == std::numeric_limits<size_t>::max () || j->second == std::numeric_limits<size_t>::max ()) {
+      if (i->second != j->second || i->second == invalid_id || j->second == invalid_id) {
         ++d;
       }
     }
@@ -2673,6 +2748,32 @@ void align (Iter i1, Iter i2, Iter j1, Iter j2, Distance distance)
 
 }
 
+/**
+ *  @brief Returns true, if the given net is passive
+ *  A passive net does not have devices nor (active) pins.
+ */
+static bool is_passive_net (const db::Net *net, const std::map<const db::Circuit *, CircuitMapper> &circuit_and_pin_mapping)
+{
+  if (net->terminal_count () != 0) {
+    return false;
+  }
+
+  if (net->subcircuit_pin_count () == 0) {
+    return true;
+  }
+
+  for (db::Net::const_subcircuit_pin_iterator p = net->begin_subcircuit_pins (); p != net->end_subcircuit_pins (); ++p) {
+    const db::Circuit *c = p->subcircuit ()->circuit ();
+    std::map<const db::Circuit *, CircuitMapper>::const_iterator ic;
+    ic = circuit_and_pin_mapping.find (c);
+    if (ic != circuit_and_pin_mapping.end () && ic->second.has_other_pin_for_this_pin (p->pin_id ())) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 bool
 NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
                                    db::DeviceCategorizer &device_categorizer,
@@ -2743,7 +2844,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
           data.logger = mp_logger;
 
           size_t ni = g1.derive_node_identities (i1 - g1.begin (), 0, 1, 0 /*not tentative*/, pass > 0 /*with ambiguities*/, &data);
-          if (ni > 0 && ni != std::numeric_limits<size_t>::max ()) {
+          if (ni > 0 && ni != failed_match) {
             new_identities += ni;
 #if defined(PRINT_DEBUG_NETCOMPARE)
             tl::info << ni << " new identities.";
@@ -2777,8 +2878,12 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       }
 
       if (nodes.empty () || other_nodes.empty ()) {
-        if (! nodes.empty () || ! other_nodes.empty ()) {
-          good = false;
+        //  active mismatched nodes give an error
+        for (std::vector<const NetGraphNode *>::const_iterator n = nodes.begin (); n != nodes.end () && good; ++n) {
+          good = is_passive_net ((*n)->net (), c12_circuit_and_pin_mapping);
+        }
+        for (std::vector<const NetGraphNode *>::const_iterator n = other_nodes.begin (); n != other_nodes.end () && good; ++n) {
+          good = is_passive_net ((*n)->net (), c22_circuit_and_pin_mapping);
         }
         //  this assumes that we don't gain anything here. Stop now.
         break;
@@ -2796,7 +2901,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       data.logger = mp_logger;
 
       size_t ni = g1.derive_node_identities_from_node_set (nodes, other_nodes, 0, 1, 0 /*not tentative*/, pass > 0 /*with ambiguities*/, &data);
-      if (ni > 0 && ni != std::numeric_limits<size_t>::max ()) {
+      if (ni > 0 && ni != failed_match) {
         new_identities += ni;
 #if defined(PRINT_DEBUG_NETCOMPARE)
         tl::info << ni << " new identities.";
@@ -2836,11 +2941,19 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 void
 NetlistComparer::handle_pin_mismatch (const db::Circuit *c1, const db::Pin *pin1, const db::Circuit *c2, const db::Pin *pin2, bool &good, bool &pin_mismatch) const
 {
-  //  Determine whether the pin in question is used - only in this case we will report an error.
-  //  Otherwise, the report will be "match" against 0.
-
   const db::Circuit *c = pin1 ? c1 : c2;
   const db::Pin *pin = pin1 ? pin1 : pin2;
+
+  //  If the pin isn't connected internally inside the circuit we can ignore it
+  if (c->net_for_pin (pin->id ()) && c->net_for_pin (pin->id ())->is_passive ()) {
+    if (mp_logger) {
+      mp_logger->match_pins (pin1, pin2);
+    }
+    return;
+  }
+
+  //  Determine whether the pin in question is used - only in this case we will report an error.
+  //  Otherwise, the report will be "match" against 0.
 
   bool is_not_connected = true;
   for (db::Circuit::const_refs_iterator r = c->begin_refs (); r != c->end_refs () && is_not_connected; ++r) {
@@ -2870,43 +2983,46 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
   //  Report pin assignment
   //  This step also does the pin identity mapping.
 
-  //  try to assign floating pins by name with higher prio
-  std::map<std::string, std::pair<const db::Pin *, const db::Pin *> > floating_pins_by_name;
+  //  try to assign abstract pins by name with higher prio
+  //  NOTE: An "abstract" pin is a concept that is used in the context of circuit abstracts where the circuits is
+  //  intentionally emptied. An "abstract pin" is not just a floating pin. An abstract does not have a net while
+  //  a floating pin has a net, but this net is passive - i.e. not attached to any device.
+  std::map<std::string, std::pair<const db::Pin *, const db::Pin *> > abstract_pins_by_name;
 
   for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
     const db::Net *net = c2->net_for_pin (p->id ());
     if (!net && !p->name ().empty ()) {
-      floating_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.second = p.operator-> ();
+      abstract_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.second = p.operator-> ();
     }
   }
 
   for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
     const db::Net *net = c1->net_for_pin (p->id ());
     if (!net && !p->name ().empty ()) {
-      floating_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.first = p.operator-> ();
+      abstract_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.first = p.operator-> ();
     }
   }
 
-  std::map<const db::Pin *, const db::Pin *> floating_pin_name_mapping;
-  for (std::map<std::string, std::pair<const db::Pin *, const db::Pin *> >::const_iterator i = floating_pins_by_name.begin (); i != floating_pins_by_name.end (); ++i) {
+  std::map<const db::Pin *, const db::Pin *> abstract_pin_name_mapping;
+  for (std::map<std::string, std::pair<const db::Pin *, const db::Pin *> >::const_iterator i = abstract_pins_by_name.begin (); i != abstract_pins_by_name.end (); ++i) {
     if (i->second.first && i->second.second) {
-      floating_pin_name_mapping [i->second.first] = i->second.second;
-      floating_pin_name_mapping [i->second.second] = i->second.first;
+      abstract_pin_name_mapping [i->second.first] = i->second.second;
+      abstract_pin_name_mapping [i->second.second] = i->second.first;
     }
   }
 
-  std::vector<const db::Pin *> floating_pins;
+  std::vector<const db::Pin *> abstract_pins;
   std::multimap<size_t, const db::Pin *> net2pin;
   for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
     const db::Net *net = c2->net_for_pin (p->id ());
     if (net) {
       net2pin.insert (std::make_pair (g2.node_index_for_net (net), p.operator-> ()));
-    } else if (floating_pin_name_mapping.find (p.operator-> ()) == floating_pin_name_mapping.end ()) {
-      floating_pins.push_back (p.operator-> ());
+    } else if (abstract_pin_name_mapping.find (p.operator-> ()) == abstract_pin_name_mapping.end ()) {
+      abstract_pins.push_back (p.operator-> ());
     }
   }
 
-  std::vector<const db::Pin *>::iterator next_float = floating_pins.begin ();
+  std::vector<const db::Pin *>::iterator next_abstract = abstract_pins.begin ();
 
   CircuitMapper &c12_pin_mapping = c12_circuit_and_pin_mapping [c1];
   c12_pin_mapping.set_other (c2);
@@ -2920,10 +3036,10 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
     const db::Net *net = c1->net_for_pin (p->id ());
     if (! net) {
 
-      std::map<const db::Pin *, const db::Pin *>::const_iterator fp = floating_pin_name_mapping.find (p.operator-> ());
-      if (fp != floating_pin_name_mapping.end ()) {
+      std::map<const db::Pin *, const db::Pin *>::const_iterator fp = abstract_pin_name_mapping.find (p.operator-> ());
+      if (fp != abstract_pin_name_mapping.end ()) {
 
-        //  assign a floating pin - this is a dummy assignment which is mitigated
+        //  assign an abstract pin - this is a dummy assignment which is mitigated
         //  by declaring the pins equivalent in derive_pin_equivalence
         if (mp_logger) {
           mp_logger->match_pins (p.operator-> (), fp->second);
@@ -2931,17 +3047,17 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
         c12_pin_mapping.map_pin (p->id (), fp->second->id ());
         c22_pin_mapping.map_pin (fp->second->id (), p->id ());
 
-      } else if (next_float != floating_pins.end ()) {
+      } else if (next_abstract != abstract_pins.end ()) {
 
-        //  assign a floating pin - this is a dummy assignment which is mitigated
+        //  assign an abstract pin - this is a dummy assignment which is mitigated
         //  by declaring the pins equivalent in derive_pin_equivalence
         if (mp_logger) {
-          mp_logger->match_pins (p.operator-> (), *next_float);
+          mp_logger->match_pins (p.operator-> (), *next_abstract);
         }
-        c12_pin_mapping.map_pin (p->id (), (*next_float)->id ());
-        c22_pin_mapping.map_pin ((*next_float)->id (), p->id ());
+        c12_pin_mapping.map_pin (p->id (), (*next_abstract)->id ());
+        c22_pin_mapping.map_pin ((*next_abstract)->id (), p->id ());
 
-        ++next_float;
+        ++next_abstract;
 
       } else {
 
@@ -2957,11 +3073,8 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
     const db::NetGraphNode &n = *(g1.begin () + g1.node_index_for_net (net));
 
     if (! n.has_other ()) {
-
       handle_pin_mismatch (c1, p.operator-> (), c2, 0, good, pin_mismatch);
-
       continue;
-
     }
 
     std::multimap<size_t, const db::Pin *>::iterator np = net2pin.find (n.other_net_index ());
@@ -2994,9 +3107,10 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
     handle_pin_mismatch (c1, 0, c2, np->second, good, pin_mismatch);
   }
 
-  while (next_float != floating_pins.end ()) {
-    handle_pin_mismatch (c1, 0, c2, *next_float, good, pin_mismatch);
-    ++next_float;
+  //  abstract pins must match.
+  while (next_abstract != abstract_pins.end ()) {
+    handle_pin_mismatch (c1, 0, c2, *next_abstract, good, pin_mismatch);
+    ++next_abstract;
   }
 
 }
@@ -3028,7 +3142,7 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
       if (! g1.begin () [i->second].has_other ()) {
-        i->second = std::numeric_limits<size_t>::max ();  //  normalization
+        i->second = invalid_id;  //  normalization
         mapped = false;
       }
     }
@@ -3062,7 +3176,7 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
     bool mapped = true;
     for (std::vector<std::pair<size_t, size_t> >::iterator i = k.begin (); i != k.end (); ++i) {
       if (! g2.begin () [i->second].has_other ()) {
-        i->second = std::numeric_limits<size_t>::max ();  //  normalization
+        i->second = invalid_id;  //  normalization
         mapped = false;
       } else {
         i->second = g2.begin () [i->second].other_net_index ();

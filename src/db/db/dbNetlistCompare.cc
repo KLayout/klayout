@@ -32,7 +32,7 @@
 
 //  verbose debug output
 //  TODO: make this a feature?
-// #define PRINT_DEBUG_NETCOMPARE
+#define PRINT_DEBUG_NETCOMPARE
 
 //  verbose net graph output
 //  TODO: make this a feature?
@@ -1676,6 +1676,9 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
     tl::info << indent(depth) << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
   } else {
     tl::info << indent(depth) << "tentatively deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+if (n->net()->expanded_name() == "$I30" && n_other->net ()->expanded_name () == "DWSA_0") {
+printf("@@@ BANG!\n");
+}
   }
 #endif
 
@@ -1730,9 +1733,43 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
         new_nodes += bt_count;
       }
 
+    } else if (tentative) {
+      //  in tentative mode an exact match is required: no having the same edges for a node disqualifies the node
+      //  as matching.
+#if defined(PRINT_DEBUG_NETCOMPARE)
+      tl::info << indent(depth) << "! rejected pair for missing edge.";
+#endif
+      return failed_match;
     }
 
     e = ee;
+
+  }
+
+  if (tentative) {
+
+    //  in tentative mode, again an exact match is required
+
+    for (NetGraphNode::edge_iterator e_other = n_other->begin (); e_other != n_other->end (); ) {
+
+      NetGraphNode::edge_iterator ee_other = e_other;
+      ++ee_other;
+
+      while (ee_other != n_other->end () && ee_other->first == e_other->first) {
+        ++ee_other;
+      }
+
+      NetGraphNode::edge_iterator e = n->find_edge (e_other->first);
+      if (e == n->end ()) {
+#if defined(PRINT_DEBUG_NETCOMPARE)
+        tl::info << indent(depth) << "! rejected pair for missing edge.";
+#endif
+        return failed_match;
+      }
+
+      e_other = ee_other;
+
+    }
 
   }
 

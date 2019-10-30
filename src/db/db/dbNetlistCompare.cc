@@ -32,7 +32,7 @@
 
 //  verbose debug output
 //  TODO: make this a feature?
-#define PRINT_DEBUG_NETCOMPARE
+// #define PRINT_DEBUG_NETCOMPARE
 
 //  verbose net graph output
 //  TODO: make this a feature?
@@ -1676,9 +1676,6 @@ NetGraph::derive_node_identities (size_t net_index, size_t depth, size_t n_branc
     tl::info << indent(depth) << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
   } else {
     tl::info << indent(depth) << "tentatively deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
-if (n->net()->expanded_name() == "$I30" && n_other->net ()->expanded_name () == "DWSA_0") {
-printf("@@@ BANG!\n");
-}
   }
 #endif
 
@@ -2787,7 +2784,7 @@ void align (Iter i1, Iter i2, Iter j1, Iter j2, Distance distance)
 
 /**
  *  @brief Returns true, if the given net is passive
- *  A passive net does not have devices nor (active) pins.
+ *  A passive net does not have devices nor pins except those which are ignored (not mapped).
  */
 static bool is_passive_net (const db::Net *net, const std::map<const db::Circuit *, CircuitMapper> &circuit_and_pin_mapping)
 {
@@ -2800,7 +2797,7 @@ static bool is_passive_net (const db::Net *net, const std::map<const db::Circuit
   }
 
   for (db::Net::const_subcircuit_pin_iterator p = net->begin_subcircuit_pins (); p != net->end_subcircuit_pins (); ++p) {
-    const db::Circuit *c = p->subcircuit ()->circuit ();
+    const db::Circuit *c = p->subcircuit ()->circuit_ref ();
     std::map<const db::Circuit *, CircuitMapper>::const_iterator ic;
     ic = circuit_and_pin_mapping.find (c);
     if (ic != circuit_and_pin_mapping.end () && ic->second.has_other_pin_for_this_pin (p->pin_id ())) {

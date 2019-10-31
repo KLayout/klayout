@@ -294,6 +294,10 @@ public:
   virtual RegionDelegate *selected_not_interacting (const Edges &other) const = 0;
   virtual RegionDelegate *selected_overlapping (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_overlapping (const Region &other) const = 0;
+  virtual RegionDelegate *pull_inside (const Region &other) const = 0;
+  virtual RegionDelegate *pull_interacting (const Region &other) const = 0;
+  virtual EdgesDelegate *pull_interacting (const Edges &other) const = 0;
+  virtual RegionDelegate *pull_overlapping (const Region &other) const = 0;
   virtual RegionDelegate *in (const Region &other, bool invert) const = 0;
 
   virtual const db::Polygon *nth (size_t n) const = 0;

@@ -113,6 +113,15 @@ DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, c
   set_merged_semantics (merged_semantics);
 }
 
+DeepRegion::DeepRegion (const db::Region &other, DeepShapeStore &dss)
+  : AsIfFlatRegion (), m_merged_polygons ()
+{
+  m_deep_layer = dss.create_from_flat (other, false);
+
+  init ();
+  set_merged_semantics (other.merged_semantics ());
+}
+
 DeepRegion::DeepRegion ()
   : AsIfFlatRegion ()
 {
@@ -393,6 +402,17 @@ private:
 
 }
 
+const DeepLayer &
+DeepRegion::merged_deep_layer () const
+{
+  if (merged_semantics ()) {
+    ensure_merged_polygons_valid ();
+    return m_merged_polygons;
+  } else {
+    return deep_layer ();
+  }
+}
+
 void
 DeepRegion::ensure_merged_polygons_valid () const
 {
@@ -642,17 +662,17 @@ DeepRegion::area (const db::Box &box) const
 {
   if (box.empty ()) {
 
-    ensure_merged_polygons_valid ();
+    const db::DeepLayer &polygons = merged_deep_layer ();
 
     db::cell_variants_collector<db::MagnificationReducer> vars;
-    vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+    vars.collect (polygons.layout (), polygons.initial_cell ());
 
     DeepRegion::area_type a = 0;
 
-    const db::Layout &layout = m_merged_polygons.layout ();
+    const db::Layout &layout = polygons.layout ();
     for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
       DeepRegion::area_type ac = 0;
-      for (db::ShapeIterator s = layout.cell (*c).shapes (m_merged_polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+      for (db::ShapeIterator s = layout.cell (*c).shapes (polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
         ac += s->area ();
       }
       const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
@@ -675,17 +695,17 @@ DeepRegion::perimeter (const db::Box &box) const
 {
   if (box.empty ()) {
 
-    ensure_merged_polygons_valid ();
+    const db::DeepLayer &polygons = merged_deep_layer ();
 
     db::cell_variants_collector<db::MagnificationReducer> vars;
-    vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+    vars.collect (polygons.layout (), polygons.initial_cell ());
 
     DeepRegion::perimeter_type p = 0;
 
-    const db::Layout &layout = m_merged_polygons.layout ();
+    const db::Layout &layout = polygons.layout ();
     for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
       DeepRegion::perimeter_type pc = 0;
-      for (db::ShapeIterator s = layout.cell (*c).shapes (m_merged_polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+      for (db::ShapeIterator s = layout.cell (*c).shapes (polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
         pc += s->perimeter ();
       }
       const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
@@ -731,19 +751,18 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
     return new EmptyEdgePairs ();
   }
 
-  ensure_merged_polygons_valid ();
-
-  db::Layout &layout = m_merged_polygons.layout ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::GridReducer> vars (gx);
-  vars.collect (layout, m_merged_polygons.initial_cell ());
+  vars.collect (layout, polygons.initial_cell ());
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const db::Shapes &shapes = c->shapes (m_merged_polygons.layer ());
+    const db::Shapes &shapes = c->shapes (polygons.layer ());
 
     const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
     for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
@@ -777,15 +796,14 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
 EdgePairsDelegate *
 DeepRegion::angle_check (double min, double max, bool inverse) const
 {
-  ensure_merged_polygons_valid ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
-  db::Layout &layout = m_merged_polygons.layout ();
-
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const db::Shapes &shapes = c->shapes (m_merged_polygons.layer ());
+    const db::Shapes &shapes = c->shapes (polygons.layer ());
     db::Shapes &markers = c->shapes (res->deep_layer ().layer ());
 
     for (db::Shapes::shape_iterator si = shapes.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -815,19 +833,19 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
     return this;
   }
 
-  ensure_merged_polygons_valid ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
 
   db::cell_variants_collector<db::GridReducer> vars (gx);
 
-  vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+  vars.collect (polygons.layout (), polygons.initial_cell ());
 
   //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (vars);
+  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
 
-  db::Layout &layout = m_merged_polygons.layout ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
   std::vector<db::Point> heap;
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
@@ -835,7 +853,7 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
     const db::ICplxTrans &tr = v.begin ()->first;
     db::ICplxTrans trinv = tr.inverted ();
 
-    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    const db::Shapes &s = c->shapes (polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
     db::PolygonRefToShapesGenerator pr (&layout, &st);
 
@@ -856,7 +874,7 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
 EdgesDelegate *
 DeepRegion::edges (const EdgeFilterBase *filter) const
 {
-  ensure_merged_polygons_valid ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
 
   std::auto_ptr<VariantsCollectorBase> vars;
 
@@ -864,16 +882,16 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
     vars.reset (new db::VariantsCollectorBase (filter->vars ()));
 
-    vars->collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+    vars->collect (polygons.layout (), polygons.initial_cell ());
 
     //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (*vars);
+    const_cast<db::DeepLayer &> (polygons).separate_variants (*vars);
 
   }
 
-  db::Layout &layout = m_merged_polygons.layout ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     db::ICplxTrans tr;
@@ -883,7 +901,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
       tr = v.begin ()->first;
     }
 
-    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    const db::Shapes &s = c->shapes (polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -901,7 +919,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
   }
 
-  res->set_is_merged (true);
+  res->set_is_merged (merged_semantics () || is_merged ());
   return res.release ();
 }
 
@@ -975,36 +993,34 @@ template <class Result, class OutputContainer>
 OutputContainer *
 DeepRegion::processed_impl (const polygon_processor<Result> &filter) const
 {
-  if (! filter.requires_raw_input ()) {
-    ensure_merged_polygons_valid ();
-  }
+  const db::DeepLayer &polygons = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
 
   std::auto_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (m_deep_layer.layout (), m_deep_layer.initial_cell ());
+    vars->collect (polygons.layout (), polygons.initial_cell ());
 
     if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
+      const_cast<db::DeepLayer &> (polygons).separate_variants (*vars);
     }
 
   }
 
-  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   std::vector<Result> heap;
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
-  std::auto_ptr<OutputContainer> res (new OutputContainer (m_deep_layer.derived ()));
+  std::auto_ptr<OutputContainer> res (new OutputContainer (polygons.derived ()));
   if (filter.result_must_not_be_merged ()) {
     res->set_merged_semantics (false);
   }
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_polygons.layer ());
+    const db::Shapes &s = c->shapes (polygons.layer ());
 
     if (vars.get ()) {
 
@@ -1075,30 +1091,28 @@ DeepRegion::filter_in_place (const PolygonFilterBase &filter)
 RegionDelegate *
 DeepRegion::filtered (const PolygonFilterBase &filter) const
 {
-  if (! filter.requires_raw_input ()) {
-    ensure_merged_polygons_valid ();
-  }
+  const db::DeepLayer &polygons = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
 
   std::auto_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (m_deep_layer.layout (), m_deep_layer.initial_cell ());
+    vars->collect (polygons.layout (), polygons.initial_cell ());
 
     if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (m_deep_layer).separate_variants (*vars);
+      const_cast<db::DeepLayer &> (polygons).separate_variants (*vars);
     }
 
   }
 
-  db::Layout &layout = const_cast<db::Layout &> (m_deep_layer.layout ());
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_deep_layer.derived ()));
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const db::Shapes &s = c->shapes (filter.requires_raw_input () ? m_deep_layer.layer () : m_merged_polygons.layer ());
+    const db::Shapes &s = c->shapes (polygons.layer ());
 
     if (vars.get ()) {
 
@@ -1233,17 +1247,17 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
     return clone ();
   }
 
-  ensure_merged_polygons_valid ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
 
-  db::Layout &layout = m_merged_polygons.layout ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::MagnificationReducer> vars;
-  vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+  vars.collect (polygons.layout (), polygons.initial_cell ());
 
   //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (vars);
+  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
@@ -1251,7 +1265,7 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
     double mag = v.begin ()->first.mag ();
     db::Coord d_with_mag = db::coord_traits<db::Coord>::rounded (d / mag);
 
-    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    const db::Shapes &s = c->shapes (polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
     db::PolygonRefToShapesGenerator pr (&layout, &st);
@@ -1268,7 +1282,7 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
 
   //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
   //  overlap after size and are not necessarily merged)
-  if (d < 0) {
+  if (d < 0 && (merged_semantics () || is_merged ())) {
     res->set_is_merged (true);
   }
 
@@ -1311,17 +1325,17 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     return sized (dx, mode);
   }
 
-  ensure_merged_polygons_valid ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
 
-  db::Layout &layout = m_merged_polygons.layout ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::XYAnisotropyAndMagnificationReducer> vars;
-  vars.collect (m_merged_polygons.layout (), m_merged_polygons.initial_cell ());
+  vars.collect (polygons.layout (), polygons.initial_cell ());
 
   //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (m_merged_polygons).separate_variants (vars);
+  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
@@ -1336,7 +1350,7 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
       std::swap (dx_with_mag, dy_with_mag);
     }
 
-    const db::Shapes &s = c->shapes (m_merged_polygons.layer ());
+    const db::Shapes &s = c->shapes (polygons.layer ());
     db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
     db::PolygonRefToShapesGenerator pr (&layout, &st);
@@ -1353,7 +1367,7 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
   //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
   //  overlap after size and are not necessarily merged)
-  if (dx < 0 && dy < 0) {
+  if (dx < 0 && dy < 0 && (merged_semantics () || is_merged ())) {
     res->set_is_merged (true);
   }
 
@@ -1471,7 +1485,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
     }
   }
 
-  ensure_merged_polygons_valid ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
 
   EdgeRelationFilter check (rel, d, metrics);
   check.set_include_zero (false);
@@ -1480,19 +1494,19 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   check.set_min_projection (min_projection);
   check.set_max_projection (max_projection);
 
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
   db::CheckLocalOperation op (check, different_polygons, other_deep != 0);
 
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()),
-                                                                          const_cast<db::Cell *> (&m_deep_layer.initial_cell ()),
-                                                                          other_deep ? &other_deep->deep_layer ().layout () : const_cast<db::Layout *> (&m_deep_layer.layout ()),
-                                                                          other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&m_deep_layer.initial_cell ()));
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&polygons.layout ()),
+                                                                          const_cast<db::Cell *> (&polygons.initial_cell ()),
+                                                                          other_deep ? &other_deep->deep_layer ().layout () : const_cast<db::Layout *> (&polygons.layout ()),
+                                                                          other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&polygons.initial_cell ()));
 
   proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (m_deep_layer.store ()->threads ());
+  proc.set_threads (polygons.store ()->threads ());
 
-  proc.run (&op, m_merged_polygons.layer (), other_deep ? other_deep->deep_layer ().layer () : m_merged_polygons.layer (), res->deep_layer ().layer ());
+  proc.run (&op, polygons.layer (), other_deep ? other_deep->deep_layer ().layer () : polygons.layer (), res->deep_layer ().layer ());
 
   return res.release ();
 }
@@ -1500,7 +1514,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 EdgePairsDelegate *
 DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
 {
-  ensure_merged_polygons_valid ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
 
   EdgeRelationFilter check (rel, d, metrics);
   check.set_include_zero (false);
@@ -1509,12 +1523,12 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, b
   check.set_min_projection (min_projection);
   check.set_max_projection (max_projection);
 
-  db::Layout &layout = m_merged_polygons.layout ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (m_merged_polygons.derived ()));
+  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const db::Shapes &shapes = c->shapes (m_merged_polygons.layer ());
+    const db::Shapes &shapes = c->shapes (polygons.layer ());
     db::Shapes &result = c->shapes (res->deep_layer ().layer ());
 
     for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::Polygons); ! s.at_end (); ++s) {
@@ -1549,9 +1563,14 @@ public:
     //  .. nothing yet ..
   }
 
+  virtual db::Coord dist () const
+  {
+    return m_touching ? 1 : 0;
+  }
+
   virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    m_ep.clear ();
+    db::EdgeProcessor ep;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -1564,20 +1583,20 @@ public:
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i, ++n) {
       const db::PolygonRef &subject = interactions.subject_shape (i->first);
       for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-        m_ep.insert (*e, n);
+        ep.insert (*e, n);
       }
     }
 
     for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
       for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-        m_ep.insert (*e, 0);
+        ep.insert (*e, 0);
       }
     }
 
     db::InteractionDetector id (m_mode, 0);
     id.set_include_touching (m_touching);
     db::EdgeSink es;
-    m_ep.process (es, id);
+    ep.process (es, id);
     id.finish ();
 
     n = 0;
@@ -1614,11 +1633,88 @@ private:
   int m_mode;
   bool m_touching;
   bool m_inverse;
-  mutable db::EdgeProcessor m_ep;
+};
+
+class PullLocalOperation
+  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
+{
+public:
+  PullLocalOperation (int mode, bool touching)
+    : m_mode (mode), m_touching (touching)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual db::Coord dist () const
+  {
+    return m_touching ? 1 : 0;
+  }
+
+  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    db::EdgeProcessor ep;
+
+    std::set<db::PolygonRef> others;
+    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        others.insert (interactions.intruder_shape (*j));
+      }
+    }
+
+    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      const db::PolygonRef &subject = interactions.subject_shape (i->first);
+      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, 0);
+      }
+    }
+
+    size_t n = 1;
+    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o, ++n) {
+      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, n);
+      }
+    }
+
+    db::InteractionDetector id (m_mode, 0);
+    id.set_include_touching (m_touching);
+    db::EdgeSink es;
+    ep.process (es, id);
+    id.finish ();
+
+    n = 0;
+    std::set <size_t> selected;
+    for (db::InteractionDetector::iterator i = id.begin (); i != id.end () && i->first == 0; ++i) {
+      ++n;
+      selected.insert (i->second);
+    }
+
+    n = 1;
+    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o, ++n) {
+      if (selected.find (n) != selected.end ()) {
+        result.insert (*o);
+      }
+    }
+  }
+
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  {
+    return Drop;
+  }
+
+  virtual std::string description () const
+  {
+    return tl::to_string (tr ("Pull regions by their geometrical relation to first"));
+  }
+
+private:
+  int m_mode;
+  bool m_touching;
 };
 
 struct ResultInserter
 {
+  typedef db::Polygon value_type;
+
   ResultInserter (db::Layout *layout, std::unordered_set<db::PolygonRef> &result)
     : mp_layout (layout), mp_result (&result)
   {
@@ -1635,6 +1731,25 @@ private:
   std::unordered_set<db::PolygonRef> *mp_result;
 };
 
+struct EdgeResultInserter
+{
+  typedef db::Edge value_type;
+
+  EdgeResultInserter (std::unordered_set<db::Edge> &result)
+    : mp_result (&result)
+  {
+    //  .. nothing yet ..
+  }
+
+  void insert (const db::Edge &e)
+  {
+    (*mp_result).insert (e);
+  }
+
+private:
+  std::unordered_set<db::Edge> *mp_result;
+};
+
 class InteractingWithEdgeLocalOperation
   : public local_operation<db::PolygonRef, db::Edge, db::PolygonRef>
 {
@@ -1645,16 +1760,22 @@ public:
     //  .. nothing yet ..
   }
 
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
+  }
+
   virtual void compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    m_scanner.clear ();
+    db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
 
     ResultInserter inserter (layout, result);
     region_to_edge_interaction_filter<ResultInserter> filter (inserter, m_inverse);
 
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        m_scanner.insert2 (& interactions.intruder_shape (*j), 0);
+        scanner.insert2 (& interactions.intruder_shape (*j), 0);
       }
     }
 
@@ -1664,14 +1785,14 @@ public:
       const db::PolygonRef &subject = interactions.subject_shape (i->first);
       heap.push_back (subject.obj ().transformed (subject.trans ()));
 
-      m_scanner.insert1 (&heap.back (), 0);
+      scanner.insert1 (&heap.back (), 0);
       if (m_inverse) {
         filter.preset (&heap.back ());
       }
 
     }
 
-    m_scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
+    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
     if (m_inverse) {
       filter.fill_output ();
     }
@@ -1688,12 +1809,63 @@ public:
 
   virtual std::string description () const
   {
-    return tl::to_string (tr ("Select regions by their geometric relation (interacting, inside, outside ..)"));
+    return tl::to_string (tr ("Select regions by their geometric relation to edges"));
   }
 
 private:
   bool m_inverse;
-  mutable db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> m_scanner;
+};
+
+class PullWithEdgeLocalOperation
+  : public local_operation<db::PolygonRef, db::Edge, db::Edge>
+{
+public:
+  PullWithEdgeLocalOperation ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual db::Coord dist () const
+  {
+    //  touching is sufficient
+    return 1;
+  }
+
+  virtual void compute_local (db::Layout *, const shape_interactions<db::PolygonRef, db::Edge> &interactions, std::unordered_set<db::Edge> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner;
+
+    EdgeResultInserter inserter (result);
+    region_to_edge_interaction_filter<EdgeResultInserter> filter (inserter, false);
+
+    for (shape_interactions<db::PolygonRef, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (shape_interactions<db::PolygonRef, db::Edge>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        scanner.insert2 (& interactions.intruder_shape (*j), 0);
+      }
+    }
+
+    std::list<db::Polygon> heap;
+    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+      const db::PolygonRef &subject = interactions.subject_shape (i->first);
+      heap.push_back (subject.obj ().transformed (subject.trans ()));
+
+      scanner.insert1 (&heap.back (), 0);
+
+    }
+
+    scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
+  }
+
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  {
+    return Drop;
+  }
+
+  virtual std::string description () const
+  {
+    return tl::to_string (tr ("Pull edges from second by their geometric relation to first"));
+  }
 };
 
 }
@@ -1704,29 +1876,34 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
+  std::auto_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
-    return db::AsIfFlatRegion::selected_interacting_generic (other, mode, touching, inverse);
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
   }
 
-  ensure_merged_polygons_valid ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
+  //  NOTE: on "inside", the other polygons must be merged
+  const db::DeepLayer &other_polygons = mode < 0 ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
 
-  DeepLayer dl_out (m_deep_layer.derived ());
+  DeepLayer dl_out (polygons.derived ());
 
   db::InteractingLocalOperation op (mode, touching, inverse);
 
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (m_deep_layer.store ()->threads ());
+  proc.set_threads (polygons.store ()->threads ());
   if (split_after) {
-    proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
-    proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
+    proc.set_area_ratio (polygons.store ()->max_area_ratio ());
+    proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
   }
 
-  proc.run (&op, m_merged_polygons.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, polygons.layer (), other_polygons.layer (), dl_out.layer ());
 
   db::DeepRegion *res = new db::DeepRegion (dl_out);
-  if (! split_after) {
+  if (! split_after && ((mode < 0 && other.merged_semantics ()) || other.is_merged ()) && (merged_semantics () || is_merged ())) {
     res->set_is_merged (true);
   }
   return res;
@@ -1738,31 +1915,102 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse) cons
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
+  std::auto_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
-    return db::AsIfFlatRegion::selected_interacting_generic (other, inverse);
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
   }
 
-  ensure_merged_polygons_valid ();
+  const db::DeepLayer &polygons = merged_deep_layer ();
 
-  DeepLayer dl_out (m_deep_layer.derived ());
+  DeepLayer dl_out (polygons.derived ());
 
   db::InteractingWithEdgeLocalOperation op (inverse);
 
-  db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&m_deep_layer.layout ()), const_cast<db::Cell *> (&m_deep_layer.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (m_deep_layer.store ()->threads ());
+  proc.set_threads (polygons.store ()->threads ());
   if (split_after) {
-    proc.set_area_ratio (m_deep_layer.store ()->max_area_ratio ());
-    proc.set_max_vertex_count (m_deep_layer.store ()->max_vertex_count ());
+    proc.set_area_ratio (polygons.store ()->max_area_ratio ());
+    proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
   }
 
-  proc.run (&op, m_merged_polygons.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, polygons.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
 
   db::DeepRegion *res = new db::DeepRegion (dl_out);
   if (! split_after) {
+    res->set_is_merged (other.is_merged () && (merged_semantics () || is_merged ()));
+  }
+  return res;
+}
+
+RegionDelegate *
+DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
+{
+  //  with these flag set to true, the resulting polygons are broken again.
+  bool split_after = false;
+
+  std::auto_ptr<db::DeepRegion> dr_holder;
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  //  in "inside" mode, the first argument needs to be merged too
+  const db::DeepLayer &polygons = mode < 0 ? merged_deep_layer () : deep_layer ();
+  const db::DeepLayer &other_polygons = other_deep->merged_deep_layer ();
+
+  DeepLayer dl_out (polygons.derived ());
+
+  db::PullLocalOperation op (mode, touching);
+
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (polygons.store ()->threads ());
+  if (split_after) {
+    proc.set_area_ratio (polygons.store ()->max_area_ratio ());
+    proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
+  }
+
+  proc.run (&op, polygons.layer (), other_polygons.layer (), dl_out.layer ());
+
+  db::DeepRegion *res = new db::DeepRegion (dl_out);
+  if (! split_after && ((mode < 0 && merged_semantics ()) || is_merged ()) && (other.merged_semantics () || other.is_merged ())) {
     res->set_is_merged (true);
   }
+  return res;
+}
+
+EdgesDelegate *
+DeepRegion::pull_generic (const Edges &other) const
+{
+  std::auto_ptr<db::DeepEdges> dr_holder;
+  const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  //  in "inside" mode, the first argument needs to be merged too
+  const db::DeepLayer &polygons = deep_layer ();
+  const db::DeepLayer &other_edges = other_deep->merged_deep_layer ();
+
+  DeepLayer dl_out (polygons.derived ());
+
+  db::PullWithEdgeLocalOperation op;
+
+  db::local_processor<db::PolygonRef, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_edges.layout (), &other_edges.initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (polygons.store ()->threads ());
+  proc.run (&op, polygons.layer (), other_edges.layer (), dl_out.layer ());
+
+  db::DeepEdges *res = new db::DeepEdges (dl_out);
+  res->set_is_merged (is_merged () && (other.merged_semantics () || other.is_merged ()));
   return res;
 }
 

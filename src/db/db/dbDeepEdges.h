@@ -43,6 +43,7 @@ class DB_PUBLIC DeepEdges
 {
 public:
   DeepEdges ();
+  DeepEdges (const db::Edges &other, DeepShapeStore &dss);
   DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, bool as_edges = true);
   DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges = true, bool merged_semantics = true);
 
@@ -136,11 +137,6 @@ public:
 
   virtual RegionDelegate *extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const;
 
-  virtual EdgesDelegate *selected_interacting (const Edges &) const;
-  virtual EdgesDelegate *selected_not_interacting (const Edges &) const;
-  virtual EdgesDelegate *selected_interacting (const Region &) const;
-  virtual EdgesDelegate *selected_not_interacting (const Region &) const;
-
   virtual EdgesDelegate *in (const Edges &, bool) const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
@@ -171,11 +167,14 @@ private:
 
   void init ();
   void ensure_merged_edges_valid () const;
+  const DeepLayer &merged_deep_layer () const;
   DeepLayer and_or_not_with(const DeepEdges *other, bool and_op) const;
   DeepLayer edge_region_op (const DeepRegion *other, bool outside, bool include_borders) const;
   EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  EdgesDelegate *selected_interacting_generic (const Edges &edges, bool invert) const;
-  EdgesDelegate *selected_interacting_generic (const Region &region, bool invert) const;
+  virtual EdgesDelegate *pull_generic (const Edges &edges) const;
+  virtual RegionDelegate *pull_generic (const Region &region) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool invert) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Region &region, bool invert) const;
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const edge_processor<Result> &filter) const;
 };
 

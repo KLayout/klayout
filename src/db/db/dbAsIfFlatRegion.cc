@@ -27,6 +27,7 @@
 #include "dbFlatEdges.h"
 #include "dbEmptyRegion.h"
 #include "dbEmptyEdgePairs.h"
+#include "dbEmptyEdges.h"
 #include "dbRegion.h"
 #include "dbRegionUtils.h"
 #include "dbShapeProcessor.h"
@@ -337,7 +338,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse) 
   scanner.reserve2 (other.size ());
 
   std::auto_ptr<FlatRegion> output (new FlatRegion (false));
-  region_to_edge_interaction_filter<Shapes> filter (output->raw_polygons (), inverse);
+  region_to_edge_interaction_filter<Shapes, db::Polygon> filter (output->raw_polygons (), inverse);
 
   AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
 
@@ -416,6 +417,92 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   n = 1;
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
     if ((selected.find (n) == selected.end ()) == inverse) {
+      output->raw_polygons ().insert (*p);
+    }
+  }
+
+  return output.release ();
+}
+
+EdgesDelegate *
+AsIfFlatRegion::pull_generic (const Edges &other) const
+{
+  if (other.empty ()) {
+    return other.delegate ()->clone ();
+  } else if (empty ()) {
+    return new EmptyEdges ();
+  }
+
+  db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner (report_progress (), progress_desc ());
+  scanner.reserve1 (size ());
+  scanner.reserve2 (other.size ());
+
+  std::auto_ptr<FlatEdges> output (new FlatEdges (false));
+  region_to_edge_interaction_filter<Shapes, db::Edge> filter (output->raw_edges (), false);
+
+  AddressablePolygonDelivery p (begin (), has_valid_merged_polygons ());
+
+  for ( ; ! p.at_end (); ++p) {
+    scanner.insert1 (p.operator-> (), 0);
+  }
+
+  AddressableEdgeDelivery e (other.addressable_merged_edges ());
+
+  for ( ; ! e.at_end (); ++e) {
+    scanner.insert2 (e.operator-> (), 0);
+  }
+
+  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
+
+  return output.release ();
+}
+
+RegionDelegate *
+AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) const
+{
+  db::EdgeProcessor ep (report_progress (), progress_desc ());
+  ep.set_base_verbosity (base_verbosity ());
+
+  //  shortcut
+  if (empty ()) {
+    return clone ();
+  } else if (other.empty ()) {
+    return new EmptyRegion ();
+  }
+
+  size_t n = 1;
+  for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p, ++n) {
+    if (p->box ().touches (bbox ())) {
+      ep.insert (*p, n);
+    }
+  }
+
+  for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+    if (mode > 0 || p->box ().touches (other.bbox ())) {
+      ep.insert (*p, 0);
+    }
+  }
+
+  db::InteractionDetector id (mode, 0);
+  id.set_include_touching (touching);
+  db::EdgeSink es;
+  ep.process (es, id);
+  id.finish ();
+
+  std::auto_ptr<FlatRegion> output (new FlatRegion (false));
+
+  n = 0;
+  std::set <size_t> selected;
+  for (db::InteractionDetector::iterator i = id.begin (); i != id.end () && i->first == 0; ++i) {
+    ++n;
+    selected.insert (i->second);
+  }
+
+  output->reserve (n);
+
+  n = 1;
+  for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p, ++n) {
+    if (selected.find (n) != selected.end ()) {
       output->raw_polygons ().insert (*p);
     }
   }

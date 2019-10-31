@@ -27,6 +27,7 @@
 #include "dbEdges.h"
 #include "dbBoxScanner.h"
 #include "dbPolygonTools.h"
+#include "tlSelect.h"
 
 namespace db {
 
@@ -242,7 +243,7 @@ private:
  *
  *  There is a special box converter which is able to sort that out as well.
  */
-template <class OutputContainer>
+template <class OutputContainer, class OutputType = typename OutputContainer::value_type>
 class edge_to_region_interaction_filter
   : public db::box_scanner_receiver2<db::Edge, size_t, db::Polygon, size_t>
 {
@@ -255,17 +256,20 @@ public:
 
   void add (const db::Edge *e, size_t, const db::Polygon *p, size_t)
   {
-    if (m_seen.find (e) == m_seen.end ()) {
+    const OutputType *ep = 0;
+    tl::select (ep, e, p);
+
+    if (m_seen.find (ep) == m_seen.end ()) {
       if (db::interact (*p, *e)) {
-        m_seen.insert (e);
-        mp_output->insert (*e);
+        m_seen.insert (ep);
+        mp_output->insert (*ep);
       }
     }
   }
 
 private:
   OutputContainer *mp_output;
-  std::set<const db::Edge *> m_seen;
+  std::set<const OutputType *> m_seen;
 };
 
 /**

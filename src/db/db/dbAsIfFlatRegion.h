@@ -205,6 +205,26 @@ public:
     return selected_interacting_generic (other, 0, false, true);
   }
 
+  virtual RegionDelegate *pull_inside (const Region &other) const
+  {
+    return pull_generic (other, -1, true);
+  }
+
+  virtual RegionDelegate *pull_interacting (const Region &other) const
+  {
+    return pull_generic (other, 0, true);
+  }
+
+  virtual EdgesDelegate *pull_interacting (const Edges &other) const
+  {
+    return pull_generic (other);
+  }
+
+  virtual RegionDelegate *pull_overlapping (const Region &other) const
+  {
+    return pull_generic (other, 0, false);
+  }
+
   virtual RegionDelegate *in (const Region &other, bool invert) const;
 
   virtual bool equals (const Region &other) const;
@@ -218,8 +238,10 @@ protected:
 
   EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
-  RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
+  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
+  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
+  virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
+  virtual EdgesDelegate *pull_generic (const Edges &other) const;
 
   template <class Trans>
   static void produce_markers_for_grid_check (const db::Polygon &poly, const Trans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes);

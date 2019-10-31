@@ -367,6 +367,20 @@ TEST(8_SelectInteracting)
   db::Edges e2 = r2.edges ();
   db::Edges e3 = r3.edges ();
 
+  db::Region r2f (db::RecursiveShapeIterator (ly, top_cell, l2));
+  db::Region r3f (db::RecursiveShapeIterator (ly, top_cell, l3));
+  db::Edges e2f = r2f.edges ();
+  db::Edges e3f = r3f.edges ();
+
+  db::Region r2r = r2;
+  r2r.set_merged_semantics (false);
+  db::Region r3r = r3;
+  r3r.set_merged_semantics (false);
+  db::Edges e2r = r2r.edges ();
+  e2r.set_merged_semantics (false);
+  db::Edges e3r = r3r.edges ();
+  e3r.set_merged_semantics (false);
+
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
 
@@ -382,6 +396,46 @@ TEST(8_SelectInteracting)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), e2.selected_not_interacting (r3));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), e3.selected_interacting (r2));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), e3.selected_not_interacting (r2));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e2.selected_interacting (e3f));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), e2.selected_not_interacting (e3f));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), e3.selected_interacting (e2f));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), e3.selected_not_interacting (e2f));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), e2.selected_interacting (r3f));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), e2.selected_not_interacting (r3f));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), e3.selected_interacting (r2f));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (43, 0)), e3.selected_not_interacting (r2f));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (50, 0)), e2r.selected_interacting (e3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 0)), e2r.selected_not_interacting (e3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 0)), e3r.selected_interacting (e2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (53, 0)), e3r.selected_not_interacting (e2));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (60, 0)), e2r.selected_interacting (r3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (61, 0)), e2r.selected_not_interacting (r3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (62, 0)), e3r.selected_interacting (r2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (63, 0)), e3r.selected_not_interacting (r2));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (70, 0)), e2.selected_interacting (e3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (71, 0)), e2.selected_not_interacting (e3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (72, 0)), e3.selected_interacting (e2r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (73, 0)), e3.selected_not_interacting (e2r));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (80, 0)), e2.selected_interacting (r3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (81, 0)), e2.selected_not_interacting (r3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (82, 0)), e3.selected_interacting (r2r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (83, 0)), e3.selected_not_interacting (r2r));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (90, 0)), e2r.selected_interacting (e3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (91, 0)), e2r.selected_not_interacting (e3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (92, 0)), e3r.selected_interacting (e2r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (93, 0)), e3r.selected_not_interacting (e2r));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (100, 0)), e2r.selected_interacting (r3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (101, 0)), e2r.selected_not_interacting (r3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (102, 0)), e3r.selected_interacting (r2r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (103, 0)), e3r.selected_not_interacting (r2r));
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au8.gds");
@@ -433,5 +487,84 @@ TEST(9_DRCChecks)
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au9.gds");
   }
+}
+
+TEST(10_PullInteracting)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r2r = r2;
+  r2r.set_merged_semantics (false);
+  db::Region r2f (db::RecursiveShapeIterator (ly, top_cell, l2));
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r3r = r3;
+  r3r.set_merged_semantics (false);
+  db::Region r3f (db::RecursiveShapeIterator (ly, top_cell, l3));
+  db::Edges e2 = r2.edges ();
+  db::Edges e2r = r2r.edges ();
+  e2r.set_merged_semantics (false);
+  db::Edges e2f = r2f.edges ();
+  db::Edges e3 = r3.edges ();
+  db::Edges e3r = r3r.edges ();
+  e3r.set_merged_semantics (false);
+  db::Edges e3f = r3f.edges ();
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (3, 0)), r3);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.pull_interacting (e3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e3.pull_interacting (e2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), e2.pull_interacting (e3f));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), e3.pull_interacting (e2f));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), e2.pull_interacting (e3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), e3.pull_interacting (e2r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (16, 0)), e2r.pull_interacting (e3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (17, 0)), e3r.pull_interacting (e2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (18, 0)), e2r.pull_interacting (e3r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (19, 0)), e3r.pull_interacting (e2r));
+
+  db::Region o;
+  e2.pull_interacting (o, r3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), o);
+  e3.pull_interacting (o, r2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), o);
+  e2.pull_interacting (o, r3f);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), o);
+  e3.pull_interacting (o, r2f);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), o);
+  e2.pull_interacting (o, r3r);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), o);
+  e3.pull_interacting (o, r2r);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), o);
+  e2r.pull_interacting (o, r3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 0)), o);
+  e3r.pull_interacting (o, r2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (27, 0)), o);
+  e2r.pull_interacting (o, r3r);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (28, 0)), o);
+  e3r.pull_interacting (o, r2r);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (29, 0)), o);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au10.gds");
 }
 

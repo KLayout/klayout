@@ -1356,6 +1356,46 @@ public:
   }
 
   /**
+   *  @brief Returns all polygons of "other" which are inside polygons of this region
+   *
+   *  Merged semantics applies.
+   */
+  Region pull_inside (const Region &other) const
+  {
+    return Region (mp_delegate->pull_inside (other));
+  }
+
+  /**
+   *  @brief Returns all edges of "other" which are interacting (touching or overlapping with) polygons of this region
+   *
+   *  Merged semantics applies.
+   */
+  Edges pull_interacting (const Edges &other) const
+  {
+    return Edges (mp_delegate->pull_interacting (other));
+  }
+
+  /**
+   *  @brief Returns all polygons of "other" which are interacting (touching or overlapping with) polygons of this region
+   *
+   *  Merged semantics applies.
+   */
+  Region pull_interacting (const Region &other) const
+  {
+    return Region (mp_delegate->pull_interacting (other));
+  }
+
+  /**
+   *  @brief Returns all polygons of "other" which are overlapping with polygons of this region
+   *
+   *  Merged semantics applies.
+   */
+  Region pull_overlapping (const Region &other) const
+  {
+    return Region (mp_delegate->pull_overlapping (other));
+  }
+
+  /**
    *  @brief Returns the holes
    *
    *  This method returns the holes of the polygons.

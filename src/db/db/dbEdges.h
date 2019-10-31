@@ -1063,6 +1063,25 @@ public:
   }
 
   /**
+   *  @brief Selects all polygons of the other region set which overlap or touch edges from this edge set
+   *
+   *  Merged semantics applies for the other region. Merged polygons will be selected from the other region
+   *  if merged semantics is enabled.
+   */
+  void pull_interacting (Region &output, const Region &other) const;
+
+  /**
+   *  @brief Selects all edges of the other edge set which overlap or touch edges from this edge set
+   *
+   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be
+   *  selected as a whole from other.
+   */
+  Edges pull_interacting (const Edges &other) const
+  {
+    return Edges (mp_delegate->pull_interacting (other));
+  }
+
+  /**
    *  @brief Selects all edges of this edge set which overlap or touch with polygons from the region
    *
    *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 
